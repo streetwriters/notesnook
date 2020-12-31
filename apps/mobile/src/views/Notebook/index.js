@@ -1,34 +1,36 @@
-import React, { useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { AddTopicEvent } from '../../components/DialogManager/recievers';
+import React, {useEffect, useState} from 'react';
+import {InteractionManager} from 'react-native';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { db } from "../../utils/DB";
-import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
+import {db} from '../../utils/DB';
+import {
+  eOnNewTopicAdded,
+  eOpenAddTopicDialog,
+  eScrollEvent,
+} from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
-  const [, dispatch] = useTracked();
-  const [topics, setTopics] = useState([]);
+  const [topics, setTopics] = useState(route.params.notebook.topics);
+  const [loading, setLoading] = useState(true);
   let params = route.params;
+  let pageIsLoaded = false;
 
   const onLoad = () => {
-    let allTopics;
-    allTopics = db.notebooks.notebook(route.params.notebook.id).data.topics;
-    setTopics(allTopics);
+    InteractionManager.runAfterInteractions(() => {
+      setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
+    });
   };
 
   useEffect(() => {
-    eSendEvent(eScrollEvent, 0);
-    params = route.params;
-    setTopics([...params.notebook.topics]);
-  }, []);
+    onLoad();
+  }, [route.params]);
 
   useEffect(() => {
     eSubscribeEvent(eOnNewTopicAdded, onLoad);
@@ -37,29 +39,38 @@ export const Notebook = ({route, navigation}) => {
     };
   }, []);
 
-  const onFocus = () => {
-    eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-    onLoad();
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: params.title,
-      },
+  const onFocus = async () => {
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
+      if (route.params.menu) {
+        navigation.setOptions({
+          animationEnabled: false,
+          gestureEnabled: false,
+        });
+      } else {
+        navigation.setOptions({
+          animationEnabled: true,
+          gestureEnabled: Platform.OS === 'ios',
+        });
+      }
+      updateSearch();
+     
     });
-
-    updateSearch();
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress:_onPressBottomButton
-      },
+    
+    if (!pageIsLoaded) {
+      console.log('returning since page is not loaded');
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState('notebooks', params, {
+      heading: params.title,
+      id: params.notebook.id,
+      type: 'notebook',
     });
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'notebook',
-    });
-  }
+  };
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
@@ -67,11 +78,7 @@ export const Notebook = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
-  },[]);
-
-
-
-
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -87,12 +94,9 @@ export const Notebook = ({route, navigation}) => {
     });
   };
 
-
-
   const _onPressBottomButton = () => {
     let n = route.params.notebook;
-    AddTopicEvent(n);
-  
+    eSendEvent(eOpenAddTopicDialog, n.id);
   };
 
   return (
@@ -103,9 +107,18 @@ export const Notebook = ({route, navigation}) => {
         refreshCallback={() => {
           onLoad();
         }}
+        headerProps={{
+          heading: params.title,
+        }}
+        loading={loading}
         focused={() => navigation.isFocused()}
-        placeholder={<></>}
-        placeholderText=""
+        placeholderData={{
+          heading: route.params.notebook.title,
+          paragraph: 'You have not added any topics yet.',
+          button: 'Add a Topic',
+          action: _onPressBottomButton,
+          loading: 'Loading notebook topics',
+        }}
       />
 
       <ContainerBottomButton
@@ -117,43 +130,3 @@ export const Notebook = ({route, navigation}) => {
 };
 
 export default Notebook;
-/* 
-const RenderItem = ({item, index}) => {
-  const [state, dispatch] = useTracked();
-  const {colors,selectionMode } = state;
-
-  return (
-    <SelectionWrapper
-      onPress={() => {
-        NavigationService.navigate('NotesPage', {
-          ...item,
-        });
-      }}
-      onLongPress={() => {
-        if (!selectionMode) {
-          dispatch({
-            type: Actions.SELECTION_MODE,
-            enabled: !selectionMode,
-          });
-        }
-        dispatch({
-          type: Actions.SELECTED_ITEMS,
-          item: item,
-        });
-      }}
-      item={item}>
-      <NotebookItem
-        isTopic={true}
-        customStyle={{
-          width: '100%',
-          marginHorizontal: 0,
-        }}
-        selectionMode={selectionMode}
-        item={item}
-        index={index}
-        colors={colors}
-      />
-    </SelectionWrapper>
-  );
-};
- */

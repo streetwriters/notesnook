@@ -1,20 +1,20 @@
-import React, {createRef} from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dWidth, SORT, sortSettings} from '../../utils';
-import ActionSheet from '../ActionSheet';
-import {DDS} from '../../services/DeviceDetection';
-import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
-import {PressableButton} from '../PressableButton';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {defaultState} from '../../provider/DefaultState';
-import {MMKV} from '../../utils/mmkv';
-import {updateEvent} from '../DialogManager/recievers';
-import {Actions} from '../../provider/Actions';
+import React, { createRef } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Seperator from '../Seperator';
+import { notesnook } from '../../../e2e/test.ids';
+import { Actions } from '../../provider/Actions';
+import { defaultState } from '../../provider/DefaultState';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import Paragraph from '../Typography/Paragraph';
+import { getElevation, SORT, sortSettings } from '../../utils';
+import { eCloseSortDialog, eOpenSortDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import { updateEvent } from '../DialogManager/recievers';
+import { PressableButton } from '../PressableButton';
+import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 
 const actionSheet = createRef();
@@ -24,23 +24,36 @@ class SortDialog extends React.Component {
     super(props);
     this.state = {
       settings: defaultState.settings,
+      visible: false,
     };
   }
 
   async open() {
-    actionSheet.current?._setModalVisible(true);
-    await this.getSettings();
+    this.setState(
+      {
+        visible: true,
+      },
+      async () => {
+        actionSheet.current?.setModalVisible(true);
+        await this.getSettings();
+      },
+    );
   }
 
   async getSettings() {
-    let settings = await MMKV.getItem('settings');
+    let settings = await MMKV.getItem('appSettings');
     this.setState({
       settings: JSON.parse(settings),
     });
   }
 
   close() {
-    actionSheet.current?._setModalVisible(false);
+    actionSheet.current?.setModalVisible(false);
+    sleep(200).then(() => {
+      this.setState({
+        visible: false,
+      });
+    });
   }
 
   async componentDidMount() {
@@ -55,35 +68,16 @@ class SortDialog extends React.Component {
 
   render() {
     const {colors} = this.props;
+
+    if (!this.state.visible) return null;
+
     return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          alignSelf: 'center',
-          width: DDS.isTab ? 500 : '100%',
-          borderRadius: 10,
-          marginBottom: DDS.isTab ? 50 : 0,
-        }}
-        extraScroll={DDS.isTab ? 50 : 0}
-        gestureEnabled={true}
-        footerAlwaysVisible={DDS.isTab}
-        footerHeight={DDS.isTab ? 20 : 10}
-        footerStyle={
-          DDS.isTab
-            ? {
-                borderRadius: 10,
-                backgroundColor: colors.bg,
-              }
-            : null
-        }
-        ref={actionSheet}
-        initialOffsetFromBottom={1}>
+      <ActionSheetWrapper fwdRef={actionSheet}>
         <View
           style={{
-            width: DDS.isTab ? 500 : dWidth,
+            width: '100%',
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
-            paddingHorizontal: 12,
             borderRadius: 10,
             paddingTop: 10,
           }}>
@@ -93,6 +87,7 @@ class SortDialog extends React.Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                paddingHorizontal: 12,
               }}>
               <Heading
                 size={SIZE.xl}
@@ -103,9 +98,10 @@ class SortDialog extends React.Component {
               </Heading>
 
               <TouchableOpacity
+                testID={notesnook.ids.dialogs.sortBy.order}
                 onPress={async () => {
                   let value =
-                    this.state.settings.sortOrder === 'asc' ? 'des' : 'asc';
+                    this.state.settings?.sortOrder === 'asc' ? 'desc' : 'asc';
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
                   await this.getSettings();
@@ -114,19 +110,26 @@ class SortDialog extends React.Component {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
+                  backgroundColor: colors.accent,
+                  borderRadius: 100,
+                  paddingHorizontal: 8,
+                  height: 22,
+                  ...getElevation(2),
                 }}>
-                <Paragraph
+                <Heading
+                  size={SIZE.sm}
                   style={{
                     marginRight: 5,
+                    color: 'white',
                   }}>
-                  {this.state.settings.sortOrder === 'asc'
+                  {this.state.settings?.sortOrder === 'asc'
                     ? 'Ascending'
                     : 'Descending'}
-                </Paragraph>
+                </Heading>
                 <Icon
-                  color={colors.pri}
+                  color="white"
                   name={
-                    this.state.settings.sortOrder === 'asc'
+                    this.state.settings?.sortOrder === 'asc'
                       ? 'sort-ascending'
                       : 'sort-descending'
                   }
@@ -135,42 +138,51 @@ class SortDialog extends React.Component {
               </TouchableOpacity>
             </View>
             <Seperator />
+
             {Object.keys(SORT).map((item, index) => (
               <PressableButton
                 key={item}
-                color={
-                  this.state.settings.sort === item
-                    ? colors.shade
-                    : 'transparent'
-                }
+                testID={'btn-' + item}
+                type={this.state.settings?.sort === item ? 'shade' : 'gray'}
                 onPress={async () => {
                   await SettingsService.set('sort', item);
                   await this.getSettings();
                   sortSettings.sort = item;
                   updateEvent({type: Actions.NOTES});
                 }}
-                selectedColor={
-                  this.state.settings.sort === item ? colors.accent : colors.nav
-                }
-                alpha={!colors.night ? -0.02 : 0.02}
-                opacity={this.state.settings.sort === item ? 0.12 : 1}
+                type="transparent"
                 customStyle={{
                   width: '100%',
                   height: 50,
+                  justifyContent: 'space-between',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  borderRadius: 0,
+                  paddingHorizontal: 12,
                 }}>
-                <Paragraph
+                <Heading
+                  size={SIZE.sm}
                   color={
-                    this.state.settings.sort === item
+                    this.state.settings?.sort === item
                       ? colors.accent
                       : colors.pri
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
-                </Paragraph>
+                </Heading>
+                {this.state.settings?.sort === item ? (
+                  <Icon color={colors.accent} name="check" size={SIZE.lg} />
+                ) : null}
               </PressableButton>
             ))}
           </View>
+
+          <View
+            style={{
+              height: 25,
+            }}
+          />
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

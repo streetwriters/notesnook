@@ -19,13 +19,15 @@ export const eSendEvent = (eventName, data) => {
  * @typedef {Object} vaultType
  * @property {Object} item
  * @property {boolean} novault
- * @property {Object} locked
- * @property {Object} permanant
- * @property {Object} goToEditor
- * @property {Object} share
- * @property {Object} deleteNote
- * @property {Object} fingerprintAccess
- * @property {Object} copyNote
+ * @property {boolean} locked
+ * @property {boolean} permanant
+ * @property {boolean} goToEditor
+ * @property {boolean} share
+ * @property {boolean} deleteNote
+ * @property {boolean} fingerprintAccess
+ * @property {boolean} revokeFingerprintAccess
+ * @property {boolean} changePassword
+ * @property {boolean} copyNote
  * @param {vaultType} data 
  */
 

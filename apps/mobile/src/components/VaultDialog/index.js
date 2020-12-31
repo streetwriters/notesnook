@@ -1,18 +1,19 @@
 import React, {Component, createRef} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import {InteractionManager, TouchableOpacity, View} from 'react-native';
 import * as Keychain from 'react-native-keychain';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {getElevation} from '../../utils';
+import {getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eCloseVaultDialog,
@@ -27,19 +28,20 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
-import Seperator from '../Seperator';
+import Input from '../Input';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const passInputRef = createRef();
 const confirmPassRef = createRef();
-
+const changePassInputRef = createRef();
 export class VaultDialog extends Component {
   constructor(props) {
     super(props);
     this.state = {
       visible: false,
       wrongPassword: false,
+      loading: false,
       note: {},
       vault: false,
       locked: true,
@@ -50,11 +52,16 @@ export class VaultDialog extends Component {
       deleteNote: false,
       focusIndex: null,
       biometricUnlock: false,
+      isBiometryEnrolled: false,
       isBiometryAvailable: false,
       fingerprintAccess: false,
+      changePassword: false,
+      copyNote: false,
+      revokeFingerprintAccess: false,
     };
     this.password = null;
     this.confirmPassword = null;
+    this.newPassword = null;
   }
 
   componentDidMount() {
@@ -75,14 +82,15 @@ export class VaultDialog extends Component {
     let biometry = await Keychain.getSupportedBiometryType();
     let available = false;
     let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
+
     if (
       biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
       biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
     ) {
       available = true;
     }
+
     this.setState({
-      visible: true,
       note: data.item,
       novault: data.novault,
       locked: data.locked,
@@ -93,14 +101,35 @@ export class VaultDialog extends Component {
       copyNote: data.copyNote,
       isBiometryAvailable: available,
       biometricUnlock: fingerprint,
+      isBiometryEnrolled: fingerprint,
       fingerprintAccess: data.fingerprintAccess,
+      changePassword: data.changePassword,
+      revokeFingerprintAccess: data.revokeFingerprintAccess,
     });
-    if (fingerprint && this.state.novault && !this.state.fingerprintAccess) {
+
+    if (
+      fingerprint &&
+      data.novault &&
+      !data.fingerprintAccess &&
+      !data.revokeFingerprintAccess
+    ) {
       await this._onPressFingerprintAuth();
+    } else {
+      this.setState({
+        visible: true,
+      });
     }
   };
 
   close = () => {
+    if (this.state.loading) {
+      ToastEvent.show(
+        'Please wait and do not close the app.',
+        'success',
+        'local',
+      );
+      return;
+    }
     updateEvent({type: Actions.NOTES});
 
     this.password = null;
@@ -119,12 +148,24 @@ export class VaultDialog extends Component {
   };
 
   onPress = async () => {
-    if (!this.state.novault) {
-      if (this.password.length < 3) {
-        ToastEvent.show('Password too short', 'error', 'local');
+    if (this.state.revokeFingerprintAccess) {
+      await this._revokeFingerprintAccess();
+      this.close();
+      return;
+    }
+    if (this.state.loading) return;
 
-        return;
-      }
+    if (!this.password) {
+      ToastEvent.show('You must fill all the fields.', 'error', 'local');
+      return;
+    }
+    if (this.password && this.password.length < 3) {
+      ToastEvent.show('Password too short', 'error', 'local');
+
+      return;
+    }
+
+    if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
         ToastEvent.show('Passwords do not match', 'error', 'local');
         this.setState({
@@ -134,6 +175,31 @@ export class VaultDialog extends Component {
       }
 
       this._createVault();
+    } else if (this.state.changePassword) {
+      this.setState({
+        loading: true,
+      });
+
+      db.vault
+        .changePassword(this.password, this.newPassword)
+        .then((result) => {
+          this.setState({
+            loading: false,
+          });
+          if (this.state.biometricUnlock) {
+            this._enrollFingerprint(this.newPassword);
+          }
+          ToastEvent.show('Vault password changed', 'success');
+          this.close();
+        })
+        .catch((e) => {
+          this.setState({
+            loading: false,
+          });
+          if (e.message === db.vault.ERRORS.wrongPassword) {
+            ToastEvent.show('Current password incorrect.', 'error', 'local');
+          }
+        });
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
         ToastEvent.show('Password is invalid', 'error', 'local');
@@ -141,25 +207,24 @@ export class VaultDialog extends Component {
           wrongPassword: true,
         });
         return;
-      } else {
-        db.vault
-          .unlock(this.password)
-          .then(async () => {
-            this.setState({
-              wrongPassword: false,
-            });
-            if (this.state.note.locked) {
-              await this._unlockNote();
-            } else {
-              await this._lockNote();
-            }
-          })
-          .catch((e) => {
-            this._takeErrorAction(e);
-          });
       }
-    } else if (this.state.fingerprintEnroll) {
-      this._enrollFingerprint();
+      db.vault
+        .unlock(this.password)
+        .then(async () => {
+          this.setState({
+            wrongPassword: false,
+          });
+          if (this.state.note.locked) {
+            await this._unlockNote();
+          } else {
+            await this._lockNote();
+          }
+        })
+        .catch((e) => {
+          this._takeErrorAction(e);
+        });
+    } else if (this.state.fingerprintAccess) {
+      this._enrollFingerprint(this.password);
     }
   };
 
@@ -177,57 +242,53 @@ export class VaultDialog extends Component {
   async _unlockNote() {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show('Password is invalid', 'error', 'local');
-
       return;
+    }
+    if (this.state.permanant) {
+      this._permanantUnlock();
     } else {
-      if (this.state.permanant) {
-        this._permanantUnlock();
-      } else {
-        await this._openNote();
-      }
+      await this._openNote();
     }
   }
 
-  async _openNote() {
-    db.vault
-      .open(this.state.note.id, this.password)
-      .then(async (note) => {
-        if (this.state.goToEditor) {
-          console.log(note, 'NOTE');
-          this._openInEditor(note);
-        } else if (this.state.share) {
-          this._shareNote(note);
-        } else if (this.state.deleteNote) {
-          await this._deleteNote();
-        }
-      })
-      .catch((e) => {
-        this._takeErrorAction(e);
-      });
-  }
+  _openNote = async () => {
+    try {
+      let note = await db.vault.open(this.state.note.id, this.password);
+      if (this.state.biometricUnlock && !this.state.isBiometryEnrolled) {
+        await this._enrollFingerprint(this.password);
+      }
+      if (this.state.goToEditor) {
+        this._openInEditor(note);
+      } else if (this.state.share) {
+        await this._shareNote(note);
+      } else if (this.state.deleteNote) {
+        await this._deleteNote();
+      } else if (this.state.copyNote) {
+        this._copyNote(note);
+      }
+    } catch (e) {
+      this._takeErrorAction(e);
+    }
+  };
   async _deleteNote() {
+    this.close();
     await db.notes.delete(this.state.note.id);
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     eSendEvent(refreshNotesPage);
-    this.close();
-    ToastEvent.show('Note deleted', 'success', 'local');
+    ToastEvent.show('Note deleted', 'success');
   }
 
-  async _enrollFingerprint() {
+  async _enrollFingerprint(password) {
     try {
-      await Keychain.setInternetCredentials(
-        'nn_vault',
-        'nn_vault',
-        this.password,
-        {
-          accessControl:
-            Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
-          authenticationPrompt: {cancel: null},
-          accessible:
-            Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-        },
-      );
+      await Keychain.setInternetCredentials('nn_vault', 'nn_vault', password, {
+        accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
+        authenticationPrompt: {cancel: null},
+        accessible: Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+      });
+      eSendEvent('vaultUpdated');
+      ToastEvent.show('Fingerprint access enabled!', 'success');
+      this.close();
     } catch (e) {
       this._takeErrorAction(e);
     }
@@ -249,11 +310,13 @@ export class VaultDialog extends Component {
   }
 
   _permanantUnlock() {
-    console.log('permanant unlock');
     db.vault
       .remove(this.state.note.id, this.password)
       .then((r) => {
         console.log(r, 'unocking result');
+        sendNoteEditedEvent(this.state.note.id);
+        updateEvent({type: Actions.NOTES});
+        eSendEvent(refreshNotesPage);
         this.close();
       })
       .catch((e) => {
@@ -263,21 +326,36 @@ export class VaultDialog extends Component {
   }
 
   _openInEditor(note) {
-    eSendEvent(eOnLoadNote, note);
-    if (!DDS.isTab) {
-      tabBarRef.current?.goToPage(1);
-    }
+    this.close();
+    InteractionManager.runAfterInteractions(() => {
+      eSendEvent(eOnLoadNote, note);
+      if (!DDS.isTab) {
+        tabBarRef.current?.goToPage(1);
+      }
+    });
+  }
+
+  _copyNote(note) {
+    let text = toTXT(note.content.data);
+    let m = `${note.title}\n \n ${text}`;
+    Clipboard.setString(text);
+    ToastEvent.show('Note copied to clipboard', 'success', 'local');
     this.close();
   }
 
-  _shareNote(note) {
-    let m = `${note.title}\n \n ${note.content.text}`;
-    Share.open({
-      title: 'Share note to',
-      failOnCancel: false,
-      message: m,
-    });
+  async _shareNote(note) {
     this.close();
+    let text = toTXT(note.content.data);
+    let m = `${note.title}\n \n ${text}`;
+    try {
+      await Share.open({
+        title: 'Share note to',
+        failOnCancel: false,
+        message: m,
+      });
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   _takeErrorAction(e) {
@@ -291,6 +369,23 @@ export class VaultDialog extends Component {
     }
   }
 
+  _revokeFingerprintAccess = async () => {
+    try {
+      await Keychain.resetInternetCredentials('nn_vault', {
+        accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
+        authenticationType:
+          Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+        authenticationPrompt: {
+          cancel: null,
+        },
+      });
+      eSendEvent('vaultUpdated');
+      ToastEvent.show('Fingerprint access revoked!', 'success');
+    } catch (e) {
+      ToastEvent.show(e.message, 'error', 'local');
+    }
+  };
+
   _onPressFingerprintAuth = async () => {
     try {
       let credentials = await Keychain.getInternetCredentials('nn_vault', {
@@ -301,12 +396,14 @@ export class VaultDialog extends Component {
           cancel: null,
         },
       });
-      console.log(credentials.password);
       if (credentials?.password) {
         this.password = credentials.password;
         this.onPress();
       }
     } catch (e) {
+      this.setState({
+        visible: true,
+      });
       ToastEvent.show('Fingerprint Authentication Canceled', 'error', 'local');
     }
   };
@@ -322,36 +419,49 @@ export class VaultDialog extends Component {
       locked,
       permanant,
       biometricUnlock,
+      deleteNote,
+      share,
+      goToEditor,
+      fingerprintAccess,
+      changePassword,
+      copyNote,
+      loading,
     } = this.state;
 
+    if (!visible) return null;
     return (
       <BaseDialog
         onShow={() => {
           passInputRef.current?.focus();
         }}
+        statusBarTranslucent={false}
         onRequestClose={this.close}
-        visible={visible}>
+        visible={true}>
         <View
           style={{
             ...getElevation(5),
-            width: DDS.isTab ? 350 : '80%',
+            width: DDS.isTab ? 350 : '85%',
             borderRadius: 5,
             backgroundColor: colors.bg,
             paddingHorizontal: ph,
-            paddingVertical: pv,
+            paddingVertical: 15,
           }}>
           <DialogHeader
             title={
               !novault
                 ? 'Create Vault'
-                : this.state.fingerprintAccess
-                ? 'Fingerprint Access'
+                : fingerprintAccess
+                ? 'Vault Fingerprint Unlock'
+                : this.state.revokeFingerprintAccess
+                ? 'Revoke Vault Fingerprint Unlock'
+                : changePassword
+                ? 'Change Vault Password'
                 : note.locked
-                ? this.state.deleteNote
+                ? deleteNote
                   ? 'Delete note'
-                  : this.state.share
+                  : share
                   ? 'Share note'
-                  : this.state.goToEditor
+                  : goToEditor
                   ? 'Unlock note'
                   : 'Unlock note'
                 : 'Lock note'
@@ -359,16 +469,20 @@ export class VaultDialog extends Component {
             paragraph={
               !novault
                 ? 'Set a password to create vault'
-                : this.state.fingerprintAccess
-                ? 'Enter vault password to enable access to the vault with fingerprint'
+                : fingerprintAccess
+                ? 'Enter vault password to enable fingerprint unlocking'
+                : this.state.revokeFingerprintAccess
+                ? 'Disable vault fingerprint unlock '
+                : changePassword
+                ? 'Setup a new password for the vault.'
                 : permanant
                 ? 'Enter password to remove note from vault.'
                 : note.locked
-                ? this.state.deleteNote
+                ? deleteNote
                   ? 'Unlock note to delete it.'
-                  : this.state.share
+                  : share
                   ? 'Unlock note to share it.'
-                  : this.state.goToEditor
+                  : goToEditor
                   ? 'Unlock note to open it in editor'
                   : 'Enter vault password to unlock note.'
                 : 'Enter vault password to lock note.'
@@ -376,43 +490,33 @@ export class VaultDialog extends Component {
             icon="shield"
           />
 
-          <Seperator />
-
-          {note.locked ||
-          locked ||
-          permanant ||
-          this.state.fingerprintAccess ? (
+          {(novault || changePassword) &&
+          !this.state.revokeFingerprintAccess ? (
             <>
-              <TextInput
-                ref={passInputRef}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: wrongPassword
-                    ? colors.errorText
-                    : this.state.focusIndex === 0
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  marginTop: 10,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                }}
+              <Input
+                fwdRef={passInputRef}
+                editable={!loading}
+                autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwd}
                 onChangeText={(value) => {
                   this.password = value;
                 }}
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 0,
-                  });
-                }}
+                marginBottom={
+                  !this.state.biometricUnlock ||
+                  !this.state.isBiometryEnrolled ||
+                  !novault ||
+                  changePassword
+                    ? 0
+                    : 10
+                }
                 secureTextEntry
-                placeholder="Password"
-                placeholderTextColor={colors.icon}
+                placeholder={changePassword ? 'Current Password' : 'Password'}
               />
-              <Seperator />
-              {!this.state.biometricUnlock || !novault ? null : (
+
+              {!this.state.biometricUnlock ||
+              !this.state.isBiometryEnrolled ||
+              !novault ||
+              changePassword ? null : (
                 <Button
                   onPress={this._onPressFingerprintAuth}
                   width="100%"
@@ -427,58 +531,45 @@ export class VaultDialog extends Component {
             </>
           ) : null}
 
+          {changePassword ? (
+            <>
+              <Input
+                ref={changePassInputRef}
+                editable={!loading}
+                testID={notesnook.ids.dialogs.vault.changePwd}
+                autoCapitalize="none"
+                onChangeText={(value) => {
+                  this.newPassword = value;
+                }}
+                secureTextEntry
+                placeholder={'New Password'}
+              />
+            </>
+          ) : null}
+
           {!novault ? (
             <View>
-              <TextInput
-                ref={passInputRef}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: passwordsDontMatch
-                    ? colors.errorText
-                    : this.state.focusIndex === 1
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                }}
+              <Input
+                fwdRef={passInputRef}
+                autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwd}
                 onChangeText={(value) => {
                   this.password = value;
                 }}
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 1,
-                  });
-                }}
                 secureTextEntry
                 placeholder="Password"
-                placeholderTextColor={colors.icon}
               />
 
-              <TextInput
-                ref={confirmPassRef}
-                style={{
-                  padding: pv - 5,
-                  borderBottomWidth: 1.5,
-                  borderColor: passwordsDontMatch
-                    ? colors.errorText
-                    : this.state.focusIndex === 2
-                    ? colors.accent
-                    : colors.nav,
-                  paddingHorizontal: ph,
-                  borderRadius: 5,
-                  fontSize: SIZE.sm,
-                  fontFamily: WEIGHT.regular,
-                  marginTop: 10,
-                }}
+              <Input
+                fwdRef={confirmPassRef}
+                autoCapitalize="none"
+                testID={notesnook.ids.dialogs.vault.pwdAlt}
                 secureTextEntry
-                onFocus={() => {
-                  this.setState({
-                    focusIndex: 2,
-                  });
-                }}
+                validationType="confirmPassword"
+                customValidator={() => this.password}
+                errorMessage="Passwords do not match."
+                onErrorCheck={(e) => null}
+                marginBottom={0}
                 onChangeText={(value) => {
                   this.confirmPassword = value;
                   if (value !== this.password) {
@@ -492,19 +583,26 @@ export class VaultDialog extends Component {
                   }
                 }}
                 placeholder="Confirm password"
-                placeholderTextColor={colors.icon}
               />
             </View>
           ) : null}
 
-          {this.state.isBiometryAvailable && !this.state.fingerprintAccess &&
-          (!this.state.biometricUnlock || !novault)  ? (
+          {this.state.biometricUnlock && !this.state.isBiometryEnrolled && (
+            <Paragraph>
+              Unlock with password once to enable fingerprint access.
+            </Paragraph>
+          )}
+
+          {this.state.isBiometryAvailable &&
+          !this.state.fingerprintAccess &&
+          ((!this.state.biometricUnlock && !changePassword) || !novault) ? (
             <TouchableOpacity
               onPress={() => {
                 this.setState({
                   biometricUnlock: !biometricUnlock,
                 });
               }}
+              testID={notesnook.ids.dialogs.vault.fingerprint}
               activeOpacity={0.7}
               style={{
                 flexDirection: 'row',
@@ -530,9 +628,7 @@ export class VaultDialog extends Component {
                   maxWidth: '90%',
                   marginLeft: 10,
                 }}>
-                {!biometricUnlock
-                  ? 'Fingerprint Unlock Disabled'
-                  : 'Fingerprint Unlock Enabled'}
+                Fingerprint Unlock
               </Paragraph>
             </TouchableOpacity>
           ) : null}
@@ -540,15 +636,20 @@ export class VaultDialog extends Component {
           <DialogButtons
             onPressNegative={this.close}
             onPressPositive={this.onPress}
+            loading={loading}
             positiveTitle={
-              this.state.fingerprintAccess
+              fingerprintAccess
                 ? 'Enable'
+                : this.state.revokeFingerprintAccess
+                ? 'Revoke'
+                : changePassword
+                ? 'Change'
                 : note.locked
-                ? this.state.deleteNote
+                ? deleteNote
                   ? 'Delete'
-                  : this.state.share
+                  : share
                   ? 'Share '
-                  : this.state.goToEditor
+                  : goToEditor
                   ? 'Open'
                   : 'Unlock'
                 : !note.id

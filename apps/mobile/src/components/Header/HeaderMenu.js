@@ -3,9 +3,10 @@ import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
 import { eSendEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
 import { eOpenSortDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
-import Paragraph from '../Typography/Paragraph';
+import Heading from '../Typography/Heading';
 
 export const HeaderMenu = () => {
   const [state] = useTracked();
@@ -16,30 +17,35 @@ export const HeaderMenu = () => {
       onPress={() => {
         eSendEvent(eOpenSortDialog);
       }}
-      hitSlop={{top: 10, right: 10, left: 30, bottom: 15}}
+      hitSlop={{top: 15, right: 10, left: 30, bottom: 15}}
       activeOpacity={1}
       style={{
         flexDirection: 'row',
         alignItems: 'center',
-        zIndex:10
+        zIndex: 10,
+        height: 22,
+        backgroundColor: colors.accent,
+        paddingHorizontal: 8,
+        borderRadius: 100,
+        ...getElevation(2)
       }}>
-      <Paragraph
+      <Heading
+        color={colors.light}
+        size={SIZE.sm}
         style={{
           marginRight: 5,
-          height: 35,
-          textAlignVertical:'center'
+          textAlignVertical: 'center',
         }}>
         {settings.sort.slice(0, 1).toUpperCase() +
           settings.sort.slice(1, settings.sort.length)}
-      </Paragraph>
+      </Heading>
       <Icon
-        color={colors.pri}
+        color={colors.light}
         name={
           settings.sortOrder === 'asc' ? 'sort-ascending' : 'sort-descending'
         }
         style={{
-          textAlignVertical:'center',
-          height: 30,
+          textAlignVertical: 'center',
         }}
         size={SIZE.md}
       />

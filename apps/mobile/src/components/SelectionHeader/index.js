@@ -1,16 +1,20 @@
-import React, {useEffect} from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {TEMPLATE_DELETE} from '../DialogManager/Templates';
+import React, { useEffect } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, useValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
+import {
+  eOpenMoveNoteDialog,
+  eOpenSimpleDialog,
+  refreshNotesPage
+} from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { TEMPLATE_DELETE } from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
 export const SelectionHeader = () => {
@@ -99,11 +103,13 @@ export const SelectionHeader = () => {
           right: 12,
           paddingTop: insets.top,
         }}>
-        {currentScreen === 'trash' || currentScreen === 'notebooks' ? null : (
+        {currentScreen === 'trash' ||
+        currentScreen === 'notebooks' ||
+        currentScreen === 'notebook' ? null : (
           <ActionIcon
-            onPress={() => {
+            onPress={async () => {
               dispatch({type: Actions.SELECTION_MODE, enabled: false});
-              dispatch({type: Actions.CLEAR_SELECTION});
+              await sleep(100);
               eSendEvent(eOpenMoveNoteDialog);
             }}
             customStyle={{
@@ -114,6 +120,29 @@ export const SelectionHeader = () => {
             size={SIZE.xl}
           />
         )}
+
+        {currentScreen === 'favorites' ? (
+          <ActionIcon
+            onPress={async () => {
+              if (selectedItemsList.length > 0) {
+                selectedItemsList.forEach((item) => {
+                  db.notes.note(item.id).favorite();
+                });
+                dispatch({type: Actions.FAVORITES});
+                eSendEvent(refreshNotesPage);
+                dispatch({type: Actions.NOTES});
+                dispatch({type: Actions.SELECTION_MODE, enabled: false});
+                dispatch({type: Actions.CLEAR_SELECTION});
+              }
+            }}
+            customStyle={{
+              marginLeft: 10,
+            }}
+            color={colors.heading}
+            name="star-off"
+            size={SIZE.xl}
+          />
+        ) : null}
 
         {currentScreen === 'trash' ? null : (
           <ActionIcon
@@ -142,9 +171,9 @@ export const SelectionHeader = () => {
                 selectedItemsList.forEach((item) => {
                   noteIds.push(item.id);
                 });
-
                 await db.trash.restore(...noteIds);
-
+                dispatch({type: Actions.NOTEBOOKS});
+                dispatch({type: Actions.NOTES});
                 dispatch({type: Actions.TRASH});
                 dispatch({type: Actions.SELECTION_MODE, enabled: false});
                 dispatch({type: Actions.CLEAR_SELECTION});

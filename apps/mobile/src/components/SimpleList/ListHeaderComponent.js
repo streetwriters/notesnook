@@ -13,7 +13,6 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {MessageCard} from './MessageCard';
 
-const opacity = new Animated.Value(1);
 export const ListHeaderComponent = ({
   type,
   messageCard = true,
@@ -24,26 +23,8 @@ export const ListHeaderComponent = ({
   shouldShow = false,
 }) => {
   const [state] = useTracked();
-  const {colors, headerTextState, currentScreen} = state;
-  /* 
-  const onScroll = async (y) => {
-    if (y > 100) {
-      let o = (y - 100) / 100;
-      o = 1 - o;
-      console.log(o);
-      opacity.setValue(o);
-    } else {
-      opacity.setValue(1);
-    }
-  };
+  const {colors} = state;
 
-  useEffect(() => {
-    eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
-  }, []);
- */
   return type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
     <View
       style={{
@@ -59,61 +40,62 @@ export const ListHeaderComponent = ({
   ) : (
     <View
       style={{
-        minHeight: 195,
-        marginBottom: 5,
-        padding: 12,
         width: '100%',
-        backgroundColor: COLORS_NOTE[currentScreen]
-          ? hexToRGBA(COLORS_NOTE[currentScreen], 0.15)
-          : color || colors.shade,
       }}>
-      {messageCard && <MessageCard />}
-
-      <View
-        style={{
-          right: 0,
-          paddingRight: 12,
-          opacity: 0.5,
-          bottom: 0,
-          paddingHorizontal: 12,
-          position: 'absolute',
-        }}>
-        <Placeholder
-          color={COLORS_NOTE[currentScreen]}
-          w={normalize(150)}
-          h={normalize(150)}
-          type={type}
+      {messageCard && (
+        <MessageCard
+          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
         />
-      </View>
+      )}
       <View
         style={{
-          position: 'absolute',
-          bottom: 0,
-          paddingHorizontal: 12,
-          paddingBottom: 12,
+          minHeight: 195,
+          padding: 12,
+          width: '100%',
+          zIndex: 10,
+          justifyContent: 'flex-end',
+          backgroundColor: COLORS_NOTE[title.toLowerCase()]
+            ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
+            : color || colors.shade,
         }}>
-        <Heading
-          style={{marginBottom: paragraph ? -10 : 0}}
-          size={SIZE.xxxl * 1.5}
-          color={headerTextState.color}>
-          <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
-            {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
-          </Heading>
+        <View
+          style={{
+            right: 0,
+            paddingRight: 12,
+            opacity: 0.5,
+            bottom: 0,
+            paddingHorizontal: 12,
+            position: 'absolute',
+          }}>
+          <Placeholder
+            color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
+            w={normalize(150)}
+            h={normalize(150)}
+            type={type}
+          />
+        </View>
+        <View
+          style={{
+            marginTop: 15,
+          }}>
+          <Heading
+            style={{marginBottom: paragraph ? -10 : 0}}
+            size={SIZE.xxxl * 1.5}>
+            <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
+              {title.slice(0, 1) === '#' ? '#' : null}
+            </Heading>
 
-          {title
-            ? title
-            : headerTextState.heading.slice(0, 1) === '#'
-            ? headerTextState.heading.slice(1)
-            : headerTextState.heading}
-        </Heading>
-        {paragraph && (
-          <Paragraph color={colors.icon}>
-            {'\n'}or
-            <Paragraph onPress={onPress} color={colors.accent}>
-              {' ' + paragraph}
+            {title.slice(0, 1) === '#' ? title.slice(1) : title}
+          </Heading>
+          {paragraph && (
+            <Paragraph color={colors.icon}>
+              {'\n'}or
+              <Paragraph onPress={onPress} color={colors.accent}>
+                {' ' + paragraph}
+              </Paragraph>
             </Paragraph>
-          </Paragraph>
-        )}
+          )}
+        </View>
       </View>
     </View>
   );

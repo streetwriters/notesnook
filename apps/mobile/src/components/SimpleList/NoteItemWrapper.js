@@ -15,6 +15,7 @@ import {TEMPLATE_TRASH} from '../DialogManager/Templates';
 import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {tabBarRef} from '../../utils/Refs';
+import {notesnook} from '../../../e2e/test.ids';
 
 export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
@@ -26,17 +27,12 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   }, [item]);
 
   const onNoteChange = (data) => {
+
     if (!data || data.id !== note.id || data.closed) {
       return;
     }
     let newNote = db.notes.note(data.id).data;
-    if (
-      !data.noEdit &&
-      newNote.title === note.title &&
-      newNote.headline === note.headline
-    ) {
-      return;
-    }
+    console.log('updating note',newNote.notebooks)
     setNote(newNote);
   };
 
@@ -45,7 +41,7 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     return () => {
       eUnSubscribeEvent(eOnNoteEdited, onNoteChange);
     };
-  }, [note]);
+  }, []);
 
   const style = useMemo(() => {
     return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
@@ -58,21 +54,22 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     dispatch({type: Actions.SELECTED_ITEMS, item: note});
   };
 
-  const onPress = async (event) => {
+  const onPress = async () => {
     if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
     }
+
     if (selectionMode) {
       onLongPress();
       return;
     } else if (note.locked) {
       openVault({
-        item:item,
-        novault:true,
-        locked:true,
-        goToEditor:true,
-      })
+        item: item,
+        novault: true,
+        locked: true,
+        goToEditor: true,
+      });
       return;
     }
     if (isTrash) {
@@ -82,13 +79,13 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
     }
     if (DDS.isPhone || DDS.isSmallTab) {
       tabBarRef.current?.goToPage(1);
-      //openEditorAnimation(event.nativeEvent);
     }
   };
 
   return (
     <SelectionWrapper
       index={index}
+      testID={notesnook.ids.note.get(index)}
       onLongPress={onLongPress}
       onPress={onPress}
       item={note}>

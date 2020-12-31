@@ -1,238 +1,411 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import * as Sentry from '@sentry/react-native';
-import {EV} from 'notes-core/common';
-import React, {useEffect, useState} from 'react';
+import { EV } from 'notes-core/common';
+import React, { useEffect } from 'react';
 import {
   Appearance,
   AppState,
-  Dimensions,
+  Linking,
+  NativeModules,
   Platform,
-  StatusBar,
-  View,
+  StatusBar
 } from 'react-native';
-import Orientation from 'react-native-orientation';
-import {enabled} from 'react-native-privacy-snapshot';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import * as RNIap from 'react-native-iap';
+import { enabled } from 'react-native-privacy-snapshot';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {RootView} from './RootView';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { RootView } from './initializer.root';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
 import Backup from './src/services/Backup';
-import {DDS} from './src/services/DeviceDetection';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
-import {setLoginMessage} from './src/services/Message';
-import SettingsService from './src/services/SettingsService';
-import {setWidthHeight} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
-import {db} from './src/utils/DB';
 import {
+  clearMessage,
+  setEmailVerifyMessage,
+  setLoginMessage
+} from './src/services/Message';
+import Navigation from './src/services/Navigation';
+import PremiumService from './src/services/PremiumService';
+import SettingsService from './src/services/SettingsService';
+import Sync from './src/services/Sync';
+import { editing, getAppIsIntialized, getIntentOnAppLoadProcessed, setAppIsInitialized, setIntentOnAppLoadProcessed } from './src/utils';
+import { COLOR_SCHEME } from './src/utils/Colors';
+import { db } from './src/utils/DB';
+import {
+  eClosePremiumDialog,
+  eCloseProgressDialog,
   eDispatchAction,
   eOnLoadNote,
-  eResetApp,
-  eStartSyncer,
+  eOpenLoginDialog,
+  eOpenPendingDialog,
+  eOpenProgressDialog,
+  eOpenSideMenu,
+  refreshNotesPage
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote} from './src/views/Editor/Functions';
+import { MMKV } from './src/utils/mmkv';
+import { tabBarRef } from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, setIntent } from './src/views/Editor/Functions';
+const {ReceiveSharingIntent} = NativeModules;
 
-Sentry.init({
-  dsn:
-    'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-});
+let Sentry = null;
+let hasPurchased = false;
 
-let firstLoad = true;
-let note = null;
-let {width, height} = Dimensions.get('window');
+function updateStatusBarColor() {
+  StatusBar.setBarStyle(
+    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+    true,
+  );
+  if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor('transparent', true);
+    StatusBar.setTranslucent(true, true);
+  }
+}
 
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
-    console.log('active state');
-    StatusBar.setBarStyle(
-      COLOR_SCHEME.night ? 'light-content' : 'dark-content',
-      true,
-    );
-    if (Platform.OS === 'android') {
-      StatusBar.setBackgroundColor('transparent', true);
-      StatusBar.setTranslucent(true, true);
-    }
+    updateStatusBarColor();
     if (SettingsService.get().privacyScreen) {
       enabled(false);
+    } 
+    if (getAppIsIntialized()) {
+      await MMKV.removeItem('appState');
     }
+    try {
+      if (getIntentOnAppLoadProcessed()) {
+        if (Platform.OS === 'android') {
+          let intent = await ReceiveSharingIntent.getFileNames();
+          if (intent) {
+            IntentService.setIntent(intent);
+            IntentService.check(loadIntent);
+          }
+        }
+      } else {
+        if (!db || !db.notes) return;
+        if (!getNote()) {
+          eSendEvent('nointent');
+        } else {
+          SplashScreen.hide();
+        }
+      }
+    } catch (e) {}
   } else {
+    if (editing.currentlyEditing && getAppIsIntialized()) {
+      let state = JSON.stringify({
+        editing: editing.currentlyEditing,
+        note: getNote(),
+      });
+      await MMKV.setItem('appState', state);
+    }
+
     if (SettingsService.get().privacyScreen) {
       enabled(true);
     }
   }
 };
 
+function loadIntent(event) {
+  if (event) {
+    setIntent();
+    eSendEvent(eOnLoadNote, event);
+    tabBarRef.current?.goToPage(1);
+    Navigation.closeDrawer();
+  } else {
+    eSendEvent('nointent');
+    SplashScreen.hide();
+    sleep(300).then(() => eSendEvent(eOpenSideMenu));
+  }
+}
+
 const onNetworkStateChanged = (netInfo) => {
-  let message = 'Internet connection restored';
+  /*  let message = 'Internet connection restored';
   let type = 'success';
   if (!netInfo.isConnected || !netInfo.isInternetReachable) {
     message = 'No internet connection';
     type = 'error';
   }
   db.user?.get().then((user) => {
-    if (user) {
+    if (user && intentOnAppLoadProcessed) {
       ToastEvent.show(message, type);
     }
-  });
+  }); */
 };
 
 const App = () => {
-  const [, dispatch] = useTracked(),
-    [init, setInit] = useState(false);
+  const [, dispatch] = useTracked();
 
-  const _onOrientationChange = (o) => {
-    return;
-    let smallTab = DDS.isSmallTab;
-    DDS.setNewValues();
-    DDS.checkSmallTab(o);
-    if (smallTab === DDS.isSmallTab) {
-      return;
-    }
-    I = DDS.isLargeTablet() ? require('./index.tablet') : require('./RootView');
-
-    setTimeout(() => {
-      resetApp();
-    }, 1000);
-  };
-  const syncChanges = async () => {
-      dispatch({type: Actions.ALL});
-    },
-    resetApp = async () => {
-      note = getNote();
-      setInit(false);
-      Initialize();
-      setInit(true);
-      await sleep(300);
-      if (note && note.id) {
-        eSendEvent(eOnLoadNote, note);
-        if (DDS.isPhone || DDS.isSmallTab) {
-          tabBarRef.current?.goToPage(1);
-        }
-        note = null;
-      }
-    },
-    startSyncer = async () => {
-      try {
-        let user = await db.user.get();
-        if (user) {
-          EV.subscribe('db:refresh', syncChanges);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-
-  const onSystemThemeChanged = async () => {
-    await SettingsService.setTheme();
-  };
+  let subsriptionSuccessListerner;
+  let subsriptionErrorListener;
 
   useEffect(() => {
-    eSubscribeEvent(eStartSyncer, startSyncer);
-    eSubscribeEvent(eResetApp, resetApp);
-    Orientation.addOrientationListener(_onOrientationChange);
     eSubscribeEvent(eDispatchAction, (type) => {
       dispatch(type);
     });
+    attachIAPListeners();
     AppState.addEventListener('change', onAppStateChanged);
-    Appearance.addChangeListener(onSystemThemeChanged);
+    eSubscribeEvent('nointent', loadMainApp);
+    Appearance.addChangeListener(SettingsService.setTheme);
     let unsub = NetInfo.addEventListener(onNetworkStateChanged);
+    Linking.addEventListener('url', onUrlRecieved);
+    EV.subscribe('db:refresh', onSyncComplete);
+    EV.subscribe('db:sync', partialSync);
+    EV.subscribe('user:loggedOut', onLogout);
+    EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
     return () => {
-      EV.unsubscribe('db:refresh', syncChanges);
-      eUnSubscribeEvent(eStartSyncer, startSyncer);
-      eUnSubscribeEvent(eResetApp, resetApp);
+      EV.subscribe('db:refresh', onSyncComplete);
+      EV.unsubscribe('user:loggedOut', onLogout);
+      EV.unsubscribe('db:sync', partialSync);
+      EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
-      Orientation.removeOrientationListener(_onOrientationChange);
+      eUnSubscribeEvent('nointent', loadMainApp);
       AppState.removeEventListener('change', onAppStateChanged);
-      Appearance.removeChangeListener(onSystemThemeChanged);
+      Appearance.removeChangeListener(SettingsService.setTheme);
+      Linking.removeEventListener('url', onUrlRecieved);
       unsub();
+      unsubIAP();
     };
   }, []);
 
-  const getUser = async () => {
-    let user = await db.user.get();
-    if (user) {
-      dispatch({type: Actions.USER, user: user});
-      dispatch({type: Actions.SYNCING, syncing: true});
-      await db.sync();
-      dispatch({type: Actions.SYNCING, syncing: false});
-      dispatch({type: Actions.ALL});
-      await startSyncer();
-    } else {
-      setLoginMessage(dispatch);
+  useEffect(() => {
+    SettingsService.init().then((r) => console.log);
+    dispatch({
+      type: Actions.DEVICE_MODE,
+      state: DDS.isLargeTablet()
+        ? 'tablet'
+        : DDS.isSmallTab
+        ? 'smallTablet'
+        : 'mobile',
+    });
+    db.init().catch(console.log).finally(runAfterInit);
+  }, []);
+
+  const onSyncComplete = async () => {
+    dispatch({type: Actions.ALL});
+    dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+  };
+
+  const onUrlRecieved = async (res) => {
+    if (getIntentOnAppLoadProcessed()) {
+      let url = res ? res.url : '';
+
+      try {
+        if (Platform.OS === 'ios' && url.startsWith('ShareMedia://dataUrl')) {
+          let intent = await ReceiveSharingIntent.getFileNames(url);
+          intent = IntentService.iosSortedData(intent);
+
+          if (intent) {
+            IntentService.setIntent(intent);
+            IntentService.check(loadIntent);
+          }
+        } else if (url.startsWith('https://notesnook.com')) {
+          await onEmailVerified();
+        }
+      } catch (e) {}
     }
   };
 
-  useEffect(() => {
-    Initialize();
-    let error = null;
-    (async () => {
-      try {
-        await db.init();
-        console.log('db is initialized');
-      } catch (e) {
-        error = e;
-        console.log(e, 'ERROR DB');
-      } finally {
-        dispatch({type: Actions.ALL});
-        getUser().catch((e) => console.log);
-        backupData().then((r) => r);
+  const onEmailVerified = async () => {
+    let user = await db.user.fetchUser();
+    dispatch({type: Actions.USER, user: user});
+    if (!user) return;
+    let message =
+      user?.subscription?.type === 2
+        ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
+        : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for free for the next 14 days!';
+    eSendEvent(eOpenProgressDialog, {
+      title: 'Email Confirmed!',
+      paragraph: message,
+      noProgress: true,
+    });
+
+    if (user?.isEmailConfirmed) {
+      clearMessage(dispatch);
+    }
+  };
+
+  const attachIAPListeners = () => {
+    if (Platform.OS === 'ios') {
+      RNIap.getReceiptIOS()
+        .then((r) => {
+          hasPurchased = true;
+          processReceipt(r);
+        })
+        .catch(console.log)
+        .finally(() => {
+          subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+            onSuccessfulSubscription,
+          );
+          subsriptionErrorListener = RNIap.purchaseErrorListener(
+            onSubscriptionError,
+          );
+        });
+    } else {
+      subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
+        onSuccessfulSubscription,
+      );
+      subsriptionErrorListener = RNIap.purchaseErrorListener(
+        onSubscriptionError,
+      );
+    }
+  };
+
+  const partialSync = async () => {
+    try {
+      dispatch({type: Actions.SYNCING, syncing: true});
+      await db.sync(false);
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+    } catch (e) {
+    } finally {
+      dispatch({type: Actions.SYNCING, syncing: false});
+    }
+  };
+
+  const onLogout = (reason) => {
+    console.log(reason, 'REASON');
+    eSendEvent(eOpenProgressDialog, {
+      title: 'User Logged Out',
+      paragraph: 'You have been logged out of your account.',
+      action: async () => {
+        eSendEvent(eCloseProgressDialog);
+        await sleep(50);
+        eSendEvent(eOpenLoginDialog);
+      },
+      icon: 'logout',
+      actionText: 'Login Again',
+      noProgress: true,
+    });
+  };
+
+  unsubIAP = () => {
+    if (subsriptionSuccessListerner) {
+      subsriptionSuccessListerner?.remove();
+      subsriptionSuccessListerner = null;
+    }
+    if (subsriptionErrorListener) {
+      subsriptionErrorListener?.remove();
+      subsriptionErrorListener = null;
+    }
+  };
+
+  const loadMainApp = () => {
+    dispatch({type: Actions.INTENT_MODE, state: false});
+    dispatch({type: Actions.ALL});
+    setCurrentUser().then(console.log).catch(console.log);
+    Backup.checkAndRun().then((r) => r);
+    sleep(500).then(() => setAppIsInitialized(true));
+    db.notes.init().then(() => {
+      dispatch({type: Actions.NOTES});
+      dispatch({type: Actions.FAVORITES});
+      eSendEvent(refreshNotesPage);
+      dispatch({type: Actions.LOADING, loading: false});
+      SettingsService.setAppLoaded();
+    });
+    SplashScreen.hide();
+    Linking.getInitialURL().then(async (url) => {
+      if (url && url.startsWith('https://notesnook.com')) {
+        await onEmailVerified();
       }
-      setInit(true);
-      setTimeout(() => {
-        if (error) {
-          console.log(error);
-          ToastEvent.show('Error initializing database.');
+    });
+    setIntentOnAppLoadProcessed(true)
+    sleep(300).then(() => eSendEvent(eOpenSideMenu));
+    //Sentry = require('@sentry/react-native');
+    // Sentry.init({
+    //   dsn:
+    //     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+    // });
+  };
+
+  const setCurrentUser = async () => {
+    try {
+      let user = await db.user.fetchUser();
+      if (user) {
+        clearMessage(dispatch);
+        if (!user.isEmailConfirmed) {
+          setEmailVerifyMessage(dispatch);
         }
-        IntentService.check();
-        SplashScreen.hide();
-      }, 100);
-    })();
-  }, []);
-
-  async function backupData() {
-    await sleep(1000);
-    let settings = await MMKV.getStringAsync('settings');
-    settings = JSON.parse(settings);
-    if (await Backup.checkBackupRequired(settings.reminder)) {
-      try {
-        await Backup.run();
-      } catch (e) {
-        console.log(e);
-      }
-    }
-  }
-
-  function Initialize() {
-    Orientation.lockToLandscape();
-    if (firstLoad) {
-      console.log(DDS.isTab);
-      if (DDS.isTab) {
+        dispatch({type: Actions.USER, user: user});
+        await Sync.run();
+        await startSyncer();
       } else {
-        Orientation.lockToPortrait();
+        setLoginMessage(dispatch);
       }
-      firstLoad = false;
+    } catch (e) {}
+  };
+
+  const runAfterInit = () => {
+    let isIntent = false;
+    IntentService.getIntent()
+      .then(() => {
+        IntentService.check((event) => {
+          SplashScreen.hide();
+          loadIntent(event);
+          setIntentOnAppLoadProcessed(true)
+          dispatch({type: Actions.ALL});
+          isIntent = true;
+          dispatch({type: Actions.INTENT_MODE, state: true});
+          ReceiveSharingIntent.clearFileNames();
+        });
+      })
+      .catch((e) => console.log)
+      .finally(() => {
+        if (!isIntent) {
+          dispatch({type: Actions.INTENT_MODE, state: false});
+          ReceiveSharingIntent.clearFileNames();
+          setIntentOnAppLoadProcessed(true)
+          loadMainApp();
+        }
+      });
+  };
+
+  const onSuccessfulSubscription = (subscription) => {
+    if (hasPurchased) {
+      return;
     }
-    SettingsService.init().then((r) => r);
-  }
+    const receipt = subscription.transactionReceipt;
+    processReceipt(receipt);
+
+    setTimeout(() => {
+      eSendEvent(eClosePremiumDialog);
+      eSendEvent(eOpenPendingDialog);
+    }, 500);
+  };
+
+  const onSubscriptionError = (error) => {};
+
+  const processReceipt = (receipt) => {
+    return;
+    if (receipt) {
+      if (Platform.OS === 'ios') {
+        fetch('http://192.168.10.5:8100/webhooks/assn', {
+          method: 'POST',
+          body: JSON.stringify({
+            receipt_data: receipt,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+          .then((r) => {
+            console.log(r.status, 'STATUS');
+          })
+          .catch((e) => {
+            console.log(e, 'ERROR');
+          });
+      }
+    }
+  };
 
   return (
-    <>
-      <SafeAreaProvider>
-        <>{!init ? <></> : <RootView />}</>
-      </SafeAreaProvider>
-    </>
+    <SafeAreaProvider>
+      <RootView />
+    </SafeAreaProvider>
   );
 };
 

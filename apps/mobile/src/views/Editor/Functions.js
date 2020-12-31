@@ -2,15 +2,21 @@ import {createRef} from 'react';
 import {Linking, Platform} from 'react-native';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
-import {refreshNotesPage} from '../../utils/Events';
 import {editing} from '../../utils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
-import {normalize} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
-import {DDS} from '../../services/DeviceDetection';
+import {db} from '../../utils/DB';
+import {
+  eOnLoadNote,
+  eShowGetPremium,
+  refreshNotesPage,
+} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {sideMenuRef, tabBarRef} from '../../utils/Refs';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 
 export const EditorWebView = createRef();
 
@@ -24,12 +30,8 @@ export const injectedJS = ` setTimeout(() => {
      link.href = './site/index.html?${params}';
      link.click();  
    }
-},1000);   
-true;
+},100);   
       `;
-
-  
-  
 
 let noteEdited = false;
 let note = null;
@@ -59,8 +61,8 @@ export function setColors(colors) {
   }
   let theme = {...appColors, factor: normalize(1)};
 
-  if (note && note.colors[0] && !DDS.isLargeTablet()) {
-    theme.shade = hexToRGBA(COLORS_NOTE[note.colors[0]], 0.15);
+  if (note && note.color && !DDS.isLargeTablet()) {
+    theme.shade = hexToRGBA(COLORS_NOTE[note.color], 0.15);
   }
   post('theme', theme);
 }
@@ -80,18 +82,17 @@ export function clearTimer() {
   }
 }
 
-
 export const INJECTED_JAVASCRIPT = (premium) =>
   premium
     ? `(function() {
         setTimeout(() => {
-         loadAction(true,false);
+         loadAction(true,${DDS.isLargeTablet()});
      
         },100)
      })();`
     : `(function() {
       setTimeout(() => {
-       loadAction(false,false);
+       loadAction(false,${DDS.isLargeTablet()});
       },100)
    })();`;
 
@@ -139,7 +140,6 @@ async function setNote(item) {
 }
 
 function clearNote() {
-  console.log('note cleared');
   note = null;
   title = '';
   noteEdited = false;
@@ -150,18 +150,18 @@ function clearNote() {
   };
 }
 
-let currentEditingTimer = null;
+let currentEditingTimer = null; 
 
-export async function loadNote(item) {
-  console.log(item);
+export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   post('blur');
+
   if (item && item.type === 'new') {
-    await clearEditor();
+       await clearEditor();
     clearNote();
-    intent = false;
     noteEdited = false;
     id = null;
+    await sleep(10);
     if (Platform.OS === 'android') {
       textInput.current?.focus();
       post('focusTitle');
@@ -173,11 +173,11 @@ export async function loadNote(item) {
     await clearEditor();
     clearNote();
     id = null;
-    intent = true;
     content = {
       data: item.data,
       type: 'delta',
     };
+    intent = true;
     if (webviewInit) {
       await loadNoteInEditor();
     }
@@ -185,11 +185,20 @@ export async function loadNote(item) {
     clearTimer();
     await setNote(item);
     sendNoteEditedEvent(item.id);
-    await loadNoteInEditor();
-    currentEditingTimer = setTimeout(() => {
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
-    }, 500);
+    if (webviewInit) {
+      await loadNoteInEditor();
+    }
+    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
   }
+};
+
+export function setIntentNote(item) {
+  id = null;
+  intent = true;
+  content = {
+    data: item.data,
+    type: 'delta',
+  };
 }
 
 export const _onMessage = async (evt) => {
@@ -220,6 +229,18 @@ export const _onMessage = async (evt) => {
     case 'scroll':
       eSendEvent('editorScroll', message);
       break;
+    case 'premium':
+      eSendEvent(eShowGetPremium, {
+        context: 'editor',
+        title: 'Get Notesnook Pro',
+        desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+      });
+
+      break;
+    case 'status':
+      webviewInit = true;
+      loadNoteInEditor();
+      break;
     default:
       break;
   }
@@ -228,6 +249,7 @@ export const _onMessage = async (evt) => {
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
+
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
@@ -249,7 +271,10 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
+  post('dateEdited', "");
+  post('saving', '');
   clearNote();
+  //intent = false;
 }
 
 function checkIfContentIsSavable() {
@@ -288,7 +313,8 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-
+      updateEvent({type: Actions.NOTEBOOKS});
+      eSendEvent(refreshNotesPage);
       break;
     }
     case 'tag': {
@@ -297,6 +323,8 @@ async function addToCollection(id) {
         type: null,
       };
 
+      updateEvent({type: Actions.TAGS});
+      eSendEvent(refreshNotesPage);
       break;
     }
     case 'color': {
@@ -305,7 +333,8 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-
+      eSendEvent(refreshNotesPage);
+      updateEvent({type: Actions.COLORS});
       break;
     }
     default: {
@@ -314,82 +343,105 @@ async function addToCollection(id) {
   }
 }
 
-export async function saveNote(canPost = true) {
+export async function saveNote() {
   if (!checkIfContentIsSavable()) return;
 
   if (id && !db.notes.note(id)) {
     clearNote();
     return;
   }
-  let lockedNote = id ? db.notes.note(id).data.locked : null;
-  if (!lockedNote) {
-    let rId = await db.notes.add({
-      title,
-      content: {
-        data: content.data,
-        type: content.type,
-      },
-      id: id,
-    });
+  let locked = id ? db.notes.note(id).data.locked : null;
+
+  let noteData = {
+    title,
+    content: {
+      data: content.data,
+      type: content.type,
+    },
+    id: id,
+  };
+
+  if (!locked) {
+    let noteId = await db.notes.add(noteData);
     if (!id || saveCounter < 3) {
       updateEvent({
         type: Actions.NOTES,
       });
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: id});
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
       eSendEvent(refreshNotesPage);
     }
-    sendNoteEditedEvent(rId);
-    await setNoteInEditorAfterSaving(id, rId);
-    if (id) {
-      await addToCollection(id);
-      updateEvent({
-        type: Actions.CURRENT_EDITING_NOTE,
-        id: id,
-      });
+
+    if (!id) {
+      await addToCollection(noteId);
     }
+    await setNoteInEditorAfterSaving(id, noteId);
     saveCounter++;
   } else {
-    await db.vault.save({
-      title,
-      content: {
-        type: content.type,
-        data: content.data,
-      },
-      id: id,
-    });
+    noteData.contentId = note.contentId;
+    await db.vault.save(noteData);
   }
+  sendNoteEditedEvent(id);
   let n = db.notes.note(id).data.dateEdited;
-  if (canPost) {
-    post('dateEdited', timeConverter(n));
-    post('saving', 'Saved');
-  }
+  post('dateEdited', timeConverter(n));
+  post('saving', 'Saved');
 }
 
-export async function onWebViewLoad( premium, colors) {
+export async function onWebViewLoad(premium, colors, event) {
   EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
   if (!checkNote()) {
     post('blur');
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
   post('blur');
-  await sleep(1000);
   setColors(colors);
-  await loadNoteInEditor();
-  webviewInit = true;
+  await loadEditorState();
+}
+async function loadEditorState() {
+  if (sideMenuRef.current !== null) {
+    if (intent) {
+      MMKV.removeItem('appState');
+      return;
+    }
+    let appState = await MMKV.getItem('appState');
+    if (appState) {
+      appState = JSON.parse(appState);
+      if (appState.editing && appState.note && appState.note.id) {
+        eSendEvent(eOnLoadNote, appState.note);
+        tabBarRef.current?.goToPage(1);
+        MMKV.removeItem('appState');
+      }
+    }
+  } else {
+    /*  IntentService.check((event) => {
+      if (event) {
+        intent = true;
+        eSendEvent(eOnLoadNote, event);
+        SplashScreen.hide();
+        sleep(300).then(() => eSendEvent(eOpenSideMenu));
+      } else {
+        eSendEvent('nointent');
+      }
+    }); */
+  }
 }
 
+export let isFromIntent = false;
+
 const loadNoteInEditor = async () => {
+  if (!webviewInit) return;
   saveCounter = 0;
   if (intent) {
     post('delta', content.data);
-    await saveNote();
     intent = false;
+    await saveNote();
   } else if (note?.id) {
     post('title', title);
-    post('dateEdited', timeConverter(note.dateEdited));
+    intent = false;
     setColors();
     post('delta', content.data);
+    await sleep(10);
+    post('dateEdited', timeConverter(note.dateEdited));
   }
-  await sleep(50);
+  await sleep(10);
   post('clearHistory');
 };

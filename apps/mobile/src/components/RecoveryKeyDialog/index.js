@@ -1,24 +1,25 @@
-import React, {createRef} from 'react';
-import {Clipboard, Text, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Clipboard, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import RNFetchBlob from 'rn-fetch-blob';
-import {LOGO_BASE64} from '../../assets/images/assets';
+import { LOGO_BASE64 } from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
-import {dWidth} from '../../utils';
-import ActionSheet from '../ActionSheet';
-import {Button} from '../Button';
-import Seperator from '../Seperator';
-import {Toast} from '../Toast';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
+import { dWidth } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
+import { sleep } from '../../utils/TimeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import { Button } from '../Button';
+import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class RecoveryKeyDialog extends React.Component {
@@ -26,6 +27,7 @@ class RecoveryKeyDialog extends React.Component {
     super(props);
     this.state = {
       key: null,
+      visible: false,
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
@@ -37,17 +39,29 @@ class RecoveryKeyDialog extends React.Component {
     if (signup) {
       this.signup = true;
     }
-    this.actionSheetRef.current?._setModalVisible(true);
+    this.setState(
+      {
+        visible: true,
+      },
+      () => {
+        this.actionSheetRef.current?.setModalVisible(true);
+      },
+    );
   };
 
   close = () => {
-    this.actionSheetRef.current?._setModalVisible(false);
+    this.actionSheetRef.current?.setModalVisible(false);
+    sleep(200).then(() => {
+      this.setState({
+        visible: false,
+      });
+    });
     if (this.signup) {
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
           title: 'Welcome!',
-          paragraph: 'Your 14 day trial for Notesnook Pro is activated',
-          icon: 'checkbox-marked-circle',
+          paragraph: 'Please verify your email to activate syncing.',
+          icon: 'check',
           button: 'Thank You!',
         });
       }, 500);
@@ -69,7 +83,7 @@ class RecoveryKeyDialog extends React.Component {
 
     this.svg.current?.toDataURL(async (data) => {
       let path = await Storage.checkAndCreateDir('/');
-      let fileName = 'nn_' + this.user.username + '_recovery_key_qrcode.png';
+      let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
       RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
         RNFetchBlob.fs
           .scanFile([
@@ -95,7 +109,7 @@ class RecoveryKeyDialog extends React.Component {
       return;
     }
     let path = await Storage.checkAndCreateDir('/');
-    let fileName = 'nn_' + this.user.username + '_recovery_key.txt';
+    let fileName = 'nn_' + this.user.email + '_recovery_key.txt';
 
     RNFetchBlob.fs
       .writeFile(path + fileName, this.state.key, 'utf8')
@@ -110,9 +124,9 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   onOpen = async () => {
-    let k = await db.user.key();
-    this.user = await db.user.get();
-    console.log(k);
+    let k = await db.user.getEncryptionKey();
+    this.user = await db.user.getUser();
+
     if (k) {
       this.setState({
         key: k.key,
@@ -122,18 +136,13 @@ class RecoveryKeyDialog extends React.Component {
 
   render() {
     const {colors} = this.props;
+    if (!this.state.visible) return null;
     return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          width: '100%',
-          alignSelf: 'center',
-          borderRadius: 10,
-        }}
+      <ActionSheetWrapper
         closeOnTouchBackdrop={false}
+        gestureEnabled={false}
         onOpen={this.onOpen}
-        ref={this.actionSheetRef}
-        initialOffsetFromBottom={1}>
+        fwdRef={this.actionSheetRef}>
         <View
           style={{
             width: dWidth,
@@ -255,7 +264,7 @@ class RecoveryKeyDialog extends React.Component {
           />
           <Toast context="local" />
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

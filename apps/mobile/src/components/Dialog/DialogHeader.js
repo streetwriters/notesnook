@@ -1,12 +1,12 @@
 import React from 'react';
-import {Text, View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {View} from 'react-native';
 import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const DialogHeader = ({icon, title, paragraph}) => {
+const DialogHeader = ({icon, title, paragraph, button}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
 
@@ -16,16 +16,39 @@ const DialogHeader = ({icon, title, paragraph}) => {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'space-between',
+          minHeight: 50,
         }}>
-        {/*   {icon ? (
-          <Icon name={icon} color={colors.accent} size={SIZE.lg} />
-        ) : null} */}
-        <Heading size={SIZE.xl}>{title}</Heading>
-      </View>
+        <View
+          style={{
+            width: '100%',
+          }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+            }}>
+            <Heading size={SIZE.xl}>{title}</Heading>
 
-      {paragraph ? (
-        <Paragraph color={colors.icon}>{paragraph}</Paragraph>
-      ) : null}
+            {button && (
+              <Button
+                onPress={button.onPress}
+                style={{
+                  borderRadius: 100,
+                }}
+                title={button.title}
+                type="accent"
+                height={22}
+              />
+            )}
+          </View>
+
+          {paragraph ? (
+            <Paragraph color={colors.icon}>{paragraph}</Paragraph>
+          ) : null}
+        </View>
+      </View>
     </>
   );
 };

@@ -8,11 +8,13 @@ import {defaultState} from '../provider/DefaultState';
 import {createRef} from 'react';
 import {dummyRef} from '../components/DummyText';
 import {SIZE} from './SizeUtils';
+import RNTooltips from 'react-native-tooltips';
+import {tabBarRef} from './Refs';
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
-  await MMKV.setStringAsync('settings', JSON.stringify(s));
+  await MMKV.setStringAsync('appSettings', JSON.stringify(s));
   updateEvent({type: Actions.SETTINGS, settings: s});
 }
 
@@ -64,7 +66,6 @@ export const history = {
 };
 
 export async function showContext(event, title) {
-  console.log(event.nativeEvent);
   event._targetInst.ref.current?.measureInWindow((x, y, w, h) => {
     dummyRef.current.setNativeProps({
       style: {
@@ -99,7 +100,7 @@ export let dHeight = Dimensions.get('window').height;
 
 export function setWidthHeight(size) {
   dWidth = size.width;
-  dHeight = size.height
+  dHeight = size.height;
 }
 
 export const itemSkus = Platform.select({
@@ -144,10 +145,89 @@ export const SUBSCRIPTION_STATUS = {
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {
-  0: "Expired",
-  1: "Trial",
-  2: "Pro",
-  3: "Pro",
-  4: "Cancelled",
+  0: 'Basic',
+  1: 'Trial',
+  2: 'Beta',
+  3: 'Trial Expired',
+  4: 'Beta Expired',
 };
 
+export const BUTTON_TYPES = {
+  transparent: {
+    primary: 'transparent',
+    text: 'accent',
+    selected: 'shade',
+  },
+  gray: {
+    primary: 'transparent',
+    text: 'icon',
+    selected: 'nav',
+  },
+  grayBg: {
+    primary: 'nav',
+    text: 'icon',
+    selected: 'nav',
+  },
+  accent: (themeColor, text) => ({
+    primary: themeColor,
+    text: text,
+    selected: themeColor,
+  }),
+  inverted: {
+    primary: 'bg',
+    text: 'accent',
+    selected: 'bg',
+  },
+  shade: {
+    primary: 'shade',
+    text: 'accent',
+    selected: 'accent',
+    opacity: 0.12,
+  },
+};
+
+export function toTXT(data) {
+  return data.reduce(function (text, op) {
+    if (!op.insert) return text;
+    if (typeof op.insert !== 'string') return text + ' ';
+    return text + op.insert;
+  }, '');
+}
+
+export const TOOLTIP_POSITIONS = {
+  LEFT: 1,
+  RIGHT: 2,
+  TOP: 3,
+  BOTTOM: 4,
+};
+
+export function showTooltip(event, text, position) {
+  if (!event._targetInst?.ref?.current) return;
+  RNTooltips.Show(event._targetInst.ref.current, tabBarRef.current, {
+    text: text,
+    tintColor: 'black',
+    corner: 40,
+    textSize: 12,
+    position: position,
+  });
+}
+
+let appIsInitialized = false;
+
+export function setAppIsInitialized(value) {
+  appIsInitialized = value;
+}
+
+export function getAppIsIntialized() {
+  return appIsInitialized;
+}
+
+let intentOnAppLoadProcessed = false;
+
+export function setIntentOnAppLoadProcessed(value) {
+  intentOnAppLoadProcessed = value;
+}
+
+export function getIntentOnAppLoadProcessed() {
+  return intentOnAppLoadProcessed;
+}

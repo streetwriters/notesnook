@@ -1,9 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {TextInput, View} from 'react-native';
+import {Platform, TextInput, View} from 'react-native';
 import {useTracked} from '../../provider';
 import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
-import {normalize, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
 export const SearchInput = (props) => {
   const [state] = useTracked();
@@ -12,26 +12,18 @@ export const SearchInput = (props) => {
 
   const updateSearchState = () => {
     setSearchState(SearchService.getSearchInformation().placeholder);
-    console.log(SearchService.getSearchInformation().placeholder);
   };
 
   useEffect(() => {
     updateSearchState();
+
+    return () => {
+      SearchService.setTerm(null);
+    };
   }, []);
 
-  /*  const clearSearch = () => {
-    searchResult = null;
-    inputRef.current?.setNativeProps({
-      text: '',
-    });
-    dispatch({
-      type: Actions.SEARCH_RESULTS,
-      results: [],
-    });
-  }; */
-
   const onChangeText = async (value) => {
-    await SearchService.search(value);
+    SearchService.setTerm(value);
   };
 
   return (
@@ -42,9 +34,7 @@ export const SearchInput = (props) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           alignSelf: 'center',
-          height: normalize(50),
-          borderRadius: 5,
-          width: '100%',
+          height: 50,
           paddingHorizontal: 12,
         },
         props.customStyle,
@@ -56,14 +46,21 @@ export const SearchInput = (props) => {
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,
-          flex: 1,
           flexWrap: 'wrap',
-          paddingVertical:0,
-          padding:0
+          padding: 0,
+          paddingVertical: 0,
+          paddingHorizontal: 0,
+          margin: 0,
+          marginBottom: Platform.OS === 'ios' ? 5 : 0,
         }}
+        textAlignVertical="center"
         onChangeText={onChangeText}
-        numberOfLines={1}
-        placeholder={searchState}
+        multiline={false}
+        onSubmitEditing={async () => {
+          await SearchService.search();
+        }}
+        enablesReturnKeyAutomatically
+        placeholder="Type a keyword"
         placeholderTextColor={colors.icon}
       />
     </View>

@@ -1,28 +1,28 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {
-  FlatList,
-  Modal,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {Keyboard, TextInput, TouchableOpacity, View} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {eOpenMoveNoteDialog} from '../../utils/Events';
-import {getElevation} from '../../utils';
+import {db} from '../../utils/DB';
+import {
+  eOnNewTopicAdded,
+  eOpenMoveNoteDialog,
+  refreshNotesPage,
+} from '../../utils/Events';
+import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -30,27 +30,18 @@ let newNotebookTitle = null;
 let newTopicTitle = null;
 const notebookInput = createRef();
 const topicInput = createRef();
-
+const actionSheetRef = createRef();
 const MoveNoteDialog = () => {
-  const [state, dispatch] = useTracked();
-  const {notebooks, colors, selectedItemsList} = state;
+  const [, dispatch] = useTracked();
   const [visible, setVisible] = useState(false);
-  const [expanded, setExpanded] = useState('');
-  const [notebookInputFocused, setNotebookInputFocused] = useState(false);
-  const [topicInputFocused, setTopicInputFocused] = useState(false);
-  const insets = useSafeAreaInsets();
-
-  function open() {
+  const [note, setNote] = useState(null);
+  function open(note) {
+    setNote(note);
     setVisible(true);
+    actionSheetRef.current?.setModalVisible(true);
   }
-
   const close = () => {
-    setVisible(false);
-    setExpanded(false);
-    newTopicTitle = null;
-    newNotebookTitle = null;
-    setNotebookInputFocused(false);
-    setTopicInputFocused(false);
+    actionSheetRef.current?.setModalVisible(false);
   };
 
   useEffect(() => {
@@ -60,330 +51,371 @@ const MoveNoteDialog = () => {
     };
   }, []);
 
+  const _onClose = () => {
+    setVisible(false);
+    newTopicTitle = null;
+    newNotebookTitle = null;
+    setNote(null);
+    eSendEvent(refreshNotesPage);
+    eSendEvent(eOnNewTopicAdded);
+    dispatch({type: Actions.CLEAR_SELECTION});
+    dispatch({type: Actions.NOTEBOOKS});
+    dispatch({type: Actions.NOTES});
+  };
+
+  const update = (note) => {
+    console.log(note.notebooks.length);
+    setNote(note);
+  };
+
+  return !visible ? null : (
+    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
+      <MoveNoteComponent close={close} note={note} setNote={update} />
+    </ActionSheetWrapper>
+  );
+};
+
+export default MoveNoteDialog;
+
+const MoveNoteComponent = ({close, note, setNote}) => {
+  const [state, dispatch] = useTracked();
+  const {colors, selectedItemsList} = state;
+  const [expanded, setExpanded] = useState('');
+  const [notebookInputFocused, setNotebookInputFocused] = useState(false);
+  const [topicInputFocused, setTopicInputFocused] = useState(false);
+
   const addNewNotebook = async () => {
     if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
       return ToastEvent.show('Title is required', 'error', 'local');
 
     await db.notebooks.add({
       title: newNotebookTitle,
-      description: 'this.description',
+      description: null,
       topics: [],
       id: null,
     });
     notebookInput.current?.clear();
     notebookInput.current?.blur();
     dispatch({type: Actions.NOTEBOOKS});
-    dispatch({type: Actions.PINNED});
   };
 
   const addNewTopic = async () => {
     if (!newTopicTitle || newTopicTitle.trim().length === 0) {
       return ToastEvent.show('Title is required', 'error', 'local');
     }
-
-    let res = await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-
+    await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
     dispatch({type: Actions.NOTEBOOKS});
-    dispatch({type: Actions.PINNED});
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
   };
 
+  const handlePress = async (item, index) => {
+    if (
+      note?.notebooks?.findIndex(
+        (o) =>
+          o.topics.findIndex((i) => {
+            return i === item.id;
+          }) > -1,
+      ) > -1
+    ) {
+      await db.notebooks
+        .notebook(item.notebookId)
+        .topics.topic(item.id)
+        .delete(note.id);
+
+      if (note && note.id) {
+        setNote({...db.notes.note(note.id).data});
+        sendNoteEditedEvent(note.id);
+      }
+      dispatch({type: Actions.NOTEBOOKS});
+
+      return;
+    }
+
+    let noteIds = [];
+    selectedItemsList.forEach((i) => noteIds.push(i.id));
+    console.log(noteIds, 'NOTE IDS');
+    await db.notes.move(
+      {
+        topic: item.id,
+        id: item.notebookId,
+      },
+      ...noteIds,
+    );
+    if (note && note.id) {
+      setNote({...db.notes.note(note.id).data});
+
+      sendNoteEditedEvent(note.id);
+    }
+    dispatch({type: Actions.NOTEBOOKS});
+  };
+
   return (
-    <Modal
-      animated={true}
-      animationType="slide"
-      onRequestClose={close}
-      visible={visible}
-      statusBarTranslucent={true}
-      transparent={true}>
-      <View
-        style={{
-          flex: 1,
-          paddingTop: insets.top,
-          backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
-          width: '100%',
-          height: '100%',
-          alignSelf: 'center',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
+    <>
+      <View>
         <TouchableOpacity
-          onPress={close}
           style={{
             width: '100%',
             height: '100%',
             position: 'absolute',
-            zIndex: 1,
+          }}
+          onPress={() => {
+            Keyboard.dismiss();
           }}
         />
-
         <View
           style={{
-            ...getElevation(DDS.isTab ? 10 : 0),
-            width: DDS.isTab ? 500 : '100%',
-            height: DDS.isTab ? 500 : '100%',
-            flex: 1,
-            borderRadius: DDS.isTab ? 5 : 0,
-            backgroundColor: colors.bg,
-            padding: DDS.isTab ? 8 : 0,
-            zIndex: 10,
+            paddingHorizontal: 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: 50,
-            }}>
-            <Icon
-              name="close"
-              size={SIZE.xxl}
-              onPress={close}
-              style={{
-                width: 50,
-                height: 50,
-                marginLeft: 12,
-                position: 'absolute',
-                textAlignVertical: 'center',
-                left: 0,
-                marginBottom: 15,
-              }}
-              color={colors.heading}
-            />
-            <Heading color={colors.accent}>
-              {selectedItemsList.length > 1
-                ? 'Add notes to notebook'
-                : 'Add note to notebook'}
-            </Heading>
-          </View>
+          <DialogHeader
+            title="Add to notebook"
+            paragraph={`Add your notes in notebooks to find them easily.`}
+          />
+        </View>
 
-          <FlatList
-            data={state.notebooks}
-            ListHeaderComponent={
-              <View
-                style={{
-                  paddingHorizontal: 12,
+        <FlatList
+          nestedScrollEnabled={true}
+          onScrollEndDrag={() => {
+            actionSheetRef.current?.handleChildScrollEnd();
+          }}
+          onMomentumScrollEnd={() => {
+            actionSheetRef.current?.handleChildScrollEnd();
+          }}
+          onScrollAnimationEnd={() => {
+            actionSheetRef.current?.handleChildScrollEnd();
+          }}
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode="none"
+          data={state.notebooks}
+          ListFooterComponent={
+            <View
+              style={{
+                height: 100,
+              }}
+            />
+          }
+          ListHeaderComponent={
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginBottom: 10,
+                width: '100%',
+                borderBottomWidth: 1,
+                borderColor: colors.nav,
+                paddingHorizontal: 12,
+              }}>
+              <TextInput
+                ref={notebookInput}
+                onChangeText={(value) => {
+                  newNotebookTitle = value;
+                }}
+                testID={notesnook.ids.dialogs.addTo.addNotebook}
+                blurOnSubmit={false}
+                onFocus={() => {
+                  setNotebookInputFocused(true);
+                }}
+                onBlur={() => {
+                  setNotebookInputFocused(false);
+                }}
+                onSubmitEditing={addNewNotebook}
+                style={[
+                  {
+                    color: colors.pri,
+                    width: '90%',
+                    maxWidth: '90%',
+                    paddingHorizontal: 0,
+                    borderRadius: 5,
+                    minHeight: 45,
+                    fontSize: SIZE.md,
+                    fontFamily: WEIGHT.regular,
+                    padding: pv - 2,
+                  },
+                ]}
+                placeholder="Create a new notebook"
+                placeholderTextColor={colors.icon}
+              />
+              <TouchableOpacity
+                onPress={addNewNotebook}
+                testID={notesnook.ids.dialogs.addTo.addNotebook}
+                style={[
+                  {
+                    borderRadius: 5,
+                    minHeight: 45,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  },
+                ]}>
+                <Icon
+                  name="plus"
+                  size={SIZE.lg}
+                  color={notebookInputFocused ? colors.accent : colors.icon}
+                />
+              </TouchableOpacity>
+            </View>
+          }
+          renderItem={({item, index}) => (
+            <View
+              style={{
+                height: expanded === item.id ? null : 60,
+              }}>
+              <PressableButton
+                onPress={() => {
+                  setExpanded(item.id === expanded ? null : item.id);
+                  setTopicInputFocused(false);
+                  setNotebookInputFocused(false);
+                }}
+                type="gray"
+                customStyle={{
+                  height: 50,
+                  width: '100%',
+                  borderRadius: 0,
+                  alignItems: 'flex-start',
+                  marginBottom: 5,
+                  borderBottomWidth: 1,
+                  borderBottomColor:
+                    expanded === item.id ? colors.accent : colors.nav,
                 }}>
                 <View
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    paddingHorizontal: 0,
-                    marginBottom: 10,
                     width: '100%',
-                    borderBottomWidth: 1,
-                    borderColor: notebookInputFocused
-                      ? colors.accent
-                      : colors.nav,
-                  }}>
-                  <TextInput
-                    ref={notebookInput}
-                    onChangeText={(value) => {
-                      newNotebookTitle = value;
-                    }}
-                    blurOnSubmit={false}
-                    onFocus={() => {
-                      setNotebookInputFocused(true);
-                    }}
-                    onBlur={() => {
-                      setNotebookInputFocused(false);
-                    }}
-                    onSubmitEditing={addNewNotebook}
-                    style={[
-                      {
-                        color: colors.pri,
-                        width: '85%',
-                        maxWidth: '85%',
-                        paddingHorizontal: 0,
-                        borderRadius: 5,
-                        minHeight: 45,
-                        fontSize: SIZE.md,
-                        fontFamily: WEIGHT.regular,
-                        padding: pv - 2,
-                      },
-                    ]}
-                    placeholder="Create a new notebook"
-                    placeholderTextColor={colors.icon}
-                  />
-                  <TouchableOpacity
-                    onPress={addNewNotebook}
-                    style={[
-                      {
-                        borderRadius: 5,
-                        width: '12%',
-                        minHeight: 45,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      },
-                    ]}>
-                    <Icon
-                      name="plus"
-                      size={SIZE.lg}
-                      color={notebookInputFocused ? colors.accent : colors.nav}
-                    />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            }
-            renderItem={({item, index}) => (
-              <View>
-                <PressableButton
-                  onPress={() => {
-                    setExpanded(item.id === expanded ? null : item.id);
-                  }}
-                  color={expanded === item.id ? colors.shade : 'transparent'}
-                  selectedColor={
-                    expanded === item.id ? colors.accent : colors.nav
-                  }
-                  alpha={colors.night ? 0.02 : -0.02}
-                  opacity={expanded === item.id ? 0.12 : 1}
-                  customStyle={{
                     height: 50,
-                    width: '100%',
-                    borderRadius: 0,
-                    alignItems: 'flex-start',
+                    justifyContent: 'space-between',
+                    flexDirection: 'row',
+                    alignItems: 'center',
                     paddingHorizontal: 12,
-                    marginBottom: 5,
                   }}>
-                  <View
-                    style={{
-                      borderBottomWidth: 1,
-                      width: '100%',
-                      height: 50,
-                      justifyContent: 'center',
-                      borderBottomColor:
-                        expanded === item.id ? 'transparent' : colors.nav,
-                    }}>
-                    <Heading size={SIZE.md}>
+                  <View>
+                    <Heading
+                      color={expanded === item.id ? colors.accent : null}
+                      size={SIZE.md}>
                       {item.title}
-                      {'\n'}
-                      <Paragraph size={SIZE.xs} color={colors.icon}>
-                        {item.totalNotes +
-                          ' notes' +
-                          ' & ' +
-                          item.topics.length +
-                          ' topics'}
-                      </Paragraph>
                     </Heading>
+                    <Paragraph size={SIZE.xs} color={colors.icon}>
+                      Notebook{' '}
+                      {item.totalNotes +
+                        ' notes' +
+                        ' & ' +
+                        item.topics.length +
+                        ' topics'}
+                    </Paragraph>
                   </View>
-                </PressableButton>
 
-                {expanded === item.id ? (
-                  <FlatList
-                    data={item.topics}
-                    ListHeaderComponent={
+                  <Icon
+                    name={expanded === item.id ? 'chevron-up' : 'chevron-down'}
+                    color={colors.pri}
+                    size={SIZE.lg}
+                  />
+                </View>
+              </PressableButton>
+
+              {expanded === item.id ? (
+                <FlatList
+                  nestedScrollEnabled
+                  data={item.topics}
+                  keyboardShouldPersistTaps="always"
+                  keyboardDismissMode="none"
+                  onScrollEndDrag={() => {
+                    actionSheetRef.current?.handleChildScrollEnd();
+                  }}
+                  onMomentumScrollEnd={() => {
+                    actionSheetRef.current?.handleChildScrollEnd();
+                  }}
+                  onScrollAnimationEnd={() => {
+                    actionSheetRef.current?.handleChildScrollEnd();
+                  }}
+                  style={{
+                    width: '90%',
+                    alignSelf: 'flex-end',
+                    maxHeight: 500,
+                  }}
+                  ListHeaderComponent={
+                    <View>
                       <View
                         style={{
-                          paddingRight: 12,
-                        }}>
-                        <View
-                          style={{
-                            flexDirection: 'row',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            width: '90%',
-                            alignSelf: 'flex-end',
-                            marginBottom: 5,
-                            marginTop: 5,
-                            borderBottomWidth: 1,
-                            borderColor: topicInputFocused
-                              ? colors.accent
-                              : colors.nav,
-                          }}>
-                          <TextInput
-                            ref={topicInput}
-                            onChangeText={(value) => {
-                              newTopicTitle = value;
-                            }}
-                            blurOnSubmit={false}
-                            onFocus={() => {
-                              setTopicInputFocused(true);
-                            }}
-                            onBlur={() => {
-                              setTopicInputFocused(false);
-                            }}
-                            onSubmitEditing={addNewTopic}
-                            style={[
-                              {
-                                color: colors.pri,
-                                width: '85%',
-                                maxWidth: '85%',
-                                paddingHorizontal: 0,
-                                borderRadius: 5,
-                                height: 40,
-                                fontSize: SIZE.sm,
-                                fontFamily: WEIGHT.regular,
-                                padding: pv - 2,
-                              },
-                            ]}
-                            placeholder="Create a new topic"
-                            placeholderTextColor={colors.icon}
-                          />
-                          <TouchableOpacity
-                            onPress={addNewTopic}
-                            style={[
-                              {
-                                borderRadius: 5,
-                                width: 40,
-                                minHeight: 40,
-                                justifyContent: 'center',
-                                alignItems: 'center',
-                              },
-                            ]}>
-                            <Icon
-                              name="plus"
-                              size={SIZE.lg}
-                              color={
-                                topicInputFocused ? colors.accent : colors.nav
-                              }
-                            />
-                          </TouchableOpacity>
-                        </View>
-                      </View>
-                    }
-                    renderItem={({item, index}) => (
-                      <PressableButton
-                        onPress={async () => {
-                          let noteIds = [];
-                          selectedItemsList.forEach((i) => noteIds.push(i.id));
-
-                          let res = await db.notes.move(
-                            {
-                              topic: item.title,
-                              id: item.notebookId,
-                            },
-                            ...noteIds,
-                          );
-                          dispatch({type: Actions.CLEAR_SELECTION});
-                          dispatch({type: Actions.NOTEBOOKS});
-                          dispatch({type: Actions.PINNED});
-                          close();
-                          let notebookName = db.notebooks.notebook(
-                            item.notebookId,
-                          ).title;
-                          ToastEvent.show(
-                            `Note moved to ${item.title} in ${notebookName}`,
-                            'success',
-                          );
-                        }}
-                        color="transparent"
-                        selectedColor={colors.nav}
-                        alpha={colors.night ? 0.02 : -0.02}
-                        customStyle={{
-                          height: 50,
-                          borderTopWidth: index === 0 ? 0 : 1,
-                          borderTopColor: colors.nav,
-                          width: '87%',
-                          alignSelf: 'flex-end',
-                          borderRadius: 0,
-                          alignItems: 'center',
-                          marginRight: 12,
                           flexDirection: 'row',
                           justifyContent: 'space-between',
+                          alignItems: 'center',
+                          width: '100%',
+                          alignSelf: 'flex-end',
+                          marginBottom: 5,
+                          marginTop: 5,
+                          borderBottomWidth: 1,
+                          paddingHorizontal: 12,
+                          borderColor: colors.nav,
                         }}>
+                        <TextInput
+                          ref={topicInput}
+                          onChangeText={(value) => {
+                            newTopicTitle = value;
+                          }}
+                          testID={notesnook.ids.dialogs.addTo.addTopic}
+                          blurOnSubmit={false}
+                          onFocus={() => {
+                            setTopicInputFocused(true);
+                          }}
+                          onBlur={() => {
+                            setTopicInputFocused(false);
+                          }}
+                          onSubmitEditing={addNewTopic}
+                          style={[
+                            {
+                              color: colors.pri,
+                              width: '90%',
+                              maxWidth: '90%',
+                              paddingHorizontal: 0,
+                              borderRadius: 5,
+                              height: 40,
+                              fontSize: SIZE.sm,
+                              fontFamily: WEIGHT.regular,
+                              padding: pv - 2,
+                            },
+                          ]}
+                          placeholder="Add a topic"
+                          placeholderTextColor={colors.icon}
+                        />
+                        <TouchableOpacity
+                          onPress={addNewTopic}
+                          testID={notesnook.ids.dialogs.addTo.btnTopic}
+                          style={[
+                            {
+                              borderRadius: 5,
+                              height: 40,
+                              justifyContent: 'center',
+                              alignItems: 'center',
+                            },
+                          ]}>
+                          <Icon
+                            name="plus"
+                            size={SIZE.lg}
+                            color={
+                              topicInputFocused ? colors.accent : colors.icon
+                            }
+                          />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  }
+                  renderItem={({item, index}) => (
+                    <PressableButton
+                      onPress={() => handlePress(item, index)}
+                      type="gray"
+                      customStyle={{
+                        height: 50,
+                        borderTopWidth: index === 0 ? 0 : 1,
+                        borderTopColor: colors.nav,
+                        width: '100%',
+                        borderRadius: 0,
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        paddingHorizontal: 12,
+                        justifyContent: 'space-between',
+                      }}>
+                      <View>
                         <Paragraph color={colors.heading}>
                           {item.title}
                           {'\n'}
@@ -391,19 +423,23 @@ const MoveNoteDialog = () => {
                             {item.totalNotes + ' notes'}
                           </Paragraph>
                         </Paragraph>
-                        <Paragraph color={colors.accent}>Move</Paragraph>
-                      </PressableButton>
-                    )}
-                  />
-                ) : null}
-              </View>
-            )}
-          />
-        </View>
-        <Toast context="local" />
+                      </View>
+                      {note?.notebooks?.findIndex(
+                        (o) => o.topics.indexOf(item.id) > -1,
+                      ) > -1 ? (
+                        <Paragraph size={SIZE.sm} color={colors.errorText}>
+                          Remove Note
+                        </Paragraph>
+                      ) : null}
+                    </PressableButton>
+                  )}
+                />
+              ) : null}
+            </View>
+          )}
+        />
       </View>
-    </Modal>
+      <Toast context="local" />
+    </>
   );
 };
-
-export default MoveNoteDialog;

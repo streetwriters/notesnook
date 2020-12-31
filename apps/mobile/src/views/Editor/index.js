@@ -1,13 +1,8 @@
 import React from 'react';
-import {
-  KeyboardAvoidingView,
-  Platform,
-  SafeAreaView,
-  TextInput,
-  View,
-} from 'react-native';
+import { Platform, TextInput, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {useTracked} from '../../provider';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -16,12 +11,13 @@ import {
   sourceUri,
   textInput,
   _onMessage,
-  _onShouldStartLoadWithRequest,
+  _onShouldStartLoadWithRequest
 } from './Functions';
 
 const Editor = () => {
   const [state] = useTracked();
   const {colors, premiumUser} = state;
+
   return (
     <>
       <TextInput
@@ -31,10 +27,12 @@ const Editor = () => {
       />
       <EditorHeader />
       <WebView
-        testID="editor"
+        testID={notesnook.ids.default.editor}
         ref={EditorWebView}
         onError={(error) => console.log(error)}
-        onLoad={async () => await onWebViewLoad(premiumUser, colors)}
+        onLoad={async (event) =>
+          await onWebViewLoad(premiumUser, colors, event)
+        }
         javaScriptEnabled={true}
         focusable={true}
         keyboardDisplayRequiresUserAction={false}

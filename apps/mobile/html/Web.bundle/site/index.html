@@ -6,65 +6,519 @@
   <link href="styles.css" rel="stylesheet" />
 
   <style>
-     .ql-toolbar {
-    background-color:transparent;
-    overflow-x: auto;
-    width: 100vw;
-    white-space: nowrap;
-    position: absolute;
-    bottom: 0px;
-    height: 50px;
-    left: 0px;
-  }
-  .ql-toolbar::-webkit-scrollbar {
-    display: none;
-  }
+    .ql-toolbar {
+      background-color: transparent;
+      overflow-x: auto;
+      width: 100vw;
+      white-space: nowrap;
+      position: absolute;
+      bottom: 0px;
+      height: 50px;
+      left: 0px;
+    }
+
+    .ql-toolbar::-webkit-scrollbar {
+      display: none;
+    }
+    #simpleTitleInput {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600 !important;
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 24px;
+      padding-right: 12px;
+      padding-left:12px;
+      height:50px;
+    }
+    .info-bar {
+      margin-bottom: 0px !important;
+    }
+
+    #titlebarAlt {
+      height:50px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+    }
+    #titlebar {
+      display: none !important;
+    }
+
+
+
   </style>
 
 </head>
 
 <body class="app-body">
   <div class="app-main">
-    <div id="titlebar">
-      <form id="formBox">
+     <div id="titlebar">
+    <form id="formBox">
         <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
+
         <div id="textCopy"></div>
-      </form>
+      </form> 
       <div class="info-bar">
         <p id="infowords"></p>
-        <p>-</p>
         <p id="infodate"></p>
-        <p>-</p>
         <p id="infosaved"></p>
       </div>
+    </div> 
+
+    <div id="titlebarAlt">
+    
+         <input maxlength="150" id="simpleTitleInput" placeholder="Title here"></input>
+         <div class="info-bar info-bar-alt">
+           <p id="infowords"></p>
+           <p id="infodate"></p>
+           <p id="infosaved"></p>
+         </div>
     </div>
+
+
     <div id="editor"></div>
   </div>
   <div id="toolbar"></div>
 </body>
-
-<script src="constants.js"></script>
-<script src="listeners.js"></script>
-<script src="module.js"></script>
-<script src="quill.js"></script>
-<script src="image-resize.min.js"></script>
-
 <script>
   let editor;
+  let isTablet = true;
+  </script>
+<script src="quill.js"></script>
+<script src="constants.js"></script>
+<script src="module.js"></script>
+<script src="image-resize.min.js"></script>
+<script src="magic-url.js"></script>
+<script src="listeners.js"></script>
 
-  function loadAction(premium, noMenu) {
+<script>
+  const List = Quill.import("formats/list");
+  let BlockEmbed = Quill.import("blots/block/embed");
+  class HorizontalRule extends BlockEmbed { }
+  HorizontalRule.blotName = "hr";
+  HorizontalRule.tagName = "hr";
+  const Block = Quill.import("blots/block");
+
+  Quill.register("formats/horizontal", HorizontalRule);
+  function matchInline(text, pattern, lineStart, commit) {
+    if (text.match(/^([*_ \n]+)$/g)) return false;
+
+    let match = pattern.exec(text);
+
+    const annotatedText = match[0];
+    const matchedText = match[2];
+    match.index = match.index && commit ? match.index + 1 : match.index;
+    const startIndex = lineStart + match.index;
+
+    return { annotatedText, matchedText, startIndex };
+  }
+  class MarkdownShortcuts {
+    _makeHeaderAction(headerSize) {
+      return (text, selection, _pattern, lineStart) => {
+        const [prevLine] = this.quill.getLine(lineStart - 1);
+        const prevLineStart =
+          selection.index - text.length - prevLine.cache.length;
+        const prevLineText = this.quill.getText(
+          prevLineStart,
+          prevLine.cache.length
+        );
+        if (prevLineText.trim().length <= 0) return false;
+        setTimeout(() => {
+          this.quill.formatLine(prevLineStart, 0, "header", headerSize);
+          this.quill.deleteText(lineStart, text.length);
+        }, 0);
+      };
+    }
+    _makeInlineAction(inlineStyle) {
+      return (text, _selection, pattern, lineStart, commit, trigger) => {
+        const matchInfo = matchInline(text, pattern, lineStart, commit);
+        if (!matchInfo) return;
+        const { matchedText, annotatedText, startIndex } = matchInfo;
+
+        setTimeout(() => {
+          this.quill.deleteText(startIndex, annotatedText.length);
+          if (!commit) this.quill.insertText(startIndex, " ");
+          this.quill.insertText(
+            startIndex + (commit ? 0 : 1),
+            commit ? matchedText : annotatedText.trim(),
+            inlineStyle
+          );
+          if (commit)
+            this.quill.insertText(this.quill.getSelection(), trigger, {
+              bold: false,
+              italic: false,
+              strike: false,
+              code: false,
+            });
+        }, 0);
+      };
+    }
+    _makeEmphasisMatcher(name, numberOfChars, inlineStyle) {
+      return {
+        name,
+        pattern: new RegExp(
+          `(?:^|\\s|\\n|[^A-z0-9_*~\`])(\\*{${numberOfChars}}|_{${numberOfChars}})((?!\\1).*?)(\\1)($|\\s|\\n|[^A-z0-9_*~\`])`,
+          "g"
+        ),
+        action: this._makeInlineAction(inlineStyle),
+      };
+    }
+
+    constructor(quill, options) {
+      this.quill = quill;
+      this.options = options;
+
+      this.ignoreTags = ["PRE"];
+      this.matches = [
+        this._makeEmphasisMatcher("bolditalic", 3, { bold: true, italic: true }),
+        this._makeEmphasisMatcher("bold", 2, { bold: true }),
+        this._makeEmphasisMatcher("italic", 1, { italic: true }),
+        {
+          name: "header",
+          pattern: /^(#){1,6}\s/g,
+          action: (text, selection, pattern) => {
+            var match = pattern.exec(text);
+            if (!match) return;
+            const size = match[0].length;
+            // Need to defer this action https://github.com/quilljs/quill/issues/1134
+            setTimeout(() => {
+              this.quill.formatLine(selection.index, 0, "header", size - 1);
+              this.quill.deleteText(selection.index - size, size);
+            }, 0);
+          },
+        },
+        {
+          name: "subtext-header-1",
+          pattern: /^=+$/g,
+          action: this._makeHeaderAction(1),
+        },
+        {
+          name: "subtext-header-2",
+          pattern: /^-+$/g,
+          action: this._makeHeaderAction(2),
+        },
+        {
+          name: "blockquote",
+          pattern: /^(>)\s/g,
+          action: (text, selection) => {
+            // Need to defer this action https://github.com/quilljs/quill/issues/1134
+            setTimeout(() => {
+              this.quill.formatLine(selection.index, 1, "blockquote", true);
+              this.quill.deleteText(selection.index - 2, 2);
+            }, 0);
+          },
+        },
+        {
+          name: "code-block",
+          pattern: /^`{3}/g,
+          action: (text, selection, _pattern, lineStart, commit, trigger) => {
+            if (!commit) return;
+            // Need to defer this action https://github.com/quilljs/quill/issues/1134
+            setTimeout(() => {
+              this.quill.formatLine(selection.index, 1, "code-block", true);
+              let deleteCount = trigger === " " ? 4 : 3;
+              this.quill.deleteText(selection.index - deleteCount, deleteCount);
+              this.quill.setSelection(selection.index - deleteCount);
+            }, 0);
+          },
+        },
+        {
+          name: "strikethrough",
+          pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(~{2})((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
+          action: this._makeInlineAction({ strike: true }),
+        },
+        {
+          name: "displayformula",
+          pattern: /(?:\$\$)(.+?)(?:\$\$)/g,
+          action: (text, selection, pattern, lineStart) => {
+            let match = pattern.exec(text);
+
+            const annotatedText = match[0];
+            const matchedText = match[1];
+            const startIndex = lineStart + match.index;
+
+            if (text.match(/^([*_ \n]+)$/g)) return;
+
+            setTimeout(() => {
+              this.quill.deleteText(startIndex, annotatedText.length);
+              this.quill.insertEmbed(startIndex, "formula", matchedText);
+              this.quill.insertText(startIndex + 1, "\n", "align", "center");
+            }, 0);
+          },
+        },
+        {
+          name: "formula",
+          pattern: /(?:\$)(.+?)(?:\$)/g,
+          action: (text, selection, pattern, lineStart) => {
+            let match = pattern.exec(text);
+
+            const annotatedText = match[0];
+            const matchedText = match[1];
+            const startIndex = lineStart + match.index;
+
+            if (text.match(/^([*_ \n]+)$/g)) return;
+
+            setTimeout(() => {
+              this.quill.deleteText(startIndex, annotatedText.length);
+              this.quill.insertEmbed(startIndex, "formula", matchedText);
+            }, 0);
+          },
+        },
+        {
+          name: "code",
+          pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(`)((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
+          action: this._makeInlineAction({
+            code: true,
+          }),
+        },
+        {
+          name: "hr",
+          pattern: /^(-|\*){3}/g,
+          action: (text, selection, pattern) => {
+            setTimeout(() => {
+              const matchedText = text.match(pattern)[0];
+              const startIndex = selection.index - matchedText.length;
+              this.quill.deleteText(startIndex, matchedText.length);
+
+              this.quill.insertEmbed(startIndex, "hr", true, Quill.sources.USER);
+              this.quill.setSelection(startIndex + 1, Quill.sources.SILENT);
+            }, 0);
+          },
+        },
+        {
+          name: "plus-ul",
+          // Quill 1.3.5 already treat * as another trigger for bullet lists
+          pattern: /^\+\s$/g,
+          action: (text, selection, pattern) => {
+            setTimeout(() => {
+              this.quill.formatLine(selection.index, 1, "list", "unordered");
+              this.quill.deleteText(selection.index - 2, 2);
+            }, 0);
+          },
+        },
+        {
+          name: "image",
+          pattern: /!\[([^\]]*)]\(([^)"]+)(?: "([^"]+)")?\)/g,
+          action: (text, selection, pattern, _lineStart, commit, trigger) => {
+            if (!commit) return;
+            const [matchedText, , link] = pattern.exec(text);
+            const start =
+              selection.index - matchedText.length - (trigger === " " ? 1 : 0);
+            setTimeout(() => {
+              this.quill.deleteText(start, matchedText.length);
+              this.quill.insertEmbed(start, "image", link);
+            }, 0);
+          },
+        },
+        {
+          name: "link",
+          pattern: /\[([^\]]+)]\(([^)"]+)(?: "([^"]+)")?\)/g,
+          action: (text, selection, pattern, _lineStart, commit, trigger) => {
+            if (!commit) return;
+            const [matchedText, title, link] = pattern.exec(text);
+            const start =
+              selection.index - matchedText.length - (trigger === " " ? 1 : 0);
+            setTimeout(() => {
+              this.quill.deleteText(start, matchedText.length);
+              this.quill.insertText(start, title, "link", link);
+            }, 0);
+          },
+        },
+      ];
+
+      // Handler that looks for insert deltas that match specific characters
+      this.quill.on("text-change", (delta, oldContents, source) => {
+        if (source !== "user") return;
+        for (let i = 0; i < delta.ops.length; i++) {
+          if (delta.ops[i].hasOwnProperty("insert")) {
+            let char = delta.ops[i].insert;
+            if (char === " " || char === "\n") {
+              this.onSpace(char, true);
+            } //else this.onSpace("", false);
+          } else if (delta.ops[i].hasOwnProperty("delete") && source === "user") {
+            this.onDelete();
+          }
+        }
+      });
+    }
+
+    isValid(text, tagName) {
+      return (
+        typeof text !== "undefined" &&
+        text &&
+        this.ignoreTags.indexOf(tagName) === -1
+      );
+    }
+
+    onSpace(trigger, commit) {
+      const selection = this.quill.getSelection();
+      if (!selection) return;
+      const [line, offset] = this.quill.getLine(selection.index);
+      const lineStart = selection.index - offset;
+      //const rawText = this.quill.getText(lineStart, selection.index - lineStart);
+
+      // formulas count as a single character for insertion/deletion
+      // purposes, yet they don't show up the output of getText.
+      // So we have to compensate:
+      // see https://github.com/quilljs/quill/blob/cb0fb6630a59aa8efff3e0d1caa6645e565d19bd/core/editor.js#L147
+      // for the implementation of getText, which is what we were using before here
+      const text = this.quill
+        .getContents(lineStart, selection.index)
+        .filter((op) => typeof op.insert === "string" || op.insert.formula)
+        .map((op) => (op.insert.formula ? " " : op.insert))
+        .join("");
+
+      if (this.isValid(text, line.domNode.tagName)) {
+        for (let match of this.matches) {
+          const matchedText = text.match(match.pattern);
+          if (matchedText) {
+            // We need to replace only matched text not the whole line
+            if (
+              match.action(
+                text,
+                selection,
+                match.pattern,
+                lineStart,
+                commit,
+                trigger
+              ) !== false
+            ) {
+              this.lastMatch = match;
+              console.log("Quill match made (" + match.name + ")");
+              return;
+            }
+          }
+        }
+      }
+    }
+
+    onDelete() {
+      const range = this.quill.getSelection();
+      const format = this.quill.getFormat(range);
+
+      if (format.blockquote || format.code || format["code-block"]) {
+        if (this.isLastBrElement(range) || this.isEmptyLine(range)) {
+          this.quill.removeFormat(range.index, range.length);
+        }
+      }
+    }
+
+    isLastBrElement(range) {
+      const [block] = this.quill.scroll.descendant(Block, range.index);
+      const isBrElement =
+        block != null && block.domNode.firstChild instanceof HTMLBRElement;
+      return isBrElement;
+    }
+
+    isEmptyLine(range) {
+      const [line] = this.quill.getLine(range.index);
+      const isEmpty = line?.children?.head?.text?.trim() === "";
+      return isEmpty;
+    }
+  }
+
+  class BetterList extends List {
+    constructor(el) {
+      super(el);
+      const isCheckList = el.hasAttribute("data-checked");
+      el.addEventListener("touchstart", e => {
+        if (!isCheckList) {
+          return;
+        }
+        e.preventDefault();
+      });
+    }
+  }
+
+
+  function moduleHandlerWrapper(type, premium) {
+    return async function (value) {
+      if (!premium) {
+        await window.ReactNativeWebView.postMessage(JSON.stringify({
+          type: "premium"
+        }));
+        return;
+      }
+      handlers[type].call(this, value);
+    };
+  }
+
+  const SnowTheme = Quill.import("themes/snow");
+  const Toolbar = Quill.import("modules/toolbar");
+
+  const handlers = {
+    ...Toolbar.DEFAULTS.handlers,
+    ...SnowTheme.DEFAULTS.modules.toolbar.handlers,
+    color: function (color) {
+      this.quill.format("color", color, "user");
+    },
+    background: function (color) {
+      this.quill.format("background", color, "user");
+    },
+    align: function (position) {
+      this.quill.format("align", position, "user");
+    },
+    "code-block": function (value) {
+      this.quill.format("code-block", value, "user");
+    },
+    size: function (value) {
+      this.quill.format("size", value, "user");
+    },
+    script: function (value) {
+      this.quill.format("script", value, "user");
+    },
+  };
+
+  attachMessageListener();
+  function loadAction(premium) {
+    isTablet = true;
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
     titleIn.style['padding-right'] = 0;
-
+ 
     let mainToolbar = premium ? proToolbar : simpleToolbar;
     setFonts();
-
     Quill.register('modules/imageCompressor', imageCompressor);
+    Quill.register("formats/lists", BetterList);
+    Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 
     editor = new Quill('#editor', {
       modules: {
-        toolbar: mainToolbar,
+        toolbar: {
+          container: [
+            ["bold", "italic", "underline", "strike", "blockquote"],
+            [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
+            [
+              { align: "" },
+              { align: "center" },
+              { align: "right" },
+              { align: "justify" },
+            ],
+            [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
+            [{ indent: "-1" }, { indent: "+1" }],
+            [{ size: ["small", false, "large", "huge"] }],
+            ["code-block", { script: "sub" }, { script: "super" }],
+            [{ color: [] }, { background: [] }],
+            ["link", "image", "video"],
+            [{ direction: "rtl" }, "clean"],
+          ],
+          handlers: {
+            list: moduleHandlerWrapper("list", premium),
+            indent: moduleHandlerWrapper("indent", premium),
+            direction: moduleHandlerWrapper("direction", premium),
+            image: moduleHandlerWrapper("image", premium),
+            video: moduleHandlerWrapper("video", premium),
+            formula: moduleHandlerWrapper("formula", premium),
+            color: moduleHandlerWrapper("formula", premium),
+            background: moduleHandlerWrapper("background", premium),
+            align: moduleHandlerWrapper("align", premium),
+            "code-block": moduleHandlerWrapper("code-block", premium),
+            size: moduleHandlerWrapper("size", premium),
+            script: moduleHandlerWrapper("script", premium),
+          },
+        },
         imageCompressor: {
           quality: 0.9,
           maxWidth: 1024,
@@ -76,8 +530,10 @@
           userOnly: true,
         },
         imageResize: {
-          displaySize: true,
-        }
+          displaySize: false,
+        },
+        markdownShortcuts: premium,
+        magicUrl: true
       },
       placeholder: 'Start writing your note',
       theme: 'snow',
@@ -90,10 +546,26 @@
 
     addLinkMatcher();
     attachTitleInputListeners();
-    setTheme();
     attachEditorListeners();
     fixDropdownMenuLocations();
+    setTheme();
+    function loaded() {
+            let msg = JSON.stringify({
+                data: true,
+                type: 'status',
+            });
+            window.ReactNativeWebView.postMessage(msg);
+        }
+        if (editor) {
+            loaded();
+        } else {
+            setTimeout(() => {
+                loaded();
+            }, 500)
+        }
   }
+
+  loadAction(true)
 </script>
 
 </html>

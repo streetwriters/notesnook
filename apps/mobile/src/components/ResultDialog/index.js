@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
-import {ph, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
+import { ph, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -41,12 +41,12 @@ const ResultDialog = () => {
     setVisible(false);
   };
 
-  return (
-    <BaseDialog visible={visible} onRequestClose={close}>
+  return !visible ? null : (
+    <BaseDialog visible={true} onRequestClose={close}>
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 350 : '80%',
+          width: DDS.isTab ? 350 : '85%',
           maxHeight: 350,
           borderRadius: 5,
           backgroundColor: colors.bg,

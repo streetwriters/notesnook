@@ -1,5 +1,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
@@ -12,6 +14,9 @@ import {db} from '../../utils/DB';
 import {eShowGetPremium} from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const tagsInputRef = createRef();
@@ -27,73 +32,57 @@ export const ActionSheetTagsSection = ({item, close}) => {
   const [note, setNote] = useState(item);
 
   const localRefresh = () => {
-    toAdd = db.notes.note(note.id);
-    if (toAdd) {
-      toAdd = toAdd.data;
-    } else {
-      setTimeout(() => {
-        toAdd = db.notes.note(note.id);
-        if (toAdd) {
-          toAdd = toAdd.data;
-        }
-      }, 500);
-    }
+    toAdd = db.notes.note(note.id).data;
     dispatch({type: Actions.NOTES});
     dispatch({type: Actions.TAGS});
     setNote({...toAdd});
+    if (prevQuery) {
+      getSuggestions(prevQuery, toAdd);
+    } else {
+      getSuggestions(null, toAdd);
+    }
   };
 
-  const _onSubmit = useCallback(async () => {
+  const _onSubmit = async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
-      console.log('Calling submit', tagToAdd);
       ToastEvent.show('Empty Tag', 'error', 'local');
       return;
     }
 
-    async function add() {
-      let tag = tagToAdd;
-      tag = tag.trim();
-      if (tag.includes(' ')) {
-        tag = tag.replace(' ', '_');
-      }
-      if (tag.includes(',')) {
-        tag = tag.replace(',', '');
-      }
-
-      try {
-        await db.notes.note(note.id).tag(tag);
-        localRefresh(note.type);
-        dispatch({type: Actions.TAGS});
-        tagsInputRef.current?.setNativeProps({
-          text: '',
-        });
-        tagToAdd = '';
-      } catch (e) {
-        ToastEvent.show(e.message, 'error', 'local');
-      }
+    let tag = tagToAdd;
+    tag = tag.trim();
+    if (tag.includes(' ')) {
+      tag = tag.replace(' ', '_');
     }
-
-    if (
-      tags.length >= 5 &&
-      tags.findIndex((t) => t.title === tagToAdd) === -1
-    ) {
-      await PremiumService.verify(add, () => {
-        eSendEvent(eShowGetPremium, {
-          context: 'sheet',
-          title: 'Get Notesnook Pro',
-          desc: 'To create more tags for your notes become a Pro user today.',
-        });
+    if (tag.includes(',')) {
+      tag = tag.replace(',', '');
+    }
+    try {
+      await db.notes.note(note.id).tag(tag);
+      dispatch({type: Actions.TAGS});
+      localRefresh(note.type);
+      prevQuery = null;
+      tagsInputRef.current?.setNativeProps({
+        text: '',
       });
-
-      return;
+      tagToAdd = '';
+    } catch (e) {
+      console.log(e.message);
+      ToastEvent.show(e.message, 'error', 'local');
     }
-
-    await add();
-  });
+  };
 
   useEffect(() => {
-    getSuggestions(prevQuery);
-  }, [note]);
+    if (prevQuery) {
+      getSuggestions(prevQuery);
+    } else {
+      getSuggestions();
+    }
+
+    return () => {
+      prevQuery = null;
+    };
+  }, []);
 
   const _onKeyPress = useCallback(async (event) => {
     if (event.nativeEvent.key === 'Backspace') {
@@ -131,92 +120,91 @@ export const ActionSheetTagsSection = ({item, close}) => {
     }
   });
 
-  const getSuggestions = (query) => {
-    console.log(note.tags);
-    prevQuery = query;
+  const getSuggestions = (query, note) => {
+    if (!note || !note?.id) return;
 
-    let _suggestions = tags.filter(
-      (t) => t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
-    );
+    prevQuery = query;
+    let _suggestions;
+    if (query) {
+      _suggestions = tags.filter(
+        (t) =>
+          t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
+      );
+    } else {
+      _suggestions = tags
+        .slice()
+        .sort(function (x, y) {
+          return x.dateEdited - y.dateEdited;
+        })
+        .filter(
+          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
+        )
+        .slice(0, 10);
+    }
+
     setSuggestions(_suggestions);
   };
-
-  const _renderTag = (tag) => (
-    <TouchableOpacity
-      key={tag}
-      onPress={async () => {
-        let oldProps = {...note};
-        try {
-          await db.notes
-            .note(note.id)
-            .untag(oldProps.tags[oldProps.tags.indexOf(tag)]);
-          sendNoteEditedEvent(note.id, false, true);
-          dispatch({type: Actions.TAGS});
-          localRefresh(note.type);
-        } catch (e) {
-          sendNoteEditedEvent(note.id, false, true);
-        }
-      }}
-      style={{
-        paddingHorizontal: 5,
-        backgroundColor: colors.shade,
-        marginLeft: 5,
-        borderRadius: 2.5,
-      }}>
-      <Paragraph>
-        <Paragraph color={colors.accent}>#</Paragraph>
-        {tag}
-      </Paragraph>
-    </TouchableOpacity>
-  );
 
   return note.id || note.dateCreated ? (
     <View
       style={{
         marginHorizontal: 12,
       }}>
-      <View
-        style={{
+      <ScrollView
+        horizontal
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
+        contentContainerStyle={{
           flexDirection: 'row',
-          flexWrap: 'wrap',
-          marginBottom: 5,
-          marginTop: 5,
           alignItems: 'center',
+          paddingVertical: 5,
         }}>
-        {tags.filter(
-          (o) => o.noteIds.length >= 1 && !note.tags.find((t) => t === o.title),
-        ).length === 0 ? null : (
-          <Paragraph size={SIZE.xs}>{'Suggested: '}</Paragraph>
-        )}
-
-        {suggestions.map((tag) => (
-          <TouchableOpacity
-            key={tag.title}
-            onPress={() => {
-              tagToAdd = tag.title;
-              _onSubmit();
-            }}
+        {suggestions.length === 0 ? null : (
+          <View
+            key="suggestions"
             style={{
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'center',
               margin: 1,
               marginRight: 5,
               paddingHorizontal: 0,
               paddingVertical: 2.5,
             }}>
-            <Paragraph>
-              <Paragraph color={colors.accent}>#</Paragraph>
-              {tag.title}
-            </Paragraph>
-          </TouchableOpacity>
+            <Heading size={SIZE.sm} color={colors.accent}>
+              Suggestions:
+            </Heading>
+          </View>
+        )}
+
+        {suggestions.map((tag) => (
+          <Button
+            key={tag.title}
+            onPress={() => {
+              tagToAdd = tag.title;
+              _onSubmit();
+            }}
+            title={'#' + tag.title}
+            type="shade"
+            height={22}
+            style={{
+              margin: 1,
+              marginRight: 5,
+              paddingHorizontal: 0,
+              paddingVertical: 2.5,
+              borderRadius: 100,
+              paddingHorizontal: 12,
+            }}
+          />
         ))}
-      </View>
-      <View
+      </ScrollView>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          tagsInputRef.current?.focus();
+        }}
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
-          borderRadius: 5,
           borderBottomWidth: 1.5,
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
@@ -236,8 +224,16 @@ export const ActionSheetTagsSection = ({item, close}) => {
           </Paragraph>
         ) : null}
 
-        {note && note.tags ? note.tags.map(_renderTag) : null}
+        {note.tags.map((item,index) => (
+          <TagItem
+            key={item}
+            tag={item}
+            note={note}
+            localRefresh={localRefresh}
+          />
+        ))}
         <TextInput
+          key="inputItem"
           style={{
             minWidth: 100,
             zIndex: 10,
@@ -246,19 +242,16 @@ export const ActionSheetTagsSection = ({item, close}) => {
             paddingHorizontal: 5,
             paddingVertical: 0,
             height: 40,
-            fontSize: SIZE.sm,
+            fontSize: SIZE.md,
             textAlignVertical: 'center',
           }}
+          testID={notesnook.ids.dialogs.actionsheet.hashtagInput}
           autoCapitalize="none"
           textAlignVertical="center"
           blurOnSubmit={false}
           ref={tagsInputRef}
           placeholderTextColor={colors.icon}
           onFocus={() => {
-            if (!premiumUser) {
-              close('premium');
-              return;
-            }
             setFocused(true);
           }}
           selectionColor={colors.accent}
@@ -274,7 +267,42 @@ export const ActionSheetTagsSection = ({item, close}) => {
           onSubmitEditing={_onSubmit}
           onKeyPress={_onKeyPress}
         />
-      </View>
+      </TouchableOpacity>
     </View>
   ) : null;
+};
+
+const TagItem = ({tag, note, localRefresh}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+
+  const onPress = async () => {
+    let prevNote = {...note};
+    try {
+      await db.notes
+        .note(note.id)
+        .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
+      sendNoteEditedEvent(note.id, false, true);
+      console.log('localRefreshHHH EEE');
+      localRefresh(note.type);
+    } catch (e) {
+      sendNoteEditedEvent(note.id, false, true);
+    }
+  };
+
+  return (
+    <TouchableOpacity
+      onPress={onPress}
+      style={{
+        paddingHorizontal: 8,
+        backgroundColor: colors.shade,
+        marginLeft: 5,
+        borderRadius: 100,
+        paddingVertical: 2,
+      }}>
+      <Paragraph size={SIZE.md} color={colors.accent}>
+        #{tag}
+      </Paragraph>
+    </TouchableOpacity>
+  );
 };

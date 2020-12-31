@@ -1,50 +1,60 @@
-import React, {useCallback, useEffect} from 'react';
-import * as Keychain from 'react-native-keychain';
+import React, {useCallback, useEffect, useState} from 'react';
+import {InteractionManager} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {scrollRef} from '../../utils';
+import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import Storage from '../../utils/storage';
-import * as Sentry from '@sentry/react-native';
 
-export const Home = ({navigation}) => {
+export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {notes} = state;
+  const {loading} = state;
+  const [localLoad, setLocalLoad] = useState(true);
+  const notes = state.notes;
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
+    InteractionManager.runAfterInteractions(() => {
+      if (localLoad) {
+        setLocalLoad(false);
+      }
+
+      updateSearch();
+      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+          },
+        });
+      }
+    });
+
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+
+    Navigation.setHeaderState(
+      'notes',
+      {
+        menu: true,
+      },
+      {
         heading: 'Notes',
+        id: 'notes_navigation',
       },
-    });
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'notes',
-    });
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress:_onPressBottomButton
-      },
-    });
-
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
-    });
-    updateSearch();
-
-    dispatch({type: Actions.COLORS});
-    dispatch({type: Actions.NOTES});
-  }, [notes]);
+    );
+  }, []);
 
   const onBlur = useCallback(() => {}, []);
 
@@ -52,11 +62,12 @@ export const Home = ({navigation}) => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
+      pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
-  },[]);
+  }, []);
 
   useEffect(() => {
     if (navigation.isFocused()) {
@@ -66,18 +77,16 @@ export const Home = ({navigation}) => {
 
   const updateSearch = () => {
     SearchService.update({
-      placeholder: 'Search in notes',
-      data: notes,
+      placeholder: 'Type a keyword to search in notes',
+      data: db?.notes?.all,
       type: 'notes',
     });
   };
 
   const _onPressBottomButton = (event) => {
-  
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
-      console.log('called');
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
   };
@@ -90,7 +99,11 @@ export const Home = ({navigation}) => {
         type="notes"
         isHome={true}
         pinned={true}
+        loading={loading || localLoad}
         sortMenuButton={true}
+        headerProps={{
+          heading: 'Notes',
+        }}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
         placeholderData={{
@@ -98,6 +111,7 @@ export const Home = ({navigation}) => {
           paragraph: 'You have not added any notes yet.',
           button: 'Add your First Note',
           action: _onPressBottomButton,
+          loading: 'Loading your notes.',
         }}
       />
 

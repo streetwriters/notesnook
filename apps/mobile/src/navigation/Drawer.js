@@ -1,20 +1,32 @@
+import {createDrawerNavigator} from '@react-navigation/drawer';
+import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
+import {State} from 'react-native-gesture-handler';
+import {Menu} from '../components/Menu';
+import {useTracked} from '../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
 import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
-import {NavigationContainer} from '@react-navigation/native';
-import {sideMenuRef} from '../utils/Refs';
-import {Dimensions} from 'react-native';
+import {sideMenuRef, tabBarRef} from '../utils/Refs';
+import {sleep} from '../utils/TimeUtils';
 import {NavigatorStack} from './NavigatorStack';
-import {Menu} from '../components/Menu';
-import NavigationService from '../services/Navigation';
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {DDS} from '../services/DeviceDetection';
-import { dWidth } from '../utils';
 
 const Drawer = createDrawerNavigator();
 
+const onStateChange = (state) => {
+  let s = state[0];
+  if (s && s !== State.ACTIVE && s !== State.BEGAN) {
+    let state = sideMenuRef.current.getRootState();
+    if (state.history.findIndex((o) => o.type === 'drawer') === -1) {
+      tabBarRef.current?.setScrollEnabled(true);
+    }
+  }
+};
+
 export const NavigationStack = ({component = NavigatorStack}) => {
+  const [state] = useTracked();
+  const {deviceMode} = state;
   const [locked, setLocked] = React.useState(false);
+  const [initRender, setInitRender] = React.useState(true);
 
   const setGestureDisabled = () => {
     setLocked(true);
@@ -22,6 +34,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
 
   const setGestureEnabled = () => {
     setLocked(false);
+    setInitRender(false);
   };
 
   React.useEffect(() => {
@@ -37,20 +50,18 @@ export const NavigationStack = ({component = NavigatorStack}) => {
     <NavigationContainer ref={sideMenuRef}>
       <Drawer.Navigator
         screenOptions={{
-          swipeEnabled: locked ? false : true,
+          swipeEnabled: locked || deviceMode !== 'mobile' ? false : true,
+          gestureEnabled: locked || deviceMode !== 'mobile' ? false : true,
         }}
+        onStateChange={onStateChange}
         drawerStyle={{
-          width:
-           DDS.isLargeTablet()
-              ? DDS.width * 0.15
-              : DDS.isSmallTab
-              ? "30%"
-              : "65%",
+          width: deviceMode !== 'mobile' ? 0 : '75%',
+          opacity: initRender ? 0 : 1,
           borderRightWidth: 0,
         }}
         edgeWidth={200}
-        drawerType={DDS.isTab || DDS.isSmallTab ? 'permanent' : 'slide'}
-        drawerContent={DrawerComponent}
+        drawerType="slide"
+        drawerContent={deviceMode !== 'mobile' ? () => <></> : DrawerComponent}
         initialRouteName="Main">
         <Drawer.Screen name="Main" component={component} />
       </Drawer.Navigator>
@@ -58,10 +69,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   );
 };
 
-
-
 const DrawerComponent = () => {
-  return (
-    <Menu  />
-  );
+  return <Menu />;
 };

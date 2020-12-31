@@ -8,7 +8,7 @@ import {
   FAV_SVG,
   TRASH_SVG,
   SETTINGS_SVG,
-  SEARCH_SVG
+  SEARCH_SVG,
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
 export const Placeholder = ({type, w, h, color}) => {
@@ -20,6 +20,8 @@ export const Placeholder = ({type, w, h, color}) => {
         return NOTE_SVG(color || colors.accent);
       case 'notebooks':
         return NOTEBOOK_SVG(colors.accent);
+      case 'topics':
+        return NOTEBOOK_SVG(colors.accent);
       case 'tags':
         return TAG_SVG(colors.accent);
       case 'favorites':
@@ -28,8 +30,8 @@ export const Placeholder = ({type, w, h, color}) => {
         return TRASH_SVG(colors.accent);
       case 'settings':
         return SETTINGS_SVG(colors.accent);
-        case 'search':
-          return SEARCH_SVG(colors.accent);
+      case 'search':
+        return SEARCH_SVG(colors.accent);
     }
   };
 

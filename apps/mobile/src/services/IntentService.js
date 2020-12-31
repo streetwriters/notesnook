@@ -1,56 +1,138 @@
-import ReceiveSharingIntent from 'react-native-receive-sharing-intent';
-import { eOnLoadNote } from '../utils/Events';
-import { tabBarRef } from '../utils/Refs';
-import { setIntent } from '../views/Editor/Functions';
-import { DDS } from './DeviceDetection';
-import { eSendEvent } from './EventManager';
+import {Linking, NativeModules, Platform} from 'react-native';
+const {ReceiveSharingIntent} = NativeModules;
+let currentIntent = null;
+const isIos = Platform.OS === 'ios';
 
-let previousIntent = {
-  text: null,
-  weblink: null,
-};
-
-function check() {
-  ReceiveSharingIntent.getReceivedFiles(
-    (d) => {
-      console.log('INTENT SERVICE', d);
-      let data = d[0];
-      if (data.text || data.weblink) {
-        let text = data.text;
-        let weblink = data.weblink;
-        let delta = null;
-
-        if (weblink && text) {
-          delta = [{insert: `${text + ' ' + weblink}`}];
-          text = data.text + ' ' + data.weblink;
-        } else if (text && !weblink) {
-          delta = [{insert: `${text}`}];
-          text = data.text;
-        } else if (weblink) {
-          delta = [{insert: `${weblink}`}];
-          text = weblink;
+function getIntent() {
+  return new Promise(async (resolve, reject) => {
+    let initialUrlIOS;
+    let _data = null;
+    try {
+      if (isIos) {
+        initialUrlIOS = await Linking.getInitialURL();
+        if (initialUrlIOS && initialUrlIOS.startsWith('ShareMedia://dataUrl')) {
+          _data = await ReceiveSharingIntent.getFileNames(initialUrlIOS);
+          _data = iosSortedData(_data);
+        } else {
+          reject('unsupported url');
         }
-
-        previousIntent.text = text;
-        previousIntent.weblink = weblink;
-        setIntent();
-        eSendEvent(eOnLoadNote, {
-          type: 'intent',
-          data: delta,
-          text: text,
-        });
-        if (DDS.isPhone || DDS.isSmallTab) {
-          tabBarRef.current?.goToPage(1);
-        }
+      } else {
+        _data = await ReceiveSharingIntent.getFileNames();
       }
-      ReceiveSharingIntent.clearReceivedFiles();
-    },
-    (error) => {
-      console.log(error, 'INTENT ERROR');
-    },
-  );
+    } catch (e) {
+      reject(e);
+    }
+    if (!_data) {
+      console.log(_data);
+      return;
+    }
+    setIntent(_data, resolve, reject);
+  });
 }
 
+function setIntent(d, resolve, reject) {
+  let data = d[0];
+  if (data.text || data.weblink) {
+    let text = data.text;
+    let weblink = data.weblink;
+    let delta = null;
+
+    if (weblink && text) {
+      delta = [{insert: `${text + ' ' + weblink}`}];
+      text = data.text + ' ' + data.weblink;
+    } else if (text && !weblink) {
+      delta = [{insert: `${text}`}];
+      text = data.text;
+    } else if (weblink) {
+      delta = [{insert: `${weblink}`}];
+      text = weblink;
+    }
+    currentIntent = {
+      type: 'intent',
+      data: delta,
+    };
+    if (resolve) {
+      resolve(true);
+    }
+  } else {
+    if (reject) {
+      reject('nothing found');
+    }
+  }
+}
+
+function check(callback) {
+  callback(currentIntent);
+  currentIntent = null;
+}
+
+
+const iosSortedData = (data) => {
+  let objects = {
+    filePath: null,
+    text: null,
+    weblink: null,
+    mimeType: null,
+    contentUri: null,
+    fileName: null,
+    extension: null,
+  };
+  let file = data;
+  if (file.startsWith('text:')) {
+    let text = file.replace('text:', '');
+    if (text.startsWith('http')) {
+      let object = [{...objects, weblink: text}];
+      return object;
+    }
+    let object = [{...objects, text: text}];
+    return object;
+  } else if (file.startsWith('webUrl:')) {
+    let weblink = file.replace('webUrl:', '');
+    let object = [{...objects, weblink: weblink}];
+    return object;
+  } else {
+    try {
+      let files = JSON.parse(file);
+      let object = [];
+      for (let i = 0; i < files.length; i++) {
+        let path = files[i].path;
+        let obj = {
+          ...objects,
+          fileName: getFileName(path),
+          extension: getExtension(path),
+          mimeType: getMimeType(path),
+          filePath: path,
+        };
+        object.push(obj);
+      }
+      return object;
+    } catch (error) {
+      return [{...objects}];
+    }
+  }
+};
+
+const getFileName = (file) => {
+  return file.replace(/^.*(\\|\/|\:)/, '');
+};
+
+const getExtension = (fileName) => {
+  return fileName.substr(fileName.lastIndexOf('.') + 1);
+};
+
+const getMimeType = (file) => {
+  let ext = getExtension(file);
+  let extension = '.' + ext.toLowerCase();
+  if (MimeTypes[extension]) {
+    return MimeTypes[extension];
+  }
+  return null;
+};
+
 export default {
+  getIntent,
   check,
+  setIntent,
+  iosSortedData,
+
 };

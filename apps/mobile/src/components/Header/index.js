@@ -1,23 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, StyleSheet, View} from 'react-native';
-import * as Animatable from 'react-native-animatable';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import NavigationService from '../../services/Navigation';
-import {dWidth, getElevation} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {SearchInput} from '../SearchInput';
-import {HeaderLeftMenu} from './HeaderLeftMenu';
+import React, { useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import SearchService from '../../services/SearchService';
+import { dWidth } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { SearchInput } from '../SearchInput';
+import { HeaderLeftMenu } from './HeaderLeftMenu';
 import { HeaderRightMenu } from './HeaderRightMenu';
-import {HeaderTitle} from './HeaderTitle';
+import { HeaderTitle } from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
-  const {colors, syncing, currentScreen} = state;
+  const {colors, currentScreen} = state;
   const insets = useSafeAreaInsets();
   const [hide, setHide] = useState(true);
 
@@ -52,11 +50,14 @@ export const Header = ({root}) => {
       <View style={styles.leftBtnContainer}>
         <HeaderLeftMenu />
 
-        {Platform.OS === 'android' && currentScreen !== 'search' || Platform.isPad ? (
+        {(Platform.OS === 'android' && currentScreen !== 'search') ||
+        Platform.isPad ? (
           <HeaderTitle root={root} />
         ) : null}
       </View>
-      {Platform.OS !== 'android' && !Platform.isPad && currentScreen !== 'search' ? (
+      {Platform.OS !== 'android' &&
+      !Platform.isPad &&
+      currentScreen !== 'search' ? (
         <HeaderTitle root={root} />
       ) : null}
 
@@ -69,40 +70,20 @@ export const Header = ({root}) => {
         </View>
       ) : null}
 
-      <Animatable.View
-        transition={['opacity']}
-        duration={300}
-        style={[
-          styles.loadingContainer,
-          {
-            opacity: syncing ? 1 : 0,
-          },
-        ]}>
-        <View
-          style={[
-            styles.loadingInnerContainer,
-            {
-              backgroundColor: colors.bg,
-            },
-          ]}
-        />
-        <ActivityIndicator size={25} color={colors.accent} />
-      </Animatable.View>
-
       {currentScreen === 'search' ? (
-        <View style={styles.rightBtnContainer}>
+        <View style={[styles.rightBtnContainer, {right: 6}]}>
           <ActionIcon
-            onPress={async () => {
-              NavigationService.navigate('Search');
+            onPress={() => {
+              SearchService.search();
             }}
-            name="tune"
+            name="magnify"
             size={SIZE.xxxl}
             color={colors.pri}
             style={styles.rightBtn}
           />
         </View>
       ) : (
-       <HeaderRightMenu/>
+        <HeaderRightMenu />
       )}
     </View>
   );

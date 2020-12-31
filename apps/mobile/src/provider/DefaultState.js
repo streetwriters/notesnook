@@ -26,13 +26,14 @@ export const defaultState = {
     useSystemTheme: false,
     reminder: 'off',
     encryptedBackups: false,
-    homepage: 'Home',
+    homepage: 'Notes',
     sort: 'default',
-    sortOrder: 'des',
+    sortOrder: 'desc',
     screenshotMode: true,
     privacyScreen: false,
   },
-  currentScreen: 'home',
+  currentScreen: 'notes',
+  deviceMode:null,
   colors: {
     night: false,
     bg: 'white',
@@ -59,7 +60,7 @@ export const defaultState = {
   searchResults: [],
   headerMenuState: true,
   headerTextState: {
-    heading: 'Home',
+    heading: 'Notes',
     color: null,
   },
   headerVerticalMenu: false,
@@ -80,4 +81,8 @@ export const defaultState = {
     icon: 'account-outline',
   },
   keyword: [],
+  menuPins:[],
+  lastSynced:"Never",
+  intentMode:true,
+  searching:false
 };

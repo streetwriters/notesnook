@@ -1,8 +1,8 @@
-import {Appearance, Platform, StatusBar} from "react-native";
-import {COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme} from "./Colors";
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from "../services/EventManager";
-import {eThemeUpdated} from "./Events";
-import {MMKV} from "./MMKV";
+import { Appearance } from "react-native";
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from "../services/EventManager";
+import { COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme } from "./Colors";
+import { eThemeUpdated } from "./Events";
+import { MMKV } from "./MMKV";
 
 const isValidHex = (hex) => /^#([A-Fa-f0-9]{3,4}){1,2}$/.test(hex);
 const getChunksFromString = (st, chunkSize) =>

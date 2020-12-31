@@ -1,15 +1,13 @@
-import React, {createRef} from 'react';
-import {Text, View} from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
-import {dWidth} from '../../utils';
-import ActionSheet from '../ActionSheet';
+import React, { createRef } from 'react';
+import { View } from 'react-native';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
+import { eClosePendingDialog, eOpenPendingDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const actionSheet = createRef();
 class PendingDialog extends React.Component {
@@ -22,15 +20,15 @@ class PendingDialog extends React.Component {
   }
 
   async open() {
-    actionSheet.current?._setModalVisible(true);
-    let u = await db.user.get();
+    actionSheet.current?.setModalVisible(true);
+    let u = await db.user.fetchUser();
     this.setState({
       user: u && u.Id ? u : null,
     });
   }
 
   close() {
-    actionSheet.current?._setModalVisible(false);
+    actionSheet.current?.setModalVisible(false);
     this.setState({
       user: null,
     });
@@ -38,10 +36,6 @@ class PendingDialog extends React.Component {
   async componentDidMount() {
     eSubscribeEvent(eOpenPendingDialog, this.open.bind(this));
     eSubscribeEvent(eClosePendingDialog, this.close.bind(this));
-    let u = await db.user.get();
-    this.setState({
-      user: u && u.Id ? u : null,
-    });
   }
 
   componentWillUnmount() {
@@ -52,31 +46,10 @@ class PendingDialog extends React.Component {
   render() {
     const {colors} = this.props;
     return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          alignSelf: 'center',
-          width: DDS.isTab ? 500 : '100%',
-          borderRadius: 10,
-          marginBottom: DDS.isTab ? 50 : 0,
-        }}
-        extraScroll={DDS.isTab ? 50 : 0}
-        gestureEnabled={true}
-        footerAlwaysVisible={DDS.isTab}
-        footerHeight={DDS.isTab ? 20 : 10}
-        footerStyle={
-          DDS.isTab
-            ? {
-                borderRadius: 10,
-                backgroundColor: colors.bg,
-              }
-            : null
-        }
-        ref={actionSheet}
-        initialOffsetFromBottom={1}>
+      <ActionSheetWrapper fwdRef={actionSheet}>
         <View
           style={{
-            width: DDS.isTab ? 500 : dWidth,
+            width: '100%',
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -109,7 +82,7 @@ class PendingDialog extends React.Component {
           </Paragraph>
           <Seperator />
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

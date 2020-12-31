@@ -1,16 +1,16 @@
 import React, {createRef} from 'react';
-import {ScrollView, Text, View} from 'react-native';
+import {Platform, ScrollView, TouchableOpacity, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {eOpenLoginDialog, eOpenPendingDialog} from '../../utils/Events';
-import {dHeight, itemSkus, dWidth} from '../../utils';
-import ActionSheet from '../ActionSheet';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import {dHeight, itemSkus} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class PremiumDialog extends React.Component {
@@ -18,35 +18,43 @@ class PremiumDialog extends React.Component {
     super(props);
     this.state = {
       user: null,
-      product: null,
+      products: null,
       scrollEnabled: false,
+      product: null,
+      visible: false,
     };
     this.routeIndex = 0;
     this.count = 0;
     this.actionSheetRef = createRef();
-    this.subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
-      this.onSuccessfulSubscription,
-    );
-    this.subsriptionErrorListener = RNIap.purchaseErrorListener(
-      this.onSubscriptionError,
-    );
     this.prevScroll = 0;
   }
 
   open() {
-    this.actionSheetRef.current?._setModalVisible(true);
+    this.setState(
+      {
+        visible: true,
+      },
+      () => {
+        this.actionSheetRef.current?.setModalVisible(true);
+      },
+    );
   }
 
   close() {
-    this.actionSheetRef.current?._setModalVisible(false);
+    this.actionSheetRef.current?.setModalVisible(false);
   }
 
   async getSkus() {
     try {
-      let u = await db.user.get();
-      let prod = await RNIap.getSubscriptions(itemSkus);
+      let u = await db.user.getUser();
       this.setState({
-        user: u && u.Id ? u : null,
+        user: u,
+      });
+      await RNIap.initConnection();
+      let prod = await RNIap.getSubscriptions(itemSkus);
+      console.log(prod);
+      this.setState({
+        products: prod,
         product: prod[0],
       });
     } catch (e) {
@@ -54,55 +62,26 @@ class PremiumDialog extends React.Component {
     }
   }
 
-  onSuccessfulSubscription = (subscription) => {
-    const receipt = subscription.transactionReceipt;
-
-    if (receipt) {
-      this.close();
-      setTimeout(() => {
-        eSendEvent(eOpenPendingDialog);
-      }, 500);
-    }
-  };
-
-  onSubscriptionError = (error) => {
-    console.log(error.message, 'Error');
-    ToastEvent.show(error.message);
-  };
-
   render() {
     const {colors} = this.props;
-    return (
-      <ActionSheet
-        containerStyle={{
-          backgroundColor: colors.bg,
-          width: DDS.isTab ? 500 : '100%',
-          alignSelf: 'center',
-          borderRadius: 10,
-          marginBottom: DDS.isTab ? 50 : 0,
-          borderBottomRightRadius: 0,
-          borderBottomLeftRadius: 0,
-        }}
+    return !this.state.visible ? null : (
+      <ActionSheetWrapper
         onOpen={async () => {
-          await this.getSkus();
+          try {
+            await this.getSkus();
+          } catch (e) {
+            console.log(e);
+          }
         }}
-        extraScroll={DDS.isTab ? 50 : 0}
-        footerAlwaysVisible={DDS.isTab}
-        footerHeight={DDS.isTab ? 20 : 10}
-        footerStyle={
-          DDS.isTab
-            ? {
-                borderRadius: 10,
-                backgroundColor: colors.bg,
-              }
-            : null
-        }
-        gestureEnabled={true}
-        ref={this.actionSheetRef}
-        initialOffsetFromBottom={1}>
+        onClose={() => {
+          this.setState({
+            visible: false,
+          });
+        }}
+        fwdRef={this.actionSheetRef}>
         <View
           style={{
-            width: DDS.isTab ? 500 : dWidth,
+            width: '100%',
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             paddingHorizontal: 12,
@@ -116,21 +95,21 @@ class PremiumDialog extends React.Component {
               paddingTop: 10,
               alignSelf: 'center',
             }}>
-            Get Notesnook Pro
+            Notesnook Pro
           </Heading>
 
           <ScrollView
             nestedScrollEnabled={true}
-            onScrollEndDrag={this.actionSheetRef.current?.childScrollHandler}
+            onScrollEndDrag={this.actionSheetRef.current?.handleChildScrollEnd}
             onScrollAnimationEnd={
-              this.actionSheetRef.current?.childScrollHandler
+              this.actionSheetRef.current?.handleChildScrollEnd
             }
             onMomentumScrollEnd={
-              this.actionSheetRef.current?.childScrollHandler
+              this.actionSheetRef.current?.handleChildScrollEnd
             }
             style={{
               width: '100%',
-              maxHeight: DDS.isTab ? dHeight * 0.35 : dHeight * 0.5,
+              maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.45,
             }}>
             {[
               {
@@ -185,7 +164,7 @@ class PremiumDialog extends React.Component {
                   />
 
                   <Heading
-                    SIZE={SIZE.md}
+                    size={SIZE.md}
                     style={{
                       marginLeft: 10,
                       maxWidth: '85%',
@@ -223,48 +202,81 @@ class PremiumDialog extends React.Component {
                 size={SIZE.sm}
                 style={{
                   fontWeight: '400',
+                  lineHeight: 17,
                 }}>
                 {this.state.user
-                  ? 'Cancel anytime in Subscriptions on Google Play'
-                  : 'Start your 14 Day Trial for Free (no credit card needed)'}
+                  ? `You can cancel anytime from subscriptions on${
+                      Platform.OS === 'android' ? ' Google Play' : ' App Store'
+                    }`
+                  : 'Start your 14 Day Trial Today (no credit card required.)'}
               </Paragraph>
             </Heading>
-            <Paragraph
-              size={SIZE.xl}
+
+            <View
               style={{
-                fontSize: SIZE.xl,
-                paddingVertical: 15,
+                flexDirection: 'row',
+                paddingVertical: 5,
+                marginTop: 10,
               }}>
-              {this.state.product?.localizedPrice}
-              <Paragraph color={colors.accent} size={SIZE.sm}>
-                /mo
-              </Paragraph>
-            </Paragraph>
+              {this.state.products?.map((item) => (
+                <TouchableOpacity
+                  onPress={() => {
+                    this.setState({
+                      product: item,
+                    });
+                  }}
+                  style={{
+                    borderWidth: 1,
+                    borderColor: this.state.product?.productId
+                      ? colors.accent
+                      : 'transparent',
+                    borderRadius: 5,
+                    padding: 5,
+                    paddingVertical: 10,
+                    marginRight: 10,
+                  }}>
+                  <Paragraph size={SIZE.lg}>
+                    {item.localizedPrice}
+                    <Paragraph color={colors.accent} size={SIZE.sm}>
+                      /mo
+                    </Paragraph>
+                  </Paragraph>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            <Seperator half />
             <Button
-              onPress={() => {
+              onPress={async () => {
                 if (!this.state.user) {
                   this.close();
                   setTimeout(() => {
                     eSendEvent(eOpenLoginDialog);
                   }, 400);
                 } else {
-                  RNIap.requestSubscription(this.state.product.productId)
+                  RNIap.requestSubscription(
+                    this.state.product?.productId,
+                    false,
+                    null,
+                    null,
+                    null,
+                    this.state.user.id,
+                  )
                     .then((r) => {})
                     .catch((e) => {
                       console.log(e);
                     });
+                  this.close();
                 }
               }}
-              title={
-                this.state.user ? 'Subscribe to Notesnook Pro' : 'Sign Up Now'
-              }
+              title={this.state.user ? 'Subscribe' : 'Sign Up'}
               type="accent"
               height={50}
               width="100%"
             />
           </View>
         </View>
-      </ActionSheet>
+      </ActionSheetWrapper>
     );
   }
 }

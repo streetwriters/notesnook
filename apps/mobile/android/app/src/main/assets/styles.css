@@ -4,13 +4,7 @@
 * Copyright (c) 2014, Jason Chen
 * Copyright (c) 2013, salesforce.com
 */
-.ql-container {
-  box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
-  margin: 0px;
-  position: relative;
-  height: calc(100% - 260px) !important;
-}
+
 
 .ql-container.ql-disabled .ql-tooltip {
   visibility: hidden;
@@ -40,6 +34,7 @@
   outline: none;
   overflow-y: hidden;
   padding: 12px 12px;
+  padding-top: 0px;
   tab-size: 4;
   -moz-tab-size: 4;
   text-align: left;
@@ -783,7 +778,8 @@
 }
 
 .ql-snow .ql-picker.ql-header {
-  min-width: 98px;
+  min-width: 20px;
+  margin-top:5px
 }
 
 .ql-snow .ql-picker.ql-header .ql-picker-label::before,
@@ -879,7 +875,7 @@
 }
 
 .ql-snow .ql-picker.ql-size {
-  min-width: 98px;
+  min-width: 20px;
 }
 
 .ql-snow .ql-picker.ql-size .ql-picker-label::before,
@@ -950,9 +946,16 @@
   align-items: center;
 }
 
-.ql-snow .ql-picker .ql-picker-label {
+.ql-snow .ql-picker {
   font-size:14px;
-  width: 120px ;
+  min-width: 50px ;
+}
+
+.ql-header .ql-picker-label,
+.ql-size .ql-picker-label
+ {
+  font-size:14px;
+  min-width: 120px !important;
 }
 
 .ql-snow .ql-tooltip a.ql-preview {
@@ -974,6 +977,10 @@
 
 .ql-snow .ql-tooltip.ql-editing a.ql-preview,
 .ql-snow .ql-tooltip.ql-editing a.ql-remove {
+  display: none;
+}
+
+.ql-snow .ql-tooltip input[type='text'] {
   display: none;
 }
 
@@ -1077,6 +1084,7 @@
   border: none;
   width: 100%;
   outline: none;
+  resize: none;
 }
 
 #formBox {
@@ -1088,7 +1096,7 @@
   background-color: transparent;
   padding-left: 12px;
   padding-right: 12px;
-  min-height: 195px;
+  min-height: 45px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
@@ -1113,7 +1121,7 @@
 
 #formBox > div {
   visibility: hidden;
-  min-height: 60px;
+  min-height: 45px;
 }
 
 .info-bar {
@@ -1123,7 +1131,8 @@
   height: 20px;
   font-family: 'Poppins';
   margin-top: -8px;
-  margin-bottom: 12px;
+  margin-bottom: 6px ;
+  padding-left: 0px !important;
 }
 
 #titlebar textarea:focus {
@@ -1131,17 +1140,25 @@
 }
 #infowords {
   margin-right: 5px;
-  margin-left: 5px;
+  margin-left: 0px;
+  border-radius: 5;
+  background-color: #a9a9a9;
 }
 
 #infodate {
   margin-right: 5px;
   margin-left: 5px;
+
+  border-radius: 5;
+  background-color: #a9a9a9;
 }
 
 #infosaved {
   margin-right: 5px;
   margin-left: 5px;
+
+  border-radius: 5;
+  background-color: #a9a9a9;
 }
 
 .app-body {

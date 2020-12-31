@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -10,14 +11,13 @@ import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
-import { eShowGetPremium } from '../../utils/Events';
+import {eShowGetPremium, refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {PressableButton} from '../PressableButton';
 
-export const ActionSheetColorsSection = ({item,close}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
+export const ActionSheetColorsSection = ({item, close}) => {
+  const [, dispatch] = useTracked();
   const [note, setNote] = useState(item);
 
   const localRefresh = () => {
@@ -43,32 +43,21 @@ export const ActionSheetColorsSection = ({item,close}) => {
 
     return (
       <PressableButton
-        color={RGB_Linear_Shade(
-          !colors.night ? -0.2 : 0.2,
-          hexToRGBA(color.value, 1),
-        )}
-        selectedColor={color.value}
-        alpha={!colors.night ? -0.1 : 0.1}
-        opacity={1}
+        type="accent"
+        accentColor={color.name.toLowerCase()}
+        testID={notesnook.ids.dialogs.actionsheet.color(c)}
         key={color.value}
         onPress={async () => {
-          await PremiumService.verify(async () => {
-            let noteColors = note.colors;
-            if (noteColors.includes(color.name)) {
-              await db.notes.note(note.id).uncolor(color.name);
-            } else {
-              await db.notes.note(note.id).color(color.name);
-            }
-            dispatch({type: Actions.COLORS});
-            sendNoteEditedEvent(note.id, false, true);
-            localRefresh();
-          },() => {
-            eSendEvent(eShowGetPremium,{
-              context:'sheet',
-              title:'Get Notesnook Pro',
-              desc:'To assign color to a note get Notesnook Pro today.'
-            })
-          });
+          let noteColor = note.color;
+          if (noteColor === color.name) {
+            await db.notes.note(note.id).uncolor(color.name);
+          } else {
+            await db.notes.note(note.id).color(color.name);
+          }
+          localRefresh();
+          dispatch({type: Actions.COLORS});
+          sendNoteEditedEvent(note.id, false, true);
+          eSendEvent(refreshNotesPage);
         }}
         customStyle={{
           width: DDS.isTab ? 400 / 10 : dWidth / 10,
@@ -77,7 +66,7 @@ export const ActionSheetColorsSection = ({item,close}) => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        {note && note.colors && note.colors.includes(color.name) ? (
+        {note.color === color.name ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>

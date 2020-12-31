@@ -1,165 +1,95 @@
 import React from 'react';
-import {ActivityIndicator, Text, TouchableOpacity, View} from 'react-native';
-import {color} from 'react-native-reanimated';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {showContext, SUBSCRIPTION_STATUS_STRINGS} from '../../utils';
-import {db} from '../../utils/DB';
+import Sync from '../../services/Sync';
 import {eOpenLoginDialog} from '../../utils/Events';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import {SIZE} from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
   const [state, dispatch] = useTracked();
-  const {colors, syncing, user} = state;
+  const {colors, syncing, user, lastSynced} = state;
 
-  return user && user.username ? (
+  return (
     <View
       style={{
         width: '100%',
-        borderRadius: 0,
+        alignSelf: 'center',
+        backgroundColor: colors.nav,
       }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center',
-          backgroundColor: colors.accent,
-          paddingHorizontal: 6,
-          paddingVertical: 8,
+          paddingRight: 8,
+          paddingLeft: 8,
         }}>
-        <Paragraph color="white">
-          <Icon name="account-outline" /> {user.username}
-        </Paragraph>
-        <Paragraph color="white" size={SIZE.xs}>
-          {SUBSCRIPTION_STATUS_STRINGS[user.subscription.status]}
-        </Paragraph>
-      </View>
-
-      <TouchableOpacity
-        onPress={async () => {
-          dispatch({
-            type: Actions.SYNCING,
-            syncing: true,
-          });
-          try {
-            if (!user) {
-              let u = await db.user.get();
-              dispatch({type: Actions.USER, user: u});
+        <TouchableOpacity
+          activeOpacity={0.8}
+          onPress={() => {
+            if (user) {
+              ToastEvent.show('Logged in as ' + user?.email, 'success');
+            } else {
+              eSendEvent(eOpenLoginDialog);
             }
-            await db.sync();
-            ToastEvent.show('Sync Complete', 'success');
-          } catch (e) {
-            ToastEvent.show(e.message, 'error');
-          }
-          let u = await db.user.get();
-          dispatch({type: Actions.USER, user: u});
-          dispatch({type: Actions.ALL});
-          dispatch({
-            type: Actions.SYNCING,
-            syncing: false,
-          });
-        }}
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingHorizontal: 5,
-          paddingVertical: 12,
-        }}>
-        <View
+          }}
           style={{
             flexDirection: 'row',
             alignItems: 'center',
+            paddingVertical:10
           }}>
-          <Paragraph
+          <View
             style={{
-              marginLeft: 5,
+              height: 8,
+              width: 8,
+              backgroundColor: !user ? colors.red : colors.green,
+              borderRadius: 100,
+              marginRight: 5,
+            }}
+          />
+          <Heading size={SIZE.sm} color={colors.heading}>
+            {!user ? 'Not Logged in' : 'Logged in'}
+          </Heading>
+        </TouchableOpacity>
+
+        {user && (
+          <TouchableOpacity
+            activeOpacity={0.8}
+            onPress={Sync.run}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              paddingVertical:10
             }}>
-            {syncing ? 'Syncing ' : 'Synced '}
-            {!syncing ? (
-              user?.lastSynced ? (
-                <TimeSince time={user.lastSynced} />
-              ) : (
-                'never'
-              )
-            ) : null}
-            {'\n'}
             <Paragraph
-              size={SIZE.xs}
-              color={colors.icon}
               style={{
-                fontSize: SIZE.xs,
-                color: colors.icon,
-              }}>
-              {syncing ? 'Fetching your notes ' : 'Tap to sync '}
+                marginRight: 5,
+              }}
+              size={SIZE.xs}
+              color={syncing ? colors.accent : colors.icon}>
+              {syncing ? 'Syncing' : 'Synced '}
+
+              {!syncing ? (
+                lastSynced && lastSynced !== 'Never' ? (
+                  <TimeSince style={{fontSize: SIZE.xs}} time={lastSynced} />
+                ) : (
+                  'never'
+                )
+              ) : null}
             </Paragraph>
-          </Paragraph>
-        </View>
-        {syncing ? (
-          <ActivityIndicator size={SIZE.lg} color={colors.accent} />
-        ) : (
-          <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+            {syncing ? (
+              <ActivityIndicator size={SIZE.md} color={colors.accent} />
+            ) : (
+              <Icon color={colors.accent} name="sync" size={SIZE.md} />
+            )}
+          </TouchableOpacity>
         )}
-      </TouchableOpacity>
-    </View>
-  ) : (
-    <PressableButton
-      onPress={() => {
-        eSendEvent(eOpenLoginDialog);
-      }}
-      onLongPress={(event) => {
-        showContext(event, 'Login');
-      }}
-      color="transparent"
-      selectedColor={colors.accent}
-      alpha={!colors.night ? -0.02 : 0.1}
-      opacity={0.12}
-      customStyle={{
-        paddingVertical: 12,
-        marginVertical: 5,
-        marginTop: pv + 5,
-        borderRadius: 0,
-        width: '100%',
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'flex-start',
-        paddingHorizontal: 8,
-      }}>
-      <View
-        style={{
-          width: 30,
-          backgroundColor: noTextMode ? 'transparent' : colors.accent,
-          height: 30,
-          borderRadius: 100,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <Icon
-          style={{
-            textAlign: 'center',
-            textAlignVertical: 'center',
-          }}
-          name={noTextMode ? 'login-variant' : 'account-outline'}
-          color={noTextMode ? colors.accent : 'white'}
-          size={noTextMode ? SIZE.md + 5 : SIZE.md + 1}
-        />
       </View>
-      {noTextMode ? null : (
-        <View
-          style={{
-            marginLeft: 10,
-          }}>
-          <Paragraph size={SIZE.xs} color={colors.icon}>
-            You are not logged in
-          </Paragraph>
-          <Paragraph color={colors.accent}>Login to sync notes.</Paragraph>
-        </View>
-      )}
-    </PressableButton>
+    </View>
   );
 };

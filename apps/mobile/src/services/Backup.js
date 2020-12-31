@@ -3,11 +3,13 @@ import RNFetchBlob from 'rn-fetch-blob';
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
 import {ToastEvent} from './EventManager';
+import SettingsService from './SettingsService';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
 async function run() {
+  console.log('exporting backup data');
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
     if (!granted) {
@@ -18,7 +20,12 @@ async function run() {
   let backup;
   let error;
   try {
-    backup = await db.backup.export('mobile');
+    console.log('exporting backup data');
+    backup = await db.backup.export(
+      'mobile',
+      SettingsService.get().encryptedBackups,
+    );
+    console.log('backup data gotten');
   } catch (e) {
     console.log('error', e);
     error = true;
@@ -64,18 +71,30 @@ async function checkBackupRequired(type) {
     } else {
       return false;
     }
-  } else if (type === "weekly") {
+  } else if (type === 'weekly') {
     if (lastBackupDate + MS_WEEK < now) {
       return true;
     } else {
       false;
     }
   } else {
-    console.log("Backups are disabled");
+    console.log('Backups are disabled');
   }
 }
+
+const checkAndRun = async () => {
+  let settings = SettingsService.get();
+  if (await checkBackupRequired(settings.reminder)) {
+    try {
+      await run();
+    } catch (e) {
+      console.log(e);
+    }
+  }
+};
 
 export default {
   checkBackupRequired,
   run,
+  checkAndRun,
 };

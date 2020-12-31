@@ -7,14 +7,25 @@ import {MMKV} from '../utils/mmkv';
 import {scale, updateSize} from '../utils/SizeUtils';
 import {enabled} from 'react-native-privacy-snapshot';
 import {Platform} from 'react-native';
+
 let settings = defaultState.settings;
+
+let appLoaded = false;
+
+function setAppLoaded() {
+  appLoaded = true;
+}
+
+function getApploaded() {
+  return appLoaded;
+}
 
 async function init() {
   scale.fontScale = 1;
-  settings = await MMKV.getStringAsync('settings');
+  settings = await MMKV.getStringAsync('appSettings');
   if (!settings) {
     settings = defaultState.settings;
-    await MMKV.setStringAsync('settings', JSON.stringify(settings));
+    await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
   }
@@ -38,29 +49,36 @@ async function init() {
   sortSettings.sortOrder = settings.sortOrder;
   updateSize();
   updateEvent({type: Actions.SETTINGS, settings: {...settings}});
-  await setTheme();
+  setTheme();
+  return;
 }
 
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
+    
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };
 
 async function set(name, value) {
   settings[name] = value;
-  await MMKV.setStringAsync('settings', JSON.stringify(s));
-  updateEvent({type: Actions.SETTINGS, settings: s});
+  await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
+  updateEvent({type: Actions.SETTINGS, settings: {...settings}});
 }
 
 function get() {
+  console.log(settings.useSystemTheme,'getting')
   return settings;
 }
+
+
 
 export default {
   init,
   setTheme,
   set,
   get,
+  setAppLoaded,
+  getApploaded,
 };

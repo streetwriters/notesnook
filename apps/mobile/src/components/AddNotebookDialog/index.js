@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {createRef} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -6,23 +6,25 @@ import {
   Platform,
   SafeAreaView,
   StyleSheet,
-  Text,
   TouchableOpacity,
   View,
 } from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
-import {Button} from '../Button';
-import {updateEvent} from '../DialogManager/recievers';
-import {Toast} from '../Toast';
-import {ToastEvent} from '../../services/EventManager';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
+import {eShowGetPremium} from '../../utils/Events';
+import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
+import {GetPremium} from '../ActionSheetComponent/GetPremium';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
+import {updateEvent} from '../DialogManager/recievers';
+import Input from '../Input';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
@@ -52,6 +54,9 @@ export class AddNotebookDialog extends React.Component {
     this.titleRef;
     this.descriptionRef;
     this.topicsToDelete = [];
+    this.hiddenInput = createRef();
+    this.topicInputRef = createRef();
+    this.addingTopic = false;
   }
 
   open = () => {
@@ -64,7 +69,6 @@ export class AddNotebookDialog extends React.Component {
         if (index === 0) return;
         topicsList.push(item.title);
       });
-      console.log(topicsList);
       this.id = toEdit.id;
       this.title = toEdit.title;
       this.description = toEdit.description;
@@ -88,12 +92,14 @@ export class AddNotebookDialog extends React.Component {
     this.currentSelectedInput = null;
     this.title = null;
     this.description = null;
+    this.currentInputValue = null;
     this.id = null;
     this.setState({
       visible: false,
       topics: [],
       descFocused: false,
       titleFocused: false,
+      editTopic: false,
     });
   };
 
@@ -105,7 +111,7 @@ export class AddNotebookDialog extends React.Component {
     let edit = this.props.toEdit;
     if (edit && edit.id) {
       let topicToDelete = edit.topics[index + 1];
-      console.log(topicToDelete);
+
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
       }
@@ -115,7 +121,7 @@ export class AddNotebookDialog extends React.Component {
       this.prevIndex = null;
       this.prevItem = null;
       this.currentInputValue = null;
-      this.topicInputRef.setNativeProps({
+      this.topicInputRef.current?.setNativeProps({
         text: null,
       });
     }
@@ -129,7 +135,7 @@ export class AddNotebookDialog extends React.Component {
     let edit = this.props.toEdit;
 
     if (!this.title || this.title?.trim().length === 0)
-      return ToastEvent.show('Title is required', 'error', 'local');
+      return ToastEvent.show('Notebook title is required', 'error', 'local');
 
     let id = edit && edit.id ? edit.id : null;
 
@@ -187,11 +193,10 @@ export class AddNotebookDialog extends React.Component {
     this.close();
     updateEvent({type: Actions.NOTEBOOKS});
     updateEvent({type: Actions.PINNED});
-
-    //ToastEvent.show('New notebook added', 'success', 'local');
   };
 
   onSubmit = (forward = true) => {
+    this.hiddenInput.current?.focus();
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
@@ -202,10 +207,6 @@ export class AddNotebookDialog extends React.Component {
       this.setState({
         topics: prevTopics,
       });
-      this.topicInputRef.setNativeProps({
-        text: null,
-      });
-
       setTimeout(() => {
         this.listRef.scrollToEnd({animated: true});
       }, 30);
@@ -216,23 +217,9 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
-      /*   if (prevTopics[this.prevIndex + 1] && forward) {
-                this.prevIndex = this.prevIndex + 1;
-                this.prevItem = prevTopics[this.prevIndex];
-                this.currentInputValue = this.prevItem;
-                this.topicInputRef.setNativeProps({
-                    text: null,
-                });
-                this.topicInputRef.setNativeProps({
-                    text: prevTopics[this.prevIndex],
-                });
-                this.setState({
-                    editTopic:true
-                })
-            } else {} */
-
+      console.log('edit topic is', this.state.editTopic);
       if (this.state.editTopic) {
-        this.topicInputRef.blur();
+        this.topicInputRef.current?.blur();
         Keyboard.dismiss();
         this.setState({
           editTopic: false,
@@ -241,9 +228,6 @@ export class AddNotebookDialog extends React.Component {
       this.prevItem = null;
       this.prevIndex = null;
       this.currentInputValue = null;
-      this.topicInputRef.setNativeProps({
-        text: null,
-      });
 
       if (forward) {
         setTimeout(() => {
@@ -251,6 +235,8 @@ export class AddNotebookDialog extends React.Component {
         }, 30);
       }
     }
+
+    this.topicInputRef.current?.focus();
   };
 
   render() {
@@ -262,18 +248,29 @@ export class AddNotebookDialog extends React.Component {
       visible,
       topicInputFocused,
     } = this.state;
+    if (!visible) return null;
     return (
       <Modal
-        visible={visible}
+        visible={true}
         transparent={true}
         animated
         animationType={DDS.isTab ? 'fade' : 'slide'}
         onShow={() => {
           this.topicsToDelete = [];
-          this.titleRef.focus();
+          this.titleRef?.focus();
         }}
         onRequestClose={this.close}>
         <SafeAreaView>
+          <TextInput
+            ref={this.hiddenInput}
+            style={{
+              width: 1,
+              height: 1,
+              opacity: 0,
+              position: 'absolute',
+            }}
+            blurOnSubmit={false}
+          />
           <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : null}
             style={styles.wrapper}>
@@ -294,135 +291,62 @@ export class AddNotebookDialog extends React.Component {
                 paragraph={
                   toEdit && toEdit.dateCreated
                     ? 'Edit your notebook'
-                    : 'Add a new notebook to your notebooks.'
+                    : 'Add a new notebook'
                 }
               />
 
-              <TextInput
-                ref={(ref) => (this.titleRef = ref)}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: titleFocused ? colors.accent : colors.nav,
-                    color: colors.pri,
-                    fontSize: SIZE.md,
-                  },
-                ]}
-                numberOfLines={1}
-                multiline={false}
-                onFocus={() => {
-                  this.setState({
-                    titleFocused: true,
-                  });
-                }}
-                onBlur={() => {
-                  this.setState({
-                    titleFocused: false,
-                  });
-                }}
-                defaultValue={toEdit ? toEdit.title : null}
+              <Input
+                fwdRef={(ref) => (this.titleRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.title}
                 onChangeText={(value) => {
                   this.title = value;
                 }}
-                onSubmitEditing={() => {
+                placeholder="Enter a Title"
+                onSubmit={() => {
                   this.descriptionRef.focus();
                 }}
-                placeholder="Title"
-                placeholderTextColor={colors.icon}
+                defaultValue={toEdit ? toEdit.title : null}
               />
-              <TextInput
-                ref={(ref) => (this.descriptionRef = ref)}
-                style={[
-                  styles.input,
-                  {
-                    borderColor: descFocused ? colors.accent : colors.nav,
-                    minHeight: 45,
-                    color: colors.pri,
-                  },
-                ]}
-                maxLength={150}
-                onFocus={() => {
-                  this.setState({
-                    descFocused: true,
-                  });
-                }}
-                onBlur={() => {
-                  this.setState({
-                    descFocused: false,
-                  });
-                }}
-                defaultValue={toEdit ? toEdit.description : null}
+
+              <Input
+                fwdRef={(ref) => (this.descriptionRef = ref)}
+                testID={notesnook.ids.dialogs.notebook.inputs.description}
                 onChangeText={(value) => {
                   this.description = value;
                 }}
-                onSubmitEditing={() => {
-                  this.topicInputRef.focus();
-                }}
                 placeholder="Describe your notebook."
-                placeholderTextColor={colors.icon}
+                onSubmit={() => {
+                  this.topicInputRef.current?.focus();
+                }}
+                defaultValue={toEdit ? toEdit.description : null}
               />
 
-              <View style={styles.topicContainer}>
-                <TextInput
-                  ref={(ref) => (this.topicInputRef = ref)}
-                  onChangeText={(value) => {
-                    this.currentInputValue = value;
-                    if (this.prevItem !== null) {
-                      refs[this.prevIndex].setNativeProps({
-                        text: this.prevIndex + 1 + '. ' + value,
-                        style: {
-                          borderBottomColor: colors.accent,
-                        },
-                      });
-                    }
-                  }}
-                  blurOnSubmit={false}
-                  onFocus={() => {
-                    this.setState({
-                      topicInputFocused: true,
+              <Input
+                fwdRef={this.topicInputRef}
+                testID={notesnook.ids.dialogs.notebook.inputs.topic}
+                clearTextOnFocus={true}
+                onChangeText={(value) => {
+                  this.currentInputValue = value;
+                  if (this.prevItem !== null) {
+                    refs[this.prevIndex].setNativeProps({
+                      text: value,
+                      style: {
+                        borderBottomColor: colors.accent,
+                      },
                     });
-                  }}
-                  onBlur={() => {
-                    this.onSubmit(false);
-                    this.setState({
-                      topicInputFocused: false,
-                      editTopic: false,
-                    });
-                  }}
-                  onSubmitEditing={this.onSubmit}
-                  style={[
-                    styles.input,
-                    {
-                      borderColor: topicInputFocused
-                        ? colors.accent
-                        : colors.nav,
-                      color: colors.pri,
-                      width: '100%',
-                      maxWidth: '100%',
-                      marginTop: 5,
-                      paddingRight: '15%',
-                    },
-                  ]}
-                  placeholder="Add a topic"
-                  placeholderTextColor={colors.icon}
-                />
-                <TouchableOpacity
-                  onPress={this.onSubmit}
-                  style={[
-                    styles.addBtn,
-                    {
-                      borderColor: topicInputFocused
-                        ? colors.accent
-                        : colors.nav,
-                    },
-                  ]}>
-                  <Icon
-                    name={this.state.editTopic ? 'check' : 'plus'}
-                    size={SIZE.lg}
-                    color={topicInputFocused ? colors.accent : colors.icon}
-                  />
-                </TouchableOpacity>
-              </View>
+                  }
+                }}
+                onSubmit={() => {
+                  this.onSubmit();
+                }}
+                blurOnSubmit={false}
+                button={{
+                  icon: this.state.editTopic ? 'check' : 'plus',
+                  onPress: this.onSubmit,
+                  color: topicInputFocused ? colors.accent : colors.icon,
+                }}
+                placeholder="Add a topic"
+              />
 
               <FlatList
                 data={topics}
@@ -432,13 +356,12 @@ export class AddNotebookDialog extends React.Component {
                   <TopicItem
                     item={item}
                     onPress={(item, index) => {
-                      console.log('here');
                       this.prevIndex = index;
                       this.prevItem = item;
-                      this.topicInputRef.setNativeProps({
+                      this.topicInputRef.current?.setNativeProps({
                         text: item,
                       });
-                      this.topicInputRef.focus();
+                      this.topicInputRef.current?.focus();
                       this.currentInputValue = item;
                       this.setState({
                         editTopic: true,
@@ -548,10 +471,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   container: {
-    width: DDS.isTab ? 500 : '80%',
-    height: DDS.isTab ? 600 : null,
-    maxHeight: DDS.isTab ? 600 :"90%",
-    borderRadius: 5,
+    width: DDS.isTab ? 500 : '100%',
+    height: DDS.isTab ? 600 : '100%',
+    maxHeight: DDS.isTab ? 600 : '100%',
+    borderRadius: DDS.isTab ? 5 : 0,
     paddingHorizontal: 12,
     paddingVertical: pv,
   },

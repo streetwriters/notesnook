@@ -1,42 +1,50 @@
 import React from 'react';
-import {StyleSheet, View} from 'react-native';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import NavigationService from '../../services/Navigation';
+import Navigation from '../../services/Navigation';
 import {dWidth} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import { Button } from '../Button';
+import {Button} from '../Button';
 
 export const HeaderRightMenu = () => {
-  const [state,] = useTracked();
-  const {colors, containerBottomButton,currentScreen} = state;
+  const [state] = useTracked();
+  const {colors, containerBottomButton, currentScreen, syncing} = state;
 
   return (
     <View style={styles.rightBtnContainer}>
-      <ActionIcon
-        onPress={async () => {
-          NavigationService.navigate('Search');
-        }}
-        name="magnify"
-        size={SIZE.xxxl}
-        color={colors.pri}
-        customStyle={styles.rightBtn}
-      />
+      {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
+
+     {
+       currentScreen !== "settings"  && <ActionIcon
+       onPress={async () => {
+         Navigation.navigate('Search', {
+           menu: false,
+         });
+       }}
+       testID={notesnook.ids.default.header.buttons.left}
+       name="magnify"
+       size={SIZE.xxxl}
+       color={colors.pri}
+       customStyle={styles.rightBtn}
+     />
+     } 
+
       {DDS.isLargeTablet() && containerBottomButton.onPress ? (
         <Button
-          onPress={ () => {
-            console.log('hello');
-            containerBottomButton.onPress()
-
+          onPress={() => {
+            containerBottomButton.onPress();
           }}
-          icon={currentScreen === "trash" ? "delete" : 'plus'}
+          testID={notesnook.ids.default.addBtn}
+          icon={currentScreen === 'trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
           type="shade"
           style={{
             marginLeft: 20,
-            width:60,
-            height:35
+            width: 50,
+            height: 35,
           }}
         />
       ) : null}
@@ -54,51 +62,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     width: '100%',
   },
-  loadingContainer: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 999,
-    left: dWidth / 2 - 20,
-    top: -20,
-    width: 40,
-    height: 40,
-    position: 'absolute',
-  },
-  loadingInnerContainer: {
-    width: 40,
-    height: 20,
-    position: 'absolute',
-    zIndex: 10,
-    top: 0,
-  },
-  leftBtnContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    position: 'absolute',
-    left: 12,
-  },
-  leftBtn: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: 40,
-    width: 40,
-    borderRadius: 100,
-    marginLeft: -5,
-    marginRight: 25,
-  },
   rightBtnContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     position: 'absolute',
-    right: 12,
+    right: 6,
   },
   rightBtn: {
     justifyContent: 'center',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     height: 40,
-    width: 50,
+    width: 40,
+    marginLeft: 10,
     paddingRight: 0,
   },
 });

@@ -1,4 +1,5 @@
-import React, {useCallback, useEffect} from 'react';
+import React, {useCallback, useEffect, useState} from 'react';
+import { InteractionManager } from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
@@ -6,47 +7,55 @@ import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {trash} = state;
+  const trash = state.trash;
+  const [loading, setLoading] = useState(true);
+  let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: true,
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: null,
+          },
+        });
+      }
+      updateSearch();
     });
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
+
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+    Navigation.setHeaderState(
+      'trash',
+      {
+        menu: true,
+      },
+      {
         heading: 'Trash',
+        id: 'trash_navigation',
       },
-    });
-
-    dispatch({
-      type: Actions.CONTAINER_BOTTOM_BUTTON,
-      state: {
-        onPress: null,
-      },
-    });
-
-    updateSearch();
-    dispatch({
-      type: Actions.TRASH,
-    });
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'trash',
-    });
+    );
   }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
+      pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -62,7 +71,7 @@ export const Trash = ({route, navigation}) => {
     SearchService.update({
       placeholder: 'Search in trash',
       data: trash,
-      type: 'notes',
+      type: 'trash',
     });
   };
 
@@ -74,11 +83,16 @@ export const Trash = ({route, navigation}) => {
         data={trash}
         type="trash"
         focused={() => navigation.isFocused()}
+        loading={loading}
         placeholderData={{
-          heading: 'Your Trash',
+          heading: 'Trash',
           paragraph:
             'Items in the trash will be permanently deleted after 7 days.',
           button: null,
+          loading: 'Loading trash items',
+        }}
+        headerProps={{
+          heading: 'Trash',
         }}
         placeholder={<Placeholder type="trash" />}
         placeholderText="Deleted notes & notebooks appear here."

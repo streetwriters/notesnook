@@ -265,7 +265,6 @@ const setTheme = function () {
   }
   .ql-snow.ql-toolbar button,
     .ql-snow .ql-toolbar button {
-
       height: ${pageTheme.colors.factor * 32};
       width: ${pageTheme.colors.factor * 36};
     }
@@ -289,19 +288,13 @@ const setTheme = function () {
   }
 
   #titleInput {
-    color:${pageTheme.colors.pri};
-    font-size:${32 * 1.5 * pageTheme.colors.factor};
-
-  }
-
-  #titlebar {
-    background-color:${pageTheme.colors.shade};
+    color:${pageTheme.colors.heading};
+    font-size:${32 * pageTheme.colors.factor};
   }
 
   #textCopy {
     color:${pageTheme.colors.pri};
-    font-size:${32 * 1.5 * pageTheme.colors.factor};
-
+    font-size:${32 * pageTheme.colors.factor};
   }
   #titleInput::-webkit-input-placeholder {
     color:${pageTheme.colors.icon}
@@ -312,7 +305,7 @@ const setTheme = function () {
     border-color:${pageTheme.colors.nav};
   }
   .ql-container {
-    font-size:${pageTheme.colors.factor * 18};
+    font-size:${pageTheme.colors.factor * 15};
     color:${pageTheme.colors.pri};
   }
   .info-bar {
@@ -337,6 +330,40 @@ const setTheme = function () {
       font-size: 25px;
     
     }   
+
+    #simpleTitleInput::-webkit-input-placeholder {
+      color:${pageTheme.colors.icon}
+    }
+    #simpleTitleInput {
+      font-family: 'Poppins', sans-serif;
+      font-weight: 600 !important;
+      background-color: transparent;
+      border: none;
+      width: 100%;
+      outline: none;
+      font-size: 24px;
+      padding-right: 12px;
+      padding-left:12px;
+      height:50px;
+      color:${pageTheme.colors.heading}
+    }
+
+    #titlebarAlt {
+      height:50px;
+      display:${isTablet ? 'none !important' : 'flex !important'};
+      justify-content: center;
+      flex-direction: column;
+    }
+    #titlebar {
+      display:${!isTablet ? 'none !important' : 'flex !important'};
+    }
+    .ql-container {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0px;
+      position: relative;
+      height:calc(100% - 115px) !important
+    }
     
 
                 `;
@@ -348,6 +375,7 @@ let proToolbar = [
   [{header: 1}, {header: 2}],
   [{size: ['small', false, 'large', 'huge']}], // custom dropdown
   ['bold', 'italic', 'image'], // toggled buttons
+  ['link'],
   [{list: 'ordered'}, {list: 'bullet'}, {list: 'check'}],
   [{header: [3, 4, 5, 6]}],
   [{align: []}],
@@ -513,7 +541,6 @@ function fixDropdownMenuLocations() {
 
       document.getElementById(dropdown).style.top = downTop + 20;
       document.getElementById(dropdown).style.left = left;
-      //console.log('called',downTop + 20,left);
     });
   }
 }

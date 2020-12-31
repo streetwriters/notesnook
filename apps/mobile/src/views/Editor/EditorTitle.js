@@ -49,7 +49,8 @@ export const EditorTitle = () => {
     <Animated.View
       style={{
         opacity: opacityVal,
-        maxWidth: DDS.isLargeTablet() ? '65%' : '40%',
+        maxWidth: DDS.isLargeTablet() ? '100%' : '100%',
+        paddingLeft:20,
         transform: [
           {
             translateY: translateY,

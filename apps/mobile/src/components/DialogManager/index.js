@@ -1,15 +1,14 @@
-import React, {Component} from 'react';
-import {Platform} from 'react-native';
+import React, {Component, createRef} from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
 } from '../../services/EventManager';
+import {dWidth} from '../../utils';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
-  eCloseAddTopicDialog,
   eCloseLoginDialog,
   eCloseMoveNoteDialog,
   eClosePremiumDialog,
@@ -17,19 +16,20 @@ import {
   eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
-  eOpenAddTopicDialog,
   eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
   eOpenSimpleDialog,
 } from '../../utils/Events';
-import ActionSheet from '../ActionSheet';
 import {ActionSheetComponent} from '../ActionSheetComponent';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {translatePrem} from '../ActionSheetComponent/GetPremium';
 import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
+import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
@@ -39,22 +39,19 @@ import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
 import ProgressDialog from '../ProgressDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
-import {VaultDialog} from '../VaultDialog';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {DDS} from '../../services/DeviceDetection';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import JumpToDialog from '../JumpToDialog';
-import {GetPremium,translatePrem} from '../ActionSheetComponent/GetPremium';
+import {VaultDialog} from '../VaultDialog';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 
 export class DialogManager extends Component {
   constructor(props) {
     super(props);
-    this.actionSheet;
+    this.actionSheet = createRef();
     this.opened = false;
     this.state = {
       item: {},
+      actionSheetVisible: false,
       actionSheetData: {
         colors: false,
         tags: false,
@@ -84,15 +81,16 @@ export class DialogManager extends Component {
       {
         actionSheetData: data,
         item: data.item ? data.item : {},
+        actionSheetVisible: true,
       },
       () => {
-        this.actionSheet._setModalVisible();
+        this.actionSheet.current?.setModalVisible();
       },
     );
   };
 
   _hideActionSheet = () => {
-    this.actionSheet._setModalVisible();
+    this.actionSheet.current?.setModalVisible(false);
   };
 
   _showMoveNote = () => {
@@ -122,7 +120,6 @@ export class DialogManager extends Component {
         item: notebook,
       });
     }
-
     this.addTopicsDialog.open();
   };
 
@@ -145,8 +142,8 @@ export class DialogManager extends Component {
     eSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
 
-    eSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
-    eSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
+    //eSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
+    //eSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
@@ -170,8 +167,8 @@ export class DialogManager extends Component {
     eUnSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eUnSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
 
-    eUnSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
-    eUnSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
+    //eUnSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
+    //eUnSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
 
     eUnSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eUnSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
@@ -230,11 +227,11 @@ export class DialogManager extends Component {
         case 'delete': {
           if (this.state.item.locked) {
             openVault({
-              item:this.state.item,
-              novault:true,
-              locked:true,
-              deleteNote:true,
-            })
+              item: this.state.item,
+              novault: true,
+              locked: true,
+              deleteNote: true,
+            });
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
           }
@@ -246,28 +243,28 @@ export class DialogManager extends Component {
         }
         case 'novault': {
           openVault({
-            item:this.state.item,
-            novault:false,
-            locked:true,
-            deleteNote:true,
-          })
+            item: this.state.item,
+            novault: false,
+            locked: true,
+            deleteNote: true,
+          });
           break;
         }
         case 'locked': {
           openVault({
-            item:this.state.item,
-            novault:true,
-            locked:true,
-          })
+            item: this.state.item,
+            novault: true,
+            locked: true,
+          });
           break;
         }
         case 'unlock': {
           openVault({
-            item:this.state.item,
-            novault:true,
-            locked:true,
-            permanant:true
-          })
+            item: this.state.item,
+            novault: true,
+            locked: true,
+            permanant: true,
+          });
           break;
         }
         case 'notebook': {
@@ -300,68 +297,39 @@ export class DialogManager extends Component {
     let {actionSheetData, item, simpleDialog} = this.state;
     return (
       <>
-        <ActionSheet
-          ref={(ref) => (this.actionSheet = ref)}
-          containerStyle={{
-            backgroundColor: colors.bg,
-            width: DDS.isTab ? 500 : '100%',
-            alignSelf: 'center',
-            borderRadius: 10,
-            marginBottom: DDS.isTab ? 50 : 0,
-          }}
-          extraScroll={DDS.isTab ? 50 : 0}
-          indicatorColor={
-            Platform.ios
-              ? hexToRGBA(colors.accent + '19')
-              : hexToRGBA(colors.shade)
-          }
-          premium={
-            <GetPremium
-              context="sheet"
-              close={() => this.actionSheet._hideModal()}
-              offset={50}
-            />
-          }
-          keyboardShouldPersistTaps="always"
-          delayActionSheetDraw={true}
-          delayActionSheetDrawTime={10}
-          footerAlwaysVisible={DDS.isTab}
-          footerHeight={DDS.isTab ? 20 : 10}
-          footerStyle={
-            DDS.isTab
-              ? {
-                  borderRadius: 10,
-                  backgroundColor: colors.bg,
-                }
-              : null
-          }
-          initialOffsetFromBottom={1}
-          bounceOnOpen={false}
-          gestureEnabled={true}
-          onClose={() => {
-            translatePrem.setValue(-800)
-            this.onActionSheetHide();
-          }}>
-          <ActionSheetComponent
-            item={item}
-            setWillRefresh={(value) => {
-              this.willRefresh = true;
-            }}
-            hasColors={actionSheetData.colors}
-            hasTags={actionSheetData.colors}
-            overlayColor={
-              colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
-            }
-            rowItems={actionSheetData.rowItems}
-            columnItems={actionSheetData.columnItems}
-            close={(value) => {
-              if (value) {
-                this.show = value;
+        {!this.state.actionSheetVisible ? null : (
+          <ActionSheetWrapper
+            fwdRef={this.actionSheet}
+            onClose={() => {
+              translatePrem.setValue(-dWidth * 5);
+              this.onActionSheetHide();
+              this.setState({
+                actionSheetVisible: false,
+              });
+            }}>
+            <ActionSheetComponent
+              item={item}
+              setWillRefresh={(value) => {
+                this.willRefresh = true;
+              }}
+              getRef={() => this.actionSheet}
+              hasColors={actionSheetData.colors}
+              hasTags={actionSheetData.colors}
+              overlayColor={
+                colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
               }
-              this.actionSheet._setModalVisible();
-            }}
-          />
-        </ActionSheet>
+              rowItems={actionSheetData.rowItems}
+              columnItems={actionSheetData.columnItems}
+              close={(value) => {
+                if (value) {
+                  this.show = value;
+                }
+                this.actionSheet.current?.setModalVisible();
+              }}
+            />
+          </ActionSheetWrapper>
+        )}
+
         <Dialog
           ref={(ref) => (this.simpleDialog = ref)}
           item={item}
@@ -370,12 +338,8 @@ export class DialogManager extends Component {
         />
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
-          toEdit={item.type === 'topic' ? item : null}
-          notebookID={
-            actionSheetData.extraData
-              ? actionSheetData.extraData.notebookID
-              : item.id
-          }
+          toEdit={item?.type === 'topic' ? item : null}
+          notebookID={item?.type !== 'topic' ? item.id : item.notebookId}
           colors={colors}
         />
         <AddNotebookDialog

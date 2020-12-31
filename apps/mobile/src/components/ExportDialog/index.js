@@ -2,19 +2,18 @@ import React, {Fragment, useEffect, useState} from 'react';
 import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {ToastEvent} from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
-import PremiumService from '../../services/PremiumService';
 import {getElevation} from '../../utils';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {GetPremium} from '../ActionSheetComponent/GetPremium';
-import {Button} from '../Button/index';
 import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {Loading} from '../Loading';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -61,6 +60,7 @@ const ExportDialog = () => {
   };
 
   const save = async (func, name) => {
+    if (exporting) return;
     setExporting(true);
     let res;
     for (var i = 0; i < notes.length; i++) {
@@ -87,42 +87,20 @@ const ExportDialog = () => {
     {
       title: 'PDF',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToPDF, 'PDF');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
       desc: 'Most commonly used, opens on any device.',
+      id: notesnook.ids.dialogs.export.pdf,
     },
     {
       title: 'Markdown',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToMarkdown, 'Markdown');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
       desc: 'Most commonly used, opens on any device.',
+      id: notesnook.ids.dialogs.export.md,
     },
     {
       title: 'Plain Text',
@@ -131,34 +109,24 @@ const ExportDialog = () => {
       },
       icon: 'card-text',
       desc: 'A plain text file with no formatting.',
+      id: notesnook.ids.dialogs.export.text,
     },
     {
       title: 'HTML',
       func: async () => {
-        await PremiumService.verify(
-          async () => {
-            await save(Exporter.saveToHTML, 'Html');
-          },
-          () => {
-            eSendEvent(eShowGetPremium, {
-              context: 'export',
-              title: 'Export in PDF, MD & HTML',
-              desc:
-                'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
-            });
-          },
-        );
+        await save(Exporter.saveToHTML, 'Html');
       },
       icon: 'language-html5',
       desc: 'A file that can be opened in a browser.',
+      id: notesnook.ids.dialogs.export.html,
     },
   ];
 
-  return (
+  return !visible ? null : (
     <BaseDialog
       premium={<GetPremium context="export" offset={50} close={close} />}
       onRequestClose={close}
-      visible={visible}>
+      visible={true}>
       <View
         style={[
           {
@@ -178,88 +146,79 @@ const ExportDialog = () => {
         />
 
         <Seperator half />
-        {exporting ? (
-          <Loading
-            done={complete}
-            doneText={doneText}
-            onDone={async () => {
-              close();
-              await sleep(500);
-              FileViewer.open(result.filePath, {
-                showOpenWithDialog: true,
-                showAppsSuggestions: true,
-              }).catch((e) => {
-                console.log(e);
-                ToastEvent.show(
-                  `No application found to open ${result.name} file`,
-                );
-              });
-            }}
-            tagline="Exporting notes"
-          />
-        ) : (
-          <>
-            <View style={styles.buttonContainer}>
-              {actions.map((item) => (
-                <Fragment key={item.title}>
-                  <Seperator half />
-
-                  <TouchableOpacity
-                    onPress={item.func}
-                    activeOpacity={1}
-                    style={{
-                      width: '100%',
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                      paddingRight: 12,
-                      paddingVertical: 10,
-                    }}>
-                    <View
-                      style={{
-                        backgroundColor: colors.shade,
-                        borderRadius: 5,
-                        height: 40,
-                        width: 40,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                      }}>
-                      <Icon
-                        name={item.icon}
-                        color={colors.accent}
-                        size={SIZE.xxxl}
-                      />
-                    </View>
-                    <Heading
-                      style={{marginLeft: 5, maxWidth: '90%'}}
-                      size={SIZE.md}>
-                      {item.title}
-                      {'\n'}
-                      <Paragraph size={SIZE.sm} color={colors.icon}>
-                        {item.desc}
-                      </Paragraph>
-                    </Heading>
-                  </TouchableOpacity>
-                </Fragment>
-              ))}
-              <Seperator />
-              <View
+        <View style={styles.buttonContainer}>
+          {actions.map((item) => (
+            <Fragment key={item.title}>
+              <Seperator half />
+              <TouchableOpacity
+                testID={item.id}
+                onPress={item.func}
+                activeOpacity={1}
                 style={{
-                  justifyContent: 'flex-end',
                   width: '100%',
+                  alignItems: 'center',
                   flexDirection: 'row',
+                  paddingRight: 12,
+                  paddingVertical: 10,
                 }}>
-                <View />
-                <Button
-                  onPress={close}
-                  width="30%"
-                  type="gray"
-                  title="Cancel"
-                  fontSize={SIZE.md}
-                />
-              </View>
-            </View>
-          </>
-        )}
+                <View
+                  style={{
+                    backgroundColor: colors.shade,
+                    borderRadius: 5,
+                    height: 40,
+                    width: 40,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    name={item.icon}
+                    color={colors.accent}
+                    size={SIZE.xxxl}
+                  />
+                </View>
+                <Heading
+                  style={{marginLeft: 5, maxWidth: '90%'}}
+                  size={SIZE.md}>
+                  {item.title}
+                  {'\n'}
+                  <Paragraph size={SIZE.sm} color={colors.icon}>
+                    {item.desc}
+                  </Paragraph>
+                </Heading>
+              </TouchableOpacity>
+            </Fragment>
+          ))}
+
+          <View
+            style={{
+              width: '100%',
+            }}>
+            <DialogButtons
+              onPressNegative={close}
+              negativeTitle="Cancel"
+              positiveTitle={complete && 'Open File'}
+              onPressPositive={
+                complete
+                  ? async () => {
+                      close();
+                      await sleep(500);
+                      FileViewer.open(result.filePath, {
+                        showOpenWithDialog: true,
+                        showAppsSuggestions: true,
+                      }).catch((e) => {
+                        console.log(e);
+                        ToastEvent.show(
+                          `No application found to open ${result.name} file`,
+                        );
+                      });
+                    }
+                  : null
+              }
+              loading={exporting && !complete}
+              doneText={complete && 'Note Exported!'}
+            />
+          </View>
+        </View>
       </View>
     </BaseDialog>
   );

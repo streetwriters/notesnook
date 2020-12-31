@@ -1,14 +1,16 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
-import {PanGestureHandler, State} from 'react-native-gesture-handler';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { KeyboardAvoidingView, Platform, SafeAreaView, View } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { GetPremium } from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {eOnLoadNote} from '../../utils/Events';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { eOnLoadNote } from '../../utils/Events';
+import { editorRef } from '../../utils/Refs';
 import Editor from './index';
-import {editorRef} from "../../utils/Refs"
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -37,6 +39,7 @@ const onHandlerStateChange = (evt) => {
 
 const onGestureEvent = (event) => {
   if (event.nativeEvent.translationY < 0) return;
+
   let v = event.nativeEvent.translationY;
   if (v >= 80 && prevVal !== 80) {
     prevVal = 80;
@@ -76,7 +79,9 @@ function opacityAnim(a, b, c) {
   }).start();
 }
 
-const AnimatedKeyboardView = Animated.createAnimatedComponent(KeyboardAvoidingView)
+const AnimatedKeyboardView = Animated.createAnimatedComponent(
+  KeyboardAvoidingView,
+);
 
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
@@ -84,84 +89,91 @@ export const EditorWrapper = ({dimensions}) => {
   const insets = useSafeAreaInsets();
 
   return (
-    <SafeAreaView
+    <View
       ref={editorRef}
       style={{
-        width: dimensions.width * 0.55,
+        width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
       }}>
-      <View
+      <SafeAreaView
         style={{
-          position: 'absolute',
-          zIndex: 20,
-          height: insets.top,
-          top: 0,
-          width: dimensions.width,
-          backgroundColor: colors.bg,
-        }}
-      />
-      <PanGestureHandler
-        minPointers={2}
-        onHandlerStateChange={onHandlerStateChange}
-        onGestureEvent={onGestureEvent}>
-        <AnimatedKeyboardView
-        behavior={Platform.OS === 'ios' ? 'padding' : null}
+          width: '100%',
+          height: '100%',
+        }}>
+        <GetPremium context="editor" offset={50 + insets.top} />
+        <View
           style={{
-            transform: [
-              {
-                translateY: anim2,
-              },
-            ],
-            height: '100%',
-            width: '100%',
-          }}>
-          <View
+            position: 'absolute',
+            zIndex: 20,
+            height: insets.top,
+            top: 0,
+            width: dimensions.width,
+            backgroundColor: colors.bg,
+          }}
+        />
+        <PanGestureHandler
+          minPointers={2}
+          onHandlerStateChange={onHandlerStateChange}
+          onGestureEvent={onGestureEvent}>
+          <AnimatedKeyboardView
+            behavior={Platform.OS === 'ios' ? 'padding' : null}
             style={{
-              height: 80,
-              position: 'absolute',
-              backgroundColor: colors.accent,
-              width: '100%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              zIndex: 10,
               transform: [
                 {
-                  translateY: -80 + insets.top,
+                  translateY: anim2,
                 },
               ],
+              height: '100%',
+              width: '100%',
             }}>
-            <Animated.Text
+            <View
               style={{
+                height: 80,
                 position: 'absolute',
-                opacity: op1,
-                bottom: 10,
+                backgroundColor: colors.accent,
+                width: '100%',
+                justifyContent: 'center',
+                alignItems: 'center',
+                zIndex: 10,
+                transform: [
+                  {
+                    translateY:Platform.OS === "ios" ? -80 : -80 + insets.top,
+                  },
+                ],
               }}>
-              <Paragraph color="white">
-                Keep swiping down to start a new note.
-              </Paragraph>
-            </Animated.Text>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op1,
+                  bottom: 10,
+                }}>
+                <Paragraph color="white">
+                  Keep swiping down to start a new note.
+                </Paragraph>
+              </Animated.Text>
 
-            <Animated.Text
-              style={{
-                position: 'absolute',
-                opacity: op3,
-              }}>
-              <Paragraph color="white">Release to load new note</Paragraph>
-            </Animated.Text>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op3,
+                }}>
+                <Paragraph color="white">Release to load new note</Paragraph>
+              </Animated.Text>
 
-            <Animated.Text
-              style={{
-                position: 'absolute',
-                opacity: op2,
-              }}>
-              <Paragraph color="white">Loading a new note</Paragraph>
-            </Animated.Text>
-          </View>
+              <Animated.Text
+                style={{
+                  position: 'absolute',
+                  opacity: op2,
+                }}>
+                <Paragraph color="white">Loading a new note</Paragraph>
+              </Animated.Text>
+            </View>
 
-            <Editor/>
-        </AnimatedKeyboardView>
-      </PanGestureHandler>
-    </SafeAreaView>
+            <Editor />
+          </AnimatedKeyboardView>
+        </PanGestureHandler>
+      </SafeAreaView>
+    </View>
   );
 };

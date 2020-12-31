@@ -1,59 +1,45 @@
 import React from 'react';
-import {Text, TouchableOpacity, View} from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {SIZE} from '../../utils/SizeUtils';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { SIZE } from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const MessageCard = ({data}) => {
+export const MessageCard = ({data, color}) => {
   const [state] = useTracked();
-  const {colors, selectionMode, currentScreen, messageBoardState} = state;
+  const {selectionMode, messageBoardState} = state;
 
-  return (
-    <View>
-      {!messageBoardState.visible || selectionMode ? null : (
-        <TouchableOpacity
-          activeOpacity={0.7}
-          onPress={messageBoardState.onPress}
+  return !messageBoardState.visible || selectionMode ? null : (
+    <TouchableOpacity
+      activeOpacity={0.7}
+      onPress={messageBoardState.onPress}
+      testID={notesnook.ids.default.loginToSync}
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+        position: DDS.isLargeTablet() ? 'relative' : 'absolute',
+        right: 10,
+        top: 10,
+        zIndex:999
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Paragraph
+          color={color}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            position: DDS.isLargeTablet() ? 'relative' : 'absolute',
-            right: 0,
-            top: 0,
+            marginRight: 10,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-            }}>
-            <Paragraph
-              color={
-                COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent
-              }
-              style={{
-                marginRight: 10,
-              }}>
-              {messageBoardState.actionText}
-            </Paragraph>
+          {messageBoardState.actionText}
+        </Paragraph>
 
-            <Icon
-              name="arrow-right"
-              size={SIZE.sm}
-              color={
-                COLORS_NOTE[currentScreen]
-                  ? COLORS_NOTE[currentScreen]
-                  : colors.accent
-              }
-            />
-          </View>
-        </TouchableOpacity>
-      )}
-    </View>
+        <Icon name="arrow-right" size={SIZE.sm} color={color} />
+      </View>
+    </TouchableOpacity>
   );
 };

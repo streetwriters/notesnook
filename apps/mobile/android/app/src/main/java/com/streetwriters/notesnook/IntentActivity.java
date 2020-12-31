@@ -3,6 +3,7 @@ package com.streetwriters.notesnook;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 
 public class IntentActivity extends AppCompatActivity {
@@ -12,8 +13,9 @@ public class IntentActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = this.getIntent();
-        intent.setClass(getBaseContext(),MainActivity.class);
+        intent.setClass(getBaseContext(), MainActivity.class);
+        finishAffinity();
         startActivity(intent);
-        finish();
+
     }
 }

@@ -4,7 +4,6 @@ import com.facebook.react.ReactActivity;
 import android.content.Intent; 
 import android.content.res.Configuration;
 import android.os.Bundle;
-import android.view.WindowManager.LayoutParams;
 
 import org.devio.rn.splashscreen.SplashScreen;
 
@@ -13,11 +12,9 @@ public class MainActivity extends ReactActivity {
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
-
-
     SplashScreen.show(this);
-
     super.onCreate(savedInstanceState);
+    startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
   }
 
 
@@ -41,5 +38,10 @@ public void onConfigurationChanged(Configuration newConfig) {
     return "Notesnook";
   }
 
+
+  @Override
+  public void invokeDefaultOnBackPressed() {
+    moveTaskToBack(true);
+  }
   
 }

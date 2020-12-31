@@ -1,9 +1,9 @@
 import React from 'react';
-import {ScrollView, View} from 'react-native';
+import {FlatList, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -13,10 +13,6 @@ import {
 } from '../../utils/Colors';
 import {MenuItemsList} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import Seperator from '../Seperator';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
@@ -25,7 +21,7 @@ import {UserSection} from './UserSection';
 export const Menu = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors} = state;
+    const {colors, deviceMode} = state;
     const insets = useSafeAreaInsets();
     const noTextMode = false;
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
@@ -33,13 +29,9 @@ export const Menu = React.memo(
       dispatch({type: Actions.THEME, colors: newColors});
     }
 
-    React.useEffect(() => {
-      console.log('rerendering drawer');
-    });
-
     const BottomItemsList = [
       {
-        name: 'Night mode',
+        name: colors.night ? 'Day' : 'Night',
         icon: 'theme-light-dark',
         func: () => {
           if (!colors.night) {
@@ -66,75 +58,57 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor:DDS.isLargeTablet()? colors.nav : colors.bg,
+          backgroundColor: deviceMode !== 'mobile' ? colors.nav : colors.bg,
           paddingTop: insets.top,
-          borderRightWidth: 1,
-          borderRightColor: colors.nav,
         }}>
-        <ScrollView
+        <FlatList
           alwaysBounceVertical={false}
           contentContainerStyle={{
-            minHeight: '50%',
             flexGrow: 1,
           }}
-          showsVerticalScrollIndicator={false}>
-          {MenuItemsList.map((item, index) => (
-            <MenuListItem
-              testID={item.name}
-              key={item.name}
-              item={item}
-              index={index}
-              noTextMode={noTextMode}
-            />
-          ))}
+          style={{
+            height: '100%',
+            width: '100%',
+          }}
+          showsVerticalScrollIndicator={false}
+          data={[0]}
+          keyExtractor={() => 'mainMenuView'}
+          renderItem={() => (
+            <>
+              {MenuItemsList.map((item, index) => (
+                <MenuListItem
+                  key={item.name}
+                  item={item}
+                  testID={item.name}
+                  index={index}
+                />
+              ))}
+              <ColorSection noTextMode={noTextMode} />
+              <TagsSection />
+            </>
+          )}
+        />
 
-          {noTextMode ? null : <TagsSection />}
-          <ColorSection noTextMode={noTextMode} />
-          <View
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexGrow: 1,
-              paddingHorizontal: '10%',
-            }}>
-            <Heading style={{marginBottom: 2.5}} size={SIZE.sm}>
-              Your Pins
-            </Heading>
-            <Paragraph
-              style={{textAlign: 'center'}}
-              color={colors.icon}
-              size={SIZE.xs}>
-              You have not pinned anything yet. You can pin topics and tags
-              here.
-            </Paragraph>
-          </View>
-        </ScrollView>
+        {BottomItemsList.slice(1, 2).map((item, index) => (
+          <MenuListItem
+            testID={
+              item.name == 'Night mode'
+                ? notesnook.ids.menu.nightmode
+                : item.name
+            }
+            key={item.name}
+            item={item}
+            index={index}
+            ignore={true}
+            rightBtn={BottomItemsList[0]}
+          />
+        ))}
 
         <View
           style={{
             width: '100%',
-            justifyContent: noTextMode ? 'center' : 'center',
-            alignItems: 'center',
-            alignSelf: 'center',
-            marginBottom: 15,
+            paddingHorizontal: 0,
           }}>
-          <View
-            style={{
-              width: '100%',
-            }}>
-            {BottomItemsList.map((item, index) => (
-              <MenuListItem
-                testID={item.name == 'Night mode' ? 'night_mode' : item.name}
-                key={item.name}
-                item={item}
-                index={index}
-                ignore={true}
-                noTextMode={noTextMode}
-              />
-            ))}
-          </View>
-          <Seperator half />
-
           <UserSection noTextMode={noTextMode} />
         </View>
       </View>

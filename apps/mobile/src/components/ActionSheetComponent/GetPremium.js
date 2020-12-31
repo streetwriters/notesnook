@@ -16,7 +16,7 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const translatePrem = new Animated.Value(-dWidth * 2);
+export const translatePrem = new Animated.Value(-dWidth * 5);
 
 export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
@@ -25,7 +25,6 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     title: '',
     desc: '',
   });
-
   const open = (event) => {
     if (event.context === context) {
       setMsg({
@@ -45,7 +44,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
           easing: Easing.inOut(Easing.ease),
         }).start();
         await sleep(200);
-        translatePrem.setValue(-dWidth * 2);
+        translatePrem.setValue(-dWidth * 5);
       }, 5000);
     }
   };
@@ -53,7 +52,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
-      translatePrem.setValue(-dWidth * 2);
+      translatePrem.setValue(-dWidth * 5);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, []);
@@ -98,7 +97,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       <Button
         onPress={async () => {
           close();
-          translatePrem.setValue(-800);
+          translatePrem.setValue(-dWidth * 5);
           await sleep(Platform.OS === 'ios' ? 300 : 50);
           eSendEvent(eOpenPremiumDialog);
         }}

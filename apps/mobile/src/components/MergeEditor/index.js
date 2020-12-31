@@ -1,26 +1,32 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, Text, TouchableOpacity, View, SafeAreaView} from 'react-native';
+import {Modal, SafeAreaView, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  sendNoteEditedEvent,
 } from '../../services/EventManager';
+import {dHeight} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../utils/Events';
-import {dHeight} from '../../utils';
-import {Button} from '../Button';
-import {simpleDialogEvent, updateEvent} from '../DialogManager/recievers';
-import {TEMPLATE_APPLY_CHANGES} from '../DialogManager/Templates';
 import {normalize, SIZE} from '../../utils/SizeUtils';
-import {db} from '../../utils/DB';
+import {Button} from '../Button';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
+import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
 
 const {Value, timing} = Animated;
@@ -35,16 +41,19 @@ function openEditorAnimation(
   heightToAnimate,
   extendedHeight = null,
   siblingStatus,
+  insets,
 ) {
   let openConfig = {
     duration: 300,
-    toValue: !siblingStatus ? dHeight - 100 : dHeight * 0.5 - 50,
+    toValue: !siblingStatus
+      ? dHeight - (100 + insets.top)
+      : dHeight * 0.5 - (50 + insets.top / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight * 0.5 - 50,
+    toValue: dHeight * 0.5 - (50 + insets.top / 2),
     easing: Easing.inOut(Easing.ease),
   };
 
@@ -54,7 +63,7 @@ function openEditorAnimation(
   timing(heightToAnimate, openConfig).start();
 }
 
-function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
+function closeEditorAnimation(heightToAnimate, heightToExtend = null, insets) {
   let closeConfig = {
     duration: 300,
     toValue: 0,
@@ -63,7 +72,7 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
 
   let extendConfig = {
     duration: 300,
-    toValue: dHeight - 100,
+    toValue: dHeight - (100 + insets.top),
     easing: Easing.inOut(Easing.ease),
   };
   if (heightToExtend) {
@@ -73,12 +82,9 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null) {
   timing(heightToAnimate, closeConfig).start();
 }
 
-let primaryDelta = null;
-let primaryText = '';
+let primaryData = null;
 
-let secondaryDelta = null;
-let secondaryText = '';
-
+let secondaryData = null;
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -88,7 +94,9 @@ const MergeEditor = () => {
   const [keepContentFrom, setKeepContentFrom] = useState(null);
   const [copyToSave, setCopyToSave] = useState(null);
   const [disardedContent, setDiscardedContent] = useState(null);
+  const [dialogVisible, setDialogVisible] = useState(false);
 
+  const insets = useSafeAreaInsets();
   const postMessageToPrimaryWebView = (message) =>
     primaryWebView.current?.postMessage(JSON.stringify(message));
 
@@ -98,7 +106,7 @@ const MergeEditor = () => {
   const onPrimaryWebViewLoad = () => {
     postMessageToPrimaryWebView({
       type: 'delta',
-      value: primaryDelta,
+      value: primaryData.data,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -111,7 +119,7 @@ const MergeEditor = () => {
   const onSecondaryWebViewLoad = () => {
     postMessageToSecondaryWebView({
       type: 'delta',
-      value: secondaryDelta,
+      value: secondaryData.data,
     });
     let c = {...colors};
     c.factor = normalize(1);
@@ -131,18 +139,25 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = (evt) => {
+    console.log(evt.nativeEvent.data);
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      primaryDelta = data.delta;
-      primaryText = data.text;
+      console.log(data);
+      if (data.type === 'delta') {
+        console.log(data.data);
+        primaryData = data.data;
+      }
     }
   };
 
   const onMessageFromSecondaryWebView = (evt) => {
-    if (evt.nativeEvent.data !== '') {
+    console.log(data.data);
+    if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      secondaryDelta = data.delta;
-      secondaryText = data.text;
+      if (data.type === 'delta') {
+        console.log(data.data);
+        secondaryData = data.data;
+      }
     }
   };
 
@@ -150,11 +165,9 @@ const MergeEditor = () => {
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
-          text: primaryText,
-          delta: {
-            data: primaryDelta,
-            resolved: true,
-          },
+          data: primaryData.data,
+          resolved: true,
+          type: primaryData.type,
         },
         id: note.id,
         conflicted: false,
@@ -162,11 +175,9 @@ const MergeEditor = () => {
     } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
         content: {
-          text: secondaryText,
-          delta: {
-            data: primaryDelta,
-            resolved: true,
-          },
+          data: primaryData.data,
+          type: primaryData.type,
+          resolved: true,
         },
         id: note.id,
         conflicted: false,
@@ -176,21 +187,22 @@ const MergeEditor = () => {
     if (copyToSave === 'primary') {
       await db.notes.add({
         content: {
-          text: primaryText,
-          delta: primaryDelta,
+          data: primaryData.data,
+          type: primaryData.type,
         },
         id: null,
       });
     } else if (copyToSave === 'secondary') {
       await db.notes.add({
         content: {
-          text: secondaryText,
-          delta: secondaryDelta,
+          data: secondaryData.data,
+          type: secondaryData.type,
         },
         id: null,
       });
     }
     eSendEvent(refreshNotesPage);
+    sendNoteEditedEvent(note.id);
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     close();
@@ -198,13 +210,17 @@ const MergeEditor = () => {
 
   const show = async (item) => {
     note = item;
+    let noteData = await db.content.raw(note.contentId);
 
-    let rawDelta = await db.delta.raw(note.content.delta);
-    primaryDelta = rawDelta.data;
-    secondaryDelta = rawDelta.conflicted.data;
-
+    switch (noteData.type) {
+      case 'delta':
+        primaryData = noteData;
+        secondaryData = noteData.conflicted;
+    }
     setVisible(true);
-    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
+    firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
+    secondWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
   useEffect(() => {
@@ -219,41 +235,51 @@ const MergeEditor = () => {
   const onPressKeepFromPrimaryWebView = () => {
     if (keepContentFrom == 'primary') {
       setKeepContentFrom(null);
-      openEditorAnimation(firstWebViewHeight, secondWebViewHeight);
+      openEditorAnimation(
+        firstWebViewHeight,
+        secondWebViewHeight,
+        false,
+        insets,
+      );
     } else {
       setKeepContentFrom('primary');
-      closeEditorAnimation(firstWebViewHeight, secondWebViewHeight);
+      closeEditorAnimation(firstWebViewHeight, secondWebViewHeight, insets);
     }
   };
 
   const onPressSaveCopyFromPrimaryWebView = () => {
     setCopyToSave('primary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressKeepFromSecondaryWebView = () => {
     if (keepContentFrom == 'secondary') {
       setKeepContentFrom(null);
-      openEditorAnimation(secondWebViewHeight, firstWebViewHeight);
+      openEditorAnimation(
+        secondWebViewHeight,
+        firstWebViewHeight,
+        false,
+        insets,
+      );
     } else {
       setKeepContentFrom('secondary');
-      closeEditorAnimation(secondWebViewHeight, firstWebViewHeight);
+      closeEditorAnimation(secondWebViewHeight, firstWebViewHeight, insets);
     }
   };
 
   const onPressSaveCopyFromSecondaryWebView = () => {
     setCopyToSave('secondary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressDiscardFromPrimaryWebView = () => {
     setDiscardedContent('primary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const onPressDiscardFromSecondaryWebView = () => {
     setDiscardedContent('secondary');
-    simpleDialogEvent(TEMPLATE_APPLY_CHANGES);
+    setDialogVisible(true);
   };
 
   const close = () => {
@@ -263,12 +289,13 @@ const MergeEditor = () => {
     setCopyToSave(null);
     setDiscardedContent(null);
     setKeepContentFrom(null);
-    primaryDelta = null;
-    secondaryDelta = null;
+    setDialogVisible(false);
+    primaryData = null;
+    secondaryData = null;
     primaryText = null;
     secondaryText = null;
     note = null;
-    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true);
+    openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
   const params = 'platform=' + Platform.OS;
@@ -281,17 +308,39 @@ const MergeEditor = () => {
           link.click();  
     }`;
 
-  return (
-    <Modal transparent={false} animated animationType="fade" visible={visible}>
+  return !visible ? null : (
+    <Modal
+      statusBarTranslucent
+      transparent={false}
+      animationType="slide"
+      visible={true}>
       <SafeAreaView
         style={{
           backgroundColor: colors.nav,
+          paddingTop: insets.top,
         }}>
+        {dialogVisible && (
+          <BaseDialog visible={true}>
+            <DialogContainer>
+              <DialogHeader
+                title="Apply Changes"
+                paragraph="Apply selected changes to note?"
+              />
+              <DialogButtons
+                positiveTitle="Apply"
+                negativeTitle="Cancel"
+                onPressNegative={() => setDialogVisible(false)}
+                onPressPositive={applyChanges}
+              />
+            </DialogContainer>
+          </BaseDialog>
+        )}
+
         <View
           style={{
             height: '100%',
             width: '100%',
-            backgroundColor: 'rgba(0,0,0,0.3)',
+            backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : null,
           }}>
           <View
             style={{
@@ -319,7 +368,7 @@ const MergeEditor = () => {
                 }}
                 onPress={close}
                 size={SIZE.xxl}
-                name="chevron-left"
+                name="arrow-left"
               />
               <TouchableOpacity
                 onPress={() => {
@@ -331,6 +380,7 @@ const MergeEditor = () => {
                         ? secondWebViewHeight
                         : null,
                       secondary && keepContentFrom !== 'secondary',
+                      insets,
                     );
                     setPrimary(true);
                   } else {
@@ -339,6 +389,7 @@ const MergeEditor = () => {
                       secondary && keepContentFrom !== 'secondary'
                         ? secondWebViewHeight
                         : null,
+                      insets,
                     );
                     setPrimary(false);
                   }
@@ -349,8 +400,7 @@ const MergeEditor = () => {
                   justifyContent: 'space-between',
                 }}>
                 <Paragraph color={colors.icon} size={SIZE.xxs}>
-                  Saved on 10/10/20 {'\n'}
-                  12:30pm on Tablet
+                  Saved on {timeConverter(primaryData.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}
@@ -458,6 +508,7 @@ const MergeEditor = () => {
                         ? firstWebViewHeight
                         : null,
                       primary && keepContentFrom !== 'primary',
+                      insets,
                     );
                     setSecondary(true);
                   } else {
@@ -466,6 +517,7 @@ const MergeEditor = () => {
                       primary && keepContentFrom !== 'primary'
                         ? firstWebViewHeight
                         : null,
+                      insets,
                     );
                     setSecondary(false);
                   }
@@ -476,8 +528,7 @@ const MergeEditor = () => {
                   justifyContent: 'space-between',
                 }}>
                 <Paragraph color={colors.icon} size={SIZE.xs}>
-                  Saved on 10/10/20 {'\n'}
-                  12:30pm on Tablet
+                  Saved on {timeConverter(secondaryData.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}

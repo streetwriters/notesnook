@@ -14,25 +14,26 @@ import {SIZE, WEIGHT} from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Paragraph = ({color, size, style, ...restProps}) => {
+const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
 
   return (
     <Text
-      onLayout={e => console.log(e.nativeEvent.layout.height,"HEIGHT")}
+      allowFontScaling
+      maxFontSizeMultiplier={1}
       {...restProps}
       style={[
         {
           fontFamily: WEIGHT.regular,
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
-          fontWeight:'400',
-          paddingBottom:Platform.OS === "ios" && size? size/3.5:3.5
+          fontWeight: '400',
+          paddingBottom: Platform.OS === 'ios' ? size * 0.25 : null,
         },
         style,
       ]}></Text>
   );
 };
 
-export default Paragraph
+export default Paragraph;

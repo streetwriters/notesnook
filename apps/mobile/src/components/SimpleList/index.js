@@ -1,24 +1,21 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
-  Platform,
+  ActivityIndicator,
   RefreshControl,
-  StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from 'react-native';
+import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {
-  eOpenJumpToDialog,
-  eOpenLoginDialog,
-  eScrollEvent,
-} from '../../utils/Events';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {eSendEvent} from '../../services/EventManager';
+import Sync from '../../services/Sync';
+import {dHeight} from '../../utils';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {eOpenJumpToDialog, eScrollEvent} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import {HeaderMenu} from '../Header/HeaderMenu';
 import Seperator from '../Seperator';
@@ -36,8 +33,6 @@ const header = {
 const SimpleList = ({
   data,
   type,
-  placeholder,
-  RenderItem,
   customRefresh,
   customRefreshing,
   refreshCallback,
@@ -45,17 +40,23 @@ const SimpleList = ({
   scrollRef,
   jumpToDialog,
   placeholderData,
+  loading,
+  headerProps = {
+    heading: 'Home',
+  },
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
-  const searchResults = {...state.searchResults};
+  const {colors, searchResults, headerTextState} = state;
   const [refreshing, setRefreshing] = useState(false);
+
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }),
+    }).cloneWithRows([header, {type: 'empty'}]),
   );
-  const {width, fontScale} = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+
+  const {width, fontScale, height} = useWindowDimensions();
 
   const listData = data;
   const dataType = type;
@@ -67,10 +68,13 @@ const SimpleList = ({
 
   useEffect(() => {
     loadData();
-  }, [listData, searchResults.results]);
+  }, [data, searchResults.results,loading]);
 
   const loadData = () => {
-    let mainData = [header, ...listData];
+    if (loading) return;
+    let mainData = [header, {type: 'empty'}];
+    mainData =
+      !listData || listData.length === 0 ? mainData : [header, ...listData];
     setDataProvider(dataProvider.cloneWithRows(mainData));
   };
 
@@ -83,78 +87,56 @@ const SimpleList = ({
         justifyContent: 'space-between',
         paddingHorizontal: 12,
         height: 35,
+        backgroundColor:
+          index === 1
+            ? headerProps.color
+              ? colors[headerProps.color]
+              : colors.shade
+            : colors.nav,
+        marginTop: index === 1 ? 0 : 5,
       }}>
-      <Paragraph
+      <TouchableWithoutFeedback
         onPress={() => {
-          console.log('clicekd');
           if (jumpToDialog) {
             eSendEvent(eOpenJumpToDialog);
           }
         }}
-        color={colors.accent}
+        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
         style={{
-          height: 35,
-          minWidth: 60,
-          alignSelf: 'center',
-          textAlignVertical: 'center',
+          height: '100%',
+          justifyContent: 'center',
         }}>
-        {item.title}
-      </Paragraph>
+        <Heading
+          color={colors.accent}
+          size={SIZE.sm}
+          style={{
+            minWidth: 60,
+            alignSelf: 'center',
+            textAlignVertical: 'center',
+          }}>
+          {!item.title || item.title === '' ? 'Pinned' : item.title}
+        </Heading>
+      </TouchableWithoutFeedback>
       {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
     </View>
   );
 
-  const _onRefresh = useCallback(async () => {
-    if (Platform.OS === 'ios') {
-      dispatch({
-        type: Actions.SYNCING,
-        syncing: true,
-      });
-    } else {
-      setRefreshing(true);
+  const _onRefresh = async () => {
+    await Sync.run();
+    if (refreshCallback) {
+      refreshCallback();
     }
-    try {
-      let user = await db.user.get();
-      dispatch({type: Actions.USER, user: user});
-      await db.sync();
-      ToastEvent.show('Sync Complete', 'success');
-    } catch (e) {
-      ToastEvent.show(
-        'You must login to sync.',
-        'error',
-        'global',
-        5000,
-        () => {
-          eSendEvent(eOpenLoginDialog);
-        },
-        'Login',
-      );
-    } finally {
-      if (Platform.OS === 'ios') {
-        dispatch({
-          type: Actions.SYNCING,
-          syncing: false,
-        });
-      } else {
-        setRefreshing(false);
-      }
-      if (refreshCallback) {
-        refreshCallback();
-      }
-    }
-    dispatch({type: Actions.ALL});
-  }, []);
+  };
 
   const _ListEmptyComponent = (
     <View
       style={[
         {
           backgroundColor: colors.bg,
-          height: '100%',
+          height: height - 250 - insets.top,
+          width: '100%',
         },
       ]}>
-      <ListHeaderComponent type={type} />
-
       <View
         style={{
           flexGrow: 1,
@@ -162,17 +144,32 @@ const SimpleList = ({
           alignItems: 'center',
         }}>
         <Heading>{placeholderData.heading}</Heading>
-        <Paragraph color={colors.icon}>{placeholderData.paragraph}</Paragraph>
+        <Paragraph
+          style={{
+            textAlign: 'center',
+            width: '80%',
+          }}
+          color={colors.icon}>
+          {loading ? placeholderData.loading : placeholderData.paragraph}
+        </Paragraph>
         <Seperator />
-        {placeholderData.button && (
+        {placeholderData.button && !loading ? (
           <Button
             onPress={placeholderData.action}
             title={placeholderData.button}
             icon="plus"
-            type="transparent"
+            type="accent"
             fontSize={SIZE.md}
+            accentColor="bg"
+            accentText={
+              COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                ? headerTextState.heading.toLowerCase()
+                : 'accent'
+            }
           />
-        )}
+        ) : loading ? (
+          <ActivityIndicator color={colors.accent} />
+        ) : null}
       </View>
     </View>
   );
@@ -195,6 +192,10 @@ const SimpleList = ({
           dim.width = width;
           dim.height = 110 * fontScale;
           break;
+        case 'empty':
+          dim.width = width;
+          dim.height = dHeight - 250 - insets.top;
+          break;
         case 'topic':
           dim.width = width;
           dim.height = 80 * fontScale;
@@ -205,12 +206,12 @@ const SimpleList = ({
           break;
         case 'header':
           dim.width = width;
-          dim.height = 35 * fontScale;
+          dim.height = 40 * fontScale;
           break;
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 200;
+            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 195;
           break;
         default:
           dim.width = width;
@@ -248,23 +249,29 @@ const SimpleList = ({
         );
       case 'MAIN_HEADER':
         return (
-          <ListHeaderComponent type={dataType} index={index} data={listData} />
+          <ListHeaderComponent
+            title={headerProps.heading}
+            type={dataType}
+            index={index}
+            data={listData}
+          />
         );
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;
+      case 'empty':
+        return _ListEmptyComponent;
     }
   };
 
-  return !listData || listData.length === 0 || !dataProvider ? (
-    _ListEmptyComponent
-  ) : (
+  return (
     <RecyclerListView
       ref={scrollRef}
       layoutProvider={_layoutProvider}
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      canChangeSize
+      canChangeSize={true}
+      optimizeForInsertDeleteAnimations
       forceNonDeterministicRendering
       renderFooter={() => <View style={{height: 300}} />}
       scrollViewProps={{
@@ -287,6 +294,7 @@ const SimpleList = ({
           alignSelf: 'center',
           minHeight: '100%',
         },
+        testID: 'list-' + type,
       }}
       style={{
         height: '100%',
@@ -298,36 +306,3 @@ const SimpleList = ({
 };
 
 export default SimpleList;
-
-const styles = StyleSheet.create({
-  loginCard: {
-    width: '100%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingHorizontal: 12,
-    alignSelf: 'center',
-    height: 40,
-    borderRadius: 0,
-    position: 'relative',
-  },
-  loginIcon: {
-    textAlign: 'center',
-    textAlignVertical: 'center',
-  },
-  searchHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 12,
-    height: 40,
-  },
-  emptyList: {
-    height: '100%',
-    width: '100%',
-    alignItems: 'center',
-    alignSelf: 'center',
-    justifyContent: 'center',
-    opacity: 1,
-  },
-});

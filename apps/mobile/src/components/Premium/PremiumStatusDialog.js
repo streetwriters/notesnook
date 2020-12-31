@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Modal, StyleSheet, Text, TouchableOpacity, View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {getElevation} from '../../utils';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { getElevation } from '../../utils';
+import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogContainer from '../Dialog/dialog-container';
 import Seperator from '../Seperator';
-import {ph, pv, SIZE, WEIGHT} from "../../utils/SizeUtils";
-import {DDS} from "../../services/DeviceDetection";
-import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const {
   eSubscribeEvent,
@@ -19,8 +19,8 @@ const {
 } = require('../../utils/Events');
 
 const PremiumStatusDialog = () => {
-  const [state, dispatch] = useTracked();
-  const {colors, premiumUser} = state;
+  const [state] = useTracked();
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -33,50 +33,45 @@ const PremiumStatusDialog = () => {
     };
   }, []);
 
-  const open = (data) => {
+  const open = () => {
     setVisible(true);
   };
 
-  const close = (data) => {
+  const close = () => {
     setVisible(false);
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent={true}
-      animated
-      animationType="fade"
-      onRequestClose={close}>
-      <View style={styles.wrapper}>
-        <TouchableOpacity onPress={close} style={styles.overlay} />
-        <View
-          style={[
-            {
-              width: DDS.isTab ? '40%' : '80%',
-              backgroundColor: colors.bg,
-            },
-            styles.container,
-          ]}>
-          <View style={styles.headingContainer}>
-            <Heading color={colors.accent} style={styles.heading}>
-              Notesnook Pro
-            </Heading>
+    visible && (
+      <BaseDialog visible={true} onRequestClose={close}>
+        <DialogContainer>
+          <View
+            style={[
+              {
+                justifyContent: 'center',
+                alignItems: 'center',
+              },
+            ]}>
+            <View style={styles.headingContainer}>
+              <Heading color={colors.accent} style={styles.heading}>
+                Notesnook Pro
+              </Heading>
+            </View>
+            <Seperator />
+            <Paragraph
+              style={{
+                textAlign: 'center',
+                width: '90%',
+                alignSelf: 'center',
+              }}>
+              Your account has been upgraded to Notesnook Pro successfully. Now
+              you can enjoy all premium features!
+            </Paragraph>
+            <Seperator />
           </View>
-          <Seperator />
-          <Paragraph
-            style={{
-              textAlign: 'center',
-              width: '90%',
-              alignSelf: 'center',
-            }}>
-            Your account has been upgraded to Notesnook Pro successfully. Now
-            you can enjoy all premium features!
-          </Paragraph>
-          <Seperator />
-        </View>
-      </View>
-    </Modal>
+        </DialogContainer>
+      </BaseDialog>
+    )
   );
 };
 

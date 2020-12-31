@@ -101,3 +101,11 @@ export const TEMPLATE_UNPIN = (type) => { return {
   negativeText: 'Cancel',
   action: dialogActions.ACTION_UPIN
 }};
+
+export const TEMPLATE_UNPIN_MENU = (name,type) => { return {
+  title: 'Unpin' + name,
+  paragraph: 'Remove this ' + type  + 'from menu?',
+  positiveText: 'Unpin',
+  negativeText: 'Cancel',
+  action: dialogActions.ACTION_UPIN_MENU
+}};

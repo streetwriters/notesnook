@@ -1,27 +1,30 @@
 import React from 'react';
-import { useTracked } from '../../provider';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
-import NavigationService from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import Navigation from '../../services/Navigation';
+import SettingsService from '../../services/SettingsService';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 
 export const HeaderLeftMenu = () => {
   const [state] = useTracked();
-  const {colors, headerMenuState, currentScreen} = state;
+  const {colors, headerMenuState, currentScreen, deviceMode} = state;
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {
-      NavigationService.openDrawer();
+      Navigation.openDrawer();
       return;
     }
-    NavigationService.goBack();
+    Navigation.goBack();
   };
-
   return (
     <>
-      {!DDS.isTab || currentScreen === 'search' ? (
+      {deviceMode === 'mobile' ||
+      currentScreen === 'search' ||
+      !headerMenuState ? (
         <ActionIcon
-          testID="left_menu_button"
+          testID={notesnook.ids.default.header.buttons.left}
           customStyle={{
             justifyContent: 'center',
             alignItems: 'center',
@@ -29,9 +32,12 @@ export const HeaderLeftMenu = () => {
             width: 40,
             borderRadius: 100,
             marginLeft: -5,
-            marginRight: 25,
+            marginRight:DDS.isLargeTablet()? 10 : 25,
           }}
           onPress={onLeftButtonPress}
+          onLongPress={() => {
+            Navigation.popToTop();
+          }}
           name={!headerMenuState ? 'arrow-left' : 'menu'}
           size={SIZE.xxxl}
           color={colors.pri}

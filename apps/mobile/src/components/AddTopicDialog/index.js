@@ -1,19 +1,24 @@
 import React, {createRef} from 'react';
-import {Modal, Text, TouchableOpacity, View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getElevation} from '../../utils';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {eOnNewTopicAdded} from '../../utils/Events';
-import {Toast} from '../Toast';
-import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogHeader from '../Dialog/dialog-header';
-import DialogButtons from '../Dialog/dialog-buttons';
-import {opacity, ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {Actions} from '../../provider/Actions';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
 import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import Seperator from '../Seperator';
+import {
+  eCloseAddTopicDialog,
+  eOnNewTopicAdded,
+  eOpenAddTopicDialog,
+} from '../../utils/Events';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
+import {updateEvent} from '../DialogManager/recievers';
+import Input from '../Input';
+import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -25,6 +30,7 @@ export class AddTopicDialog extends React.Component {
 
     this.title;
     this.titleRef = createRef();
+    this.notebook = null;
   }
 
   addNewTopic = async () => {
@@ -32,8 +38,8 @@ export class AddTopicDialog extends React.Component {
       return ToastEvent.show('Title is required', 'error', 'local');
 
     if (!this.props.toEdit) {
-      await db.notebooks.notebook(this.props.notebookID).topics.add(this.title);
-      //ToastEvent.show('New topic added', 'success');
+      await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
+
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
@@ -41,86 +47,75 @@ export class AddTopicDialog extends React.Component {
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
+    updateEvent({type: Actions.NOTEBOOKS});
     eSendEvent(eOnNewTopicAdded);
   };
 
-  open() {
+  componentDidMount() {
+    eSubscribeEvent(eOpenAddTopicDialog, this.open);
+    eSubscribeEvent(eCloseAddTopicDialog, this.close);
+  }
+  componentWillUnmount() {
+    eUnSubscribeEvent(eOpenAddTopicDialog, this.open);
+    eUnSubscribeEvent(eCloseAddTopicDialog, this.close);
+  }
+
+  open = async (notebookId) => {
+    let id = notebookId || this.props.notebookID;
+    console.log(notebookId)
+    this.notebook = await db.notebooks.notebook(id).data
     this.setState({
       visible: true,
     });
-  }
-  close() {
+  };
+  close = () => {
     this.title = null;
     this.setState({
       visible: false,
     });
-  }
+  };
 
   render() {
-    const {visible, titleFocused} = this.state;
+    const {visible} = this.state;
     const {colors, toEdit} = this.props;
-
+    if (!visible) return null;
     return (
       <BaseDialog
         onShow={() => {
           this.titleRef.current?.focus();
         }}
-        visible={visible}
+        statusBarTranslucent={false}
+        visible={true}
         onRequestClose={this.close}>
-        <View
-          style={{
-            ...getElevation(5),
-            width: DDS.isTab ? 350 : '80%',
-            maxHeight: 350,
-            borderRadius: 5,
-            backgroundColor: colors.bg,
-            paddingHorizontal: ph,
-            paddingVertical: pv,
-          }}>
+        <DialogContainer>
           <DialogHeader
             icon="book-outline"
-            title={toEdit ? 'Edit Topic' : 'Add New Topic'}
+            title={toEdit ? 'Edit Topic' : 'New Topic'}
+            paragraph={'Add a new topic to ' + this.notebook.title}
           />
 
-          <Seperator />
-
-          <TextInput
-            ref={this.titleRef}
-            style={{
-              padding: pv,
-              borderBottomWidth: 1,
-              borderColor: titleFocused ? colors.accent : colors.nav,
-              paddingHorizontal: ph,
-              borderRadius: 5,
-              fontSize: SIZE.sm,
-              fontFamily: WEIGHT.regular,
-              color: colors.pri,
-              marginTop: 20,
-            }}
-            onFocus={() => {
-              this.setState({
-                titleFocused: true,
-              });
-            }}
-            onBlur={() => {
-              this.setState({
-                titleFocused: true,
-              });
-            }}
-            defaultValue={toEdit ? toEdit.title : null}
+          <Input
+            fwdRef={this.titleRef}
             onChangeText={(value) => {
               this.title = value;
             }}
+            blurOnSubmit={false}
+            defaultValue={toEdit ? toEdit.title : null}
             placeholder="Enter title of topic"
-            placeholderTextColor={colors.icon}
+            onSubmit={this.addNewTopic}
           />
 
           <DialogButtons
             positiveTitle={toEdit ? 'Save' : 'Add'}
-            onPressNegative={this.close}
+            onPressNegative={() => {
+              this.title = null;
+              this.setState({
+                visible: false,
+              });
+            }}
             onPressPositive={this.addNewTopic}
           />
-        </View>
+        </DialogContainer>
         <Toast context="local" />
       </BaseDialog>
     );

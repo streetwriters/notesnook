@@ -18,6 +18,7 @@ const BaseDialog = ({
   onShow,
   animation = 'fade',
   premium,
+  statusBarTranslucent=true
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
@@ -27,7 +28,7 @@ const BaseDialog = ({
       visible={visible}
       transparent={true}
       animated
-      statusBarTranslucent
+      statusBarTranslucent={statusBarTranslucent}
       onShow={() => {
         if (onShow) {
           onShow();

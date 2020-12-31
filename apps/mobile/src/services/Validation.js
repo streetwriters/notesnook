@@ -1,4 +1,4 @@
-import {db} from "../utils/DB";
+import {db} from '../utils/DB';
 
 let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
@@ -10,15 +10,44 @@ export function validateEmail(email) {
   }
 }
 
+export const ERRORS_LIST = {
+  SHORT_PASS: 'Longer than 6 characters',
+  NO_ABC: 'Atleast 1 lowercase letter.',
+  NO_CAPS_ABC: 'Atleast 1 capital letter.',
+  NO_NUM: 'Atleast 1 number',
+  SPECIAL: 'Atleast 1 special character',
+};
+
 export function validatePass(password) {
-  if (password && password.length <= 0) {
+  if (password?.length <= 0) {
     return false;
   }
-  if (password && password.length < 8 && password.length > 0) {
-    return false;
-  } else if (password && password.length >= 8 && password.length > 0) {
-    return true;
+
+  let errors = {
+    SHORT_PASS: true,
+    NO_ABC: true,
+    NO_CAPS_ABC: true,
+    NO_NUM: true,
+    SPECIAL: true,
+  };
+
+  if (password.length > 6) {
+    errors.SHORT_PASS = false;
   }
+
+  if (password.match(/[a-z]+/)) {
+    errors.NO_ABC = false;
+  }
+  if (password.match(/[A-Z]+/)) {
+    errors.NO_CAPS_ABC = false;
+  }
+  if (password.match(/[0-9]+/)) {
+    errors.NO_NUM = false;
+  }
+  if (password.match(/[$@#&!_]+/)) {
+    errors.SPECIAL = false;
+  }
+  return errors;
 }
 
 export function validateUsername(username) {
@@ -31,6 +60,6 @@ export function validateUsername(username) {
 }
 
 export async function checkPremiumUser() {
-  let user = await db.user.get();
+  //let user = await db.user.get();
   return false;
 }

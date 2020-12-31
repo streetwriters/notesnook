@@ -1,22 +1,56 @@
-import React, { useEffect } from 'react';
-import { Text, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { eSendEvent } from '../../services/EventManager';
-import { refreshNotesPage } from '../../utils/Events';
-import NavigationService from '../../services/Navigation';
-import { PressableButton } from '../PressableButton';
-import {COLORS_NOTE} from "../../utils/Colors";
-import {SIZE, WEIGHT} from "../../utils/SizeUtils";
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import {getElevation} from '../../utils';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {refreshNotesPage} from '../../utils/Events';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const ColorSection = ({noTextMode}) => {
+export const ColorSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, colorNotes, currentScreen} = state;
+  const {colorNotes, loading} = state;
 
   useEffect(() => {
-  
-    dispatch({type: Actions.TAGS});
+    if (!loading) {
+      dispatch({type: Actions.COLORS});
+    }
+  }, [loading]);
+
+  return colorNotes.map((item, index) => (
+    <ColorItem key={item.id} item={item} index={index} />
+  ));
+};
+
+const ColorItem = ({item, index}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const [headerTextState, setHeaderTextState] = useState(null);
+
+  const onHeaderStateChange = (event) => {
+      if (event?.id === item.id) {
+        setHeaderTextState(event);
+      } else {
+        setHeaderTextState(null);
+      }
+
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
   }, []);
 
   const onPress = (item) => {
@@ -24,98 +58,81 @@ export const ColorSection = ({noTextMode}) => {
       type: 'color',
       title: item.title,
       color: item,
-      menu:true
+      menu: true,
     };
-    dispatch({
-      type: Actions.HEADER_VERTICAL_MENU,
-      state: false,
+    Navigation.navigate('NotesPage', params, {
+      heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
+      id: item.id,
+      type: 'color',
     });
-
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: item.title,
-    });
-
-    dispatch({
-      type: Actions.HEADER_TEXT_STATE,
-      state: {
-        heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
-      },
-    });
-
-    NavigationService.navigate('NotesPage', params);
     eSendEvent(refreshNotesPage, params);
-    NavigationService.closeDrawer();
-  }
+    Navigation.closeDrawer();
+  };
 
   return (
-    <View
-      style={{
+    <PressableButton
+      customColor="transparent"
+      customSelectedColor={COLORS_NOTE[item.title]}
+      customAlpha={!colors.night ? -0.02 : 0.02}
+      customOpacity={0.12}
+      onPress={() => onPress(item)}
+      customStyle={{
         width: '100%',
+        alignSelf: 'center',
+        borderRadius: 0,
+        flexDirection: 'row',
+        paddingHorizontal: 8,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        height: normalize(50),
       }}>
-      {colorNotes.map((item) => (
-        <PressableButton
-          key={item.id}
-          color={
-            currentScreen === item.title
-              ? COLORS_NOTE[item.title]
-              : 'transparent'
-          }
-          selectedColor={COLORS_NOTE[item.title]}
-          alpha={!colors.night ? -0.02 : 0.02}
-          opacity={0.12}
-          onPress={() => onPress(item)}
-          customStyle={{
-            flexDirection: 'row',
-            justifyContent: noTextMode ? 'center' : 'flex-start',
-            alignItems: 'center',
-            width: '100%',
-            borderRadius: 0,
-            paddingHorizontal: 10,
-            height: 50,
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <View
+          style={{
+            width: 30,
+            justifyContent: 'center',
+            alignItems: 'flex-start',
           }}>
           <View
             style={{
-              width: 35,
-              height: 35,
+              width: SIZE.md,
+              height: SIZE.md,
+              backgroundColor: COLORS_NOTE[item.title],
+              borderRadius: 100,
               justifyContent: 'center',
-              alignItems: 'flex-start',
-            }}>
-            <View
-              style={{
-                width: SIZE.md,
-                height: SIZE.md,
-                backgroundColor: COLORS_NOTE[item.title],
-                borderRadius: 100,
-                justifyContent: 'center',
-                marginRight: 10,
-              }}
-            />
-          </View>
+              marginRight: 10,
+            }}
+          />
+        </View>
+        {headerTextState?.id === item.id ? (
+          <Heading color={COLORS_NOTE[item.title.toLowerCase()]} size={SIZE.md}>
+            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+          </Heading>
+        ) : (
+          <Paragraph color={colors.heading} size={SIZE.md}>
+            {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+          </Paragraph>
+        )}
+      </View>
 
-          {noTextMode ? null : (
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '85%',
-              }}>
-              <Paragraph
-              color={colors.heading}
-                style={{
-                  fontFamily: WEIGHT.regular,
-                  fontSize: SIZE.sm,
-                  color: colors.heading,
-                }}>
-                {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
-              </Paragraph>
-
-        
-            </View>
-          )}
-        </PressableButton>
-      ))}
-    </View>
+      <View
+        style={{
+          backgroundColor:
+            headerTextState?.id === item.id
+              ? COLORS_NOTE[item.title.toLowerCase()]
+              : 'transparent',
+          width: 7,
+          height: 7,
+          borderRadius: 100,
+          ...getElevation(
+            headerTextState?.id === item.id + '_navigation' ? 1 : 0,
+          ),
+        }}
+      />
+    </PressableButton>
   );
 };

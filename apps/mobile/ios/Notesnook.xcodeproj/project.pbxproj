@@ -16,12 +16,16 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
+		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		655FD77A253AD31C001D807D /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
 		659CDF2A2566EFDB00D8E0C8 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659CDF282566EFDA00D8E0C8 /* Poppins-Regular.ttf */; };
 		659CDF2B2566EFDB00D8E0C8 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659CDF292566EFDA00D8E0C8 /* Poppins-SemiBold.ttf */; };
 		65A7F343255687E600699170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A7F342255687E600699170 /* ShareViewController.swift */; };
 		65A7F346255687E600699170 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65A7F344255687E600699170 /* MainInterface.storyboard */; };
 		65A7F34A255687E600699170 /* Add to Notes.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65A7F340255687E600699170 /* Add to Notes.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		65B5F41D257CADA5007D2310 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 65B5F41C257CADA5007D2310 /* notesnook-text.png */; };
+		65E0340B257B9FF100793428 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E0340A257B9FF100793428 /* File.swift */; };
+		65E0340C257B9FF100793428 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E0340A257B9FF100793428 /* File.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		87CE5B71DC72F3D95B7B1AA5 /* libPods-Notesnook-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */; };
 		A79A93DC9D0CAE8703462151 /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */; };
@@ -84,6 +88,9 @@
 		2D02E47B1E0B4A5D006451C7 /* Notesnook-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Notesnook-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Notesnook-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Notesnook-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
+		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
+		6529D2B1257B4A4300B49BC3 /* Add to NotesDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Add to NotesDebug.entitlements"; sourceTree = "<group>"; };
 		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
 		659CDF282566EFDA00D8E0C8 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Poppins-Regular.ttf"; path = "../android/app/src/main/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
 		659CDF292566EFDA00D8E0C8 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Poppins-SemiBold.ttf"; path = "../android/app/src/main/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
@@ -93,6 +100,9 @@
 		65A7F347255687E600699170 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
 		65A7F35025568A3F00699170 /* Add to Notes.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Add to Notes.entitlements"; sourceTree = "<group>"; };
+		65B5F41C257CADA5007D2310 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
+		65E03409257B9FF100793428 /* Notesnook-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Notesnook-Bridging-Header.h"; sourceTree = "<group>"; };
+		65E0340A257B9FF100793428 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		747E42E32601638E75E9A3CF /* Pods-Notesnook-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-tvOSTests/Pods-Notesnook-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook.release.xcconfig"; path = "Target Support Files/Pods-Notesnook/Pods-Notesnook.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = Notesnook/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -119,6 +129,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B3F87EC6B2264CD8ABA5DA8 /* libPods-Notesnook.a in Frameworks */,
+				6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +179,8 @@
 		13B07FAE1A68108700A75B9A /* Notesnook */ = {
 			isa = PBXGroup;
 			children = (
+				65B5F41C257CADA5007D2310 /* notesnook-text.png */,
+				6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */,
 				65A7F34F255689AD00699170 /* Notesnook.entitlements */,
 				655FD779253AD31C001D807D /* Web.bundle */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
@@ -177,6 +190,8 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				65E0340A257B9FF100793428 /* File.swift */,
+				65E03409257B9FF100793428 /* Notesnook-Bridging-Header.h */,
 			);
 			name = Notesnook;
 			sourceTree = "<group>";
@@ -184,6 +199,7 @@
 		2D16E6871FA4F8E400B85C8A /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				6515C42E2580AA2F00E83E39 /* StoreKit.framework */,
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
 				4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */,
@@ -197,6 +213,7 @@
 		65A7F341255687E600699170 /* Add to Notes */ = {
 			isa = PBXGroup;
 			children = (
+				6529D2B1257B4A4300B49BC3 /* Add to NotesDebug.entitlements */,
 				65A7F35025568A3F00699170 /* Add to Notes.entitlements */,
 				65A7F342255687E600699170 /* ShareViewController.swift */,
 				65A7F344255687E600699170 /* MainInterface.storyboard */,
@@ -376,7 +393,8 @@
 					};
 					13B07F861A680F5B00A75B9A = {
 						DevelopmentTeam = 53CWBG3QUC;
-						LastSwiftMigration = 1120;
+						LastSwiftMigration = 1220;
+						ProvisioningStyle = Automatic;
 					};
 					2D02E47A1E0B4A5D006451C7 = {
 						CreatedOnToolsVersion = 8.2.1;
@@ -433,6 +451,7 @@
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				659CDF2A2566EFDB00D8E0C8 /* Poppins-Regular.ttf in Resources */,
+				65B5F41D257CADA5007D2310 /* notesnook-text.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -474,7 +493,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		23B3F321642872B180473574 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -618,7 +637,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
+			shellScript = "#export SENTRY_PROPERTIES=sentry.properties\n#../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\n";
 		};
 		74EE9ED768E52033B174E41C /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -764,6 +783,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				65E0340B257B9FF100793428 /* File.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -790,6 +810,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				65A7F343255687E600699170 /* ShareViewController.swift in Sources */,
+				65E0340C257B9FF100793428 /* File.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -829,6 +850,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = B9989E5C777BB11343A62D09 /* Pods-Notesnook-NotesnookTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -852,6 +874,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = F284B149424757AABC0A96C2 /* Pods-Notesnook-NotesnookTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = NotesnookTests/Info.plist;
@@ -875,19 +898,24 @@
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_ENTITLEMENTS = Notesnook/Notesnook.entitlements;
+				CODE_SIGN_ENTITLEMENTS = Notesnook/NotesnookDebug.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				INFOPLIST_FILE = Notesnook/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
 				PRODUCT_NAME = Notesnook;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Notesnook-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -903,17 +931,22 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Notesnook/Notesnook.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				INFOPLIST_FILE = Notesnook/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				MARKETING_VERSION = 0.1.2;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
+				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
 				PRODUCT_NAME = Notesnook;
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_OBJC_BRIDGING_HEADER = "Notesnook-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -1039,7 +1072,8 @@
 				CLANG_ENABLE_OBJC_WEAK = YES;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
-				CODE_SIGN_ENTITLEMENTS = "Add to Notes/Add to Notes.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Add to Notes/Add to NotesDebug.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
@@ -1049,8 +1083,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.Notesnook.Add-to-Notes";
+				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -1069,16 +1104,19 @@
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Add to Notes/Add to Notes.entitlements";
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Add to Notes/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.Notesnook.Add-to-Notes";
+				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.extension;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;

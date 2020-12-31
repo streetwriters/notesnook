@@ -1,16 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, View} from 'react-native';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import { PressableButton } from '../../components/PressableButton';
+import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation, scrollRef } from '../../utils';
-import { eCloseJumpToDialog, eOpenJumpToDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation, scrollRef} from '../../utils';
+import {
+  eCloseJumpToDialog,
+  eOpenJumpToDialog,
+  eScrollEvent,
+} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
 let timeout = null;
@@ -35,12 +38,12 @@ const JumpToDialog = () => {
   useEffect(() => {
     eSubscribeEvent(eOpenJumpToDialog, open);
     eSubscribeEvent(eCloseJumpToDialog, close);
-    //eSubscribeEvent(eScrollEvent, onScroll);
+    eSubscribeEvent(eScrollEvent, onScroll);
 
     return () => {
       eUnSubscribeEvent(eOpenJumpToDialog, open);
       eUnSubscribeEvent(eCloseJumpToDialog, close);
-      //eUnSubscribeEvent(eScrollEvent, onScroll);
+      eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, []);
 
@@ -51,8 +54,8 @@ const JumpToDialog = () => {
     }
     timeout = setTimeout(() => {
       let index = offsets.findIndex((o, i) => o <= y && offsets[i + 1] > y);
-      //setCurrentIndex(index);
-    }, 100);
+      setCurrentIndex(index);
+    }, 200);
   };
 
   const open = () => {
@@ -77,23 +80,22 @@ const JumpToDialog = () => {
         );
         ind = ind + 1;
         ind = ind - (index + 1);
-        offset = offset + ind * 100 + 200;
-
+        offset = offset + ind * 100 + 190;
         offsets.push(offset);
       });
   };
 
-  return (
+  return !visible ? null : (
     <BaseDialog
       onShow={() => {
         loadOffsets();
       }}
       onRequestClose={close}
-      visible={visible}>
+      visible={true}>
       <View
         style={{
           ...getElevation(5),
-          width: DDS.isTab ? 500 : '80%',
+          width: DDS.isTab ? 500 : '85%',
           backgroundColor: colors.bg,
           zIndex: 100,
           bottom: 20,
@@ -121,36 +123,63 @@ const JumpToDialog = () => {
               flexWrap: 'wrap',
               alignSelf: 'center',
               justifyContent: 'center',
+              paddingBottom: 20,
             }}>
+            <PressableButton
+              key="go to top"
+              onPress={() => {
+                scrollRef.current?.scrollToOffset(0, 0, true);
+                close()
+              }}
+              type='shade'
+              customStyle={{
+                minWidth: '20%',
+                maxWidth: '46%',
+                width: null,
+                paddingHorizontal: 10,
+                margin: 5,
+                borderRadius: 100,
+                height: 22,
+              }}>
+              <Heading
+                size={SIZE.sm}
+                color={colors.accent}
+                style={{
+                  textAlign: 'center',
+                }}>
+                Top
+              </Heading>
+            </PressableButton>
             {notes
               .filter((i) => i.type === 'header')
-              .map((item, index) => (
-                <PressableButton
-                  key={item.title}
-                  onPress={() => onPress(item, index)}
-                  color={currentIndex === index ? colors.shade : 'transparent'}
-                  selectedColor={
-                    currentIndex === index ? colors.accent : colors.nav
-                  }
-                  alpha={!colors.night ? -0.02 : 0.02}
-                  opacity={currentIndex === index ? 0.12 : 1}
-                  customStyle={{
-                    minWidth: '20%',
-                    maxWidth: '46%',
-                    width: null,
-                    padding: 15,
-                    margin: 5,
-                  }}>
-                  <Paragraph
-                    size={SIZE.xs}
-                    color={currentIndex === index ? colors.accent : null}
-                    style={{
-                      textAlign: 'center',
+              .map((item, index) => {
+                return item.title ? (
+                  <PressableButton
+                    key={item.title}
+                    onPress={() => onPress(item, index)}
+                    type={currentIndex === index ? 'accent' : 'shade'}
+                    customStyle={{
+                      minWidth: '20%',
+                      maxWidth: '46%',
+                      width: null,
+                      paddingHorizontal: 0,
+                      margin: 5,
+                      borderRadius: 100,
+                      height: 22,
                     }}>
-                    {item.title}
-                  </Paragraph>
-                </PressableButton>
-              ))}
+                    <Heading
+                      size={SIZE.sm}
+                      color={
+                        currentIndex === index ? colors.light : colors.accent
+                      }
+                      style={{
+                        textAlign: 'center',
+                      }}>
+                      {item.title}
+                    </Heading>
+                  </PressableButton>
+                ) : null;
+              })}
           </View>
         </ScrollView>
       </View>

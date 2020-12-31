@@ -1,42 +1,16 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, Text} from 'react-native';
+import {ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {BUTTON_TYPES, showTooltip} from '../../utils';
+import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
 
-const BUTTON_TYPES = {
-  transparent: {
-    primary: 'transparent',
-    text: 'accent',
-    selected: 'shade',
-  },
-  gray: {
-    primary: 'transparent',
-    text: 'icon',
-    selected: 'nav',
-  },
-  accent: {
-    primary: 'accent',
-    text: 'light',
-    selected: 'accent',
-  },
-  inverted: {
-    primary: 'bg',
-    text: 'accent',
-    selected: 'bg',
-  },
-
-  shade: {
-    primary: 'shade',
-    text: 'accent',
-    selected: 'accent',
-    opacity: 0.12,
-  },
-};
-
+/**
+ *
+ * @param {import('../PressableButton').buttonTypes} type
+ */
 export const Button = ({
   height = 40,
   width = null,
@@ -48,18 +22,38 @@ export const Button = ({
   type = 'transparent',
   iconSize = SIZE.md,
   style = {},
+  testID,
+  accentColor = 'accent',
+  accentText = 'light',
+  onLongPress,
+  tooltipText,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
+  const textColor =
+    colors[
+      type === 'accent'
+        ? BUTTON_TYPES[type](accentColor, accentText).text
+        : BUTTON_TYPES[type].text
+    ];
 
   return (
     <PressableButton
       onPress={onPress}
+      onLongPress={(event) => {
+        if (onLongPress) {
+          onLongPress();
+          return;
+        }
+        if (tooltipText) {
+          showTooltip(event, tooltipText);
+        }
+      }}
       disabled={loading}
-      color={colors[BUTTON_TYPES[type].primary]}
-      selectedColor={colors[BUTTON_TYPES[type].selected]}
-      alpha={!colors.night ? -0.04 : 0.04}
-      opacity={BUTTON_TYPES[type].opacity || 1}
+      testID={testID}
+      type={type}
+      accentColor={accentColor}
+      accentText={accentText}
       customStyle={{
         height: height,
         width: width || null,
@@ -72,39 +66,27 @@ export const Button = ({
         flexDirection: 'row',
         ...style,
       }}>
-      {loading && <ActivityIndicator color={colors[BUTTON_TYPES[type].text]} />}
+      {loading && <ActivityIndicator color={textColor} />}
       {icon && !loading && (
         <Icon
           name={icon}
           style={{
             marginRight: 0,
           }}
-          color={colors[BUTTON_TYPES[type].text]}
+          color={textColor}
           size={iconSize}
         />
       )}
       {!title ? null : (
         <Heading
-          color={colors[BUTTON_TYPES[type].text]}
+          color={textColor}
           size={fontSize}
-          style={styles.buttonText}>
+          style={{
+            marginLeft: icon || loading ? 5 : 0,
+          }}>
           {title}
         </Heading>
       )}
     </PressableButton>
   );
 };
-
-const styles = StyleSheet.create({
-  activityText: {
-    fontSize: SIZE.sm,
-    textAlign: 'center',
-  },
-  activityContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  buttonText: {
-    marginLeft: 5,
-  },
-});
