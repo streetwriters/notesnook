@@ -8,6 +8,7 @@ import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const NotebookItem = ({
   item,
@@ -92,7 +93,7 @@ export const NotebookItem = ({
               item.topics
                 .slice(1)
                 .sort((a, b) => b.dateEdited - a.dateEdited)
-                .slice(0, 2) 
+                .slice(0, 2)
                 .map((topic) => (
                   <TouchableOpacity
                     activeOpacity={0.8}
@@ -173,14 +174,16 @@ export const NotebookItem = ({
             </>
           ) : null}
           {isTrash ? null : (
-            <Paragraph
-              color={colors.icon}
-              size={SIZE.xs}
-              style={{
-                marginRight: 10,
-              }}>
-              {new Date(item.dateCreated).toDateString().substring(4)}
-            </Paragraph>
+            <>
+              <Paragraph
+                color={colors.icon}
+                size={SIZE.xs}
+                style={{
+                  marginRight: 10,
+                }}>
+                {new Date(item.dateCreated).toDateString().substring(4)}
+              </Paragraph>
+            </>
           )}
           <Paragraph
             color={colors.icon}
@@ -195,6 +198,19 @@ export const NotebookItem = ({
               ? item.totalNotes + ' Note'
               : '0 Notes'}
           </Paragraph>
+
+          {item.pinned ? (
+            <Icon
+              style={{marginRight: 10}}
+              name="pin"
+              size={SIZE.sm}
+              style={{
+                marginRight: 10,
+                marginTop: 2,
+              }}
+              color={colors.accent}
+            />
+          ) : null}
         </View>
       </View>
       {item.title === 'General' && item.type === 'topic' ? null : (
