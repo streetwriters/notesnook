@@ -37,45 +37,40 @@ export const ActionSheetTagsSection = ({item, close}) => {
     dispatch({type: Actions.TAGS});
     setNote({...toAdd});
     if (prevQuery) {
-      getSuggestions(prevQuery);
+      getSuggestions(prevQuery, toAdd);
     } else {
-      getSuggestions();
+      getSuggestions(null, toAdd);
     }
   };
 
-  const _onSubmit = useCallback(async () => {
+  const _onSubmit = async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
       ToastEvent.show('Empty Tag', 'error', 'local');
       return;
     }
 
-    async function add() {
-      let tag = tagToAdd;
-      tag = tag.trim();
-      if (tag.includes(' ')) {
-        tag = tag.replace(' ', '_');
-      }
-      if (tag.includes(',')) {
-        tag = tag.replace(',', '');
-      }
-
-      try {
-        await db.notes.note(note.id).tag(tag);
-        localRefresh(note.type);
-        dispatch({type: Actions.TAGS});
-        tagsInputRef.current?.setNativeProps({
-          text: '',
-        });
-        tagToAdd = '';
-      } catch (e) {
-        ToastEvent.show(e.message, 'error', 'local');
-      }
+    let tag = tagToAdd;
+    tag = tag.trim();
+    if (tag.includes(' ')) {
+      tag = tag.replace(' ', '_');
     }
-
-    await add();
-  });
-
-
+    if (tag.includes(',')) {
+      tag = tag.replace(',', '');
+    }
+    try {
+      await db.notes.note(note.id).tag(tag);
+      dispatch({type: Actions.TAGS});
+      localRefresh(note.type);
+      prevQuery = null;
+      tagsInputRef.current?.setNativeProps({
+        text: '',
+      });
+      tagToAdd = '';
+    } catch (e) {
+      console.log(e.message);
+      ToastEvent.show(e.message, 'error', 'local');
+    }
+  };
 
   useEffect(() => {
     if (prevQuery) {
@@ -125,7 +120,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
     }
   });
 
-  const getSuggestions = (query) => {
+  const getSuggestions = (query, note) => {
     if (!note || !note?.id) return;
 
     prevQuery = query;
@@ -287,7 +282,7 @@ const TagItem = ({tag, note, localRefresh}) => {
         .note(note.id)
         .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
       sendNoteEditedEvent(note.id, false, true);
-      console.log('localRefreshHHH EEE')
+      console.log('localRefreshHHH EEE');
       localRefresh(note.type);
     } catch (e) {
       sendNoteEditedEvent(note.id, false, true);
