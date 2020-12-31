@@ -90,6 +90,7 @@ export const NavigatorStack = React.memo(
           onStateChange={() => {
             updateEvent({type: Actions.SELECTION_MODE, enabled: false});
             updateEvent({type: Actions.CLEAR_SELECTION});
+            eSendEvent("navigate")
           }}
           independent={true}
           ref={rootNavigatorRef}>
