@@ -192,7 +192,6 @@ export const ActionSheetComponent = ({
       name: 'Delete',
       icon: 'delete',
       func: async () => {
-     
         try {
           await deleteItems(note);
         } catch (e) {
@@ -285,7 +284,7 @@ export const ActionSheetComponent = ({
       func: async () => {
         if (!note.id) return;
         if (note.type === 'note') {
-          if (db.notes.pinned.length === 3) {
+          if (db.notes.pinned.length === 3 && !note.pinned) {
             ToastEvent.show(
               'You cannot pin more than 3 notes',
               'error',
@@ -295,7 +294,7 @@ export const ActionSheetComponent = ({
           }
           await db.notes.note(note.id).pin();
         } else {
-          if (db.notebooks.pinned.length === 3) {
+          if (db.notebooks.pinned.length === 3 && !note.pinned) {
             ToastEvent.show(
               'You cannot pin more than 3 notes',
               'error',
@@ -520,7 +519,7 @@ export const ActionSheetComponent = ({
         }}
       />
       {!note.id && !note.dateCreated ? (
-        <Paragraph style={{marginVertical: 10,alignSelf:"center"}}>
+        <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
         </Paragraph>
       ) : (

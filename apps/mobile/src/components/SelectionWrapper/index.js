@@ -110,13 +110,13 @@ const ActionStrip = ({note, setActionStrip}) => {
         if (!note.id) return;
 
         if (note.type === 'note') {
-          if (db.notes.pinned.length === 3) {
+          if (db.notes.pinned.length === 3 && !note.pinned) {
             ToastEvent.show('You cannot pin more than 3 notes', 'error');
             return;
           }
           await db.notes.note(note.id).pin();
         } else {
-          if (db.notebooks.pinned.length === 3) {
+          if (db.notebooks.pinned.length === 3 && !note.pinned) {
             ToastEvent.show('You cannot pin more than 3 notebooks', 'error');
             return;
           }
