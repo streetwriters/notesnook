@@ -496,6 +496,8 @@ export const ActionSheetComponent = ({
       onScrollEndDrag={onScrollEnd}
       onScrollAnimationEnd={onScrollEnd}
       onMomentumScrollEnd={onScrollEnd}
+      keyboardShouldPersistTaps="always"
+      keyboardDismissMode="none"
       onLayout={() => {
         if (!item.dateDeleted) {
           localRefresh(item.type, true);

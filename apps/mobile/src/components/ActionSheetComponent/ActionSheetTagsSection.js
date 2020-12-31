@@ -160,6 +160,8 @@ export const ActionSheetTagsSection = ({item, close}) => {
       }}>
       <ScrollView
         horizontal
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         contentContainerStyle={{
           flexDirection: 'row',
           alignItems: 'center',
@@ -203,7 +205,11 @@ export const ActionSheetTagsSection = ({item, close}) => {
           />
         ))}
       </ScrollView>
-      <View
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={() => {
+          tagsInputRef.current?.focus();
+        }}
         style={{
           flexDirection: 'row',
           flexWrap: 'wrap',
@@ -243,6 +249,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
             fontSize: SIZE.md,
             textAlignVertical: 'center',
           }}
+          t
           testID={notesnook.ids.dialogs.actionsheet.hashtagInput}
           autoCapitalize="none"
           textAlignVertical="center"
@@ -265,7 +272,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           onSubmitEditing={_onSubmit}
           onKeyPress={_onKeyPress}
         />
-      </View>
+      </TouchableOpacity>
     </View>
   ) : null;
 };
