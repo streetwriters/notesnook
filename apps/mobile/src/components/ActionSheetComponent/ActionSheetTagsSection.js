@@ -32,20 +32,15 @@ export const ActionSheetTagsSection = ({item, close}) => {
   const [note, setNote] = useState(item);
 
   const localRefresh = () => {
-    toAdd = db.notes.note(note.id);
-    if (toAdd) {
-      toAdd = toAdd.data;
-    } else {
-      setTimeout(() => {
-        toAdd = db.notes.note(note.id);
-        if (toAdd) {
-          toAdd = toAdd.data;
-        }
-      }, 500);
-    }
+    toAdd = db.notes.note(note.id).data;
     dispatch({type: Actions.NOTES});
     dispatch({type: Actions.TAGS});
     setNote({...toAdd});
+    if (prevQuery) {
+      getSuggestions(prevQuery);
+    } else {
+      getSuggestions();
+    }
   };
 
   const _onSubmit = useCallback(async () => {
@@ -80,6 +75,8 @@ export const ActionSheetTagsSection = ({item, close}) => {
     await add();
   });
 
+
+
   useEffect(() => {
     if (prevQuery) {
       getSuggestions(prevQuery);
@@ -90,7 +87,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
     return () => {
       prevQuery = null;
     };
-  }, [note]);
+  }, []);
 
   const _onKeyPress = useCallback(async (event) => {
     if (event.nativeEvent.key === 'Backspace') {
@@ -232,11 +229,14 @@ export const ActionSheetTagsSection = ({item, close}) => {
           </Paragraph>
         ) : null}
 
-        {note && note.tags
-          ? note.tags.map((item) => (
-              <TagItem key={item.title} tag={item} note={note} />
-            ))
-          : null}
+        {note.tags.map((item) => (
+          <TagItem
+            key={item.title}
+            tag={item}
+            note={note}
+            localRefresh={localRefresh}
+          />
+        ))}
         <TextInput
           style={{
             minWidth: 100,
@@ -249,7 +249,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
             fontSize: SIZE.md,
             textAlignVertical: 'center',
           }}
-          t
           testID={notesnook.ids.dialogs.actionsheet.hashtagInput}
           autoCapitalize="none"
           textAlignVertical="center"
@@ -277,7 +276,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
   ) : null;
 };
 
-const TagItem = ({tag, note}) => {
+const TagItem = ({tag, note, localRefresh}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -288,7 +287,7 @@ const TagItem = ({tag, note}) => {
         .note(note.id)
         .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
       sendNoteEditedEvent(note.id, false, true);
-      dispatch({type: Actions.TAGS});
+      console.log('localRefreshHHH EEE')
       localRefresh(note.type);
     } catch (e) {
       sendNoteEditedEvent(note.id, false, true);
