@@ -13,7 +13,7 @@ export const db = new Database(
 //"https://api.notesnook.com"
 
 db.host({
-  API_HOST: 'http://192.168.10.10:5264',
-  AUTH_HOST: 'http://192.168.10.10:8264',
-  SSE_HOST: 'http://192.168.10.10:7264',
+  API_HOST: 'https://192.168.10.5:5264',
+  AUTH_HOST: 'https://192.168.10.5:8264',
+  SSE_HOST: 'https://192.168.10.5:7264',
 });
