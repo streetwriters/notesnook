@@ -86,8 +86,11 @@ export default class Note {
   async color(color) {
     if (!(await sendCheckUserStatusEvent(CHECK_IDS.noteColor))) return;
     await this.uncolor();
-    await this._db.colors.add(color, this._note.id);
-    await this._db.notes._collection.addItem({ ...this._note, color });
+    let tag = await this._db.colors.add(color, this._note.id);
+    await this._db.notes._collection.addItem({
+      ...this._note,
+      color: tag.title,
+    });
   }
 
   async uncolor() {
@@ -104,11 +107,11 @@ export default class Note {
       !(await sendCheckUserStatusEvent(CHECK_IDS.noteTag))
     )
       return;
-    return await addTag.call(this, tag, "tags");
+    return await addTag.call(this, tag);
   }
 
   untag(tag) {
-    return removeTag.call(this, tag, "tags");
+    return removeTag.call(this, tag);
   }
 
   _toggle(prop) {
@@ -124,21 +127,21 @@ export default class Note {
   }
 }
 
-async function addTag(tag, array) {
-  if (this._note[array].indexOf(tag) > -1)
+async function addTag(tag) {
+  if (this._note.tags.indexOf(tag) > -1)
     throw new Error("Cannot add a duplicate tag.");
-  let arr = [...this._note[array], tag];
-  const note = { ...this._note, [array]: arr };
-  await this._db[array].add(tag, note.id);
+  let tagItem = await this._db.tags.add(tag, note.id);
+  let arr = [...this._note.tags, tagItem.title];
+  const note = { ...this._note, tags: arr };
   await this._db.notes._collection.addItem(note);
 }
 
-async function removeTag(tag, array) {
-  if (this._note[array].indexOf(tag) <= -1)
+async function removeTag(tag) {
+  if (this._note.tags.indexOf(tag) <= -1)
     throw new Error("This note is not tagged by the specified tag.");
-  let arr = [...this._note[array]];
+  let arr = [...this._note.tags];
   arr.splice(arr.indexOf(tag), 1);
-  const note = { ...this._note, [array]: arr };
-  await this._db[array].remove(tag, note.id);
+  const note = { ...this._note, tags: arr };
+  await this._db.tags.remove(tag, note.id);
   await this._db.notes._collection.addItem(note);
 }

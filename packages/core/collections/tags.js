@@ -60,7 +60,7 @@ export default class Tags extends Collection {
     };
 
     await this._collection.addItem(tag);
-    return id;
+    return tag;
   }
 
   get raw() {
