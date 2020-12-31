@@ -65,9 +65,9 @@ async function saveToText(note) {
       return null;
     }
   }
-  let markdown = await db.notes.note(note.id).export('txt');
+  let text = await db.notes.note(note.id).export('txt');
   path = path + note.title + '.txt';
-  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+  await RNFetchBlob.fs.writeFile(path, text, 'utf8');
 
   return {
     filePath: path,
@@ -85,9 +85,9 @@ async function saveToHTML(note) {
       return null;
     }
   }
-  let markdown = await db.notes.note(note.id).export('html');
+  let html = await db.notes.note(note.id).export('html');
   path = path + note.title + '.html';
-  await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
+  await RNFetchBlob.fs.writeFile(path, html, 'utf8');
 
   return {
     filePath: path,
