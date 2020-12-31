@@ -68,13 +68,11 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
 const screenOptionsForAnimation = {
   animationEnabled: true,
   cardStyleInterpolator: forSlide,
-  gestureEnabled:true
+  gestureEnabled: true,
 };
-
 
 export const NavigatorStack = React.memo(
   () => {
-    
     React.useEffect(() => {
       sleep(2000).then(() => {
         let headerState = {
@@ -86,18 +84,21 @@ export const NavigatorStack = React.memo(
       });
     }, []);
 
-  
     return (
       <Container root={true}>
-        <NavigationContainer 
-        independent={true} ref={rootNavigatorRef}>
+        <NavigationContainer
+          onStateChange={() => {
+            updateEvent({type: Actions.SELECTION_MODE, enabled: false});
+            updateEvent({type: Actions.CLEAR_SELECTION});
+          }}
+          independent={true}
+          ref={rootNavigatorRef}>
           <Stack.Navigator
-          
             initialRouteName={SettingsService.get().homepage}
             screenOptions={{
               headerShown: false,
               animationEnabled: false,
-              gestureEnabled:false
+              gestureEnabled: false,
             }}>
             <Stack.Screen name="Notes" component={Home} />
             <Stack.Screen name="Notebooks" component={Folders} />
