@@ -289,6 +289,7 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).pin();
         }
         localRefresh(item.type);
+        close();
       },
       close: false,
       check: true,
@@ -308,6 +309,7 @@ export const ActionSheetComponent = ({
         dispatch({type: Actions.FAVORITES});
         sendNoteEditedEvent(note.id, false, true);
         localRefresh(item.type, true);
+        close();
       },
       close: false,
       check: true,
