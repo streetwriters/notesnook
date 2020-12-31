@@ -130,7 +130,7 @@ export default class Note {
 async function addTag(tag) {
   if (this._note.tags.indexOf(tag) > -1)
     throw new Error("Cannot add a duplicate tag.");
-  let tagItem = await this._db.tags.add(tag, note.id);
+  let tagItem = await this._db.tags.add(tag, this._note.id);
   let arr = [...this._note.tags, tagItem.title];
   const note = { ...this._note, tags: arr };
   await this._db.notes._collection.addItem(note);
