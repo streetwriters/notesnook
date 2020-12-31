@@ -7,6 +7,7 @@ import { showToast } from "../utils/toast";
 class NotebookStore extends BaseStore {
   notebooks = [];
   selectedNotebookTopics = [];
+  selectedNotebookId = 0;
 
   refresh = () => {
     this.set((state) => (state.notebooks = db.notebooks.all));
@@ -39,6 +40,7 @@ class NotebookStore extends BaseStore {
   setSelectedNotebookTopics = (id) => {
     this.set((state) => {
       state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
+      state.selectedNotebookId = id;
     });
   };
 }

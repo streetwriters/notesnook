@@ -37,7 +37,7 @@ function TopicDialog(props) {
   );
 }
 
-export function showTopicDialog(notebook) {
+export function showTopicDialog() {
   return showDialog((perform) => (
     <TopicDialog
       title={"Create a Topic"}
@@ -46,10 +46,11 @@ export function showTopicDialog(notebook) {
       onClose={() => {
         perform(false);
       }}
-      onYes={async (topic) => {
+      onAction={async (topic) => {
         if (!topic) return;
-        await db.notebooks.notebook(notebook).topics.add(topic);
-        store.setSelectedNotebookTopics(notebook);
+        const notebookId = store.get().selectedNotebookId;
+        await db.notebooks.notebook(notebookId).topics.add(topic);
+        store.setSelectedNotebookTopics(notebookId);
         perform(true);
       }}
     />
