@@ -5,7 +5,6 @@ import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 
-let searchTerm;
 export const SearchInput = (props) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -17,10 +16,14 @@ export const SearchInput = (props) => {
 
   useEffect(() => {
     updateSearchState();
+
+    return () => {
+      SearchService.setTerm(null);
+    };
   }, []);
 
   const onChangeText = async (value) => {
-    searchTerm = value;
+    SearchService.setTerm(value);
   };
 
   return (
@@ -54,7 +57,7 @@ export const SearchInput = (props) => {
         onChangeText={onChangeText}
         multiline={false}
         onSubmitEditing={async () => {
-          await SearchService.search(searchTerm);
+          await SearchService.search();
         }}
         enablesReturnKeyAutomatically
         placeholder="Type a keyword"
