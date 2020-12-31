@@ -1,4 +1,4 @@
-import { CHECK_IDS } from 'notes-core/common';
+import {CHECK_IDS} from 'notes-core/common';
 import {db} from '../utils/DB';
 import {eOpenPremiumDialog, eShowGetPremium} from '../utils/Events';
 import {eSendEvent} from './EventManager';
@@ -24,10 +24,9 @@ function get() {
 }
 
 async function verify(callback, error) {
-  /*  if (!callback) console.warn('You must provide a callback function');
+  /*  if (!callback) console.warn('You must provide a callback function');*/
   await callback();
-
-  return; */
+  return;
   try {
     let user = await db.user.getUser();
 
@@ -51,6 +50,8 @@ async function verify(callback, error) {
 const onUserStatusCheck = async (type) => {
   let status = get();
   let message = null;
+
+  return {type, result: true};
 
   if (!status) {
     switch (type) {
