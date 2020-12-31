@@ -17,18 +17,20 @@ export const HeaderRightMenu = () => {
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
 
-      <ActionIcon
-        onPress={async () => {
-          Navigation.navigate('Search', {
-            menu: false,
-          });
-        }}
-        testID={notesnook.ids.default.header.buttons.left}
-        name="magnify"
-        size={SIZE.xxxl}
-        color={colors.pri}
-        customStyle={styles.rightBtn}
-      />
+     {
+       currentScreen !== "settings"  && <ActionIcon
+       onPress={async () => {
+         Navigation.navigate('Search', {
+           menu: false,
+         });
+       }}
+       testID={notesnook.ids.default.header.buttons.left}
+       name="magnify"
+       size={SIZE.xxxl}
+       color={colors.pri}
+       customStyle={styles.rightBtn}
+     />
+     } 
 
       {DDS.isLargeTablet() && containerBottomButton.onPress ? (
         <Button
