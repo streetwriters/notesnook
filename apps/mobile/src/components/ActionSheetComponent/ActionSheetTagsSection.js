@@ -224,15 +224,16 @@ export const ActionSheetTagsSection = ({item, close}) => {
           </Paragraph>
         ) : null}
 
-        {note.tags.map((item) => (
+        {note.tags.map((item,index) => (
           <TagItem
-            key={item.title}
+            key={item}
             tag={item}
             note={note}
             localRefresh={localRefresh}
           />
         ))}
         <TextInput
+          key="inputItem"
           style={{
             minWidth: 100,
             zIndex: 10,
