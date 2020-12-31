@@ -60,7 +60,7 @@ export const deleteItems = async (item) => {
           let trashItem = trash.all.find((item) => item.itemId === it.id);
           ids.push(trashItem.id);
         }
-        await db.trash.restore(ids);
+        await db.trash.restore(...ids);
         updateEvent({type: Actions.NOTEBOOKS});
         updateEvent({type: Actions.NOTES});
         updateEvent({type: Actions.TRASH});
