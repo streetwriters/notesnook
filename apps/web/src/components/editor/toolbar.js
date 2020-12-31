@@ -77,10 +77,27 @@ function Toolbar(props) {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
-        onClick: toggleProperties,
+        onClick: () => {
+          if (!sessionId) {
+            showToast(
+              "error",
+              "Please start writing a note to use properties."
+            );
+            return;
+          }
+          toggleProperties();
+        },
       },
     ],
-    [quill, redoable, undoable, toggleFocusMode, toggleProperties, isFocusMode]
+    [
+      quill,
+      redoable,
+      undoable,
+      toggleFocusMode,
+      toggleProperties,
+      isFocusMode,
+      sessionId,
+    ]
   );
 
   return (
