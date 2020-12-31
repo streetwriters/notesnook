@@ -66,7 +66,6 @@ export default class NoteItem extends React.Component {
   };
 
   render() {
- 
     let {colors, item, customStyle, isTrash} = this.props;
     return (
       <View
@@ -96,7 +95,6 @@ export default class NoteItem extends React.Component {
               }}>
               <TouchableOpacity
                 activeOpacity={1}
-               
                 style={{
                   paddingVertical: 1.5,
                   marginBottom: 2.5,
@@ -147,7 +145,11 @@ export default class NoteItem extends React.Component {
             {!isTrash ? (
               <>
                 <TimeSince
-                  style={{fontSize: SIZE.xs, color: colors.icon,marginRight:10}}
+                  style={{
+                    fontSize: SIZE.xs,
+                    color: colors.icon,
+                    marginRight: 10,
+                  }}
                   time={item.dateCreated}
                   updateFrequency={
                     Date.now() - item.dateCreated < 60000 ? 2000 : 60000
@@ -180,13 +182,25 @@ export default class NoteItem extends React.Component {
                   />
                 ) : null}
 
+                {item.pinned ? (
+                  <Icon
+                    style={{marginRight: 10}}
+                    name="pin"
+                    size={SIZE.sm}
+                    style={{
+                      marginRight: 10,
+                      marginTop:2
+                    }}
+                    color={colors.accent}
+                  />
+                ) : null}
+
                 {item.favorite ? (
                   <Icon
                     style={{marginRight: 10}}
                     name="star"
                     size={SIZE.md}
                     style={{
-                      marginBottom: 2,
                       marginRight: 10,
                     }}
                     color="orange"
