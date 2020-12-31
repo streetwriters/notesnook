@@ -63,22 +63,7 @@ export const ActionSheetComponent = ({
   const {colors, premiumUser, user} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
-  const [note, setNote] = useState(
-    item
-      ? item
-      : {
-          colors: [],
-          tags: [],
-          pinned: false,
-          favorite: false,
-          locked: false,
-          content: {
-            text: null,
-            delta: null,
-          },
-          dateCreated: null,
-        },
-  );
+  const [note, setNote] = useState(item);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -739,7 +724,7 @@ export const ActionSheetComponent = ({
         <ActionSheetColorsSection close={close} item={note} />
       ) : null}
 
-      {hasTags ? (
+      {hasTags && note ? (
         <ActionSheetTagsSection
           close={close}
           item={note}
