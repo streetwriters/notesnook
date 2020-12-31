@@ -105,6 +105,11 @@ class EditorStore extends BaseStore {
     this.set((state) => (state.session.isSaving = true));
 
     this._saveFn()(this.get().session).then(async (id) => {
+      const note = db.notes.note(id)?.data;
+      if (!note) {
+        noteStore.refresh();
+        return;
+      }
       /* eslint-disable */
       storeSync: {
         const session = this.get().session;
@@ -127,7 +132,6 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
-        const note = db.notes.note(id).data;
         state.session.id = id;
         state.session.title = note.title;
         state.session.isSaving = false;
