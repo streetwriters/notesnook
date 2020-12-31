@@ -8,6 +8,7 @@ import {dWidth, getElevation, toTXT} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
+import { deleteItems } from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
