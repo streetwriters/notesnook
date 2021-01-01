@@ -88,7 +88,7 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          {item.notebooks && item.notebooks.length > 0 && (
+          {!isTrash && item.notebooks && item.notebooks.length > 0 && (
             <View
               style={{
                 flexDirection: 'row',
@@ -189,7 +189,7 @@ export default class NoteItem extends React.Component {
                     size={SIZE.sm}
                     style={{
                       marginRight: 10,
-                      marginTop:2
+                      marginTop: 2,
                     }}
                     color={colors.accent}
                   />
