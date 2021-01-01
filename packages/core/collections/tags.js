@@ -10,37 +10,9 @@ export default class Tags extends Collection {
     return tagItem;
   }
 
-  async merge(tag) {
-    if (!tag) return;
-    if (tag.deleted) {
-      await this._collection.addItem(tag);
-      return;
-    }
-    const oldTag = this.all.find(
-      (t) => t.id === tag.id || t.title === tag.title
-    );
-
-    if (!oldTag) return await this._collection.addItem(tag);
-
-    const deletedIds = set.union(oldTag.deletedIds, tag.deletedIds);
-    const noteIds = set.difference(
-      set.union(oldTag.noteIds, tag.noteIds),
-      deletedIds
-    );
-
-    const dateEdited =
-      tag.dateEdited > oldTag.dateEdited ? tag.dateEdited : oldTag.dateEdited;
-    tag = {
-      ...oldTag,
-      noteIds,
-      dateEdited,
-      deletedIds,
-    };
-    await this._collection.addItem(tag);
-  }
-
   async add(tagId, noteId) {
-    if (!tagId || !noteId) return;
+    if (!tagId || !noteId) new Error("tagId and noteId cannot be falsy.");
+
     let tag = this.all.find((t) => t.id === tagId || t.title === tagId) || {
       title: tagId,
     };
@@ -50,13 +22,11 @@ export default class Tags extends Collection {
 
     if (notes.find((id) => id === noteId)) return id;
 
-    let deletedIds = tag.deletedIds || [];
     tag = {
       type: "tag",
       id,
       title: tag.title,
       noteIds: [...notes, noteId],
-      deletedIds,
     };
 
     await this._collection.addItem(tag);
@@ -72,14 +42,14 @@ export default class Tags extends Collection {
   }
 
   async remove(tagTitle, noteId) {
-    if (!tagTitle || !noteId) return;
+    if (!tagTitle || !noteId) new Error("tagTitle and noteId cannot be falsy.");
     let tag = this.all.find((t) => t.title === tagTitle);
-    if (!tag) return;
+    if (!tag) throw new Error(`No tag with title "${tagTitle}" found.`);
     tag = qclone(tag);
     const noteIndex = tag.noteIds.indexOf(noteId);
-    if (noteIndex <= -1) return;
+    if (noteIndex <= -1)
+      throw new Error(`No note of id "${noteId}" exists in this tag.`);
     tag.noteIds.splice(noteIndex, 1);
-    tag.deletedIds.push(noteId);
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
     else await this._collection.removeItem(tag.id);
   }

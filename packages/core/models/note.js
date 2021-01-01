@@ -94,6 +94,7 @@ export default class Note {
   }
 
   async uncolor() {
+    if (!this._note.color) return;
     await this._db.colors.remove(this._note.color, this._note.id);
     await this._db.notes._collection.addItem({
       ...this._note,

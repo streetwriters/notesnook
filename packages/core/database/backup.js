@@ -138,14 +138,6 @@ export default class Backup {
         dbCollection: this._db.notebooks,
       },
       {
-        index: data["tags"],
-        dbCollection: this._db.tags,
-      },
-      {
-        index: data["colors"],
-        dbCollection: this._db.colors,
-      },
-      {
         index: data["trash"],
         dbCollection: this._db.trash,
       },

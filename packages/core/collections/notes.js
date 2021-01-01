@@ -223,8 +223,8 @@ export default class Notes extends Collection {
   async _delete(moveToTrash = true, ...ids) {
     for (let id of ids) {
       let item = this.note(id);
-      const itemData = qclone(item.data);
       if (!item) continue;
+      const itemData = qclone(item.data);
       if (item.notebooks) {
         for (let notebook of item.notebooks) {
           for (let topic of notebook.topics) {
@@ -238,8 +238,8 @@ export default class Notes extends Collection {
       for (let tag of item.tags) {
         await this._db.tags.remove(tag, id);
       }
-      if (item.color) {
-        await this._db.colors.remove(item.color, id);
+      if (item.data.color) {
+        await this._db.colors.remove(item.data.color, id);
       }
       await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);

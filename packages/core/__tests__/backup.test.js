@@ -111,8 +111,6 @@ describe.each([
       verifyIndex(data, db, "notebooks", "notebooks");
       verifyIndex(data, db, "delta", "content");
       verifyIndex(data, db, "content", "content");
-      verifyIndex(data, db, "tags", "tags");
-      verifyIndex(data, db, "colors", "colors");
       verifyIndex(data, db, "trash", "trash");
     });
   });
