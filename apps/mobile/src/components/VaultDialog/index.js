@@ -281,6 +281,9 @@ export class VaultDialog extends Component {
 
   async _enrollFingerprint(password) {
     try {
+      this.setState({
+        loading: true,
+      });
       await Keychain.setInternetCredentials('nn_vault', 'nn_vault', password, {
         accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
         authenticationPrompt: {cancel: null},
@@ -289,6 +292,9 @@ export class VaultDialog extends Component {
       eSendEvent('vaultUpdated');
       ToastEvent.show('Fingerprint access enabled!', 'success');
       this.close();
+      this.setState({
+        loading: false,
+      });
     } catch (e) {
       this._takeErrorAction(e);
     }
