@@ -352,6 +352,14 @@ const SelectionWrapper = ({
     setActionStrip(!actionStrip);
   };
 
+  const _onPress = async () => {
+    if (actionStrip) {
+      setActionStrip(false);
+      return;
+    }
+    await onPress();
+  }
+
   const closeStrip = () => {
     setActionStrip(false);
   };
@@ -369,7 +377,7 @@ const SelectionWrapper = ({
       customColor="transparent"
       testID={testID}
       onLongPress={onLong}
-      onPress={onPress}
+      onPress={_onPress}
       customSelectedColor={colors.nav}
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={1}
