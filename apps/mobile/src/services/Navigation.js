@@ -7,9 +7,13 @@ import {eSendEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
 let currentScreen = null;
-
+let headerState = null;
 function getCurrentScreen() {
   return currentScreen;
+}
+
+function getHeaderState() {
+  return headerState;
 }
 
 /**
@@ -40,6 +44,7 @@ function navigate(name, params, item) {
  * @param {screenParams} item
  */
 function setHeaderState(name, params, item) {
+  headerState = item;
   currentScreen = name;
   if (item) {
     updateEvent({
@@ -109,4 +114,5 @@ export default {
   setHeaderState,
   replace,
   popToTop,
+  getHeaderState
 };
