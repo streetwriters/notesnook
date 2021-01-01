@@ -227,9 +227,11 @@ export const ActionSheetComponent = ({
         dispatch({type: note.itemType});
         dispatch({type: Actions.FAVORITES});
         eSendEvent(refreshNotesPage);
+        type = note.type === 'trash' ? note.itemType : note.type;
         ToastEvent.show(
-          note.type === 'note' ? 'Note restored' : 'Notebook restored',
+          type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',
+          'global',
         );
         close();
       },
