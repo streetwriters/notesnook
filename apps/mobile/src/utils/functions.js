@@ -46,7 +46,7 @@ export const deleteItems = async (item) => {
   let message = history.selectedItemsList.length + msgPart + ' moved to trash.';
 
   let itemsCopy = [...history.selectedItemsList];
-  if (history.selectedItemsList[0].type !== 'topic') {
+  if (topics.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
     ToastEvent.show(
       message,
       'error',
@@ -73,4 +73,4 @@ export const deleteItems = async (item) => {
   updateEvent({type: Actions.TRASH});
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-}
+};
