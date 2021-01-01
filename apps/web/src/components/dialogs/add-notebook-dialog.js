@@ -231,23 +231,27 @@ function TopicItem(props) {
       {!hideActions && (
         <Flex justifyContent="center" alignItems="center">
           <Text
+            display="flex"
             variant="subBody"
             color="primary"
-            sx={{ ":hover": { opacity: 0.8 } }}
+            sx={{ alignItems: "center", ":hover": { opacity: 0.8 } }}
             onClick={isEditing ? onDoneEditing : onEdit}
             data-test-id={`and-topic-${index}-actions-edit`}
+            height="25px"
           >
             {isEditing ? "Done" : "Edit"}
           </Text>
           <Text
+            display="flex"
             variant="subBody"
             color="error"
-            ml={1}
+            ml={2}
+            height="25px"
             onClick={(e) => {
               e.stopPropagation();
               onDelete();
             }}
-            sx={{ ":hover": { opacity: 0.8 } }}
+            sx={{ alignItems: "center", ":hover": { opacity: 0.8 } }}
           >
             Delete
           </Text>
