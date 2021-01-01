@@ -46,7 +46,7 @@ const onChangeTab = async (obj) => {
     if (getIntent()) return;
     movedAway = false;
     currentTab = 1;
-
+    eSendEvent('navigate');
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
