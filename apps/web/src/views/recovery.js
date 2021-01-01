@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Button, Flex, Text } from "rebass";
-import { navigate, useQueryParams } from "raviger";
+import { navigate, useQueryParams } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import Field from "../components/field";
 import * as Icon from "../components/icons";

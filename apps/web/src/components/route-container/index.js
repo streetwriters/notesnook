@@ -5,7 +5,7 @@ import { useStore } from "../../stores/app-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { CREATE_BUTTON_MAP, SELECTION_OPTIONS_MAP } from "../../common";
 import useMobile from "../../utils/use-mobile";
-import { navigate } from "raviger";
+import { navigate } from "../../navigation";
 
 function RouteContainer(props) {
   const { type, route, canGoBack, title, subtitle, onlyBackButton } = props;

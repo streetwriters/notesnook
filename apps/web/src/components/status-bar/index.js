@@ -5,7 +5,7 @@ import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { showLogInDialog } from "../dialogs/logindialog";
 import TimeAgo from "timeago-react";
-import { navigate } from "raviger";
+import { navigate } from "../../navigation";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ReactDOM from "react-dom";
 import { Flex } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -7,13 +7,13 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
 import NavigationItem from "./navigation-item";
-import { navigate } from "raviger";
+import { navigate } from "../../navigation";
 import { toTitleCase } from "../../utils/string";
 import { COLORS } from "../../common";
 import { showLogInDialog } from "../dialogs/logindialog";
-import { usePath } from "raviger";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
+import { useLocation } from "wouter";
 
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
@@ -51,8 +51,7 @@ const bottomRoutes = [
 
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
-  const path = usePath(false);
-  const [selectedRoute, setSelectedRoute] = useState(path);
+  const [location] = useLocation();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
@@ -66,10 +65,6 @@ function NavigationMenu(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
-
-  useEffect(() => {
-    setSelectedRoute(path);
-  }, [path]);
 
   return (
     <Animated.Flex
@@ -129,12 +124,11 @@ function NavigationMenu(props) {
             icon={item.icon}
             selected={
               item.path === "/"
-                ? selectedRoute === item.path
-                : selectedRoute.startsWith(item.path)
+                ? location === item.path
+                : location.startsWith(item.path)
             }
             onClick={() => {
-              setSelectedRoute(item.path);
-              if (!isMobile && !isTablet && selectedRoute === item.path)
+              if (!isMobile && !isTablet && location === item.path)
                 return toggleNavigationContainer();
               toggleNavigationContainer(true);
               navigate(item.path);
@@ -146,7 +140,7 @@ function NavigationMenu(props) {
             key={color.title}
             title={toTitleCase(color.title)}
             icon={Icon.Circle}
-            selected={selectedRoute === `/colors/${color.id}`}
+            selected={location === `/colors/${color.id}`}
             color={COLORS[color.title]}
             onClick={() => {
               navigate(`/colors/${color.id}`);
@@ -172,7 +166,7 @@ function NavigationMenu(props) {
                   ? Icon.Tag2
                   : Icon.Topic
               }
-              selected={shouldSelectNavItem(selectedRoute, pin)}
+              selected={shouldSelectNavItem(location, pin)}
               onClick={() => {
                 if (pin.type === "notebook") {
                   navigate(`/notebooks/${pin.id}`);
@@ -223,9 +217,8 @@ function NavigationMenu(props) {
             icon={item.icon}
             onClick={() => {
               navigate(item.path);
-              setSelectedRoute(item.path);
             }}
-            selected={selectedRoute.startsWith(item.path)}
+            selected={location.startsWith(item.path)}
           />
         ))}
       </Flex>

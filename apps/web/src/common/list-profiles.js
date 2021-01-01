@@ -1,4 +1,4 @@
-import { navigate } from "raviger";
+import { navigate } from "../navigation/";
 import React from "react";
 import Note from "../components/note";
 import Notebook from "../components/notebook";

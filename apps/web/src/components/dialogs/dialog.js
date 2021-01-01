@@ -146,17 +146,22 @@ export function showDialog(dialog) {
       const perform = (result) => {
         window.removeEventListener("hashchange", onHashChange);
         ReactDOM.unmountComponentAtNode(root);
+        setHashParam(undefined, false, false, false);
         resolve(result);
       };
       window.addEventListener("hashchange", onHashChange);
 
       function onHashChange() {
-        if (!getHashParam("type")) perform(false);
+        if (!getHashParam("dialog")) perform(false);
       }
 
-      setHashParam({ type: "dialog" }, true, true, true);
-
       const PropDialog = dialog(perform);
+      setHashParam(
+        { dialog: PropDialog.type.name.toLowerCase() },
+        true,
+        true,
+        true
+      );
       ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
     });
   }

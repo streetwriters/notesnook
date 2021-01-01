@@ -21,7 +21,6 @@
     "qclone": "^1.0.4",
     "quill": "https://github.com/thecodrr/quill.git#1.3.7",
     "quill-magic-url": "^1.0.3",
-    "raviger": "^2.0.0",
     "react": "^16.13.1",
     "react-app-polyfill": "^1.0.6",
     "react-dom": "^16.13.1",
@@ -34,6 +33,7 @@
     "rebass": "^4.0.7",
     "timeago-react": "^3.0.0",
     "uzip": "^0.20201126.0",
+    "wouter": "^2.7.0",
     "zustand": "^2.2.3"
   },
   "devDependencies": {

@@ -10,7 +10,7 @@ import Search from "../views/search";
 import Settings from "../views/settings";
 import Tags from "../views/tags";
 import Topics from "../views/topics";
-import { navigate } from "raviger";
+import { navigate } from "../navigation";
 import Trash from "../views/trash";
 
 const routes = {
