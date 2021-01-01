@@ -23,6 +23,7 @@ import {
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -281,20 +282,32 @@ export class VaultDialog extends Component {
 
   async _enrollFingerprint(password) {
     try {
-      this.setState({
-        loading: true,
-      });
-      await Keychain.setInternetCredentials('nn_vault', 'nn_vault', password, {
-        accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
-        authenticationPrompt: {cancel: null},
-        accessible: Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-      });
-      eSendEvent('vaultUpdated');
-      ToastEvent.show('Fingerprint access enabled!', 'success');
-      this.close();
-      this.setState({
-        loading: false,
-      });
+      this.setState(
+        {
+          loading: true,
+        },
+        async () => {
+          await sleep(20);
+          await Keychain.setInternetCredentials(
+            'nn_vault',
+            'nn_vault',
+            password,
+            {
+              accessControl:
+                Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
+              authenticationPrompt: {cancel: null},
+              accessible:
+                Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+            },
+          );
+          this.setState({
+            loading: false,
+          });
+          eSendEvent('vaultUpdated');
+          ToastEvent.show('Fingerprint access enabled!', 'success');
+          this.close();
+        },
+      );
     } catch (e) {
       this._takeErrorAction(e);
     }
@@ -663,8 +676,8 @@ export class VaultDialog extends Component {
                 : 'Lock'
             }
           />
+          <Toast context="local" />
         </View>
-        <Toast context="local" />
       </BaseDialog>
     );
   }
