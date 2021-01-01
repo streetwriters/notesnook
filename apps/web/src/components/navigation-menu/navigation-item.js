@@ -44,8 +44,9 @@ function NavigationItem(props) {
             whiteSpace: "nowrap",
             overflow: "hidden",
             textOverflow: "ellipsis",
+            fontWeight: props.selected ? "bold" : "normal",
           }}
-          color={props.selected ? "primary" : "text"}
+          color={props.selected ? (!!color ? color : "primary") : "text"}
           ml={1}
         >
           {title}
