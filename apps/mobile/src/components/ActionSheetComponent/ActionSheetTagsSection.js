@@ -1,5 +1,5 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
-import {Text, TextInput, TouchableOpacity, View} from 'react-native';
+import {TextInput, TouchableOpacity, View} from 'react-native';
 import {ScrollView} from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
@@ -9,13 +9,11 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
+import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {eShowGetPremium} from '../../utils/Events';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -35,6 +33,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
     toAdd = db.notes.note(note.id).data;
     dispatch({type: Actions.NOTES});
     dispatch({type: Actions.TAGS});
+    eSendEvent(refreshNotesPage);
     setNote({...toAdd});
     if (prevQuery) {
       getSuggestions(prevQuery, toAdd);
@@ -224,7 +223,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           </Paragraph>
         ) : null}
 
-        {note.tags.map((item,index) => (
+        {note.tags.map((item, index) => (
           <TagItem
             key={item}
             tag={item}
@@ -283,7 +282,6 @@ const TagItem = ({tag, note, localRefresh}) => {
         .note(note.id)
         .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
       sendNoteEditedEvent(note.id, false, true);
-      console.log('localRefreshHHH EEE');
       localRefresh(note.type);
     } catch (e) {
       sendNoteEditedEvent(note.id, false, true);
