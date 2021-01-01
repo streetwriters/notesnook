@@ -320,7 +320,10 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).favorite();
         }
         dispatch({type: Actions.FAVORITES});
-        sendNoteEditedEvent(note.id, false, true);
+        sendNoteEditedEvent({
+          id: note.id,
+          forced: true,
+        });
         localRefresh(item.type, true);
         close();
       },
@@ -466,7 +469,10 @@ export const ActionSheetComponent = ({
           if (n.locked) {
             close();
           }
-          sendNoteEditedEvent(note.id, false, true);
+          sendNoteEditedEvent({
+            id: note.id,
+            forced: true,
+          });
           localRefresh(note.type);
         })
         .catch(async (e) => {

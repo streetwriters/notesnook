@@ -184,7 +184,9 @@ export const loadNote = async (item) => {
   } else {
     clearTimer();
     await setNote(item);
-    sendNoteEditedEvent(item.id);
+    sendNoteEditedEvent({
+      id: id,
+    });
     if (webviewInit) {
       await loadNoteInEditor();
     }
@@ -265,7 +267,10 @@ export async function clearEditor() {
     await saveNote(false);
   }
   updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
-  sendNoteEditedEvent(null, true);
+  sendNoteEditedEvent({
+    id: id,
+    forced:true
+  });
   eSendEvent('historyEvent', {
     undo: 0,
     redo: 0,
@@ -380,7 +385,9 @@ export async function saveNote() {
     noteData.contentId = note.contentId;
     await db.vault.save(noteData);
   }
-  sendNoteEditedEvent(id);
+  sendNoteEditedEvent({
+    id: id,
+  });
   let n = db.notes.note(id).data.dateEdited;
   post('dateEdited', timeConverter(n));
   post('saving', 'Saved');

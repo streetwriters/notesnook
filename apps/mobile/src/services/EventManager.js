@@ -1,5 +1,10 @@
 import {DeviceEventEmitter} from 'react-native';
-import {eHideToast, eOnNoteEdited, eOpenVaultDialog, eShowToast} from '../utils/Events';
+import {
+  eHideToast,
+  eOnNoteEdited,
+  eOpenVaultDialog,
+  eShowToast,
+} from '../utils/Events';
 
 export const eSubscribeEvent = (eventName, action) => {
   DeviceEventEmitter.addListener(eventName, action);
@@ -11,8 +16,6 @@ export const eUnSubscribeEvent = (eventName, action) => {
 
 export const eSendEvent = (eventName, data) => {
   DeviceEventEmitter.emit(eventName, data);
-
-
 };
 
 /**
@@ -28,51 +31,59 @@ export const eSendEvent = (eventName, data) => {
  * @property {boolean} revokeFingerprintAccess
  * @property {boolean} changePassword
  * @property {boolean} copyNote
- * @param {vaultType} data 
+ * @param {vaultType} data
  */
 
 export const openVault = (data) => {
   eSendEvent(eOpenVaultDialog, data);
 };
 
-export function sendNoteEditedEvent(id="",closed=false,noEdit=false) {
-    eSendEvent(eOnNoteEdited , {id,closed, noEdit});
+
+/**
+ * @typedef {Object} noteEdit
+ * @property {string} id
+ * @property {boolean} closed
+ * @property {boolean} noEdit
+ * @property {boolean} forced
+ * @param {noteEdit} data
+ */
+export function sendNoteEditedEvent(data) {
+  eSendEvent(eOnNoteEdited, data);
 }
 
-
 export const ToastEvent = {
-    show: (
-        message,
-        type = 'error',
-        context = 'global',
-        duration = 3000,
-        func = null,
-        actionText = '',
-    ) => {
-        eSendEvent(eShowToast, {
-            message,
-            type,
-            context,
-            duration,
-            func,
-            actionText,
-        });
-    },
-    hide: (
-        message,
-        type = 'error',
-        context = 'global',
-        duration = 3000,
-        func = null,
-        actionText = '',
-    ) => {
-        eSendEvent(eHideToast, {
-            message,
-            type,
-            context,
-            duration,
-            func,
-            actionText,
-        });
-    },
+  show: (
+    message,
+    type = 'error',
+    context = 'global',
+    duration = 3000,
+    func = null,
+    actionText = '',
+  ) => {
+    eSendEvent(eShowToast, {
+      message,
+      type,
+      context,
+      duration,
+      func,
+      actionText,
+    });
+  },
+  hide: (
+    message,
+    type = 'error',
+    context = 'global',
+    duration = 3000,
+    func = null,
+    actionText = '',
+  ) => {
+    eSendEvent(eHideToast, {
+      message,
+      type,
+      context,
+      duration,
+      func,
+      actionText,
+    });
+  },
 };

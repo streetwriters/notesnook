@@ -202,7 +202,10 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
-    sendNoteEditedEvent(note.id);
+    sendNoteEditedEvent({
+      id: note.id,
+      forced: true,
+    });
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     close();

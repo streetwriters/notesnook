@@ -332,14 +332,15 @@ export class VaultDialog extends Component {
     db.vault
       .remove(this.state.note.id, this.password)
       .then((r) => {
-        console.log(r, 'unocking result');
-        sendNoteEditedEvent(this.state.note.id);
+        sendNoteEditedEvent({
+          id:this.state.note.id,
+          forced: true,
+        });
         updateEvent({type: Actions.NOTES});
         eSendEvent(refreshNotesPage);
         this.close();
       })
       .catch((e) => {
-        console.log(e, 'unlocking error');
         this._takeErrorAction(e);
       });
   }

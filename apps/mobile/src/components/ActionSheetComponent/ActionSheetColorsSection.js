@@ -56,7 +56,10 @@ export const ActionSheetColorsSection = ({item, close}) => {
           }
           localRefresh();
           dispatch({type: Actions.COLORS});
-          sendNoteEditedEvent(note.id, false, true);
+          sendNoteEditedEvent({
+            id: note.id,
+            forced: true,
+          });
           eSendEvent(refreshNotesPage);
         }}
         customStyle={{

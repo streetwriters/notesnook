@@ -27,7 +27,14 @@ export const NoteItemWrapper = ({item, index, isTrash = false}) => {
   }, [item]);
 
   const onNoteChange = (data) => {
-    if (!data || data.id !== item.id || data.closed) {
+    if (!data || data.id !== item.id) {
+      return;
+    }
+    if (
+      !data.forced &&
+      data.title === item.title &&
+      data.headline === item.headline
+    ) {
       return;
     }
     let _note = db.notes.note(item.id).data;

@@ -126,7 +126,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
       if (note && note.id) {
         setNote({...db.notes.note(note.id).data});
-        sendNoteEditedEvent(note.id);
+        sendNoteEditedEvent({
+          id: note.id,
+          forced: true,
+        });
       }
       dispatch({type: Actions.NOTEBOOKS});
 
@@ -146,7 +149,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
 
-      sendNoteEditedEvent(note.id);
+         sendNoteEditedEvent({
+        id: note.id,
+        forced: true,
+      });
     }
     dispatch({type: Actions.NOTEBOOKS});
   };

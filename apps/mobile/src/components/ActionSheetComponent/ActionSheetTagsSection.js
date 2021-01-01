@@ -281,10 +281,13 @@ const TagItem = ({tag, note, localRefresh}) => {
       await db.notes
         .note(note.id)
         .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
-      sendNoteEditedEvent(note.id, false, true);
-      localRefresh(note.type);
+        localRefresh(note.type);
     } catch (e) {
-      sendNoteEditedEvent(note.id, false, true);
+    } finally {
+      sendNoteEditedEvent({
+        id: note.id,
+        forced: true,
+      });
     }
   };
 
