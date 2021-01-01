@@ -676,8 +676,9 @@ export class VaultDialog extends Component {
                 : 'Lock'
             }
           />
-          <Toast context="local" />
+        
         </View>
+        <Toast context="local" />
       </BaseDialog>
     );
   }

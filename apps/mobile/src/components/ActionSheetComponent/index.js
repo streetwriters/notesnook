@@ -39,7 +39,7 @@ import {
 import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, pv, SIZE} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
@@ -176,10 +176,21 @@ export const ActionSheetComponent = ({
       name: 'Delete',
       icon: 'delete',
       func: async () => {
-        try {
-          await deleteItems(note);
-        } catch (e) {
-          console.log(e);
+        if (note.locked) {
+          close();
+          await sleep(300);
+          openVault({
+            deleteNote: true,
+            novault: true,
+            locked: true,
+            item: note,
+          }); 
+        } else {
+          try {
+            await deleteItems(note);
+          } catch (e) {
+            console.log(e);
+          }
         }
         close();
       },
