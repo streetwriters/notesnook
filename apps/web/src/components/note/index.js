@@ -187,7 +187,7 @@ function Note(props) {
             </Text>
           )}
           <Flex variant="rowCenter">
-            {note.pinned && (
+            {note.pinned && !props.context && (
               <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
             )}
             <TimeAgo
