@@ -70,8 +70,6 @@
 	<string>Access photos to be added to your notes</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Poppins-Regular.ttf</string>
-		<string>Poppins-SemiBold.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>

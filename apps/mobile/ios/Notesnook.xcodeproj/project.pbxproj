@@ -18,8 +18,6 @@
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		655FD77A253AD31C001D807D /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
-		659CDF2A2566EFDB00D8E0C8 /* Poppins-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659CDF282566EFDA00D8E0C8 /* Poppins-Regular.ttf */; };
-		659CDF2B2566EFDB00D8E0C8 /* Poppins-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 659CDF292566EFDA00D8E0C8 /* Poppins-SemiBold.ttf */; };
 		65A7F343255687E600699170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A7F342255687E600699170 /* ShareViewController.swift */; };
 		65A7F346255687E600699170 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65A7F344255687E600699170 /* MainInterface.storyboard */; };
 		65A7F34A255687E600699170 /* Add to Notes.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65A7F340255687E600699170 /* Add to Notes.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -92,8 +90,6 @@
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		6529D2B1257B4A4300B49BC3 /* Add to NotesDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Add to NotesDebug.entitlements"; sourceTree = "<group>"; };
 		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
-		659CDF282566EFDA00D8E0C8 /* Poppins-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Poppins-Regular.ttf"; path = "../android/app/src/main/assets/fonts/Poppins-Regular.ttf"; sourceTree = "<group>"; };
-		659CDF292566EFDA00D8E0C8 /* Poppins-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Poppins-SemiBold.ttf"; path = "../android/app/src/main/assets/fonts/Poppins-SemiBold.ttf"; sourceTree = "<group>"; };
 		65A7F340255687E600699170 /* Add to Notes.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Add to Notes.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65A7F342255687E600699170 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
 		65A7F345255687E600699170 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
@@ -232,8 +228,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				659CDF282566EFDA00D8E0C8 /* Poppins-Regular.ttf */,
-				659CDF292566EFDA00D8E0C8 /* Poppins-SemiBold.ttf */,
 				13B07FAE1A68108700A75B9A /* Notesnook */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* NotesnookTests */,
@@ -446,11 +440,9 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				659CDF2B2566EFDB00D8E0C8 /* Poppins-SemiBold.ttf in Resources */,
 				655FD77A253AD31C001D807D /* Web.bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				659CDF2A2566EFDB00D8E0C8 /* Poppins-Regular.ttf in Resources */,
 				65B5F41D257CADA5007D2310 /* notesnook-text.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
