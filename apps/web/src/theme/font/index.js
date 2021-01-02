@@ -6,12 +6,12 @@ class FontFactory {
       fontSizes: new FontSizeFactory(scale),
       fontWeights: {
         body: 400,
-        heading: 600,
-        bold: 600,
+        heading: 700,
+        bold: 700,
       },
       fonts: {
-        body: "Poppins, sans-serif",
-        heading: `Poppins, sans-serif`,
+        body: `-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;`,
+        heading: `-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;`,
       },
     };
   }

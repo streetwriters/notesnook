@@ -29,7 +29,7 @@ function NavigationItem(props) {
       <Flex
         justifyContent={"flex-start"}
         alignItems="center"
-        sx={{ position: "relative" }}
+        //sx={{ position: "relative" }}
       >
         <Icon
           size={18}
