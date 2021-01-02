@@ -43,6 +43,7 @@ export const SearchInput = (props) => {
         ref={inputRef}
         style={{
           fontFamily: "sans-serif",
+          fontWeight:'bold',
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,
