@@ -1,28 +1,28 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {Keyboard, TextInput, TouchableOpacity, View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { createRef, useEffect, useState } from 'react';
+import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   sendNoteEditedEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenMoveNoteDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { pv, SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
+import { PressableButton } from '../PressableButton';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -238,7 +238,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     borderRadius: 5,
                     minHeight: 45,
                     fontSize: SIZE.md,
-                    fontFamily: WEIGHT.regular,
+                    fontFamily: "sans-serif",
                     padding: pv - 2,
                   },
                 ]}
@@ -377,7 +377,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                               borderRadius: 5,
                               height: 40,
                               fontSize: SIZE.sm,
-                              fontFamily: WEIGHT.regular,
+                              fontFamily: "sans-serif",
                               padding: pv - 2,
                             },
                           ]}

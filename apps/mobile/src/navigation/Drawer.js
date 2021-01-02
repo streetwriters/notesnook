@@ -1,14 +1,13 @@
-import {createDrawerNavigator} from '@react-navigation/drawer';
-import {NavigationContainer} from '@react-navigation/native';
+import { createDrawerNavigator } from '@react-navigation/drawer';
+import { NavigationContainer } from '@react-navigation/native';
 import * as React from 'react';
-import {State} from 'react-native-gesture-handler';
-import {Menu} from '../components/Menu';
-import {useTracked} from '../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
-import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
-import {sideMenuRef, tabBarRef} from '../utils/Refs';
-import {sleep} from '../utils/TimeUtils';
-import {NavigatorStack} from './NavigatorStack';
+import { State } from 'react-native-gesture-handler';
+import { Menu } from '../components/Menu';
+import { useTracked } from '../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { eCloseSideMenu, eOpenSideMenu } from '../utils/Events';
+import { sideMenuRef, tabBarRef } from '../utils/Refs';
+import { NavigatorStack } from './NavigatorStack';
 
 const Drawer = createDrawerNavigator();
 
@@ -33,8 +32,12 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   };
 
   const setGestureEnabled = () => {
-    setLocked(false);
+    if (locked) {
+      setLocked(false);
+    }
+    if (initRender) {
     setInitRender(false);
+    }
   };
 
   React.useEffect(() => {
@@ -44,7 +47,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
       eUnSubscribeEvent(eOpenSideMenu, setGestureEnabled);
       eUnSubscribeEvent(eCloseSideMenu, setGestureDisabled);
     };
-  }, []);
+  }, [locked,initRender]);
 
   return (
     <NavigationContainer ref={sideMenuRef}>

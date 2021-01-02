@@ -1,8 +1,8 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, Text, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {Button} from '../Button';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Paragraph from '../Typography/Paragraph';
 
 export const Loading = ({
@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: {
-    fontFamily: WEIGHT.medium,
+    fontFamily: "sans-serif",
     color: 'white',
     fontSize: SIZE.sm,
   },

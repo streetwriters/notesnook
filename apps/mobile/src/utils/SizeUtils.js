@@ -88,10 +88,4 @@ export const br = 5; // border radius
 export var ph = normalize(10); // padding horizontal
 export var pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity
-export const WEIGHT = {
-  light: 'Poppins-Regular',
-  regular: 'Poppins-Regular',
-  medium: 'Poppins-Regular',
-  semibold: 'Poppins-SemiBold',
-  bold: 'Poppins-SemiBold',
-};
+

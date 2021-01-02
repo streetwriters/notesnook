@@ -609,37 +609,37 @@
 }
 .ql-snow .ql-editor h1 {
   font-size: 2em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h2 {
   font-size: 1.5em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h3 {
   font-size: 1.17em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h4 {
   font-size: 1em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h5 {
   font-size: 0.83em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
 .ql-snow .ql-editor h6 {
   font-size: 0.67em;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
 }
 
@@ -910,7 +910,7 @@
 
 .ql-toolbar.ql-snow {
   box-sizing: border-box;
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   padding-left: 12px;
   padding-right:12px;
   padding-top: 5px;
@@ -1087,7 +1087,7 @@
 }
 
 #formBox textarea {
-  font-family: 'Poppins', sans-serif;
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   font-weight: 600 !important;
   background-color: transparent;
   border: none;
@@ -1126,7 +1126,7 @@
 }
 
 #textCopy {
-  font-family: 'Poppins', sans-serif;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif
   font-weight: 600 !important;
 }
 
@@ -1144,7 +1144,7 @@
   color: gray;
   font-size: 11px;
   height: 20px;
-  font-family: 'Poppins';
+  font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif;
   margin-top: -8px;
   margin-bottom: 6px;
 }

@@ -1,7 +1,7 @@
 import React from 'react';
-import {Platform, Text} from 'react-native';
-import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { Text } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
 
 /**
  *
@@ -25,11 +25,9 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
       {...restProps}
       style={[
         {
-          fontFamily: WEIGHT.regular,
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
           fontWeight: '400',
-          paddingBottom: Platform.OS === 'ios' ? size * 0.25 : null,
         },
         style,
       ]}></Text>

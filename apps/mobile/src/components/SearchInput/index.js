@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, TextInput, View} from 'react-native';
-import {useTracked} from '../../provider';
+import React, { useEffect, useState } from 'react';
+import { Platform, TextInput, View } from 'react-native';
+import { useTracked } from '../../provider';
 import SearchService from '../../services/SearchService';
-import {inputRef} from '../../utils/Refs';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { inputRef } from '../../utils/Refs';
+import { SIZE } from '../../utils/SizeUtils';
 
 export const SearchInput = (props) => {
   const [state] = useTracked();
@@ -42,7 +42,7 @@ export const SearchInput = (props) => {
       <TextInput
         ref={inputRef}
         style={{
-          fontFamily: WEIGHT.bold,
+          fontFamily: "sans-serif",
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,

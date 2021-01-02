@@ -1,4 +1,4 @@
-import React, {createRef} from 'react';
+import React, { createRef } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -7,24 +7,21 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eShowGetPremium} from '../../utils/Events';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {GetPremium} from '../ActionSheetComponent/GetPremium';
+import { FlatList, TextInput } from 'react-native-gesture-handler';
+import { notesnook } from '../../../e2e/test.ids';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/DB';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
+import { updateEvent } from '../DialogManager/recievers';
 import Input from '../Input';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
@@ -489,7 +486,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headingText: {
-    fontFamily: WEIGHT.bold,
     marginLeft: 5,
     fontSize: SIZE.xl,
   },
@@ -499,7 +495,6 @@ const styles = StyleSheet.create({
     borderRadius: 0,
     minHeight: 45,
     fontSize: SIZE.md,
-    fontFamily: WEIGHT.regular,
     padding: pv - 2,
     borderBottomWidth: 1,
     marginTop: 10,
@@ -530,7 +525,7 @@ const styles = StyleSheet.create({
   topicInput: {
     padding: pv - 5,
     fontSize: SIZE.sm,
-    fontFamily: WEIGHT.regular,
+    fontFamily: "sans-serif",
     paddingHorizontal: ph,
     paddingRight: 40,
     paddingVertical: 10,

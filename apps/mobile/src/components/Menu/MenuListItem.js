@@ -1,12 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {InteractionManager, View} from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';

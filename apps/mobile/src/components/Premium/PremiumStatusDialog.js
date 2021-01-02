@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { useTracked } from '../../provider';
 import { getElevation } from '../../utils';
-import { ph, pv, SIZE, WEIGHT } from '../../utils/SizeUtils';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogContainer from '../Dialog/dialog-container';
 import Seperator from '../Seperator';
@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heading: {
-    fontFamily: WEIGHT.bold,
+    fontFamily: "sans-serif",
     marginLeft: 5,
     fontSize: SIZE.xxxl,
   },
@@ -116,7 +116,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: {
-    fontFamily: WEIGHT.medium,
+    fontFamily: "sans-serif",
     color: 'white',
     fontSize: SIZE.sm,
     marginLeft: 5,

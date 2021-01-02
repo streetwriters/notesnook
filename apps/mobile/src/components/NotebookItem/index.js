@@ -1,14 +1,14 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import { TouchableOpacity, View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
 import Navigation from '../../services/Navigation';
-import {ph, pv, SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import { pv, SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 export const NotebookItem = ({
   item,
@@ -190,7 +190,7 @@ export const NotebookItem = ({
             size={SIZE.xs}
             style={{
               marginRight: 10,
-              fontFamily: WEIGHT.regular,
+              fontFamily: "sans-serif",
             }}>
             {item && item.totalNotes && item.totalNotes > 1
               ? item.totalNotes + ' Notes'

@@ -1,6 +1,6 @@
 import React, { createRef } from 'react';
-import {Text} from 'react-native';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import { Text } from 'react-native';
+import { SIZE } from '../../utils/SizeUtils';
 
 export const dummyRef = createRef();
 
@@ -10,7 +10,7 @@ export const DummyText = () => {
 	  ref={dummyRef}
       style={[
         {
-          fontFamily: WEIGHT.regular,
+          fontFamily: "sans-serif",
 		  fontSize: SIZE.sm,
 		  position:"absolute",
 		  right:-1000,

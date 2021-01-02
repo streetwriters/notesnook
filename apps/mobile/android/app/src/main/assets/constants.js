@@ -393,7 +393,7 @@ let simpleToolbar = [
   [{direction: 'rtl'}], // text direction
 ];
 
-let fonts = ['Poppins', 'sans-serif'];
+let fonts = ["-apple-system","BlinkMacSystemFont","Segoe UI","Roboto","Oxygen-Sans","Ubuntu","Cantarell","Helvetica Neue","sans-serif"];
 let fontNames = fonts.map((font) => getFontName(font));
 function getFontName(font) {
   return font.toLowerCase().replace(/\s/g, '-');

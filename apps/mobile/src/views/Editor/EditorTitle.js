@@ -1,12 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {TextInput} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {post, _onMessage} from './Functions';
+import React, { useEffect, useState } from 'react';
+import { TextInput } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { post, _onMessage } from './Functions';
 
 const opacityVal = new Animated.Value(0);
 const translateY = new Animated.Value(-700);
@@ -60,7 +60,7 @@ export const EditorTitle = () => {
       <TextInput
         defaultValue={title}
         style={{
-          fontFamily: WEIGHT.bold,
+          fontFamily: "sans-serif",
           fontSize: SIZE.xl,
           color: colors.heading,
           maxWidth: '100%',

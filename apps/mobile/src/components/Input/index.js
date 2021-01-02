@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider/index';
+import { useTracked } from '../../provider/index';
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
-  validateUsername,
+  validateUsername
 } from '../../services/Validation';
-import {getElevation} from '../../utils';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { getElevation } from '../../utils';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import Paragraph from '../Typography/Paragraph';
 
 const Input = ({
@@ -132,7 +131,7 @@ const Input = ({
   const textStyle = {
     paddingHorizontal: 0,
     fontSize: SIZE.md,
-    fontFamily: WEIGHT.regular,
+    fontFamily: "sans-serif",
     color: colors.pri,
     paddingVertical: 0,
     paddingBottom: 2.5,

@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
 import Paragraph from '../Typography/Paragraph';
 
 let contextTimeout = null;

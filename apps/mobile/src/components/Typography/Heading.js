@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text} from 'react-native';
 import {useTracked} from '../../provider';
-import {SIZE, WEIGHT} from '../../utils/SizeUtils';
+import {SIZE} from '../../utils/SizeUtils';
 
 /**
  *
@@ -17,6 +17,7 @@ import {SIZE, WEIGHT} from '../../utils/SizeUtils';
 const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
+  let fontSize = size || SIZE.xl;
 
   return (
     <Text
@@ -25,10 +26,10 @@ const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
       {...restProps}
       style={[
         {
-          fontFamily: WEIGHT.bold,
+          fontFamily: 'sans-serif',
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          paddingBottom: Platform.OS === 'ios' ? size * 0.25 : null,
+          fontWeight: 'bold',
         },
         style,
       ]}></Text>
