@@ -61,6 +61,7 @@ export const EditorTitle = () => {
         defaultValue={title}
         style={{
           fontFamily: "sans-serif",
+          fontWeight:'bold',
           fontSize: SIZE.xl,
           color: colors.heading,
           maxWidth: '100%',

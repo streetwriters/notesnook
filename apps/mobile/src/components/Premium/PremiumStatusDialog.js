@@ -101,6 +101,7 @@ const styles = StyleSheet.create({
   },
   heading: {
     fontFamily: "sans-serif",
+    fontWeight:'bold',
     marginLeft: 5,
     fontSize: SIZE.xxxl,
   },
