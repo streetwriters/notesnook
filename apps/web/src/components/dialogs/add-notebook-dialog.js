@@ -261,7 +261,9 @@ function TopicItem(props) {
   );
 }
 
-export function showEditNotebookDialog(notebook) {
+export function showEditNotebookDialog(notebookId) {
+  const notebook = db.notebooks.notebook(notebookId)?.data;
+  if (!notebook) return false;
   return showDialog((perform) => (
     <AddNotebookDialog
       isOpen={true}
@@ -291,13 +293,13 @@ export function showEditNotebookDialog(notebook) {
   ));
 }
 
-export function showAddNotebookDialog(notebook) {
+export function showAddNotebookDialog() {
   return showDialog((perform) => (
     <AddNotebookDialog
       isOpen={true}
       onDone={async (nb) => {
         // add the notebook to db
-        await store.add({ ...notebook, ...nb });
+        await store.add({ ...nb });
 
         showToast("success", "Notebook added successfully!");
         perform(true);

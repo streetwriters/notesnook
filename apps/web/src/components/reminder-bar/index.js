@@ -24,7 +24,7 @@ function ReminderBar() {
       onClick={reminder?.action}
       justifyContent="space-between"
     >
-      <Flex>
+      <Flex alignItems="center">
         <reminder.icon size={14} color="primary" sx={{ mr: 1 }} />
         <Text variant="subBody" fontSize={10} color="primary">
           {reminder.title}

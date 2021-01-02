@@ -5,13 +5,13 @@ import DeltaTransformer from "quill/core/delta";
 import DeltaToggle from "./deltatoggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common";
-import { setHashParam } from "../../utils/useHashParam";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { hashNavigate } from "../../navigation";
 
 const deltaTransformer = new DeltaTransformer();
 
 function SplitEditor(props) {
-  const { diffId } = props;
+  const { noteId } = props;
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const [conflictedNote, setConflictedNote] = useState();
@@ -19,12 +19,12 @@ function SplitEditor(props) {
   const [localDelta, setLocalDelta] = useState();
 
   useEffect(() => {
-    let note = db.notes.note(diffId);
+    let note = db.notes.note(noteId);
     if (!note) {
-      setHashParam({ note: 0 });
+      hashNavigate(`/notes/create`);
       return;
     }
-    notesStore.setSelectedNote(diffId);
+    notesStore.setSelectedNote(noteId);
     note = note.data;
     (async function () {
       const delta = await db.content.raw(note.contentId);
@@ -32,7 +32,7 @@ function SplitEditor(props) {
       setLocalDelta({ ...delta, conflicted: false });
       setRemoteDelta(delta.conflicted);
     })();
-  }, [diffId]);
+  }, [noteId]);
 
   useEffect(() => {
     setIsEditorOpen(true);

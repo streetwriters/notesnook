@@ -4,7 +4,7 @@ import { timeConverter } from "../../utils/time";
 import DeltaTransformer from "quill/core/delta";
 import { store as notestore } from "../../stores/note-store";
 import { db } from "../../common";
-import { setHashParam } from "../../utils/useHashParam";
+import { hashNavigate } from "../../navigation";
 
 const deltaTransformer = new DeltaTransformer();
 
@@ -49,7 +49,7 @@ function DeltaToggle(props) {
         });
       }
       notestore.refresh();
-      setHashParam({ note: note.id });
+      hashNavigate(`/notes/${note.id}/edit`);
     },
     [note]
   );

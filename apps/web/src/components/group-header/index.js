@@ -78,6 +78,7 @@ function GroupHeader(props) {
         style={{
           display: isExpanded ? "flex" : "none",
         }}
+        justifyContent="center"
         sx={{
           position: "absolute",
           zIndex: 1,
@@ -120,6 +121,7 @@ function IconButton(props) {
         ":hover": { bg: "hover" },
         ...sx,
       }}
+      alignItems="center"
     >
       <Text variant="subtitle" fontWeight="normal" sx={textStyle}>
         {text}
@@ -197,6 +199,7 @@ function GroupByMenu(props) {
         <Flex
           key={item.title}
           justifyContent="space-between"
+          alignItems="center"
           p={1}
           px={2}
           sx={{ cursor: "pointer", ":hover": { bg: "shade" } }}

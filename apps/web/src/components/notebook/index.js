@@ -8,6 +8,7 @@ import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common";
 import * as Icon from "../icons";
+import { hashNavigate } from "../../navigation";
 
 const pin = async (notebook, index) => {
   await store.pin(notebook, index);
@@ -28,9 +29,7 @@ function menuItems(notebook, index) {
     },
     {
       title: "Edit",
-      onClick: async () => {
-        if (await showEditNotebookDialog(notebook)) store.refresh();
-      },
+      onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`),
     },
     {
       title: "Delete",

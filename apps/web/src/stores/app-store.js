@@ -27,7 +27,6 @@ class AppStore extends BaseStore {
     notebookStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
-    editorStore.openLastSession();
     this.refreshColors();
     this.refreshMenuPins();
   };

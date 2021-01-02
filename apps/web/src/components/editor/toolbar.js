@@ -8,6 +8,7 @@ import { EventManagers } from "../../utils/observablearray";
 import Animated from "../animated";
 
 function Toolbar(props) {
+  console.log("TOOLBACR");
   const { quill } = props;
   const sessionState = useStore((store) => store.session.state);
   const sessionId = useStore((store) => store.session.sessionId);

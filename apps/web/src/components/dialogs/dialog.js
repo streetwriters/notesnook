@@ -5,7 +5,7 @@ import ThemeProvider from "../theme-provider";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
-import { getHashParam, setHashParam } from "../../utils/useHashParam";
+import { hashNavigate } from "../../navigation";
 
 function Dialog(props) {
   const theme = useTheme();
@@ -144,26 +144,18 @@ export function showDialog(dialog) {
   if (root) {
     return new Promise((resolve) => {
       const perform = (result) => {
-        window.removeEventListener("hashchange", onHashChange);
         ReactDOM.unmountComponentAtNode(root);
-        setHashParam(undefined, false, false, false);
+        hashNavigate("/");
         resolve(result);
       };
-      window.addEventListener("hashchange", onHashChange);
-
-      function onHashChange() {
-        if (!getHashParam("dialog")) perform(false);
-      }
-
       const PropDialog = dialog(perform);
-      setHashParam(
-        { dialog: PropDialog.type.name.toLowerCase() },
-        true,
-        true,
-        true
-      );
       ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
     });
   }
   return Promise.reject("No element with id 'dialogContainer'");
+}
+
+export function closeOpenedDialog() {
+  const root = document.getElementById("dialogContainer");
+  ReactDOM.unmountComponentAtNode(root);
 }

@@ -7,7 +7,7 @@ import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
 import NavigationItem from "./navigation-item";
-import { navigate } from "../../navigation";
+import { hashNavigate, navigate } from "../../navigation";
 import { toTitleCase } from "../../utils/string";
 import { COLORS } from "../../common";
 import { showLogInDialog } from "../dialogs/logindialog";
@@ -207,7 +207,7 @@ function NavigationMenu(props) {
           <NavigationItem
             title="Login"
             icon={Icon.Login}
-            onClick={showLogInDialog}
+            onClick={() => hashNavigate("/login")}
           />
         )}
         {bottomRoutes.map((item) => (

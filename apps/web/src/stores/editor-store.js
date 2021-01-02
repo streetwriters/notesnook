@@ -4,12 +4,16 @@ import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import BaseStore from ".";
-import { isMobile, isTablet } from "../utils/dimensions";
-import { getHashParam, setHashParam } from "../utils/useHashParam";
 import { qclone } from "qclone";
 import { EV } from "notes-core/common";
+import { hashNavigate } from "../navigation";
 
-const SESSION_STATES = { stale: "stale", new: "new", locked: "locked" };
+const SESSION_STATES = {
+  stale: "stale",
+  new: "new",
+  locked: "locked",
+  unlocked: "unlocked",
+};
 const DEFAULT_SESSION = {
   notebooks: undefined,
   state: undefined,
@@ -34,59 +38,39 @@ class EditorStore extends BaseStore {
   arePropertiesVisible = false;
 
   init = () => {
-    window.addEventListener("hashchange", async () => {
-      const note = getHashParam("note");
-
-      if (this.get().session.id === note) return;
-
-      if (isMobile() && !note && appStore.get().isEditorOpen) {
-        return this.clearSession();
-      }
-
-      if (note) await this.openSession(note);
-    });
-
     EV.subscribe("user:loggedOut", () => this.get().newSession());
   };
 
-  openLastSession = () => {
-    // Do not reopen last session on mobile
-    if (isMobile() && isTablet()) return;
-    const id = localStorage.getItem("lastOpenedNote");
-
-    if (id) {
-      db.notes.init().then(() => {
-        setHashParam({ note: id });
-      });
-    }
-  };
-
   openLockedSession = async (note) => {
-    setHashParam({});
-    setHashParam({ note: note.id }, false);
-    saveLastOpenedNote(note.id);
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
         ...note,
         content: note.content,
-        state: SESSION_STATES.new,
+        state: SESSION_STATES.unlocked,
       };
     });
     appStore.setIsEditorOpen(true);
+    hashNavigate(`/notes/${note.id}/edit`);
   };
 
   openSession = async (noteId) => {
+    const session = this.get().session;
+    console.log(session);
+    if (session.id === noteId && session.state === SESSION_STATES.unlocked) {
+      this.set((state) => (state.session.state = SESSION_STATES.new));
+      return;
+    }
+
+    await db.notes.init();
     let note = db.notes.note(noteId);
     if (!note) return;
     note = qclone(note.data);
 
     noteStore.setSelectedNote(note.id);
 
-    if (note.locked) return setHashParam({ unlock: noteId });
-    if (note.conflicted) return setHashParam({ diff: noteId });
-
-    saveLastOpenedNote(note.id);
+    if (note.locked) return hashNavigate(`/notes/${noteId}/unlock`, true);
+    if (note.conflicted) return hashNavigate(`/notes/${noteId}/conflict`, true);
 
     let content = await db.content.raw(note.contentId);
 
@@ -140,12 +124,6 @@ class EditorStore extends BaseStore {
       });
 
       noteStore.refresh();
-
-      saveLastOpenedNote(!this.get().session.locked && id);
-
-      if (!oldSession?.index) {
-        setHashParam({ note: id }, false);
-      }
     });
   };
 
@@ -158,9 +136,7 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
-    saveLastOpenedNote();
     noteStore.setSelectedNote(0);
-    setHashParam({ note: 0 });
   };
 
   clearSession = () => {
@@ -171,9 +147,8 @@ class EditorStore extends BaseStore {
         state: SESSION_STATES.new,
       };
     });
-    saveLastOpenedNote();
     noteStore.setSelectedNote(0);
-    setHashParam({});
+    hashNavigate(`/`);
   };
 
   setSession = (set) => {
@@ -238,11 +213,6 @@ class EditorStore extends BaseStore {
       (state) => (state.session.tags = db.notes.note(id).data.tags)
     );
   }
-}
-
-function saveLastOpenedNote(id) {
-  if (!id) return localStorage.removeItem("lastOpenedNote");
-  localStorage.setItem("lastOpenedNote", id);
 }
 
 /**

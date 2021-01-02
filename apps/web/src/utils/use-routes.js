@@ -1,10 +1,10 @@
 import React from "react";
-import { useRouter } from "wouter";
+import { useLocation } from "wouter";
+import makeMatcher from "wouter/matcher";
 
 export default function useRoutes(routes, options) {
-  const router = useRouter();
-  const [location] = router.hook();
-  const matcher = router.matcher;
+  const [location] = useLocation();
+  const matcher = makeMatcher();
 
   for (var key in routes) {
     const [match, params] = matcher(key, location);

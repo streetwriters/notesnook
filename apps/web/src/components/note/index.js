@@ -11,10 +11,10 @@ import { db, COLORS } from "../../common";
 import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 import { showExportDialog } from "../dialogs/exportdialog";
-import { setHashParam } from "../../utils/useHashParam";
 import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
+import { hashNavigate } from "../../navigation";
 
 const pin = async (note) => {
   await store.pin(note.id);
@@ -166,9 +166,9 @@ function Note(props) {
       bg={color}
       onClick={() => {
         if (note.conflicted) {
-          setHashParam({ diff: note.id });
+          hashNavigate(`/notes/${note.id}/conflict`);
         } else {
-          setHashParam({ note: note.id });
+          hashNavigate(`/notes/${note.id}/edit`);
         }
       }}
       info={

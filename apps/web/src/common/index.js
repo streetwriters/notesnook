@@ -13,6 +13,7 @@ import { Text } from "rebass";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
+import { hashNavigate } from "../navigation";
 
 export const db = new Database(StorageInterface, EventSource);
 db.host({
@@ -53,9 +54,12 @@ export const SELECTION_OPTIONS_MAP = {
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Make a note",
-    onClick: () => editorStore.newSession(noteStore.get().context),
+    onClick: () => hashNavigate("/notes/create"),
   },
-  notebooks: { title: "Create a notebook", onClick: showAddNotebookDialog },
+  notebooks: {
+    title: "Create a notebook",
+    onClick: () => hashNavigate("/notebooks/create"),
+  },
   topics: { title: "Add a topic", onClick: showTopicDialog },
 };
 

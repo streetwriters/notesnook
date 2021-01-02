@@ -11,10 +11,6 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
 import Header from "./header";
-import { useHashParam } from "../../utils/useHashParam";
-import SplitEditor from "../spliteditor";
-import Unlock from "../unlock";
-import RouteContainer from "../route-container";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import { SUBSCRIPTION_STATUS } from "../../common";
@@ -25,7 +21,7 @@ import EditorLoading from "./loading";
 
 const ReactQuill = React.lazy(() => import("./react-quill"));
 
-function Editor() {
+function Editor(props) {
   const sessionState = useStore((store) => store.session.state);
   const contentType = useStore((store) => store.session.content?.type);
   const setSession = useStore((store) => store.setSession);
@@ -47,8 +43,6 @@ function Editor() {
   }, [isTablet, isMobile]);
 
   const quillRef = useRef();
-  const [diff] = useHashParam("diff");
-  const [unlock] = useHashParam("unlock");
 
   useEffect(() => {
     if (contentType !== "delta") return;
@@ -93,15 +87,6 @@ function Editor() {
     }
   }, [sessionState, quillRef, contentType]);
 
-  if (unlock)
-    return (
-      <RouteContainer
-        onlyBackButton={isMobile}
-        route={<Unlock noteId={unlock} />}
-      />
-    );
-
-  if (diff) return <SplitEditor diffId={diff} />;
   return (
     <Flex
       flexDirection="column"

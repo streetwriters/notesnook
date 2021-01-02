@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from "react";
 import "./app.css";
-import { Flex, Box } from "rebass";
+import { Flex } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
-import { useStore as useEditorStore } from "./stores/editor-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import Animated from "./components/animated";
@@ -23,7 +22,9 @@ import {
   showPasswordChangedNotice,
 } from "./components/dialogs/confirm";
 import StatusBar from "./components/statusbar";
-import useRoutes from "./utils/useRouter";
+import useRoutes from "./utils/use-routes";
+import useHashRoutes from "./utils/use-hash-routes";
+import hashroutes from "./navigation/hash-routes";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -33,12 +34,10 @@ function App() {
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
-  const openLastSession = useEditorStore((store) => store.openLastSession);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const routeResult = useRoutes(routes);
 
   useEffect(
     function initializeApp() {
@@ -79,10 +78,6 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);
-
-  useEffect(() => {
-    openLastSession();
-  }, [openLastSession]);
 
   useEffect(() => {
     if (!isMobile && !isTablet) return;
@@ -134,16 +129,15 @@ function App() {
               }}
             >
               {isMobile && <Banner />}
-              {routeResult}
+              <Routes />
             </Animated.Flex>
             <Flex
               width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
               flexDirection="column"
             >
-              <Editor />
+              <EditorSwitch />
             </Flex>
           </Flex>
-          <Box id="dialogContainer" />
           <GlobalMenuWrapper />
         </Flex>
         <StatusBar />
@@ -152,3 +146,13 @@ function App() {
   );
 }
 export default App;
+
+function Routes() {
+  const routeResult = useRoutes(routes);
+  return routeResult;
+}
+
+function EditorSwitch() {
+  const routeResult = useHashRoutes(hashroutes);
+  return routeResult || <Editor />;
+}
