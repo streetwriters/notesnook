@@ -3,9 +3,9 @@ import { createBackup, db } from "./index";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import { showSignUpDialog } from "../components/dialogs/signupdialog";
 import { showToast } from "../utils/toast";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
+import { hashNavigate } from "../navigation";
 
 export async function shouldAddBackupReminder() {
   const backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -42,7 +42,7 @@ export const Reminders = {
   },
   signup: {
     title: "Sign up for cross-device syncing!",
-    action: () => showSignUpDialog(),
+    action: () => hashNavigate("/signup"),
     icon: Icon.Login,
   },
   email: {

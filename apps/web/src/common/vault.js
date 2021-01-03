@@ -3,8 +3,9 @@ import { showPasswordDialog } from "../components/dialogs/passworddialog";
 import { showToast } from "../utils/toast";
 
 class Vault {
-  static createVault() {
-    return showPasswordDialog("create_vault", async ({ password }) => {
+  static async createVault() {
+    if (await db.vault.exists()) return false;
+    return await showPasswordDialog("create_vault", async ({ password }) => {
       await db.vault.create(password);
       showToast("success", "Vault created.");
       return true;

@@ -12,7 +12,7 @@ import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
 import { resetReminders } from "./common/reminders";
-import { isUserPremium } from "./common";
+import { db, isUserPremium } from "./common";
 import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
@@ -36,6 +36,7 @@ function App() {
   const initNotes = useNotesStore((store) => store.init);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const isMobile = useMobile();
   const isTablet = useTablet();
 
@@ -47,6 +48,7 @@ function App() {
       initNotes();
       (async function () {
         await resetReminders();
+        setIsVaultCreated(await db.vault.exists());
       })();
     },
     [refreshColors, refreshMenuPins, initUser, initNotes, addReminder]

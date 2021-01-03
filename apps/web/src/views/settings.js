@@ -4,6 +4,7 @@ import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { useStore as useSettingStore } from "../stores/setting-store";
+import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import { showLogInDialog } from "../components/dialogs/logindialog";
@@ -24,6 +25,7 @@ import ScrollContainer from "../components/scroll-container";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import { hashNavigate } from "../navigation";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -55,6 +57,7 @@ function importBackup() {
 
 function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
+  const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
@@ -72,7 +75,6 @@ function Settings(props) {
     "backupReminderOffset",
     0
   );
-  const [isVaultCreated, setIsVaultCreated] = useState(false);
 
   const subscriptionDaysRemaining = useMemo(
     () => dayjs(user?.subscription?.expiry).diff(dayjs(), "day") + 1,
@@ -87,12 +89,6 @@ function Settings(props) {
     if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
   }, [followSystemTheme, isSystemThemeDark, setTheme]);
-
-  useEffect(() => {
-    (async function () {
-      setIsVaultCreated(await db.vault.exists());
-    })();
-  }, [isVaultCreated]);
 
   return (
     <ScrollContainer>
@@ -369,7 +365,10 @@ function Settings(props) {
 
         {isVaultCreated ? (
           <>
-            <Button variant="list" onClick={Vault.changeVaultPassword}>
+            <Button
+              variant="list"
+              onClick={() => hashNavigate("/vault/changePassword")}
+            >
               <TextWithTip text="Change vault password" />
             </Button>
           </>
@@ -377,7 +376,7 @@ function Settings(props) {
           <Button
             variant="list"
             onClick={async () => {
-              setIsVaultCreated(await Vault.createVault());
+              hashNavigate("/vault/create");
             }}
           >
             <TextWithTip

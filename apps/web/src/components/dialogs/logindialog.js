@@ -7,6 +7,7 @@ import { useStore } from "../../stores/user-store";
 import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
 import { showForgotPasswordDialog } from "./forgotpassworddialog";
+import { hashNavigate } from "../../navigation";
 
 const requiredValues = ["email", "password", "remember"];
 function LoginDialog(props) {
@@ -66,7 +67,7 @@ function LoginDialog(props) {
                 variant="anchor"
                 sx={{ textAlign: "left" }}
                 fontSize="body"
-                onClick={showSignUpDialog}
+                onClick={() => hashNavigate("/signup")}
               >
                 Create an account here.
               </Button>

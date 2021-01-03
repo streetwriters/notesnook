@@ -16,6 +16,7 @@ class AppStore extends BaseStore {
   isSideMenuOpen = !isMobile();
   isFocusMode = false;
   isEditorOpen = false;
+  isVaultCreated = false;
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
@@ -57,6 +58,10 @@ class AppStore extends BaseStore {
 
   setIsEditorOpen = (toggleState) => {
     this.set((state) => (state.isEditorOpen = toggleState));
+  };
+
+  setIsVaultCreated = (toggleState) => {
+    this.set((state) => (state.isVaultCreated = toggleState));
   };
 
   /**

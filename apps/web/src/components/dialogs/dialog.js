@@ -145,7 +145,7 @@ export function showDialog(dialog) {
     return new Promise((resolve) => {
       const perform = (result) => {
         ReactDOM.unmountComponentAtNode(root);
-        hashNavigate("/");
+        hashNavigate("/", true);
         resolve(result);
       };
       const PropDialog = dialog(perform);
