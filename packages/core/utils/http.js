@@ -18,6 +18,13 @@ post.json = function (url, data, token) {
   return bodyRequest(url, data, true, token, "POST");
 };
 
+export default {
+  get,
+  post,
+  delete: deleteRequest,
+  patch,
+};
+
 function transformer(data, json) {
   if (!data) return;
   if (json) return JSON.stringify(data);
@@ -38,8 +45,7 @@ async function handleResponse(response) {
     if (response.ok) {
       return json;
     }
-    let error = json.error || json.errors.join("\n");
-    throw new Error(error);
+    throw new Error(errorTransformer(json));
   } else {
     if (response.status === 429) throw new Error("You are being rate limited.");
 
@@ -79,9 +85,23 @@ function getAuthorizationHeader(token) {
   return token ? { Authorization: "Bearer " + token } : {};
 }
 
-export default {
-  get,
-  post,
-  delete: deleteRequest,
-  patch,
-};
+function errorTransformer(errorJson) {
+  if (!errorJson.error && !errorJson.errors && !errorJson.error_description)
+    return "Unknown error.";
+  const { error, error_description, errors } = errorJson;
+
+  if (errors) {
+    return errors.join("\n");
+  }
+
+  switch (error) {
+    case "invalid_grant": {
+      switch (error_description) {
+        case "invalid_username_or_password":
+          return "Username or password incorrect.";
+        default:
+          return error_description;
+      }
+    }
+  }
+}
