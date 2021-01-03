@@ -10,10 +10,9 @@ export const db = new Database(
   Platform.OS === 'ios' ? EventSource : AndroidEventSource,
 );
 
-//"https://api.notesnook.com"
 
 db.host({
-  API_HOST: 'https://192.168.10.5:5264',
-  AUTH_HOST: 'https://192.168.10.5:8264',
-  SSE_HOST: 'https://192.168.10.5:7264',
+  API_HOST: 'https://api.notesnook.com',
+  AUTH_HOST: 'https://auth.streetwriters.co',
+  SSE_HOST: 'https://events.streetwriters.co',
 });

@@ -58,21 +58,27 @@ async function checkBackupRequired(type) {
   lastBackupDate = parseInt(lastBackupDate);
 
   if (type === 'daily') {
+    console.log('backing up data daily!');
     now = new Date(now);
     lastBackupDate = new Date(lastBackupDate);
+
     if (now.getUTCDate() > lastBackupDate.getUTCDate()) {
+      console.log('backup is needed');
       return true;
     } else if (
       (now.getUTCDate() === lastBackupDate.getUTCDate() &&
         now.getUTCFullYear() > lastBackupDate.getUTCFullYear()) ||
       now.getUTCMonth() > lastBackupDate.getUTCMonth()
     ) {
+      console.log('backup is  needed');
       return true;
     } else {
+      console.log('backup is not needed');
       return false;
     }
   } else if (type === 'weekly') {
     if (lastBackupDate + MS_WEEK < now) {
+      console.log('backup is  needed');
       return true;
     } else {
       false;

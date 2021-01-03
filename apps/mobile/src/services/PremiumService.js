@@ -1,6 +1,6 @@
 import {CHECK_IDS} from 'notes-core/common';
 import {db} from '../utils/DB';
-import {eOpenPremiumDialog, eShowGetPremium} from '../utils/Events';
+import {eOpenPremiumDialog, eOpenProgressDialog, eShowGetPremium} from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
 import {eSendEvent, ToastEvent} from './EventManager';
 

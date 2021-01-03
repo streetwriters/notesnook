@@ -15,6 +15,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import PremiumService from '../../services/PremiumService';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
@@ -190,11 +191,18 @@ const LoginDialog = () => {
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
-      await db.sync();
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+      db.sync()
+        .catch((e) => {})
+        .finally(async () => {
+          dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+        });
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
       clearMessage(dispatch);
+      if (!user.isEmailConfirmed) {
+        setEmailVerifyMessage(dispatch);
+        PremiumService.showVerifyEmailDialog();
+      }
       close();
       ToastEvent.show(`Logged in as ${user.email}`, 'success', 'global');
     } catch (e) {
@@ -495,7 +503,7 @@ const LoginDialog = () => {
                   validationType={mode === MODES.signup ? 'password' : null}
                   secureTextEntry
                   placeholder="Password"
-                  errorMessage={mode === MODES.signup && "Password is invalid"}
+                  errorMessage={mode === MODES.signup && 'Password is invalid'}
                   onSubmit={() => {
                     if (
                       mode === MODES.signup ||
