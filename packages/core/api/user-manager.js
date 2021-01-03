@@ -36,7 +36,7 @@ class UserManager {
       password,
       client_id: "notesnook",
     });
-    return await this.login(email, password);
+    return await this.login(email, password, true);
   }
 
   async login(email, password, remember) {
