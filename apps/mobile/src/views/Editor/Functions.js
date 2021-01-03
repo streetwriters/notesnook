@@ -393,6 +393,8 @@ export async function saveNote() {
     id: id,
   });
   let n = db.notes.note(id).data.dateEdited;
+  let title = db.notes.note(id).data.title;
+  post('title', title);
   post('dateEdited', timeConverter(n));
   post('saving', 'Saved');
 }
