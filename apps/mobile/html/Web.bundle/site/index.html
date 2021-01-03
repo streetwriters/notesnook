@@ -19,6 +19,7 @@
     .ql-toolbar::-webkit-scrollbar {
       display: none;
     }
+
     #simpleTitleInput {
       font-family: 'Poppins', sans-serif;
       font-weight: 600 !important;
@@ -28,52 +29,51 @@
       outline: none;
       font-size: 24px;
       padding-right: 12px;
-      padding-left:12px;
-      height:50px;
+      padding-left: 12px;
+      height: 50px;
     }
+
     .info-bar {
       margin-bottom: 0px !important;
     }
 
     #titlebarAlt {
-      height:50px;
+      height: 50px;
       display: flex;
       justify-content: center;
       flex-direction: column;
     }
+
     #titlebar {
       display: none !important;
     }
-
-
-
   </style>
 
 </head>
 
 <body class="app-body">
   <div class="app-main">
-     <div id="titlebar">
-    <form id="formBox">
-        <textarea maxlength="150" id="titleInput" placeholder="Title here"></textarea>
+    <div id="titlebar">
+      <form id="formBox">
+        <textarea maxlength="150" id="titleInput" placeholder="Untitled Note"></textarea>
 
         <div id="textCopy"></div>
-      </form> 
+      </form>
       <div class="info-bar">
         <p id="infowords"></p>
         <p id="infodate"></p>
         <p id="infosaved"></p>
       </div>
-    </div> 
+    </div>
 
     <div id="titlebarAlt">
-    
-         <input maxlength="150" id="simpleTitleInput" placeholder="Title here"></input>
-         <div class="info-bar info-bar-alt">
-           <p id="infowords"></p>
-           <p id="infodate"></p>
-           <p id="infosaved"></p>
-         </div>
+
+      <input maxlength="150" id="simpleTitleInput" placeholder="Untitled Note"></input>
+      <div class="info-bar info-bar-alt">
+        <p id="infowords"></p>
+        <p id="infodate"></p>
+        <p id="infosaved"></p>
+      </div>
     </div>
 
 
@@ -84,7 +84,7 @@
 <script>
   let editor;
   let isTablet = true;
-  </script>
+</script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
 <script src="module.js"></script>
@@ -476,7 +476,7 @@
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
     titleIn.style['padding-right'] = 0;
- 
+
     let mainToolbar = premium ? proToolbar : simpleToolbar;
     setFonts();
     Quill.register('modules/imageCompressor', imageCompressor);
@@ -549,19 +549,19 @@
     fixDropdownMenuLocations();
     setTheme();
     function loaded() {
-            let msg = JSON.stringify({
-                data: true,
-                type: 'status',
-            });
-            window.ReactNativeWebView.postMessage(msg);
-        }
-        if (editor) {
-            loaded();
-        } else {
-            setTimeout(() => {
-                loaded();
-            }, 500)
-        }
+      let msg = JSON.stringify({
+        data: true,
+        type: 'status',
+      });
+      window.ReactNativeWebView.postMessage(msg);
+    }
+    if (editor) {
+      loaded();
+    } else {
+      setTimeout(() => {
+        loaded();
+      }, 500)
+    }
   }
 
   loadAction(true)
