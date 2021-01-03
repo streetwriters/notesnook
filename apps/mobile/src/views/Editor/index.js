@@ -14,7 +14,6 @@ import {
   _onMessage,
   _onShouldStartLoadWithRequest
 } from './Functions';
-
 const Editor = () => {
   const [state] = useTracked();
   const {colors} = state;
