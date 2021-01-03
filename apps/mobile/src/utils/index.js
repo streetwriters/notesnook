@@ -137,11 +137,11 @@ export const MenuItemsList = [
 ];
 
 export const SUBSCRIPTION_STATUS = {
-  EXPIRED: 0,
+  BASIC: 0,
   TRIAL: 1,
-  ACTIVE: 2,
-  ACTIVE_RENEWING: 3,
-  CANCELLED: 4,
+  BETA: 2,
+  TRIAL_EXPIRED: 3,
+  BETA_EXPIRED: 4,
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {

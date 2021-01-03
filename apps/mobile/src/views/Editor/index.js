@@ -3,6 +3,7 @@ import { Platform, TextInput, View } from 'react-native';
 import WebView from 'react-native-webview';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
+import PremiumService from '../../services/PremiumService';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -16,7 +17,7 @@ import {
 
 const Editor = () => {
   const [state] = useTracked();
-  const {colors, premiumUser} = state;
+  const {colors} = state;
 
   return (
     <>
@@ -31,7 +32,7 @@ const Editor = () => {
         ref={EditorWebView}
         onError={(error) => console.log(error)}
         onLoad={async (event) =>
-          await onWebViewLoad(premiumUser, colors, event)
+          await onWebViewLoad(PremiumService.get(), colors, event)
         }
         javaScriptEnabled={true}
         focusable={true}

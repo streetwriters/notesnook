@@ -1,9 +1,10 @@
 import {CHECK_IDS} from 'notes-core/common';
 import {db} from '../utils/DB';
 import {eOpenPremiumDialog, eShowGetPremium} from '../utils/Events';
-import {eSendEvent} from './EventManager';
+import {MMKV} from '../utils/mmkv';
+import {eSendEvent, ToastEvent} from './EventManager';
 
-let premiumStatus = true;
+let premiumStatus = 0;
 
 async function setPremiumStatus() {
   try {
@@ -19,7 +20,7 @@ async function setPremiumStatus() {
 }
 
 function get() {
-  return premiumStatus && premiumStatus !== 0 && premiumStatus !== 4;
+  return premiumStatus === 1 || premiumStatus === 2;
 }
 
 async function verify(callback, error) {
@@ -91,9 +92,44 @@ const onUserStatusCheck = async (type) => {
   return {type, result: status};
 };
 
+const showVerifyEmailDialog = () => {
+  eSendEvent(eOpenProgressDialog, {
+    title: 'Email not verified',
+    icon: 'email',
+    paragraph:
+      'We have sent you an email confirmation link. Please check your email to verify your account.',
+    action: async () => {
+      try {
+        let lastEmailTime = await MMKV.getItem('lastEmailTime');
+        if (
+          lastEmailTime &&
+          Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
+        ) {
+          ToastEvent.show(
+            'Please wait before requesting another email',
+            'error',
+            'local',
+          );
+          console.log('error');
+          return;
+        }
+        await db.user.sendVerificationEmail();
+        await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
+        ToastEvent.show('Verification email sent!', 'success', 'local');
+      } catch (e) {
+        ToastEvent.show(e.message, 'error', 'local');
+        await MMKV.removeItem('lastEmailTime');
+      }
+    },
+    actionText: 'Resend Confirmation Link',
+    noProgress: true,
+  });
+};
+
 export default {
   verify,
   setPremiumStatus,
   get,
   onUserStatusCheck,
+  showVerifyEmailDialog,
 };

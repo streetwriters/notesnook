@@ -6,6 +6,7 @@ import {
 } from '../utils/Events';
 import { MMKV } from '../utils/mmkv';
 import { eSendEvent, ToastEvent } from './EventManager';
+import PremiumService from './PremiumService';
 
 export function setLoginMessage(dispatch) {
   dispatch({
@@ -32,37 +33,7 @@ export function setEmailVerifyMessage(dispatch) {
       message: 'Email not verified',
       actionText: 'Please verify your email to sync.',
       onPress: () => {
-        eSendEvent(eOpenProgressDialog, {
-          title: 'Email not verified',
-          icon: 'email',
-          paragraph:
-            'We have sent you an email confirmation link. Please check your email to verify your account.',
-          action: async () => {
-            try {
-              let lastEmailTime = await MMKV.getItem('lastEmailTime');
-              if (
-                lastEmailTime &&
-                Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
-              ) {
-                ToastEvent.show(
-                  'Please wait before requesting another email',
-                  'error',
-                  'local',
-                );
-                console.log('error');
-                return;
-              }
-              await db.user.sendVerificationEmail();
-              await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
-              ToastEvent.show('Verification email sent!', 'success', 'local');
-            } catch (e) {
-              ToastEvent.show(e.message, 'error', 'local');
-              await MMKV.removeItem('lastEmailTime');
-            }
-          },
-          actionText: 'Resend Confirmation Link',
-          noProgress: true,
-        });
+        PremiumService.showVerifyEmailDialog();
       },
       data: {},
       icon: 'alert',

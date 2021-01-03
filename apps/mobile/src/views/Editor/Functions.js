@@ -150,14 +150,14 @@ function clearNote() {
   };
 }
 
-let currentEditingTimer = null; 
+let currentEditingTimer = null;
 
 export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   post('blur');
 
   if (item && item.type === 'new') {
-       await clearEditor();
+    await clearEditor();
     clearNote();
     noteEdited = false;
     id = null;
@@ -232,12 +232,16 @@ export const _onMessage = async (evt) => {
       eSendEvent('editorScroll', message);
       break;
     case 'premium':
-      eSendEvent(eShowGetPremium, {
-        context: 'editor',
-        title: 'Get Notesnook Pro',
-        desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
-      });
-
+      let user = await db.user.getUser();
+      if (!user.isEmailConfirmed) {
+        PremiumService.showVerifyEmailDialog();
+      } else {
+        eSendEvent(eShowGetPremium, {
+          context: 'editor',
+          title: 'Get Notesnook Pro',
+          desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+        });
+      }
       break;
     case 'status':
       webviewInit = true;
@@ -269,14 +273,14 @@ export async function clearEditor() {
   updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
   sendNoteEditedEvent({
     id: id,
-    forced:true
+    forced: true,
   });
   eSendEvent('historyEvent', {
     undo: 0,
     redo: 0,
   });
   saveCounter = 0;
-  post('dateEdited', "");
+  post('dateEdited', '');
   post('saving', '');
   clearNote();
   //intent = false;
