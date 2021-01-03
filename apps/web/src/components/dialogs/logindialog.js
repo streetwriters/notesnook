@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Flex, Button, Text } from "rebass";
 import * as Icon from "../icons";
 import Dialog, { showDialog } from "./dialog";
-import { showSignUpDialog } from "./signupdialog";
 import { useStore } from "../../stores/user-store";
 import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";

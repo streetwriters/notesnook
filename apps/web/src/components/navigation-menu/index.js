@@ -10,7 +10,6 @@ import NavigationItem from "./navigation-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { toTitleCase } from "../../utils/string";
 import { COLORS } from "../../common";
-import { showLogInDialog } from "../dialogs/logindialog";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import { useLocation } from "wouter";

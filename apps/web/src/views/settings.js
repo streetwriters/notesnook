@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -20,7 +20,6 @@ import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { showBuyDialog } from "../components/dialogs/buy-dialog";
-import Vault from "../common/vault";
 import ScrollContainer from "../components/scroll-container";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { showToast } from "../utils/toast";

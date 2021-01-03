@@ -1,5 +1,4 @@
 import React, { useEffect } from "react";
-import { showAddNotebookDialog } from "../components/dialogs/addnotebookdialog";
 import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";

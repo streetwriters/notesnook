@@ -1,4 +1,3 @@
-import React from "react";
 import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
 

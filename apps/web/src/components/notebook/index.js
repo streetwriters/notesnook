@@ -3,7 +3,6 @@ import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
-import { showEditNotebookDialog } from "../dialogs/addnotebookdialog";
 import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common";

@@ -51,7 +51,14 @@ function App() {
         setIsVaultCreated(await db.vault.exists());
       })();
     },
-    [refreshColors, refreshMenuPins, initUser, initNotes, addReminder]
+    [
+      refreshColors,
+      refreshMenuPins,
+      initUser,
+      initNotes,
+      addReminder,
+      setIsVaultCreated,
+    ]
   );
 
   useEffect(() => {
