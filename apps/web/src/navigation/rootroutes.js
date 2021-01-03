@@ -4,7 +4,7 @@ import EmailConfirmed from "../views/emailconfirmed";
 
 const rootroutes = {
   "/account/recovery": () => <AccountRecovery />,
-  "/account/confirmed": () => <EmailConfirmed />,
+  "/account/verified": () => <EmailConfirmed />,
 };
 
 export default rootroutes;

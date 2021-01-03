@@ -1,9 +1,16 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import * as Icon from "../components/icons";
+import { useQueryParams } from "../navigation";
 
-function EmailConfirmed(props) {
+function EmailConfirmed() {
+  const [{ userId }] = useQueryParams();
+
+  useEffect(() => {
+    if (!userId) window.location.href = "/";
+  }, [userId]);
+
   return (
     <ThemeProvider>
       <Flex
@@ -31,7 +38,7 @@ function EmailConfirmed(props) {
             variant="secondary"
             mt={1}
             onClick={() => {
-              window.location.href = "https://notesnook.com/";
+              window.location.href = "/";
             }}
           >
             Return to Notesnook

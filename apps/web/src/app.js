@@ -170,8 +170,8 @@ function EditorSwitch() {
 function Root() {
   const path = getCurrentPath();
   switch (path) {
-    case "/account/confirmed":
-      return rootroutes["/account/confirmed"]();
+    case "/account/verified":
+      return rootroutes["/account/verified"]();
     case "/account/recovery":
       return rootroutes["/account/recovery"]();
     default:
