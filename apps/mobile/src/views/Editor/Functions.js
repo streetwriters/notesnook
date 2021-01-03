@@ -233,7 +233,7 @@ export const _onMessage = async (evt) => {
       break;
     case 'premium':
       let user = await db.user.getUser();
-      if (!user.isEmailConfirmed) {
+      if (user && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
       } else {
         eSendEvent(eShowGetPremium, {

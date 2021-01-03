@@ -144,7 +144,7 @@ class PremiumDialog extends React.Component {
               },
             ].map((item) => (
               <View
-                key={item.title}
+                key={item.description}
                 style={{
                   paddingVertical: 5,
                   marginBottom: 10,

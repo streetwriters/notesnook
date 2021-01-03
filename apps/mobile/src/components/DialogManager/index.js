@@ -1,11 +1,10 @@
-import React, {Component, createRef} from 'react';
+import React, { Component, createRef } from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault,
+  openVault
 } from '../../services/EventManager';
-import {dWidth} from '../../utils';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -21,13 +20,13 @@ import {
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
   eOpenSimpleDialog,
+  eShowGetPremium
 } from '../../utils/Events';
-import {ActionSheetComponent} from '../ActionSheetComponent';
+import { ActionSheetComponent } from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {translatePrem} from '../ActionSheetComponent/GetPremium';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {Dialog} from '../Dialog';
+import { AddNotebookDialog } from '../AddNotebookDialog';
+import { AddTopicDialog } from '../AddTopicDialog';
+import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
@@ -41,8 +40,8 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import {VaultDialog} from '../VaultDialog';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
+import { VaultDialog } from '../VaultDialog';
+import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './Templates';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -301,7 +300,7 @@ export class DialogManager extends Component {
           <ActionSheetWrapper
             fwdRef={this.actionSheet}
             onClose={() => {
-              translatePrem.setValue(-dWidth * 5);
+              eSendEvent(eShowGetPremium,null)
               this.onActionSheetHide();
               this.setState({
                 actionSheetVisible: false,

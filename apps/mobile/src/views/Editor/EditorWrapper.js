@@ -101,7 +101,7 @@ export const EditorWrapper = ({dimensions}) => {
           width: '100%',
           height: '100%',
         }}>
-        <GetPremium context="editor" offset={50 + insets.top} />
+        <GetPremium context="editor" offset={50 + insets.top}  />
         <View
           style={{
             position: 'absolute',
