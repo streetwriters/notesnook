@@ -8,6 +8,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
 import {dWidth, getElevation, toTXT} from '../../utils';
@@ -104,6 +105,7 @@ const ActionStrip = ({note, setActionStrip}) => {
 
   const updateNotes = () => {
     dispatch({type: Actions.NOTES});
+    sendNoteEditedEvent({id: note.id, forced: true});
     dispatch({type: Actions.FAVORITES});
     eSendEvent(refreshNotesPage);
   };
@@ -358,7 +360,7 @@ const SelectionWrapper = ({
       return;
     }
     await onPress();
-  }
+  };
 
   const closeStrip = () => {
     setActionStrip(false);
