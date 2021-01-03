@@ -204,7 +204,7 @@ const App = () => {
             IntentService.setIntent(intent);
             IntentService.check(loadIntent);
           }
-        } else if (url.startsWith('https://notesnook.com')) {
+        } else if (url.startsWith('https://notesnook.com/emailConfirmed')) {
           await onEmailVerified();
         }
       } catch (e) {}
