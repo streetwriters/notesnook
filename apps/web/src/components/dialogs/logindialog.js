@@ -146,6 +146,7 @@ function LoginDialog(props) {
             sx={{ mt: 1 }}
           />
           <Button
+            type="button"
             variant="anchor"
             sx={{ alignSelf: "flex-start" }}
             onClick={showForgotPasswordDialog}
@@ -153,7 +154,7 @@ function LoginDialog(props) {
             Forgot password?
           </Button>
           {error && <Text variant="error">{error}</Text>}
-          <Label mt={1} fontSize="body" alignItems="center">
+          <Label mt={1} fontSize="body" alignItems="center" color="text">
             <Checkbox id="remember" name="remember" defaultChecked />
             Keep me logged in
           </Label>

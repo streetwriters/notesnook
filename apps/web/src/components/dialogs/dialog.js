@@ -17,9 +17,10 @@ function Dialog(props) {
       shouldReturnFocusAfterClose
       shouldFocusAfterRender
       onAfterOpen={(e) => {
+        if (!props.onClose) return;
         // we need this work around because ReactModal content spreads over the overlay
         const child = e.contentEl.firstElementChild;
-        e.contentEl.onclick = function (e) {
+        e.contentEl.onmousedown = function (e) {
           if (!e.screenX && !e.screenY) return;
           if (
             e.x < child.offsetLeft ||

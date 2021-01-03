@@ -1,12 +1,9 @@
-import React, { useState } from "react";
+import React from "react";
 import { Box, Text } from "rebass";
 import Dialog, { showDialog } from "./dialog";
 import * as Icon from "../icons";
-import Field from "../field";
 
 function Confirm(props) {
-  const [isButtonEnabled, setIsButtonEnabled] = useState(!props.confirmWith);
-
   return (
     <Dialog
       isOpen={true}
@@ -17,7 +14,6 @@ function Confirm(props) {
       positiveButton={{
         text: props.yesText,
         onClick: props.onYes,
-        disabled: !isButtonEnabled,
       }}
       negativeButton={
         props.noText && { text: props.noText, onClick: props.onNo }
@@ -27,36 +23,12 @@ function Confirm(props) {
         <Text as="span" variant="body">
           {props.message}
         </Text>
-        {props.confirmWith && (
-          <Field
-            autoFocus
-            sx={{ mt: 2 }}
-            label={
-              <>
-                Please type
-                <Text as="span" color="error" mx={1}>
-                  {`${props.confirmWith}`}
-                </Text>
-                to confirm
-              </>
-            }
-            id="confirm"
-            name="confirm"
-            onChange={(e) => {
-              if (e.target.value === props.confirmWith)
-                setIsButtonEnabled(true);
-            }}
-          />
-        )}
       </Box>
     </Dialog>
   );
 }
 
-export function confirm(
-  icon,
-  { title, subtitle, message, yesText, noText, confirmWith }
-) {
+export function confirm(icon, { title, subtitle, message, yesText, noText }) {
   return showDialog((perform) => (
     <Confirm
       title={title}
@@ -64,7 +36,6 @@ export function confirm(
       message={message}
       yesText={yesText}
       noText={noText}
-      confirmWith={confirmWith}
       icon={icon}
       onNo={() => perform(false)}
       onYes={() => perform(true)}
@@ -125,22 +96,6 @@ export function showLogoutConfirmation() {
       "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
     yesText: `Yes`,
     noText: "No",
-  });
-}
-
-export function showAccountDeleteConfirmation(username) {
-  return confirm(Icon.Logout, {
-    title: `Delete Account?`,
-    message: (
-      <>
-        This action is <b>IRREVERSIBLE</b>. All your data (notes, notebooks,
-        tags, pins, favorites) will be <b>permanently deleted</b> with no way of
-        recovery.
-      </>
-    ),
-    confirmWith: username,
-    yesText: `I understand, delete my account`,
-    noText: "Cancel",
   });
 }
 
