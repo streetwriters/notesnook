@@ -44,6 +44,7 @@ function ToastContainer(props) {
           data-test-id="toast-message"
           variant="body"
           fontSize="menu"
+          color="text"
           mr={2}
         >
           {message}
