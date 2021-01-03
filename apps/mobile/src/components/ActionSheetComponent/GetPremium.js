@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, Text, View} from 'react-native';
+import {Platform, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -17,6 +17,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const translatePrem = new Animated.Value(-dWidth * 5);
+export const opacityPrem = new Animated.Value(0);
 
 export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
@@ -25,12 +26,19 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     title: '',
     desc: '',
   });
+
   const open = (event) => {
+    if (!event) {
+      opacityPrem.setValue(0);
+      translatePrem.setValue(-dWidth * 5);
+      return;
+    }
     if (event.context === context) {
       setMsg({
         title: event.title,
         desc: event.desc,
       });
+      opacityPrem.setValue(1);
       Animated.timing(translatePrem, {
         toValue: 0,
         duration: 300,
@@ -44,6 +52,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
           easing: Easing.inOut(Easing.ease),
         }).start();
         await sleep(200);
+        opacityPrem.setValue(0);
         translatePrem.setValue(-dWidth * 5);
       }, 5000);
     }
@@ -71,6 +80,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         alignSelf: 'center',
         justifyContent: 'space-between',
         top: offset,
+        opacity: opacityPrem,
         maxWidth: DDS.isLargeTablet() ? 400 : '100%',
         transform: [
           {
@@ -96,8 +106,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
 
       <Button
         onPress={async () => {
-          close();
-          translatePrem.setValue(-dWidth * 5);
+            open(null);
           await sleep(Platform.OS === 'ios' ? 300 : 50);
           eSendEvent(eOpenPremiumDialog);
         }}
