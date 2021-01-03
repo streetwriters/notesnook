@@ -1,5 +1,6 @@
 import { useLocation } from "wouter";
 import makeMatcher from "wouter/matcher";
+import { navigate } from "../navigation";
 
 export default function useRoutes(routes, options) {
   const [location] = useLocation();
@@ -13,5 +14,7 @@ export default function useRoutes(routes, options) {
   }
   if (!options) return;
   const { fallbackRoute } = options;
-  if (fallbackRoute && routes[fallbackRoute]) return routes[fallbackRoute]();
+  if (fallbackRoute) {
+    navigate(fallbackRoute);
+  }
 }

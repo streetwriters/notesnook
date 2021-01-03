@@ -3,8 +3,8 @@ import AccountRecovery from "../views/recovery";
 import EmailConfirmed from "../views/emailconfirmed";
 
 const rootroutes = {
-  "/accountRecovery": () => <AccountRecovery />,
-  "/emailConfirmed": () => <EmailConfirmed />,
+  "/account/recovery": () => <AccountRecovery />,
+  "/account/confirmed": () => <EmailConfirmed />,
 };
 
 export default rootroutes;

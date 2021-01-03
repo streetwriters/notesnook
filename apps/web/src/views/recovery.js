@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { Button, Flex, Text } from "rebass";
-import { navigate, useQueryParams } from "../navigation";
+import { useQueryParams } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import Field from "../components/field";
 import * as Icon from "../components/icons";
 import { db } from "../common";
 import { showToast } from "../utils/toast";
 import { useCallback } from "react";
+
+function navigate(path) {
+  window.location.href = path;
+}
 
 function AccountRecovery(props) {
   const [{ code, userId }] = useQueryParams();
@@ -30,13 +34,13 @@ function AccountRecovery(props) {
   );
 
   useEffect(() => {
+    setLoading({ isLoading: true, message: "Please wait..." });
     if (!code || !userId) {
       navigate("/");
       return;
     }
     // http://localhost:3000/accountRecovery?userId=5fe1895d1b0636cf87b5058ecode=CfDJ8J5/rfvIUAZBidvsDZpkZcvNxUm0K2dGODHceKrSC4GUrGxtS3ZG5G2l8T7m0dvx6otZZv7djtzKBOUls0yZsjehYq+uSe0hG72M+DAMtB9gQ6df28xWdh2fx7L7Fw7s5I9unuRGYjN/A31e0BT3ryt9rzS1NM9ATnju80l1NR0Te599i76lSPLaOpnbO8qUanOqGtoQwaOa+bEMjJRGDG5NH2DkuJEsuD7VGqgXB57s4LWNJL0MvNwm5y2WImuaoQ==
     (async function () {
-      setLoading({ isLoading: true, message: "Authorizing. Please wait..." });
       doWorkWithLoading(
         "Authorizing. Please wait...",
         async () => {

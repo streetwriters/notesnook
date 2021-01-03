@@ -25,6 +25,8 @@ import StatusBar from "./components/statusbar";
 import useRoutes from "./utils/use-routes";
 import useHashRoutes from "./utils/use-hash-routes";
 import hashroutes from "./navigation/hash-routes";
+import rootroutes from "./navigation/rootroutes";
+import { getCurrentPath } from "./navigation";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -106,7 +108,7 @@ function App() {
     toggleSideMenu(!isMobile);
     if (!isMobile && !isTablet) setShow(true);
   }, [isMobile, isTablet, toggleSideMenu]);
-
+  console.log("ROUTING!");
   return (
     <ThemeProvider>
       <Flex
@@ -154,14 +156,27 @@ function App() {
     </ThemeProvider>
   );
 }
-export default App;
 
 function Routes() {
-  const routeResult = useRoutes(routes);
-  return routeResult;
+  const routeResult = useRoutes(routes, { fallbackRoute: "/" });
+  return routeResult || null;
 }
 
 function EditorSwitch() {
   const routeResult = useHashRoutes(hashroutes);
   return routeResult || <Editor />;
 }
+
+function Root() {
+  const path = getCurrentPath();
+  switch (path) {
+    case "/account/confirmed":
+      return rootroutes["/account/confirmed"]();
+    case "/account/recovery":
+      return rootroutes["/account/recovery"]();
+    default:
+      return <App />;
+  }
+}
+
+export default Root;
