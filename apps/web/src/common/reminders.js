@@ -3,7 +3,6 @@ import { createBackup, db } from "./index";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import { showToast } from "../utils/toast";
 import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
 import { hashNavigate } from "../navigation";
 
@@ -47,10 +46,7 @@ export const Reminders = {
   },
   email: {
     title: "Please confirm your email",
-    action: async () => {
-      await db.user.sendVerificationEmail();
-      showToast("success", "Confirmation email sent. Please check your inbox!");
-    },
+    action: () => hashNavigate("/email/verify"),
     icon: Icon.Email,
   },
   recoverykey: {

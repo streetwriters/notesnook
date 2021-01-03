@@ -172,7 +172,11 @@ function Settings(props) {
                 </>
               ) : null
             ) : (
-              <Button mt={2} bg="error">
+              <Button
+                mt={2}
+                bg="error"
+                onClick={() => hashNavigate("/email/verify")}
+              >
                 <Flex alignItems="center">
                   <Icon.Warn color="static" size={13} />
                   <Text color="static" ml={1}>

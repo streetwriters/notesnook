@@ -1,5 +1,6 @@
 import React from "react";
 import Vault from "../common/vault";
+import { showEmailVerificationDialog } from "../components/dialogs/emailverificationdialog";
 import {
   showAddNotebookDialog,
   showEditNotebookDialog,
@@ -18,6 +19,9 @@ import { isMobile } from "../utils/dimensions";
 const hashroutes = {
   "/": () => {
     closeOpenedDialog();
+  },
+  "/email/verify": () => {
+    showEmailVerificationDialog();
   },
   "/notebooks/create": () => {
     showAddNotebookDialog();

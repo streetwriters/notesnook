@@ -5,7 +5,7 @@ import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { showLogInDialog } from "../dialogs/logindialog";
 import TimeAgo from "timeago-react";
-import { navigate } from "../../navigation";
+import { hashNavigate, navigate } from "../../navigation";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -24,7 +24,11 @@ function StatusBar() {
       {isLoggedIn ? (
         <Flex>
           <Button
-            onClick={() => navigate("/settings")}
+            onClick={() =>
+              user.isEmailConfirmed
+                ? navigate("/settings")
+                : hashNavigate("/email/verify")
+            }
             variant="statusitem"
             display="flex"
             sx={{ alignItems: "center", justifyContent: "center" }}
