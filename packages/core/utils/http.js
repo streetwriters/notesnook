@@ -103,5 +103,7 @@ function errorTransformer(errorJson) {
           return error_description;
       }
     }
+    default:
+      return error_description || error;
   }
 }
