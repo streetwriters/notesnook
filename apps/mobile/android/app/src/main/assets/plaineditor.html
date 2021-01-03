@@ -2,10 +2,9 @@
 
 <head>
     <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
- 
+
     <link href="styles.css" rel="stylesheet">
     <style>
-        
         .ql-toolbar {
             overflow-x: auto;
             width: 100vw;
@@ -26,17 +25,20 @@
 <script>
     let editor;
     let isTablet = false;
-    </script>
+</script>
 <script src="quill.js"></script>
 <script src="constants.js"></script>
 <script src="module.js"></script>
 <script src="magic-url.js"></script>
 <script src="listeners.js"></script>
-<script src="image-resize.min.js"></script>  
+<script src="image-resize.min.js"></script>
 
 <script>
     attachMessageListener()
     function loadAction() {
+        var Block = Quill.import('blots/block');
+        Block.tagName = 'DIV';
+        Quill.register(Block, true);
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
         editor = new Quill('#editor', {
@@ -63,7 +65,7 @@
         let Font = Quill.import('formats/font');
         Font.whitelist = fontNames;
         Quill.register(Font, true);
-        
+
         setTheme();
         attachEditorListeners();
     }

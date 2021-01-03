@@ -440,10 +440,15 @@
             this.quill.format("script", value, "user");
         },
     };
+
     attachMessageListener();
     function loadAction(premium) {
         isTablet = true;
         setFonts();
+        
+        var Block = Quill.import('blots/block');
+        Block.tagName = 'DIV';
+        Quill.register(Block, true);
         Quill.register("modules/imageCompressor", imageCompressor);
         Quill.register("formats/lists", BetterList);
         Quill.register("modules/markdownShortcuts", MarkdownShortcuts);

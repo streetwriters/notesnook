@@ -34,7 +34,9 @@
 <script>
     attachMessageListener();
     function loadAction() {
-
+        var Block = Quill.import('blots/block');
+        Block.tagName = 'DIV';
+        Quill.register(Block, true);
         setFonts();
         Quill.register("modules/imageCompressor", imageCompressor);
 

@@ -476,9 +476,11 @@
     let titleIn = document.getElementById('titlebar');
     titleIn.style['padding-left'] = 0;
     titleIn.style['padding-right'] = 0;
-
-    let mainToolbar = premium ? proToolbar : simpleToolbar;
     setFonts();
+           
+    var Block = Quill.import('blots/block');
+    Block.tagName = 'DIV';
+    Quill.register(Block, true);
     Quill.register('modules/imageCompressor', imageCompressor);
     Quill.register("formats/lists", BetterList);
     Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
