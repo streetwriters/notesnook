@@ -1,24 +1,25 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, ScrollView, View } from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {ActivityIndicator, Platform, ScrollView, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
+import {FlatList} from 'react-native-gesture-handler';
 import RNFetchBlob from 'rn-fetch-blob';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
@@ -192,10 +193,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             }}
           />
         </View>
-
         <Seperator half />
-
-        <ScrollView
+        <FlatList
           nestedScrollEnabled
           onScrollEndDrag={() => {
             actionSheetRef.current?.handleChildScrollEnd();
@@ -206,10 +205,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           onScrollAnimationEnd={() => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
-          style={{
-            paddingHorizontal: 12,
-          }}>
-          {files && files.length > 0 ? null : (
+          ListEmptyComponent={
             <View
               style={{
                 justifyContent: 'center',
@@ -218,34 +214,39 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
               }}>
               <Paragraph color={colors.icon}>No backups found.</Paragraph>
             </View>
-          )}
-
-          {!restoring ? null : (
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}>
-              <ActivityIndicator color={colors.accent} />
-              <Paragraph color={colors.icon}>
-                Restoring backup. Please wait.
-              </Paragraph>
-
-              <Button
-                title="Cancel"
-                type="accent"
-                onPress={() => {
-                  setRestoring(false);
-                }}
-                height={25}
+          }
+          keyExtractor={item => item.filename}
+          ListHeaderComponent={
+            !restoring ? null : (
+              <View
                 style={{
-                  marginTop: 5,
-                }}
-              />
-            </View>
-          )}
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <ActivityIndicator color={colors.accent} />
+                <Paragraph color={colors.icon}>
+                  Restoring backup. Please wait.
+                </Paragraph>
 
-          {files.map((item, index) => (
+                <Button
+                  title="Cancel"
+                  type="accent"
+                  onPress={() => {
+                    setRestoring(false);
+                  }}
+                  height={25}
+                  style={{
+                    marginTop: 5,
+                  }}
+                />
+              </View>
+            )
+          }
+          style={{
+            paddingHorizontal: 12,
+          }}
+          data={files}
+          renderItem={({item, index}) => [
             <View
               style={{
                 minHeight: 50,
@@ -276,14 +277,16 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                 height={30}
                 onPress={() => restore(item, index)}
               />
-            </View>
-          ))}
-          <View
-            style={{
-              height: 25,
-            }}
-          />
-        </ScrollView>
+            </View>,
+          ]}
+          ListFooterComponent={
+            <View
+              style={{
+                height: 150,
+              }}
+            />
+          }
+        />
       </View>
       <Toast context="local" />
     </>
