@@ -41,6 +41,8 @@ async function handleResponse(response) {
     let error = json.error || json.errors.join("\n");
     throw new Error(error);
   } else {
+    if (response.status === 429) throw new Error("You are being rate limited.");
+
     if (response.ok) return await response.text();
     else
       throw new Error(
