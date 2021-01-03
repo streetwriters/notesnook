@@ -37,7 +37,7 @@ export const getElevation = (elevation) => {
 
 export const sortSettings = {
   sort: defaultState.settings.sort,
-  sortOrder: defaultState.settings.sortOrder,
+  sortOrder: "desc",
 };
 
 export const SORT = {

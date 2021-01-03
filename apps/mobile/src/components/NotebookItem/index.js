@@ -190,7 +190,7 @@ export const NotebookItem = ({
             size={SIZE.xs}
             style={{
               marginRight: 10,
-              fontFamily: "sans-serif",
+              //fontFamily: "sans-serif",
             }}>
             {item && item.totalNotes && item.totalNotes > 1
               ? item.totalNotes + ' Notes'

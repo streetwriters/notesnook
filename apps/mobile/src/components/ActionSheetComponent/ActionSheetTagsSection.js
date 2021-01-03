@@ -235,7 +235,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           style={{
             minWidth: 100,
             zIndex: 10,
-            fontFamily: "sans-serif",
+            //fontFamily: "sans-serif",
             color: colors.pri,
             paddingHorizontal: 5,
             paddingVertical: 0,

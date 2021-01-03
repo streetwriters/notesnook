@@ -131,7 +131,7 @@ const Input = ({
   const textStyle = {
     paddingHorizontal: 0,
     fontSize: SIZE.md,
-    fontFamily: "sans-serif",
+    //ontFamily: "sans-serif",
     color: colors.pri,
     paddingVertical: 0,
     paddingBottom: 2.5,

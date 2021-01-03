@@ -8,7 +8,9 @@ import {defaultState} from './DefaultState';
 
 export const reducer = (state, action) => {
   switch (action.type) {
+
     case Actions.ALL: {
+      console.log(sortSettings.sortOrder,'SORT ORDER');
       return {
         ...state,
         notes: db.notes.group(
@@ -53,6 +55,7 @@ export const reducer = (state, action) => {
       };
     }
     case Actions.NOTES:
+      console.log(sortSettings.sortOrder,'SORT ORDER');
       return {
         ...state,
         notes: db.notes.group(

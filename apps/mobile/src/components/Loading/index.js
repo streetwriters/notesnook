@@ -64,7 +64,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   buttonText: {
-    fontFamily: "sans-serif",
+    //fontFamily: "sans-serif",
     color: 'white',
     fontSize: SIZE.sm,
   },

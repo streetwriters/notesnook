@@ -747,7 +747,7 @@ const SettingsAppearanceSection = () => {
                         : 'transparent',
                   }}
                   textStyle={{
-                    fontFamily: "sans-serif",
+                    //fontFamily: "sans-serif",
                     fontSize: SIZE.sm,
                     color:
                       settings.homepage === item.name

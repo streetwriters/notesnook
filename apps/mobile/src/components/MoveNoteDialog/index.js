@@ -238,7 +238,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     borderRadius: 5,
                     minHeight: 45,
                     fontSize: SIZE.md,
-                    fontFamily: "sans-serif",
+                    //fontFamily: "sans-serif",
                     padding: pv - 2,
                   },
                 ]}
@@ -377,7 +377,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                               borderRadius: 5,
                               height: 40,
                               fontSize: SIZE.sm,
-                              fontFamily: "sans-serif",
+                              //fontFamily: "sans-serif",
                               padding: pv - 2,
                             },
                           ]}

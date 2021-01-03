@@ -100,7 +100,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   heading: {
-    fontFamily: "sans-serif",
+    //fontFamily: "sans-serif",
     fontWeight:'bold',
     marginLeft: 5,
     fontSize: SIZE.xxxl,

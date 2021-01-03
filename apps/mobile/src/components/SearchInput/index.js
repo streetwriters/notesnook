@@ -42,7 +42,7 @@ export const SearchInput = (props) => {
       <TextInput
         ref={inputRef}
         style={{
-          fontFamily: "sans-serif",
+          //fontFamily: "sans-serif",
           fontWeight:'bold',
           color: colors.pri,
           fontSize: SIZE.xl,

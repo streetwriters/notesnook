@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import {Text} from 'react-native';
 import {useTracked} from '../../provider';
 import {SIZE} from '../../utils/SizeUtils';
@@ -26,7 +27,6 @@ const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
       {...restProps}
       style={[
         {
-          fontFamily: 'sans-serif',
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
           fontWeight: 'bold',

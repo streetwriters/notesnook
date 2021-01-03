@@ -525,7 +525,7 @@ const styles = StyleSheet.create({
   topicInput: {
     padding: pv - 5,
     fontSize: SIZE.sm,
-    fontFamily: "sans-serif",
+    //fontFamily: "sans-serif",
     paddingHorizontal: ph,
     paddingRight: 40,
     paddingVertical: 10,

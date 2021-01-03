@@ -643,7 +643,7 @@ export class VaultDialog extends Component {
               <Paragraph
                 style={{
                   fontSize: SIZE.sm,
-                  fontFamily: "sans-serif",
+                  //fontFamily: "sans-serif",
                   color: colors.pri,
                   maxWidth: '90%',
                   marginLeft: 10,
