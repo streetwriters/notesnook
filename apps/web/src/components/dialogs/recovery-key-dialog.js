@@ -37,9 +37,11 @@ function RecoveryKeyDialog(props) {
             Please BACKUP your recovery key before proceeding
           </Text>
           <Text
-            color="gray"
-            bg="#dbdbdb22"
+            mt={2}
+            bg="bgSecondary"
             p={2}
+            fontFamily="monospace"
+            fontSize="body"
             sx={{ borderRadius: "default", overflowWrap: "anywhere" }}
           >
             {key}
