@@ -54,6 +54,14 @@ function importBackup() {
   });
 }
 
+function subscriptionStatusToString(user) {
+  const status = user?.subscription?.type;
+
+  if (status === SUBSCRIPTION_STATUS.BETA) return "Beta";
+  else if (status === SUBSCRIPTION_STATUS.TRIAL) return "Trial";
+  else return "Basic";
+}
+
 function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -79,10 +87,14 @@ function Settings(props) {
     () => dayjs(user?.subscription?.expiry).diff(dayjs(), "day") + 1,
     [user]
   );
-  const isTrial = useMemo(
-    () => user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL,
-    [user]
-  );
+
+  const isTrial = useMemo(() => {
+    return user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  }, [user]);
+
+  const isBeta = useMemo(() => {
+    return user?.subscription?.type === SUBSCRIPTION_STATUS.BETA;
+  }, [user]);
 
   useEffect(() => {
     if (!followSystemTheme) return;
@@ -94,16 +106,19 @@ function Settings(props) {
       <Flex variant="columnFill" px={2}>
         {isLoggedIn ? (
           <Flex
-            bg="shade"
+            bg={user.isEmailConfirmed ? "shade" : "errorBg"}
             flexDirection="column"
             p={2}
             sx={{ borderRadius: "default" }}
           >
             <Flex flex="1" justifyContent="space-between">
               <Flex>
-                <Icon.User size={15} color="primary" />
+                <Icon.User
+                  size={15}
+                  color={user.isEmailConfirmed ? "primary" : "error"}
+                />
                 <Text variant="body" color="text" ml={1}>
-                  {user.username}
+                  {user.email}
                 </Text>
               </Flex>
               <Text
@@ -111,29 +126,59 @@ function Settings(props) {
                 px={"2px"}
                 py={"1px"}
                 sx={{ borderRadius: "default" }}
-                bg="static"
-                color="primary"
+                bg={user.isEmailConfirmed ? "primary" : "errorBg"}
+                color={user.isEmailConfirmed ? "static" : "error"}
               >
-                {isTrial ? "Trial" : "Pro"}
+                {subscriptionStatusToString(user)}
               </Text>
             </Flex>
-            <Text
-              color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
-              variant="body"
-              fontSize={26}
-              mt={2}
-            >
-              {subscriptionDaysRemaining > 0
-                ? `${subscriptionDaysRemaining} Days Remaining`
-                : "Your trial has ended."}
-            </Text>
-            <Text variant="subBody">
-              Your trial period started on{" "}
-              {dayjs(user.subscription.start).format("MMMM D, YYYY")}
-            </Text>
-            {isTrial && (
-              <Button mt={2} onClick={showBuyDialog}>
-                Upgrade to Notesnook Pro
+            {user.isEmailConfirmed ? (
+              isTrial ? (
+                <>
+                  <Text
+                    color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
+                    variant="body"
+                    fontSize={26}
+                    mt={2}
+                  >
+                    {subscriptionDaysRemaining > 0
+                      ? `${subscriptionDaysRemaining} Days Remaining`
+                      : "Your trial has ended."}
+                  </Text>
+                  <Text variant="subBody">
+                    Your trial period started on{" "}
+                    {dayjs(user.subscription.start).format("MMMM D, YYYY")}
+                  </Text>
+                  <Button mt={2} onClick={showBuyDialog}>
+                    Upgrade to Notesnook Pro
+                  </Button>
+                </>
+              ) : isBeta ? (
+                <>
+                  <Text
+                    color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
+                    variant="body"
+                    fontSize={26}
+                    mt={2}
+                  >
+                    {subscriptionDaysRemaining > 0
+                      ? `${subscriptionDaysRemaining} Days Remaining`
+                      : "Your beta subscription has ended."}
+                  </Text>
+                  <Text variant="subBody">
+                    Your were enrolled in our beta program on{" "}
+                    {dayjs(user.subscription.start).format("MMMM D, YYYY")}
+                  </Text>
+                </>
+              ) : null
+            ) : (
+              <Button mt={2} bg="error">
+                <Flex alignItems="center">
+                  <Icon.Warn color="static" size={13} />
+                  <Text color="static" ml={1}>
+                    Please verify your email.
+                  </Text>
+                </Flex>
               </Button>
             )}
           </Flex>

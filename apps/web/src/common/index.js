@@ -13,10 +13,15 @@ import { store as userstore } from "../stores/user-store";
 import { hashNavigate } from "../navigation";
 
 export const db = new Database(StorageInterface, EventSource);
+// db.host({
+//   API_HOST: "https://api.notesnook.com",
+//   AUTH_HOST: "https://auth.streetwriters.co",
+//   SSE_HOST: "https://events.streetwriters.co",
+// });
 db.host({
-  API_HOST: "https://192.168.10.5:5264",
-  AUTH_HOST: "https://192.168.10.5:8264",
-  SSE_HOST: "https://192.168.10.5:7264",
+  API_HOST: "http://localhost:5264",
+  AUTH_HOST: "http://localhost:8264",
+  SSE_HOST: "http://localhost:7264",
 });
 //db.host("http://192.168.10.5:8100");
 // db.host();
@@ -33,11 +38,11 @@ export const COLORS = {
 };
 
 export const SUBSCRIPTION_STATUS = {
-  EXPIRED: 0,
+  BASIC: 0,
   TRIAL: 1,
-  ACTIVE: 2,
-  ACTIVE_RENEWING: 3,
-  CANCELLED: 4,
+  BETA: 2,
+  TRIAL_EXPIRED: 3,
+  BETA_EXPIRED: 4,
 };
 
 export const SELECTION_OPTIONS_MAP = {
