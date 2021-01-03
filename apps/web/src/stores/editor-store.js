@@ -55,14 +55,14 @@ class EditorStore extends BaseStore {
   };
 
   openSession = async (noteId) => {
+    await db.notes.init();
+
     const session = this.get().session;
-    console.log(session);
     if (session.id === noteId && session.state === SESSION_STATES.unlocked) {
       this.set((state) => (state.session.state = SESSION_STATES.new));
       return;
     }
 
-    await db.notes.init();
     let note = db.notes.note(noteId);
     if (!note) return;
     note = qclone(note.data);
