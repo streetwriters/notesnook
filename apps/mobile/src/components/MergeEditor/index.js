@@ -28,6 +28,7 @@ import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
+import KeepAwake from '@sayem314/react-native-keep-awake';
 
 const {Value, timing} = Animated;
 
@@ -322,6 +323,7 @@ const MergeEditor = () => {
           backgroundColor: colors.nav,
           paddingTop: insets.top,
         }}>
+        <KeepAwake />
         {dialogVisible && (
           <BaseDialog visible={true}>
             <DialogContainer>
