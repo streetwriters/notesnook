@@ -51,6 +51,9 @@ export default class Tags extends Collection {
       throw new Error(`No note of id "${noteId}" exists in this tag.`);
     tag.noteIds.splice(noteIndex, 1);
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
-    else await this._collection.removeItem(tag.id);
+    else {
+      await this._db.settings.unpin(tag.id);
+      await this._collection.removeItem(tag.id);
+    }
   }
 }

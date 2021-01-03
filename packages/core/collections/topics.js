@@ -102,6 +102,7 @@ export default class Topics {
       let index = topicIds.findIndex((id) => topic.id === id);
       let t = this.topic(topic);
       await t.delete(...topic.notes);
+      await this._db.settings.unpin(topic.id);
       if (index > -1) {
         allTopics.splice(i, 1);
       }

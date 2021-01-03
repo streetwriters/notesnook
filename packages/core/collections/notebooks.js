@@ -87,6 +87,7 @@ export default class Notebooks extends Collection {
       if (!notebook) continue;
       await notebook.topics.delete(...notebook.data.topics);
       await this._collection.removeItem(id);
+      await this._db.settings.unpin(id);
       await this._db.trash.add(notebook.data);
     }
   }
