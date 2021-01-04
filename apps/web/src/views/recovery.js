@@ -135,6 +135,7 @@ function AccountRecovery(props) {
                   name="recovery_key"
                   label="Recovery Key"
                   autoFocus
+                  required
                   helpText="We'll use the recovery key to download & decrypt your data."
                 />
               ) : (
@@ -144,12 +145,13 @@ function AccountRecovery(props) {
                   type="password"
                   label="New Password"
                   autoFocus
+                  required
                   helpText="Enter new account password."
                 />
               )}
 
               <Flex alignSelf="flex-end" mt={2}>
-                {step === 1 && (
+                {/* {step === 1 && (
                   <Button
                     type="submit"
                     variant="secondary"
@@ -160,7 +162,7 @@ function AccountRecovery(props) {
                   >
                     I don't have it
                   </Button>
-                )}
+                )} */}
                 <Button type="submit" py={"7px"} px={4}>
                   Next
                 </Button>
