@@ -107,6 +107,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
           type="shade"
           height={25}
           fontSize={SIZE.xs}
+          
           iconSize={SIZE.xs}
           icon={rightBtn.icon}
           style={{

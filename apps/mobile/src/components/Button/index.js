@@ -57,7 +57,6 @@ export const Button = ({
       customStyle={{
         height: height,
         width: width || null,
-        paddingVertical: pv,
         paddingHorizontal: ph,
         borderRadius: 5,
         alignSelf: 'center',
