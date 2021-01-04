@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useStore } from "../../stores/editor-store";
+import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import { EventManagers } from "../../utils/observablearray";
 import Animated from "../animated";
@@ -11,7 +11,6 @@ function Toolbar(props) {
   console.log("TOOLBACR");
   const { quill } = props;
   const sessionState = useStore((store) => store.session.state);
-  const sessionId = useStore((store) => store.session.sessionId);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -93,7 +92,7 @@ function Toolbar(props) {
           }}
           size={18}
           onClick={() => {
-            if (sessionId) showToast("success", "Note saved!");
+            if (store.get().session.id) showToast("success", "Note saved!");
             clearSession();
           }}
         />

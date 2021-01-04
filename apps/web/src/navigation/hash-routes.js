@@ -29,6 +29,10 @@ const hashroutes = {
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     showEditNotebookDialog(notebookId);
   },
+  "/notes/create": () => {
+    console.log("session");
+    editorStore.get().newSession(noteStore.get().context);
+  },
   "/notes/:noteId/edit": ({ noteId }) => {
     editorStore.openSession(noteId);
   },
@@ -42,9 +46,6 @@ const hashroutes = {
   },
   "/notes/:noteId/conflict": ({ noteId }) => {
     return <SplitEditor noteId={noteId} />;
-  },
-  "/notes/create": () => {
-    editorStore.newSession(noteStore.get().context);
   },
   "/signup": () => {
     showSignUpDialog();

@@ -124,12 +124,16 @@ class EditorStore extends BaseStore {
       });
 
       noteStore.refresh();
+      if (!oldSession?.id) {
+        hashNavigate(`/notes/${id}/edit`, true, true);
+      }
     });
   };
 
   newSession = (context = {}) => {
+    console.log("Session");
     appStore.setIsEditorOpen(true);
-    this.set(function (state) {
+    this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
         context,
