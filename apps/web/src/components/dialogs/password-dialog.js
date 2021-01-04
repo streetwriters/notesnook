@@ -132,6 +132,17 @@ function getDialogData(type) {
           "All your data will be re-encrypted and synced with the new password.",
         positiveButtonText: "Change password",
       };
+    case "delete_account":
+      return {
+        title: "Delete your account",
+        subtitle: (
+          <Text as="span" color="error">
+            All your data will be permanently deleted with{" "}
+            <b>no way of recovery</b>. Proceed with caution.
+          </Text>
+        ),
+        positiveButtonText: "Delete Account",
+      };
     default:
       return;
   }
