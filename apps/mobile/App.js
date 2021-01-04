@@ -194,7 +194,6 @@ const App = () => {
   const onUrlRecieved = async (res) => {
     if (getIntentOnAppLoadProcessed()) {
       let url = res ? res.url : '';
-
       try {
         if (Platform.OS === 'ios' && url.startsWith('ShareMedia://dataUrl')) {
           let intent = await ReceiveSharingIntent.getFileNames(url);
@@ -204,8 +203,10 @@ const App = () => {
             IntentService.setIntent(intent);
             IntentService.check(loadIntent);
           }
-        } else if (url.startsWith('https://notesnook.com/emailConfirmed')) {
+        } else if (url.startsWith('https://app.notesnook.com/account/verified')) {
           await onEmailVerified();
+        } else {
+          return;
         }
       } catch (e) {}
     }
