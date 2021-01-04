@@ -8973,9 +8973,21 @@ normalize-url@^3.0.0, normalize-url@^3.0.1:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
+notes-core@../notes-core:
+  version "5.2.1"
+  dependencies:
+    fast-sort "^2.0.1"
+    fuzzysearch "^1.0.3"
+    jshashes "^1.0.8"
+    no-internet "^1.5.2"
+    qclone "^1.0.4"
+    quill-delta-to-html "^0.12.0"
+    quill-delta-to-markdown "https://github.com/streetwriters/quill-delta-to-markdown"
+    transfun "^1.0.2"
+
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "5.2.1"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#f7c739694e8e5c899bc866bdf53df5cd4884637f"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#5f4b4365dc3d24ccf15ea0272dc67fdfd79c4af9"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
