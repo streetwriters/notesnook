@@ -193,7 +193,6 @@ const LoginDialog = () => {
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
-      setLoading(false);
       close();
     } catch (e) {
       setLoading(false);
@@ -238,17 +237,7 @@ const LoginDialog = () => {
     setStatus('Creating User');
     try {
       await db.user.signup(email, password);
-    } catch (e) {
-      setLoading(false);
-      setStatus(null);
-      console.log(e);
-      ToastEvent.show(e.message, 'error', 'local');
-      return;
-    }
-
-    let user;
-    try {
-      user = await db.user.getUser();
+      let user = await db.user.getUser();
       setStatus('Setting up crenditials');
       dispatch({type: Actions.USER, user: user});
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
@@ -259,9 +248,8 @@ const LoginDialog = () => {
       eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
       setStatus(null);
-      ToastEvent.show(e.message, 'error', 'local');
-    } finally {
       setLoading(false);
+      ToastEvent.show(e.message, 'error', 'local');
     }
   };
 
