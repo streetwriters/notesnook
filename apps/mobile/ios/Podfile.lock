@@ -198,6 +198,8 @@ PODS:
     - React
   - react-native-html-to-pdf (0.8.0):
     - React
+  - react-native-keep-awake (1.0.4):
+    - React
   - react-native-mmkv-storage (0.3.7):
     - MMKV (= 1.2.6)
     - React
@@ -353,6 +355,7 @@ DEPENDENCIES:
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
+  - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation (from `../node_modules/react-native-orientation`)
@@ -444,6 +447,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-get-random-values"
   react-native-html-to-pdf:
     :path: "../node_modules/react-native-html-to-pdf"
+  react-native-keep-awake:
+    :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
     :path: "../node_modules/react-native-mmkv-storage"
   react-native-netinfo:
@@ -559,6 +564,7 @@ SPEC CHECKSUMS:
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
+  react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
   react-native-mmkv-storage: 1af147d3491d82e9b8c9706d8c03f82a30d8f1b4
   react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
