@@ -1,42 +1,29 @@
 import React from "react";
-import { Flex, Box } from "rebass";
-import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import "./search.css";
+import Field from "../field";
 
 function SearchBox(props) {
-  //const { query, type, context } = props;
-
   return (
-    <Flex
-      variant="rowCenter"
-      mx={2}
-      mb={2}
-      px={2}
-      bg="bgSecondary"
-      sx={{
-        position: "relative",
-        borderRadius: "default",
+    <Field
+      id="search"
+      name="search"
+      type="text"
+      sx={{ mx: 2 }}
+      placeholder="Type your query here"
+      onKeyDown={(e) => {
+        if (e.key === "Enter") props.onSearch(e.target.value);
       }}
-    >
-      <Input
-        id="searchInput"
-        name="search"
-        sx={{ borderWidth: 0, px: 0 }}
-        placeholder={`Type your query here`}
-        onKeyDown={(e) => {
-          if (e.key === "Enter") props.onSearch(e.target.value);
-        }}
-      />
-      <Box
-        id="searchIcon"
-        sx={{
-          color: "hover",
-        }}
-      >
-        <Icon.Search size={24} />
-      </Box>
-    </Flex>
+      action={{
+        icon: Icon.Search,
+        onClick: () => {
+          const searchField = document.getElementById("search");
+          if (searchField && searchField.value && searchField.value.length) {
+            props.onSearch(searchField.value);
+          }
+        },
+      }}
+    />
   );
 }
 export default SearchBox;

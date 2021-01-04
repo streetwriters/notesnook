@@ -16,6 +16,7 @@ function Field(props) {
     helpText,
     action,
     onKeyUp,
+    onKeyDown,
     onChange,
     inputRef,
     defaultValue,
@@ -54,6 +55,7 @@ function Field(props) {
           type={type || "text"}
           onChange={onChange}
           onKeyUp={onKeyUp}
+          onKeyDown={onKeyDown}
         />
         {type === "password" && (
           <Flex
