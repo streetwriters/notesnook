@@ -178,41 +178,27 @@ const LoginDialog = () => {
 
     try {
       await db.user.login(email.toLowerCase(), password, true);
-    } catch (e) {
-      console.log(e);
-      ToastEvent.show(e.message, 'error', 'local');
-      setLoading(false);
-      setStatus(null);
-      return;
-    }
-
-    try {
       let user = await db.user.getUser();
+      console.log(user);
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
-      db.sync()
-        .catch((e) => {
-          console.log(e);
-        })
-        .finally(async () => {
-          dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-          dispatch({type: Actions.ALL});
-          eSendEvent(refreshNotesPage);
-        });
       clearMessage(dispatch);
       if (!user.isEmailConfirmed) {
         setEmailVerifyMessage(dispatch);
         PremiumService.showVerifyEmailDialog();
       }
-      close();
       ToastEvent.show(`Logged in as ${user.email}`, 'success', 'global');
+      await db.sync();
+      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+      dispatch({type: Actions.ALL});
+      eSendEvent(refreshNotesPage);
+      setLoading(false);
+      close();
     } catch (e) {
-      console.warn(e);
+      setLoading(false);
       setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
-    } finally {
-      setLoading(false);
     }
   };
 
