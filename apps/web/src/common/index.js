@@ -13,19 +13,24 @@ import { store as userstore } from "../stores/user-store";
 import { hashNavigate } from "../navigation";
 
 export const db = new Database(StorageInterface, EventSource);
+
 // db.host({
 //   API_HOST: "https://api.notesnook.com",
 //   AUTH_HOST: "https://auth.streetwriters.co",
 //   SSE_HOST: "https://events.streetwriters.co",
 // });
+
+// db.host({
+//   API_HOST: "http://localhost:5264",
+//   AUTH_HOST: "http://localhost:8264",
+//   SSE_HOST: "http://localhost:7264",
+// });
+
 db.host({
-  API_HOST: "http://localhost:5264",
-  AUTH_HOST: "http://localhost:8264",
-  SSE_HOST: "http://localhost:7264",
+  API_HOST: "http://192.168.10.8:5264",
+  AUTH_HOST: "http://192.168.10.8:8264",
+  SSE_HOST: "http://192.168.10.8:7264",
 });
-//db.host("http://192.168.10.5:8100");
-// db.host();
-//db.host("https://api.notesnook.com");
 
 export const COLORS = {
   red: "#f44336",

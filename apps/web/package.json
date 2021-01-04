@@ -64,6 +64,7 @@
     "preinstall": "chmod +x ./scripts/ci.sh && ./scripts/ci.sh",
     "start": "REACT_APP_CI=true react-scripts start",
     "build": "REACT_APP_CI=true react-scripts build",
+    "deploy": "./scripts/deploy.sh",
     "debug": "BROWSER=none react-scripts start",
     "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
     "eject": "react-scripts eject",
