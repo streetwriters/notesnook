@@ -192,12 +192,14 @@ const LoginDialog = () => {
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       db.sync()
-        .catch((e) => {})
+        .catch((e) => {
+          console.log(e);
+        })
         .finally(async () => {
           dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+          dispatch({type: Actions.ALL});
+          eSendEvent(refreshNotesPage);
         });
-      dispatch({type: Actions.ALL});
-      eSendEvent(refreshNotesPage);
       clearMessage(dispatch);
       if (!user.isEmailConfirmed) {
         setEmailVerifyMessage(dispatch);
