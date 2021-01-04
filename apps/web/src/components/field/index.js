@@ -1,7 +1,30 @@
 import React, { useState } from "react";
-import { Flex } from "rebass";
+import { Flex, Text } from "rebass";
 import { Input, Label } from "@rebass/forms";
 import * as Icon from "../icons";
+
+const passwordValidationRules = [
+  {
+    title: "8 characters",
+    validate: (password) => password.length >= 8,
+  },
+  {
+    title: "1 lowercase letter",
+    validate: (password) => /[a-z]/.test(password),
+  },
+  {
+    title: "1 uppercase letter",
+    validate: (password) => /[A-Z]/.test(password),
+  },
+  {
+    title: "1 digit",
+    validate: (password) => /\d/.test(password),
+  },
+  {
+    title: "1 special character",
+    validate: (password) => /\W/.test(password),
+  },
+];
 
 function Field(props) {
   const {
@@ -21,8 +44,10 @@ function Field(props) {
     inputRef,
     defaultValue,
     placeholder,
+    validatePassword,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [rules, setRules] = useState(passwordValidationRules);
 
   return (
     <Flex sx={sx} flexDirection="column">
@@ -53,7 +78,17 @@ function Field(props) {
           placeholder={placeholder}
           autoComplete={autoComplete}
           type={type || "text"}
-          onChange={onChange}
+          onChange={(e) => {
+            if (validatePassword) {
+              const value = e.target.value;
+              setRules((rules) =>
+                rules.map((rule) => {
+                  return { ...rule, isValid: rule.validate(value) };
+                })
+              );
+            }
+            if (onChange) onChange(e);
+          }}
           onKeyUp={onKeyUp}
           onKeyDown={onKeyDown}
         />
@@ -71,6 +106,7 @@ function Field(props) {
               top: 0,
               bottom: 0,
               px: 1,
+              cursor: "pointer",
               borderRadius: "default",
               ":hover": { bg: "border" },
             }}
@@ -91,6 +127,7 @@ function Field(props) {
               position: "absolute",
               right: "2px",
               top: "2px",
+              cursor: "pointer",
               bottom: "2px",
               px: 1,
               borderRadius: "default",
@@ -101,6 +138,22 @@ function Field(props) {
           </Flex>
         )}
       </Flex>
+      {validatePassword && (
+        <Flex flexDirection="column" mt={1}>
+          {rules.map((rule) => (
+            <Flex>
+              {rule.isValid ? (
+                <Icon.Check color="success" size={14} />
+              ) : (
+                <Icon.Cross color="error" size={14} />
+              )}
+              <Text fontSize="body" ml={1}>
+                {rule.title}
+              </Text>
+            </Flex>
+          ))}
+        </Flex>
+      )}
     </Flex>
   );
 }

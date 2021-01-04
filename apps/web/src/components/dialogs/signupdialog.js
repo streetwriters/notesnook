@@ -87,6 +87,7 @@ function SignUpDialog(props) {
           name="password"
           type="password"
           autoComplete="new-password"
+          validatePassword
           sx={{ mt: 1 }}
         />
         {error && <Text variant="error">{error}</Text>}
