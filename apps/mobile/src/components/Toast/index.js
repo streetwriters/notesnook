@@ -11,7 +11,7 @@ import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
 const {timing} = Animated;
 
-const toastMessages = [];
+let toastMessages = [];
 export const Toast = ({context = 'global'}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -43,7 +43,7 @@ export const Toast = ({context = 'global'}) => {
         color: colors.errorText,
       });
     }
-
+    toastTranslate.setValue(dHeight);
     toastTranslate.setValue(0);
     await sleep(50);
     timing(toastOpacity, {
@@ -114,18 +114,21 @@ export const Toast = ({context = 'global'}) => {
   };
 
   useEffect(() => {
+    toastMessages = [];
+    toastTranslate.setValue(dHeight);
+    toastOpacity.setValue(0);
     Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
     Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
     eSubscribeEvent(eShowToast, showToastFunc);
     eSubscribeEvent(eHideToast, hideToastFunc);
-
     return () => {
+      toastMessages = [];
       Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
       eUnSubscribeEvent(eShowToast, showToastFunc);
       eUnSubscribeEvent(eHideToast, hideToastFunc);
     };
-  }, []);
+  }, [keyboard]);
 
   return (
     <Animated.View
