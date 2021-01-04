@@ -563,23 +563,27 @@ const SettingsAppearanceSection = () => {
   }
 
   const switchTheme = async () => {
-    await PremiumService.verify(async () => {
-      await SettingsService.set(
-        'useSystemTheme',
-        SettingsService.get().useSystemTheme ? false : true,
-      );
-      if (SettingsService.get().useSystemTheme) {
-        await MMKV.setStringAsync(
-          'theme',
-          JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+    if (SettingsService.get().useSystemTheme) {
+      await SettingsService.set('useSystemTheme', false);
+    } else {
+      await PremiumService.verify(async () => {
+        await SettingsService.set(
+          'useSystemTheme',
+          SettingsService.get().useSystemTheme ? false : true,
         );
-        changeColorScheme(
-          Appearance.getColorScheme() === 'dark'
-            ? COLOR_SCHEME_DARK
-            : COLOR_SCHEME_LIGHT,
-        );
-      }
-    });
+        if (SettingsService.get().useSystemTheme) {
+          await MMKV.setStringAsync(
+            'theme',
+            JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+          );
+          changeColorScheme(
+            Appearance.getColorScheme() === 'dark'
+              ? COLOR_SCHEME_DARK
+              : COLOR_SCHEME_LIGHT,
+          );
+        }
+      });
+    }
   };
 
   return (
