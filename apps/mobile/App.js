@@ -212,7 +212,7 @@ const App = () => {
   };
 
   const onEmailVerified = async () => {
-    let user = await db.user.fetchUser();
+    let user = await db.user.fetchUser(true);
     dispatch({type: Actions.USER, user: user});
     if (!user) return;
     let message =
@@ -324,7 +324,7 @@ const App = () => {
 
   const setCurrentUser = async () => {
     try {
-      let user = await db.user.fetchUser();
+      let user = await db.user.getUser(true);
       if (user) {
         clearMessage(dispatch);
         if (!user.isEmailConfirmed) {
