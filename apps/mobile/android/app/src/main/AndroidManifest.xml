@@ -35,7 +35,7 @@
                   <category android:name="android.intent.category.DEFAULT" />
                   <category android:name="android.intent.category.BROWSABLE" />
                   <data android:scheme="https"
-              android:host="notesnook.com"></data>
+              android:host="app.notesnook.com"></data>
                 
             </intent-filter>
         </activity>
