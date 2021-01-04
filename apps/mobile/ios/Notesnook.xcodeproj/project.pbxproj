@@ -17,6 +17,7 @@
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
+		653BE16B25A2EA710045F8A2 /* Images-2.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 653BE16A25A2EA710045F8A2 /* Images-2.xcassets */; };
 		655FD77A253AD31C001D807D /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
 		65A7F343255687E600699170 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A7F342255687E600699170 /* ShareViewController.swift */; };
 		65A7F346255687E600699170 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 65A7F344255687E600699170 /* MainInterface.storyboard */; };
@@ -89,6 +90,7 @@
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		6529D2B1257B4A4300B49BC3 /* Add to NotesDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Add to NotesDebug.entitlements"; sourceTree = "<group>"; };
+		653BE16A25A2EA710045F8A2 /* Images-2.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = "Images-2.xcassets"; path = "Notesnook/Images-2.xcassets"; sourceTree = "<group>"; };
 		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
 		65A7F340255687E600699170 /* Add to Notes.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Add to Notes.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		65A7F342255687E600699170 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				13B07FB71A68108700A75B9A /* main.m */,
 				65E0340A257B9FF100793428 /* File.swift */,
 				65E03409257B9FF100793428 /* Notesnook-Bridging-Header.h */,
+				653BE16A25A2EA710045F8A2 /* Images-2.xcassets */,
 			);
 			name = Notesnook;
 			sourceTree = "<group>";
@@ -443,6 +446,7 @@
 				655FD77A253AD31C001D807D /* Web.bundle in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				653BE16B25A2EA710045F8A2 /* Images-2.xcassets in Resources */,
 				65B5F41D257CADA5007D2310 /* notesnook-text.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
