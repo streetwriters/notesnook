@@ -91,9 +91,12 @@ function AccountRecovery(props) {
               <Text variant="body">{loading.message}</Text>
             </Flex>
           ) : step === 3 ? (
-            <Flex flexDirection="column">
-              <Button variant="secondary">Return to Notesnook</Button>
-            </Flex>
+            <Button
+              variant="secondary"
+              onClick={() => (window.location.href = "/")}
+            >
+              Return to Notesnook
+            </Button>
           ) : (
             <Flex
               flexDirection="column"
@@ -106,6 +109,7 @@ function AccountRecovery(props) {
                 var recoveryKey = formData.get("recovery_key");
                 if (recoveryKey) {
                   const [key] = recoveryKey.split("\0");
+                  console.log(recoveryKey.split("\0"));
                   await doWorkWithLoading(
                     "Downloading your data. This might take a bit.",
                     async () => {

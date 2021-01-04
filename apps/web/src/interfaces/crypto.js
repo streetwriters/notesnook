@@ -11,7 +11,7 @@ class Crypto {
           if (this.isReady) return;
           this.isReady = true;
           this.sodium = _sodium;
-          loadScript("crypto.worker.js").then(resolve);
+          loadScript("/crypto.worker.js").then(resolve);
         },
       };
       await loadScript("sodium.js");
@@ -58,7 +58,7 @@ class CryptoWorker {
       });
 
     this.initializing = true;
-    this.worker = new Worker("crypto.worker.js");
+    this.worker = new Worker("/crypto.worker.js");
     const buffer = Buffer.allocUnsafe(32);
     crypto.getRandomValues(buffer);
     const message = { seed: buffer.buffer };

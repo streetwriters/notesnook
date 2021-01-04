@@ -15,8 +15,8 @@ function RecoveryKeyDialog(props) {
   useEffect(() => {
     (async () => {
       const { email } = await db.user.getUser();
-      const { key, salt } = await db.user.getEncryptionKey();
-      setKey(`${key}\0${salt}`);
+      const { key } = await db.user.getEncryptionKey();
+      setKey(key);
       setEmail(email);
     })();
   }, []);
