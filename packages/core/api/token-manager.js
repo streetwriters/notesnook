@@ -5,6 +5,7 @@ const ENDPOINTS = {
   token: "/connect/token",
   revoke: "/connect/revocation",
   temporaryToken: "/account/token",
+  logout: "/account/logout",
 };
 
 class TokenManager {
@@ -54,19 +55,13 @@ class TokenManager {
   async revokeToken() {
     const token = await this.getToken();
     if (!token) return;
-    const { access_token, refresh_token } = token;
+    const { access_token } = token;
 
-    await http.post(`${constants.AUTH_HOST}${ENDPOINTS.revoke}`, {
-      token: access_token,
-      client_id: "notesnook",
-      token_type_hint: "access_token",
-    });
-
-    await http.post(`${constants.AUTH_HOST}${ENDPOINTS.revoke}`, {
-      token: refresh_token,
-      client_id: "notesnook",
-      token_type_hint: "refresh_token",
-    });
+    await http.post(
+      `${constants.AUTH_HOST}${ENDPOINTS.logout}`,
+      null,
+      access_token
+    );
   }
 
   saveToken(tokenResponse) {
