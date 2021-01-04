@@ -175,20 +175,15 @@ const LoginDialog = () => {
     _email.current.blur();
     _pass.current.blur();
     setStatus('Logging in');
-
+    let user;
     try {
       await db.user.login(email.toLowerCase(), password, true);
-      let user = await db.user.getUser();
-      console.log(user);
+      user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
       dispatch({type: Actions.USER, user: user});
       clearMessage(dispatch);
-      if (!user.isEmailConfirmed) {
-        setEmailVerifyMessage(dispatch);
-        PremiumService.showVerifyEmailDialog();
-      }
-      ToastEvent.show(`Logged in as ${user.email}`, 'success', 'global');
+      ToastEvent.show(`Logged in as ${user.email}`, 'success', 'local');
       await db.sync();
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
@@ -197,7 +192,14 @@ const LoginDialog = () => {
     } catch (e) {
       setLoading(false);
       setStatus(null);
-      ToastEvent.show(e.message, 'error', 'local');
+      if (user && !user.isEmailConfirmed) {
+        close();
+        setEmailVerifyMessage(dispatch);
+        await sleep(300);
+        PremiumService.showVerifyEmailDialog();
+      } else {
+        ToastEvent.show(e.message, 'error', 'local');
+      }
     }
   };
 
@@ -244,7 +246,7 @@ const LoginDialog = () => {
       clearMessage(dispatch);
       setEmailVerifyMessage(dispatch);
       close();
-      await sleep(500);
+      await sleep(300);
       eSendEvent(eOpenRecoveryKeyDialog, true);
     } catch (e) {
       setStatus(null);
