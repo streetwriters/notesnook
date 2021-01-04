@@ -110,7 +110,6 @@ const Input = ({
 
   const onBlur = () => {
     setFocus(false);
-    validate();
   };
 
   const onFocus = () => {
@@ -131,7 +130,6 @@ const Input = ({
   const textStyle = {
     paddingHorizontal: 0,
     fontSize: SIZE.md,
-    //ontFamily: "sans-serif",
     color: colors.pri,
     paddingVertical: 0,
     paddingBottom: 2.5,
