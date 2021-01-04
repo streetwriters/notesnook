@@ -61,7 +61,7 @@ function Editor(props) {
 
   useEffect(() => {
     if (contentType !== "delta" || !quillRef || !quillRef.current) return;
-    console.log("session", sessionState);
+
     if (sessionState === SESSION_STATES.new) {
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       const {

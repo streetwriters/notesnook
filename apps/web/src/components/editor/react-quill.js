@@ -7,7 +7,7 @@ import "quill/dist/quill.core.css";
 import "./modules/betterlist";
 import MarkdownShortcuts from "./modules/markdown";
 import MagicUrl from "quill-magic-url";
-import { Text } from "rebass";
+import { Box, Text } from "rebass";
 import QuillFocus from "./modules/focus";
 import { isMobile } from "../../utils/dimensions";
 import { showBuyDialog } from "../dialogs/buy-dialog";
@@ -191,13 +191,14 @@ export default class ReactQuill extends Component {
 
   render() {
     return (
-      <Text
-        mx={[2, 2, 0]}
-        as="pre"
-        sx={{ cursor: "text" }}
-        onFocus={this.props.onFocus}
-        id={this.props.id}
-      />
+      <Box mx={[2, 2, 0]}>
+        <Text
+          as="pre"
+          sx={{ cursor: "text" }}
+          onFocus={this.props.onFocus}
+          id={this.props.id}
+        />
+      </Box>
     );
   }
 }
