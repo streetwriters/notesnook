@@ -23,6 +23,8 @@ import useHashRoutes from "./utils/use-hash-routes";
 import hashroutes from "./navigation/hash-routes";
 import rootroutes from "./navigation/rootroutes";
 import { getCurrentPath } from "./navigation";
+import useVersion from "./utils/useVersion";
+import { showAppUpdatedNotice } from "./components/dialogs/confirm";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -35,8 +37,15 @@ function App() {
   const isEditorOpen = useStore((store) => store.isEditorOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
+  const version = useVersion();
   const isMobile = useMobile();
   const isTablet = useTablet();
+
+  useEffect(() => {
+    (async function () {
+      if (version.appUpdated) await showAppUpdatedNotice(version);
+    })();
+  }, [version]);
 
   useEffect(
     function initializeApp() {
@@ -98,7 +107,7 @@ function App() {
     toggleSideMenu(!isMobile);
     if (!isMobile && !isTablet) setShow(true);
   }, [isMobile, isTablet, toggleSideMenu]);
-  console.log("ROUTING!");
+
   return (
     <ThemeProvider>
       <Flex

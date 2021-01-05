@@ -25,6 +25,7 @@ import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
 import { hashNavigate } from "../navigation";
+import useVersion from "../utils/useVersion";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -69,6 +70,8 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
+  const version = useVersion();
+
   const toggleFollowSystemTheme = useThemeStore(
     (store) => store.toggleFollowSystemTheme
   );
@@ -442,7 +445,7 @@ function Settings(props) {
         >
           Other
         </Text>
-        {["Terms of Service", "Privacy Policy", "About"].map((title) => (
+        {["Terms of Service", "Privacy Policy"].map((title) => (
           <Button
             key={title}
             variant="list"
@@ -455,6 +458,11 @@ function Settings(props) {
             {title}
           </Button>
         ))}
+        <TextWithTip
+          sx={{ mt: 2 }}
+          text="About"
+          tip={`version ${version.formatted}`}
+        />
       </Flex>
     </ScrollContainer>
   );

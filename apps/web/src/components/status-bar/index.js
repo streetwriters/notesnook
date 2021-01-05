@@ -21,57 +21,59 @@ function StatusBar() {
       justifyContent="space-between"
       px={2}
     >
-      {isLoggedIn ? (
-        <Flex>
+      <Flex>
+        {isLoggedIn ? (
+          <>
+            <Button
+              onClick={() =>
+                user.isEmailConfirmed
+                  ? navigate("/settings")
+                  : hashNavigate("/email/verify")
+              }
+              variant="statusitem"
+              display="flex"
+              sx={{ alignItems: "center", justifyContent: "center" }}
+            >
+              <Icon.Circle
+                size={7}
+                color={user.isEmailConfirmed ? "success" : "warn"}
+              />
+              <Text variant="subBody" ml={1}>
+                {user.email}
+                {user.isEmailConfirmed ? "" : " (not verified)"}
+              </Text>
+            </Button>
+            <Button
+              variant="statusitem"
+              display="flex"
+              onClick={sync}
+              sx={{ alignItems: "center", justifyContent: "center" }}
+            >
+              <Icon.Sync size={10} rotate={isSyncing} />
+              <Text variant="subBody" ml={1}>
+                {"Synced "}
+                {lastSynced ? (
+                  <TimeAgo live={true} datetime={lastSynced} />
+                ) : (
+                  "never"
+                )}
+              </Text>
+            </Button>
+          </>
+        ) : (
           <Button
-            onClick={() =>
-              user.isEmailConfirmed
-                ? navigate("/settings")
-                : hashNavigate("/email/verify")
-            }
             variant="statusitem"
             display="flex"
+            onClick={showLogInDialog}
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
-            <Icon.Circle
-              size={7}
-              color={user.isEmailConfirmed ? "success" : "warn"}
-            />
+            <Icon.Circle size={7} color="error" />
             <Text variant="subBody" ml={1}>
-              {user.email}
-              {user.isEmailConfirmed ? "" : " (not verified)"}
+              Not logged in
             </Text>
           </Button>
-          <Button
-            variant="statusitem"
-            display="flex"
-            onClick={sync}
-            sx={{ alignItems: "center", justifyContent: "center" }}
-          >
-            <Icon.Sync size={10} rotate={isSyncing} />
-            <Text variant="subBody" ml={1}>
-              {"Synced "}
-              {lastSynced ? (
-                <TimeAgo live={true} datetime={lastSynced} />
-              ) : (
-                "never"
-              )}
-            </Text>
-          </Button>
-        </Flex>
-      ) : (
-        <Button
-          variant="statusitem"
-          display="flex"
-          onClick={showLogInDialog}
-          sx={{ alignItems: "center", justifyContent: "center" }}
-        >
-          <Icon.Circle size={7} color="error" />
-          <Text variant="subBody" ml={1}>
-            Not logged in
-          </Text>
-        </Button>
-      )}
+        )}
+      </Flex>
       <EditorFooter />
     </Flex>
   );

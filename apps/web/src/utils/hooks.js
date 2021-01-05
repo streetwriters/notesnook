@@ -1,13 +1,12 @@
 import { useState } from "react";
-import { tryParse } from "./parse";
+import config from "./config";
 
 export const usePersistentState = (key, def) => {
-  let value = window.localStorage.getItem(key) || def;
-  const defState = tryParse(value);
+  let defState = config.get(key, def);
   const [k, setKey] = useState(defState);
   const _setKey = (s) => {
     setKey(s);
-    window.localStorage.setItem(key, s);
+    config.set(key, s);
   };
   return [k, _setKey];
 };

@@ -59,6 +59,7 @@ export const Star = createIcon(Icons.mdiStar);
 export const StarOutline = createIcon(Icons.mdiStarOutline);
 export const Circle = createIcon(Icons.mdiCircle);
 export const CircleEmpty = createIcon(Icons.mdiCircleOutline);
+export const Update = createIcon(Icons.mdiUpdate);
 export const Check = createIcon(Icons.mdiCheck);
 export const Cross = createIcon(Icons.mdiClose);
 export const MoreVertical = createIcon(Icons.mdiDotsVertical);

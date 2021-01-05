@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import Dialog, { showDialog } from "./dialog";
 import * as Icon from "../icons";
 
@@ -122,5 +122,25 @@ export function showAccountLoggedOutNotice(reason) {
     title: reason,
     message: `You were logged out`,
     yesText: `Okay`,
+  });
+}
+
+export function showAppUpdatedNotice(version) {
+  return confirm(Icon.Update, {
+    title: `Welcome to v${version.formatted}`,
+    message: (
+      <Flex
+        flexDirection="column"
+        bg="shade"
+        p={1}
+        sx={{ borderRadius: "default" }}
+      >
+        <Text variant="title">Changelog:</Text>
+        <Text as="pre" fontFamily="monospace" variant="body" mt={1}>
+          {version.changelog || "No change log."}
+        </Text>
+      </Flex>
+    ),
+    yesText: `Yay!`,
   });
 }
