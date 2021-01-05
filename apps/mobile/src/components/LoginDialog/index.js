@@ -172,11 +172,14 @@ const LoginDialog = () => {
       return;
     }
     setLoading(true);
-    _email.current.blur();
-    _pass.current.blur();
+    _email.current?.blur();
+    _pass.current?.blur();
     setStatus('Logging in');
     let user;
     try {
+      if (!db.user) {
+        throw new Error('Database is not initialized!');
+      }
       await db.user.login(email.toLowerCase(), password, true);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
@@ -234,10 +237,13 @@ const LoginDialog = () => {
   };
 
   const signupUser = async () => {
-    if (!validateInfo()) return;
+    if (!validateInfo()) return; 
     setLoading(true);
     setStatus('Creating User');
     try {
+      if (!db.user) {
+        throw new Error('Database is not initialized!');
+      }
       await db.user.signup(email, password);
       let user = await db.user.getUser();
       setStatus('Setting up crenditials');
