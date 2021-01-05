@@ -8,6 +8,7 @@ import { EV } from "notes-core/common";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { Text } from "rebass";
 import { showToast } from "../utils/toast";
+import { showAccountLoggedOutNotice } from "../components/dialogs/confirm";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -35,11 +36,11 @@ class UserStore extends BaseStore {
       });
       EV.subscribe("user:emailConfirmed", async () => {
         showToast("success", "Email confirmed successfully!");
-        await this.sync(true);
+        window.location.reload();
       });
 
       EV.subscribe("db:sync", () => this.sync(false));
-      EV.subscribe("user:loggedOut", async () => {
+      EV.subscribe("user:loggedOut", async (reason) => {
         this.set((state) => {
           state.user = {};
           state.isLoggedIn = false;
@@ -51,6 +52,9 @@ class UserStore extends BaseStore {
           await navigator.credentials.preventSilentAccess();
           if (navigator.credentials.requireUserMediation)
             await navigator.credentials.requireUserMediation();
+        }
+        if (!reason) {
+          await showAccountLoggedOutNotice(reason);
         }
       });
       await this.sync();

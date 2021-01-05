@@ -17,10 +17,6 @@ import { EV } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
 import Banner from "./components/banner";
-import {
-  showAccountDeletedNotice,
-  showPasswordChangedNotice,
-} from "./components/dialogs/confirm";
 import StatusBar from "./components/statusbar";
 import useRoutes from "./utils/use-routes";
 import useHashRoutes from "./utils/use-hash-routes";
@@ -72,12 +68,6 @@ function App() {
         await showBuyDialog();
         return { type, result: false };
       }
-    });
-    EV.subscribe("user:deleted", async () => {
-      await showAccountDeletedNotice();
-    });
-    EV.subscribe("user:passwordChanged", async () => {
-      await showPasswordChangedNotice();
     });
   }, []);
 

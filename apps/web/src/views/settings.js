@@ -254,7 +254,8 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
-                  await db.user.logout(true, "User's request.");
+                  await db.user.logout(true);
+                  showToast("success", "You have been logged out.");
                 }
               }}
             >

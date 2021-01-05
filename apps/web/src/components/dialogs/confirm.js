@@ -99,28 +99,28 @@ export function showLogoutConfirmation() {
   });
 }
 
-export function showAccountDeletedNotice() {
-  return confirm(Icon.Logout, {
-    title: `Account deleted`,
-    message:
-      "You deleted your account from another device. You have been logged out.",
-    yesText: `Okay`,
-  });
-}
+// export function showAccountDeletedNotice() {
+//   return confirm(Icon.Logout, {
+//     title: `Account deleted`,
+//     message:
+//       "You deleted your account from another device. You have been logged out.",
+//     yesText: `Okay`,
+//   });
+// }
 
-export function showPasswordChangedNotice() {
-  return confirm(Icon.Logout, {
-    title: `Account password changed`,
-    message:
-      "Your account password was changed, please login again using the new password.",
-    yesText: `Okay`,
-  });
-}
+// export function showPasswordChangedNotice() {
+//   return confirm(Icon.Logout, {
+//     title: `Account password changed`,
+//     message:
+//       "Your account password was changed, please login again using the new password.",
+//     yesText: `Okay`,
+//   });
+// }
 
 export function showAccountLoggedOutNotice(reason) {
   return confirm(Icon.Logout, {
-    title: `You were logged out`,
-    message: reason,
+    title: reason,
+    message: `You were logged out`,
     yesText: `Okay`,
   });
 }
