@@ -1,41 +1,47 @@
 import * as NetInfo from '@react-native-community/netinfo';
-import { EV } from 'notes-core/common';
-import React, { useEffect } from 'react';
+import {EV} from 'notes-core/common';
+import React, {useEffect} from 'react';
 import {
   Appearance,
   AppState,
   Linking,
   NativeModules,
   Platform,
-  StatusBar
+  StatusBar,
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {enabled} from 'react-native-privacy-snapshot';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import { RootView } from './initializer.root';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
+import {RootView} from './initializer.root';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
-import { DDS } from './src/services/DeviceDetection';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
 import IntentService from './src/services/IntentService';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { editing, getAppIsIntialized, getIntentOnAppLoadProcessed, setAppIsInitialized, setIntentOnAppLoadProcessed } from './src/utils';
-import { COLOR_SCHEME } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {
+  editing,
+  getAppIsIntialized,
+  getIntentOnAppLoadProcessed,
+  setAppIsInitialized,
+  setIntentOnAppLoadProcessed,
+} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
@@ -45,12 +51,12 @@ import {
   eOpenPendingDialog,
   eOpenProgressDialog,
   eOpenSideMenu,
-  refreshNotesPage
+  refreshNotesPage,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { tabBarRef } from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, setIntent } from './src/views/Editor/Functions';
+import {MMKV} from './src/utils/mmkv';
+import {tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, setIntent} from './src/views/Editor/Functions';
 const {ReceiveSharingIntent} = NativeModules;
 
 let Sentry = null;
@@ -72,7 +78,7 @@ const onAppStateChanged = async (state) => {
     updateStatusBarColor();
     if (SettingsService.get().privacyScreen) {
       enabled(false);
-    } 
+    }
     if (getAppIsIntialized()) {
       await MMKV.removeItem('appState');
     }
@@ -203,7 +209,9 @@ const App = () => {
             IntentService.setIntent(intent);
             IntentService.check(loadIntent);
           }
-        } else if (url.startsWith('https://app.notesnook.com/account/verified')) {
+        } else if (
+          url.startsWith('https://app.notesnook.com/account/verified')
+        ) {
           await onEmailVerified();
         } else {
           return;
@@ -269,10 +277,13 @@ const App = () => {
   };
 
   const onLogout = (reason) => {
-    console.log(reason, 'REASON');
+    dispatch({type: Actions.USER, user: null});
+    dispatch({type: Actions.CLEAR_ALL});
+    dispatch({type: Actions.SYNCING, syncing: false});
+    setLoginMessage(dispatch);
     eSendEvent(eOpenProgressDialog, {
-      title: 'User Logged Out',
-      paragraph: 'You have been logged out of your account.',
+      title: reason ? reason : 'User Logged Out',
+      paragraph: `You have been logged out of your account.`,
       action: async () => {
         eSendEvent(eCloseProgressDialog);
         await sleep(50);
@@ -314,7 +325,7 @@ const App = () => {
         await onEmailVerified();
       }
     });
-    setIntentOnAppLoadProcessed(true)
+    setIntentOnAppLoadProcessed(true);
     sleep(300).then(() => eSendEvent(eOpenSideMenu));
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
@@ -347,7 +358,7 @@ const App = () => {
         IntentService.check((event) => {
           SplashScreen.hide();
           loadIntent(event);
-          setIntentOnAppLoadProcessed(true)
+          setIntentOnAppLoadProcessed(true);
           dispatch({type: Actions.ALL});
           isIntent = true;
           dispatch({type: Actions.INTENT_MODE, state: true});
@@ -359,7 +370,7 @@ const App = () => {
         if (!isIntent) {
           dispatch({type: Actions.INTENT_MODE, state: false});
           ReceiveSharingIntent.clearFileNames();
-          setIntentOnAppLoadProcessed(true)
+          setIntentOnAppLoadProcessed(true);
           loadMainApp();
         }
       });

@@ -17,9 +17,11 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
+import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
+import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
@@ -206,17 +208,19 @@ const SectionHeader = ({title}) => {
         textAlignVertical: 'center',
         paddingHorizontal: 12,
         height: 30,
-        backgroundColor:colors.nav
+        backgroundColor: colors.nav,
       }}>
       {title}
     </Heading>
   );
 };
 
+let passwordValue = null;
 const AccoutLogoutSection = () => {
   const [state, dispatch] = useTracked();
   const {colors, user} = state;
   const [visible, setVisible] = useState(false);
+  const [deleteAccount, setDeleteAccount] = useState(true);
 
   return (
     user && (
@@ -234,16 +238,82 @@ const AccoutLogoutSection = () => {
                 onPressNegative={() => setVisible(false)}
                 onPressPositive={async () => {
                   await db.user.logout();
-                  dispatch({type: Actions.USER, user: null});
-                  dispatch({type: Actions.CLEAR_ALL});
-                  dispatch({type: Actions.SYNCING, syncing: false});
-                  setLoginMessage(dispatch);
                   setVisible(false);
                 }}
               />
             </DialogContainer>
           </BaseDialog>
         )}
+
+        {deleteAccount && (
+          <BaseDialog
+            onRequestClose={() => {
+              setDeleteAccount(false);
+              passwordValue = null;
+            }}
+            visible={true}>
+            <DialogContainer>
+              <DialogHeader
+                title="Delete Account"
+                paragraph="All your data will be removed permanantly. This action is IRREVERSIBLE."
+                paragraphColor={colors.red}
+              />
+
+              <Input
+                placeholder="Enter Account Password"
+                onChangeText={(v) => {
+                  passwordValue = v;
+                }}
+                secureTextEntry={true}
+              />
+
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  alignSelf: 'flex-end',
+                }}>
+                <Button
+                  onPress={() => {
+                    setDeleteAccount(false);
+                    passwordValue = null;
+                  }}
+                  fontSize={SIZE.md}
+                  type="gray"
+                  title="Cancel"
+                />
+                <Button
+                  onPress={async () => {
+                    if (!passwordValue) {
+                      ToastEvent.show(
+                        'Account Password Required.',
+                        'error',
+                        'local',
+                      );
+                      return;
+                    }
+                    try {
+                      await db.user.deleteUser(passwordValue);
+                    } catch (e) {
+                      ToastEvent.show(e.message, 'error', 'local');
+                    }
+                    close();
+                  }}
+                  fontSize={SIZE.md}
+                  style={{
+                    marginLeft: 10,
+                  }}
+                  type="accent"
+                  accentColor="light"
+                  accentText="red"
+                  title="Delete"
+                />
+              </View>
+            </DialogContainer>
+            <Toast context="local" />
+          </BaseDialog>
+        )}
+
         {[
           {
             name: 'Logout',
@@ -253,6 +323,10 @@ const AccoutLogoutSection = () => {
           },
           {
             name: 'Delete My Account',
+            func: () => {
+              setDeleteAccount(true);
+              passwordValue = null;
+            },
           },
         ].map((item, index) => (
           <PressableButton
