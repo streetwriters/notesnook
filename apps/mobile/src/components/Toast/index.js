@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard, Text, TouchableOpacity, View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, TouchableOpacity, View } from 'react-native';
+import Animated, { Easing, useValue } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dHeight, getElevation} from '../../utils';
-import {eHideToast, eShowToast} from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { dHeight, getElevation } from '../../utils';
+import { eHideToast, eShowToast } from '../../utils/Events';
+import { sleep } from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
 const {timing} = Animated;
 

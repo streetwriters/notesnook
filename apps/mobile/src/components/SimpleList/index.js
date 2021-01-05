@@ -68,7 +68,7 @@ const SimpleList = ({
 
   useEffect(() => {
     loadData();
-  }, [data, searchResults.results,loading]);
+  }, [data, searchResults.results, loading]);
 
   const loadData = () => {
     if (loading) return;
@@ -86,7 +86,7 @@ const SimpleList = ({
         width: '100%',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        height: 35,
+        height: 30,
         backgroundColor:
           index === 1
             ? headerProps.color

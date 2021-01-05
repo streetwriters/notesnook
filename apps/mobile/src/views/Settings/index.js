@@ -205,7 +205,8 @@ const SectionHeader = ({title}) => {
       style={{
         textAlignVertical: 'center',
         paddingHorizontal: 12,
-        height: 35,
+        height: 30,
+        backgroundColor:colors.nav
       }}>
       {title}
     </Heading>
