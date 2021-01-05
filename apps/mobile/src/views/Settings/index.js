@@ -149,7 +149,7 @@ export const Settings = ({navigation}) => {
     {
       name: 'Check for updates',
       func: async () => {
-        if (version?.mobile === APP_VERSION - 1) {
+        if (version?.mobile === APP_VERSION) {
           ToastEvent.show('You are using the latest version', 'success');
           return;
         }

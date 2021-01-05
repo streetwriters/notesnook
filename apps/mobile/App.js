@@ -332,7 +332,7 @@ const App = () => {
       db.version()
         .then((ver) => {
           console.log(ver,'version');
-          if (ver.mobile > APP_VERSION - 1) {
+          if (ver.mobile > APP_VERSION) {
             eSendEvent('updateDialog', ver);
           }
         })
