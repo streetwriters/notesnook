@@ -16,6 +16,7 @@ import Settings from "./settings";
 import Migrations from "./migrations";
 import Outbox from "./outbox";
 import UserManager from "./user-manager";
+import http from "../utils/http";
 
 /**
  * @type {EventSource}
@@ -169,6 +170,10 @@ class Database {
       Constants.API_HOST = hosts.API_HOST || Constants.API_HOST;
       Constants.SSE_HOST = hosts.SSE_HOST || Constants.SSE_HOST;
     }
+  }
+
+  version() {
+    return http.get(`${Constants.API_HOST}/version`);
   }
 }
 
