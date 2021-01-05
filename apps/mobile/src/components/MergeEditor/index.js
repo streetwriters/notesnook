@@ -29,6 +29,7 @@ import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
 import KeepAwake from '@sayem314/react-native-keep-awake';
+import {timeConverter} from '../../utils/TimeUtils';
 
 const {Value, timing} = Animated;
 
@@ -431,7 +432,11 @@ const MergeEditor = () => {
               {keepContentFrom === 'secondary' ? (
                 <Button
                   width={null}
+                  height={40}
                   title="Discard"
+                  type="accent"
+                  accentColor="red"
+                  accentText="light"
                   color={colors.errorText}
                   onPress={onPressDiscardFromPrimaryWebView}
                 />
@@ -440,6 +445,7 @@ const MergeEditor = () => {
               {keepContentFrom === 'secondary' ? null : (
                 <Button
                   width={null}
+                  height={40}
                   title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
                   onPress={onPressKeepFromPrimaryWebView}
                   color={
@@ -551,6 +557,7 @@ const MergeEditor = () => {
               {keepContentFrom === 'primary' ? (
                 <Button
                   width={null}
+                  height={40}
                   onPress={onPressSaveCopyFromSecondaryWebView}
                   title="Save Copy"
                 />
@@ -559,8 +566,11 @@ const MergeEditor = () => {
               {keepContentFrom === 'primary' ? (
                 <Button
                   width={null}
+                  height={40}
                   title="Discard"
-                  color={colors.errorText}
+                  type="accent"
+                  accentColor="red"
+                  accentText="light"
                   onPress={onPressDiscardFromSecondaryWebView}
                 />
               ) : null}
