@@ -131,7 +131,7 @@ export function showAppUpdatedNotice(version) {
     message: (
       <Flex
         flexDirection="column"
-        bg="shade"
+        bg="bgSecondary"
         p={1}
         sx={{ borderRadius: "default" }}
       >
