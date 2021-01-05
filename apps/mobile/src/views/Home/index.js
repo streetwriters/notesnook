@@ -85,9 +85,6 @@ export const Home = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = async (event) => {
-    console.log(await Storage.read("token"));
-    
-    return;
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {

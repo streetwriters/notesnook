@@ -40,6 +40,7 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
+import { UpdateDialog } from '../UpdateDialog';
 import { VaultDialog } from '../VaultDialog';
 import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './Templates';
 
@@ -363,6 +364,7 @@ export class DialogManager extends Component {
         <MoveNoteDialog colors={colors} />
         <SortDialog colors={colors} />
         <JumpToDialog />
+        <UpdateDialog/>
       </>
     );
   }

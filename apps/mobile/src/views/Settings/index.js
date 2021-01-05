@@ -41,6 +41,7 @@ import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
+  APP_VERSION,
   dWidth,
   MenuItemsList,
   setSetting,
@@ -70,34 +71,20 @@ import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {timeConverter} from '../../utils/TimeUtils';
 
-const otherItems = [
-  {
-    name: 'Privacy Policy',
-    func: async () => {
-      await Linking.openURL('https://www.notesnook.com/privacy.html');
-    },
-    desc: 'Read our privacy policy',
-  },
-  {
-    name: 'Check for updates',
-    func: async () => {
-      await Linking.openURL('https://www.notesnook.com/privacy.html');
-    },
-    desc: 'Check for a newer version of app',
-  },
-  {
-    name: 'About',
-    func: async () => {
-      await Linking.openURL('https://www.notesnook.com');
-    },
-    desc: 'You are using the latest version of our app.',
-  },
-];
-
 let menuRef = createRef();
+
+const format = (ver) => {
+  let parts = ver.toString().split('');
+  return `v${parts[0]}.${parts[1]}.${parts[2]}${
+    parts[3] === '0' ? '' : parts[3]
+  } `;
+};
+
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+  const [version, setVersion] = useState(null);
+
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -137,6 +124,13 @@ export const Settings = ({navigation}) => {
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
+    db.version()
+      .then((ver) => {
+        console.log(ver);
+        setVersion(ver);
+      })
+      .catch(console.log);
+
     return () => {
       pageIsLoaded = false;
       eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
@@ -144,12 +138,46 @@ export const Settings = ({navigation}) => {
     };
   }, []);
 
+  const otherItems = [
+    {
+      name: 'Privacy Policy',
+      func: async () => {
+        await Linking.openURL('https://www.notesnook.com/privacy.html');
+      },
+      desc: 'Read our privacy policy',
+    },
+    {
+      name: 'Check for updates',
+      func: async () => {
+        if (version?.mobile === APP_VERSION - 1) {
+          ToastEvent.show('You are using the latest version', 'success');
+          return;
+        }
+        eSendEvent("updateDialog",version)
+      },
+
+      desc:
+        version?.mobile > APP_VERSION
+          ? 'New update available.'
+          : 'You are using the latest version',
+    },
+    {
+      name: 'About',
+      func: async () => {
+        await Linking.openURL('https://www.notesnook.com');
+      },
+      desc: version && format(APP_VERSION),
+    },
+  ];
+
   return (
     <View
       style={{
         height: '100%',
         backgroundColor: colors.bg,
       }}>
+     
+
       <ScrollView
         onScroll={(e) =>
           eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
@@ -220,7 +248,7 @@ const AccoutLogoutSection = () => {
   const [state, dispatch] = useTracked();
   const {colors, user} = state;
   const [visible, setVisible] = useState(false);
-  const [deleteAccount, setDeleteAccount] = useState(true);
+  const [deleteAccount, setDeleteAccount] = useState(false);
 
   return (
     user && (

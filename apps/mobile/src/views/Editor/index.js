@@ -18,6 +18,8 @@ const Editor = () => {
   const [state] = useTracked();
   const {colors} = state;
 
+  
+
   return (
     <>
       <TextInput

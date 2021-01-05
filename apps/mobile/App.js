@@ -34,6 +34,7 @@ import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
 import {
+  APP_VERSION,
   editing,
   getAppIsIntialized,
   getIntentOnAppLoadProcessed,
@@ -326,7 +327,18 @@ const App = () => {
       }
     });
     setIntentOnAppLoadProcessed(true);
-    sleep(300).then(() => eSendEvent(eOpenSideMenu));
+    sleep(300).then(() => {
+      eSendEvent(eOpenSideMenu);
+      db.version()
+        .then((ver) => {
+          console.log(ver,'version');
+          if (ver.mobile > APP_VERSION - 1) {
+            eSendEvent('updateDialog', ver);
+          }
+        })
+        .catch(console.log);
+    });
+
     //Sentry = require('@sentry/react-native');
     // Sentry.init({
     //   dsn:
