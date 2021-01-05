@@ -12,6 +12,10 @@ import App from "./App";
 import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 import Splash from "./views/splash";
 
+if (process.env.NODE_ENV === "production") {
+  console.log = () => {};
+}
+
 // Sentry.init({
 //   dsn:
 //     "https://647084abf3de441c83c17d2b603633b8@o477952.ingest.sentry.io/5520885",
