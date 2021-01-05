@@ -17,10 +17,10 @@ class TokenManager {
     this._db = db;
   }
 
-  async getToken() {
+  async getToken(renew = true) {
     let token = await this._db.context.read("token");
     if (!token) return;
-    if (this._isTokenExpired(token)) {
+    if (renew && this._isTokenExpired(token)) {
       await this._refreshToken(token);
       return await this.getToken();
     }

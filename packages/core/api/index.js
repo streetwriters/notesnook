@@ -123,16 +123,15 @@ class Database {
           EV.publish("user:upgraded", data);
           break;
         case "userDeleted":
-          await this.user.logout();
-          EV.publish("user:deleted");
+          await this.user.logout(false, "Account Deleted");
           break;
         case "userPasswordChanged":
-          await this.user.logout();
-          EV.publish("user:passwordChanged");
+          await this.user.logout(true, "Password Changed");
           break;
         case "emailConfirmed":
           const token = await this.context.read("token");
           await this.user.tokenManager._refreshToken(token);
+          await this.user.fetchUser(true);
           EV.publish("user:emailConfirmed");
           break;
         case "sync":
