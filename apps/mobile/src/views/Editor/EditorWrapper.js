@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { KeyboardAvoidingView, Platform, SafeAreaView, View } from 'react-native';
 import { PanGestureHandler, State } from 'react-native-gesture-handler';
 import Animated, { Easing } from 'react-native-reanimated';
