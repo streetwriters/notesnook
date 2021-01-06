@@ -64,9 +64,10 @@ const onChangeTab = async (obj) => {
   }
 };
 
-export const RootView = () => {
+export const RootView = React.memo(() => {
   const [state] = useTracked();
   const {colors, intentMode} = state;
+
 
   return (
     <>
@@ -86,7 +87,7 @@ export const RootView = () => {
       <DialogManager colors={colors} />
     </>
   );
-};
+}, () => true);
 
 let updatedDimensions = {
   width: width,
