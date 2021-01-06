@@ -315,6 +315,8 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
     }
     setTimeout(() => {
       post('title', note.title);
+      post('dateEdited', timeConverter(note.dateEdited));
+      post('saving', 'Saved');
     }, 150);
   }
 }

@@ -86,11 +86,14 @@ const onAppStateChanged = async (state) => {
     try {
       if (getIntentOnAppLoadProcessed()) {
         if (Platform.OS === 'android') {
+          console.log('calling intent from here too');
           let intent = await ReceiveSharingIntent.getFileNames();
+          console.log("INTENT RECIEVED",intent);
           if (intent) {
             IntentService.setIntent(intent);
             IntentService.check(loadIntent);
           }
+          ReceiveSharingIntent.clearFileNames();
         }
       } else {
         if (!db || !db.notes) return;
@@ -164,6 +167,8 @@ const App = () => {
     EV.subscribe('user:loggedOut', onLogout);
     EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
     return () => {
+      setIntentOnAppLoadProcessed(false);
+      setAppIsInitialized(false);
       EV.subscribe('db:refresh', onSyncComplete);
       EV.unsubscribe('user:loggedOut', onLogout);
       EV.unsubscribe('db:sync', partialSync);

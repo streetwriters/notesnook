@@ -1,5 +1,4 @@
-import { ToastAndroid } from 'react-native';
-import {Linking, NativeModules, Platform} from 'react-native';
+import { Linking, NativeModules, Platform } from 'react-native';
 const {ReceiveSharingIntent} = NativeModules;
 let currentIntent = null;
 const isIos = Platform.OS === 'ios';
@@ -19,10 +18,12 @@ function getIntent() {
         }
       } else {
         _data = await ReceiveSharingIntent.getFileNames();
+   
       }
     } catch (e) {
       reject(e);
     }
+    ReceiveSharingIntent.clearFileNames();
     if (!_data) {
       return;
     }
