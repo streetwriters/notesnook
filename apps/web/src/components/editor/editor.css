@@ -22,7 +22,7 @@
   position: sticky;
   position: -webkit-sticky;
   top: 0;
-  z-index: 999;
+  z-index: 2;
   background-color: var(--background);
   margin-top: -1px !important;
   max-height: 45px;

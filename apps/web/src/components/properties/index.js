@@ -77,6 +77,7 @@ function Properties() {
           style={{
             position: "absolute",
             right: 0,
+            zIndex: 3,
             height: "100%",
           }}
         >
