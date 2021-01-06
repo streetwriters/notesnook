@@ -203,6 +203,7 @@ export function setIntentNote(item) {
   };
 }
 
+let statusUpdateTimer = null;
 export const _onMessage = async (evt) => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
@@ -244,8 +245,14 @@ export const _onMessage = async (evt) => {
       }
       break;
     case 'status':
-      webviewInit = true;
-      loadNoteInEditor();
+      if (statusUpdateTimer !== null) {
+        clearTimeout(statusUpdateTimer);
+        statusUpdateTimer = null;
+      }
+      statusUpdateTimer = setTimeout(() => {
+        webviewInit = true;
+        loadNoteInEditor();
+      }, 200);
       break;
     default:
       break;
@@ -394,8 +401,10 @@ export async function saveNote() {
   });
   let n = db.notes.note(id).data.dateEdited;
   if (id) {
-    let title = db.notes.note(id).data.title;
-    post('title', title);
+    setTimeout(() => {
+      let title = db.notes.note(id).data.title;
+      post('title', title);
+    }, 150);
   }
   post('dateEdited', timeConverter(n));
   post('saving', 'Saved');
@@ -426,17 +435,6 @@ async function loadEditorState() {
         MMKV.removeItem('appState');
       }
     }
-  } else {
-    /*  IntentService.check((event) => {
-      if (event) {
-        intent = true;
-        eSendEvent(eOnLoadNote, event);
-        SplashScreen.hide();
-        sleep(300).then(() => eSendEvent(eOpenSideMenu));
-      } else {
-        eSendEvent('nointent');
-      }
-    }); */
   }
 }
 
