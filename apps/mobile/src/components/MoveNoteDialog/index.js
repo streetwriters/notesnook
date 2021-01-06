@@ -64,7 +64,6 @@ const MoveNoteDialog = () => {
   };
 
   const update = (note) => {
-    console.log(note.notebooks.length);
     setNote(note);
   };
 
@@ -138,7 +137,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
     let noteIds = [];
     selectedItemsList.forEach((i) => noteIds.push(i.id));
-    console.log(noteIds, 'NOTE IDS');
+
     await db.notes.move(
       {
         topic: item.id,

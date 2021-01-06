@@ -374,7 +374,7 @@ export class VaultDialog extends Component {
         message: m,
       });
     } catch (e) {
-      console.log(e);
+      
     }
   }
 

@@ -9,7 +9,6 @@ const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
 async function run() {
-  console.log('exporting backup data');
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
     if (!granted) {
@@ -20,14 +19,11 @@ async function run() {
   let backup;
   let error;
   try {
-    console.log('exporting backup data');
     backup = await db.backup.export(
       'mobile',
       SettingsService.get().encryptedBackups,
     );
-    console.log('backup data gotten');
   } catch (e) {
-    console.log('error', e);
     error = true;
   }
   if (!error) {
@@ -58,33 +54,32 @@ async function checkBackupRequired(type) {
   lastBackupDate = parseInt(lastBackupDate);
 
   if (type === 'daily') {
-    console.log('backing up data daily!');
     now = new Date(now);
     lastBackupDate = new Date(lastBackupDate);
 
     if (now.getUTCDate() > lastBackupDate.getUTCDate()) {
-      console.log('backup is needed');
+   
       return true;
     } else if (
       (now.getUTCDate() === lastBackupDate.getUTCDate() &&
         now.getUTCFullYear() > lastBackupDate.getUTCFullYear()) ||
       now.getUTCMonth() > lastBackupDate.getUTCMonth()
     ) {
-      console.log('backup is  needed');
+     
       return true;
     } else {
-      console.log('backup is not needed');
+    
       return false;
     }
   } else if (type === 'weekly') {
     if (lastBackupDate + MS_WEEK < now) {
-      console.log('backup is  needed');
+      
       return true;
     } else {
       false;
     }
   } else {
-    console.log('Backups are disabled');
+    
   }
 }
 

@@ -61,7 +61,6 @@ export const Notebook = ({route, navigation}) => {
     });
     
     if (!pageIsLoaded) {
-      console.log('returning since page is not loaded');
       pageIsLoaded = true;
       return;
     }

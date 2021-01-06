@@ -68,7 +68,6 @@ async function set(name, value) {
 }
 
 function get() {
-  console.log(settings.useSystemTheme,'getting')
   return settings;
 }
 

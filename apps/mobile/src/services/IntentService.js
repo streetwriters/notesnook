@@ -1,3 +1,4 @@
+import { ToastAndroid } from 'react-native';
 import {Linking, NativeModules, Platform} from 'react-native';
 const {ReceiveSharingIntent} = NativeModules;
 let currentIntent = null;
@@ -23,7 +24,6 @@ function getIntent() {
       reject(e);
     }
     if (!_data) {
-      console.log(_data);
       return;
     }
     setIntent(_data, resolve, reject);

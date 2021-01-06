@@ -111,7 +111,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     } catch (e) {
       setRestoring(false);
       ToastEvent.show(e.message, 'error', 'local');
-      console.log(e);
+    
     }
   };
 
@@ -137,7 +137,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
 
       setFiles(files);
     } catch (e) {
-      console.log(e);
+    
     }
   };
 

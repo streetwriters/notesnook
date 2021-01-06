@@ -178,7 +178,7 @@ const ActionStrip = ({note, setActionStrip}) => {
 
           setActionStrip(false);
         } catch (e) {
-          console.log(e);
+         
         }
       },
       visible: note.type !== 'note',
@@ -239,7 +239,7 @@ const ActionStrip = ({note, setActionStrip}) => {
         try {
           await deleteItems(note);
         } catch (e) {
-          console.log(e);
+          
         }
         setActionStrip(false);
       },

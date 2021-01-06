@@ -331,7 +331,6 @@ const App = () => {
       eSendEvent(eOpenSideMenu);
       db.version()
         .then((ver) => {
-          console.log(ver,'version');
           if (ver.mobile > APP_VERSION) {
             eSendEvent('updateDialog', ver);
           }

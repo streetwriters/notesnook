@@ -206,7 +206,7 @@ const ExportDialog = () => {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true,
                       }).catch((e) => {
-                        console.log(e);
+                        //console.log(e);
                         ToastEvent.show(
                           `No application found to open ${result.name} file`,
                         );

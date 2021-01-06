@@ -126,7 +126,6 @@ export const Settings = ({navigation}) => {
     navigation.addListener('focus', onFocus);
     db.version()
       .then((ver) => {
-        console.log(ver);
         setVersion(ver);
       })
       .catch(console.log);
@@ -1019,7 +1018,6 @@ const SettingsBackupAndRestore = () => {
           paragraph:
             "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
         });
-        console.log('running backup now');
         await Backup.run();
         eSendEvent(eCloseProgressDialog);
       },

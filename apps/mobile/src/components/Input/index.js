@@ -83,7 +83,7 @@ const Input = ({
         isError = value === customValidator();
         break;
     }
-    console.log('isError', isError, error);
+    //console.log('isError', isError, error);
 
     if (validationType === 'password') {
       let hasError = false;

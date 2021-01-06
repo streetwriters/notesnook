@@ -189,7 +189,7 @@ export const ActionSheetComponent = ({
           try {
             await deleteItems(note);
           } catch (e) {
-            console.log(e);
+            //console.log(e);
           }
         }
         close();

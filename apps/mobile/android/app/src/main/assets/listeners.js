@@ -79,7 +79,7 @@ function autosize() {
     ele.innerHTML = document
       .getElementById(titleInput)
       .value.replace(/\n/g, '<br/>');
-    console.log(document.getElementById('titlebar').scrollHeight);
+    //console.log(document.getElementById('titlebar').scrollHeight);
     let newHeight = document.getElementById('titlebar').scrollHeight;
     let css = document.createElement('style');
     css.type = 'text/css';

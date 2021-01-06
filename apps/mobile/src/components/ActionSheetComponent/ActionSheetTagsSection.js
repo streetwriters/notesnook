@@ -65,7 +65,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
       });
       tagToAdd = '';
     } catch (e) {
-      console.log(e.message);
+      //console.log(e.message);
       ToastEvent.show(e.message, 'error', 'local');
     }
   };

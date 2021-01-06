@@ -38,7 +38,7 @@ export const NotebookItemWrapper = ({
 
   const onPress = () => {
     if (selectionMode) {
-      console.log(item.title);
+  
       onLongPress();
       return;
     }

@@ -15,7 +15,6 @@ export const Search = ({route, navigation}) => {
   const onFocus = useCallback(() => {
     sleep(300).then(() => inputRef.current?.focus());
     if (!pageIsLoaded) {
-      console.log('returning since page is not loaded search');
       pageIsLoaded = true;
       return;
     }

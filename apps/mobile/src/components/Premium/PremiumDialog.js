@@ -52,13 +52,13 @@ class PremiumDialog extends React.Component {
       });
       await RNIap.initConnection();
       let prod = await RNIap.getSubscriptions(itemSkus);
-      console.log(prod);
+
       this.setState({
         products: prod,
         product: prod[0],
       });
     } catch (e) {
-      console.log(e, 'SKU ERROR');
+   
     }
   }
 
@@ -70,7 +70,7 @@ class PremiumDialog extends React.Component {
           try {
             await this.getSkus();
           } catch (e) {
-            console.log(e);
+            
           }
         }}
         onClose={() => {
@@ -264,7 +264,7 @@ class PremiumDialog extends React.Component {
                   )
                     .then((r) => {})
                     .catch((e) => {
-                      console.log(e);
+                  
                     });
                   this.close();
                 }

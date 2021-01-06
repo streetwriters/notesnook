@@ -141,23 +141,22 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = (evt) => {
-    console.log(evt.nativeEvent.data);
+  
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      console.log(data);
+    
       if (data.type === 'delta') {
-        console.log(data.data);
         primaryData = data.data;
       }
     }
   };
 
   const onMessageFromSecondaryWebView = (evt) => {
-    console.log(data.data);
+
     if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
       if (data.type === 'delta') {
-        console.log(data.data);
+      
         secondaryData = data.data;
       }
     }

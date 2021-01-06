@@ -19,7 +19,6 @@ async function read(key, isArray = false) {
 }
 
 async function write(key, data) {
-  console.log(key, data);
   return await MMKV.setItem(
     key,
     typeof data === 'string' ? data : JSON.stringify(data),
@@ -85,10 +84,9 @@ async function deriveCryptoKey(name, data) {
       credentials.key,
       CRYPT_CONFIG,
     );
-    console.log(credentials.key);
     return credentials.key;
   } catch (e) {
-    console.log(e);
+
   }
 }
 
@@ -104,7 +102,7 @@ async function getCryptoKey(name) {
       return null;
     }
   } catch (e) {
-    console.log(e);
+
   }
 }
 
@@ -113,7 +111,7 @@ async function removeCryptoKey(name) {
     let result = await Keychain.resetInternetCredentials('notesnook');
     return result;
   } catch (e) {
-    console.log(e);
+
   }
 }
 
@@ -148,7 +146,7 @@ async function checkAndCreateDir(path) {
       await RNFetchBlob.fs.mkdir(dir);
     }
   } catch (e) {
-    console.log(e);
+    
     await RNFetchBlob.fs.mkdir(dir);
   } finally {
   }

@@ -214,7 +214,7 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
-      console.log('edit topic is', this.state.editTopic);
+      //console.log('edit topic is', this.state.editTopic);
       if (this.state.editTopic) {
         this.topicInputRef.current?.blur();
         Keyboard.dismiss();

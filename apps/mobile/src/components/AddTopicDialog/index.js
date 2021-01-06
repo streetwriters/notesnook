@@ -62,7 +62,7 @@ export class AddTopicDialog extends React.Component {
 
   open = async (notebookId) => {
     let id = notebookId || this.props.notebookID;
-    console.log(notebookId)
+    //console.log(notebookId)
     this.notebook = await db.notebooks.notebook(id).data
     this.setState({
       visible: true,
