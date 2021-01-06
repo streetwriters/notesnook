@@ -87,7 +87,7 @@
 .ql-toolbar.ql-snow {
   width: 100%;
   border: none !important;
-  border-top: 1px solid var(--border) !important;
+  border-bottom: 1px solid var(--border) !important;
   padding: 5px !important;
   padding-left: 0px !important;
 }
