@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, Suspense } from "react";
-//import ReactQuill from "./react-quill";
 import { Flex } from "rebass";
 import Properties from "../properties";
 import {
@@ -33,7 +32,6 @@ function Editor(props) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
-
   const isTrial = useUserStore(
     (store) => store.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
   );
@@ -59,8 +57,19 @@ function Editor(props) {
       } = editorstore.get().session;
 
       const { quill } = quillRef.current;
-      quill.setContents(data, "init");
-      // quill.history.clear();
+      const pages = opsToPages(data);
+      quillRef.current.init(pages, data);
+
+      const editorScroll = document.querySelector(".editorScroll");
+      while (
+        editorScroll.scrollHeight <= editorScroll.clientHeight &&
+        quillRef.current.currentPage < pages.length
+      ) {
+        const page = pages[++quillRef.current.currentPage];
+        if (!page) break;
+        quill.updateContents(getNextPage(page, quillRef.current.quill), "init");
+      }
+
       quill.history.stack = {
         undo: new ObservableArray("undo"),
         redo: new ObservableArray("redo"),
@@ -72,11 +81,28 @@ function Editor(props) {
         quill.history.stack.redo = new ObservableArray("redo");
       };
 
-      if (!data || !data.length) return;
-      const text = quill.getText();
-      quill.setSelection(text.length, 0, "init");
+      function onScroll(e) {
+        const scrollBottom = e.target.scrollTop + e.target.clientHeight + 10;
+        const maxScrollHeight = e.target.scrollHeight - 80;
+        if (scrollBottom > maxScrollHeight) {
+          const page = pages[++quillRef.current.currentPage];
+          if (!page) {
+            editorScroll.removeEventListener("scroll", onScroll);
+            return;
+          }
+          quill.updateContents(
+            getNextPage(page, quillRef.current.quill),
+            "init"
+          );
+        }
+      }
+      editorScroll.addEventListener("scroll", onScroll);
+      return () => {
+        editorScroll.removeEventListener("scroll", onScroll);
+      };
     }
-  }, [sessionState, quillRef, contentType, sessionId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [quillRef, contentType, sessionId]);
 
   return (
     <Flex
@@ -107,7 +133,7 @@ function Editor(props) {
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={"900px"}
-          mt={[0, 0, 0]}
+          mt={[0, 0, 25]}
         >
           <Header />
           {contentType === "delta" && (
@@ -135,7 +161,11 @@ function Editor(props) {
                   setSession((state) => {
                     state.session.content = {
                       type: "delta",
-                      data: delta,
+                      data: appendPages(
+                        delta,
+                        quillRef.current.pages,
+                        quillRef.current.currentPage
+                      ),
                     };
                   });
                 }}
@@ -149,3 +179,28 @@ function Editor(props) {
   );
 }
 export default Editor;
+
+function opsToPages(delta, pageSize = 20) {
+  const totalPages = delta.length / pageSize;
+  const pages = [];
+  for (var i = 0; i < totalPages; ++i) {
+    const start = i * pageSize;
+    const end = start + pageSize;
+    pages.push(delta.slice(start, end));
+  }
+  return pages;
+}
+
+function getNextPage(page, quill) {
+  const length = quill.getLength();
+  page.splice(0, 0, { retain: length - 1 });
+  return page;
+}
+
+function appendPages(delta, pages, currentPage) {
+  if (pages.length === currentPage + 1) return delta;
+  for (var i = currentPage; i < pages.length; ++i) {
+    delta.push(...pages[i]);
+  }
+  return delta;
+}

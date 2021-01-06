@@ -79,6 +79,7 @@ class EditorStore extends BaseStore {
         ...DEFAULT_SESSION,
         ...note,
         content: content || DEFAULT_SESSION.content,
+        totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
       };
     });
@@ -131,7 +132,6 @@ class EditorStore extends BaseStore {
   };
 
   newSession = (context = {}) => {
-    console.log("Session");
     appStore.setIsEditorOpen(true);
     this.set((state) => {
       state.session = {
@@ -156,6 +156,7 @@ class EditorStore extends BaseStore {
   };
 
   setSession = (set) => {
+    console.log("setSession");
     const oldSession = { ...this.get().session };
     this.set(set);
     this.saveSession(oldSession);

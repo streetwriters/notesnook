@@ -8,7 +8,6 @@ import { EventManagers } from "../../utils/observablearray";
 import Animated from "../animated";
 
 function Toolbar(props) {
-  console.log("TOOLBACR");
   const { quill } = props;
   const sessionState = useStore((store) => store.session.state);
   const [undoable, setUndoable] = useState(false);
@@ -22,6 +21,7 @@ function Toolbar(props) {
 
   useEffect(() => {
     const editorScroll = document.querySelector(".editorScroll");
+
     function onScroll(e) {
       const headerOffset = document.querySelector(".editorTitle").scrollHeight;
       const hideOffset = headerOffset + 60;

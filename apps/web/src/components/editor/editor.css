@@ -258,3 +258,7 @@ code {
   text-decoration: line-through;
   text-decoration-color: var(--primary);
 }
+
+.ql-editor code {
+  background-color: var(--bgSecondary) !important;
+}

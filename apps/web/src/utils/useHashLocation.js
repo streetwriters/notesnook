@@ -4,7 +4,6 @@ import { hashNavigate } from "../navigation";
 // returns the current hash location in a normalized form
 // (excluding the leading '#' symbol)
 const currentLocation = () => {
-  console.log("currentLocation", window.location);
   return window.location.hash.replace(/^#/, "") || "/";
 };
 

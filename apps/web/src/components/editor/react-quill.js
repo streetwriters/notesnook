@@ -96,12 +96,16 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
   },
 });
 
+// const wordCountRegex = /\b\S+\b/g;
 export default class ReactQuill extends Component {
   /**
    * @type {Quill}
    */
   quill;
   changeTimeout;
+  words = 0;
+  currentPage = 0;
+  pages = [];
   getEditor() {
     return this.quill.editor;
   }
@@ -173,10 +177,10 @@ export default class ReactQuill extends Component {
     this.quill.off("text-change", this.textChangeHandler);
   }
 
-  textChangeHandler = (_delta, _oldDelta, source) => {
-    if (this.props.onWordCountChanged)
-      this.props.onWordCountChanged(this.getWordCount());
+  textChangeHandler = (delta, _oldDelta, source) => {
     if (source === "init") return;
+    if (this.props.onWordCountChanged)
+      this.props.onWordCountChanged(this.getWordCount(delta));
     clearTimeout(this.changeTimeout);
     this.changeTimeout = setTimeout(
       this.props.onChange,
@@ -184,9 +188,25 @@ export default class ReactQuill extends Component {
     );
   };
 
-  getWordCount() {
-    let text = this.quill.getText();
-    return (text.split(/\b\S+\b/g) || []).length;
+  getWordCount(delta) {
+    const wordCount = delta.reduce((prev, curr) => {
+      if (!curr.insert || curr.insert.image) return prev;
+      const text = curr.insert.trim();
+      if (text <= 1) return prev;
+      const count = countWords(text); // curr.insert.split(wordCountRegex).length;
+      return prev + count;
+    }, 0);
+    this.words += wordCount;
+    return this.words;
+  }
+
+  init(pages, delta) {
+    this.pages = pages;
+    this.currentPage = 0;
+    this.words = 0;
+    this.words = this.getWordCount(delta);
+    this.props.onWordCountChanged(this.words);
+    this.quill.setContents(pages[this.currentPage], "init");
   }
 
   render() {
@@ -201,4 +221,14 @@ export default class ReactQuill extends Component {
       </Box>
     );
   }
+}
+
+function countWords(str) {
+  let count = 1;
+  for (var i = 0; i < str.length; ++i) {
+    const char = str[i];
+    if (char === " " || char === "\n" || char === "\t" || char === "\r")
+      ++count;
+  }
+  return count;
 }
