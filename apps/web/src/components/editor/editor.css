@@ -18,6 +18,14 @@
   padding-top: 1px;
   font-size: 0.975em;
 }
+.ql-toolbar.ql-snow {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 0;
+  z-index: 999;
+  background-color: var(--background);
+  margin-top: -1px !important;
+}
 
 .ql-formats {
   margin-bottom: 5px;

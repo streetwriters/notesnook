@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, Suspense } from "react";
 //import ReactQuill from "./react-quill";
-import { Box, Flex } from "rebass";
+import { Flex } from "rebass";
 import Properties from "../properties";
 import {
   useStore,
@@ -44,16 +44,6 @@ function Editor(props) {
   }, [isTablet, isMobile]);
 
   const quillRef = useRef();
-
-  useEffect(() => {
-    if (contentType !== "delta") return;
-    // move the toolbar outside (easiest way)
-    const toolbar = document.querySelector(".ql-toolbar.ql-snow");
-    const toolbarContainer = document.querySelector("#toolbar");
-    if (toolbar && toolbarContainer) {
-      toolbarContainer.appendChild(toolbar);
-    }
-  }, [contentType]);
 
   useEffect(() => {
     init();
@@ -119,8 +109,6 @@ function Editor(props) {
           mt={[0, 0, 50]}
         >
           <Header />
-          <Box id="toolbar" />
-          {/* <EditorMenu quill={quillRef.current?.quill} /> */}
           {contentType === "delta" && (
             <Suspense fallback={<EditorLoading />}>
               <ReactQuill
