@@ -40,7 +40,7 @@ function Editor(props) {
   const isLoggedin = useUserStore((store) => store.isLoggedIn);
   const editorMargins = useMemo(() => {
     if (isMobile || isTablet) return "0%";
-    else return "15%";
+    else return "10px";
   }, [isTablet, isMobile]);
 
   const quillRef = useRef();
@@ -100,13 +100,14 @@ function Editor(props) {
         <Animated.Flex
           variant="columnFill"
           className="editor"
-          sx={{ mx: [0, 0, editorMargins] }}
+          sx={{ mx: [0, 0, editorMargins], alignSelf: "center" }}
           animate={{
             marginRight: isFocusMode ? "25%" : editorMargins,
             marginLeft: isFocusMode ? "25%" : editorMargins,
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          mt={[0, 0, 50]}
+          maxWidth={"900px"}
+          mt={[0, 0, 0]}
         >
           <Header />
           {contentType === "delta" && (
