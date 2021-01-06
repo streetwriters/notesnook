@@ -36,20 +36,15 @@
                   <category android:name="android.intent.category.BROWSABLE" />
                   <data android:scheme="https"
               android:host="app.notesnook.com"></data>
-                
+         
             </intent-filter>
-        </activity>
-        <activity
-            android:name=".IntentActivity"
-            android:label="Make Note"
-            android:launchMode="singleTask"
-            android:noHistory="true">
-            <intent-filter>
+
+               <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
-            </intent-filter>
-            <intent-filter>
+            </intent-filter>  
+              <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
