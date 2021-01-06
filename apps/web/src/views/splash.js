@@ -7,7 +7,7 @@ import ProgressBar from "../components/progress-bar";
 import { getRandom } from "../utils/random";
 import { EV } from "notes-core/common";
 import { showToast } from "../utils/toast";
-//import * as Sentry from "@sentry/react";
+import { captureException } from "@sentry/react";
 
 const loadingLines = [
   "Ejecting bumfuzzled notes",
@@ -30,10 +30,10 @@ function Splash(props) {
         });
         await db.init();
       } catch (e) {
-        // Sentry.captureException(e, (scope) => {
-        //   scope.setExtra("where", "db.init");
-        //   return scope;
-        // });
+        captureException(e, (scope) => {
+          scope.setExtra("where", "db.init");
+          return scope;
+        });
         console.error(e);
         showToast("error", `Error initializing database: ${e.message}`);
       } finally {
