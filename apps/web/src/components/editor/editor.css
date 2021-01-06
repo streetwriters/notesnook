@@ -25,6 +25,18 @@
   z-index: 999;
   background-color: var(--background);
   margin-top: -1px !important;
+  max-height: 45px;
+  overflow: hidden;
+
+  -webkit-transition: max-height 500ms linear;
+  -moz-transition: max-height 500ms linear;
+  -o-transition: max-height 500ms linear;
+  -ms-transition: max-height 500ms linear;
+  transition: max-height 500ms linear;
+}
+
+.ql-toolbar.ql-snow:hover {
+  max-height: 500px;
 }
 
 .ql-formats {
