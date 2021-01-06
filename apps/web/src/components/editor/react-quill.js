@@ -212,12 +212,7 @@ export default class ReactQuill extends Component {
   render() {
     return (
       <Box mx={[2, 2, 0]}>
-        <Text
-          as="pre"
-          sx={{ cursor: "text" }}
-          onFocus={this.props.onFocus}
-          id={this.props.id}
-        />
+        <Text as="pre" onFocus={this.props.onFocus} id={this.props.id} />
       </Box>
     );
   }
