@@ -313,6 +313,9 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
         note = note.data;
       }
     }
+    setTimeout(() => {
+      post('title', note.title);
+    }, 150);
   }
 }
 
@@ -400,12 +403,6 @@ export async function saveNote() {
     id: id,
   });
   let n = db.notes.note(id).data.dateEdited;
-  if (id) {
-    setTimeout(() => {
-      let title = db.notes.note(id).data.title;
-      post('title', title);
-    }, 150);
-  }
   post('dateEdited', timeConverter(n));
   post('saving', 'Saved');
 }
