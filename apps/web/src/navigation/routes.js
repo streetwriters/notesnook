@@ -83,13 +83,18 @@ const routes = {
       />
     );
   },
-  "/colors/:color": ({ color }) => (
-    <RouteContainer
-      type="notes"
-      title={toTitleCase(db.colors.tag(color).title)}
-      route={<Notes context={{ type: "color", value: color }} />}
-    />
-  ),
+  "/colors/:color": ({ color }) => {
+    const colorItem = db.colors.tag(color);
+    if (!colorItem) return navigate("/");
+    const { title } = colorItem;
+    return (
+      <RouteContainer
+        type="notes"
+        title={toTitleCase(title)}
+        route={<Notes context={{ type: "color", value: color }} />}
+      />
+    );
+  },
   "/settings": () => <RouteContainer title="Settings" route={<Settings />} />,
   "/search": () => (
     <RouteContainer type="search" canGoBack title="Search" route={<Search />} />
