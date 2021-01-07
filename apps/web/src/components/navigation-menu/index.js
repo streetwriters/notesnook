@@ -136,7 +136,7 @@ function NavigationMenu(props) {
         ))}
         {colors.map(
           (color) =>
-            !!color.title && (
+            color?.title?.length && (
               <NavigationItem
                 key={color.title}
                 title={toTitleCase(color.title)}
