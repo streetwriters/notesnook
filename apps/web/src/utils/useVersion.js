@@ -2,9 +2,9 @@ import { useEffect } from "react";
 import { db } from "../common";
 import { usePersistentState } from "./hooks";
 
-const APP_VERSION = {
-  formatted: format(1000),
-  numerical: 1000,
+export const APP_VERSION = {
+  formatted: format(1100),
+  numerical: 1100,
   updateAvailable: false,
   changelog: undefined,
 };
