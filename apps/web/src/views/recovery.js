@@ -109,7 +109,6 @@ function AccountRecovery(props) {
                 var recoveryKey = formData.get("recovery_key");
                 if (recoveryKey) {
                   const [key] = recoveryKey.split("\0");
-                  console.log(recoveryKey.split("\0"));
                   await doWorkWithLoading(
                     "Downloading your data. This might take a bit.",
                     async () => {

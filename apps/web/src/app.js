@@ -93,7 +93,6 @@ function App() {
 
   useEffect(() => {
     if (!isMobile && !isTablet) return;
-    console.log("turning", isEditorOpen);
     setShow(!isEditorOpen);
     //setIsEditorOpen(!show);
     // if (isTablet) toggleSideMenu(!isEditorOpen);

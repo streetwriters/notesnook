@@ -43,7 +43,6 @@ function Search() {
       <SearchBox
         onSearch={async (query) => {
           const [lookupType, items] = await typeToItems(type, context);
-          console.log(lookupType, items, type, context);
           setResults([]);
 
           if (items.length <= 0) return;

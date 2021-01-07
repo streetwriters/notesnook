@@ -41,7 +41,6 @@ const hashroutes = {
     showEditTopicDialog(notebookId, topicId);
   },
   "/notes/create": () => {
-    console.log("session");
     editorStore.get().newSession(noteStore.get().context);
   },
   "/notes/:noteId/edit": ({ noteId }) => {

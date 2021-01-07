@@ -156,7 +156,6 @@ class EditorStore extends BaseStore {
   };
 
   setSession = (set) => {
-    console.log("setSession");
     const oldSession = { ...this.get().session };
     this.set(set);
     this.saveSession(oldSession);
