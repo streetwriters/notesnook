@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === "production") {
       }
       return event;
     },
+    ignoreErrors: ["ResizeObserver loop limit exceeded"],
     // We recommend adjusting this value in production, or using tracesSampler
     // for finer control
     tracesSampleRate: 1.0,
