@@ -67,7 +67,7 @@ const routes = {
   "/trash": () => (
     <RouteContainer type="trash" title="Trash" route={<Trash />} />
   ),
-  "/tags": () => <RouteContainer title="Tags" route={<Tags />} />,
+  "/tags": () => <RouteContainer title="Tags" type="tags" route={<Tags />} />,
   "/tags/:tag": ({ tag }) => {
     const tagItem = db.tags.tag(tag);
     if (!tagItem) return navigate("/");

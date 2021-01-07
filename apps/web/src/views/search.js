@@ -22,6 +22,8 @@ async function typeToItems(type, context) {
       if (!notebookId) return ["topics", []];
       const topics = db.notebooks.notebook(notebookId).topics.all;
       return ["topics", topics];
+    case "tags":
+      return ["tags", db.tags.all];
     case "trash":
       return ["trash", db.trash.all];
     default:
