@@ -5,8 +5,9 @@ import { db } from "../../common";
 import { QRCode } from "react-qrcode-logo";
 import Logo from "../../assets/notesnook-small.png";
 import download from "../../utils/download";
-import copyToClipboard from "../../utils/clipboard";
+import ClipboardJS from "clipboard";
 import Config from "../../utils/config";
+import { captureMessage } from "@sentry/react";
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
@@ -20,6 +21,24 @@ function RecoveryKeyDialog(props) {
       setEmail(email);
     })();
   }, []);
+
+  useEffect(() => {
+    var clipboard = new ClipboardJS(".copyKey");
+    clipboard.on("success", function (e) {
+      setCopyText("Copied!");
+      setTimeout(() => {
+        setCopyText("Copy to clipboard");
+      }, 2000);
+      e.clearSelection();
+    });
+    clipboard.on("error", function (e) {
+      captureMessage("Error while copying text.");
+    });
+    return () => {
+      clipboard.destroy();
+    };
+  }, []);
+
   return (
     <Dialog isOpen={true} title="Backup Recovery Key">
       <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
@@ -56,14 +75,13 @@ function RecoveryKeyDialog(props) {
             />
             <Flex flexDirection="column">
               <Button
+                data-clipboard-text={key}
                 mt={1}
+                className="copyKey"
                 fontSize="body"
                 onClick={async () => {
-                  await copyToClipboard(key);
-                  setCopyText("Copied!");
-                  setTimeout(() => {
-                    setCopyText("Copy to clipboard");
-                  }, 2000);
+                  // await copyToClipboard(key);
+                  // setCopyText("Copied!");
                 }}
               >
                 {copyText}

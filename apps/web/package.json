@@ -8,6 +8,7 @@
     "@rebass/forms": "^4.0.6",
     "@sentry/react": "^5.27.4",
     "@sentry/tracing": "^5.27.4",
+    "clipboard": "^2.0.6",
     "cogo-toast": "^4.2.3",
     "dayjs": "^1.9.1",
     "emotion-theming": "^10.0.19",
