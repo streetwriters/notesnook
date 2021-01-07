@@ -83,8 +83,6 @@ class Database {
 
     await this.migrations.init();
     await this.migrations.migrate();
-
-    await this.user.fetchUser(true);
   }
 
   async _onUserStateChanged() {
