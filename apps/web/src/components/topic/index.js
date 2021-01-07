@@ -10,7 +10,9 @@ import { hashNavigate } from "../../navigation";
 
 const menuItems = (item) => [
   {
-    title: db.settings.isPinned(item.id) ? "Unpin from Menu" : "Pin to Menu",
+    title: db.settings.isPinned(item.id)
+      ? "Remove shortcut"
+      : "Create shortcut",
     onClick: () => appStore.pinItemToMenu(item),
   },
   {
