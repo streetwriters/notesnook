@@ -69,14 +69,7 @@ function Header(props) {
               <Icon.Search
                 size={24}
                 onClick={() => {
-                  navigate(
-                    `/search`,
-                    false,
-                    {
-                      type,
-                    },
-                    true
-                  );
+                  navigate(`/search`, { type });
                 }}
               />
             )}

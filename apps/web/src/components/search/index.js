@@ -6,10 +6,11 @@ import Field from "../field";
 function SearchBox(props) {
   return (
     <Field
+      autoFocus
       id="search"
       name="search"
       type="text"
-      sx={{ mx: 2 }}
+      sx={{ mx: 2, mb: 2 }}
       placeholder="Type your query here"
       onKeyDown={(e) => {
         if (e.key === "Enter") props.onSearch(e.target.value);

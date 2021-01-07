@@ -8,9 +8,10 @@ import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "rebass";
 
-function typeToItems(type, context) {
+async function typeToItems(type, context) {
   switch (type) {
     case "notes":
+      await db.notes.init();
       if (!context) return ["notes", db.notes.all];
       const notes = notesFromContext(context);
       return ["notes", notes];
@@ -41,8 +42,8 @@ function Search() {
     <>
       <SearchBox
         onSearch={async (query) => {
-          const [lookupType, items] = typeToItems(type, context);
-
+          const [lookupType, items] = await typeToItems(type, context);
+          console.log(lookupType, items, type, context);
           setResults([]);
 
           if (items.length <= 0) return;
