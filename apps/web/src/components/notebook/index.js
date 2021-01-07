@@ -22,8 +22,8 @@ function menuItems(notebook, index) {
     },
     {
       title: db.settings.isPinned(notebook.id)
-        ? "Unpin from Menu"
-        : "Pin to Menu",
+        ? "Remove shortcut"
+        : "Create shortcut",
       onClick: () => appStore.pinItemToMenu(notebook),
     },
     {

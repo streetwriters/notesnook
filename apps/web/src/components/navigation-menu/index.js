@@ -158,7 +158,7 @@ function NavigationMenu(props) {
               key={pin.id}
               title={pin.title}
               menu={{
-                items: [{ title: "Unpin", onClick: () => {} }],
+                items: [{ title: "Remove shortcut", onClick: () => {} }],
                 data: pin,
               }}
               icon={
