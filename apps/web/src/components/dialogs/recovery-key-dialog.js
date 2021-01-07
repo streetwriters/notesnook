@@ -8,17 +8,16 @@ import download from "../../utils/download";
 import ClipboardJS from "clipboard";
 import Config from "../../utils/config";
 import { captureMessage } from "@sentry/react";
+import { useStore as useUserStore } from "../../stores/user-store";
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
-  const [email, setEmail] = useState();
+  const { email } = useUserStore((store) => store.user);
   const [copyText, setCopyText] = useState("Copy to clipboard");
   useEffect(() => {
     (async () => {
-      const { email } = await db.user.getUser();
       const { key } = await db.user.getEncryptionKey();
       setKey(key);
-      setEmail(email);
     })();
   }, []);
 

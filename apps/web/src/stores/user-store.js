@@ -19,7 +19,7 @@ class UserStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
-    return db.user.getUser().then(async (user) => {
+    return db.user.fetchUser(true).then(async (user) => {
       if (!user) return false;
       this.set((state) => {
         state.user = user;
