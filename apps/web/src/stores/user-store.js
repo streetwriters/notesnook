@@ -53,7 +53,7 @@ class UserStore extends BaseStore {
           if (navigator.credentials.requireUserMediation)
             await navigator.credentials.requireUserMediation();
         }
-        if (!reason) {
+        if (!!reason) {
           await showAccountLoggedOutNotice(reason);
         }
       });

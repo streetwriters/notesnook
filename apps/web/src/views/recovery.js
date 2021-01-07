@@ -18,13 +18,13 @@ function AccountRecovery(props) {
   const [loading, setLoading] = useState({ isLoading: false });
 
   const doWorkWithLoading = useCallback(
-    async (message, workCallback, onError) => {
+    async (message, workCallback, error, onError) => {
       try {
         setLoading({ isLoading: true, message });
         await workCallback();
       } catch (e) {
         console.error(e);
-        showToast("error", e.message);
+        showToast("error", `${error} Error: ${e.message}`);
         if (onError) onError(e);
       } finally {
         setLoading({ isLoading: false });
@@ -56,6 +56,7 @@ function AccountRecovery(props) {
           );
           await db.user.fetchUser(false);
         },
+        "Could not authorize user.",
         () => {
           navigate("/");
         }
@@ -93,7 +94,7 @@ function AccountRecovery(props) {
           ) : step === 3 ? (
             <Button
               variant="secondary"
-              onClick={() => (window.location.href = "/")}
+              onClick={() => (window.location.href = "/#/login")}
             >
               Return to Notesnook
             </Button>
@@ -115,9 +116,10 @@ function AccountRecovery(props) {
                       const user = await db.user.getUser();
                       await db.context.write(`_uk_@${user.email}@_k`, key);
                       await db.sync(true, true);
-                    }
+                      setStep((s) => ++s);
+                    },
+                    "Invalid recovery key."
                   );
-                  setStep((s) => ++s);
                 }
                 var newPassword = formData.get("new_password");
                 if (newPassword) {
@@ -125,9 +127,11 @@ function AccountRecovery(props) {
                     "Resetting account password. Please wait...",
                     async () => {
                       if (await db.user.resetPassword(newPassword)) {
+                        await db.user.logout(true);
                         setStep((s) => ++s);
                       }
-                    }
+                    },
+                    "Invalid password."
                   );
                 }
               }}
