@@ -57,7 +57,11 @@ export function showTopicDialog() {
   ));
 }
 
-export function showEditTopicDialog(topic) {
+export function showEditTopicDialog(notebookId, topicId) {
+  const topic = db.notebooks.notebook(notebookId)?.topics?.topic(topicId)
+    ?._topic;
+  console.log(topic);
+  if (!topic) return;
   return showDialog((perform) => (
     <TopicDialog
       title={"Edit Topic"}

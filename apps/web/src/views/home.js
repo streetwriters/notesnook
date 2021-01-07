@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useStore, store } from "../stores/note-store";
-import { useStore as useEditorStore } from "../stores/editor-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common";
+import { hashNavigate } from "../navigation";
 
 function Home() {
   const [isLoading, setIsLoading] = useState(true);
@@ -26,7 +26,6 @@ function Home() {
     })();
   }, []);
   const notes = useStore((store) => store.notes);
-  const newSession = useEditorStore((store) => store.newSession);
 
   return (
     <ListContainer
@@ -34,7 +33,10 @@ function Home() {
       isLoading={isLoading}
       items={notes}
       placeholder={NotesPlaceholder}
-      button={{ content: "Make a new note", onClick: () => newSession() }}
+      button={{
+        content: "Make a new note",
+        onClick: () => hashNavigate("/notes/create"),
+      }}
     />
   );
 }

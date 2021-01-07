@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import ListContainer from "../components/list-container";
-import { useStore } from "../stores/editor-store";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common";
+import { hashNavigate } from "../navigation";
 
 function Notes(props) {
   const [isLoading, setIsLoading] = useState(true);
-  const newSession = useStore((store) => store.newSession);
   const context = useNotesStore((store) => store.context);
   const setContext = useNotesStore((store) => store.setContext);
 
@@ -32,7 +31,7 @@ function Notes(props) {
       placeholder={props.placeholder || NotesPlaceholder}
       button={{
         content: "Make a new note",
-        onClick: () => newSession(props.context),
+        onClick: () => hashNavigate("/notes/create"),
       }}
     />
   );

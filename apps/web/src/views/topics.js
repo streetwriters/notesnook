@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
-import { showTopicDialog } from "../components/dialogs/topicdialog";
+import { hashNavigate } from "../navigation";
 
 function Topics(props) {
   const { notebookId } = props;
@@ -32,9 +32,7 @@ function Topics(props) {
         placeholder={Flex}
         button={{
           content: "Add a new topic",
-          onClick: async () => {
-            await showTopicDialog(notebookId);
-          },
+          onClick: () => hashNavigate(`/topics/create`),
         }}
       />
     </>

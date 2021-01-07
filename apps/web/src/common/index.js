@@ -3,7 +3,6 @@ import StorageInterface from "../interfaces/storage";
 import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
 import EventSource from "eventsource";
-import { showTopicDialog } from "../components/dialogs/topicdialog";
 import { showToast } from "../utils/toast";
 import download from "../utils/download";
 import { Text } from "rebass";
@@ -67,7 +66,10 @@ export const CREATE_BUTTON_MAP = {
     title: "Create a notebook",
     onClick: () => hashNavigate("/notebooks/create"),
   },
-  topics: { title: "Add a topic", onClick: showTopicDialog },
+  topics: {
+    title: "Add a topic",
+    onClick: () => hashNavigate(`/topics/create`),
+  },
 };
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };

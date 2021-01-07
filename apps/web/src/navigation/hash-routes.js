@@ -15,6 +15,10 @@ import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { isMobile, isTablet } from "../utils/dimensions";
+import {
+  showEditTopicDialog,
+  showTopicDialog,
+} from "../components/dialogs/topicdialog";
 
 const hashroutes = {
   "/": () => {
@@ -29,6 +33,12 @@ const hashroutes = {
   },
   "/notebooks/:notebookId/edit": ({ notebookId }) => {
     showEditNotebookDialog(notebookId);
+  },
+  "/topics/create": () => {
+    showTopicDialog();
+  },
+  "/notebooks/:notebookId/topics/:topicId/edit": ({ notebookId, topicId }) => {
+    showEditTopicDialog(notebookId, topicId);
   },
   "/notes/create": () => {
     console.log("session");

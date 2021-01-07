@@ -1,12 +1,12 @@
 import React from "react";
 import ListItem from "../list-item";
-import { showEditTopicDialog } from "../dialogs/topicdialog";
 import { confirm } from "../dialogs/confirm";
 import * as Icon from "../icons";
 import { db } from "../../common";
 import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { Text } from "rebass";
+import { hashNavigate } from "../../navigation";
 
 const menuItems = (item) => [
   {
@@ -15,9 +15,8 @@ const menuItems = (item) => [
   },
   {
     title: "Edit",
-    onClick: () => {
-      showEditTopicDialog(item);
-    },
+    onClick: () =>
+      hashNavigate(`/notebooks/${item.notebookId}/topics/${item.id}/edit`),
     visible: item.title !== "General",
   },
   {

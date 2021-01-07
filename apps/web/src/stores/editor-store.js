@@ -132,7 +132,6 @@ class EditorStore extends BaseStore {
   };
 
   newSession = (context = {}) => {
-    appStore.setIsEditorOpen(true);
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
@@ -141,6 +140,7 @@ class EditorStore extends BaseStore {
       };
     });
     noteStore.setSelectedNote(0);
+    appStore.setIsEditorOpen(true);
   };
 
   clearSession = (shouldNavigate = true) => {
