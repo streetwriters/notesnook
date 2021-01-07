@@ -36,7 +36,10 @@ function format(version) {
 export async function getVersion(oldVersion) {
   try {
     const version = await db.version();
-    if (!version || versionChecked) return oldVersion;
+    if (!version || versionChecked)
+      return APP_VERSION.numerical > oldVersion.numerical
+        ? APP_VERSION
+        : oldVersion;
     versionChecked = true;
     return {
       formatted: format(version.web),
