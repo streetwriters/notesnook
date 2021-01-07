@@ -12,6 +12,7 @@ import QuillFocus from "./modules/focus";
 import { isMobile } from "../../utils/dimensions";
 import { showBuyDialog } from "../dialogs/buy-dialog";
 import "./editor.css";
+import { isUserPremium } from "../../common";
 
 Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
@@ -19,7 +20,7 @@ Quill.register("modules/focus", QuillFocus);
 
 function moduleHandlerWrapper(type, isSimple) {
   return async function (value) {
-    if (isSimple) {
+    if (isSimple && !isUserPremium()) {
       await showBuyDialog();
       return;
     }

@@ -14,11 +14,11 @@ import { hashNavigate } from "../navigation";
 
 export const db = new Database(StorageInterface, EventSource);
 
-// db.host({
-//   API_HOST: "https://api.notesnook.com",
-//   AUTH_HOST: "https://auth.streetwriters.co",
-//   SSE_HOST: "https://events.streetwriters.co",
-// });
+db.host({
+  API_HOST: "https://api.notesnook.com",
+  AUTH_HOST: "https://auth.streetwriters.co",
+  SSE_HOST: "https://events.streetwriters.co",
+});
 
 // db.host({
 //   API_HOST: "http://localhost:5264",
@@ -26,11 +26,11 @@ export const db = new Database(StorageInterface, EventSource);
 //   SSE_HOST: "http://localhost:7264",
 // });
 
-db.host({
-  API_HOST: "http://192.168.10.8:5264",
-  AUTH_HOST: "http://192.168.10.8:8264",
-  SSE_HOST: "http://192.168.10.8:7264",
-});
+// db.host({
+//   API_HOST: "http://192.168.10.8:5264",
+//   AUTH_HOST: "http://192.168.10.8:8264",
+//   SSE_HOST: "http://192.168.10.8:7264",
+// });
 
 export const COLORS = {
   red: "#f44336",
@@ -118,6 +118,9 @@ export async function createBackup() {
 }
 
 export function isUserPremium() {
-  const subStatus = userstore.get().user?.subscription?.status;
-  return subStatus && subStatus >= 1 && subStatus <= 3;
+  const subStatus = userstore.get().user?.subscription?.type;
+  return (
+    subStatus === SUBSCRIPTION_STATUS.BETA ||
+    subStatus === SUBSCRIPTION_STATUS.TRIAL
+  );
 }
