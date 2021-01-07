@@ -34,16 +34,21 @@ function format(version) {
 }
 
 export async function getVersion(oldVersion) {
-  const version = await db.version();
-  if (!version || versionChecked) return oldVersion;
-  versionChecked = true;
-  return {
-    formatted: format(version.web),
-    numerical: version.web,
-    appUpdated:
-      version.web > oldVersion.numerical &&
-      APP_VERSION.numerical === version.web,
-    updateSeverity: version.severity,
-    changelog: version.changelog === "" ? undefined : version.changelog,
-  };
+  try {
+    const version = await db.version();
+    if (!version || versionChecked) return oldVersion;
+    versionChecked = true;
+    return {
+      formatted: format(version.web),
+      numerical: version.web,
+      appUpdated:
+        version.web > oldVersion.numerical &&
+        APP_VERSION.numerical === version.web,
+      updateSeverity: version.severity,
+      changelog: version.changelog === "" ? undefined : version.changelog,
+    };
+  } catch (e) {
+    console.error(e);
+    return oldVersion;
+  }
 }
