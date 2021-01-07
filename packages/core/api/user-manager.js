@@ -106,8 +106,8 @@ class UserManager {
         token
       );
       if (user) {
-        const oldUser = this.getUser();
-        if (!oldUser.isEmailConfirmed && user.isEmailConfirmed) {
+        const oldUser = await this.getUser();
+        if (!!oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed) {
           // generate new token
           const token = await this.tokenManager.getToken(false);
           await this.tokenManager._refreshToken(token);
