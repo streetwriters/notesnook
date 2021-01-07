@@ -12,7 +12,7 @@ function EmailVerificationDialog(props) {
   const [canSendAgain, setCanSendAgain] = useState(true);
   if (!user) {
     props.onCancel();
-    return;
+    return null;
   }
   return (
     <Dialog
