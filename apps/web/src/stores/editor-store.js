@@ -143,7 +143,7 @@ class EditorStore extends BaseStore {
     noteStore.setSelectedNote(0);
   };
 
-  clearSession = () => {
+  clearSession = (shouldNavigate = true) => {
     appStore.setIsEditorOpen(false);
     this.set((state) => {
       state.session = {
@@ -152,7 +152,7 @@ class EditorStore extends BaseStore {
       };
     });
     noteStore.setSelectedNote(0);
-    hashNavigate(`/`);
+    if (shouldNavigate) hashNavigate(`/`);
   };
 
   setSession = (set) => {

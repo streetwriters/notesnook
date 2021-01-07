@@ -14,11 +14,12 @@ import Unlock from "../components/unlock";
 import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
-import { isMobile } from "../utils/dimensions";
+import { isMobile, isTablet } from "../utils/dimensions";
 
 const hashroutes = {
   "/": () => {
     closeOpenedDialog();
+    if (isMobile() || isTablet()) editorStore.clearSession(false);
   },
   "/email/verify": () => {
     showEmailVerificationDialog();

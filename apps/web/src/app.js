@@ -5,6 +5,7 @@ import ThemeProvider from "./components/theme-provider";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
+import { useStore as useEditorStore } from "./stores/editor-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
 import routes from "./navigation/routes";
@@ -35,6 +36,7 @@ function App() {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
+  const clearSession = useEditorStore((store) => store.clearSession);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
   const version = useVersion();
@@ -91,7 +93,9 @@ function App() {
 
   useEffect(() => {
     if (!isMobile && !isTablet) return;
+    console.log("turning", isEditorOpen);
     setShow(!isEditorOpen);
+    //setIsEditorOpen(!show);
     // if (isTablet) toggleSideMenu(!isEditorOpen);
     // if (!isEditorOpen && !isTablet && !isMobile) toggleSideMenu(true);
     // // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,7 +123,10 @@ function App() {
       >
         <Flex flex={1} sx={{ overflow: "hidden" }}>
           <NavigationMenu
-            toggleNavigationContainer={(state) => setShow(state || !show)}
+            toggleNavigationContainer={(state) => {
+              if (isMobile || isTablet) clearSession();
+              else setShow(state || !show);
+            }}
           />
           <Flex variant="rowFill">
             <Animated.Flex
