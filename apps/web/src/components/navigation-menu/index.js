@@ -134,18 +134,21 @@ function NavigationMenu(props) {
             }}
           />
         ))}
-        {colors.map((color) => (
-          <NavigationItem
-            key={color.title}
-            title={toTitleCase(color.title)}
-            icon={Icon.Circle}
-            selected={location === `/colors/${color.id}`}
-            color={COLORS[color.title]}
-            onClick={() => {
-              navigate(`/colors/${color.id}`);
-            }}
-          />
-        ))}
+        {colors.map(
+          (color) =>
+            !!color.title && (
+              <NavigationItem
+                key={color.title}
+                title={toTitleCase(color.title)}
+                icon={Icon.Circle}
+                selected={location === `/colors/${color.id}`}
+                color={COLORS[color.title]}
+                onClick={() => {
+                  navigate(`/colors/${color.id}`);
+                }}
+              />
+            )
+        )}
         <Flex
           flexDirection="column"
           sx={{ borderTop: "1px solid", borderTopColor: "border" }}
