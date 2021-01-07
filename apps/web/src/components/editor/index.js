@@ -126,7 +126,10 @@ function Editor(props) {
         <Animated.Flex
           variant="columnFill"
           className="editor"
-          sx={{ mx: [0, 0, editorMargins], alignSelf: "center" }}
+          sx={{
+            mx: [0, 0, editorMargins],
+            alignSelf: ["stretch", "stretch", "center"],
+          }}
           animate={{
             marginRight: isFocusMode ? "25%" : editorMargins,
             marginLeft: isFocusMode ? "25%" : editorMargins,
