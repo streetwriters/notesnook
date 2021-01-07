@@ -101,7 +101,7 @@ export function showSignUpDialog() {
     <SignUpDialog
       onClose={async (res) => {
         perform(res);
-        if (res) await showRecoveryKeyDialog();
+        if (res === true) await showRecoveryKeyDialog();
       }}
     />
   ));
