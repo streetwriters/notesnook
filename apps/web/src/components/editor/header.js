@@ -12,7 +12,7 @@ function Header() {
   return (
     <Flex mx={[2, 2, 0]} mb={[2, 2, 0]}>
       <TitleBox
-        shouldFocus={sessionState === SESSION_STATES.new}
+        shouldFocus={sessionState === SESSION_STATES.new && title.length <= 0}
         title={title}
         changeInterval={500}
         setTitle={(title) =>
