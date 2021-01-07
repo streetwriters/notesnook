@@ -449,11 +449,7 @@ function Settings(props) {
           <Button
             key={title}
             variant="list"
-            onClick={() =>
-              props.navigator.navigate("TOS", {
-                title,
-              })
-            }
+            onClick={() => showToast("warn", "TBD")}
           >
             {title}
           </Button>
