@@ -207,20 +207,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
         }}>
-        {!premiumUser ? (
-          <Paragraph
-            color={colors.accent}
-            size={SIZE.xs}
-            style={{
-              marginRight: 4,
-              marginTop: 2.5,
-              position: 'absolute',
-              right: 0,
-              top: 0,
-            }}>
-            PRO
-          </Paragraph>
-        ) : null}
+       
 
         {note.tags.map((item, index) => (
           <TagItem

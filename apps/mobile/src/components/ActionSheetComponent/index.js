@@ -307,6 +307,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.pinned,
+      nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.pin,
     },
     {
@@ -330,6 +331,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: note.favorite,
+      nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.favorite,
       color: 'orange',
     },
@@ -357,6 +359,7 @@ export const ActionSheetComponent = ({
       close: false,
       check: true,
       on: isPinnedToMenu,
+      nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.pinMenu,
     },
   ];
@@ -439,8 +442,6 @@ export const ActionSheetComponent = ({
               name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
             />
           ) : undefined}
-
-          {item.nopremium ? null : <PremiumTag pro={premiumUser} />}
 
           {item.check ? (
             <Icon
