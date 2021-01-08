@@ -47,6 +47,10 @@ let webviewInit = false;
 let intent = false;
 let appColors = COLOR_SCHEME;
 
+export function setWebviewInit(init) {
+  webviewInit = init;
+}
+
 export function setIntent() {
   intent = true;
 }
@@ -83,16 +87,9 @@ export function clearTimer() {
 }
 
 export const INJECTED_JAVASCRIPT = (premium) =>
-  premium
-    ? `(function() {
-        setTimeout(() => {
-         loadAction(true,${DDS.isLargeTablet()});
-     
-        },100)
-     })();`
-    : `(function() {
+  `(function() {
       setTimeout(() => {
-       loadAction(false,${DDS.isLargeTablet()});
+       loadAction(${premium});
       },100)
    })();`;
 
@@ -169,6 +166,9 @@ export const loadNote = async (item) => {
     } else {
       post('focusTitle');
     }
+    if (!webviewInit) {
+      EditorWebView.current?.reload();
+    }
   } else if (item && item.type === 'intent') {
     await clearEditor();
     clearNote();
@@ -180,6 +180,8 @@ export const loadNote = async (item) => {
     intent = true;
     if (webviewInit) {
       await loadNoteInEditor();
+    } else {
+      EditorWebView.current?.reload();
     }
   } else {
     clearTimer();
@@ -189,6 +191,8 @@ export const loadNote = async (item) => {
     });
     if (webviewInit) {
       await loadNoteInEditor();
+    } else {
+      EditorWebView.current?.reload();
     }
     updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
   }
@@ -203,7 +207,6 @@ export function setIntentNote(item) {
   };
 }
 
-let statusUpdateTimer = null;
 export const _onMessage = async (evt) => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
@@ -237,6 +240,7 @@ export const _onMessage = async (evt) => {
       if (user && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
       } else {
+        await sleep(300);
         eSendEvent(eShowGetPremium, {
           context: 'editor',
           title: 'Get Notesnook Pro',
@@ -245,14 +249,8 @@ export const _onMessage = async (evt) => {
       }
       break;
     case 'status':
-      if (statusUpdateTimer !== null) {
-        clearTimeout(statusUpdateTimer);
-        statusUpdateTimer = null;
-      }
-      statusUpdateTimer = setTimeout(() => {
-        webviewInit = true;
-        loadNoteInEditor();
-      }, 200);
+      webviewInit = true;
+      loadNoteInEditor();
       break;
     default:
       break;
@@ -313,11 +311,9 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
         note = note.data;
       }
     }
-    setTimeout(() => {
-      post('title', note.title);
-      post('dateEdited', timeConverter(note.dateEdited));
-      post('saving', 'Saved');
-    }, 150);
+    post('title', note?.title);
+    post('dateEdited', timeConverter(note?.dateEdited));
+    post('saving', 'Saved');
   }
 }
 
@@ -366,51 +362,55 @@ async function addToCollection(id) {
 
 export async function saveNote() {
   if (!checkIfContentIsSavable()) return;
-
-  if (id && !db.notes.note(id)) {
-    clearNote();
-    return;
-  }
-  let locked = id ? db.notes.note(id).data.locked : null;
-
-  let noteData = {
-    title,
-    content: {
-      data: content.data,
-      type: content.type,
-    },
-    id: id,
-  };
-
-  if (!locked) {
-    let noteId = await db.notes.add(noteData);
-    if (!id || saveCounter < 3) {
-      updateEvent({
-        type: Actions.NOTES,
-      });
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
-      eSendEvent(refreshNotesPage);
+  try {
+    if (id && !db.notes.note(id)) {
+      clearNote();
+      return;
     }
+    let locked = id ? db.notes.note(id).data.locked : null;
+    console.log(content.data,"DATA")
+    let noteData = {
+      title,
+      content: {
+        data: content.data,
+        type: content.type,
+      },
+      id: id,
+    };
 
-    if (!id) {
-      await addToCollection(noteId);
+    if (!locked) {
+      let noteId = await db.notes.add(noteData);
+      if (!id || saveCounter < 3) {
+        updateEvent({
+          type: Actions.NOTES,
+        });
+        updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
+        eSendEvent(refreshNotesPage);
+      }
+
+      if (!id) {
+        await addToCollection(noteId);
+      }
+      await setNoteInEditorAfterSaving(id, noteId);
+      saveCounter++;
+    } else {
+      noteData.contentId = note.contentId;
+      await db.vault.save(noteData);
     }
-    await setNoteInEditorAfterSaving(id, noteId);
-    saveCounter++;
-  } else {
-    noteData.contentId = note.contentId;
-    await db.vault.save(noteData);
+    sendNoteEditedEvent({
+      id: id,
+    });
+    let n = db.notes.note(id)?.data?.dateEdited;
+    post('dateEdited', timeConverter(n));
+    post('saving', 'Saved');
+  } catch (e) {
+    console.log(e);
   }
-  sendNoteEditedEvent({
-    id: id,
-  });
-  let n = db.notes.note(id).data.dateEdited;
-  post('dateEdited', timeConverter(n));
-  post('saving', 'Saved');
 }
 
-export async function onWebViewLoad(premium, colors, event) {
-  EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium, false));
+export async function onWebViewLoad(premium, colors) {
+  console.log(premium, 'PREMIUM');
+  EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium));
   if (!checkNote()) {
     post('blur');
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
@@ -419,6 +419,7 @@ export async function onWebViewLoad(premium, colors, event) {
   setColors(colors);
   await loadEditorState();
 }
+
 async function loadEditorState() {
   if (sideMenuRef.current !== null) {
     if (intent) {
