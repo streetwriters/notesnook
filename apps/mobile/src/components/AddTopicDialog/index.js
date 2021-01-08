@@ -61,8 +61,10 @@ export class AddTopicDialog extends React.Component {
 
   open = async (notebookId) => {
     let id = notebookId || this.props.notebookID;
-
     this.notebook = await db.notebooks.notebook(id).data;
+    if (this.props.toEdit) {
+      this.title = this.props.toEdit.title;
+    }
     this.setState({
       visible: true,
     });
@@ -103,13 +105,13 @@ export class AddTopicDialog extends React.Component {
             blurOnSubmit={false}
             defaultValue={toEdit ? toEdit.title : null}
             placeholder="Enter title of topic"
-            onSubmit={this.addNewTopic}
+            onSubmit={() => this.addNewTopic()}
           />
 
           <DialogButtons
             positiveTitle={toEdit ? 'Save' : 'Add'}
             onPressNegative={() => this.close()}
-            onPressPositive={this.addNewTopic}
+            onPressPositive={() => this.addNewTopic()}
           />
         </DialogContainer>
         <Toast context="local" />
