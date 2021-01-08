@@ -28,8 +28,8 @@ export const NotebookItem = ({
     let columnItems = isTrash
       ? []
       : item.type === 'topic'
-      ? ['Pin to Menu', 'Unpin from Menu']
-      : ['Pin', 'Pin to Menu', 'Unpin from Menu'];
+      ? ['Add Shortcut to Menu', 'Remove Shortcut from Menu']
+      : ['Pin', 'Add Shortcut to Menu', 'Remove Shortcut from Menu'];
 
     ActionSheetEvent(item, false, false, rowItems, columnItems, {
       notebookID: notebookID,

@@ -95,14 +95,13 @@ export const TagsSection = () => {
               paddingHorizontal: '10%',
             }}>
             <Heading style={{marginBottom: 2.5}} size={SIZE.sm}>
-              Your Pins
+              Shortcuts
             </Heading>
             <Paragraph
               style={{textAlign: 'center'}}
               color={colors.icon}
               size={SIZE.xs}>
-              You have not pinned anything yet. You can pin notebooks, topics
-              and tags here.
+              You can add shortcuts to notebooks, topics and tags here.
             </Paragraph>
           </View>
         }
@@ -123,14 +122,11 @@ const PinItem = ({item, index, onPress}) => {
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
 
   const onHeaderStateChange = (event) => {
-  
-      if (event?.id === item.id) {
-        setHeaderTextState(event);
-      } else {
-        setHeaderTextState(null);
-      }
-   
-  
+    if (event?.id === item.id) {
+      setHeaderTextState(event);
+    } else {
+      setHeaderTextState(null);
+    }
   };
 
   useEffect(() => {

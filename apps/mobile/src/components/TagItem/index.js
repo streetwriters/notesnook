@@ -78,7 +78,7 @@ const TagItem = ({item, index}) => {
         size={SIZE.xl}
         onPress={() => {
           let rowItems = [];
-          let columnItems = ['Pin to Menu', 'Unpin from Menu'];
+          let columnItems = ['Add Shortcut to Menu', 'Remove Shortcut from Menu'];
           ActionSheetEvent(item, false, false, rowItems, columnItems);
         }}
         testID={notesnook.ids.tag.menu}

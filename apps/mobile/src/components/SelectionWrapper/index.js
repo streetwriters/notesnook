@@ -154,8 +154,8 @@ const ActionStrip = ({note, setActionStrip}) => {
     },
 
     {
-      title: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
-      icon: isPinnedToMenu ? 'tag-off-outline' : 'tag-outline',
+      title: isPinnedToMenu ? 'Remove Shortcut from Menu' : 'Add Shortcut to Menu',
+      icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       onPress: async () => {
         try {
           if (isPinnedToMenu) {
