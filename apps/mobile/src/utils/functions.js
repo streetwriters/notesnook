@@ -29,8 +29,8 @@ export const deleteItems = async (item) => {
       let it = topics[i];
       await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
     }
-
     updateEvent({type: Actions.NOTEBOOKS});
+    updateEvent({type: Actions.MENU_PINS});
     eSendEvent(eOnNewTopicAdded);
     ToastEvent.show('Topics deleted', 'success');
   }
@@ -40,6 +40,7 @@ export const deleteItems = async (item) => {
     await db.notebooks.delete(...ids);
     updateEvent({type: Actions.NOTEBOOKS});
     updateEvent({type: Actions.NOTES});
+    updateEvent({type: Actions.MENU_PINS});
   }
 
   let msgPart = history.selectedItemsList.length === 1 ? ' item' : ' items';
@@ -64,12 +65,12 @@ export const deleteItems = async (item) => {
         updateEvent({type: Actions.NOTEBOOKS});
         updateEvent({type: Actions.NOTES});
         updateEvent({type: Actions.TRASH});
+        updateEvent({type: Actions.MENU_PINS});
         ToastEvent.hide();
       },
       'Undo',
     );
   }
-
   updateEvent({type: Actions.TRASH});
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
