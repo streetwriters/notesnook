@@ -61,9 +61,12 @@ export const Search = ({route, navigation}) => {
         placeholderData={{
           heading: 'Search',
           paragraph:
-            searchStatus || SearchService.getSearchInformation().placeholder,
+            searchStatus ||
+            `Type a keyword to search in ${
+              SearchService.getSearchInformation().title
+            }`,
           button: null,
-          loading: 'Searching...',
+          loading:"Searching..."
         }}
       />
     </>
