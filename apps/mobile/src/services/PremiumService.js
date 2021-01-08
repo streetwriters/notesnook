@@ -1,4 +1,6 @@
 import {CHECK_IDS} from 'notes-core/common';
+import { updateEvent } from '../components/DialogManager/recievers';
+import { Actions } from '../provider/Actions';
 import {db} from '../utils/DB';
 import {eOpenPremiumDialog, eOpenProgressDialog, eShowGetPremium} from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
@@ -9,14 +11,17 @@ let premiumStatus = 0;
 async function setPremiumStatus() {
   try {
     let user = await db.user.getUser();
-    if (!user || !user.id) {
+    if (!user) {
       premiumStatus = null;
+      updateEvent({type:Actions.PREMIUM,state:get()})
     } else {
-      premiumStatus = user.subscription.status;
+      premiumStatus = user.subscription.type;
+      updateEvent({type:Actions.PREMIUM,state:get()})
     }
   } catch (e) {
     premiumStatus = null;
   }
+  console.log(premiumStatus,"PREMIUM STATUS")
 }
 
 function get() {
@@ -25,9 +30,7 @@ function get() {
 
 async function verify(callback, error) {
   try {
-    let user = await db.user.getUser();
-
-    if (!user || !user.id || premiumStatus) {
+    if (!premiumStatus) {
       if (error) {
         error();
         return;
