@@ -1,35 +1,18 @@
 import React, { useEffect } from 'react';
-import {
-  BackHandler,
-  InteractionManager,
-  Keyboard,
-  Platform,
-  View
-} from 'react-native';
+import { Keyboard, Platform, View } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../../e2e/test.ids';
 import { ActionIcon } from '../../components/ActionIcon';
-import {
-  ActionSheetEvent,
-  simpleDialogEvent
-} from '../../components/DialogManager/recievers';
-import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
+import { ActionSheetEvent } from '../../components/DialogManager/recievers';
 import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { editing } from '../../utils';
 import { db } from '../../utils/DB';
 import {
-  eClearEditor,
   eCloseFullscreenEditor,
-  eOnLoadNote,
   eOpenFullscreenEditor
 } from '../../utils/Events';
 import { sideMenuRef, tabBarRef } from '../../utils/Refs';
@@ -37,11 +20,8 @@ import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
   clearEditor,
-  clearTimer,
   EditorWebView,
-
   getNote,
-
   isNotedEdited,
   loadNote,
   post,
@@ -56,7 +36,7 @@ let tapCount = 0;
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, premiumUser, fullscreen, deviceMode} = state;
+  const {colors, fullscreen, deviceMode,premiumUser} = state;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -68,64 +48,9 @@ const EditorHeader = () => {
   }, [deviceMode]);
 
   useEffect(() => {
-    eSubscribeEvent(eOnLoadNote, load);
-    eSubscribeEvent(eClearEditor, onCallClear);
-
-    return () => {
-      eUnSubscribeEvent(eClearEditor, onCallClear);
-      eUnSubscribeEvent(eOnLoadNote, load);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (fullscreen && DDS.isTab) {
-      handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
-        editing.isFullscreen = false;
-        return true;
-      });
-    }
-
-    return () => {
-      clearTimer();
-      if (handleBack) {
-        handleBack.remove();
-        handleBack = null;
-      }
-    };
-  }, [fullscreen]);
-
-  const load = async (item) => {
-    await loadNote(item);
-    InteractionManager.runAfterInteractions(() => {
-      Keyboard.addListener('keyboardDidShow', () => {
-        post('keyboard');
-      });
-      if (!DDS.isTab) {
-        handleBack = BackHandler.addEventListener(
-          'hardwareBackPress',
-          _onHardwareBackPress,
-        );
-      }
-    });
-  };
-
-  const onCallClear = async () => {
-    if (editing.currentlyEditing) {
-      await _onBackPress();
-    }
-  };
-
-  useEffect(() => {
+    console.log(premiumUser,"PREMIUM USER EDITOR")
     EditorWebView.current?.reload();
   }, [premiumUser]);
-
-  const _onHardwareBackPress = async () => {
-    if (editing.currentlyEditing) {
-      await _onBackPress();
-      return true;
-    }
-  };
 
   const _onBackPress = async () => {
     if (sideMenuRef.current === null) {
