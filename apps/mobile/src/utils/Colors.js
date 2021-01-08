@@ -73,6 +73,10 @@ export const COLOR_SCHEME_DARK = {
   light: '#ffffff',
 };
 
+export function getCurrentColors() {
+  return COLOR_SCHEME
+}
+
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
