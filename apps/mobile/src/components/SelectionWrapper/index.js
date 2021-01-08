@@ -162,7 +162,7 @@ const ActionStrip = ({note, setActionStrip}) => {
         try {
           if (isPinnedToMenu) {
             await db.settings.unpin(note.id);
-            ToastEvent.show('Unpinned from menu', 'success');
+            ToastEvent.show('Shortcut removed from menu', 'success');
           } else {
             if (note.type === 'topic') {
               await db.settings.pin(note.type, {
@@ -173,7 +173,7 @@ const ActionStrip = ({note, setActionStrip}) => {
               await db.settings.pin(note.type, {id: note.id});
             }
 
-            ToastEvent.show('Pinned to menu', 'success');
+            ToastEvent.show('Shortcut added to menu', 'success');
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});

@@ -149,9 +149,9 @@ const PinItem = ({item, index, onPress}) => {
               paddingHorizontal: ph,
               paddingVertical: pv,
             }}>
-            <DialogHeader title="Unpin" paragraph="Remove item from menu" />
+            <DialogHeader title="Remove Shortcut" paragraph={`Remove this ${item.type} from menu`} />
             <DialogButtons
-              positiveTitle="Unpin"
+              positiveTitle="Remove"
               negativeTitle="Cancel"
               onPressNegative={() => setVisible(false)}
               onPressPositive={async () => {
