@@ -1,33 +1,33 @@
-//
-//  ShareViewController.m
-//  Make Note
-//
-//  Created by Ammar Ahmed on 07/01/2021.
-//
+#import <Foundation/Foundation.h>
+#import <ReactNativeShareExtension.h>
+#import <React/RCTBundleURLProvider.h>
+#import <React/RCTRootView.h>
+#import <React/RCTLog.h>
 
-#import "ShareViewController.h"
-
-@interface ShareViewController ()
-
+@interface ShareViewController : ReactNativeShareExtension
 @end
 
 @implementation ShareViewController
 
-- (BOOL)isContentValid {
-    // Do validation of contentText and/or NSExtensionContext attachments here
-    return YES;
-}
+RCT_EXPORT_MODULE();
 
-- (void)didSelectPost {
-    // This is called after the user selects Post. Do the upload of contentText and/or NSExtensionContext attachments.
-    
-    // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
-    [self.extensionContext completeRequestReturningItems:@[] completionHandler:nil];
-}
+- (UIView*) shareView {
+  NSURL *jsCodeLocation;
 
-- (NSArray *)configurationItems {
-    // To add configuration options via table cells at the bottom of the sheet, return an array of SLComposeSheetConfigurationItem here.
-    return @[];
+  jsCodeLocation = [[RCTBundleURLProvider sharedSettings] jsBundleURLForBundleRoot:@"index" fallbackResource:nil];
+  
+  RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation
+                                                      moduleName:@"NotesnookShare"
+                                               initialProperties:nil
+                                                    launchOptions:nil];
+  rootView.window.backgroundColor =[UIColor clearColor];
+  rootView.layer.shadowOpacity = 0;
+  rootView.backgroundColor = [UIColor clearColor];
+
+  // Uncomment for console output in Xcode console for release mode on device:
+  // RCTSetLogThreshold(RCTLogLevelInfo - 1);
+
+  return rootView;
 }
 
 @end

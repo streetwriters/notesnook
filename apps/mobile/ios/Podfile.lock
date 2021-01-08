@@ -212,7 +212,7 @@ PODS:
   - react-native-safe-area-context (3.1.9):
     - React-Core
   - react-native-sodium (0.3.6):
-    - React
+    - React-Core
   - react-native-splash-screen (3.2.0):
     - React
   - react-native-viewpager (4.2.2):
@@ -279,6 +279,8 @@ PODS:
     - React-Core (= 0.63.4)
     - React-cxxreact (= 0.63.4)
     - React-jsi (= 0.63.4)
+  - rn-extensions-share (2.4.0):
+    - React-Core
   - rn-fetch-blob (0.12.0):
     - React-Core
   - RNCCheckbox (0.5.6):
@@ -356,7 +358,7 @@ DEPENDENCIES:
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
-  - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage`)
+  - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
   - react-native-orientation (from `../node_modules/react-native-orientation`)
   - react-native-receive-sharing-intent (from `../node_modules/react-native-receive-sharing-intent`)
@@ -375,6 +377,7 @@ DEPENDENCIES:
   - React-RCTText (from `../node_modules/react-native/Libraries/Text`)
   - React-RCTVibration (from `../node_modules/react-native/Libraries/Vibration`)
   - ReactCommon/turbomodule/core (from `../node_modules/react-native/ReactCommon`)
+  - rn-extensions-share (from `../node_modules/rn-extensions-share`)
   - rn-fetch-blob (from `../node_modules/rn-fetch-blob`)
   - "RNCCheckbox (from `../node_modules/@react-native-community/checkbox`)"
   - "RNCMaskedView (from `../node_modules/@react-native-community/masked-view`)"
@@ -450,7 +453,7 @@ EXTERNAL SOURCES:
   react-native-keep-awake:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
-    :path: "../node_modules/react-native-mmkv-storage"
+    :path: "../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec"
   react-native-netinfo:
     :path: "../node_modules/@react-native-community/netinfo"
   react-native-orientation:
@@ -487,6 +490,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/Libraries/Vibration"
   ReactCommon:
     :path: "../node_modules/react-native/ReactCommon"
+  rn-extensions-share:
+    :path: "../node_modules/rn-extensions-share"
   rn-fetch-blob:
     :path: "../node_modules/rn-fetch-blob"
   RNCCheckbox:
@@ -570,7 +575,7 @@ SPEC CHECKSUMS:
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-receive-sharing-intent: feba0a332a07977549a85aa58b496eb44368366a
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
-  react-native-sodium: c7587732667e1cdb7d0d77c2aa2e98420aad2036
+  react-native-sodium: a1502233a73c60696a680bff3e0cbdfdb85640a4
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
   react-native-viewpager: ea945e2881ce9a4a8bcdc84de4ec65ff23c90f6e
   react-native-webview: dfd7202ff115c44d3ea401c2f36122fb3ac79f07
@@ -584,6 +589,7 @@ SPEC CHECKSUMS:
   React-RCTText: 5c51df3f08cb9dedc6e790161195d12bac06101c
   React-RCTVibration: ae4f914cfe8de7d4de95ae1ea6cc8f6315d73d9d
   ReactCommon: 73d79c7039f473b76db6ff7c6b159c478acbbb3b
+  rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCCheckbox: 80ee60cd2e67b46986e8e244db520655372deab4
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
@@ -609,6 +615,6 @@ SPEC CHECKSUMS:
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 1cb02af42eb11bb808c12bcec382e64156ced4a8
+PODFILE CHECKSUM: 35fc693c4d538e75ade1302857b725c6a8a63b89
 
 COCOAPODS: 1.10.0
