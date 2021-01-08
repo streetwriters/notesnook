@@ -1,10 +1,11 @@
-import React, { Component, createRef } from 'react';
+import React, {Component, createRef} from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault
+  openVault,
 } from '../../services/EventManager';
+import {getCurrentColors} from '../../utils/Colors';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -20,13 +21,14 @@ import {
   eOpenMoveNoteDialog,
   eOpenPremiumDialog,
   eOpenSimpleDialog,
-  eShowGetPremium
+  eShowGetPremium,
+  eThemeUpdated,
 } from '../../utils/Events';
-import { ActionSheetComponent } from '../ActionSheetComponent';
+import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { Dialog } from '../Dialog';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
@@ -40,9 +42,9 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import { UpdateDialog } from '../UpdateDialog';
-import { VaultDialog } from '../VaultDialog';
-import { TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE } from './Templates';
+import {UpdateDialog} from '../UpdateDialog';
+import {VaultDialog} from '../VaultDialog';
+import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -52,6 +54,7 @@ export class DialogManager extends Component {
     this.state = {
       item: {},
       actionSheetVisible: false,
+      colors: getCurrentColors(),
       actionSheetData: {
         colors: false,
         tags: false,
@@ -127,7 +130,14 @@ export class DialogManager extends Component {
     this.addTopicsDialog.close();
   };
 
+  onThemeChange = () => {
+    this.setState({
+      colors: getCurrentColors(),
+    });
+  };
+
   componentDidMount() {
+    eSubscribeEvent(eThemeUpdated, this.onThemeChange);
     eSubscribeEvent(eOnLoadNote, this.loadNote);
 
     eSubscribeEvent(eOpenActionSheet, this._showActionSheet);
@@ -153,6 +163,7 @@ export class DialogManager extends Component {
   }
 
   componentWillUnmount() {
+    eUnSubscribeEvent(eThemeUpdated, this.onThemeChange);
     eUnSubscribeEvent(eOnLoadNote, this.loadNote);
 
     eUnSubscribeEvent(eOpenActionSheet, this._showActionSheet);
@@ -293,15 +304,14 @@ export class DialogManager extends Component {
   };
 
   render() {
-    let {colors} = this.props;
-    let {actionSheetData, item, simpleDialog} = this.state;
+    let {actionSheetData, item, simpleDialog, colors} = this.state;
     return (
       <>
         {!this.state.actionSheetVisible ? null : (
           <ActionSheetWrapper
             fwdRef={this.actionSheet}
             onClose={() => {
-              eSendEvent(eShowGetPremium,null)
+              eSendEvent(eShowGetPremium, null);
               this.onActionSheetHide();
               this.setState({
                 actionSheetVisible: false,
@@ -364,7 +374,7 @@ export class DialogManager extends Component {
         <MoveNoteDialog colors={colors} />
         <SortDialog colors={colors} />
         <JumpToDialog />
-        <UpdateDialog/>
+        <UpdateDialog />
       </>
     );
   }
