@@ -128,16 +128,17 @@ const App = () => {
     attachIAPListeners();
     AppState.addEventListener('change', onAppStateChanged);
     Appearance.addChangeListener(SettingsService.setTheme);
-    // let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     Linking.addEventListener('url', onUrlRecieved);
     EV.subscribe('db:refresh', onSyncComplete);
     EV.subscribe('db:sync', partialSync);
     EV.subscribe('user:loggedOut', onLogout);
+    EV.subscribe('user:emailConfirmed', onEmailVerified);
     EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
     return () => {
       setIntentOnAppLoadProcessed(false);
       setAppIsInitialized(false);
-      EV.subscribe('db:refresh', onSyncComplete);
+      EV.unsubscribe('user:emailConfirmed', onEmailVerified);
+      EV.unsubscribe('db:refresh', onSyncComplete);
       EV.unsubscribe('user:loggedOut', onLogout);
       EV.unsubscribe('db:sync', partialSync);
       EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
@@ -182,7 +183,7 @@ const App = () => {
   };
 
   const onEmailVerified = async () => {
-    let user = await db.user.fetchUser(true);
+    let user = await db.user.getUser();
     dispatch({type: Actions.USER, user: user});
     if (!user) return;
     await PremiumService.setPremiumStatus();
@@ -312,18 +313,27 @@ const App = () => {
       let user = await db.user.fetchUser(true);
       if (user) {
         clearMessage(dispatch);
-        if (!user.isEmailConfirmed) {
-          setEmailVerifyMessage(dispatch);
-        }
         dispatch({type: Actions.USER, user: user});
         await PremiumService.setPremiumStatus();
+        if (!user.isEmailConfirmed) {
+          setEmailVerifyMessage(dispatch);
+          return;
+        }
         await Sync.run();
-        await startSyncer();
       } else {
         await PremiumService.setPremiumStatus();
         setLoginMessage(dispatch);
       }
-    } catch (e) {}
+    } catch (e) {
+      let user = await db.user.getUser();
+      if (user && !user.isEmailConfirmed) {
+        setEmailVerifyMessage(dispatch);
+      } else if (!user) {
+        setLoginMessage(dispatch);
+      } else {
+        console.log('unknown error', e);
+      }
+    }
   };
 
   const onSuccessfulSubscription = (subscription) => {
