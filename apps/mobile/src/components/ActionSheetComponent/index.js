@@ -334,8 +334,8 @@ export const ActionSheetComponent = ({
       color: 'orange',
     },
     {
-      name: isPinnedToMenu ? 'Unpin from Menu' : 'Pin to Menu',
-      icon: 'tag-outline',
+      name: isPinnedToMenu ? 'Remove Shortcut from Menu' : 'Add Shortcut to Menu',
+      icon: isPinnedToMenu? 'link-variant-remove' : 'link-variant',
       func: async () => {
         try {
           if (isPinnedToMenu) {
