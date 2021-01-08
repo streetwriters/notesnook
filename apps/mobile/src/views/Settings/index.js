@@ -250,7 +250,7 @@ const AccoutLogoutSection = () => {
   const [deleteAccount, setDeleteAccount] = useState(false);
 
   return (
-    user && (
+    !user && (
       <>
         {visible && (
           <BaseDialog visible={true}>
@@ -359,8 +359,7 @@ const AccoutLogoutSection = () => {
           <PressableButton
             onPress={item.func}
             key={item.name}
-            type="accent"
-            accentColor="light"
+            type="gray"
             customStyle={{
               height: 50,
               borderTopWidth: index === 0 ? 1 : 0,
@@ -852,7 +851,6 @@ const SettingsAppearanceSection = () => {
                         : 'transparent',
                   }}
                   textStyle={{
-                    //fontFamily: "sans-serif",
                     fontSize: SIZE.sm,
                     color:
                       settings.homepage === item.name
