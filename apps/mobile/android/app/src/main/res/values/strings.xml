@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Notesnook</string>
+    <string name="title_activity_share">NotesnookShare</string>
+
 </resources>
