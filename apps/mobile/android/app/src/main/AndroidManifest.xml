@@ -30,28 +30,48 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-             <intent-filter android:label="Notesnook">
-                   <action android:name="android.intent.action.VIEW" />
-                  <category android:name="android.intent.category.DEFAULT" />
-                  <category android:name="android.intent.category.BROWSABLE" />
-                  <data android:scheme="https"
-              android:host="app.notesnook.com"></data>
-         
+            <intent-filter android:label="Notesnook">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data
+                    android:host="app.notesnook.com"
+                    android:scheme="https"></data>
+
             </intent-filter>
 
-               <intent-filter android:label="Make Note">
+        </activity>
+
+        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
+
+        <activity
+            android:name=".ShareActivity"
+            android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
+            android:label="@string/title_activity_share"
+            android:noHistory="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppThemeB">
+            <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />
-                <data android:mimeType="text/*" />
-            </intent-filter>  
-              <intent-filter android:label="Make Note">
+                <data android:mimeType="text/plain" />
+            </intent-filter>
+            <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:mimeType="text/*" />
             </intent-filter>
+
+
         </activity>
-        <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-        <service android:name="com.streetwriters.notesnook.OnClearFromRecentService" android:stopWithTask="false" android:enabled="true" android:exported="true" />
+
+        <service
+            android:name="com.streetwriters.notesnook.OnClearFromRecentService"
+            android:enabled="true"
+            android:exported="true"
+            android:stopWithTask="false" />
         <provider
             android:name="com.vinzscam.reactnativefileviewer.FileProvider"
             android:authorities="${applicationId}.provider"
