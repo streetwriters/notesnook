@@ -1,43 +1,45 @@
-import { activateKeepAwake, deactivateKeepAwake } from "@sayem314/react-native-keep-awake";
-import React, { useEffect, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import {
+  activateKeepAwake,
+  deactivateKeepAwake,
+} from '@sayem314/react-native-keep-awake';
+import React, {useEffect, useState} from 'react';
+import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { notesnook } from './e2e/test.ids';
+import SplashScreen from 'react-native-splash-screen';
+import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
-import { DialogManager } from './src/components/DialogManager';
-import { DummyText } from './src/components/DummyText';
-import { Menu } from './src/components/Menu';
-import { Toast } from './src/components/Toast';
-import { NavigationStack } from './src/navigation/Drawer';
-import { NavigatorStack } from './src/navigation/NavigatorStack';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { DDS } from './src/services/DeviceDetection';
+import {DialogManager} from './src/components/DialogManager';
+import {DummyText} from './src/components/DummyText';
+import {Menu} from './src/components/Menu';
+import {Toast} from './src/components/Toast';
+import {NavigationStack} from './src/navigation/Drawer';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
-import { editing, setWidthHeight } from './src/utils';
+import {editing, setWidthHeight} from './src/utils';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eCloseSideMenu,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenSideMenu
+  eOpenSideMenu,
 } from './src/utils/Events';
-import { editorRef, tabBarRef } from './src/utils/Refs';
-import { EditorWrapper } from './src/views/Editor/EditorWrapper';
-import {
-  getIntent,
-  getNote,
-  post
-} from './src/views/Editor/Functions';
+import {editorRef, tabBarRef} from './src/utils/Refs';
+import {EditorWrapper} from './src/views/Editor/EditorWrapper';
+import {getIntent, getNote, post} from './src/views/Editor/Functions';
 let {width, height} = Dimensions.get('window');
 let movedAway = true;
 let layoutTimer = null;
 let currentTab = 0;
+
+
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
@@ -64,30 +66,20 @@ const onChangeTab = async (obj) => {
   }
 };
 
-export const RootView = React.memo(() => {
-  const [state] = useTracked();
-  const {colors, intentMode} = state;
-
-
-  return (
-    <>
-      {intentMode ? (
-        <EditorWrapper
-          dimensions={{
-            width: '100%',
-            height: '100%',
-          }}
-        />
-      ) : (
+export const RootView = React.memo(
+  () => {
+    return (
+      <>
         <NavigationStack component={AppStack} />
-      )}
-      <Toast />
-      <ContextMenu />
-      <DummyText />
-      <DialogManager colors={colors} />
-    </>
-  );
-}, () => true);
+        <Toast />
+        <ContextMenu />
+        <DummyText />
+        <DialogManager />
+      </>
+    );
+  },
+  () => true,
+);
 
 let updatedDimensions = {
   width: width,
@@ -137,7 +129,7 @@ const _onTouchEnd = (e) => {
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors, intentMode} = state;
+    const {colors} = state;
     const [mode, setMode] = useState(
       DDS.isLargeTablet()
         ? 'tablet'
@@ -193,7 +185,7 @@ const AppStack = React.memo(
       if (!size || (size.width === dimensions.width && mode !== null)) {
         DDS.setSize(size);
         dispatch({type: Actions.DEVICE_MODE, state: mode});
-
+      
         return;
       }
       updatedDimensions = size;

@@ -184,6 +184,7 @@ const LoginDialog = () => {
       user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
+      PremiumService.setPremiumStatus();
       dispatch({type: Actions.USER, user: user});
       clearMessage(dispatch);
       ToastEvent.show(`Logged in as ${user.email}`, 'success', 'local');

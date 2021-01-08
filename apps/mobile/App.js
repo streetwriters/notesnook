@@ -14,6 +14,7 @@ import {enabled} from 'react-native-privacy-snapshot';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 import {RootView} from './initializer.root';
+import {updateEvent} from './src/components/DialogManager/recievers';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
@@ -23,13 +24,11 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
-import IntentService from './src/services/IntentService';
 import {
   clearMessage,
   setEmailVerifyMessage,
   setLoginMessage,
 } from './src/services/Message';
-import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
@@ -37,7 +36,6 @@ import {
   APP_VERSION,
   editing,
   getAppIsIntialized,
-  getIntentOnAppLoadProcessed,
   setAppIsInitialized,
   setIntentOnAppLoadProcessed,
 } from './src/utils';
@@ -47,7 +45,6 @@ import {
   eClosePremiumDialog,
   eCloseProgressDialog,
   eDispatchAction,
-  eOnLoadNote,
   eOpenLoginDialog,
   eOpenPendingDialog,
   eOpenProgressDialog,
@@ -55,10 +52,9 @@ import {
   refreshNotesPage,
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
-import {tabBarRef} from './src/utils/Refs';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote, setIntent} from './src/views/Editor/Functions';
-const {ReceiveSharingIntent} = NativeModules;
+import EditorRoot from './src/views/Editor/EditorRoot';
+import {getNote} from './src/views/Editor/Functions';
 
 let Sentry = null;
 let hasPurchased = false;
@@ -82,28 +78,26 @@ const onAppStateChanged = async (state) => {
     }
     if (getAppIsIntialized()) {
       await MMKV.removeItem('appState');
-    }
-    try {
-      if (getIntentOnAppLoadProcessed()) {
-        if (Platform.OS === 'android') {
-          console.log('calling intent from here too');
-          let intent = await ReceiveSharingIntent.getFileNames();
-          console.log("INTENT RECIEVED",intent);
-          if (intent) {
-            IntentService.setIntent(intent);
-            IntentService.check(loadIntent);
+      let intent = await MMKV.getItem('notesAddedFromIntent');
+      if (intent) {
+        try {
+          if (Platform.OS === 'ios') {
+            await db.init();
+            await db.notes.init();
+            updateEvent({type: Actions.NOTES});
+            eSendEvent(refreshNotesPage);
+          } else {
+            updateEvent({type: Actions.NOTES});
+            eSendEvent(refreshNotesPage);
           }
-          ReceiveSharingIntent.clearFileNames();
+        } catch (e) {
+          console.log(e);
         }
-      } else {
-        if (!db || !db.notes) return;
-        if (!getNote()) {
-          eSendEvent('nointent');
-        } else {
-          SplashScreen.hide();
-        }
+        MMKV.removeItem('notesAddedFromIntent');
+        updateEvent({type: Actions.ALL});
+        eSendEvent(refreshNotesPage);
       }
-    } catch (e) {}
+    }
   } else {
     if (editing.currentlyEditing && getAppIsIntialized()) {
       let state = JSON.stringify({
@@ -119,32 +113,7 @@ const onAppStateChanged = async (state) => {
   }
 };
 
-function loadIntent(event) {
-  if (event) {
-    setIntent();
-    eSendEvent(eOnLoadNote, event);
-    tabBarRef.current?.goToPage(1);
-    Navigation.closeDrawer();
-  } else {
-    eSendEvent('nointent');
-    SplashScreen.hide();
-    sleep(300).then(() => eSendEvent(eOpenSideMenu));
-  }
-}
-
-const onNetworkStateChanged = (netInfo) => {
-  /*  let message = 'Internet connection restored';
-  let type = 'success';
-  if (!netInfo.isConnected || !netInfo.isInternetReachable) {
-    message = 'No internet connection';
-    type = 'error';
-  }
-  db.user?.get().then((user) => {
-    if (user && intentOnAppLoadProcessed) {
-      ToastEvent.show(message, type);
-    }
-  }); */
-};
+//const onNetworkStateChanged = (netInfo) => {};
 
 const App = () => {
   const [, dispatch] = useTracked();
@@ -158,9 +127,8 @@ const App = () => {
     });
     attachIAPListeners();
     AppState.addEventListener('change', onAppStateChanged);
-    eSubscribeEvent('nointent', loadMainApp);
     Appearance.addChangeListener(SettingsService.setTheme);
-    let unsub = NetInfo.addEventListener(onNetworkStateChanged);
+    // let unsub = NetInfo.addEventListener(onNetworkStateChanged);
     Linking.addEventListener('url', onUrlRecieved);
     EV.subscribe('db:refresh', onSyncComplete);
     EV.subscribe('db:sync', partialSync);
@@ -176,11 +144,10 @@ const App = () => {
       eUnSubscribeEvent(eDispatchAction, (type) => {
         dispatch(type);
       });
-      eUnSubscribeEvent('nointent', loadMainApp);
       AppState.removeEventListener('change', onAppStateChanged);
       Appearance.removeChangeListener(SettingsService.setTheme);
       Linking.removeEventListener('url', onUrlRecieved);
-      unsub();
+      //unsub();
       unsubIAP();
     };
   }, []);
@@ -195,7 +162,7 @@ const App = () => {
         ? 'smallTablet'
         : 'mobile',
     });
-    db.init().catch(console.log).finally(runAfterInit);
+    db.init().catch(console.log).finally(loadMainApp);
   }, []);
 
   const onSyncComplete = async () => {
@@ -204,32 +171,21 @@ const App = () => {
   };
 
   const onUrlRecieved = async (res) => {
-    if (getIntentOnAppLoadProcessed()) {
-      let url = res ? res.url : '';
-      try {
-        if (Platform.OS === 'ios' && url.startsWith('ShareMedia://dataUrl')) {
-          let intent = await ReceiveSharingIntent.getFileNames(url);
-          intent = IntentService.iosSortedData(intent);
-
-          if (intent) {
-            IntentService.setIntent(intent);
-            IntentService.check(loadIntent);
-          }
-        } else if (
-          url.startsWith('https://app.notesnook.com/account/verified')
-        ) {
-          await onEmailVerified();
-        } else {
-          return;
-        }
-      } catch (e) {}
-    }
+    let url = res ? res.url : '';
+    try {
+      if (url.startsWith('https://app.notesnook.com/account/verified')) {
+        await onEmailVerified();
+      } else {
+        return;
+      }
+    } catch (e) {}
   };
 
   const onEmailVerified = async () => {
     let user = await db.user.fetchUser(true);
     dispatch({type: Actions.USER, user: user});
     if (!user) return;
+    await PremiumService.setPremiumStatus();
     let message =
       user?.subscription?.type === 2
         ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
@@ -282,11 +238,12 @@ const App = () => {
     }
   };
 
-  const onLogout = (reason) => {
+  const onLogout = async (reason) => {
     dispatch({type: Actions.USER, user: null});
     dispatch({type: Actions.CLEAR_ALL});
     dispatch({type: Actions.SYNCING, syncing: false});
     setLoginMessage(dispatch);
+    await PremiumService.setPremiumStatus();
     eSendEvent(eOpenProgressDialog, {
       title: reason ? reason : 'User Logged Out',
       paragraph: `You have been logged out of your account.`,
@@ -313,11 +270,13 @@ const App = () => {
   };
 
   const loadMainApp = () => {
-    dispatch({type: Actions.INTENT_MODE, state: false});
     dispatch({type: Actions.ALL});
     setCurrentUser().then(console.log).catch(console.log);
     Backup.checkAndRun().then((r) => r);
-    sleep(500).then(() => setAppIsInitialized(true));
+    sleep(500).then(() => {
+      setAppIsInitialized(true);
+      SplashScreen.hide();
+    });
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
@@ -325,13 +284,11 @@ const App = () => {
       dispatch({type: Actions.LOADING, loading: false});
       SettingsService.setAppLoaded();
     });
-    SplashScreen.hide();
     Linking.getInitialURL().then(async (url) => {
-      if (url && url.startsWith('https://notesnook.com')) {
+      if (url && url.startsWith('https://app.notesnook.com/account/verified')) {
         await onEmailVerified();
       }
     });
-    setIntentOnAppLoadProcessed(true);
     sleep(300).then(() => {
       eSendEvent(eOpenSideMenu);
       db.version()
@@ -352,44 +309,21 @@ const App = () => {
 
   const setCurrentUser = async () => {
     try {
-      let user = await db.user.getUser(true);
+      let user = await db.user.fetchUser(true);
       if (user) {
         clearMessage(dispatch);
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage(dispatch);
         }
         dispatch({type: Actions.USER, user: user});
+        await PremiumService.setPremiumStatus();
         await Sync.run();
         await startSyncer();
       } else {
+        await PremiumService.setPremiumStatus();
         setLoginMessage(dispatch);
       }
     } catch (e) {}
-  };
-
-  const runAfterInit = () => {
-    let isIntent = false;
-    IntentService.getIntent()
-      .then(() => {
-        IntentService.check((event) => {
-          SplashScreen.hide();
-          loadIntent(event);
-          setIntentOnAppLoadProcessed(true);
-          dispatch({type: Actions.ALL});
-          isIntent = true;
-          dispatch({type: Actions.INTENT_MODE, state: true});
-          ReceiveSharingIntent.clearFileNames();
-        });
-      })
-      .catch((e) => console.log)
-      .finally(() => {
-        if (!isIntent) {
-          dispatch({type: Actions.INTENT_MODE, state: false});
-          ReceiveSharingIntent.clearFileNames();
-          setIntentOnAppLoadProcessed(true);
-          loadMainApp();
-        }
-      });
   };
 
   const onSuccessfulSubscription = (subscription) => {
@@ -433,6 +367,7 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <RootView />
+      <EditorRoot />
     </SafeAreaProvider>
   );
 };
