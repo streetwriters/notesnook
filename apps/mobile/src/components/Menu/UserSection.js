@@ -11,7 +11,7 @@ import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
 
 export const UserSection = ({noTextMode}) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors, syncing, user, lastSynced} = state;
 
   return (
@@ -41,17 +41,17 @@ export const UserSection = ({noTextMode}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingVertical:10
+            paddingVertical: 10,
           }}>
-          <View
+          <Icon
             style={{
-              height: 8,
-              width: 8,
-              backgroundColor: !user ? colors.red : colors.green,
-              borderRadius: 100,
               marginRight: 5,
             }}
+            name="checkbox-blank-circle"
+            size={10}
+            color={!user ? colors.red : colors.green}
           />
+
           <Heading size={SIZE.sm} color={colors.heading}>
             {!user ? 'Not Logged in' : 'Logged in'}
           </Heading>
@@ -64,7 +64,7 @@ export const UserSection = ({noTextMode}) => {
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingVertical:10
+              paddingVertical: 10,
             }}>
             <Paragraph
               style={{
@@ -76,7 +76,10 @@ export const UserSection = ({noTextMode}) => {
 
               {!syncing ? (
                 lastSynced && lastSynced !== 'Never' ? (
-                  <TimeSince style={{fontSize: SIZE.xs}} time={lastSynced} />
+                  <TimeSince
+                    style={{fontSize: SIZE.xs, color: colors.icon}}
+                    time={lastSynced}
+                  />
                 ) : (
                   'never'
                 )
