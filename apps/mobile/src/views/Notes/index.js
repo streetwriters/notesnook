@@ -183,6 +183,10 @@ export const Notes = ({route, navigation}) => {
       noSearch: false,
       type: 'notes',
       color: params.type === 'color' ? params.title : null,
+      title:
+        params.type === 'tag'
+          ? '#' + params.title
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
     });
   };
 

@@ -84,5 +84,6 @@ export const defaultState = {
   menuPins:[],
   lastSynced:"Never",
   intentMode:true,
-  searching:false
+  searching:false,
+  searchStatus:null
 };

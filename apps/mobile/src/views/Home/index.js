@@ -81,6 +81,7 @@ export const Home = ({route, navigation}) => {
       placeholder: 'Type a keyword to search in notes',
       data: db?.notes?.all,
       type: 'notes',
+      title:'Notes'
     });
   };
 

@@ -72,6 +72,7 @@ export const Folders = ({route, navigation}) => {
       placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
+      title:"Notebooks"
     });
   };
 

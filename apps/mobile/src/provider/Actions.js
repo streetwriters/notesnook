@@ -35,5 +35,6 @@ export const Actions = {
   LAST_SYNC:"lastSynced",
   INTENT_MODE: "intentMode",
   SEARCHING:'searching',
-  PREMIUM:'premium'
+  PREMIUM:'premium',
+  SEARCH_STATUS: 'searchStatus'
 };

@@ -72,6 +72,7 @@ export const Trash = ({route, navigation}) => {
       placeholder: 'Search in trash',
       data: trash,
       type: 'trash',
+      title: "Trash"
     });
   };
 

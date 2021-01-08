@@ -279,7 +279,8 @@ export const reducer = (state, action) => {
     case Actions.SEARCHING: {
       return {
         ...state,
-        searching: action.searching,
+        searching: action.searching.isSearching,
+        searchStatus:action.searching.status
       };
     }
     case Actions.PREMIUM: {

@@ -52,7 +52,6 @@ export const SearchInput = (props) => {
           paddingVertical: 0,
           paddingHorizontal: 0,
           margin: 0,
-          marginBottom: Platform.OS === 'ios' ? 5 : 0,
         }}
         textAlignVertical="center"
         onChangeText={onChangeText}

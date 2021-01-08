@@ -8,8 +8,8 @@ import {sleep} from '../../utils/TimeUtils';
 
 export const Search = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {searchResults,searching} = state;
-  
+  const {searchResults, searching, searchStatus} = state;
+
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -33,6 +33,17 @@ export const Search = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     return () => {
       pageIsLoaded = false;
+      dispatch({
+        type: Actions.SEARCH_RESULTS,
+        results: [],
+      });
+      dispatch({
+        type: Actions.SEARCHING,
+        searching: {
+          isSearching: false,
+          status: null,
+        },
+      });
       navigation.removeListener('focus', onFocus);
     };
   }, []);
@@ -49,9 +60,10 @@ export const Search = ({route, navigation}) => {
         CustomHeader={true}
         placeholderData={{
           heading: 'Search',
-          paragraph: SearchService.getSearchInformation().placeholder,
+          paragraph:
+            searchStatus || SearchService.getSearchInformation().placeholder,
           button: null,
-          loading:"Searching..."
+          loading: 'Searching...',
         }}
       />
     </>

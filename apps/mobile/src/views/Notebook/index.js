@@ -90,6 +90,7 @@ export const Notebook = ({route, navigation}) => {
       placeholder: `Search in "${params.title}"`,
       data: topics,
       type: 'topics',
+      title:params.title
     });
   };
 

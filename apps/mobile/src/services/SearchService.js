@@ -1,10 +1,9 @@
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {db} from '../utils/DB';
-import {ToastEvent} from './EventManager';
 
 let searchInformation = {
-  placeholder: 'Search all notes',
+  placeholder: 'Search in all notes',
   data: [],
   type: 'notes',
 };
@@ -16,7 +15,7 @@ function update(data) {
 }
 
 function setTerm(term) {
-  keyword = term
+  keyword = term;
 }
 
 async function search() {
@@ -28,20 +27,39 @@ async function search() {
     });
     return;
   }
-  updateEvent({type:Actions.SEARCHING, searching:true})
+  updateEvent({
+    type: Actions.SEARCHING,
+    searching: {
+      isSearching: true,
+      status: `Searching for "${term}" in ${searchInformation.title}`,
+    },
+  });
   let results;
   if (!searchInformation.type) return;
-  
+
   results = await db.lookup[searchInformation.type](
     searchInformation.data,
     term,
   );
 
   if (!results || results.length === 0) {
-    ToastEvent.show('No search results found for ' + term, 'error');
+    updateEvent({type: Actions.SEARCHING, searching: false});
+    updateEvent({
+      type: Actions.SEARCHING,
+      searching: {
+        isSearching: false,
+        status: `No search results found for "${term}" in ${searchInformation.title}`,
+      },
+    });
     return;
   }
-  updateEvent({type:Actions.SEARCHING, searching:false})
+  updateEvent({
+    type: Actions.SEARCHING,
+    searching: {
+      isSearching: false,
+      status: null,
+    },
+  });
   updateEvent({
     type: Actions.SEARCH_RESULTS,
     results: results,
@@ -56,5 +74,5 @@ export default {
   update,
   getSearchInformation,
   search,
-  setTerm
+  setTerm,
 };

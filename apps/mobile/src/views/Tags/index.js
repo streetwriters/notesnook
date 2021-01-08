@@ -69,6 +69,7 @@ export const Tags = ({route, navigation}) => {
       placeholder: 'Search in tags',
       data: tags,
       type: 'tags',
+      title:"Tags"
     });
   };
 

@@ -70,6 +70,7 @@ export const Favorites = ({route, navigation}) => {
       placeholder: 'Search in favorites',
       data: favorites,
       type: 'notes',
+      title:"Favorites"
     });
   };
 
