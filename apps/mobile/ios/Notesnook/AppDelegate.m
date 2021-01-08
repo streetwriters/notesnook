@@ -5,7 +5,6 @@
 #import <React/RCTRootView.h>
 #import "RNSplashScreen.h"
 #import <React/RCTLinkingManager.h>
-#import "ReceiveSharingIntent-Bridging-Header.h"
 #import <MMKV.h>
 @implementation AppDelegate
 
