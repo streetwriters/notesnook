@@ -350,6 +350,12 @@ export class DialogManager extends Component {
           ref={(ref) => (this.addTopicsDialog = ref)}
           toEdit={item?.type === 'topic' ? item : null}
           notebookID={item?.type !== 'topic' ? item.id : item.notebookId}
+          close={() => {
+            console.log("closing")
+            this.setState({
+              item:{}
+            })
+          }}
           colors={colors}
         />
         <AddNotebookDialog

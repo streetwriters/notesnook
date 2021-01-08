@@ -39,7 +39,6 @@ export class AddTopicDialog extends React.Component {
 
     if (!this.props.toEdit) {
       await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
-
     } else {
       let topic = this.props.toEdit;
       topic.title = this.title;
@@ -62,14 +61,16 @@ export class AddTopicDialog extends React.Component {
 
   open = async (notebookId) => {
     let id = notebookId || this.props.notebookID;
-    //console.log(notebookId)
-    this.notebook = await db.notebooks.notebook(id).data
+
+    this.notebook = await db.notebooks.notebook(id).data;
     this.setState({
       visible: true,
     });
   };
   close = () => {
+    this.props.close();
     this.title = null;
+    this.notebook = null;
     this.setState({
       visible: false,
     });
@@ -107,12 +108,7 @@ export class AddTopicDialog extends React.Component {
 
           <DialogButtons
             positiveTitle={toEdit ? 'Save' : 'Add'}
-            onPressNegative={() => {
-              this.title = null;
-              this.setState({
-                visible: false,
-              });
-            }}
+            onPressNegative={() => this.close()}
             onPressPositive={this.addNewTopic}
           />
         </DialogContainer>
