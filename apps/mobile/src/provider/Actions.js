@@ -34,5 +34,6 @@ export const Actions = {
   MENU_PINS:"menuPins",
   LAST_SYNC:"lastSynced",
   INTENT_MODE: "intentMode",
-  SEARCHING:'searching'
+  SEARCHING:'searching',
+  PREMIUM:'premium'
 };

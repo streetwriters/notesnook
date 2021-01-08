@@ -282,6 +282,12 @@ export const reducer = (state, action) => {
         searching: action.searching,
       };
     }
+    case Actions.PREMIUM: {
+      return {
+        ...state,
+        premiumUser: action.state,
+      };
+    }
     default:
       throw new Error('unknown action type');
   }
