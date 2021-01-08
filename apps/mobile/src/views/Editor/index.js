@@ -1,9 +1,11 @@
-import React, {useEffect} from 'react';
-import {Platform, TextInput, View} from 'react-native';
+import React, {useCallback, useEffect} from 'react';
+import {Platform, TextInput} from 'react-native';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
+import {ToastEvent} from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
+import {getCurrentColors} from '../../utils/Colors';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -14,10 +16,30 @@ import {
   _onMessage,
   _onShouldStartLoadWithRequest,
 } from './Functions';
+
+const source =
+  Platform.OS === 'ios'
+    ? {uri: sourceUri}
+    : {
+        uri: 'file:///android_asset/texteditor.html',
+        baseUrl: 'file:///android_asset/',
+      };
+
+const style = {
+  height: '100%',
+  maxHeight: '100%',
+  width: '100%',
+  alignSelf: 'center',
+  backgroundColor: 'transparent',
+};
+
 const Editor = React.memo(
   () => {
     const [state] = useTracked();
-    const {colors} = state;
+    const {premiumUser} = state;
+    const onLoad = async () => {
+      await onWebViewLoad(premiumUser, getCurrentColors());
+    };
 
     return (
       <>
@@ -30,25 +52,16 @@ const Editor = React.memo(
         <WebView
           testID={notesnook.ids.default.editor}
           ref={EditorWebView}
-          onLoad={async (event) =>{
-            console.log("on load webview event")
-            await onWebViewLoad(PremiumService.get(), colors, event)
-          }
-          }
+          onLoad={onLoad}
+          onError={(event) => {
+            //EditorWebView.current?.reload();
+            ToastEvent.show('Editor Load Error', 'error');
+          }}
           javaScriptEnabled={true}
           focusable={true}
           keyboardDisplayRequiresUserAction={false}
           injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
           onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-          renderLoading={() => (
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'transparent',
-              }}
-            />
-          )}
           cacheMode="LOAD_DEFAULT"
           cacheEnabled={false}
           domStorageEnabled={true}
@@ -60,21 +73,8 @@ const Editor = React.memo(
           allowFileAccessFromFileURLs={true}
           allowUniversalAccessFromFileURLs={true}
           originWhitelist={['*']}
-          source={
-            Platform.OS === 'ios'
-              ? {uri: sourceUri}
-              : {
-                  uri: 'file:///android_asset/texteditor.html',
-                  baseUrl: 'file:///android_asset/',
-                }
-          }
-          style={{
-            height: '100%',
-            maxHeight: '100%',
-            width: '100%',
-            alignSelf: 'center',
-            backgroundColor: 'transparent',
-          }}
+          source={source}
+          style={style}
           onMessage={_onMessage}
         />
       </>
