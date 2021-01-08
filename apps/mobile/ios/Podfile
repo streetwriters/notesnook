@@ -7,21 +7,30 @@ permissions_path = '../node_modules/react-native-permissions/ios'
 
 pod 'Base64'
 pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary.podspec"
-pod 'MMKV'
 pod 'SexyTooltip',:git => 'https://github.com/prscX/SexyTooltip.git'
 pod 'RNTooltips', :path => '../node_modules/react-native-tooltips/ios'
 
+
+
 target 'Notesnook' do
   config = use_native_modules!
-
+  pod 'MMKV'
   use_react_native!(:path => config["reactNativePath"])
-
+  pod 'react-native-mmkv-storage', :path => '../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec'
+  
+  # for share extension
+  target 'Make Note' do
+    use_native_modules!
+    inherit! :complete
+    
+  end
   
   target 'NotesnookTests' do
-    inherit! :complete
+   
     # Pods for testing
   end
 
+  
   # Enables Flipper.
   #
   # Note that if you have use_frameworks! enabled, Flipper will not work and
@@ -32,11 +41,21 @@ target 'Notesnook' do
  # end
 end
 
+
+
 target 'Notesnook-tvOS' do
   # Pods for Notesnook-tvOS
 
   target 'Notesnook-tvOSTests' do
     inherit! :search_paths
     # Pods for testing
+  end
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['APPLICATION_EXTENSION_API_ONLY'] = 'NO'
+    end
   end
 end
