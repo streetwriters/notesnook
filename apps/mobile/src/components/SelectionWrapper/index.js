@@ -154,7 +154,9 @@ const ActionStrip = ({note, setActionStrip}) => {
     },
 
     {
-      title: isPinnedToMenu ? 'Remove Shortcut from Menu' : 'Add Shortcut to Menu',
+      title: isPinnedToMenu
+        ? 'Remove Shortcut from Menu'
+        : 'Add Shortcut to Menu',
       icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       onPress: async () => {
         try {
@@ -177,9 +179,7 @@ const ActionStrip = ({note, setActionStrip}) => {
           dispatch({type: Actions.MENU_PINS});
 
           setActionStrip(false);
-        } catch (e) {
-         
-        }
+        } catch (e) {}
       },
       visible: note.type !== 'note',
     },
@@ -238,9 +238,7 @@ const ActionStrip = ({note, setActionStrip}) => {
       onPress: async () => {
         try {
           await deleteItems(note);
-        } catch (e) {
-          
-        }
+        } catch (e) {}
         setActionStrip(false);
       },
     },
@@ -351,6 +349,9 @@ const SelectionWrapper = ({
 
   const onLong = () => {
     if (selectionMode) return;
+    console.log(item.type,item.title)
+    if (item.type === 'topic' && item.title === 'General') return;
+
     setActionStrip(!actionStrip);
   };
 
