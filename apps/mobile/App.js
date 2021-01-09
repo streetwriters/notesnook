@@ -56,6 +56,7 @@ import {sleep} from './src/utils/TimeUtils';
 import EditorRoot from './src/views/Editor/EditorRoot';
 import {getNote} from './src/views/Editor/Functions';
 import Sentry from '@sentry/react-native';
+import Orientation from 'react-native-orientation';
 let hasPurchased = false;
 
 function updateStatusBarColor() {
@@ -154,6 +155,8 @@ const App = () => {
 
   useEffect(() => {
     SettingsService.init().then((r) => console.log);
+    console.log(Orientation.getInitialOrientation(),"INIT ORIENT")
+    DDS.checkSmallTab(Orientation.getInitialOrientation())
     dispatch({
       type: Actions.DEVICE_MODE,
       state: DDS.isLargeTablet()

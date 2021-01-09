@@ -185,6 +185,7 @@ const AppStack = React.memo(
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && mode !== null)) {
         DDS.setSize(size);
+        console.log(mode,"MODE__")
         dispatch({type: Actions.DEVICE_MODE, state: mode});
       
         return;
