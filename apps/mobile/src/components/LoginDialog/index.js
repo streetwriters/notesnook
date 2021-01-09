@@ -109,7 +109,7 @@ const LoginDialog = () => {
       loading:
         'We have sent you a recovery email on ' +
         email +
-        '. Follow the link in the email to set a new password',
+        '. Follow the link in the email to set a new password. If you cannot find the email, check your spam folder.',
       showLoader: false,
       buttonAlt: 'Login',
       buttonAltFunc: () => {
@@ -180,7 +180,9 @@ const LoginDialog = () => {
       if (!db.user) {
         throw new Error('Database is not initialized!');
       }
+      console.log('LOGGING IN');
       await db.user.login(email.toLowerCase(), password, true);
+      console.log('LOGGED IN');
       user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Data');
@@ -238,7 +240,7 @@ const LoginDialog = () => {
   };
 
   const signupUser = async () => {
-    if (!validateInfo()) return; 
+    if (!validateInfo()) return;
     setLoading(true);
     setStatus('Creating User');
     try {
@@ -275,14 +277,14 @@ const LoginDialog = () => {
       ) {
         throw new Error('Please wait before requesting another email');
       }
-      await db.user.recoverAccount(email);
+      setStatus('Account Recovery Email Sent!');
+      //await db.user.recoverAccount(email);
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
     } catch (e) {
-      await MMKV.removeItem('lastRecoveryEmailTime');
+      //await MMKV.removeItem('lastRecoveryEmailTime');
       setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
     }
-    setStatus('Account Recovery Email Sent!');
   };
 
   const changePassword = async () => {
