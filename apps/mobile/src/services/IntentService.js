@@ -1,4 +1,4 @@
-import { Linking, NativeModules, Platform } from 'react-native';
+/* import {Linking, NativeModules, Platform} from 'react-native';
 const {ReceiveSharingIntent} = NativeModules;
 let currentIntent = null;
 const isIos = Platform.OS === 'ios';
@@ -18,7 +18,6 @@ function getIntent() {
         }
       } else {
         _data = await ReceiveSharingIntent.getFileNames();
-   
       }
     } catch (e) {
       reject(e);
@@ -39,14 +38,11 @@ function setIntent(d, resolve, reject) {
     let delta = null;
 
     if (weblink && text) {
-      delta = [{insert: `${text + ' ' + weblink}`}];
-      text = data.text + ' ' + data.weblink;
+      delta = [{insert: text}, {insert: weblink, attributes: {link: weblink}}];
     } else if (text && !weblink) {
-      delta = [{insert: `${text}`}];
-      text = data.text;
+      delta = [{insert: text}];
     } else if (weblink) {
-      delta = [{insert: `${weblink}`}];
-      text = weblink;
+      delta = [{insert: weblink, attributes: {link: weblink}}];
     }
     currentIntent = {
       type: 'intent',
@@ -66,7 +62,6 @@ function check(callback) {
   callback(currentIntent);
   currentIntent = null;
 }
-
 
 const iosSortedData = (data) => {
   let objects = {
@@ -135,5 +130,5 @@ export default {
   check,
   setIntent,
   iosSortedData,
-
 };
+ */

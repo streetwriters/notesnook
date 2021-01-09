@@ -238,9 +238,9 @@ export const _onMessage = async (evt) => {
     case 'premium':
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
+        await sleep(500);
         PremiumService.showVerifyEmailDialog();
       } else {
-        await sleep(300);
         eSendEvent(eShowGetPremium, {
           context: 'editor',
           title: 'Get Notesnook Pro',
@@ -252,6 +252,9 @@ export const _onMessage = async (evt) => {
       webviewInit = true;
       loadNoteInEditor();
       break;
+    case 'focus':
+      editing.focusType = message.value;
+      break;  
     default:
       break;
   }
@@ -292,9 +295,6 @@ export async function clearEditor() {
 }
 
 function checkIfContentIsSavable() {
-  if (content.data.length === 0 && title === '') {
-    return false;
-  }
   return true;
 }
 
@@ -368,7 +368,7 @@ export async function saveNote() {
       return;
     }
     let locked = id ? db.notes.note(id).data.locked : null;
-    console.log(content.data,"DATA")
+    console.log(content.data, 'DATA');
     let noteData = {
       title,
       content: {

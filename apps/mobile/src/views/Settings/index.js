@@ -250,7 +250,7 @@ const AccoutLogoutSection = () => {
   const [deleteAccount, setDeleteAccount] = useState(false);
 
   return (
-    !user && (
+    user && (
       <>
         {visible && (
           <BaseDialog visible={true}>

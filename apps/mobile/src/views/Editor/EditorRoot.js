@@ -66,6 +66,7 @@ const EditorRoot = () => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
       Keyboard.addListener('keyboardDidShow', () => {
+        editing.isFocused = true;
         post('keyboard');
       });
       if (!DDS.isTab) {
@@ -127,6 +128,7 @@ const EditorRoot = () => {
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', () => {
+        editing.isFocused = true;
         post('keyboard');
       });
       if (handleBack) {
