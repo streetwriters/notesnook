@@ -1,8 +1,12 @@
 import {CHECK_IDS} from 'notes-core/common';
-import { updateEvent } from '../components/DialogManager/recievers';
-import { Actions } from '../provider/Actions';
+import {updateEvent} from '../components/DialogManager/recievers';
+import {Actions} from '../provider/Actions';
 import {db} from '../utils/DB';
-import {eOpenPremiumDialog, eOpenProgressDialog, eShowGetPremium} from '../utils/Events';
+import {
+  eOpenPremiumDialog,
+  eOpenProgressDialog,
+  eShowGetPremium,
+} from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
 import {eSendEvent, ToastEvent} from './EventManager';
 
@@ -13,15 +17,15 @@ async function setPremiumStatus() {
     let user = await db.user.getUser();
     if (!user) {
       premiumStatus = null;
-      updateEvent({type:Actions.PREMIUM,state:get()})
+      updateEvent({type: Actions.PREMIUM, state: get()});
     } else {
       premiumStatus = user.subscription.type;
-      updateEvent({type:Actions.PREMIUM,state:get()})
+      updateEvent({type: Actions.PREMIUM, state: get()});
     }
   } catch (e) {
     premiumStatus = null;
   }
-  console.log(premiumStatus,"PREMIUM STATUS")
+  console.log(premiumStatus, 'PREMIUM STATUS');
 }
 
 function get() {
@@ -100,7 +104,7 @@ const showVerifyEmailDialog = () => {
     title: 'Email not verified',
     icon: 'email',
     paragraph:
-      'We have sent you an email confirmation link. Please check your email to verify your account.',
+      'We have sent you an email confirmation link. Please check your email inbox to verify your account. If you cannot find the email, check your spam folder.',
     action: async () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
@@ -117,11 +121,12 @@ const showVerifyEmailDialog = () => {
           return;
         }
         await db.user.sendVerificationEmail();
+        console.log('MAIN SENT');
         await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
         ToastEvent.show('Verification email sent!', 'success', 'local');
       } catch (e) {
         ToastEvent.show(e.message, 'error', 'local');
-        await MMKV.removeItem('lastEmailTime');
+        //await MMKV.removeItem('lastEmailTime');
       }
     },
     actionText: 'Resend Confirmation Link',
