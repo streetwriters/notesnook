@@ -25,7 +25,10 @@ import hashroutes from "./navigation/hash-routes";
 import rootroutes from "./navigation/rootroutes";
 import { getCurrentPath } from "./navigation";
 import useVersion from "./utils/useVersion";
-import { showAppUpdatedNotice } from "./components/dialogs/confirm";
+import {
+  showAppAvailableNotice,
+  showAppUpdatedNotice,
+} from "./components/dialogs/confirm";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -46,6 +49,7 @@ function App() {
   useEffect(() => {
     (async function () {
       if (version.appUpdated) await showAppUpdatedNotice(version);
+      else if (version.appUpdateable) await showAppAvailableNotice(version);
     })();
   }, [version]);
 

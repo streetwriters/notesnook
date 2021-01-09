@@ -1,23 +1,27 @@
+import { useState } from "react";
 import { useEffect } from "react";
 import { db } from "../common";
-import { usePersistentState } from "./hooks";
 
-export const APP_VERSION = {
+var APP_VERSION = {
   formatted: format(1100),
   numerical: 1100,
-  updateAvailable: false,
+  appUpdated: false,
+  appUpdateable: false,
   changelog: undefined,
+  fetched: false,
 };
-var versionChecked = false;
+
+var CACHED_VERSION = undefined;
+
 export default () => {
-  const [version, setVersion] = usePersistentState("app_version", APP_VERSION);
+  const [version, setVersion] = useState(APP_VERSION);
 
   useEffect(() => {
     (async function () {
-      setVersion(await getVersion(version));
+      const version = await getVersion();
+      setVersion(version);
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [setVersion]);
 
   return version;
 };
@@ -29,29 +33,36 @@ export default () => {
 function format(version) {
   const parts = version.toString().split("");
   return `${parts[0]}.${parts[1]}.${parts[2]}${
-    parts[3] !== "0" ? parts[3] : ""
+    parts[3] && parts[3] !== "0" ? parts[3] : ""
   }`;
 }
 
-export async function getVersion(oldVersion) {
+export function getAppVersion() {
+  return APP_VERSION;
+}
+
+export async function getVersion() {
   try {
+    if (APP_VERSION.fetched) return CACHED_VERSION;
+
     const version = await db.version();
-    if (!version || versionChecked)
-      return APP_VERSION.numerical > oldVersion.numerical
-        ? APP_VERSION
-        : oldVersion;
-    versionChecked = true;
-    return {
+    if (!version) return APP_VERSION;
+
+    const changelog = version.web_changelog || version.changelog;
+    CACHED_VERSION = {
       formatted: format(version.web),
       numerical: version.web,
       appUpdated:
-        version.web > oldVersion.numerical &&
+        version.web > APP_VERSION.numerical &&
         APP_VERSION.numerical === version.web,
+      appUpdateable: version.web > APP_VERSION.numerical,
       updateSeverity: version.severity,
-      changelog: version.changelog === "" ? undefined : version.changelog,
+      changelog: !changelog ? undefined : changelog,
+      fetched: true,
     };
+    return CACHED_VERSION;
   } catch (e) {
     console.error(e);
-    return oldVersion;
   }
+  return APP_VERSION;
 }

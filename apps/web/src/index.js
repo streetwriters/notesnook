@@ -11,7 +11,7 @@ import Modal from "react-modal";
 import App from "./App";
 import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 import Splash from "./views/splash";
-import { APP_VERSION } from "./utils/useVersion";
+import { getAppVersion } from "./utils/useVersion";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -25,7 +25,7 @@ if (process.env.NODE_ENV === "production") {
       }
       return event;
     },
-    release: `notesnook-web@${APP_VERSION.formatted}`,
+    release: `notesnook-web@${getAppVersion().formatted}`,
     ignoreErrors: [/ResizeObserver loop limit exceeded/],
     // We recommend adjusting this value in production, or using tracesSampler
     // for finer control

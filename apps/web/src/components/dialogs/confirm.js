@@ -28,7 +28,10 @@ function Confirm(props) {
   );
 }
 
-export function confirm(icon, { title, subtitle, message, yesText, noText }) {
+export function confirm(
+  icon,
+  { title, subtitle, message, yesText, noText, yesAction }
+) {
   return showDialog((perform) => (
     <Confirm
       title={title}
@@ -38,7 +41,10 @@ export function confirm(icon, { title, subtitle, message, yesText, noText }) {
       noText={noText}
       icon={icon}
       onNo={() => perform(false)}
-      onYes={() => perform(true)}
+      onYes={() => {
+        if (yesAction) yesAction();
+        perform(true);
+      }}
     />
   ));
 }
@@ -142,5 +148,32 @@ export function showAppUpdatedNotice(version) {
       </Flex>
     ),
     yesText: `Yay!`,
+  });
+}
+
+export function showAppAvailableNotice(version) {
+  return confirm(Icon.Update, {
+    title: `New version available`,
+    message: (
+      <Flex
+        flexDirection="column"
+        bg="bgSecondary"
+        p={1}
+        sx={{ borderRadius: "default" }}
+      >
+        <Text variant="title">v{version.formatted} changelog:</Text>
+        <Text
+          as="pre"
+          fontFamily="monospace"
+          variant="body"
+          mt={1}
+          sx={{ overflow: "auto" }}
+        >
+          {version.changelog || "No change log."}
+        </Text>
+      </Flex>
+    ),
+    yesText: `Update now`,
+    yesAction: () => window.location.reload(),
   });
 }
