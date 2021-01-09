@@ -11,7 +11,7 @@ import {SIZE} from './SizeUtils';
 import RNTooltips from 'react-native-tooltips';
 import {tabBarRef} from './Refs';
 
-export const APP_VERSION = 1000
+export const APP_VERSION = 1100
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -56,6 +56,8 @@ export const editing = {
   actionAfterFirstSave: {
     type: null,
   },
+  isFocused:false,
+  focusType:null
 };
 export const selection = {
   data: [],
