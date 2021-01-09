@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import { db } from "../common";
 
 var APP_VERSION = {
-  formatted: format(1100),
-  numerical: 1100,
+  formatted: format(1110),
+  numerical: 1110,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
