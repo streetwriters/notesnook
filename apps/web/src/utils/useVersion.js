@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { db } from "../common";
+import config from "./config";
 
 var APP_VERSION = {
   formatted: format(1110),
@@ -21,7 +21,7 @@ export default () => {
       const version = await getVersion();
       setVersion(version);
     })();
-  }, [setVersion]);
+  }, []);
 
   return version;
 };
@@ -41,8 +41,17 @@ export function getAppVersion() {
   return APP_VERSION;
 }
 
+export function getCachedVersion() {
+  return CACHED_VERSION;
+}
+
 export async function getVersion() {
   try {
+    var app_version = config.get("app_version");
+    if (!app_version) {
+      app_version = APP_VERSION;
+      config.set("app_version", APP_VERSION);
+    }
     if (APP_VERSION.fetched) return CACHED_VERSION;
 
     const version = await db.version();
@@ -53,7 +62,7 @@ export async function getVersion() {
       formatted: format(version.web),
       numerical: version.web,
       appUpdated:
-        version.web > APP_VERSION.numerical &&
+        version.web > app_version.numerical &&
         APP_VERSION.numerical === version.web,
       appUpdateable: version.web > APP_VERSION.numerical,
       updateSeverity: version.severity,

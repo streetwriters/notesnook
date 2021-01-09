@@ -24,7 +24,7 @@ import useHashRoutes from "./utils/use-hash-routes";
 import hashroutes from "./navigation/hash-routes";
 import rootroutes from "./navigation/rootroutes";
 import { getCurrentPath } from "./navigation";
-import useVersion from "./utils/useVersion";
+import useVersion, { getCachedVersion } from "./utils/useVersion";
 import {
   showAppAvailableNotice,
   showAppUpdatedNotice,
@@ -48,8 +48,10 @@ function App() {
 
   useEffect(() => {
     (async function () {
-      if (version.appUpdated) await showAppUpdatedNotice(version);
-      else if (version.appUpdateable) await showAppAvailableNotice(version);
+      const cached = getCachedVersion();
+      if (!cached) return;
+      if (cached.appUpdated) await showAppUpdatedNotice(cached);
+      else if (cached.appUpdateable) await showAppAvailableNotice(cached);
     })();
   }, [version]);
 
