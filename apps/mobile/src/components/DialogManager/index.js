@@ -167,7 +167,7 @@ export class DialogManager extends Component {
     eUnSubscribeEvent(eOnLoadNote, this.loadNote);
 
     eUnSubscribeEvent(eOpenActionSheet, this._showActionSheet);
-    eUnSubscribeEvent(eCloseActionSheet, this._hideSimpleDialog);
+    eUnSubscribeEvent(eCloseActionSheet, this._hideActionSheet);
 
     eUnSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
     eUnSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
