@@ -55,8 +55,7 @@ import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
 import EditorRoot from './src/views/Editor/EditorRoot';
 import {getNote} from './src/views/Editor/Functions';
-
-let Sentry = null;
+import Sentry from '@sentry/react-native';
 let hasPurchased = false;
 
 function updateStatusBarColor() {
@@ -301,11 +300,11 @@ const App = () => {
         .catch(console.log);
     });
 
-    //Sentry = require('@sentry/react-native');
-    // Sentry.init({
-    //   dsn:
-    //     'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-    // });
+    Sentry.init({
+      dsn:
+        'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+    });
+
   };
 
   const setCurrentUser = async () => {
