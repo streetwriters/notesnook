@@ -412,10 +412,13 @@
     }
 
     isEmptyLine(range) {
-      const [line] = this.quill.getLine(range.index);
-      const isEmpty = line?.children?.head?.text?.trim() === "";
-      return isEmpty;
-    }
+            const [line] = this.quill.getLine(range.index);
+            var isEmpty;
+            if (line && line.children && line.children.head && line.children.head.text) {
+                isEmpty = line.children.head.text.trim() === "";
+            }
+            return isEmpty;
+     }
   }
 
   class BetterList extends List {

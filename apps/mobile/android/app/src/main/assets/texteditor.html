@@ -382,7 +382,10 @@
 
         isEmptyLine(range) {
             const [line] = this.quill.getLine(range.index);
-            const isEmpty = line?.children?.head?.text?.trim() === "";
+            var isEmpty;
+            if (line && line.children && line.children.head && line.children.head.text) {
+                isEmpty = line.children.head.text.trim() === "";
+            }
             return isEmpty;
         }
     }
@@ -445,7 +448,7 @@
     function loadAction(premium) {
         isTablet = true;
         setFonts();
-        
+
         var Block = Quill.import('blots/block');
         Block.tagName = 'DIV';
         Quill.register(Block, true);
@@ -534,6 +537,8 @@
         }
 
     }
+
+    loadAction(true);
 </script>
 
 
