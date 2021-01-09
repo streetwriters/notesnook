@@ -303,6 +303,7 @@ const App = () => {
     Sentry.init({
       dsn:
         'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+      release:"notesnook-mobile@1.1.0",  
     });
 
   };
