@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Keyboard} from 'react-native';
 import {Platform, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
@@ -12,32 +13,51 @@ import {dWidth, getElevation} from '../../utils';
 import {eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import {post} from '../../views/Editor/Functions';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const translatePrem = new Animated.Value(-dWidth * 5);
 export const opacityPrem = new Animated.Value(0);
-
+let timer = null;
+let  currentMsg = {
+  title: '',
+  desc: '',
+}
 export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [msg, setMsg] = useState({
-    title: '',
-    desc: '',
-  });
+  const [msg, setMsg] = useState(currentMsg);
 
   const open = (event) => {
     if (!event) {
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      currentMsg = {
+        title: '',
+        desc: '',
+      }
+      setMsg(currentMsg)
       opacityPrem.setValue(0);
       translatePrem.setValue(-dWidth * 5);
       return;
     }
-    if (event.context === context) {
-      setMsg({
+
+    if (event.context === context && currentMsg?.desc !== event.desc) {
+      if (timer !== null) {
+        clearTimeout(timer);
+        timer = null;
+      }
+      opacityPrem.setValue(0);
+      translatePrem.setValue(-dWidth * 5);
+      currentMsg = {
         title: event.title,
         desc: event.desc,
-      });
+      }
+      setMsg(currentMsg);
       opacityPrem.setValue(1);
       Animated.timing(translatePrem, {
         toValue: 0,
@@ -45,12 +65,17 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         easing: Easing.inOut(Easing.ease),
       }).start();
 
-      setTimeout(async () => {
+      let timer = setTimeout(async () => {
         Animated.timing(translatePrem, {
           toValue: dWidth * 2,
           duration: 150,
           easing: Easing.inOut(Easing.ease),
         }).start();
+        currentMsg = {
+          title: '',
+          desc: '',
+        }
+        setMsg(currentMsg)
         await sleep(200);
         opacityPrem.setValue(0);
         translatePrem.setValue(-dWidth * 5);
@@ -106,8 +131,9 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
 
       <Button
         onPress={async () => {
-            open(null);
-          await sleep(Platform.OS === 'ios' ? 300 : 50);
+          open(null);
+          post('blur');
+          await sleep(500);
           eSendEvent(eOpenPremiumDialog);
         }}
         width={80}
