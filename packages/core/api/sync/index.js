@@ -101,7 +101,7 @@ export default class Sync {
     EV.publish("db:refresh");
 
     // check for conflicts and throw
-    await this._db.conflicts.check();
+    // await this._db.conflicts.check();
 
     // update our lastSynced time
     if (serverResponse.lastSynced) {
