@@ -1,5 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Linking} from 'react-native';
+import {ScrollView} from 'react-native';
+import {TextInput} from 'react-native';
 import {Platform} from 'react-native';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
@@ -69,12 +71,13 @@ export const UpdateDialog = () => {
               alignItems: 'center',
               marginTop: 10,
             }}>
-            <View
+            <ScrollView
               style={{
                 width: '100%',
                 backgroundColor: colors.nav,
                 padding: 10,
                 borderRadius: 5,
+                maxHeight: 150,
               }}>
               <Paragraph
                 style={{
@@ -91,11 +94,16 @@ export const UpdateDialog = () => {
                     Platform.OS === 'ios' ? 'Courier New' : 'monospace',
                 }}
                 size={SIZE.xs}>
-                {version.changelog && version.changelog !== ''
-                  ? version.changelog
+                {version.mobile_changelog && version.mobile_changelog !== ''
+                  ? version.mobile_changelog
                   : 'No changelog provided.'}
               </Paragraph>
-            </View>
+              <View
+                style={{
+                  height: 25,
+                }}
+              />
+            </ScrollView>
           </View>
 
           <Seperator />
