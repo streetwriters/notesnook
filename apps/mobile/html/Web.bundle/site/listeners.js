@@ -46,6 +46,15 @@ function attachTitleInputListeners() {
     }
   };
 
+  document.getElementById(titleInput).onfocus = function (evt) {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'focus',
+        value: 'title',
+      }),
+    );
+  };
+
   document.getElementById(titleInput).onkeydown = function (evt) {
     onTitleChange(evt);
   };
@@ -96,12 +105,23 @@ function autosize() {
   }
 }
 
+
+
 function attachEditorListeners() {
   /*  editor.once('text-change', function () {
     window.ReactNativeWebView.postMessage('loaded');
   }); */
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
   infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
+
+  editor.on('selection-change', function () {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'focus',
+        value: 'editor',
+      }),
+    );
+  });
 
   function isWhitespace(ch) {
     let whiteSpace = false;

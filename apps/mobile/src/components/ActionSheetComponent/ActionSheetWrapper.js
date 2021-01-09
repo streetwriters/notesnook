@@ -5,6 +5,8 @@ import {DDS} from '../../services/DeviceDetection';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import ActionSheet from 'react-native-actions-sheet';
 import {GetPremium} from './GetPremium';
+import { editing } from '../../utils';
+import { post } from '../../views/Editor/Functions';
 
 const ActionSheetWrapper = ({
   children,
@@ -37,6 +39,9 @@ const ActionSheetWrapper = ({
     };
   }, [colors.bg, gestureEnabled]);
 
+
+
+
   return (
     <ActionSheet
       ref={fwdRef}
@@ -60,7 +65,20 @@ const ActionSheetWrapper = ({
           offset={50}
         />
       }
-      onClose={onClose}>
+      onClose={() => {
+        if (editing.isFocused) {
+          post('blur');
+          if (editing.focusType == "editor") {
+            post('focusEditor');
+          } else {
+            post('focusTitle');
+          }
+        }
+
+        if (onClose) {
+          onClose()
+        }
+      } }>
       {children}
     </ActionSheet>
   );

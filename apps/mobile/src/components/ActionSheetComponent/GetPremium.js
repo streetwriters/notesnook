@@ -9,8 +9,8 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import {dWidth, getElevation} from '../../utils';
-import {eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
+import {dWidth, editing, getElevation} from '../../utils';
+import {eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {post} from '../../views/Editor/Functions';
@@ -21,10 +21,10 @@ import Paragraph from '../Typography/Paragraph';
 export const translatePrem = new Animated.Value(-dWidth * 5);
 export const opacityPrem = new Animated.Value(0);
 let timer = null;
-let  currentMsg = {
+let currentMsg = {
   title: '',
   desc: '',
-}
+};
 export const GetPremium = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -39,8 +39,8 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       currentMsg = {
         title: '',
         desc: '',
-      }
-      setMsg(currentMsg)
+      };
+      setMsg(currentMsg);
       opacityPrem.setValue(0);
       translatePrem.setValue(-dWidth * 5);
       return;
@@ -56,7 +56,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       currentMsg = {
         title: event.title,
         desc: event.desc,
-      }
+      };
       setMsg(currentMsg);
       opacityPrem.setValue(1);
       Animated.timing(translatePrem, {
@@ -74,8 +74,8 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         currentMsg = {
           title: '',
           desc: '',
-        }
-        setMsg(currentMsg)
+        };
+        setMsg(currentMsg);
         await sleep(200);
         opacityPrem.setValue(0);
         translatePrem.setValue(-dWidth * 5);
@@ -132,8 +132,14 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       <Button
         onPress={async () => {
           open(null);
-          post('blur');
-          await sleep(500);
+          if (editing.isFocused) {
+            post('blur');
+            await sleep(300);
+          } else {
+            eSendEvent(eCloseActionSheet);
+            await sleep(300);
+            
+          }
           eSendEvent(eOpenPremiumDialog);
         }}
         width={80}

@@ -48,6 +48,7 @@ const onChangeTab = async (obj) => {
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
+    editing.isFocused = false;
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;

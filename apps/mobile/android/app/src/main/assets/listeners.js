@@ -46,6 +46,15 @@ function attachTitleInputListeners() {
     }
   };
 
+  document.getElementById(titleInput).onfocus = function (evt) {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'focus',
+        value: 'title',
+      }),
+    );
+  };
+
   document.getElementById(titleInput).onkeydown = function (evt) {
     onTitleChange(evt);
   };
@@ -101,6 +110,15 @@ function attachEditorListeners() {
   titleInput = isTablet ? 'titleInput' : 'simpleTitleInput';
   infoBar = isTablet ? '.info-bar' : '.info-bar-alt';
 
+  editor.on('selection-change', function () {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'focus',
+        value: 'editor',
+      }),
+    );
+  });
+
   function isWhitespace(ch) {
     let whiteSpace = false;
     if (ch === ' ' || ch === '\t' || ch === '\n') {
@@ -115,9 +133,9 @@ function attachEditorListeners() {
   editor.on('text-change', function (delta, oldDelta, source) {
     var regex = /https?:\/\/[^\s]+$/;
 
-   if (source === "custom") {
-     return;
-   }
+    if (source === 'custom') {
+      return;
+    }
 
     if (
       delta.ops.length === 2 &&
@@ -196,7 +214,6 @@ function attachMessageListener() {
     }
     switch (type) {
       case 'reset': {
-
         editor.history.clear();
         editor.setText('', 'custom');
         document.getElementById(titleInput).value = '';
@@ -210,7 +227,7 @@ function attachMessageListener() {
         info.querySelector('#infosaved').innerText = '';
         info.querySelector('#infowords').innerText = '';
         autosize();
-        editor.getModule("imageResize").hideOverlay();
+        editor.getModule('imageResize').hideOverlay();
         break;
       }
       case 'keyboard':
