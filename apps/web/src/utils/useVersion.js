@@ -69,6 +69,9 @@ export async function getVersion() {
       changelog: !changelog ? undefined : changelog,
       fetched: true,
     };
+    if (CACHED_VERSION.appUpdated) {
+      config.set("app_version", CACHED_VERSION);
+    }
     return CACHED_VERSION;
   } catch (e) {
     console.error(e);
