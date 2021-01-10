@@ -26,6 +26,7 @@ class Default {
       cursor: "pointer",
       ":focus": {
         outline: "none",
+        opacity: 0.8,
       },
     };
   }
