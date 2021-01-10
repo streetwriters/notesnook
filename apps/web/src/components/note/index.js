@@ -166,9 +166,9 @@ function Note(props) {
       bg={color}
       onClick={() => {
         if (note.conflicted) {
-          hashNavigate(`/notes/${note.id}/conflict`);
+          hashNavigate(`/notes/${note.id}/conflict`, true);
         } else {
-          hashNavigate(`/notes/${note.id}/edit`);
+          hashNavigate(`/notes/${note.id}/edit`, true);
         }
       }}
       info={

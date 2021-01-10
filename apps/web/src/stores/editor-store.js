@@ -51,7 +51,7 @@ class EditorStore extends BaseStore {
       };
     });
     appStore.setIsEditorOpen(true);
-    hashNavigate(`/notes/${note.id}/edit`);
+    hashNavigate(`/notes/${note.id}/edit`, true);
   };
 
   openSession = async (noteId) => {
@@ -152,7 +152,7 @@ class EditorStore extends BaseStore {
       };
     });
     noteStore.setSelectedNote(0);
-    if (shouldNavigate) hashNavigate(`/`);
+    if (shouldNavigate) hashNavigate(`/`, true);
   };
 
   setSession = (set) => {

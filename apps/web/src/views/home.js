@@ -35,7 +35,7 @@ function Home() {
       placeholder={NotesPlaceholder}
       button={{
         content: "Make a new note",
-        onClick: () => hashNavigate("/notes/create"),
+        onClick: () => hashNavigate("/notes/create", true),
       }}
     />
   );

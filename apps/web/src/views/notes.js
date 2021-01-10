@@ -31,7 +31,7 @@ function Notes(props) {
       placeholder={props.placeholder || NotesPlaceholder}
       button={{
         content: "Make a new note",
-        onClick: () => hashNavigate("/notes/create"),
+        onClick: () => hashNavigate("/notes/create", true),
       }}
     />
   );

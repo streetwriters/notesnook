@@ -60,7 +60,7 @@ export const SELECTION_OPTIONS_MAP = {
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Make a note",
-    onClick: () => hashNavigate("/notes/create"),
+    onClick: () => hashNavigate("/notes/create", true),
   },
   notebooks: {
     title: "Create a notebook",
@@ -120,6 +120,7 @@ export async function createBackup() {
 }
 
 export function isUserPremium() {
+  return true;
   const subStatus = userstore.get().user?.subscription?.type;
   return (
     subStatus === SUBSCRIPTION_STATUS.BETA ||

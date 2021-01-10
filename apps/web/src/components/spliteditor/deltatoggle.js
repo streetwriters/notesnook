@@ -49,7 +49,7 @@ function DeltaToggle(props) {
         });
       }
       notestore.refresh();
-      hashNavigate(`/notes/${note.id}/edit`);
+      hashNavigate(`/notes/${note.id}/edit`, true);
     },
     [note]
   );

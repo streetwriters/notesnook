@@ -21,7 +21,7 @@ function SplitEditor(props) {
   useEffect(() => {
     let note = db.notes.note(noteId);
     if (!note) {
-      hashNavigate(`/notes/create`);
+      hashNavigate(`/notes/create`, true);
       return;
     }
     notesStore.setSelectedNote(noteId);
