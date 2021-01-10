@@ -51,7 +51,7 @@ export const HeaderTitle = () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
   }, [headerTextState.heading]);
-
+  
   return (
     <Animated.View
       style={{

@@ -50,8 +50,8 @@ export const Header = ({root}) => {
       <View style={styles.leftBtnContainer}>
         <HeaderLeftMenu />
 
-        {(Platform.OS === 'android' && currentScreen !== 'search') ||
-        Platform.isPad ? (
+        {(Platform.OS === 'android' ||
+        Platform.isPad) && currentScreen !== 'search' ? (
           <HeaderTitle root={root} />
         ) : null}
       </View>
