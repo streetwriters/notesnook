@@ -16,6 +16,7 @@ import {
   eOpenFullscreenEditor
 } from '../../utils/Events';
 import { sideMenuRef, tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
 import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
@@ -172,8 +173,13 @@ const EditorHeader = () => {
             customStyle={{
               marginLeft: 10,
             }}
-            onPress={() => {
+            onPress={async () => {
               let note = getNote() && db.notes.note(getNote().id).data;
+              if (editing.isFocused) {
+                post('blur');
+                await sleep(500);
+                editing.isFocused = true;
+              } 
               ActionSheetEvent(
                 note,
                 true,
