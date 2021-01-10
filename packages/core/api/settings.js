@@ -66,7 +66,7 @@ class Settings {
   }
 
   get pins() {
-    return this._settings.pins.map((pin) => {
+    return this._settings.pins.reduce((prev, pin) => {
       if (pin.type === "notebook") {
         return this._db.notebooks.notebook(pin.data.id).data;
       } else if (pin.type === "topic") {
@@ -76,7 +76,8 @@ class Settings {
       } else if (pin.type === "tag") {
         return this._db.tags.tag(pin.data.id);
       }
-    });
+      return prev;
+    }, []);
   }
 }
 export default Settings;
