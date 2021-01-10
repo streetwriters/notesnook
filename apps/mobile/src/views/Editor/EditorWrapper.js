@@ -95,6 +95,8 @@ export const EditorWrapper = ({dimensions}) => {
         width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
+        borderLeftWidth:1,
+        borderLeftColor:DDS.isLargeTablet() ? colors.nav : 'transparent'
       }}>
       <SafeAreaView
         style={{
