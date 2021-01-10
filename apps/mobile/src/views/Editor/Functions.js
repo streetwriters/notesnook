@@ -169,7 +169,7 @@ export const loadNote = async (item) => {
     if (!webviewInit) {
       EditorWebView.current?.reload();
     }
-  } else if (item && item.type === 'intent') {
+  } /* else if (item && item.type === 'intent') {
     await clearEditor();
     clearNote();
     id = null;
@@ -177,13 +177,15 @@ export const loadNote = async (item) => {
       data: item.data,
       type: 'delta',
     };
+  
     intent = true;
     if (webviewInit) {
       await loadNoteInEditor();
     } else {
       EditorWebView.current?.reload();
     }
-  } else {
+  } */ else {
+    editing.isFocused = false;
     clearTimer();
     await setNote(item);
     sendNoteEditedEvent({
