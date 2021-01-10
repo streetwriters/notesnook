@@ -158,43 +158,43 @@ class MarkdownShortcuts {
         pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(~{2})((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
         action: this._makeInlineAction({ strike: true }),
       },
-      {
-        name: "displayformula",
-        pattern: /(?:\$\$)(.+?)(?:\$\$)/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
+      // {
+      //   name: "displayformula",
+      //   pattern: /(?:\$\$)(.+?)(?:\$\$)/g,
+      //   action: (text, selection, pattern, lineStart) => {
+      //     let match = pattern.exec(text);
 
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
+      //     const annotatedText = match[0];
+      //     const matchedText = match[1];
+      //     const startIndex = lineStart + match.index;
 
-          if (text.match(/^([*_ \n]+)$/g)) return;
+      //     if (text.match(/^([*_ \n]+)$/g)) return;
 
-          setTimeout(() => {
-            this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertEmbed(startIndex, "formula", matchedText);
-            this.quill.insertText(startIndex + 1, "\n", "align", "center");
-          }, 0);
-        },
-      },
-      {
-        name: "formula",
-        pattern: /(?:\$)(.+?)(?:\$)/g,
-        action: (text, selection, pattern, lineStart) => {
-          let match = pattern.exec(text);
+      //     setTimeout(() => {
+      //       this.quill.deleteText(startIndex, annotatedText.length);
+      //       this.quill.insertEmbed(startIndex, "formula", matchedText);
+      //       this.quill.insertText(startIndex + 1, "\n", "align", "center");
+      //     }, 0);
+      //   },
+      // },
+      // {
+      //   name: "formula",
+      //   pattern: /(?:\$)(.+?)(?:\$)/g,
+      //   action: (text, selection, pattern, lineStart) => {
+      //     let match = pattern.exec(text);
 
-          const annotatedText = match[0];
-          const matchedText = match[1];
-          const startIndex = lineStart + match.index;
+      //     const annotatedText = match[0];
+      //     const matchedText = match[1];
+      //     const startIndex = lineStart + match.index;
 
-          if (text.match(/^([*_ \n]+)$/g)) return;
+      //     if (text.match(/^([*_ \n]+)$/g)) return;
 
-          setTimeout(() => {
-            this.quill.deleteText(startIndex, annotatedText.length);
-            this.quill.insertEmbed(startIndex, "formula", matchedText);
-          }, 0);
-        },
-      },
+      //     setTimeout(() => {
+      //       this.quill.deleteText(startIndex, annotatedText.length);
+      //       this.quill.insertEmbed(startIndex, "formula", matchedText);
+      //     }, 0);
+      //   },
+      // },
       {
         name: "code",
         pattern: /(?:^|\s|\n|[^A-z0-9_*~`])(`)((?!\1).*?)(\1)($|\s|\n|[^A-z0-9_*~`])/g,
@@ -295,8 +295,8 @@ class MarkdownShortcuts {
     // for the implementation of getText, which is what we were using before here
     const text = this.quill
       .getContents(lineStart, selection.index)
-      .filter((op) => typeof op.insert === "string" || op.insert.formula)
-      .map((op) => (op.insert.formula ? " " : op.insert))
+      .filter((op) => typeof op.insert === "string" /* || op.insert.formula*/)
+      .map((op) => op.insert /*(op.insert.formula ? " " : op.insert) */)
       .join("");
 
     if (this.isValid(text, line.domNode.tagName)) {
