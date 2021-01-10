@@ -9,7 +9,7 @@ import Animated from "../animated";
 import NavigationItem from "./navigation-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { toTitleCase } from "../../utils/string";
-import { COLORS } from "../../common";
+import { COLORS, db } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import { useLocation } from "wouter";
@@ -55,6 +55,7 @@ function NavigationMenu(props) {
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
   const isSideMenuOpen = useAppStore((store) => store.isSideMenuOpen);
+  const refreshMenuPins = useAppStore((store) => store.refreshMenuPins);
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isSyncing = useUserStore((store) => store.isSyncing);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
@@ -134,21 +135,18 @@ function NavigationMenu(props) {
             }}
           />
         ))}
-        {colors.map(
-          (color) =>
-            color?.title?.length && (
-              <NavigationItem
-                key={color.title}
-                title={toTitleCase(color.title)}
-                icon={Icon.Circle}
-                selected={location === `/colors/${color.id}`}
-                color={COLORS[color.title]}
-                onClick={() => {
-                  navigate(`/colors/${color.id}`);
-                }}
-              />
-            )
-        )}
+        {colors.map((color) => (
+          <NavigationItem
+            key={color.id}
+            title={toTitleCase(color.title)}
+            icon={Icon.Circle}
+            selected={location === `/colors/${color.id}`}
+            color={COLORS[color.title]}
+            onClick={() => {
+              navigate(`/colors/${color.id}`);
+            }}
+          />
+        ))}
         <Flex
           flexDirection="column"
           sx={{ borderTop: "1px solid", borderTopColor: "border" }}
@@ -158,7 +156,15 @@ function NavigationMenu(props) {
               key={pin.id}
               title={pin.title}
               menu={{
-                items: [{ title: "Remove shortcut", onClick: () => {} }],
+                items: [
+                  {
+                    title: "Remove shortcut",
+                    onClick: async () => {
+                      await db.settings.unpin(pin.id);
+                      refreshMenuPins();
+                    },
+                  },
+                ],
                 data: pin,
               }}
               icon={
