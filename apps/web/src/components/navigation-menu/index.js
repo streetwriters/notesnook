@@ -84,8 +84,16 @@ function NavigationMenu(props) {
       sx={{
         borderRight: "1px solid",
         borderRightColor: "border",
-        minWidth: ["85%", isSideMenuOpen ? 150 : 0, isFocusMode ? 0 : 150],
-        maxWidth: ["85%", isSideMenuOpen ? 150 : 0, isFocusMode ? 0 : 150],
+        minWidth: [
+          "85%",
+          isSideMenuOpen && !isFocusMode ? 150 : 0,
+          isFocusMode ? 0 : 150,
+        ],
+        maxWidth: [
+          "85%",
+          isSideMenuOpen && !isFocusMode ? 150 : 0,
+          isFocusMode ? 0 : 150,
+        ],
         zIndex: !isSideMenuOpen ? -1 : isMobile ? 999 : isTablet ? 1 : 1,
         height: ["100%", "auto", "auto"],
         position: ["absolute", "relative", "relative"],

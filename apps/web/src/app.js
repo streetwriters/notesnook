@@ -92,7 +92,7 @@ function App() {
     if (isFocusMode) {
       setShow(false);
     } else {
-      setShow(true);
+      if (!isTablet) setShow(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);

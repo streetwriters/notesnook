@@ -69,8 +69,9 @@ function Toolbar(props) {
       },
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
-        icon: Icon.FocusMode,
+        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
         enabled: true,
+        hideOnMobile: true,
         onClick: toggleFocusMode,
       },
       {
@@ -93,6 +94,7 @@ function Toolbar(props) {
           size={18}
           onClick={() => {
             if (store.get().session.id) showToast("success", "Note saved!");
+            if (isFocusMode) toggleFocusMode();
             clearSession();
           }}
         />
@@ -115,6 +117,7 @@ function Toolbar(props) {
             title={tool.title}
             key={tool.title}
             sx={{
+              display: [tool.hideOnMobile ? "none" : "block", "block", "block"],
               color: tool.enabled ? "text" : "disabled",
               cursor: tool.enabled ? "pointer" : "not-allowed",
             }}

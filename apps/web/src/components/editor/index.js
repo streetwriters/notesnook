@@ -109,7 +109,7 @@ function Editor(props) {
       flexDirection="column"
       sx={{
         position: "relative",
-        alignSelf: isFocusMode ? "center" : "stretch",
+        alignSelf: "stretch",
         overflow: "hidden",
       }}
       flex="1 1 auto"
@@ -131,8 +131,8 @@ function Editor(props) {
             alignSelf: ["stretch", "stretch", "center"],
           }}
           animate={{
-            marginRight: isFocusMode ? "25%" : editorMargins,
-            marginLeft: isFocusMode ? "25%" : editorMargins,
+            marginRight: isFocusMode && !isTablet ? "25%" : editorMargins,
+            marginLeft: isFocusMode && !isTablet ? "25%" : editorMargins,
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "900px"}
