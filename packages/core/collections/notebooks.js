@@ -4,6 +4,7 @@ import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
 import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
+import { qclone } from "qclone";
 var tfun = require("transfun/transfun.js").tfun;
 if (!tfun) {
   tfun = global.tfun;
@@ -85,10 +86,11 @@ export default class Notebooks extends Collection {
     for (let id of ids) {
       let notebook = this.notebook(id);
       if (!notebook) continue;
+      const notebookData = qclone(notebook.data);
       await notebook.topics.delete(...notebook.data.topics);
       await this._collection.removeItem(id);
       await this._db.settings.unpin(id);
-      await this._db.trash.add(notebook.data);
+      await this._db.trash.add(notebookData);
     }
   }
 
