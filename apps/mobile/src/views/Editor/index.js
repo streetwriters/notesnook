@@ -1,11 +1,11 @@
-import React, {useCallback, useEffect} from 'react';
-import {Platform, TextInput} from 'react-native';
+import React from 'react';
+import { Platform, TextInput } from 'react-native';
 import WebView from 'react-native-webview';
-import {notesnook} from '../../../e2e/test.ids';
+import { notesnook } from '../../../e2e/test.ids';
+import { Loading } from '../../components/Loading';
 import { useTracked } from '../../provider';
-import {ToastEvent} from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import {getCurrentColors} from '../../utils/Colors';
+import { ToastEvent } from '../../services/EventManager';
+import { getCurrentColors } from '../../utils/Colors';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -14,7 +14,7 @@ import {
   sourceUri,
   textInput,
   _onMessage,
-  _onShouldStartLoadWithRequest,
+  _onShouldStartLoadWithRequest
 } from './Functions';
 
 const source =
@@ -36,12 +36,15 @@ const style = {
 const Editor = React.memo(
   () => {
     const [state] = useTracked();
-    const {premiumUser} = state;
+    const {premiumUser, loading} = state;
+
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    return (
+    return loading ? (
+      <Loading tagline="Loading Editor" height="100%" />
+    ) : (
       <>
         <TextInput
           ref={textInput}
@@ -54,7 +57,6 @@ const Editor = React.memo(
           ref={EditorWebView}
           onLoad={onLoad}
           onError={(event) => {
-            //EditorWebView.current?.reload();
             ToastEvent.show('Editor Load Error', 'error');
           }}
           javaScriptEnabled={true}
