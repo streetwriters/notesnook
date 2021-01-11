@@ -328,9 +328,12 @@ const setTheme = function () {
 
     
     .ql-editor ul[data-checked='false'] > li::before {
-      font-size: 25px;
-    
+      font-size:${pageTheme.colors.factor * 20};
     }  
+    .ql-editor ul[data-checked='true'] > li::before {
+      font-size:${pageTheme.colors.factor * 20};
+    }    
+    
     #simpleTitleInput::-webkit-input-placeholder {
       color:${pageTheme.colors.icon}
     }

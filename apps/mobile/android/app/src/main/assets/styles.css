@@ -92,14 +92,10 @@
 
  .ql-editor ul[data-checked='true'] > li::before {
   content: '\2611';
-  font-size: 25px;
-  margin-right: 0px;
-  
 }
 
 .ql-editor ul[data-checked='false'] > li::before {
   content: '\2610';
-  font-size: 25px;
 } 
 
 .ql-editor li::before {
@@ -109,7 +105,6 @@
 }
 
 .ql-editor li:not(.ql-direction-rtl)::before {
-  margin-left: -1.5em;
   margin-right: 0.3em;
   text-align: right;
 }
