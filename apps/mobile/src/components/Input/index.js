@@ -37,7 +37,6 @@ const Input = ({
   const [state] = useTracked();
   const colors = state.colors;
   const [error, setError] = useState(false);
-  const [value, setValue] = useState(null);
   const [focus, setFocus] = useState(false);
   const [secureEntry, setSecureEntry] = useState(true);
   const [showError, setShowError] = useState(false);
@@ -48,6 +47,7 @@ const Input = ({
     NO_NUM: true,
     SPECIAL: true,
   });
+
   const color = error
     ? colors.red
     : focus
@@ -104,7 +104,6 @@ const Input = ({
 
   const onChange = (value) => {
     onChangeText(value);
-    setValue(value);
     validate(value);
   };
 
@@ -137,8 +136,6 @@ const Input = ({
     height: 35,
   };
 
-
-
   return (
     <>
       <View style={style}>
@@ -152,11 +149,12 @@ const Input = ({
           onBlur={onBlur}
           onEndEditing={() => {
             if (clearTextOnFocus) {
-              setValue(null)
+              fwdRef.current?.setNativeProps({
+                text:''
+              })
             }
           }}
           onFocus={onFocus}
-          value={value}
           onSubmitEditing={onSubmit}
           blurOnSubmit={blurOnSubmit}
           style={textStyle}
