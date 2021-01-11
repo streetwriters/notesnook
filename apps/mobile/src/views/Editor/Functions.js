@@ -169,22 +169,7 @@ export const loadNote = async (item) => {
     if (!webviewInit) {
       EditorWebView.current?.reload();
     }
-  } /* else if (item && item.type === 'intent') {
-    await clearEditor();
-    clearNote();
-    id = null;
-    content = {
-      data: item.data,
-      type: 'delta',
-    };
-  
-    intent = true;
-    if (webviewInit) {
-      await loadNoteInEditor();
-    } else {
-      EditorWebView.current?.reload();
-    }
-  } */ else {
+  } else {
     editing.isFocused = false;
     clearTimer();
     await setNote(item);
@@ -256,7 +241,7 @@ export const _onMessage = async (evt) => {
       break;
     case 'focus':
       editing.focusType = message.value;
-      break;  
+      break;
     default:
       break;
   }
@@ -293,12 +278,8 @@ export async function clearEditor() {
   post('dateEdited', '');
   post('saving', '');
   clearNote();
-  //intent = false;
 }
 
-function checkIfContentIsSavable() {
-  return true;
-}
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
   if (oldId !== currentId) {
@@ -313,9 +294,6 @@ async function setNoteInEditorAfterSaving(oldId, currentId) {
         note = note.data;
       }
     }
-    post('title', note?.title);
-    post('dateEdited', timeConverter(note?.dateEdited));
-    post('saving', 'Saved');
   }
 }
 
@@ -363,14 +341,12 @@ async function addToCollection(id) {
 }
 
 export async function saveNote() {
-  if (!checkIfContentIsSavable()) return;
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
       return;
     }
     let locked = id ? db.notes.note(id).data.locked : null;
-    console.log(content.data, 'DATA');
     let noteData = {
       title,
       content: {
@@ -419,23 +395,17 @@ export async function onWebViewLoad(premium, colors) {
   }
   post('blur');
   setColors(colors);
-  await loadEditorState();
+  await restoreEditorState();
 }
 
-async function loadEditorState() {
-  if (sideMenuRef.current !== null) {
-    if (intent) {
+async function restoreEditorState() {
+  let appState = await MMKV.getItem('appState');
+  if (appState) {
+    appState = JSON.parse(appState);
+    if (appState.editing && appState.note && appState.note.id) {
+      eSendEvent(eOnLoadNote, appState.note);
+      tabBarRef.current?.goToPage(1);
       MMKV.removeItem('appState');
-      return;
-    }
-    let appState = await MMKV.getItem('appState');
-    if (appState) {
-      appState = JSON.parse(appState);
-      if (appState.editing && appState.note && appState.note.id) {
-        eSendEvent(eOnLoadNote, appState.note);
-        tabBarRef.current?.goToPage(1);
-        MMKV.removeItem('appState');
-      }
     }
   }
 }
@@ -445,11 +415,7 @@ export let isFromIntent = false;
 const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
-  if (intent) {
-    post('delta', content.data);
-    intent = false;
-    await saveNote();
-  } else if (note?.id) {
+  if (note?.id) {
     post('title', title);
     intent = false;
     setColors();
