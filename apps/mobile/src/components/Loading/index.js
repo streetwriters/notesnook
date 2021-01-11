@@ -17,7 +17,7 @@ export const Loading = ({
   const {colors} = state;
 
   return (
-    <View style={[{height: height}, styles.activityContainer, customStyle]}>
+    <View style={[{height: height,backgroundColor:colors.bg}, styles.activityContainer, customStyle]}>
       {done ? (
         <>
           <Paragraph
