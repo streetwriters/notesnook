@@ -155,8 +155,7 @@ const App = () => {
 
   useEffect(() => {
     SettingsService.init().then((r) => console.log);
-    console.log(Orientation.getInitialOrientation(),"INIT ORIENT")
-    DDS.checkSmallTab(Orientation.getInitialOrientation())
+    DDS.checkSmallTab(Orientation.getInitialOrientation());
     dispatch({
       type: Actions.DEVICE_MODE,
       state: DDS.isLargeTablet()
@@ -303,12 +302,15 @@ const App = () => {
         .catch(console.log);
     });
 
-    Sentry.init({
-      dsn:
-        'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-      release:"notesnook-mobile@1.1.0",  
-    });
-
+    if (!__DEV__) {
+      try {
+        Sentry.init({
+          dsn:
+            'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+          release: 'notesnook-mobile@1.1.0',
+        });
+      } catch (e) {}
+    }
   };
 
   const setCurrentUser = async () => {
