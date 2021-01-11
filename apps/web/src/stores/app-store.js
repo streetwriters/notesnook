@@ -7,7 +7,6 @@ import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
 import { isMobile } from "../utils/dimensions";
 import { showToast } from "../utils/toast";
-import { toTitleCase } from "../utils/string";
 import { resetReminders } from "../common/reminders";
 
 class AppStore extends BaseStore {
@@ -88,14 +87,14 @@ class AppStore extends BaseStore {
         }
       });
       await db.settings.unpin(item.id);
-      showToast("success", `${toTitleCase(item.type)} unpinned from menu!`);
+      showToast("success", `Shortcut created!`);
     } else {
       this.set((state) => state.menuPins.push(item));
       await db.settings.pin(item.type, {
         id: item.id,
         notebookId: item.notebookId,
       });
-      showToast("success", `${toTitleCase(item.type)} pinned to menu!`);
+      showToast("success", `Shortcut removed!`);
     }
 
     // refresh the respective list

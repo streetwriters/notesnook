@@ -4,7 +4,6 @@ import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import BaseStore from ".";
-import { qclone } from "qclone";
 import { EV } from "notes-core/common";
 import { hashNavigate } from "../navigation";
 

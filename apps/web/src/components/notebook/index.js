@@ -31,7 +31,7 @@ function menuItems(notebook, index) {
       onClick: () => hashNavigate(`/notebooks/${notebook.id}/edit`),
     },
     {
-      title: "Delete",
+      title: "Move to trash",
       color: "red",
       onClick: () => {
         showDeleteConfirmation("notebook").then(async (res) => {
