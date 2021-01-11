@@ -43,6 +43,7 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
+    SplashScreen.hide();
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
@@ -51,7 +52,7 @@ const App = () => {
       SettingsService.setAppLoaded();
     });
     eSendEvent(eOpenSideMenu);
-    SplashScreen.hide();
+
     dispatch({type: Actions.ALL});
  
   };

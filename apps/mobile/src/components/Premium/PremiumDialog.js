@@ -50,7 +50,7 @@ class PremiumDialog extends React.Component {
       this.setState({
         user: u,
       });
-      await RNIap.initConnection();
+      await RNIap.initConnection();      
       let prod = await RNIap.getSubscriptions(itemSkus);
 
       this.setState({

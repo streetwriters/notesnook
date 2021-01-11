@@ -211,6 +211,7 @@ export const AppRootEvents = React.memo(
             );
           });
       } else {
+        
         subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
           onSuccessfulSubscription,
         );
