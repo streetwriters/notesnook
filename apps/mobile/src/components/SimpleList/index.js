@@ -45,8 +45,8 @@ const SimpleList = ({
     heading: 'Home',
   },
 }) => {
-  const [state, dispatch] = useTracked();
-  const {colors, searchResults, headerTextState} = state;
+  const [state] = useTracked();
+  const {colors} = state;
   const [refreshing, setRefreshing] = useState(false);
 
   const [dataProvider, setDataProvider] = useState(
@@ -56,7 +56,7 @@ const SimpleList = ({
   );
   const insets = useSafeAreaInsets();
 
-  const {width, fontScale, height} = useWindowDimensions();
+  const {width, fontScale} = useWindowDimensions();
 
   const listData = data;
   const dataType = type;
@@ -67,11 +67,12 @@ const SimpleList = ({
   };
 
   useEffect(() => {
+    if (loading) return;
     loadData();
-  }, [data, searchResults.results, loading]);
+  }, [data, loading]);
 
   const loadData = () => {
-    if (loading) return;
+    
     let mainData = [header, {type: 'empty'}];
     mainData =
       !listData || listData.length === 0 ? mainData : [header, ...listData];
@@ -127,52 +128,6 @@ const SimpleList = ({
       refreshCallback();
     }
   };
-
-  const _ListEmptyComponent = (
-    <View
-      style={[
-        {
-          backgroundColor: colors.bg,
-          height: height - 250 - insets.top,
-          width: '100%',
-        },
-      ]}>
-      <View
-        style={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Heading>{placeholderData.heading}</Heading>
-        <Paragraph
-          style={{
-            textAlign: 'center',
-            width: '80%',
-          }}
-          color={colors.icon}>
-          {loading ? placeholderData.loading : placeholderData.paragraph}
-        </Paragraph>
-        <Seperator />
-        {placeholderData.button && !loading ? (
-          <Button
-            onPress={placeholderData.action}
-            title={placeholderData.button}
-            icon="plus"
-            type="accent"
-            fontSize={SIZE.md}
-            accentColor="bg"
-            accentText={
-              COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                ? headerTextState.heading.toLowerCase()
-                : 'accent'
-            }
-          />
-        ) : loading ? (
-          <ActivityIndicator color={colors.accent} />
-        ) : null}
-      </View>
-    </View>
-  );
 
   const _layoutProvider = new LayoutProvider(
     (index) => {
@@ -259,7 +214,12 @@ const SimpleList = ({
       case 'header':
         return <RenderSectionHeader item={data} index={index} />;
       case 'empty':
-        return _ListEmptyComponent;
+        return (
+          <ListEmptyComponent
+            loading={loading}
+            placeholderData={placeholderData}
+          />
+        );
     }
   };
 
@@ -306,3 +266,55 @@ const SimpleList = ({
 };
 
 export default SimpleList;
+
+const ListEmptyComponent = ({loading = true, placeholderData}) => {
+  const [state] = useTracked();
+  const {colors, headerTextState} = state;
+  const insets = useSafeAreaInsets();
+  const {height} = useWindowDimensions();
+  return (
+    <View
+      style={[
+        {
+          backgroundColor: colors.bg,
+          height: height - 250 - insets.top,
+          width: '100%',
+        },
+      ]}>
+      <View
+        style={{
+          flexGrow: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+        <Heading>{placeholderData.heading}</Heading>
+        <Paragraph
+          style={{
+            textAlign: 'center',
+            width: '80%',
+          }}
+          color={colors.icon}>
+          {loading ? placeholderData.loading : placeholderData.paragraph}
+        </Paragraph>
+        <Seperator />
+        {placeholderData.button && !loading ? (
+          <Button
+            onPress={placeholderData.action}
+            title={placeholderData.button}
+            icon="plus"
+            type="accent"
+            fontSize={SIZE.md}
+            accentColor="bg"
+            accentText={
+              COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                ? headerTextState.heading.toLowerCase()
+                : 'accent'
+            }
+          />
+        ) : loading ? (
+          <ActivityIndicator color={colors.accent} />
+        ) : null}
+      </View>
+    </View>
+  );
+};

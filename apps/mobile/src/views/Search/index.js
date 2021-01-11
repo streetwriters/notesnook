@@ -48,6 +48,8 @@ export const Search = ({route, navigation}) => {
     };
   }, []);
 
+  
+
   return (
     <>
       <SimpleList
