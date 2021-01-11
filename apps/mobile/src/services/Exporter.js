@@ -3,7 +3,7 @@ import {db} from '../utils/DB';
 import RNFetchBlob from 'rn-fetch-blob';
 import {ToastEvent} from './EventManager';
 import he from 'he';
-import RNHTMLtoPDF from 'react-native-html-to-pdf';
+import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
 
 async function saveToPDF(note) {
