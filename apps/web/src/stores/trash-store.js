@@ -10,18 +10,16 @@ class TrashStore extends BaseStore {
     this.set((state) => (state.trash = db.trash.all));
   };
 
-  delete = (id, index, commit = false) => {
+  delete = (id, commit = false) => {
     if (!commit) {
-      return this.set((state) => {
-        state.trash.splice(index, 1);
-      });
+      return this.set((state) => (state.trash = db.trash.all));
     }
     return db.trash.delete(id);
   };
 
-  restore = (id, index) => {
+  restore = (id) => {
     return db.trash.restore(id).then(() => {
-      this.set((state) => state.trash.splice(index, 1));
+      this.set((state) => (state.trash = db.trash.all));
       appStore.refreshColors();
     });
   };

@@ -65,7 +65,7 @@ class EditorStore extends BaseStore {
 
     let note = db.notes.note(noteId);
     if (!note) return;
-    note = qclone(note.data);
+    note = note.data;
 
     noteStore.setSelectedNote(note.id);
 

@@ -17,7 +17,9 @@ function menuItems(item, index) {
         store.restore(item.id, index);
         showToast(
           "success",
-          `${item.type === "note" ? "Note" : "Notebook"} restored successfully!`
+          `${
+            item.itemType === "note" ? "Note" : "Notebook"
+          } restored successfully!`
         );
       },
     },
@@ -44,7 +46,7 @@ function menuItems(item, index) {
           ),
         }).then(async (res) => {
           if (res) {
-            await store.delete(item.id, index);
+            await store.delete(item.id);
             showPermanentDeleteToast(item, index);
           }
         });

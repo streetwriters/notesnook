@@ -55,17 +55,15 @@ function showItemDeletedToast(item) {
   var toast = showToast("success", messageText, actions);
 }
 
-async function showPermanentDeleteToast(item, index) {
-  const noun = item.type === "note" ? "Note" : "Notebook";
+async function showPermanentDeleteToast(item) {
+  const noun = item.itemType === "note" ? "Note" : "Notebook";
   const messageText = `${noun} permanently deleted!`;
   const timeoutId = setTimeout(() => {
-    trashstore.delete(item.id, index, true);
+    trashstore.delete(item.id, true);
   }, 5000);
   const undoAction = async () => {
     toast.hide();
-    trashstore.set((state) => {
-      state.trash.splice(index, 0, item);
-    });
+    trashstore.refresh();
     clearTimeout(timeoutId);
   };
   let actions = [{ text: "Undo", onClick: undoAction }];
