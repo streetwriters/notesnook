@@ -20,9 +20,9 @@ PODS:
     - DoubleConversion
     - glog
   - glog (0.3.5)
-  - MMKV (1.2.6):
-    - MMKVCore (~> 1.2.6)
-  - MMKVCore (1.2.6)
+  - MMKV (1.2.7):
+    - MMKVCore (~> 1.2.7)
+  - MMKVCore (1.2.7)
   - Permission-PhotoLibrary (2.2.2):
     - RNPermissions
   - pop (1.0.12)
@@ -201,7 +201,7 @@ PODS:
   - react-native-keep-awake (1.0.4):
     - React
   - react-native-mmkv-storage (0.3.7):
-    - MMKV (= 1.2.6)
+    - MMKV (= 1.2.7)
     - React
   - react-native-netinfo (5.9.9):
     - React-Core
@@ -542,8 +542,8 @@ SPEC CHECKSUMS:
   FBReactNativeSpec: f2c97f2529dd79c083355182cc158c9f98f4bd6e
   Folly: b73c3869541e86821df3c387eb0af5f65addfab4
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
-  MMKV: 27f6b9e34849e77e78c5a1cc8f7f513e37f5fa15
-  MMKVCore: c301b04fd2ab9957e6e4d4465b9b60e443b0bb6b
+  MMKV: 22e5136f7d00197bc0fc9694b7f71519f0d1ca12
+  MMKVCore: 607b7b05f2c2140056b5d338e45f2c14bf3f4232
   Permission-PhotoLibrary: 8227a6ed9f6a971537afe63742d54f5f23a38fe2
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
@@ -560,7 +560,7 @@ SPEC CHECKSUMS:
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
-  react-native-mmkv-storage: 1af147d3491d82e9b8c9706d8c03f82a30d8f1b4
+  react-native-mmkv-storage: 6d9ce7bbbef45fcdde623dd13bf3617ea87c2a52
   react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
