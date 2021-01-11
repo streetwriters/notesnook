@@ -1,7 +1,7 @@
 import {eSendEvent} from '../services/EventManager';
 import {eThemeUpdated} from './Events';
 import {Platform, StatusBar} from 'react-native';
-import { AndroidModule } from '.';
+import {AndroidModule} from '.';
 
 export const ACCENT = {
   color: '#0560FF',
@@ -75,9 +75,8 @@ export const COLOR_SCHEME_DARK = {
 };
 
 export function getCurrentColors() {
-  return COLOR_SCHEME
+  return COLOR_SCHEME;
 }
-
 
 export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
   COLOR_SCHEME = {...colors, accent: accent.color, shade: accent.shade};
@@ -86,10 +85,11 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     COLOR_SCHEME.night ? 'light-content' : 'dark-content',
     true,
   );
-  AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
+
   if (Platform.OS === 'android') {
+    AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
     StatusBar.setBackgroundColor('transparent', true);
-    StatusBar.setTranslucent(true,true);
+    StatusBar.setTranslucent(true, true);
   }
   eSendEvent(eThemeUpdated);
 

@@ -196,7 +196,7 @@ PODS:
     - React-Core
   - react-native-get-random-values (1.5.0):
     - React
-  - react-native-html-to-pdf (0.8.0):
+  - react-native-html-to-pdf-lite (0.9.1):
     - React
   - react-native-keep-awake (1.0.4):
     - React
@@ -312,8 +312,6 @@ PODS:
     - Sentry (= 6.0.9)
   - RNShare (3.8.5):
     - React-Core
-  - RNStoreReview (0.1.5):
-    - React
   - RNSVG (12.1.0):
     - React
   - RNTooltips (1.0.2):
@@ -354,7 +352,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
-  - react-native-html-to-pdf (from `../node_modules/react-native-html-to-pdf`)
+  - react-native-html-to-pdf-lite (from `../node_modules/react-native-html-to-pdf-lite`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -391,7 +389,6 @@ DEPENDENCIES:
   - RNSecureRandom (from `../node_modules/react-native-securerandom`)
   - "RNSentry (from `../node_modules/@sentry/react-native`)"
   - RNShare (from `../node_modules/react-native-share`)
-  - RNStoreReview (from `../node_modules/react-native-store-review/ios`)
   - RNSVG (from `../node_modules/react-native-svg`)
   - RNTooltips (from `../node_modules/react-native-tooltips/ios`)
   - RNVectorIcons (from `../node_modules/react-native-vector-icons`)
@@ -445,8 +442,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-document-picker"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
-  react-native-html-to-pdf:
-    :path: "../node_modules/react-native-html-to-pdf"
+  react-native-html-to-pdf-lite:
+    :path: "../node_modules/react-native-html-to-pdf-lite"
   react-native-keep-awake:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
@@ -519,8 +516,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/@sentry/react-native"
   RNShare:
     :path: "../node_modules/react-native-share"
-  RNStoreReview:
-    :path: "../node_modules/react-native-store-review/ios"
   RNSVG:
     :path: "../node_modules/react-native-svg"
   RNTooltips:
@@ -563,7 +558,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
-  react-native-html-to-pdf: 1d1199917f56a98377d431bce84c2f275e48eb71
+  react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
   react-native-mmkv-storage: 1af147d3491d82e9b8c9706d8c03f82a30d8f1b4
   react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
@@ -600,7 +595,6 @@ SPEC CHECKSUMS:
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNSentry: 51972e3fe50e2fb38ae459af8c87d61f63f364db
   RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
-  RNStoreReview: 62d6afd7c37db711a594bbffca6b0ea3a812b7a8
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNTooltips: e13180e4339e2a85daabd09507f62a5a32d3dc8a
   RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
@@ -609,6 +603,6 @@ SPEC CHECKSUMS:
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 35fc693c4d538e75ade1302857b725c6a8a63b89
+PODFILE CHECKSUM: 221f4e1fcc0976630135f88e7c95ccec5cc28b8e
 
 COCOAPODS: 1.10.0
