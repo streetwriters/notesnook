@@ -47,7 +47,7 @@ function onMessage(ev) {
         return;
     }
   } catch (error) {
-    sendMessage(type, { error }, messageId);
+    sendMessage(type, { error: error.message }, messageId);
   }
 }
 
