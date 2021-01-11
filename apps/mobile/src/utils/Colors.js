@@ -1,6 +1,7 @@
 import {eSendEvent} from '../services/EventManager';
 import {eThemeUpdated} from './Events';
 import {Platform, StatusBar} from 'react-native';
+import { AndroidModule } from '.';
 
 export const ACCENT = {
   color: '#0560FF',
@@ -40,7 +41,7 @@ const fixedColors = {
 export var COLOR_SCHEME = {
   ...fixedColors,
   night: false,
-  bg: 'white',
+  bg: '#ffffff',
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
   pri: '#000000',
@@ -51,13 +52,13 @@ export var COLOR_SCHEME = {
 export const COLOR_SCHEME_LIGHT = {
   ...fixedColors,
   night: false,
-  bg: 'white',
+  bg: '#ffffff',
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
   input: 'transparent',
   heading: '#000000',
   pri: '#24292e',
-  sec: 'white',
+  sec: '#ffffff',
   light: '#ffffff',
 };
 export const COLOR_SCHEME_DARK = {
@@ -85,6 +86,7 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     COLOR_SCHEME.night ? 'light-content' : 'dark-content',
     true,
   );
+  AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
   if (Platform.OS === 'android') {
     StatusBar.setBackgroundColor('transparent', true);
     StatusBar.setTranslucent(true,true);

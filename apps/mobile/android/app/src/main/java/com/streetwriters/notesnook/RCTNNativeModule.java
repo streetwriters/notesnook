@@ -1,6 +1,7 @@
 package com.streetwriters.notesnook;
 
 
+import android.graphics.Color;
 import android.view.WindowManager;
 
 import com.facebook.react.bridge.ReactContext;
@@ -26,6 +27,17 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
 
     @ReactMethod
+    public void setBackgroundColor(final String color) {
+
+        try {
+           getCurrentActivity().getWindow().getDecorView().setBackgroundColor(Color.parseColor(color));
+        } catch (Exception e) {
+
+        }
+    }
+
+
+    @ReactMethod
     public void setSecureMode(final boolean mode) {
         try {
 
@@ -44,6 +56,7 @@ public class RCTNNativeModule extends ReactContextBaseJavaModule {
 
         }
     }
+
 
 
 }
