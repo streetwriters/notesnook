@@ -24,7 +24,7 @@ function selectMenuItem(isSelected, toggleSelection) {
 
 const ItemSelector = ({ isSelected, toggleSelection }) => {
   return isSelected ? (
-    <Icon.Check
+    <Icon.CheckCircle
       color="primary"
       size={16}
       sx={{

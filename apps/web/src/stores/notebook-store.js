@@ -41,9 +41,7 @@ class NotebookStore extends BaseStore {
 
   setSelectedNotebookTopics = (id) => {
     this.set((state) => {
-      state.selectedNotebookTopics = db.notebooks
-        .notebook(id)
-        .topics.all.slice();
+      state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
       state.selectedNotebookId = id;
     });
   };
