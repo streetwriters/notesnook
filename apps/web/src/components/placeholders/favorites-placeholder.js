@@ -3,6 +3,12 @@ import { ReactComponent as Fav } from "../../assets/fav.svg";
 import Placeholder from "./index";
 
 function FavoritesPlaceholder() {
-  return <Placeholder image={Fav} />;
+  return (
+    <Placeholder
+      image={Fav}
+      title="Your favorites"
+      text="Notes you favorite will appear here."
+    />
+  );
 }
 export default FavoritesPlaceholder;
