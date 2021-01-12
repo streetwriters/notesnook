@@ -55,8 +55,10 @@ const onAppStateChanged = async (state) => {
     if (SettingsService.get().privacyScreen) {
       enabled(false);
     }
+
     await MMKV.removeItem('appState');
     let intent = await MMKV.getItem('notesAddedFromIntent');
+    console.log("FROM INTENT",intent)
     if (intent) {
       try {
         if (Platform.OS === 'ios') {
@@ -64,6 +66,7 @@ const onAppStateChanged = async (state) => {
           await db.notes.init();
           updateEvent({type: Actions.NOTES});
           eSendEvent(refreshNotesPage);
+          console.log("RELOADING APP")
         } else {
           updateEvent({type: Actions.NOTES});
           eSendEvent(refreshNotesPage);
@@ -75,6 +78,7 @@ const onAppStateChanged = async (state) => {
       updateEvent({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
     }
+
   } else {
     if (editing.currentlyEditing && getAppIsIntialized()) {
       let state = JSON.stringify({
@@ -99,8 +103,9 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
-      console.log('EVENT ROOT', loading);
+    
       if (!loading) {
+        console.log('SUB EVENTS', loading);
         Linking.getInitialURL().then(async (url) => {
           if (
             url &&
@@ -156,7 +161,7 @@ export const AppRootEvents = React.memo(
         Linking.removeEventListener('url', onUrlRecieved);
         unsubIAP();
       };
-    }, []);
+    }, [loading]);
 
     const onSyncComplete = async () => {
       dispatch({type: Actions.ALL});

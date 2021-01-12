@@ -1,4 +1,4 @@
-import React, {createRef, useCallback, useEffect, useState} from 'react';
+import React, { createRef, useCallback, useEffect, useState } from 'react';
 import {
   Appearance,
   InteractionManager,
@@ -6,36 +6,35 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as Keychain from 'react-native-keychain';
-import {enabled} from 'react-native-privacy-snapshot';
-import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import { enabled } from 'react-native-privacy-snapshot';
+import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import Input from '../../components/Input';
-import {PressableButton} from '../../components/PressableButton';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
-import {Toast} from '../../components/Toast';
+import { ListHeaderComponent } from '../../components/SimpleList/ListHeaderComponent';
+import { Toast } from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import Backup from '../../services/Backup';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {setLoginMessage} from '../../services/Message';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
@@ -45,17 +44,17 @@ import {
   dWidth,
   MenuItemsList,
   setSetting,
-  SUBSCRIPTION_STATUS_STRINGS,
+  SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -64,12 +63,12 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {pv, SIZE} from '../../utils/SizeUtils';
+import { MMKV } from '../../utils/mmkv';
+import { pv, SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {timeConverter} from '../../utils/TimeUtils';
+import { timeConverter } from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
