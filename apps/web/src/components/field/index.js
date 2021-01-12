@@ -147,7 +147,7 @@ function Field(props) {
               ) : (
                 <Icon.Cross color="error" size={14} />
               )}
-              <Text fontSize="body" ml={1}>
+              <Text fontSize="body" color="text" ml={1}>
                 {rule.title}
               </Text>
             </Flex>
