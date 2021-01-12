@@ -17,7 +17,7 @@ function Trash() {
       placeholder={TrashPlaceholder}
       items={items}
       button={{
-        show: true,
+        show: !!items.length,
         content: "Clear Trash",
         icon: Icon.Trash,
         onClick: function () {
