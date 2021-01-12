@@ -72,55 +72,11 @@ const SimpleList = ({
   }, [data, loading]);
 
   const loadData = () => {
-    
     let mainData = [header, {type: 'empty'}];
     mainData =
       !listData || listData.length === 0 ? mainData : [header, ...listData];
     setDataProvider(dataProvider.cloneWithRows(mainData));
   };
-
-  const RenderSectionHeader = ({item, index}) => (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '100%',
-        justifyContent: 'space-between',
-        paddingHorizontal: 12,
-        height: 30,
-        backgroundColor:
-          index === 1
-            ? headerProps.color
-              ? colors[headerProps.color]
-              : colors.shade
-            : colors.nav,
-        marginTop: index === 1 ? 0 : 5,
-      }}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (jumpToDialog) {
-            eSendEvent(eOpenJumpToDialog);
-          }
-        }}
-        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
-        style={{
-          height: '100%',
-          justifyContent: 'center',
-        }}>
-        <Heading
-          color={colors.accent}
-          size={SIZE.sm}
-          style={{
-            minWidth: 60,
-            alignSelf: 'center',
-            textAlignVertical: 'center',
-          }}>
-          {!item.title || item.title === '' ? 'Pinned' : item.title}
-        </Heading>
-      </TouchableWithoutFeedback>
-      {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
-    </View>
-  );
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -212,7 +168,14 @@ const SimpleList = ({
           />
         );
       case 'header':
-        return <RenderSectionHeader item={data} index={index} />;
+        return (
+          <RenderSectionHeader
+            item={data}
+            index={index}
+            headerProps={headerProps}
+            jumpToDialog={jumpToDialog}
+          />
+        );
       case 'empty':
         return (
           <ListEmptyComponent
@@ -222,6 +185,39 @@ const SimpleList = ({
         );
     }
   };
+
+  let scrollProps = React.useMemo(() => {
+    return {
+      refreshControl: (
+        <RefreshControl
+          style={{
+            opacity: 0,
+            elevation: 0,
+          }}
+          tintColor={colors.accent}
+          colors={[colors.accent]}
+          progressViewOffset={150}
+          onRefresh={customRefresh ? customRefresh : _onRefresh}
+          refreshing={customRefresh ? customRefreshing : refreshing}
+        />
+      ),
+      overScrollMode: 'always',
+      contentContainerStyle: {
+        width: '100%',
+        alignSelf: 'center',
+        minHeight: '100%',
+      },
+      testID: 'list-' + type,
+    };
+  }, [colors.accent, type, customRefresh]);
+
+  let styles = {
+    height: '100%',
+    backgroundColor: colors.bg,
+    width: '100%',
+  };
+
+  const renderFooter = () => <View style={{height: 300}} />;
 
   return (
     <RecyclerListView
@@ -233,39 +229,62 @@ const SimpleList = ({
       canChangeSize={true}
       optimizeForInsertDeleteAnimations
       forceNonDeterministicRendering
-      renderFooter={() => <View style={{height: 300}} />}
-      scrollViewProps={{
-        refreshControl: (
-          <RefreshControl
-            style={{
-              opacity: 0,
-              elevation: 0,
-            }}
-            tintColor={colors.accent}
-            colors={[colors.accent]}
-            progressViewOffset={150}
-            onRefresh={customRefresh ? customRefresh : _onRefresh}
-            refreshing={customRefresh ? customRefreshing : refreshing}
-          />
-        ),
-        overScrollMode: 'always',
-        contentContainerStyle: {
-          width: '100%',
-          alignSelf: 'center',
-          minHeight: '100%',
-        },
-        testID: 'list-' + type,
-      }}
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-        width: '100%',
-      }}
+      renderFooter={renderFooter}
+      scrollViewProps={scrollProps}
+      style={styles}
     />
   );
 };
 
 export default SimpleList;
+
+const RenderSectionHeader = ({item, index, headerProps, jumpToDialog}) => {
+  const [state] = useTracked();
+  const {colors} = state;
+
+  return (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '100%',
+        justifyContent: 'space-between',
+        paddingHorizontal: 12,
+        height: 30,
+        backgroundColor:
+          index === 1
+            ? headerProps.color
+              ? colors[headerProps.color]
+              : colors.shade
+            : colors.nav,
+        marginTop: index === 1 ? 0 : 5,
+      }}>
+      <TouchableWithoutFeedback
+        onPress={() => {
+          if (jumpToDialog) {
+            eSendEvent(eOpenJumpToDialog);
+          }
+        }}
+        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
+        style={{
+          height: '100%',
+          justifyContent: 'center',
+        }}>
+        <Heading
+          color={colors.accent}
+          size={SIZE.sm}
+          style={{
+            minWidth: 60,
+            alignSelf: 'center',
+            textAlignVertical: 'center',
+          }}>
+          {!item.title || item.title === '' ? 'Pinned' : item.title}
+        </Heading>
+      </TouchableWithoutFeedback>
+      {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
+    </View>
+  );
+};
 
 const ListEmptyComponent = ({loading = true, placeholderData}) => {
   const [state] = useTracked();
