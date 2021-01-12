@@ -7,6 +7,7 @@ import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "rebass";
+import { showToast } from "../utils/toast";
 
 async function typeToItems(type, context) {
   switch (type) {
@@ -47,13 +48,18 @@ function Search() {
           const [lookupType, items] = await typeToItems(type, context);
           setResults([]);
 
-          if (items.length <= 0) return;
+          if (items.length <= 0) {
+            showToast("error", `There are no items to search in.`);
+            return;
+          }
 
           setSearchState({ isSearching: true, totalItems: items.length });
-
-          setResults(await db.lookup[lookupType](items, query));
-
+          const results = await db.lookup[lookupType](items, query);
+          setResults(results);
           setSearchState({ isSearching: false, totalItems: 0 });
+          if (!results.length) {
+            showToast("error", `Nothing found for "${query}".`);
+          }
         }}
       />
       {searchState.isSearching ? (
