@@ -11,6 +11,7 @@ class LightColorSchemeFactory {
       border: "#e7e7e7",
       hover: "#e0e0e0",
       fontSecondary: "white",
+      fontTertiary: "#5b5b5b",
       text: "#202124",
       overlay: "rgba(0, 0, 0, 0.1)",
       secondary: "white",

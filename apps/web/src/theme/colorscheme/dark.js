@@ -12,6 +12,7 @@ class DarkColorSchemeFactory {
       border: "#2b2b2b",
       hover: "#3b3b3b",
       fontSecondary: "#000",
+      fontTertiary: "#7b7b7b",
       text: "#d3d3d3",
       overlay: "rgba(255, 255, 255, 0.5)",
       secondary: "black",
