@@ -1,15 +1,11 @@
 import { useAnimation } from "framer-motion";
 import React, { useEffect } from "react";
 import { Flex, Box, Text } from "rebass";
-import { SUBSCRIPTION_STATUS } from "../../common";
-import { useStore as useUserStore } from "../../stores/user-store";
+import { isUserPremium } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import Animated from "../animated";
 
 function Menu(props) {
-  const isTrial = useUserStore(
-    (store) => store.user?.subscription?.status === SUBSCRIPTION_STATUS.TRIAL
-  );
   const isMobile = useMobile();
   const Container = isMobile ? MobileMenuContainer : MenuContainer;
 
@@ -54,7 +50,7 @@ function Menu(props) {
                   {item.title}
                 </Text>
               )}
-              {item.onlyPro && !isTrial && (
+              {item.onlyPro && !isUserPremium() && (
                 <Text
                   fontSize="body"
                   bg="primary"
