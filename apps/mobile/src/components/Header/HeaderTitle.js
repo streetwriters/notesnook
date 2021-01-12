@@ -1,8 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Animated from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import { eScrollEvent } from '../../utils/Events';
 import Heading from '../Typography/Heading';
 
@@ -12,7 +13,19 @@ let scrollPostions = {};
 
 export const HeaderTitle = () => {
   const [state] = useTracked();
-  const {colors, headerTextState} = state;
+  const {colors} = state;
+  const [headerTextState, setHeaderTextState] = useState(Navigation.getHeaderState());
+
+  const onHeaderStateChange = (event) => {
+        setHeaderTextState(event);
+  };
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
+
 
   const onScroll = async (y) => {
     if (DDS.isLargeTablet()) return;
@@ -42,7 +55,7 @@ export const HeaderTitle = () => {
     } else {
       opacity.setValue(0);
     }
-    scrollPostions[headerTextState.heading] = y;
+    scrollPostions[headerTextState?.heading] = y;
   };
 
   useEffect(() => {
@@ -50,7 +63,7 @@ export const HeaderTitle = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [headerTextState.heading]);
+  }, [headerTextState?.heading]);
   
   return (
     <Animated.View

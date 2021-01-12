@@ -3,7 +3,6 @@ import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
-import SettingsService from '../../services/SettingsService';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 
@@ -18,6 +17,9 @@ export const HeaderLeftMenu = () => {
     }
     Navigation.goBack();
   };
+
+
+
   return (
     <>
       {deviceMode === 'mobile' ||

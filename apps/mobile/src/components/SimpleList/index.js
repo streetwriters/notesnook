@@ -10,7 +10,12 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
@@ -58,8 +63,6 @@ const SimpleList = ({
   const refreshing = false;
   const listData = data;
   const dataType = type;
-
-
 
   useEffect(() => {
     if (loading) return;
@@ -240,7 +243,13 @@ const SimpleList = ({
 
 export default SimpleList;
 
-const RenderSectionHeader = ({item, index, headerProps, jumpToDialog,sortMenuButton}) => {
+const RenderSectionHeader = ({
+  item,
+  index,
+  headerProps,
+  jumpToDialog,
+  sortMenuButton,
+}) => {
   const [state] = useTracked();
   const {colors} = state;
 
@@ -290,9 +299,23 @@ const RenderSectionHeader = ({item, index, headerProps, jumpToDialog,sortMenuBut
 
 const ListEmptyComponent = ({loading = true, placeholderData}) => {
   const [state] = useTracked();
-  const {colors, headerTextState} = state;
+  const {colors} = state;
+  const [headerTextState, setHeaderTextState] = useState(
+    Navigation.getHeaderState(),
+  );
   const insets = useSafeAreaInsets();
   const {height} = useWindowDimensions();
+
+  const onHeaderStateChange = (event) => {
+    setHeaderTextState(event);
+  };
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
+
   return (
     <View
       style={[
@@ -333,7 +356,13 @@ const ListEmptyComponent = ({loading = true, placeholderData}) => {
             }
           />
         ) : loading ? (
-          <ActivityIndicator color={colors.accent} />
+          <ActivityIndicator
+            color={
+              COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
+                : colors.accent
+            }
+          />
         ) : null}
       </View>
     </View>

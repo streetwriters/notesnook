@@ -5,8 +5,11 @@ import { rootNavigatorRef, sideMenuRef } from '../utils/Refs';
 import { eSendEvent } from './EventManager';
 import SettingsService from './SettingsService';
 
-let currentScreen = null;
-let headerState = null;
+let currentScreen = "Notes"
+let headerState = {
+  heading: 'Notes',
+  color: null,
+}
 function getCurrentScreen() {
   return currentScreen;
 }
@@ -46,13 +49,8 @@ function setHeaderState(name, params, item) {
   headerState = item;
   currentScreen = name;
   if (item) {
-    updateEvent({
-      type: Actions.HEADER_TEXT_STATE,
-      state: item,
-    });
     eSendEvent('onHeaderStateChange', item);
   }
-
   if (name) {
     updateEvent({
       type: Actions.CURRENT_SCREEN,
