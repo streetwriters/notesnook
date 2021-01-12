@@ -181,6 +181,7 @@ function Editor(props) {
                     "#toolbarContainer"
                   );
                   if (toolbar && toolbarContainer) {
+                    toolbar.style.opacity = 1;
                     toolbarContainer.appendChild(toolbar);
                   }
                 }}

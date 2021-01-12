@@ -65,6 +65,7 @@
   width: 120px !important;
 }
 .ql-toolbar.ql-snow {
+  opacity: 0;
   width: 100%;
   border: none !important;
   border-bottom: 1px solid var(--border) !important;
