@@ -49,33 +49,6 @@ export function confirm(
   ));
 }
 
-/**
- *
- * @param {"note"|"notebook"} type
- */
-export function showDeleteConfirmation(type, multi = false) {
-  let noun = type === "note" ? "Note" : "Notebook";
-  if (multi) noun += "s";
-  let lowerCaseNoun = noun.toLowerCase();
-
-  let secondPronoun = multi ? "they" : "it";
-
-  return confirm(Icon.Trash, {
-    title: `Delete ${noun}?`,
-    message: (
-      <Text as="span" fontSize="body">
-        The {lowerCaseNoun} will be{" "}
-        <Text as="span" color="primary">
-          kept in your Trash for 7 days
-        </Text>{" "}
-        after which {secondPronoun} will be permanently removed.
-      </Text>
-    ),
-    yesText: `Delete ${lowerCaseNoun}`,
-    noText: "Cancel",
-  });
-}
-
 export function showMultiDeleteConfirmation(type) {
   let noun = type === "note" ? "Notes" : "Notebooks";
 

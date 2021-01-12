@@ -3,7 +3,6 @@ import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "timeago-react";
 import ListItem from "../list-item";
-import { confirm, showDeleteConfirmation } from "../dialogs/confirm";
 import { showMoveNoteDialog } from "../dialogs/movenotedialog";
 import { store, useStore } from "../../stores/note-store";
 import { showPasswordDialog } from "../dialogs/passworddialog";
@@ -68,33 +67,12 @@ function menuItems(note, context) {
       visible: context?.type === "topic",
       title: "Remove from topic",
       onClick: async () => {
-        confirm(Icon.Topic, {
-          title: "Remove Note from Topic",
-          subtitle: "Are you sure you want to remove the note from this topic?",
-          yesText: "Remove note",
-          noText: "Cancel",
-          message: (
-            <Text as="span">
-              <Text as="span" color="primary">
-                This action does not delete the note.
-              </Text>{" "}
-              The note will only be removed from this notebook. You will still
-              be able to{" "}
-              <Text as="span" color="primary">
-                access it from Home and other places.
-              </Text>
-            </Text>
-          ),
-        }).then(async (res) => {
-          if (res) {
-            console.log(context);
-            await db.notebooks
-              .notebook(context.value.id)
-              .topics.topic(context.value.topic)
-              .delete(note.id);
-            store.setContext(context);
-          }
-        });
+        await db.notebooks
+          .notebook(context.value.id)
+          .topics.topic(context.value.topic)
+          .delete(note.id);
+        store.setContext(context);
+        await showToast("success", "Note removed from topic!");
       },
     },
     {
@@ -110,11 +88,7 @@ function menuItems(note, context) {
           });
           if (!res) return;
         }
-        showDeleteConfirmation("note").then(async (res) => {
-          if (res) {
-            await store.delete(note.id).then(() => showItemDeletedToast(note));
-          }
-        });
+        await store.delete(note.id).then(() => showItemDeletedToast(note));
       },
     },
   ];

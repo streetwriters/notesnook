@@ -6,7 +6,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
 import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
-import { showDeleteConfirmation } from "../components/dialogs/confirm";
+import { showMultiDeleteConfirmation } from "../components/dialogs/confirm";
 import { showExportDialog } from "../components/dialogs/exportdialog";
 import { showToast } from "../utils/toast";
 
@@ -31,7 +31,7 @@ const DeleteOption = createOption(
   async function (state) {
     const item = state.selectedItems[0];
 
-    if (!(await showDeleteConfirmation(item.type, true))) return;
+    if (!(await showMultiDeleteConfirmation(item.type))) return;
 
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {

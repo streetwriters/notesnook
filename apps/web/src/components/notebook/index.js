@@ -3,7 +3,6 @@ import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
 import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
-import { showDeleteConfirmation } from "../dialogs/confirm";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common";
 import * as Icon from "../icons";
@@ -33,14 +32,10 @@ function menuItems(notebook, index) {
     {
       title: "Move to trash",
       color: "red",
-      onClick: () => {
-        showDeleteConfirmation("notebook").then(async (res) => {
-          if (res) {
-            await store
-              .delete(notebook.id, index)
-              .then(() => showItemDeletedToast(notebook));
-          }
-        });
+      onClick: async () => {
+        await store
+          .delete(notebook.id, index)
+          .then(() => showItemDeletedToast(notebook));
       },
     },
   ];
