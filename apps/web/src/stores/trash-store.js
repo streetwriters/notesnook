@@ -12,7 +12,10 @@ class TrashStore extends BaseStore {
 
   delete = (id, commit = false) => {
     if (!commit) {
-      return this.set((state) => (state.trash = db.trash.all));
+      return this.set((state) => {
+        const index = state.trash.findIndex((item) => item.id === id);
+        if (index > -1) state.trash.splice(index, 1);
+      });
     }
     return db.trash.delete(id);
   };
