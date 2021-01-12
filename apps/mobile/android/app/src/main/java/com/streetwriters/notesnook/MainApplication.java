@@ -27,7 +27,6 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.ReactPackage;
 import com.learnium.RNDeviceInfo.RNDeviceModule;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
-import com.reactnativecommunity.rnpermissions.RNPermissionsModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
 
 import chat.rocket.rnshareextension.ShareModule;
@@ -61,8 +60,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     return new RNTooltipsModule(reactContext);
                                 case "RNHTMLtoPDF":
                                     return new RNHTMLtoPDFModule(reactContext);
-                                case "RNFetchBlob":
-                                    return new RNFetchBlob(reactContext);
                                 case "RNFileViewer":
                                     return new RNFileViewerModule(reactContext);
                                 case "RNDocumentPicker":
@@ -71,9 +68,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     return new RNShareModule(reactContext);
                                 case RNDeviceModule.NAME:
                                     return new RNDeviceModule(reactContext);
-                                case RNPermissionsModule
-                                        .MODULE_NAME:
-                                    return new RNPermissionsModule(reactContext);
                                 case "RNIapModule":
                                     return new RNIapModule(reactContext);
                                 default:
@@ -92,14 +86,10 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     map.put("NNativeModule", getModuleInfo("NNativeModule", "com.streetwriters.notesnook.NNativeModule"));
                                     map.put("RNTooltips", getModuleInfo("RNTooltips", "px.tooltips.RNTooltipsModule"));
                                     map.put("RNHTMLtoPDF", getModuleInfo("RNHTMLtoPDF", "com.onibenjo.htmltopdf.RNHTMLtoPDFModule"));
-                                    map.put("RNFetchBlob", getModuleInfo("RNFetchBlob", "com.RNFetchBlob.RNFetchBlob"));
                                     map.put("RNFileViewer", getModuleInfo("RNFileViewer", "com.vinzscam.reactnativefileviewer.RNFileViewerModule"));
                                     map.put("RNDocumentPicker", getModuleInfo("RNDocumentPicker", "io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule"));
                                     map.put("RNShare", getModuleInfo("RNShare", "cl.json.RNShareModule"));
                                     map.put(RNDeviceModule.NAME, getModuleInfo(RNDeviceModule.NAME, "com.learnium.RNDeviceInfo.RNDeviceModule"));
-                                    map.put(RNPermissionsModule
-                                            .MODULE_NAME, getModuleInfo(RNPermissionsModule
-                                            .MODULE_NAME, "com.streetwriters.notesnook.RNPermissionsModule"));
                                     map.put("RNIapModule", getModuleInfo("RNIapModule", "com.dooboolab.RNIap.RNIapModule"));
 
                                     return map;
