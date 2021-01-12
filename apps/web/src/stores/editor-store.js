@@ -151,6 +151,7 @@ class EditorStore extends BaseStore {
       };
     });
     noteStore.setSelectedNote(0);
+    this.toggleProperties(false);
     if (shouldNavigate) hashNavigate(`/`, true);
   };
 
