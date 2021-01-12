@@ -18,20 +18,6 @@
   padding-top: 1px;
   font-size: 0.975em;
 }
-.ql-toolbar.ql-snow {
-  position: sticky;
-  position: -webkit-sticky;
-  top: 0;
-  z-index: 2;
-  background-color: var(--background);
-  margin-top: -1px !important;
-
-  -webkit-transition: max-height 500ms linear;
-  -moz-transition: max-height 500ms linear;
-  -o-transition: max-height 500ms linear;
-  -ms-transition: max-height 500ms linear;
-  transition: max-height 500ms linear;
-}
 
 .ql-formats {
   margin-bottom: 5px;
@@ -82,6 +68,7 @@
   width: 100%;
   border: none !important;
   border-bottom: 1px solid var(--border) !important;
+  background-color: var(--background);
   padding: 5px !important;
   padding-left: 0px !important;
 }

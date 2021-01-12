@@ -143,6 +143,7 @@ export default class ReactQuill extends Component {
       id,
       isSimple,
       isFocusMode,
+      onQuillInitialized,
     } = this.props;
 
     this.quill = new Quill("#" + id, {
@@ -160,6 +161,12 @@ export default class ReactQuill extends Component {
 
     if (onChange) {
       this.quill.on("text-change", this.textChangeHandler);
+    }
+
+    if (onQuillInitialized) {
+      this.quill.once("editor-change", () => {
+        onQuillInitialized();
+      });
     }
 
     if (onSave) {

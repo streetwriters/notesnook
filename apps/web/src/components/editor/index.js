@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, Suspense } from "react";
-import { Flex } from "rebass";
+import { Box, Flex } from "rebass";
 import Properties from "../properties";
 import {
   useStore,
@@ -139,6 +139,23 @@ function Editor(props) {
           mt={[0, 0, 25]}
         >
           <Header />
+          <Box
+            id="toolbarContainer"
+            bg="background"
+            sx={{
+              borderBottom: "1px solid",
+              borderBottomColor: "border",
+              position: "sticky",
+              top: 0,
+              zIndex: 2,
+              height: 45,
+              overflow: "hidden",
+              transition: "max-height 500ms linear",
+              ":hover": {
+                overflow: "visible",
+              },
+            }}
+          />
           {contentType === "delta" && (
             <Suspense fallback={<EditorLoading />}>
               <ReactQuill
@@ -158,6 +175,15 @@ function Editor(props) {
                 }}
                 changeInterval={500}
                 onWordCountChanged={updateWordCount}
+                onQuillInitialized={() => {
+                  const toolbar = document.querySelector(".ql-toolbar.ql-snow");
+                  const toolbarContainer = document.querySelector(
+                    "#toolbarContainer"
+                  );
+                  if (toolbar && toolbarContainer) {
+                    toolbarContainer.appendChild(toolbar);
+                  }
+                }}
                 onChange={() => {
                   const { quill } = quillRef.current;
                   const delta = quill.getContents().ops;
