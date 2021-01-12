@@ -47,24 +47,19 @@ const SimpleList = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const [refreshing, setRefreshing] = useState(false);
-
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
     }).cloneWithRows([header, {type: 'empty'}]),
   );
+
   const insets = useSafeAreaInsets();
-
   const {width, fontScale} = useWindowDimensions();
-
+  const refreshing = false;
   const listData = data;
   const dataType = type;
-  const _onScroll = (event) => {
-    if (!event) return;
-    let y = event.nativeEvent.contentOffset.y;
-    eSendEvent(eScrollEvent, y);
-  };
+
+
 
   useEffect(() => {
     if (loading) return;
@@ -83,6 +78,12 @@ const SimpleList = ({
     if (refreshCallback) {
       refreshCallback();
     }
+  };
+
+  const _onScroll = (event) => {
+    if (!event) return;
+    let y = event.nativeEvent.contentOffset.y;
+    eSendEvent(eScrollEvent, y);
   };
 
   const _layoutProvider = new LayoutProvider(
@@ -174,6 +175,7 @@ const SimpleList = ({
             index={index}
             headerProps={headerProps}
             jumpToDialog={jumpToDialog}
+            sortMenuButton={sortMenuButton}
           />
         );
       case 'empty':
@@ -238,7 +240,7 @@ const SimpleList = ({
 
 export default SimpleList;
 
-const RenderSectionHeader = ({item, index, headerProps, jumpToDialog}) => {
+const RenderSectionHeader = ({item, index, headerProps, jumpToDialog,sortMenuButton}) => {
   const [state] = useTracked();
   const {colors} = state;
 
