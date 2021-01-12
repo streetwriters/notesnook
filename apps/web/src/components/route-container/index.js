@@ -51,7 +51,7 @@ function Header(props) {
               size={24}
               onClick={() => window.history.back()}
               sx={{ flexShrink: 0, mr: 2 }}
-              color="fontPrimary"
+              color="text"
               data-test-id="go-back"
             />
           ) : (
