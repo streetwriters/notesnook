@@ -120,7 +120,6 @@ export async function createBackup() {
 }
 
 export function isUserPremium() {
-  return true;
   const subStatus = userstore.get().user?.subscription?.type;
   return (
     subStatus === SUBSCRIPTION_STATUS.BETA ||
