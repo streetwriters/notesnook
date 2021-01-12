@@ -95,9 +95,17 @@ const routes = {
       />
     );
   },
-  "/settings": () => <RouteContainer title="Settings" route={<Settings />} />,
+  "/settings": () => (
+    <RouteContainer noSearch title="Settings" route={<Settings />} />
+  ),
   "/search": () => (
-    <RouteContainer type="search" canGoBack title="Search" route={<Search />} />
+    <RouteContainer
+      type="search"
+      canGoBack
+      noSearch
+      title="Search"
+      route={<Search />}
+    />
   ),
 };
 

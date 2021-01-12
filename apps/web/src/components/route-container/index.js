@@ -8,7 +8,15 @@ import useMobile from "../../utils/use-mobile";
 import { navigate } from "../../navigation";
 
 function RouteContainer(props) {
-  const { type, route, canGoBack, title, subtitle, onlyBackButton } = props;
+  const {
+    type,
+    route,
+    canGoBack,
+    title,
+    subtitle,
+    onlyBackButton,
+    noSearch,
+  } = props;
   return (
     <>
       <Header
@@ -16,6 +24,7 @@ function RouteContainer(props) {
         canGoBack={canGoBack}
         title={title}
         subtitle={subtitle}
+        noSearch={noSearch}
         onlyBackButton={onlyBackButton}
       />
       {route}
@@ -26,7 +35,7 @@ function RouteContainer(props) {
 export default RouteContainer;
 
 function Header(props) {
-  const { title, subtitle, canGoBack, onlyBackButton, type } = props;
+  const { title, subtitle, canGoBack, onlyBackButton, type, noSearch } = props;
   const createButtonData = CREATE_BUTTON_MAP[type];
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
@@ -65,7 +74,7 @@ function Header(props) {
         <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
         {!isSelectionMode && (
           <Flex>
-            {type !== "search" && (
+            {!noSearch && (
               <Icon.Search
                 size={24}
                 onClick={() => {
