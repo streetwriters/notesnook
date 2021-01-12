@@ -57,11 +57,11 @@ const DeleteOption = createOption(
     } else if (item.type === "notebook") {
       await db.notebooks.delete(...items);
       nbStore.refresh();
-    } else if (item.notebookId) {
-      // its a topic
+    } else if (item.type === "topic") {
       await db.notebooks.notebook(item.notebookId).topics.delete(...items);
-      // TODO refresh topics
+      nbStore.setSelectedNotebookTopics(item.notebookId);
     }
+    showToast("success", `${items.length} ${item.type}s moved to trash!`);
   }
 );
 
@@ -83,10 +83,8 @@ const AddToNotebookOption = createOption(
   Icon.AddToNotebook,
   async function (state) {
     const items = state.selectedItems.map((item) => item.id);
-    if (await showMoveNoteDialog(items)) {
-      //TODO show proper snack
-      console.log("Notes moved successfully!");
-    }
+    await showMoveNoteDialog(items);
+    showToast("success", `${items.length} notes moved!`);
   }
 );
 
@@ -108,6 +106,7 @@ const RestoreOption = createOption(
     const items = state.selectedItems.map((item) => item.id);
     await db.trash.restore(...items);
     trashStore.refresh();
+    showToast("success", `${items.length} items restored!`);
   }
 );
 
