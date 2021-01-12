@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
@@ -14,11 +14,6 @@ function Topics(props) {
     (store) => store.selectedNotebookTopics
   );
 
-  const [topics, setTopics] = useState([]);
-  useEffect(() => {
-    setTopics(selectedNotebookTopics);
-  }, [selectedNotebookTopics]);
-
   useEffect(() => {
     setSelectedNotebookTopics(notebookId);
   }, [setSelectedNotebookTopics, notebookId]);
@@ -27,7 +22,7 @@ function Topics(props) {
     <>
       <ListContainer
         type="topics"
-        items={topics}
+        items={selectedNotebookTopics}
         context={{ notebookId }}
         placeholder={Flex}
         button={{

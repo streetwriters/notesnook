@@ -67,4 +67,9 @@ function Topic({ item, index, onClick }) {
     />
   );
 }
-export default Topic;
+export default React.memo(Topic, (prev, next) => {
+  return (
+    prev?.item?.title === next?.item?.title &&
+    prev?.item?.totalNotes === next?.item?.totalNotes
+  );
+});

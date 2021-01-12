@@ -1,6 +1,7 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
 import { store as trashStore } from "./trash-store";
+import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 
@@ -25,6 +26,7 @@ class NotebookStore extends BaseStore {
     this.set((state) => {
       state.notebooks.splice(index, 1);
       trashStore.refresh();
+      appStore.refreshMenuPins();
     });
   };
 
@@ -39,7 +41,9 @@ class NotebookStore extends BaseStore {
 
   setSelectedNotebookTopics = (id) => {
     this.set((state) => {
-      state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
+      state.selectedNotebookTopics = db.notebooks
+        .notebook(id)
+        .topics.all.slice();
       state.selectedNotebookId = id;
     });
   };
