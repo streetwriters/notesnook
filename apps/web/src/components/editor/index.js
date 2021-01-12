@@ -148,7 +148,7 @@ function Editor(props) {
               position: "sticky",
               top: 0,
               zIndex: 2,
-              height: 45,
+              maxHeight: 45,
               overflow: "hidden",
               transition: "max-height 500ms linear",
               ":hover": {

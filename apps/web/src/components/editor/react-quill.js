@@ -163,12 +163,6 @@ export default class ReactQuill extends Component {
       this.quill.on("text-change", this.textChangeHandler);
     }
 
-    if (onQuillInitialized) {
-      this.quill.once("editor-change", () => {
-        onQuillInitialized();
-      });
-    }
-
     if (onSave) {
       this.quill.keyboard.addBinding(
         {
@@ -178,6 +172,8 @@ export default class ReactQuill extends Component {
         onSave.bind(this, this.quill)
       );
     }
+
+    onQuillInitialized();
   }
 
   componentWillUnmount() {
