@@ -257,7 +257,18 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
-                  await db.user.logout(true);
+                  await showLoadingDialog({
+                    title: "Logging you out",
+                    subtitle: "We are logging you out. Please wait...",
+                    action: async () => {
+                      await db.user.logout(true);
+                    },
+                    message: (
+                      <Text color="error">
+                        Please do NOT close your browser or shut down your PC.
+                      </Text>
+                    ),
+                  });
                   showToast("success", "You have been logged out.");
                 }
               }}

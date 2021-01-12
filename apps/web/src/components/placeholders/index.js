@@ -8,7 +8,7 @@ function Placeholder(props) {
   useEffect(() => {
     changeSvgTheme(accent);
   }, [accent]);
-  const { image: Image, title, text, callToAction } = props;
+  const { image: Image, text, callToAction } = props;
 
   return (
     <>
