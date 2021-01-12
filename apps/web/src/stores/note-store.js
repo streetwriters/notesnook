@@ -7,6 +7,7 @@ import BaseStore from ".";
 import { EV } from "notes-core/common";
 import Config from "../utils/config";
 import { showToast } from "../utils/toast";
+import { qclone } from "qclone";
 
 class NoteStore extends BaseStore {
   notes = [];
@@ -27,14 +28,14 @@ class NoteStore extends BaseStore {
   };
 
   refresh = () => {
-    this.refreshContext();
-    this.set(
-      (state) =>
-        (state.notes = db.notes.group(
-          Config.get("selectedGroup"),
-          Config.get("sortDirection", "desc")
-        ))
+    const notes = db.notes.group(
+      Config.get("selectedGroup"),
+      Config.get("sortDirection", "desc")
     );
+    this.set((state) => {
+      state.notes = qclone(notes);
+    });
+    this.refreshContext();
   };
 
   refreshContext = () => {
