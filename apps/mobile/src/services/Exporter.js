@@ -2,7 +2,6 @@ import {Platform} from 'react-native';
 import {db} from '../utils/DB';
 import RNFetchBlob from 'rn-fetch-blob';
 import {ToastEvent} from './EventManager';
-import he from 'he';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
 
@@ -18,7 +17,7 @@ async function saveToPDF(note) {
 
   await Storage.checkAndCreateDir('/exported/PDF/');
   let html = await db.notes.note(note).export('html');
-
+  let he = require("he");
   html = he.decode(html);
   let options = {
     html: html,
