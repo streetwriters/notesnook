@@ -101,7 +101,7 @@ export const TagsSection = () => {
               style={{textAlign: 'center'}}
               color={colors.icon}
               size={SIZE.xs}>
-              You can add shortcuts to notebooks, topics and tags here.
+              You can add shortcuts of notebooks, topics and tags here.
             </Paragraph>
           </View>
         }
