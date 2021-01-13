@@ -18,7 +18,6 @@ async function run() {
   }
   let backup;
   let error;
-  console.log(SettingsService.get())
   try {
     backup = await db.backup.export(
       'mobile',
@@ -27,6 +26,7 @@ async function run() {
   } catch (e) {
     error = true;
   }
+  console.log('BACKUP COMPLETE');
   if (!error) {
     let backupName = 'notesnook_backup_' + new Date().toString() + '.nnbackup';
     let path = await storage.checkAndCreateDir('/backups/');
@@ -49,38 +49,17 @@ async function getLastBackupDate() {
 async function checkBackupRequired(type) {
   let now = Date.now();
   let lastBackupDate = await getLastBackupDate();
-  if (lastBackupDate === 'never') {
+  if (lastBackupDate === 'never' || !lastBackupDate) {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);
-
-  if (type === 'daily') {
-    now = new Date(now);
-    lastBackupDate = new Date(lastBackupDate);
-
-    if (now.getUTCDate() > lastBackupDate.getUTCDate()) {
-   
-      return true;
-    } else if (
-      (now.getUTCDate() === lastBackupDate.getUTCDate() &&
-        now.getUTCFullYear() > lastBackupDate.getUTCFullYear()) ||
-      now.getUTCMonth() > lastBackupDate.getUTCMonth()
-    ) {
-     
-      return true;
-    } else {
-    
-      return false;
-    }
-  } else if (type === 'weekly') {
-    if (lastBackupDate + MS_WEEK < now) {
-      
-      return true;
-    } else {
-      false;
-    }
+  
+  if (type === 'daily' && lastBackupDate + MS_DAY < now) {
+    return true;
+  } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
+    return true;
   } else {
-    
+    return false;
   }
 }
 
