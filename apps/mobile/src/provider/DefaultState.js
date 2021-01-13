@@ -25,7 +25,7 @@ export const defaultState = {
     forcePortraitOnTablet: false,
     useSystemTheme: false,
     reminder: 'off',
-    encryptedBackups: false,
+    encryptedBackup: false,
     homepage: 'Notes',
     sort: 'default',
     sortOrder: 'desc',

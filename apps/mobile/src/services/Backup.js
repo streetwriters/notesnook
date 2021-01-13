@@ -18,10 +18,11 @@ async function run() {
   }
   let backup;
   let error;
+  console.log(SettingsService.get())
   try {
     backup = await db.backup.export(
       'mobile',
-      SettingsService.get().encryptedBackups,
+      SettingsService.get().encryptedBackup,
     );
   } catch (e) {
     error = true;
