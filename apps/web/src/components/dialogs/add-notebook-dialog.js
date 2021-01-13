@@ -224,7 +224,7 @@ function TopicItem(props) {
     >
       <Flex alignItems="center" justifyContent="center">
         <Icon.Topic />
-        <Text as="span" ml={1} fontSize="body">
+        <Text as="span" ml={1} fontSize="body" color="text">
           {title}
         </Text>
       </Flex>
