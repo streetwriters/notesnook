@@ -9,6 +9,7 @@ function Confirm(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
+      scrollable
       description={props.subtitle}
       onClose={props.onNo}
       positiveButton={{
@@ -115,7 +116,13 @@ export function showAppUpdatedNotice(version) {
         sx={{ borderRadius: "default" }}
       >
         <Text variant="title">Changelog:</Text>
-        <Text as="pre" fontFamily="monospace" variant="body" mt={1}>
+        <Text
+          as="pre"
+          overflow="auto"
+          fontFamily="monospace"
+          variant="body"
+          mt={1}
+        >
           {version.changelog || "No change log."}
         </Text>
       </Flex>
@@ -136,6 +143,7 @@ export function showAppAvailableNotice(version) {
       >
         <Text variant="title">v{version.formatted} changelog:</Text>
         <Text
+          overflow="auto"
           as="pre"
           fontFamily="monospace"
           variant="body"
