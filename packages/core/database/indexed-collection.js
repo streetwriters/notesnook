@@ -42,6 +42,10 @@ export default class IndexedCollection {
     });
   }
 
+  deleteItem(id) {
+    return this.indexer.remove(id);
+  }
+
   exists(id) {
     return this.indexer.exists(id);
   }

@@ -11,6 +11,10 @@ export default class Tags extends Collection {
   }
 
   async add(tagId, noteId) {
+    if (tagId.id || tagId.title) {
+      tagId = tagId.id;
+    }
+
     if (!tagId || !noteId) new Error("tagId and noteId cannot be falsy.");
 
     let tag = this.all.find((t) => t.id === tagId || t.title === tagId) || {
@@ -53,7 +57,7 @@ export default class Tags extends Collection {
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
     else {
       await this._db.settings.unpin(tag.id);
-      await this._collection.removeItem(tag.id);
+      await this._collection.deleteItem(tag.id);
     }
   }
 }
