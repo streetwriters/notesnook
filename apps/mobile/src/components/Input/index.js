@@ -147,13 +147,7 @@ const Input = ({
           autoCapitalize={autoCapitalize}
           onChangeText={onChange}
           onBlur={onBlur}
-          onEndEditing={() => {
-            if (clearTextOnFocus) {
-              fwdRef.current?.setNativeProps({
-                text:''
-              })
-            }
-          }}
+      
           onFocus={onFocus}
           onSubmitEditing={onSubmit}
           blurOnSubmit={blurOnSubmit}
