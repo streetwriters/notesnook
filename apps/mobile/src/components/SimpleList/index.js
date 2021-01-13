@@ -231,9 +231,9 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      canChangeSize={true}
+      //canChangeSize={true}
       optimizeForInsertDeleteAnimations
-      forceNonDeterministicRendering
+      //forceNonDeterministicRendering
       renderFooter={renderFooter}
       scrollViewProps={scrollProps}
       style={styles}
