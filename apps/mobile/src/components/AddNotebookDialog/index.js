@@ -54,6 +54,7 @@ export class AddNotebookDialog extends React.Component {
     this.hiddenInput = createRef();
     this.topicInputRef = createRef();
     this.addingTopic = false;
+    
   }
 
   open = () => {
@@ -214,7 +215,6 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
-      //console.log('edit topic is', this.state.editTopic);
       if (this.state.editTopic) {
         this.topicInputRef.current?.blur();
         Keyboard.dismiss();
@@ -232,7 +232,9 @@ export class AddNotebookDialog extends React.Component {
         }, 30);
       }
     }
-
+    this.topicInputRef.current?.setNativeProps({
+      text:''
+    })
     this.topicInputRef.current?.focus();
   };
 
@@ -321,7 +323,6 @@ export class AddNotebookDialog extends React.Component {
               <Input
                 fwdRef={this.topicInputRef}
                 testID={notesnook.ids.dialogs.notebook.inputs.topic}
-                clearTextOnFocus={true}
                 onChangeText={(value) => {
                   this.currentInputValue = value;
                   if (this.prevItem !== null) {
