@@ -10,7 +10,6 @@ import {
 import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
@@ -26,7 +25,6 @@ export const ColorSection = () => {
       dispatch({type: Actions.COLORS});
     }
   }, [loading]);
-
   return colorNotes.map((item, index) => (
     <ColorItem key={item.id} item={item} index={index} />
   ));
