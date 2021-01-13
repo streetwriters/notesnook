@@ -201,6 +201,7 @@ class EditorStore extends BaseStore {
   };
 
   async _setTag(value) {
+    if (!value) return;
     const { tags, id } = this.get().session;
 
     let note = db.notes.note(id);
@@ -209,6 +210,7 @@ class EditorStore extends BaseStore {
     let index = tags.indexOf(value);
     if (index > -1) {
       await note.untag(value);
+      appStore.refreshMenuPins();
     } else {
       await note.tag(value);
     }
