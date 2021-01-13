@@ -141,10 +141,9 @@ const MergeEditor = () => {
   };
 
   const onMessageFromPrimaryWebView = (evt) => {
-  
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
-    
+
       if (data.type === 'delta') {
         primaryData = data.data;
       }
@@ -152,11 +151,9 @@ const MergeEditor = () => {
   };
 
   const onMessageFromSecondaryWebView = (evt) => {
-
     if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
       if (data.type === 'delta') {
-      
         secondaryData = data.data;
       }
     }
@@ -362,6 +359,7 @@ const MergeEditor = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                maxWidth: '50%',
               }}>
               <Icon
                 style={{
@@ -404,7 +402,10 @@ const MergeEditor = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Paragraph color={colors.icon} size={SIZE.xxs}>
+                <Paragraph
+                  style={{maxWidth: '80%'}}
+                  color={colors.icon}
+                  size={SIZE.xs}>
                   Saved on {timeConverter(primaryData.dateEdited)}
                 </Paragraph>
                 <Icon
@@ -440,17 +441,21 @@ const MergeEditor = () => {
                   onPress={onPressDiscardFromPrimaryWebView}
                 />
               ) : null}
-              <View style={{width: 10}} />
               {keepContentFrom === 'secondary' ? null : (
-                <Button
-                  width={null}
-                  height={40}
-                  title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
-                  onPress={onPressKeepFromPrimaryWebView}
-                  color={
-                    keepContentFrom === 'primary' ? colors.errorText : 'accent'
-                  }
-                />
+                <>
+                  <View style={{width: 10}} />
+                  <Button
+                    width={null}
+                    height={40}
+                    title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
+                    onPress={onPressKeepFromPrimaryWebView}
+                    color={
+                      keepContentFrom === 'primary'
+                        ? colors.errorText
+                        : 'accent'
+                    }
+                  />
+                </>
               )}
             </View>
           </View>
@@ -507,6 +512,7 @@ const MergeEditor = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
+                maxWidth: '50%',
               }}>
               <TouchableOpacity
                 onPress={() => {
@@ -537,7 +543,10 @@ const MergeEditor = () => {
                   alignItems: 'center',
                   justifyContent: 'space-between',
                 }}>
-                <Paragraph color={colors.icon} size={SIZE.xs}>
+                <Paragraph
+                  style={{maxWidth: '80%'}}
+                  color={colors.icon}
+                  size={SIZE.xs}>
                   Saved on {timeConverter(secondaryData.dateEdited)}
                 </Paragraph>
                 <Icon
@@ -573,18 +582,21 @@ const MergeEditor = () => {
                   onPress={onPressDiscardFromSecondaryWebView}
                 />
               ) : null}
-              <View style={{width: 10}} />
+
               {keepContentFrom === 'primary' ? null : (
-                <Button
-                  width={null}
-                  title={keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
-                  onPress={onPressKeepFromSecondaryWebView}
-                  color={
-                    keepContentFrom === 'secondary'
-                      ? colors.errorText
-                      : 'accent'
-                  }
-                />
+                <>
+                  <View style={{width: 10}} />
+                  <Button
+                    width={null}
+                    title={keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
+                    onPress={onPressKeepFromSecondaryWebView}
+                    color={
+                      keepContentFrom === 'secondary'
+                        ? colors.errorText
+                        : 'accent'
+                    }
+                  />
+                </>
               )}
             </View>
           </View>
