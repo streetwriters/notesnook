@@ -19,14 +19,15 @@ function SplitEditor(props) {
   const [localDelta, setLocalDelta] = useState();
 
   useEffect(() => {
-    let note = db.notes.note(noteId);
-    if (!note) {
-      hashNavigate(`/notes/create`, true);
-      return;
-    }
-    notesStore.setSelectedNote(noteId);
-    note = note.data;
     (async function () {
+      await db.notes.init();
+      let note = db.notes.note(noteId);
+      if (!note) {
+        hashNavigate(`/notes/create`, true);
+        return;
+      }
+      notesStore.setSelectedNote(noteId);
+      note = note.data;
       const delta = await db.content.raw(note.contentId);
       setConflictedNote(note);
       setLocalDelta({ ...delta, conflicted: false });
