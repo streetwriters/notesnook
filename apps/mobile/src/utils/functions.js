@@ -65,6 +65,7 @@ export const deleteItems = async (item) => {
         updateEvent({type: Actions.NOTEBOOKS});
         updateEvent({type: Actions.NOTES});
         updateEvent({type: Actions.TRASH});
+        updateEvent({type: Actions.COLORS});
         updateEvent({type: Actions.MENU_PINS});
         ToastEvent.hide();
       },
@@ -73,5 +74,6 @@ export const deleteItems = async (item) => {
   }
   updateEvent({type: Actions.TRASH});
   updateEvent({type: Actions.CLEAR_SELECTION});
+  updateEvent({type: Actions.COLORS});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 };
