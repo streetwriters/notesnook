@@ -76,7 +76,7 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={props.focused || isSelected ? "shade" : "background"}
+      bg={isSelected ? "shade" : "background"}
       alignItems="center"
       onContextMenu={(e) => openContextMenu(e, menuItems, false)}
       p={2}
@@ -167,6 +167,27 @@ function ListItem(props) {
           color="icon"
           onClick={(event) => openContextMenu(event, menuItems, true)}
         />
+      )}
+      {props.focused && (
+        <Text
+          display="flex"
+          bg="shade"
+          justifyContent="center"
+          alignItems="center"
+          px="2px"
+          py="2px"
+          sx={{
+            position: "absolute",
+            bottom: 2,
+            right: 2,
+            borderRadius: "default",
+          }}
+          fontWeight="bold"
+          color="primary"
+          fontSize={8}
+        >
+          <Icon.Edit color="primary" size={8} /> EDITING NOW
+        </Text>
       )}
     </Flex>
   );
