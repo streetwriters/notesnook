@@ -3,8 +3,8 @@ import { db } from "../common";
 import config from "./config";
 
 var APP_VERSION = {
-  formatted: format(1110),
-  numerical: 1110,
+  formatted: format(1200),
+  numerical: 1200,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
