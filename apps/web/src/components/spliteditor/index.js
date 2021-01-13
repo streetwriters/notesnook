@@ -43,12 +43,13 @@ function SplitEditor(props) {
 
   if (!conflictedNote || !localDelta || !remoteDelta) return null;
   return (
-    <Flex width="100%" flex="1 1 auto" flexDirection="column">
+    <Flex width="100%" flex="1 1 auto" flexDirection="column" overflow="hidden">
       <Text
         mt={2}
         variant="heading"
         textAlign="center"
         sx={{
+          flexShrink: 0,
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
@@ -56,10 +57,15 @@ function SplitEditor(props) {
       >
         {conflictedNote.title}
       </Text>
-      <Flex flex="1 1 auto" flexDirection={["column", "column", "row"]}>
+      <Flex
+        flex="1 1 auto"
+        flexDirection={["column", "column", "row"]}
+        overflow="hidden"
+      >
         <Flex
           flexDirection="column"
           className="firstEditor"
+          height={["50%", "50%", "100%"]}
           width={["100%", "100%", "50%"]}
           flex="1 1 auto"
         >
@@ -86,6 +92,7 @@ function SplitEditor(props) {
           <Box
             px={2}
             flex={1}
+            overflowY="auto"
             sx={{
               borderStyle: "solid",
               borderWidth: 0,
@@ -110,6 +117,7 @@ function SplitEditor(props) {
           flexDirection="column"
           className="secondEditor"
           flex="1 1 auto"
+          height={["50%", "50%", "100%"]}
           width={["100%", "100%", "50%"]}
         >
           <DeltaToggle
@@ -134,7 +142,7 @@ function SplitEditor(props) {
               otherEditor: remoteEditor.current.quill,
             })}
           />
-          <Box px={2}>
+          <Box px={2} overflowY="auto">
             <SimpleEditor
               pref={remoteEditor}
               container=".secondEditor"

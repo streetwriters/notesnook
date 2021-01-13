@@ -173,7 +173,7 @@ export default class ReactQuill extends Component {
       );
     }
 
-    onQuillInitialized();
+    if (onQuillInitialized) onQuillInitialized();
   }
 
   componentWillUnmount() {
