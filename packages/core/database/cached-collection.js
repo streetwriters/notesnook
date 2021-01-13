@@ -34,6 +34,11 @@ export default class CachedCollection extends IndexedCollection {
     return this.map.get(id);
   }
 
+  async deleteItem(id) {
+    this.map.delete(id);
+    await super.deleteItem(id);
+  }
+
   getRaw() {
     return Array.from(this.map.values());
   }
