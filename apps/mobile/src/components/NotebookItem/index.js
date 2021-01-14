@@ -1,12 +1,12 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { pv, SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {pv, SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -73,7 +73,6 @@ export const NotebookItem = ({
             numberOfLines={2}
             style={{
               maxWidth: '100%',
-              paddingVertical: 5,
             }}>
             {item.description}
           </Paragraph>
@@ -87,7 +86,7 @@ export const NotebookItem = ({
               width: '80%',
               maxWidth: '80%',
               flexWrap: 'wrap',
-              paddingVertical: item.description ? 0 : 5,
+              paddingVertical: item.description ? 0 : 0,
             }}>
             {item && item.topics ? (
               item.topics
@@ -190,7 +189,6 @@ export const NotebookItem = ({
             size={SIZE.xs}
             style={{
               marginRight: 10,
-              //fontFamily: "sans-serif",
             }}>
             {item && item.totalNotes && item.totalNotes > 1
               ? item.totalNotes + ' Notes'
