@@ -141,7 +141,7 @@ export class DialogManager extends Component {
     eSubscribeEvent(eOnLoadNote, this.loadNote);
 
     eSubscribeEvent(eOpenActionSheet, this._showActionSheet);
-    eSubscribeEvent(eCloseActionSheet, this._hideSimpleDialog);
+    eSubscribeEvent(eCloseActionSheet, this._hideActionSheet);
 
     eSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
     eSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
@@ -224,12 +224,12 @@ export class DialogManager extends Component {
         simpleDialog: data,
       },
       () => {
-        this.simpleDialog.show();
+        this.simpleDialog?.show();
       },
     );
   };
   _hideSimpleDialog = (data) => {
-    this.simpleDialog.hide();
+    this.simpleDialog?.hide();
   };
 
   onActionSheetHide = () => {

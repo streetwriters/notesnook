@@ -10,7 +10,11 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {dWidth, editing, getElevation} from '../../utils';
-import {eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium} from '../../utils/Events';
+import {
+  eCloseActionSheet,
+  eOpenPremiumDialog,
+  eShowGetPremium,
+} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {post} from '../../views/Editor/Functions';
@@ -132,14 +136,11 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       <Button
         onPress={async () => {
           open(null);
+          eSendEvent(eCloseActionSheet);
           if (editing.isFocused) {
             post('blur');
-            await sleep(300);
-          } else {
-            eSendEvent(eCloseActionSheet);
-            await sleep(300);
-            
           }
+          await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}
         width={80}
