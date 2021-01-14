@@ -57,7 +57,8 @@ export const editing = {
     type: null,
   },
   isFocused:false,
-  focusType:null
+  focusType:null,
+  movedAway:true
 };
 export const selection = {
   data: [],

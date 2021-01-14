@@ -3,7 +3,7 @@ import {BackHandler, InteractionManager, Keyboard} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -66,7 +66,10 @@ const EditorRoot = () => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
       Keyboard.addListener('keyboardDidShow', () => {
-        editing.isFocused = true;
+        console.log(editing.currentlyEditing,'current')
+        if (!editing.movedAway) {
+          editing.isFocused = true;
+        }
         post('keyboard');
       });
       if (!DDS.isTab) {
@@ -128,7 +131,9 @@ const EditorRoot = () => {
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', () => {
-        editing.isFocused = true;
+        if (!editing.movedAway) {
+          editing.isFocused = true;
+        }
         post('keyboard');
       });
       if (handleBack) {

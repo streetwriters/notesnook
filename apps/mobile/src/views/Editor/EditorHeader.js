@@ -91,7 +91,9 @@ const EditorHeader = () => {
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', () => {
-        editing.isFocused = true;
+        if (!editing.movedAway) {
+          editing.isFocused = true;
+        }
         post('keyboard');
       });
       if (handleBack) {

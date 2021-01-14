@@ -35,7 +35,6 @@ import {editorRef, tabBarRef} from './src/utils/Refs';
 import {EditorWrapper} from './src/views/Editor/EditorWrapper';
 import {getIntent, getNote, post} from './src/views/Editor/Functions';
 let {width, height} = Dimensions.get('window');
-let movedAway = true;
 let layoutTimer = null;
 let currentTab = 0;
 
@@ -43,7 +42,7 @@ let currentTab = 0;
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
-    movedAway = false;
+    editing.movedAway = false;
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
@@ -58,7 +57,7 @@ const onChangeTab = async (obj) => {
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
-      movedAway = true;
+      editing.movedAway = true;
       post('blur');
     }
     editing.isFocused = false;
@@ -227,7 +226,7 @@ const AppStack = React.memo(
           paddingHorizontal: 0,
         },
       });
-      if (!movedAway && current !== 'tablet') {
+      if (!editing.movedAway && current !== 'tablet') {
         tabBarRef.current?.goToPage(1);
       }
     }
