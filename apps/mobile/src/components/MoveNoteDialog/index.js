@@ -1,28 +1,29 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { Keyboard, TextInput, TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import React, {createRef, useEffect, useState} from 'react';
+import {Keyboard, TextInput, TouchableOpacity, View} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   sendNoteEditedEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenMoveNoteDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { pv, SIZE } from '../../utils/SizeUtils';
+import {pv, SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import { PressableButton } from '../PressableButton';
-import { Toast } from '../Toast';
+import {PressableButton} from '../PressableButton';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -148,7 +149,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
 
-         sendNoteEditedEvent({
+      sendNoteEditedEvent({
         id: note.id,
         forced: true,
       });
@@ -432,9 +433,21 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       {note?.notebooks?.findIndex(
                         (o) => o.topics.indexOf(item.id) > -1,
                       ) > -1 ? (
-                        <Paragraph size={SIZE.sm} color={colors.errorText}>
-                          Remove Note
-                        </Paragraph>
+                        <Button
+                          onPress={() => handlePress(item, index)}
+                          title="Remove Note"
+                          type="accent"
+                          accentColor="red"
+                          height={22}
+                          style={{
+                            margin: 1,
+                            marginRight: 5,
+                            paddingHorizontal: 0,
+                            paddingVertical: 2.5,
+                            borderRadius: 100,
+                            paddingHorizontal: 12,
+                          }}
+                        />
                       ) : null}
                     </PressableButton>
                   )}
