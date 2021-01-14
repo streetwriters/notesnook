@@ -152,8 +152,7 @@ export class DialogManager extends Component {
     eSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
 
-    //eSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
-    //eSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
+
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
@@ -177,9 +176,6 @@ export class DialogManager extends Component {
 
     eUnSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eUnSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
-
-    //eUnSubscribeEvent(eOpenAddTopicDialog, this.showAddTopic);
-    //eUnSubscribeEvent(eCloseAddTopicDialog, this.hideAddTopic);
 
     eUnSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eUnSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
