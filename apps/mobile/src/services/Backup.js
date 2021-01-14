@@ -49,7 +49,8 @@ async function getLastBackupDate() {
 async function checkBackupRequired(type) {
   let now = Date.now();
   let lastBackupDate = await getLastBackupDate();
-  if (lastBackupDate === 'never' || !lastBackupDate) {
+  if (!lastBackupDate) return false;
+  if (lastBackupDate === 'never') {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);

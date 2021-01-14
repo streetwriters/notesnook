@@ -12,7 +12,6 @@ import {scrollRef} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import Storage from '../../utils/storage';
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -85,7 +84,7 @@ export const Home = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = async (event) => {
+  const _onPressBottomButton = async () => {
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
