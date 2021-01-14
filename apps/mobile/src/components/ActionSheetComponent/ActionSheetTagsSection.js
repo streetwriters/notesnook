@@ -121,15 +121,17 @@ export const ActionSheetTagsSection = ({item, close}) => {
   const getSuggestions = (query, note) => {
     if (!note || !note?.id) return;
 
+    let _tags = db.tags.all;
     prevQuery = query;
     let _suggestions;
+    
     if (query) {
-      _suggestions = tags.filter(
+      _suggestions = _tags.filter(
         (t) =>
           t.title.startsWith(query) && !note.tags.find((n) => n === t.title),
       );
     } else {
-      _suggestions = tags
+      _suggestions = _tags
         .slice()
         .sort(function (x, y) {
           return x.dateEdited - y.dateEdited;
