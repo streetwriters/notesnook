@@ -41,7 +41,7 @@ export class Dialog extends Component {
         updateEvent({type: Actions.TRASH});
         updateEvent({type: Actions.CLEAR_SELECTION});
         updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-        ToastEvent.show('Items permanantly deleted');
+        ToastEvent.show('Permanantly deleted','success');
         this.hide();
         break;
       }
@@ -50,7 +50,7 @@ export class Dialog extends Component {
         updateEvent({type: Actions.TRASH});
         updateEvent({type: Actions.CLEAR_SELECTION});
         updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-        ToastEvent.show('Trash cleared', 'error');
+        ToastEvent.show('Trash cleared', 'success');
         this.hide();
         break;
       }
