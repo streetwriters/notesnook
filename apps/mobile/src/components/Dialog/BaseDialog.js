@@ -18,7 +18,8 @@ const BaseDialog = ({
   onShow,
   animation = 'fade',
   premium,
-  statusBarTranslucent=true
+  statusBarTranslucent = true,
+  transparent,
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
@@ -41,7 +42,9 @@ const BaseDialog = ({
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={[
             {
-              backgroundColor: state.colors.night
+              backgroundColor: transparent
+                ? 'transparent'
+                : state.colors.night
                 ? 'rgba(255,255,255,0.15)'
                 : 'rgba(0,0,0,0.3)',
             },

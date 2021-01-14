@@ -90,7 +90,7 @@ const LoginDialog = () => {
       buttonFunc: () => signupUser(),
       headerParagraph: 'login to your account',
       showForgotButton: false,
-      loading: 'Please wait while we are setting up your account.',
+      loading: 'Please wait while we set up your account.',
       showLoader: true,
       buttonAlt: 'Login',
       buttonAltFunc: () => {
@@ -107,9 +107,7 @@ const LoginDialog = () => {
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading:
-        'We have sent you a recovery email on ' +
-        email +
-        '. Follow the link in the email to set a new password. If you cannot find the email, check your spam folder.',
+        'Please follow the link in the email to set up your new password. If you are unable to find our email, check your spam folder.',
       showLoader: false,
       buttonAlt: 'Login',
       buttonAltFunc: () => {
@@ -126,7 +124,7 @@ const LoginDialog = () => {
       headerParagraph: 'login to your account',
       showForgotButton: false,
       loading:
-        'Please wait while we change your password and reencrypt your data.',
+        'Please wait while we change your password and encrypt your data.',
       showLoader: true,
       buttonAlt: null,
     },
@@ -185,7 +183,7 @@ const LoginDialog = () => {
       console.log('LOGGED IN');
       user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
-      setStatus('Syncing Data');
+      setStatus('Syncing Your Data');
       PremiumService.setPremiumStatus();
       dispatch({type: Actions.USER, user: user});
       clearMessage(dispatch);
@@ -249,7 +247,7 @@ const LoginDialog = () => {
       }
       await db.user.signup(email, password);
       let user = await db.user.getUser();
-      setStatus('Setting up crenditials');
+      setStatus('Setting up Crenditials');
       dispatch({type: Actions.USER, user: user});
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       clearMessage(dispatch);
@@ -266,7 +264,7 @@ const LoginDialog = () => {
 
   const sendEmail = async () => {
     if (!email || error) {
-      ToastEvent.show('Account email required.', 'error', 'local');
+      ToastEvent.show('Account email is required.', 'error', 'local');
       return;
     }
     try {
@@ -277,11 +275,10 @@ const LoginDialog = () => {
       ) {
         throw new Error('Please wait before requesting another email');
       }
-      setStatus('Account Recovery Email Sent!');
-      //await db.user.recoverAccount(email);
+      setStatus('Password Recovery Email Sent!');
+      await db.user.recoverAccount(email);
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
     } catch (e) {
-      //await MMKV.removeItem('lastRecoveryEmailTime');
       setStatus(null);
       ToastEvent.show(e.message, 'error', 'local');
     }
@@ -315,12 +312,56 @@ const LoginDialog = () => {
       {status ? (
         <BaseDialog
           visible={true}
+          transparent={current.showLoader}
+          animation="slide"
           onRequestClose={() => {
             if (!current.showLoader) {
               setStatus(null);
             }
           }}>
-          <DialogContainer>
+          <View
+            style={{
+              alignItems: 'center',
+              position: 'absolute',
+              bottom: 0,
+              paddingHorizontal: 12,
+              backgroundColor: colors.nav,
+              paddingTop: 10,
+              paddingBottom: 20,
+              width: '100%',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+            }}>
+            <View
+              style={{
+                maxWidth: '80%',
+              }}>
+              <Heading size={SIZE.md}>{status}</Heading>
+              <Paragraph style={{maxWidth: '100%'}} color={colors.icon}>
+                {current.loading}
+                {!current.showLoader ? null : (
+                  <Paragraph color={colors.errorText}>
+                    {'\n'}
+                    Do not close the app.
+                  </Paragraph>
+                )}
+              </Paragraph>
+            </View>
+
+            {!current.showLoader ? (
+              <Button
+                title="Ok"
+                width={50}
+                onPress={() => {
+                  setStatus(null);
+                }}
+                type="accent"
+              />
+            ) : (
+              <ActivityIndicator size={SIZE.xxxl} color={colors.accent} />
+            )}
+          </View>
+          {/* <DialogContainer>
             <View
               style={{
                 justifyContent: 'center',
@@ -342,7 +383,7 @@ const LoginDialog = () => {
             {!current.showLoader ? null : (
               <ActivityIndicator color={colors.accent} />
             )}
-          </DialogContainer>
+          </DialogContainer> */}
         </BaseDialog>
       ) : null}
       <View
@@ -588,7 +629,6 @@ const LoginDialog = () => {
               onPress={current.buttonFunc}
               width="100%"
               type="accent"
-              loading={loading}
               fontSize={SIZE.md}
               height={50}
             />
