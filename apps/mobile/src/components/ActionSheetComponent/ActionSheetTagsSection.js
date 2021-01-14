@@ -76,9 +76,9 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   useEffect(() => {
     if (prevQuery) {
-      getSuggestions(prevQuery);
+      getSuggestions(prevQuery,note);
     } else {
-      getSuggestions();
+      getSuggestions(null,note);
     }
 
     return () => {
@@ -123,12 +123,14 @@ export const ActionSheetTagsSection = ({item, close}) => {
   });
 
   const getSuggestions = (query, note) => {
+  
     if (!note || !note?.id) return;
 
     let _tags = db.tags.all;
+    console.log(_tags);
+
     prevQuery = query;
     let _suggestions;
-
     if (query) {
       _suggestions = _tags.filter(
         (t) =>
@@ -286,6 +288,7 @@ const TagItem = ({tag, note, localRefresh}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
+      activeOpacity={0.8}
       style={{
         paddingHorizontal: 8,
         backgroundColor: colors.shade,
