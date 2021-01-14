@@ -240,14 +240,14 @@ const LoginDialog = () => {
   const signupUser = async () => {
     if (!validateInfo()) return;
     setLoading(true);
-    setStatus('Creating User');
+    setStatus('Creating Account');
     try {
       if (!db.user) {
         throw new Error('Database is not initialized!');
       }
       await db.user.signup(email, password);
       let user = await db.user.getUser();
-      setStatus('Setting up Crenditials');
+      setStatus('Setting Crenditials');
       dispatch({type: Actions.USER, user: user});
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       clearMessage(dispatch);
