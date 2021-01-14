@@ -104,7 +104,9 @@ class SortDialog extends React.Component {
                     this.state.settings?.sortOrder === 'asc' ? 'desc' : 'asc';
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
-                  await this.getSettings();
+                  await this.getSettings();    
+                  updateEvent({type: Actions.NOTES});
+
                 }}
                 activeOpacity={1}
                 style={{
