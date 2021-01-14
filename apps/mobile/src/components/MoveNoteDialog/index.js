@@ -424,11 +424,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       <View>
                         <Paragraph color={colors.heading}>
                           {item.title}
-                          {'\n'}
-                          <Paragraph color={colors.icon} size={SIZE.xs}>
+                        </Paragraph>
+                        <Paragraph color={colors.icon} size={SIZE.xs}>
                             {item.totalNotes + ' notes'}
                           </Paragraph>
-                        </Paragraph>
                       </View>
                       {note?.notebooks?.findIndex(
                         (o) => o.topics.indexOf(item.id) > -1,
@@ -436,8 +435,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                         <Button
                           onPress={() => handlePress(item, index)}
                           title="Remove Note"
-                          type="accent"
-                          accentColor="red"
+                          type="error"
                           height={22}
                           style={{
                             margin: 1,

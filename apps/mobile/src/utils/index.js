@@ -189,6 +189,12 @@ export const BUTTON_TYPES = {
     selected: 'accent',
     opacity: 0.12,
   },
+  error: {
+    primary: 'red',
+    text: 'red',
+    selected: 'red',
+    opacity: 0.12,
+  },
 };
 
 export function toTXT(data) {
