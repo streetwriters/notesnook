@@ -71,6 +71,7 @@ const EditorHeader = () => {
       }
       return true;
     }
+    editing.isFocused = false;
     editing.currentlyEditing = false;
     if (DDS.isLargeTablet()) {
       if (fullscreen) {

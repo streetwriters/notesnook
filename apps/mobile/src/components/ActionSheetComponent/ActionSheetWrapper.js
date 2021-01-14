@@ -66,6 +66,7 @@ const ActionSheetWrapper = ({
         />
       }
       onClose={() => {
+        console.log(editing.isFocused,editing.focusType)
         if (editing.isFocused === true) {
           post('blur');
           if (editing.focusType == "editor") {

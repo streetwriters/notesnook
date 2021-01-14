@@ -43,12 +43,11 @@ let currentTab = 0;
 const onChangeTab = async (obj) => {
   if (obj.i === 1) {
     eSendEvent(eCloseSideMenu);
-    if (getIntent()) return;
     movedAway = false;
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
-    editing.isFocused = false;
+
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
@@ -62,6 +61,7 @@ const onChangeTab = async (obj) => {
       movedAway = true;
       post('blur');
     }
+    editing.isFocused = false;
     currentTab = 0;
     eSendEvent(eOpenSideMenu);
   }
