@@ -95,6 +95,16 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     };
   }, []);
 
+  const onPress = async () => {
+    open(null);
+    eSendEvent(eCloseActionSheet);
+    if (editing.isFocused) {
+      post('blur');
+    }
+    await sleep(300);
+    eSendEvent(eOpenPremiumDialog);
+  };
+
   return (
     <Animated.View
       style={{
@@ -133,20 +143,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         </Paragraph>
       </View>
 
-      <Button
-        onPress={async () => {
-          open(null);
-          eSendEvent(eCloseActionSheet);
-          if (editing.isFocused) {
-            post('blur');
-          }
-          await sleep(300);
-          eSendEvent(eOpenPremiumDialog);
-        }}
-        width={80}
-        title="Get Now"
-        type="inverted"
-      />
+      <Button onPress={onPress} width={80} title="Get Now" type="inverted" />
     </Animated.View>
   );
 };
