@@ -47,6 +47,10 @@ export const ActionSheetTagsSection = ({item, close}) => {
       return;
     }
 
+    if (tagToAdd.startsWith("#")) {
+      tagToAdd = tagToAdd.slice(1);
+    }
+
     let tag = tagToAdd;
     tag = tag.trim();
     if (tag.includes(' ')) {
@@ -124,7 +128,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
     let _tags = db.tags.all;
     prevQuery = query;
     let _suggestions;
-    
+
     if (query) {
       _suggestions = _tags.filter(
         (t) =>
