@@ -1,18 +1,18 @@
-import React, { createRef, useCallback, useEffect, useState } from 'react';
-import { TextInput, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import React, {createRef, useCallback, useEffect, useState} from 'react';
+import {TextInput, TouchableOpacity, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   eSendEvent,
   sendNoteEditedEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { refreshNotesPage } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import {db} from '../../utils/DB';
+import {refreshNotesPage} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -47,7 +47,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
       return;
     }
 
-    if (tagToAdd.startsWith("#")) {
+    if (tagToAdd.startsWith('#')) {
       tagToAdd = tagToAdd.slice(1);
     }
 
@@ -76,9 +76,9 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   useEffect(() => {
     if (prevQuery) {
-      getSuggestions(prevQuery,note);
+      getSuggestions(prevQuery, note);
     } else {
-      getSuggestions(null,note);
+      getSuggestions(null, note);
     }
 
     return () => {
@@ -123,7 +123,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
   });
 
   const getSuggestions = (query, note) => {
-  
     if (!note || !note?.id) return;
 
     let _tags = db.tags.all;
@@ -164,6 +163,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           flexDirection: 'row',
           alignItems: 'center',
           paddingVertical: 5,
+          paddingBottom:10
         }}>
         {suggestions.length === 0 ? null : (
           <View
@@ -215,8 +215,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
         }}>
-       
-
         {note.tags.map((item, index) => (
           <TagItem
             key={item}
@@ -230,7 +228,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           style={{
             minWidth: 100,
             zIndex: 10,
-            //fontFamily: "sans-serif",
             color: colors.pri,
             paddingHorizontal: 5,
             paddingVertical: 0,
@@ -275,7 +272,7 @@ const TagItem = ({tag, note, localRefresh}) => {
       await db.notes
         .note(note.id)
         .untag(prevNote.tags[prevNote.tags.indexOf(tag)]);
-        localRefresh(note.type);
+      localRefresh(note.type);
     } catch (e) {
     } finally {
       sendNoteEditedEvent({
@@ -286,19 +283,21 @@ const TagItem = ({tag, note, localRefresh}) => {
   };
 
   return (
-    <TouchableOpacity
+    <Button
+      key={tag.title}
       onPress={onPress}
-      activeOpacity={0.8}
+      title={'#' + tag}
+      type="accent"
+      height={25}
+      fontSize={SIZE.md}
       style={{
-        paddingHorizontal: 8,
-        backgroundColor: colors.shade,
-        marginLeft: 5,
+        margin: 1,
+        marginRight: 5,
+        paddingHorizontal: 0,
+        paddingVertical: 2.5,
         borderRadius: 100,
-        paddingVertical: 2,
-      }}>
-      <Paragraph size={SIZE.md} color={colors.accent}>
-        #{tag}
-      </Paragraph>
-    </TouchableOpacity>
+        paddingHorizontal: 12,
+      }}
+    />
   );
 };

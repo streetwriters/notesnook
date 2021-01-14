@@ -27,6 +27,7 @@ export const Button = ({
   accentText = 'light',
   onLongPress,
   tooltipText,
+  textStyle
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -80,9 +81,9 @@ export const Button = ({
         <Heading
           color={textColor}
           size={fontSize}
-          style={{
+          style={[{
             marginLeft: icon || loading ? 5 : 0,
-          }}>
+          },textStyle]}>
           {title}
         </Heading>
       )}
