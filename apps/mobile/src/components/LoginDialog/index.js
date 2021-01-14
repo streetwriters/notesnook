@@ -175,9 +175,6 @@ const LoginDialog = () => {
     setStatus('Logging in');
     let user;
     try {
-      if (!db.user) {
-        throw new Error('Database is not initialized!');
-      }
       console.log('LOGGING IN');
       await db.user.login(email.toLowerCase(), password, true);
       console.log('LOGGED IN');
@@ -242,9 +239,6 @@ const LoginDialog = () => {
     setLoading(true);
     setStatus('Creating Account');
     try {
-      if (!db.user) {
-        throw new Error('Database is not initialized!');
-      }
       await db.user.signup(email, password);
       let user = await db.user.getUser();
       setStatus('Setting Crenditials');
