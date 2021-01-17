@@ -18,6 +18,20 @@ Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
 Quill.register("modules/focus", QuillFocus);
 
+let Embed = Quill.import("blots/embed");
+let Delta = Quill.import("delta");
+
+function lineBreakMatcher() {
+  var newDelta = new Delta();
+  newDelta.insert({ manualbreak: true });
+  return newDelta;
+}
+
+class SmartBreak extends Embed {}
+SmartBreak.blotName = "manualbreak";
+SmartBreak.tagName = "BR";
+Quill.register(SmartBreak);
+
 function moduleHandlerWrapper(type, isSimple) {
   return async function (value) {
     if (isSimple && !isUserPremium()) {
@@ -57,7 +71,7 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
     : {
         container: [
           ["bold", "italic", "underline", "strike", "blockquote"],
-          [{ header: "2" }, { header: "3" }, { header: [false, 4, 5, 6] }],
+          [{ header: "2" }, { header: "3" }],
           [
             { align: "" },
             { align: "center" },
@@ -66,10 +80,11 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
           ],
           [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
           [{ indent: "-1" }, { indent: "+1" }],
-          [{ size: ["small", false, "large", "huge"] }],
           ["code-block", { script: "sub" }, { script: "super" }],
           [{ color: [] }, { background: [] }],
-          ["link", "image", "video"],
+          [{ header: [false, 2, 3, 4, 5, 6] }],
+          [{ size: ["small", false, "large", "huge"] }],
+          [("link", "image", "video")],
           [{ direction: "rtl" }, "clean"],
         ],
         handlers: {
@@ -94,6 +109,34 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
   focus: {
     enabled: isFocusMode,
     focusClass: "focused-blot", // Defaults to .focused-blot.
+  },
+  clipboard: {
+    matchers: [["BR", lineBreakMatcher]],
+  },
+  keyboard: {
+    bindings: {
+      linebreak: {
+        key: 13,
+        shiftKey: true,
+        handler: function (range) {
+          // let currentLeaf = this.quill.getLeaf(range.index)[0];
+          // let nextLeaf = this.quill.getLeaf(range.index + 1)[0];
+          this.quill.setSelection(range.index, "silent");
+          //this.quill.insertText(range.index, "\n", "user");
+
+          this.quill.insertEmbed(range.index, "manualbreak", true, "user");
+
+          // Insert a second break if:
+          // At the end of the editor, OR next leaf has a different parent (<p>)
+          // if (nextLeaf === null || currentLeaf.parent !== nextLeaf.parent) {
+          //   this.quill.insertEmbed(range.index, "manualbreak", true, "user");
+          // }
+
+          // Now that we've inserted a line break, move the cursor forward
+          this.quill.setSelection(range.index + 1, Quill.sources.SILENT);
+        },
+      },
+    },
   },
 });
 
@@ -194,7 +237,7 @@ export default class ReactQuill extends Component {
 
   getWordCount(delta) {
     const wordCount = delta.reduce((prev, curr) => {
-      if (!curr.insert || curr.insert.image) return prev;
+      if (typeof curr.insert !== "string") return prev;
       const text = curr.insert.trim();
       if (text <= 1) return prev;
       const count = countWords(text); // curr.insert.split(wordCountRegex).length;

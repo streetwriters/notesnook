@@ -212,8 +212,8 @@ code {
   padding: 10px 0px 10px 0px !important;
 }
 
-.ql-editor > p {
-  margin-bottom: 20px !important;
+.ql-editor > p:not(:first-child) {
+  margin-top: 20px;
 }
 
 .ql-editor.ql-blank::before {
