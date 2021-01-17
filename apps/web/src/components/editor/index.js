@@ -6,6 +6,7 @@ import {
   SESSION_STATES,
   store as editorstore,
 } from "../../stores/editor-store";
+import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useUserStore } from "../../stores/user-store";
 import Animated from "../animated";
@@ -17,10 +18,12 @@ import Toolbar from "./toolbar";
 import ObservableArray from "../../utils/observablearray";
 import Banner from "../banner";
 import EditorLoading from "./loading";
+import { useTheme } from "emotion-theming";
 
 const ReactQuill = React.lazy(() => import("./react-quill"));
 
 function Editor(props) {
+  const theme = useTheme();
   const sessionState = useStore((store) => store.session.state);
   const sessionId = useStore((store) => store.session.id);
   const contentType = useStore((store) => store.session.content?.type);
@@ -142,6 +145,7 @@ function Editor(props) {
           <Box
             id="toolbarContainer"
             bg="background"
+            alignSelf="center"
             sx={{
               borderBottom: "1px solid",
               borderBottomColor: "border",
@@ -151,11 +155,52 @@ function Editor(props) {
               maxHeight: 45,
               overflow: "hidden",
               transition: "max-height 500ms linear",
-              ":hover": {
-                overflow: "visible",
-              },
             }}
-          />
+          >
+            <Icon.ChevronDown
+              id="editorToolbarExpand"
+              sx={{
+                display: ["none", "none", "block"],
+                position: "absolute",
+                right: 0,
+                top: 12,
+                cursor: "pointer",
+                height: 28,
+                borderRadius: "default",
+                ":hover": { bg: "dimPrimary" },
+              }}
+              title="Expand"
+              size={28}
+              onClick={(e) => {
+                const toolbarContainer = document.getElementById(
+                  "toolbarContainer"
+                );
+                const toolbarExpandButton = document.getElementById(
+                  "editorToolbarExpand"
+                );
+                const quill = document.getElementById("quill");
+                if (toolbarContainer) {
+                  const toolbar = toolbarContainer.lastElementChild;
+                  if (
+                    !toolbarContainer.style.overflow ||
+                    toolbarContainer.style.overflow === "hidden"
+                  ) {
+                    toolbarContainer.style.overflow = "visible";
+                    toolbarExpandButton.style["background-color"] =
+                      theme.colors.shade;
+                    quill.style.paddingTop = `${
+                      toolbar.clientHeight - toolbarContainer.clientHeight
+                    }px`;
+                  } else {
+                    toolbarContainer.style.overflow = "hidden";
+                    toolbarExpandButton.style["background-color"] =
+                      "transparent";
+                    quill.style.paddingTop = `0px`;
+                  }
+                }
+              }}
+            />
+          </Box>
           {contentType === "delta" && (
             <Suspense fallback={<EditorLoading />}>
               <ReactQuill

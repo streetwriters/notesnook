@@ -25,6 +25,7 @@ function createIcon(name, rotate = false) {
   return function (props) {
     return (
       <Animated.Flex
+        id={props.id}
         title={props.title}
         variant={props.variant}
         whileHover={{ scale: 1.1 }}
@@ -79,6 +80,7 @@ export const Sync = createIcon(Icons.mdiSync);
 export const Loading = createIcon(Icons.mdiLoading, true);
 export const Export = createIcon(Icons.mdiExportVariant);
 export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
+export const Expand = createIcon(Icons.mdiArrowExpandDown);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
