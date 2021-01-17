@@ -33,11 +33,17 @@
 <script src="image-resize.min.js"></script>
 <script>
     attachMessageListener();
+
+    const Embed = Quill.import('blots/embed')
+    class SmartBreak extends Embed {}
+    SmartBreak.blotName = "manualbreak";
+    SmartBreak.tagName = "BR";
     function loadAction() {
         var Block = Quill.import('blots/block');
         Block.tagName = 'DIV';
         Quill.register(Block, true);
         setFonts();
+        Quill.register(SmartBreak);
         Quill.register("modules/imageCompressor", imageCompressor);
 
         editor = new Quill('#editor', {

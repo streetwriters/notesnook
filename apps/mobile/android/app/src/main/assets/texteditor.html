@@ -443,7 +443,11 @@
             this.quill.format("script", value, "user");
         },
     };
-
+    const Embed = Quill.import('blots/embed')
+    class SmartBreak extends Embed {}
+    SmartBreak.blotName = "manualbreak";
+    SmartBreak.tagName = "BR";
+  
     attachMessageListener();
     function loadAction(premium) {
         isTablet = true;
@@ -452,6 +456,7 @@
         var Block = Quill.import('blots/block');
         Block.tagName = 'DIV';
         Quill.register(Block, true);
+        Quill.register(SmartBreak);
         Quill.register("modules/imageCompressor", imageCompressor);
         Quill.register("formats/lists", BetterList);
         Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
