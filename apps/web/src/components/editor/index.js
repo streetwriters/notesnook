@@ -212,12 +212,13 @@ function Editor(props) {
                 onFocus={() => {
                   toggleProperties(false);
                 }}
-                placeholder="Type anything here"
+                placeholder="Start writing your note here..."
                 container=".editor"
                 scrollContainer=".editorScroll"
                 onSave={() => {
                   saveSession();
                 }}
+                initialContent={[{ insert: "\n" }]}
                 changeInterval={500}
                 onWordCountChanged={updateWordCount}
                 onQuillInitialized={() => {

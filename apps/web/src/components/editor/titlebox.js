@@ -56,7 +56,7 @@ function TitleBox(props) {
         data-test-id="editor-title"
         className="editorTitle"
         autoFocus={shouldFocus}
-        placeholder="Untitled"
+        placeholder="Note title"
         as="textarea"
         width="100%"
         minHeight={[30, 30, 60]}
