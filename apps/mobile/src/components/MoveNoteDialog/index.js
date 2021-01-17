@@ -377,7 +377,6 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                               borderRadius: 5,
                               height: 40,
                               fontSize: SIZE.sm,
-                              //fontFamily: "sans-serif",
                               padding: pv - 2,
                             },
                           ]}

@@ -10,7 +10,6 @@ export const DummyText = () => {
       ref={dummyRef}
       style={[
         {
-          //fontFamily: "sans-serif",
           fontSize: SIZE.sm,
           position: 'absolute',
           right: -1000,

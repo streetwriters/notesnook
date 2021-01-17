@@ -7,10 +7,18 @@ import {RootView} from './initializer.root';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import {DDS} from './src/services/DeviceDetection';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from './src/services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
 import {db} from './src/utils/DB';
-import {eDispatchAction, eOpenSideMenu, refreshNotesPage} from './src/utils/Events';
+import {
+  eDispatchAction,
+  eOpenSideMenu,
+  refreshNotesPage,
+} from './src/utils/Events';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
 const App = () => {
@@ -52,9 +60,7 @@ const App = () => {
       SettingsService.setAppLoaded();
     });
     eSendEvent(eOpenSideMenu);
-
     dispatch({type: Actions.ALL});
- 
   };
 
   return (
