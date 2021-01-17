@@ -30,11 +30,8 @@
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
-  NSArray *paths = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
-  NSString *libraryPath = (NSString *) [paths firstObject];
-  NSString *rootDir = [libraryPath stringByAppendingPathComponent:@"mmkv"];
-  [MMKV initializeMMKV:rootDir];
-  MMKV *kv = [MMKV mmkvWithID:@"default" mode:MMKVSingleProcess];
+  
+  MMKV *kv = [MMKV mmkvWithID:@"default" mode:MMKVMultiProcess];
   [kv removeValueForKey:@"appState"];
 }
 
