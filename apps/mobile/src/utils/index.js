@@ -11,7 +11,7 @@ import {SIZE} from './SizeUtils';
 import RNTooltips from 'react-native-tooltips';
 import {tabBarRef} from './Refs';
 
-export const APP_VERSION = 1200
+export const APP_VERSION = 1220
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
