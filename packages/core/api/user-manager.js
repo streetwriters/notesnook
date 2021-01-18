@@ -1,7 +1,7 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { EV } from "../common";
+import { EV, NOTESNOOK_CORE_VERSION } from "../common";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -12,6 +12,8 @@ const ENDPOINTS = {
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
+  status: "/account/status",
+  hcliMigrate: "/migrate/hcli",
 };
 
 class UserManager {
@@ -31,15 +33,43 @@ class UserManager {
   }
 
   async signup(email, password) {
+    const hashedPassword = await this._db.context.hash(password, email);
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
-      password,
+      password: hashedPassword,
       client_id: "notesnook",
     });
-    return await this.login(email, password, true);
+    return await this.login(email, hashedPassword, true, true);
   }
 
-  async login(email, password, remember) {
+  async _getUserStatus(email) {
+    return await http.get(
+      `${constants.AUTH_HOST}${ENDPOINTS.status}/?id=${email}`
+    );
+  }
+
+  async _hcliMigrate(email, plaintextPassword, hashedPassword) {
+    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.hcliMigrate}`, {
+      username: email,
+      plaintext_password: plaintextPassword,
+      hashed_password: hashedPassword,
+    });
+  }
+
+  async _migrateUser(email, plaintextPassword) {
+    const status = await this._getUserStatus(email);
+    var hashedPassword = await this._db.context.hash(plaintextPassword, email);
+    if (!status.hcli) {
+      await this._hcliMigrate(email, plaintextPassword, hashedPassword);
+    }
+    return hashedPassword;
+  }
+
+  async login(email, password, remember, skipMigrationCheck = true) {
+    if (!skipMigrationCheck) {
+      password = await this._migrateUser(email, password);
+    }
+
     await this.tokenManager.saveToken(
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,

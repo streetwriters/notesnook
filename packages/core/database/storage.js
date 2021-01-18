@@ -30,6 +30,11 @@ export default class Storage {
   deriveCryptoKey(name, data) {
     return this.storage.deriveCryptoKey(name, data);
   }
+
+  hash(password, userId) {
+    return this.storage.hash(password, userId);
+  }
+
   getCryptoKey(name) {
     return this.storage.getCryptoKey(name);
   }
