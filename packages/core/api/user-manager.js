@@ -65,7 +65,7 @@ class UserManager {
     return hashedPassword;
   }
 
-  async login(email, password, remember, skipMigrationCheck = true) {
+  async login(email, password, remember, skipMigrationCheck = false) {
     if (!skipMigrationCheck) {
       password = await this._migrateUser(email, password);
     }
