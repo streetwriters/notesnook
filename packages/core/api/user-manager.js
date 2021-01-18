@@ -44,7 +44,7 @@ class UserManager {
 
   async _getUserStatus(email) {
     return await http.get(
-      `${constants.AUTH_HOST}${ENDPOINTS.status}/?id=${email}`
+      `${constants.AUTH_HOST}${ENDPOINTS.status}?id=${email}`
     );
   }
 
