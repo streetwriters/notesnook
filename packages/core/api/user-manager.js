@@ -43,9 +43,9 @@ class UserManager {
   }
 
   async _getUserStatus(email) {
-    return await http.get(
-      `${constants.AUTH_HOST}${ENDPOINTS.status}?id=${email}`
-    );
+    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.status}`, {
+      email,
+    });
   }
 
   async _hcliMigrate(email, plaintextPassword, hashedPassword) {
