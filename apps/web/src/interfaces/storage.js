@@ -73,6 +73,7 @@ export default {
   getAllKeys,
   deriveCryptoKey,
   getCryptoKey,
+  hash: crypto.hashPassword,
   encrypt: crypto.encrypt,
   decrypt: crypto.decrypt,
 };

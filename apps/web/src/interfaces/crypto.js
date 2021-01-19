@@ -42,6 +42,11 @@ class Crypto {
     await this._initialize();
     return global.ncrypto.deriveKey.call(this, password, salt, exportKey);
   };
+
+  hashPassword = async (password, userId) => {
+    await this._initialize();
+    return global.ncrypto.hashPassword.call(this, password, userId);
+  };
 }
 
 class CryptoWorker {
@@ -128,6 +133,10 @@ class CryptoWorker {
 
   deriveKey = (password, salt, exportKey = false) => {
     return this._communicate("deriveKey", { password, salt, exportKey });
+  };
+
+  hashPassword = (password, userId) => {
+    return this._communicate("hashPassword", { password, userId });
   };
 }
 

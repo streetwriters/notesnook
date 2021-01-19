@@ -28,6 +28,12 @@ function onMessage(ev) {
         sendMessage("deriveKey", derivedKey, messageId);
         break;
       }
+      case "hashPassword": {
+        const { password, userId } = data;
+        const hashedPassword = hashPassword.call(context, password, userId);
+        sendMessage("hashPassword", hashedPassword, messageId);
+        break;
+      }
       case "load": {
         const { seed } = data;
         self.sodium = {
@@ -78,6 +84,26 @@ const deriveKey = (password, salt, exportKey = false) => {
     return key;
   }
   return { key, salt: saltHex };
+};
+
+const hashPassword = (password, userId) => {
+  const { sodium } = this;
+
+  const appSalt = "oVzKtazBo7d8sb7TBvY9jw";
+  const salt = sodium.crypto_generichash(
+    sodium.crypto_pwhash_SALTBYTES,
+    `${appSalt}${userId}`
+  );
+  const hash = sodium.crypto_pwhash(
+    32,
+    password,
+    salt,
+    3, // operations limit
+    1024 * 1024 * 64, // memory limit (8MB)
+    sodium.crypto_pwhash_ALG_ARGON2ID13,
+    "base64"
+  );
+  return hash;
 };
 
 const _getKey = (passwordOrKey) => {
