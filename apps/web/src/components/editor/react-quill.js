@@ -140,7 +140,7 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
   },
 });
 
-// const wordCountRegex = /\b\S+\b/g;
+//
 export default class ReactQuill extends Component {
   /**
    * @type {Quill}
@@ -182,6 +182,7 @@ export default class ReactQuill extends Component {
       initialContent,
       onChange,
       onSave,
+      onSelectAll,
       modules,
       id,
       isSimple,
@@ -216,6 +217,16 @@ export default class ReactQuill extends Component {
       );
     }
 
+    if (onSelectAll) {
+      this.quill.keyboard.addBinding(
+        {
+          key: "A",
+          shortKey: true,
+        },
+        onSelectAll.bind(this, this.quill)
+      );
+    }
+
     if (onQuillInitialized) onQuillInitialized();
   }
 
@@ -224,10 +235,10 @@ export default class ReactQuill extends Component {
     this.quill.off("text-change", this.textChangeHandler);
   }
 
-  textChangeHandler = (delta, _oldDelta, source) => {
+  textChangeHandler = (delta, oldDelta, source) => {
     if (source === "init") return;
     if (this.props.onWordCountChanged)
-      this.props.onWordCountChanged(this.getWordCount(delta));
+      this.props.onWordCountChanged(this.getWordCount(oldDelta.compose(delta)));
     clearTimeout(this.changeTimeout);
     this.changeTimeout = setTimeout(
       this.props.onChange,
@@ -243,7 +254,7 @@ export default class ReactQuill extends Component {
       const count = countWords(text); // curr.insert.split(wordCountRegex).length;
       return prev + count;
     }, 0);
-    this.words += wordCount;
+    this.words = wordCount;
     return this.words;
   }
 
@@ -265,12 +276,26 @@ export default class ReactQuill extends Component {
   }
 }
 
+// const wordCountRegex = /\b\S+\b/g;
 function countWords(str) {
-  let count = 1;
+  let count = 0;
+  let shouldCount = false;
+
   for (var i = 0; i < str.length; ++i) {
-    const char = str[i];
-    if (char === " " || char === "\n" || char === "\t" || char === "\r")
+    const s = str.charCodeAt(i);
+
+    // 32 = space
+    // 13 = \r
+    // 10 = \n
+    // 42 = *
+    if (s === 32 || s === 13 || s === 10 || s === 42) {
+      if (shouldCount) continue;
       ++count;
+      shouldCount = true;
+    } else {
+      shouldCount = false;
+    }
   }
+  if (!shouldCount) ++count;
   return count;
 }
