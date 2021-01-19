@@ -12,7 +12,7 @@ const ENDPOINTS = {
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
-  status: "/account/status",
+  migrateStatus: "/migrate/status",
   hcliMigrate: "/migrate/hcli",
 };
 
@@ -43,7 +43,7 @@ class UserManager {
   }
 
   async _getUserStatus(email) {
-    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.status}`, {
+    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.migrateStatus}`, {
       email,
     });
   }
