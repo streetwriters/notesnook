@@ -39,7 +39,7 @@ class UserManager {
       password: hashedPassword,
       client_id: "notesnook",
     });
-    return await this.login(email, hashedPassword, true, true);
+    return await this.login(email, password, true, hashedPassword);
   }
 
   async _getUserStatus(email) {
@@ -65,15 +65,15 @@ class UserManager {
     return hashedPassword;
   }
 
-  async login(email, password, remember, skipMigrationCheck = false) {
-    if (!skipMigrationCheck) {
-      password = await this._migrateUser(email, password);
+  async login(email, password, remember, hashedPassword) {
+    if (!hashedPassword) {
+      hashedPassword = await this._migrateUser(email, password);
     }
 
     await this.tokenManager.saveToken(
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,
-        password,
+        password: hashedPassword,
         grant_type: "password",
         scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
@@ -118,9 +118,10 @@ class UserManager {
   async deleteUser(password) {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
+    const user = await this.getUser();
     await http.post(
       `${constants.API_HOST}${ENDPOINTS.deleteUser}`,
-      { password },
+      { password: await this._db.context.hash(password, user.email) },
       token
     );
     await this.logout(false, "Account deleted.");
@@ -199,11 +200,26 @@ class UserManager {
   async _updatePassword(type, data) {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
+
+    // we hash the passwords beforehand
+    const { email } = await this.getUser();
+    var hashedData = {};
+    if (data.old_password)
+      hashedData.old_password = await this._db.context.hash(
+        data.old_password,
+        email
+      );
+    if (data.new_password)
+      hashedData.new_password = await this._db.context.hash(
+        data.new_password,
+        email
+      );
+
     await http.patch(
       `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
       {
         type,
-        ...data,
+        ...hashedData,
       },
       token
     );
