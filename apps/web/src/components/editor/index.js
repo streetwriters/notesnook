@@ -90,6 +90,7 @@ function Editor(props) {
         if (scrollBottom > maxScrollHeight) {
           const page = pages[++quillRef.current.currentPage];
           if (!page) {
+            --quillRef.current.currentPage;
             editorScroll.removeEventListener("scroll", onScroll);
             return;
           }
@@ -218,6 +219,30 @@ function Editor(props) {
                 onSave={() => {
                   saveSession();
                 }}
+                onSelectAll={(quill) => {
+                  const { pages, currentPage } = quillRef.current;
+                  const percentageLoaded = (currentPage / pages.length) * 100;
+                  if (percentageLoaded < 70) {
+                    if (
+                      window.confirm(
+                        "This seems to be a large document. It might take a little time to load and select all of it."
+                      )
+                    ) {
+                      const delta = quill.getContents().ops;
+                      quillRef.current.currentPage = pages.length;
+                      quill.setContents(
+                        appendPages(
+                          delta,
+                          quillRef.current.pages,
+                          quillRef.current.currentPage
+                        ),
+                        "init"
+                      );
+                    } else return;
+                  }
+                  quill.setSelection(0, quill.getLength(), "user");
+                  quill.scrollIntoView();
+                }}
                 initialContent={[{ insert: "\n" }]}
                 changeInterval={500}
                 onWordCountChanged={updateWordCount}
@@ -274,7 +299,7 @@ function getNextPage(page, quill) {
 }
 
 function appendPages(delta, pages, currentPage) {
-  if (pages.length === currentPage + 1) return delta;
+  if (pages.length === currentPage) return delta;
   for (var i = currentPage; i < pages.length; ++i) {
     delta.push(...pages[i]);
   }
