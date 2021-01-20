@@ -84,7 +84,7 @@ const onAppStateChanged = async (state) => {
       let state = JSON.stringify({
         editing: editing.currentlyEditing,
         note: getNote(),
-        movedAway:editing.movedAway
+        movedAway: editing.movedAway,
       });
       await MMKV.setItem('appState', state);
     }
