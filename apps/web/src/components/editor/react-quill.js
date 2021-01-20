@@ -19,12 +19,9 @@ Quill.register("modules/magicUrl", MagicUrl);
 Quill.register("modules/focus", QuillFocus);
 
 let Embed = Quill.import("blots/embed");
-let Delta = Quill.import("delta");
 
 function lineBreakMatcher() {
-  var newDelta = new Delta();
-  newDelta.insert({ manualbreak: true });
-  return newDelta;
+  return { ops: [{ insert: { manualbreak: true } }] };
 }
 
 class SmartBreak extends Embed {}
@@ -112,6 +109,7 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
   },
   clipboard: {
     matchers: [["BR", lineBreakMatcher]],
+    matchVisual: false,
   },
   keyboard: {
     bindings: {
@@ -226,6 +224,18 @@ export default class ReactQuill extends Component {
         onSelectAll.bind(this, this.quill)
       );
     }
+
+    this.quill.clipboard.addMatcher(Node.TEXT_NODE, function (_node, delta) {
+      return {
+        ops: delta.ops[0].insert
+          .split("\n")
+          .filter((p) => !!p)
+          .map((para) => ({
+            insert: para + "\n",
+            attributes: { background: "transparent" },
+          })),
+      };
+    });
 
     if (onQuillInitialized) onQuillInitialized();
   }
