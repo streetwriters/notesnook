@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import { Platform } from 'react-native';
 import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -196,7 +197,8 @@ const LoginDialog = () => {
       if (user && !user.isEmailConfirmed) {
         close();
         setEmailVerifyMessage(dispatch);
-        await sleep(300);
+        await sleep(500);
+        console.log('showing verify email dialog')
         PremiumService.showVerifyEmailDialog();
       } else {
         ToastEvent.show(e.message, 'error', 'local');
