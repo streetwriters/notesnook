@@ -51,6 +51,10 @@ export function setWebviewInit(init) {
   webviewInit = init;
 }
 
+export function getWebviewInit(init) {
+  return webviewInit
+}
+
 export function setIntent() {
   intent = true;
 }
@@ -400,11 +404,14 @@ export async function onWebViewLoad(premium, colors) {
 
 async function restoreEditorState() {
   let appState = await MMKV.getItem('appState');
+  console.log('restoring editor state',appState);
   if (appState) {
     appState = JSON.parse(appState);
     if (appState.editing && appState.note && appState.note.id) {
       eSendEvent(eOnLoadNote, appState.note);
-      tabBarRef.current?.goToPage(1);
+      if (!appState.movedAway) {
+        tabBarRef.current?.goToPage(1);
+      }
       MMKV.removeItem('appState');
     }
   }

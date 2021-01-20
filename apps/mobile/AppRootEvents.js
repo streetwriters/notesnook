@@ -35,7 +35,7 @@ import {
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote} from './src/views/Editor/Functions';
+import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 let hasPurchased = false;
 
 function updateStatusBarColor() {
@@ -56,9 +56,7 @@ const onAppStateChanged = async (state) => {
       enabled(false);
     }
 
-    await MMKV.removeItem('appState');
     let intent = await MMKV.getItem('notesAddedFromIntent');
-    console.log("FROM INTENT",intent)
     if (intent) {
       try {
         if (Platform.OS === 'ios') {
@@ -66,7 +64,7 @@ const onAppStateChanged = async (state) => {
           await db.notes.init();
           updateEvent({type: Actions.NOTES});
           eSendEvent(refreshNotesPage);
-          console.log("RELOADING APP")
+          console.log('RELOADING APP');
         } else {
           updateEvent({type: Actions.NOTES});
           eSendEvent(refreshNotesPage);
@@ -78,12 +76,15 @@ const onAppStateChanged = async (state) => {
       updateEvent({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
     }
-
+    if (getWebviewInit()) {
+      await MMKV.removeItem('appState');
+    }
   } else {
-    if (editing.currentlyEditing && getAppIsIntialized()) {
+    if (editing.currentlyEditing) {
       let state = JSON.stringify({
         editing: editing.currentlyEditing,
         note: getNote(),
+        movedAway:editing.movedAway
       });
       await MMKV.setItem('appState', state);
     }
@@ -103,7 +104,6 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
-    
       if (!loading) {
         console.log('SUB EVENTS', loading);
         Linking.getInitialURL().then(async (url) => {
@@ -216,7 +216,6 @@ export const AppRootEvents = React.memo(
             );
           });
       } else {
-        
         subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
           onSuccessfulSubscription,
         );
