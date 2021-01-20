@@ -516,6 +516,7 @@
             theme: 'snow',
             scrollingContainer: '.app-main'
         });
+     
 
         let Font = Quill.import('formats/font');
         Font.whitelist = fontNames;
@@ -525,7 +526,6 @@
         attachEditorListeners();
         fixDropdownMenuLocations();
         setTheme();
-
         function loaded() {
             let msg = JSON.stringify({
                 data: true,
@@ -542,7 +542,6 @@
         }
 
     }
-    loadAction(true);
 </script>
 
 
