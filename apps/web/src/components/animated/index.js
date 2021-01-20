@@ -1,9 +1,11 @@
 import { m as motion } from "framer-motion";
-import * as Rebass from "rebass";
+import { Flex, Box, Image, Text } from "rebass";
+import { Input } from "@rebass/forms";
 
 export default {
-  Flex: motion.custom(Rebass.Flex),
-  Box: motion.custom(Rebass.Box),
-  Image: motion.custom(Rebass.Image),
-  Text: motion.custom(Rebass.Text),
+  Flex: motion.custom(Flex),
+  Box: motion.custom(Box),
+  Image: motion.custom(Image),
+  Text: motion.custom(Text),
+  Input: motion.custom(Input),
 };
