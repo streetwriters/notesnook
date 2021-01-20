@@ -153,6 +153,10 @@ async function checkAndCreateDir(path) {
   return dir;
 }
 
+async function hash(password,email) {
+  return await Sodium.hashPassword(password,email)
+}
+
 export default {
   read,
   write,
@@ -168,4 +172,5 @@ export default {
   deriveCryptoKey,
   getCryptoKey,
   removeCryptoKey,
+  hash
 };
