@@ -317,7 +317,7 @@ const MergeEditor = () => {
       visible={true}>
       <SafeAreaView
         style={{
-          backgroundColor: colors.nav,
+          backgroundColor: colors.bg,
           paddingTop: insets.top,
         }}>
         <KeepAwake />
@@ -371,6 +371,7 @@ const MergeEditor = () => {
                 }}
                 onPress={close}
                 size={SIZE.xxl}
+                color={colors.pri}
                 name="arrow-left"
               />
               <TouchableOpacity
@@ -411,6 +412,7 @@ const MergeEditor = () => {
                 <Icon
                   size={SIZE.lg}
                   name={primary ? 'chevron-up' : 'chevron-down'}
+                  color={colors.pri}
                 />
               </TouchableOpacity>
             </View>
@@ -463,6 +465,7 @@ const MergeEditor = () => {
           <Animated.View
             style={{
               height: firstWebViewHeight,
+              backgroundColor:colors.bg
             }}>
             <WebView
               onLoad={onPrimaryWebViewLoad}
@@ -470,6 +473,7 @@ const MergeEditor = () => {
               style={{
                 width: '100%',
                 height: '100%',
+                backgroundColor:'transparent'
               }}
               injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
@@ -552,6 +556,7 @@ const MergeEditor = () => {
                 <Icon
                   size={SIZE.lg}
                   name={secondary ? 'chevron-up' : 'chevron-down'}
+                  color={colors.pri}
                 />
               </TouchableOpacity>
             </View>
@@ -611,6 +616,7 @@ const MergeEditor = () => {
               style={{
                 width: '100%',
                 height: '100%',
+                backgroundColor:'transparent'
               }}
               injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
