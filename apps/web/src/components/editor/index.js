@@ -164,7 +164,7 @@ function Editor(props) {
                 display: ["none", "none", "block"],
                 position: "absolute",
                 right: 0,
-                top: 12,
+                top: 10,
                 cursor: "pointer",
                 height: 28,
                 borderRadius: "default",
