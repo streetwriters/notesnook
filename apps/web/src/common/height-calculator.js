@@ -12,6 +12,7 @@ function getNoteHeight(item) {
   let height = SINGLE_LINE_HEIGHT * 3;
   //if (title.length > 35) height += SINGLE_LINE_HEIGHT;
   if (headline?.length > 0) height += SINGLE_LINE_HEIGHT * 2;
+  else height += SINGLE_LINE_HEIGHT;
   if (notebook) height += SINGLE_LINE_HEIGHT / 2;
 
   return height * DEFAULT_FONT_SIZE;
