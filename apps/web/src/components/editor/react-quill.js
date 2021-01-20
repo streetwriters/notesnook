@@ -288,7 +288,7 @@ function countWords(str) {
     // 13 = \r
     // 10 = \n
     // 42 = *
-    if (s === 32 || s === 13 || s === 10 || s === 42) {
+    if (s === 32 || s === 13 || s === 10 || s === 42 || s === 9) {
       if (shouldCount) continue;
       ++count;
       shouldCount = true;
