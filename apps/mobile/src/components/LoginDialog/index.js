@@ -482,6 +482,7 @@ const LoginDialog = () => {
                   setError(r);
                 }}
                 validationType="email"
+                autoCapitalize="none"
                 errorMessage="Email is invalid"
                 placeholder="Email"
                 onSubmit={() => {
@@ -502,6 +503,7 @@ const LoginDialog = () => {
                   setError(r);
                 }}
                 secureTextEntry
+                autoCapitalize="none"
                 placeholder="Current Password"
                 onSubmit={() => {
                   if (mode === MODES.signup) {
@@ -524,6 +526,7 @@ const LoginDialog = () => {
                   marginBottom={0}
                   validationType={mode === MODES.signup ? 'password' : null}
                   secureTextEntry
+                  autoCapitalize="none"
                   placeholder="Password"
                   errorMessage={mode === MODES.signup && 'Password is invalid'}
                   onSubmit={() => {
@@ -565,6 +568,7 @@ const LoginDialog = () => {
                   }}
                   loading={loading}
                   validationType="confirmPassword"
+                  autoCapitalize="none"
                   customValidator={() => password}
                   secureTextEntry
                   placeholder="Confirm Password"

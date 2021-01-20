@@ -147,7 +147,7 @@ const Input = ({
           autoCapitalize={autoCapitalize}
           onChangeText={onChange}
           onBlur={onBlur}
-      
+        
           onFocus={onFocus}
           onSubmitEditing={onSubmit}
           blurOnSubmit={blurOnSubmit}
