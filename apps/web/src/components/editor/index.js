@@ -221,7 +221,8 @@ function Editor(props) {
                 }}
                 onSelectAll={(quill) => {
                   const { pages, currentPage } = quillRef.current;
-                  const percentageLoaded = (currentPage / pages.length) * 100;
+                  const percentageLoaded =
+                    (currentPage + 1 / pages.length) * 100;
                   if (percentageLoaded < 70) {
                     if (
                       window.confirm(
@@ -299,7 +300,7 @@ function getNextPage(page, quill) {
 }
 
 function appendPages(delta, pages, currentPage) {
-  if (pages.length === currentPage) return delta;
+  if (pages.length === currentPage + 1) return delta;
   for (var i = currentPage; i < pages.length; ++i) {
     delta.push(...pages[i]);
   }
