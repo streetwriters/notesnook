@@ -176,9 +176,7 @@ const LoginDialog = () => {
     setStatus('Logging in');
     let user;
     try {
-      console.log('LOGGING IN');
       await db.user.login(email.toLowerCase(), password, true);
-      console.log('LOGGED IN');
       user = await db.user.getUser();
       if (!user) throw new Error('Email or passoword incorrect!');
       setStatus('Syncing Your Data');
