@@ -9,7 +9,7 @@ const SUCCESS_LOGIN_RESPONSE = {
 };
 
 const SUCCESS_USER_RESPONSE = {
-  userId: "0",
+  id: "0",
   email: process.env.EMAIL,
   salt: "",
   vaultKey: null,
@@ -23,7 +23,13 @@ async function login(db) {
     .mockResponseOnce(JSON.stringify(SUCCESS_USER_RESPONSE), {
       headers: { "Content-Type": "application/json" },
     });
-  await db.user.login(SUCCESS_USER_RESPONSE.email, "password");
+
+  await db.user.login(
+    SUCCESS_USER_RESPONSE.email,
+    "password",
+    true,
+    "password"
+  );
 }
 
 function mainCollectionParams(collection, itemKey, item) {

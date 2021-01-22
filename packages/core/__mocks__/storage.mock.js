@@ -55,6 +55,10 @@ async function getCryptoKey(name) {
   return storage[name].key;
 }
 
+async function hash(password, userId) {
+  return password;
+}
+
 module.exports = {
   read,
   readMulti,
@@ -66,4 +70,5 @@ module.exports = {
   deriveCryptoKey,
   getCryptoKey,
   getAllKeys,
+  hash,
 };

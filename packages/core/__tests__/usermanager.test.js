@@ -10,7 +10,7 @@ const SUCCESS_LOGIN_RESPONSE = {
 };
 
 const SUCCESS_USER_RESPONSE = {
-  userId: "0",
+  id: "0",
   email: process.env.EMAIL,
   salt: "",
 };
@@ -51,10 +51,10 @@ test("undefined user should not be set", () =>
 test("login user", async () =>
   databaseTest().then(async (db) => {
     mock();
-    await db.user.login("myuser", "mylogin");
+    await db.user.login("myuser", "mylogin", true, "mylogin");
     const dbuser = await db.user.getUser();
     expect(dbuser.email).toBe(SUCCESS_USER_RESPONSE.email);
-    expect(dbuser.userId).toBe(SUCCESS_USER_RESPONSE.userId);
+    expect(dbuser.id).toBe(SUCCESS_USER_RESPONSE.id);
   }));
 
 test("login user with wrong password", () =>
@@ -63,17 +63,17 @@ test("login user with wrong password", () =>
       JSON.stringify({ error: "Username or password is incorrect." }),
       { status: 400, headers: { "Content-Type": "application/json" } }
     );
-    await expect(db.user.login("myuser", "wrongpassword")).rejects.toThrow(
-      /Username or password is incorrect./
-    );
+    await expect(
+      db.user.login("myuser", "wrongpassword", true, "wrongpassword")
+    ).rejects.toThrow(/Username or password is incorrect./);
   }));
 
 test("failed login with unknown error", () =>
   databaseTest().then(async (db) => {
     fetch.mockResponseOnce(JSON.stringify({}), { status: 400 });
-    await expect(db.user.login("myuser", "wrongpassword")).rejects.toThrow(
-      /Request failed with status code: /
-    );
+    await expect(
+      db.user.login("myuser", "wrongpassword", true, "wrongpassword")
+    ).rejects.toThrow(/Request failed with status code: /);
   }));
 
 test("signup user", () =>
@@ -88,7 +88,7 @@ test("signup user", () =>
 test("logout user", () =>
   databaseTest().then(async (db) => {
     mock();
-    await db.user.login("myuser", "mylogin");
+    await db.user.login("myuser", "mylogin", true, "mylogin");
     const dbuser = await db.user.getUser();
     expect(dbuser.email).toBe(SUCCESS_USER_RESPONSE.email);
     await db.user.logout();
@@ -98,7 +98,12 @@ test("logout user", () =>
 test("refresh user's token", () =>
   databaseTest().then(async (db) => {
     mock();
-    await db.user.login(SUCCESS_USER_RESPONSE.email, "mylogin");
+    await db.user.login(
+      SUCCESS_USER_RESPONSE.email,
+      "mylogin",
+      true,
+      "mylogin"
+    );
     const token = await db.user.tokenManager.getToken();
     await db.user.tokenManager.saveToken({ ...token, expires_in: -2000 });
     fetch.mockResponseOnce(
@@ -123,7 +128,12 @@ test("refresh user's token", () =>
 test("refresh user's token when its not expired", () =>
   databaseTest().then(async (db) => {
     mock();
-    await db.user.login(SUCCESS_USER_RESPONSE.email, "mylogin");
+    await db.user.login(
+      SUCCESS_USER_RESPONSE.email,
+      "mylogin",
+      true,
+      "mylogin"
+    );
     expect(await db.user.tokenManager.getAccessToken()).toBe("access_token");
     const dbuser = await db.user.getUser();
     expect(dbuser.email).toBe(SUCCESS_USER_RESPONSE.email);

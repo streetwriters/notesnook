@@ -116,9 +116,9 @@ class Database {
 
       switch (type) {
         case "upgrade":
-          await this.user.set({
-            subscription: data,
-          });
+          const user = await this.user.getUser();
+          user.subscription = data;
+          await this.user.setUser(user);
           EV.publish("user:upgraded", data);
           break;
         case "userDeleted":

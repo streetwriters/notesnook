@@ -147,16 +147,12 @@ class UserManager {
         await this.setUser({ ...user, remember });
         EV.publish("user:fetched", user);
         return user;
-      }
-    } catch (e) {
-      if (e.message === "invalid_grant") {
-        await this.logout(
-          false,
-          "You were logged out. Either your session expired or your account was deleted. Please try logging in again."
-        );
       } else {
         return await this.getUser();
       }
+    } catch (e) {
+      console.error(e);
+      return await this.getUser();
     }
   }
 
