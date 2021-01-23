@@ -1,11 +1,17 @@
-import React from 'react';
-import { Platform, TextInput } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, TextInput} from 'react-native';
 import WebView from 'react-native-webview';
-import { notesnook } from '../../../e2e/test.ids';
-import { Loading } from '../../components/Loading';
-import { useTracked } from '../../provider';
-import { ToastEvent } from '../../services/EventManager';
-import { getCurrentColors } from '../../utils/Colors';
+import {notesnook} from '../../../e2e/test.ids';
+import {Loading} from '../../components/Loading';
+import {useTracked} from '../../provider';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import {getCurrentColors} from '../../utils/Colors';
+import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
@@ -14,7 +20,7 @@ import {
   sourceUri,
   textInput,
   _onMessage,
-  _onShouldStartLoadWithRequest
+  _onShouldStartLoadWithRequest,
 } from './Functions';
 
 const source =
@@ -37,13 +43,34 @@ const Editor = React.memo(
   () => {
     const [state] = useTracked();
     const {premiumUser, loading} = state;
+    const [resetting, setResetting] = useState(false);
 
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    return loading ? (
-      <Loading tagline="Loading Editor" height="100%" />
+    const onResetRequested = async () => {
+      console.log('resetting now');
+      setResetting(true);
+      await sleep(3000);
+      ToastEvent.show('Editor has recovered from crash.', 'success');
+      setResetting(false);
+    };
+
+    useEffect(() => {
+      if (!loading) {
+        eSubscribeEvent('webviewreset', onResetRequested);
+      }
+      return () => {
+        eUnSubscribeEvent('webviewreset', onResetRequested);
+      };
+    },[loading]);
+
+    return resetting || loading ? (
+      <Loading
+        tagline={resetting ? 'Reloading Editor' : 'Loading Editor'}
+        height="100%"
+      />
     ) : (
       <>
         <TextInput

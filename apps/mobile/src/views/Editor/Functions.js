@@ -18,7 +18,7 @@ import {sideMenuRef, tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 
-export const EditorWebView = createRef();
+export let EditorWebView = createRef();
 
 export const params = 'platform=' + Platform.OS;
 export const sourceUri =
@@ -33,6 +33,7 @@ export const injectedJS = ` setTimeout(() => {
 },100);   
       `;
 
+let webviewOK = true;      
 let noteEdited = false;
 let note = null;
 let id = null;
@@ -97,6 +98,18 @@ export const INJECTED_JAVASCRIPT = (premium) =>
       },100)
    })();`;
 
+export const CHECK_STATUS = (premium) =>
+   `(function() {
+       setTimeout(() => {
+        let msg = JSON.stringify({
+          data: true,
+          type: 'running',
+        });
+        window.ReactNativeWebView.postMessage(msg)
+
+       },100)
+})();`;   
+
 export function getNote() {
   return note;
 }
@@ -153,6 +166,9 @@ function clearNote() {
 
 let currentEditingTimer = null;
 
+
+let webviewTimer = null;
+
 export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   post('blur');
@@ -187,7 +203,25 @@ export const loadNote = async (item) => {
     }
     updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
   }
+  checkStatus();
 };
+
+const checkStatus = () => {
+  webviewOK = false
+  EditorWebView.current?.injectJavaScript(CHECK_STATUS());
+  clearTimeout(webviewTimer)
+  console.log('webview ok',webviewOK);
+  webviewTimer = setTimeout(() => {
+    if (!webviewOK) {
+      webviewInit = false;
+      EditorWebView = createRef();
+      console.log("webview failed to load")
+      eSendEvent("webviewreset")
+    } else {
+      console.log("webview is running",webviewOK)
+    }
+  },3000)
+}
 
 export function setIntentNote(item) {
   id = null;
@@ -243,6 +277,9 @@ export const _onMessage = async (evt) => {
       webviewInit = true;
       loadNoteInEditor();
       break;
+    case 'running':
+      webviewOK = false;
+    break;  
     case 'focus':
       editing.focusType = message.value;
       break;
