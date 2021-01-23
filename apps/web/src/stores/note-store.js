@@ -4,7 +4,7 @@ import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";
 import Vault from "../common/vault";
 import BaseStore from ".";
-import { EV } from "notes-core/common";
+import { EV, EVENTS } from "notes-core/common";
 import Config from "../utils/config";
 import { showToast } from "../utils/toast";
 import { qclone } from "qclone";
@@ -15,7 +15,7 @@ class NoteStore extends BaseStore {
   selectedNote = 0;
 
   init = () => {
-    EV.subscribe("notes:removeEmptyNote", (id) => {
+    EV.subscribe(EVENTS.noteRemoved, (id) => {
       const { session, newSession } = editorStore.get();
       if (session.id === id) {
         newSession();

@@ -14,7 +14,7 @@ import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
 import { resetReminders } from "./common/reminders";
 import { db, isUserPremium } from "./common";
-import { EV } from "notes-core/common";
+import { EV, EVENTS } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
 import Banner from "./components/banner";
@@ -77,7 +77,7 @@ function App() {
   );
 
   useEffect(() => {
-    EV.subscribe("user:checkStatus", async (type) => {
+    EV.subscribe(EVENTS.userCheckStatus, async (type) => {
       if (process.env.REACT_APP_CI) return { type, result: true };
       if (isUserPremium()) {
         return { type, result: true };

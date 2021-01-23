@@ -4,7 +4,7 @@ import { store as appStore } from "./app-store";
 import { store as tagStore } from "./tag-store";
 import { db } from "../common";
 import BaseStore from ".";
-import { EV } from "notes-core/common";
+import { EV, EVENTS } from "notes-core/common";
 import { hashNavigate } from "../navigation";
 
 const SESSION_STATES = {
@@ -37,7 +37,7 @@ class EditorStore extends BaseStore {
   arePropertiesVisible = false;
 
   init = () => {
-    EV.subscribe("user:loggedOut", () => this.get().newSession());
+    EV.subscribe(EVENTS.userLoggedOut, () => this.get().newSession());
   };
 
   openLockedSession = async (note) => {

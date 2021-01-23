@@ -5,7 +5,7 @@ import Animated from "../components/animated";
 import { db } from "../common";
 import ProgressBar from "../components/progress-bar";
 import { getRandom } from "../utils/random";
-import { EV } from "notes-core/common";
+import { EV, EVENTS } from "notes-core/common";
 import { showToast } from "../utils/toast";
 import { captureException } from "@sentry/react";
 
@@ -23,7 +23,7 @@ function Splash(props) {
   useEffect(() => {
     (async function () {
       try {
-        EV.subscribe("user:loggedOut", (reason) => {
+        EV.subscribe(EVENTS.userLoggedOut, (reason) => {
           if (reason) {
             showToast("error", reason);
           }

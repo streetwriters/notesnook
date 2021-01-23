@@ -4,7 +4,7 @@ import { db } from "../common";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
-import { EV } from "notes-core/common";
+import { EV, EVENTS } from "notes-core/common";
 import { showLoadingDialog } from "../components/dialogs/loadingdialog";
 import { Text } from "rebass";
 import { showToast } from "../utils/toast";
@@ -19,14 +19,21 @@ class UserStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
+    db.user.getUser().then((user) => {
+      if (!user) return false;
+      this.set((state) => {
+        state.user = user;
+        state.isLoggedIn = true;
+      });
+    });
     return db.user.fetchUser(true).then(async (user) => {
       if (!user) return false;
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;
       });
-      EV.subscribe("db:refresh", () => appStore.refresh());
-      EV.subscribe("user:upgraded", (subscription) => {
+      EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
+      EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         this.set((state) => {
           state.user = {
             ...state.user,
@@ -34,13 +41,13 @@ class UserStore extends BaseStore {
           };
         });
       });
-      EV.subscribe("user:emailConfirmed", async () => {
+      EV.subscribe(EVENTS.userEmailConfirmed, async () => {
         showToast("success", "Email confirmed successfully!");
         window.location.reload();
       });
 
-      EV.subscribe("db:sync", () => this.sync(false));
-      EV.subscribe("user:loggedOut", async (reason) => {
+      EV.subscribe(EVENTS.databaseSyncRequested, () => this.sync(false));
+      EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
         this.set((state) => {
           state.user = {};
           state.isLoggedIn = false;
