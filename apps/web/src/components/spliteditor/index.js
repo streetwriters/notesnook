@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Flex, Box, Text } from "rebass";
 import SimpleEditor from "./simpleeditor";
-import DeltaTransformer from "quill/core/delta";
 import DeltaToggle from "./deltatoggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
+import DeltaTransformer from "../deltatransformer";
 
 const deltaTransformer = new DeltaTransformer();
 

@@ -3,8 +3,8 @@ import Quill from "quill";
 const List = Quill.import("formats/list");
 
 class BetterList extends List {
-  constructor(el) {
-    super(el);
+  constructor(_scroll, el) {
+    super(_scroll, el);
 
     const isCheckList = el.hasAttribute("data-checked");
     el.addEventListener("touchstart", (e) => {

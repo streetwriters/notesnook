@@ -2,7 +2,7 @@
   transition: opacity 300ms;
 }
 
-.quill-focus .ql-editor :not(.focused-blot) {
+.quill-focus .ql-editor > :not(.focused-blot) {
   opacity: 0.7;
 }
 

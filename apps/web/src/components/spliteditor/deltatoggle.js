@@ -1,10 +1,10 @@
 import React, { useCallback } from "react";
 import { Flex, Text, Button } from "rebass";
 import { timeConverter } from "../../utils/time";
-import DeltaTransformer from "quill/core/delta";
 import { store as notestore } from "../../stores/note-store";
 import { db } from "../../common";
 import { hashNavigate } from "../../navigation";
+import DeltaTransformer from "../deltatransformer";
 
 const deltaTransformer = new DeltaTransformer();
 

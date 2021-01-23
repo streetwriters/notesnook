@@ -67,20 +67,8 @@ class MarkdownShortcuts {
       const { matchedText, annotatedText, startIndex } = matchInfo;
 
       setTimeout(() => {
-        this.quill.deleteText(startIndex, annotatedText.length);
-        if (!commit) this.quill.insertText(startIndex, " ");
-        this.quill.insertText(
-          startIndex + (commit ? 0 : 1),
-          commit ? matchedText : annotatedText.trim(),
-          inlineStyle
-        );
-        if (commit)
-          this.quill.insertText(this.quill.getSelection(), trigger, {
-            bold: false,
-            italic: false,
-            strike: false,
-            code: false,
-          });
+        this.quill.deleteText(startIndex, annotatedText.trim().length);
+        this.quill.insertText(startIndex, matchedText, inlineStyle);
       }, 0);
     };
   }
@@ -141,7 +129,7 @@ class MarkdownShortcuts {
       },
       {
         name: "code-block",
-        pattern: /^`{3}/g,
+        pattern: /^`{3}(\s+|)$/g,
         action: (text, selection, _pattern, lineStart, commit, trigger) => {
           if (!commit) return;
           // Need to defer this action https://github.com/quilljs/quill/issues/1134

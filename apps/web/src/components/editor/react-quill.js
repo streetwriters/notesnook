@@ -114,7 +114,7 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
   keyboard: {
     bindings: {
       linebreak: {
-        key: 13,
+        key: "Enter",
         shiftKey: true,
         handler: function (range) {
           // let currentLeaf = this.quill.getLeaf(range.index)[0];
