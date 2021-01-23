@@ -573,7 +573,8 @@ const SettingsUserSection = () => {
               </View>
               <View>
                 {user.subscription.type === 1 ||
-                user.subscription.type === 2 ? (
+                user.subscription.type === 2 ||
+                user.subscription.type === 5 ? (
                   <View>
                     <Seperator />
                     <Paragraph
@@ -598,7 +599,7 @@ const SettingsUserSection = () => {
                   </View>
                 ) : null}
 
-                {user.isEmailConfirmed && user.subscription.type !== 2 && (
+                {!user.isEmailConfirmed &&  (
                   <>
                     <Seperator />
                     <Button
