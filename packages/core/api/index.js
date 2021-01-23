@@ -45,9 +45,15 @@ class Database {
 
   async init() {
     EV.subscribeMulti(
-      [EVENTS.userLoggedIn, EVENTS.userLoggedOut, EVENTS.userFetched],
-      this._onUserStateChanged.bind(this)
+      [EVENTS.userLoggedIn, EVENTS.userFetched],
+      this.connectSSE.bind(this)
     );
+    EV.subscribe(EVENTS.userLoggedOut, () => {
+      if (this.evtSource) {
+        this.evtSource.close();
+        this.evtSource = null;
+      }
+    });
     EV.subscribe(EVENTS.databaseUpdated, this._onDBWrite.bind(this));
 
     this.session = new Session(this.context);
@@ -85,10 +91,11 @@ class Database {
     await this.migrations.migrate();
   }
 
-  async _onUserStateChanged() {
+  async connectSSE() {
     if (!NNEventSource) return;
     if (this.evtSource) {
       this.evtSource.close();
+      this.evtSource = null;
     }
 
     let token = await this.user.tokenManager.getAccessToken();
