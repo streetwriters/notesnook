@@ -1,42 +1,43 @@
 import Sentry from '@sentry/react-native';
-import {EV} from 'notes-core/common';
-import React, {useEffect} from 'react';
-import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
+import { EV } from 'notes-core/common';
+import React, { useEffect } from 'react';
+import { Appearance, AppState, Linking, Platform, StatusBar } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import {updateEvent} from './src/components/DialogManager/recievers';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { enabled } from 'react-native-privacy-snapshot';
+import { updateEvent } from './src/components/DialogManager/recievers';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  ToastEvent
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage,
+  setLoginMessage
 } from './src/services/Message';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, editing, getAppIsIntialized} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import { APP_VERSION, editing } from './src/utils';
+import { COLOR_SCHEME } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
-  eClosePremiumDialog,
   eCloseProgressDialog,
   eDispatchAction,
   eOpenLoginDialog,
-  eOpenPendingDialog,
+
   eOpenProgressDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
-let hasPurchased = false;
+import { MMKV } from './src/utils/mmkv';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, getWebviewInit } from './src/views/Editor/Functions';
+
+let prevTransactionId = null;
 
 function updateStatusBarColor() {
   StatusBar.setBarStyle(
@@ -95,7 +96,7 @@ const onAppStateChanged = async (state) => {
   }
 };
 
-let subsriptionSuccessListerner;
+let subsriptionSuccessListener;
 let subsriptionErrorListener;
 
 export const AppRootEvents = React.memo(
@@ -104,6 +105,7 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
+
       if (!loading) {
         console.log('SUB EVENTS', loading);
         Linking.getInitialURL().then(async (url) => {
@@ -136,6 +138,7 @@ export const AppRootEvents = React.memo(
         EV.subscribe('user:loggedOut', onLogout);
         EV.subscribe('user:emailConfirmed', onEmailVerified);
         EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
+        EV.subscribe('user:upgraded', onAccountStatusChange);
 
         if (!__DEV__) {
           try {
@@ -153,6 +156,7 @@ export const AppRootEvents = React.memo(
         EV.unsubscribe('user:loggedOut', onLogout);
         EV.unsubscribe('db:sync', partialSync);
         EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
+        EV.unsubscribe('user:upgraded', onAccountStatusChange);
         eUnSubscribeEvent(eDispatchAction, (type) => {
           dispatch(type);
         });
@@ -199,29 +203,35 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const attachIAPListeners = () => {
-      if (Platform.OS === 'ios') {
-        RNIap.getReceiptIOS()
-          .then((r) => {
-            hasPurchased = true;
-            processReceipt(r);
-          })
-          .catch(console.log)
-          .finally(() => {
-            subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
-              onSuccessfulSubscription,
-            );
-            subsriptionErrorListener = RNIap.purchaseErrorListener(
-              onSubscriptionError,
-            );
-          });
-      } else {
-        subsriptionSuccessListerner = RNIap.purchaseUpdatedListener(
-          onSuccessfulSubscription,
-        );
-        subsriptionErrorListener = RNIap.purchaseErrorListener(
-          onSubscriptionError,
-        );
+    const attachIAPListeners = async () => {
+      await RNIap.initConnection()
+        .catch((e) => {
+          console.log(e);
+        })
+        .then(() => {
+          subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
+            onSuccessfulSubscription,
+          );
+          subsriptionErrorListener = RNIap.purchaseErrorListener(
+            onSubscriptionError,
+          );
+        });
+    };
+
+    const onAccountStatusChange = async () => {
+      await PremiumService.setPremiumStatus();
+      let user = await db.user.getUser();
+      if (user.subscription.type === 5) {
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Notesnook Pro',
+          paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
+          action: async () => {
+            eSendEvent(eCloseProgressDialog);
+          },
+          icon: 'check',
+          actionText: 'Continue',
+          noProgress: true,
+        });
       }
     };
 
@@ -257,9 +267,9 @@ export const AppRootEvents = React.memo(
     };
 
     unsubIAP = () => {
-      if (subsriptionSuccessListerner) {
-        subsriptionSuccessListerner?.remove();
-        subsriptionSuccessListerner = null;
+      if (subsriptionSuccessListener) {
+        subsriptionSuccessListener?.remove();
+        subsriptionSuccessListener = null;
       }
       if (subsriptionErrorListener) {
         subsriptionErrorListener?.remove();
@@ -295,36 +305,47 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const onSuccessfulSubscription = (subscription) => {
-      if (hasPurchased) {
+    const onSuccessfulSubscription = async (subscription) => {
+      const receipt = subscription.transactionReceipt;
+
+      if (prevTransactionId === subscription.transactionId) {
+        console.log('returning same ID');
         return;
       }
-      const receipt = subscription.transactionReceipt;
-      processReceipt(receipt);
-
-      setTimeout(() => {
-        eSendEvent(eClosePremiumDialog);
-        eSendEvent(eOpenPendingDialog);
-      }, 500);
+      await processReceipt(receipt);
     };
 
-    const onSubscriptionError = (error) => {};
+    const onSubscriptionError = async (error) => {
+      console.log('IAP ERROR', error);
+      ToastEvent.show(error.message, 'error', 'local');
+      if (Platform.OS === 'ios') {
+        await RNIap.clearTransactionIOS();
+      }
+    };
 
-    const processReceipt = (receipt) => {
-      return;
+    const processReceipt = async (receipt) => {
       if (receipt) {
         if (Platform.OS === 'ios') {
-          fetch('http://192.168.10.5:8100/webhooks/assn', {
+          let user = await db.user.getUser();
+          fetch('http://192.168.10.7:6264/apple/verify', {
             method: 'POST',
             body: JSON.stringify({
               receipt_data: receipt,
+              user_id: user.userId,
             }),
             headers: {
               'Content-Type': 'application/json',
             },
           })
-            .then((r) => {
-              console.log(r.status, 'STATUS');
+            .then(async (r) => {
+              let text = await r.text();
+              if (text === 'Receipt already expired.') {
+                await RNIap.clearTransactionIOS();
+              } else {
+                console.log('FINSIHING TRANSACTION');
+                await RNIap.finishTransactionIOS(prevTransactionId);
+                await RNIap.clearTransactionIOS();
+              }
             })
             .catch((e) => {
               console.log(e, 'ERROR');
