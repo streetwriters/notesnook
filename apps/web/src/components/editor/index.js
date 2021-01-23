@@ -222,7 +222,7 @@ function Editor(props) {
                 onSelectAll={(quill) => {
                   const { pages, currentPage } = quillRef.current;
                   const percentageLoaded =
-                    (currentPage + 1 / pages.length) * 100;
+                    ((currentPage + 1) / pages.length) * 100;
                   if (percentageLoaded < 70) {
                     if (
                       window.confirm(
@@ -231,14 +231,12 @@ function Editor(props) {
                     ) {
                       const delta = quill.getContents().ops;
                       quillRef.current.currentPage = pages.length;
-                      quill.setContents(
-                        appendPages(
-                          delta,
-                          quillRef.current.pages,
-                          quillRef.current.currentPage
-                        ),
-                        "init"
+                      const fullContent = appendPages(
+                        delta,
+                        pages,
+                        currentPage
                       );
+                      quill.setContents(fullContent, "init");
                     } else return;
                   }
                   quill.setSelection(0, quill.getLength(), "user");

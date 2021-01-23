@@ -39,12 +39,14 @@
   margin-right: 2px;
 }
 
-.ql-formats > span.ql-header {
+.ql-formats > span.ql-header,
+.ql-formats > span.ql-size {
   padding: 0px !important;
   height: auto !important;
 }
 
-.ql-formats > span.ql-header > .ql-picker-label {
+.ql-formats > span.ql-header > .ql-picker-label,
+.ql-formats > span.ql-size > .ql-picker-label {
   padding: 5px !important;
   height: auto !important;
   border-radius: 5px;
@@ -125,7 +127,6 @@
 .ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
-  stroke: var(--primary) !important;
   fill: var(--primary) !important;
 }
 
@@ -158,7 +159,6 @@
 .ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
 .ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
   fill: var(--primary) !important;
-  stroke: var(--primary) !important;
 }
 
 .ql-snow.ql-toolbar :not(.ql-background).ql-picker .ql-picker-item:hover,

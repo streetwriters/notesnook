@@ -216,11 +216,13 @@ export default class ReactQuill extends Component {
     }
 
     if (onSelectAll) {
+      console.log("ADDING");
       this.quill.keyboard.addBinding(
         {
-          key: "A",
-          shortKey: true,
+          key: 65,
+          ctrlKey: true,
         },
+        {},
         onSelectAll.bind(this, this.quill)
       );
     }
