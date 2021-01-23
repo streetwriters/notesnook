@@ -391,7 +391,7 @@ export async function saveNote() {
 }
 
 export async function onWebViewLoad(premium, colors) {
-  console.log(premium, 'PREMIUM');
+
   EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium));
   if (!checkNote()) {
     post('blur');
@@ -404,7 +404,6 @@ export async function onWebViewLoad(premium, colors) {
 
 async function restoreEditorState() {
   let appState = await MMKV.getItem('appState');
-  console.log('restoring editor state',appState);
   if (appState) {
     appState = JSON.parse(appState);
     if (appState.editing && appState.note && appState.note.id) {

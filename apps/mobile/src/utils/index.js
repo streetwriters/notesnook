@@ -154,6 +154,8 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
   1: 'Trial',
   2: 'Beta',
   5: 'Pro',
+  6: 'Expired',
+  7: 'Pro'
 };
 
 export const BUTTON_TYPES = {

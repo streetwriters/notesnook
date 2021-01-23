@@ -49,7 +49,7 @@ const EditorHeader = () => {
   }, [deviceMode]);
 
   useEffect(() => {
-    console.log(premiumUser,"PREMIUM USER EDITOR")
+
     EditorWebView.current?.reload();
   }, [premiumUser]);
 

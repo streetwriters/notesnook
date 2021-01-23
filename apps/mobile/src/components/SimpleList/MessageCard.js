@@ -6,7 +6,6 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import { getElevation } from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
-import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const MessageCard = ({data, color}) => {

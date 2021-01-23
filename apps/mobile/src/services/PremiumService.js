@@ -25,7 +25,6 @@ async function setPremiumStatus() {
   } catch (e) {
     premiumStatus = null;
   }
-  console.log(premiumStatus, 'PREMIUM STATUS');
 }
 
 function get() {
