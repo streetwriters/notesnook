@@ -105,7 +105,6 @@ export const AppRootEvents = React.memo(
 
     useEffect(() => {
       if (!loading) {
-        console.log('SUB EVENTS', loading);
         Linking.getInitialURL().then(async (url) => {
           if (
             url &&
@@ -149,7 +148,13 @@ export const AppRootEvents = React.memo(
         }
       }
       return () => {
-        EV.unsubscribeAll()
+        EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
+        EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
+        EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
+        EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+        EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
+        EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
+
         eUnSubscribeEvent(eDispatchAction, (type) => {
           dispatch(type);
         });
@@ -212,6 +217,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async () => {
+     
       await PremiumService.setPremiumStatus();
       let user = await db.user.getUser();
       if (user.subscription.type === 5) {
