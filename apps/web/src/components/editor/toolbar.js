@@ -73,7 +73,12 @@ function Toolbar(props) {
         icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
         enabled: true,
         hideOnMobile: true,
-        onClick: toggleFocusMode,
+        onClick: () => {
+          if (isFocusMode) exitFullscreen(document);
+          else enterFullscreen(document.documentElement);
+          toggleFocusMode();
+          quill.focus();
+        },
       },
       {
         title: "Properties",
@@ -150,3 +155,29 @@ function Toolbar(props) {
   );
 }
 export default Toolbar;
+
+/* View in fullscreen */
+function enterFullscreen(elem) {
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    /* Safari */
+    elem.webkitRequestFullscreen();
+  } else if (elem.msRequestFullscreen) {
+    /* IE11 */
+    elem.msRequestFullscreen();
+  }
+}
+
+/* Close fullscreen */
+function exitFullscreen(elem) {
+  if (elem.exitFullscreen) {
+    elem.exitFullscreen();
+  } else if (elem.webkitExitFullscreen) {
+    /* Safari */
+    elem.webkitExitFullscreen();
+  } else if (elem.msExitFullscreen) {
+    /* IE11 */
+    elem.msExitFullscreen();
+  }
+}
