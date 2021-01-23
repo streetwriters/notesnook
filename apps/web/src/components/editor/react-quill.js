@@ -216,7 +216,6 @@ export default class ReactQuill extends Component {
     }
 
     if (onSelectAll) {
-      console.log("ADDING");
       this.quill.keyboard.addBinding(
         {
           key: 65,
@@ -234,7 +233,6 @@ export default class ReactQuill extends Component {
           .filter((p) => !!p)
           .map((para) => ({
             insert: para + "\n",
-            attributes: { background: "transparent" },
           })),
       };
     });
