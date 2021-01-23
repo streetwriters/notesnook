@@ -25,7 +25,7 @@
  * Syncing should pause until all the conflicts have been resolved
  * And then it should continue.
  */
-import { EV } from "../../common";
+import { EV, EVENTS } from "../../common";
 import Constants from "../../utils/constants";
 import http from "../../utils/http";
 import TokenManager from "../token-manager";
@@ -98,7 +98,7 @@ export default class Sync {
     // merge the server response
     await this._merger.merge(serverResponse, lastSynced);
 
-    EV.publish("db:refresh");
+    EV.publish(EVENTS.appRefreshRequested);
 
     // check for conflicts and throw
     // await this._db.conflicts.check();

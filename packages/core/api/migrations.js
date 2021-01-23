@@ -1,4 +1,4 @@
-import { CURRENT_DATABASE_VERSION, EV } from "../common";
+import { CURRENT_DATABASE_VERSION, EV, EVENTS } from "../common";
 import Migrator from "../database/migrator";
 
 class Migrations {
@@ -54,7 +54,7 @@ class Migrations {
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);
     await this._db.context.write("v", CURRENT_DATABASE_VERSION);
 
-    EV.publish("db:onMigrationDone", {
+    EV.publish(EVENTS.databaseMigrated, {
       prev: this.dbVersion,
       current: CURRENT_DATABASE_VERSION,
     });

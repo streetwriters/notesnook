@@ -1,7 +1,7 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { EV, NOTESNOOK_CORE_VERSION } from "../common";
+import { EV, EVENTS, NOTESNOOK_CORE_VERSION } from "../common";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -86,7 +86,7 @@ class UserManager {
       salt: user.salt,
     });
 
-    EV.publish("user:loggedIn", user);
+    EV.publish(EVENTS.userLoggedIn, user);
   }
 
   async getSessions() {
@@ -102,7 +102,7 @@ class UserManager {
       console.error(e);
     } finally {
       await this._db.context.clear();
-      EV.publish("user:loggedOut", reason);
+      EV.publish(EVENTS.userLoggedOut, reason);
     }
   }
 
@@ -145,7 +145,7 @@ class UserManager {
         }
 
         await this.setUser({ ...user, remember });
-        EV.publish("user:fetched", user);
+        EV.publish(EVENTS.userFetched, user);
         return user;
       } else {
         return await this.getUser();

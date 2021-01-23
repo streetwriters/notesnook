@@ -8,7 +8,7 @@ import {
 } from "../utils/date";
 import Note from "../models/note";
 import getId from "../utils/id";
-import { EV } from "../common";
+import { EV, EVENTS } from "../common";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
 var tfun = require("transfun/transfun.js").tfun;
@@ -65,7 +65,7 @@ export default class Notes extends Collection {
 
       if (isNoteEmpty(note, content)) {
         if (oldNote) {
-          EV.publish("notes:removeEmptyNote", id);
+          EV.publish(EVENTS.noteRemoved, id);
           await this.remove(id);
         }
         return;

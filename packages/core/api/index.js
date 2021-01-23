@@ -11,7 +11,7 @@ import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
 import Session from "./session";
 import Constants from "../utils/constants";
-import { EV } from "../common";
+import { EV, EVENTS } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
 import Outbox from "./outbox";
@@ -119,7 +119,7 @@ class Database {
           const user = await this.user.getUser();
           user.subscription = data;
           await this.user.setUser(user);
-          EV.publish("user:upgraded", data);
+          EV.publish(EVENTS.userSubscriptionUpdated, data);
           break;
         case "userDeleted":
           await this.user.logout(false, "Account Deleted");
@@ -131,7 +131,7 @@ class Database {
           const token = await this.context.read("token");
           await this.user.tokenManager._refreshToken(token);
           await this.user.fetchUser(true);
-          EV.publish("user:emailConfirmed");
+          EV.publish(EVENTS.userEmailConfirmed);
           break;
         case "sync":
           await this.syncer.eventMerge(data);
@@ -150,7 +150,7 @@ class Database {
     }
     clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(() => {
-      EV.publish("db:sync");
+      EV.publish(EVENTS.databaseSyncRequested);
     }, 15 * 1000);
   }
 

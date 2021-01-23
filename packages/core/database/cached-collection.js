@@ -1,6 +1,6 @@
 import Indexer from "./indexer";
 import sort from "fast-sort";
-import { EV } from "../common";
+import { EV, EVENTS } from "../common";
 import IndexedCollection from "./indexed-collection";
 
 export default class CachedCollection extends IndexedCollection {
@@ -21,7 +21,7 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   async updateItem(item) {
-    EV.publish("db:write", item);
+    EV.publish(EVENTS.databaseUpdated, item);
     await super.updateItem(item);
     this.map.set(item.id, item);
   }
