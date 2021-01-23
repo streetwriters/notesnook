@@ -153,8 +153,7 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
   0: 'Basic',
   1: 'Trial',
   2: 'Beta',
-  3: 'Trial Expired',
-  4: 'Beta Expired',
+  5: 'Pro',
 };
 
 export const BUTTON_TYPES = {
