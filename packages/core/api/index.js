@@ -45,10 +45,10 @@ class Database {
 
   async init() {
     EV.subscribeMulti(
-      ["user:loggedIn", "user:loggedOut", "user:fetched"],
+      [EVENTS.userLoggedIn, EVENTS.userLoggedOut, EVENTS.userFetched],
       this._onUserStateChanged.bind(this)
     );
-    EV.subscribe("db:write", this._onDBWrite.bind(this));
+    EV.subscribe(EVENTS.databaseUpdated, this._onDBWrite.bind(this));
 
     this.session = new Session(this.context);
     await this._validate();

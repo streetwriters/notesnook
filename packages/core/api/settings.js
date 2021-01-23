@@ -1,4 +1,4 @@
-import { EV } from "../common";
+import { EV, EVENTS } from "../common";
 import id from "../utils/id";
 
 class Settings {
@@ -33,7 +33,7 @@ class Settings {
     var settings = await this._db.context.read("settings");
     if (!settings) await this._db.context.write("settings", this._settings);
     else this._settings = settings;
-    EV.subscribe("user:loggedOut", () => {
+    EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = {
         type: "settings",
         id: id(),

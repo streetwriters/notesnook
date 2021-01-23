@@ -1,4 +1,4 @@
-import { EV } from "../common";
+import { EV, EVENTS } from "../common";
 import CachedCollection from "../database/cached-collection";
 import IndexedCollection from "../database/indexed-collection";
 
@@ -11,7 +11,7 @@ class Collection {
 
     if (collection._collection.clear)
       EV.subscribe(
-        "user:loggedOut",
+        EVENTS.userLoggedOut,
         async () => await collection._collection.clear()
       );
 

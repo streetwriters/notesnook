@@ -1,4 +1,4 @@
-import { CHECK_IDS, EV, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, EV, EVENTS, sendCheckUserStatusEvent } from "../common";
 import getId from "../utils/id";
 
 const ERASE_TIME = 1000 * 60 * 30;
@@ -17,7 +17,7 @@ export default class Vault {
       vaultLocked: "ERR_VAULT_LOCKED",
       wrongPassword: "ERR_WRONG_PASSWORD",
     };
-    EV.subscribe("user:loggedOut", () => {
+    EV.subscribe(EVENTS.userLoggedOut, () => {
       this._password = "";
     });
   }
