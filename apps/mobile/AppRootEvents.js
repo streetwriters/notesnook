@@ -1,41 +1,40 @@
 import Sentry from '@sentry/react-native';
-import { EV } from 'notes-core/common';
-import React, { useEffect } from 'react';
-import { Appearance, AppState, Linking, Platform, StatusBar } from 'react-native';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect} from 'react';
+import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import { updateEvent } from './src/components/DialogManager/recievers';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
+import {enabled} from 'react-native-privacy-snapshot';
+import {updateEvent} from './src/components/DialogManager/recievers';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
 } from './src/services/Message';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { APP_VERSION, editing } from './src/utils';
-import { COLOR_SCHEME } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {APP_VERSION, editing} from './src/utils';
+import {COLOR_SCHEME} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eCloseProgressDialog,
   eDispatchAction,
   eOpenLoginDialog,
-
   eOpenProgressDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, getWebviewInit } from './src/views/Editor/Functions';
+import {MMKV} from './src/utils/mmkv';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 
@@ -105,7 +104,6 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
-
       if (!loading) {
         console.log('SUB EVENTS', loading);
         Linking.getInitialURL().then(async (url) => {
@@ -133,12 +131,12 @@ export const AppRootEvents = React.memo(
         AppState.addEventListener('change', onAppStateChanged);
         Appearance.addChangeListener(SettingsService.setTheme);
         Linking.addEventListener('url', onUrlRecieved);
-        EV.subscribe('db:refresh', onSyncComplete);
-        EV.subscribe('db:sync', partialSync);
-        EV.subscribe('user:loggedOut', onLogout);
-        EV.subscribe('user:emailConfirmed', onEmailVerified);
-        EV.subscribe('user:checkStatus', PremiumService.onUserStatusCheck);
-        EV.subscribe('user:upgraded', onAccountStatusChange);
+        EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
+        EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
+        EV.subscribe(EVENTS.userLoggedOut, onLogout);
+        EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+        EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
+        EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
         if (!__DEV__) {
           try {
@@ -151,12 +149,7 @@ export const AppRootEvents = React.memo(
         }
       }
       return () => {
-        EV.unsubscribe('user:emailConfirmed', onEmailVerified);
-        EV.unsubscribe('db:refresh', onSyncComplete);
-        EV.unsubscribe('user:loggedOut', onLogout);
-        EV.unsubscribe('db:sync', partialSync);
-        EV.unsubscribe('user:checkStatus', PremiumService.onUserStatusCheck);
-        EV.unsubscribe('user:upgraded', onAccountStatusChange);
+        EV.unsubscribeAll()
         eUnSubscribeEvent(eDispatchAction, (type) => {
           dispatch(type);
         });
@@ -331,7 +324,7 @@ export const AppRootEvents = React.memo(
             method: 'POST',
             body: JSON.stringify({
               receipt_data: receipt,
-              user_id: user.userId,
+              user_id: user.id,
             }),
             headers: {
               'Content-Type': 'application/json',
