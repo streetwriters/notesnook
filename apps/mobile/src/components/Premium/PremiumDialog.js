@@ -11,6 +11,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 class PremiumDialog extends React.Component {
@@ -52,7 +53,7 @@ class PremiumDialog extends React.Component {
       });
       await RNIap.initConnection();      
       let prod = await RNIap.getSubscriptions(itemSkus);
-
+      console.log(prod)
       this.setState({
         products: prod,
         product: prod[0],
@@ -236,7 +237,7 @@ class PremiumDialog extends React.Component {
                     marginRight: 10,
                   }}>
                   <Paragraph size={SIZE.lg}>
-                    {item.localizedPrice}
+                  {!item.localizedPrice && item.currency + " "}{item.localizedPrice || item.price} 
                     <Paragraph color={colors.accent} size={SIZE.sm}>
                       /mo
                     </Paragraph>
@@ -248,6 +249,7 @@ class PremiumDialog extends React.Component {
             <Seperator half />
             <Button
               onPress={async () => {
+                
                 if (!this.state.user) {
                   this.close();
                   setTimeout(() => {
@@ -261,12 +263,13 @@ class PremiumDialog extends React.Component {
                     null,
                     null,
                     this.state.user.id,
-                  )
-                    .then((r) => {})
+                  ).then((r) => {
+                    this.close();
+                  })
                     .catch((e) => {
-                  
+                      console.log(e);
                     });
-                  this.close();
+                 
                 }
               }}
               title={this.state.user ? 'Subscribe' : 'Sign Up'}
@@ -275,6 +278,7 @@ class PremiumDialog extends React.Component {
               width="100%"
             />
           </View>
+          <Toast context="local" />
         </View>
       </ActionSheetWrapper>
     );
