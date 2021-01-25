@@ -1,4 +1,4 @@
-import React, { createRef, useCallback, useEffect, useState } from 'react';
+import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {
   Appearance,
   InteractionManager,
@@ -6,34 +6,34 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import * as Keychain from 'react-native-keychain';
-import { enabled } from 'react-native-privacy-snapshot';
-import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
+import {enabled} from 'react-native-privacy-snapshot';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
+import {Button} from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import Input from '../../components/Input';
-import { PressableButton } from '../../components/PressableButton';
+import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import { ListHeaderComponent } from '../../components/SimpleList/ListHeaderComponent';
-import { Toast } from '../../components/Toast';
+import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
+import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import Backup from '../../services/Backup';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -44,17 +44,17 @@ import {
   dWidth,
   MenuItemsList,
   setSetting,
-  SUBSCRIPTION_STATUS_STRINGS
+  SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -63,12 +63,12 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState
+  eUpdateSearchState,
 } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { pv, SIZE } from '../../utils/SizeUtils';
+import {MMKV} from '../../utils/mmkv';
+import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { timeConverter } from '../../utils/TimeUtils';
+import {timeConverter} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -151,7 +151,7 @@ export const Settings = ({navigation}) => {
           ToastEvent.show('You are using the latest version', 'success');
           return;
         }
-        eSendEvent("updateDialog",version)
+        eSendEvent('updateDialog', version);
       },
 
       desc:
@@ -174,8 +174,6 @@ export const Settings = ({navigation}) => {
         height: '100%',
         backgroundColor: colors.bg,
       }}>
-     
-
       <ScrollView
         onScroll={(e) =>
           eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
@@ -574,13 +572,16 @@ const SettingsUserSection = () => {
               <View>
                 {user.subscription.type === 1 ||
                 user.subscription.type === 2 ||
-                user.subscription.type === 5 ? (
+                user.subscription.type === 5 ||
+                user.subscription.type === 6 ||
+                user.subscription.type === 7 ? (
                   <View>
                     <Seperator />
                     <Paragraph
                       size={SIZE.lg}
                       color={
-                        getTimeLeft(parseInt(user.subscription.expiry)) > 5
+                        getTimeLeft(parseInt(user.subscription.expiry)) > 5 ||
+                        user.subscription.type !== 6
                           ? colors.accent
                           : colors.red
                       }>
@@ -594,26 +595,38 @@ const SettingsUserSection = () => {
                         : user.subscription.type === 1
                         ? 'Your trial period started on ' +
                           timeConverter(user.subscription.start)
+                        : user.subscription.type === 6
+                        ? 'Your account will be downgraded to Basic in 3 days.'
+                        : user.subscription.type === 7
+                        ? 'You have cancelled your subscription.'
+                        : user.subscription.type === 5
+                        ? 'Your subscription will auto renew every month.'
                         : null}
                     </Paragraph>
                   </View>
                 ) : null}
 
-                {!user.isEmailConfirmed &&  (
-                  <>
-                    <Seperator />
-                    <Button
-                      onPress={() => {
-                        eSendEvent(eOpenPremiumDialog);
-                      }}
-                      width="100%"
-                      fontSize={SIZE.md}
-                      title="Subscribe to Notesnook Pro"
-                      height={50}
-                      type="transparent"
-                    />
-                  </>
-                )}
+                {!user.isEmailConfirmed &&
+                  user.subscription.type !== 5 &&
+                  user.subscription.type !== 2 && (
+                    <>
+                      <Seperator />
+                      <Button
+                        onPress={() => {
+                          eSendEvent(eOpenPremiumDialog);
+                        }}
+                        width="100%"
+                        fontSize={SIZE.md}
+                        title={
+                          user.subscription.type === 6
+                            ? 'Resubscribe to Notesnook Pro'
+                            : 'Subscribe to Notesnook Pro'
+                        }
+                        height={50}
+                        type="transparent"
+                      />
+                    </>
+                  )}
               </View>
             </View>
           </View>
