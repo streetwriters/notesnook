@@ -26,6 +26,7 @@ import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../components/dialogs/passworddialog";
 import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
+import http from "notes-core/utils/http";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -60,6 +61,12 @@ function subscriptionStatusToString(user) {
 
   if (status === SUBSCRIPTION_STATUS.BETA) return "Beta";
   else if (status === SUBSCRIPTION_STATUS.TRIAL) return "Trial";
+  else if (
+    status === SUBSCRIPTION_STATUS.PREMIUM ||
+    status === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
+  )
+    return "Pro";
+  else if (status === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED) return "Expired";
   else return "Basic";
 }
 
@@ -86,19 +93,6 @@ function Settings(props) {
     0
   );
 
-  const subscriptionDaysRemaining = useMemo(
-    () => dayjs(user?.subscription?.expiry).diff(dayjs(), "day") + 1,
-    [user]
-  );
-
-  const isTrial = useMemo(() => {
-    return user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
-  }, [user]);
-
-  const isBeta = useMemo(() => {
-    return user?.subscription?.type === SUBSCRIPTION_STATUS.BETA;
-  }, [user]);
-
   useEffect(() => {
     if (!followSystemTheme) return;
     setTheme(isSystemThemeDark ? "dark" : "light");
@@ -108,87 +102,7 @@ function Settings(props) {
     <ScrollContainer>
       <Flex variant="columnFill" px={2}>
         {isLoggedIn ? (
-          <Flex
-            bg={user.isEmailConfirmed ? "shade" : "errorBg"}
-            flexDirection="column"
-            p={2}
-            sx={{ borderRadius: "default" }}
-          >
-            <Flex flex="1" justifyContent="space-between">
-              <Flex>
-                <Icon.User
-                  size={15}
-                  color={user.isEmailConfirmed ? "primary" : "error"}
-                />
-                <Text variant="body" color="text" ml={1}>
-                  {user.email}
-                </Text>
-              </Flex>
-              <Text
-                variant="subBody"
-                px={"2px"}
-                py={"1px"}
-                sx={{ borderRadius: "default" }}
-                bg={user.isEmailConfirmed ? "primary" : "errorBg"}
-                color={user.isEmailConfirmed ? "static" : "error"}
-              >
-                {subscriptionStatusToString(user)}
-              </Text>
-            </Flex>
-            {user.isEmailConfirmed ? (
-              isTrial ? (
-                <>
-                  <Text
-                    color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
-                    variant="body"
-                    fontSize={26}
-                    mt={2}
-                  >
-                    {subscriptionDaysRemaining > 0
-                      ? `${subscriptionDaysRemaining} Days Remaining`
-                      : "Your trial has ended."}
-                  </Text>
-                  <Text variant="subBody">
-                    Your trial period started on{" "}
-                    {dayjs(user.subscription.start).format("MMMM D, YYYY")}
-                  </Text>
-                  <Button mt={2} onClick={showBuyDialog}>
-                    Upgrade to Notesnook Pro
-                  </Button>
-                </>
-              ) : isBeta ? (
-                <>
-                  <Text
-                    color={subscriptionDaysRemaining <= 5 ? "error" : "primary"}
-                    variant="body"
-                    fontSize={26}
-                    mt={2}
-                  >
-                    {subscriptionDaysRemaining > 0
-                      ? `${subscriptionDaysRemaining} Days Remaining`
-                      : "Your beta subscription has ended."}
-                  </Text>
-                  <Text variant="subBody">
-                    Your were enrolled in our beta program on{" "}
-                    {dayjs(user.subscription.start).format("MMMM D, YYYY")}
-                  </Text>
-                </>
-              ) : null
-            ) : (
-              <Button
-                mt={2}
-                bg="error"
-                onClick={() => hashNavigate("/email/verify")}
-              >
-                <Flex alignItems="center">
-                  <Icon.Warn color="static" size={13} />
-                  <Text color="static" ml={1}>
-                    Please verify your email.
-                  </Text>
-                </Flex>
-              </Button>
-            )}
-          </Flex>
+          <AccountStatus user={user} />
         ) : (
           <Flex
             bg="shade"
@@ -481,7 +395,7 @@ function TextWithTip({ text, tip, sx, color }) {
   return (
     <Text color={color || "text"} fontSize="body" sx={sx}>
       {text}
-      <Text color={color || "fontTertiary"} fontSize="subBody">
+      <Text color={"fontTertiary"} fontSize="subBody">
         {tip}
       </Text>
     </Text>
@@ -569,6 +483,173 @@ function OptionsItem(props) {
           </Text>
         ))}
       </Flex>
+    </Flex>
+  );
+}
+
+function AccountStatus(props) {
+  const { user } = props;
+
+  const {
+    isTrial,
+    isBeta,
+    isPro,
+    isBasic,
+    isProCancelled,
+    isProExpired,
+    remainingDays,
+  } = useMemo(() => {
+    const type = user?.subscription?.type;
+    const expiry = user?.subscription?.expiry;
+    if (!type || !expiry) return { isBasic: true };
+    return {
+      remainingDays: dayjs(expiry).diff(dayjs(), "day") + 1,
+      isTrial: type === SUBSCRIPTION_STATUS.TRIAL,
+      isBasic: type === SUBSCRIPTION_STATUS.BASIC,
+      isBeta: type === SUBSCRIPTION_STATUS.BETA,
+      isPro: type === SUBSCRIPTION_STATUS.PREMIUM,
+      isProCancelled: type === SUBSCRIPTION_STATUS.PREMIUM_CANCELED,
+      isProExpired: type === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED,
+    };
+  }, [user]);
+
+  const subtitle = useMemo(() => {
+    const expiryDate = dayjs(user?.subscription?.expiry).format("MMMM D, YYYY");
+    const startDate = dayjs(user?.subscription?.start).format("MMMM D, YYYY");
+    return isPro
+      ? `Your subscription will auto renew on ${expiryDate}.`
+      : isProCancelled
+      ? `Your subscription will end on ${expiryDate}.`
+      : isProExpired
+      ? "Your account will be downgraded to Basic in 3 days."
+      : isBeta
+      ? `Your were enrolled in our beta program on ${startDate}`
+      : isTrial
+      ? `Your trial period started on ${startDate}`
+      : null;
+  }, [isPro, isProExpired, isProCancelled, isBeta, isTrial, user]);
+
+  const provider = useMemo(() => {
+    const provider = user?.subscription?.provider;
+    switch (provider) {
+      default:
+      case 0:
+        return "Streetwriters";
+      case 1:
+        return "iOS";
+      case 2:
+        return "Android";
+      case 3:
+        return "Web";
+    }
+  }, [user]);
+
+  if (!user.isEmailConfirmed)
+    return (
+      <AccountStatusContainer user={user} bg={"errorBg"} color={"error"}>
+        <Button mt={2} bg="error" onClick={() => hashNavigate("/email/verify")}>
+          <Flex alignItems="center">
+            <Icon.Warn color="static" size={13} />
+            <Text color="static" ml={1}>
+              Please verify your email.
+            </Text>
+          </Flex>
+        </Button>
+      </AccountStatusContainer>
+    );
+
+  return (
+    <AccountStatusContainer
+      user={user}
+      color={"primary"}
+      sx={{ borderWidth: 1, borderColor: "primary", borderStyle: "solid" }}
+    >
+      <Text
+        color={remainingDays <= 5 ? "error" : "primary"}
+        variant="body"
+        fontSize={26}
+        mt={2}
+      >
+        {remainingDays > 0
+          ? `${remainingDays} Days Remaining`
+          : isBeta
+          ? "Your beta subscription has ended."
+          : isTrial
+          ? "Your trial has ended."
+          : isPro
+          ? "Your premium subscription has ended."
+          : ""}
+      </Text>
+      {subtitle && <Text variant="subBody">{subtitle}</Text>}
+      {isBasic || remainingDays <= 0 ? (
+        <Button mt={2} onClick={showBuyDialog}>
+          Upgrade to Notesnook Pro
+        </Button>
+      ) : (
+        <>
+          <Button
+            variant="list"
+            sx={{ ":hover": { borderColor: "error" } }}
+            onClick={async () => {
+              const token = await db.user.tokenManager.getAccessToken();
+              await http.post(
+                `http://localhost:9264/subscriptions/cancel`,
+                null,
+                token
+              );
+            }}
+          >
+            <TextWithTip
+              color="error"
+              text="Cancel subscription"
+              tip="You will be downgraded to the Basic plan at the end of your billing period."
+            />
+          </Button>
+          <Text
+            variant="subBody"
+            mt={1}
+            px={"4px"}
+            py={"2px"}
+            alignSelf="flex-end"
+            sx={{ borderRadius: "default" }}
+            color={"primary"}
+          >
+            Purchased on {provider}
+          </Text>
+        </>
+      )}
+    </AccountStatusContainer>
+  );
+}
+
+function AccountStatusContainer(props) {
+  const { bg, color, user, sx, children } = props;
+  return (
+    <Flex
+      bg={bg}
+      flexDirection="column"
+      p={2}
+      sx={{ borderRadius: "default", ...sx }}
+    >
+      <Flex flex="1" justifyContent="space-between">
+        <Flex>
+          <Icon.User size={15} color={color} />
+          <Text variant="body" color="text" ml={1}>
+            {user.email}
+          </Text>
+        </Flex>
+        <Text
+          variant="subBody"
+          px={"2px"}
+          py={"1px"}
+          sx={{ borderRadius: "default" }}
+          bg={bg}
+          color={color}
+        >
+          {subscriptionStatusToString(user)}
+        </Text>
+      </Flex>
+      {children}
     </Flex>
   );
 }

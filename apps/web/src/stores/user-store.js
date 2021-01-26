@@ -34,12 +34,8 @@ class UserStore extends BaseStore {
       });
       EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-        this.set((state) => {
-          state.user = {
-            ...state.user,
-            subscription,
-          };
-        });
+        console.log("USER UPGRAED", subscription);
+        this.set((state) => (state.user.subscription = subscription));
       });
       EV.subscribe(EVENTS.userEmailConfirmed, async () => {
         showToast("success", "Email confirmed successfully!");

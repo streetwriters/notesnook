@@ -39,11 +39,11 @@ async function upgrade(user) {
   cart.setup.setMerchant("250327951921"); // your Merchant code
   cart.billing.setEmail(user.email); // customer email address
   cart.shipping.setEmail(user.email); // customer Delivery email
-  cart.cart.setExternalCustomerReference(user.Id);
+  cart.cart.setExternalCustomerReference(user.id);
   cart.cart.setTest(true);
 
   cart.products.add({
-    code: "notesnook",
+    code: "com.streetwriters.notesnook",
     quantity: 1,
   });
 
