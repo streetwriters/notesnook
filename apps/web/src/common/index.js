@@ -19,17 +19,17 @@ export const db = new Database(StorageInterface, EventSource);
 //   SSE_HOST: "https://events.streetwriters.co",
 // });
 
-// db.host({
-//   API_HOST: "http://localhost:5264",
-//   AUTH_HOST: "http://localhost:8264",
-//   SSE_HOST: "http://localhost:7264",
-// });
-
 db.host({
-  API_HOST: "http://192.168.10.9:5264",
-  AUTH_HOST: "http://192.168.10.9:8264",
-  SSE_HOST: "http://192.168.10.9:7264",
+  API_HOST: "http://localhost:5264",
+  AUTH_HOST: "http://localhost:8264",
+  SSE_HOST: "http://localhost:7264",
 });
+
+// db.host({
+//   API_HOST: "http://192.168.10.7:5264",
+//   AUTH_HOST: "http://192.168.10.7:8264",
+//   SSE_HOST: "http://192.168.10.7:7264",
+// });
 
 export const COLORS = {
   red: "#f44336",
@@ -45,8 +45,9 @@ export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
   TRIAL: 1,
   BETA: 2,
-  TRIAL_EXPIRED: 3,
-  BETA_EXPIRED: 4,
+  PREMIUM: 5,
+  PREMIUM_EXPIRED: 6,
+  PREMIUM_CANCELED: 7,
 };
 
 export const SELECTION_OPTIONS_MAP = {
@@ -123,6 +124,7 @@ export function isUserPremium() {
   const subStatus = userstore.get().user?.subscription?.type;
   return (
     subStatus === SUBSCRIPTION_STATUS.BETA ||
+    subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
     subStatus === SUBSCRIPTION_STATUS.TRIAL
   );
 }
