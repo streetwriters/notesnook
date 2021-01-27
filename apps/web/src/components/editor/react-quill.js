@@ -226,17 +226,6 @@ export default class ReactQuill extends Component {
       );
     }
 
-    this.quill.clipboard.addMatcher(Node.TEXT_NODE, function (_node, delta) {
-      return {
-        ops: delta.ops[0].insert
-          .split("\n")
-          .filter((p) => !!p)
-          .map((para) => ({
-            insert: para + "\n",
-          })),
-      };
-    });
-
     if (onQuillInitialized) onQuillInitialized();
   }
 
