@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import { EventManagers } from "../../utils/observablearray";
@@ -18,6 +19,8 @@ function Toolbar(props) {
   const toggleProperties = useStore((store) => store.toggleProperties);
   const clearSession = useStore((store) => store.clearSession);
   const title = useStore((store) => store.session.title);
+  const theme = useThemeStore((store) => store.theme);
+  const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
 
   useEffect(() => {
@@ -57,6 +60,12 @@ function Toolbar(props) {
   const tools = useMemo(
     () => [
       {
+        title: theme === "Dark" ? "Light mode" : "Dark mode",
+        icon: Icon.Theme,
+        hidden: !isFocusMode,
+        onClick: () => toggleNightMode(),
+      },
+      {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
@@ -87,7 +96,16 @@ function Toolbar(props) {
         onClick: toggleProperties,
       },
     ],
-    [quill, redoable, undoable, toggleFocusMode, toggleProperties, isFocusMode]
+    [
+      quill,
+      redoable,
+      undoable,
+      toggleFocusMode,
+      toggleProperties,
+      isFocusMode,
+      theme,
+      toggleNightMode,
+    ]
   );
 
   return (
@@ -137,6 +155,7 @@ function Toolbar(props) {
             key={tool.title}
             sx={{
               display: [tool.hideOnMobile ? "none" : "block", "block", "block"],
+              visibility: tool.hidden ? "collapse" : "visible",
               color: tool.enabled ? "text" : "disabled",
               cursor: tool.enabled ? "pointer" : "not-allowed",
             }}
