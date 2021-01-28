@@ -18,7 +18,7 @@ Quill.register("modules/markdownShortcuts", MarkdownShortcuts);
 Quill.register("modules/magicUrl", MagicUrl);
 Quill.register("modules/focus", QuillFocus);
 
-let Embed = Quill.import("blots/embed");
+const Embed = Quill.import("blots/embed");
 
 function lineBreakMatcher() {
   return { ops: [{ insert: { manualbreak: true } }] };
@@ -28,6 +28,13 @@ class SmartBreak extends Embed {}
 SmartBreak.blotName = "manualbreak";
 SmartBreak.tagName = "BR";
 Quill.register(SmartBreak);
+
+const Inline = Quill.import("blots/inline");
+
+// HOTFIX: fix blot getting deleted on auto-correct
+class FontBlot extends Inline {}
+FontBlot.tagName = "FONT";
+Quill.register(FontBlot);
 
 function moduleHandlerWrapper(type, isSimple) {
   return async function (value) {
@@ -81,7 +88,7 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
           [{ color: [] }, { background: [] }],
           [{ header: [false, 2, 3, 4, 5, 6] }],
           [{ size: ["small", false, "large", "huge"] }],
-          [("link", "image", "video")],
+          ["link", "image", "video"],
           [{ direction: "rtl" }, "clean"],
         ],
         handlers: {

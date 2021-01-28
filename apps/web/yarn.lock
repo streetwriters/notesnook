@@ -10687,7 +10687,7 @@ quill-magic-url@^1.0.3:
 
 "quill@https://github.com/thecodrr/quill.git#develop":
   version "2.0.0-dev.4"
-  resolved "https://github.com/thecodrr/quill.git#86f978ccc26af8d4e44d641d565ac0d07fd6a40c"
+  resolved "https://github.com/thecodrr/quill.git#54013b85f043ca0b141a4d01ef761a30b3fad4c9"
   dependencies:
     eventemitter3 "^4.0.0"
     lodash.clonedeep "^4.5.0"
