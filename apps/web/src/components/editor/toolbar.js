@@ -77,7 +77,7 @@ function Toolbar(props) {
           if (isFocusMode) exitFullscreen(document);
           else enterFullscreen(document.documentElement);
           toggleFocusMode();
-          quill.focus();
+          if (quill) quill.focus();
         },
       },
       {
@@ -171,13 +171,20 @@ function enterFullscreen(elem) {
 
 /* Close fullscreen */
 function exitFullscreen(elem) {
-  if (elem.exitFullscreen) {
-    elem.exitFullscreen();
-  } else if (elem.webkitExitFullscreen) {
-    /* Safari */
-    elem.webkitExitFullscreen();
-  } else if (elem.msExitFullscreen) {
-    /* IE11 */
-    elem.msExitFullscreen();
+  if (
+    document.fullscreenElement ||
+    document.webkitFullscreenElement ||
+    document.mozFullScreenElement
+  ) {
+    document.exitFullscreen();
   }
+  // if (elem.exitFullscreen) {
+  //   elem.exitFullscreen();
+  // } else if (elem.webkitExitFullscreen) {
+  //   /* Safari */
+  //   elem.webkitExitFullscreen();
+  // } else if (elem.msExitFullscreen) {
+  //   /* IE11 */
+  //   elem.msExitFullscreen();
+  // }
 }
