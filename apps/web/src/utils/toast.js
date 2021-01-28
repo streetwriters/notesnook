@@ -4,12 +4,13 @@ import { Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import * as Icon from "../components/icons";
 import { toTitleCase } from "./string";
-
+import { store as appstore } from "../stores/app-store";
 /**
  *
  * @returns {import("cogo-toast").CTReturn}
  */
 function showToast(type, message, actions) {
+  if (appstore.get().isFocusMode) return null;
   const IconComponent = Icon[toTitleCase(type)];
 
   return CogoToast[type](
