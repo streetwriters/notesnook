@@ -85,10 +85,10 @@ const quillModules = (isSimple, isFocusMode, isMobile) => ({
           [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
           [{ indent: "-1" }, { indent: "+1" }],
           ["code-block", { script: "sub" }, { script: "super" }],
-          [{ color: [] }, { background: [] }],
+          ["link", "image", "video"],
           [{ header: [false, 2, 3, 4, 5, 6] }],
           [{ size: ["small", false, "large", "huge"] }],
-          ["link", "image", "video"],
+          [{ color: [] }, { background: [] }],
           [{ direction: "rtl" }, "clean"],
         ],
         handlers: {
