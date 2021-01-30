@@ -173,8 +173,8 @@ const MergeEditor = () => {
     } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
         content: {
-          data: primaryData.data,
-          type: primaryData.type,
+          data: secondaryData.data,
+          type: secondaryData.type,
           resolved: true,
         },
         id: note.id,
