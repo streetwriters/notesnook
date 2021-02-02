@@ -47,7 +47,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
     // 4. edit the note's content
     await db.notes.add({
       id: noteId,
-      content: { type: "delta", data: [{ insert: "text" }] },
+      content: { ...TEST_NOTE.content },
     });
 
     // 5. sync again and expect conflicts
@@ -57,10 +57,10 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
       v: CURRENT_DATABASE_VERSION,
       ...(await getEncrypted({
         id: contentId,
-        type: "delta",
+        type: TEST_NOTE.content.type,
         dateEdited: Date.now(),
         conflicted: false,
-        data: [{ insert: "text" }],
+        data: TEST_NOTE.content.data,
       })),
     };
 
@@ -88,8 +88,8 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
       id: noteId,
       conflicted: false,
       content: {
-        type: "delta",
-        data: [{ insert: "text" }],
+        type: TEST_NOTE.content.type,
+        data: TEST_NOTE.content.data,
         resolved: true,
       },
     });

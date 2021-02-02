@@ -15,7 +15,7 @@ class Migrator {
             if (item.deleted)
               return await collection.dbCollection._collection.addItem(item);
 
-            const migrate = migrations[version][item.type || id];
+            const migrate = migrations[version][item.type || collection.type];
             if (migrate) item = migrate(item);
 
             if (!!collection.dbCollection.merge) {

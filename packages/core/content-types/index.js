@@ -1,9 +1,9 @@
-import Delta from "./delta";
+import Tiny from "./tiny";
 
 export function getContentFromData(type, data) {
   switch (type) {
-    case "delta":
-      return new Delta(data);
+    case "tiny":
+      return new Tiny(data);
     default:
       return null;
   }

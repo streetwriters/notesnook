@@ -100,6 +100,11 @@ describe.each([
       ).toBeTruthy();
 
       expect(db.notebooks.all.every((v) => v.title != null)).toBeTruthy();
+
+      const allContent = await db.content.all();
+      expect(
+        allContent.every((v) => v.type === "tiny" || v.deleted)
+      ).toBeTruthy();
     });
   });
 

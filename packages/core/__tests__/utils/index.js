@@ -27,11 +27,8 @@ const notebookTest = (notebook = TEST_NOTEBOOK) =>
 
 var TEST_NOTE = {
   content: {
-    type: "delta",
-    data: [
-      { insert: "Hello\n" },
-      { insert: "This is colorful", attributes: { color: "#f00" } },
-    ],
+    type: "tiny",
+    data: `<p>Hello<br/><span style='color:#f00'>This is colorful</span></p>`,
   },
 };
 

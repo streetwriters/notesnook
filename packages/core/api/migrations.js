@@ -49,6 +49,7 @@ class Migrations {
       {
         index: [this._db.settings.raw],
         dbCollection: this._db.settings,
+        type: "settings",
       },
     ];
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);

@@ -61,7 +61,7 @@ test("unlock a note", () =>
     const note = await db.vault.open(id, "password");
     expect(note.id).toBe(id);
     expect(note.content.data).toBeDefined();
-    expect(note.content.type).toBe("delta");
+    expect(note.content.type).toBe(TEST_NOTE.content.type);
   }));
 
 test("unlock a note permanently", () =>
@@ -74,7 +74,7 @@ test("unlock a note permanently", () =>
     expect(note.headline).not.toBe("");
     const content = await db.content.raw(note.data.contentId);
     expect(content.data).toBeDefined();
-    expect(typeof content.data).toBe("object");
+    expect(typeof content.data).toBe("string");
   }));
 
 test("save a locked note", () =>

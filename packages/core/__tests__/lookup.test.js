@@ -14,10 +14,12 @@ beforeEach(async () => {
   StorageInterface.clear();
 });
 
+const content = { ...TEST_NOTE.content, data: "<p>5</p>" };
+
 //TODO
 test("search notes", () =>
   noteTest({
-    content: { type: "delta", data: [{ insert: "5" }] },
+    content: content,
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
     let filtered = await db.lookup.notes(db.notes.all, "5");
@@ -26,7 +28,7 @@ test("search notes", () =>
 
 test("search notes with a locked note", () =>
   noteTest({
-    content: { type: "delta", data: [{ insert: "5" }] },
+    content: content,
   }).then(async ({ db }) => {
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
@@ -37,11 +39,11 @@ test("search notes with a locked note", () =>
 
 test("search notes with an empty note", () =>
   noteTest({
-    content: { type: "delta", data: [{ insert: "5" }] },
+    content: content,
   }).then(async ({ db }) => {
     await db.notes.add({
       title: "hello world",
-      content: { type: "delta", data: [{ insert: "\n" }] },
+      content: { type: "tiny", data: "<p><br></p>" },
     });
     let filtered = await db.lookup.notes(db.notes.all, "hello world");
     expect(filtered.length).toBe(1);

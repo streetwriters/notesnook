@@ -97,6 +97,7 @@ export default class Backup {
       case 4:
       case 4.1:
       case 4.2:
+      case 4.3:
       case 3:
       case 2: {
         return backup;
@@ -144,6 +145,7 @@ export default class Backup {
       {
         index: data["delta"],
         dbCollection: this._db.content,
+        type: "delta",
       },
       {
         index: data["content"],
@@ -152,6 +154,7 @@ export default class Backup {
       {
         index: ["settings"],
         dbCollection: this._db.settings,
+        type: "settings",
       },
     ];
 

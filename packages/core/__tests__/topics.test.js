@@ -69,7 +69,7 @@ test("get topic", () =>
     await topics.add("Home");
     let topic = topics.topic("Home");
     let noteId = await db.notes.add({
-      content: { type: "delta", data: [{ insert: "Hello" }] },
+      content: TEST_NOTE.content,
     });
     await topic.add(noteId);
     topic = topics.topic("Home");

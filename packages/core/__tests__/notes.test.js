@@ -60,7 +60,7 @@ test("get all notes", () =>
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("Hello This is colorful");
+    expect(note.title).toBe("HelloThis is colorful");
   }));
 
 test("note title should allow trailing space", () =>
@@ -85,8 +85,8 @@ test("update note", () =>
       id,
       title: "I am a new title",
       content: {
-        type: "delta",
-        data: [],
+        type: TEST_NOTE.content.type,
+        data: "<p><br></p>",
       },
       pinned: true,
       favorite: true,
@@ -106,8 +106,8 @@ test("updating empty note should delete it", () =>
       id,
       title: "\n",
       content: {
-        type: "delta",
-        data: [{ insert: "\n" }],
+        type: TEST_NOTE.content.type,
+        data: "<p><br></p>",
       },
     });
     expect(id).toBeUndefined();
@@ -221,7 +221,7 @@ test("export note to html", () =>
     const html = await db.notes.note(id).export("html");
     expect(
       html.includes(
-        `<p>Hello<br/><span style="color:#f00">This is colorful</span></p>`
+        `<p>Hello<br/><span style='color:#f00'>This is colorful</span></p>`
       )
     ).toBeTruthy();
   }));
@@ -229,7 +229,7 @@ test("export note to html", () =>
 test("export note to md", () =>
   noteTest().then(async ({ db, id }) => {
     const md = await db.notes.note(id).export("md");
-    expect(md.includes(`Hello\nThis is colorful\n`)).toBeTruthy();
+    expect(md.includes(`Hello  \nThis is colorful\n`)).toBeTruthy();
   }));
 
 test("export note to txt", () =>
