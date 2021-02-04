@@ -21,6 +21,8 @@ async function setPremiumStatus() {
     } else {
       premiumStatus = user.subscription.type;
       updateEvent({type: Actions.PREMIUM, state: get()});
+      console.log('updating user');
+      updateEvent({type: Actions.USER, user: user});
     }
   } catch (e) {
     premiumStatus = null;
@@ -28,7 +30,12 @@ async function setPremiumStatus() {
 }
 
 function get() {
-  return premiumStatus === 1 || premiumStatus === 2;
+  return (
+    premiumStatus === 1 ||
+    premiumStatus === 2 ||
+    premiumStatus === 5 ||
+    premiumStatus === 6
+  );
 }
 
 async function verify(callback, error) {
