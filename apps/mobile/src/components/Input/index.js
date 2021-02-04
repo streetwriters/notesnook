@@ -1,17 +1,18 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import React, {useState} from 'react';
+import {TouchableOpacity} from 'react-native';
+import {View} from 'react-native';
+import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider/index';
+import {useTracked} from '../../provider/index';
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
-  validateUsername
+  validateUsername,
 } from '../../services/Validation';
-import { getElevation } from '../../utils';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {getElevation} from '../../utils';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import Paragraph from '../Typography/Paragraph';
 
 const Input = ({
@@ -32,7 +33,11 @@ const Input = ({
   button,
   testID,
   defaultValue,
-  clearTextOnFocus
+  clearTextOnFocus,
+  onBlurInput,
+  onPress,
+  height=50,
+  fontSize=SIZE.md
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -109,6 +114,9 @@ const Input = ({
 
   const onBlur = () => {
     setFocus(false);
+    if (onBlurInput) {
+      onBlurInput();
+    }
   };
 
   const onFocus = () => {
@@ -122,14 +130,15 @@ const Input = ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    height: 50,
+    height: height,
     marginBottom: marginBottom,
+    flexGrow: 1,
   };
 
   const textStyle = {
     paddingHorizontal: 0,
-    fontSize: SIZE.md,
-    color: colors.pri,
+    fontSize: fontSize,
+    color: onPress && loading ? colors.accent : colors.pri,
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
@@ -138,7 +147,12 @@ const Input = ({
 
   return (
     <>
-      <View style={style}>
+      <TouchableOpacity
+        disabled={!loading}
+        onPress={onPress}
+        activeOpacity={1}
+        style={style}>
+        
         <TextInput
           ref={fwdRef}
           testID={testID}
@@ -147,7 +161,6 @@ const Input = ({
           autoCapitalize={autoCapitalize}
           onChangeText={onChange}
           onBlur={onBlur}
-        
           onFocus={onFocus}
           onSubmitEditing={onSubmit}
           blurOnSubmit={blurOnSubmit}
@@ -240,7 +253,7 @@ const Input = ({
             </Paragraph>
           </View>
         ) : null}
-      </View>
+      </TouchableOpacity>
 
       {validationType === 'password' && focus && (
         <View
