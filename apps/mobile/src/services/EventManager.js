@@ -1,21 +1,22 @@
-import {DeviceEventEmitter} from 'react-native';
+import EventManager from 'notes-core/utils/event-manager';
 import {
   eHideToast,
   eOnNoteEdited,
   eOpenVaultDialog,
   eShowToast,
 } from '../utils/Events';
+const eventManager = new EventManager();
 
 export const eSubscribeEvent = (eventName, action) => {
-  DeviceEventEmitter.addListener(eventName, action);
+  eventManager.subscribe(eventName, action);
 };
 
 export const eUnSubscribeEvent = (eventName, action) => {
-  DeviceEventEmitter.removeListener(eventName, action);
+  eventManager.unsubscribe(eventName, action);
 };
 
 export const eSendEvent = (eventName, data) => {
-  DeviceEventEmitter.emit(eventName, data);
+  eventManager.publish(eventName, data);
 };
 
 /**
@@ -37,7 +38,6 @@ export const eSendEvent = (eventName, data) => {
 export const openVault = (data) => {
   eSendEvent(eOpenVaultDialog, data);
 };
-
 
 /**
  * @typedef {Object} noteEdit
