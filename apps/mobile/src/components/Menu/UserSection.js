@@ -52,9 +52,13 @@ export const UserSection = ({noTextMode}) => {
             color={!user ? colors.red : colors.green}
           />
 
-          <Heading size={SIZE.sm} color={colors.heading}>
-            {!user ? 'Not Logged in' : 'Logged in'}
-          </Heading>
+          <View>
+            <Heading size={SIZE.sm} color={colors.heading}>
+              {!user ? 'Not Logged in' : 'Logged in'}
+            </Heading>
+
+            <Paragraph color={colors.icon}  >Login to encrypt and sync your notes.</Paragraph>
+          </View>
         </TouchableOpacity>
 
         {user && (
