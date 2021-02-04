@@ -1,82 +1,28 @@
+<!DOCTYPE html>
 <html>
 
 <head>
-    <meta content="width=device-width, initial-scale=1, user-scalable=no" name="viewport" />
-
-    <link href="styles.css" rel="stylesheet">
-    <style>
-        .ql-toolbar {
-            overflow-x: auto;
-            width: 100vw;
-            white-space: nowrap;
-            position: fixed;
-            height: 0px !important;
-            bottom: 0px;
-            left: 0px;
-        }
-    </style>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta charset="utf-8" />
+	<title>Getting Started</title>
+	<link rel="stylesheet" href="./index.css">
 </head>
 
-<body class="app-body">
-    <div id="editor"></div>
-    <div id="toolbar"></div>
+<body>
+	<div>
+		<input id="image-input" accept='image/png, image/gif, image/jpeg, image/bmp, image/x-icon' type="file"
+			name="name" style="display: none;" />
+		<textarea id="tiny_textarea"></textarea>
+	</div>
+
+	<script src="./listeners.js"></script>
+	<script src="./dist/main.js"></script>
+	<script src="./constants.js"></script>
+	<script src="./init.js"></script>
+	<script>
+		init_tiny("100vh");
+	</script>
+
 </body>
-
-<script>
-    let editor;
-    let isTablet = false;
-</script>
-<script src="quill.js"></script>
-<script src="constants.js"></script>
-<script src="module.js"></script>
-<script src="magic-url.js"></script>
-<script src="listeners.js"></script>
-<script src="image-resize.min.js"></script>
-
-<script>
-      const Embed = Quill.import('blots/embed')
-class SmartBreak extends Embed {}
-    SmartBreak.blotName = "manualbreak";
-    SmartBreak.tagName = "BR";
-  
-    attachMessageListener()
-    function loadAction() {
-        var Block = Quill.import('blots/block');
-        Block.tagName = 'DIV';
-        Quill.register(SmartBreak);
-        Quill.register(Block, true);
-        setFonts();
-        Quill.register("modules/imageCompressor", imageCompressor);
-        editor = new Quill('#editor', {
-            modules: {
-                toolbar: [
-                    [],],
-                imageCompressor: {
-                    quality: 0.9,
-                    maxWidth: 1024,
-                    imageType: 'image/jpeg'
-                },
-                history: {
-                    delay: 2000,
-                    maxStack: 500,
-                    userOnly: true,
-                },
-                imageResize: {
-                    displaySize: true,
-                },
-                magicUrl: true
-            },
-            placeholder: 'Type something here',
-        });
-        let Font = Quill.import('formats/font');
-        Font.whitelist = fontNames;
-        Quill.register(Font, true);
-
-        setTheme();
-        attachEditorListeners();
-    }
-    loadAction()
-</script>
-
 
 </html>
