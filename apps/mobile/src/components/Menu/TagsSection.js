@@ -94,13 +94,13 @@ export const TagsSection = () => {
               alignItems: 'center',
               paddingHorizontal: '10%',
             }}>
-            <Heading style={{marginBottom: 2.5}} size={SIZE.sm}>
+            <Heading style={{marginBottom: 2.5}} size={SIZE.md}>
               Shortcuts
             </Heading>
             <Paragraph
               style={{textAlign: 'center'}}
               color={colors.icon}
-              size={SIZE.xs}>
+              size={SIZE.sm}>
               You can add shortcuts of notebooks, topics and tags here.
             </Paragraph>
           </View>
