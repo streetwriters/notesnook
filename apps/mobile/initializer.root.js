@@ -1,38 +1,39 @@
 import {
   activateKeepAwake,
-  deactivateKeepAwake
+  deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { notesnook } from './e2e/test.ids';
+import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
-import { DialogManager } from './src/components/DialogManager';
-import { DummyText } from './src/components/DummyText';
-import { Menu } from './src/components/Menu';
-import { Toast } from './src/components/Toast';
-import { NavigationStack } from './src/navigation/Drawer';
-import { NavigatorStack } from './src/navigation/NavigatorStack';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { DDS } from './src/services/DeviceDetection';
+import {DialogManager} from './src/components/DialogManager';
+import {DummyText} from './src/components/DummyText';
+import {Menu} from './src/components/Menu';
+import {Toast} from './src/components/Toast';
+import {NavigationStack} from './src/navigation/Drawer';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
-import { editing, setWidthHeight } from './src/utils';
+import {editing, setWidthHeight} from './src/utils';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eCloseSideMenu,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenSideMenu
+  eOpenSideMenu,
 } from './src/utils/Events';
-import { editorRef, tabBarRef } from './src/utils/Refs';
-import { EditorWrapper } from './src/views/Editor/EditorWrapper';
-import { getNote, post } from './src/views/Editor/Functions';
+import {editorRef, tabBarRef} from './src/utils/Refs';
+import {EditorWrapper} from './src/views/Editor/EditorWrapper';
+import {EditorWebView, getNote, post} from './src/views/Editor/Functions';
+import tiny from './src/views/Editor/tiny/tiny';
 let {width, height} = Dimensions.get('window');
 let layoutTimer = null;
 let currentTab = 0;
@@ -56,7 +57,7 @@ const onChangeTab = async (obj) => {
         eSendEvent(eClearEditor);
       }
       editing.movedAway = true;
-      post('blur');
+      tiny.call(EditorWebView, tiny.blur);
     }
     editing.isFocused = false;
     currentTab = 0;
@@ -102,8 +103,12 @@ let touchEndTimer = null;
 
 const _handleTouch = () => {
   {
+    let heightCheck = !editing.tooltip
+      ? updatedDimensions.height - 70
+      : updatedDimensions.height - 140;
     if (
-      (currentTab === 1 && startLocation > updatedDimensions.height - 70) ||
+      (currentTab === 1 && startLocation > heightCheck) ||
+      (currentTab === 1 && startLocationX > 50) ||
       (currentTab === 0 && startLocationX < 150)
     ) {
       if (currentScroll === 0 || currentScroll === 1) {
@@ -238,7 +243,7 @@ const AppStack = React.memo(
       }
     };
 
-    const renderTabBar = useCallback(() => <></>,[])
+    const renderTabBar = useCallback(() => <></>, []);
 
     return (
       <View
