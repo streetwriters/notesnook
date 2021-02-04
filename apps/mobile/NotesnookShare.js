@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
 import ShareExtension from 'rn-extensions-share';
+import validator from 'validator';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import Storage from './src/utils/storage';
@@ -61,29 +62,24 @@ export default class NotesnookShare extends Component {
 
   onPress = async () => {
     this.titleInputRef.current?.blur();
-    this.textInputRef.current?.blur();    
+    this.textInputRef.current?.blur();
     this.setState({
       loading: true,
     });
-    if (db && db.notes) {
+
+    let tag = validator.isURL(this.state.text) ? 'a' : 'p';
+    let add = async () => {
       await db.notes.add({
         title: this.state.title,
-        content: {
-          type: 'delta',
-          data: [{insert: this.state.text}],
-        },
+        content: `<${tag}>${this.state.text}<${tag}/>`,
         id: null,
       });
+    };
+    if (db && db.notes) {
+      await add();
     } else {
       await db.init();
-      await db.notes.add({
-        title: this.state.title,
-        content: {
-          type: 'delta',
-          data: [{insert: this.state.text}],
-        },
-        id: null,
-      });
+      await add();
     }
     await Storage.write('notesAddedFromIntent', 'added');
     await sleep(500);
@@ -273,7 +269,7 @@ export default class NotesnookShare extends Component {
               borderTopRightRadius: 10,
               borderTopLeftRadius: 10,
               width: '100%',
-              paddingTop:15
+              paddingTop: 15,
             }}>
             <ScrollView
               style={{
