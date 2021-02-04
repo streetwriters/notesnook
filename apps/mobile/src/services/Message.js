@@ -1,11 +1,8 @@
-import { Actions } from '../provider/Actions';
-import { db } from '../utils/DB';
-import {
-  eOpenLoginDialog,
-  eOpenProgressDialog
-} from '../utils/Events';
-import { MMKV } from '../utils/mmkv';
-import { eSendEvent, ToastEvent } from './EventManager';
+import {Actions} from '../provider/Actions';
+import {db} from '../utils/DB';
+import {eOpenLoginDialog, eOpenProgressDialog} from '../utils/Events';
+import {MMKV} from '../utils/mmkv';
+import {eSendEvent, ToastEvent} from './EventManager';
 import PremiumService from './PremiumService';
 
 export function setLoginMessage(dispatch) {
@@ -14,7 +11,7 @@ export function setLoginMessage(dispatch) {
     state: {
       visible: true,
       message: 'You are not logged in',
-      actionText: 'Login to sync your data.',
+      actionText: 'Login to encrypt and sync notes.',
       onPress: () => {
         eSendEvent(eOpenLoginDialog);
       },
@@ -30,8 +27,8 @@ export function setEmailVerifyMessage(dispatch) {
     type: Actions.MESSAGE_BOARD_STATE,
     state: {
       visible: true,
-      message: 'Email not verified',
-      actionText: 'Please verify your email to sync.',
+      message: 'Email not confirmed',
+      actionText: 'Please confrim your email to encrypt and sync notes.',
       onPress: () => {
         PremiumService.showVerifyEmailDialog();
       },
