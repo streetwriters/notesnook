@@ -26,16 +26,25 @@ async function run() {
   } catch (e) {
     error = true;
   }
-  console.log('BACKUP COMPLETE');
   if (!error) {
-    let backupName = 'notesnook_backup_' + new Date().toString() + '.nnbackup';
-    let path = await storage.checkAndCreateDir('/backups/');
-    await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
-    await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
-    setTimeout(() => {
-      ToastEvent.show('Backup complete!', 'success');
-    }, 1000);
-    return path;
+    try {
+      let backupName =
+        'notesnook_backup_' + Date.now() + '.nnbackup';
+      let path = await storage.checkAndCreateDir('backups/');
+      console.log(path + backupName);
+      RNFetchBlob.fs
+        .createFile(path + backupName, 'abc', 'utf8')
+        .then(console.log)
+        .catch(console.log);
+
+      await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
+      setTimeout(() => {
+        ToastEvent.show('Backup complete!', 'success');
+      }, 1000);
+      return path;
+    } catch (e) {
+      console.log('backup error', e);
+    }
   } else {
     ToastEvent.show('Backup failed!', 'success');
     return null;
@@ -54,7 +63,7 @@ async function checkBackupRequired(type) {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);
-  
+
   if (type === 'daily' && lastBackupDate + MS_DAY < now) {
     return true;
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
