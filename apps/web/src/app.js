@@ -6,6 +6,7 @@ import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useEditorStore } from "./stores/editor-store";
+import { useStore as useThemeStore } from "./stores/theme-store";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
 import routes from "./navigation/routes";
@@ -29,6 +30,7 @@ import {
   showAppAvailableNotice,
   showAppUpdatedNotice,
 } from "./components/dialogs/confirm";
+import { useAnimation } from "framer-motion";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -163,6 +165,7 @@ function App() {
           <GlobalMenuWrapper />
         </Flex>
         <StatusBar />
+        <ThemeTransition />
       </Flex>
     </ThemeProvider>
   );
@@ -188,6 +191,51 @@ function Root() {
     default:
       return <App />;
   }
+}
+
+function ThemeTransition() {
+  const theme = useThemeStore((store) => store.theme);
+  const animate = useAnimation();
+  useEffect(() => {
+    if (!ThemeTransition.first) {
+      ThemeTransition.first = true;
+      return;
+    }
+    const element = document.getElementById("themeTransition");
+    element.style.visibility = "visible";
+    animate
+      .start({
+        opacity: 1,
+        transition: { duration: 0 },
+      })
+      .then(() => {
+        animate
+          .start({
+            opacity: 0,
+            transition: { duration: 1.5 },
+          })
+          .then(() => {
+            element.style.visibility = "collapse";
+          });
+      });
+  }, [theme, animate]);
+  return (
+    <Animated.Box
+      id="themeTransition"
+      sx={{
+        position: "absolute",
+        width: "100%",
+        height: "100%",
+        top: 0,
+        left: 0,
+        zIndex: 999,
+        opacity: 1,
+        visibility: "collapse",
+      }}
+      animate={animate}
+      bg="bgSecondary"
+    />
+  );
 }
 
 export default Root;
