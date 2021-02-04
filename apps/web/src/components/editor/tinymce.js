@@ -117,11 +117,11 @@ function TinyMCE(props) {
       tinymceRef.current.editor.dom.styleSheetLoader.unload(
         `${oldSkin}/content.min.css`
       );
-      tinymceRef.current.editor.dom.styleSheetLoader.load(
-        `${newSkin}/content.min.css`
-      );
       tinymceRef.current.editor.ui.styleSheetLoader.unload(
         `${oldSkin}/skin.min.css`
+      );
+      tinymceRef.current.editor.dom.styleSheetLoader.load(
+        `${newSkin}/content.min.css`
       );
       tinymceRef.current.editor.ui.styleSheetLoader.load(
         `${newSkin}/skin.min.css`
