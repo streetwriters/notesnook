@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Flex, Box, Text } from "rebass";
 import SimpleEditor from "./simpleeditor";
-import DeltaToggle from "./deltatoggle";
+import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -70,7 +70,7 @@ function SplitEditor(props) {
           width={["100%", "100%", "50%"]}
           flex="1 1 auto"
         >
-          <DeltaToggle
+          <ContentToggle
             label="Current note"
             dateEdited={localContent.dateEdited}
             isSelected={selectedDelta === 0}
@@ -78,8 +78,8 @@ function SplitEditor(props) {
             onToggle={() => setSelectedDelta((s) => (s === 0 ? -1 : 0))}
             note={conflictedNote}
             editors={() => ({
-              selectedEditor: remoteEditor.current.quill,
-              otherEditor: localEditor.current.quill,
+              selectedEditor: remoteEditor.current.editor,
+              otherEditor: localEditor.current.editor,
             })}
             sx={{
               borderStyle: "solid",
@@ -112,7 +112,7 @@ function SplitEditor(props) {
           height={["50%", "50%", "100%"]}
           width={["100%", "100%", "50%"]}
         >
-          <DeltaToggle
+          <ContentToggle
             sx={{
               alignItems: "flex-end",
               borderStyle: "solid",
@@ -130,8 +130,8 @@ function SplitEditor(props) {
             dateEdited={remoteContent.dateEdited}
             onToggle={() => setSelectedDelta((s) => (s === 1 ? -1 : 1))}
             editors={() => ({
-              selectedEditor: localEditor.current.quill,
-              otherEditor: remoteEditor.current.quill,
+              selectedEditor: localEditor.current.editor,
+              otherEditor: remoteEditor.current.editor,
             })}
           />
           <Box px={2} overflowY="auto">

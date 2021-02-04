@@ -4,8 +4,9 @@ import { timeConverter } from "../../utils/time";
 import { store as notestore } from "../../stores/note-store";
 import { db } from "../../common";
 import { hashNavigate } from "../../navigation";
+import diff from "./differ";
 
-function DeltaToggle(props) {
+function ContentToggle(props) {
   const {
     isSelected,
     isOtherSelected,
@@ -21,7 +22,7 @@ function DeltaToggle(props) {
     async (selectedContent, otherContent) => {
       selectedContent = {
         data: selectedContent,
-        type: "delta",
+        type: "tiny",
         resolved: true,
       };
 
@@ -33,7 +34,7 @@ function DeltaToggle(props) {
       if (otherContent) {
         otherContent = {
           data: otherContent,
-          type: "delta",
+          type: "tiny",
         };
         await db.notes.add({
           ...note,
@@ -60,10 +61,10 @@ function DeltaToggle(props) {
             mr={2}
             onClick={async () => {
               const { selectedEditor, otherEditor } = editors();
-              // await resolveConflict(
-              //   deltaTransformer.cleanDifference(selectedEditor.getContents()),
-              //   deltaTransformer.cleanDifference(otherEditor.getContents())
-              // );
+              await resolveConflict(
+                diff.clean(selectedEditor.getContent({ format: "html" })),
+                diff.clean(otherEditor.getContent({ format: "html" }))
+              );
             }}
             p={1}
             px={2}
@@ -75,10 +76,10 @@ function DeltaToggle(props) {
           variant="primary"
           onClick={async () => {
             if (isOtherSelected) {
-              // const { selectedEditor } = editors();
-              // await resolveConflict(
-              //   deltaTransformer.cleanDifference(selectedEditor.getContents())
-              // );
+              const { selectedEditor } = editors();
+              await resolveConflict(
+                diff.clean(selectedEditor.getContent({ format: "html" }))
+              );
             } else {
               onToggle();
             }
@@ -105,4 +106,4 @@ function DeltaToggle(props) {
     </Flex>
   );
 }
-export default DeltaToggle;
+export default ContentToggle;

@@ -659,7 +659,9 @@
       if (non_tags.length !== 0) {
         var val = non_tags.join("");
         if (val.trim()) {
-          rendering += `<span class="diff-${tag} ${class_name}">${val}</span>`;
+          rendering += `<span class="diff-${tag} ${
+            class_name || ""
+          }">${val}</span>`;
         }
       }
 
@@ -880,8 +882,6 @@
     before = html_to_tokens(before);
     after = html_to_tokens(after);
     ops = calculate_operations(before, after);
-
-    console.log("NEW", ops);
     return render_operations_dual_pane(before, after, ops);
   }
 
@@ -894,6 +894,20 @@
   diff.calculate_operations = calculate_operations;
   diff.render_operations = render_operations;
   diff.diff_dual_pane = diff_dual_pane;
+  diff.clean = function (html) {
+    const tokens = html_to_tokens(html);
+    let isDiffSpanOpen = false;
+    return tokens.reduce((result, token) => {
+      if (token.includes(`span class="diff-`)) {
+        isDiffSpanOpen = true;
+        return result;
+      } else if (isDiffSpanOpen && token.includes("</span>")) {
+        isDiffSpanOpen = false;
+        return result;
+      }
+      return result + token;
+    }, "");
+  };
 
   if (typeof define === "function") {
     // eslint-disable-next-line no-undef

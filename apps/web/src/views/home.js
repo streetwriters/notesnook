@@ -11,10 +11,10 @@ function Home() {
     (async function () {
       await db.notes.init();
       store.refresh();
-      // const note = db.notes.note("7d91f4af509bfc824d005262").data;
+      // const note = db.notes.note("f90f344ee3c13c2f686bd5c1").data;
       // const data = await db.content.raw(note.contentId);
 
-      // const note2 = db.notes.note("7a9dc2c53a534e578f28861b").data;
+      // const note2 = db.notes.note("3e9a515cc63199a101ec49bb").data;
       // const data2 = await db.content.raw(note2.contentId);
 
       // const data3 = { ...data, conflicted: data2 };
