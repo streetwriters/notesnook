@@ -1,13 +1,14 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
-import { Toast } from '../Toast';
+import {Button} from '../Button';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -78,12 +79,34 @@ const ProgressDialog = () => {
           ) : null}
         </Paragraph>
       </View>
-
+      <View
+        style={{
+          paddingHorizontal: 12,
+          backgroundColor:colors.shade,
+          marginBottom:12
+        }}>
+        {dialogData.valueArray &&
+          dialogData.valueArray.map((v) => (
+            <Button
+              title={v}
+              type="transparent"
+              textStyle={{fontWeight: 'normal'}}
+              fontSize={SIZE.sm}
+              icon="check"
+              width="100%"
+              style={{
+                justifyContent:"flex-start",
+                backgroundColor:'transparent'
+              }}
+            />
+          ))}
+      </View>
       {dialogData?.action ? (
         <Button
-          type="transparent"
           onPress={dialogData.action}
           title={dialogData.actionText}
+          fontSize={SIZE.lg}
+          
         />
       ) : null}
 
