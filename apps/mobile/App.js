@@ -40,13 +40,9 @@ const App = () => {
   }, []);
 
   useEffect(() => {
-    eSubscribeEvent(eDispatchAction, (type) => {
-      dispatch(type);
-    });
+    eSubscribeEvent(eDispatchAction, dispatch);
     return () => {
-      eUnSubscribeEvent(eDispatchAction, (type) => {
-        dispatch(type);
-      });
+      eUnSubscribeEvent(eDispatchAction, dispatch);
     };
   }, []);
 

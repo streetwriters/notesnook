@@ -123,9 +123,6 @@ export const AppRootEvents = React.memo(
           })
           .catch(console.log);
 
-        eSubscribeEvent(eDispatchAction, (type) => {
-          dispatch(type);
-        });
         attachIAPListeners();
         AppState.addEventListener('change', onAppStateChanged);
         Appearance.addChangeListener(SettingsService.setTheme);
@@ -152,18 +149,20 @@ export const AppRootEvents = React.memo(
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
         EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
-        EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
+        EV.unsubscribe(
+          EVENTS.userCheckStatus,
+          PremiumService.onUserStatusCheck,
+        );
         EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
-        eUnSubscribeEvent(eDispatchAction, (type) => {
-          dispatch(type);
-        });
         AppState.removeEventListener('change', onAppStateChanged);
         Appearance.removeChangeListener(SettingsService.setTheme);
         Linking.removeEventListener('url', onUrlRecieved);
         unsubIAP();
       };
     }, [loading]);
+
+  
 
     const onSyncComplete = async () => {
       dispatch({type: Actions.ALL});
@@ -216,11 +215,12 @@ export const AppRootEvents = React.memo(
         });
     };
 
-    const onAccountStatusChange = async () => {
-     
-      await PremiumService.setPremiumStatus();
-      let user = await db.user.getUser();
-      if (user.subscription.type === 5) {
+    const onAccountStatusChange = async (userStatus) => {
+      console.log('STATUS CODE', userStatus);
+
+      if (!PremiumService.get() && userStatus.type === 5) {
+
+        console.log('STATUS CODE IN', userStatus.type);
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
           paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
@@ -232,6 +232,7 @@ export const AppRootEvents = React.memo(
           noProgress: true,
         });
       }
+      await PremiumService.setPremiumStatus();
     };
 
     const partialSync = async () => {
@@ -260,7 +261,7 @@ export const AppRootEvents = React.memo(
           eSendEvent(eOpenLoginDialog);
         },
         icon: 'logout',
-        actionText: 'Login Again',
+        actionText: 'Relogin',
         noProgress: true,
       });
     };
