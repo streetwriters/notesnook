@@ -4,9 +4,6 @@ import { timeConverter } from "../../utils/time";
 import { store as notestore } from "../../stores/note-store";
 import { db } from "../../common";
 import { hashNavigate } from "../../navigation";
-import DeltaTransformer from "../deltatransformer";
-
-const deltaTransformer = new DeltaTransformer();
 
 function DeltaToggle(props) {
   const {
@@ -63,10 +60,10 @@ function DeltaToggle(props) {
             mr={2}
             onClick={async () => {
               const { selectedEditor, otherEditor } = editors();
-              await resolveConflict(
-                deltaTransformer.cleanDifference(selectedEditor.getContents()),
-                deltaTransformer.cleanDifference(otherEditor.getContents())
-              );
+              // await resolveConflict(
+              //   deltaTransformer.cleanDifference(selectedEditor.getContents()),
+              //   deltaTransformer.cleanDifference(otherEditor.getContents())
+              // );
             }}
             p={1}
             px={2}
@@ -78,10 +75,10 @@ function DeltaToggle(props) {
           variant="primary"
           onClick={async () => {
             if (isOtherSelected) {
-              const { selectedEditor } = editors();
-              await resolveConflict(
-                deltaTransformer.cleanDifference(selectedEditor.getContents())
-              );
+              // const { selectedEditor } = editors();
+              // await resolveConflict(
+              //   deltaTransformer.cleanDifference(selectedEditor.getContents())
+              // );
             } else {
               onToggle();
             }

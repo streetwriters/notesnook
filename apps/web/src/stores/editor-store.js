@@ -28,8 +28,8 @@ const DEFAULT_SESSION = {
   dateEdited: 0,
   totalWords: 0,
   content: {
-    type: "delta",
-    data: [],
+    type: "tiny",
+    data: "",
   },
 };
 class EditorStore extends BaseStore {

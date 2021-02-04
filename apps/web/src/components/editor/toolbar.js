@@ -1,15 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
+import tinymce from "tinymce/tinymce";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
-import { EventManagers } from "../../utils/observablearray";
 import Animated from "../animated";
 
 function Toolbar(props) {
-  const { quill } = props;
   const sessionState = useStore((store) => store.session.state);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
@@ -41,21 +40,29 @@ function Toolbar(props) {
   }, [isTitleVisible]);
 
   useEffect(() => {
-    if (!quill?.history) return;
-
     function updateState() {
-      setUndoable(quill.history.stack.undo.length > 0);
-      setRedoable(quill.history.stack.redo.length > 0);
+      if (!tinymce.activeEditor) return;
+      setUndoable(tinymce.activeEditor.undoManager.hasUndo());
+      setRedoable(tinymce.activeEditor.undoManager.hasRedo());
     }
+    tinymce.EditorManager.once("AddEditor", () => {
+      tinymce.activeEditor.on("Undo", updateState);
+      tinymce.activeEditor.on("BeforeAddUndo", updateState);
+      tinymce.activeEditor.on("AddUndo", updateState);
+      tinymce.activeEditor.on("Redo", updateState);
+      tinymce.activeEditor.on("ClearUndos", updateState);
+      tinymce.activeEditor.on("TypingUndo", updateState);
 
-    EventManagers.redo.subscribeMulti(["pop", "push"], updateState);
-    EventManagers.undo.subscribeMulti(["pop", "push"], updateState);
-
-    return () => {
-      EventManagers.undo.unsubscribeAll();
-      EventManagers.redo.unsubscribeAll();
-    };
-  }, [sessionState, quill]);
+      tinymce.activeEditor.on("remove", () => {
+        tinymce.activeEditor.off("Undo", updateState);
+        tinymce.activeEditor.off("BeforeAddUndo", updateState);
+        tinymce.activeEditor.off("AddUndo", updateState);
+        tinymce.activeEditor.off("Redo", updateState);
+        tinymce.activeEditor.off("ClearUndos", updateState);
+        tinymce.activeEditor.off("TypingUndo", updateState);
+      });
+    });
+  }, [sessionState]);
 
   const tools = useMemo(
     () => [
@@ -69,13 +76,13 @@ function Toolbar(props) {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
-        onClick: () => quill.history.undo(),
+        onClick: () => tinymce.activeEditor.execCommand("Undo"),
       },
       {
         title: "Redo",
         icon: Icon.Redo,
         enabled: redoable,
-        onClick: () => quill.history.redo(),
+        onClick: () => tinymce.activeEditor.execCommand("Redo"),
       },
       {
         title: isFocusMode ? "Normal mode" : "Focus mode",
@@ -86,7 +93,7 @@ function Toolbar(props) {
           if (isFocusMode) exitFullscreen(document);
           else enterFullscreen(document.documentElement);
           toggleFocusMode();
-          if (quill) quill.focus();
+          if (tinymce.activeEditor) tinymce.activeEditor.focus();
         },
       },
       {
@@ -97,7 +104,6 @@ function Toolbar(props) {
       },
     ],
     [
-      quill,
       redoable,
       undoable,
       toggleFocusMode,

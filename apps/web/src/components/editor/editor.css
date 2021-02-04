@@ -1,251 +1,64 @@
-.ql-editor {
-  height: auto !important;
-  overflow: hidden !important;
+.tox .tox-tbtn:hover {
+  background: var(--shade) !important;
 }
 
-.ql-container.ql-snow {
-  border: none !important;
-  overflow: hidden !important;
-}
-
-/*Quill Toolbar*/
-
-.ql-toolbar.ql-snow svg {
-  height: 22px !important;
-  width: 22px;
-}
-.ql-toolbar.ql-snow span {
-  padding-top: 1px;
-  font-size: 0.975em;
-}
-
-.ql-formats {
-  margin-bottom: 5px;
-}
-
-.ql-formats > span.ql-color-picker {
-  padding: 0px !important;
-  height: auto !important;
-  width: auto !important;
-}
-
-.ql-formats > span.ql-color-picker > .ql-picker-label {
-  padding: 5px !important;
-  padding-bottom: 0px !important;
-  height: auto !important;
-  width: auto !important;
-  border-radius: 5px;
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-.ql-formats > span.ql-header,
-.ql-formats > span.ql-size {
-  padding: 0px !important;
-  height: auto !important;
-}
-
-.ql-formats > span.ql-header > .ql-picker-label,
-.ql-formats > span.ql-size > .ql-picker-label {
-  padding: 5px !important;
-  height: auto !important;
-  border-radius: 5px;
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-.ql-formats > button {
-  width: auto !important;
-  height: auto !important;
-  padding: 5px !important;
-  border-radius: 5px;
-  margin-left: 2px;
-  margin-right: 2px;
-}
-
-.ql-header.ql-picker {
-  width: 120px !important;
-}
-.ql-toolbar.ql-snow {
-  width: 100%;
-  border: none !important;
-  border-bottom: 1px solid var(--border) !important;
-  background-color: var(--background);
-  padding: 5px !important;
-  padding-left: 0px !important;
-}
-
-/*Color Overrides*/
-.ql-toolbar.ql-snow svg {
-  fill: var(--text) !important;
-}
-
-.ql-snow.ql-toolbar button:hover,
-.ql-snow .ql-toolbar button:hover,
-.ql-snow.ql-toolbar button:focus,
-.ql-snow .ql-toolbar button:focus,
-.ql-snow.ql-toolbar button.ql-active,
-.ql-snow .ql-toolbar button.ql-active,
-.ql-snow.ql-toolbar .ql-picker-label:hover,
-.ql-snow .ql-toolbar .ql-picker-label:hover,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active {
-  color: var(--primary) !important;
-  fill: var(--primary) !important;
-  background-color: var(--shade) !important;
-  transition: color 300ms linear;
-}
-
-.ql-snow.ql-toolbar button:hover svg,
-.ql-snow .ql-toolbar button:hover svg,
-.ql-snow.ql-toolbar button:focus svg,
-.ql-snow .ql-toolbar button:focus svg,
-.ql-snow.ql-toolbar button.ql-active svg,
-.ql-snow .ql-toolbar button.ql-active svg {
-  fill: var(--primary) !important;
-}
-
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
-.ql-snow.ql-toolbar button:hover .ql-stroke-miter,
-.ql-snow .ql-toolbar button:hover .ql-stroke-miter,
-.ql-snow.ql-toolbar button:focus .ql-stroke-miter,
-.ql-snow .ql-toolbar button:focus .ql-stroke-miter,
-.ql-snow.ql-toolbar button.ql-active .ql-stroke-miter,
-.ql-snow .ql-toolbar button.ql-active .ql-stroke-miter,
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke-miter,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke-miter,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke-miter,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke-miter {
-  fill: var(--primary) !important;
-}
-
-.ql-snow.ql-toolbar button:hover .ql-fill,
-.ql-snow .ql-toolbar button:hover .ql-fill,
-.ql-snow.ql-toolbar button:focus .ql-fill,
-.ql-snow .ql-toolbar button:focus .ql-fill,
-.ql-snow.ql-toolbar button.ql-active .ql-fill,
-.ql-snow .ql-toolbar button.ql-active .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill,
-.ql-snow.ql-toolbar button:hover .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar button:hover .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar button:focus .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar button:focus .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar button.ql-active .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar button.ql-active .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke.ql-fill,
-.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill,
-.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke.ql-fill {
-  fill: var(--primary) !important;
-}
-
-.ql-snow.ql-toolbar :not(.ql-background).ql-picker .ql-picker-item:hover,
-.ql-snow.ql-toolbar
-  :not(.ql-background).ql-picker
-  .ql-picker-item.ql-selected:hover {
-  background-color: var(--shade) !important;
+.tox-textfield {
+  border-radius: 5px !important;
+  border-color: var(--border) !important;
   color: var(--text) !important;
+  padding: 10px !important;
+  font-size: 0.875rem !important;
+  line-height: 0.875rem !important;
 }
 
-.ql-snow.ql-toolbar :not(.ql-background).ql-picker .ql-picker-item.ql-selected {
-  color: var(--primary) !important;
-  background-color: var(--shade) !important;
+.tox-textfield:focus {
+  outline: none !important;
+  border-color: var(--primary) !important;
+  border-width: 2px !important;
 }
 
-.ql-snow.ql-toolbar .ql-picker-item {
-  padding-left: 10px !important;
-  padding-right: 10px !important;
+.tox-textfield:hover {
+  border-color: var(--dimPrimary) !important;
 }
 
-.ql-snow .ql-picker {
-  color: var(--text) !important;
+.tox-button {
+  background-color: var(--primary) !important;
+  color: var(--static) !important;
+  transition: opacity 300ms linear;
+  border-width: 0px !important;
 }
 
-.ql-toolbar.ql-snow .ql-picker.ql-expanded .ql-picker-options {
-  border: 0px !important;
-  border-radius: 5px;
-  background-color: var(--accent) !important;
-  padding: 5px 0px !important;
+.tox-button:hover:not(.tox-button[disabled="disabled"]) {
+  opacity: 0.8;
 }
 
-.ql-editor.ql-blank::before {
-  color: var(--placeholder) !important;
-  font-family: sans-serif;
-}
-
-.ql-editor .ql-syntax,
-code {
-  font-family: monospace !important;
-  font-size: 16px;
-}
-
-.ql-editor .ql-syntax * {
-  font-family: monospace !important;
-  font-size: 16px;
-}
-
-.ql-editor {
-  font-size: 16px;
-  line-height: 1.6 !important;
-  color: var(--text) !important;
-  padding: 10px 0px 10px 0px !important;
-}
-
-.ql-editor > p:not(:first-child) {
-  margin-top: 20px;
-}
-
-.ql-editor.ql-blank::before {
-  left: 0px !important;
-  right: 0px !important;
-}
-
-.ql-editor h1 h2 h3 h4 h5 h6 {
-  font-family: sans-serif !important;
-  font-weight: 700 !important;
-}
-
-.ql-editor code,
-pre > * {
-  font-family: monospace !important;
-}
-
-.ql-editor ul[data-checked="false"] > li::before,
-.ql-editor ul[data-checked="true"] > li::before {
-  font-size: 20px;
-}
-
-.ql-editor ul[data-checked="true"] > li::before {
-  color: var(--primary) !important;
-}
-
-.ql-editor ul[data-checked="true"] > li {
-  text-decoration: line-through;
-  text-decoration-color: var(--primary);
-}
-
-.ql-editor code {
+.tox-button--secondary,
+.tox-button--icon {
   background-color: var(--bgSecondary) !important;
+  color: var(--text) !important;
+}
+.tox-button[disabled="disabled"] {
+  background-color: var(--bgSecondary) !important;
+  color: var(--fontTertiary) !important;
+}
+
+tox-tbtn tox-tbtn--select {
+  border-radius: 5px !important;
+}
+
+.tox-dialog {
+  border-radius: 5px !important;
+  border-width: 0px !important;
+  box-shadow: 4px 5px 18px 2px #00000038;
+  padding: 15px !important;
+}
+
+.tox-dialog__footer {
+  border-top: 0px !important;
+}
+
+.tox-dialog__title {
+  color: var(--text) !important;
+  font-size: 1.2rem !important;
+  font-weight: bold !important;
 }

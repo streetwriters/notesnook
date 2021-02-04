@@ -1,25 +1,17 @@
 import React, { Suspense } from "react";
 import EditorLoading from "../editor/loading";
-const ReactQuill = React.lazy(() => import("../editor/react-quill"));
+const ReactMCE = React.lazy(() => import("../editor/tinymce"));
 
 function SimpleEditor(props) {
-  const { delta, container, id, pref } = props;
+  const { content, pref } = props;
 
   return (
     <Suspense fallback={<EditorLoading />}>
-      <ReactQuill
-        ref={pref}
-        id={id}
-        modules={{ toolbar: [] }}
-        initialContent={delta}
-        onQuillInitialized={() => {
-          const toolbar = document.querySelector(
-            `${container} .ql-toolbar.ql-snow`
-          );
-          if (toolbar) toolbar.remove();
-        }}
+      <ReactMCE
+        editorRef={pref}
+        simple
+        initialValue={content}
         placeholder="Type anything here"
-        container={container}
       />
     </Suspense>
   );

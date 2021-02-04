@@ -6,17 +6,16 @@ import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
-import DeltaTransformer from "../deltatransformer";
-
-const deltaTransformer = new DeltaTransformer();
+import diff from "./differ";
 
 function SplitEditor(props) {
   const { noteId } = props;
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const [conflictedNote, setConflictedNote] = useState();
-  const [remoteDelta, setRemoteDelta] = useState();
-  const [localDelta, setLocalDelta] = useState();
+  const [remoteContent, setRemoteContent] = useState();
+  const [localContent, setLocalContent] = useState();
+  const [htmlDiff, setHtmlDiff] = useState({});
 
   useEffect(() => {
     (async function () {
@@ -28,10 +27,11 @@ function SplitEditor(props) {
       }
       notesStore.setSelectedNote(noteId);
       note = note.data;
-      const delta = await db.content.raw(note.contentId);
+      const content = await db.content.raw(note.contentId);
       setConflictedNote(note);
-      setLocalDelta({ ...delta, conflicted: false });
-      setRemoteDelta(delta.conflicted);
+      setLocalContent({ ...content, conflicted: false });
+      setRemoteContent(content.conflicted);
+      setHtmlDiff(diff.diff_dual_pane(content.data, content.conflicted.data));
     })();
   }, [noteId]);
 
@@ -42,7 +42,7 @@ function SplitEditor(props) {
   const [localEditor, remoteEditor] = [useRef(), useRef()];
   const [selectedDelta, setSelectedDelta] = useState(-1);
 
-  if (!conflictedNote || !localDelta || !remoteDelta) return null;
+  if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
     <Flex width="100%" flex="1 1 auto" flexDirection="column" overflow="hidden">
       <Text
@@ -72,7 +72,7 @@ function SplitEditor(props) {
         >
           <DeltaToggle
             label="Current note"
-            dateEdited={localDelta.dateEdited}
+            dateEdited={localContent.dateEdited}
             isSelected={selectedDelta === 0}
             isOtherSelected={selectedDelta === 1}
             onToggle={() => setSelectedDelta((s) => (s === 0 ? -1 : 0))}
@@ -102,16 +102,7 @@ function SplitEditor(props) {
               borderColor: "border",
             }}
           >
-            <SimpleEditor
-              pref={localEditor}
-              container=".firstEditor"
-              id="firstQuill"
-              delta={deltaTransformer.highlightDifference(
-                localDelta.data,
-                remoteDelta.data,
-                "#FDB0C0"
-              )}
-            />
+            <SimpleEditor pref={localEditor} content={htmlDiff.before} />
           </Box>
         </Flex>
         <Flex
@@ -136,7 +127,7 @@ function SplitEditor(props) {
             note={conflictedNote}
             isSelected={selectedDelta === 1}
             isOtherSelected={selectedDelta === 0}
-            dateEdited={remoteDelta.dateEdited}
+            dateEdited={remoteContent.dateEdited}
             onToggle={() => setSelectedDelta((s) => (s === 1 ? -1 : 1))}
             editors={() => ({
               selectedEditor: localEditor.current.quill,
@@ -144,16 +135,7 @@ function SplitEditor(props) {
             })}
           />
           <Box px={2} overflowY="auto">
-            <SimpleEditor
-              pref={remoteEditor}
-              container=".secondEditor"
-              id="secondQuill"
-              delta={deltaTransformer.highlightDifference(
-                remoteDelta.data,
-                localDelta.data,
-                "#CAFFFB"
-              )}
-            />
+            <SimpleEditor pref={remoteEditor} content={htmlDiff.after} />
           </Box>
         </Flex>
       </Flex>

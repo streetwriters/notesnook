@@ -11,17 +11,17 @@ function Home() {
     (async function () {
       await db.notes.init();
       store.refresh();
-      // const note = db.notes.note("7180399cb8ea4b7dfa015a0f").data;
-      // const delta = await db.content.raw(note.contentId);
+      // const note = db.notes.note("7d91f4af509bfc824d005262").data;
+      // const data = await db.content.raw(note.contentId);
 
-      // const note2 = db.notes.note("f85150f4a3850fb44dc65569").data;
-      // const delta2 = await db.content.raw(note2.contentId);
+      // const note2 = db.notes.note("7a9dc2c53a534e578f28861b").data;
+      // const data2 = await db.content.raw(note2.contentId);
 
-      // const delta3 = { ...delta, conflicted: delta2 };
+      // const data3 = { ...data, conflicted: data2 };
 
-      // await db.content.add(delta3);
+      // await db.content.add(data3);
       // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
-      // console.log(delta3);
+      // console.log(data3);
       setIsLoading(false);
     })();
   }, []);
