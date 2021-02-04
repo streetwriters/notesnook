@@ -11,7 +11,7 @@ import {SIZE} from './SizeUtils';
 import RNTooltips from 'react-native-tooltips';
 import {tabBarRef} from './Refs';
 
-export const APP_VERSION = 1220
+export const APP_VERSION = 1220;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -39,7 +39,7 @@ export const getElevation = (elevation) => {
 
 export const sortSettings = {
   sort: defaultState.settings.sort,
-  sortOrder: "desc",
+  sortOrder: 'desc',
 };
 
 export const SORT = {
@@ -56,9 +56,10 @@ export const editing = {
   actionAfterFirstSave: {
     type: null,
   },
-  isFocused:false,
-  focusType:null,
-  movedAway:true
+  isFocused: false,
+  focusType: null,
+  movedAway: true,
+  tooltip: false,
 };
 export const selection = {
   data: [],
@@ -155,7 +156,29 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
   2: 'Beta',
   5: 'Pro',
   6: 'Expired',
-  7: 'Pro'
+  7: 'Pro',
+};
+
+export const SUBSCRIPTION_PROVIDER = {
+  0: {
+    type: 'iOS',
+    title: 'Subscribed on iOS',
+    desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase.',
+    icon:'ios'
+  },
+  1: {
+    type: 'Android',
+    title: 'Subscribed on Android',
+    desc:
+      'You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.',
+      icon:'android'
+  },
+  2: {
+    type: 'Web',
+    title: 'Subscribed on Web',
+    desc: 'You subscribed to Notesnook Pro on the Web/Desktop App using doCheckout.',
+    icon:'web'
+  },
 };
 
 export const BUTTON_TYPES = {
@@ -196,6 +219,12 @@ export const BUTTON_TYPES = {
     selected: 'red',
     opacity: 0.12,
   },
+  errorShade: {
+    primary: 'transparent',
+    text: 'red',
+    selected: 'red',
+    opacity: 0.12,
+  },
 };
 
 export function toTXT(data) {
@@ -219,7 +248,7 @@ export function showTooltip(event, text, position) {
     text: text,
     tintColor: 'black',
     corner: 40,
-    textSize: 12,
+    textSize: 14,
     position: position,
   });
 }
