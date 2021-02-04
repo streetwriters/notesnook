@@ -111,7 +111,6 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     } catch (e) {
       setRestoring(false);
       ToastEvent.show(e.message, 'error', 'local');
-    
     }
   };
 
@@ -136,9 +135,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       });
 
       setFiles(files);
-    } catch (e) {
-    
-    }
+    } catch (e) {}
   };
 
   return (
@@ -215,7 +212,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
               <Paragraph color={colors.icon}>No backups found.</Paragraph>
             </View>
           }
-          keyExtractor={item => item.filename}
+          keyExtractor={(item) => item.filename}
           ListHeaderComponent={
             !restoring ? null : (
               <View

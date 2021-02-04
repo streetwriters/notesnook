@@ -30,7 +30,7 @@ export class DeviceDetectionService {
     this.isPhoneOrTablet();
     this.isIosOrAndroid();
     this.detectIphoneX();
-    console.log(size.width > size.height,"CALC")
+    //console.log(size.width > size.height,"CALC")
     this.checkSmallTab(size.width > size.height ? 'LANDSCAPE' : 'PORTRAIT');
   }
 
@@ -49,7 +49,7 @@ export class DeviceDetectionService {
     this.height = Dimensions.get('screen').height;
     let deviceSize = this.getDeviceSize();
 
-    console.log(deviceSize, orientation, DeviceInfo.isTablet(), 'DATA');
+    //console.log(deviceSize, orientation, DeviceInfo.isTablet(), 'DATA');
     if (
       (!DeviceInfo.isTablet() && orientation === 'LANDSCAPE') ||
       (DeviceInfo.isTablet() && (orientation === 'PORTRAIT' || deviceSize < 9))
