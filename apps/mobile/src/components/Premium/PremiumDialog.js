@@ -4,16 +4,19 @@ import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
-import {dHeight, itemSkus} from '../../utils';
+import {dHeight, dWidth, itemSkus} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOpenLoginDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import Carousel from 'react-native-snap-carousel';
+import {SvgXml} from 'react-native-svg';
+import {NOTE_SVG} from '../../assets/images/assets';
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -51,17 +54,49 @@ class PremiumDialog extends React.Component {
       this.setState({
         user: u,
       });
-      await RNIap.initConnection();      
+      await RNIap.initConnection();
       let prod = await RNIap.getSubscriptions(itemSkus);
-      console.log(prod)
+      console.log(prod);
       this.setState({
         products: prod,
         product: prod[0],
       });
-    } catch (e) {
-   
-    }
+    } catch (e) {}
   }
+
+ 
+  features = [
+    {
+      title: 'Cross Platfrom Sync',
+      description:
+        'Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!',
+    },
+    {
+      title: 'Zero Knowledge',
+      description:
+        'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
+    },
+    {
+      title: 'Organize Notes Like Never Before',
+      description:
+        'Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!',
+    },
+    {
+      title: 'Full Rich Text Editor with Markdown',
+      description:
+        'Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!',
+    },
+    {
+      title: 'Export Notes',
+      description:
+        'You can export your notes as PDF, Markdown, Plain text or HTML file.',
+    },
+    {
+      title: 'Backup and Restore',
+      description:
+        'Backup and restore your notes anytime into your phone storage. You can encrypt all your backups if required!',
+    },
+  ];
 
   render() {
     const {colors} = this.props;
@@ -70,9 +105,7 @@ class PremiumDialog extends React.Component {
         onOpen={async () => {
           try {
             await this.getSkus();
-          } catch (e) {
-            
-          }
+          } catch (e) {}
         }}
         onClose={() => {
           this.setState({
@@ -96,7 +129,10 @@ class PremiumDialog extends React.Component {
               paddingTop: 10,
               alignSelf: 'center',
             }}>
-            Notesnook Pro
+            Notesnook{' '}
+            <Heading size={SIZE.xxxl} color={colors.accent}>
+              Pro
+            </Heading>
           </Heading>
 
           <ScrollView
@@ -112,79 +148,57 @@ class PremiumDialog extends React.Component {
               width: '100%',
               maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.45,
             }}>
-            {[
-              {
-                title: 'Cross Platfrom Sync',
-                description:
-                  'Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!',
-              },
-              {
-                title: 'Zero Knowledge',
-                description:
-                  'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
-              },
-              {
-                title: 'Organize Notes Like Never Before',
-                description:
-                  'Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!',
-              },
-              {
-                title: 'Full Rich Text Editor with Markdown',
-                description:
-                  'Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!',
-              },
-              {
-                title: 'Export Notes',
-                description:
-                  'You can export your notes as PDF, Markdown, Plain text or HTML file.',
-              },
-              {
-                title: 'Backup and Restore',
-                description:
-                  'Backup and restore your notes anytime into your phone storage. You can encrypt all your backups if required!',
-              },
-            ].map((item) => (
-              <View
-                key={item.description}
-                style={{
-                  paddingVertical: 5,
-                  marginBottom: 10,
-                }}>
+            <Carousel
+              data={this.features}
+              itemWidth={dWidth}
+              sliderWidth={dWidth}
+              autoplay
+              loop
+              autoplayInterval={5000}
+              autoplayDelay={3000}
+              renderItem={({item, index}) => (
                 <View
+                  key={item.description}
                   style={{
-                    alignItems: 'flex-start',
-                    flexDirection: 'row',
-                    justifyContent: 'flex-start',
-                    flexWrap: 'wrap',
-                    width: '100%',
+                    paddingVertical: 5,
+                    marginBottom: 10,
                   }}>
-                  <Icon
-                    name="checkbox-marked-circle"
-                    size={SIZE.lg}
-                    color={colors.accent}
-                  />
-
-                  <Heading
-                    size={SIZE.md}
+                  <View
                     style={{
-                      marginLeft: 10,
-                      maxWidth: '85%',
+                      flexWrap: 'wrap',
+                      width: '100%',
+                      alignItems: 'center',
                     }}>
-                    {item.title} {'\n'}
-                    <Paragraph
-                      SIZE={SIZE.xs}
-                      color={colors.icon}
+                    <SvgXml
+                      xml={NOTE_SVG(colors.accent)}
+                      width={170}
+                      height={170}
+                    />
+
+                    <Heading
+                      size={SIZE.lg}
                       style={{
-                        marginLeft: 10,
-                        maxWidth: '85%',
-                        fontWeight: '400',
+                        textAlign: 'center',
+                        alignSelf: 'center',
+                      }}>
+                      {item.title}
+                    </Heading>
+
+                    <Paragraph
+                      SIZE={SIZE.sm}
+                      color={colors.icon}
+                      textBreakStrategy="balanced"
+                      style={{
+                        fontWeight: 'normal',
+                        textAlign: 'center',
+                        alignSelf: 'center',
                       }}>
                       {item.description}
                     </Paragraph>
-                  </Heading>
+                  </View>
                 </View>
-              </View>
-            ))}
+              )}
+            />
           </ScrollView>
 
           <Seperator />
@@ -193,10 +207,9 @@ class PremiumDialog extends React.Component {
             style={{
               padding: 5,
               borderRadius: 10,
-              backgroundColor: colors.shade,
               paddingHorizontal: 12,
             }}>
-            <Heading size={SIZE.xl} color={colors.accent}>
+            {/*  <Heading size={SIZE.xl} color={colors.accent}>
               {!this.state.user ? 'Try it Now' : 'Upgrade Now'}
               {'\n'}
               <Paragraph
@@ -212,8 +225,8 @@ class PremiumDialog extends React.Component {
                   : 'Start your 14 Day Trial Today (no credit card required.)'}
               </Paragraph>
             </Heading>
-
-            <View
+ */}
+            {/*   <View
               style={{
                 flexDirection: 'row',
                 paddingVertical: 5,
@@ -236,20 +249,21 @@ class PremiumDialog extends React.Component {
                     paddingVertical: 10,
                     marginRight: 10,
                   }}>
+
                   <Paragraph size={SIZE.lg}>
-                  {!item.localizedPrice && item.currency + " "}{item.localizedPrice || item.price} 
+                    {!item.localizedPrice && item.currency + ' '}
+                    {item.localizedPrice || item.price}
                     <Paragraph color={colors.accent} size={SIZE.sm}>
                       /mo
                     </Paragraph>
                   </Paragraph>
                 </TouchableOpacity>
               ))}
-            </View>
+            </View> */}
 
             <Seperator half />
             <Button
               onPress={async () => {
-                
                 if (!this.state.user) {
                   this.close();
                   setTimeout(() => {
@@ -263,20 +277,31 @@ class PremiumDialog extends React.Component {
                     null,
                     null,
                     this.state.user.id,
-                  ).then((r) => {
-                    this.close();
-                  })
+                  )
+                    .then((r) => {
+                      this.close();
+                    })
                     .catch((e) => {
                       console.log(e);
                     });
-                 
                 }
               }}
-              title={this.state.user ? 'Subscribe' : 'Sign Up'}
+              fontSize={SIZE.md}
+              title={
+                this.state.user ? 'Subscribe' : 'Start Your Free 14 Day Trial'
+              }
               type="accent"
               height={50}
               width="100%"
             />
+
+            <Paragraph
+              style={{
+                alignSelf: 'center',
+                marginTop: 5,
+              }}>
+              (No credit card required.)
+            </Paragraph>
           </View>
           <Toast context="local" />
         </View>
