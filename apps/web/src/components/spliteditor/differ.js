@@ -229,7 +229,7 @@
             }
             current_word = char;
             mode = "whitespace";
-          } else if (/[\w\d\#@]/.test(char)) {
+          } else if (/[\w\d#@]/.test(char)) {
             current_word += char;
           } else if (/&/.test(char)) {
             if (current_word) {
@@ -864,6 +864,9 @@
         case "replace":
           before_render += next_block[0];
           after_render += next_block[1];
+          break;
+        default:
+          continue;
       }
     }
     return return_dual_pane(before_render, after_render);

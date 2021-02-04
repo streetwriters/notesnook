@@ -109,7 +109,6 @@ function TinyMCE(props) {
     initialValue,
     onFocus,
     editorRef,
-    isNew,
   } = props;
   const [oldSkin, newSkin] = useSkin();
   const tinymceRef = editorRef;
@@ -176,14 +175,14 @@ function TinyMCE(props) {
         },
       }}
       onBeforeExecCommand={async (command) => {
-        // if (
-        //   premiumCommands.some((cmd) => command.command === cmd) &&
-        //   !isUserPremium()
-        // ) {
-        //   command.preventDefault();
-        //   await showBuyDialog();
-        //   return;
-        // }
+        if (
+          premiumCommands.some((cmd) => command.command === cmd) &&
+          !isUserPremium()
+        ) {
+          command.preventDefault();
+          await showBuyDialog();
+          return;
+        }
       }}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === "s") {
