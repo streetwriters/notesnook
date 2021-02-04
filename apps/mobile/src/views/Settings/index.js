@@ -44,6 +44,7 @@ import {
   dWidth,
   MenuItemsList,
   setSetting,
+  SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
 import {
@@ -160,11 +161,36 @@ export const Settings = ({navigation}) => {
           : 'You are using the latest version',
     },
     {
+      name: 'Join our Discord Community',
+
+      func: async () => {
+        eSendEvent(eOpenProgressDialog,{
+          title:'Join our Discord Community',
+          paragraph:'We are not ghosts, chat with us and share your experience.',
+          valueArray: [
+            'Talk with us anytime.',
+            'Follow the development process',
+            'Give suggestions and report issues.',
+            'Get early access to new features',
+            'Meet other people using Notesnook'
+          ],
+          noProgress:true,
+          icon:'discord',
+          action:async () => {
+            await Linking.openURL('https://discord.gg/zQBK97EE22');
+          },
+          actionText:"Join Now"
+
+        })
+      },
+      desc: 'We are not ghosts, chat with us and share your experience.',
+    },
+    {
       name: 'About',
       func: async () => {
         await Linking.openURL('https://www.notesnook.com');
       },
-      desc: version && format(APP_VERSION),
+      desc: format(APP_VERSION),
     },
   ];
 
@@ -429,6 +455,14 @@ const SettingsUserSection = () => {
   const [state] = useTracked();
   const {colors, user, messageBoardState} = state;
 
+  /*  const user = {
+    email: 'ammarahmed6506@gmail.com',
+    subscription: {
+      provider: 1,
+      expiry: Date.now() + 86400000 * 2,
+      type: 5,
+    },
+  }; */
   const getTimeLeft = (t2) => {
     let d1 = new Date(Date.now());
     let d2 = new Date(t2);
@@ -628,6 +662,39 @@ const SettingsUserSection = () => {
                     </>
                   )}
               </View>
+
+              {user?.subscription?.provider && (
+                <Button
+                  title={
+                    SUBSCRIPTION_PROVIDER[user?.subscription?.provider].title
+                  }
+                  onPress={() => {
+                    eSendEvent(eOpenProgressDialog, {
+                      title:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .title,
+                      paragraph:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .desc,
+                      noProgress: true,
+                      icon:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .icon,
+                    });
+                  }}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginTop: 10,
+                    borderRadius: 3,
+                  }}
+                  fontSize={11}
+                  textStyle={{
+                    fontWeight: 'normal',
+                  }}
+                  height={20}
+                  type="accent"
+                />
+              )}
             </View>
           </View>
           {[
