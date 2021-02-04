@@ -17,7 +17,8 @@ import {
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import {post} from '../../views/Editor/Functions';
+import {EditorWebView, post} from '../../views/Editor/Functions';
+import tiny from '../../views/Editor/tiny/tiny';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -99,7 +100,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     open(null);
     eSendEvent(eCloseActionSheet);
     if (editing.isFocused) {
-      post('blur');
+      tiny.call(EditorWebView,tiny.blur)
     }
     await sleep(300);
     eSendEvent(eOpenPremiumDialog);

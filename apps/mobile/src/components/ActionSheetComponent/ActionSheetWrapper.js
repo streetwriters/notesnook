@@ -6,8 +6,15 @@ import {hexToRGBA} from '../../utils/ColorUtils';
 import ActionSheet from 'react-native-actions-sheet';
 import {GetPremium} from './GetPremium';
 import {editing} from '../../utils';
-import {EditorWebView, post, textInput} from '../../views/Editor/Functions';
+import {
+  editorTitleInput,
+  EditorWebView,
+  post,
+  textInput,
+} from '../../views/Editor/Functions';
 import {sleep} from '../../utils/TimeUtils';
+import tiny from '../../views/Editor/tiny/tiny';
+import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
 
 const ActionSheetWrapper = ({
   children,
@@ -65,27 +72,15 @@ const ActionSheetWrapper = ({
       }
       onClose={async () => {
         if (editing.isFocused === true) {
+          textInput.current?.focus();
+          await sleep(10);
           if (editing.focusType == 'editor') {
-            await sleep(10);
-            if (Platform.OS === 'android') {
-              textInput.current?.focus();
-              post('focusEditor');
-              EditorWebView.current?.requestFocus();
-            } else {
-              post('focusEditor');
-            }
+            focusEditor();
           } else {
-            await sleep(10);
-            if (Platform.OS === 'android') {
-              textInput.current?.focus();
-              post('focusTitle');
-              EditorWebView.current?.requestFocus();
-            } else {
-              post('focusTitle');
-            }
+            Platform.OS === 'android' && EditorWebView.current.requestFocus();
+            tiny.call(EditorWebView, tiny.focusTitle);
           }
         }
-
         if (onClose) {
           onClose();
         }
