@@ -66,7 +66,7 @@ const EditorRoot = () => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
       Keyboard.addListener('keyboardDidShow', () => {
-        console.log(editing.currentlyEditing,'current')
+     
         if (!editing.movedAway) {
           editing.isFocused = true;
         }

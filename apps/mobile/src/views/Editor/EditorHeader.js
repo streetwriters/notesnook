@@ -31,6 +31,7 @@ import {
   setIntent
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
+import tiny from './tiny/tiny';
 
 let handleBack;
 let tapCount = 0;
@@ -44,9 +45,7 @@ const EditorHeader = () => {
     setColors(colors);
   }, [colors.bg]);
 
-  useEffect(() => {
-    post('tablet', DDS.isLargeTablet());
-  }, [deviceMode]);
+  
 
   useEffect(() => {
 
@@ -179,7 +178,7 @@ const EditorHeader = () => {
             onPress={async () => {
               let note = getNote() && db.notes.note(getNote().id).data;
               if (editing.isFocused) {
-                post('blur');
+                tiny.call(EditorWebView,tiny.blur)
                 await sleep(500);
                 editing.isFocused = true;
               } 

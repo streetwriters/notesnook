@@ -1,60 +1,58 @@
 import React, {useEffect, useState} from 'react';
 import {ActionIcon} from '../../components/ActionIcon';
 import {useTracked} from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import {post,} from './Functions';
-
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {EditorWebView, post} from './Functions';
+import tiny from './tiny/tiny';
 
 const HistoryComponent = () => {
-    const [state] = useTracked();
-    const {colors} = state;
-    const [historyState,setHistoryState] = useState({
-        undo:0,
-        redo:0
-    });
+  const [state] = useTracked();
+  const {colors} = state;
+  const [historyState, setHistoryState] = useState({
+    undo: false,
+    redo: false,
+  });
 
-    const onHistoryChange = (data) => {
-        setHistoryState(data);
-    }
+  const onHistoryChange = (data) => {
+    setHistoryState(data);
+  };
 
-    useEffect(() => {
-        eSubscribeEvent('historyEvent',onHistoryChange);
+  useEffect(() => {
+    eSubscribeEvent('historyEvent', onHistoryChange);
 
-        return () => {
-            eUnSubscribeEvent('historyEvent',onHistoryChange);
-        }
-    },[])
+    return () => {
+      eUnSubscribeEvent('historyEvent', onHistoryChange);
+    };
+  }, []);
 
-    return (
-        <>
-
-            <ActionIcon
-                name="undo"
-                disabled={historyState.undo === 0}
-                color={colors.heading}
-                customStyle={{
-                    marginLeft: 10,
-                }}
-                onPress={() => {
-                    if (historyState.undo === 0) return;
-                    post('undo');
-                }}
-            />
-            <ActionIcon
-                name="redo"
-                disabled={historyState.redo=== 0}
-                color={colors.heading}
-                customStyle={{
-                    marginLeft: 10,
-                }}
-                onPress={() => {
-                    if (historyState.redo === 0) return;
-                    post('redo');
-                }}
-            />
-
-        </>
-    );
+  return (
+    <>
+      <ActionIcon
+        name="undo"
+        disabled={!historyState.undo}
+        color={colors.heading}
+        customStyle={{
+          marginLeft: 10,
+        }}
+        onPress={() => {
+          if (!historyState.undo) return;
+          tiny.call(EditorWebView, tiny.undo);
+        }}
+      />
+      <ActionIcon
+        name="redo"
+        disabled={!historyState.redo}
+        color={colors.heading}
+        customStyle={{
+          marginLeft: 10,
+        }}
+        onPress={() => {
+          if (!historyState.redo) return;
+          tiny.call(EditorWebView, tiny.redo);
+        }}
+      />
+    </>
+  );
 };
 
 export default HistoryComponent;

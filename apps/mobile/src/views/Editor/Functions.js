@@ -17,8 +17,10 @@ import {MMKV} from '../../utils/mmkv';
 import {sideMenuRef, tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
+import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
+export const editorTitleInput = createRef();
 
 export const params = 'platform=' + Platform.OS;
 export const sourceUri =
@@ -33,13 +35,13 @@ export const injectedJS = ` setTimeout(() => {
 },100);   
       `;
 
-let webviewOK = true;      
+let webviewOK = true;
 let noteEdited = false;
 let note = null;
 let id = null;
 let content = {
   data: [],
-  type: 'delta',
+  type: 'tiny',
 };
 let title = '';
 let saveCounter = 0;
@@ -53,7 +55,7 @@ export function setWebviewInit(init) {
 }
 
 export function getWebviewInit(init) {
-  return webviewInit
+  return webviewInit;
 }
 
 export function setIntent() {
@@ -73,7 +75,7 @@ export function setColors(colors) {
   if (note && note.color && !DDS.isLargeTablet()) {
     theme.shade = hexToRGBA(COLORS_NOTE[note.color], 0.15);
   }
-  post('theme', theme);
+  tiny.call(EditorWebView, tiny.updateTheme(JSON.stringify(theme)));
 }
 
 export function isNotedEdited() {
@@ -91,15 +93,8 @@ export function clearTimer() {
   }
 }
 
-export const INJECTED_JAVASCRIPT = (premium) =>
-  `(function() {
-      setTimeout(() => {
-       loadAction(${premium});
-      },100)
-   })();`;
-
 export const CHECK_STATUS = (premium) =>
-   `(function() {
+  `(function() {
        setTimeout(() => {
         let msg = JSON.stringify({
           data: true,
@@ -108,7 +103,7 @@ export const CHECK_STATUS = (premium) =>
         window.ReactNativeWebView.postMessage(msg)
 
        },100)
-})();`;   
+})();`;
 
 export function getNote() {
   return note;
@@ -160,31 +155,31 @@ function clearNote() {
   id = null;
   content = {
     data: [],
-    type: 'delta',
+    type: 'tiny',
   };
 }
 
 let currentEditingTimer = null;
 
-
 let webviewTimer = null;
 
 export const loadNote = async (item) => {
   editing.currentlyEditing = true;
-  post('blur');
+  tiny.call(EditorWebView, tiny.blur);
 
   if (item && item.type === 'new') {
     await clearEditor();
     clearNote();
     noteEdited = false;
     id = null;
-    await sleep(10);
+    await sleep(20);
     if (Platform.OS === 'android') {
       textInput.current?.focus();
-      post('focusTitle');
+      console.log('focus');
+      tiny.call(EditorWebView, tiny.focusEditor);
       EditorWebView.current?.requestFocus();
     } else {
-      post('focusTitle');
+      editorTitleInput.current?.focus();
     }
     if (!webviewInit) {
       EditorWebView.current?.reload();
@@ -207,28 +202,26 @@ export const loadNote = async (item) => {
 };
 
 const checkStatus = () => {
-  webviewOK = false
+  webviewOK = false;
   EditorWebView.current?.injectJavaScript(CHECK_STATUS());
-  clearTimeout(webviewTimer)
-  console.log('webview ok',webviewOK);
+  clearTimeout(webviewTimer);
   webviewTimer = setTimeout(() => {
     if (!webviewOK) {
       webviewInit = false;
       EditorWebView = createRef();
-      console.log("webview failed to load")
-      eSendEvent("webviewreset")
+      eSendEvent('webviewreset');
     } else {
-      console.log("webview is running",webviewOK)
+      console.log('webview is running', webviewOK);
     }
-  },3000)
-}
+  }, 5000);
+};
 
 export function setIntentNote(item) {
   id = null;
   intent = true;
   content = {
     data: item.data,
-    type: 'delta',
+    type: 'tiny',
   };
 }
 
@@ -243,14 +236,15 @@ export const _onMessage = async (evt) => {
   }
   switch (message.type) {
     case 'history':
-      eSendEvent('historyEvent', message);
+      eSendEvent('historyEvent', message.value);
       break;
-    case 'delta':
+    case 'change':
       content = message;
       onNoteChange();
       break;
     case 'title':
       noteEdited = true;
+      console.log('title', message.value);
       title = message.value;
       eSendEvent('editorScroll', {
         title: message.value,
@@ -278,10 +272,14 @@ export const _onMessage = async (evt) => {
       loadNoteInEditor();
       break;
     case 'running':
-      webviewOK = false;
-    break;  
+      webviewOK = true;
+      break;
     case 'focus':
+      console.log(message.value, 'value');
       editing.focusType = message.value;
+      break;
+    case 'selectionchange':
+      eSendEvent('onSelectionChange', message.value);
       break;
     default:
       break;
@@ -302,7 +300,7 @@ function onNoteChange() {
 
 export async function clearEditor() {
   clearTimer();
-  post('reset');
+  tiny.call(EditorWebView, tiny.reset);
   if (noteEdited && id) {
     await saveNote(false);
   }
@@ -316,11 +314,11 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
-  post('dateEdited', '');
-  post('saving', '');
+  tiny.call(EditorWebView, tiny.updateDateEdited(''));
+  tiny.call(EditorWebView, tiny.updateSavingState(''));
+
   clearNote();
 }
-
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
   if (oldId !== currentId) {
@@ -420,21 +418,19 @@ export async function saveNote() {
       id: id,
     });
     let n = db.notes.note(id)?.data?.dateEdited;
-    post('dateEdited', timeConverter(n));
-    post('saving', 'Saved');
+    tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
+    tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } catch (e) {
     console.log(e);
   }
 }
 
 export async function onWebViewLoad(premium, colors) {
-
-  EditorWebView.current?.injectJavaScript(INJECTED_JAVASCRIPT(premium));
   if (!checkNote()) {
-    post('blur');
+    tiny.call(EditorWebView, tiny.reset);
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
-  post('blur');
+  tiny.call(EditorWebView, tiny.reset);
   setColors(colors);
   await restoreEditorState();
 }
@@ -459,13 +455,12 @@ const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
-    post('title', title);
+    tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
+    tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
-    post('delta', content.data);
-    await sleep(10);
-    post('dateEdited', timeConverter(note.dateEdited));
+    tiny.call(EditorWebView, tiny.updateDateEdited(note.dateEdited));
+    tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   }
-  await sleep(10);
-  post('clearHistory');
+  tiny.call(EditorWebView, tiny.clearHistory);
 };

@@ -70,7 +70,6 @@ export const EditorTitle = () => {
         placeholder="Title Here"
         onChangeText={(text) => {
           setTitle(text);
-          post('title', text);
           _onMessage({
             nativeEvent: {
               data: JSON.stringify({
