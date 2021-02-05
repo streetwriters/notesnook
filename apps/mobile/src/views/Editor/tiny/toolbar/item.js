@@ -71,28 +71,29 @@ const ToolbarItem = ({
       return;
     }
     if (formats.indexOf(format) > -1 && format !== 'removeformat') {
+
       if (format === 'forecolor' || format === 'hilitecolor') {
         if (!data[format]) {
           setSelected(false);
           return;
         }
-
-        if (format === 'link') {
-          properties.selection = data;
-          properties.pauseSelectionChange = true;
-          eSendEvent('showTooltip', {
-            data: null,
-            value: data['link'],
-            type: 'link',
-          });
-          return;
-        }
-
         if (data[format]?.startsWith('#')) {
           setColor(data[format]);
         } else {
           setColor(rgbToHex(data[format]));
         }
+      }
+
+      if (format === "link") {
+        console.log(format,data[format]);
+        properties.selection = data;
+        properties.pauseSelectionChange = true;
+        eSendEvent('showTooltip', {
+          data: null,
+          value: data['link'],
+          type: 'link',
+        });
+        return;
       }
 
       if (
