@@ -63,6 +63,7 @@ document.getElementById(titleInput).value = '${value}';
 `;
 
 const cacheRange = `current_selection_range = editor.selection.getRng();`;
+const restoreRange = `editor.selection.setRng(current_selection_range);`;
 const clearRange = `current_selection_range = null`;
 
 const toggleFormat = (format) => {
@@ -150,4 +151,5 @@ export default {
   updateSavingState,
   updateTheme,
   setTitle,
+  restoreRange
 };
