@@ -262,6 +262,19 @@ export const TOOLBAR_CONFIG = [
   ],
   [
     {
+      format: 'outdent',
+      type: 'format',
+      fullname: 'Outdent',
+      premium: true,
+    },
+    {
+      format: 'indent',
+      type: 'format',
+      premium: true,
+      fullname: 'Indent',
+    },
+
+    {
       format: 'superscript',
       type: 'format',
       premium: true,
@@ -282,14 +295,14 @@ export const TOOLBAR_CONFIG = [
   ],
   [
     {
-      format: 'rtl',
-      type: 'format',
-      fullname: 'Text Direction RTL',
-    },
-    {
       format: 'ltr',
       type: 'format',
       fullname: 'Text Direction LTR',
+    },
+    {
+      format: 'rtl',
+      type: 'format',
+      fullname: 'Text Direction RTL',
     },
   ],
   [
