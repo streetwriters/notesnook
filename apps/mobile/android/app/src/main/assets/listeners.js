@@ -52,6 +52,7 @@ function attachTitleInputListeners() {
 }
 
 function onTitleChange(ele) {
+ if (isLoading) return;
   let titleMessage = {
     type: 'title',
     value: titleInput.value,
@@ -79,7 +80,6 @@ function autosize() {
         min-height:calc(100vh - ${newHeight}px) !important;
         };
    `;
-  console.log('updating height');
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);
 }
