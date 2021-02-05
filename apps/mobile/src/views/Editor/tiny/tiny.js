@@ -1,12 +1,13 @@
 const reset = `
-(() => {
+isLoading = true;
+document.getElementById("titleInput").value = '';
+autosize();
+tinyMCE.activeEditor.setContent('');
 editor.undoManager.clear();
-editor.('', 'custom');
 document.activeElement.blur();
 window.blur();
-editor.resetContent();
-})();
 `;
+
 export const keyboardStateChanged = `(() => {
 	var range = editor.getSelection();
 	if (range) {
@@ -51,7 +52,8 @@ export const clearEditor = `
 		editor.setContent("");
 `;
 const clearTitle = `
-		document.getElementById(titleInput).value = '';
+    document.getElementById(titleInput).value = '';
+    autosize();
 `;
 
 const focusTitle = `
@@ -59,7 +61,8 @@ document.getElementById("titleInput").focus();
 `;
 
 const setTitle = (value) => `
-document.getElementById(titleInput).value = '${value}';
+document.getElementById("titleInput").value = '${value}';
+autosize();
 `;
 
 const cacheRange = `current_selection_range = editor.selection.getRng();`;
@@ -103,7 +106,7 @@ const updateTheme = (value) => `
 
 `;
 
-const isLoading =`
+const isLoading = `
 isLoading = true;
 `;
 
@@ -157,5 +160,5 @@ export default {
   updateTheme,
   setTitle,
   restoreRange,
-  isLoading
+  isLoading,
 };

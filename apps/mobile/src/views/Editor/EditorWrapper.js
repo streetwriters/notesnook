@@ -1,15 +1,16 @@
-import React, { useEffect } from 'react';
-import { KeyboardAvoidingView, Platform, SafeAreaView, View } from 'react-native';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, { Easing } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { GetPremium } from '../../components/ActionSheetComponent/GetPremium';
+import React, {useEffect} from 'react';
+import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
+import {PanGestureHandler, State} from 'react-native-gesture-handler';
+import Animated, {Easing} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
-import { eOnLoadNote } from '../../utils/Events';
-import { editorRef } from '../../utils/Refs';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import {eOnLoadNote} from '../../utils/Events';
+import {editorRef} from '../../utils/Refs';
+import EditorOverlay from './EditorOverlay';
 import Editor from './index';
 let prevVal = 0;
 let finalValue = 80;
@@ -95,15 +96,15 @@ export const EditorWrapper = ({dimensions}) => {
         width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
         height: '100%',
         backgroundColor: colors.bg,
-        borderLeftWidth:1,
-        borderLeftColor:DDS.isLargeTablet() ? colors.nav : 'transparent'
+        borderLeftWidth: 1,
+        borderLeftColor: DDS.isLargeTablet() ? colors.nav : 'transparent',
       }}>
       <SafeAreaView
         style={{
           width: '100%',
           height: '100%',
         }}>
-        <GetPremium context="editor" offset={50 + insets.top}  />
+        <GetPremium context="editor" offset={50 + insets.top} />
         <View
           style={{
             position: 'absolute',
@@ -140,7 +141,7 @@ export const EditorWrapper = ({dimensions}) => {
                 zIndex: 10,
                 transform: [
                   {
-                    translateY:Platform.OS === "ios" ? -80 : -80 + insets.top,
+                    translateY: Platform.OS === 'ios' ? -80 : -80 + insets.top,
                   },
                 ],
               }}>
@@ -173,6 +174,8 @@ export const EditorWrapper = ({dimensions}) => {
             </View>
 
             <Editor />
+
+            <EditorOverlay />
           </AnimatedKeyboardView>
         </PanGestureHandler>
       </SafeAreaView>

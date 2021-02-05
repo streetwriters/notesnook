@@ -60,7 +60,6 @@ export const EditorTitle = () => {
       <TextInput
         defaultValue={title}
         style={{
-          //fontFamily: "sans-serif",
           fontWeight:'bold',
           fontSize: SIZE.xl,
           color: colors.heading,

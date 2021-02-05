@@ -16,6 +16,7 @@ import {getCurrentColors} from '../../utils/Colors';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
+import EditorOverlay from './EditorOverlay';
 import {
   editorTitleInput,
   EditorWebView,

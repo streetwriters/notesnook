@@ -1,23 +1,23 @@
-import React, { useEffect } from 'react';
-import { Keyboard, Platform, View } from 'react-native';
+import React, {useEffect} from 'react';
+import {Keyboard, Platform, View} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { db } from '../../utils/DB';
+import {editing} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
 } from '../../utils/Events';
-import { sideMenuRef, tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorTitle } from './EditorTitle';
+import {sideMenuRef, tabBarRef} from '../../utils/Refs';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
@@ -28,7 +28,7 @@ import {
   post,
   saveNote,
   setColors,
-  setIntent
+  setIntent,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
@@ -38,19 +38,12 @@ let tapCount = 0;
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, fullscreen, deviceMode,premiumUser} = state;
+  const {colors, fullscreen} = state;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
     setColors(colors);
   }, [colors.bg]);
-
-  
-
-  useEffect(() => {
-
-    EditorWebView.current?.reload();
-  }, [premiumUser]);
 
   const _onBackPress = async () => {
     if (sideMenuRef.current === null) {
@@ -141,56 +134,57 @@ const EditorHeader = () => {
           style={{
             flexDirection: 'row',
           }}>
-          <ActionIcon
-            name="plus"
-            color={colors.accent}
-            customStyle={{
-              marginLeft: 10,
-              borderRadius: 5,
-            }}
-            onPress={async () => {
-              await loadNote({type: 'new'});
-            }}
-          />
-
-          {DDS.isLargeTablet() && !fullscreen ? (
+          <>
             <ActionIcon
-              name="fullscreen"
+              name="plus"
+              color={colors.accent}
+              customStyle={{
+                marginLeft: 10,
+                borderRadius: 5,
+              }}
+              onPress={async () => {
+                await loadNote({type: 'new'});
+              }}
+            />
+
+            {DDS.isLargeTablet() && !fullscreen ? (
+              <ActionIcon
+                name="fullscreen"
+                color={colors.heading}
+                customStyle={{
+                  marginLeft: 10,
+                }}
+                onPress={() => {
+                  eSendEvent(eOpenFullscreenEditor);
+                  editing.isFullscreen = true;
+                }}
+              />
+            ) : null}
+            <HistoryComponent />
+
+            <ActionIcon
+              name="dots-horizontal"
               color={colors.heading}
               customStyle={{
                 marginLeft: 10,
               }}
-              onPress={() => {
-                eSendEvent(eOpenFullscreenEditor);
-                editing.isFullscreen = true;
+              onPress={async () => {
+                let note = getNote() && db.notes.note(getNote().id).data;
+                if (editing.isFocused) {
+                  tiny.call(EditorWebView, tiny.blur);
+                  await sleep(500);
+                  editing.isFocused = true;
+                }
+                ActionSheetEvent(
+                  note,
+                  true,
+                  true,
+                  ['Add to', 'Share', 'Export', 'Delete'],
+                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+                );
               }}
             />
-          ) : null}
-
-          <HistoryComponent />
-
-          <ActionIcon
-            name="dots-horizontal"
-            color={colors.heading}
-            customStyle={{
-              marginLeft: 10,
-            }}
-            onPress={async () => {
-              let note = getNote() && db.notes.note(getNote().id).data;
-              if (editing.isFocused) {
-                tiny.call(EditorWebView,tiny.blur)
-                await sleep(500);
-                editing.isFocused = true;
-              } 
-              ActionSheetEvent(
-                note,
-                true,
-                true,
-                ['Add to', 'Share', 'Export', 'Delete'],
-                ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-              );
-            }}
-          />
+          </>
         </View>
       </View>
     </>

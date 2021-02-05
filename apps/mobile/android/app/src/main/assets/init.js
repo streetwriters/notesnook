@@ -65,6 +65,11 @@ function init_tiny(size) {
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
+      editor.on("SetContent", event => {
+        if (!event.paste) {
+          reactNativeEventHandler('noteLoaded', true);
+        }
+      })
       editor.on('Change', function (e) {
         clearTimeout(changeTimer);
         if (isLoading) {

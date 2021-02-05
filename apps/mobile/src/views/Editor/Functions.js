@@ -185,6 +185,7 @@ export const loadNote = async (item) => {
       EditorWebView.current?.reload();
     }
   } else {
+    eSendEvent('loadingNote', true);
     editing.isFocused = false;
     clearTimer();
     await setNote(item);
@@ -239,10 +240,10 @@ export const _onMessage = async (evt) => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
-      console.log('change',message);
+      console.log('change', message);
       content = {
-        type:message.type,
-        data:message.value
+        type: message.type,
+        data: message.value,
       };
       onNoteChange();
       break;
@@ -257,6 +258,9 @@ export const _onMessage = async (evt) => {
       break;
     case 'scroll':
       eSendEvent('editorScroll', message);
+      break;
+    case 'noteLoaded':
+      eSendEvent('loadingNote', !message.value);
       break;
     case 'premium':
       let user = await db.user.getUser();
@@ -303,9 +307,8 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
-  tiny.call(EditorWebView,tiny.isLoading);
-  clearTimer();
   tiny.call(EditorWebView, tiny.reset);
+  clearTimer();
   if (noteEdited && id) {
     await saveNote(false);
   }
@@ -391,7 +394,7 @@ export async function saveNote() {
       return;
     }
     let locked = id ? db.notes.note(id).data.locked : null;
-    console.log(content,"SAVE Content");
+    console.log(content, 'SAVE Content');
 
     let noteData = {
       title,
@@ -466,7 +469,7 @@ const loadNoteInEditor = async () => {
     intent = false;
     tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
-    tiny.call(EditorWebView, tiny.updateDateEdited(note.dateEdited));
+    tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   }
   tiny.call(EditorWebView, tiny.clearHistory);
