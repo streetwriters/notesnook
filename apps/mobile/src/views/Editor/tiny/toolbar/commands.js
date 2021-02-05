@@ -13,9 +13,9 @@ export const execCommands = {
   underline: `tinymce.activeEditor.execCommand('Underline');`,
   superscript: `tinymce.activeEditor.execCommand('Superscript');`,
   subscript: `tinymce.activeEditor.execCommand('Subscript');`,
-  hilitecolor: (color) =>
-    `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
   forecolor: (color) =>
+    `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
+  hilitecolor: (color) =>
     `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
 
   fontname: (fontname) =>
