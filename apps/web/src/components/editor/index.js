@@ -118,7 +118,7 @@ function Editor(props) {
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "900px"}
-          width={isFocusMode ? "900px" : "100%"}
+          width={isFocusMode ? "50%" : "100%"}
           mt={[0, 0, 25]}
         >
           <Header />
