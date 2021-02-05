@@ -174,16 +174,18 @@ function TinyMCE(props) {
           );
         },
       }}
-      onBeforeExecCommand={async (command) => {
-        if (
-          premiumCommands.some((cmd) => command.command === cmd) &&
-          !isUserPremium()
-        ) {
-          command.preventDefault();
-          await showBuyDialog();
-          return;
-        }
-      }}
+      // onBeforeExecCommand={async (command) => {
+      //   if (
+      //     premiumCommands.some(
+      //       (cmd) => command.command === cmd && !command.value.paste
+      //     ) &&
+      //     !isUserPremium()
+      //   ) {
+      //     command.preventDefault();
+      //     await showBuyDialog();
+      //     return;
+      //   }
+      // }}
       onKeyDown={(e) => {
         if (e.ctrlKey && e.key === "s") {
           e.preventDefault();
