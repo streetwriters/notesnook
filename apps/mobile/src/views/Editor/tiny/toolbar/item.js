@@ -37,7 +37,7 @@ const ToolbarItem = ({
   groupType,
   text,
   formatValue,
-  fullname
+  fullname,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -76,6 +76,18 @@ const ToolbarItem = ({
           setSelected(false);
           return;
         }
+
+        if (format === 'link') {
+          properties.selection = data;
+          properties.pauseSelectionChange = true;
+          eSendEvent('showTooltip', {
+            data: null,
+            value: data['link'],
+            type: 'link',
+          });
+          return;
+        }
+
         if (data[format]?.startsWith('#')) {
           setColor(data[format]);
         } else {
@@ -207,7 +219,7 @@ const ToolbarItem = ({
       return;
     }
 
-    if (format === "image") {
+    if (format === 'image') {
       execCommands.image();
       return;
     }

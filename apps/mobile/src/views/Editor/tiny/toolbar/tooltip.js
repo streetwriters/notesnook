@@ -33,41 +33,7 @@ const Tooltip = () => {
       eUnSubscribeEvent('showTooltip', show);
     };
   }, []);
-
-  useEffect(() => {
-    eSubscribeEvent('onSelectionChange', onSelectionChange);
-    return () => {
-      eUnSubscribeEvent('onSelectionChange', onSelectionChange);
-    };
-  }, []);
-
-  const onSelectionChange = (data) => {
-    if (properties.pauseSelectionChange) return;
-    if (data['link']) {
-      properties.selection = data;
-      properties.pauseSelectionChange = true;
-      show({
-        data: null,
-        value: data['link'],
-        type: 'link',
-      });
-    } else if (data['video']) {
-      properties.selection = data;
-      properties.pauseSelectionChange = true;
-      show({
-        data: null,
-        value: data['video'],
-        type: 'video',
-        format: 'format',
-      });
-    } else {
-      if (editing.tooltip !== 'background' && editing.tooltip !== 'color') {
-        setVisible(false);
-        eSendEvent('showTooltip');
-        editing.tooltip = null;
-      }
-    }
-  };
+  
 
   const show = (data) => {
     properties.userBlur = true;
@@ -81,9 +47,7 @@ const Tooltip = () => {
   };
 
   let ParentElement = (props) =>
-    group.type === 'link' ||
-    group.type === 'video' ||
-    group.type === 'table' ? (
+    group.type === 'link' || group.type === 'table' ? (
       <View
         style={{
           borderRadius: floating ? 5 : 0,
@@ -137,7 +101,7 @@ const Tooltip = () => {
   return (
     visible && (
       <ParentElement>
-        {!group.data && (group.type === 'link' || group.type === 'video') && (
+        {!group.data && /^(link|video|)$/.test(group.type) && (
           <ToolbarLinkInput
             format={group.type}
             setVisible={setVisible}
@@ -204,13 +168,12 @@ const Tooltip = () => {
           </View>
         )}
 
-        {group.type === 'hilitecolor' || group.type === 'forecolor' ? (
+        {/^(hilitecolor|forecolor|)$/.test(group.type) ? (
           <ColorGroup group={group} />
         ) : null}
 
         {group.data &&
-          group.type !== 'hilitecolor' &&
-          group.type !== 'forecolor' &&
+          /^(hilitecolor|forecolor|)$/.test(group.type) === false &&
           group.data.map((item) =>
             group.type === 'link' || group.type === 'video' ? (
               <ToolbarLinkInput
