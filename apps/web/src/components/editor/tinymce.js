@@ -175,6 +175,14 @@ function TinyMCE(props) {
             "data:" + blobInfo.blob().type + ";base64," + blobInfo.base64()
           );
         },
+        setup: (editor) => {
+          editor.on("ScrollIntoView", (e) => {
+            if (editor.pauseScrollIntoView) {
+              e.preventDefault();
+              editor.pauseScrollIntoView = false;
+            }
+          });
+        },
       }}
       // onBeforeExecCommand={async (command) => {
       //   if (
