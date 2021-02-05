@@ -6,8 +6,10 @@ import Input from '../../../../components/Input';
 import {useTracked} from '../../../../provider';
 import {editing} from '../../../../utils';
 import {execCommands} from './commands';
-import {formatSelection, INPUT_MODE, properties} from './constants';
+import {focusEditor, formatSelection, INPUT_MODE, properties} from './constants';
 import LinkPreview from './linkpreview';
+import tiny from '../tiny';
+import { EditorWebView } from '../../Functions';
 
 let inputValue = null;
 
@@ -23,7 +25,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   useEffect(() => {
     if (!value) {
       inputRef.current?.focus();
-      formatSelection(`editor.selection.setRng(current_selection_range);`);
+      tiny.call(EditorWebView, tiny.restoreRange);
     }
     properties.inputMode = value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING;
     editing.tooltip = format;
@@ -54,9 +56,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     } else {
       formatSelection(execCommands[format](inputValue));
     }
-    formatSelection(
-      `editor.selection.setRng(current_selection_range); current_selection_range = null`,
-    );
+    tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
+
     setVisible(false);
     editing.tooltip = null;
     focusEditor(format);
@@ -68,6 +69,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   };
 
   const onBlur = async () => {
+    tiny.call(EditorWebView, tiny.clearRange);
     formatSelection(`current_selection_range = null`);
     if (properties.userBlur) return;
     focusEditor('custom');
@@ -98,9 +100,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             defaultValue={value}
             blurOnSubmit={false}
             loading={mode === INPUT_MODE.NO_EDIT}
-            placeholder={
-              format === 'video' ? 'Enter url to video' : 'Enter link'
-            }
+            placeholder="Enter link"
           />
 
           {mode === INPUT_MODE.EDITING && (
