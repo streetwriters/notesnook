@@ -49,9 +49,9 @@ const ColorItem = ({value, format}) => {
   
 	const onPress = () => {
 	  if (selected) {
-		formatSelection(type, null);
+		formatSelection(format, null);
 	  } else {
-		formatSelection(execCommands[type](value));
+		formatSelection(execCommands[format](value));
 	  }
 	};
   
