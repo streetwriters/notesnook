@@ -40,6 +40,7 @@ const markdownPatterns = [
   { start: "######", format: "h6" },
   { start: "* ", cmd: "InsertUnorderedList" },
   { start: "- ", cmd: "InsertUnorderedList" },
+  { start: "> ", format: "blockquote" },
   {
     start: "1. ",
     cmd: "InsertOrderedList",
@@ -137,6 +138,7 @@ function TinyMCE(props) {
         menubar: false,
         statusbar: false,
         link_quicklink: true,
+        width: "100%",
         plugins:
           "paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
         toolbar_mode: "sliding",
@@ -157,7 +159,7 @@ function TinyMCE(props) {
 `,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
         mobile: {
           toolbar_mode: "scrolling",
         },

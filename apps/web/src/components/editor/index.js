@@ -16,7 +16,7 @@ import Banner from "../banner";
 import EditorLoading from "./loading";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
-
+var isToolbarSticky = false;
 function Editor(props) {
   const editorRef = useRef();
   const sessionState = useStore((store) => store.session.state);
@@ -85,6 +85,25 @@ function Editor(props) {
         flexDirection="column"
         overflow="hidden"
         overflowY="auto"
+        onScroll={(e) => {
+          const title = document.querySelector(".editorTitle");
+          const headerOffset = title.scrollHeight;
+          const hideOffset = headerOffset + 60;
+          if (e.target.scrollTop > hideOffset && !isToolbarSticky) {
+            const toolbar = document.querySelector(".tox-editor-header");
+            toolbar.style.position = "fixed";
+            toolbar.style.top = "40px";
+            toolbar.style.bottom = "auto";
+            toolbar.style.width = `${title.clientWidth}px`;
+            isToolbarSticky = true;
+          } else if (e.target.scrollTop <= hideOffset && isToolbarSticky) {
+            const toolbar = document.querySelector(".tox-editor-header");
+            toolbar.style.position = "relative";
+            toolbar.style.top = "0px";
+            toolbar.style.bottom = "0px";
+            isToolbarSticky = false;
+          }
+        }}
       >
         <Animated.Flex
           variant="columnFill"
@@ -99,6 +118,7 @@ function Editor(props) {
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "900px"}
+          width="100%"
           mt={[0, 0, 25]}
         >
           <Header />
