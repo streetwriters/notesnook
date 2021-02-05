@@ -8,7 +8,7 @@ import Paragraph from '../../../../components/Typography/Paragraph';
 import {useTracked} from '../../../../provider';
 import {ToastEvent} from '../../../../services/EventManager';
 import {SIZE} from '../../../../utils/SizeUtils';
-import { INPUT_MODE, properties } from './constants';
+import {INPUT_MODE, properties} from './constants';
 
 let prevLink = {};
 let prevHeight = 65;
@@ -90,15 +90,16 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
             </Heading>
           )}
 
-          {description && (
-            <Paragraph
-              style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-              numberOfLines={2}
-              color={colors.icon}
-              size={SIZE.xs}>
-              {description}
-            </Paragraph>
-          )}
+          {description ||
+            (title && (
+              <Paragraph
+                style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
+                numberOfLines={2}
+                color={colors.icon}
+                size={SIZE.xs}>
+                {description ? description : link.value}
+              </Paragraph>
+            ))}
 
           <View
             style={{
