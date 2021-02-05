@@ -3,6 +3,7 @@ import { ScrollView } from 'react-native';
 import ColorItem from './coloritem';
 
 const ColorGroup = ({group}) => {
+
 	return (
 	  <ScrollView
 		keyboardDismissMode="none"
@@ -21,7 +22,7 @@ const ColorGroup = ({group}) => {
 		  <ColorItem
 			key={item.formatValue}
 			value={item.formatValue}
-			format={group.format}
+			format={group.type}
 		  />
 		))}
 	  </ScrollView>

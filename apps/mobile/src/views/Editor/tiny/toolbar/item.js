@@ -247,7 +247,9 @@ const ToolbarItem = ({
   };
 
   return (
-    <View>
+    <View style={{
+      marginHorizontal:5
+    }}>
       <PressableButton
         type={selected ? 'shade' : 'transparent'}
         customColor={selected && color}
@@ -267,7 +269,7 @@ const ToolbarItem = ({
           borderRadius: 5,
           marginTop: 5,
           marginBottom: 5,
-          marginHorizontal: 4,
+          
         }}>
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />

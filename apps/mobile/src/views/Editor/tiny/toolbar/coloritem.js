@@ -51,6 +51,7 @@ const ColorItem = ({value, format}) => {
 	  if (selected) {
 		formatSelection(format, null);
 	  } else {
+		  console.log(format,value);
 		formatSelection(execCommands[format](value));
 	  }
 	};
