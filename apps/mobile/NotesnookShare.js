@@ -71,7 +71,10 @@ export default class NotesnookShare extends Component {
     let add = async () => {
       await db.notes.add({
         title: this.state.title,
-        content: `<${tag}>${this.state.text}<${tag}/>`,
+        content: {
+          type:'tiny',
+          data:`<${tag}>${this.state.text}<${tag}/>`
+        },
         id: null,
       });
     };

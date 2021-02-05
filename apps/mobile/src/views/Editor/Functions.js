@@ -238,8 +238,12 @@ export const _onMessage = async (evt) => {
     case 'history':
       eSendEvent('historyEvent', message.value);
       break;
-    case 'change':
-      content = message;
+    case 'tiny':
+      console.log('change',message);
+      content = {
+        type:message.type,
+        data:message.value
+      };
       onNoteChange();
       break;
     case 'title':
@@ -299,6 +303,7 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
+  tiny.call(EditorWebView,tiny.isLoading);
   clearTimer();
   tiny.call(EditorWebView, tiny.reset);
   if (noteEdited && id) {
@@ -386,6 +391,8 @@ export async function saveNote() {
       return;
     }
     let locked = id ? db.notes.note(id).data.locked : null;
+    console.log(content,"SAVE Content");
+
     let noteData = {
       title,
       content: {

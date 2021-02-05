@@ -128,11 +128,13 @@ export default class NoteItem extends React.Component {
             {item.title.replace('\n', '')}
           </Heading>
 
-          <Paragraph numberOfLines={2}>
-            {item.headline[item.headline.length - 1] === '\n'
-              ? item.headline.slice(0, item.headline.length - 1)
-              : item.headline}
-          </Paragraph>
+          {item.headline && (
+            <Paragraph numberOfLines={2}>
+              {item.headline[item.headline.length - 1] === '\n'
+                ? item.headline.slice(0, item.headline.length - 1)
+                : item.headline}
+            </Paragraph>
+          )}
 
           <View
             style={{

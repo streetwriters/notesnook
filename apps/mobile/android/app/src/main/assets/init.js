@@ -12,6 +12,8 @@ function reactNativeEventHandler(type, value) {
 }
 
 let changeTimer = null;
+let isLoading = true;
+
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -46,7 +48,12 @@ function init_tiny(size) {
       reactNativeEventHandler('status', true);
       editor.on('SelectionChange', function (e) {
         clearTimeout(changeTimer);
+        if (isLoading) {
+          isLoading = false;
+          return;
+        }
         changeTimer = setTimeout(() => {
+          if (editor.plugins.wordcount.getCount() === 0) return;
           selectchange();
           reactNativeEventHandler('tiny', editor.getContent());
           reactNativeEventHandler('history', {
@@ -60,7 +67,13 @@ function init_tiny(size) {
       });
       editor.on('Change', function (e) {
         clearTimeout(changeTimer);
+        if (isLoading) {
+          isLoading = false;
+          return;
+        }
+
         changeTimer = setTimeout(() => {
+          if (editor.plugins.wordcount.getCount() === 0) return;
           selectchange();
           reactNativeEventHandler('tiny', editor.getContent());
           reactNativeEventHandler('history', {
@@ -70,7 +83,7 @@ function init_tiny(size) {
         }, 5);
       });
       editor.on('ExecCommand', function (e) {
-        reactNativeEventHandler(e);
+        //reactNativeEventHandler(e);
       });
     },
   });

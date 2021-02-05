@@ -549,7 +549,7 @@ export const ActionSheetComponent = ({
             {note.type === 'notebook' && note.description
               ? note.description
               : null}
-            {note.type === 'note'
+            {note.type === 'note' && item.headline
               ? note.headline[item.headline.length - 1] === '\n'
                 ? note.headline.slice(0, note.headline.length - 1)
                 : note.headline

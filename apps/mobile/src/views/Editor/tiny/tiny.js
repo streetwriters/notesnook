@@ -103,7 +103,12 @@ const updateTheme = (value) => `
 
 `;
 
+const isLoading =`
+isLoading = true;
+`;
+
 const html = (value) => `
+isLoading = true;
 editor.setContent("${value}");   
 info.querySelector('#infowords').innerText =
 editor.plugins.wordcount.getCount() + " words";
@@ -151,5 +156,6 @@ export default {
   updateSavingState,
   updateTheme,
   setTitle,
-  restoreRange
+  restoreRange,
+  isLoading
 };
