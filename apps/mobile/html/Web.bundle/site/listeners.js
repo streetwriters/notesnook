@@ -1,13 +1,29 @@
 let titleInput = document.getElementById('titleInput');
 let infoBar = '.info-bar';
 let info = null;
-
+let scrollTimer = null;
 function attachTitleInputListeners() {
   infoBar = '.info-bar';
   document.addEventListener(
     'DOMContentLoaded',
     () => {
       autosize();
+      document
+        .body.onscroll = (event) => {
+          if (scrollTimer) {
+            clearTimeout(scrollTimer);
+            scrollTimer = null;
+          }
+          scrollTimer = setTimeout(() => {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                visible: event.target.documentElement.scrollTop.scrollTop,
+                title: document.getElementById("titleInput").value,
+                type: 'scroll',
+              }),
+            );
+          }, 100);
+        }
     },
     false,
   );
