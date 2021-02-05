@@ -34,13 +34,14 @@ const ColorItem = ({value, format}) => {
 	  let formats = Object.keys(data);
 	  let _color;
 	  if (data[format] !== null) {
+
 		if (data[format]?.startsWith('#')) {
 		  _color = data[format];
 		} else {
 		  _color = rgbToHex(data[format]);
 		}
 	  }
-	  if (formats.indexOf(format) > -1 && _color === format) {
+	  if (formats.indexOf(format) > -1 && _color === value) {
 		setSelected(true);
 		return;
 	  }
