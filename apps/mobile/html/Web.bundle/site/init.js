@@ -12,8 +12,8 @@ function reactNativeEventHandler(type, value) {
 }
 
 let changeTimer = null;
-let isLoading = true;
-let editor = null;
+
+
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -33,6 +33,7 @@ function init_tiny(size) {
     },
     statusbar: false,
     contextmenu: false,
+    autoresize_bottom_margin: 0,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
     placeholder: 'Start writing your note here',
     object_resizing: true,
@@ -53,12 +54,11 @@ function init_tiny(size) {
           return;
         }
         changeTimer = setTimeout(() => {
-          if (tinymce.activeEditor.plugins.wordcount.getCount() === 0) return;
+          if (editor.plugins.wordcount.getCount() === 0) return;
           selectchange();
-          reactNativeEventHandler('tiny', editor.getContent());
           reactNativeEventHandler('history', {
-            undo: tinymce.activeEditor.undoManager.hasUndo(),
-            redo: tinymce.activeEditor.undoManager.hasRedo(),
+            undo: editor.undoManager.hasUndo(),
+            redo: editor.undoManager.hasRedo(),
           });
         }, 5);
       });
@@ -70,26 +70,26 @@ function init_tiny(size) {
           reactNativeEventHandler('noteLoaded', true);
         }
       });
-      editor.on('Change', function (e) {
-        clearTimeout(changeTimer);
-        if (isLoading) {
-          isLoading = false;
-          return;
-        }
 
-        changeTimer = setTimeout(() => {
-          if (tinymce.activeEditor.plugins.wordcount.getCount() === 0) return;
-          selectchange();
-          reactNativeEventHandler('tiny', tinymce.activeEditor.getContent());
-          reactNativeEventHandler('history', {
-            undo: tinymce.activeEditor.undoManager.hasUndo(),
-            redo: tinymce.activeEditor.undoManager.hasRedo(),
-          });
-        }, 5);
-      });
+      editor.on('keyup', onChange);
+      editor.on('Change', onChange);
     },
   });
 }
+
+const onChange = (event) => {
+  if (isLoading) {
+    isLoading = false;
+    return;
+  }
+  if (editor.plugins.wordcount.getCount() === 0) return;
+  selectchange();
+  reactNativeEventHandler('tiny', editor.getContent());
+  reactNativeEventHandler('history', {
+    undo: editor.undoManager.hasUndo(),
+    redo: editor.undoManager.hasRedo(),
+  });
+};
 
 function getNodeColor(element) {
   if (element.style.color && element.style.color !== '') {
@@ -105,24 +105,24 @@ function getNodeBg(element) {
   return null;
 }
 
-function selectchange(editor) {
+function selectchange() {
   info = document.querySelector('.info-bar');
   info.querySelector('#infowords').innerText =
-    tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+    editor.plugins.wordcount.getCount() + ' words';
 
-  let formats = Object.keys(tinymce.activeEditor.formatter.get());
+  let formats = Object.keys(editor.formatter.get());
   let currentFormats = {};
-  tinymce.activeEditor.formatter
+  editor.formatter
     .matchAll(formats)
     .forEach((format) => (currentFormats[format] = true));
 
-  let node = tinymce.activeEditor.selection.getNode();
+  let node = editor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);
   currentFormats.forecolor = getNodeColor(node);
 
   if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
     for (var i = 0; i < node.children.length; i++) {
-      let item = tinymce.activeEditor.selection.getNode().children.item(i);
+      let item = editor.selection.getNode().children.item(i);
       currentFormats.hilitecolor = getNodeBg(item);
       currentFormats.forecolor = getNodeColor(item);
     }
@@ -158,15 +158,15 @@ function selectchange(editor) {
     currentFormats.link = node.getAttribute('href');
   }
 
-  currentFormats.fontname = tinymce.activeEditor.selection.getNode().style.fontFamily;
+  currentFormats.fontname = editor.selection.getNode().style.fontFamily;
 
   if (/^(LI|UL|OL|DL)$/.test(node.nodeName)) {
-    let listElm = tinymce.activeEditor.selection.getNode();
+    let listElm = editor.selection.getNode();
     if (listElm.nodeName === 'LI') {
-      listElm = tinymce.activeEditor.dom.getParent(listElm, 'ol,ul');
+      listElm = editor.dom.getParent(listElm, 'ol,ul');
     }
 
-    let style = tinymce.activeEditor.dom.getStyle(listElm, 'listStyleType');
+    let style = editor.dom.getStyle(listElm, 'listStyleType');
     if (style === '') {
       style = 'default';
     }
