@@ -30,12 +30,16 @@ export const ListHeaderComponent = ({
       style={{
         minHeight: 50,
         marginBottom: 5,
-        padding: 12,
+        padding: 0,
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
       }}>
-      {messageCard && <MessageCard />}
+      {messageCard && (
+        <MessageCard
+          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
+        />
+      )}
     </View>
   ) : (
     <View
