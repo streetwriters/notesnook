@@ -291,7 +291,8 @@ const ToolbarItem = ({
           <Paragraph
             size={SIZE.md}
             color={selected ? colors.accent : colors.pri}>
-            {formatValue || currentText}
+            {formatValue || currentText || "12pt"}
+
           </Paragraph>
         ) : text && groupFormat !== 'header' ? (
           <Paragraph
@@ -307,6 +308,7 @@ const ToolbarItem = ({
             }}
             size={SIZE.md}>
             {currentText || text}
+
           </Paragraph>
         ) : (
           <Icon

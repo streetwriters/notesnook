@@ -1,3 +1,5 @@
+import {EditorWebView, getWebviewInit} from '../Functions';
+
 const reset = `
 isLoading = true;
 document.getElementById("titleInput").value = '';
@@ -122,7 +124,14 @@ tinymce.activeEditor.focus();
 `;
 
 function call(webview, func) {
-  webview.current?.injectJavaScript(func);
+  if (getWebviewInit()) {
+    webview.current?.injectJavaScript(func);
+  } else {
+    setTimeout(() => {
+      console.log('run after delay');
+      webview.current?.injectJavaScript(func);
+    }, 1000);
+  }
 }
 
 const undo = `
