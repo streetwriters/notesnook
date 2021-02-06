@@ -83,6 +83,14 @@ const ToolbarItem = ({
         }
       }
 
+      if (format === 'fontname' && data[format].includes('times new')) {
+        data[format] = 'times new roman';
+      }
+
+      if (format === 'fontname' && data[format].includes('courier new')) {
+        data[format] = 'courier new';
+      }
+
       if (format === 'link') {
         console.log(format, data[format]);
         properties.selection = data;
@@ -178,7 +186,7 @@ const ToolbarItem = ({
 		  });
 		}
 		return;
-	  } */
+    } */
     if (editing.tooltip === format && !formatValue) {
       focusEditor(format);
       eSendEvent('showTooltip');
@@ -223,12 +231,18 @@ const ToolbarItem = ({
       groupFormat === 'ol' ||
       groupFormat === 'ul'
     ) {
-      value = formatValue;
+      if (groupFormat === "fontname" && formatValue === "") {
+        value = "serif";
+      } else {
+        value = formatValue;
+      }
+    
     }
 
+ 
     if (selected && (format === 'ol' || format === 'ul' || format === 'cl')) {
       formatSelection(execCommands.removeList);
-    } else if (value) {
+    } else if (value || value === "") {
       formatSelection(execCommands[format](value));
     } else {
       formatSelection(execCommands[format]);
