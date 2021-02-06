@@ -3,7 +3,7 @@ isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
 tinyMCE.activeEditor.setContent('');
-editor.undoManager.clear();
+tinymce.activeEditor.undoManager.clear();
 document.activeElement.blur();
 window.blur();
 `;
@@ -49,7 +49,7 @@ const updateSavingState = (value) => `
 `;
 
 export const clearEditor = `
-		editor.setContent("");
+tinymce.activeEditor.setContent("");
 `;
 const clearTitle = `
     document.getElementById(titleInput).value = '';
@@ -112,13 +112,13 @@ isLoading = true;
 
 const html = (value) => `
 isLoading = true;
-editor.setContent("${value}");   
+tinymce.activeEditor.setContent(\`${value}\`);   
 info.querySelector('#infowords').innerText =
-editor.plugins.wordcount.getCount() + " words";
+tinymce.activeEditor.plugins.wordcount.getCount() + " words";
 `;
 
 const focusEditor = `
- editor.focus();
+tinymce.activeEditor.focus();
 `;
 
 function call(webview, func) {
@@ -127,17 +127,17 @@ function call(webview, func) {
 
 const undo = `
 	
-editor.undoManager.undo();
+tinymce.activeEditor.undoManager.undo();
 
 `;
 const redo = `
 	
-editor.undoManager.redo();
+tinymce.activeEditor.undoManager.redo();
 
 `;
 
 const clearHistory = `
-editor.undoManager.clear();
+tinymce.activeEditor.undoManager.clear();
 `;
 
 export default {

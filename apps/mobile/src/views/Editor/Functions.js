@@ -467,6 +467,9 @@ const loadNoteInEditor = async () => {
   if (note?.id) {
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
+
+    console.log(content.data);
+
     tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));

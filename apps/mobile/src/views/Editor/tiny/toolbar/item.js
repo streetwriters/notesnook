@@ -71,7 +71,6 @@ const ToolbarItem = ({
       return;
     }
     if (formats.indexOf(format) > -1 && format !== 'removeformat') {
-
       if (format === 'forecolor' || format === 'hilitecolor') {
         if (!data[format]) {
           setSelected(false);
@@ -84,8 +83,8 @@ const ToolbarItem = ({
         }
       }
 
-      if (format === "link") {
-        console.log(format,data[format]);
+      if (format === 'link') {
+        console.log(format, data[format]);
         properties.selection = data;
         properties.pauseSelectionChange = true;
         eSendEvent('showTooltip', {
@@ -94,14 +93,6 @@ const ToolbarItem = ({
           type: 'link',
         });
         return;
-      }
-
-      if (
-        format === 'fontname' &&
-        (data[format].includes('courier') ||
-          data[format].includes('times new roman'))
-      ) {
-        data[format] = JSON.parse(data[format]);
       }
 
       if (
@@ -248,9 +239,10 @@ const ToolbarItem = ({
   };
 
   return (
-    <View style={{
-      marginHorizontal:5
-    }}>
+    <View
+      style={{
+        marginHorizontal: 5,
+      }}>
       <PressableButton
         type={selected ? 'shade' : 'transparent'}
         customColor={selected && color}
@@ -270,7 +262,6 @@ const ToolbarItem = ({
           borderRadius: 5,
           marginTop: 5,
           marginBottom: 5,
-          
         }}>
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />
