@@ -4,12 +4,13 @@ import {ScrollView, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Paragraph from '../../../../components/Typography/Paragraph';
 import {useTracked} from '../../../../provider';
+import {DDS} from '../../../../services/DeviceDetection';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   eSendEvent,
 } from '../../../../services/EventManager';
-import {editing, getElevation} from '../../../../utils';
+import {dWidth, editing, getElevation} from '../../../../utils';
 import ColorGroup from './colorgroup';
 import {execCommands} from './commands';
 import {formatSelection, properties} from './constants';
@@ -26,7 +27,7 @@ const Tooltip = () => {
     type: null,
   });
   const [visible, setVisible] = useState(false);
-  const floating = group.type === 'table';
+  const floating = group.type === 'table' || DDS.isTab;
   useEffect(() => {
     eSubscribeEvent('showTooltip', show);
     return () => {
@@ -41,8 +42,8 @@ const Tooltip = () => {
       editing.tooltip = null;
       return;
     }
-    console.log('visible now');
     setGroup(data);
+
     setVisible(true);
   };
 
@@ -54,17 +55,21 @@ const Tooltip = () => {
           padding: floating ? 5 : 0,
           position: 'absolute',
           bottom: floating ? 60 : 50,
-          width: group.type === 'table' ? 35 * 5 + 10 : '100%',
+          width:
+            group.type === 'table' ? 35 * 5 + 15 : floating ? '50%' : '100%',
+
           minHeight: 50,
           backgroundColor: colors.bg,
           alignSelf: 'center',
           flexDirection: 'row',
+          borderWidth: floating ? 1 : 0,
+          borderColor: floating && colors.nav,
           borderTopWidth: 1,
           borderTopColor: colors.nav,
           justifyContent: 'space-around',
           alignItems: 'center',
           flexDirection: 'row',
-          left: floating && group?.pageX ? group.pageX / 1.9 : null,
+
           ...getElevation(floating ? 5 : 0),
           zIndex: 999,
         }}
@@ -73,17 +78,21 @@ const Tooltip = () => {
     ) : (
       <ScrollView
         style={{
-          borderRadius: 0,
+          borderRadius: floating ? 5 : 0,
           position: 'absolute',
-          bottom:50,
-          width: '100%',
+          bottom: floating ? 60 : 50,
+          width:
+            group.type === 'table' ? 35 * 5 + 10 : floating ? '50%' : '100%',
           minHeight: 50,
           backgroundColor: colors.bg,
-          borderRadius: 0,
           alignSelf: 'center',
           flexDirection: 'row',
+          borderWidth: floating ? 1 : 0,
+          borderColor: floating && colors.nav,
           borderTopWidth: 1,
           borderTopColor: colors.nav,
+
+          ...getElevation(floating ? 5 : 0),
           zIndex: 999,
         }}
         horizontal
