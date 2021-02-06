@@ -183,6 +183,7 @@ function TinyMCE(props) {
             }
           });
         },
+        browser_spellcheck: true,
       }}
       // onBeforeExecCommand={async (command) => {
       //   if (
