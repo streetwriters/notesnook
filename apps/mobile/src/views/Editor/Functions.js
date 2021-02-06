@@ -54,7 +54,7 @@ export function setWebviewInit(init) {
   webviewInit = init;
 }
 
-export function getWebviewInit(init) {
+export function getWebviewInit() {
   return webviewInit;
 }
 
