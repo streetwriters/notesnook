@@ -327,6 +327,7 @@ export const AppRootEvents = React.memo(
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
+          if (!user) return;
           fetch('http://192.168.10.7:6264/apple/verify', {
             method: 'POST',
             body: JSON.stringify({

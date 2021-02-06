@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { Platform } from 'react-native';
 import {View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -232,7 +233,7 @@ const ToolbarItem = ({
       groupFormat === 'ul'
     ) {
       if (groupFormat === "fontname" && formatValue === "") {
-        value = "serif";
+        value = Platform.OS === "ios" ? "-apple-system" : "serif";
       } else {
         value = formatValue;
       }
@@ -298,9 +299,9 @@ const ToolbarItem = ({
             style={{
               paddingHorizontal: 12,
               fontFamily:
-                format === 'fontname' && formatValue
+                format === 'fontname' && formatValue && formatValue !== "-apple-system"
                   ? formatValue
-                  : format === 'fontname' && icon
+                  : format === 'fontname' && icon !== "-apple-system" && icon
                   ? icon
                   : null,
             }}

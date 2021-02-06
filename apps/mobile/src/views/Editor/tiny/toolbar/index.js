@@ -23,29 +23,34 @@ const EditorToolbar = React.memo(
 
     return (
       <>
-        <Tooltip />
-        <ScrollView
+        <View
           style={{
             width: '100%',
-            maxWidth: '100%',
-            minHeight: 50,
-            borderTopWidth: 1,
-            borderTopColor: colors.nav,
-            paddingLeft: 12,
-          }}
-          onScrollBeginDrag={() => {
-            eSendEvent('showTooltip');
-          }}
-          keyboardShouldPersistTaps="always"
-          keyboardDismissMode="none"
-          horizontal={true}
-          showsHorizontalScrollIndicator={false}
-          showsVerticalScrollIndicator={false}
-          bounces={false}>
-          {config.map((item, index) => (
-            <ToolbarGroup key={item[0].format} group={item} />
-          ))}
-        </ScrollView>
+          }}>
+          <Tooltip />
+          <ScrollView
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              minHeight: 50,
+              borderTopWidth: 1,
+              borderTopColor: colors.nav,
+              paddingLeft: 12,
+            }}
+            onScrollBeginDrag={() => {
+              eSendEvent('showTooltip');
+            }}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="none"
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            showsVerticalScrollIndicator={false}
+            bounces={false}>
+            {config.map((item, index) => (
+              <ToolbarGroup key={item[0].format} group={item} />
+            ))}
+          </ScrollView>
+        </View>
       </>
     );
   },

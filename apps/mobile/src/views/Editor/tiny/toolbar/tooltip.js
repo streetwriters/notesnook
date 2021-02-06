@@ -33,7 +33,6 @@ const Tooltip = () => {
       eUnSubscribeEvent('showTooltip', show);
     };
   }, []);
-  
 
   const show = (data) => {
     properties.userBlur = true;
@@ -42,6 +41,7 @@ const Tooltip = () => {
       editing.tooltip = null;
       return;
     }
+    console.log('visible now');
     setGroup(data);
     setVisible(true);
   };
@@ -66,6 +66,7 @@ const Tooltip = () => {
           flexDirection: 'row',
           left: floating && group?.pageX ? group.pageX / 1.9 : null,
           ...getElevation(floating ? 5 : 0),
+          zIndex: 999,
         }}
         children={props.children}
       />
@@ -74,7 +75,7 @@ const Tooltip = () => {
         style={{
           borderRadius: 0,
           position: 'absolute',
-          bottom: 50,
+          bottom:50,
           width: '100%',
           minHeight: 50,
           backgroundColor: colors.bg,
@@ -83,6 +84,7 @@ const Tooltip = () => {
           flexDirection: 'row',
           borderTopWidth: 1,
           borderTopColor: colors.nav,
+          zIndex: 999,
         }}
         horizontal
         showsHorizontalScrollIndicator={false}

@@ -13,7 +13,6 @@ function reactNativeEventHandler(type, value) {
 
 let changeTimer = null;
 
-
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -33,6 +32,7 @@ function init_tiny(size) {
     },
     statusbar: false,
     contextmenu: false,
+    browser_spellcheck: true,
     autoresize_bottom_margin: 0,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
     placeholder: 'Start writing your note here',
@@ -69,6 +69,12 @@ function init_tiny(size) {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
+      });
+      editor.on('ScrollIntoView', (e) => {
+        e.preventDefault();
+        let offset = e.elm.offsetTop + 60;
+        console.log(e)
+        document.scrollingElement.scrollTo({top:offset})
       });
 
       editor.on('keyup', onChange);

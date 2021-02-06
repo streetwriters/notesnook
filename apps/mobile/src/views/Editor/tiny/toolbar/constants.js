@@ -1,6 +1,6 @@
-import { Platform } from "react-native";
-import { EditorWebView } from "../../Functions";
-import tiny from "../tiny";
+import {Platform} from 'react-native';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 
 export const properties = {
   selection: {},
@@ -50,14 +50,23 @@ export const INPUT_MODE = {
   NO_EDIT: 2,
 };
 
-export const font_names = [
-  {name: 'System Font', value: ''},
-  {name: 'Times New Roman', value: 'times new roman'},
-  {name: 'Serif', value: 'serif'},
-  {name: 'Sans', value: 'sans-serif'},
-  {name: 'Mono', value: 'monospace'},
-  {name: 'Classic', value: 'courier new'},
-];
+export const font_names = Platform.select({
+  android: [
+    {name: 'System Font', value: ''},
+    {name: 'Times New Roman', value: 'times new roman'},
+    {name: 'Serif', value: 'serif'},
+    {name: 'Sans', value: 'sans-serif'},
+    {name: 'Mono', value: 'courier'},
+    {name: 'Classic', value: 'courier new'},
+  ],
+  ios: [
+    {name: 'System Font', value: ''},
+    {name: 'Sans', value: '-apple-system'},
+    {name: 'Times New Roman', value: 'times new roman'},
+    {name: 'Mono', value: 'courier'},
+    {name: 'Classic', value: 'courier new'},
+  ],
+});
 
 export const editor_colors = [
   '#000000',
@@ -151,6 +160,6 @@ export const TOOLBAR_ICONS = {
   h6: 'format-header-6',
   fontsize: 'format-font-size-increase',
   removeformat: 'format-clear',
-  horizontal:"border-horizontal",
-  table:'table-plus'
+  horizontal: 'border-horizontal',
+  table: 'table-plus',
 };
