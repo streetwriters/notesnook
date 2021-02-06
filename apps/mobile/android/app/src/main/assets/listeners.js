@@ -8,37 +8,42 @@ function attachTitleInputListeners() {
     'DOMContentLoaded',
     () => {
       autosize();
-      document
-        .body.onscroll = (event) => {
-          if (scrollTimer) {
-            clearTimeout(scrollTimer);
-            scrollTimer = null;
-          }
-          scrollTimer = setTimeout(() => {
-            window.ReactNativeWebView.postMessage(
-              JSON.stringify({
-                visible: event.target.documentElement.scrollTop.scrollTop,
-                title: document.getElementById("titleInput").value,
-                type: 'scroll',
-              }),
-            );
-          }, 100);
+      document.body.onscroll = (event) => {
+        if (scrollTimer) {
+          clearTimeout(scrollTimer);
+          scrollTimer = null;
         }
+        scrollTimer = setTimeout(() => {
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              visible: event.target.documentElement.scrollTop.scrollTop,
+              title: document.getElementById('titleInput').value,
+              type: 'scroll',
+            }),
+          );
+        }, 100);
+      };
     },
     false,
   );
 
   document.getElementById('formBox').onsubmit = function (evt) {
     evt.preventDefault();
-    editor.focus();
-    editor.setSelection(editor.getText().length - 1, 0);
+    if (tinymce.activeEditor) {
+      tinymce.activeEditor && tinymce.activeEditor.focus();
+    }
+ 
     onTitleChange();
   };
 
   titleInput.onkeypress = function (evt) {
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
-      editor.focus();
+      if (tinymce.activeEditor) {
+        tinymce.activeEditor && tinymce.activeEditor.focus();
+      }
+     
+
       onTitleChange();
       return false;
     }
@@ -68,14 +73,17 @@ function attachTitleInputListeners() {
 }
 
 function onTitleChange(ele) {
- if (isLoading) return;
+  if (isLoading) return;
   let titleMessage = {
     type: 'title',
     value: titleInput.value,
   };
+
   info = document.querySelector(infoBar);
-  info.querySelector('#infowords').innerText =
-    editor.plugins.wordcount.getCount() + ' words';
+  if (tinymce.activeEditor) {
+    info.querySelector('#infowords').innerText =
+      tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+  }
 
   autosize();
   if (titleMessage && typeof titleMessage.value === 'string') {

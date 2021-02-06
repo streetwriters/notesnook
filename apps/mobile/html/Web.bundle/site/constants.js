@@ -22,25 +22,38 @@ let pageTheme = {
 };
 
 function dark() {
-  if (!editor) return;
-  editor.dom.styleSheetLoader.unload('dist/skins/notesnook/content.min.css');
-  editor.dom.styleSheetLoader.load('dist/skins/notesnook-dark/content.min.css');
-  editor.ui.styleSheetLoader.unload('dist/skins/notesnook/skin.min.css');
-  editor.ui.styleSheetLoader.load('dist/skins/notesnook-dark/skin.min.css');
+  if (!tinymce.activeEditor) return;
+  tinymce.activeEditor.dom.styleSheetLoader.unload(
+    'dist/skins/notesnook/content.min.css',
+  );
+  tinymce.activeEditor.dom.styleSheetLoader.load(
+    'dist/skins/notesnook-dark/content.min.css',
+  );
+  tinymce.activeEditor.ui.styleSheetLoader.unload(
+    'dist/skins/notesnook/skin.min.css',
+  );
+  tinymce.activeEditor.ui.styleSheetLoader.load(
+    'dist/skins/notesnook-dark/skin.min.css',
+  );
 }
 
 function light() {
-  if (!editor) return;
-  editor.dom.styleSheetLoader.unload(
+  if (!tinymce.activeEditor) return;
+  tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook-dark/content.min.css',
   );
-  editor.dom.styleSheetLoader.load('dist/skins/notesnook/content.min.css');
-  editor.ui.styleSheetLoader.unload('dist/skins/notesnook-dark/skin.min.css');
-  editor.ui.styleSheetLoader.load('dist/skins/notesnook/skin.min.css');
+  tinymce.activeEditor.dom.styleSheetLoader.load(
+    'dist/skins/notesnook/content.min.css',
+  );
+  tinymce.activeEditor.ui.styleSheetLoader.unload(
+    'dist/skins/notesnook-dark/skin.min.css',
+  );
+  tinymce.activeEditor.ui.styleSheetLoader.load(
+    'dist/skins/notesnook/skin.min.css',
+  );
 }
 
 function setTheme() {
-  
   if (pageTheme.colors.night) {
     dark();
   } else {
@@ -100,16 +113,14 @@ var minifyImg = function (
   });
 };
 
-
-
 function loadImage() {
   let fileInput = document.querySelector('#image-input');
   let listener = () => {
     if (fileInput.files != null && fileInput.files[0] != null) {
       let reader = new FileReader();
-      console.log(reader.readyState,"READY STATE");
+      console.log(reader.readyState, 'READY STATE');
       let load = (e) => {
-        console.log(e,'loaded error');
+        console.log(e, 'loaded error');
         minifyImg(
           reader.result,
           600,
@@ -132,14 +143,13 @@ function loadImage() {
       };
       reader.onabort = () => {
         console.log('abort');
-      }
+      };
       reader.addEventListener('load', load);
       reader.addEventListener('error', error);
       reader.readAsDataURL(fileInput.files[0]);
     }
   };
 
-  
   fileInput.addEventListener('change', listener);
   fileInput.click();
 }

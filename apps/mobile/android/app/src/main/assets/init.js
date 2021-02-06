@@ -13,7 +13,7 @@ function reactNativeEventHandler(type, value) {
 
 let changeTimer = null;
 let isLoading = true;
-
+let editor = null;
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -53,23 +53,23 @@ function init_tiny(size) {
           return;
         }
         changeTimer = setTimeout(() => {
-          if (editor.plugins.wordcount.getCount() === 0) return;
+          if (tinymce.activeEditor.plugins.wordcount.getCount() === 0) return;
           selectchange();
           reactNativeEventHandler('tiny', editor.getContent());
           reactNativeEventHandler('history', {
-            undo: editor.undoManager.hasUndo(),
-            redo: editor.undoManager.hasRedo(),
+            undo: tinymce.activeEditor.undoManager.hasUndo(),
+            redo: tinymce.activeEditor.undoManager.hasRedo(),
           });
         }, 5);
       });
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
-      editor.on("SetContent", event => {
+      editor.on('SetContent', (event) => {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
-      })
+      });
       editor.on('Change', function (e) {
         clearTimeout(changeTimer);
         if (isLoading) {
@@ -78,17 +78,14 @@ function init_tiny(size) {
         }
 
         changeTimer = setTimeout(() => {
-          if (editor.plugins.wordcount.getCount() === 0) return;
+          if (tinymce.activeEditor.plugins.wordcount.getCount() === 0) return;
           selectchange();
-          reactNativeEventHandler('tiny', editor.getContent());
+          reactNativeEventHandler('tiny', tinymce.activeEditor.getContent());
           reactNativeEventHandler('history', {
-            undo: editor.undoManager.hasUndo(),
-            redo: editor.undoManager.hasRedo(),
+            undo: tinymce.activeEditor.undoManager.hasUndo(),
+            redo: tinymce.activeEditor.undoManager.hasRedo(),
           });
         }, 5);
-      });
-      editor.on('ExecCommand', function (e) {
-        //reactNativeEventHandler(e);
       });
     },
   });
@@ -108,24 +105,24 @@ function getNodeBg(element) {
   return null;
 }
 
-function selectchange() {
+function selectchange(editor) {
   info = document.querySelector('.info-bar');
   info.querySelector('#infowords').innerText =
-    editor.plugins.wordcount.getCount() + ' words';
+    tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
 
-  let formats = Object.keys(editor.formatter.get());
+  let formats = Object.keys(tinymce.activeEditor.formatter.get());
   let currentFormats = {};
-  editor.formatter
+  tinymce.activeEditor.formatter
     .matchAll(formats)
     .forEach((format) => (currentFormats[format] = true));
 
-  let node = editor.selection.getNode();
+  let node = tinymce.activeEditor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);
   currentFormats.forecolor = getNodeColor(node);
 
   if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
     for (var i = 0; i < node.children.length; i++) {
-      let item = editor.selection.getNode().children.item(i);
+      let item = tinymce.activeEditor.selection.getNode().children.item(i);
       currentFormats.hilitecolor = getNodeBg(item);
       currentFormats.forecolor = getNodeColor(item);
     }
@@ -161,15 +158,15 @@ function selectchange() {
     currentFormats.link = node.getAttribute('href');
   }
 
-  currentFormats.fontname = editor.selection.getNode().style.fontFamily;
+  currentFormats.fontname = tinymce.activeEditor.selection.getNode().style.fontFamily;
 
   if (/^(LI|UL|OL|DL)$/.test(node.nodeName)) {
-    let listElm = editor.selection.getNode();
+    let listElm = tinymce.activeEditor.selection.getNode();
     if (listElm.nodeName === 'LI') {
-      listElm = editor.dom.getParent(listElm, 'ol,ul');
+      listElm = tinymce.activeEditor.dom.getParent(listElm, 'ol,ul');
     }
 
-    let style = editor.dom.getStyle(listElm, 'listStyleType');
+    let style = tinymce.activeEditor.dom.getStyle(listElm, 'listStyleType');
     if (style === '') {
       style = 'default';
     }
