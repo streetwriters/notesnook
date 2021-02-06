@@ -88,9 +88,9 @@ function Editor(props) {
         onScroll={(e) => {
           const title = document.querySelector(".editorTitle");
           const headerOffset = title.scrollHeight;
-          const hideOffset = headerOffset + 60;
+          const hideOffset = headerOffset + 60 + 40;
           const { editor } = editorRef.current;
-          if (e.target.scrollTop > hideOffset && !editor.isToolbarSticky) {
+          if (e.target.scrollTop >= hideOffset && !editor.isToolbarSticky) {
             editor.pauseScrollIntoView = true;
             const toolbar = document.querySelector(".tox-editor-header");
             toolbar.style.position = "fixed";
@@ -99,7 +99,7 @@ function Editor(props) {
             toolbar.style.width = `${title.clientWidth}px`;
             editor.isToolbarSticky = true;
           } else if (
-            e.target.scrollTop <= hideOffset &&
+            e.target.scrollTop < hideOffset - 20 &&
             editor.isToolbarSticky
           ) {
             editor.pauseScrollIntoView = true;
@@ -135,7 +135,6 @@ function Editor(props) {
                 onFocus={() => toggleProperties(false)}
                 onSave={saveSession}
                 onChange={(content) => {
-                  console.log("CHANGING CONTENT", content);
                   if (!content.length) content = "<p><br></pr>";
                   setSession((state) => {
                     state.session.content = {

@@ -177,13 +177,19 @@ function TinyMCE(props) {
         },
         setup: (editor) => {
           editor.on("ScrollIntoView", (e) => {
+            e.preventDefault();
             if (editor.pauseScrollIntoView) {
-              e.preventDefault();
               editor.pauseScrollIntoView = false;
+            } else {
+              e.elm.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+              });
             }
           });
         },
         browser_spellcheck: true,
+        autoresize_bottom_margin: 100,
       }}
       // onBeforeExecCommand={async (command) => {
       //   if (
