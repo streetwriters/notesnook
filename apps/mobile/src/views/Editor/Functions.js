@@ -175,11 +175,10 @@ export const loadNote = async (item) => {
     await sleep(20);
     if (Platform.OS === 'android') {
       textInput.current?.focus();
-      console.log('focus');
       tiny.call(EditorWebView, tiny.focusEditor);
       EditorWebView.current?.requestFocus();
     } else {
-      editorTitleInput.current?.focus();
+      tiny.call(EditorWebView, tiny.focusEditor);
     }
     if (!webviewInit) {
       EditorWebView.current?.reload();
