@@ -240,7 +240,7 @@ export const _onMessage = async (evt) => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
-      console.log('change', message);
+      console.log('change');
       content = {
         type: message.type,
         data: message.value,

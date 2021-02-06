@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator} from 'react-native';
-import {View} from 'react-native';
-import {Button} from '../../components/Button';
-import Heading from '../../components/Typography/Heading';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { Button } from '../../components/Button';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {SIZE} from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/SizeUtils';
 
 let timer = null;
 let timerError = null;
@@ -19,19 +18,28 @@ const EditorOverlay = () => {
   const {colors} = state;
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const opacity = useValue(1);
   const load = (loading) => {
     clearTimeout(timer);
     clearTimeout(timerError);
     if (loading) {
-      timer = setTimeout(() => {
-        setLoading(loading);
-        timerError = setTimeout(() => {
-          setError(true);
-        }, 6000);
-      }, 3000);
+      setLoading(loading);
+      timerError = setTimeout(() => {
+        setError(true);
+      }, 6000);
     } else {
       setError(false);
-      setLoading(false);
+      timing(opacity, {
+        toValue: 0,
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      }).start(() => {
+        setTimeout(() => {
+          opacity.setValue(1);
+          clearTimeout(timerError);
+          setLoading(false);
+        }, 300);
+      });
     }
   };
 
@@ -44,14 +52,15 @@ const EditorOverlay = () => {
 
   return (
     loading && (
-      <View
+      <Animated.View
         style={{
           position: 'absolute',
           width: '100%',
           height: '100%',
-          backgroundColor: 'rgba(0,0,0,0.2)',
+          backgroundColor: colors.bg,
           justifyContent: 'center',
           alignItems: 'center',
+          opacity: opacity,
         }}>
         <View
           style={{
@@ -92,7 +101,7 @@ const EditorOverlay = () => {
             </>
           )}
         </View>
-      </View>
+      </Animated.View>
     )
   );
 };
