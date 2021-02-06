@@ -26,15 +26,20 @@ const App = () => {
 
   useEffect(() => {
     SettingsService.init().then((r) => {
-      DDS.checkSmallTab(Orientation.getInitialOrientation());
-      dispatch({
-        type: Actions.DEVICE_MODE,
-        state: DDS.isLargeTablet()
-          ? 'tablet'
-          : DDS.isSmallTab
-          ? 'smallTablet'
-          : 'mobile',
-      });
+      Orientation.getOrientation((e,r) => {
+      
+        DDS.checkSmallTab(r);
+        console.log(r,"RESULTING",DDS.isSmallTab)
+        dispatch({
+          type: Actions.DEVICE_MODE,
+          state: DDS.isLargeTablet()
+            ? 'tablet'
+            : DDS.isSmallTab
+            ? 'smallTablet'
+            : 'mobile',
+        });
+      })
+      
       db.init().catch(console.log).finally(loadMainApp);
     });
   }, []);

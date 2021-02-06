@@ -132,14 +132,7 @@ const _onTouchEnd = (e) => {
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors} = state;
-    const [mode, setMode] = useState(
-      DDS.isLargeTablet()
-        ? 'tablet'
-        : DDS.isSmallTab
-        ? 'smallTablet'
-        : 'mobile',
-    );
+    const {colors, deviceMode} = state;
     const [dimensions, setDimensions] = useState({width, height});
 
     const showFullScreenEditor = () => {
@@ -185,14 +178,20 @@ const AppStack = React.memo(
 
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
-      if (!size || (size.width === dimensions.width && mode !== null)) {
+      if (!size || (size.width === dimensions.width && deviceMode !== null)) {
+        console.log(
+          size.width,
+          dimensions.width,
+          dimensions.height,
+          size.height,
+          'before mode',
+        );
         DDS.setSize(size);
-        console.log(mode, 'MODE__');
-        dispatch({type: Actions.DEVICE_MODE, state: mode});
-
+        console.log(deviceMode, 'MODE__');
+        dispatch({type: Actions.DEVICE_MODE, state: deviceMode});
         return;
       }
-      updatedDimensions = size;
+
       layoutTimer = setTimeout(async () => {
         checkDeviceType(size);
       }, 500);
@@ -206,9 +205,12 @@ const AppStack = React.memo(
 
       setWidthHeight(size);
       DDS.setSize(size);
+      console.log(DDS.isLargeTablet(), size, DDS.isSmallTab);
       if (DDS.isLargeTablet()) {
+        console.log('setting large tab');
         setDeviceMode('tablet', size);
       } else if (DDS.isSmallTab) {
+        console.log('setting small tab');
         setDeviceMode('smallTablet', size);
       } else {
         setDeviceMode('mobile', size);
@@ -217,7 +219,6 @@ const AppStack = React.memo(
 
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
-      setMode(current);
       dispatch({type: Actions.DEVICE_MODE, state: current});
       dispatch({type: Actions.FULLSCREEN, state: false});
 
@@ -257,7 +258,7 @@ const AppStack = React.memo(
         onMoveShouldSetResponderCapture={_moveResponder}
         onTouchEnd={_onTouchEnd}
         onStartShouldSetResponderCapture={_responder}>
-        {mode && (
+        {deviceMode && (
           <ScrollableTabView
             ref={tabBarRef}
             style={{
@@ -268,7 +269,7 @@ const AppStack = React.memo(
             prerenderingSiblingsNumber={Infinity}
             onChangeTab={onChangeTab}
             renderTabBar={renderTabBar}>
-            {mode !== 'tablet' && (
+            {deviceMode !== 'tablet' && (
               <View
                 style={{
                   width: dimensions.width,
@@ -279,7 +280,7 @@ const AppStack = React.memo(
                   alignItems: 'center',
                   justifyContent: 'flex-start',
                 }}>
-                {mode === 'smallTablet' && (
+                {deviceMode === 'smallTablet' && (
                   <View
                     style={{
                       height: '100%',
@@ -293,7 +294,7 @@ const AppStack = React.memo(
                   style={{
                     height: '100%',
                     width:
-                      mode === 'mobile'
+                      deviceMode === 'mobile'
                         ? dimensions.width
                         : dimensions.width * 0.65,
                   }}>
@@ -309,7 +310,7 @@ const AppStack = React.memo(
                 flexDirection: 'row',
                 backgroundColor: colors.bg,
               }}>
-              {mode === 'tablet' && (
+              {deviceMode === 'tablet' && (
                 <View
                   style={{
                     width: dimensions.width * 0.45,
