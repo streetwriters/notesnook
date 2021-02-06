@@ -57,7 +57,13 @@ export const UserSection = ({noTextMode}) => {
               {!user ? 'Not Logged in' : 'Logged in'}
             </Heading>
 
-            <Paragraph color={colors.icon}  >Login to encrypt and sync your notes.</Paragraph>
+            <Paragraph
+              style={{
+                maxWidth: '96%',
+              }}
+              color={colors.icon}>
+              Login to encrypt and sync your notes.
+            </Paragraph>
           </View>
         </TouchableOpacity>
 
