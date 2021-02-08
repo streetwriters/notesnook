@@ -1,8 +1,12 @@
 import React from 'react';
 import { View } from 'react-native';
+import { useTracked } from '../../../../provider';
 import ToolbarItem from './item';
 
 const ToolbarGroup = ({group}) => {
+	const [state] = useTracked();
+	const {colors} = state;
+
 	return (
 	  <View
 		style={{
@@ -10,6 +14,9 @@ const ToolbarGroup = ({group}) => {
 		  flexDirection: 'row',
 		  alignItems: 'center',
 		  paddingRight: 12,
+		  marginRight:12,
+		  borderRightWidth:1,
+		  borderRightColor:colors.nav
 		}}>
 		{group.map((item) => (
 		  <ToolbarItem
@@ -26,6 +33,9 @@ const ToolbarGroup = ({group}) => {
 			fullname={item.fullname}
 		  />
 		))}
+
+		
+
 	  </View>
 	);
   };
