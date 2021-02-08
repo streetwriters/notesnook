@@ -1,3 +1,4 @@
+import { createRef } from 'react';
 import {Platform} from 'react-native';
 import { eSendEvent } from '../../../../services/EventManager';
 import {EditorWebView} from '../../Functions';
@@ -9,6 +10,8 @@ export const properties = {
   inputMode: 1,
   userBlur: false,
 };
+
+export const toolbarRef = createRef();
 
 export function formatSelection(command) {
   EditorWebView.current?.injectJavaScript(command);

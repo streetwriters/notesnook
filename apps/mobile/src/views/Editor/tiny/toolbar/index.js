@@ -4,7 +4,7 @@ import {ScrollView} from 'react-native';
 import {useTracked} from '../../../../provider';
 import {eSendEvent} from '../../../../services/EventManager';
 import {TOOLBAR_CONFIG} from './config';
-import {properties} from './constants';
+import {properties, toolbarRef} from './constants';
 import ToolbarGroup from './group';
 import Tooltip from './tooltip';
 
@@ -29,6 +29,7 @@ const EditorToolbar = React.memo(
           }}>
           <Tooltip />
           <ScrollView
+            ref={toolbarRef}
             style={{
               width: '100%',
               maxWidth: '100%',

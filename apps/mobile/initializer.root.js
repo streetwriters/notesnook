@@ -57,6 +57,7 @@ const onChangeTab = async (obj) => {
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
+      eSendEvent("showTooltip");
       editing.movedAway = true;
       tiny.call(EditorWebView, tiny.blur);
     }

@@ -32,6 +32,7 @@ import {
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
+import { toolbarRef } from './tiny/toolbar/constants';
 
 let handleBack;
 let tapCount = 0;
@@ -46,23 +47,12 @@ const EditorHeader = () => {
   }, [colors.bg]);
 
   const _onBackPress = async () => {
-    if (sideMenuRef.current === null) {
-      if (tapCount > 0) {
-        tapCount = 0;
-        setIntent(false);
-        editing.currentlyEditing = false;
-        await clearEditor();
-        RNExitApp.exitApp();
-      } else {
-        await saveNote();
-        tapCount = 1;
-        setTimeout(() => {
-          tapCount = 0;
-        }, 3000);
-        ToastEvent.show('Note saved, press back again to exit app.', 'success');
-      }
-      return true;
-    }
+    eSendEvent("showTooltip");
+    toolbarRef.current?.scrollTo({
+      x:0,
+      y:0,
+      animated:false
+    })
     editing.isFocused = false;
     editing.currentlyEditing = false;
     if (DDS.isLargeTablet()) {
