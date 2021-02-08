@@ -245,7 +245,6 @@ export const _onMessage = async (evt) => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
-      console.log('change');
       content = {
         type: message.type,
         data: message.value,
@@ -254,7 +253,6 @@ export const _onMessage = async (evt) => {
       break;
     case 'title':
       noteEdited = true;
-      console.log('title', message.value);
       title = message.value;
       eSendEvent('editorScroll', {
         title: message.value,
@@ -281,14 +279,15 @@ export const _onMessage = async (evt) => {
       }
       break;
     case 'status':
+      setColors(COLOR_SCHEME)
       webviewInit = true;
+      webviewOK = true;
       loadNoteInEditor();
       break;
     case 'running':
       webviewOK = true;
       break;
     case 'focus':
-      console.log(message.value, 'value');
       editing.focusType = message.value;
       break;
     case 'selectionchange':
@@ -400,7 +399,6 @@ export async function saveNote() {
       return;
     }
     let locked = id ? db.notes.note(id).data.locked : null;
-    console.log(content, 'SAVE Content');
 
     let noteData = {
       title,
@@ -473,7 +471,6 @@ const loadNoteInEditor = async () => {
   if (note?.id) {
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
-    console.log(content.data);
     tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
