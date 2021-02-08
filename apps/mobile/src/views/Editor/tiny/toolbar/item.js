@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import {View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -188,6 +188,11 @@ const ToolbarItem = ({
 		}
 		return;
     } */
+    if (type === 'settings') {
+      eSendEvent('openEditorSettings');
+      return;
+    }
+
     if (editing.tooltip === format && !formatValue) {
       focusEditor(format);
       eSendEvent('showTooltip');
@@ -232,18 +237,16 @@ const ToolbarItem = ({
       groupFormat === 'ol' ||
       groupFormat === 'ul'
     ) {
-      if (groupFormat === "fontname" && formatValue === "") {
-        value = Platform.OS === "ios" ? "-apple-system" : "serif";
+      if (groupFormat === 'fontname' && formatValue === '') {
+        value = Platform.OS === 'ios' ? '-apple-system' : 'serif';
       } else {
         value = formatValue;
       }
-    
     }
 
- 
     if (selected && (format === 'ol' || format === 'ul' || format === 'cl')) {
       formatSelection(execCommands.removeList);
-    } else if (value || value === "") {
+    } else if (value || value === '') {
       formatSelection(execCommands[format](value));
     } else {
       formatSelection(execCommands[format]);
@@ -291,8 +294,7 @@ const ToolbarItem = ({
           <Paragraph
             size={SIZE.md}
             color={selected ? colors.accent : colors.pri}>
-            {formatValue || currentText || "12pt"}
-
+            {formatValue || currentText || '12pt'}
           </Paragraph>
         ) : text && groupFormat !== 'header' ? (
           <Paragraph
@@ -300,15 +302,16 @@ const ToolbarItem = ({
             style={{
               paddingHorizontal: 12,
               fontFamily:
-                format === 'fontname' && formatValue && formatValue !== "-apple-system"
+                format === 'fontname' &&
+                formatValue &&
+                formatValue !== '-apple-system'
                   ? formatValue
-                  : format === 'fontname' && icon !== "-apple-system" && icon
+                  : format === 'fontname' && icon !== '-apple-system' && icon
                   ? icon
                   : null,
             }}
             size={SIZE.md}>
             {currentText || text}
-
           </Paragraph>
         ) : (
           <Icon

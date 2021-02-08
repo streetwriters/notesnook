@@ -1,4 +1,5 @@
 import {Platform} from 'react-native';
+import { eSendEvent } from '../../../../services/EventManager';
 import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 
@@ -14,6 +15,8 @@ export function formatSelection(command) {
 }
 
 export function focusEditor(format) {
+
+  eSendEvent("showTooltip");
   Platform.OS === 'android' && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
     tiny.call(EditorWebView, tiny.blur + ' ' + tiny.focusEditor);
@@ -162,4 +165,5 @@ export const TOOLBAR_ICONS = {
   removeformat: 'format-clear',
   horizontal: 'border-horizontal',
   table: 'table-plus',
+  settings:'cog-outline'
 };
