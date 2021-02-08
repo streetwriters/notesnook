@@ -47,21 +47,16 @@ function init_tiny(size) {
       editor = edit;
       setTheme();
       reactNativeEventHandler('status', true);
+
+
       editor.on('SelectionChange', function (e) {
-        clearTimeout(changeTimer);
-        if (isLoading) {
-          isLoading = false;
-          return;
-        }
-        changeTimer = setTimeout(() => {
-          if (editor.plugins.wordcount.getCount() === 0) return;
-          selectchange();
-          reactNativeEventHandler('history', {
+        selectchange();
+        reactNativeEventHandler('history', {
             undo: editor.undoManager.hasUndo(),
             redo: editor.undoManager.hasRedo(),
           });
-        }, 5);
       });
+
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
@@ -77,9 +72,9 @@ function init_tiny(size) {
           block: 'nearest',
         });
       });
-
+      editor.on('input', onChange);
       editor.on('keyup', onChange);
-      editor.on('Change', onChange);
+      editor.on('NodeChange', onChange);
     },
   });
 }
