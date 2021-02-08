@@ -36,8 +36,8 @@ const Input = ({
   clearTextOnFocus,
   onBlurInput,
   onPress,
-  height=50,
-  fontSize=SIZE.md
+  height = 50,
+  fontSize = SIZE.md,
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -130,9 +130,8 @@ const Input = ({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-end',
-    height: height,
-    marginBottom: marginBottom,
     flexGrow: 1,
+    height: 50,
   };
 
   const textStyle = {
@@ -147,144 +146,149 @@ const Input = ({
 
   return (
     <>
-      <TouchableOpacity
-        disabled={!loading}
-        onPress={onPress}
-        activeOpacity={1}
-        style={style}>
-        
-        <TextInput
-          ref={fwdRef}
-          testID={testID}
-          editable={!loading}
-          defaultValue={defaultValue}
-          autoCapitalize={autoCapitalize}
-          onChangeText={onChange}
-          onBlur={onBlur}
-          onFocus={onFocus}
-          onSubmitEditing={onSubmit}
-          blurOnSubmit={blurOnSubmit}
-          style={textStyle}
-          secureTextEntry={secureTextEntry && secureEntry}
-          placeholder={placeholder}
-          placeholderTextColor={colors.icon}
-        />
+      <View
+        style={{
+          height: height,
+          marginBottom: marginBottom,
+        }}>
+        <TouchableOpacity
+          disabled={!loading}
+          onPress={onPress}
+          activeOpacity={1}
+          style={style}>
+          <TextInput
+            ref={fwdRef}
+            testID={testID}
+            editable={!loading}
+            defaultValue={defaultValue}
+            autoCapitalize={autoCapitalize}
+            onChangeText={onChange}
+            onBlur={onBlur}
+            onFocus={onFocus}
+            onSubmitEditing={onSubmit}
+            blurOnSubmit={blurOnSubmit}
+            style={textStyle}
+            secureTextEntry={secureTextEntry && secureEntry}
+            placeholder={placeholder}
+            placeholderTextColor={colors.icon}
+          />
 
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'center',
-            height: 35,
-            alignItems: 'center',
-          }}>
-          {secureTextEntry && (
-            <ActionIcon
-              name="eye"
-              size={20}
-              top={10}
-              bottom={10}
-              onPress={() => {
-                setSecureEntry(!secureEntry);
-              }}
-              style={{
-                width: 25,
-                marginLeft: 5,
-              }}
-              color={secureEntry ? colors.icon : colors.accent}
-            />
-          )}
-
-          {button && (
-            <ActionIcon
-              name={button.icon}
-              size={20}
-              top={10}
-              bottom={10}
-              onPress={button.onPress}
-              style={{
-                width: 25,
-                marginLeft: 5,
-              }}
-              color={button.color}
-            />
-          )}
-
-          {error && (
-            <ActionIcon
-              name="alert-circle-outline"
-              top={10}
-              bottom={10}
-              onPress={() => {
-                setShowError(!showError);
-              }}
-              size={20}
-              style={{
-                width: 25,
-                marginLeft: 5,
-              }}
-              color={colors.errorText}
-            />
-          )}
-        </View>
-
-        {error && showError && errorMessage ? (
           <View
             style={{
-              position: 'absolute',
-              backgroundColor: colors.nav,
-              paddingVertical: 3,
-              paddingHorizontal: 5,
-              borderRadius: 2.5,
-              ...getElevation(2),
-              top: 0,
+              flexDirection: 'row',
+              justifyContent: 'center',
+              height: 35,
+              alignItems: 'center',
             }}>
-            <Paragraph
-              size={SIZE.xs}
-              style={{
-                textAlign: 'right',
-                textAlignVertical: 'bottom',
-              }}>
-              <Icon
-                name="alert-circle-outline"
-                size={SIZE.xs}
-                color={colors.errorText}
-              />{' '}
-              {errorMessage}
-            </Paragraph>
-          </View>
-        ) : null}
-      </TouchableOpacity>
-
-      {validationType === 'password' && focus && (
-        <View
-          style={{
-            paddingTop: 5,
-          }}>
-          {Object.keys(errorList).filter((k) => errorList[k] === true)
-            .length !== 0 ? (
-            Object.keys(ERRORS_LIST).map((error) => (
-              <View
+            {secureTextEntry && (
+              <ActionIcon
+                name="eye"
+                size={20}
+                top={10}
+                bottom={10}
+                onPress={() => {
+                  setSecureEntry(!secureEntry);
+                }}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
+                  width: 25,
+                  marginLeft: 5,
+                }}
+                color={secureEntry ? colors.icon : colors.accent}
+              />
+            )}
+
+            {button && (
+              <ActionIcon
+                name={button.icon}
+                size={20}
+                top={10}
+                bottom={10}
+                onPress={button.onPress}
+                style={{
+                  width: 25,
+                  marginLeft: 5,
+                }}
+                color={button.color}
+              />
+            )}
+
+            {error && (
+              <ActionIcon
+                name="alert-circle-outline"
+                top={10}
+                bottom={10}
+                onPress={() => {
+                  setShowError(!showError);
+                }}
+                size={20}
+                style={{
+                  width: 25,
+                  marginLeft: 5,
+                }}
+                color={colors.errorText}
+              />
+            )}
+          </View>
+
+          {error && showError && errorMessage ? (
+            <View
+              style={{
+                position: 'absolute',
+                backgroundColor: colors.nav,
+                paddingVertical: 3,
+                paddingHorizontal: 5,
+                borderRadius: 2.5,
+                ...getElevation(2),
+                top: 0,
+              }}>
+              <Paragraph
+                size={SIZE.xs}
+                style={{
+                  textAlign: 'right',
+                  textAlignVertical: 'bottom',
                 }}>
                 <Icon
-                  name={errorList[error] ? 'close' : 'check'}
-                  color={errorList[error] ? 'red' : 'green'}
-                />
+                  name="alert-circle-outline"
+                  size={SIZE.xs}
+                  color={colors.errorText}
+                />{' '}
+                {errorMessage}
+              </Paragraph>
+            </View>
+          ) : null}
+        </TouchableOpacity>
 
-                <Paragraph style={{marginLeft: 5}} size={SIZE.xs}>
-                  {ERRORS_LIST[error]}
-                </Paragraph>
-              </View>
-            ))
-          ) : (
-            <Paragraph color={colors.green} size={SIZE.xs}>
-              Password is strong.
-            </Paragraph>
-          )}
-        </View>
-      )}
+        {validationType === 'password' && focus && (
+          <View
+            style={{
+              paddingTop: 5,
+            }}>
+            {Object.keys(errorList).filter((k) => errorList[k] === true)
+              .length !== 0 ? (
+              Object.keys(ERRORS_LIST).map((error) => (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                  }}>
+                  <Icon
+                    name={errorList[error] ? 'close' : 'check'}
+                    color={errorList[error] ? 'red' : 'green'}
+                  />
+
+                  <Paragraph style={{marginLeft: 5}} size={SIZE.xs}>
+                    {ERRORS_LIST[error]}
+                  </Paragraph>
+                </View>
+              ))
+            ) : (
+              <Paragraph color={colors.green} size={SIZE.xs}>
+                Password is strong.
+              </Paragraph>
+            )}
+          </View>
+        )}
+      </View>
     </>
   );
 };
