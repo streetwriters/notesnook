@@ -72,9 +72,10 @@ function init_tiny(size) {
       });
       editor.on('ScrollIntoView', (e) => {
         e.preventDefault();
-        let offset = e.elm.offsetTop + 60;
-        console.log(e)
-        document.scrollingElement.scrollTo({top:offset})
+        e.elm.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest',
+        });
       });
 
       editor.on('keyup', onChange);
