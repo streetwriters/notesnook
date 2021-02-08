@@ -70,14 +70,14 @@ export const HeaderTitle = () => {
       style={{
         opacity: DDS.isLargeTablet() ? 1 : opacity,
       }}>
-      <Heading color={headerTextState.color}>
+      <Heading color={headerTextState?.color}>
         <Heading color={colors.accent}>
-          {headerTextState.heading.slice(0, 1) === '#' ? '#' : null}
+          {headerTextState?.heading.slice(0, 1) === '#' ? '#' : null}
         </Heading>
 
-        {headerTextState.heading.slice(0, 1) === '#'
-          ? headerTextState.heading.slice(1)
-          : headerTextState.heading}
+        {headerTextState?.heading.slice(0, 1) === '#'
+          ? headerTextState?.heading.slice(1)
+          : headerTextState?.heading}
       </Heading>
     </Animated.View>
   );

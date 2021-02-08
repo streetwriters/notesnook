@@ -307,6 +307,7 @@ const ListEmptyComponent = ({loading = true, placeholderData}) => {
   const {height} = useWindowDimensions();
 
   const onHeaderStateChange = (event) => {
+    if (!event) return;
     setHeaderTextState(event);
   };
   useEffect(() => {
@@ -350,16 +351,16 @@ const ListEmptyComponent = ({loading = true, placeholderData}) => {
             fontSize={SIZE.md}
             accentColor="bg"
             accentText={
-              COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                ? headerTextState.heading.toLowerCase()
+              COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
+                ? headerTextState.heading?.toLowerCase()
                 : 'accent'
             }
           />
         ) : loading ? (
           <ActivityIndicator
             color={
-              COLORS_NOTE[headerTextState.heading.toLowerCase()]
-                ? COLORS_NOTE[headerTextState.heading.toLowerCase()]
+              COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
+                ? COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
                 : colors.accent
             }
           />
