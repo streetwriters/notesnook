@@ -123,10 +123,11 @@ const focusEditor = `
 tinymce.activeEditor.focus();
 `;
 
-function call(webview, func) {
+function call(webview, func, noqueue) {
   if (getWebviewInit()) {
     webview.current?.injectJavaScript(func);
   } else {
+    if (noqueue) return;
     setTimeout(() => {
       console.log('run after delay');
       webview.current?.injectJavaScript(func);

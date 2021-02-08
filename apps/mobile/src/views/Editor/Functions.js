@@ -311,8 +311,7 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
-  if (!webviewInit) return;
-  tiny.call(EditorWebView, tiny.reset);
+  tiny.call(EditorWebView, tiny.reset,true);
   clearTimer();
   if (noteEdited && id) {
     await saveNote(false);
@@ -327,8 +326,8 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
-  tiny.call(EditorWebView, tiny.updateDateEdited(''));
-  tiny.call(EditorWebView, tiny.updateSavingState(''));
+  tiny.call(EditorWebView, tiny.updateDateEdited(''),true);
+  tiny.call(EditorWebView, tiny.updateSavingState(''),true);
 
   clearNote();
 }
