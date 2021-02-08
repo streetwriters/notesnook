@@ -48,7 +48,7 @@ const Tooltip = () => {
   };
 
   let ParentElement = (props) =>
-    group.type === 'link' || group.type === 'table' ? (
+    group.type === 'link' || group.type === 'table' || group.title === 'ul' || group.title === "align" ? (
       <View
         style={{
           borderRadius: floating ? 5 : 0,
