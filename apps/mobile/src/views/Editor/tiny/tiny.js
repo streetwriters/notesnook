@@ -63,7 +63,7 @@ document.getElementById("titleInput").focus();
 `;
 
 const setTitle = (value) => `
-document.getElementById("titleInput").value = '${value}';
+document.getElementById("titleInput").value = \`${value}\`;
 autosize();
 `;
 

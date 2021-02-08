@@ -201,19 +201,25 @@ export const loadNote = async (item) => {
   checkStatus();
 };
 
-const checkStatus = () => {
+const checkStatus = (reset = false) => {
   webviewOK = false;
   EditorWebView.current?.injectJavaScript(CHECK_STATUS());
   clearTimeout(webviewTimer);
   webviewTimer = setTimeout(() => {
     if (!webviewOK) {
+      if (!reset) {
+        checkStatus(true);
+        console.log('checking again')
+        return;
+      }
       webviewInit = false;
       EditorWebView = createRef();
       eSendEvent('webviewreset');
     } else {
       console.log('webview is running', webviewOK);
     }
-  }, 5000);
+
+  }, 3500);
 };
 
 export function setIntentNote(item) {
@@ -467,9 +473,7 @@ const loadNoteInEditor = async () => {
   if (note?.id) {
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
-
     console.log(content.data);
-
     tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
