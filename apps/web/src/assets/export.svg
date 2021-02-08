@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" data-name="Layer 1" viewBox="0 0 438 513">
+  <defs/>
+  <g data-name="Group 29">
+    <circle cx="103.2" cy="179.2" r="30" fill="#2f2e41" data-name="Ellipse 108"/>
+    <circle cx="105.7" cy="184.7" r="24.6" fill="#a0616a" data-name="Ellipse 109"/>
+    <path fill="#a0616a" d="M199 259a11 11 0 00-1 2l-49-2-6-11-17 7 8 20a8 8 0 008 4l56-6a11 11 0 101-14z" data-name="Path 704"/>
+    <path fill="#ccc" d="M119 264a5 5 0 01-2-3l-7-23a13 13 0 1124-11l13 20a5 5 0 01-2 7l-22 10a5 5 0 01-4 0z" data-name="Path 705"/>
+    <path fill="#a0616a" d="M168 500l11-6-18-45-16 9z" data-name="Path 706"/>
+    <path fill="#2f2e41" d="M163 498l22-12a15 15 0 0120 6l1 1-35 18z" data-name="Path 707"/>
+    <path fill="#a0616a" d="M50 500h12l6-48H50z" data-name="Path 708"/>
+    <path fill="#2f2e41" d="M46 496h25a15 15 0 0115 15H46z" data-name="Path 709"/>
+    <path fill="#3f3d56" d="M126 290l4 48 44 134a4 4 0 01-2 5h-1l-13 3a4 4 0 01-5-2L96 365a2 2 0 00-4 0L67 480a4 4 0 01-4 3H51a4 4 0 01-4-4c1-80-3-170 28-184l5-13z" data-name="Path 710"/>
+    <path fill="#ccc" d="M78 285l-5-31a31 31 0 0110-28 30 30 0 0128-7h1a31 31 0 0122 28c1 13 0 33-9 49l-1 1z" data-name="Path 711"/>
+    <path fill="#2f2e41" d="M130 172a33 33 0 01-19 6 20 20 0 008 3 67 67 0 01-27 0 18 18 0 01-6-2 7 7 0 01-4-5c0-3 2-6 5-8a36 36 0 0130-6c4 0 7 2 9 5s3 7 1 9z" data-name="Path 712"/>
+    <path fill="#2f2e41" d="M103 149c3-11-8-24-19-24-12 0-21 11-27 22s-12 22-24 26a24 24 0 01-33-23c-1 13 1 26 9 36s23 14 34 8c6-4 10-10 14-17s6-13 11-19 12-8 19-6l8 3c2 0 7-1 7-4z" data-name="Path 713"/>
+    <path fill="#a0616a" d="M44 358a11 11 0 012-17l22-95 21 9-27 91a11 11 0 01-18 12z" data-name="Path 714"/>
+    <path fill="#ccc" d="M59 259a5 5 0 010-4l8-22a13 13 0 0126 5l-1 24a5 5 0 01-6 5l-24-5a5 5 0 01-3-3z" data-name="Path 715"/>
+  </g>
+  <g fill="#ccc" data-name="Group 28">
+    <path d="M300 4a6 6 0 00-5-4H186a6 6 0 00-6 6v138a6 6 0 006 6h109a6 6 0 006-6V6a6 6 0 00-1-2zm-1 140a5 5 0 01-4 5H186a5 5 0 01-5-5V6a5 5 0 015-5h109a5 5 0 014 3 5 5 0 010 1 5 5 0 010 1z" data-name="Path 410"/>
+    <path d="M277 33h-32a3 3 0 010-6h32a3 3 0 010 6z" data-name="Path 411"/>
+    <path d="M277 46h-32a3 3 0 010-5h32a3 3 0 010 5z" data-name="Path 412"/>
+    <path d="M228 54h-24a3 3 0 01-3-3V23a3 3 0 013-3h24a3 3 0 013 3v28a3 3 0 01-3 3z" data-name="Path 413"/>
+    <path d="M277 75h-74a3 3 0 010-6h74a3 3 0 010 6z" data-name="Path 414"/>
+    <path d="M277 89h-74a3 3 0 010-6h74a3 3 0 110 6z" data-name="Path 415"/>
+    <path d="M277 102h-74a3 3 0 010-5h74a3 3 0 010 5z" data-name="Path 416"/>
+    <path d="M277 116h-74a3 3 0 010-5h74a3 3 0 010 5z" data-name="Path 417"/>
+    <path d="M277 130h-74a3 3 0 010-5h74a3 3 0 010 5z" data-name="Path 418"/>
+  </g>
+  <path fill="#e6e6e6" d="M366 85a8 8 0 00-7-4H221a8 8 0 00-8 7v176a8 8 0 008 7h138a8 8 0 008-7V88a7 7 0 00-1-3z" data-name="Path 336"/>
+  <path fill="#fff" d="M355 261H225c-2 0-3-2-3-4V94c0-3 1-5 3-5h130c2 0 3 2 3 5v163c0 2-1 4-3 4z"/>
+  <path fill="#3f3d56" d="M366 85a8 8 0 00-7-4H221a8 8 0 00-8 7v176a8 8 0 008 7h138a8 8 0 008-7V88a7 7 0 00-1-3zm-1 179a6 6 0 01-6 5H221a6 6 0 01-6-5V88a6 6 0 016-6h138a6 6 0 016 4 6 6 0 010 1 6 6 0 010 1z" data-name="Path 336"/>
+  <path fill="#3f3d56" d="M337 122h-42a3 3 0 010-7h42a3 3 0 110 7z" data-name="Path 337"/>
+  <path fill="#3f3d56" d="M337 140h-42a3 3 0 010-7h42a3 3 0 110 7z" data-name="Path 338"/>
+  <path fill="#0560ff" d="M274 150h-31a4 4 0 01-3-4v-36a4 4 0 013-4h31a4 4 0 014 4v36a4 4 0 01-4 4z" data-name="Path 339"/>
+  <path fill="#e6e6e6" d="M337 175h-94a3 3 0 010-6h94a3 3 0 110 6z" data-name="Path 340"/>
+  <path fill="#e6e6e6" d="M337 193h-94a3 3 0 010-7h94a3 3 0 010 7z" data-name="Path 341"/>
+  <path fill="#e6e6e6" d="M337 211h-94a3 3 0 010-7h94a3 3 0 110 7z" data-name="Path 342"/>
+  <path fill="#e6e6e6" d="M337 228h-94a3 3 0 110-7h94a3 3 0 010 7z" data-name="Path 343"/>
+  <path fill="#e6e6e6" d="M337 246h-94a3 3 0 110-7h94a3 3 0 010 7z" data-name="Path 344"/>
+  <circle cx="383.6" cy="67.6" r="54" fill="#0560ff" data-name="Ellipse 44"/>
+  <path fill="#fff" d="M392 69V40h-15v29h-7l7 13 7 13 8-13 7-13z" data-name="Path 692"/>
+  <path fill="#e6e6e6" d="M404 513H23a1 1 0 110-2h381a1 1 0 010 2z" data-name="Path 717"/>
+  <path fill="#f2f2f2" d="M371 504c-10 7-22 7-34 6h-6c-3-6-6-11-7-18-1-6 1-13 7-16a11 11 0 012-1l1-1a12 12 0 0114 16c5-5 4-13 3-19s-4-14-1-20a13 13 0 019-7h1a18 18 0 0112 3c7 4 11 12 12 21 2 13-2 28-13 36z" data-name="Path 694"/>
+</svg>
