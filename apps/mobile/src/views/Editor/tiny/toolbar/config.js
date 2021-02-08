@@ -19,18 +19,15 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Italic',
     },
     {
-      format: 'strikethrough',
-      type: 'format',
-      fullname: 'Strikethrough',
-    },
-    {
       format: 'underline',
       type: 'format',
       fullname: 'Underline',
     },
-  ],
-
-  [
+    {
+      format: 'strikethrough',
+      type: 'format',
+      fullname: 'Strikethrough',
+    },
     {
       format: 'align',
       type: 'tooltip',
@@ -66,41 +63,6 @@ export const TOOLBAR_CONFIG = [
   ],
   [
     {
-      format: 'ol',
-      type: 'tooltip',
-      fullname: 'Ordered List',
-      group: orderedListStyles.map((style) => {
-        return {
-          format: 'ol',
-          formatValue: style,
-          fullname: style,
-          premium: true,
-        };
-      }),
-    },
-
-    {
-      format: 'ul',
-      type: 'tooltip',
-      fullname: 'Unordered List',
-      group: unorderedListStyles.map((style) => {
-        return {
-          format: 'ul',
-          formatValue: style === 'default' ? 'disc' : style,
-          fullname: style,
-          premium: true,
-        };
-      }),
-    },
-    {
-      format: 'cl',
-      type: 'format',
-      fullname: 'Checklist',
-      premium: true,
-    },
-  ],
-  [
-    {
       format: 'fontsize',
       type: 'tooltip',
       valueIcon: 'fontsize',
@@ -130,35 +92,12 @@ export const TOOLBAR_CONFIG = [
       }),
     },
     {
-      format: 'hilitecolor',
-      type: 'tooltip',
-      fullname: 'Text Highlight Color',
-      groupType: 'hilitecolor',
-      group: editor_colors.map((item) => {
-        return {
-          format: 'hilitecolor',
-          formatValue: item,
-          premium: true,
-          fullname: item,
-        };
-      }),
+      format: 'h2',
+      type: 'format',
+      showTitle: false,
+      premium: true,
+      fullname: 'Heading 2',
     },
-    {
-      format: 'forecolor',
-      type: 'tooltip',
-      fullname: 'Text Color',
-      groupType: 'forecolor',
-      group: editor_colors.map((item) => {
-        return {
-          format: 'forecolor',
-          formatValue: item,
-          fullname: item,
-          premium: true,
-        };
-      }),
-    },
-  ],
-  [
     {
       format: 'header',
       type: 'tooltip',
@@ -217,6 +156,72 @@ export const TOOLBAR_CONFIG = [
       ],
     },
   ],
+  [
+    {
+      format: 'ol',
+      type: 'tooltip',
+      fullname: 'Ordered List',
+      group: orderedListStyles.map((style) => {
+        return {
+          format: 'ol',
+          formatValue: style,
+          fullname: style,
+          premium: true,
+        };
+      }),
+    },
+
+    {
+      format: 'ul',
+      type: 'tooltip',
+      fullname: 'Unordered List',
+      group: unorderedListStyles.map((style) => {
+        return {
+          format: 'ul',
+          formatValue: style === 'default' ? 'disc' : style,
+          fullname: style,
+          premium: true,
+        };
+      }),
+    },
+    {
+      format: 'cl',
+      type: 'format',
+      fullname: 'Checklist',
+      premium: true,
+    },
+  ],
+  [
+   
+    {
+      format: 'hilitecolor',
+      type: 'tooltip',
+      fullname: 'Text Highlight Color',
+      groupType: 'hilitecolor',
+      group: editor_colors.map((item) => {
+        return {
+          format: 'hilitecolor',
+          formatValue: item,
+          premium: true,
+          fullname: item,
+        };
+      }),
+    },
+    {
+      format: 'forecolor',
+      type: 'tooltip',
+      fullname: 'Text Color',
+      groupType: 'forecolor',
+      group: editor_colors.map((item) => {
+        return {
+          format: 'forecolor',
+          formatValue: item,
+          fullname: item,
+          premium: true,
+        };
+      }),
+    },
+  ],
 
   [
     {
@@ -242,21 +247,6 @@ export const TOOLBAR_CONFIG = [
       format: 'code-block',
       type: 'formatLine',
       fullname: 'Code',
-      premium: true,
-    },
-  ],
-  [
-    {
-      format: 'image',
-      type: 'format',
-      fullname: 'Image',
-      premium: true,
-    },
-    {
-      format: 'video',
-      type: 'format',
-      groupType: 'video',
-      fullname: 'Video',
       premium: true,
     },
   ],
@@ -295,6 +285,22 @@ export const TOOLBAR_CONFIG = [
   ],
   [
     {
+      format: 'image',
+      type: 'format',
+      fullname: 'Image',
+      premium: true,
+    },
+    {
+      format: 'video',
+      type: 'format',
+      groupType: 'video',
+      fullname: 'Video',
+      premium: true,
+    },
+  ],
+ 
+  [
+    {
       format: 'ltr',
       type: 'format',
       fullname: 'Text Direction LTR',
@@ -317,5 +323,10 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Remove Formatting',
     },
+    /*  {
+      format: 'settings',
+      type: 'settings',
+      fullname: 'Editor Settings',
+    },  */
   ],
 ];
