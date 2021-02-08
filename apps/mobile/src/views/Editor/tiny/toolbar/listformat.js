@@ -45,7 +45,7 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
                 color: selected ? colors.accent: colors.pri,
               }}
               size={6}
-              name="check-box-outline"
+              name="checkbox-marked"
             />
           ) : (
             <View
@@ -69,7 +69,7 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
             style={{
               width: 20,
               height: 3,
-              backgroundColor: selected ? colors.pri : colors.nav,
+              backgroundColor: selected ? colors.accent : colors.pri,
             }}
           />
         </View>
