@@ -33,7 +33,7 @@ function init_tiny(size) {
     statusbar: false,
     contextmenu: false,
     browser_spellcheck: true,
-    autoresize_bottom_margin: 0,
+    autoresize_bottom_margin: 50,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
     placeholder: 'Start writing your note here',
     object_resizing: true,
