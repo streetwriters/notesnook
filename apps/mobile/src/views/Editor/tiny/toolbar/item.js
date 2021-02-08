@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableButton} from '../../../../components/PressableButton';
+import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
 import {useTracked} from '../../../../provider';
 import {
@@ -65,7 +66,9 @@ const ToolbarItem = ({
       let keys = group.map((i) => i.format);
       keys.forEach((k) => {
         if (formats.includes(k)) {
+          console.log(group.find((e) => e.format === k).text);
           setCurrentText(group.find((e) => e.format === k).text);
+
           setSelected(false);
         }
       });
@@ -284,7 +287,12 @@ const ToolbarItem = ({
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />
         )}
-        {format === 'ol' || format === 'ul' || format === 'cl' ? (
+
+        {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format)? (
+          <Heading size={SIZE.md + 2} color={selected ? colors.accent : colors.pri}>
+            {format.slice(0, 1).toUpperCase() + format.slice(1)}
+          </Heading>
+        ) : /^(ol|ul|cl)$/.test(format) ? (
           <ToolbarListFormat
             format={format}
             selected={selected}
