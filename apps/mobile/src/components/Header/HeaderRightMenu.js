@@ -1,8 +1,9 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {dWidth} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
@@ -11,26 +12,42 @@ import {Button} from '../Button';
 
 export const HeaderRightMenu = () => {
   const [state] = useTracked();
-  const {colors, containerBottomButton, currentScreen, syncing} = state;
+  const {colors, containerBottomButton, syncing} = state;
+  const [headerTextState, setHeaderTextState] = useState(
+    Navigation.getHeaderState(),
+  );
+  const currentScreen = headerTextState.currentScreen;
+
+  const onHeaderStateChange = (event) => {
+    if (!event) return;
+    setHeaderTextState(event);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
 
   return (
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
 
-     {
-       currentScreen !== "settings"  && <ActionIcon
-       onPress={async () => {
-         Navigation.navigate('Search', {
-           menu: false,
-         });
-       }}
-       testID={notesnook.ids.default.header.buttons.left}
-       name="magnify"
-       size={SIZE.xxxl}
-       color={colors.pri}
-       customStyle={styles.rightBtn}
-     />
-     } 
+      {currentScreen !== 'settings' && (
+        <ActionIcon
+          onPress={async () => {
+            Navigation.navigate('Search', {
+              menu: false,
+            });
+          }}
+          testID={notesnook.ids.default.header.buttons.left}
+          name="magnify"
+          size={SIZE.xxxl}
+          color={colors.pri}
+          customStyle={styles.rightBtn}
+        />
+      )}
 
       {DDS.isLargeTablet() && containerBottomButton.onPress ? (
         <Button

@@ -6,6 +6,7 @@ import Container from '../components/Container';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {eSendEvent} from '../services/EventManager';
+import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
 import {rootNavigatorRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
@@ -75,12 +76,16 @@ export const NavigatorStack = React.memo(
   () => {
     React.useEffect(() => {
       sleep(2000).then(() => {
-        let headerState = {
-          heading: SettingsService.get().homepage,
-          id: SettingsService.get().homepage.toLowerCase() + '_navigation',
-        };
-        updateEvent({type: Actions.HEADER_TEXT_STATE, state: headerState});
-        eSendEvent('onHeaderStateChange', headerState);
+        Navigation.setHeaderState(
+          SettingsService.get().homepage,
+          {
+            menu: true,
+          },
+          {
+            heading: SettingsService.get().homepage,
+            id: SettingsService.get().homepage.toLowerCase() + '_navigation',
+          },
+        );
       });
     }, []);
 
@@ -90,7 +95,7 @@ export const NavigatorStack = React.memo(
           onStateChange={() => {
             updateEvent({type: Actions.SELECTION_MODE, enabled: false});
             updateEvent({type: Actions.CLEAR_SELECTION});
-            eSendEvent("navigate")
+            eSendEvent('navigate');
           }}
           independent={true}
           ref={rootNavigatorRef}>

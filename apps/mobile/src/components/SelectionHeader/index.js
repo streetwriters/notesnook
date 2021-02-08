@@ -1,34 +1,51 @@
-import React, { useEffect } from 'react';
-import { View } from 'react-native';
-import Animated, { Easing, useValue } from 'react-native-reanimated';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import {db} from '../../utils/DB';
 import {
   eOpenMoveNoteDialog,
   eOpenSimpleDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { TEMPLATE_DELETE } from '../DialogManager/Templates';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
 export const SelectionHeader = () => {
   // State
   const [state, dispatch] = useTracked();
-  const {
-    colors,
-    selectionMode,
-    selectedItemsList,
-    currentScreen,
-    premiumUser,
-  } = state;
+  const {colors, selectionMode, selectedItemsList} = state;
   const insets = useSafeAreaInsets();
   const translateY = useValue(-150);
+
+  const [headerTextState, setHeaderTextState] = useState(
+    Navigation.getHeaderState(),
+  );
+  const currentScreen = headerTextState.currentScreen;
+
+  const onHeaderStateChange = (event) => {
+    if (!event) return;
+    setHeaderTextState(event);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
 
   useEffect(() => {
     Animated.timing(translateY, {

@@ -1,15 +1,17 @@
-import { DrawerActions, StackActions } from '@react-navigation/native';
-import { updateEvent } from '../components/DialogManager/recievers';
-import { Actions } from '../provider/Actions';
-import { rootNavigatorRef, sideMenuRef } from '../utils/Refs';
-import { eSendEvent } from './EventManager';
+import {DrawerActions, StackActions} from '@react-navigation/native';
+import {updateEvent} from '../components/DialogManager/recievers';
+import {Actions} from '../provider/Actions';
+import {rootNavigatorRef, sideMenuRef} from '../utils/Refs';
+import {eSendEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
-let currentScreen = "Notes"
+let currentScreen = 'Notes';
 let headerState = {
   heading: 'Notes',
   color: null,
-}
+  verticalMenu:true,
+  currentScreen:'Notes'
+};
 function getCurrentScreen() {
   return currentScreen;
 }
@@ -46,12 +48,18 @@ function navigate(name, params, item) {
  * @param {screenParams} item
  */
 function setHeaderState(name, params, item) {
-  headerState = item;
-  currentScreen = name;
   if (item) {
-    eSendEvent('onHeaderStateChange', item);
+    headerState = item;
   }
-  if (name) {
+  currentScreen = name;
+  headerState.currentScreen = name.toLowerCase();
+  headerState.verticalMenu = params.menu;
+
+  if (headerState) {
+    eSendEvent('onHeaderStateChange', headerState);
+  }
+
+  /*  if (name) {
     updateEvent({
       type: Actions.CURRENT_SCREEN,
       screen: name.toLowerCase(),
@@ -62,7 +70,7 @@ function setHeaderState(name, params, item) {
       type: Actions.HEADER_STATE,
       state: params.menu,
     });
-  }
+  } */
 }
 
 function goBack() {
@@ -111,5 +119,5 @@ export default {
   setHeaderState,
   replace,
   popToTop,
-  getHeaderState
+  getHeaderState,
 };

@@ -3,6 +3,7 @@ import { Platform, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { dWidth } from '../../utils';
 import { eScrollEvent } from '../../utils/Events';
@@ -15,9 +16,30 @@ import { HeaderTitle } from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
-  const {colors, currentScreen} = state;
+  const {colors} = state;
   const insets = useSafeAreaInsets();
   const [hide, setHide] = useState(true);
+  const [headerTextState, setHeaderTextState] = useState(
+    Navigation.getHeaderState(),
+  );
+  const currentScreen = headerTextState.currentScreen;
+
+  const onHeaderStateChange = (event) => {
+    if (!event) return;
+    setHeaderTextState(event);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    return () => {
+      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    };
+  }, []);
+
+
+
+
+
 
   const onScroll = (y) => {
     if (y > 150) {
