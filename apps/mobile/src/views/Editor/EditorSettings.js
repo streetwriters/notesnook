@@ -39,6 +39,18 @@ export const EditorSettings = () => {
     };
   }, []);
 
+  let presets = [
+    {
+      name:"Poems",
+      size:"12pt",
+      fontname: {name: 'Times New Roman', value: 'times new roman'},
+      line_break:"paragraph",
+      direction:"ltr",
+      forecolor:"#ff0000",
+      hilitecolor:"#00ff00",
+    }
+  ]
+
   return (
     visible && (
       <ActionSheetWrapper
@@ -75,8 +87,6 @@ export const EditorSettings = () => {
               onPress: () => {},
             }}
           />
-
-		  
         </View>
       </ActionSheetWrapper>
     )
