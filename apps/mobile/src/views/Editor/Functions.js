@@ -306,6 +306,7 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
+  if (!webviewInit) return;
   tiny.call(EditorWebView, tiny.reset);
   clearTimer();
   if (noteEdited && id) {
