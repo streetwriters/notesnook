@@ -24,6 +24,7 @@ import {
   eShowGetPremium,
   eThemeUpdated,
 } from '../../utils/Events';
+import { EditorSettings } from '../../views/Editor/EditorSettings';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {AddNotebookDialog} from '../AddNotebookDialog';
