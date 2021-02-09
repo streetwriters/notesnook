@@ -209,7 +209,7 @@ const checkStatus = (reset = false) => {
     if (!webviewOK) {
       if (!reset) {
         checkStatus(true);
-        console.log('checking again')
+        console.log('checking again');
         return;
       }
       webviewInit = false;
@@ -218,7 +218,6 @@ const checkStatus = (reset = false) => {
     } else {
       console.log('webview is running', webviewOK);
     }
-
   }, 3500);
 };
 
@@ -279,10 +278,11 @@ export const _onMessage = async (evt) => {
       }
       break;
     case 'status':
-      setColors(COLOR_SCHEME)
+      setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
       loadNoteInEditor();
+
       break;
     case 'running':
       webviewOK = true;
@@ -311,7 +311,7 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
-  tiny.call(EditorWebView, tiny.reset,true);
+  tiny.call(EditorWebView, tiny.reset, true);
   clearTimer();
   if (noteEdited && id) {
     await saveNote(false);
@@ -326,8 +326,8 @@ export async function clearEditor() {
     redo: 0,
   });
   saveCounter = 0;
-  tiny.call(EditorWebView, tiny.updateDateEdited(''),true);
-  tiny.call(EditorWebView, tiny.updateSavingState(''),true);
+  tiny.call(EditorWebView, tiny.updateDateEdited(''), true);
+  tiny.call(EditorWebView, tiny.updateSavingState(''), true);
 
   clearNote();
 }
@@ -440,12 +440,9 @@ export async function saveNote() {
 
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
-    tiny.call(EditorWebView, tiny.reset);
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
-  tiny.call(EditorWebView, tiny.reset);
   setColors(colors);
-  await restoreEditorState();
 }
 
 async function restoreEditorState() {
@@ -472,8 +469,13 @@ const loadNoteInEditor = async () => {
     intent = false;
     tiny.call(EditorWebView, tiny.html(content.data));
     setColors();
-    tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
+    tiny.call(
+      EditorWebView,
+      tiny.updateDateEdited(timeConverter(note.dateEdited)),
+    );
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+  } else {
+    await restoreEditorState();
   }
   tiny.call(EditorWebView, tiny.clearHistory);
 };
