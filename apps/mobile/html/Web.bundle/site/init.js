@@ -30,6 +30,14 @@ function init_tiny(size) {
     images_upload_handler: function (blobInfo, success, failure) {
       success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
     },
+    content_style: `
+    span.diff-del {
+      background-color: #FDB0C0;  
+    }
+    span.diff-ins {
+      background-color: #CAFFFB;  
+    }
+`,
     statusbar: false,
     contextmenu: false,
     browser_spellcheck: true,
@@ -48,13 +56,12 @@ function init_tiny(size) {
       setTheme();
       reactNativeEventHandler('status', true);
 
-
       editor.on('SelectionChange', function (e) {
         selectchange();
         reactNativeEventHandler('history', {
-            undo: editor.undoManager.hasUndo(),
-            redo: editor.undoManager.hasRedo(),
-          });
+          undo: editor.undoManager.hasUndo(),
+          redo: editor.undoManager.hasRedo(),
+        });
       });
 
       editor.on('focus', () => {
@@ -80,7 +87,7 @@ function init_tiny(size) {
 }
 
 const onChange = (event) => {
-  console.log("called")
+  console.log('called');
   if (isLoading) {
     isLoading = false;
     return;

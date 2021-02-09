@@ -31,6 +31,7 @@ import Paragraph from '../Typography/Paragraph';
 import KeepAwake from '@sayem314/react-native-keep-awake';
 import {timeConverter} from '../../utils/TimeUtils';
 import tiny from '../../views/Editor/tiny/tiny';
+import diff from '../../utils/differ';
 
 const {Value, timing} = Animated;
 
@@ -103,14 +104,26 @@ const MergeEditor = () => {
   const insets = useSafeAreaInsets();
 
   const onPrimaryWebViewLoad = () => {
-    tiny.call(primaryWebView, tiny.html(primaryData.data), true);
+    let htmlDiff = {
+      before: primaryData.data,
+    };
+    if (secondaryData.data) {
+      htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
+    }
+    tiny.call(primaryWebView, tiny.html(htmlDiff.before), true);
     let theme = {...colors};
     theme.factor = normalize(1);
     tiny.call(primaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
   };
 
   const onSecondaryWebViewLoad = () => {
-    tiny.call(secondaryWebView, tiny.html(secondaryData.data), true);
+    let htmlDiff = {
+      before: primaryData.data,
+    };
+    if (secondaryData.data) {
+      htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
+    }
+    tiny.call(secondaryWebView, tiny.html(htmlDiff.after), true);
     let theme = {...colors};
     theme.factor = normalize(1);
     tiny.call(secondaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
@@ -154,7 +167,9 @@ const MergeEditor = () => {
     if (keepContentFrom === 'primary') {
       await db.notes.add({
         content: {
-          data: primaryData.data,
+          data: primaryData.data
+            ? diff.clean(primaryData.data)
+            : primaryData.data,
           resolved: true,
           type: primaryData.type,
         },
@@ -164,7 +179,9 @@ const MergeEditor = () => {
     } else if (keepContentFrom === 'secondary') {
       await db.notes.add({
         content: {
-          data: secondaryData.data,
+          data: secondaryData.data
+            ? diff.clean(secondaryData.data)
+            : secondaryData.data,
           type: secondaryData.type,
           resolved: true,
         },
@@ -176,7 +193,9 @@ const MergeEditor = () => {
     if (copyToSave === 'primary') {
       await db.notes.add({
         content: {
-          data: primaryData.data,
+          data: primaryData.data
+            ? diff.clean(primaryData.data)
+            : primaryData.data,
           type: primaryData.type,
         },
         id: null,
@@ -184,7 +203,9 @@ const MergeEditor = () => {
     } else if (copyToSave === 'secondary') {
       await db.notes.add({
         content: {
-          data: secondaryData.data,
+          data: secondaryData.data
+            ? diff.clean(secondaryData.data)
+            : secondaryData.data,
           type: secondaryData.type,
         },
         id: null,

@@ -32,6 +32,14 @@ function init_tiny(size) {
     },
     statusbar: false,
     contextmenu: false,
+    content_style: `
+    span.diff-del {
+      background-color: #FDB0C0;  
+    }
+    span.diff-ins {
+      background-color: #CAFFFB;  
+    }
+`,
     browser_spellcheck: true,
     autoresize_bottom_margin: 50,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
