@@ -13,8 +13,6 @@ function reactNativeEventHandler(type, value) {
 
 let changeTimer = null;
 
-
-
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -24,8 +22,8 @@ function init_tiny(size) {
     content_css: 'dist/skins/notesnook',
     plugins: [
       'mychecklist advlist autolink textpattern hr lists link noneditable image charmap preview anchor',
-      'searchreplace visualblocks code fullscreen importcss',
-      'insertdatetime media imagetools table paste help wordcount autoresize directionality',
+      'searchreplace visualblocks fullscreen importcss',
+      'mycode insertdatetime media imagetools table paste help wordcount autoresize directionality',
     ],
     toolbar: false,
     paste_data_images: true,
@@ -59,13 +57,21 @@ function init_tiny(size) {
       setTheme();
       reactNativeEventHandler('status', true);
 
-
       editor.on('SelectionChange', function (e) {
         selectchange();
         reactNativeEventHandler('history', {
-            undo: editor.undoManager.hasUndo(),
-            redo: editor.undoManager.hasRedo(),
-          });
+          undo: editor.undoManager.hasUndo(),
+          redo: editor.undoManager.hasRedo(),
+        });
+      });
+
+      editor.on('NewBlock', function (event) {
+
+        if (event.newBlock.nodeName === "PRE") {
+          console.log(event.newBlock);
+          console.log(event.newBlock.prevSibling)
+         }
+
       });
 
       editor.on('focus', () => {
@@ -91,7 +97,7 @@ function init_tiny(size) {
 }
 
 const onChange = (event) => {
-  console.log("called")
+  console.log('called');
   if (isLoading) {
     isLoading = false;
     return;
