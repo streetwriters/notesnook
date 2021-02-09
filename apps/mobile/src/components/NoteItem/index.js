@@ -88,7 +88,7 @@ export default class NoteItem extends React.Component {
             width: '92%',
             paddingRight: 5,
           }}>
-          {!isTrash && item.notebooks && item.notebooks.length > 0 && (
+          {!isTrash && item.notebooks && item.notebooks.length > 0 ? (
             <View
               style={{
                 flexDirection: 'row',
@@ -115,26 +115,26 @@ export default class NoteItem extends React.Component {
                   {db.notebooks.notebook(item.notebooks[0]?.id)?.title + ' '}{' '}
                   {item.notebooks.length > 1
                     ? '& ' + (item.notebooks.length - 1) + ' others'
-                    : ''}
+                    : ''} 
                 </Heading>
               </TouchableOpacity>
             </View>
-          )}
+          ) : null}
 
           <Heading
             color={COLORS_NOTE[item.color]}
             numberOfLines={1}
             size={SIZE.md}>
-            {item.title.replace('\n', '')}
+            {item?.title.replace('\n', '')}
           </Heading>
 
-          {item.headline && (
+          {item?.headline ? (
             <Paragraph numberOfLines={2}>
               {item.headline[item.headline.length - 1] === '\n'
                 ? item.headline.slice(0, item.headline.length - 1)
                 : item.headline}
             </Paragraph>
-          )}
+          ) : null}
 
           <View
             style={{
@@ -158,7 +158,7 @@ export default class NoteItem extends React.Component {
                   }
                 />
 
-                {item.color && (
+                {item.color ? (
                   <View
                     key={item}
                     style={{
@@ -170,7 +170,7 @@ export default class NoteItem extends React.Component {
                       marginRight: 10,
                     }}
                   />
-                )}
+                ) : null}
 
                 {item.locked ? (
                   <Icon
