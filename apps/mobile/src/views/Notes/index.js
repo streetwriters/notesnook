@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {InteractionManager, Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
-import {NoteItemWrapper} from '../../components/SimpleList/NoteItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
@@ -217,7 +216,6 @@ export const Notes = ({route, navigation}) => {
         }}
         loading={loading || localLoad}
         focused={() => navigation.isFocused()}
-        RenderItem={NoteItemWrapper}
         placeholderText={`Add some notes to this" ${
           params.type ? params.type : 'topic.'
         }`}

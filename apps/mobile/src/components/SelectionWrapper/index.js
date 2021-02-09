@@ -60,10 +60,6 @@ const SelectionWrapper = ({
     setActionStrip(false);
   };
 
-  const closeStrip = () => {
-    setActionStrip(false);
-  };
-
   useEffect(() => {
     eSubscribeEvent('navigate', closeStrip);
 

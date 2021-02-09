@@ -1,35 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {
-  ActivityIndicator,
-  RefreshControl,
-  useWindowDimensions,
-  View,
-} from 'react-native';
-import {TouchableWithoutFeedback} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-} from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import React, { useEffect, useState } from 'react';
+import { RefreshControl, useWindowDimensions } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { DataProvider, LayoutProvider, RecyclerListView } from 'recyclerlistview';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {dHeight} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {eOpenJumpToDialog, eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {HeaderMenu} from '../Header/HeaderMenu';
-import Seperator from '../Seperator';
+import { dHeight } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
+import { NotebookWrapper } from '../NotebookItem/wrapper';
+import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
-import {ListHeaderComponent} from './ListHeaderComponent';
-import {NotebookItemWrapper} from './NotebookItemWrapper';
-import {NoteItemWrapper} from './NoteItemWrapper';
+import { Empty } from './empty';
+import { Footer } from './footer';
+import { Header } from './header';
+import { SectionHeader } from './section-header';
 
 const header = {
   type: 'MAIN_HEADER',
@@ -138,18 +123,16 @@ const SimpleList = ({
   const _renderRow = (type, data, index) => {
     switch (type) {
       case 'note':
-        return (
-          <NoteItemWrapper item={data} pinned={data.pinned} index={index} />
-        );
+        return <NoteWrapper item={data} pinned={data.pinned} index={index} />;
       case 'notebook':
         return (
-          <NotebookItemWrapper item={data} pinned={data.pinned} index={index} />
+          <NotebookWrapper item={data} pinned={data.pinned} index={index} />
         );
       case 'tag':
         return <TagItem item={data} index={index} />;
       case 'topic':
         return (
-          <NotebookItemWrapper
+          <NotebookWrapper
             item={data}
             isTopic={true}
             pinned={data.pinned}
@@ -158,13 +141,13 @@ const SimpleList = ({
         );
       case 'trash':
         return data.itemType === 'note' ? (
-          <NoteItemWrapper item={data} index={index} isTrash={true} />
+          <NoteWrapper item={data} index={index} isTrash={true} />
         ) : (
-          <NotebookItemWrapper item={data} index={index} isTrash={true} />
+          <NotebookWrapper item={data} index={index} isTrash={true} />
         );
       case 'MAIN_HEADER':
         return (
-          <ListHeaderComponent
+          <Header
             title={headerProps.heading}
             type={dataType}
             index={index}
@@ -173,7 +156,7 @@ const SimpleList = ({
         );
       case 'header':
         return (
-          <RenderSectionHeader
+          <SectionHeader
             item={data}
             index={index}
             headerProps={headerProps}
@@ -182,12 +165,7 @@ const SimpleList = ({
           />
         );
       case 'empty':
-        return (
-          <ListEmptyComponent
-            loading={loading}
-            placeholderData={placeholderData}
-          />
-        );
+        return <Empty loading={loading} placeholderData={placeholderData} />;
     }
   };
 
@@ -222,7 +200,7 @@ const SimpleList = ({
     width: '100%',
   };
 
-  const renderFooter = () => <View style={{height: 300}} />;
+
 
   return (
     <RecyclerListView
@@ -234,7 +212,7 @@ const SimpleList = ({
       canChangeSize={true}
       optimizeForInsertDeleteAnimations
       //forceNonDeterministicRendering
-      renderFooter={renderFooter}
+      renderFooter={ Footer}
       scrollViewProps={scrollProps}
       style={styles}
     />
@@ -242,130 +220,3 @@ const SimpleList = ({
 };
 
 export default SimpleList;
-
-const RenderSectionHeader = ({
-  item,
-  index,
-  headerProps,
-  jumpToDialog,
-  sortMenuButton,
-}) => {
-  const [state] = useTracked();
-  const {colors} = state;
-
-  return (
-    <View
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        width: '100%',
-        justifyContent: 'space-between',
-        paddingHorizontal: 12,
-        height: 30,
-        backgroundColor:
-          index === 1
-            ? headerProps.color
-              ? colors[headerProps.color]
-              : colors.shade
-            : colors.nav,
-        marginTop: index === 1 ? 0 : 5,
-      }}>
-      <TouchableWithoutFeedback
-        onPress={() => {
-          if (jumpToDialog) {
-            eSendEvent(eOpenJumpToDialog);
-          }
-        }}
-        hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
-        style={{
-          height: '100%',
-          justifyContent: 'center',
-        }}>
-        <Heading
-          color={colors.accent}
-          size={SIZE.sm}
-          style={{
-            minWidth: 60,
-            alignSelf: 'center',
-            textAlignVertical: 'center',
-          }}>
-          {!item.title || item.title === '' ? 'Pinned' : item.title}
-        </Heading>
-      </TouchableWithoutFeedback>
-      {index === 1 && sortMenuButton ? <HeaderMenu /> : null}
-    </View>
-  );
-};
-
-const ListEmptyComponent = ({loading = true, placeholderData}) => {
-  const [state] = useTracked();
-  const {colors} = state;
-  const [headerTextState, setHeaderTextState] = useState(
-    Navigation.getHeaderState(),
-  );
-  const insets = useSafeAreaInsets();
-  const {height} = useWindowDimensions();
-
-  const onHeaderStateChange = (event) => {
-    if (!event) return;
-    setHeaderTextState(event);
-  };
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
-
-  return (
-    <View
-      style={[
-        {
-          backgroundColor: colors.bg,
-          height: height - 250 - insets.top,
-          width: '100%',
-        },
-      ]}>
-      <View
-        style={{
-          flexGrow: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Heading>{placeholderData.heading}</Heading>
-        <Paragraph
-          style={{
-            textAlign: 'center',
-            width: '80%',
-          }}
-          color={colors.icon}>
-          {loading ? placeholderData.loading : placeholderData.paragraph}
-        </Paragraph>
-        <Seperator />
-        {placeholderData.button && !loading ? (
-          <Button
-            onPress={placeholderData.action}
-            title={placeholderData.button}
-            icon="plus"
-            type="accent"
-            fontSize={SIZE.md}
-            accentColor="bg"
-            accentText={
-              COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
-                ? headerTextState.heading?.toLowerCase()
-                : 'accent'
-            }
-          />
-        ) : loading ? (
-          <ActivityIndicator
-            color={
-              COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
-                ? COLORS_NOTE[headerTextState?.heading?.toLowerCase()]
-                : colors.accent
-            }
-          />
-        ) : null}
-      </View>
-    </View>
-  );
-};

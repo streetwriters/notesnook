@@ -2,7 +2,6 @@ import React, {useCallback, useEffect, useState} from 'react';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
-import {NotebookItemWrapper} from '../../components/SimpleList/NotebookItemWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
@@ -84,7 +83,6 @@ export const Folders = ({route, navigation}) => {
         data={notebooks}
         type="notebooks"
         focused={() => navigation.isFocused()}
-        RenderItem={NotebookItemWrapper}
         loading={loading}
         placeholderData={{
           heading: 'Your Notebooks',

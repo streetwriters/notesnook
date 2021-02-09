@@ -1,37 +1,35 @@
-import React, {useEffect, useRef, useState} from 'react';
-import { Platform } from 'react-native';
-import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Modal, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
-import {Actions} from '../../provider/Actions';
-import {useTracked} from '../../provider/index';
-import {DDS} from '../../services/DeviceDetection';
+import { Toast } from '../../components/Toast';
+import { Actions } from '../../provider/Actions';
+import { useTracked } from '../../provider/index';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import {getElevation} from '../../utils';
-import {db} from '../../utils/DB';
+import { getElevation } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenRecoveryKeyDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
-import DialogContainer from '../Dialog/dialog-container';
 import Input from '../Input';
-import {ListHeaderComponent} from '../SimpleList/ListHeaderComponent';
+import { Header } from '../SimpleList/header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -457,7 +455,7 @@ const LoginDialog = () => {
             <View />
           </View>
 
-          <ListHeaderComponent
+          <Header
             color="transparent"
             type="settings"
             shouldShow

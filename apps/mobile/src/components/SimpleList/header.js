@@ -1,19 +1,16 @@
-import React, {useEffect} from 'react';
-import {Text, View} from 'react-native';
-import Animated from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {eScrollEvent} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {Placeholder} from '../ListPlaceholders';
+import React from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Placeholder } from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {MessageCard} from './MessageCard';
+import { Card } from './card';
 
-export const ListHeaderComponent = ({
+export const Header = ({
   type,
   messageCard = true,
   title,
@@ -36,9 +33,7 @@ export const ListHeaderComponent = ({
         alignItems: 'center',
       }}>
       {messageCard && (
-        <MessageCard
-          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
-        />
+        <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
       )}
     </View>
   ) : (
@@ -47,9 +42,7 @@ export const ListHeaderComponent = ({
         width: '100%',
       }}>
       {messageCard && (
-        <MessageCard
-          color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
-        />
+        <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
       )}
       <View
         style={{

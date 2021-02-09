@@ -1,6 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react';
-import NoteItem from '../../components/NoteItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import NoteItem from '.';
+import SelectionWrapper from '../SelectionWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
@@ -17,7 +17,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {tabBarRef} from '../../utils/Refs';
 import {notesnook} from '../../../e2e/test.ids';
 
-export const NoteItemWrapper = ({item, index, isTrash = false}) => {
+export const NoteWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [note, setNote] = useState(item);

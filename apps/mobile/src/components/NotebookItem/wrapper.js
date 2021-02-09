@@ -1,13 +1,13 @@
 import React, {useMemo} from 'react';
 import {notesnook} from '../../../e2e/test.ids';
-import {NotebookItem} from '../../components/NotebookItem';
-import SelectionWrapper from '../../components/SelectionWrapper';
+import {NotebookItem} from '.';
+import SelectionWrapper from '../SelectionWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Navigation from '../../services/Navigation';
 import {rootNavigatorRef} from '../../utils/Refs';
 
-export const NotebookItemWrapper = ({
+export const NotebookWrapper = ({
   item,
   index,
   isTrash = false,

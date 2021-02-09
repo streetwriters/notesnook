@@ -4,11 +4,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import { getElevation } from '../../utils';
+import {getElevation} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const MessageCard = ({data, color}) => {
+export const Card = ({data, color}) => {
   const [state] = useTracked();
   const {selectionMode, messageBoardState} = state;
 
@@ -25,7 +25,7 @@ export const MessageCard = ({data, color}) => {
         right: 0,
         top: 0,
         zIndex: 999,
-        backgroundColor: messageBoardState.type === "error" ? "red" : color,
+        backgroundColor: messageBoardState.type === 'error' ? 'red' : color,
         width: '100%',
       }}>
       <View
@@ -45,9 +45,13 @@ export const MessageCard = ({data, color}) => {
             width: 20,
             justifyContent: 'center',
             alignItems: 'center',
-            ...getElevation(5)
+            ...getElevation(5),
           }}>
-          <Icon name={messageBoardState.icon} size={SIZE.sm} color={messageBoardState.type === "error" ? "red" : color} />
+          <Icon
+            name={messageBoardState.icon}
+            size={SIZE.sm}
+            color={messageBoardState.type === 'error' ? 'red' : color}
+          />
         </View>
 
         <Paragraph size={SIZE.sm} color="white">
