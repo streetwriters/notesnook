@@ -31,7 +31,7 @@ export default class NotesnookShare extends Component {
           : COLOR_SCHEME_LIGHT,
       height: 0,
     };
-
+    this.initialText = '';
     this.textInputRef = createRef();
     this.titleInputRef = createRef();
   }
@@ -47,6 +47,7 @@ export default class NotesnookShare extends Component {
       this.setState({
         text: text,
       });
+      this.initialText = text;
     } catch (e) {
       console.log('errrr', e);
     }
@@ -66,8 +67,15 @@ export default class NotesnookShare extends Component {
       loading: true,
     });
 
-    let tag = validator.isURL(this.state.text)
-      ? `<a href='${this.state.text}' target='_blank'>${this.state.text}</a>`
+    let tag = validator.isURL(this.initialText)
+      ? `<a href='${this.initialText}' target='_blank'>${
+          this.state.text.split(' ')[0]
+        }</a>
+      <p>${
+        this.state.text.split(' ').length > 0
+          ? this.state.text.split(' ').slice(1).join(' ')
+          : ''
+      } </p>`
       : `<p>${this.state.text}</p>`;
 
     let add = async () => {
