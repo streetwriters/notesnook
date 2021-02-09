@@ -51,7 +51,7 @@ const SimpleList = ({
   },
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const {colors, deviceMode} = state;
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
@@ -67,7 +67,7 @@ const SimpleList = ({
   useEffect(() => {
     if (loading) return;
     loadData();
-  }, [data, loading]);
+  }, [data, loading, deviceMode]);
 
   const loadData = () => {
     let mainData = [header, {type: 'empty'}];
@@ -231,7 +231,7 @@ const SimpleList = ({
       dataProvider={dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
-      //canChangeSize={true}
+      canChangeSize={true}
       optimizeForInsertDeleteAnimations
       //forceNonDeterministicRendering
       renderFooter={renderFooter}
