@@ -20,7 +20,7 @@ import DialogHeader from '../../components/Dialog/dialog-header';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {ListHeaderComponent} from '../../components/SimpleList/ListHeaderComponent';
+import {Header} from '../../components/SimpleList/header';
 import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
@@ -98,6 +98,8 @@ export const Settings = ({navigation}) => {
       });
     }
 
+    
+
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
       data: [],
@@ -164,24 +166,24 @@ export const Settings = ({navigation}) => {
       name: 'Join our Discord Community',
 
       func: async () => {
-        eSendEvent(eOpenProgressDialog,{
-          title:'Join our Discord Community',
-          paragraph:'We are not ghosts, chat with us and share your experience.',
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Join our Discord Community',
+          paragraph:
+            'We are not ghosts, chat with us and share your experience.',
           valueArray: [
             'Talk with us anytime.',
             'Follow the development process',
             'Give suggestions and report issues.',
             'Get early access to new features',
-            'Meet other people using Notesnook'
+            'Meet other people using Notesnook',
           ],
-          noProgress:true,
-          icon:'discord',
-          action:async () => {
+          noProgress: true,
+          icon: 'discord',
+          action: async () => {
             await Linking.openURL('https://discord.gg/zQBK97EE22');
           },
-          actionText:"Join Now"
-
-        })
+          actionText: 'Join Now',
+        });
       },
       desc: 'We are not ghosts, chat with us and share your experience.',
     },
@@ -209,30 +211,32 @@ export const Settings = ({navigation}) => {
           paddingHorizontal: 0,
         }}>
         {!DDS.isLargeTablet() && (
-          <ListHeaderComponent
+          <Header
             title="Settings"
             type="settings"
             messageCard={false}
           />
         )}
-
         <SettingsUserSection />
         <SettingsAppearanceSection />
-        <SettingsPrivacyAndSecurity />
-        <SettingsBackupAndRestore />
 
-        <SectionHeader title="Other" />
+          <>
+            <SettingsPrivacyAndSecurity />
+            <SettingsBackupAndRestore />
 
-        {otherItems.map((item) => (
-          <CustomButton
-            key={item.name}
-            title={item.name}
-            tagline={item.desc}
-            onPress={item.func}
-          />
-        ))}
+            <SectionHeader title="Other" />
 
-        <AccoutLogoutSection />
+            {otherItems.map((item) => (
+              <CustomButton
+                key={item.name}
+                title={item.name}
+                tagline={item.desc}
+                onPress={item.func}
+              />
+            ))}
+
+            <AccoutLogoutSection />
+          </>
 
         <View
           style={{
