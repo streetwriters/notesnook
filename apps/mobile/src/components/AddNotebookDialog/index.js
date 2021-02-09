@@ -1,4 +1,4 @@
-import React, { createRef } from 'react';
+import React, {createRef} from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -7,21 +7,21 @@ import {
   SafeAreaView,
   StyleSheet,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
-import { FlatList, TextInput } from 'react-native-gesture-handler';
-import { notesnook } from '../../../e2e/test.ids';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { ToastEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {FlatList, TextInput} from 'react-native-gesture-handler';
+import {notesnook} from '../../../e2e/test.ids';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {ToastEvent} from '../../services/EventManager';
+import {db} from '../../utils/DB';
+import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import { updateEvent } from '../DialogManager/recievers';
+import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
@@ -38,6 +38,7 @@ export class AddNotebookDialog extends React.Component {
       count: 0,
       topicInputFocused: false,
       editTopic: false,
+      loading: false,
     };
     this.title = null;
     this.description = null;
@@ -54,7 +55,6 @@ export class AddNotebookDialog extends React.Component {
     this.hiddenInput = createRef();
     this.topicInputRef = createRef();
     this.addingTopic = false;
-    
   }
 
   open = () => {
@@ -129,6 +129,9 @@ export class AddNotebookDialog extends React.Component {
   };
 
   addNewNotebook = async () => {
+    this.setState({
+      loading: true,
+    });
     let {topics} = this.state;
     let edit = this.props.toEdit;
 
@@ -233,8 +236,8 @@ export class AddNotebookDialog extends React.Component {
       }
     }
     this.topicInputRef.current?.setNativeProps({
-      text:''
-    })
+      text: '',
+    });
     this.topicInputRef.current?.focus();
   };
 
@@ -377,6 +380,7 @@ export class AddNotebookDialog extends React.Component {
                 positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
                 onPressPositive={this.addNewNotebook}
                 onPressNegative={this.close}
+                loading={this.state.loading}
               />
             </View>
           </KeyboardAvoidingView>

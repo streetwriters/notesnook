@@ -26,6 +26,7 @@ export class AddTopicDialog extends React.Component {
     this.state = {
       visible: false,
       titleFocused: false,
+      loading:false
     };
 
     this.title;
@@ -34,6 +35,7 @@ export class AddTopicDialog extends React.Component {
   }
 
   addNewTopic = async () => {
+    this.setState({loading:true})
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 'local');
 
@@ -112,6 +114,7 @@ export class AddTopicDialog extends React.Component {
             positiveTitle={toEdit ? 'Save' : 'Add'}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
+            loading={this.state.loading}
           />
         </DialogContainer>
         <Toast context="local" />
