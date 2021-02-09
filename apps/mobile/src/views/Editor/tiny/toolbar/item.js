@@ -62,6 +62,10 @@ const ToolbarItem = ({
   const checkForChanges = (data) => {
     properties.selection = data;
     let formats = Object.keys(data);
+
+    if (!data['link']) {
+      eSendEvent('showTooltip');
+    }
     if (format === 'header' && type === 'tooltip') {
       let keys = group.map((i) => i.format);
       keys.forEach((k) => {
@@ -288,8 +292,10 @@ const ToolbarItem = ({
           <ToolbarItemPin format={format} color={selected && color} />
         )}
 
-        {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format)? (
-          <Heading size={SIZE.md + 2} color={selected ? colors.accent : colors.pri}>
+        {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format) ? (
+          <Heading
+            size={SIZE.md + 2}
+            color={selected ? colors.accent : colors.pri}>
             {format.slice(0, 1).toUpperCase() + format.slice(1)}
           </Heading>
         ) : /^(ol|ul|cl)$/.test(format) ? (
