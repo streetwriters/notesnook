@@ -150,6 +150,8 @@ const Input = ({
         style={{
           height: height,
           marginBottom: marginBottom,
+          flexGrow:1,
+          maxHeight:height
         }}>
         <TouchableOpacity
           disabled={!loading}
