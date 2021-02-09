@@ -66,14 +66,16 @@ export default class NotesnookShare extends Component {
     this.setState({
       loading: true,
     });
-
-    let tag = validator.isURL(this.state.text) ? 'a' : 'p';
+    
+    let tag = validator.isURL(this.state.text)
+      ? `a href="${this.state.text}"`
+      : 'p';
     let add = async () => {
       await db.notes.add({
         title: this.state.title,
         content: {
-          type:'tiny',
-          data:`<${tag}>${this.state.text}<${tag}/>`
+          type: 'tiny',
+          data: `<${tag}>${this.state.text}<${tag.slice(0, 1)}/>`,
         },
         id: null,
       });
