@@ -90,16 +90,15 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
             </Heading>
           )}
 
-          {description ||
-            (title && (
-              <Paragraph
-                style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-                numberOfLines={2}
-                color={colors.icon}
-                size={SIZE.xs}>
-                {description ? description : link.value}
-              </Paragraph>
-            ))}
+          {description || title ? (
+            <Paragraph
+              style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
+              numberOfLines={2}
+              color={colors.icon}
+              size={SIZE.xs}>
+              {description ? description : link.value}
+            </Paragraph>
+          ) : null}
 
           <View
             style={{
@@ -108,7 +107,7 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
               justifyContent: 'space-between',
               width: '100%',
             }}>
-            {!title && !description && (
+            {!title && !description ? (
               <Paragraph
                 onPress={openLink}
                 style={{
@@ -117,7 +116,8 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
                 }}>
                 {value}
               </Paragraph>
-            )}
+            ) : null}
+
             <View
               style={{
                 flexDirection: 'row',
