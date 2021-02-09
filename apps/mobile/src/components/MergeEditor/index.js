@@ -30,6 +30,7 @@ import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
 import KeepAwake from '@sayem314/react-native-keep-awake';
 import {timeConverter} from '../../utils/TimeUtils';
+import tiny from '../../views/Editor/tiny/tiny';
 
 const {Value, timing} = Animated;
 
@@ -87,6 +88,7 @@ function closeEditorAnimation(heightToAnimate, heightToExtend = null, insets) {
 let primaryData = null;
 
 let secondaryData = null;
+
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -99,36 +101,19 @@ const MergeEditor = () => {
   const [dialogVisible, setDialogVisible] = useState(false);
 
   const insets = useSafeAreaInsets();
-  const postMessageToPrimaryWebView = (message) =>
-    primaryWebView.current?.postMessage(JSON.stringify(message));
-
-  const postMessageToSecondaryWebView = (message) =>
-    secondaryWebView.current?.postMessage(JSON.stringify(message));
 
   const onPrimaryWebViewLoad = () => {
-    postMessageToPrimaryWebView({
-      type: 'delta',
-      value: primaryData.data,
-    });
-    let c = {...colors};
-    c.factor = normalize(1);
-    postMessageToPrimaryWebView({
-      type: 'theme',
-      value: c,
-    });
+    tiny.call(primaryWebView, tiny.html(primaryData.data), true);
+    let theme = {...colors};
+    theme.factor = normalize(1);
+    tiny.call(primaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
   };
 
   const onSecondaryWebViewLoad = () => {
-    postMessageToSecondaryWebView({
-      type: 'delta',
-      value: secondaryData.data,
-    });
-    let c = {...colors};
-    c.factor = normalize(1);
-    postMessageToSecondaryWebView({
-      type: 'theme',
-      value: c,
-    });
+    tiny.call(secondaryWebView, tiny.html(secondaryData.data), true);
+    let theme = {...colors};
+    theme.factor = normalize(1);
+    tiny.call(secondaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
   };
 
   const _onShouldStartLoadWithRequest = (request) => {
@@ -144,8 +129,11 @@ const MergeEditor = () => {
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
 
-      if (data.type === 'delta') {
-        primaryData = data.data;
+      if (data.type === 'tiny') {
+        primaryData = {
+          type: 'tiny',
+          data: data.value,
+        };
       }
     }
   };
@@ -153,8 +141,11 @@ const MergeEditor = () => {
   const onMessageFromSecondaryWebView = (evt) => {
     if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
-      if (data.type === 'delta') {
-        secondaryData = data.data;
+      if (data.type === 'tiny') {
+        secondaryData = {
+          type: 'tiny',
+          data: data.value,
+        };
       }
     }
   };
@@ -214,7 +205,7 @@ const MergeEditor = () => {
     let noteData = await db.content.raw(note.contentId);
 
     switch (noteData.type) {
-      case 'delta':
+      case 'tiny':
         primaryData = noteData;
         secondaryData = noteData.conflicted;
     }
@@ -465,7 +456,7 @@ const MergeEditor = () => {
           <Animated.View
             style={{
               height: firstWebViewHeight,
-              backgroundColor:colors.bg
+              backgroundColor: colors.bg,
             }}>
             <WebView
               onLoad={onPrimaryWebViewLoad}
@@ -473,7 +464,7 @@ const MergeEditor = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                backgroundColor:'transparent'
+                backgroundColor: 'transparent',
               }}
               injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
@@ -616,7 +607,7 @@ const MergeEditor = () => {
               style={{
                 width: '100%',
                 height: '100%',
-                backgroundColor:'transparent'
+                backgroundColor: 'transparent',
               }}
               injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
