@@ -68,6 +68,7 @@ const onAppStateChanged = async (state) => {
         } else {
           updateEvent({type: Actions.NOTES});
           eSendEvent(refreshNotesPage);
+          eSendEvent("webviewreset")
         }
       } catch (e) {
         console.log(e);
@@ -136,11 +137,12 @@ export const AppRootEvents = React.memo(
 
         if (!__DEV__) {
           try {
-            Sentry.init({
+          /*   Sentry.init({
               dsn:
                 'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
               release: 'notesnook-mobile@1.1.0',
-            });
+              
+            }); */
           } catch (e) {}
         }
       }

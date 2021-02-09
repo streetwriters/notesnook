@@ -1,8 +1,8 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {useTracked} from '../../provider';
+import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import Paragraph from '../Typography/Paragraph';
 
 export const Loading = ({
@@ -17,7 +17,12 @@ export const Loading = ({
   const {colors} = state;
 
   return (
-    <View style={[{height: height,backgroundColor:colors.bg}, styles.activityContainer, customStyle]}>
+    <View
+      style={[
+        {height: height, backgroundColor: colors.bg},
+        styles.activityContainer,
+        customStyle,
+      ]}>
       {done ? (
         <>
           <Paragraph
@@ -32,7 +37,12 @@ export const Loading = ({
       ) : (
         <>
           <ActivityIndicator color={colors.accent} />
-          <Paragraph color={colors.pri} style={styles.activityText}>
+          <Paragraph
+            size={SIZE.md}
+            style={{
+              marginTop:10
+            }}
+            color={colors.pri}>
             {tagline}
           </Paragraph>
         </>

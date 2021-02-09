@@ -50,16 +50,18 @@ const Editor = React.memo(
     const [state] = useTracked();
     const {premiumUser, loading} = state;
     const [resetting, setResetting] = useState(false);
-
+    const [localLoading, setLocalLoading] = useState(false);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
     const onResetRequested = async () => {
+      setLocalLoading(true);
       setResetting(true);
-      await sleep(3000);
-      ToastEvent.show('Editor has recovered from crash.', 'success');
+      await sleep(10);
       setResetting(false);
+      await sleep(1000);
+      setLocalLoading(false);
     };
 
     useEffect(() => {
@@ -78,6 +80,8 @@ const Editor = React.memo(
       />
     ) : (
       <>
+        {localLoading && <Loading tagline="Loading Editor" height="100%" />}
+
         <TextInput
           ref={textInput}
           style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
@@ -101,14 +105,8 @@ const Editor = React.memo(
             testID={notesnook.ids.default.editor}
             ref={EditorWebView}
             onLoad={onLoad}
-            onError={(event) => {
-              console.log('error', event.nativeEvent);
-              ToastEvent.show('Editor Load Error', 'error');
-            }}
             onRenderProcessGone={(event) => {
-              console.log('error', event.nativeEvent);
               onResetRequested();
-              ToastEvent.show('Editor Render Process Gone', 'error');
             }}
             javaScriptEnabled={true}
             focusable={true}
