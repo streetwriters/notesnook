@@ -26,10 +26,9 @@ const App = () => {
 
   useEffect(() => {
     SettingsService.init().then((r) => {
-      Orientation.getOrientation((e,r) => {
-      
+      Orientation.getOrientation((e, r) => {
         DDS.checkSmallTab(r);
-        console.log(r,"RESULTING",DDS.isSmallTab)
+        console.log(r, 'RESULTING', DDS.isSmallTab);
         dispatch({
           type: Actions.DEVICE_MODE,
           state: DDS.isLargeTablet()
@@ -38,16 +37,20 @@ const App = () => {
             ? 'smallTablet'
             : 'mobile',
         });
-      })
-      
+      });
+
       db.init().catch(console.log).finally(loadMainApp);
     });
   }, []);
 
+  const _dispatch = (data) => {
+    dispatch(data);
+  };
+
   useEffect(() => {
-    eSubscribeEvent(eDispatchAction, dispatch);
+    eSubscribeEvent(eDispatchAction, _dispatch);
     return () => {
-      eUnSubscribeEvent(eDispatchAction, dispatch);
+      eUnSubscribeEvent(eDispatchAction, _dispatch);
     };
   }, []);
 
