@@ -1,3 +1,4 @@
+import {getLinkPreview} from 'link-preview-js';
 import React, {Component, createRef} from 'react';
 import {
   ActivityIndicator,
@@ -14,6 +15,7 @@ import ShareExtension from 'rn-extensions-share';
 import validator from 'validator';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
+import {SIZE} from './src/utils/SizeUtils';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
 
@@ -25,6 +27,7 @@ export default class NotesnookShare extends Component {
       text: '',
       title: '',
       loading: false,
+      loadingIntent: true,
       colors:
         Appearance.getColorScheme() === 'dark'
           ? COLOR_SCHEME_DARK
@@ -44,9 +47,44 @@ export default class NotesnookShare extends Component {
       if (item.type === 'text') {
         text = item.value;
       }
-      this.setState({
-        text: text,
-      });
+      if (validator.isURL(text)) {
+        getLinkPreview(text)
+          .then((r) => {
+            console.log(r);
+            if (r?.siteName) {
+              this.setState({
+                title: r.siteName,
+                text: text,
+                loadingIntent: false,
+              });
+            } else if (r?.title) {
+              this.setState({
+                title: r.title,
+                text: text,
+                loadingIntent: false,
+              });
+            } else {
+              this.setState({
+                title: 'Web Link',
+                text: text,
+                loadingIntent: false,
+              });
+            }
+          })
+          .catch((e) => {
+            this.setState({
+              title: 'Web Link',
+              text: text,
+              loadingIntent: false,
+            });
+          });
+      } else {
+        this.setState({
+          text: text,
+          loadingIntent: false,
+        });
+      }
+
       this.initialText = text;
     } catch (e) {
       console.log('errrr', e);
@@ -169,85 +207,108 @@ export default class NotesnookShare extends Component {
             borderTopLeftRadius: 10,
           }}
           behavior="padding">
-          <View
-            style={{
-              maxHeight: '100%',
-            }}>
+          {this.state.loadingIntent ? (
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                borderBottomWidth: 1,
-                borderBottomColor: this.state.colors.nav,
-                paddingHorizontal: 12,
-                justifyContent: 'space-between',
-              }}>
-              <TextInput
-                ref={this.titleInputRef}
-                style={{
-                  fontSize: 25,
-                  fontWeight: 'bold',
-                  color: this.state.colors.pri,
-                  flexGrow: 1,
-                  maxWidth: '85%',
-                }}
-                placeholderTextColor={this.state.colors.icon}
-                value={this.state.title}
-                onChangeText={(v) => this.setState({title: v})}
-                onSubmitEditing={() => {
-                  this.textInputRef.current?.focus();
-                }}
-                blurOnSubmit={false}
-                placeholder="Note Title"
-              />
-
-              <TouchableOpacity
-                onPress={this.close}
-                activeOpacity={0.8}
-                style={{
-                  width: 50,
-                  height: 40,
-                  borderRadius: 5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: this.state.colors.accent,
-                    marginLeft: this.state.loading ? 10 : 0,
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              ref={this.textInputRef}
-              style={{
-                fontSize: 15,
-                color: this.state.colors.pri,
-                marginBottom: 10,
+                height: 150,
                 width: '100%',
-                maxHeight: '70%',
-                paddingVertical: 10,
-                paddingHorizontal: 12,
-              }}
-              placeholderTextColor={this.state.colors.icon}
-              onChangeText={(v) => this.setState({text: v})}
-              multiline={true}
-              value={this.state.text}
-              blurOnSubmit={false}
-              placeholder="Type your note here"
-            />
-            {this.saveBtn()}
-            <View
-              style={{
-                height: 25,
-              }}
-            />
-          </View>
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <ActivityIndicator color={this.state.colors.accent} />
+
+              <Text
+                style={{
+                  color: this.state.colors.pri,
+                  fontSize: SIZE.md,
+                  marginTop: 5,
+                }}>
+                Parsing Data...
+              </Text>
+            </View>
+          ) : (
+            <>
+              <View
+                style={{
+                  maxHeight: '100%',
+                }}>
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    borderBottomWidth: 1,
+                    borderBottomColor: this.state.colors.nav,
+                    paddingHorizontal: 12,
+                    justifyContent: 'space-between',
+                  }}>
+                  <TextInput
+                    ref={this.titleInputRef}
+                    style={{
+                      fontSize: 25,
+                      fontWeight: 'bold',
+                      color: this.state.colors.pri,
+                      flexGrow: 1,
+                      maxWidth: '85%',
+                    }}
+                    placeholderTextColor={this.state.colors.icon}
+                    value={this.state.title}
+                    onChangeText={(v) => this.setState({title: v})}
+                    onSubmitEditing={() => {
+                      this.textInputRef.current?.focus();
+                    }}
+                    blurOnSubmit={false}
+                    placeholder="Note Title"
+                  />
+
+                  <TouchableOpacity
+                    onPress={this.close}
+                    activeOpacity={0.8}
+                    style={{
+                      width: 50,
+                      height: 40,
+                      borderRadius: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}>
+                    <Text
+                      style={{
+                        fontSize: 14,
+                        color: this.state.colors.accent,
+                        marginLeft: this.state.loading ? 10 : 0,
+                      }}>
+                      Cancel
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+
+                <TextInput
+                  ref={this.textInputRef}
+                  style={{
+                    fontSize: 15,
+                    color: this.state.colors.pri,
+                    marginBottom: 10,
+                    width: '100%',
+                    maxHeight: '70%',
+                    paddingVertical: 10,
+                    paddingHorizontal: 12,
+                  }}
+                  placeholderTextColor={this.state.colors.icon}
+                  onChangeText={(v) => this.setState({text: v})}
+                  multiline={true}
+                  value={this.state.text}
+                  blurOnSubmit={false}
+                  placeholder="Type your note here"
+                />
+                {this.saveBtn()}
+                <View
+                  style={{
+                    height: 25,
+                  }}
+                />
+              </View>
+            </>
+          )}
         </KeyboardAvoidingView>
       </View>
     ) : (
@@ -284,78 +345,99 @@ export default class NotesnookShare extends Component {
               width: '100%',
               paddingTop: 15,
             }}>
-            <ScrollView
-              style={{
-                maxHeight: this.state.height * 0.8,
-              }}>
+            {this.state.loadingIntent ? (
               <View
                 style={{
-                  flexDirection: 'row',
+                  height: 150,
+                  width: '100%',
+                  justifyContent: 'center',
                   alignItems: 'center',
-                  borderBottomWidth: 1,
-                  borderBottomColor: this.state.colors.nav,
-                  paddingHorizontal: 12,
-                  justifyContent: 'space-between',
                 }}>
-                <TextInput
-                  ref={this.titleInputRef}
+                <ActivityIndicator color={this.state.colors.accent} />
+
+                <Text
                   style={{
-                    fontSize: 25,
-                    fontWeight: 'bold',
                     color: this.state.colors.pri,
-                    flexGrow: 1,
-                    maxWidth: '85%',
-                  }}
-                  placeholderTextColor={this.state.colors.icon}
-                  value={this.state.title}
-                  onChangeText={(v) => this.setState({title: v})}
-                  onSubmitEditing={() => {
-                    this.textInputRef.current?.focus();
-                  }}
-                  blurOnSubmit={false}
-                  placeholder="Note Title"
-                />
-
-                <TouchableOpacity
-                  onPress={this.close}
-                  activeOpacity={0.8}
-                  style={{
-                    width: 70,
-                    height: 40,
-                    borderRadius: 5,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    flexDirection: 'row',
+                    fontSize: SIZE.md,
+                    marginTop: 5,
                   }}>
-                  <Text
-                    style={{
-                      fontSize: 14,
-                      color: this.state.colors.accent,
-                      marginLeft: this.state.loading ? 10 : 0,
-                    }}>
-                    Cancel
-                  </Text>
-                </TouchableOpacity>
+                  Parsing Data...
+                </Text>
               </View>
+            ) : (
+              <>
+                <ScrollView
+                  style={{
+                    maxHeight: this.state.height * 0.8,
+                  }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      borderBottomWidth: 1,
+                      borderBottomColor: this.state.colors.nav,
+                      paddingHorizontal: 12,
+                      justifyContent: 'space-between',
+                    }}>
+                    <TextInput
+                      ref={this.titleInputRef}
+                      style={{
+                        fontSize: SIZE.lg,
+                        fontWeight: 'bold',
+                        color: this.state.colors.pri,
+                        flexGrow: 1,
+                        maxWidth: '85%',
+                      }}
+                      placeholderTextColor={this.state.colors.icon}
+                      value={this.state.title}
+                      onChangeText={(v) => this.setState({title: v})}
+                      onSubmitEditing={() => {
+                        this.textInputRef.current?.focus();
+                      }}
+                      blurOnSubmit={false}
+                      placeholder="Note Title"
+                    />
 
-              <TextInput
-                ref={this.textInputRef}
-                style={{
-                  fontSize: 15,
-                  color: this.state.colors.pri,
-                  paddingTop: 0,
-                  marginBottom: 10,
-                  paddingHorizontal: 12,
-                }}
-                placeholderTextColor={this.state.colors.icon}
-                onChangeText={(v) => this.setState({text: v})}
-                multiline={true}
-                value={this.state.text}
-                placeholder="Type your note here"
-              />
-            </ScrollView>
-
-            {this.saveBtn()}
+                    <TouchableOpacity
+                      onPress={this.close}
+                      activeOpacity={0.8}
+                      style={{
+                        width: 70,
+                        height: 40,
+                        borderRadius: 5,
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                      }}>
+                      <Text
+                        style={{
+                          fontSize: 14,
+                          color: this.state.colors.accent,
+                          marginLeft: this.state.loading ? 10 : 0,
+                        }}>
+                        Cancel
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                  <TextInput
+                    ref={this.textInputRef}
+                    style={{
+                      fontSize: 15,
+                      color: this.state.colors.pri,
+                      paddingTop: 0,
+                      marginBottom: 10,
+                      paddingHorizontal: 12,
+                    }}
+                    placeholderTextColor={this.state.colors.icon}
+                    onChangeText={(v) => this.setState({text: v})}
+                    multiline={true}
+                    value={this.state.text}
+                    placeholder="Type your note here"
+                  />
+                </ScrollView>
+                {this.saveBtn()}
+              </>
+            )}
           </View>
         </View>
       </Modal>
