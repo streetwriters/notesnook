@@ -13,6 +13,8 @@ function reactNativeEventHandler(type, value) {
 
 let changeTimer = null;
 
+
+
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -21,8 +23,8 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      'mychecklist advlist autolink lists link image charmap preview anchor',
-      'searchreplace visualblocks code fullscreen',
+      'mychecklist advlist autolink textpattern hr lists link noneditable image charmap preview anchor',
+      'searchreplace visualblocks code fullscreen importcss',
       'insertdatetime media imagetools table paste help wordcount autoresize directionality',
     ],
     toolbar: false,
@@ -31,6 +33,7 @@ function init_tiny(size) {
       success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
     },
     statusbar: false,
+    textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
     span.diff-del {

@@ -13,6 +13,8 @@ function reactNativeEventHandler(type, value) {
 
 let changeTimer = null;
 
+
+
 function init_tiny(size) {
   tinymce.init({
     selector: '#tiny_textarea',
@@ -21,8 +23,8 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      'mychecklist advlist autolink lists link image charmap preview anchor',
-      'searchreplace visualblocks code fullscreen',
+      'mychecklist advlist autolink textpattern hr lists link noneditable image charmap preview anchor',
+      'searchreplace visualblocks code fullscreen importcss',
       'insertdatetime media imagetools table paste help wordcount autoresize directionality',
     ],
     toolbar: false,
@@ -30,6 +32,9 @@ function init_tiny(size) {
     images_upload_handler: function (blobInfo, success, failure) {
       success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
     },
+    statusbar: false,
+    textpattern_patterns: markdownPatterns,
+    contextmenu: false,
     content_style: `
     span.diff-del {
       background-color: #FDB0C0;  
@@ -38,8 +43,6 @@ function init_tiny(size) {
       background-color: #CAFFFB;  
     }
 `,
-    statusbar: false,
-    contextmenu: false,
     browser_spellcheck: true,
     autoresize_bottom_margin: 50,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
@@ -56,12 +59,13 @@ function init_tiny(size) {
       setTheme();
       reactNativeEventHandler('status', true);
 
+
       editor.on('SelectionChange', function (e) {
         selectchange();
         reactNativeEventHandler('history', {
-          undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo(),
-        });
+            undo: editor.undoManager.hasUndo(),
+            redo: editor.undoManager.hasRedo(),
+          });
       });
 
       editor.on('focus', () => {
@@ -87,7 +91,7 @@ function init_tiny(size) {
 }
 
 const onChange = (event) => {
-  console.log('called');
+  console.log("called")
   if (isLoading) {
     isLoading = false;
     return;
