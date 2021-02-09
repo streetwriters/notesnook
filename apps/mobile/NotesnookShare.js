@@ -40,11 +40,10 @@ export default class NotesnookShare extends Component {
     try {
       const data = await ShareExtension.data();
       let text;
-      data.forEach((item) => {
-        if (item.type === 'text') {
-          text = item.value + '\n\n';
-        }
-      });
+      let item = data[0];
+      if (item.type === 'text') {
+        text = item.value;
+      }
       this.setState({
         text: text,
       });
@@ -66,16 +65,17 @@ export default class NotesnookShare extends Component {
     this.setState({
       loading: true,
     });
-    
+
     let tag = validator.isURL(this.state.text)
-      ? `a href="${this.state.text}"`
-      : 'p';
+      ? `<a href='${this.state.text}' target='_blank'>${this.state.text}</a>`
+      : `<p>${this.state.text}</p>`;
+
     let add = async () => {
       await db.notes.add({
         title: this.state.title,
         content: {
           type: 'tiny',
-          data: `<${tag}>${this.state.text}<${tag.slice(0, 1)}/>`,
+          data: tag,
         },
         id: null,
       });
