@@ -32,6 +32,7 @@ import KeepAwake from '@sayem314/react-native-keep-awake';
 import {timeConverter} from '../../utils/TimeUtils';
 import tiny from '../../views/Editor/tiny/tiny';
 import diff from '../../utils/differ';
+import { openLinkInBrowser } from '../../utils/functions';
 
 const {Value, timing} = Animated;
 
@@ -130,8 +131,13 @@ const MergeEditor = () => {
   };
 
   const _onShouldStartLoadWithRequest = (request) => {
-    if (request.url.includes('https')) {
-      Linking.openURL(request.url);
+    if (request.url.includes('http')) {
+      openLinkInBrowser(request.url, colors)
+      .catch((e) => ToastEvent.show(e.message, 'error'))
+      .then((r) => {
+        console.log('closed');
+      });
+
       return false;
     } else {
       return true;

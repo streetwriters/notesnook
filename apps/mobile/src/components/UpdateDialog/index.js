@@ -114,6 +114,8 @@ export const UpdateDialog = () => {
                 'https://play.google.com/store/apps/details?id=com.streetwriters.notesnook';
               let url_ios = 'itms-apps://itunes.apple.com/app/id1544027013';
               setVisible(false);
+
+              
               await Linking.openURL(
                 Platform.OS === 'android' ? url_android : url_ios,
               );

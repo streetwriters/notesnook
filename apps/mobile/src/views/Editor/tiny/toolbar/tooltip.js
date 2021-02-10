@@ -38,7 +38,6 @@ const Tooltip = () => {
   const show = (data) => {
     properties.userBlur = true;
     if (!data) {
-      console.log('hiding')
       setVisible(false);
       editing.tooltip = null;
       return;

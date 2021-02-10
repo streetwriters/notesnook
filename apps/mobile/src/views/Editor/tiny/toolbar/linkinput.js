@@ -10,6 +10,7 @@ import {focusEditor, formatSelection, INPUT_MODE, properties} from './constants'
 import LinkPreview from './linkpreview';
 import tiny from '../tiny';
 import { EditorWebView } from '../../Functions';
+import { openLinkInBrowser } from '../../../../utils/functions';
 
 let inputValue = null;
 
@@ -65,7 +66,11 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   };
 
   const onPress = async () => {
-    await Linking.openURL(value);
+    openLinkInBrowser(value, colors)
+      .catch((e) => ToastEvent.show(e.message, 'error'))
+      .then((r) => {
+        console.log('closed');
+      });
   };
 
   const onBlur = async () => {

@@ -4,6 +4,8 @@ import {Actions} from '../provider/Actions';
 import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {db} from './DB';
 import {eClearEditor, eOnNewTopicAdded, refreshNotesPage} from './Events';
+import {Linking} from 'react-native';
+import {InAppBrowser} from 'react-native-inappbrowser-reborn';
 
 export const deleteItems = async (item) => {
   if (item && item.id && history.selectedItemsList.length === 0) {
@@ -77,3 +79,34 @@ export const deleteItems = async (item) => {
   updateEvent({type: Actions.COLORS});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 };
+
+
+export const openLinkInBrowser = async (link, colors) => {
+  try {
+    const url = link;
+    if (await InAppBrowser.isAvailable()) {
+      await InAppBrowser.open(url, {
+        // iOS Properties
+        dismissButtonStyle: 'cancel',
+        preferredBarTintColor: colors.accent,
+        preferredControlTintColor: 'white',
+        readerMode: false,
+        animated: true,
+        modalPresentationStyle: 'fullScreen',
+        modalTransitionStyle: 'coverVertical',
+        modalEnabled: true,
+        enableBarCollapsing: false,
+        // Android Properties
+        showTitle: true,
+        toolbarColor: colors.accent,
+        secondaryToolbarColor: 'black',
+        enableUrlBarHiding: true,
+        enableDefaultShare: true,
+        forceCloseOnRedirection: false,
+       
+      });
+    } else Linking.openURL(url);
+  } catch (error) {
+    console.log(error.message);
+  }
+}

@@ -66,6 +66,7 @@ import {
   eScrollEvent,
   eUpdateSearchState,
 } from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
@@ -97,8 +98,6 @@ export const Settings = ({navigation}) => {
         },
       });
     }
-
-    
 
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
@@ -143,7 +142,11 @@ export const Settings = ({navigation}) => {
     {
       name: 'Privacy Policy',
       func: async () => {
-        await Linking.openURL('https://www.notesnook.com/privacy.html');
+        openLinkInBrowser('https://www.notesnook.com/privacy.html', colors)
+          .catch((e) => ToastEvent.show(e.message, 'error'))
+          .then((r) => {
+            console.log('closed');
+          });
       },
       desc: 'Read our privacy policy',
     },
@@ -180,7 +183,11 @@ export const Settings = ({navigation}) => {
           noProgress: true,
           icon: 'discord',
           action: async () => {
-            await Linking.openURL('https://discord.gg/zQBK97EE22');
+            openLinkInBrowser('https://discord.gg/zQBK97EE22', colors)
+              .catch((e) => ToastEvent.show(e.message, 'error'))
+              .then((r) => {
+                console.log('closed');
+              });
           },
           actionText: 'Join Now',
         });
@@ -190,7 +197,11 @@ export const Settings = ({navigation}) => {
     {
       name: 'About',
       func: async () => {
-        await Linking.openURL('https://www.notesnook.com');
+        openLinkInBrowser('https://www.notesnook.com', colors)
+          .catch((e) => ToastEvent.show(e.message, 'error'))
+          .then((r) => {
+            console.log('closed');
+          });
       },
       desc: format(APP_VERSION),
     },
@@ -211,32 +222,28 @@ export const Settings = ({navigation}) => {
           paddingHorizontal: 0,
         }}>
         {!DDS.isLargeTablet() && (
-          <Header
-            title="Settings"
-            type="settings"
-            messageCard={false}
-          />
+          <Header title="Settings" type="settings" messageCard={false} />
         )}
         <SettingsUserSection />
         <SettingsAppearanceSection />
 
-          <>
-            <SettingsPrivacyAndSecurity />
-            <SettingsBackupAndRestore />
+        <>
+          <SettingsPrivacyAndSecurity />
+          <SettingsBackupAndRestore />
 
-            <SectionHeader title="Other" />
+          <SectionHeader title="Other" />
 
-            {otherItems.map((item) => (
-              <CustomButton
-                key={item.name}
-                title={item.name}
-                tagline={item.desc}
-                onPress={item.func}
-              />
-            ))}
+          {otherItems.map((item) => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+            />
+          ))}
 
-            <AccoutLogoutSection />
-          </>
+          <AccoutLogoutSection />
+        </>
 
         <View
           style={{
