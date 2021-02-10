@@ -13,6 +13,7 @@ import {
   eShowGetPremium,
   refreshNotesPage,
 } from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {sideMenuRef, tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
@@ -121,7 +122,12 @@ export function post(type, value = null) {
 
 export const _onShouldStartLoadWithRequest = async (request) => {
   if (request.url.includes('https')) {
-    await Linking.openURL(request.url);
+    openLinkInBrowser(request.url, appColors)
+      .catch((e) => ToastEvent.show(e.message, 'error'))
+      .then((r) => {
+        console.log('closed');
+      });
+
     return false;
   } else {
     return true;
