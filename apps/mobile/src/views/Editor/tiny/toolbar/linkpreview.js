@@ -1,12 +1,14 @@
-import React, {useEffect, useState} from 'react';
 import {getLinkPreview} from 'link-preview-js';
-import {Image, Linking, View} from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Image, View} from 'react-native';
 import {TouchableOpacity} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../../../components/Button';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
 import {useTracked} from '../../../../provider';
 import {ToastEvent} from '../../../../services/EventManager';
+import {openLinkInBrowser} from '../../../../utils/functions';
 import {SIZE} from '../../../../utils/SizeUtils';
 import {INPUT_MODE, properties} from './constants';
 
@@ -46,24 +48,47 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           height: height,
           borderRadius: 5,
           marginVertical: 5,
+          borderWidth: 1,
+          borderColor: colors.nav,
         }}
+        resizeMode="cover"
         source={{uri: imageLink}}
       />
     ) : faviconLink ? (
-      <Image
+      <View
+        style={{
+          borderColor: colors.nav,
+          borderWidth: 1,
+          marginVertical: 5,
+          borderRadius: 5,
+        }}>
+        <Image
+          style={{
+            width: height,
+            height: height,
+          }}
+          resizeMode="center"
+          source={{uri: faviconLink}}
+        />
+      </View>
+    ) : (
+      <View
         style={{
           width: height,
           height: height,
-          borderRadius: 5,
           marginVertical: 5,
-        }}
-        source={{uri: faviconLink}}
-      />
-    ) : null;
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: colors.shade,
+          borderRadius: 5,
+        }}>
+        <Icon size={40} color={colors.accent} name="web" />
+      </View>
+    );
   };
 
   const openLink = () => {
-    Linking.openURL(value)
+    openLinkInBrowser(value, colors)
       .catch((e) => ToastEvent.show(e.message, 'error'))
       .then((r) => {
         console.log('closed');
@@ -81,24 +106,20 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           flex: 1,
         }}>
         <TouchableOpacity onPress={openLink} activeOpacity={1}>
-          {title && (
-            <Heading
-              numberOfLines={1}
-              style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-              size={SIZE.sm}>
-              {name ? name + ': ' + title : title}
-            </Heading>
-          )}
+          <Heading
+            numberOfLines={1}
+            style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
+            size={SIZE.sm}>
+            {name ? name + ': ' + title : title ? title : 'Web Link'}
+          </Heading>
 
-          {description || title ? (
-            <Paragraph
-              style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-              numberOfLines={2}
-              color={colors.icon}
-              size={SIZE.xs}>
-              {description ? description : link.value}
-            </Paragraph>
-          ) : null}
+          <Paragraph
+            style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
+            numberOfLines={2}
+            color={colors.icon}
+            size={SIZE.xs}>
+            {description ? description : link?.value ? link.value : value}
+          </Paragraph>
 
           <View
             style={{
@@ -107,17 +128,6 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
               justifyContent: 'space-between',
               width: '100%',
             }}>
-            {!title && !description ? (
-              <Paragraph
-                onPress={openLink}
-                style={{
-                  textDecorationLine: 'underline',
-                  color: colors.accent,
-                }}>
-                {value}
-              </Paragraph>
-            ) : null}
-
             <View
               style={{
                 flexDirection: 'row',
@@ -155,6 +165,13 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
     <>
       {renderImage(link.image, link.favicon)}
       {renderText(link.name, link.title, link.description)}
+
+      <Button
+        type="shade"
+        title="Visit"
+        icon="open-in-new"
+        onPress={openLink}
+      />
     </>
   );
 };
