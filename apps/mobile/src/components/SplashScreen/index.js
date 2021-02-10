@@ -1,18 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Image} from 'react-native';
-import {View} from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Image, View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import Carousel from 'react-native-snap-carousel';
-import {SvgXml} from 'react-native-svg';
-import {NOTE_SVG, LOGO_SVG, SYNC_SVG} from '../../assets/images/assets';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {dHeight, dWidth, getElevation} from '../../utils';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { SvgXml } from 'react-native-svg';
+import { NOTE_SVG, SYNC_SVG } from '../../assets/images/assets';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { dHeight, dWidth, getElevation } from '../../utils';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -28,7 +27,7 @@ const SplashScreen = () => {
   const features = [
     {
       title: 'Notesnook',
-      description: 'A safe place to write and get organized.',
+      description: 'A safe place to write and stay organized.',
       icon: require('../../assets/images/notesnook-logo-png.png'),
       type: 'image',
     },
@@ -45,20 +44,25 @@ const SplashScreen = () => {
   ];
 
   useEffect(() => {
-    Storage.read('introCompleted').then((r) => {
-      if (!r) {
-        setVisible(true);
-        timing(opacity, {
-          toValue: 1,
-          duration: 500,
-          easing: Easing.in(Easing.ease),
-        }).start();
-        timing(translateY, {
-          toValue: 0,
-          duration: 500,
-          easing: Easing.in(Easing.ease),
-        }).start();
-      }
+
+    return;
+    Storage.read('introCompleted').then(async (r) => {
+      setVisible(true);
+      await sleep(500);
+      requestAnimationFrame(() => {
+        if (!r) {
+          timing(opacity, {
+            toValue: 1,
+            duration: 500,
+            easing: Easing.in(Easing.ease),
+          }).start();
+          timing(translateY, {
+            toValue: 0,
+            duration: 500,
+            easing: Easing.in(Easing.ease),
+          }).start();
+        }
+      });
     });
   }, []);
 
@@ -77,6 +81,7 @@ const SplashScreen = () => {
       <Animated.View
         style={{
           zIndex: 999,
+          ...getElevation(10),
           width: '100%',
           height: '100%',
           position: 'absolute',
@@ -112,7 +117,7 @@ const SplashScreen = () => {
               sliderWidth={dWidth}
               autoplay={false}
               loop={false}
-			  shouldOptimizeUpdates
+              shouldOptimizeUpdates
               autoplayInterval={5000}
               autoplayDelay={3000}
               onEndReached={() => {

@@ -29,6 +29,7 @@ const forFade = ({current}) => ({
 });
 
 const forSlide = ({current, next, inverted, layouts: {screen}}) => {
+
   const progress = Animated.add(
     current.progress.interpolate({
       inputRange: [0, 1],

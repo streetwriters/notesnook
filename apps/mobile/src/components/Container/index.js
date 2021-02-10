@@ -12,7 +12,7 @@ export const Container = ({children, root}) => {
       <SafeAreaView
         style={{
           height: '100%',
-          backgroundColor:colors.bg
+          backgroundColor:colors.bg,
         }}>
         <SelectionHeader />
         <ContainerTopSection root={root} />

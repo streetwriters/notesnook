@@ -2,7 +2,6 @@ import React, {createRef, useEffect, useState} from 'react';
 import {ActivityIndicator, Platform, ScrollView, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {FlatList} from 'react-native-gesture-handler';
-import RNFetchBlob from 'rn-fetch-blob';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
@@ -23,7 +22,7 @@ import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
-
+let RNFetchBlob
 const RestoreDialog = () => {
   const [visible, setVisible] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -125,6 +124,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         return;
       }
     }
+    RNFetchBlob = require("rn-fetch-blob");
     try {
       let path = await storage.checkAndCreateDir('/backups/');
       let files = await RNFetchBlob.fs.lstat(path);

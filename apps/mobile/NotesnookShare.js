@@ -1,4 +1,3 @@
-import {getLinkPreview} from 'link-preview-js';
 import React, {Component, createRef} from 'react';
 import {
   ActivityIndicator,
@@ -11,14 +10,16 @@ import {
   View,
 } from 'react-native';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
-import ShareExtension from 'rn-extensions-share';
-import validator from 'validator';
+
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {SIZE} from './src/utils/SizeUtils';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
 
+let validator;
+let linkPreview;
+let ShareExtension;
 export default class NotesnookShare extends Component {
   constructor(props, context) {
     super(props, context);
@@ -41,6 +42,9 @@ export default class NotesnookShare extends Component {
 
   async componentDidMount() {
     try {
+      ShareExtension = require("rn-extensions-share").default
+      validator = require("validator").default
+      linkPreview = require("link-preview-js")
       const data = await ShareExtension.data();
       let text;
       let item = data[0];
@@ -48,9 +52,8 @@ export default class NotesnookShare extends Component {
         text = item.value;
       }
       if (validator.isURL(text)) {
-        getLinkPreview(text)
+        linkPreview.getLinkPreview(text)
           .then((r) => {
-            console.log(r);
             if (r?.siteName) {
               this.setState({
                 title: r.siteName,

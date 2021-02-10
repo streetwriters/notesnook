@@ -1,9 +1,10 @@
 import {Platform} from 'react-native';
 import {db} from '../utils/DB';
-import RNFetchBlob from 'rn-fetch-blob';
 import {ToastEvent} from './EventManager';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
+
+let RNFetchBlob;
 
 async function saveToPDF(note) {
   let androidSavePath = '/Notesnook/exported/PDF';
@@ -14,7 +15,7 @@ async function saveToPDF(note) {
       return null;
     }
   }
-
+  
   await Storage.checkAndCreateDir('/exported/PDF/');
   let html = await db.notes.note(note).export('html');
   let he = require("he");
@@ -43,6 +44,7 @@ async function saveToMarkdown(note) {
       return null;
     }
   }
+  RNFetchBlob = require("rn-fetch-blob");
   let markdown = await db.notes.note(note.id).export('md');
 
   path = path + note.title + '.md';
@@ -64,6 +66,7 @@ async function saveToText(note) {
       return null;
     }
   }
+  RNFetchBlob = require("rn-fetch-blob");
   let text = await db.notes.note(note.id).export('txt');
   path = path + note.title + '.txt';
   await RNFetchBlob.fs.writeFile(path, text, 'utf8');
@@ -84,6 +87,7 @@ async function saveToHTML(note) {
       return null;
     }
   }
+  RNFetchBlob = require("rn-fetch-blob");
   let html = await db.notes.note(note.id).export('html');
   path = path + note.title + '.html';
   await RNFetchBlob.fs.writeFile(path, html, 'utf8');

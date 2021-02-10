@@ -1,6 +1,7 @@
 import DocumentPicker from 'react-native-document-picker';
-import RNFetchBlob from 'rn-fetch-blob';
+
 import {formatSelection} from './constants';
+let RNFetchBlob;
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -52,6 +53,8 @@ export const execCommands = {
     DocumentPicker.pick({
       type: [DocumentPicker.types.images],
     }).then((r) => {
+
+      RNFetchBlob = require("rn-fetch-blob");
       RNFetchBlob.fs.readFile(r.uri, 'base64').then((read) => {
         let b64 = `data:${r.type};base64, ` + read;
         formatSelection(`
@@ -70,7 +73,6 @@ export const execCommands = {
     });
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
-  code: `tinymce.activeEditor.execCommand('mceCode')`,
-  /* 
-,*/
+  code: `tinymce.activeEditor.execCommand('CodeBlock')`,
+
 };

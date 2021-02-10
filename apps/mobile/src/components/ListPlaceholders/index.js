@@ -9,6 +9,8 @@ import {
   TRASH_SVG,
   SETTINGS_SVG,
   SEARCH_SVG,
+  LOGIN_SVG,
+  LOGO_SVG,
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
 export const Placeholder = ({type, w, h, color}) => {
@@ -32,6 +34,10 @@ export const Placeholder = ({type, w, h, color}) => {
         return SETTINGS_SVG(colors.accent);
       case 'search':
         return SEARCH_SVG(colors.accent);
+      case 'login':
+        return LOGIN_SVG(colors.accent);
+      case 'signup':
+        return LOGO_SVG;
     }
   };
 

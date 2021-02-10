@@ -63,5 +63,6 @@ export const HideAddTopicEvent = notebook => {
 };
 
 export const updateEvent = data => {
+  
   eSendEvent(eDispatchAction, data);
 };

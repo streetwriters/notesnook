@@ -2,7 +2,7 @@ import React, {createRef} from 'react';
 import {Clipboard, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import RNFetchBlob from 'rn-fetch-blob';
+
 import {LOGO_BASE64} from '../../assets/images/assets';
 import {
   eSendEvent,
@@ -23,6 +23,9 @@ import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+
+let RNFetchBlob;
+
 class RecoveryKeyDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -84,6 +87,7 @@ class RecoveryKeyDialog extends React.Component {
   }
 
   saveQRCODE = async () => {
+ 
     if ((await Storage.requestPermission()) === false) {
       ToastEvent.show('Storage access not granted!', 'error', 'local');
       return;
@@ -91,7 +95,7 @@ class RecoveryKeyDialog extends React.Component {
 
     this.svg.current?.toDataURL(async (data) => {
       let path = await Storage.checkAndCreateDir('/');
-
+      RNFetchBlob = require("rn-fetch-blob"); 
       let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
       RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
         RNFetchBlob.fs
@@ -113,13 +117,14 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   saveToTextFile = async () => {
+
     if ((await Storage.requestPermission()) === false) {
       ToastEvent.show('Storage access not granted!', 'error', 'local');
       return;
     }
     let path = await Storage.checkAndCreateDir('/');
     let fileName = 'nn_' + this.user.email + '_recovery_key.txt';
-
+    RNFetchBlob = require("rn-fetch-blob");
     RNFetchBlob.fs
       .writeFile(path + fileName, this.state.key, 'utf8')
       .then((r) => {

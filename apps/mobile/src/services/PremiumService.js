@@ -30,12 +30,12 @@ async function setPremiumStatus() {
 }
 
 function get() {
-  return (
+  return true /*  (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
     premiumStatus === 5 ||
     premiumStatus === 6
-  );
+  ); */
 }
 
 async function verify(callback, error) {
@@ -102,7 +102,7 @@ const onUserStatusCheck = async (type) => {
     }
   }
 
-  return {type, result: status};
+  return {type, result: true};
 };
 
 const showVerifyEmailDialog = () => {

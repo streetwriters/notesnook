@@ -3,7 +3,6 @@ import {eSendEvent} from '../services/EventManager';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {MMKV} from './mmkv';
-import RNFetchBlob from 'rn-fetch-blob';
 import {defaultState} from '../provider/DefaultState';
 import {createRef} from 'react';
 import {dummyRef} from '../components/DummyText';
@@ -23,9 +22,6 @@ export async function setSetting(settings, name, value) {
 export const scrollRef = createRef();
 export const AndroidModule = NativeModules.NNativeModule;
 
-export const dirs = RNFetchBlob.fs.dirs;
-export const ANDROID_PATH = dirs.SDCardDir + '/Notesnook/';
-export const IOS_PATH = dirs.DocumentDir;
 
 export const getElevation = (elevation) => {
   return {

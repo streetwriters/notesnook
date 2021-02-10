@@ -34,7 +34,9 @@ const App = () => {
               ? 'smallTablet'
               : 'mobile',
           });
+          SplashScreen.hide();
         });
+      
         await db.init();
       } catch (e) {
         console.log(e);
@@ -56,9 +58,10 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
-    SplashScreen.hide();
+   
     dispatch({type: Actions.ALL});
     eSendEvent(eOpenSideMenu);
+
     SettingsService.setAppLoaded();
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});

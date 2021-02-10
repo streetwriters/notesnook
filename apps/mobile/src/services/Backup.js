@@ -1,15 +1,16 @@
 const {MMKV} = require('../utils/MMKV');
-import RNFetchBlob from 'rn-fetch-blob';
+
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
 import {eSendEvent, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import {sleep} from '../utils/TimeUtils';
+import Share from 'react-native-share';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
-
+let RNFetchBlob;
 async function run() {
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
@@ -18,6 +19,7 @@ async function run() {
       return;
     }
   }
+  RNFetchBlob = require('rn-fetch-blob');
   eSendEvent(eOpenProgressDialog, {
     title: 'Backing up your data',
     paragraph:

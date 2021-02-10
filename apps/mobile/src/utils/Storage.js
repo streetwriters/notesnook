@@ -1,13 +1,12 @@
-import 'react-native-get-random-values';
-import {generateSecureRandom} from 'react-native-securerandom';
-import Sodium from 'react-native-sodium';
-import RNFetchBlob from 'rn-fetch-blob';
-import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
-import {MMKV} from './mmkv';
 import {Platform} from 'react-native';
-import {ANDROID_PATH, IOS_PATH} from '.';
-import * as Keychain from 'react-native-keychain';
+import 'react-native-get-random-values';
+import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
+import {generateSecureRandom} from 'react-native-securerandom';
+import {MMKV} from './mmkv';
 
+let Sodium;
+let Keychain;
+let RNFetchBlob;
 async function read(key, isArray = false) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
@@ -53,44 +52,60 @@ async function clear() {
 }
 
 function encrypt(password, data) {
+  if (!Sodium) {
+    Sodium = require('react-native-sodium');
+  }
+
   return Sodium.encrypt(password, data).then((result) => result);
 }
 
 function decrypt(password, data) {
+  if (!Sodium) {
+    Sodium = require('react-native-sodium')
+  }
   return Sodium.decrypt(password, data).then((result) => result);
 }
 
-let CRYPT_CONFIG = Platform.select({
-  ios: {
-    accessible: Keychain.ACCESSIBLE.AFTER_FIRST_UNLOCK,
-  },
-  android: {
-    authenticationType:
-      Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-    accessControl: Keychain.ACCESS_CONTROL.DEVICE_PASSCODE,
-    rules: Keychain.SECURITY_RULES.AUTOMATIC_UPGRADE,
-    authenticationPrompt: {
-      cancel: null,
+let CRYPT_CONFIG = (kc) =>
+  Platform.select({
+    ios: {
+      accessible: kc.ACCESSIBLE.AFTER_FIRST_UNLOCK,
     },
-  },
-});
+    android: {
+      authenticationType: kc.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+      accessControl: kc.ACCESS_CONTROL.DEVICE_PASSCODE,
+      rules: kc.SECURITY_RULES.AUTOMATIC_UPGRADE,
+      authenticationPrompt: {
+        cancel: null,
+      },
+    },
+  });
 
 async function deriveCryptoKey(name, data) {
+  if (!Keychain) {
+    Keychain = require('react-native-keychain');
+  }
+
+  if (!Sodium) {
+    Sodium = require('react-native-sodium');
+  }
+
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     await Keychain.setInternetCredentials(
       'notesnook',
       name,
       credentials.key,
-      CRYPT_CONFIG,
+      CRYPT_CONFIG(Keychain),
     );
     return credentials.key;
-  } catch (e) {
-
-  }
+  } catch (e) {}
 }
 
 async function getCryptoKey(name) {
+  if (!Keychain) {
+    Keychain = require('react-native-keychain');
+  }
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
       let credentials = await Keychain.getInternetCredentials(
@@ -101,18 +116,18 @@ async function getCryptoKey(name) {
     } else {
       return null;
     }
-  } catch (e) {
-
-  }
+  } catch (e) {}
 }
 
 async function removeCryptoKey(name) {
+  if (!Keychain) {
+    Keychain = require('react-native-keychain');
+  }
+
   try {
     let result = await Keychain.resetInternetCredentials('notesnook');
     return result;
-  } catch (e) {
-
-  }
+  } catch (e) {}
 }
 
 async function getAllKeys() {
@@ -138,7 +153,15 @@ async function requestPermission() {
   return granted;
 }
 async function checkAndCreateDir(path) {
-  let dir = Platform.OS === 'ios' ? IOS_PATH + path : ANDROID_PATH + path;
+  if (!RNFetchBlob) {
+    RNFetchBlob = require('rn-fetch-blob');
+  }
+
+  let dir =
+    Platform.OS === 'ios'
+      ? RNFetchBlob.fs.dirs.DocumentDir + path
+      : RNFetchBlob.fs.dirs.SDCardDir + '/Notesnook/' + path;
+
   try {
     let exists = await RNFetchBlob.fs.exists(dir);
     let isDir = await RNFetchBlob.fs.isDir(dir);
@@ -146,15 +169,17 @@ async function checkAndCreateDir(path) {
       await RNFetchBlob.fs.mkdir(dir);
     }
   } catch (e) {
-    
     await RNFetchBlob.fs.mkdir(dir);
   } finally {
   }
   return dir;
 }
 
-async function hash(password,email) {
-  return await Sodium.hashPassword(password,email)
+async function hash(password, email) {
+  if (!Sodium) {
+    Sodium = require('react-native-sodium');
+  }
+  return await Sodium.hashPassword(password, email);
 }
 
 export default {
@@ -172,5 +197,5 @@ export default {
   deriveCryptoKey,
   getCryptoKey,
   removeCryptoKey,
-  hash
+  hash,
 };

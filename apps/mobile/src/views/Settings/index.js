@@ -1,4 +1,5 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
+import {Image} from 'react-native';
 import {
   Appearance,
   InteractionManager,
@@ -178,7 +179,7 @@ export const Settings = ({navigation}) => {
             'Follow the development process',
             'Give suggestions and report issues.',
             'Get early access to new features',
-            'Meet other people using Notesnook',
+            'Meet other people that use Notesnook',
           ],
           noProgress: true,
           icon: 'discord',
@@ -226,24 +227,21 @@ export const Settings = ({navigation}) => {
         )}
         <SettingsUserSection />
         <SettingsAppearanceSection />
+        <SettingsPrivacyAndSecurity />
+        <SettingsBackupAndRestore />
 
-        <>
-          <SettingsPrivacyAndSecurity />
-          <SettingsBackupAndRestore />
+        <SectionHeader title="Other" />
 
-          <SectionHeader title="Other" />
+        {otherItems.map((item) => (
+          <CustomButton
+            key={item.name}
+            title={item.name}
+            tagline={item.desc}
+            onPress={item.func}
+          />
+        ))}
 
-          {otherItems.map((item) => (
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              tagline={item.desc}
-              onPress={item.func}
-            />
-          ))}
-
-          <AccoutLogoutSection />
-        </>
+        <AccoutLogoutSection />
 
         <View
           style={{

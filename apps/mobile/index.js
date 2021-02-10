@@ -1,13 +1,14 @@
-import 'react-native-gesture-handler'
-import {AppRegistry} from 'react-native';
-import App from './App';
-import {name as appName} from './app.json';
 import React from 'react';
-import {Provider} from './src/provider';
-import NotesnookShare from './NotesnookShare';
+import {AppRegistry} from 'react-native';
+import {name as appName} from './app.json';
 
+let Provider;
+let App;
+let NotesnookShare;
 
 const AppProvider = () => {
+  Provider = require('./src/provider').Provider
+  App = require("./App").default
   return (
     <Provider>
       <App />
@@ -16,4 +17,7 @@ const AppProvider = () => {
 };
 
 AppRegistry.registerComponent(appName, () => AppProvider);
-AppRegistry.registerComponent('NotesnookShare', () => NotesnookShare)
+AppRegistry.registerComponent('NotesnookShare', () => {
+  NotesnookShare = require("./NotesnookShare").default
+  return NotesnookShare;
+})

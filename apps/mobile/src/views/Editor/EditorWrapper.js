@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Animated, {Easing} from 'react-native-reanimated';
@@ -11,13 +11,13 @@ import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import {editorRef} from '../../utils/Refs';
 import EditorOverlay from './EditorOverlay';
-import Editor from './index';
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
 const op1 = new Animated.Value(1);
 const op2 = new Animated.Value(0);
 const op3 = new Animated.Value(0);
+
 const onHandlerStateChange = (evt) => {
   if (evt.nativeEvent.state === State.END) {
     if (evt.nativeEvent.translationY >= finalValue) {
@@ -84,10 +84,22 @@ const AnimatedKeyboardView = Animated.createAnimatedComponent(
   KeyboardAvoidingView,
 );
 
+let Editor;
+
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const {colors, loading} = state;
+  const [loaded, setLoaded] = useState(false);
   const insets = useSafeAreaInsets();
+
+  useEffect(() => {
+    if (!loading) {
+      if (!Editor) {
+        Editor = require('./index').default;
+      }
+      setLoaded(true);
+    }
+  }, [loading]);
 
   return (
     <View
@@ -173,8 +185,7 @@ export const EditorWrapper = ({dimensions}) => {
               </Animated.Text>
             </View>
 
-            <Editor />
-
+            {!loaded || loading ? null : <Editor />}
             <EditorOverlay />
           </AnimatedKeyboardView>
         </PanGestureHandler>
