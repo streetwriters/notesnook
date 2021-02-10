@@ -2,8 +2,10 @@ const {MMKV} = require('../utils/MMKV');
 import RNFetchBlob from 'rn-fetch-blob';
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
-import {ToastEvent} from './EventManager';
+import {eSendEvent, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
+import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
+import {sleep} from '../utils/TimeUtils';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -16,6 +18,11 @@ async function run() {
       return;
     }
   }
+  eSendEvent(eOpenProgressDialog, {
+    title: 'Backing up your data',
+    paragraph:
+      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+  });
   let backup;
   let error;
   try {
@@ -28,24 +35,39 @@ async function run() {
   }
   if (!error) {
     try {
-      let backupName =
-        'notesnook_backup_' + Date.now() + '.nnbackup';
+      let backupName = 'notesnook_backup_' + Date.now() + '.nnbackup';
       let path = await storage.checkAndCreateDir('backups/');
-      console.log(path + backupName);
-      RNFetchBlob.fs
-        .createFile(path + backupName, 'abc', 'utf8')
-        .then(console.log)
-        .catch(console.log);
-
+      await RNFetchBlob.fs.createFile(path + backupName, backup, 'utf8');
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
-      setTimeout(() => {
-        ToastEvent.show('Backup complete!', 'success');
-      }, 1000);
-      return path;
+      ToastEvent.show('Backup complete!', 'success');
+      eSendEvent(eOpenProgressDialog, {
+        title: 'Backup Complete',
+        icon: 'cloud-upload',
+        paragraph:
+          'Share your backup to your cloud storage such as Dropbox or Google Drive.',
+        noProgress: true,
+        actionText: 'Share Backup File',
+        actionsArray: [
+          {
+            action: () => {
+              Share.open({
+                url: 'file:/' + path + backupName,
+                title: 'Save Backup to Cloud',
+                message: 'Saving backup file to cloud storage',
+              }).catch((e) => console.log);
+            },
+            actionText: 'Share Backup File',
+          },
+        ],
+      });
+
+      return path + backupName;
     } catch (e) {
       console.log('backup error', e);
+      eSendEvent(eCloseProgressDialog);
     }
   } else {
+    eSendEvent(eCloseProgressDialog);
     ToastEvent.show('Backup failed!', 'success');
     return null;
   }
