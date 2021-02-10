@@ -1,4 +1,4 @@
-import Sentry from '@sentry/react-native';
+import NetInfo from '@react-native-community/netinfo';
 import {EV, EVENTS} from 'notes-core/common';
 import React, {useEffect} from 'react';
 import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
@@ -8,12 +8,7 @@ import {updateEvent} from './src/components/DialogManager/recievers';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent,
-} from './src/services/EventManager';
+import {eSendEvent, ToastEvent} from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -27,7 +22,6 @@ import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
   eCloseProgressDialog,
-  eDispatchAction,
   eOpenLoginDialog,
   eOpenProgressDialog,
   refreshNotesPage,
@@ -37,6 +31,8 @@ import {sleep} from './src/utils/TimeUtils';
 import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
+let subsriptionSuccessListener;
+let subsriptionErrorListener;
 
 function updateStatusBarColor() {
   StatusBar.setBarStyle(
@@ -49,55 +45,66 @@ function updateStatusBarColor() {
   }
 }
 
+async function storeAppState() {
+  if (editing.currentlyEditing) {
+    let state = JSON.stringify({
+      editing: editing.currentlyEditing,
+      note: getNote(),
+      movedAway: editing.movedAway,
+    });
+    await MMKV.setItem('appState', state);
+  }
+}
+
+async function checkIntentState() {
+  try {
+    let intent = await MMKV.getItem('notesAddedFromIntent');
+    if (intent) {
+      if (Platform.OS === 'ios') {
+        await db.init();
+        await db.notes.init();
+      }
+      eSendEvent('webviewreset');
+      updateEvent({type: Actions.NOTES});
+      eSendEvent(refreshNotesPage);
+      MMKV.removeItem('notesAddedFromIntent');
+      updateEvent({type: Actions.ALL});
+      eSendEvent(refreshNotesPage);
+    }
+  } catch (e) {}
+}
+
+async function reconnectSSE(connection) {
+  let state = connection;
+  try {
+    if (!state) {
+      state = await NetInfo.fetch();
+    }
+    let user = await db.user.getUser();
+    if (user && state.isConnected && state.isInternetReachable) {
+      await db.connectSSE();
+    }
+  } catch (e) {}
+}
+
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
     if (SettingsService.get().privacyScreen) {
       enabled(false);
     }
-
-    let intent = await MMKV.getItem('notesAddedFromIntent');
-    if (intent) {
-      try {
-        if (Platform.OS === 'ios') {
-          await db.init();
-          await db.notes.init();
-          updateEvent({type: Actions.NOTES});
-          eSendEvent(refreshNotesPage);
-          console.log('RELOADING APP');
-        } else {
-          updateEvent({type: Actions.NOTES});
-          eSendEvent(refreshNotesPage);
-          eSendEvent("webviewreset")
-        }
-      } catch (e) {
-        console.log(e);
-      }
-      MMKV.removeItem('notesAddedFromIntent');
-      updateEvent({type: Actions.ALL});
-      eSendEvent(refreshNotesPage);
-    }
+    await reconnectSSE();
+    await checkIntentState();
     if (getWebviewInit()) {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (editing.currentlyEditing) {
-      let state = JSON.stringify({
-        editing: editing.currentlyEditing,
-        note: getNote(),
-        movedAway: editing.movedAway,
-      });
-      await MMKV.setItem('appState', state);
-    }
-
+    await storeAppState();
     if (SettingsService.get().privacyScreen) {
       enabled(true);
     }
   }
 };
-
-let subsriptionSuccessListener;
-let subsriptionErrorListener;
 
 export const AppRootEvents = React.memo(
   () => {
@@ -105,47 +112,16 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
-      if (!loading) {
-        Linking.getInitialURL().then(async (url) => {
-          if (
-            url &&
-            url.startsWith('https://app.notesnook.com/account/verified')
-          ) {
-            await onEmailVerified();
-          }
-        });
-        Backup.checkAndRun().then((r) => r);
-        setCurrentUser().then(console.log).catch(console.log);
-        db.version()
-          .then((ver) => {
-            if (ver.mobile > APP_VERSION) {
-              eSendEvent('updateDialog', ver);
-            }
-          })
-          .catch(console.log);
+      attachIAPListeners();
+      Appearance.addChangeListener(SettingsService.setTheme);
+      Linking.addEventListener('url', onUrlRecieved);
+      EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
+      EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
+      EV.subscribe(EVENTS.userLoggedOut, onLogout);
+      EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+      EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
+      EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
-        attachIAPListeners();
-        AppState.addEventListener('change', onAppStateChanged);
-        Appearance.addChangeListener(SettingsService.setTheme);
-        Linking.addEventListener('url', onUrlRecieved);
-        EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
-        EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
-        EV.subscribe(EVENTS.userLoggedOut, onLogout);
-        EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
-        EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
-        EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
-
-        if (!__DEV__) {
-          try {
-          /*   Sentry.init({
-              dsn:
-                'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-              release: 'notesnook-mobile@1.1.0',
-              
-            }); */
-          } catch (e) {}
-        }
-      }
       return () => {
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
@@ -157,14 +133,55 @@ export const AppRootEvents = React.memo(
         );
         EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
-        AppState.removeEventListener('change', onAppStateChanged);
         Appearance.removeChangeListener(SettingsService.setTheme);
         Linking.removeEventListener('url', onUrlRecieved);
         unsubIAP();
       };
+    }, []);
+
+    useEffect(() => {
+      let unsubscribe;
+      if (!loading) {
+        unsubscribe = NetInfo.addEventListener(onInternetStateChanged);
+        AppState.addEventListener('change', onAppStateChanged);
+        (async () => {
+          try {
+            let url = await Linking.getInitialURL();
+            if (url?.startsWith('https://app.notesnook.com/account/verified')) {
+              await onEmailVerified();
+            }
+            await setCurrentUser();
+            await Backup.checkAndRun();
+            let version = await db.version();
+            if (version.mobile > APP_VERSION) {
+              eSendEvent('updateDialog', ver);
+            }
+          } catch (e) {
+            console.log(e);
+          }
+        })();
+        if (!__DEV__) {
+          try {
+            /*   Sentry.init({
+              dsn:
+                'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
+              release: 'notesnook-mobile@1.1.0',
+              
+            }); */
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      }
+      return () => {
+        unsubscribe && unsubscribe();
+        AppState.removeEventListener('change', onAppStateChanged);
+      };
     }, [loading]);
 
-  
+    const onInternetStateChanged = async (state) => {
+      reconnectSSE(state);
+    };
 
     const onSyncComplete = async () => {
       dispatch({type: Actions.ALL});
@@ -221,7 +238,6 @@ export const AppRootEvents = React.memo(
       console.log('STATUS CODE', userStatus);
 
       if (!PremiumService.get() && userStatus.type === 5) {
-
         console.log('STATUS CODE IN', userStatus.type);
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',

@@ -14,33 +14,34 @@ import {
 } from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
 import {db} from './src/utils/DB';
-import {
-  eDispatchAction,
-  eOpenSideMenu,
-  refreshNotesPage,
-} from './src/utils/Events';
+import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
 const App = () => {
   const [, dispatch] = useTracked();
 
   useEffect(() => {
-    SettingsService.init().then((r) => {
-      Orientation.getOrientation((e, r) => {
-        DDS.checkSmallTab(r);
-        console.log(r, 'RESULTING', DDS.isSmallTab);
-        dispatch({
-          type: Actions.DEVICE_MODE,
-          state: DDS.isLargeTablet()
-            ? 'tablet'
-            : DDS.isSmallTab
-            ? 'smallTablet'
-            : 'mobile',
+    (async () => {
+      try {
+        await SettingsService.init();
+        Orientation.getOrientation((e, r) => {
+          DDS.checkSmallTab(r);
+          dispatch({
+            type: Actions.DEVICE_MODE,
+            state: DDS.isLargeTablet()
+              ? 'tablet'
+              : DDS.isSmallTab
+              ? 'smallTablet'
+              : 'mobile',
+          });
         });
-      });
-
-      db.init().catch(console.log).finally(loadMainApp);
-    });
+        await db.init();
+      } catch (e) {
+        console.log(e);
+      } finally {
+        loadMainApp();
+      }
+    })();
   }, []);
 
   const _dispatch = (data) => {
@@ -56,15 +57,14 @@ const App = () => {
 
   const loadMainApp = () => {
     SplashScreen.hide();
+    dispatch({type: Actions.ALL});
+    eSendEvent(eOpenSideMenu);
+    SettingsService.setAppLoaded();
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
-      eSendEvent(refreshNotesPage);
       dispatch({type: Actions.LOADING, loading: false});
-      SettingsService.setAppLoaded();
     });
-    eSendEvent(eOpenSideMenu);
-    dispatch({type: Actions.ALL});
   };
 
   return (
