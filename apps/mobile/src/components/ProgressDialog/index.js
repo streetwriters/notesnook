@@ -82,8 +82,8 @@ const ProgressDialog = () => {
       <View
         style={{
           paddingHorizontal: 12,
-          backgroundColor:colors.shade,
-          marginBottom:12
+          backgroundColor: colors.shade,
+          marginBottom: 12,
         }}>
         {dialogData.valueArray &&
           dialogData.valueArray.map((v) => (
@@ -95,8 +95,8 @@ const ProgressDialog = () => {
               icon="check"
               width="100%"
               style={{
-                justifyContent:"flex-start",
-                backgroundColor:'transparent'
+                justifyContent: 'flex-start',
+                backgroundColor: 'transparent',
               }}
             />
           ))}
@@ -106,10 +106,28 @@ const ProgressDialog = () => {
           onPress={dialogData.action}
           title={dialogData.actionText}
           fontSize={SIZE.lg}
-          
         />
       ) : null}
 
+      <View
+        style={{
+          paddingHorizontal: 12,
+        }}>
+        {dialogData?.actionsArray &&
+          dialogData?.actionsArray.map((item) => (
+            <Button
+              onPress={item.action}
+              title={item.actionText}
+              type="accent"
+              height={50}
+              style={{
+                marginBottom: 10,
+              }}
+              width="100%"
+              fontSize={SIZE.md}
+            />
+          ))}
+      </View>
       <Toast context="local" />
     </ActionSheetWrapper>
   );
