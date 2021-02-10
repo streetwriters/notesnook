@@ -1,11 +1,9 @@
 const {MMKV} = require('../utils/MMKV');
-
 import storage from '../utils/storage';
 import {db} from '../utils/DB';
 import {eSendEvent, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
-import {sleep} from '../utils/TimeUtils';
 import Share from 'react-native-share';
 
 const MS_DAY = 86400000;
@@ -19,7 +17,7 @@ async function run() {
       return;
     }
   }
-  RNFetchBlob = require('rn-fetch-blob');
+  RNFetchBlob = require('rn-fetch-blob').default
   eSendEvent(eOpenProgressDialog, {
     title: 'Backing up your data',
     paragraph:
@@ -35,6 +33,7 @@ async function run() {
   } catch (e) {
     error = true;
   }
+
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now() + '.nnbackup';
@@ -42,6 +41,7 @@ async function run() {
       await RNFetchBlob.fs.createFile(path + backupName, backup, 'utf8');
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
       ToastEvent.show('Backup complete!', 'success');
+  
       eSendEvent(eOpenProgressDialog, {
         title: 'Backup Complete',
         icon: 'cloud-upload',

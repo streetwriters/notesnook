@@ -24,16 +24,15 @@ import com.facebook.react.module.model.ReactModuleInfo;
 import com.facebook.react.module.model.ReactModuleInfoProvider;
 import com.facebook.react.bridge.NativeModule;
 import com.facebook.react.bridge.ReactApplicationContext;
-import com.facebook.react.ReactPackage;
 import com.learnium.RNDeviceInfo.RNDeviceModule;
+import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
 
-import chat.rocket.rnshareextension.ShareModule;
 import cl.json.RNShareModule;
 import io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule;
 import px.tooltips.RNTooltipsModule;
-
+import com.oblador.keychain.KeychainModuleBuilder;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -48,6 +47,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 protected List<ReactPackage> getPackages() {
 
                     List<ReactPackage> packages = new PackageList(this).getPackages();
+                    packages.add(new KeychainPackage(new KeychainModuleBuilder().withoutWarmUp()));
 
                     packages.add(new TurboReactPackage() {
                         @Override

@@ -7,6 +7,7 @@ import {MMKV} from '../utils/mmkv';
 import {scale, updateSize} from '../utils/SizeUtils';
 import {enabled} from 'react-native-privacy-snapshot';
 import {Platform} from 'react-native';
+import Navigation from './Navigation';
 
 let settings = defaultState.settings;
 
@@ -22,13 +23,24 @@ function getApploaded() {
 
 async function init() {
   scale.fontScale = 1;
-  settings = await MMKV.getStringAsync('appSettings');
+  settings = await MMKV.getItem('appSettings');
   if (!settings) {
     settings = defaultState.settings;
-    await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
+    await MMKV.setItem('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
   }
+  Navigation.setHeaderState(
+    settings.homepage,
+    {
+      menu: true,
+    },
+    {
+      heading: settings.homepage,
+      id: settings.homepage.toLowerCase() + '_navigation',
+    },
+  );
+
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
@@ -56,22 +68,19 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };
 
 async function set(name, value) {
   settings[name] = value;
-  await MMKV.setStringAsync('appSettings', JSON.stringify(settings));
+  await MMKV.setItem('appSettings', JSON.stringify(settings));
   updateEvent({type: Actions.SETTINGS, settings: {...settings}});
 }
 
 function get() {
   return settings;
 }
-
-
 
 export default {
   init,

@@ -1100,13 +1100,7 @@ const SettingsBackupAndRestore = () => {
     {
       name: 'Backup data',
       func: async () => {
-        eSendEvent(eOpenProgressDialog, {
-          title: 'Backing up your data',
-          paragraph:
-            "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
-        });
         await Backup.run();
-        eSendEvent(eCloseProgressDialog);
       },
       desc: 'Backup your data to phone storage',
     },

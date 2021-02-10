@@ -95,7 +95,7 @@ class RecoveryKeyDialog extends React.Component {
 
     this.svg.current?.toDataURL(async (data) => {
       let path = await Storage.checkAndCreateDir('/');
-      RNFetchBlob = require("rn-fetch-blob"); 
+      RNFetchBlob = require("rn-fetch-blob").default
       let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
       RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
         RNFetchBlob.fs
@@ -124,7 +124,7 @@ class RecoveryKeyDialog extends React.Component {
     }
     let path = await Storage.checkAndCreateDir('/');
     let fileName = 'nn_' + this.user.email + '_recovery_key.txt';
-    RNFetchBlob = require("rn-fetch-blob");
+    RNFetchBlob = require('rn-fetch-blob')
     RNFetchBlob.fs
       .writeFile(path + fileName, this.state.key, 'utf8')
       .then((r) => {

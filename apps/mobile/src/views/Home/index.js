@@ -1,4 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
+import { AsyncStorage } from 'react-native';
 import {InteractionManager} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
@@ -85,6 +86,7 @@ export const Home = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = async () => {
+
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {

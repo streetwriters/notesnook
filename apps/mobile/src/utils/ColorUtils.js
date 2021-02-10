@@ -64,12 +64,12 @@ export const RGB_Linear_Shade = (p, rgba) => {
 
 export async function getColorScheme(useSystemTheme) {
 
-    let accentColor = await MMKV.getStringAsync('accentColor');
-    let theme= await MMKV.getStringAsync('theme');
+    let accentColor = await MMKV.getItem('accentColor');
+    let theme= await MMKV.getItem('theme');
 
 
     if (!accentColor ) {
-        await MMKV.setStringAsync('accentColor', '#0560FF');
+        await MMKV.setItem('accentColor', '#0560FF');
         setAccentColor('#0560FF');
     } else {
         setAccentColor(accentColor);
@@ -84,7 +84,7 @@ export async function getColorScheme(useSystemTheme) {
     }
 
     if (!theme) {
-        await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+        await MMKV.setItem('theme', JSON.stringify({night: false}));
         setColorScheme(COLOR_SCHEME_LIGHT);
     } else {
         theme = JSON.parse(theme);

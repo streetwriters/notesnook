@@ -1,6 +1,6 @@
 import React, { Component, createRef } from 'react';
 import { InteractionManager, TouchableOpacity, View } from 'react-native';
-import * as Keychain from 'react-native-keychain';
+
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
@@ -33,6 +33,7 @@ import Input from '../Input';
 import { Toast } from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
+let Keychain;
 const passInputRef = createRef();
 const confirmPassRef = createRef();
 const changePassInputRef = createRef();
@@ -287,6 +288,9 @@ export class VaultDialog extends Component {
           loading: true,
         },
         async () => {
+          if (!Keychain) {
+            Keychain = require('react-native-keychain');
+          }
           await sleep(20);
           await Keychain.setInternetCredentials(
             'nn_vault',
@@ -298,6 +302,8 @@ export class VaultDialog extends Component {
               authenticationPrompt: {cancel: null},
               accessible:
                 Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
+              storage: kc.STORAGE_TYPE.AES,
+              rules: "none"  
             },
           );
           this.setState({
@@ -391,6 +397,9 @@ export class VaultDialog extends Component {
 
   _revokeFingerprintAccess = async () => {
     try {
+      if (!Keychain) {
+        Keychain = require('react-native-keychain');
+      }
       await Keychain.resetInternetCredentials('nn_vault', {
         accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
         authenticationType:
@@ -398,6 +407,8 @@ export class VaultDialog extends Component {
         authenticationPrompt: {
           cancel: null,
         },
+        storage: kc.STORAGE_TYPE.AES,
+        rules: "none" 
       });
       eSendEvent('vaultUpdated');
       ToastEvent.show('Fingerprint access revoked!', 'success');
@@ -408,6 +419,10 @@ export class VaultDialog extends Component {
 
   _onPressFingerprintAuth = async () => {
     try {
+
+      if (!Keychain) {
+        Keychain = require('react-native-keychain');
+      }
       let credentials = await Keychain.getInternetCredentials('nn_vault', {
         accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
         authenticationType:
@@ -415,6 +430,8 @@ export class VaultDialog extends Component {
         authenticationPrompt: {
           cancel: null,
         },
+        storage: kc.STORAGE_TYPE.AES,
+        rules: "none" 
       });
       if (credentials?.password) {
         this.password = credentials.password;

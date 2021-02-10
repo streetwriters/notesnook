@@ -124,7 +124,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         return;
       }
     }
-    RNFetchBlob = require("rn-fetch-blob");
+    RNFetchBlob = require('rn-fetch-blob').default
     try {
       let path = await storage.checkAndCreateDir('/backups/');
       let files = await RNFetchBlob.fs.lstat(path);

@@ -48,7 +48,7 @@ const style = {
 const Editor = React.memo(
   () => {
     const [state] = useTracked();
-    const {premiumUser, loading} = state;
+    const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
     const [localLoading, setLocalLoading] = useState(false);
     const onLoad = async () => {
@@ -65,15 +65,14 @@ const Editor = React.memo(
     };
 
     useEffect(() => {
-      if (!loading) {
-        eSubscribeEvent('webviewreset', onResetRequested);
-      }
+      eSubscribeEvent('webviewreset', onResetRequested);
+
       return () => {
         eUnSubscribeEvent('webviewreset', onResetRequested);
       };
-    }, [loading]);
+    }, []);
 
-    return resetting || loading ? (
+    return resetting ? (
       <Loading
         tagline={resetting ? 'Reloading Editor' : 'Loading Editor'}
         height="100%"

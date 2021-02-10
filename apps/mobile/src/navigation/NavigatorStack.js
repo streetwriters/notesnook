@@ -75,20 +75,7 @@ const screenOptionsForAnimation = {
 
 export const NavigatorStack = React.memo(
   () => {
-    React.useEffect(() => {
-      sleep(2000).then(() => {
-        Navigation.setHeaderState(
-          SettingsService.get().homepage,
-          {
-            menu: true,
-          },
-          {
-            heading: SettingsService.get().homepage,
-            id: SettingsService.get().homepage.toLowerCase() + '_navigation',
-          },
-        );
-      });
-    }, []);
+  
 
     return (
       <Container root={true}>

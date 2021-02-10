@@ -54,7 +54,7 @@ export const execCommands = {
       type: [DocumentPicker.types.images],
     }).then((r) => {
 
-      RNFetchBlob = require("rn-fetch-blob");
+      RNFetchBlob = require('rn-fetch-blob').default
       RNFetchBlob.fs.readFile(r.uri, 'base64').then((read) => {
         let b64 = `data:${r.type};base64, ` + read;
         formatSelection(`

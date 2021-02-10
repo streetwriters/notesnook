@@ -34,10 +34,12 @@ const App = () => {
               ? 'smallTablet'
               : 'mobile',
           });
-          SplashScreen.hide();
+       
         });
-      
+        
+        //let p = performance.now();
         await db.init();
+        //console.log("[INIT CALL]", performance.now() - p);
       } catch (e) {
         console.log(e);
       } finally {
@@ -58,7 +60,7 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
-   
+    SplashScreen.hide();
     dispatch({type: Actions.ALL});
     eSendEvent(eOpenSideMenu);
 

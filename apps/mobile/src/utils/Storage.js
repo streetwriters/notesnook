@@ -8,12 +8,12 @@ let Sodium;
 let Keychain;
 let RNFetchBlob;
 async function read(key, isArray = false) {
-  let data = await MMKV.getItem(key);
-  if (!data) return null;
-  try {
-    data = JSON.parse(data);
-  } catch (e) {}
 
+  //let per = performance.now();
+  let data = await MMKV.getItem(key);
+  //console.log("[INIT S1]",key + "_key", performance.now() - per);
+  if (!data) return null;
+  data = JSON.parse(data);
   return data;
 }
 
@@ -74,10 +74,11 @@ let CRYPT_CONFIG = (kc) =>
     android: {
       authenticationType: kc.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
       accessControl: kc.ACCESS_CONTROL.DEVICE_PASSCODE,
-      rules: kc.SECURITY_RULES.AUTOMATIC_UPGRADE,
+      rules: "none",
       authenticationPrompt: {
         cancel: null,
       },
+      storage: kc.STORAGE_TYPE.AES
     },
   });
 
@@ -87,7 +88,7 @@ async function deriveCryptoKey(name, data) {
   }
 
   if (!Sodium) {
-    Sodium = require('react-native-sodium');
+    Sodium = require('react-native-sodium')
   }
 
   try {
@@ -96,7 +97,9 @@ async function deriveCryptoKey(name, data) {
       'notesnook',
       name,
       credentials.key,
-      CRYPT_CONFIG(Keychain),
+      {
+        
+      },
     );
     return credentials.key;
   } catch (e) {}
@@ -121,7 +124,7 @@ async function getCryptoKey(name) {
 
 async function removeCryptoKey(name) {
   if (!Keychain) {
-    Keychain = require('react-native-keychain');
+    Keychain = require('react-native-keychain')
   }
 
   try {
@@ -154,7 +157,7 @@ async function requestPermission() {
 }
 async function checkAndCreateDir(path) {
   if (!RNFetchBlob) {
-    RNFetchBlob = require('rn-fetch-blob');
+    RNFetchBlob = require('rn-fetch-blob').default
   }
 
   let dir =

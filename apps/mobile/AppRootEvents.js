@@ -112,7 +112,6 @@ export const AppRootEvents = React.memo(
     const {loading} = state;
 
     useEffect(() => {
-      attachIAPListeners();
       Appearance.addChangeListener(SettingsService.setTheme);
       Linking.addEventListener('url', onUrlRecieved);
       EV.subscribe(EVENTS.appRefreshRequested, onSyncComplete);
@@ -135,7 +134,6 @@ export const AppRootEvents = React.memo(
 
         Appearance.removeChangeListener(SettingsService.setTheme);
         Linking.removeEventListener('url', onUrlRecieved);
-        unsubIAP();
       };
     }, []);
 
@@ -176,6 +174,7 @@ export const AppRootEvents = React.memo(
       return () => {
         unsubscribe && unsubscribe();
         AppState.removeEventListener('change', onAppStateChanged);
+        unsubIAP();
       };
     }, [loading]);
 
@@ -299,6 +298,7 @@ export const AppRootEvents = React.memo(
       try {
         let user = await db.user.fetchUser(true);
         if (user) {
+          attachIAPListeners();
           clearMessage(dispatch);
           dispatch({type: Actions.USER, user: user});
           await PremiumService.setPremiumStatus();
