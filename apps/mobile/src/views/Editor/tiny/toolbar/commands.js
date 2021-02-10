@@ -70,6 +70,7 @@ export const execCommands = {
     });
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
+  code: `tinymce.activeEditor.execCommand('mceCode')`,
   /* 
 ,*/
 };

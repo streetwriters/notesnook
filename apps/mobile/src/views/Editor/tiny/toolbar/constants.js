@@ -150,7 +150,7 @@ export const TOOLBAR_ICONS = {
   rtl: 'format-textdirection-r-to-l',
   ltr: 'format-textdirection-l-to-r',
   link: 'link',
-  'code-block': 'code-braces',
+  code: 'code-braces',
   image: 'image',
   video: 'video',
   ul: 'format-list-bulleted',
