@@ -88,7 +88,7 @@ function ListItem(props) {
         cursor: "pointer",
         position: "relative",
         ":hover": {
-          backgroundColor: "shade",
+          backgroundColor: props.bg ? props.bg + "11" : "shade",
         },
       }}
       data-test-id={`${props.item.type}-${props.index}`}
@@ -171,7 +171,7 @@ function ListItem(props) {
       {props.focused && (
         <Text
           display="flex"
-          bg="shade"
+          bg={props.bg ? props.bg + "11" : "shade"}
           justifyContent="center"
           alignItems="center"
           px="2px"
@@ -183,10 +183,10 @@ function ListItem(props) {
             borderRadius: "default",
           }}
           fontWeight="bold"
-          color="primary"
+          color={props.bg || "primary"}
           fontSize={8}
         >
-          <Icon.Edit color="primary" size={8} /> EDITING NOW
+          <Icon.Edit color={props.bg || "primary"} size={8} /> EDITING NOW
         </Text>
       )}
     </Flex>
