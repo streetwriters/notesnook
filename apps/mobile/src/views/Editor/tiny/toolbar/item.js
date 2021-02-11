@@ -56,6 +56,7 @@ const ToolbarItem = ({
   }, []);
 
   useEffect(() => {
+    console.log('called')
     onSelectionChange(properties.selection);
   }, []);
 
@@ -63,7 +64,7 @@ const ToolbarItem = ({
     properties.selection = data;
     let formats = Object.keys(data);
 
-    if (!data['link']) {
+    if (!data['link'] && type === "tooltip") {
       eSendEvent('showTooltip');
     }
     if (format === 'header' && type === 'tooltip') {
@@ -248,6 +249,17 @@ const ToolbarItem = ({
         value = Platform.OS === 'ios' ? '-apple-system' : 'serif';
       } else {
         value = formatValue;
+      }
+    }
+
+    if (format === 'pre') {
+      if (selected) {
+        formatSelection(`tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });`);
+        focusEditor(format);
+        editing.tooltip = null;
+        return;
+      } else {
+        value = "add";
       }
     }
 
