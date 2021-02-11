@@ -22,7 +22,6 @@ export async function setSetting(settings, name, value) {
 export const scrollRef = createRef();
 export const AndroidModule = NativeModules.NNativeModule;
 
-
 export const getElevation = (elevation) => {
   return {
     elevation,
@@ -160,20 +159,21 @@ export const SUBSCRIPTION_PROVIDER = {
     type: 'iOS',
     title: 'Subscribed on iOS',
     desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase.',
-    icon:'ios'
+    icon: 'ios',
   },
   1: {
     type: 'Android',
     title: 'Subscribed on Android',
     desc:
       'You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.',
-      icon:'android'
+    icon: 'android',
   },
   2: {
     type: 'Web',
     title: 'Subscribed on Web',
-    desc: 'You subscribed to Notesnook Pro on the Web/Desktop App using doCheckout.',
-    icon:'web'
+    desc:
+      'You subscribed to Notesnook Pro on the Web/Desktop App using doCheckout.',
+    icon: 'web',
   },
 };
 
@@ -222,13 +222,14 @@ export const BUTTON_TYPES = {
     opacity: 0.12,
   },
 };
+let he;
 
-export function toTXT(data) {
-  return data.reduce(function (text, op) {
-    if (!op.insert) return text;
-    if (typeof op.insert !== 'string') return text + ' ';
-    return text + op.insert;
-  }, '');
+export function toTXT(html) {
+  let text = html.replace(/<br[^>]*>/gi, '\n').replace(/<[^>]+>/g, '');
+  if (!he) {
+    he = require('he')
+  }
+  return he.decode(text);
 }
 
 export const TOOLTIP_POSITIONS = {
