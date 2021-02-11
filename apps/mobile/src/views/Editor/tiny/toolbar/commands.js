@@ -73,6 +73,8 @@ export const execCommands = {
     });
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
-  code: `tinymce.activeEditor.execCommand('CodeBlock')`,
+  pre:`
+    tinymce.activeEditor.execCommand('CodeBlock')
+  `,
 
 };

@@ -144,6 +144,7 @@ function selectchange() {
     index: range.startOffset,
     length: range.endOffset - range.startOffset,
   };
+
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;
 
   if (currentFormats.fontsize === '') {

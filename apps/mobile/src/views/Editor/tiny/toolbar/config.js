@@ -244,7 +244,7 @@ export const TOOLBAR_CONFIG = [
       ],
     },
     {
-      format: 'code',
+      format: 'pre',
       type: 'format',
       fullname: 'Code Block',
       premium: true,
