@@ -11,19 +11,17 @@ import tinymce from "tinymce/tinymce";
     });
     node = editor.selection.getNode();
     editor.focus();
-    editor.selection.setCursorLocation(node);
+    editor.selection.setCursorLocation(node, 5);
     editor.nodeChanged();
   };
 
-  var addCodeBlock = function (editor, api) {
-    if (api.isActive()) {
-      replaceContent(
-        editor,
-        (node) => `<p>${node.innerHTML.replace(/\n/gm, "<br>")}</p>`
-      );
+  var addCodeBlock = function (editor, api, type) {
+    if (api && api.isActive && api.isActive()) {
+      editor.execCommand("mceInsertNewLine", false, { shiftKey: true });
     } else {
       var content = editor.selection.getContent({ format: "text" });
       content = content.replace(/^\n/gm, "");
+      if (type === "shortcut") content = "<br>";
       if (content.length > 0) {
         editor.undoManager.transact(function () {
           editor.execCommand(
@@ -65,8 +63,29 @@ import tinymce from "tinymce/tinymce";
       var nodeChangeHandler = function (e) {
         api.setActive(e.element.tagName === "PRE");
       };
+
+      var setContentHandler = function (e) {
+        if (e.content === "<pre></pre>") {
+          e.preventDefault();
+          editor.creatingCodeBlock = true;
+          addCodeBlock(editor, undefined, "shortcut");
+        }
+      };
+
+      var beforeExecCommandHandler = function (e) {
+        console.log(e);
+        if (editor.creatingCodeBlock && e.command === "mceInsertNewLine") {
+          e.preventDefault();
+          editor.creatingCodeBlock = false;
+        }
+      };
+
+      editor.on("BeforeExecCommand", beforeExecCommandHandler);
+      editor.on("BeforeSetContent", setContentHandler);
       editor.on("NodeChange", nodeChangeHandler);
       return function () {
+        editor.off("BeforeExecCommand", beforeExecCommandHandler);
+        editor.off("BeforeSetContent", setContentHandler);
         return editor.off("NodeChange", nodeChangeHandler);
       };
     };

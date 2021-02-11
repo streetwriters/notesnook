@@ -29,7 +29,9 @@ import { showBuyDialog } from "../dialogs/buy-dialog";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
 const markdownPatterns = [
+  { start: "```", replacement: "<pre></pre>" },
   { start: "*", end: "*", format: "italic" },
+  { start: "_", end: "_", format: "italic" },
   { start: "**", end: "**", format: "bold" },
   { start: "`", end: "`", format: "code" },
   { start: "#", format: "h1" },
