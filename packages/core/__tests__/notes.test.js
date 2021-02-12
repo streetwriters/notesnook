@@ -117,16 +117,16 @@ test("updating empty note should delete it", () =>
 
 test("get favorite notes", () =>
   noteTest({
+    ...TEST_NOTE,
     favorite: true,
-    content: { delta: [{ insert: "Hello" }], text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.favorites.length).toBeGreaterThan(0);
   }));
 
 test("get pinned notes", () =>
   noteTest({
+    ...TEST_NOTE,
     pinned: true,
-    content: { delta: [{ insert: "Hello" }], text: "Hello" },
   }).then(({ db }) => {
     expect(db.notes.pinned.length).toBeGreaterThan(0);
   }));

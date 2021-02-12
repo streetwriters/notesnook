@@ -15,14 +15,14 @@ export default class Lookup {
   }
 
   async notes(notes, query) {
-    const deltas = await this._db.content.multi(
+    const contents = await this._db.content.multi(
       notes.map((note) => note.contentId)
     );
     const results = [];
     notes.forEach((note) => {
       const title = note.title;
       if (!note.locked) {
-        let content = deltas.find((delta) => delta.id === note.contentId);
+        let content = contents.find((content) => content.id === note.contentId);
         content = getContentFromData(content.type, content.data);
         if (fzs(query, title) || content.search(query)) results.push(note);
       } else {

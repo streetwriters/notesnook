@@ -14,7 +14,7 @@ import { CURRENT_DATABASE_VERSION } from "../../../common";
 const emptyServerResponse = {
   notes: [],
   notebooks: [],
-  delta: [],
+  content: [],
   text: [],
   tags: [],
   colors: [],
@@ -110,7 +110,13 @@ describe.each(tests)(
         item.title = "Google";
         const result = await merger.merge(
           {
-            [collection]: [{ id: item.id, ...(await getEncrypted(item)) }],
+            [collection]: [
+              {
+                id: item.id,
+                v: CURRENT_DATABASE_VERSION,
+                ...(await getEncrypted(item)),
+              },
+            ],
             synced: false,
           },
           0
@@ -122,7 +128,7 @@ describe.each(tests)(
   }
 );
 
-test("local delta updated after lastSyncedTimestamp should cause merge conflict", () => {
+test("local content updated after lastSyncedTimestamp should cause merge conflict", () => {
   StorageInterface.clear();
   return noteTest().then(async ({ db, id }) => {
     await login(db);
@@ -138,8 +144,8 @@ test("local delta updated after lastSyncedTimestamp should cause merge conflict"
             ...(await getEncrypted({
               id: contentId,
               noteId: id,
-              type: "delta",
-              data: [{ insert: "my name is" }],
+              type: "tiny",
+              data: "<p>my name is</p>",
               dateEdited: 2919,
               conflicted: false,
               resolved: false,

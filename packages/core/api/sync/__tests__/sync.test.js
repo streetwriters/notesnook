@@ -60,7 +60,7 @@ test("sync without merge conflicts, cause merge conflicts, resolve them and then
         type: TEST_NOTE.content.type,
         dateEdited: Date.now(),
         conflicted: false,
-        data: TEST_NOTE.content.data,
+        data: "<p>hello world what are you doing</p>",
       })),
     };
 

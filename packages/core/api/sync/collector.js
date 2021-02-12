@@ -15,7 +15,7 @@ class Collector {
 
     this._map = async (i) => {
       const item = { ...i };
-      // in case of resolved delta
+      // in case of resolved content
       delete item.resolved;
       // turn the migrated flag off so we don't keep syncing this item repeated
       delete item.migrated;

@@ -4091,10 +4091,6 @@ quill-delta-to-html@^0.12.0:
   dependencies:
     lodash.isequal "^4.5.0"
 
-"quill-delta-to-markdown@https://github.com/streetwriters/quill-delta-to-markdown":
-  version "0.7.0"
-  resolved "https://github.com/streetwriters/quill-delta-to-markdown#8854bc4882f99f5229cfbd22cf0697d14e725755"
-
 react-is@^16.12.0, react-is@^16.8.4:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
