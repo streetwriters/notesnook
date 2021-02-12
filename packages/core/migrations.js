@@ -37,10 +37,13 @@ export const migrations = {
       item.data = deltaConverter.convert();
       item.type = "tiny";
       item.migrated = true;
-      return migrations["5.0"].delta(item);
+      return migrations["5"].delta(item);
     },
   },
   5.0: {
+    tiny: function (item) {
+      return migrations["5"].delta(item);
+    },
     delta: function (item) {
       if (item.conflicted) {
         const deltaConverter = new QuillDeltaToHtmlConverter(
@@ -62,6 +65,10 @@ export const migrations = {
     notebook: false,
     tag: false,
     trash: false,
+    tiny: false,
+    /**
+     * @deprecated
+     */
     delta: false,
     settings: false,
   },

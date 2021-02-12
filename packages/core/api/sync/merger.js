@@ -1,5 +1,6 @@
 import { migrations } from "../../migrations";
 import { areAllEmpty } from "./utils";
+import SparkMD5 from "spark-md5";
 
 class Merger {
   /**
@@ -110,6 +111,9 @@ class Merger {
       (id) => this._db.content.raw(id),
       (item) => this._db.content.add(item),
       async (local, remote) => {
+        // if hashes are equal do nothing
+        if (SparkMD5.hash(local.data) === SparkMD5.hash(remote.data)) return;
+
         // merge conflicts resolver
         const note = this._db.notes.note(local.noteId).data;
 
