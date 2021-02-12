@@ -6,6 +6,7 @@ var he;
 class Tiny {
   constructor(data) {
     this.data = data;
+    this.text;
   }
 
   toHTML() {
@@ -31,11 +32,17 @@ class Tiny {
   }
 
   toTitle() {
-    return this.toTXT().substring(0, 30);
+    if (!this.text) {
+      this.text = this.toTXT();
+    }
+    return getTitleFromText(this.text);
   }
 
   toHeadline() {
-    return this.toTXT().substring(0, 80);
+    if (!this.text) {
+      this.text = this.toTXT();
+    }
+    return getHeadlineFromText(this.text);
   }
 
   isEmpty() {
@@ -52,3 +59,35 @@ class Tiny {
   }
 }
 export default Tiny;
+
+function getHeadlineFromText(text) {
+  for (var i = 0; i < text.length; ++i) {
+    const char = text[i];
+    if (
+      char === "\n" ||
+      char === "\t" ||
+      char === "\r" ||
+      char === "." ||
+      i >= 120
+    ) {
+      return text.substring(0, i);
+    }
+  }
+  return text;
+}
+
+function getTitleFromText(text) {
+  var title = "";
+  var count = 0;
+  for (var i = 0; i < text.length; ++i) {
+    const char = text[i];
+    if (char === "\n" || char === "\t" || char === "\r" || char === " ") {
+      ++count;
+      title += " ";
+      if (count === 4) {
+        return title;
+      }
+    } else title += char;
+  }
+  return title;
+}
