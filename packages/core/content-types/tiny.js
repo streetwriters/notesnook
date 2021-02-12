@@ -2,6 +2,7 @@ import TurndownService from "turndown";
 var turndownService = new TurndownService();
 
 const splitter = /\W+/gm;
+var he;
 class Tiny {
   constructor(data) {
     this.data = data;
@@ -16,7 +17,12 @@ class Tiny {
       let doc = new DOMParser().parseFromString(this.data, "text/html");
       return doc.body.textContent || "";
     } else {
-      return this.data.replace(/<br>/gm, "\n").replace(/<[^>]+>/g, "");
+      if (!he) {
+        he = require("he");
+      }
+      return he.decode(
+        this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
+      );
     }
   }
 
