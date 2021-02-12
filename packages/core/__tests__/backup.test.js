@@ -4,9 +4,6 @@ import {
   noteTest,
   notebookTest,
 } from "./utils";
-import v0Backup from "./__fixtures__/backup.v0.json";
-import v2Backup from "./__fixtures__/backup.v2.json";
-import v3Backup from "./__fixtures__/backup.v3.json";
 import v4Backup from "./__fixtures__/backup.v4.json";
 import v42Backup from "./__fixtures__/backup.v4.2.json";
 import v43Backup from "./__fixtures__/backup.v4.3.json";
@@ -70,9 +67,6 @@ test("import tempered backup", () =>
   ));
 
 describe.each([
-  ["v0", v0Backup],
-  ["v2", v2Backup],
-  ["v3", v3Backup],
   ["v4", v4Backup],
   ["v4.2", v42Backup],
   ["v4.3", v43Backup],

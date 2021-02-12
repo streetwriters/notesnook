@@ -31,4 +31,4 @@ export const EVENTS = {
   noteRemoved: "note:removed",
 };
 
-export const CURRENT_DATABASE_VERSION = 5.0;
+export const CURRENT_DATABASE_VERSION = 5.1;

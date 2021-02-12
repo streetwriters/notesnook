@@ -94,27 +94,12 @@ export default class Backup {
 
     switch (version) {
       case CURRENT_DATABASE_VERSION:
+      case 5.0:
       case 4:
       case 4.1:
       case 4.2:
-      case 4.3:
-      case 3:
-      case 2: {
+      case 4.3: {
         return backup;
-      }
-      case 0: {
-        const hash = backup.data.h;
-        const hash_type = backup.data.ht;
-        delete backup.data.h;
-        delete backup.data.ht;
-        return {
-          version: 0,
-          type: backup.type,
-          date: backup.date || Date.now(),
-          data: backup.data,
-          hash,
-          hash_type,
-        };
       }
       default:
         throw new Error("Unknown backup version.");
@@ -141,11 +126,6 @@ export default class Backup {
       {
         index: data["trash"],
         dbCollection: this._db.trash,
-      },
-      {
-        index: data["delta"],
-        dbCollection: this._db.content,
-        type: "delta",
       },
       {
         index: data["content"],
