@@ -267,7 +267,7 @@ function parseAlgorithm(alg) {
   return {
     encryptionAlgorithm: enc,
     kdfAlgorithm: kdf,
-    isCompressed: compressed === 1,
+    isCompressed: compressed === "1",
     base64_variant: base64variant,
   };
 }
