@@ -262,6 +262,7 @@ function loadScript(url) {
  * @param {string} alg
  */
 function parseAlgorithm(alg) {
+  if (!alg) return {};
   const [enc, kdf, compressed, base64variant] = alg.split("-");
   return {
     encryptionAlgorithm: enc,
