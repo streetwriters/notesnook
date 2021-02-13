@@ -44,9 +44,7 @@ function onMessage(ev) {
             sendMessage("load", {}, messageId);
           },
         };
-        importScripts(
-          "https://cdn.jsdelivr.net/gh/jedisct1/libsodium.js@0.7.8/dist/browsers/sodium.js"
-        );
+        importScripts("sodium.js");
         break;
       }
       default:
@@ -57,8 +55,8 @@ function onMessage(ev) {
   }
 }
 
-function sendMessage(type, data, messageId) {
-  postMessage({ type, data, messageId });
+function sendMessage(type, data, messageId, transferables) {
+  postMessage({ type, data, messageId }, undefined, transferables);
 }
 
 const deriveKey = (password, salt, exportKey = false) => {
@@ -124,19 +122,23 @@ const _getKey = (passwordOrKey) => {
 /**
  *
  * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
- * @param {string|Object} data - the plaintext data
+ * @param {{type: "plain" | "uint8array", data: string | Uint8Array}} plainData - the plaintext data
  */
-const encrypt = (passwordOrKey, data) => {
+const encrypt = (passwordOrKey, plainData) => {
   const { sodium } = this;
+
+  if (plainData.type === "plain") {
+    plainData.data = enc.encode(data.data);
+  }
 
   const { key, salt } = _getKey(passwordOrKey);
 
   const nonce = sodium.randombytes_buf(
     sodium.crypto_aead_xchacha20poly1305_ietf_NPUBBYTES
   );
-  const dataArray = enc.encode(data);
+
   const cipher = sodium.crypto_aead_xchacha20poly1305_ietf_encrypt(
-    dataArray,
+    plainData.data,
     undefined,
     undefined,
     nonce,
@@ -147,10 +149,14 @@ const encrypt = (passwordOrKey, data) => {
   sodium.memzero(nonce);
   sodium.memzero(key);
   return {
+    alg: getAlgorithm(
+      sodium.base64_variants.URLSAFE_NO_PADDING,
+      plainData.type === "uint8array" ? 1 : 0 // TODO: Crude but works (change this to a more exact boolean flag)
+    ),
     cipher,
     iv,
     salt,
-    length: dataArray.length,
+    length: plainData.data.length,
   };
 };
 
@@ -159,21 +165,21 @@ const encrypt = (passwordOrKey, data) => {
  * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
  * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
  */
-const decrypt = (passwordOrKey, { iv, cipher, salt }) => {
+const decrypt = (passwordOrKey, { iv, cipher, salt, output }) => {
   const { sodium } = this;
 
   const { key } = _getKey({ salt, ...passwordOrKey });
 
-  const plainText = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
+  const data = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     undefined,
     sodium.from_base64(cipher),
     undefined,
     sodium.from_base64(iv),
     key,
-    "text"
+    output
   );
   sodium.memzero(key);
-  return plainText;
+  return data;
 };
 
 if (self.document) {
@@ -225,3 +231,8 @@ const webCryptoPolyfill = (seed, sodium) => {
   };
   self.crypto = crypto;
 };
+
+function getAlgorithm(base64Variant, compress) {
+  //Template: encryptionAlgorithm-kdfAlgorithm-compressionFlag-base64variant
+  return `xcha-argon2i13-${compress}-${base64Variant}`;
+}

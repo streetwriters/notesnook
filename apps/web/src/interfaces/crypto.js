@@ -1,3 +1,24 @@
+import lzutf8 from "lzutf8";
+
+/**
+ * @return {Uint8Array}
+ */
+function compress(data) {
+  return lzutf8.compress(data, {
+    blockSize: 64 * 1024 * 1024,
+    outputEncoding: "ByteArray",
+    inputEncoding: "String",
+  });
+}
+
+function decompress(data) {
+  return lzutf8.decompress(data, {
+    blockSize: 64 * 1024 * 1024,
+    inputEncoding: "ByteArray",
+    outputEncoding: "String",
+  });
+}
+
 class Crypto {
   isReady = false;
   constructor() {
@@ -19,23 +40,60 @@ class Crypto {
   }
 
   /**
-   *
+   * @private
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string|Object} data - the plaintext data
+   * @param {string} plainData - the plaintext data
    */
-  encrypt = async (passwordOrKey, data) => {
+  _encryptCompressed = async (passwordOrKey, plainData) => {
     await this._initialize();
-    return global.ncrypto.encrypt.call(this, passwordOrKey, data);
+    return global.ncrypto.encrypt.call(this, passwordOrKey, {
+      type: "uint8array",
+      data: compress(plainData),
+    });
   };
 
   /**
    *
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
+   * @param {string} plainData - the plaintext data
+   * @param {boolean}
    */
-  decrypt = async (passwordOrKey, cipher) => {
+  encrypt = async (passwordOrKey, plainData, compress) => {
+    if (compress)
+      return await this._encryptCompressed(passwordOrKey, plainData);
+
     await this._initialize();
-    return global.ncrypto.decrypt.call(this, passwordOrKey, cipher);
+    return global.ncrypto.encrypt.call(this, passwordOrKey, {
+      type: "plain",
+      data: plainData,
+    });
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
+   */
+  decrypt = async (passwordOrKey, cipherData) => {
+    const algorithm = parseAlgorithm(cipherData.alg);
+    if (algorithm.isCompressed)
+      return await this._decryptCompressed(passwordOrKey, cipherData);
+
+    await this._initialize();
+    cipherData.output = "text";
+    return global.ncrypto.decrypt.call(this, passwordOrKey, cipherData);
+  };
+
+  /**
+   * @private
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{salt: string, iv: string, cipher: string}} cipherData - the cipher data
+   */
+  _decryptCompressed = async (passwordOrKey, cipherData) => {
+    cipherData.output = "uint8array";
+    return decompress(
+      await global.ncrypto.decrypt.call(this, passwordOrKey, cipherData)
+    );
   };
 
   deriveKey = async (password, salt, exportKey = false) => {
@@ -111,24 +169,61 @@ class CryptoWorker {
   }
 
   /**
+   * @private
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {string} data - the plaintext data
+   */
+  _encryptCompressed = (passwordOrKey, data) => {
+    const message = {
+      passwordOrKey,
+      data: { type: "uint8array", data: compress(data) },
+    };
+    return this._communicate("encrypt", message, [message.data.data.buffer]);
+  };
+
+  /**
    *
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string|Object} data - the plaintext data
+   * @param {string} data - the plaintext data
+   * @param {boolean} compress
    */
-  encrypt = (passwordOrKey, data) => {
+  encrypt = (passwordOrKey, data, compress) => {
+    if (compress) {
+      return this._encryptCompressed(passwordOrKey, data);
+    }
     return this._communicate("encrypt", {
       passwordOrKey,
-      data,
+      data: { type: "plain", data },
     });
   };
 
   /**
    *
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
+   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
    */
-  decrypt = (passwordOrKey, cipher) => {
-    return this._communicate("decrypt", { passwordOrKey, cipher });
+  decrypt = (passwordOrKey, cipherData) => {
+    const algorithm = parseAlgorithm(cipherData.alg);
+    if (algorithm.isCompressed)
+      return this._decryptCompressed(passwordOrKey, cipherData);
+
+    cipherData.output = "text";
+    return this._communicate("decrypt", { passwordOrKey, cipher: cipherData });
+  };
+
+  /**
+   * @private
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
+   */
+  _decryptCompressed = async (passwordOrKey, cipherData) => {
+    cipherData.output = "uint8array";
+    return decompress(
+      await this._communicate("decrypt", {
+        passwordOrKey,
+        cipher: cipherData,
+      })
+    );
   };
 
   deriveKey = (password, salt, exportKey = false) => {
@@ -160,4 +255,18 @@ function loadScript(url) {
     // fire the loading
     head.appendChild(script);
   });
+}
+
+/**
+ *
+ * @param {string} alg
+ */
+function parseAlgorithm(alg) {
+  const [enc, kdf, compressed, base64variant] = alg.split("-");
+  return {
+    encryptionAlgorithm: enc,
+    kdfAlgorithm: kdf,
+    isCompressed: compressed === 1,
+    base64_variant: base64variant,
+  };
 }

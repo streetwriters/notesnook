@@ -24,6 +24,4 @@ yarn-error.log*
 
 .now
 
-public/sodium.js
-
 __diff_output__
