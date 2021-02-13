@@ -28,6 +28,10 @@ class Collector {
     };
   }
 
+  shouldCompress(itemType) {
+    return itemType === "tiny";
+  }
+
   async collect(lastSyncedTimestamp, force) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
@@ -44,7 +48,11 @@ class Collector {
 
   _serialize(item) {
     if (!item) return;
-    return this._db.context.encrypt(this.key, JSON.stringify(item));
+    return this._db.context.encrypt(
+      this.key,
+      JSON.stringify(item),
+      shouldCompress(item.type)
+    );
   }
 
   _collect(array) {
