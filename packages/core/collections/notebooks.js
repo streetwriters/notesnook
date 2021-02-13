@@ -43,11 +43,15 @@ export default class Notebooks extends Collection {
       title: notebook.title,
       description: notebook.description,
       dateCreated: notebook.dateCreated,
+      dateEdited: notebook.dateEdited,
       pinned: !!notebook.pinned,
       topics: notebook.topics || [],
-      totalNotes: 0,
+      totalNotes: notebook.totalNotes || 0,
     };
-    if (!oldNotebook) {
+    if (
+      !oldNotebook &&
+      notebook.topics.findIndex((topic) => topic.title === "General") <= -1
+    ) {
       notebook.topics.splice(0, 0, "General");
     }
 
