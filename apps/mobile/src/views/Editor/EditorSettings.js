@@ -20,7 +20,6 @@ export const EditorSettings = () => {
   const actionSheetRef = useRef();
 
   const open = async () => {
-    console.log('called');
     setVisible(true);
     await sleep(1);
     actionSheetRef.current?.setModalVisible(true);

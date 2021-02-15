@@ -34,6 +34,7 @@ export const UpdateDialog = () => {
   });
 
   const format = (ver) => {
+    if (!ver) return ""
     let parts = ver.toString().split('');
     return `v${parts[0]}.${parts[1]}.${parts[2]}${
       parts[3] === '0' ? '' : parts[3]
@@ -86,7 +87,7 @@ export const UpdateDialog = () => {
                   fontWeight: 'bold',
                 }}
                 size={SIZE.sm}>
-                Changelog {format(version.mobile)}
+                Changelog {format(version?.mobile)}
               </Paragraph>
               <Paragraph
                 style={{
@@ -94,7 +95,7 @@ export const UpdateDialog = () => {
                     Platform.OS === 'ios' ? 'Courier New' : 'monospace',
                 }}
                 size={SIZE.xs}>
-                {version.mobile_changelog && version.mobile_changelog !== ''
+                {version?.mobile_changelog && version.mobile_changelog !== ''
                   ? version.mobile_changelog
                   : 'No changelog provided.'}
               </Paragraph>

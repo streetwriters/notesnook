@@ -1,19 +1,19 @@
-import React, { createRef } from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import React, {createRef} from 'react';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { Actions } from '../../provider/Actions';
-import { defaultState } from '../../provider/DefaultState';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import {notesnook} from '../../../e2e/test.ids';
+import {Actions} from '../../provider/Actions';
+import {defaultState} from '../../provider/DefaultState';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import { getElevation, SORT, sortSettings } from '../../utils';
-import { eCloseSortDialog, eOpenSortDialog } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {getElevation, SORT, sortSettings} from '../../utils';
+import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { updateEvent } from '../DialogManager/recievers';
-import { PressableButton } from '../PressableButton';
+import {updateEvent} from '../DialogManager/recievers';
+import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 
@@ -47,12 +47,11 @@ class SortDialog extends React.Component {
     });
   }
 
-  close() {
+  async close() {
     actionSheet.current?.setModalVisible(false);
-    sleep(200).then(() => {
-      this.setState({
-        visible: false,
-      });
+    await sleep(100);
+    this.setState({
+      visible: false,
     });
   }
 
@@ -104,9 +103,8 @@ class SortDialog extends React.Component {
                     this.state.settings?.sortOrder === 'asc' ? 'desc' : 'asc';
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
-                  await this.getSettings();    
+                  await this.getSettings();
                   updateEvent({type: Actions.NOTES});
-
                 }}
                 activeOpacity={1}
                 style={{
