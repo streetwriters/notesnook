@@ -2,7 +2,7 @@ const accents = [
   { label: "orange", code: "#FF5722" },
   { label: "yellow", code: "#FFA000" },
   { label: "green", code: "#1B5E20" },
-  { label: "green2", code: "#00c853" },
+  { label: "green2", code: "#01c352" },
   { label: "gray", code: "#757575" },
   { label: "blue", code: "#0560ff" },
   { label: "teal", code: "#009688" },
