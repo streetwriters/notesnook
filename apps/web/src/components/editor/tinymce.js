@@ -97,8 +97,8 @@ const premiumCommands = [
 function useSkin() {
   const theme = useThemeStore((store) => store.theme);
   return theme === "dark"
-    ? ["skins/notesnook", "skins/notesnook-dark"]
-    : ["skins/notesnook-dark", "skins/notesnook"];
+    ? ["/skins/notesnook", "/skins/notesnook-dark"]
+    : ["/skins/notesnook-dark", "/skins/notesnook"];
 }
 
 function TinyMCE(props) {
