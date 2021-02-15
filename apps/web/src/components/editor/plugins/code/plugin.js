@@ -6,7 +6,6 @@ import tinymce from "tinymce/tinymce";
   var replaceContent = function (editor, content) {
     let node = editor.selection.getNode();
     editor.undoManager.transact(function () {
-      node.remove();
       editor.execCommand("mceInsertContent", false, content(node));
     });
     node = editor.selection.getNode();
@@ -27,7 +26,7 @@ import tinymce from "tinymce/tinymce";
           editor.execCommand(
             "mceInsertContent",
             false,
-            `<pre>${content}</pre>`
+            `<pre class='codeblock'>${content}</pre>`
           );
         });
         editor.selection.setCursorLocation();
@@ -35,7 +34,11 @@ import tinymce from "tinymce/tinymce";
       } else {
         replaceContent(
           editor,
-          (node) => `<pre>${node.innerHTML.replace(/\n/gm, "<br>")}</pre>`
+          (node) =>
+            `<pre class='codeblock'>${node.innerHTML.replace(
+              /\n/gm,
+              "<br>"
+            )}</pre>`
         );
       }
     }
