@@ -1,9 +1,11 @@
 import React from 'react';
 import {FlatList, View} from 'react-native';
+import Animated from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DrawerScale} from '../../utils/Animations';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -58,59 +60,73 @@ export const Menu = React.memo(
         style={{
           height: '100%',
           width: '100%',
-          backgroundColor: deviceMode !== 'mobile' ? colors.nav : colors.bg,
-          paddingTop: insets.top,
+          backgroundColor: colors.nav,
         }}>
-        <FlatList
-          alwaysBounceVertical={false}
-          contentContainerStyle={{
-            flexGrow: 1,
-          }}
+        <Animated.View
           style={{
             height: '100%',
             width: '100%',
-          }}
-          showsVerticalScrollIndicator={false}
-          data={[0]}
-          keyExtractor={() => 'mainMenuView'}
-          renderItem={() => (
-            <>
-              {MenuItemsList.map((item, index) => (
-                <MenuListItem
-                  key={item.name}
-                  item={item}
-                  testID={item.name}
-                  index={index}
-                />
-              ))}
-              <ColorSection noTextMode={noTextMode} />
-              <TagsSection />
-            </>
-          )}
-        />
+            backgroundColor: deviceMode !== 'mobile' ? colors.nav : colors.bg,
 
-        {BottomItemsList.slice(1, 2).map((item, index) => (
-          <MenuListItem
-            testID={
-              item.name == 'Night mode'
-                ? notesnook.ids.menu.nightmode
-                : item.name
-            }
-            key={item.name}
-            item={item}
-            index={index}
-            ignore={true}
-            rightBtn={BottomItemsList[0]}
-          />
-        ))}
-
-        <View
-          style={{
-            width: '100%',
-            paddingHorizontal: 0,
+            paddingTop: insets.top,
+            borderRadius: 10,
+            transform: [
+              {
+                scale: DrawerScale,
+              },
+            ],
           }}>
-          <UserSection noTextMode={noTextMode} />
-        </View>
+          <FlatList
+            alwaysBounceVertical={false}
+            contentContainerStyle={{
+              flexGrow: 1,
+            }}
+            style={{
+              height: '100%',
+              width: '100%',
+            }}
+            showsVerticalScrollIndicator={false}
+            data={[0]}
+            keyExtractor={() => 'mainMenuView'}
+            renderItem={() => (
+              <>
+                {MenuItemsList.map((item, index) => (
+                  <MenuListItem
+                    key={item.name}
+                    item={item}
+                    testID={item.name}
+                    index={index}
+                  />
+                ))}
+                <ColorSection noTextMode={noTextMode} />
+                <TagsSection />
+              </>
+            )}
+          />
+
+          {BottomItemsList.slice(1, 2).map((item, index) => (
+            <MenuListItem
+              testID={
+                item.name == 'Night mode'
+                  ? notesnook.ids.menu.nightmode
+                  : item.name
+              }
+              key={item.name}
+              item={item}
+              index={index}
+              ignore={true}
+              rightBtn={BottomItemsList[0]}
+            />
+          ))}
+
+          <View
+            style={{
+              width: '100%',
+              paddingHorizontal: 0,
+            }}>
+            <UserSection noTextMode={noTextMode} />
+          </View>
+        </Animated.View>
       </View>
     );
   },
