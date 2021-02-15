@@ -88,7 +88,7 @@ function init_tiny(size) {
 }
 
 const onChange = (event) => {
-  console.log('called');
+
   if (isLoading) {
     isLoading = false;
     return;
