@@ -4,7 +4,7 @@ import Config from "../utils/config";
 
 class ThemeStore extends BaseStore {
   theme = Config.get("theme", "light");
-  accent = Config.get("accent", "#0560ff");
+  accent = Config.get("accent", "#00c853");
   followSystemTheme = Config.get("followSystemTheme", false);
 
   setTheme = (theme) => {
