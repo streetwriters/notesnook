@@ -190,7 +190,11 @@ export const loadNote = async (item) => {
       EditorWebView.current?.reload();
     }
   } else {
-    eSendEvent('loadingNote', true);
+    if (id === item.id) {
+      return;
+    }
+    eSendEvent('loadingNote', item);
+
     editing.isFocused = false;
     clearTimer();
     await setNote(item);
@@ -268,7 +272,7 @@ export const _onMessage = async (evt) => {
       eSendEvent('editorScroll', message);
       break;
     case 'noteLoaded':
-      eSendEvent('loadingNote', !message.value);
+      eSendEvent('loadingNote');
       break;
     case 'premium':
       let user = await db.user.getUser();
