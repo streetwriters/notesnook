@@ -28,6 +28,8 @@ export default class Vault {
    * @returns {Promise<Boolean>}
    */
   async create(password) {
+    if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
+
     const vaultKey = await this._context.read("vaultKey");
     if (!vaultKey || !vaultKey.cipher || !vaultKey.iv) {
       const encryptedData = await this._context.encrypt(
