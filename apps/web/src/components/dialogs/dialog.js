@@ -31,6 +31,7 @@ function Dialog(props) {
             props.onClose();
           }
         };
+        if (props.onOpen) props.onOpen();
       }}
       style={{
         content: {

@@ -27,6 +27,7 @@ import { showPasswordDialog } from "../components/dialogs/passworddialog";
 import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import http from "notes-core/utils/http";
+import { CHECK_IDS } from "notes-core/common";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -253,7 +254,7 @@ function Settings(props) {
           title="Follow system theme"
           onTip="Switch app theme according to system"
           offTip="Keep app theme independent"
-          premium
+          premium="customize"
           onToggled={toggleFollowSystemTheme}
           isToggled={followSystemTheme}
         />
@@ -318,7 +319,7 @@ function Settings(props) {
           onTip="All backups will be encrypted"
           offTip="Backups will not be encrypted"
           onToggled={toggleEncryptBackups}
-          premium
+          premium={CHECK_IDS.backupEncrypt}
           isToggled={encryptBackups}
         />
 
@@ -326,6 +327,7 @@ function Settings(props) {
           title="Backup reminders"
           tip="Remind me to backup my data"
           options={["Never", "Daily", "Weekly", "Monthly"]}
+          premium="backups"
           selectedOption={backupReminderOffset}
           onSelectionChanged={(_option, index) =>
             setBackupReminderOffset(index)
@@ -413,7 +415,7 @@ function ToggleItem(props) {
       onClick={async () => {
         if (isUserPremium() || !premium) onToggled();
         else {
-          await showBuyDialog();
+          await showBuyDialog(premium);
         }
       }}
       py={2}
@@ -442,6 +444,7 @@ function OptionsItem(props) {
     selectedOption,
     onSelectionChanged,
     onlyIf,
+    premium,
   } = props;
 
   if (onlyIf === false) return null;
@@ -474,7 +477,13 @@ function OptionsItem(props) {
             variant="subBody"
             p={2}
             py={1}
-            onClick={() => onSelectionChanged(option, index)}
+            onClick={async () => {
+              if (isUserPremium() || !premium)
+                onSelectionChanged(option, index);
+              else {
+                await showBuyDialog(premium);
+              }
+            }}
             sx={{
               ":hover": { color: selectedOption === index ? "static" : "text" },
             }}

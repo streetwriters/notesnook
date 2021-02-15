@@ -16,7 +16,21 @@ import { ReactComponent as Vault } from "../../assets/vault.svg";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import { changeSvgTheme } from "../../utils/css";
+import { CHECK_IDS } from "notes-core/common";
 
+const itemIdToIndex = {
+  sync: 0,
+  editor: 3,
+  backups: 5,
+  customize: 6,
+  discord: 7,
+  [CHECK_IDS.noteExport]: 4,
+  [CHECK_IDS.noteColor]: 1,
+  [CHECK_IDS.noteTag]: 1,
+  [CHECK_IDS.notebookAdd]: 1,
+  [CHECK_IDS.vaultAdd]: 2,
+  [CHECK_IDS.backupEncrypt]: 5,
+};
 const premiumDetails = [
   {
     title: "Automatic syncing",
@@ -89,24 +103,31 @@ const premiumDetails = [
 ];
 
 function BuyDialog(props) {
+  const { initialIndex } = props;
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
   const accent = useThemeStore((store) => store.accent);
-  useEffect(() => {
-    changeSvgTheme(accent);
-  }, [accent]);
-  const [slideIndex, setSlideIndex] = useState(0);
 
   return (
-    <Dialog isOpen={true} showClose onClose={props.onCancel} scrollable>
+    <Dialog
+      isOpen={true}
+      showClose
+      onClose={props.onCancel}
+      scrollable
+      onOpen={() => changeSvgTheme(accent)}
+    >
       <Flex flexDirection="column" flex={1}>
         <Carousel
+          infiniteLoop
           autoPlay
           showStatus={false}
           swipeable
           emulateTouch
           showArrows
           useKeyboardArrows
+          interval={5000}
+          stopOnHover
+          selectedItem={initialIndex}
           showThumbs={false}
           showIndicators={false}
           renderArrowNext={(click, hasNext) => (
@@ -212,6 +233,11 @@ function BuyDialog(props) {
   );
 }
 
-export function showBuyDialog() {
-  return showDialog((perform) => <BuyDialog onCancel={() => perform(false)} />);
+export function showBuyDialog(initialItemId) {
+  return showDialog((perform) => (
+    <BuyDialog
+      initialIndex={itemIdToIndex[initialItemId]}
+      onCancel={() => perform(false)}
+    />
+  ));
 }

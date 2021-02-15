@@ -84,7 +84,7 @@ function App() {
       if (isUserPremium()) {
         return { type, result: true };
       } else {
-        await showBuyDialog();
+        await showBuyDialog(type);
         return { type, result: false };
       }
     });

@@ -196,12 +196,12 @@ function TinyMCE(props) {
       onBeforeExecCommand={async (command) => {
         if (
           premiumCommands.some(
-            (cmd) => command.command === cmd && !command.value.paste
+            (cmd) => command.command === cmd && !command?.value?.paste
           ) &&
           !isUserPremium()
         ) {
           command.preventDefault();
-          await showBuyDialog();
+          await showBuyDialog("editor");
           return;
         }
       }}
