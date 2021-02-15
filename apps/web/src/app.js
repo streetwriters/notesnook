@@ -15,7 +15,7 @@ import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
 import { resetReminders } from "./common/reminders";
 import { db, isUserPremium } from "./common";
-import { EV, EVENTS } from "notes-core/common";
+import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./components/dialogs/buy-dialog";
 import Banner from "./components/banner";
@@ -84,7 +84,7 @@ function App() {
       if (isUserPremium()) {
         return { type, result: true };
       } else {
-        await showBuyDialog(type);
+        if (type !== CHECK_IDS.databaseSync) await showBuyDialog(type);
         return { type, result: false };
       }
     });
