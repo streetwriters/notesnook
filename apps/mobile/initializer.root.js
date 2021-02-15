@@ -182,15 +182,9 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
-        console.log(
-          size.width,
-          dimensions.width,
-          dimensions.height,
-          size.height,
-          'before mode',
-        );
+        
         DDS.setSize(size);
-        console.log(deviceMode, 'MODE__');
+        //console.log(deviceMode, 'MODE__');
         dispatch({type: Actions.DEVICE_MODE, state: deviceMode});
         return;
       }
@@ -208,12 +202,12 @@ const AppStack = React.memo(
 
       setWidthHeight(size);
       DDS.setSize(size);
-      console.log(DDS.isLargeTablet(), size, DDS.isSmallTab);
+      //console.log(DDS.isLargeTablet(), size, DDS.isSmallTab);
       if (DDS.isLargeTablet()) {
-        console.log('setting large tab');
+        //console.log('setting large tab');
         setDeviceMode('tablet', size);
       } else if (DDS.isSmallTab) {
-        console.log('setting small tab');
+        //console.log('setting small tab');
         setDeviceMode('smallTablet', size);
       } else {
         setDeviceMode('mobile', size);
