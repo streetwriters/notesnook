@@ -12,6 +12,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
@@ -36,7 +37,7 @@ const MoveNoteDialog = () => {
   const [, dispatch] = useTracked();
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
-  
+
   function open(note) {
     setNote(note);
     setVisible(true);
@@ -58,11 +59,14 @@ const MoveNoteDialog = () => {
     newTopicTitle = null;
     newNotebookTitle = null;
     setNote(null);
-    eSendEvent(refreshNotesPage);
-    eSendEvent(eOnNewTopicAdded);
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notes,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Notebook,
+      Navigation.routeNames.Notebooks,
+    ]);
     dispatch({type: Actions.CLEAR_SELECTION});
-    dispatch({type: Actions.NOTEBOOKS});
-    dispatch({type: Actions.NOTES});
   };
 
   const update = (note) => {
@@ -97,7 +101,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     });
     notebookInput.current?.clear();
     notebookInput.current?.blur();
-    dispatch({type: Actions.NOTEBOOKS});
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
   };
 
   const addNewTopic = async () => {
@@ -105,7 +109,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       return ToastEvent.show('Title is required', 'error', 'local');
     }
     await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-    dispatch({type: Actions.NOTEBOOKS});
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
@@ -132,7 +136,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           forced: true,
         });
       }
-      dispatch({type: Actions.NOTEBOOKS});
+      Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
 
       return;
     }
@@ -155,7 +159,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
         forced: true,
       });
     }
-    dispatch({type: Actions.NOTEBOOKS});
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
   };
 
   return (
@@ -426,8 +430,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                           {item.title}
                         </Paragraph>
                         <Paragraph color={colors.icon} size={SIZE.xs}>
-                            {item.totalNotes + ' notes'}
-                          </Paragraph>
+                          {item.totalNotes + ' notes'}
+                        </Paragraph>
                       </View>
                       {note?.notebooks?.findIndex(
                         (o) => o.topics.indexOf(item.id) > -1,
