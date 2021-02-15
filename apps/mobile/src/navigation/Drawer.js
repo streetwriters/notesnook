@@ -5,6 +5,11 @@ import {State} from 'react-native-gesture-handler';
 import {Menu} from '../components/Menu';
 import {useTracked} from '../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
+import {
+  changeContainerScale,
+  ContainerScale,
+  DrawerScale,
+} from '../utils/Animations';
 import {eCloseSideMenu, eOpenSideMenu} from '../utils/Events';
 import {sideMenuRef, tabBarRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
@@ -53,7 +58,17 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   }, [locked, initRender]);
 
   return (
-    <NavigationContainer ref={sideMenuRef}>
+    <NavigationContainer
+      onStateChange={(c) => {
+        if (c.history.find((i) => i.type === 'drawer')) {
+          changeContainerScale(ContainerScale, 0.95, 250);
+          changeContainerScale(DrawerScale, 1, 250);
+        } else {
+          changeContainerScale(DrawerScale, 0.95, 250);
+          changeContainerScale(ContainerScale, 1, 250);
+        }
+      }}
+      ref={sideMenuRef}>
       <Drawer.Navigator
         screenOptions={{
           swipeEnabled: locked || deviceMode !== 'mobile' ? false : true,
