@@ -29,6 +29,7 @@ export const SelectionHeader = () => {
   const {colors, selectionMode, selectedItemsList} = state;
   const insets = useSafeAreaInsets();
   const translateY = useValue(-150);
+  const opacity = useValue(0);
 
   const [headerTextState, setHeaderTextState] = useState(
     Navigation.getHeaderState(),
@@ -48,9 +49,10 @@ export const SelectionHeader = () => {
   }, []);
 
   useEffect(() => {
-    Animated.timing(translateY, {
-      duration: 300,
-      toValue: selectionMode ? 0 : -150,
+    translateY.setValue(selectionMode ? 0 : -150);
+    Animated.timing(opacity, {
+      duration: 200,
+      toValue: selectionMode ? 1 : 0,
       easing: Easing.in(Easing.ease),
     }).start();
   }, [selectionMode]);
@@ -67,6 +69,7 @@ export const SelectionHeader = () => {
         alignItems: 'center',
         flexDirection: 'row',
         zIndex: 999,
+        opacity: opacity,
         paddingHorizontal: 12,
         transform: [
           {
