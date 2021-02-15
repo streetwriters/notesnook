@@ -15,6 +15,7 @@ export const CHECK_IDS = {
   vaultAdd: "vault:add",
   notebookAdd: "notebook:add",
   backupEncrypt: "backup:encrypt",
+  databaseSync: "database:sync",
 };
 
 export const EVENTS = {
