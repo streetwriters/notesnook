@@ -16,7 +16,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import Carousel from 'react-native-snap-carousel';
 import {SvgXml} from 'react-native-svg';
-import {NOTE_SVG} from '../../assets/images/assets';
+import {ACCENT_SVG, BACKUP_SVG, COMMUNITY_SVG, EXPORT_SVG, NOTE_SVG, ORGANIZE_SVG, RICH_TEXT_SVG, SYNC_SVG, VAULT_SVG} from '../../assets/images/assets';
 class PremiumDialog extends React.Component {
   constructor(props) {
     super(props);
@@ -25,7 +25,7 @@ class PremiumDialog extends React.Component {
       products: null,
       scrollEnabled: false,
       product: null,
-      visible: false,
+      visible: true,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -64,37 +64,58 @@ class PremiumDialog extends React.Component {
     } catch (e) {}
   }
 
- 
+  componentDidMount() {
+    this.actionSheetRef.current?.setModalVisible(true);
+  }
+
   features = [
     {
-      title: 'Cross Platfrom Sync',
+      title: 'Automatic sync',
       description:
-        'Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!',
+        'Your notes will be automatically encrypted and synced to all your devices.',
+      icon: SYNC_SVG,
     },
     {
-      title: 'Zero Knowledge',
+      title: 'Unlimited organization',
       description:
-        'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
+        'Make unlimited notebooks and tags. Assign colors to your notes for quick access.',
+      icon: ORGANIZE_SVG,
     },
     {
-      title: 'Organize Notes Like Never Before',
+      title: 'Secure vault',
       description:
-        'Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!',
+        'Lock any note with a password and keep sensitive data under lock and key.',
+      icon: VAULT_SVG,
     },
     {
-      title: 'Full Rich Text Editor with Markdown',
+      title: 'Full rich text editor',
       description:
-        'Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!',
+        ' Add images, links, tables, lists and embed videos. Use markdown for fast editing.',
+      icon: RICH_TEXT_SVG,
     },
     {
-      title: 'Export Notes',
+      title: 'Export notes',
       description:
-        'You can export your notes as PDF, Markdown, Plain text or HTML file.',
+        'You can export your notes in PDF, Markdown and HTML formats.',
+      icon: EXPORT_SVG,
     },
     {
-      title: 'Backup and Restore',
+      title: 'Automatic and encrypted backups',
       description:
-        'Backup and restore your notes anytime into your phone storage. You can encrypt all your backups if required!',
+        'Enable daily or weekly backups of your data with automatic encryption.',
+      icon: BACKUP_SVG,
+    },
+    {
+      title: 'Customize Notesnook',
+      description:
+        'Change app colors, turn on automatic theme switching and change default home page.',
+      icon: ACCENT_SVG,
+    },
+    {
+      title: 'Get a Pro badge on Discord',
+      description:
+        'Pro users get access to special channels and priority support on our Discord server ',
+      icon: COMMUNITY_SVG,
     },
   ];
 
@@ -146,7 +167,7 @@ class PremiumDialog extends React.Component {
             }
             style={{
               width: '100%',
-              maxHeight: DDS.isLargeTablet() ? dHeight * 0.35 : dHeight * 0.45,
+              maxHeight: DDS.isLargeTablet() ? dHeight * 0.45 : dHeight * 0.55,
             }}>
             <Carousel
               data={this.features}
@@ -166,11 +187,11 @@ class PremiumDialog extends React.Component {
                   <View
                     style={{
                       flexWrap: 'wrap',
-                      width: '100%',
+                      width: '95%',
                       alignItems: 'center',
                     }}>
                     <SvgXml
-                      xml={NOTE_SVG(colors.accent)}
+                      xml={item.icon(colors.accent)}
                       width={170}
                       height={170}
                     />
@@ -180,12 +201,13 @@ class PremiumDialog extends React.Component {
                       style={{
                         textAlign: 'center',
                         alignSelf: 'center',
+                        marginTop:10
                       }}>
                       {item.title}
                     </Heading>
 
                     <Paragraph
-                      SIZE={SIZE.sm}
+                      size={SIZE.md}
                       color={colors.icon}
                       textBreakStrategy="balanced"
                       style={{
