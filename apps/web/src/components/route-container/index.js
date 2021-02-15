@@ -90,9 +90,11 @@ function Header(props) {
                 size={24}
                 sx={{
                   ml: 2,
-                  bg: "bgSecondary",
+                  border: "2px solid",
+                  borderColor: "primary",
                   borderRadius: "default",
                   size: 28,
+                  ":hover": { bg: "shade" },
                 }}
                 title={createButtonData.title}
                 onClick={createButtonData.onClick}
