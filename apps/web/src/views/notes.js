@@ -26,7 +26,7 @@ function Notes(props) {
     <ListContainer
       type="notes"
       isLoading={isLoading}
-      context={props.context}
+      context={context}
       items={context.notes}
       placeholder={props.placeholder || NotesPlaceholder}
       button={{

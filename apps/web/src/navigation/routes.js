@@ -14,9 +14,16 @@ import { navigate } from "../navigation";
 import Trash from "../views/trash";
 
 const routes = {
-  "/": () => <RouteContainer type="notes" title="Notes" route={<Home />} />,
+  "/": () => (
+    <RouteContainer key="home" type="notes" title="Notes" route={<Home />} />
+  ),
   "/notebooks": () => (
-    <RouteContainer type="notebooks" title="Notebooks" route={<Notebooks />} />
+    <RouteContainer
+      key="notebooks"
+      type="notebooks"
+      title="Notebooks"
+      route={<Notebooks />}
+    />
   ),
   "/notebooks/:notebook": ({ notebook }) => {
     const nbItem = db.notebooks.notebook(notebook);
@@ -54,6 +61,7 @@ const routes = {
   },
   "/favorites": () => (
     <RouteContainer
+      key="favorites"
       title="Favorites"
       type="favorites"
       route={
@@ -65,9 +73,11 @@ const routes = {
     />
   ),
   "/trash": () => (
-    <RouteContainer type="trash" title="Trash" route={<Trash />} />
+    <RouteContainer key="trash" type="trash" title="Trash" route={<Trash />} />
   ),
-  "/tags": () => <RouteContainer title="Tags" type="tags" route={<Tags />} />,
+  "/tags": () => (
+    <RouteContainer key="tags" title="Tags" type="tags" route={<Tags />} />
+  ),
   "/tags/:tag": ({ tag }) => {
     const tagItem = db.tags.tag(tag);
     if (!tagItem) return navigate("/");
@@ -96,10 +106,16 @@ const routes = {
     );
   },
   "/settings": () => (
-    <RouteContainer noSearch title="Settings" route={<Settings />} />
+    <RouteContainer
+      key="settings"
+      noSearch
+      title="Settings"
+      route={<Settings />}
+    />
   ),
   "/search": () => (
     <RouteContainer
+      key="search"
       type="search"
       canGoBack
       noSearch

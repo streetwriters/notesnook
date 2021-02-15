@@ -153,7 +153,7 @@ function App() {
               }}
             >
               {isMobile && <Banner />}
-              <Routes />
+              <CachedRouter />
             </Animated.Flex>
             <Flex
               width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
@@ -171,9 +171,34 @@ function App() {
   );
 }
 
-function Routes() {
-  const routeResult = useRoutes(routes, { fallbackRoute: "/" });
-  return routeResult || null;
+const cache = {};
+function CachedRouter() {
+  const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
+  useEffect(() => {
+    const key = RouteResult.key || "general";
+    const routeContainer = document.getElementById("routeContainer");
+    routeContainer.childNodes.forEach((node) => {
+      node.style.display = "none";
+    });
+
+    var route = document.getElementById(key);
+    if (route) {
+      route.style.display = "flex";
+      if (key !== "general") return;
+    }
+
+    if (!cache[key] || !route) {
+      if (!route) {
+        cache[key] = true;
+        route = document.createElement("div");
+        route.id = key;
+        route.className = "route";
+        routeContainer.appendChild(route);
+      }
+      ReactDOM.render(<ThemeProvider>{RouteResult}</ThemeProvider>, route);
+    }
+  }, [RouteResult]);
+  return <div style={{ display: "flex", flex: 1 }} id="routeContainer" />;
 }
 
 function EditorSwitch() {

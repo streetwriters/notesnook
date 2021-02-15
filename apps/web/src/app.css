@@ -16,3 +16,10 @@
   padding: 0px 10px !important;
   background-color: var(--background) !important;
 }
+
+.route {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  opacity: 1;
+}

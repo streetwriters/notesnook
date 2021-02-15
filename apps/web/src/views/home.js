@@ -4,13 +4,20 @@ import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common";
 import { hashNavigate } from "../navigation";
+import { Profiler } from "react";
 
 function Home() {
+  const notes = useStore((store) => store.notes);
   const [isLoading, setIsLoading] = useState(true);
+
   useEffect(() => {
     (async function () {
-      await db.notes.init();
-      store.refresh();
+      const intitialized = db.notes.initialized;
+      if (!intitialized) {
+        await db.notes.init();
+        store.refresh();
+        setIsLoading(false);
+      }
       // const note = db.notes.note("f90f344ee3c13c2f686bd5c1").data;
       // const data = await db.content.raw(note.contentId);
 
@@ -22,10 +29,8 @@ function Home() {
       // await db.content.add(data3);
       // await db.notes.add({ id: note.id, conflicted: true, resolved: false });
       // console.log(data3);
-      setIsLoading(false);
     })();
   }, []);
-  const notes = useStore((store) => store.notes);
 
   return (
     <ListContainer
@@ -40,4 +45,4 @@ function Home() {
     />
   );
 }
-export default Home;
+export default React.memo(Home, () => true);
