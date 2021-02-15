@@ -1,6 +1,6 @@
-import { Dimensions } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
-import { editing } from './index';
+import {Dimensions} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
+import {editing} from './index';
 
 const {Value, timing} = Animated;
 
@@ -14,9 +14,9 @@ export let animInitialValue = -Dimensions.get('window').height;
 export const opacityAnimSearch = new Animated.Value(1);
 export const setAnimValue = (value) => (animInitialValue = value);
 
-export let currentPage = "main"
-export function searchViewAnimation(translate, opacity,next,duration=150) {
-  currentPage = next
+export let currentPage = 'main';
+export function searchViewAnimation(translate, opacity, next, duration = 150) {
+  currentPage = next;
   timing(anim1, {
     toValue: translate,
     duration: duration,
@@ -62,4 +62,40 @@ export function exitEditorAnimation() {
     toValue: Dimensions.get('window').height * 2,
     easing: Easing.inOut(Easing.ease),
   }).start();
+}
+
+export const AppScale = new Animated.Value(0.95);
+export const AppBorders = new Animated.Value(10);
+export const ContainerScale = new Animated.Value(1);
+export const EditorScalee = new Animated.Value(1);
+export const DrawerScale = new Animated.Value(0.95);
+
+export function changeContainerScale(op, scale, duration = 500, callback) {
+  timing(op, {
+    duration: duration,
+    easing: Easing.out(Easing.ease),
+    toValue: scale,
+  }).start(callback);
+}
+
+export function changeAppScale(scale, duration = 500, callback) {
+  if (scale === 1) {
+    timing(AppBorders, {
+      duration: duration,
+      easing: Easing.out(Easing.ease),
+      toValue: 0,
+    }).start();
+  } else {
+    timing(AppBorders, {
+      duration: duration,
+      easing: Easing.out(Easing.ease),
+      toValue: 10,
+    }).start();
+  }
+
+  timing(AppScale, {
+    duration: duration,
+    easing: Easing.out(Easing.ease),
+    toValue: scale,
+  }).start(callback);
 }
