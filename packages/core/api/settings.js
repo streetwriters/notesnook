@@ -67,17 +67,18 @@ class Settings {
 
   get pins() {
     return this._settings.pins.reduce((prev, pin) => {
+      let item;
       if (pin.type === "notebook") {
-        prev.push(this._db.notebooks.notebook(pin.data.id).data);
+        item = this._db.notebooks.notebook(pin.data.id).data;
       } else if (pin.type === "topic") {
-        prev.push(
-          this._db.notebooks
-            .notebook(pin.data.notebookId)
-            .topics.topic(pin.data.id)._topic
-        );
+        item = this._db.notebooks
+          .notebook(pin.data.notebookId)
+          .topics.topic(pin.data.id)._topic;
       } else if (pin.type === "tag") {
-        prev.push(this._db.tags.tag(pin.data.id));
+        item =
+          this._db.tags.tag(pin.data.id) || this._db.tags.tag(pin.data.title);
       }
+      if (item) prev.push(item);
       return prev;
     }, []);
   }

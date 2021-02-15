@@ -5,8 +5,7 @@ import set from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
-    const tagItem = this.all.find((t) => t.id === id);
-    if (!tagItem) return;
+    const tagItem = this.all.find((t) => t.id === id || t.title === id);
     return tagItem;
   }
 
