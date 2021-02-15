@@ -1,36 +1,37 @@
-import React, { Component, createRef } from 'react';
-import { InteractionManager, TouchableOpacity, View } from 'react-native';
+import React, {Component, createRef} from 'react';
+import {InteractionManager, TouchableOpacity, View} from 'react-native';
 
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
+import {notesnook} from '../../../e2e/test.ids';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   sendNoteEditedEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { getElevation, toTXT } from '../../utils';
-import { db } from '../../utils/DB';
+import Navigation from '../../services/Navigation';
+import {getElevation, toTXT} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { ph, SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
+import {tabBarRef} from '../../utils/Refs';
+import {ph, SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import { updateEvent } from '../DialogManager/recievers';
+import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let Keychain;
@@ -81,7 +82,11 @@ export class VaultDialog extends Component {
    * @param {import('../../services/EventManager').vaultType} data
    */
   open = async (data) => {
+    if (!Keychain) {
+      Keychain = require('react-native-keychain');
+    }
     let biometry = await Keychain.getSupportedBiometryType();
+    console.log(biometry, 'BIOMETRY');
     let available = false;
     let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
 
@@ -275,9 +280,13 @@ export class VaultDialog extends Component {
   async _deleteNote() {
     this.close();
     await db.notes.delete(this.state.note.id);
-    updateEvent({type: Actions.NOTES});
-    updateEvent({type: Actions.FAVORITES});
-    eSendEvent(refreshNotesPage);
+
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notes,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.refreshNotesPage,
+    ]);
+
     ToastEvent.show('Note deleted', 'success');
   }
 
@@ -303,7 +312,7 @@ export class VaultDialog extends Component {
               accessible:
                 Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
               storage: kc.STORAGE_TYPE.AES,
-              rules: "none"  
+              rules: 'none',
             },
           );
           this.setState({
@@ -339,7 +348,7 @@ export class VaultDialog extends Component {
       .remove(this.state.note.id, this.password)
       .then((r) => {
         sendNoteEditedEvent({
-          id:this.state.note.id,
+          id: this.state.note.id,
           forced: true,
         });
         updateEvent({type: Actions.NOTES});
@@ -379,9 +388,7 @@ export class VaultDialog extends Component {
         failOnCancel: false,
         message: m,
       });
-    } catch (e) {
-      
-    }
+    } catch (e) {}
   }
 
   _takeErrorAction(e) {
@@ -408,7 +415,7 @@ export class VaultDialog extends Component {
           cancel: null,
         },
         storage: kc.STORAGE_TYPE.AES,
-        rules: "none" 
+        rules: 'none',
       });
       eSendEvent('vaultUpdated');
       ToastEvent.show('Fingerprint access revoked!', 'success');
@@ -419,7 +426,6 @@ export class VaultDialog extends Component {
 
   _onPressFingerprintAuth = async () => {
     try {
-
       if (!Keychain) {
         Keychain = require('react-native-keychain');
       }
@@ -431,7 +437,7 @@ export class VaultDialog extends Component {
           cancel: null,
         },
         storage: kc.STORAGE_TYPE.AES,
-        rules: "none" 
+        rules: 'none',
       });
       if (credentials?.password) {
         this.password = credentials.password;
@@ -694,7 +700,6 @@ export class VaultDialog extends Component {
                 : 'Lock'
             }
           />
-        
         </View>
         <Toast context="local" />
       </BaseDialog>
