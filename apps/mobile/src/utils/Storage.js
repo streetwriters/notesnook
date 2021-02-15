@@ -3,12 +3,11 @@ import 'react-native-get-random-values';
 import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
 import {generateSecureRandom} from 'react-native-securerandom';
 import {MMKV} from './mmkv';
+import Sodium from 'react-native-sodium';
 
-let Sodium;
 let Keychain;
 let RNFetchBlob;
 async function read(key, isArray = false) {
-
   //let per = performance.now();
   let data = await MMKV.getItem(key);
   //console.log("[INIT S1]",key + "_key", performance.now() - per);
@@ -51,19 +50,46 @@ async function clear() {
   return await MMKV.clearStore();
 }
 
-function encrypt(password, data) {
-  if (!Sodium) {
-    Sodium = require('react-native-sodium');
-  }
+async function encrypt(password, data, _compress) {
+  let message = {
+    type: _compress ? 'b64' : 'plain',
+    data: _compress ? compress(data) : data,
+  };
+  console.log(message);
+  let result = await Sodium.encrypt(password, message);
 
-  return Sodium.encrypt(password, data).then((result) => result);
+  return {
+    ...result,
+    alg: getAlgorithm(7, _compress ? 1 : 0),
+  };
 }
 
-function decrypt(password, data) {
-  if (!Sodium) {
-    Sodium = require('react-native-sodium')
+function getAlgorithm(base64Variant, _compress) {
+  return `xcha-argon2i13-${_compress}-${base64Variant}`;
+}
+
+async function decrypt(password, data) {
+  let algorithm = parseAlgorithm(data.alg);
+  console.log(algorithm);
+  data.output = algorithm.isCompress ? 'b64' : 'plain';
+
+  let result = await Sodium.decrypt(password, data);
+  console.log('result-decrypt',result)
+  if (algorithm.isCompress) {
+    return decompress(result);
   }
-  return Sodium.decrypt(password, data).then((result) => result);
+  return result;
+}
+
+function parseAlgorithm(alg) {
+  if (!alg) return {};
+  const [enc, kdf, compressed, base64variant] = alg.split('-');
+  return {
+    encryptionAlgorithm: enc,
+    kdfAlgorithm: kdf,
+    isCompress: compressed === "1",
+    base64_variant: base64variant,
+  };
 }
 
 let CRYPT_CONFIG = (kc) =>
@@ -74,11 +100,11 @@ let CRYPT_CONFIG = (kc) =>
     android: {
       authenticationType: kc.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
       accessControl: kc.ACCESS_CONTROL.DEVICE_PASSCODE,
-      rules: "none",
+      rules: 'none',
       authenticationPrompt: {
         cancel: null,
       },
-      storage: kc.STORAGE_TYPE.AES
+      storage: kc.STORAGE_TYPE.AES,
     },
   });
 
@@ -87,19 +113,13 @@ async function deriveCryptoKey(name, data) {
     Keychain = require('react-native-keychain');
   }
 
-  if (!Sodium) {
-    Sodium = require('react-native-sodium')
-  }
-
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     await Keychain.setInternetCredentials(
       'notesnook',
       name,
       credentials.key,
-      {
-        
-      },
+      {},
     );
     return credentials.key;
   } catch (e) {}
@@ -124,7 +144,7 @@ async function getCryptoKey(name) {
 
 async function removeCryptoKey(name) {
   if (!Keychain) {
-    Keychain = require('react-native-keychain')
+    Keychain = require('react-native-keychain');
   }
 
   try {
@@ -157,7 +177,7 @@ async function requestPermission() {
 }
 async function checkAndCreateDir(path) {
   if (!RNFetchBlob) {
-    RNFetchBlob = require('rn-fetch-blob').default
+    RNFetchBlob = require('rn-fetch-blob').default;
   }
 
   let dir =
@@ -179,10 +199,31 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  if (!Sodium) {
-    Sodium = require('react-native-sodium');
-  }
   return await Sodium.hashPassword(password, email);
+}
+
+let lzutf8;
+
+function compress(data) {
+  if (!lzutf8) {
+    lzutf8 = require('lzutf8');
+  }
+  return lzutf8.compress(data, {
+    blockSize: 64 * 64 * 1024,
+    outputEncoding: 'Base64',
+    inputEncoding: 'String',
+  });
+}
+
+function decompress(data) {
+  if (!lzutf8) {
+    lzutf8 = require('lzutf8');
+  }
+  return lzutf8.decompress(data, {
+    blockSize: 64 * 64 * 1024,
+    inputEncoding: 'Base64',
+    outputEncoding: 'String',
+  });
 }
 
 export default {
