@@ -16,21 +16,21 @@ function ReminderBar() {
   return (
     <Flex
       p={1}
-      bg={"shade"}
+      bg={"primary"}
       alignItems="center"
-      mx={2}
       mb={1}
-      sx={{ cursor: "pointer", borderRadius: "default" }}
+      px={2}
+      sx={{ cursor: "pointer" }}
       onClick={reminder?.action}
       justifyContent="space-between"
     >
       <Flex alignItems="center">
-        <reminder.icon size={14} color="primary" sx={{ mr: 1 }} />
-        <Text variant="subBody" fontSize={10} color="primary">
+        <reminder.icon size={14} color="static" sx={{ mr: 1 }} />
+        <Text variant="body" fontSize={"body"} color="static">
           {reminder.title}
         </Text>
       </Flex>
-      <Icon.ArrowRight size={14} color="primary" />
+      <Icon.ArrowRight size={14} color="static" />
     </Flex>
   );
 }
