@@ -10,6 +10,10 @@ import {SIZE} from './SizeUtils';
 import RNTooltips from 'react-native-tooltips';
 import {tabBarRef} from './Refs';
 
+export const InteractionManager = {
+  runAfterInteractions: (func,time) => setTimeout(func, time || 500),
+};
+
 export const APP_VERSION = 1220;
 
 export async function setSetting(settings, name, value) {
@@ -227,7 +231,7 @@ let he;
 export function toTXT(html) {
   let text = html.replace(/<br[^>]*>/gi, '\n').replace(/<[^>]+>/g, '');
   if (!he) {
-    he = require('he')
+    he = require('he');
   }
   return he.decode(text);
 }
