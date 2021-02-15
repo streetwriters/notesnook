@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {InteractionManager} from 'react-native';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -8,6 +7,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
+import { InteractionManager } from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
@@ -16,11 +16,19 @@ export const Tags = ({route, navigation}) => {
   const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
-  const onFocus = useCallback(() => {
+  let ranAfterInteractions = false;
+ 
+
+  const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       if (loading) {
         setLoading(false);
       }
+
+      Navigation.routeNeedsUpdate('Tags',() => {
+        dispatch({type:Actions.TAGS})
+      })
+
       eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
       if (DDS.isLargeTablet()) {
         dispatch({
@@ -31,8 +39,19 @@ export const Tags = ({route, navigation}) => {
         });
       }
       updateSearch();
+      ranAfterInteractions = false;
     });
 
+
+  };
+
+  const onFocus = useCallback(() => {
+    if (!ranAfterInteractions) {
+  
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+  
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -50,9 +69,14 @@ export const Tags = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
     navigation.addListener('focus', onFocus);
     return () => {
-      pageIsLoaded = false;
+      pageIsLoaded = false;  
+      ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Tags', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -75,7 +99,7 @@ export const Tags = ({route, navigation}) => {
 
   return (
     <SimpleList
-      data={tags}
+    listData={tags}
       type="tags"
       headerProps={{
         heading: 'Tags',

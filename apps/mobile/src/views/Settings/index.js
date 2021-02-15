@@ -128,9 +128,10 @@ export const Settings = ({navigation}) => {
     navigation.addListener('focus', onFocus);
     db.version()
       .then((ver) => {
+        console.log(ver,"VERSION")
         setVersion(ver);
       })
-      .catch(console.log);
+      .catch((e) => console.log(e,"VER"));
 
     return () => {
       pageIsLoaded = false;
@@ -154,7 +155,8 @@ export const Settings = ({navigation}) => {
     {
       name: 'Check for updates',
       func: async () => {
-        if (version?.mobile <= APP_VERSION) {
+        if (!version) return;
+        if (version.mobile <= APP_VERSION) {
           ToastEvent.show('You are using the latest version', 'success');
           return;
         }

@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {InteractionManager, Platform} from 'react-native';
+import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -12,7 +12,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {editing} from '../../utils';
+import {editing, InteractionManager} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent, refreshNotesPage} from '../../utils/Events';
@@ -22,47 +22,22 @@ export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
   const [localLoad, setLocalLoad] = useState(true);
-
   const [notes, setNotes] = useState([]);
   let params = route.params ? route.params : null;
   let pageIsLoaded = false;
+  let ranAfterInteractions = false;
 
-  useEffect(() => {
-    eSubscribeEvent(refreshNotesPage, init);
-
-    return () => {
-      eUnSubscribeEvent(refreshNotesPage, init);
-      editing.actionAfterFirstSave = {
-        type: null,
-      };
-    };
-  }, []);
-
-  const setActionAfterFirstSave = () => {
-    if (params.type === 'tag') {
-      editing.actionAfterFirstSave = {
-        type: 'tag',
-        id: params.tag.id,
-      };
-    } else if (params.type === 'color') {
-      editing.actionAfterFirstSave = {
-        type: 'color',
-        id: params.color.id,
-      };
-    } else {
-      editing.actionAfterFirstSave = {
-        type: 'topic',
-        id: params.id,
-        notebook: params.notebookId,
-      };
-    }
-  };
-
-  const init = (data) => {
+  const runAfterInteractions = (data) => {
     InteractionManager.runAfterInteractions(() => {
       if (localLoad) {
         setLocalLoad(false);
       }
+
+      Navigation.routeNeedsUpdate('NotesPage', () => {
+        
+        init();
+      });
+
       params = route.params;
       if (data) {
         params = data;
@@ -106,7 +81,51 @@ export const Notes = ({route, navigation}) => {
           color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
         },
       });
+      ranAfterInteractions = false;
     });
+  };
+
+  useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+    eSubscribeEvent(refreshNotesPage, init);
+    return () => {
+      ranAfterInteractions = false;
+      eUnSubscribeEvent(refreshNotesPage, init);
+      editing.actionAfterFirstSave = {
+        type: null,
+      };
+    };
+  }, []);
+
+  const setActionAfterFirstSave = () => {
+    if (params.type === 'tag') {
+      editing.actionAfterFirstSave = {
+        type: 'tag',
+        id: params.tag.id,
+      };
+    } else if (params.type === 'color') {
+      editing.actionAfterFirstSave = {
+        type: 'color',
+        id: params.color.id,
+      };
+    } else {
+      editing.actionAfterFirstSave = {
+        type: 'topic',
+        id: params.id,
+        notebook: params.notebookId,
+      };
+    }
+  };
+
+  const init = (data) => {
+    if (!ranAfterInteractions) {
+      console.log('focus');
+      ranAfterInteractions = true;
+      runAfterInteractions(data);
+    }
 
     if (!pageIsLoaded) {
       pageIsLoaded = true;
@@ -202,7 +221,7 @@ export const Notes = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={notes}
+        listData={notes}
         type="notes"
         refreshCallback={() => {
           init();

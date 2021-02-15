@@ -1,5 +1,4 @@
 import React, {useCallback, useEffect} from 'react';
-import {InteractionManager} from 'react-native';
 import {Placeholder} from '../../components/ListPlaceholders';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -8,20 +7,27 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
+import { InteractionManager } from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const favorites = state.favorites;
   const [localLoad, setLocalLoad] = React.useState(true);
   const {loading} = state;
-
   let pageIsLoaded = false;
 
-  const onFocus = useCallback(() => {
+  let ranAfterInteractions = false;
+ 
+  const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       if (localLoad) {
         setLocalLoad(false);
       }
+
+      Navigation.routeNeedsUpdate('Favorites',() => {
+        dispatch({type:Actions.FAVORITES})
+      })
+
       eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
       updateSearch();
       if (DDS.isLargeTablet()) {
@@ -32,7 +38,15 @@ export const Favorites = ({route, navigation}) => {
           },
         });
       }
+      ranAfterInteractions = false;
     });
+  };
+
+  const onFocus = useCallback(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
 
     if (!pageIsLoaded) {
       pageIsLoaded = true;
@@ -51,9 +65,14 @@ export const Favorites = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
     navigation.addListener('focus', onFocus);
     return () => {
       pageIsLoaded = false;
+      ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -70,13 +89,13 @@ export const Favorites = ({route, navigation}) => {
       placeholder: 'Search in favorites',
       data: favorites,
       type: 'notes',
-      title:"Favorites"
+      title: 'Favorites',
     });
   };
 
   return (
     <SimpleList
-      data={favorites}
+      listData={favorites}
       type="notes"
       refreshCallback={() => {
         dispatch({type: Actions.FAVORITES});

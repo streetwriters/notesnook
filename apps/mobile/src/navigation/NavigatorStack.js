@@ -4,6 +4,7 @@ import * as React from 'react';
 import {Animated} from 'react-native';
 import Container from '../components/Container';
 import {updateEvent} from '../components/DialogManager/recievers';
+import { useTracked } from '../provider';
 import {Actions} from '../provider/Actions';
 import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
@@ -29,7 +30,6 @@ const forFade = ({current}) => ({
 });
 
 const forSlide = ({current, next, inverted, layouts: {screen}}) => {
-
   const progress = Animated.add(
     current.progress.interpolate({
       inputRange: [0, 1],
@@ -75,20 +75,23 @@ const screenOptionsForAnimation = {
 
 export const NavigatorStack = React.memo(
   () => {
-  
+    const [state, dispatch] = useTracked();
+    const settings = state.settings;
+
+    const onStateChange = React.useCallback(() => {
+      dispatch({type: Actions.SELECTION_MODE, enabled: false});
+      dispatch({type: Actions.CLEAR_SELECTION});
+      eSendEvent('navigate');
+    });
 
     return (
       <Container root={true}>
         <NavigationContainer
-          onStateChange={() => {
-            updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-            updateEvent({type: Actions.CLEAR_SELECTION});
-            eSendEvent('navigate');
-          }}
+          onStateChange={onStateChange}
           independent={true}
           ref={rootNavigatorRef}>
           <Stack.Navigator
-            initialRouteName={SettingsService.get().homepage}
+            initialRouteName={settings.homepage}
             screenOptions={{
               headerShown: false,
               animationEnabled: false,

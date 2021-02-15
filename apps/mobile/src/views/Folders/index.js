@@ -10,30 +10,22 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
-import {InteractionManager} from 'react-native';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const notebooks = state.notebooks;
   const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
+  let ranAfterInteractions = false;
 
+  const InteractionManager = {
+    runAfterInteractions:(func) => setTimeout(func,300)
+  }
   const onFocus = useCallback(() => {
-    InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
-      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
-      updateSearch();
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: _onPressBottomButton,
-          },
-        });
-      }
-    });
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
 
     if (!pageIsLoaded) {
       pageIsLoaded = true;
@@ -49,11 +41,41 @@ export const Folders = ({route, navigation}) => {
         id: 'notebooks_navigation',
       },
     );
+ 
   }, []);
 
+  const runAfterInteractions = () => {
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      Navigation.routeNeedsUpdate('Notebooks',() => {
+        dispatch({type:Actions.NOTEBOOKS})
+      })
+
+      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
+      updateSearch();
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+          },
+        });
+      }
+      ranAfterInteractions = false;
+    });
+  };
+
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+
     navigation.addListener('focus', onFocus);
     return () => {
+      ranAfterInteractions = false;
       pageIsLoaded = false;
       navigation.removeListener('focus', onFocus);
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
@@ -71,7 +93,7 @@ export const Folders = ({route, navigation}) => {
       placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
-      title:"Notebooks"
+      title: 'Notebooks',
     });
   };
 
@@ -80,7 +102,7 @@ export const Folders = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={notebooks}
+        listData={notebooks}
         type="notebooks"
         focused={() => navigation.isFocused()}
         loading={loading}

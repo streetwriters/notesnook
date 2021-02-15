@@ -1,6 +1,7 @@
 import {DrawerActions, StackActions} from '@react-navigation/native';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
+import {eOnNewTopicAdded, refreshNotesPage} from '../utils/Events';
 import {rootNavigatorRef, sideMenuRef} from '../utils/Refs';
 import {eSendEvent} from './EventManager';
 import SettingsService from './SettingsService';
@@ -9,15 +10,64 @@ let currentScreen = 'Notes';
 let headerState = {
   heading: 'Notes',
   color: null,
-  verticalMenu:true,
-  currentScreen:'Notes'
+  verticalMenu: true,
+  currentScreen: 'Notes',
 };
+
+const routeNames = {
+  Notes: 'Notes',
+  Notebooks: 'Notebooks',
+  Notebook: 'Notebook',
+  NotesPage: 'NotesPage',
+  Tags: 'Tags',
+  Favorites: 'favorites',
+  Trash: 'Trash',
+};
+
+let routesToUpdate = [];
+
 function getCurrentScreen() {
   return currentScreen;
 }
 
 function getHeaderState() {
   return headerState;
+}
+
+function clearRouteFromUpdates(routeName) {
+  if (routesToUpdate.indexOf(routeName) === -1) {
+    routesToUpdate = routesToUpdate.slice(routesToUpdate.indexOf(routeName), 1);
+  }
+}
+
+function routeNeedsUpdate(routeName, callback) {
+  if (routesToUpdate.indexOf(routeName) > -1) {
+    clearRouteFromUpdates(routeName);
+    callback();
+  }
+}
+
+function setRoutesToUpdate(routes) {
+  if (routes.indexOf(currentScreen) > -1) {
+    console.log('updating', currentScreen);
+    if (
+      currentScreen === routeNames.NotesPage &&
+      currentScreen === routeNames.Notebook
+    ) {
+      eSendEvent(
+        currentScreen === routeNames.NotesPage
+          ? refreshNotesPage
+          : eOnNewTopicAdded,
+      );
+    } else {
+      updateEvent({type: Actions[currentScreen.toUpperCase()]});
+    }
+    routes = routes.slice(routes.indexOf(currentScreen), 1);
+  }
+  routesToUpdate = routesToUpdate.concat(routes);
+  routesToUpdate.filter(function (item, pos) {
+    return routesToUpdate.indexOf(item) == pos;
+  });
 }
 
 /**
@@ -58,19 +108,6 @@ function setHeaderState(name, params, item) {
   if (headerState) {
     eSendEvent('onHeaderStateChange', headerState);
   }
-
-  /*  if (name) {
-    updateEvent({
-      type: Actions.CURRENT_SCREEN,
-      screen: name.toLowerCase(),
-    });
-  }
-  if (params) {
-    updateEvent({
-      type: Actions.HEADER_STATE,
-      state: params.menu,
-    });
-  } */
 }
 
 function goBack() {
@@ -120,4 +157,7 @@ export default {
   replace,
   popToTop,
   getHeaderState,
+  setRoutesToUpdate,
+  routeNeedsUpdate,
+  routeNames,
 };

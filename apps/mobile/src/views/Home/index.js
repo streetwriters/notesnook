@@ -1,6 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import { AsyncStorage } from 'react-native';
-import {InteractionManager} from 'react-native';
+import {AsyncStorage} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
@@ -9,10 +8,11 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {scrollRef} from '../../utils';
+import {InteractionManager, scrollRef} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
+import Storage from '../../utils/storage';
 
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -20,26 +20,13 @@ export const Home = ({route, navigation}) => {
   const [localLoad, setLocalLoad] = useState(true);
   const notes = state.notes;
   let pageIsLoaded = false;
+  let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
-    InteractionManager.runAfterInteractions(() => {
-      if (localLoad) {
-        setLocalLoad(false);
-      }
-
-      updateSearch();
-      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: _onPressBottomButton,
-          },
-        });
-      }
-    });
-
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -59,17 +46,49 @@ export const Home = ({route, navigation}) => {
 
   const onBlur = useCallback(() => {}, []);
 
+  const runAfterInteractions = () => {
+    InteractionManager.runAfterInteractions(() => {
+      if (localLoad) {
+        setLocalLoad(false);
+      }
+
+      updateSearch();
+      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+
+      Navigation.routeNeedsUpdate('Notes', () => {
+        console.log('updating notes as requested');
+        dispatch({type: Actions.NOTES});
+      });
+
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+          },
+        });
+      }
+      ranAfterInteractions = false;
+    });
+  };
+
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
       pageIsLoaded = false;
+      ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };
   }, []);
-
+ 
   useEffect(() => {
     if (navigation.isFocused()) {
       updateSearch();
@@ -86,7 +105,6 @@ export const Home = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = async () => {
-
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
@@ -97,7 +115,7 @@ export const Home = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={notes}
+        listData={notes}
         scrollRef={scrollRef}
         type="notes"
         isHome={true}

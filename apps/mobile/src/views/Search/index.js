@@ -53,7 +53,7 @@ export const Search = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={searchResults}
+        listData={searchResults}
         type="search"
         focused={() => navigation.isFocused()}
         placeholderText={`Notes you write appear here`}

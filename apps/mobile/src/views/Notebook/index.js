@@ -1,5 +1,4 @@
 import React, {useEffect, useState} from 'react';
-import {InteractionManager} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import SimpleList from '../../components/SimpleList';
 import {
@@ -9,6 +8,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
+import {InteractionManager} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
@@ -22,6 +22,33 @@ export const Notebook = ({route, navigation}) => {
   let params = route.params;
   let pageIsLoaded = false;
 
+  let ranAfterInteractions = false;
+
+  const runAfterInteractions = () => {
+    InteractionManager.runAfterInteractions(() => {
+      if (loading) {
+        setLoading(false);
+      }
+      Navigation.routeNeedsUpdate('Notebooks', () => {
+        onLoad();
+      });
+
+      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
+      if (route.params.menu) {
+        navigation.setOptions({
+          animationEnabled: false,
+          gestureEnabled: false,
+        });
+      } else {
+        navigation.setOptions({
+          animationEnabled: true,
+          gestureEnabled: Platform.OS === 'ios',
+        });
+      }
+      updateSearch();
+      ranAfterInteractions = false;
+    });
+  };
   const onLoad = () => {
     InteractionManager.runAfterInteractions(() => {
       setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
@@ -40,31 +67,16 @@ export const Notebook = ({route, navigation}) => {
   }, []);
 
   const onFocus = async () => {
-    InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
-      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-      if (route.params.menu) {
-        navigation.setOptions({
-          animationEnabled: false,
-          gestureEnabled: false,
-        });
-      } else {
-        navigation.setOptions({
-          animationEnabled: true,
-          gestureEnabled: Platform.OS === 'ios',
-        });
-      }
-      updateSearch();
-     
-    });
-    
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
     }
-    Navigation.setHeaderState('notebooks', params, {
+    Navigation.setHeaderState('Notebooks', params, {
       heading: params.title,
       id: params.notebook.id,
       type: 'notebook',
@@ -72,8 +84,14 @@ export const Notebook = ({route, navigation}) => {
   };
 
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
+
     navigation.addListener('focus', onFocus);
     return () => {
+      ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -90,7 +108,7 @@ export const Notebook = ({route, navigation}) => {
       placeholder: `Search in "${params.title}"`,
       data: topics,
       type: 'topics',
-      title:params.title
+      title: params.title,
     });
   };
 
@@ -102,7 +120,7 @@ export const Notebook = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={topics}
+        listData={topics}
         type="topics"
         refreshCallback={() => {
           onLoad();

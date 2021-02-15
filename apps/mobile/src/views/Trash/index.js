@@ -1,5 +1,5 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import { InteractionManager } from 'react-native';
+
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
@@ -11,6 +11,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
+import {InteractionManager} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
@@ -19,11 +20,18 @@ export const Trash = ({route, navigation}) => {
   const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
-  const onFocus = useCallback(() => {
+  let ranAfterInteractions = false;
+
+  const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       if (loading) {
         setLoading(false);
       }
+
+      Navigation.routeNeedsUpdate('Trash', () => {
+        dispatch({type: Actions.TRASH});
+      });
+
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
       if (DDS.isLargeTablet()) {
         dispatch({
@@ -34,7 +42,15 @@ export const Trash = ({route, navigation}) => {
         });
       }
       updateSearch();
+      ranAfterInteractions = false;
     });
+  };
+
+  const onFocus = useCallback(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
 
     if (!pageIsLoaded) {
       pageIsLoaded = true;
@@ -53,9 +69,14 @@ export const Trash = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
     navigation.addListener('focus', onFocus);
     return () => {
       pageIsLoaded = false;
+      ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
@@ -72,7 +93,7 @@ export const Trash = ({route, navigation}) => {
       placeholder: 'Search in trash',
       data: trash,
       type: 'trash',
-      title: "Trash"
+      title: 'Trash',
     });
   };
 
@@ -81,7 +102,7 @@ export const Trash = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        data={trash}
+        listData={trash}
         type="trash"
         focused={() => navigation.isFocused()}
         loading={loading}
