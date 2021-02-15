@@ -69,8 +69,8 @@ export async function getColorScheme(useSystemTheme) {
 
 
     if (!accentColor ) {
-        await MMKV.setItem('accentColor', '#0560FF');
-        setAccentColor('#0560FF');
+        await MMKV.setItem('accentColor', '#00c853');
+        setAccentColor('#00c853');
     } else {
         setAccentColor(accentColor);
     }

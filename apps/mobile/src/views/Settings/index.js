@@ -181,7 +181,7 @@ export const Settings = ({navigation}) => {
             'Follow the development process',
             'Give suggestions and report issues.',
             'Get early access to new features',
-            'Meet other people that use Notesnook',
+            'Meet other people using Notesnook',
           ],
           noProgress: true,
           icon: 'discord',
@@ -820,6 +820,7 @@ const SettingsAppearanceSection = () => {
           '#f032e6',
           '#bcf60c',
           '#fabebe',
+          "#00c853"
         ].map((item) => (
           <PressableButton
             key={item}
