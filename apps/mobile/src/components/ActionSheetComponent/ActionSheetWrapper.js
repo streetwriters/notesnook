@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Platform} from 'react-native';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -15,6 +15,7 @@ import {
 import {sleep} from '../../utils/TimeUtils';
 import tiny from '../../views/Editor/tiny/tiny';
 import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
+import {changeAppScale} from '../../utils/Animations';
 
 const ActionSheetWrapper = ({
   children,
@@ -47,6 +48,28 @@ const ActionSheetWrapper = ({
     };
   }, [colors.bg, gestureEnabled]);
 
+  const _onOpen = () => {
+    //changeAppScale(0.975, 150);
+    onOpen && onOpen();
+  };
+
+  const _onClose = async () => {
+    //changeAppScale(1, 150);
+    if (editing.isFocused === true) {
+      textInput.current?.focus();
+      await sleep(10);
+      if (editing.focusType == 'editor') {
+        focusEditor();
+      } else {
+        Platform.OS === 'android' && EditorWebView.current.requestFocus();
+        tiny.call(EditorWebView, tiny.focusTitle);
+      }
+    }
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
     <ActionSheet
       ref={fwdRef}
@@ -61,7 +84,7 @@ const ActionSheetWrapper = ({
           ? hexToRGBA(colors.accent + '19')
           : hexToRGBA(colors.shade)
       }
-      onOpen={onOpen}
+      onOpen={_onOpen}
       keyboardShouldPersistTaps="always"
       premium={
         <GetPremium
@@ -70,21 +93,7 @@ const ActionSheetWrapper = ({
           offset={50}
         />
       }
-      onClose={async () => {
-        if (editing.isFocused === true) {
-          textInput.current?.focus();
-          await sleep(10);
-          if (editing.focusType == 'editor') {
-            focusEditor();
-          } else {
-            Platform.OS === 'android' && EditorWebView.current.requestFocus();
-            tiny.call(EditorWebView, tiny.focusTitle);
-          }
-        }
-        if (onClose) {
-          onClose();
-        }
-      }}>
+      onClose={_onClose}>
       {children}
     </ActionSheet>
   );
