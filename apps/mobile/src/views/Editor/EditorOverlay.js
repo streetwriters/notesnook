@@ -35,7 +35,7 @@ const EditorOverlay = () => {
       }, 6000);
     } else {
       setProgress(4);
-      await sleep(150);
+      await sleep(10);
       setError(false);
       timing(opacity, {
         toValue: 0,
