@@ -1,20 +1,27 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Image, View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import React, {useEffect, useRef, useState} from 'react';
+import {Image, View} from 'react-native';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import Carousel from 'react-native-snap-carousel';
-import { SvgXml } from 'react-native-svg';
-import { NOTE_SVG, SYNC_SVG } from '../../assets/images/assets';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import { dHeight, dWidth, getElevation } from '../../utils';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {SvgXml} from 'react-native-svg';
+import {
+  NOTE_SVG,
+  SYNC_SVG,
+  ORGANIZE_SVG,
+  PRIVACY_SVG,
+  COMMUNITY_SVG,
+} from '../../assets/images/assets';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
+import {dHeight, dWidth, getElevation} from '../../utils';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 const SplashScreen = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -32,20 +39,36 @@ const SplashScreen = () => {
       type: 'image',
     },
     {
-      title: 'Zero Knowledge',
-      description: 'Write without fear, no tracking.',
-      icon: SYNC_SVG,
+      title: 'Made to protect your privacy',
+      description:
+        'Your data is encrypted on your device. No one but you can read your notes.',
+      icon: PRIVACY_SVG,
+      link: 'https://notesnook.com',
     },
     {
-      title: 'Zero Knowledge',
+      icon: SYNC_SVG,
+      title: 'While keeping you in sync',
       description:
-        'No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.',
+        'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
+      link: 'https://notesnook.com',
+    },
+    {
+      icon: ORGANIZE_SVG,
+      title: 'And helping you stay organized',
+      description:
+        'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
+      link: 'https://notesnook.com',
+    },
+    {
+      icon: COMMUNITY_SVG,
+      title: 'Join our community',
+      description:
+        'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
+      link: 'https://discord.gg/zQBK97EE22',
     },
   ];
 
   useEffect(() => {
-
-    return;
     Storage.read('introCompleted').then(async (r) => {
       setVisible(true);
       await sleep(500);
@@ -106,16 +129,13 @@ const SplashScreen = () => {
               },
             ],
           }}>
-          <View
-            style={{
-              height: 300,
-            }}>
+          <View style={{}}>
             <Carousel
               ref={carouselRef}
               data={features}
               itemWidth={dWidth}
               sliderWidth={dWidth}
-              autoplay={false}
+              autoplay={true}
               loop={false}
               shouldOptimizeUpdates
               autoplayInterval={5000}
@@ -125,63 +145,85 @@ const SplashScreen = () => {
               }}
               renderItem={({item, index}) => (
                 <View
-                  key={item.description}
                   style={{
-                    paddingVertical: 5,
-                    marginBottom: 10,
-                    alignSelf: 'center',
+                    height: '100%',
+                    justifyContent: 'center',
                   }}>
                   <View
+                    key={item.description}
                     style={{
-                      flexWrap: 'wrap',
-                      width: '100%',
-                      alignItems: 'center',
+                      paddingVertical: 5,
+                      marginBottom: 10,
+                      alignSelf: 'center',
                     }}>
-                    {item.type === 'image' ? (
-                      <Image
-                        source={item.icon}
-                        style={{
-                          width: 170,
-                          height: 170,
-                        }}
-                      />
-                    ) : (
-                      <SvgXml
-                        xml={
-                          item.icon
-                            ? item.icon(colors.accent)
-                            : NOTE_SVG(colors.accent)
-                        }
-                        width={170}
-                        height={170}
-                      />
-                    )}
+                    <View
+                      style={{
+                        flexWrap: 'wrap',
+                        width: '100%',
+                        alignItems: 'center',
+                      }}>
+                      {item.type === 'image' ? (
+                        <Image
+                          source={item.icon}
+                          style={{
+                            width: 170,
+                            height: 170,
+                          }}
+                        />
+                      ) : item.type === 'icon' ? (
+                        <Icon color={item.color} name={item.icon} size={170} />
+                      ) : (
+                        <SvgXml
+                          xml={
+                            item.icon
+                              ? item.icon(colors.accent)
+                              : NOTE_SVG(colors.accent)
+                          }
+                          width={250}
+                          height={250}
+                        />
+                      )}
 
-                    {item.title && (
-                      <Heading
-                        size={SIZE.xl}
-                        style={{
-                          textAlign: 'center',
-                          alignSelf: 'center',
-                          marginTop: 10,
-                        }}>
-                        {item.title}
-                      </Heading>
-                    )}
+                      {item.title && (
+                        <Heading
+                          size={SIZE.xl}
+                          style={{
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                            marginTop: 10,
+                          }}>
+                          {item.title}
+                        </Heading>
+                      )}
 
-                    {item.description && (
-                      <Paragraph
-                        size={SIZE.md}
-                        color={colors.icon}
-                        textBreakStrategy="balanced"
-                        style={{
-                          fontWeight: 'normal',
-                          textAlign: 'center',
-                          alignSelf: 'center',
-                        }}>
-                        {item.description}
-                      </Paragraph>
-                    )}
+                      {item.description && (
+                        <Paragraph
+                          size={SIZE.md}
+                          color={colors.icon}
+                          textBreakStrategy="balanced"
+                          style={{
+                            fontWeight: 'normal',
+                            textAlign: 'center',
+                            alignSelf: 'center',
+                          }}>
+                          {item.description}
+                        </Paragraph>
+                      )}
+
+                      {item.link && (
+                        <Button
+                          title="Learn more"
+                          fontSize={SIZE.md}
+                          onPress={() => {
+                            openLinkInBrowser(item.link, colors)
+                              .catch((e) => ToastEvent.show(e.message, 'error'))
+                              .then((r) => {
+                                console.log('closed');
+                              });
+                          }}
+                        />
+                      )}
+                    </View>
                   </View>
                 </View>
               )}
