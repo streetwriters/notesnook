@@ -1,11 +1,8 @@
-
-import React, {useEffect} from 'react';
-import {useState} from 'react';
-import {InteractionManager} from 'react-native';
-import {ActivityIndicator} from 'react-native';
+import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import Orientation from 'react-native-orientation';
-import Animated, {Easing, timing} from 'react-native-reanimated';
+import Animated, {Easing} from 'react-native-reanimated';
+import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
 import {AppRootEvents} from './AppRootEvents';
@@ -24,7 +21,6 @@ import {db} from './src/utils/DB';
 import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
 import {sleep} from './src/utils/TimeUtils';
 import EditorRoot from './src/views/Editor/EditorRoot';
-import AnimatedProgress from 'react-native-reanimated-progress-bar';
 
 let initStatus = false;
 const App = () => {
@@ -52,7 +48,7 @@ const App = () => {
       } catch (e) {
       } finally {
         initStatus = true;
-        loadMainApp("[ORIGIN] EXTERNAL");
+        loadMainApp();
       }
     })();
   }, []);
@@ -70,7 +66,7 @@ const App = () => {
 
   const loadMainApp = (origin) => {
     if (initStatus) {
-      eSendEvent('load_overlay',origin);
+      eSendEvent('load_overlay', origin);
       dispatch({type: Actions.ALL});
     }
   };
@@ -97,47 +93,44 @@ const Overlay = ({onLoad}) => {
   const [progress, setProgress] = useState(4);
   const [opacity, setOpacity] = useState(true);
 
-  const load = async (origin) => {
-  
+  const load = async () => {
+    db.notes.init().then(() => {
+      init = true;
+      if (SettingsService.get().homepage === 'Notes') {
+        dispatch({type: Actions.NOTES});
+      } else {
+        dispatch({type: Actions.FAVORITES});
+      }
+      // if (!animation) {
+      dispatch({type: Actions.LOADING, loading: false});
+      // }
+    });
     eSendEvent(eOpenSideMenu);
     SettingsService.setAppLoaded();
     setOpacity(false);
-    let animation = true;
-    let init = false;
-    db.notes.init().then(() => {
-      init = true;
-
-      dispatch({type: Actions.NOTES});
-      dispatch({type: Actions.FAVORITES});
-      if (!animation) {
-        dispatch({type: Actions.LOADING, loading: false});
-      }
-    });
-    await sleep(300);
+    await sleep(150);
     Animated.timing(opacityV, {
       toValue: 0,
-      duration: 400,
+      duration: 150,
       easing: Easing.out(Easing.ease),
     }).start();
     Animated.timing(scaleV, {
       toValue: 1,
-      duration: 400,
+      duration: 150,
       easing: Easing.out(Easing.ease),
     }).start();
-
-    changeAppScale(1, 400);
-    await sleep(410);
+    changeAppScale(1, 250);
+    await sleep(150);
     setLoading(false);
     animation = false;
-    if (init) {
-      await sleep(5);
-      dispatch({type: Actions.LOADING, loading: false});
-    }
+    //if (init) {
+    //  dispatch({type: Actions.LOADING, loading: false});
+    //}
   };
 
   useEffect(() => {
     eSubscribeEvent('load_overlay', load);
-    onLoad("[ORIGIN] INTERNAL");
+    onLoad();
     return () => {
       eUnSubscribeEvent('load_overlay', load);
     };
