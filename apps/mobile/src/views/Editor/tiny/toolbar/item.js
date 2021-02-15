@@ -56,24 +56,22 @@ const ToolbarItem = ({
   }, []);
 
   useEffect(() => {
-    console.log('called')
     onSelectionChange(properties.selection);
   }, []);
 
   const checkForChanges = (data) => {
     properties.selection = data;
     let formats = Object.keys(data);
-
-    if (!data['link'] && type === "tooltip") {
-      eSendEvent('showTooltip');
+    if (!data['link'] && type === 'tooltip') {
+      if (editing.tooltip) {
+        eSendEvent('showTooltip');
+      }
     }
     if (format === 'header' && type === 'tooltip') {
       let keys = group.map((i) => i.format);
       keys.forEach((k) => {
         if (formats.includes(k)) {
-          console.log(group.find((e) => e.format === k).text);
           setCurrentText(group.find((e) => e.format === k).text);
-
           setSelected(false);
         }
       });
@@ -101,7 +99,6 @@ const ToolbarItem = ({
       }
 
       if (format === 'link') {
-        console.log(format, data[format]);
         properties.selection = data;
         properties.pauseSelectionChange = true;
         eSendEvent('showTooltip', {
@@ -204,7 +201,7 @@ const ToolbarItem = ({
     if (editing.tooltip === format && !formatValue) {
       focusEditor(format);
       eSendEvent('showTooltip');
-      editing.tooltip = null;
+
       properties.pauseSelectionChange = false;
       return;
     }
@@ -222,7 +219,7 @@ const ToolbarItem = ({
     }
 
     if (type === 'tooltip') {
-      editing.tooltip = format;
+      properties.pauseSelectionChange = true;
       eSendEvent('showTooltip', {
         data: group,
         title: format,
@@ -254,12 +251,13 @@ const ToolbarItem = ({
 
     if (format === 'pre') {
       if (selected) {
-        formatSelection(`tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });`);
+        formatSelection(
+          `tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });`,
+        );
         focusEditor(format);
-        editing.tooltip = null;
         return;
       } else {
-        value = "add";
+        value = 'add';
       }
     }
 
@@ -276,10 +274,7 @@ const ToolbarItem = ({
   };
 
   return (
-    <View
-      style={{
-        marginHorizontal: 5,
-      }}>
+    <View>
       <PressableButton
         type={selected ? 'shade' : 'transparent'}
         customColor={selected && color}
@@ -294,11 +289,8 @@ const ToolbarItem = ({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          height: 40,
-          minWidth: 40,
-          borderRadius: 5,
-          marginTop: 5,
-          marginBottom: 5,
+          height: 50,
+          minWidth: 60,
         }}>
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />

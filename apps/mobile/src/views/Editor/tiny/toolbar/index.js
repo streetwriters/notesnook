@@ -3,6 +3,7 @@ import {View} from 'react-native';
 import {ScrollView} from 'react-native';
 import {useTracked} from '../../../../provider';
 import {eSendEvent} from '../../../../services/EventManager';
+import { getElevation } from '../../../../utils';
 import {TOOLBAR_CONFIG} from './config';
 import {properties, toolbarRef} from './constants';
 import ToolbarGroup from './group';
@@ -34,12 +35,14 @@ const EditorToolbar = React.memo(
               width: '100%',
               maxWidth: '100%',
               minHeight: 50,
-              borderTopWidth: 1,
-              borderTopColor: colors.nav,
-              paddingLeft: 12,
+              paddingLeft: 6,
+              backgroundColor:colors.nav,
+              borderTopRightRadius:5,
+              borderTopLeftRadius:5,
+              zIndex:11
             }}
             onScrollBeginDrag={() => {
-              eSendEvent('showTooltip');
+              //eSendEvent('showTooltip');
             }}
             keyboardShouldPersistTaps="always"
             keyboardDismissMode="none"

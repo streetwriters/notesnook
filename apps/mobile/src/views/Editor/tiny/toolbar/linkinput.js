@@ -6,11 +6,17 @@ import Input from '../../../../components/Input';
 import {useTracked} from '../../../../provider';
 import {editing} from '../../../../utils';
 import {execCommands} from './commands';
-import {focusEditor, formatSelection, INPUT_MODE, properties} from './constants';
+import {
+  focusEditor,
+  formatSelection,
+  INPUT_MODE,
+  properties,
+} from './constants';
 import LinkPreview from './linkpreview';
 import tiny from '../tiny';
-import { EditorWebView } from '../../Functions';
-import { openLinkInBrowser } from '../../../../utils/functions';
+import {EditorWebView} from '../../Functions';
+import {openLinkInBrowser} from '../../../../utils/functions';
+import {SIZE} from '../../../../utils/SizeUtils';
 
 let inputValue = null;
 
@@ -113,7 +119,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               title="Save"
               onPress={onSubmit}
               height={40}
-              fontSize={12}
+              fontSize={SIZE.md}
               style={{marginLeft: 10}}
             />
           )}

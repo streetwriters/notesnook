@@ -1,44 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
-import { useTracked } from '../../../../provider';
-
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../../../services/EventManager';
+import {useTracked} from '../../../../provider';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
+import {sleep} from '../../../../utils/TimeUtils';
 
 const ToolbarItemPin = ({format, color}) => {
-	const [state] = useTracked();
-	const {colors} = state;
-	const [visible, setVisible] = useState(false);
-  
-	useEffect(() => {
-	  eSubscribeEvent('showTooltip', show);
-	  return () => {
-		eUnSubscribeEvent('showTooltip', show);
-	  };
-	}, []);
-  
-	const show = (data) => {
-	  if (data?.title === format) {
-		setVisible(true);
-	  } else {
-		setVisible(false);
-	  }
-	};
-  
-	return (
-	  visible && (
-		<View
-		  style={{
-			width: 10,
-			height: 10,
-			backgroundColor: color || colors.accent,
-			borderRadius: 100,
-			position: 'absolute',
-			top: 0,
-			top: -10,
-		  }}
-		/>
-	  )
-	);
-  };
+  const [state] = useTracked();
+  const {colors} = state;
+  const [visible, setVisible] = useState(false);
+  let scale = useValue(0);
+  useEffect(() => {
+    eSubscribeEvent('showTooltip', show);
+    return () => {
+      eUnSubscribeEvent('showTooltip', show);
+    };
+  }, []);
 
-  export default ToolbarItemPin
+  let animating = false;
+  async function animate(val, time = 200) {
+    if (animating) return;
+    animating = true;
+    timing(scale, {
+      toValue: val,
+      duration: time,
+      easing: Easing.in(Easing.ease),
+    }).start(async () => {
+      await sleep(time);
+      animating = false;
+    });
+  }
+
+  const show = async (data) => {
+    if (data?.title === format) {
+      setVisible(true);
+      await sleep(5);
+      animate(1, 150);
+    } else {
+      animate(0, 150);
+      await sleep(100);
+      setVisible(false);
+    }
+  };
+  
+  return (
+    visible && (
+      <Animated.View
+        style={{
+          width: '100%',
+          height: 3,
+          backgroundColor: color || colors.accent,
+          position: 'absolute',
+          top: 0,
+          transform: [
+            {
+              scale: scale,
+            },
+          ],
+        }}
+      />
+    )
+  );
+};
+
+export default ToolbarItemPin;

@@ -13,10 +13,12 @@ const ToolbarGroup = ({group}) => {
 		  borderRadius: 0,
 		  flexDirection: 'row',
 		  alignItems: 'center',
-		  paddingRight: 12,
-		  marginRight:12,
-		  borderRightWidth:1,
-		  borderRightColor:colors.nav
+		  marginRight:6,
+		  backgroundColor:colors.bg,
+		  borderTopRightRadius:5,
+		  borderTopLeftRadius:5,
+		  marginTop:5,
+		  overflow:"hidden"
 		}}>
 		{group.map((item) => (
 		  <ToolbarItem
