@@ -33,6 +33,7 @@ const markdownPatterns = [
   { start: "*", end: "*", format: "italic" },
   { start: "_", end: "_", format: "italic" },
   { start: "**", end: "**", format: "bold" },
+  { start: "~~", end: "~~", format: "strikethrough" },
   { start: "`", end: "`", format: "code" },
   { start: "#", format: "h1" },
   { start: "##", format: "h2" },
@@ -75,7 +76,6 @@ const markdownPatterns = [
   },
   { start: "---", replacement: "<hr/>" },
   { start: "--", replacement: "—" },
-  { start: "-", replacement: "—" },
   { start: "(c)", replacement: "©" },
 ];
 
