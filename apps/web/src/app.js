@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import "./app.css";
 import { Flex } from "rebass";
 import ThemeProvider from "./components/theme-provider";
