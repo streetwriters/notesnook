@@ -8,7 +8,7 @@ export default function useRoutes(routes, options) {
   const matcher = makeMatcher();
 
   // TODO move this to an extension function
-  selectionStore.toggleSelectionMode(false);
+  if (selectionStore.isSelectionMode) selectionStore.toggleSelectionMode(false);
 
   for (var key in routes) {
     const [match, params] = matcher(key, location);
