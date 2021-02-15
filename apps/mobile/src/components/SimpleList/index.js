@@ -1,27 +1,30 @@
-import React, { useEffect, useState } from 'react';
-import { RefreshControl, useWindowDimensions } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { DataProvider, LayoutProvider, RecyclerListView } from 'recyclerlistview';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import React, {useEffect, useState} from 'react';
+import {RefreshControl, useWindowDimensions} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import { dHeight } from '../../utils';
-import { eScrollEvent } from '../../utils/Events';
-import { NotebookWrapper } from '../NotebookItem/wrapper';
-import { NoteWrapper } from '../NoteItem/wrapper';
+import {dHeight} from '../../utils';
+import {eScrollEvent} from '../../utils/Events';
+import {NotebookWrapper} from '../NotebookItem/wrapper';
+import {NoteWrapper} from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import { Empty } from './empty';
-import { Footer } from './footer';
-import { Header } from './header';
-import { SectionHeader } from './section-header';
+import {Empty} from './empty';
+import {Footer} from './footer';
+import {Header} from './header';
+import {SectionHeader} from './section-header';
 
 const header = {
   type: 'MAIN_HEADER',
 };
+const emptyData = new DataProvider((r1, r2) => {
+  return r1 !== r2;
+}).cloneWithRows([header, {type: 'empty'}]);
 
 const SimpleList = ({
-  data,
+  listData,
   type,
   customRefresh,
   customRefreshing,
@@ -37,29 +40,40 @@ const SimpleList = ({
 }) => {
   const [state] = useTracked();
   const {colors, deviceMode} = state;
+  const [_loading, setLoading] = useState(true);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }).cloneWithRows([header, {type: 'empty'}]),
+    }).cloneWithRows(
+      !listData || listData.length === 0
+        ? [header, {type: 'empty'}]
+        : [header].concat(listData),
+    ),
   );
 
   const insets = useSafeAreaInsets();
   const {width, fontScale} = useWindowDimensions();
   const refreshing = false;
-  const listData = data;
   const dataType = type;
 
   useEffect(() => {
-    if (loading) return;
-    loadData();
-  }, [data, loading, deviceMode]);
+    setDataProvider(
+      dataProvider.cloneWithRows(
+        !listData || listData.length === 0
+          ? [header, {type: 'empty'}]
+          : [header].concat(listData),
+      ),
+    );
+    setLoading(false);
+  }, [listData, deviceMode]);
 
+  /* 
   const loadData = () => {
     let mainData = [header, {type: 'empty'}];
     mainData =
-      !listData || listData.length === 0 ? mainData : [header, ...listData];
+      !listData || listData.length === 0 ? mainData : [header].concat(listData);
     setDataProvider(dataProvider.cloneWithRows(mainData));
-  };
+  }; */
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -73,6 +87,29 @@ const SimpleList = ({
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
   };
+
+  const emptyLayoutProvider = new LayoutProvider(
+    (index) => {
+      return emptyData.getDataForIndex(index).type;
+    },
+    (type, dim) => {
+
+      switch (type) {
+        case 'empty':
+          dim.width = width;
+          dim.height = dHeight - 250 - insets.top;
+          break;
+        case 'MAIN_HEADER':
+          dim.width = width;
+          dim.height =
+            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 195;
+          break;
+        default:
+          dim.width = width;
+          dim.height = 0;
+      }
+    },
+  );
 
   const _layoutProvider = new LayoutProvider(
     (index) => {
@@ -165,7 +202,12 @@ const SimpleList = ({
           />
         );
       case 'empty':
-        return <Empty loading={loading} placeholderData={placeholderData} />;
+        return (
+          <Empty
+            loading={loading || _loading}
+            placeholderData={placeholderData}
+          />
+        );
     }
   };
 
@@ -184,6 +226,7 @@ const SimpleList = ({
           refreshing={customRefresh ? customRefreshing : refreshing}
         />
       ),
+
       overScrollMode: 'always',
       contentContainerStyle: {
         width: '100%',
@@ -199,20 +242,17 @@ const SimpleList = ({
     backgroundColor: colors.bg,
     width: '100%',
   };
-
-
-
   return (
     <RecyclerListView
       ref={scrollRef}
-      layoutProvider={_layoutProvider}
-      dataProvider={dataProvider}
+      layoutProvider={
+        loading || _loading ? emptyLayoutProvider : _layoutProvider
+      }
+      dataProvider={loading || _loading ? emptyData : dataProvider}
       rowRenderer={_renderRow}
       onScroll={_onScroll}
       canChangeSize={true}
-      optimizeForInsertDeleteAnimations
-      //forceNonDeterministicRendering
-      renderFooter={ Footer}
+      renderFooter={Footer}
       scrollViewProps={scrollProps}
       style={styles}
     />
