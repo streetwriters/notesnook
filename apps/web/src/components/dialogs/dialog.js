@@ -54,7 +54,7 @@ function Dialog(props) {
       <Flex
         p={30}
         flexDirection="column"
-        width={["100%", "90%", "33%"]}
+        width={["100%", "90%", props.width || "33%"]}
         maxHeight={["100%", "80%", "70%"]}
         height={["100%", "auto", "auto"]}
         bg="background"

@@ -1,71 +1,174 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
 import Dialog, { showDialog } from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { useStore as useThemeStore } from "../../stores/theme-store";
 import { upgrade } from "../../common/upgrade";
 import { showSignUpDialog } from "./signupdialog";
+import { ReactComponent as Personalization } from "../../assets/accent.svg";
+import { ReactComponent as Backups } from "../../assets/backup.svg";
+import { ReactComponent as Export } from "../../assets/export.svg";
+import { ReactComponent as Organize } from "../../assets/organize.svg";
+import { ReactComponent as RichText } from "../../assets/richtext.svg";
+import { ReactComponent as Sync } from "../../assets/sync.svg";
+import { ReactComponent as Vault } from "../../assets/vault.svg";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
+import { Carousel } from "react-responsive-carousel";
+import { changeSvgTheme } from "../../utils/css";
 
 const premiumDetails = [
   {
-    title: "Cross Platfrom Sync",
-    description:
-      "Securely sync your notes on any device, Android, iOS, Windows, MacOS, Linux and Web!",
+    title: "Automatic syncing",
+    description: "Your notes will be automatically synced to all your devices.",
+    illustration: {
+      icon: Sync,
+      width: "40%",
+    },
   },
   {
-    title: "Zero Knowledge",
+    title: "Unlimited organization",
     description:
-      "No sneaking, no stealing. We give all the keys for your data to you. Privacy is not just a word to us. We use industry-grade XChaChaPoly1305 and Argon2 which is miles ahead other solutions making sure your data is secure and private even a million years from now.",
+      "Make unlimited notebooks and tags, and assign colors to your notes for quick access.",
+    illustration: {
+      icon: Organize,
+      width: "40%",
+    },
   },
   {
-    title: "Organize Notes Like Never Before",
+    title: "Secure vault",
     description:
-      "Organize your notes using notebooks, tags and colors. Add notes to favorites for quick access. Pin most important notes and notebooks on top for quick access. You can also pin notes and notebooks to quickly access them!",
+      "Lock any note with a password and keep sensitive data under lock and key.",
+    illustration: {
+      icon: Vault,
+      width: "35%",
+    },
   },
   {
-    title: "Full Rich Text Editor with Markdown",
+    title: "Full rich text editor",
     description:
-      "Unleash the power of a complete Rich Text Editor in your notes app. You can add images, links and even embed videos! We have even added full markdown support too!",
+      "Add images, links, tables and lists to your notes, and use markdown for fast editing.",
+    illustration: {
+      icon: RichText,
+      width: "50%",
+    },
   },
   {
-    title: "Export Notes",
-    description:
-      "You can export your notes as PDF, Markdown, Plain text or HTML file.",
+    title: "Multi-format exports",
+    description: "Export your notes in PDF, Markdown, or HTML formats.",
+    illustration: {
+      icon: Export,
+      width: "25%",
+    },
   },
   {
-    title: "Backup and Restore",
+    title: "Automatic & encrypted backups",
+    description: "Enable daily or weekly backups with automatic encryption.",
+    illustration: {
+      icon: Backups,
+      width: "25%",
+    },
+  },
+  {
+    title: "Customize Notesnook",
+    description: "Change app colors and turn on automatic theme switching.",
+    illustration: {
+      icon: Personalization,
+      width: "50%",
+    },
+  },
+  {
+    title: "Get the pro badge on Discord",
     description:
-      "Backup and restore your notes anytime into your phone storage. You can encrypt all your backups if required!",
+      "Pro users get access to special channels and priority support on our Discord server.",
+    illustration: {
+      icon: Personalization,
+      width: "50%",
+    },
   },
 ];
 
 function BuyDialog(props) {
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
+  const accent = useThemeStore((store) => store.accent);
+  useEffect(() => {
+    changeSvgTheme(accent);
+  }, [accent]);
+  const [slideIndex, setSlideIndex] = useState(0);
 
   return (
-    <Dialog
-      isOpen={true}
-      title="Notesnook Pro"
-      onClose={props.onCancel}
-      showClose
-    >
-      <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
-        <Flex flexDirection="column" sx={{ overflowY: "scroll" }}>
-          {premiumDetails.map((detail) => (
-            <Flex mb={1}>
-              <Icon.CheckCircle
-                size={20}
-                color="primary"
-                sx={{ flexShrink: 0, mr: 2 }}
+    <Dialog isOpen={true} showClose onClose={props.onCancel} scrollable>
+      <Flex flexDirection="column" flex={1}>
+        <Carousel
+          autoPlay
+          showStatus={false}
+          swipeable
+          emulateTouch
+          showArrows
+          useKeyboardArrows
+          showThumbs={false}
+          showIndicators={false}
+          renderArrowNext={(click, hasNext) => (
+            <Button
+              variant="icon"
+              disabled={!hasNext}
+              onClick={click}
+              sx={{ alignSelf: "center" }}
+            >
+              <Icon.ArrowRight
+                color={hasNext ? "text" : "grey"}
+                sx={{
+                  ":hover": {
+                    color: "primary",
+                  },
+                }}
               />
-              <Text variant="body">
-                {detail.title}
-                <Text variant="subBody">{detail.description}</Text>
+            </Button>
+          )}
+          renderArrowPrev={(click, hasPrev) => (
+            <Button
+              variant="icon"
+              disabled={!hasPrev}
+              sx={{ alignSelf: "center" }}
+              onClick={click}
+            >
+              <Icon.ArrowLeft
+                color={hasPrev ? "text" : "grey"}
+                sx={{
+                  ":hover": {
+                    color: "primary",
+                  },
+                }}
+              />
+            </Button>
+          )}
+        >
+          {premiumDetails.map((item) => (
+            <Flex
+              flexDirection="column"
+              justifyContent="center"
+              alignItems="center"
+              width="100%"
+              height="100%"
+            >
+              <item.illustration.icon height={"150px"} />
+              <Text variant="heading" color="primary" mt={2} textAlign="center">
+                {item.title}
+              </Text>
+              <Text
+                variant="body"
+                fontSize="title"
+                color="grey"
+                mt={1}
+                textAlign="center"
+                maxWidth="80%"
+              >
+                {item.description}
               </Text>
             </Flex>
           ))}
-        </Flex>
+        </Carousel>
         <Flex
           flex={1}
           flexDirection="column"
@@ -73,6 +176,7 @@ function BuyDialog(props) {
           sx={{
             borderRadius: "default",
           }}
+          mt={25}
         >
           <Text variant="title" color="primary">
             {isLoggedIn ? "Upgrade now" : "Try it Now"}

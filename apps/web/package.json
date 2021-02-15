@@ -29,6 +29,7 @@
     "react-dom": "^17.0.1",
     "react-modal": "^3.12.1",
     "react-qrcode-logo": "^2.2.1",
+    "react-responsive-carousel": "^3.2.12",
     "react-scripts": "4.0.2",
     "react-scrollbars-custom": "^4.0.25",
     "react-virtualized-auto-sizer": "^1.0.4",

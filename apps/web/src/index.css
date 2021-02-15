@@ -60,3 +60,12 @@ body,
 .ReactModal__Overlay--before-close {
   opacity: 0;
 }
+
+.slide {
+  background-color: transparent !important;
+}
+
+.carousel.carousel-slider {
+  display: flex;
+  flex-direction: row;
+}
