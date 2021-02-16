@@ -1,9 +1,10 @@
 import React, { useEffect } from "react";
-import Logo from "../assets/notesnook-logo.png";
+import Logo from "../assets/logo.svg";
 import { initializeDatabase } from "../common/db";
 
 function Splash(props) {
   useEffect(() => {
+    if (props.noInit) return;
     (async function () {
       try {
         await initializeDatabase();
@@ -13,7 +14,7 @@ function Splash(props) {
         //   return scope;
         // });
         console.error(e);
-        alert("Error: " + `Error initializing database: ${e.message}`);
+        alert(`Error initializing database: ${e.message}`);
       } finally {
         if (props.onLoadingFinished) props.onLoadingFinished();
       }
