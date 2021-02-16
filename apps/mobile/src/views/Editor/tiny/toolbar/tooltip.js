@@ -10,6 +10,7 @@ import {
   eUnSubscribeEvent,
 } from '../../../../services/EventManager';
 import {editing, getElevation} from '../../../../utils';
+import { normalize } from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import ColorGroup from './colorgroup';
 import {execCommands} from './commands';
@@ -80,7 +81,7 @@ const Tooltip = () => {
       position: 'absolute',
       bottom: 50,
       width: group?.type === 'table' ? 35 * 5 + 15 : floating ? '50%' : '100%',
-      minHeight: 50,
+      minHeight: normalize(50) ,
       backgroundColor: colors.nav,
       alignSelf: 'center',
       flexDirection: 'row',

@@ -4,6 +4,7 @@ import {ScrollView} from 'react-native';
 import {useTracked} from '../../../../provider';
 import {eSendEvent} from '../../../../services/EventManager';
 import { getElevation } from '../../../../utils';
+import { normalize } from '../../../../utils/SizeUtils';
 import {TOOLBAR_CONFIG} from './config';
 import {properties, toolbarRef} from './constants';
 import ToolbarGroup from './group';
@@ -34,7 +35,7 @@ const EditorToolbar = React.memo(
             style={{
               width: '100%',
               maxWidth: '100%',
-              minHeight: 50,
+              minHeight: normalize(50),
               paddingLeft: 6,
               backgroundColor:colors.nav,
               borderTopRightRadius:5,

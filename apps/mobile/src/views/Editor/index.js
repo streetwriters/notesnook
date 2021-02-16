@@ -1,24 +1,14 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView} from 'react-native';
-import {View} from 'react-native';
-import {Platform, TextInput} from 'react-native';
+import {Platform, ScrollView, TextInput} from 'react-native';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {Loading} from '../../components/Loading';
 import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent,
-} from '../../services/EventManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
-import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
-import EditorOverlay from './EditorOverlay';
 import {
-  editorTitleInput,
   EditorWebView,
   injectedJS,
   onWebViewLoad,

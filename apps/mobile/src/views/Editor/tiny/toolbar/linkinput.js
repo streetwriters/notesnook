@@ -16,7 +16,7 @@ import LinkPreview from './linkpreview';
 import tiny from '../tiny';
 import {EditorWebView} from '../../Functions';
 import {openLinkInBrowser} from '../../../../utils/functions';
-import {SIZE} from '../../../../utils/SizeUtils';
+import {normalize, SIZE} from '../../../../utils/SizeUtils';
 
 let inputValue = null;
 
@@ -105,7 +105,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             fwdRef={inputRef}
             onBlurInput={onBlur}
             onPress={onPress}
-            height={45}
+            height={normalize(45) }
             onSubmit={onSubmit}
             onChangeText={onChangeText}
             defaultValue={value}
@@ -118,7 +118,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             <Button
               title="Save"
               onPress={onSubmit}
-              height={40}
+              height={normalize(40) }
               fontSize={SIZE.md}
               style={{marginLeft: 10}}
             />

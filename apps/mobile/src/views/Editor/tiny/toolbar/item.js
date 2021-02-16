@@ -13,7 +13,7 @@ import {
   eSendEvent,
 } from '../../../../services/EventManager';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
-import {SIZE} from '../../../../utils/SizeUtils';
+import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -257,7 +257,7 @@ const ToolbarItem = ({
         focusEditor(format);
         return;
       } else {
-        value = 'add';
+        value = null;
       }
     }
 
@@ -289,7 +289,7 @@ const ToolbarItem = ({
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          height: 50,
+          height: normalize(50),
           minWidth: 60,
         }}>
         {type === 'tooltip' && (

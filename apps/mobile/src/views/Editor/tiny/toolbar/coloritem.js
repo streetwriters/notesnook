@@ -4,7 +4,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
-import { SIZE } from '../../../../utils/SizeUtils';
+import { normalize, SIZE } from '../../../../utils/SizeUtils';
 import { formatSelection, properties, rgbToHex } from './constants';
 import { execCommands } from './commands';
 
@@ -66,8 +66,8 @@ const ColorItem = ({value, format}) => {
 		  borderWidth: 1,
 		  borderColor: colors.nav,
 		  borderRadius: 5,
-		  height: 40,
-		  width: 40,
+		  height:  normalize(40),
+		  width:  normalize(50),
 		  marginRight: 5,
 		}}>
 		<View
