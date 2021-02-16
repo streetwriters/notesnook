@@ -32,7 +32,7 @@ import("react-dom").then(({ render }) => {
     <Splash
       onLoadingFinished={() => {
         render(
-          <Suspense fallback={<div />}>
+          <Suspense fallback={<Splash />}>
             <App />
           </Suspense>,
           document.getElementById("root"),
