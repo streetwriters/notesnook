@@ -51,7 +51,7 @@ class Collector {
     return this._db.context.encrypt(
       this.key,
       JSON.stringify(item),
-      shouldCompress(item.type)
+      this.shouldCompress(item.type)
     );
   }
 
