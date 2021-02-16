@@ -8388,8 +8388,8 @@ normalize-url@^4.5.0:
   integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "6.2.1"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#eba6d5ecc18860b2835422f8cce05dfb7270372a"
+  version "6.3.0"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#ce4ab84b1481430986008ad786a73fd7711852ee"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
