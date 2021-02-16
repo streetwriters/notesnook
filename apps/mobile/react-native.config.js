@@ -5,10 +5,10 @@ module.exports = {
         ios: null,
       },
     },
-    'react-native-keychain': {
+  /*   'react-native-keychain': {
       platforms: {
         android: null,
       },
-    },
+    }, */
   },
 };

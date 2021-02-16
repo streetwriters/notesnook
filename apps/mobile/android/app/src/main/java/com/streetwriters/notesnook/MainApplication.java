@@ -32,7 +32,6 @@ import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
 import cl.json.RNShareModule;
 import io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule;
 import px.tooltips.RNTooltipsModule;
-import com.oblador.keychain.KeychainModuleBuilder;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
 
@@ -47,7 +46,7 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                 protected List<ReactPackage> getPackages() {
 
                     List<ReactPackage> packages = new PackageList(this).getPackages();
-                    packages.add(new KeychainPackage(new KeychainModuleBuilder().withoutWarmUp()));
+                    //packages.add(new KeychainPackage(new KeychainModuleBuilder().withoutWarmUp()));
 
                     packages.add(new TurboReactPackage() {
                         @Override

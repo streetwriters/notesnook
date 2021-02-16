@@ -5,6 +5,7 @@ import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
+import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -85,18 +86,14 @@ export class VaultDialog extends Component {
     if (!Keychain) {
       Keychain = require('react-native-keychain');
     }
-    let biometry = await Keychain.getSupportedBiometryType();
-    console.log(biometry, 'BIOMETRY');
+    let biometry = await BiometricService.isBiometryAvailable();
     let available = false;
-    let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
+    let fingerprint = await BiometricService.hasInternetCredentials('nn_vault');
 
-    if (
-      biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
-      biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
-    ) {
+    if (biometry) {
       available = true;
     }
-
+    console.log('fingerprint', fingerprint, 'biometry', biometry);
     this.setState({
       note: data.item,
       novault: data.novault,
@@ -137,7 +134,12 @@ export class VaultDialog extends Component {
       );
       return;
     }
-    updateEvent({type: Actions.NOTES});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notes,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Notebook,
+    ]);
 
     this.password = null;
     this.confirmPassword = null;
@@ -284,7 +286,8 @@ export class VaultDialog extends Component {
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
       Navigation.routeNames.Favorites,
-      Navigation.routeNames.refreshNotesPage,
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Notebook,
     ]);
 
     ToastEvent.show('Note deleted', 'success');
@@ -297,29 +300,12 @@ export class VaultDialog extends Component {
           loading: true,
         },
         async () => {
-          if (!Keychain) {
-            Keychain = require('react-native-keychain');
-          }
-          await sleep(20);
-          await Keychain.setInternetCredentials(
-            'nn_vault',
-            'nn_vault',
-            password,
-            {
-              accessControl:
-                Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
-              authenticationPrompt: {cancel: null},
-              accessible:
-                Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-              storage: kc.STORAGE_TYPE.AES,
-              rules: 'none',
-            },
-          );
+          await BiometricService.storeCredentials(password);
           this.setState({
             loading: false,
           });
           eSendEvent('vaultUpdated');
-          ToastEvent.show('Fingerprint access enabled!', 'success');
+          ToastEvent.show('Biometric unlocking enabled!', 'success');
           this.close();
         },
       );
@@ -330,13 +316,17 @@ export class VaultDialog extends Component {
 
   async _createVault() {
     await db.vault.create(this.password);
+
     if (this.state.biometricUnlock) {
-      await this._enrollFingerprint();
+      await this._enrollFingerprint(this.password);
     }
     if (this.state.note && this.state.note.id && !this.state.note.locked) {
       await db.vault.add(this.state.note.id);
-      this.close();
+      this.setState({
+        loading: false,
+      });
       ToastEvent.show('Note added to vault', 'success', 'local');
+      this.close();
     } else {
       eSendEvent('vaultUpdated');
       this.close();
@@ -351,8 +341,11 @@ export class VaultDialog extends Component {
           id: this.state.note.id,
           forced: true,
         });
-        updateEvent({type: Actions.NOTES});
-        eSendEvent(refreshNotesPage);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.NotesPage,
+        ]);
         this.close();
       })
       .catch((e) => {
@@ -404,21 +397,9 @@ export class VaultDialog extends Component {
 
   _revokeFingerprintAccess = async () => {
     try {
-      if (!Keychain) {
-        Keychain = require('react-native-keychain');
-      }
-      await Keychain.resetInternetCredentials('nn_vault', {
-        accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
-        authenticationType:
-          Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-        authenticationPrompt: {
-          cancel: null,
-        },
-        storage: kc.STORAGE_TYPE.AES,
-        rules: 'none',
-      });
+      await BiometricService.resetCredentials();
       eSendEvent('vaultUpdated');
-      ToastEvent.show('Fingerprint access revoked!', 'success');
+      ToastEvent.show('Biometrics access revoked!', 'success');
     } catch (e) {
       ToastEvent.show(e.message, 'error', 'local');
     }
@@ -426,29 +407,18 @@ export class VaultDialog extends Component {
 
   _onPressFingerprintAuth = async () => {
     try {
-      if (!Keychain) {
-        Keychain = require('react-native-keychain');
-      }
-      let credentials = await Keychain.getInternetCredentials('nn_vault', {
-        accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
-        authenticationType:
-          Keychain.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-        authenticationPrompt: {
-          cancel: null,
-        },
-        storage: kc.STORAGE_TYPE.AES,
-        rules: 'none',
-      });
+      let credentials = await BiometricService.getCredentials();
+
       if (credentials?.password) {
         this.password = credentials.password;
         this.onPress();
+      } else {
+        this.setState({
+          visible: true,
+        });
+        ToastEvent.show('Biometrics Authentication Failed', 'error', 'local');
       }
-    } catch (e) {
-      this.setState({
-        visible: true,
-      });
-      ToastEvent.show('Fingerprint Authentication Canceled', 'error', 'local');
-    }
+    } catch (e) {}
   };
 
   render() {
@@ -630,11 +600,13 @@ export class VaultDialog extends Component {
             </View>
           ) : null}
 
-          {this.state.biometricUnlock && !this.state.isBiometryEnrolled && (
-            <Paragraph>
-              Unlock with password once to enable fingerprint access.
-            </Paragraph>
-          )}
+          {this.state.biometricUnlock &&
+            !this.state.isBiometryEnrolled &&
+            novault && (
+              <Paragraph>
+                Unlock with password once to enable fingerprint access.
+              </Paragraph>
+            )}
 
           {this.state.isBiometryAvailable &&
           !this.state.fingerprintAccess &&
