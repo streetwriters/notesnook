@@ -24,6 +24,7 @@ const fixedColors = {
   fg: ACCENT.color,
   normal: 'black',
   icon: 'gray',
+  transGray:"#00000010",
   errorBg: '#FFB6C1',
   errorText: '#ff6961',
   successBg: '#DFF2BF',
