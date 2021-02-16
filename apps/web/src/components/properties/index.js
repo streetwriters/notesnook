@@ -66,7 +66,10 @@ function Properties() {
     !isFocusMode && (
       <>
         <Animated.Flex
-          animate={{ x: arePropertiesVisible ? 0 : 800 }}
+          animate={{
+            x: arePropertiesVisible ? 0 : 800,
+            display: arePropertiesVisible ? "flex" : "none",
+          }}
           transition={{
             duration: 0.3,
             bounceDamping: 1,
