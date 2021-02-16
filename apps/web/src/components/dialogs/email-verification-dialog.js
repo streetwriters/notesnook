@@ -1,6 +1,6 @@
 import React from "react";
 import { Flex, Button, Text } from "rebass";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common";
 import { useState } from "react";
@@ -73,9 +73,4 @@ function EmailVerificationDialog(props) {
     </Dialog>
   );
 }
-
-export function showEmailVerificationDialog() {
-  return showDialog((perform) => (
-    <EmailVerificationDialog onCancel={() => perform(false)} />
-  ));
-}
+export default EmailVerificationDialog;

@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { Box, Text } from "rebass";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import * as Icon from "../icons";
 
 function LoadingDialog(props) {
@@ -30,16 +30,4 @@ function LoadingDialog(props) {
     </Dialog>
   );
 }
-
-export function showLoadingDialog(dialogData) {
-  const { title, message, subtitle, action } = dialogData;
-  return showDialog((perform) => (
-    <LoadingDialog
-      title={title}
-      subtitle={subtitle}
-      message={message}
-      action={action}
-      onDone={(e) => perform(e)}
-    />
-  ));
-}
+export default LoadingDialog;

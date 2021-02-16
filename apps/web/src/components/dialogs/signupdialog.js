@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { Text, Box, Button, Flex } from "rebass";
 import * as Icon from "../icons";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { useStore } from "../../stores/user-store";
-import { showLogInDialog } from "./logindialog";
+import { showLogInDialog } from "../../common/dialog-controller";
 import Field from "../field";
-import { showRecoveryKeyDialog } from "./recoverykeydialog";
 
 const requiredValues = ["email", "password"];
 function SignUpDialog(props) {
@@ -95,14 +94,4 @@ function SignUpDialog(props) {
     </Dialog>
   );
 }
-
-export function showSignUpDialog() {
-  return showDialog((perform) => (
-    <SignUpDialog
-      onClose={async (res) => {
-        perform(res);
-        if (res === true) await showRecoveryKeyDialog();
-      }}
-    />
-  ));
-}
+export default SignUpDialog;

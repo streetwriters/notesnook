@@ -64,7 +64,7 @@ async function getCryptoKey(name) {
   }
 }
 
-export default {
+const Storage = {
   read,
   readMulti,
   write,
@@ -77,6 +77,7 @@ export default {
   encrypt: crypto.encrypt,
   decrypt: crypto.decrypt,
 };
+export default Storage;
 
 let enc = new TextEncoder();
 let dec = new TextDecoder();

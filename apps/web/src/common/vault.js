@@ -1,5 +1,5 @@
 import { db } from "../common";
-import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import { showPasswordDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 
 class Vault {

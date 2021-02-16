@@ -1,3 +1,4 @@
 import useMediaQuery from "./use-media-query";
 
-export default () => useMediaQuery("(prefers-color-scheme: dark)");
+const useSystemTheme = () => useMediaQuery("(prefers-color-scheme: dark)");
+export default useSystemTheme;

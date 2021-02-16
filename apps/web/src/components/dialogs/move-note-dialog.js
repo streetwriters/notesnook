@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
 import { db } from "../../common";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import Field from "../field";
@@ -199,16 +199,7 @@ class MoveDialog extends React.Component {
     );
   }
 }
-
-export function showMoveNoteDialog(noteIds) {
-  return showDialog((perform) => (
-    <MoveDialog
-      noteIds={noteIds}
-      onClose={() => perform(false)}
-      onMove={() => perform(true)}
-    />
-  ));
-}
+export default MoveDialog;
 
 function Item(props) {
   const { icon: Icon, indent = 0, title, totalNotes, onClick, action } = props;

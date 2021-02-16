@@ -18,7 +18,7 @@ import { resetReminders } from "./common/reminders";
 import { db, isUserPremium } from "./common";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
-import { showBuyDialog } from "./components/dialogs/buy-dialog";
+import { showBuyDialog } from "./common/dialog-controller";
 import Banner from "./components/banner";
 import StatusBar from "./components/statusbar";
 import useRoutes from "./utils/use-routes";
@@ -30,7 +30,7 @@ import useVersion, { getCachedVersion } from "./utils/useVersion";
 import {
   showAppAvailableNotice,
   showAppUpdatedNotice,
-} from "./components/dialogs/confirm";
+} from "./common/dialog-controller";
 import { useAnimation } from "framer-motion";
 import RouteContainer from "./components/route-container";
 

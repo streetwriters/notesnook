@@ -3,7 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { showLogInDialog } from "../dialogs/logindialog";
+import { showLogInDialog } from "../../common/dialog-controller";
 import TimeAgo from "timeago-react";
 import { hashNavigate, navigate } from "../../navigation";
 

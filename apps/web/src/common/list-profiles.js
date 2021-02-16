@@ -68,7 +68,7 @@ const TrashProfile = createProfile(
   Math.max(MAX_HEIGHTS.note, MAX_HEIGHTS.notebook)
 );
 
-export default {
+const Profiles = {
   home: NotesProfile,
   notebooks: NotebooksProfile,
   notes: NotesProfile,
@@ -76,3 +76,4 @@ export default {
   topics: TopicsProfile,
   trash: TrashProfile,
 };
+export default Profiles;

@@ -1,6 +1,5 @@
 import { db } from "../common/index";
 import createStore from "../common/store";
-import { store as trashStore } from "./trash-store";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";

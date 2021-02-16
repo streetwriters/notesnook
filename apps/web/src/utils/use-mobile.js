@@ -1,3 +1,4 @@
 import useMediaQuery from "./use-media-query";
 
-export default () => useMediaQuery("(max-width: 480px)");
+const useMobile = () => useMediaQuery("(max-width: 480px)");
+export default useMobile;

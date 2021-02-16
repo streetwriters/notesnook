@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
-import { useQueryParams } from "../navigation";
 import { db, notesFromContext } from "../common";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";

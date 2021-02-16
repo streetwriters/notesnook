@@ -1,6 +1,6 @@
 import React from "react";
 import ListItem from "../list-item";
-import { confirm } from "../dialogs/confirm";
+import { confirm } from "../../common/dialog-controller";
 import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "rebass";

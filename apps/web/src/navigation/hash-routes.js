@@ -1,13 +1,13 @@
 import React from "react";
 import Vault from "../common/vault";
-import { showEmailVerificationDialog } from "../components/dialogs/emailverificationdialog";
+import { showEmailVerificationDialog } from "../common/dialog-controller";
 import {
   showAddNotebookDialog,
   showEditNotebookDialog,
-} from "../components/dialogs/addnotebookdialog";
-import { closeOpenedDialog } from "../components/dialogs/dialog";
-import { showLogInDialog } from "../components/dialogs/logindialog";
-import { showSignUpDialog } from "../components/dialogs/signupdialog";
+} from "../common/dialog-controller";
+import { closeOpenedDialog } from "../common/dialog-controller";
+import { showLogInDialog } from "../common/dialog-controller";
+import { showSignUpDialog } from "../common/dialog-controller";
 import RouteContainer from "../components/route-container";
 import SplitEditor from "../components/spliteditor";
 import Unlock from "../components/unlock";
@@ -18,7 +18,7 @@ import { isMobile, isTablet } from "../utils/dimensions";
 import {
   showEditTopicDialog,
   showTopicDialog,
-} from "../components/dialogs/topicdialog";
+} from "../common/dialog-controller";
 import { hashNavigate } from ".";
 
 const hashroutes = {

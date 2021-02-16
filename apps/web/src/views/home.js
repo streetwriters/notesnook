@@ -4,7 +4,6 @@ import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common";
 import { hashNavigate } from "../navigation";
-import { Profiler } from "react";
 
 function Home() {
   const notes = useStore((store) => store.notes);

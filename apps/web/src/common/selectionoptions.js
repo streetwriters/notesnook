@@ -5,9 +5,9 @@ import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
 import { store as trashStore } from "../stores/trash-store";
 import { db } from "./index";
-import { showMoveNoteDialog } from "../components/dialogs/movenotedialog";
-import { showMultiDeleteConfirmation } from "../components/dialogs/confirm";
-import { showExportDialog } from "../components/dialogs/exportdialog";
+import { showMoveNoteDialog } from "../common/dialog-controller";
+import { showMultiDeleteConfirmation } from "../common/dialog-controller";
+import { showExportDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 
 function createOption(key, icon, onClick) {
@@ -116,10 +116,11 @@ const TopicOptions = createOptions();
 const TrashOptions = createOptions([RestoreOption]);
 const FavoritesOptions = createOptions([UnfavoriteOption]);
 
-export default {
+const SelectionOptions = {
   NotebooksOptions,
   NotesOptions,
   TopicOptions,
   TrashOptions,
   FavoritesOptions,
 };
+export default SelectionOptions;

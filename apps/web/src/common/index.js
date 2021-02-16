@@ -6,7 +6,7 @@ import EventSource from "eventsource";
 import { showToast } from "../utils/toast";
 import download from "../utils/download";
 import { Text } from "rebass";
-import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import { showLoadingDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
 import { hashNavigate } from "../navigation";

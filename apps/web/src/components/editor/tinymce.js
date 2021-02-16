@@ -25,7 +25,7 @@ import "./plugins/quickimage";
 import "./editor.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { isUserPremium } from "../../common";
-import { showBuyDialog } from "../dialogs/buy-dialog";
+import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 
 const markdownPatterns = [

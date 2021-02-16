@@ -15,4 +15,5 @@ function clear() {
   window.localStorage.clear();
 }
 
-export default { set, get, clear };
+const Config = { set, get, clear };
+export default Config;

@@ -5,10 +5,10 @@ import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "notes-core/common";
-import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import { showLoadingDialog } from "../common/dialog-controller";
 import { Text } from "rebass";
 import { showToast } from "../utils/toast";
-import { showAccountLoggedOutNotice } from "../components/dialogs/confirm";
+import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;

@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { db } from "../../common";
 import Logo from "../../assets/notesnook-small.png";
 import download from "../../utils/download";
 import ClipboardJS from "clipboard";
-import Config from "../../utils/config";
 import { captureMessage } from "@sentry/react";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { Suspense } from "react";
@@ -32,7 +31,7 @@ function RecoveryKeyDialog(props) {
       }, 2000);
       e.clearSelection();
     });
-    clipboard.on("error", function (e) {
+    clipboard.on("error", function () {
       captureMessage("Error while copying text.");
     });
     return () => {
@@ -123,14 +122,4 @@ function RecoveryKeyDialog(props) {
     </Dialog>
   );
 }
-
-export function showRecoveryKeyDialog() {
-  return showDialog((perform) => (
-    <RecoveryKeyDialog
-      onDone={() => {
-        Config.set("recoveryKeyBackupDate", Date.now());
-        perform(true);
-      }}
-    />
-  ));
-}
+export default RecoveryKeyDialog;

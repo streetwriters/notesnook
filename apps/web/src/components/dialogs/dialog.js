@@ -1,11 +1,8 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { Flex, Text, Button as RebassButton } from "rebass";
-import ThemeProvider from "../theme-provider";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
-import { hashNavigate } from "../../navigation";
 
 function Dialog(props) {
   const theme = useTheme();
@@ -139,25 +136,3 @@ function Dialog(props) {
 }
 
 export default Dialog;
-
-export function showDialog(dialog) {
-  const root = document.getElementById("dialogContainer");
-
-  if (root) {
-    return new Promise((resolve) => {
-      const perform = (result) => {
-        ReactDOM.unmountComponentAtNode(root);
-        hashNavigate("/", true);
-        resolve(result);
-      };
-      const PropDialog = dialog(perform);
-      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-    });
-  }
-  return Promise.reject("No element with id 'dialogContainer'");
-}
-
-export function closeOpenedDialog() {
-  const root = document.getElementById("dialogContainer");
-  ReactDOM.unmountComponentAtNode(root);
-}

@@ -3,7 +3,7 @@ import { createBackup, db } from "./index";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
+import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import { hashNavigate } from "../navigation";
 
 export async function shouldAddBackupReminder() {

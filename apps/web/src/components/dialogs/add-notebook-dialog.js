@@ -1,11 +1,8 @@
 import React from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
-import Dialog, { showDialog } from "./dialog";
-import { store } from "../../stores/notebook-store";
+import Dialog from "./dialog";
 import { qclone } from "qclone";
-import { showToast } from "../../utils/toast";
-import { db } from "../../common";
 import Field from "../field";
 
 class AddNotebookDialog extends React.Component {
@@ -259,54 +256,4 @@ function TopicItem(props) {
       )}
     </Flex>
   );
-}
-
-export function showEditNotebookDialog(notebookId) {
-  const notebook = db.notebooks.notebook(notebookId)?.data;
-  if (!notebook) return false;
-  return showDialog((perform) => (
-    <AddNotebookDialog
-      isOpen={true}
-      notebook={notebook}
-      edit={true}
-      onDone={async (nb, deletedTopics) => {
-        // we remove the topics from notebook
-        // beforehand so we can add them manually, later
-        const topics = qclone(nb.topics);
-        delete nb.topics;
-
-        // add the edited notebook to db
-        await store.add({ ...notebook, ...nb });
-
-        // add or delete topics as required
-        const notebookTopics = db.notebooks.notebook(notebook.id).topics;
-        await notebookTopics.delete(...deletedTopics);
-        await notebookTopics.add(...topics);
-
-        showToast("success", "Notebook edited successfully!");
-        perform(true);
-      }}
-      onClose={() => {
-        perform(false);
-      }}
-    />
-  ));
-}
-
-export function showAddNotebookDialog() {
-  return showDialog((perform) => (
-    <AddNotebookDialog
-      isOpen={true}
-      onDone={async (nb) => {
-        // add the notebook to db
-        await store.add({ ...nb });
-
-        showToast("success", "Notebook added successfully!");
-        perform(true);
-      }}
-      onClose={() => {
-        perform(false);
-      }}
-    />
-  ));
 }

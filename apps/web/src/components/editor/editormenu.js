@@ -1,7 +1,7 @@
 import React from "react";
 import { useStore } from "../../stores/editor-store";
 import { Flex, Button } from "rebass";
-import { showExportDialog } from "../dialogs/exportdialog";
+import { showExportDialog } from "../../common/dialog-controller";
 
 function EditorMenu(props) {
   const saveSession = useStore((store) => store.saveSession);

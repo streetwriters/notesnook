@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { Flex, Button, Text } from "rebass";
 import * as Icon from "../icons";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import { useStore } from "../../stores/user-store";
 import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
-import { showForgotPasswordDialog } from "./forgotpassworddialog";
+import { showForgotPasswordDialog } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
 
 const requiredValues = ["email", "password", "remember"];
@@ -163,7 +163,4 @@ function LoginDialog(props) {
     </Dialog>
   );
 }
-
-export const showLogInDialog = () => {
-  return showDialog((perform) => <LoginDialog onClose={() => perform()} />);
-};
+export default LoginDialog;

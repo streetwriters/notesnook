@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Text, Flex, Button } from "rebass";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { upgrade } from "../../common/upgrade";
-import { showSignUpDialog } from "./signupdialog";
+import { showSignUpDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
 import { ReactComponent as Backups } from "../../assets/backup.svg";
 import { ReactComponent as Export } from "../../assets/export.svg";
@@ -16,21 +16,7 @@ import { ReactComponent as Vault } from "../../assets/vault.svg";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { Carousel } from "react-responsive-carousel";
 import { changeSvgTheme } from "../../utils/css";
-import { CHECK_IDS } from "notes-core/common";
 
-const itemIdToIndex = {
-  sync: 0,
-  editor: 3,
-  backups: 5,
-  customize: 6,
-  discord: 7,
-  [CHECK_IDS.noteExport]: 4,
-  [CHECK_IDS.noteColor]: 1,
-  [CHECK_IDS.noteTag]: 1,
-  [CHECK_IDS.notebookAdd]: 1,
-  [CHECK_IDS.vaultAdd]: 2,
-  [CHECK_IDS.backupEncrypt]: 5,
-};
 const premiumDetails = [
   {
     title: "Automatic syncing",
@@ -232,12 +218,4 @@ function BuyDialog(props) {
     </Dialog>
   );
 }
-
-export function showBuyDialog(initialItemId) {
-  return showDialog((perform) => (
-    <BuyDialog
-      initialIndex={itemIdToIndex[initialItemId]}
-      onCancel={() => perform(false)}
-    />
-  ));
-}
+export default BuyDialog;

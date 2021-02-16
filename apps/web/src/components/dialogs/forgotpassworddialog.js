@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Text, Box } from "rebass";
-import Dialog, { showDialog } from "./dialog";
+import Dialog from "./dialog";
 import Field from "../field";
 import { db } from "../../common";
 import { showToast } from "../../utils/toast";
@@ -71,9 +71,4 @@ function ForgotPasswordDialog(props) {
     </Dialog>
   );
 }
-
-export function showForgotPasswordDialog() {
-  return showDialog((perform) => (
-    <ForgotPasswordDialog onClose={() => perform()} />
-  ));
-}
+export default ForgotPasswordDialog;

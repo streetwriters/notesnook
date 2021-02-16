@@ -3,7 +3,7 @@ import { Flex } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isUserPremium } from "../../common";
-import { showBuyDialog } from "../dialogs/buy-dialog";
+import { showBuyDialog } from "../../common/dialog-controller";
 
 function AccentItem(props) {
   const { code, label } = props;

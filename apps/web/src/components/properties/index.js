@@ -9,7 +9,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import Toggle from "./toggle";
 import { toTitleCase } from "../../utils/string";
-import { showMoveNoteDialog } from "../dialogs/movenotedialog";
+import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { navigate } from "../../navigation";
 
 const tools = [

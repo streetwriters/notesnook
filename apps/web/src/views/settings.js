@@ -7,8 +7,8 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
-import { showLogInDialog } from "../components/dialogs/logindialog";
-import { showLogoutConfirmation } from "../components/dialogs/confirm";
+import { showLogInDialog } from "../common/dialog-controller";
+import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
 import {
   createBackup,
@@ -18,12 +18,12 @@ import {
 } from "../common";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../components/dialogs/recoverykeydialog";
-import { showBuyDialog } from "../components/dialogs/buy-dialog";
+import { showRecoveryKeyDialog } from "../common/dialog-controller";
+import { showBuyDialog } from "../common/dialog-controller";
 import ScrollContainer from "../components/scroll-container";
-import { showLoadingDialog } from "../components/dialogs/loadingdialog";
+import { showLoadingDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
-import { showPasswordDialog } from "../components/dialogs/passworddialog";
+import { showPasswordDialog } from "../common/dialog-controller";
 import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import http from "notes-core/utils/http";

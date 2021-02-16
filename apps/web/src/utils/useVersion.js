@@ -13,7 +13,7 @@ var APP_VERSION = {
 
 var CACHED_VERSION = undefined;
 
-export default () => {
+function useVersion() {
   const [version, setVersion] = useState(APP_VERSION);
 
   useEffect(() => {
@@ -24,7 +24,8 @@ export default () => {
   }, []);
 
   return version;
-};
+}
+export default useVersion;
 
 /**
  *
