@@ -75,6 +75,10 @@ export default class Notebooks extends Collection {
     return tfun.filter(".pinned === true")(this.all);
   }
 
+  get deleted() {
+    return tfun.filter(".dateDeleted > 0")(this.raw);
+  }
+
   /**
    *
    * @param {string} id The id of the notebook

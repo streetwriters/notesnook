@@ -15,10 +15,6 @@ const emptyServerResponse = {
   notes: [],
   notebooks: [],
   content: [],
-  text: [],
-  tags: [],
-  colors: [],
-  trash: [],
   settings: [],
 };
 

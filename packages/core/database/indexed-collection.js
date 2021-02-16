@@ -37,13 +37,13 @@ export default class IndexedCollection {
     return this.updateItem({
       id,
       deleted: true,
-      dateCreated: Date.now(),
       dateEdited: Date.now(),
     });
   }
 
-  deleteItem(id) {
-    return this.indexer.remove(id);
+  async deleteItem(id) {
+    await this.indexer.deindex(id);
+    return await this.indexer.remove(id);
   }
 
   exists(id) {

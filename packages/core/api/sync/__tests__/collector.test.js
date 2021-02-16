@@ -44,11 +44,6 @@ const MAX_ITEMS = 5;
 const tests = [
   getMainCollectionParams("notes", TEST_NOTE),
   getMainCollectionParams("notebooks", TEST_NOTEBOOK),
-  getMainCollectionParams("trash", {
-    id: 2141,
-    type: "note",
-    title: "someTitle",
-  }),
   getMainCollectionParams("content", { ops: [{ insert: "true" }] }),
 ];
 

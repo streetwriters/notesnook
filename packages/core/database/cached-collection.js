@@ -30,6 +30,10 @@ export default class CachedCollection extends IndexedCollection {
     return this.map.has(id) && !this.map.get(id).deleted;
   }
 
+  has(id) {
+    return this.map.has(id);
+  }
+
   getItem(id) {
     return this.map.get(id);
   }

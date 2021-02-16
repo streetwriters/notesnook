@@ -80,8 +80,8 @@ class Database {
     this.colors = await Tags.new(this, "colors");
     /** @type {Content} */
     this.content = await Content.new(this, "content", false);
-    /** @type {Trash} */
-    this.trash = await Trash.new(this, "trash");
+
+    this.trash = new Trash(this);
 
     await this.settings.init();
     await this.outbox.init();

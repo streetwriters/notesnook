@@ -19,6 +19,10 @@ if (!tfun) {
 export default class Notes extends Collection {
   async add(noteArg) {
     if (!noteArg) return;
+    if (noteArg.deleted) {
+      await this._collection.addItem(noteArg);
+      return;
+    }
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
@@ -141,6 +145,10 @@ export default class Notes extends Collection {
     return tfun.filter(".favorite === true")(this.all);
   }
 
+  get deleted() {
+    return tfun.filter(".dateDeleted > 0")(this.raw);
+  }
+
   tagged(tagId) {
     const tag = this._db.tags.tag(tagId);
     if (!tag || tag.noteIds.length <= 0) return [];
@@ -241,8 +249,9 @@ export default class Notes extends Collection {
       if (item.data.color) {
         await this._db.colors.remove(item.data.color, id);
       }
-      await this._collection.removeItem(id);
+      // await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);
+      else await this._collection.removeItem(id);
     }
   }
 
