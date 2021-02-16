@@ -1,8 +1,8 @@
 let pageTheme = {
   colors: {
-    accent: '#0560FF',
-    shade: '#0560FF12',
-    fg: '#0560FF',
+    accent: '#00c853',
+    shade: '#00c85312',
+    fg: '#00c853',
     normal: 'black',
     icon: 'gray',
     errorBg: '#FFD2D2',
