@@ -1198,7 +1198,7 @@ const SettingsBackupAndRestore = () => {
                       }
                     }
                     await SettingsService.set('reminder', item.value);
-                    await Backup.run();
+                    //await Backup.run();
                   });
                 }
               }}
