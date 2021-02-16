@@ -61,12 +61,48 @@
       src="https://analytics.streetwriters.co/umami.js"
       data-domains="app.notesnook.com"
     ></script>
+    <style>
+      #splash img {
+        transform: scale(1);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+        }
+
+        70% {
+          transform: scale(1);
+        }
+
+        100% {
+          transform: scale(0.95);
+        }
+      }
+    </style>
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <!--     <script src="https://cdn.jsdelivr.net/npm/highlightjs@9.16.2/highlight.pack.min.js"></script>
  -->
     <div id="root"></div>
+    <div
+      id="splash"
+      style="
+        background-color: #f0f0f0;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <img alt="Notesnook logo" src="./logo.svg" width="150px" />
+    </div>
     <div id="dialogContainer"></div>
     <!--
       This HTML file is a template.

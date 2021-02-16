@@ -1,11 +1,11 @@
-import React, { Suspense } from "react";
-// import { init, showReportDialog } from "@sentry/react";
-// import { Integrations } from "@sentry/tracing";
+import React from "react";
+import { initializeDatabase } from "./common/db";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
-import Splash from "./views/splash";
+// import { init, showReportDialog } from "@sentry/react";
+// import { Integrations } from "@sentry/tracing";
 // import { getAppVersion } from "./utils/useVersion";
-const App = React.lazy(() => import("./App"));
+// const App = React.lazy(() => import("./App"));
 
 // if (process.env.NODE_ENV === "production") {
 //   console.log = () => {};
@@ -26,26 +26,17 @@ const App = React.lazy(() => import("./App"));
 //     tracesSampleRate: 1.0,
 //   });
 // }
-
-import("react-dom").then(({ render }) => {
-  render(
-    <Splash
-      onLoadingFinished={() => {
-        render(
-          <Suspense fallback={<Splash noInit />}>
-            <App />
-          </Suspense>,
-          document.getElementById("root"),
-          () => {
-            import("react-modal").then(({ default: Modal }) => {
-              Modal.setAppElement("#root");
-            });
-          }
-        );
-      }}
-    />,
-    document.getElementById("root")
-  );
+initializeDatabase().then(() => {
+  import("react-dom").then(({ render }) => {
+    import("./App").then(({ default: App }) => {
+      render(<App />, document.getElementById("root"), () => {
+        document.getElementById("splash").remove();
+        import("react-modal").then(({ default: Modal }) => {
+          Modal.setAppElement("#root");
+        });
+      });
+    });
+  });
 });
 
 // If you want your app to work offline and load faster, you can change
