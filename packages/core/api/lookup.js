@@ -1,9 +1,5 @@
 import fuzzysearch from "fuzzysearch";
 import { getContentFromData } from "../content-types";
-var tfun = require("transfun/transfun.js").tfun;
-if (!tfun) {
-  tfun = global.tfun;
-}
 
 export default class Lookup {
   /**
@@ -33,11 +29,11 @@ export default class Lookup {
   }
 
   notebooks(array, query) {
-    return tfun.filter(
+    return array.filter(
       (nb) =>
         fzs(query, nb.title + " " + nb.description) ||
         nb.topics.some((topic) => fuzzysearch(query, topic.title))
-    )(array);
+    );
   }
 
   topics(array, query) {
@@ -53,7 +49,7 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return tfun.filter((item) => fzs(query, item.title))(array);
+    return array.filter((item) => fzs(query, item.title));
   }
 }
 

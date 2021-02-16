@@ -1,14 +1,9 @@
 import Collection from "./collection";
-import fuzzysearch from "fuzzysearch";
 import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
 import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
 import { qclone } from "qclone";
-var tfun = require("transfun/transfun.js").tfun;
-if (!tfun) {
-  tfun = global.tfun;
-}
 
 export default class Notebooks extends Collection {
   async add(notebookArg) {
@@ -72,11 +67,11 @@ export default class Notebooks extends Collection {
   }
 
   get pinned() {
-    return tfun.filter(".pinned === true")(this.all);
+    return this.all.filter((item) => item.pinned === true);
   }
 
   get deleted() {
-    return tfun.filter(".dateDeleted > 0")(this.raw);
+    return this.raw.filter((item) => item.dateDeleted > 0);
   }
 
   /**
@@ -100,12 +95,5 @@ export default class Notebooks extends Collection {
       await this._db.settings.unpin(id);
       await this._db.trash.add(notebookData);
     }
-  }
-
-  filter(query) {
-    if (!query) return [];
-    let queryFn = (v) => fuzzysearch(query, v.title + " " + v.description);
-    if (query instanceof Function) queryFn = query;
-    return tfun.filter(queryFn)(this.all);
   }
 }

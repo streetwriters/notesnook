@@ -11,10 +11,6 @@ import getId from "../utils/id";
 import { EV, EVENTS } from "../common";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
-var tfun = require("transfun/transfun.js").tfun;
-if (!tfun) {
-  tfun = global.tfun;
-}
 
 export default class Notes extends Collection {
   async add(noteArg) {
@@ -134,19 +130,19 @@ export default class Notes extends Collection {
   }
 
   get pinned() {
-    return tfun.filter(".pinned === true")(this.all);
+    return this.all.filter((item) => item.pinned === true);
   }
 
   get conflicted() {
-    return tfun.filter(".conflicted === true")(this.all);
+    return this.all.filter((item) => item.conflicted === true);
   }
 
   get favorites() {
-    return tfun.filter(".favorite === true")(this.all);
+    return this.all.filter((item) => item.favorite === true);
   }
 
   get deleted() {
-    return tfun.filter(".dateDeleted > 0")(this.raw);
+    return this.raw.filter((item) => item.dateDeleted > 0);
   }
 
   tagged(tagId) {

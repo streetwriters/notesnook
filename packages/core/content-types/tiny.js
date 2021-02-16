@@ -1,8 +1,9 @@
 import TurndownService from "turndown";
+import decode from "lean-he/decode";
+
 var turndownService = new TurndownService();
 
 const splitter = /\W+/gm;
-var he;
 class Tiny {
   constructor(data) {
     this.data = data;
@@ -18,10 +19,7 @@ class Tiny {
       let doc = new DOMParser().parseFromString(this.data, "text/html");
       return doc.body.textContent || "";
     } else {
-      if (!he) {
-        he = require("he");
-      }
-      return he.decode(
+      return decode(
         this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
       );
     }

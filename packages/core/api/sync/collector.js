@@ -1,9 +1,5 @@
 import { CURRENT_DATABASE_VERSION } from "../../common";
 import Database from "../index";
-var tfun = require("transfun/transfun.js").tfun;
-if (!tfun) {
-  tfun = global.tfun;
-}
 
 class Collector {
   /**
@@ -57,14 +53,14 @@ class Collector {
 
   _collect(array) {
     if (this.force) {
-      return Promise.all(tfun.map(this._map)(array));
+      return Promise.all(array.map(this._map));
     }
     return Promise.all(
-      tfun
-        .filter(
-          (item) => item.dateEdited > this._lastSyncedTimestamp || item.migrated
-        )
-        .map(this._map)(array)
+      array.reduce((prev, item) => {
+        if (item.dateEdited > this._lastSyncedTimestamp || item.migrated)
+          prev.push(this._map(item));
+        return prev;
+      }, [])
     );
   }
 }

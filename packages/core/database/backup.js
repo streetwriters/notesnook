@@ -1,11 +1,10 @@
-import { MD5 } from "jshashes";
 import Migrator from "./migrator.js";
 import {
   CHECK_IDS,
   sendCheckUserStatusEvent,
   CURRENT_DATABASE_VERSION,
 } from "../common.js";
-const md5 = new MD5();
+import SparkMD5 from "spark-md5";
 
 const invalidKeys = ["user", "t", "lastBackupTime"];
 const validTypes = ["mobile", "web", "node"];
@@ -54,7 +53,7 @@ export default class Backup {
       type,
       date: Date.now(),
       data,
-      hash: md5.hex(JSON.stringify(data)),
+      hash: SparkMD5.hash(JSON.stringify(data)),
       hash_type: "md5",
     });
   }
@@ -154,7 +153,7 @@ export default class Backup {
     const { hash, hash_type, data: db } = backup;
     switch (hash_type) {
       case "md5": {
-        return hash === md5.hex(JSON.stringify(db));
+        return hash === SparkMD5.hash(JSON.stringify(db));
       }
       default: {
         return false;

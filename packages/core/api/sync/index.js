@@ -31,11 +31,6 @@ import http from "../../utils/http";
 import TokenManager from "../token-manager";
 import Collector from "./collector";
 import Merger from "./merger";
-var tfun = require("transfun/transfun.js").tfun;
-if (!tfun) {
-  tfun = global.tfun;
-}
-
 export default class Sync {
   /**
    *
