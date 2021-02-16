@@ -29,21 +29,15 @@ const App = React.lazy(() => import("./App"));
 
 import("react-dom").then(({ render }) => {
   render(
-    <Splash
-      onLoadingFinished={() => {
-        render(
-          <Suspense fallback={<Splash />}>
-            <App />
-          </Suspense>,
-          document.getElementById("root"),
-          () => {
-            import("react-modal").then(({ default: Modal }) => {
-              Modal.setAppElement("#root");
-            });
-          }
-        );
-      }}
-    />,
+    <Suspense fallback={<Splash />}>
+      <App />
+    </Suspense>,
+    document.getElementById("root"),
+    () => {
+      import("react-modal").then(({ default: Modal }) => {
+        Modal.setAppElement("#root");
+      });
+    },
     document.getElementById("root")
   );
 });

@@ -15,7 +15,7 @@ function Splash(props) {
         console.error(e);
         alert("Error: " + `Error initializing database: ${e.message}`);
       } finally {
-        props.onLoadingFinished();
+        if (props.onLoadingFinished) props.onLoadingFinished();
       }
     })();
   }, []);
