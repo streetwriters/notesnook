@@ -1,5 +1,5 @@
 import createStore from "../common/store";
-import { db } from "../common";
+import { db } from "../common/db";
 import BaseStore from "./index";
 
 class SearchStore extends BaseStore {

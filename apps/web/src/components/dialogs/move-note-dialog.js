@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Box, Text } from "rebass";
 import * as Icon from "../icons";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import Dialog from "./dialog";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";

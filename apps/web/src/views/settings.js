@@ -10,12 +10,8 @@ import accents from "../theme/accents";
 import { showLogInDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
-import {
-  createBackup,
-  db,
-  isUserPremium,
-  SUBSCRIPTION_STATUS,
-} from "../common";
+import { createBackup, isUserPremium, SUBSCRIPTION_STATUS } from "../common";
+import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";

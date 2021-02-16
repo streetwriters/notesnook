@@ -4,7 +4,7 @@ import { useQueryParams } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import Field from "../components/field";
 import * as Icon from "../components/icons";
-import { db } from "../common";
+import { db } from "../common/db";
 import { showToast } from "../utils/toast";
 import { useCallback } from "react";
 

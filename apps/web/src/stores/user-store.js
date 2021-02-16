@@ -1,6 +1,6 @@
 import React from "react";
 import createStore from "../common/store";
-import { db } from "../common";
+import { db } from "../common/db";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";

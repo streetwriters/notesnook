@@ -1,4 +1,4 @@
-import { db } from ".";
+import { db } from "./db";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
 import { store as trashstore } from "../stores/trash-store";

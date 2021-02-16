@@ -1,4 +1,4 @@
-import { db } from "../common/index";
+import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";

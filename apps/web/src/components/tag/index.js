@@ -3,7 +3,7 @@ import ListItem from "../list-item";
 import { navigate } from "../../navigation";
 import { Text } from "rebass";
 import { store as appStore } from "../../stores/app-store";
-import { db } from "../../common";
+import { db } from "../../common/db";
 
 const menuItems = (item) => [
   {

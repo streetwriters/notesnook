@@ -2,7 +2,7 @@ import React, { useCallback } from "react";
 import { Flex, Text, Button } from "rebass";
 import { timeConverter } from "../../utils/time";
 import { store as notestore } from "../../stores/note-store";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { hashNavigate } from "../../navigation";
 import diff from "./differ";
 

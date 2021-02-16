@@ -1,8 +1,5 @@
 import React from "react";
-import StorageInterface from "../interfaces/storage";
-import Database from "notes-core/api/";
 import SelectionOptions from "./selectionoptions";
-import EventSource from "eventsource";
 import { showToast } from "../utils/toast";
 import download from "../utils/download";
 import { Text } from "rebass";
@@ -10,26 +7,7 @@ import { showLoadingDialog } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
 import { hashNavigate } from "../navigation";
-
-export const db = new Database(StorageInterface, EventSource);
-
-// db.host({
-//   API_HOST: "https://api.notesnook.com",
-//   AUTH_HOST: "https://auth.streetwriters.co",
-//   SSE_HOST: "https://events.streetwriters.co",
-// });
-
-db.host({
-  API_HOST: "http://localhost:5264",
-  AUTH_HOST: "http://localhost:8264",
-  SSE_HOST: "http://localhost:7264",
-});
-
-// db.host({
-//   API_HOST: "http://192.168.10.7:5264",
-//   AUTH_HOST: "http://192.168.10.7:8264",
-//   SSE_HOST: "http://192.168.10.7:7264",
-// });
+import { db } from "./db";
 
 export const COLORS = {
   red: "#f44336",

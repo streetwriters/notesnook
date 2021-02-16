@@ -2,7 +2,7 @@ import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Flex, Text, Button } from "rebass";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 

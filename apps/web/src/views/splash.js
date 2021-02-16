@@ -1,62 +1,38 @@
-import React, { useEffect, useState } from "react";
-import { Flex } from "rebass";
-import Animated from "../components/animated";
+import React, { useEffect } from "react";
 import Logo from "../assets/notesnook-logo.png";
-import { db } from "../common";
-import { EV, EVENTS } from "notes-core/common";
-import { showToast } from "../utils/toast";
-import { captureException } from "@sentry/react";
+import { initializeDatabase } from "../common/db";
 
 function Splash(props) {
-  const [loading, setLoading] = useState(true);
-  const [animationEnded, setAnimationEnded] = useState(false);
   useEffect(() => {
     (async function () {
       try {
-        EV.subscribe(EVENTS.userLoggedOut, (reason) => {
-          if (reason) {
-            showToast("error", reason);
-          }
-        });
-        await db.init();
+        await initializeDatabase();
       } catch (e) {
-        captureException(e, (scope) => {
-          scope.setExtra("where", "db.init");
-          return scope;
-        });
+        // captureException(e, (scope) => {
+        //   scope.setExtra("where", "db.init");
+        //   return scope;
+        // });
         console.error(e);
-        showToast("error", `Error initializing database: ${e.message}`);
+        alert("Error: " + `Error initializing database: ${e.message}`);
       } finally {
-        setLoading(false);
+        props.onLoadingFinished();
       }
     })();
   }, []);
 
-  useEffect(() => {
-    if (!loading && animationEnded) props.onLoadingFinished();
-  }, [loading, animationEnded, props]);
-
   return (
-    <Flex
-      flexDirection="column"
-      bg="#f0f0f0"
-      height="100%"
-      justifyContent="center"
-      alignItems="center"
-      overflow="hidden"
+    <div
+      style={{
+        backgroundColor: "#f0f0f0",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
+        alignItems: "center",
+      }}
     >
-      <Animated.Image
-        src={Logo}
-        width={150}
-        animate={{ scale: 1.05 }}
-        transition={{
-          repeat: 1,
-          repeatType: "reverse",
-          duration: 1,
-        }}
-        onAnimationComplete={() => setAnimationEnded(true)}
-      />
-    </Flex>
+      <img alt="Notesnook logo" src={Logo} width={150} />
+    </div>
   );
 }
 export default Splash;

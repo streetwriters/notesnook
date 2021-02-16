@@ -4,7 +4,7 @@ import { hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
-import { db } from ".";
+import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { CHECK_IDS } from "notes-core/common";
 import { Flex, Text } from "rebass";

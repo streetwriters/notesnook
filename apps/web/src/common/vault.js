@@ -1,4 +1,4 @@
-import { db } from "../common";
+import { db } from "../common/db";
 import { showPasswordDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 

@@ -4,7 +4,7 @@ import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
 import { store as trashStore } from "../stores/trash-store";
-import { db } from "./index";
+import { db } from "./db";
 import { showMoveNoteDialog } from "../common/dialog-controller";
 import { showMultiDeleteConfirmation } from "../common/dialog-controller";
 import { showExportDialog } from "../common/dialog-controller";

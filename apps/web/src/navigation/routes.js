@@ -1,5 +1,5 @@
 import React from "react";
-import { db } from "../common";
+import { db } from "../common/db";
 import { toTitleCase } from "../utils/string";
 import Home from "../views/home";
 import Notebooks from "../views/notebooks";

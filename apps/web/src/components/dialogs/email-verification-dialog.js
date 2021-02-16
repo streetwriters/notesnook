@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Button, Text } from "rebass";
 import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { useState } from "react";
 
 function EmailVerificationDialog(props) {

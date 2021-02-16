@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../common";
+import { db } from "../common/db";
 import config from "./config";
 
 var APP_VERSION = {

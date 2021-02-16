@@ -1,4 +1,5 @@
-import { db, notesFromContext } from "../common/index";
+import { notesFromContext } from "../common";
+import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as editorStore } from "./editor-store";
 import { store as appStore } from "./app-store";

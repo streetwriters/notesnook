@@ -1,5 +1,5 @@
 import createStore from "../common/store";
-import { db } from "../common";
+import { db } from "../common/db";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";

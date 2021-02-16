@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Text, Box } from "rebass";
 import Dialog from "./dialog";
 import Field from "../field";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { showToast } from "../../utils/toast";
 
 const requiredValues = ["email"];

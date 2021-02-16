@@ -1,6 +1,6 @@
 import React from "react";
 import ListItem from "../list-item";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";

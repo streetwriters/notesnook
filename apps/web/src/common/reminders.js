@@ -1,5 +1,6 @@
 import Config from "../utils/config";
-import { createBackup, db } from "./index";
+import { createBackup } from "./index";
+import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";

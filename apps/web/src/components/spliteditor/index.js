@@ -3,7 +3,7 @@ import { Flex, Box, Text } from "rebass";
 import SimpleEditor from "./simpleeditor";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
-import { db } from "../../common";
+import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import diff from "./differ";

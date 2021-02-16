@@ -15,7 +15,8 @@ import Editor from "./components/editor";
 import useMobile from "./utils/use-mobile";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
 import { resetReminders } from "./common/reminders";
-import { db, isUserPremium } from "./common";
+import { isUserPremium } from "./common";
+import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import useTablet from "./utils/use-tablet";
 import { showBuyDialog } from "./common/dialog-controller";
@@ -33,6 +34,7 @@ import {
 } from "./common/dialog-controller";
 import { useAnimation } from "framer-motion";
 import RouteContainer from "./components/route-container";
+import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -122,54 +124,56 @@ function App() {
   }, [isMobile, isTablet, toggleSideMenu]);
 
   return (
-    <ThemeProvider>
-      <Flex
-        flexDirection="column"
-        id="app"
-        bg="background"
-        height="100%"
-        sx={{ overflow: "hidden" }}
-      >
-        <Flex flex={1} sx={{ overflow: "hidden" }}>
-          <NavigationMenu
-            toggleNavigationContainer={(state) => {
-              if (isMobile || isTablet) clearSession();
-              else setShow(state || !show);
-            }}
-          />
-          <Flex variant="rowFill">
-            <Animated.Flex
-              className="listMenu"
-              variant="columnFill"
-              initial={{ width: "30%", opacity: 1, x: 0 }}
-              animate={{
-                width: show ? "30%" : "0%",
-                x: show ? 0 : "-30%",
-                opacity: show ? 1 : 0,
+    <MotionConfig features={[AnimationFeature, GesturesFeature]}>
+      <ThemeProvider>
+        <Flex
+          flexDirection="column"
+          id="app"
+          bg="background"
+          height="100%"
+          sx={{ overflow: "hidden" }}
+        >
+          <Flex flex={1} sx={{ overflow: "hidden" }}>
+            <NavigationMenu
+              toggleNavigationContainer={(state) => {
+                if (isMobile || isTablet) clearSession();
+                else setShow(state || !show);
               }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
-              sx={{
-                borderRight: "1px solid",
-                borderColor: "border",
-                borderRightWidth: show ? 1 : 0,
-              }}
-            >
-              {isMobile && <Banner />}
-              <CachedRouter />
-            </Animated.Flex>
-            <Flex
-              width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
-              flexDirection="column"
-            >
-              <EditorSwitch />
+            />
+            <Flex variant="rowFill">
+              <Animated.Flex
+                className="listMenu"
+                variant="columnFill"
+                initial={{ width: "30%", opacity: 1, x: 0 }}
+                animate={{
+                  width: show ? "30%" : "0%",
+                  x: show ? 0 : "-30%",
+                  opacity: show ? 1 : 0,
+                }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
+                sx={{
+                  borderRight: "1px solid",
+                  borderColor: "border",
+                  borderRightWidth: show ? 1 : 0,
+                }}
+              >
+                {isMobile && <Banner />}
+                <CachedRouter />
+              </Animated.Flex>
+              <Flex
+                width={[show ? 0 : "100%", show ? 0 : "100%", "100%"]}
+                flexDirection="column"
+              >
+                <EditorSwitch />
+              </Flex>
             </Flex>
+            <GlobalMenuWrapper />
           </Flex>
-          <GlobalMenuWrapper />
+          <StatusBar />
+          <ThemeTransition />
         </Flex>
-        <StatusBar />
-        <ThemeTransition />
-      </Flex>
-    </ThemeProvider>
+      </ThemeProvider>
+    </MotionConfig>
   );
 }
 

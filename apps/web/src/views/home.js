@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useStore, store } from "../stores/note-store";
 import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { db } from "../common";
+import { db } from "../common/db";
 import { hashNavigate } from "../navigation";
 
 function Home() {
