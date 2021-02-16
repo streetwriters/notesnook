@@ -30,7 +30,9 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
           fontWeight: '400',
         },
         style,
-      ]}></Text>
+      ]}>
+        
+      </Text>
   );
 };
 

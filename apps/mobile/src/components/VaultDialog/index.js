@@ -1,10 +1,8 @@
 import React, {Component, createRef} from 'react';
 import {InteractionManager, TouchableOpacity, View} from 'react-native';
-
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -21,16 +19,14 @@ import {
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
-  refreshNotesPage,
 } from '../../utils/Events';
+import {deleteItems} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
 import {ph, SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
@@ -62,10 +58,52 @@ export class VaultDialog extends Component {
       changePassword: false,
       copyNote: false,
       revokeFingerprintAccess: false,
+      title: 'Unlock Note',
+      description: null,
     };
     this.password = null;
     this.confirmPassword = null;
     this.newPassword = null;
+    (this.title = !this.state.novault
+      ? 'Create Vault'
+      : this.state.fingerprintAccess
+      ? 'Vault Fingerprint Unlock'
+      : this.state.revokeFingerprintAccess
+      ? 'Revoke Vault Fingerprint Unlock'
+      : this.state.changePassword
+      ? 'Change Vault Password'
+      : this.state.note.locked
+      ? this.state.deleteNote
+        ? 'Delete note'
+        : this.state.share
+        ? 'Share note'
+        : this.state.copyNote
+        ? 'Copy note'
+        : this.state.goToEditor
+        ? 'Unlock note'
+        : 'Unlock note'
+      : 'Lock note'),
+      (this.description = !this.state.novault
+        ? 'Set a password to create vault'
+        : this.state.fingerprintAccess
+        ? 'Enter vault password to enable fingerprint unlocking'
+        : this.state.revokeFingerprintAccess
+        ? 'Disable vault fingerprint unlock '
+        : this.state.changePassword
+        ? 'Setup a new password for the vault.'
+        : this.state.permanant
+        ? 'Enter password to remove note from vault.'
+        : this.state.note.locked
+        ? this.state.deleteNote
+          ? 'Unlock note to delete it.'
+          : this.state.share
+          ? 'Unlock note to share it.'
+          : this.state.copyNote
+          ? 'Unlock note to copy it.'
+          : this.state.goToEditor
+          ? 'Unlock note to open it in editor'
+          : 'Enter vault password to unlock note.'
+        : 'Enter vault password to lock note.');
   }
 
   componentDidMount() {
@@ -93,7 +131,6 @@ export class VaultDialog extends Component {
     if (biometry) {
       available = true;
     }
-    console.log('fingerprint', fingerprint, 'biometry', biometry);
     this.setState({
       note: data.item,
       novault: data.novault,
@@ -109,6 +146,8 @@ export class VaultDialog extends Component {
       fingerprintAccess: data.fingerprintAccess,
       changePassword: data.changePassword,
       revokeFingerprintAccess: data.revokeFingerprintAccess,
+      title: data.title,
+      description: data.description,
     });
 
     if (
@@ -117,7 +156,7 @@ export class VaultDialog extends Component {
       !data.fingerprintAccess &&
       !data.revokeFingerprintAccess
     ) {
-      await this._onPressFingerprintAuth();
+      await this._onPressFingerprintAuth(data.title, data.description);
     } else {
       this.setState({
         visible: true,
@@ -280,17 +319,13 @@ export class VaultDialog extends Component {
     }
   };
   async _deleteNote() {
-    this.close();
-    await db.notes.delete(this.state.note.id);
-
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Notebook,
-    ]);
-
-    ToastEvent.show('Note deleted', 'success');
+    try {
+      await db.vault.remove(this.state.note.id, this.password);
+      await deleteItems(this.state.note);
+      this.close();
+    } catch (e) {
+      this._takeErrorAction(e);
+    }
   }
 
   async _enrollFingerprint(password) {
@@ -365,7 +400,7 @@ export class VaultDialog extends Component {
 
   _copyNote(note) {
     let text = toTXT(note.content.data);
-    let m = `${note.title}\n \n ${text}`;
+    text = `${note.title}\n \n ${text}`;
     Clipboard.setString(text);
     ToastEvent.show('Note copied to clipboard', 'success', 'local');
     this.close();
@@ -374,12 +409,12 @@ export class VaultDialog extends Component {
   async _shareNote(note) {
     this.close();
     let text = toTXT(note.content.data);
-    let m = `${note.title}\n \n ${text}`;
+    text = `${note.title}\n \n ${text}`;
     try {
       await Share.open({
         title: 'Share note to',
         failOnCancel: false,
-        message: m,
+        message: text,
       });
     } catch (e) {}
   }
@@ -405,9 +440,12 @@ export class VaultDialog extends Component {
     }
   };
 
-  _onPressFingerprintAuth = async () => {
+  _onPressFingerprintAuth = async (title, description) => {
     try {
-      let credentials = await BiometricService.getCredentials();
+      let credentials = await BiometricService.getCredentials(
+        title || this.state.title,
+        description || this.state.description,
+      );
 
       if (credentials?.password) {
         this.password = credentials.password;
@@ -460,46 +498,8 @@ export class VaultDialog extends Component {
             paddingVertical: 15,
           }}>
           <DialogHeader
-            title={
-              !novault
-                ? 'Create Vault'
-                : fingerprintAccess
-                ? 'Vault Fingerprint Unlock'
-                : this.state.revokeFingerprintAccess
-                ? 'Revoke Vault Fingerprint Unlock'
-                : changePassword
-                ? 'Change Vault Password'
-                : note.locked
-                ? deleteNote
-                  ? 'Delete note'
-                  : share
-                  ? 'Share note'
-                  : goToEditor
-                  ? 'Unlock note'
-                  : 'Unlock note'
-                : 'Lock note'
-            }
-            paragraph={
-              !novault
-                ? 'Set a password to create vault'
-                : fingerprintAccess
-                ? 'Enter vault password to enable fingerprint unlocking'
-                : this.state.revokeFingerprintAccess
-                ? 'Disable vault fingerprint unlock '
-                : changePassword
-                ? 'Setup a new password for the vault.'
-                : permanant
-                ? 'Enter password to remove note from vault.'
-                : note.locked
-                ? deleteNote
-                  ? 'Unlock note to delete it.'
-                  : share
-                  ? 'Unlock note to share it.'
-                  : goToEditor
-                  ? 'Unlock note to open it in editor'
-                  : 'Enter vault password to unlock note.'
-                : 'Enter vault password to lock note.'
-            }
+            title={this.state.title}
+            paragraph={this.state.description}
             icon="shield"
           />
 
@@ -523,7 +523,7 @@ export class VaultDialog extends Component {
                     : 10
                 }
                 secureTextEntry
-                placeholder={changePassword ? 'Current Password' : 'Password'}
+                placeholder={changePassword ? 'Current password' : 'Password'}
               />
 
               {!this.state.biometricUnlock ||
@@ -533,11 +533,7 @@ export class VaultDialog extends Component {
                 <Button
                   onPress={this._onPressFingerprintAuth}
                   width="100%"
-                  title={
-                    !note.locked
-                      ? 'Lock with Fingerprint'
-                      : 'Unlock with Fingerprint'
-                  }
+                  title={'Biometric unlock'}
                   type="shade"
                 />
               )}
@@ -555,7 +551,7 @@ export class VaultDialog extends Component {
                   this.newPassword = value;
                 }}
                 secureTextEntry
-                placeholder={'New Password'}
+                placeholder={'New password'}
               />
             </>
           ) : null}

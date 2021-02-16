@@ -1,24 +1,21 @@
-import React, {createRef} from 'react';
-import {Actions} from '../../provider/Actions';
+import React, { createRef } from 'react';
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
   eCloseAddTopicDialog,
-  eOnNewTopicAdded,
-  eOpenAddTopicDialog,
+
+  eOpenAddTopicDialog
 } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 
 export class AddTopicDialog extends React.Component {
   constructor(props) {
@@ -26,7 +23,7 @@ export class AddTopicDialog extends React.Component {
     this.state = {
       visible: false,
       titleFocused: false,
-      loading:false
+      loading: false,
     };
 
     this.title;
@@ -35,7 +32,7 @@ export class AddTopicDialog extends React.Component {
   }
 
   addNewTopic = async () => {
-    this.setState({loading:true})
+    this.setState({loading: true});
     if (!this.title)
       return ToastEvent.show('Title is required', 'error', 'local');
 
@@ -48,8 +45,10 @@ export class AddTopicDialog extends React.Component {
       await db.notebooks.notebook(topic.notebookId).topics.add(topic);
     }
     this.close();
-    updateEvent({type: Actions.NOTEBOOKS});
-    eSendEvent(eOnNewTopicAdded);
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notebooks,
+      Navigation.routeNames.Notebook,
+    ]);
   };
 
   componentDidMount() {

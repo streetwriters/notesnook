@@ -167,7 +167,7 @@ class RecoveryKeyDialog extends React.Component {
             paddingTop: 10,
           }}>
           <DialogHeader
-            title="Your Data Recovery Key"
+            title="Your data recovery key"
             paragraph="If you forget your password, you can recover your
             data and reset your password using your data recovery key."
           />
@@ -197,7 +197,7 @@ class RecoveryKeyDialog extends React.Component {
                 ToastEvent.show('Copied!', 'success', 'local');
               }}
               icon="content-copy"
-              title="Copy to Clipboard"
+              title="Copy to clipboard"
               width="100%"
               type="gray"
               fontSize={SIZE.md}
@@ -228,7 +228,7 @@ class RecoveryKeyDialog extends React.Component {
           </View>
 
           <Button
-            title="Save QR-Code to Gallery"
+            title="Save QR-Code to gallery"
             onPress={this.saveQRCODE}
             width="100%"
             type="accent"
@@ -238,7 +238,7 @@ class RecoveryKeyDialog extends React.Component {
           <Seperator />
           <Button
             onPress={this.saveToTextFile}
-            title="Save to Text File"
+            title="Save to text file"
             width="100%"
             type="accent"
             fontSize={SIZE.md}
@@ -246,7 +246,7 @@ class RecoveryKeyDialog extends React.Component {
           />
           <Seperator />
           <Button
-            title="I Have Saved the Key."
+            title="I have saved the key."
             width="100%"
             height={50}
             type="error"

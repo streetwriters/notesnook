@@ -20,7 +20,8 @@ export const ActionIcon = ({
   testID,
   disabled,
   onLongPress,
-  tooltipText
+  tooltipText,
+  type="gray"
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -40,7 +41,7 @@ export const ActionIcon = ({
         }
       }}
       disabled={disabled}
-      type="gray"
+      type={type}
       customStyle={{
         width: 40,
         height: 40,

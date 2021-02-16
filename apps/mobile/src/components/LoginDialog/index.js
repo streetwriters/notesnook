@@ -502,7 +502,7 @@ const LoginDialog = () => {
                 }}
                 secureTextEntry
                 autoCapitalize="none"
-                placeholder="Current Password"
+                placeholder="Current password"
                 onSubmit={() => {
                   if (mode === MODES.signup) {
                     _pass.current?.focus();
@@ -569,7 +569,7 @@ const LoginDialog = () => {
                   autoCapitalize="none"
                   customValidator={() => password}
                   secureTextEntry
-                  placeholder="Confirm Password"
+                  placeholder="Confirm password"
                   errorMessage="Passwords do not match"
                   onSubmit={() => {
                     current.buttonFunc();

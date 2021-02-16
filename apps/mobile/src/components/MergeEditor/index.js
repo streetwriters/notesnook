@@ -445,7 +445,7 @@ const MergeEditor = () => {
                 <Button
                   width={null}
                   onPress={onPressSaveCopyFromPrimaryWebView}
-                  title="Save Copy"
+                  title="Save copy"
                 />
               ) : null}
               <View style={{width: 10}} />
@@ -590,7 +590,7 @@ const MergeEditor = () => {
                   width={null}
                   height={40}
                   onPress={onPressSaveCopyFromSecondaryWebView}
-                  title="Save Copy"
+                  title="Save copy"
                 />
               ) : null}
               <View style={{width: 10}} />

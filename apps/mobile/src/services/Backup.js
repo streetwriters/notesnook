@@ -43,7 +43,7 @@ async function run() {
       ToastEvent.show('Backup complete!', 'success');
   
       eSendEvent(eOpenProgressDialog, {
-        title: 'Backup Complete',
+        title: 'Backup complete',
         icon: 'cloud-upload',
         paragraph:
           'Share your backup to your cloud storage such as Dropbox or Google Drive.',
@@ -80,19 +80,22 @@ async function getLastBackupDate() {
 }
 
 async function checkBackupRequired(type) {
+  if (type === "off") return;
   let now = Date.now();
   let lastBackupDate = await getLastBackupDate();
-  if (!lastBackupDate) return false;
-  if (lastBackupDate === 'never') {
+  if (!lastBackupDate || lastBackupDate === 'never') {
     return true;
   }
   lastBackupDate = parseInt(lastBackupDate);
 
   if (type === 'daily' && lastBackupDate + MS_DAY < now) {
+    console.log("daily")
     return true;
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
+    console.log("weekly")
     return true;
   } else {
+    console.log("no need",lastBackupDate);
     return false;
   }
 }

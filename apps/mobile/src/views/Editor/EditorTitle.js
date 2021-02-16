@@ -66,7 +66,7 @@ export const EditorTitle = () => {
           maxWidth: '100%',
           padding: 0,
         }}
-        placeholder="Title Here"
+        placeholder="Note title"
         onChangeText={(text) => {
           setTitle(text);
           _onMessage({

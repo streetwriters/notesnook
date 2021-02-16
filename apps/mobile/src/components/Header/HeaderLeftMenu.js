@@ -41,7 +41,7 @@ export const HeaderLeftMenu = () => {
   return (
     <>
       {deviceMode === 'mobile' ||
-      currentScreen === 'search' ||
+      currentScreen === 'Search' ||
       !headerMenuState ? (
         <ActionIcon
           testID={notesnook.ids.default.header.buttons.left}

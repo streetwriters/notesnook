@@ -69,6 +69,7 @@ const SplashScreen = () => {
   ];
 
   useEffect(() => {
+    return;
     Storage.read('introCompleted').then(async (r) => {
       setVisible(true);
       await sleep(500);
@@ -266,7 +267,7 @@ const SplashScreen = () => {
               }}
               style={{paddingHorizontal: 24}}
               type="accent"
-              title={isNext ? 'Next' : 'Sign Up'}
+              title={isNext ? 'Next' : 'Sign up'}
             />
           </View>
         </Animated.View>

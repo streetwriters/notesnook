@@ -15,6 +15,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
+import Navigation from './src/services/Navigation';
 import SettingsService from './src/services/SettingsService';
 import {changeAppScale} from './src/utils/Animations';
 import {db} from './src/utils/DB';
@@ -96,11 +97,8 @@ const Overlay = ({onLoad}) => {
   const load = async () => {
     db.notes.init().then(() => {
       init = true;
-      if (SettingsService.get().homepage === 'Notes') {
-        dispatch({type: Actions.NOTES});
-      } else {
-        dispatch({type: Actions.FAVORITES});
-      }
+      dispatch({type: Actions.NOTES});
+      dispatch({type: Actions.FAVORITES});
       // if (!animation) {
       dispatch({type: Actions.LOADING, loading: false});
       // }

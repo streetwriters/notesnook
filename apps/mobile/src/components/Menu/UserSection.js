@@ -55,7 +55,7 @@ export const UserSection = ({noTextMode}) => {
 
           <View>
             <Heading size={SIZE.sm} color={colors.heading}>
-              {!user ? 'Not Logged in' : 'Logged in'}
+              {!user ? 'Not logged in' : 'Logged in'}
             </Heading>
 
             <Paragraph

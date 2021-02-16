@@ -20,6 +20,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
 import {editing, toTXT} from '../../utils';
@@ -123,9 +124,11 @@ export const ActionSheetComponent = ({
     if (!nodispatch) {
       dispatch({type: type});
       if (type === 'note') {
-        eSendEvent(refreshNotesPage);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+        ])
       }
-      dispatch({type: Actions.FAVORITES});
     }
     setNote({...toAdd});
   };
@@ -153,6 +156,8 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             share: true,
+            title:'Share note',
+            description:"Unlock note to share it."
           });
         } else {
           let text = await db.notes.note(note.id).export('txt');
@@ -184,6 +189,8 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             item: note,
+            title:'Delete note',
+            description:"Unlock note to delete it."
           }); 
         } else {
           try {
@@ -219,6 +226,8 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             item: note,
+            title:'Copy note',
+            description:"Unlock note to copy to clipboard."
           });
         } else {
           let text = await db.notes.note(note.id).content();
@@ -234,10 +243,14 @@ export const ActionSheetComponent = ({
       icon: 'delete-restore',
       func: async () => {
         await db.trash.restore(note.id);
-        dispatch({type: Actions.TRASH});
-        dispatch({type: note.itemType});
-        dispatch({type: Actions.FAVORITES});
-        eSendEvent(refreshNotesPage);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Tags,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Trash
+        ])
         type = note.type === 'trash' ? note.itemType : note.type;
         ToastEvent.show(
           type === 'note' ? 'Note restored' : 'Notebook restored',
@@ -717,11 +730,12 @@ export const ActionSheetComponent = ({
               .notebook(editing.actionAfterFirstSave.notebook)
               .topics.topic(editing.actionAfterFirstSave.id)
               .delete(note.id);
-
-            eSendEvent(refreshNotesPage);
-            eSendEvent(eOnNewTopicAdded);
-            dispatch({type: Actions.NOTEBOOKS});
-            dispatch({type: Actions.NOTES});
+              Navigation.setRoutesToUpdate([
+                Navigation.routeNames.Notebooks,
+                Navigation.routeNames.Notes,
+                Navigation.routeNames.NotesPage,
+                Navigation.routeNames.Notebook,
+              ]);
             setNote(db.notes.note(note.id).data);
             close();
           }}

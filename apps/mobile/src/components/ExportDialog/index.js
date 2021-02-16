@@ -196,7 +196,7 @@ const ExportDialog = () => {
             <DialogButtons
               onPressNegative={close}
               negativeTitle="Cancel"
-              positiveTitle={complete && 'Open File'}
+              positiveTitle={complete && 'Open file'}
               onPressPositive={
                 complete
                   ? async () => {

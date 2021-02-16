@@ -40,7 +40,7 @@ function get() {
 
 async function verify(callback, error) {
   try {
-    if (!premiumStatus) {
+    if (premiumStatus) {
       if (error) {
         error();
         return;
@@ -96,6 +96,10 @@ const onUserStatusCheck = async (type) => {
             'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
         };
         break;
+      case CHECK_IDS.databaseSync:
+        message = null;
+        break;
+
     }
     if (message) {
       eSendEvent(eShowGetPremium, message);

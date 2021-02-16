@@ -12,11 +12,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {
-  eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
-  refreshNotesPage,
-} from '../../utils/Events';
+import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -57,6 +53,42 @@ export const SelectionHeader = () => {
     }).start();
   }, [selectionMode]);
 
+  const addToFavorite = async () => {
+    if (selectedItemsList.length > 0) {
+      selectedItemsList.forEach((item) => {
+        db.notes.note(item.id).favorite();
+      });
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+      ]);
+      dispatch({type: Actions.SELECTION_MODE, enabled: false});
+      dispatch({type: Actions.CLEAR_SELECTION});
+    }
+  };
+
+  const restoreItem = async () => {
+    if (selectedItemsList.length > 0) {
+      let noteIds = [];
+      selectedItemsList.forEach((item) => {
+        noteIds.push(item.id);
+      });
+      await db.trash.restore(...noteIds);
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Tags,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notebooks,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Trash,
+      ]);
+      dispatch({type: Actions.SELECTION_MODE, enabled: false});
+      dispatch({type: Actions.CLEAR_SELECTION});
+      ToastEvent.show('Restore complete', 'success');
+    }
+  };
+
   return (
     <Animated.View
       style={{
@@ -64,7 +96,7 @@ export const SelectionHeader = () => {
         position: 'absolute',
         height: 50 + insets.top,
         paddingTop: insets.top,
-        backgroundColor: colors.bg,
+        backgroundColor: colors.accent,
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
@@ -100,18 +132,22 @@ export const SelectionHeader = () => {
             dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
             dispatch({type: Actions.CLEAR_SELECTION});
           }}
-          color={colors.heading}
-          name="arrow-left"
+          color={colors.light}
+          name="close"
           size={SIZE.xxxl}
         />
 
         {Platform.OS === 'android' ? (
-          <Heading>{selectedItemsList.length + ' Selected'}</Heading>
+          <Heading color={colors.light}>
+            {selectedItemsList.length + ' Selected'}
+          </Heading>
         ) : null}
       </View>
 
       {Platform.OS !== 'android' ? (
-        <Heading>{selectedItemsList.length + ' Selected'}</Heading>
+        <Heading color={colors.light}>
+          {selectedItemsList.length + ' Selected'}
+        </Heading>
       ) : null}
 
       <View
@@ -123,48 +159,37 @@ export const SelectionHeader = () => {
           right: 12,
           paddingTop: insets.top,
         }}>
-        {currentScreen === 'trash' ||
-        currentScreen === 'notebooks' ||
-        currentScreen === 'notebook' ? null : (
+        {currentScreen === 'Trash' ||
+        currentScreen === 'Notebooks' ||
+        currentScreen === 'Notebook' ? null : (
           <ActionIcon
             onPress={async () => {
-              dispatch({type: Actions.SELECTION_MODE, enabled: false});
+              //dispatch({type: Actions.SELECTION_MODE, enabled: false});
               await sleep(100);
               eSendEvent(eOpenMoveNoteDialog);
             }}
             customStyle={{
               marginLeft: 10,
             }}
-            color={colors.heading}
+            color={colors.light}
             name="plus"
             size={SIZE.xl}
           />
         )}
 
-        {currentScreen === 'favorites' ? (
+        {currentScreen === 'Favorites' ? (
           <ActionIcon
-            onPress={async () => {
-              if (selectedItemsList.length > 0) {
-                selectedItemsList.forEach((item) => {
-                  db.notes.note(item.id).favorite();
-                });
-                dispatch({type: Actions.FAVORITES});
-                eSendEvent(refreshNotesPage);
-                dispatch({type: Actions.NOTES});
-                dispatch({type: Actions.SELECTION_MODE, enabled: false});
-                dispatch({type: Actions.CLEAR_SELECTION});
-              }
-            }}
+            onPress={addToFavorite}
             customStyle={{
               marginLeft: 10,
             }}
-            color={colors.heading}
+            color={colors.light}
             name="star-off"
             size={SIZE.xl}
           />
         ) : null}
 
-        {currentScreen === 'trash' ? null : (
+        {currentScreen === 'Trash' ? null : (
           <ActionIcon
             customStyle={{
               marginLeft: 10,
@@ -173,33 +198,19 @@ export const SelectionHeader = () => {
               eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
               return;
             }}
-            color={colors.heading}
+            color={colors.light}
             name="delete"
             size={SIZE.xl}
           />
         )}
 
-        {currentScreen === 'trash' ? (
+        {currentScreen === 'Trash' ? (
           <ActionIcon
             customStyle={{
               marginLeft: 10,
             }}
-            color={colors.heading}
-            onPress={async () => {
-              if (selectedItemsList.length > 0) {
-                let noteIds = [];
-                selectedItemsList.forEach((item) => {
-                  noteIds.push(item.id);
-                });
-                await db.trash.restore(...noteIds);
-                dispatch({type: Actions.NOTEBOOKS});
-                dispatch({type: Actions.NOTES});
-                dispatch({type: Actions.TRASH});
-                dispatch({type: Actions.SELECTION_MODE, enabled: false});
-                dispatch({type: Actions.CLEAR_SELECTION});
-                ToastEvent.show('Restore complete', 'success');
-              }
-            }}
+            color={colors.light}
+            onPress={restoreItem}
             name="delete-restore"
             size={SIZE.xl - 3}
           />

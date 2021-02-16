@@ -192,8 +192,7 @@ export class AddNotebookDialog extends React.Component {
       });
     }
     this.close();
-    updateEvent({type: Actions.NOTEBOOKS});
-    updateEvent({type: Actions.PINNED});
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
   };
 
   onSubmit = (forward = true) => {
@@ -303,7 +302,7 @@ export class AddNotebookDialog extends React.Component {
                 onChangeText={(value) => {
                   this.title = value;
                 }}
-                placeholder="Enter a Title"
+                placeholder="Enter a title"
                 onSubmit={() => {
                   this.descriptionRef.focus();
                 }}

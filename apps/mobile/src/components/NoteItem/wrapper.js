@@ -74,6 +74,8 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
         novault: true,
         locked: true,
         goToEditor: true,
+        title:'Open note',
+        description:"Unlock note to open it in editor."
       });
       return;
     }

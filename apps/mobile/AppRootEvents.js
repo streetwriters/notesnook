@@ -14,6 +14,7 @@ import {
   setEmailVerifyMessage,
   setLoginMessage,
 } from './src/services/Message';
+import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
@@ -21,6 +22,7 @@ import {APP_VERSION, editing} from './src/utils';
 import {COLOR_SCHEME} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
+  eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
@@ -120,12 +122,14 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
+      EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
 
       return () => {
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
         EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+        EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
         EV.unsubscribe(
           EVENTS.userCheckStatus,
           PremiumService.onUserStatusCheck,
@@ -136,6 +140,21 @@ export const AppRootEvents = React.memo(
         Linking.removeEventListener('url', onUrlRecieved);
       };
     }, []);
+
+    const onNoteRemoved = async (id) => {
+      try {
+        console.log("removing note");
+        await db.notes.remove(id);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Trash,
+          Navigation.routeNames.Notebook,
+        ]);
+        eSendEvent(eClearEditor);
+      } catch (e) {}
+    };
 
     useEffect(() => {
       let unsubscribe;
@@ -208,7 +227,7 @@ export const AppRootEvents = React.memo(
           ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
           : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for free for the next 14 days!';
       eSendEvent(eOpenProgressDialog, {
-        title: 'Email Confirmed!',
+        title: 'Email confirmed!',
         paragraph: message,
         noProgress: true,
       });
@@ -270,7 +289,7 @@ export const AppRootEvents = React.memo(
       setLoginMessage(dispatch);
       await PremiumService.setPremiumStatus();
       eSendEvent(eOpenProgressDialog, {
-        title: reason ? reason : 'User Logged Out',
+        title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
         action: async () => {
           eSendEvent(eCloseProgressDialog);

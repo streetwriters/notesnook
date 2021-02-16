@@ -8,6 +8,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import {dWidth, getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
@@ -28,10 +29,12 @@ export const ActionStrip = ({note, setActionStrip}) => {
   }, []);
 
   const updateNotes = () => {
-    dispatch({type: Actions.NOTES});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes,
+    ]);
     sendNoteEditedEvent({id: note.id, forced: true});
-    dispatch({type: Actions.FAVORITES});
-    eSendEvent(refreshNotesPage);
   };
 
   const actions = [
@@ -118,6 +121,8 @@ export const ActionStrip = ({note, setActionStrip}) => {
             novault: true,
             locked: true,
             item: note,
+            title:'Copy note',
+            description:"Unlock note to copy to clipboard."
           });
         } else {
           let delta = await db.notes.note(note.id).content();
@@ -134,10 +139,14 @@ export const ActionStrip = ({note, setActionStrip}) => {
       icon: 'delete-restore',
       onPress: async () => {
         await db.trash.restore(note.id);
-        dispatch({type: Actions.TRASH});
-        dispatch({type: note.itemType});
-        dispatch({type: Actions.FAVORITES});
-        eSendEvent(refreshNotesPage);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Trash,
+        ]);
+
         ToastEvent.show(
           item.type === 'note' ? 'Note restored' : 'Notebook restored',
           'success',

@@ -9,6 +9,7 @@ import {
   sendNoteEditedEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
@@ -23,16 +24,18 @@ let backPressCount = 0;
 
 export const ActionSheetTagsSection = ({item, close}) => {
   const [state, dispatch] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors, } = state;
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(item);
 
   const localRefresh = () => {
     toAdd = db.notes.note(note.id).data;
-    dispatch({type: Actions.NOTES});
-    dispatch({type: Actions.TAGS});
-    eSendEvent(refreshNotesPage);
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Tags,
+      Navigation.routeNames.Notes,
+      Navigation.routeNames.NotesPage
+    ])
     setNote({...toAdd});
     if (prevQuery) {
       getSuggestions(prevQuery, toAdd);
@@ -61,7 +64,9 @@ export const ActionSheetTagsSection = ({item, close}) => {
     }
     try {
       await db.notes.note(note.id).tag(tag);
-      dispatch({type: Actions.TAGS});
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Tags,
+      ])
       localRefresh(note.type);
       prevQuery = null;
       tagsInputRef.current?.setNativeProps({

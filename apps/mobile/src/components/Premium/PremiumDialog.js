@@ -25,7 +25,7 @@ class PremiumDialog extends React.Component {
       products: null,
       scrollEnabled: false,
       product: null,
-      visible: true,
+      visible: false,
     };
     this.routeIndex = 0;
     this.count = 0;
@@ -64,9 +64,6 @@ class PremiumDialog extends React.Component {
     } catch (e) {}
   }
 
-  componentDidMount() {
-    this.actionSheetRef.current?.setModalVisible(true);
-  }
 
   features = [
     {

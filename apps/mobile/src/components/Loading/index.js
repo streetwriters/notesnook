@@ -32,7 +32,7 @@ export const Loading = ({
             {doneText}
           </Paragraph>
 
-          <Button onPress={onDone} title="Open File" />
+          <Button onPress={onDone} title="Open file" />
         </>
       ) : (
         <>

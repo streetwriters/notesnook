@@ -65,7 +65,7 @@ export const EditorSettings = () => {
             <BaseDialog visible={true}>
               <DialogContainer>
                 <DialogHeader
-                  title="Save Preset"
+                  title="Save preset"
                   paragraph="Give this preset a name."
                 />
                 <Input placeholder="Preset name" />
@@ -79,7 +79,7 @@ export const EditorSettings = () => {
           )}
 
           <DialogHeader
-            title="Editor Settings"
+            title="Editor settings"
             paragraph="Modify editor settings based on personal preference."
             button={{
               title: 'Save as Preset',

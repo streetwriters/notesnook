@@ -54,7 +54,7 @@ export const UpdateDialog = () => {
               justifyContent: 'center',
               alignItems: 'center',
             }}>
-            <Heading>New Update Available!</Heading>
+            <Heading>New update available!</Heading>
             <Paragraph
               style={{
                 textAlign: 'center',
@@ -109,7 +109,7 @@ export const UpdateDialog = () => {
 
           <Seperator />
           <Button
-            title="Update Now"
+            title="Update now"
             onPress={async () => {
               let url_android =
                 'https://play.google.com/store/apps/details?id=com.streetwriters.notesnook';

@@ -23,6 +23,8 @@ export const eSendEvent = (eventName, data) => {
  * @typedef {Object} vaultType
  * @property {Object} item
  * @property {boolean} novault
+* @property {string} title
+* @property {string} description
  * @property {boolean} locked
  * @property {boolean} permanant
  * @property {boolean} goToEditor

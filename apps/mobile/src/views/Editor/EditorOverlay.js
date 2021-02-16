@@ -126,7 +126,7 @@ const EditorOverlay = () => {
               setError(false);
               eSendEvent('webviewreset');
             }}
-            title="Taking too long? Reload Editor"
+            title="Taking too long? Reload editor"
           />
           <Paragraph
             textBreakStrategy="balanced"

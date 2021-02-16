@@ -260,7 +260,7 @@ export default class NotesnookShare extends Component {
                       this.textInputRef.current?.focus();
                     }}
                     blurOnSubmit={false}
-                    placeholder="Note Title"
+                    placeholder="Note title"
                   />
 
                   <TouchableOpacity
@@ -398,7 +398,7 @@ export default class NotesnookShare extends Component {
                         this.textInputRef.current?.focus();
                       }}
                       blurOnSubmit={false}
-                      placeholder="Note Title"
+                      placeholder="Note title"
                     />
 
                     <TouchableOpacity

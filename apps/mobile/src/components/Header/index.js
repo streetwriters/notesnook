@@ -73,17 +73,17 @@ export const Header = ({root}) => {
         <HeaderLeftMenu />
 
         {(Platform.OS === 'android' ||
-        Platform.isPad) && currentScreen !== 'search' ? (
+        Platform.isPad) && currentScreen !== 'Search' ? (
           <HeaderTitle root={root} />
         ) : null}
       </View>
       {Platform.OS !== 'android' &&
       !Platform.isPad &&
-      currentScreen !== 'search' ? (
+      currentScreen !== 'Search' ? (
         <HeaderTitle root={root} />
       ) : null}
 
-      {currentScreen === 'search' ? (
+      {currentScreen === 'Search' ? (
         <View
           style={{
             width: '80%',
@@ -92,7 +92,7 @@ export const Header = ({root}) => {
         </View>
       ) : null}
 
-      {currentScreen === 'search' ? (
+      {currentScreen === 'Search' ? (
         <View style={[styles.rightBtnContainer, {right: 6}]}>
           <ActionIcon
             onPress={() => {

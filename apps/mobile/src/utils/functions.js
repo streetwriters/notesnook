@@ -1,11 +1,12 @@
+import {Linking} from 'react-native';
+import {InAppBrowser} from 'react-native-inappbrowser-reborn';
 import {history} from '.';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {eSendEvent, ToastEvent} from '../services/EventManager';
+import Navigation from '../services/Navigation';
 import {db} from './DB';
-import {eClearEditor, eOnNewTopicAdded, refreshNotesPage} from './Events';
-import {Linking} from 'react-native';
-import {InAppBrowser} from 'react-native-inappbrowser-reborn';
+import {eClearEditor} from './Events';
 
 export const deleteItems = async (item) => {
   if (item && item.id && history.selectedItemsList.length === 0) {
@@ -22,26 +23,32 @@ export const deleteItems = async (item) => {
   if (notes?.length > 0) {
     let ids = notes.map((i) => i.id);
     await db.notes.delete(...ids);
-    updateEvent({type: Actions.NOTES});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notes,
+      Navigation.routeNames.NotesPage,
+    ]);
     eSendEvent(eClearEditor);
-    eSendEvent(refreshNotesPage);
   }
   if (topics?.length > 0) {
     for (var i = 0; i < topics.length; i++) {
       let it = topics[i];
       await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
     }
-    updateEvent({type: Actions.NOTEBOOKS});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notebooks,
+      Navigation.routeNames.Notebook,
+    ]);
     updateEvent({type: Actions.MENU_PINS});
-    eSendEvent(eOnNewTopicAdded);
     ToastEvent.show('Topics deleted', 'success');
   }
 
   if (notebooks?.length > 0) {
     let ids = notebooks.map((i) => i.id);
     await db.notebooks.delete(...ids);
-    updateEvent({type: Actions.NOTEBOOKS});
-    updateEvent({type: Actions.NOTES});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notebooks,
+      Navigation.routeNames.Notes,
+    ]);
     updateEvent({type: Actions.MENU_PINS});
   }
 
@@ -52,7 +59,7 @@ export const deleteItems = async (item) => {
   if (topics.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
     ToastEvent.show(
       message,
-      'error',
+      'success',
       'global',
       6000,
       async () => {
@@ -64,9 +71,14 @@ export const deleteItems = async (item) => {
           ids.push(trashItem.id);
         }
         await db.trash.restore(...ids);
-        updateEvent({type: Actions.NOTEBOOKS});
-        updateEvent({type: Actions.NOTES});
-        updateEvent({type: Actions.TRASH});
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Trash,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Trash,
+        ]);
         updateEvent({type: Actions.COLORS});
         updateEvent({type: Actions.MENU_PINS});
         ToastEvent.hide();
@@ -74,12 +86,11 @@ export const deleteItems = async (item) => {
       'Undo',
     );
   }
-  updateEvent({type: Actions.TRASH});
+  Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.COLORS});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 };
-
 
 export const openLinkInBrowser = async (link, colors) => {
   try {
@@ -103,10 +114,9 @@ export const openLinkInBrowser = async (link, colors) => {
         enableUrlBarHiding: true,
         enableDefaultShare: true,
         forceCloseOnRedirection: false,
-       
       });
     } else Linking.openURL(url);
   } catch (error) {
     console.log(error.message);
   }
-}
+};

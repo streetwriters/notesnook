@@ -34,7 +34,7 @@ export const HeaderRightMenu = () => {
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
 
-      {currentScreen !== 'settings' && (
+      {currentScreen !== 'Settings' && (
         <ActionIcon
           onPress={async () => {
             Navigation.navigate('Search', {
@@ -55,7 +55,7 @@ export const HeaderRightMenu = () => {
             containerBottomButton.onPress();
           }}
           testID={notesnook.ids.default.addBtn}
-          icon={currentScreen === 'trash' ? 'delete' : 'plus'}
+          icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
           type="shade"
           style={{

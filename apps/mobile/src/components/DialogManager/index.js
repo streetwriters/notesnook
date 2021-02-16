@@ -239,6 +239,8 @@ export class DialogManager extends Component {
               novault: true,
               locked: true,
               deleteNote: true,
+              title:'Delete note',
+              description:"Unlock to delete note."
             });
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
@@ -253,8 +255,8 @@ export class DialogManager extends Component {
           openVault({
             item: this.state.item,
             novault: false,
-            locked: true,
-            deleteNote: true,
+            title:'Create vault',
+            description:"Set a password to create a vault and lock note."
           });
           break;
         }
@@ -263,6 +265,8 @@ export class DialogManager extends Component {
             item: this.state.item,
             novault: true,
             locked: true,
+            title:'Open note',
+            description:"Unlock note to open in editor"
           });
           break;
         }
@@ -272,6 +276,8 @@ export class DialogManager extends Component {
             novault: true,
             locked: true,
             permanant: true,
+            title:'Unlock note',
+            description:"Remove note from the vault."
           });
           break;
         }

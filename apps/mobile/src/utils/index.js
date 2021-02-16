@@ -190,7 +190,7 @@ export const BUTTON_TYPES = {
   gray: {
     primary: 'transparent',
     text: 'icon',
-    selected: 'nav',
+    selected: 'transGray',
   },
   grayBg: {
     primary: 'nav',
