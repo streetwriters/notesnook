@@ -66,7 +66,7 @@ const MoveNoteDialog = () => {
       Navigation.routeNames.Notebook,
       Navigation.routeNames.Notebooks,
     ]);
-    dispatch({type: Actions.CLEAR_SELECTION});
+    //dispatch({type: Actions.CLEAR_SELECTION});
   };
 
   const update = (note) => {
@@ -438,7 +438,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       ) > -1 ? (
                         <Button
                           onPress={() => handlePress(item, index)}
-                          title="Remove Note"
+                          title="Remove note"
                           type="error"
                           height={22}
                           style={{
