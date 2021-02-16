@@ -154,7 +154,8 @@ export class VaultDialog extends Component {
       fingerprint &&
       data.novault &&
       !data.fingerprintAccess &&
-      !data.revokeFingerprintAccess
+      !data.revokeFingerprintAccess &&
+      !data.changePassword
     ) {
       await this._onPressFingerprintAuth(data.title, data.description);
     } else {
