@@ -107,7 +107,7 @@ export const Tags = ({route, navigation}) => {
       loading={loading}
       focused={() => navigation.isFocused()}
       placeholderData={{
-        heading: 'Your Tags',
+        heading: 'Your tags',
         paragraph: 'You have not created any tags for your notes yet.',
         button: null,
         loading: 'Loading your tags.',

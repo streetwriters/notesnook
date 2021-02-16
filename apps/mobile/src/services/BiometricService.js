@@ -47,18 +47,17 @@ async function hasInternetCredentials() {
 	return await Keychain.hasInternetCredentials('nn_vault');
 }
 
-async function getCredentials() {
+async function getCredentials(title,description) {
   try {
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
           fallbackEnabled: true,
-          description:
-            'Biometrics are required to unlock note.',
+          description:description,
         },
         android: {
-          title: 'Unlock Note',
-          description: 'Biometrics are required to unlock note.',
+          title: title,
+          description: description,
           deviceCredentialAllowed: true,
         },
       }),

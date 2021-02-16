@@ -1,23 +1,23 @@
-import {createRef} from 'react';
-import {Linking, Platform} from 'react-native';
-import {updateEvent} from '../../components/DialogManager/recievers';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
-import {editing} from '../../utils';
-import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { createRef } from 'react';
+import { Platform } from 'react-native';
+import { updateEvent } from '../../components/DialogManager/recievers';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, sendNoteEditedEvent } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import { editing } from '../../utils';
+import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eOnLoadNote,
-  eShowGetPremium,
-  refreshNotesPage,
+  eShowGetPremium
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {sideMenuRef, tabBarRef} from '../../utils/Refs';
-import {normalize} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { normalize } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
@@ -371,8 +371,11 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-      updateEvent({type: Actions.NOTEBOOKS});
-      eSendEvent(refreshNotesPage);
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Notebooks,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Notebook,
+      ]);
       break;
     }
     case 'tag': {
@@ -380,9 +383,10 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-
-      updateEvent({type: Actions.TAGS});
-      eSendEvent(refreshNotesPage);
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Tags,
+        Navigation.routeNames.NotesPage,
+      ]);
       break;
     }
     case 'color': {
@@ -391,7 +395,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null,
       };
-      eSendEvent(refreshNotesPage);
+      Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
       updateEvent({type: Actions.COLORS});
       break;
     }
@@ -421,11 +425,13 @@ export async function saveNote() {
     if (!locked) {
       let noteId = await db.notes.add(noteData);
       if (!id || saveCounter < 3) {
-        updateEvent({
-          type: Actions.NOTES,
-        });
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Notebook,
+        ]);
         updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
-        eSendEvent(refreshNotesPage);
       }
 
       if (!id) {
