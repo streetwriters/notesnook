@@ -39,7 +39,7 @@ const SelectionWrapper = ({
         }
       }
     }
-  }, [selectedItemsList]);
+  }, [selectedItemsList,item.id]);
 
   const onLong = () => {
     if (selectionMode) return;
