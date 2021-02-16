@@ -99,7 +99,7 @@ class AppStore extends BaseStore {
         break;
       }
       case "topic": {
-        notebookStore.setSelectedNotebookTopics(item.notebookId);
+        notebookStore.setSelectedNotebook(item.notebookId);
         break;
       }
       case "tag": {

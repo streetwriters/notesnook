@@ -6,11 +6,13 @@ import { useStore, store } from "../stores/trash-store";
 import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { Text } from "rebass";
+import useNavigate from "../utils/use-navigate";
 
 function Trash() {
-  useEffect(() => store.refresh(), []);
+  useNavigate("trash", () => store.refresh());
   const items = useStore((store) => store.trash);
   const clearTrash = useStore((store) => store.clear);
+
   return (
     <ListContainer
       type="trash"

@@ -6,6 +6,7 @@ import Dialog, { showDialog } from "./dialog";
 import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import Field from "../field";
+import { store as notestore } from "../../stores/note-store";
 
 class MoveDialog extends React.Component {
   _inputRef;
@@ -15,6 +16,11 @@ class MoveDialog extends React.Component {
     currentOpenedIndex: -1,
     notebooks: db.notebooks.all,
   };
+
+  refresh() {
+    this.setState({ notebooks: db.notebooks.all });
+    notestore.refresh();
+  }
 
   async addNotebook(input) {
     if (input.value.length > 0) {
@@ -39,13 +45,13 @@ class MoveDialog extends React.Component {
   }
 
   async _addNoteToTopic(notebook, topic) {
-    const { noteIds, onMove, onClose } = this.props;
+    const { noteIds } = this.props;
     if (this._topicHasNotes(topic, noteIds)) {
       await db.notebooks
         .notebook(topic.notebookId)
         .topics.topic(topic.id)
         .delete(...noteIds);
-      this.setState({ notebooks: db.notebooks.all });
+      this.refresh();
       return;
     }
     try {
@@ -56,12 +62,10 @@ class MoveDialog extends React.Component {
       const note = db.notes.note(noteIds[0]).data;
       await db.notes.move(nb, ...noteIds);
       showNotesMovedToast(note, noteIds, nb);
-      onMove();
+      this.refresh();
     } catch (e) {
       showToast("error", e.message);
       console.error(e);
-    } finally {
-      onClose();
     }
   }
 
@@ -76,7 +80,7 @@ class MoveDialog extends React.Component {
         icon={Icon.Move}
         onClose={props.onClose}
         negativeButton={{
-          text: "Cancel",
+          text: "Done",
           onClick: props.onClose,
         }}
       >

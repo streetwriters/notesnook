@@ -25,13 +25,14 @@ import useRoutes from "./utils/use-routes";
 import useHashRoutes from "./utils/use-hash-routes";
 import hashroutes from "./navigation/hash-routes";
 import rootroutes from "./navigation/rootroutes";
-import { getCurrentPath } from "./navigation";
+import { getCurrentPath, NavigationEvents } from "./navigation";
 import useVersion, { getCachedVersion } from "./utils/useVersion";
 import {
   showAppAvailableNotice,
   showAppUpdatedNotice,
 } from "./components/dialogs/confirm";
 import { useAnimation } from "framer-motion";
+import RouteContainer from "./components/route-container";
 
 function App() {
   const [show, setShow] = useState(true);
@@ -176,8 +177,10 @@ const cache = {};
 function CachedRouter() {
   const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
   useEffect(() => {
+    NavigationEvents.publish("onNavigate", RouteResult);
+
     const key = RouteResult.key || "general";
-    const routeContainer = document.getElementById("routeContainer");
+    const routeContainer = document.getElementById("mainRouteContainer");
     routeContainer.childNodes.forEach((node) => {
       node.style.display = "none";
     });
@@ -196,10 +199,22 @@ function CachedRouter() {
         route.className = "route";
         routeContainer.appendChild(route);
       }
-      ReactDOM.render(<ThemeProvider>{RouteResult}</ThemeProvider>, route);
+      ReactDOM.render(
+        <ThemeProvider>{RouteResult.component}</ThemeProvider>,
+        route
+      );
     }
   }, [RouteResult]);
-  return <div style={{ display: "flex", flex: 1 }} id="routeContainer" />;
+
+  return (
+    <RouteContainer
+      id="mainRouteContainer"
+      type={RouteResult.type}
+      title={RouteResult.title}
+      subtitle={RouteResult.subtitle}
+      buttons={RouteResult.buttons}
+    />
+  );
 }
 
 function EditorSwitch() {

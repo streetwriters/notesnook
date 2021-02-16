@@ -16,11 +16,11 @@ import { useLocation } from "wouter";
 
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
-    return route === `/notebooks/${pin.id}`;
+    return route.startsWith(`/notebooks/${pin.id}`);
   } else if (pin.type === "topic") {
-    return route === `/notebooks/${pin.notebookId}/${pin.id}`;
+    return route.startsWith(`/notebooks/${pin.notebookId}/${pin.id}`);
   } else if (pin.type === "tag") {
-    return route === `/tags/${pin.id}`;
+    return route.startsWith(`/tags/${pin.id}`);
   }
 }
 
@@ -36,8 +36,8 @@ const routes = [
     path: "/favorites",
     icon: Icon.StarOutline,
   },
-  { title: "Trash", path: "/trash", icon: Icon.Trash },
   { title: "Tags", path: "/tags", icon: Icon.Tag },
+  { title: "Trash", path: "/trash", icon: Icon.Trash },
 ];
 
 const bottomRoutes = [

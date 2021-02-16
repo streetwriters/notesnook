@@ -13,7 +13,7 @@ function Home() {
   useEffect(() => {
     (async function () {
       const intitialized = db.notes.initialized;
-      if (!intitialized) {
+      if (!intitialized || !store.notes.length) {
         await db.notes.init();
         store.refresh();
         setIsLoading(false);

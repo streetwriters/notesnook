@@ -50,7 +50,7 @@ export function showTopicDialog() {
         if (!topic) return;
         const notebookId = store.get().selectedNotebookId;
         await db.notebooks.notebook(notebookId).topics.add(topic);
-        store.setSelectedNotebookTopics(notebookId);
+        store.setSelectedNotebook(notebookId);
         perform(true);
       }}
     />
@@ -72,7 +72,7 @@ export function showEditTopicDialog(notebookId, topicId) {
         await db.notebooks
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
-        store.setSelectedNotebookTopics(topic.notebookId);
+        store.setSelectedNotebook(topic.notebookId);
         showToast("success", "Topic edited successfully!");
         perform(true);
       }}

@@ -13,7 +13,9 @@ export default function useRoutes(routes, options) {
   for (var key in routes) {
     const [match, params] = matcher(key, location);
     if (match) {
-      return routes[key](params);
+      const result = routes[key](params);
+      if (!result) break;
+      return result;
     }
   }
   if (!options) return;

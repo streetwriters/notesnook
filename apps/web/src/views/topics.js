@@ -1,29 +1,21 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { hashNavigate } from "../navigation";
 
-function Topics(props) {
-  const { notebookId } = props;
-
-  const setSelectedNotebookTopics = useNbStore(
-    (store) => store.setSelectedNotebookTopics
-  );
+function Topics() {
   const selectedNotebookTopics = useNbStore(
     (store) => store.selectedNotebookTopics
   );
-
-  useEffect(() => {
-    setSelectedNotebookTopics(notebookId);
-  }, [setSelectedNotebookTopics, notebookId]);
+  const selectedNotebookId = useNbStore((store) => store.selectedNotebookId);
 
   return (
     <>
       <ListContainer
         type="topics"
         items={selectedNotebookTopics}
-        context={{ notebookId }}
+        context={{ notebookId: selectedNotebookId }}
         placeholder={Flex}
         button={{
           content: "Add a new topic",

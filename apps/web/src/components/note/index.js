@@ -26,9 +26,7 @@ function menuItems(note, context) {
     {
       title: "Add to notebook",
       onClick: async () => {
-        if (await showMoveNoteDialog([note.id])) {
-          store.refresh();
-        }
+        await showMoveNoteDialog([note.id]);
       },
     },
     {
@@ -67,6 +65,7 @@ function menuItems(note, context) {
       visible: context?.type === "topic",
       title: "Remove from topic",
       onClick: async () => {
+        console.log("Remove from topic:", Object.isExtensible(note));
         await db.notebooks
           .notebook(context.value.id)
           .topics.topic(context.value.topic)

@@ -8,26 +8,11 @@ import useMobile from "../../utils/use-mobile";
 import { navigate } from "../../navigation";
 
 function RouteContainer(props) {
-  const {
-    type,
-    route,
-    canGoBack,
-    title,
-    subtitle,
-    onlyBackButton,
-    noSearch,
-  } = props;
+  const { id, type, title, subtitle, buttons } = props;
   return (
     <>
-      <Header
-        type={type}
-        canGoBack={canGoBack}
-        title={title}
-        subtitle={subtitle}
-        noSearch={noSearch}
-        onlyBackButton={onlyBackButton}
-      />
-      {route}
+      <Header type={type} title={title} subtitle={subtitle} buttons={buttons} />
+      <Flex id={id} flexDirection="column" flex={1} />
     </>
   );
 }
@@ -35,21 +20,22 @@ function RouteContainer(props) {
 export default RouteContainer;
 
 function Header(props) {
-  const { title, subtitle, canGoBack, onlyBackButton, type, noSearch } = props;
+  const { title, subtitle, buttons, type } = props;
   const createButtonData = CREATE_BUTTON_MAP[type];
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
 
-  if (!onlyBackButton && !title && !subtitle) return null;
+  if (!title && !subtitle) return null;
   return (
     <Flex mx={2} flexDirection="column" justifyContent="center">
       <Flex alignItems="center" justifyContent="space-between">
         <Flex justifyContent="center" alignItems="center" py={2}>
-          {canGoBack || onlyBackButton ? (
+          {buttons?.back ? (
             <Icon.ArrowLeft
               size={24}
-              onClick={() => window.history.back()}
+              title={buttons.back.title}
+              onClick={buttons.back.action}
               sx={{ flexShrink: 0, mr: 2 }}
               color="text"
               data-test-id="go-back"
@@ -62,7 +48,7 @@ function Header(props) {
                 ml: 0,
                 mr: 4,
                 mt: 1,
-                display: [onlyBackButton ? "none" : "block", "none", "none"],
+                display: ["block", "none", "none"],
               }}
               size={30}
             />
@@ -74,12 +60,11 @@ function Header(props) {
         <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
         {!isSelectionMode && (
           <Flex>
-            {!noSearch && (
+            {buttons?.search && (
               <Icon.Search
                 size={24}
-                onClick={() => {
-                  navigate(`/search`, { type });
-                }}
+                title={buttons.search.title}
+                onClick={() => navigate(`/search/${type}`)}
               />
             )}
 

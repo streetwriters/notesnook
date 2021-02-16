@@ -25,9 +25,8 @@ class NotebookStore extends BaseStore {
     await db.notebooks.delete(id);
     this.set((state) => {
       state.notebooks.splice(index, 1);
-      trashStore.refresh();
-      appStore.refreshMenuPins();
     });
+    appStore.refreshMenuPins();
   };
 
   pin = async (notebookId) => {
@@ -39,7 +38,7 @@ class NotebookStore extends BaseStore {
     this.refresh();
   };
 
-  setSelectedNotebookTopics = (id) => {
+  setSelectedNotebook = (id) => {
     this.set((state) => {
       state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
       state.selectedNotebookId = id;

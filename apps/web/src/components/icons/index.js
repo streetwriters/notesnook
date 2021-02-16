@@ -5,13 +5,11 @@ import { useTheme } from "emotion-theming";
 import Animated from "../animated";
 //import useMobile from "../../utils/use-mobile";
 
-function Icon({ name, size = 24, color = "icon", stroke, rotate }) {
+function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
-  // const isMobile = useMobile();
-  //size += isMobile ? 4 : 0;
-
   return (
     <MDIIcon
+      title={title}
       path={name}
       size={size + "px"}
       stroke={stroke}
@@ -37,7 +35,7 @@ function createIcon(name, rotate = false) {
         justifyContent="center"
         alignItems="center"
       >
-        <Icon name={name} rotate={rotate} {...props} />
+        <Icon title={props.title} name={name} rotate={rotate} {...props} />
       </Animated.Flex>
     );
   };

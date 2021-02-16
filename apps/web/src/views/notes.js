@@ -1,34 +1,21 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { db } from "../common";
 import { hashNavigate } from "../navigation";
+import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 
-function Notes(props) {
-  const [isLoading, setIsLoading] = useState(true);
+function Notes() {
   const context = useNotesStore((store) => store.context);
-  const setContext = useNotesStore((store) => store.setContext);
-
-  useEffect(() => {
-    (async function () {
-      await db.notes.init();
-      if (props.context) {
-        setContext(props.context);
-      }
-      setIsLoading(false);
-    })();
-  }, [props.context, setContext]);
-
   if (!context) return null;
-
   return (
     <ListContainer
       type="notes"
-      isLoading={isLoading}
-      context={context}
+      context={{ ...context, notes: undefined }}
       items={context.notes}
-      placeholder={props.placeholder || NotesPlaceholder}
+      placeholder={
+        context.type === "favorites" ? FavoritesPlaceholder : NotesPlaceholder
+      }
       button={{
         content: "Make a new note",
         onClick: () => hashNavigate("/notes/create", true),

@@ -24,7 +24,7 @@ const menuItems = (item) => [
     color: "red",
     onClick: async () => {
       await db.notebooks.notebook(item.notebookId).topics.delete(item.id);
-      store.setSelectedNotebookTopics(item.notebookId);
+      store.setSelectedNotebook(item.notebookId);
     },
   },
 ];

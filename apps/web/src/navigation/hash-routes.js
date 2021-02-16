@@ -19,6 +19,7 @@ import {
   showEditTopicDialog,
   showTopicDialog,
 } from "../components/dialogs/topicdialog";
+import { hashNavigate } from ".";
 
 const hashroutes = {
   "/": () => {
@@ -49,8 +50,15 @@ const hashroutes = {
   "/notes/:noteId/unlock": ({ noteId }) => {
     return (
       <RouteContainer
-        onlyBackButton={isMobile()}
-        route={<Unlock noteId={noteId} />}
+        buttons={{
+          back: isMobile()
+            ? {
+                title: "Go back",
+                action: () => hashNavigate("/notes/create"),
+              }
+            : undefined,
+        }}
+        component={<Unlock noteId={noteId} />}
       />
     );
   },

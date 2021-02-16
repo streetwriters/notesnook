@@ -3,9 +3,10 @@ import ListContainer from "../components/list-container";
 import { useStore, store } from "../stores/notebook-store";
 import NotebooksPlaceholder from "../components/placeholders/notebooks-placeholder";
 import { hashNavigate } from "../navigation";
+import useNavigate from "../utils/use-navigate";
 
 function Notebooks() {
-  useEffect(() => store.refresh(), []);
+  useNavigate("notebooks", () => store.refresh());
   const notebooks = useStore((state) => state.notebooks);
 
   return (

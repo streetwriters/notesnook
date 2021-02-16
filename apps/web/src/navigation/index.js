@@ -1,4 +1,5 @@
 import { useState } from "react";
+import EventManager from "notes-core/utils/eventmanager";
 // import { useCallback } from "react";
 
 export function navigate(url, replaceOrQuery, replace) {
@@ -92,3 +93,5 @@ export function getCurrentPath() {
 export function getCurrentHash() {
   return window.location.hash;
 }
+
+export const NavigationEvents = new EventManager();

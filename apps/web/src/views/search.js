@@ -32,13 +32,12 @@ async function typeToItems(type, context) {
   }
 }
 
-function Search() {
+function Search({ type }) {
   const [searchState, setSearchState] = useState({
     isSearching: false,
     totalItems: 0,
   });
   const [results, setResults] = useState([]);
-  const [{ type }] = useQueryParams();
   const context = useNoteStore((store) => store.context);
 
   return (

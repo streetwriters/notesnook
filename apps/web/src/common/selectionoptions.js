@@ -59,7 +59,7 @@ const DeleteOption = createOption(
       nbStore.refresh();
     } else if (item.type === "topic") {
       await db.notebooks.notebook(item.notebookId).topics.delete(...items);
-      nbStore.setSelectedNotebookTopics(item.notebookId);
+      nbStore.setSelectedNotebook(item.notebookId);
     }
     showToast("success", `${items.length} ${item.type}s moved to trash!`);
   }
