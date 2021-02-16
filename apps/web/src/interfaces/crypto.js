@@ -1,21 +1,26 @@
-import lzutf8 from "lzutf8";
-
 /**
- * @return {Uint8Array}
+ * @return {Promise<Uint8Array>}
  */
 function compress(data) {
-  return lzutf8.compress(data, {
-    blockSize: 64 * 1024 * 1024,
-    outputEncoding: "ByteArray",
-    inputEncoding: "String",
+  return import("lzutf8").then((lzutf8) => {
+    lzutf8.compress(data, {
+      blockSize: 64 * 1024 * 1024,
+      outputEncoding: "ByteArray",
+      inputEncoding: "String",
+    });
   });
 }
 
+/**
+ * @return {Promise<string>}
+ */
 function decompress(data) {
-  return lzutf8.decompress(data, {
-    blockSize: 64 * 1024 * 1024,
-    inputEncoding: "ByteArray",
-    outputEncoding: "String",
+  return import("lzutf8").then((lzutf8) => {
+    return lzutf8.decompress(data, {
+      blockSize: 64 * 1024 * 1024,
+      inputEncoding: "ByteArray",
+      outputEncoding: "String",
+    });
   });
 }
 
@@ -48,7 +53,7 @@ class Crypto {
     await this._initialize();
     return global.ncrypto.encrypt.call(this, passwordOrKey, {
       type: "uint8array",
-      data: compress(plainData),
+      data: await compress(plainData),
     });
   };
 
@@ -91,7 +96,7 @@ class Crypto {
    */
   _decryptCompressed = async (passwordOrKey, cipherData) => {
     cipherData.output = "uint8array";
-    return decompress(
+    return await decompress(
       await global.ncrypto.decrypt.call(this, passwordOrKey, cipherData)
     );
   };
@@ -173,10 +178,10 @@ class CryptoWorker {
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
    * @param {string} data - the plaintext data
    */
-  _encryptCompressed = (passwordOrKey, data) => {
+  _encryptCompressed = async (passwordOrKey, data) => {
     const message = {
       passwordOrKey,
-      data: { type: "uint8array", data: compress(data) },
+      data: { type: "uint8array", data: await compress(data) },
     };
     return this._communicate("encrypt", message, [message.data.data.buffer]);
   };
@@ -218,7 +223,7 @@ class CryptoWorker {
    */
   _decryptCompressed = async (passwordOrKey, cipherData) => {
     cipherData.output = "uint8array";
-    return decompress(
+    return await decompress(
       await this._communicate("decrypt", {
         passwordOrKey,
         cipher: cipherData,

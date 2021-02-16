@@ -22,8 +22,6 @@
     "lzutf8": "^0.5.8",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
     "qclone": "^1.0.4",
-    "quill": "https://github.com/thecodrr/quill.git#develop",
-    "quill-magic-url": "^3.0.0",
     "react": "^17.0.1",
     "react-app-polyfill": "^2.0.0",
     "react-dom": "^17.0.1",

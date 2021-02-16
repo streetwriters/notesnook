@@ -2,13 +2,15 @@ import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
 import Dialog, { showDialog } from "./dialog";
 import { db } from "../../common";
-import { QRCode } from "react-qrcode-logo";
 import Logo from "../../assets/notesnook-small.png";
 import download from "../../utils/download";
 import ClipboardJS from "clipboard";
 import Config from "../../utils/config";
 import { captureMessage } from "@sentry/react";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { Suspense } from "react";
+
+const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
@@ -34,7 +36,7 @@ function RecoveryKeyDialog(props) {
       captureMessage("Error while copying text.");
     });
     return () => {
-      clipboard.destroy();
+      clipboard?.destroy();
     };
   }, []);
 
@@ -65,13 +67,16 @@ function RecoveryKeyDialog(props) {
             {key}
           </Text>
           <Flex justifyContent="space-around" alignItems="center">
-            <QRCode
-              value={key}
-              logoImage={Logo}
-              logoWidth={25}
-              ecLevel={"M"}
-              logoHeight={25}
-            />
+            <Suspense fallback={<div />}>
+              <QRCode
+                value={key}
+                logoImage={Logo}
+                logoWidth={25}
+                ecLevel={"M"}
+                logoHeight={25}
+              />
+            </Suspense>
+
             <Flex flexDirection="column">
               <Button
                 data-clipboard-text={key}

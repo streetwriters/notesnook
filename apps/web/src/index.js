@@ -8,10 +8,12 @@ import { Integrations } from "@sentry/tracing";
 import "./index.css";
 import * as serviceWorker from "./serviceWorker";
 import Modal from "react-modal";
-import App from "./App";
 import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
 import Splash from "./views/splash";
 import { getAppVersion } from "./utils/useVersion";
+import { Suspense } from "react";
+
+const App = React.lazy(() => import("./App"));
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
@@ -39,9 +41,11 @@ ReactDOM.render(
     <Splash
       onLoadingFinished={() => {
         ReactDOM.render(
-          <MotionConfig features={[AnimationFeature, GesturesFeature]}>
-            <App />
-          </MotionConfig>,
+          <Suspense fallback={<div />}>
+            <MotionConfig features={[AnimationFeature, GesturesFeature]}>
+              <App />
+            </MotionConfig>
+          </Suspense>,
           document.getElementById("root")
         );
       }}

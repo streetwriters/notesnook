@@ -7508,11 +7508,6 @@ jsesc@~0.5.0:
   resolved "https://registry.yarnpkg.com/jsesc/-/jsesc-0.5.0.tgz#e7dee66e35d6fc16f710fe91d5cf69f70f08911d"
   integrity sha1-597mbjXW/Bb3EP6R1c9p9w8IkR0=
 
-jshashes@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/jshashes/-/jshashes-1.0.8.tgz#f60d837428383abf73ab022e1542e6614bd75514"
-  integrity sha512-btmQZ/w1rj8Lb6nEwvhjM7nBYoj54yaEFo2PWh3RkxZ8qNwuvOxvQYN/JxVuwoMmdIluL+XwYVJ+pEEZoSYybQ==
-
 json-parse-better-errors@^1.0.1, json-parse-better-errors@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/json-parse-better-errors/-/json-parse-better-errors-1.0.2.tgz#bb867cfb3450e69107c131d1c514bab3dc8bcaa9"
@@ -7659,6 +7654,11 @@ last-call-webpack-plugin@^3.0.0:
   dependencies:
     lodash "^4.17.5"
     webpack-sources "^1.1.0"
+
+lean-he@^2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/lean-he/-/lean-he-2.1.2.tgz#50c2422f0ca42f6737c9c1988b555cf00ebc712f"
+  integrity sha512-g/cq01j/rnv7JWoxFmeLgJdd/CucksyDtS+pyepO89EdT0O4KfHJokOVz/xQ4mvjKJzcrj87Q3/s2ESou90WCQ==
 
 leven@^3.1.0:
   version "3.1.0"
@@ -8387,19 +8387,29 @@ normalize-url@^4.5.0:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-4.5.0.tgz#453354087e6ca96957bd8f5baf753f5982142129"
   integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
 
-"notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "6.3.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#ce4ab84b1481430986008ad786a73fd7711852ee"
+notes-core@../notes-core:
+  version "6.4.0"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"
-    he "^1.2.0"
-    jshashes "^1.0.8"
+    lean-he "^2.1.2"
     no-internet "^1.5.2"
     qclone "^1.0.4"
     quill-delta-to-html "^0.12.0"
     spark-md5 "^3.0.1"
-    transfun "^1.0.2"
+    turndown "^7.0.0"
+
+"notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
+  version "6.4.0"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#d655fae4986861c0ddea559613a448554c046970"
+  dependencies:
+    fast-sort "^2.0.1"
+    fuzzysearch "^1.0.3"
+    lean-he "^2.1.2"
+    no-internet "^1.5.2"
+    qclone "^1.0.4"
+    quill-delta-to-html "^0.12.0"
+    spark-md5 "^3.0.1"
     turndown "^7.0.0"
 
 npm-run-path@^2.0.0:
@@ -11950,11 +11960,6 @@ tr46@^2.0.2:
   integrity sha512-3n1qG+/5kg+jrbTzwAykB5yRYtQCTqOGKq5U5PE3b0a1/mzo6snDhjGS0zJVJunO0NrT3Dg1MLy5TjWP/UJppg==
   dependencies:
     punycode "^2.1.1"
-
-transfun@^1.0.2:
-  version "1.0.2"
-  resolved "https://registry.yarnpkg.com/transfun/-/transfun-1.0.2.tgz#14a3116296a8d921cbf9678ebd5eee1c5bb77b98"
-  integrity sha1-FKMRYpao2SHL+WeOvV7uHFu3e5g=
 
 tree-kill@^1.2.2:
   version "1.2.2"
