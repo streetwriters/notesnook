@@ -53,7 +53,7 @@ export const Favorites = ({route, navigation}) => {
       return;
     }
     Navigation.setHeaderState(
-      'favorites',
+      'Favorites',
       {
         menu: true,
       },
@@ -102,7 +102,7 @@ export const Favorites = ({route, navigation}) => {
       }}
       loading={loading || localLoad}
       placeholderData={{
-        heading: 'Your Favorites',
+        heading: 'Your favorites',
         paragraph: 'You have not added any notes to favorites yet.',
         button: null,
         loading: 'Loading your favorites',

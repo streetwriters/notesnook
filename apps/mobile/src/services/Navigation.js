@@ -48,8 +48,10 @@ function routeNeedsUpdate(routeName, callback) {
 }
 
 function setRoutesToUpdate(routes) {
+
+  console.log(currentScreen, "current");
   if (routes.indexOf(currentScreen) > -1) {
-    console.log('updating', currentScreen);
+    console.log('updating screen', currentScreen);
     if (
       currentScreen === routeNames.NotesPage &&
       currentScreen === routeNames.Notebook
@@ -102,7 +104,7 @@ function setHeaderState(name, params, item) {
     headerState = item;
   }
   currentScreen = name;
-  headerState.currentScreen = name.toLowerCase();
+  headerState.currentScreen = name;
   headerState.verticalMenu = params.menu;
 
   if (headerState) {
@@ -128,7 +130,7 @@ function popToTop() {
   rootNavigatorRef.current?.dispatch(StackActions.popToTop());
   SettingsService.get().homepage;
   setHeaderState(
-    SettingsService.get().homepage.toLowerCase(),
+    SettingsService.get().homepage,
     {
       menu: true,
     },

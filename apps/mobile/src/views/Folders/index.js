@@ -32,7 +32,7 @@ export const Folders = ({route, navigation}) => {
       return;
     }
     Navigation.setHeaderState(
-      'notebooks',
+      'Notebooks',
       {
         menu: true,
       },
@@ -107,9 +107,9 @@ export const Folders = ({route, navigation}) => {
         focused={() => navigation.isFocused()}
         loading={loading}
         placeholderData={{
-          heading: 'Your Notebooks',
+          heading: 'Your notebooks',
           paragraph: 'You have not added any notebooks yet.',
-          button: 'Add a Notebook',
+          button: 'Add a notebook',
           action: _onPressBottomButton,
           loading: 'Loading your notebooks',
         }}

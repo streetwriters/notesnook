@@ -132,7 +132,7 @@ export const Notes = ({route, navigation}) => {
       return;
     }
 
-    Navigation.setHeaderState('Notes', params, {
+    Navigation.setHeaderState('NotesPage', params, {
       heading:
         params.type === 'tag'
           ? '#' + params.title
@@ -239,9 +239,9 @@ export const Notes = ({route, navigation}) => {
           params.type ? params.type : 'topic.'
         }`}
         placeholderData={{
-          heading: 'Your Notes',
+          heading: 'Your notes',
           paragraph: 'You have not added any notes yet.',
-          button: 'Add your First Note',
+          button: 'Add your first Note',
           action: _onPressBottomButton,
           loading: 'Loading your notes.',
         }}

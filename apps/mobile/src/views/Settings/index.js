@@ -1,9 +1,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
-import {Image} from 'react-native';
 import {
   Appearance,
   InteractionManager,
-  Linking,
   Platform,
   ScrollView,
   TouchableOpacity,
@@ -28,6 +26,7 @@ import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Backup from '../../services/Backup';
+import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -58,7 +57,6 @@ import {
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
-  eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenProgressDialog,
@@ -113,7 +111,7 @@ export const Settings = ({navigation}) => {
       return;
     }
     Navigation.setHeaderState(
-      'settings',
+      'Settings',
       {
         menu: true,
       },
@@ -128,10 +126,10 @@ export const Settings = ({navigation}) => {
     navigation.addListener('focus', onFocus);
     db.version()
       .then((ver) => {
-        console.log(ver,"VERSION")
+        console.log(ver, 'VERSION');
         setVersion(ver);
       })
-      .catch((e) => console.log(e,"VER"));
+      .catch((e) => console.log(e, 'VER'));
 
     return () => {
       pageIsLoaded = false;
@@ -321,7 +319,7 @@ const AccoutLogoutSection = () => {
               />
 
               <Input
-                placeholder="Enter Account Password"
+                placeholder="Enter account password"
                 onChangeText={(v) => {
                   passwordValue = v;
                 }}
@@ -811,7 +809,6 @@ const SettingsAppearanceSection = () => {
         }}>
         {[
           '#e6194b',
-          '#3cb44b',
           '#ffe119',
           '#0560FF',
           '#f58231',
@@ -820,7 +817,7 @@ const SettingsAppearanceSection = () => {
           '#f032e6',
           '#bcf60c',
           '#fabebe',
-          "#00c853"
+          '#00c853',
         ].map((item) => (
           <PressableButton
             key={item}
@@ -943,7 +940,7 @@ const SettingsAppearanceSection = () => {
                         : 'transparent',
                   }}
                   textStyle={{
-                    fontSize: SIZE.sm,
+                    fontSize: SIZE.md,
                     color:
                       settings.homepage === item.name
                         ? colors.accent
@@ -972,14 +969,10 @@ const SettingsPrivacyAndSecurity = () => {
   const checkVaultStatus = useCallback(() => {
     InteractionManager.runAfterInteractions(() => {
       db.vault.add('check_no_vault').catch(async (e) => {
-        let biometry = await Keychain.getSupportedBiometryType();
-        let fingerprint = await Keychain.hasInternetCredentials('nn_vault');
-
+        let biometry = await BiometricService.isBiometryAvailable();
+        let fingerprint = await BiometricService.hasInternetCredentials();
         let available = false;
-        if (
-          biometry === Keychain.BIOMETRY_TYPE.FINGERPRINT ||
-          biometry === Keychain.BIOMETRY_TYPE.TOUCH_ID
-        ) {
+        if (biometry) {
           available = true;
         }
         if (e.message === db.vault.ERRORS.noVault) {
@@ -1037,14 +1030,20 @@ const SettingsPrivacyAndSecurity = () => {
           {vaultStatus.isBiometryAvailable ? (
             <CustomButton
               key="fingerprintVaultUnlock"
-              title="Vault Fingerprint Unlock"
-              tagline="Access vault with fingerprint."
+              title="Vault Biometic Unlock"
+              tagline="Access notes in vault using biometrics"
               onPress={() => {
                 openVault({
                   item: {},
                   fingerprintAccess: !vaultStatus.biometryEnrolled,
                   revokeFingerprintAccess: vaultStatus.biometryEnrolled,
                   novault: true,
+                  title: vaultStatus.biometryEnrolled
+                    ? 'Revoke biometric unlocking'
+                    : 'Enable biometery unlock',
+                  description: vaultStatus.biometryEnrolled
+                    ? 'Disable biometric unlocking for notes in vault'
+                    : 'Disable biometric unlocking for notes in vault',
                 });
               }}
               maxWidth="90%"
@@ -1065,13 +1064,15 @@ const SettingsPrivacyAndSecurity = () => {
           ) : null}
           <CustomButton
             key="changeVaultPassword"
-            title="Change Vault Password"
+            title="Change vault password"
             tagline="Setup a new password for the vault"
             onPress={() => {
               openVault({
                 item: {},
                 changePassword: true,
                 novault: true,
+                title:"Change vault password",
+                description:"Set a new password for your vault."
               });
             }}
           />
@@ -1079,13 +1080,15 @@ const SettingsPrivacyAndSecurity = () => {
       ) : (
         <CustomButton
           key="createVault"
-          title="Create Vault"
+          title="Create vault"
           tagline="Secure your notes by adding the to the vault."
           onPress={() => {
             PremiumService.verify(() => {
               openVault({
                 item: {},
                 novault: false,
+                title:"Create vault",
+                description:"Set a password to create vault and lock notes."
               });
             });
           }}
@@ -1118,7 +1121,7 @@ const SettingsBackupAndRestore = () => {
 
   return (
     <>
-      <SectionHeader title="Backup & Restore" />
+      <SectionHeader title="Backup & restore" />
 
       {backupItemsList.map((item) => (
         <CustomButton
@@ -1195,6 +1198,7 @@ const SettingsBackupAndRestore = () => {
                       }
                     }
                     await SettingsService.set('reminder', item.value);
+                    await Backup.run();
                   });
                 }
               }}
@@ -1218,7 +1222,7 @@ const SettingsBackupAndRestore = () => {
       </View>
 
       <CustomButton
-        title="Backup Encryption"
+        title="Backup encryption"
         tagline="Encrypt all your backups."
         onPress={async () => {
           if (!user) {

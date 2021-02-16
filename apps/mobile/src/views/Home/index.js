@@ -13,7 +13,7 @@ import {db} from '../../utils/DB';
 import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 import Storage from '../../utils/storage';
-
+import Keychain from 'react-native-keychain';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
@@ -33,7 +33,7 @@ export const Home = ({route, navigation}) => {
     }
 
     Navigation.setHeaderState(
-      'notes',
+      'Notes',
       {
         menu: true,
       },
@@ -88,7 +88,7 @@ export const Home = ({route, navigation}) => {
       navigation.removeListener('blur', onBlur);
     };
   }, []);
- 
+
   useEffect(() => {
     if (navigation.isFocused()) {
       updateSearch();
@@ -128,9 +128,9 @@ export const Home = ({route, navigation}) => {
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
         placeholderData={{
-          heading: 'Your Notes',
+          heading: 'Your notes',
           paragraph: 'You have not added any notes yet.',
-          button: 'Add your First Note',
+          button: 'Add your first note',
           action: _onPressBottomButton,
           loading: 'Loading your notes.',
         }}

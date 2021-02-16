@@ -57,7 +57,7 @@ export const Trash = ({route, navigation}) => {
       return;
     }
     Navigation.setHeaderState(
-      'trash',
+      'Trash',
       {
         menu: true,
       },

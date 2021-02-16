@@ -133,7 +133,7 @@ export const Notebook = ({route, navigation}) => {
         placeholderData={{
           heading: route.params.notebook.title,
           paragraph: 'You have not added any topics yet.',
-          button: 'Add a Topic',
+          button: 'Add a topic',
           action: _onPressBottomButton,
           loading: 'Loading notebook topics',
         }}
