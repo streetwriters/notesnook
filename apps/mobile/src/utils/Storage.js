@@ -55,7 +55,6 @@ async function encrypt(password, data, _compress) {
     type: _compress ? 'b64' : 'plain',
     data: _compress ? compress(data) : data,
   };
-  console.log(message);
   let result = await Sodium.encrypt(password, message);
 
   return {
@@ -70,11 +69,10 @@ function getAlgorithm(base64Variant, _compress) {
 
 async function decrypt(password, data) {
   let algorithm = parseAlgorithm(data.alg);
-  console.log(algorithm);
-  data.output = algorithm.isCompress ? 'b64' : 'plain';
 
+  data.output = algorithm.isCompress ? 'b64' : 'plain';
   let result = await Sodium.decrypt(password, data);
-  console.log('result-decrypt',result)
+
   if (algorithm.isCompress) {
     return decompress(result);
   }
@@ -95,17 +93,9 @@ function parseAlgorithm(alg) {
 let CRYPT_CONFIG = (kc) =>
   Platform.select({
     ios: {
-      accessible: kc.ACCESSIBLE.AFTER_FIRST_UNLOCK,
+      accessible: kc.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
     },
-    android: {
-      authenticationType: kc.AUTHENTICATION_TYPE.DEVICE_PASSCODE_OR_BIOMETRICS,
-      accessControl: kc.ACCESS_CONTROL.DEVICE_PASSCODE,
-      rules: 'none',
-      authenticationPrompt: {
-        cancel: null,
-      },
-      storage: kc.STORAGE_TYPE.AES,
-    },
+    android: {},
   });
 
 async function deriveCryptoKey(name, data) {
