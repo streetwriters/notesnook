@@ -51,6 +51,7 @@ function onMessage(ev) {
         return;
     }
   } catch (error) {
+    console.error("Crypto worker error:", error, messageId, type);
     sendMessage(type, { error: error.message }, messageId);
   }
 }
@@ -128,7 +129,7 @@ const encrypt = (passwordOrKey, plainData) => {
   const { sodium } = this;
 
   if (plainData.type === "plain") {
-    plainData.data = enc.encode(data.data);
+    plainData.data = enc.encode(plainData.data);
   }
 
   const { key, salt } = _getKey(passwordOrKey);
