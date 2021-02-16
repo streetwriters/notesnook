@@ -2,6 +2,7 @@ import { db } from "../common/index";
 import createStore from "../common/store";
 import BaseStore from "./index";
 import { store as appStore } from "./app-store";
+import { store as notestore } from "./note-store";
 
 class TrashStore extends BaseStore {
   trash = [];
@@ -24,6 +25,7 @@ class TrashStore extends BaseStore {
     return db.trash.restore(id).then(() => {
       this.set((state) => (state.trash = db.trash.all));
       appStore.refreshColors();
+      notestore.refresh();
     });
   };
 

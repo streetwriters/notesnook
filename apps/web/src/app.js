@@ -209,10 +209,10 @@ function CachedRouter() {
   return (
     <RouteContainer
       id="mainRouteContainer"
-      type={RouteResult.type}
-      title={RouteResult.title}
-      subtitle={RouteResult.subtitle}
-      buttons={RouteResult.buttons}
+      type={RouteResult?.type}
+      title={RouteResult?.title}
+      subtitle={RouteResult?.subtitle}
+      buttons={RouteResult?.buttons}
     />
   );
 }
