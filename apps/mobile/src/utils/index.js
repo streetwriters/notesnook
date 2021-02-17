@@ -159,24 +159,25 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
 };
 
 export const SUBSCRIPTION_PROVIDER = {
-  0: {
+  0: null,  
+  1: {
     type: 'iOS',
     title: 'Subscribed on iOS',
     desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase.',
     icon: 'ios',
   },
-  1: {
+  2: {
     type: 'Android',
     title: 'Subscribed on Android',
     desc:
       'You subscribed to Notesnook Pro on Android Phone/Tablet using Google In App Purchase.',
     icon: 'android',
   },
-  2: {
+  3: {
     type: 'Web',
     title: 'Subscribed on Web',
     desc:
-      'You subscribed to Notesnook Pro on the Web/Desktop App using doCheckout.',
+      'You subscribed to Notesnook Pro on the Web/Desktop App.',
     icon: 'web',
   },
 };
