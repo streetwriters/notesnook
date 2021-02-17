@@ -1,0 +1,52 @@
+import React, { useEffect } from "react";
+import ReactDOM from "react-dom";
+import { NavigationEvents } from "../../navigation";
+import useRoutes from "../../utils/use-routes";
+import RouteContainer from "../route-container";
+import ThemeProvider from "../theme-provider";
+import routes from "../../navigation/routes";
+
+const cache = {};
+function CachedRouter() {
+  const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
+  useEffect(() => {
+    NavigationEvents.publish("onNavigate", RouteResult);
+
+    const key = RouteResult.key || "general";
+    const routeContainer = document.getElementById("mainRouteContainer");
+    routeContainer.childNodes.forEach((node) => {
+      node.style.display = "none";
+    });
+
+    var route = document.getElementById(key);
+    if (route) {
+      route.style.display = "flex";
+      if (key !== "general") return;
+    }
+
+    if (!cache[key] || !route) {
+      if (!route) {
+        cache[key] = true;
+        route = document.createElement("div");
+        route.id = key;
+        route.className = "route";
+        routeContainer.appendChild(route);
+      }
+      ReactDOM.render(
+        <ThemeProvider>{RouteResult.component}</ThemeProvider>,
+        route
+      );
+    }
+  }, [RouteResult]);
+
+  return (
+    <RouteContainer
+      id="mainRouteContainer"
+      type={RouteResult?.type}
+      title={RouteResult?.title}
+      subtitle={RouteResult?.subtitle}
+      buttons={RouteResult?.buttons}
+    />
+  );
+}
+export default CachedRouter;

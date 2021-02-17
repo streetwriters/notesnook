@@ -13,13 +13,15 @@ import SplitEditor from "../components/spliteditor";
 import Unlock from "../components/unlock";
 import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
-import { store as noteStore } from "../stores/note-store";
 import { isMobile, isTablet } from "../utils/dimensions";
 import {
   showEditTopicDialog,
   showTopicDialog,
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
+import { Suspense } from "react";
+import EditorLoading from "../components/editor/loading";
+const Editor = React.lazy(() => import("../components/editor"));
 
 const hashroutes = {
   "/": () => {
@@ -42,10 +44,20 @@ const hashroutes = {
     showEditTopicDialog(notebookId, topicId);
   },
   "/notes/create": () => {
-    editorStore.get().newSession(noteStore.get().context);
+    //editorStore.get().newSession(noteStore.get().context);
+    return (
+      <Suspense fallback={<EditorLoading />}>
+        <Editor noteId={0} />
+      </Suspense>
+    );
   },
   "/notes/:noteId/edit": ({ noteId }) => {
-    editorStore.openSession(noteId);
+    // editorStore.openSession(noteId);
+    return (
+      <Suspense fallback={<EditorLoading text="Opening note..." />}>
+        <Editor noteId={noteId} />
+      </Suspense>
+    );
   },
   "/notes/:noteId/unlock": ({ noteId }) => {
     return (

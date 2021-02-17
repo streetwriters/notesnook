@@ -112,6 +112,7 @@ function TinyMCE(props) {
     initialValue,
     onFocus,
     editorRef,
+    onInit,
   } = props;
   const [oldSkin, newSkin] = useSkin();
   const tinymceRef = editorRef;
@@ -135,6 +136,7 @@ function TinyMCE(props) {
     <Editor
       ref={tinymceRef}
       onFocus={onFocus}
+      onInit={onInit}
       initialValue={initialValue}
       init={{
         menubar: false,

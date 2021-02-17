@@ -157,6 +157,7 @@ function Toolbar(props) {
             data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
             disabled={!tool.enabled}
             variant="tool"
+            ml={2}
             title={tool.title}
             key={tool.title}
             sx={{

@@ -2,7 +2,7 @@ import React from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 
-function EditorLoading() {
+function EditorLoading({ text }) {
   return (
     <Flex
       flexDirection="column"
@@ -12,7 +12,7 @@ function EditorLoading() {
     >
       <Icon.Loading color="primary" sx={{ mt: 2 }} />
       <Text variant="body" textAlign="center" mt={2}>
-        Loading editor. Please wait...
+        {text || "Loading editor. Please wait..."}
       </Text>
     </Flex>
   );

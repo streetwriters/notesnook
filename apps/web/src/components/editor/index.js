@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useRef, Suspense } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  Suspense,
+  useCallback,
+} from "react";
 import { Flex } from "rebass";
 import Properties from "../properties";
 import {
@@ -17,13 +23,15 @@ import EditorLoading from "./loading";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
-function Editor(props) {
+function Editor({ noteId }) {
   const editorRef = useRef();
   const sessionState = useStore((store) => store.session.state);
   const sessionId = useStore((store) => store.session.id);
   const contentType = useStore((store) => store.session.content?.type);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
+  const newSession = useStore((store) => store.newSession);
+  const openSession = useStore((store) => store.openSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
@@ -38,6 +46,23 @@ function Editor(props) {
   useEffect(() => {
     init();
   }, [init]);
+
+  const startSession = useCallback(
+    async function startSession(noteId) {
+      if (noteId === 0) newSession();
+      else if (noteId) {
+        await openSession(noteId);
+      }
+    },
+    [newSession, openSession]
+  );
+
+  useEffect(() => {
+    if (!editorRef.current?.editor) return;
+    (async () => {
+      await startSession(noteId);
+    })();
+  }, [startSession, noteId]);
 
   useEffect(() => {
     if (sessionState === SESSION_STATES.new) {
@@ -145,6 +170,9 @@ function Editor(props) {
                 }}
                 changeInterval={500}
                 onWordCountChanged={updateWordCount}
+                onInit={async () => {
+                  await startSession(noteId);
+                }}
               />
             ) : null}
           </Suspense>

@@ -130,7 +130,10 @@ class EditorStore extends BaseStore {
     });
   };
 
-  newSession = (context = {}) => {
+  newSession = (context) => {
+    if (!context) {
+      context = noteStore.get().context;
+    }
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,

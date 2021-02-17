@@ -118,9 +118,10 @@ class Tool {
       color: "text",
       p: 1,
       px: 2,
+      backgroundColor: "bgSecondary",
       borderRadius: "default",
       ":hover": {
-        backgroundColor: "bgSecondary",
+        backgroundColor: "#dbdbdb",
       },
     };
   }
