@@ -1,8 +1,8 @@
 import React, {createRef} from 'react';
 import {Clipboard, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
+import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-
 import {LOGO_BASE64} from '../../assets/images/assets';
 import {
   eSendEvent,
@@ -87,7 +87,6 @@ class RecoveryKeyDialog extends React.Component {
   }
 
   saveQRCODE = async () => {
- 
     if ((await Storage.requestPermission()) === false) {
       ToastEvent.show('Storage access not granted!', 'error', 'local');
       return;
@@ -95,7 +94,7 @@ class RecoveryKeyDialog extends React.Component {
 
     this.svg.current?.toDataURL(async (data) => {
       let path = await Storage.checkAndCreateDir('/');
-      RNFetchBlob = require("rn-fetch-blob").default
+      RNFetchBlob = require('rn-fetch-blob').default;
       let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
       RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
         RNFetchBlob.fs
@@ -117,35 +116,46 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   saveToTextFile = async () => {
-
     if ((await Storage.requestPermission()) === false) {
       ToastEvent.show('Storage access not granted!', 'error', 'local');
       return;
     }
-    let path = await Storage.checkAndCreateDir('/');
-    let fileName = 'nn_' + this.user.email + '_recovery_key.txt';
-    RNFetchBlob = require('rn-fetch-blob')
-    RNFetchBlob.fs
-      .writeFile(path + fileName, this.state.key, 'utf8')
-      .then((r) => {
-        ToastEvent.show(
-          'Recovery key saved as ' + path + fileName,
-          'success',
-          'local',
-        );
-      })
-      .catch((e) => {});
+    try {
+      let path = await Storage.checkAndCreateDir('/');
+      let fileName = 'nn_' + "test" + '_recovery_key.txt';
+      RNFetchBlob = require('rn-fetch-blob').default
+      await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+      ToastEvent.show(
+        'Recovery key saved as ' + path + fileName,
+        'success',
+        'local',
+      );
+      return path + fileName;
+    } catch (e) {
+
+      alert(e.message)
+
+    }
   };
 
   onOpen = async () => {
-    let k = await db.user.getEncryptionKey();
-    this.user = await db.user.getUser();
+    //let k = await db.user.getEncryptionKey();
+   // this.user = await db.user.getUser();
+   // if (k) {
+   //   this.setState({
+   //     key: k.key,
+   //   });
+   // }
+  };
 
-    if (k) {
-      this.setState({
-        key: k.key,
-      });
-    }
+  shareFile = async () => {
+    let path = await this.saveToTextFile();
+    if (!path) return;
+    Share.open({
+      url: 'file:/' + path,
+      title: 'Save recovery key to cloud',
+      message: 'Saving backup file to cloud storage',
+    }).catch((e) => console.log);
   };
 
   render() {
@@ -179,6 +189,7 @@ class RecoveryKeyDialog extends React.Component {
               padding: 10,
               marginTop: 10,
             }}>
+            
             <Paragraph
               color={colors.icon}
               size={SIZE.md}
@@ -187,6 +198,7 @@ class RecoveryKeyDialog extends React.Component {
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: 10,
+                marginBottom:10
               }}>
               {this.state.key}
             </Paragraph>
@@ -203,6 +215,8 @@ class RecoveryKeyDialog extends React.Component {
               fontSize={SIZE.md}
               height={50}
             />
+
+          
           </View>
           <Seperator />
 
@@ -215,6 +229,7 @@ class RecoveryKeyDialog extends React.Component {
               justifyContent: 'center',
               position: 'absolute',
               opacity: 0,
+              zIndex:-1
             }}>
             {this.state.key ? (
               <QRCode
@@ -245,6 +260,17 @@ class RecoveryKeyDialog extends React.Component {
             height={50}
           />
           <Seperator />
+
+          <Button
+            onPress={this.shareFile}
+            title="Save to Cloud"
+            width="100%"
+            type="accent"
+            fontSize={SIZE.md}
+            height={50}
+          />
+          <Seperator />
+
           <Button
             title="I have saved the key."
             width="100%"
