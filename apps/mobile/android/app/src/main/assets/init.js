@@ -21,9 +21,9 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      'mychecklist advlist autolink textpattern hr lists link noneditable image charmap preview anchor',
-      'searchreplace visualblocks fullscreen importcss',
-      'mycode insertdatetime media imagetools table paste help wordcount autoresize directionality',
+      "mychecklist advlist autolink textpattern hr lists link noneditable image",
+      "searchreplace mycode",
+      "media imagetools table paste wordcount autoresize directionality",
     ],
     toolbar: false,
     paste_data_images: true,

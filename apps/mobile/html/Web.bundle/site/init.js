@@ -21,9 +21,9 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      'mychecklist advlist autolink textpattern hr lists link noneditable image charmap preview anchor',
-      'searchreplace visualblocks fullscreen importcss',
-      'mycode insertdatetime media imagetools table paste help wordcount autoresize directionality',
+      "mychecklist advlist autolink textpattern hr lists link noneditable image",
+      "searchreplace mycode",
+      "media imagetools table paste wordcount autoresize directionality",
     ],
     toolbar: false,
     paste_data_images: true,
@@ -63,15 +63,6 @@ function init_tiny(size) {
           undo: editor.undoManager.hasUndo(),
           redo: editor.undoManager.hasRedo(),
         });
-      });
-
-      editor.on('NewBlock', function (event) {
-
-        if (event.newBlock.nodeName === "PRE") {
-          console.log(event.newBlock);
-          console.log(event.newBlock.prevSibling)
-         }
-
       });
 
       editor.on('focus', () => {
@@ -153,6 +144,7 @@ function selectchange() {
     index: range.startOffset,
     length: range.endOffset - range.startOffset,
   };
+
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;
 
   if (currentFormats.fontsize === '') {
