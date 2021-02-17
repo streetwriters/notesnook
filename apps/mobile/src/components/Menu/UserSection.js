@@ -2,7 +2,7 @@ import React from 'react';
 import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {eOpenLoginDialog} from '../../utils/Events';
@@ -58,13 +58,15 @@ export const UserSection = ({noTextMode}) => {
               {!user ? 'Not logged in' : 'Logged in'}
             </Heading>
 
-            <Paragraph
-              style={{
-                maxWidth:DDS.isLargeTablet()? '96%' : '100%',
-              }}
-              color={colors.icon}>
-              Login to encrypt and sync your notes.
-            </Paragraph>
+            {!user && (
+              <Paragraph
+                style={{
+                  maxWidth: DDS.isLargeTablet() ? '96%' : '100%',
+                }}
+                color={colors.icon}>
+                Login to encrypt and sync your notes.
+              </Paragraph>
+            )}
           </View>
         </TouchableOpacity>
 
