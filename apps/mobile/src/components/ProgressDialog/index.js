@@ -101,18 +101,23 @@ const ProgressDialog = () => {
             />
           ))}
       </View>
-      {dialogData?.action ? (
-        <Button
-          onPress={dialogData.action}
-          title={dialogData.actionText}
-          fontSize={SIZE.lg}
-        />
-      ) : null}
 
       <View
         style={{
           paddingHorizontal: 12,
         }}>
+        {dialogData?.action ? (
+          <Button
+            onPress={dialogData.action}
+            title={dialogData.actionText}
+            fontSize={SIZE.lg}
+            type="accent"
+            height={50}
+            width="100%"
+            fontSize={SIZE.md}
+          />
+        ) : null}
+        
         {dialogData?.actionsArray &&
           dialogData?.actionsArray.map((item) => (
             <Button
