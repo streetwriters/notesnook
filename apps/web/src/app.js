@@ -15,10 +15,8 @@ import { Suspense } from "react";
 import useMobile from "./utils/use-mobile";
 import useTablet from "./utils/use-tablet";
 import HashRouter from "./components/hashrouter";
+import ThemeTransition from "./components/themeprovider/themetransition";
 
-const ThemeTransition = React.lazy(() =>
-  import("./components/themeprovider/themetransition")
-);
 const AppEffects = React.lazy(() => import("./app-effects"));
 const CachedRouter = React.lazy(() => import("./components/cached-router"));
 
@@ -92,15 +90,12 @@ function App() {
                 flexDirection="column"
               >
                 <HashRouter />
-                {/* <EditorSwitch /> */}
               </Flex>
             </Flex>
             <GlobalMenuWrapper />
           </Flex>
           <StatusBar />
-          <Suspense fallback={<div />}>
-            <ThemeTransition />
-          </Suspense>
+          <ThemeTransition />
         </Flex>
       </ThemeProvider>
     </MotionConfig>
