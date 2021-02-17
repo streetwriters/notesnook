@@ -1,5 +1,7 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -14,13 +16,14 @@ import {TimeSince} from './TimeSince';
 export const UserSection = ({noTextMode}) => {
   const [state] = useTracked();
   const {colors, syncing, user, lastSynced} = state;
-
+  const insets = useSafeAreaInsets();
   return (
     <View
       style={{
         width: '100%',
         alignSelf: 'center',
         backgroundColor: colors.nav,
+        paddingBottom:Platform.OS === "ios" ? insets.bottom/2 : null
       }}>
       <View
         style={{
@@ -83,14 +86,14 @@ export const UserSection = ({noTextMode}) => {
               style={{
                 marginRight: 5,
               }}
-              size={SIZE.xs}
+              size={SIZE.sm}
               color={syncing ? colors.accent : colors.icon}>
               {syncing ? 'Syncing' : 'Synced '}
 
               {!syncing ? (
                 lastSynced && lastSynced !== 'Never' ? (
                   <TimeSince
-                    style={{fontSize: SIZE.xs, color: colors.icon}}
+                    style={{fontSize: SIZE.sm, color: colors.icon}}
                     time={lastSynced}
                   />
                 ) : (

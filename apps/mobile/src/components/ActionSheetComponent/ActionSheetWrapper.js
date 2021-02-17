@@ -1,21 +1,21 @@
-import React, {useEffect} from 'react';
-import {Platform} from 'react-native';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {hexToRGBA} from '../../utils/ColorUtils';
+import React from 'react';
+import { View } from 'react-native';
+import { Platform } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import {GetPremium} from './GetPremium';
-import {editing} from '../../utils';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { editing } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { sleep } from '../../utils/TimeUtils';
 import {
-  editorTitleInput,
   EditorWebView,
-  post,
-  textInput,
+
+  textInput
 } from '../../views/Editor/Functions';
-import {sleep} from '../../utils/TimeUtils';
 import tiny from '../../views/Editor/tiny/tiny';
-import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
-import {changeAppScale} from '../../utils/Animations';
+import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -29,7 +29,7 @@ const ActionSheetWrapper = ({
   const {colors} = state;
   const largeTablet = DDS.isLargeTablet();
   const smallTablet = DDS.isTab;
-
+  const insets = useSafeAreaInsets();
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? 500 : '100%',
@@ -95,6 +95,7 @@ const ActionSheetWrapper = ({
       }
       onClose={_onClose}>
       {children}
+      <View style={{height:Platform.OS === "ios" ? insets.bottom/2 : 0}}/>
     </ActionSheet>
   );
 };
