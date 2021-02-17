@@ -672,38 +672,39 @@ const SettingsUserSection = () => {
                   )}
               </View>
 
-              {user?.subscription?.provider && (
-                <Button
-                  title={
-                    SUBSCRIPTION_PROVIDER[user?.subscription?.provider].title
-                  }
-                  onPress={() => {
-                    eSendEvent(eOpenProgressDialog, {
-                      title:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .title,
-                      paragraph:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .desc,
-                      noProgress: true,
-                      icon:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .icon,
-                    });
-                  }}
-                  style={{
-                    alignSelf: 'flex-end',
-                    marginTop: 10,
-                    borderRadius: 3,
-                  }}
-                  fontSize={11}
-                  textStyle={{
-                    fontWeight: 'normal',
-                  }}
-                  height={20}
-                  type="accent"
-                />
-              )}
+              {user?.subscription?.provider &&
+                SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
+                  <Button
+                    title={
+                      SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
+                    }
+                    onPress={() => {
+                      eSendEvent(eOpenProgressDialog, {
+                        title:
+                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                            .title,
+                        paragraph:
+                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                            .desc,
+                        noProgress: true,
+                        icon:
+                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                            .icon,
+                      });
+                    }}
+                    style={{
+                      alignSelf: 'flex-end',
+                      marginTop: 10,
+                      borderRadius: 3,
+                    }}
+                    fontSize={11}
+                    textStyle={{
+                      fontWeight: 'normal',
+                    }}
+                    height={20}
+                    type="accent"
+                  />
+                )  : null}
             </View>
           </View>
           {[
@@ -1071,8 +1072,8 @@ const SettingsPrivacyAndSecurity = () => {
                 item: {},
                 changePassword: true,
                 novault: true,
-                title:"Change vault password",
-                description:"Set a new password for your vault."
+                title: 'Change vault password',
+                description: 'Set a new password for your vault.',
               });
             }}
           />
@@ -1087,8 +1088,8 @@ const SettingsPrivacyAndSecurity = () => {
               openVault({
                 item: {},
                 novault: false,
-                title:"Create vault",
-                description:"Set a password to create vault and lock notes."
+                title: 'Create vault',
+                description: 'Set a password to create vault and lock notes.',
               });
             });
           }}
