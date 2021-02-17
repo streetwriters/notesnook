@@ -4,8 +4,8 @@ import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
 import {generateSecureRandom} from 'react-native-securerandom';
 import {MMKV} from './mmkv';
 import Sodium from 'react-native-sodium';
+import * as Keychain from "react-native-keychain";
 
-let Keychain;
 let RNFetchBlob;
 async function read(key, isArray = false) {
   //let per = performance.now();
@@ -85,23 +85,20 @@ function parseAlgorithm(alg) {
   return {
     encryptionAlgorithm: enc,
     kdfAlgorithm: kdf,
-    isCompress: compressed === "1",
+    isCompress: compressed === '1',
     base64_variant: base64variant,
   };
 }
 
-let CRYPT_CONFIG = (kc) =>
-  Platform.select({
+let CRYPT_CONFIG = Platform.select({
     ios: {
-      accessible: kc.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+      accessible:Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     },
     android: {},
   });
 
 async function deriveCryptoKey(name, data) {
-  if (!Keychain) {
-    Keychain = require('react-native-keychain');
-  }
+
 
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
@@ -109,16 +106,14 @@ async function deriveCryptoKey(name, data) {
       'notesnook',
       name,
       credentials.key,
-      {},
+      CRYPT_CONFIG,
     );
     return credentials.key;
   } catch (e) {}
 }
 
 async function getCryptoKey(name) {
-  if (!Keychain) {
-    Keychain = require('react-native-keychain');
-  }
+
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
       let credentials = await Keychain.getInternetCredentials(
@@ -133,9 +128,6 @@ async function getCryptoKey(name) {
 }
 
 async function removeCryptoKey(name) {
-  if (!Keychain) {
-    Keychain = require('react-native-keychain');
-  }
 
   try {
     let result = await Keychain.resetInternetCredentials('notesnook');
