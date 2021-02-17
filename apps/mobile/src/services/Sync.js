@@ -26,6 +26,10 @@ const run = async (context = 'global') => {
         'Login',
       );
     } else {
+      updateEvent({
+        type: Actions.SYNCING,
+        syncing: false,
+      });
       ToastEvent.show(e.message, 'error', context, 3000);
     }
   } finally {
