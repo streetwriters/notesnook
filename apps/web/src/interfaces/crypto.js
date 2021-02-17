@@ -2,11 +2,11 @@
  * @return {Promise<Uint8Array>}
  */
 function compress(data) {
-  return import("lzutf8").then((lzutf8) => {
+  return loadLZUTF8((lzutf8) => {
     lzutf8.compress(data, {
       blockSize: 64 * 1024 * 1024,
-      outputEncoding: "ByteArray",
       inputEncoding: "String",
+      outputEncoding: "ByteArray",
     });
   });
 }
@@ -15,8 +15,8 @@ function compress(data) {
  * @return {Promise<string>}
  */
 function decompress(data) {
-  return import("lzutf8").then((lzutf8) => {
-    return lzutf8.decompress(data, {
+  loadLZUTF8((lzutf8) => {
+    lzutf8.decompress(data, {
       blockSize: 64 * 1024 * 1024,
       inputEncoding: "ByteArray",
       outputEncoding: "String",
@@ -24,6 +24,12 @@ function decompress(data) {
   });
 }
 
+function loadLZUTF8(action) {
+  return new Promise(async (resolve) => {
+    const lzutf8 = await import("lzutf8");
+    resolve(await action(lzutf8));
+  });
+}
 class Crypto {
   isReady = false;
   constructor() {
