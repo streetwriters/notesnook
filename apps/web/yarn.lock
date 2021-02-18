@@ -7854,13 +7854,6 @@ lru-cache@^6.0.0:
   dependencies:
     yallist "^4.0.0"
 
-lzutf8@^0.5.8:
-  version "0.5.8"
-  resolved "https://registry.yarnpkg.com/lzutf8/-/lzutf8-0.5.8.tgz#e07c531ad086258c0d842646bd3b973565823330"
-  integrity sha512-YrwDpLWfVFJfVfVErafPsglTpil+9BIfume6UJ6EWOFFwTJcyvMvDEFts3Ec8rEo4x1hkbh5cDnTAREfzdTSgA==
-  dependencies:
-    readable-stream "^3.6.0"
-
 magic-string@^0.25.0, magic-string@^0.25.7:
   version "0.25.7"
   resolved "https://registry.yarnpkg.com/magic-string/-/magic-string-0.25.7.tgz#3f497d6fd34c669c6798dcb821f2ef31f5445051"
@@ -8374,7 +8367,7 @@ normalize-url@^3.0.0:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "6.4.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#d655fae4986861c0ddea559613a448554c046970"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#60bd949007d75650b89d94259f8464402accd0e1"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysearch "^1.0.3"

@@ -1,123 +1,3 @@
-/**
- * @return {Promise<Uint8Array>}
- */
-function compress(data) {
-  return loadLZUTF8((lzutf8) => {
-    lzutf8.compress(data, {
-      blockSize: 64 * 1024 * 1024,
-      inputEncoding: "String",
-      outputEncoding: "ByteArray",
-    });
-  });
-}
-
-/**
- * @return {Promise<string>}
- */
-function decompress(data) {
-  loadLZUTF8((lzutf8) => {
-    lzutf8.decompress(data, {
-      blockSize: 64 * 1024 * 1024,
-      inputEncoding: "ByteArray",
-      outputEncoding: "String",
-    });
-  });
-}
-
-function loadLZUTF8(action) {
-  return new Promise(async (resolve) => {
-    const lzutf8 = await import("lzutf8");
-    resolve(await action(lzutf8));
-  });
-}
-class Crypto {
-  isReady = false;
-  constructor() {
-    this.sodium = undefined;
-  }
-  async _initialize() {
-    if (this.isReady) return;
-    return new Promise(async (resolve) => {
-      window.sodium = {
-        onload: (_sodium) => {
-          if (this.isReady) return;
-          this.isReady = true;
-          this.sodium = _sodium;
-          loadScript("/crypto.worker.js").then(resolve);
-        },
-      };
-      await loadScript("sodium.js");
-    });
-  }
-
-  /**
-   * @private
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string} plainData - the plaintext data
-   */
-  _encryptCompressed = async (passwordOrKey, plainData) => {
-    await this._initialize();
-    return global.ncrypto.encrypt.call(this, passwordOrKey, {
-      type: "uint8array",
-      data: await compress(plainData),
-    });
-  };
-
-  /**
-   *
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string} plainData - the plaintext data
-   * @param {boolean}
-   */
-  encrypt = async (passwordOrKey, plainData, compress) => {
-    if (compress)
-      return await this._encryptCompressed(passwordOrKey, plainData);
-
-    await this._initialize();
-    return global.ncrypto.encrypt.call(this, passwordOrKey, {
-      type: "plain",
-      data: plainData,
-    });
-  };
-
-  /**
-   *
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
-   */
-  decrypt = async (passwordOrKey, cipherData) => {
-    const algorithm = parseAlgorithm(cipherData.alg);
-    if (algorithm.isCompressed)
-      return await this._decryptCompressed(passwordOrKey, cipherData);
-
-    await this._initialize();
-    cipherData.output = "text";
-    return global.ncrypto.decrypt.call(this, passwordOrKey, cipherData);
-  };
-
-  /**
-   * @private
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{salt: string, iv: string, cipher: string}} cipherData - the cipher data
-   */
-  _decryptCompressed = async (passwordOrKey, cipherData) => {
-    cipherData.output = "uint8array";
-    return await decompress(
-      await global.ncrypto.decrypt.call(this, passwordOrKey, cipherData)
-    );
-  };
-
-  deriveKey = async (password, salt, exportKey = false) => {
-    await this._initialize();
-    return global.ncrypto.deriveKey.call(this, password, salt, exportKey);
-  };
-
-  hashPassword = async (password, userId) => {
-    await this._initialize();
-    return global.ncrypto.hashPassword.call(this, password, userId);
-  };
-}
-
 class CryptoWorker {
   constructor() {
     this.isReady = false;
@@ -180,28 +60,12 @@ class CryptoWorker {
   }
 
   /**
-   * @private
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string} data - the plaintext data
-   */
-  _encryptCompressed = async (passwordOrKey, data) => {
-    const message = {
-      passwordOrKey,
-      data: { type: "uint8array", data: await compress(data) },
-    };
-    return this._communicate("encrypt", message, [message.data.data.buffer]);
-  };
-
-  /**
    *
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
    * @param {string} data - the plaintext data
    * @param {boolean} compress
    */
-  encrypt = (passwordOrKey, data, compress) => {
-    if (compress) {
-      return this._encryptCompressed(passwordOrKey, data);
-    }
+  encrypt = (passwordOrKey, data) => {
     return this._communicate("encrypt", {
       passwordOrKey,
       data: { type: "plain", data },
@@ -214,27 +78,8 @@ class CryptoWorker {
    * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
    */
   decrypt = (passwordOrKey, cipherData) => {
-    const algorithm = parseAlgorithm(cipherData.alg);
-    if (algorithm.isCompressed)
-      return this._decryptCompressed(passwordOrKey, cipherData);
-
     cipherData.output = "text";
     return this._communicate("decrypt", { passwordOrKey, cipher: cipherData });
-  };
-
-  /**
-   * @private
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
-   */
-  _decryptCompressed = async (passwordOrKey, cipherData) => {
-    cipherData.output = "uint8array";
-    return await decompress(
-      await this._communicate("decrypt", {
-        passwordOrKey,
-        cipher: cipherData,
-      })
-    );
   };
 
   deriveKey = (password, salt, exportKey = false) => {
@@ -274,11 +119,68 @@ function loadScript(url) {
  */
 function parseAlgorithm(alg) {
   if (!alg) return {};
-  const [enc, kdf, compressed, base64variant] = alg.split("-");
+  const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split("-");
   return {
     encryptionAlgorithm: enc,
     kdfAlgorithm: kdf,
     isCompressed: compressed === "1",
+    compressionAlgorithm: compressionAlg,
     base64_variant: base64variant,
+  };
+}
+
+class Crypto {
+  isReady = false;
+  constructor() {
+    this.sodium = undefined;
+  }
+  async _initialize() {
+    if (this.isReady) return;
+    return new Promise(async (resolve) => {
+      window.sodium = {
+        onload: (_sodium) => {
+          if (this.isReady) return;
+          this.isReady = true;
+          this.sodium = _sodium;
+          loadScript("/crypto.worker.js").then(resolve);
+        },
+      };
+      await loadScript("sodium.js");
+    });
+  }
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {string} plainData - the plaintext data
+   * @param {boolean}
+   */
+  encrypt = async (passwordOrKey, plainData) => {
+    await this._initialize();
+    return global.ncrypto.encrypt.call(this, passwordOrKey, {
+      type: "plain",
+      data: plainData,
+    });
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
+   */
+  decrypt = async (passwordOrKey, cipherData) => {
+    await this._initialize();
+    cipherData.output = "text";
+    return global.ncrypto.decrypt.call(this, passwordOrKey, cipherData);
+  };
+
+  deriveKey = async (password, salt, exportKey = false) => {
+    await this._initialize();
+    return global.ncrypto.deriveKey.call(this, password, salt, exportKey);
+  };
+
+  hashPassword = async (password, userId) => {
+    await this._initialize();
+    return global.ncrypto.hashPassword.call(this, password, userId);
   };
 }

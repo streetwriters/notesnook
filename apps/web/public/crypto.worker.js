@@ -130,6 +130,11 @@ const encrypt = (passwordOrKey, plainData) => {
 
   if (plainData.type === "plain") {
     plainData.data = enc.encode(plainData.data);
+  } else if (plainData.type === "base64") {
+    plainData.data = sodium.from_base64(
+      plainData.data,
+      sodium.base64_variants.ORIGINAL
+    );
   }
 
   const { key, salt } = _getKey(passwordOrKey);
@@ -152,7 +157,7 @@ const encrypt = (passwordOrKey, plainData) => {
   return {
     alg: getAlgorithm(
       sodium.base64_variants.URLSAFE_NO_PADDING,
-      plainData.type === "uint8array" ? 1 : 0 // TODO: Crude but works (change this to a more exact boolean flag)
+      plainData.compress ? 1 : 0 // TODO: Crude but works (change this to a more exact boolean flag)
     ),
     cipher,
     iv,
@@ -235,5 +240,5 @@ const webCryptoPolyfill = (seed, sodium) => {
 
 function getAlgorithm(base64Variant, compress) {
   //Template: encryptionAlgorithm-kdfAlgorithm-compressionFlag-base64variant
-  return `xcha-argon2i13-${compress}-${base64Variant}`;
+  return `xcha-argon2i13-${compress}-none-${base64Variant}`;
 }
