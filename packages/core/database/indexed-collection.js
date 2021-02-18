@@ -28,8 +28,9 @@ export default class IndexedCollection {
     if (!item.id) throw new Error("The item must contain the id field.");
     // if item is newly synced, remote will be true.
     item.dateEdited = item.remote ? item.dateEdited : Date.now();
-    // the item has become local now, so remove the flag.
+    // the item has become local now, so remove the flags
     delete item.remote;
+    delete item.migrated;
     await this.indexer.write(item.id, item);
   }
 

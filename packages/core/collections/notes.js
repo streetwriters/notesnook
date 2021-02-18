@@ -44,7 +44,6 @@ export default class Notes extends Collection {
           await this._db.tags.add(tag, id);
         }
       }
-
       return await this._collection.addItem(noteArg);
     }
 
