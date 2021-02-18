@@ -4,24 +4,37 @@ import tinymce from "tinymce/tinymce";
   var global = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
   var replaceContent = function (editor, content) {
+    const rng = editor.selection.getRng();
     let node = editor.selection.getNode();
+    const innerHTML = node.innerHTML;
+    node.remove();
     editor.undoManager.transact(function () {
-      editor.execCommand("mceInsertContent", false, content(node));
+      setImmediate(() =>
+        editor.execCommand("mceInsertContent", false, content(innerHTML))
+      );
     });
-    node = editor.selection.getNode();
-    editor.focus();
-    editor.selection.setCursorLocation(node, 5);
+    editor.selection.setRng(rng, true);
     editor.nodeChanged();
   };
 
   var addCodeBlock = function (editor, api, type) {
     if (api && api.isActive && api.isActive()) {
-      editor.execCommand("mceInsertNewLine", false, { shiftKey: true });
+      let node = editor.selection.getNode();
+      const innerText = node.textContent;
+      if (innerText.length <= 0) {
+        replaceContent(
+          editor,
+          (html) => `<p>${html.replace(/\n/gm, "<br>")}</p>`
+        );
+      } else {
+        editor.execCommand("mceInsertNewLine", false, { shiftKey: true });
+      }
     } else {
       var content = editor.selection.getContent({ format: "text" });
       content = content.replace(/^\n/gm, "");
       if (type === "shortcut") content = "<br>";
       if (content.length > 0) {
+        const rng = editor.selection.getRng();
         editor.undoManager.transact(function () {
           editor.execCommand(
             "mceInsertContent",
@@ -29,16 +42,13 @@ import tinymce from "tinymce/tinymce";
             `<pre class='codeblock'>${content}</pre>`
           );
         });
-        editor.selection.setCursorLocation();
+        editor.selection.setRng(rng);
         editor.nodeChanged();
       } else {
         replaceContent(
           editor,
-          (node) =>
-            `<pre class='codeblock'>${node.innerHTML.replace(
-              /\n/gm,
-              "<br>"
-            )}</pre>`
+          (html) =>
+            `<pre class='codeblock'>${html.replace(/\n/gm, "<br>")}</pre>`
         );
       }
     }
@@ -76,7 +86,6 @@ import tinymce from "tinymce/tinymce";
       };
 
       var beforeExecCommandHandler = function (e) {
-        console.log(e);
         if (editor.creatingCodeBlock && e.command === "mceInsertNewLine") {
           e.preventDefault();
           editor.creatingCodeBlock = false;
