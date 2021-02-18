@@ -6,10 +6,10 @@ import {
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
-import { Profiler } from "react";
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
+    key: "select",
     title: () => (isSelected ? "Unselect" : "Select"),
     onClick: () => {
       const selectionState = selectionStore.get();
@@ -49,6 +49,13 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 };
 
 function ListItem(props) {
+  const {
+    colors: { shade = "shade", text = "text" } = {
+      shade: "shade",
+      text: "text",
+    },
+  } = props;
+
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
   const selectedItems = useSelectionStore((store) => store.selectedItems);
   const isSelected =
@@ -65,104 +72,98 @@ function ListItem(props) {
   );
 
   const menuItems = useMemo(() => {
-    let items = props.menu.items;
+    let items = props.menu?.items;
+    if (!items) return [];
     if (props.selectable)
       items = [selectMenuItem(isSelected, toggleSelection), ...items];
     return items;
-  }, [props.menu.items, isSelected, toggleSelection, props.selectable]);
+  }, [props.menu?.items, isSelected, toggleSelection, props.selectable]);
 
   useEffect(() => {
     if (!isSelectionMode && isSelected) toggleSelection();
   }, [isSelectionMode, toggleSelection, isSelected]);
 
   return (
-    <Profiler
-      id={props.item.type}
-      onRender={(id, phase, duration) => {
-        console.log(id, phase, duration);
+    <Flex
+      bg={isSelected ? shade : "background"}
+      onContextMenu={(e) =>
+        openContextMenu(e, menuItems, props.menu.extraData, false)
+      }
+      p={2}
+      justifyContent="center"
+      sx={{
+        height: "inherit",
+        borderBottom: "1px solid",
+        borderBottomColor: "border",
+        cursor: "pointer",
+        position: "relative",
+        ":hover": {
+          backgroundColor: shade,
+        },
       }}
-    >
-      <Flex
-        bg={isSelected ? "shade" : "background"}
-        onContextMenu={(e) =>
-          openContextMenu(e, menuItems, props.menu.extraData, false)
+      flexDirection="column"
+      onClick={() => {
+        //e.stopPropagation();
+        if (isSelectionMode) {
+          toggleSelection();
+        } else if (props.onClick) {
+          props.onClick();
         }
-        p={2}
-        justifyContent="center"
+      }}
+      data-test-id={`${props.item.type}-${props.index}`}
+    >
+      {props.header}
+      <Text
+        color={text}
+        fontFamily={"heading"}
+        fontSize="title"
+        fontWeight={"bold"}
         sx={{
-          height: "inherit",
-          borderBottom: "1px solid",
-          borderBottomColor: "border",
-          cursor: "pointer",
-          position: "relative",
-          ":hover": {
-            backgroundColor: props.bg ? props.bg + "11" : "shade",
-          },
+          display: "flex",
+          lineHeight: "1.4rem",
+          maxHeight: "1.4rem", // 1 lines, i hope
+          overflow: "hidden",
+          textOverflow: "ellipsis",
         }}
-        flexDirection="column"
-        onClick={() => {
-          //e.stopPropagation();
-          if (isSelectionMode) {
-            toggleSelection();
-          } else if (props.onClick) {
-            props.onClick();
-          }
-        }}
-        data-test-id={`${props.item.type}-${props.index}`}
+        data-test-id={`${props.item.type}-${props.index}-title`}
       >
-        {props.header}
-        <Text
-          color={props.bg ? props.bg : "text"}
-          fontFamily={"heading"}
-          fontSize="title"
-          fontWeight={"bold"}
-          sx={{
-            display: "flex",
-            lineHeight: "1.4rem",
-            maxHeight: "1.4rem", // 1 lines, i hope
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-          data-test-id={`${props.item.type}-${props.index}-title`}
-        >
-          {isSelectionMode && (
-            <ItemSelector
-              isSelected={isSelected}
-              toggleSelection={toggleSelection}
-            />
-          )}
-          {props.title}
-        </Text>
-
-        <Text
-          as="p"
-          display={props.body ? "box" : "none"}
-          variant="body"
-          sx={{
-            maxWidth: "90%",
-            cursor: "pointer",
-            lineHeight: "1.4em",
-            maxHeight: "2.8em", // 2 lines, i hope
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-          data-test-id={`${props.item.type}-${props.index}-body`}
-        >
-          {props.body}
-        </Text>
-        {props.footer}
-        {props.menu && (
-          <Icon.MoreVertical
-            sx={{ position: "absolute", right: 1 }}
-            size={22}
-            color="icon"
-            onClick={(event) =>
-              openContextMenu(event, menuItems, props.menu.extraData, true)
-            }
+        {isSelectionMode && (
+          <ItemSelector
+            isSelected={isSelected}
+            toggleSelection={toggleSelection}
           />
         )}
-      </Flex>
-    </Profiler>
+        {props.title}
+      </Text>
+
+      <Text
+        as="p"
+        display={props.body ? "box" : "none"}
+        variant="body"
+        sx={{
+          maxWidth: "90%",
+          cursor: "pointer",
+          lineHeight: "1.4em",
+          maxHeight: "2.8em", // 2 lines, i hope
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+        data-test-id={`${props.item.type}-${props.index}-body`}
+      >
+        {props.body}
+      </Text>
+      {props.footer}
+      {props.menu && (
+        <Icon.MoreVertical
+          sx={{ position: "absolute", right: 1 }}
+          size={22}
+          color="icon"
+          onClick={(event) =>
+            openContextMenu(event, menuItems, props.menu.extraData, true)
+          }
+        />
+      )}
+    </Flex>
   );
 }
 export default ListItem;
