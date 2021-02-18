@@ -6,25 +6,26 @@ class Migrator {
     await Promise.all(
       collections.map(async (collection) => {
         if (!collection.index || !collection.dbCollection) return;
+        for (var i = 0; i < collection.index.length; ++i) {
+          let id = collection.index[i];
+          let item = get(id);
+          if (!item) {
+            continue;
+          }
 
-        await Promise.all(
-          collection.index.map(async (id) => {
-            let item = get(id);
-            if (!item) return;
+          if (item.deleted && !item.type) {
+            await collection.dbCollection?._collection?.addItem(item);
+            continue;
+          }
+          const migrate = migrations[version][item.type || collection.type];
+          if (migrate) item = migrate(item);
 
-            if (item.deleted && !item.type)
-              return await collection.dbCollection?._collection?.addItem(item);
-
-            const migrate = migrations[version][item.type || collection.type];
-            if (migrate) item = migrate(item);
-
-            if (!!collection.dbCollection.merge) {
-              await collection.dbCollection.merge(item);
-            } else {
-              await collection.dbCollection.add(item);
-            }
-          })
-        );
+          if (!!collection.dbCollection.merge) {
+            await collection.dbCollection.merge(item);
+          } else {
+            await collection.dbCollection.add(item);
+          }
+        }
       })
     );
     return true;

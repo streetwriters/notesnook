@@ -16,7 +16,7 @@ export default class IndexedCollection {
   async addItem(item) {
     if (!item.id) throw new Error("The item must contain the id field.");
 
-    const exists = await this.exists(item.id);
+    const exists = this.exists(item.id);
     if (!exists) item.dateCreated = item.dateCreated || Date.now();
     await this.updateItem(item);
     if (!exists) {

@@ -11,20 +11,22 @@ export default class Indexer extends Storage {
     this.indices = (await this.read(this.type, true)) || [];
   }
 
-  async exists(key) {
+  exists(key) {
     return this.indices.includes(key);
   }
 
   async index(key) {
-    this.indices[this.indices.length] = key;
+    if (this.exists(key)) return;
+    this.indices.push(key);
     await this.write(this.type, this.indices);
   }
 
-  async getIndices() {
+  getIndices() {
     return this.indices;
   }
 
   async deindex(key) {
+    if (!this.exists(key)) return;
     this.indices.splice(this.indices.indexOf(key), 1);
     await this.write(this.type, this.indices);
   }
