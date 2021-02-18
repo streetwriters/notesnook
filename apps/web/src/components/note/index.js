@@ -41,6 +41,7 @@ function Note(props) {
       body={note.headline}
       id={note.id}
       index={index}
+      colors={{ shade, primary, text: note.color ? primary : "text" }}
       menu={{
         items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
         extraData: { note, context },
@@ -151,7 +152,7 @@ const menuItems = [
   {
     key: "colors",
     title: () => "Colors",
-    component: ({ data }) => <Colors note={data} />,
+    component: ({ data }) => <Colors note={data.note} />,
   },
   {
     key: "addtonotebook",
