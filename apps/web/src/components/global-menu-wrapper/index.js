@@ -5,7 +5,7 @@ import Animated from "../animated";
 import { useAnimation } from "framer-motion";
 
 function GlobalMenuWrapper() {
-  const [items, title, state, closeMenu] = useContextMenu();
+  const [items, title, data, state, closeMenu] = useContextMenu();
   const animation = useAnimation();
   useEffect(() => {
     if (state === "open") {
@@ -35,6 +35,7 @@ function GlobalMenuWrapper() {
         menuItems={items}
         state={state}
         title={title}
+        data={data}
         style={{
           position: "absolute",
           display: "none",

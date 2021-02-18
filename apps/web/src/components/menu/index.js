@@ -1,88 +1,93 @@
 import { useAnimation } from "framer-motion";
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { Flex, Box, Text } from "rebass";
 import { isUserPremium } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import Animated from "../animated";
 
 function Menu(props) {
+  const { menuItems, data, closeMenu, id, style, sx } = props;
   const isMobile = useMobile();
-  const Container = isMobile ? MobileMenuContainer : MenuContainer;
+  const Container = useMemo(
+    () => (isMobile ? MobileMenuContainer : MenuContainer),
+    [isMobile]
+  );
 
   return (
-    <Container {...props}>
-      {props.menuItems.map(
-        (item) =>
-          item.visible !== false && (
-            <Flex
-              data-test-id={`menuitem-${item.title
-                .split(" ")
-                .join("")
-                .toLowerCase()}`}
-              key={item.title}
-              onClick={async (e) => {
-                e.stopPropagation();
-                if (props.closeMenu) {
-                  props.closeMenu();
-                }
+    <Container id={id} style={style} sx={sx}>
+      {menuItems.map(
+        ({ title, key, onClick, component: Component, color, isPro }) => (
+          <Flex
+            data-test-id={`menuitem-${title(data)
+              .split(" ")
+              .join("")
+              .toLowerCase()}`}
+            key={key}
+            onClick={async (e) => {
+              e.stopPropagation();
+              if (closeMenu) {
+                closeMenu();
+              }
 
-                if (!item.component) {
-                  item.onClick(props.data);
-                }
-              }}
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="space-between"
-              py={"8px"}
-              px={3}
-              sx={{
-                color: item.color || "text",
-                cursor: "pointer",
-                ":hover": {
-                  backgroundColor: "shade",
-                },
-              }}
-            >
-              {item.component ? (
-                item.component
-              ) : (
-                <Text as="span" fontFamily="body" fontSize="menu">
-                  {item.title}
-                </Text>
-              )}
-              {item.onlyPro && !isUserPremium() && (
-                <Text
-                  fontSize="body"
-                  bg="primary"
-                  color="static"
-                  px={1}
-                  sx={{ borderRadius: "default" }}
-                >
-                  Pro
-                </Text>
-              )}
-            </Flex>
-          )
+              if (!Component) {
+                onClick(data);
+              }
+            }}
+            flexDirection="row"
+            alignItems="center"
+            justifyContent="space-between"
+            py={"8px"}
+            px={3}
+            sx={{
+              color: color || "text",
+              cursor: "pointer",
+              ":hover": {
+                backgroundColor: "shade",
+              },
+            }}
+          >
+            {Component ? (
+              <Component data={data} />
+            ) : (
+              <Text as="span" fontFamily="body" fontSize="menu">
+                {title(data)}
+              </Text>
+            )}
+            {isPro && !isUserPremium() && (
+              <Text
+                fontSize="body"
+                bg="primary"
+                color="static"
+                px={1}
+                sx={{ borderRadius: "default" }}
+              >
+                Pro
+              </Text>
+            )}
+          </Flex>
+        )
       )}
     </Container>
   );
 }
-export default Menu;
+export default React.memo(Menu, (prev, next) => {
+  return prev.state === next.state;
+});
 
-function MenuContainer(props) {
+function MenuContainer({ id, style, sx, children }) {
   return (
     <Flex
-      id={props.id}
+      id={id}
       bg="background"
       py={1}
-      style={props.style}
+      style={style}
       sx={{
         position: "relative",
         borderRadius: "default",
         border: "2px solid",
         borderColor: "border",
         width: 180,
-        ...props.sx,
+        ...sx,
       }}
     >
       <Box width="100%">
@@ -96,14 +101,13 @@ function MenuContainer(props) {
         >
           Properties
         </Text>
-        {props.children}
+        {children}
       </Box>
     </Flex>
   );
 }
 
-function MobileMenuContainer(props) {
-  const { style, id, state } = props;
+function MobileMenuContainer({ style, id, state, children }) {
   const animation = useAnimation();
   useEffect(() => {
     if (state === "open") {
@@ -115,6 +119,7 @@ function MobileMenuContainer(props) {
       animation.start({ y: 500 });
     }
   }, [state, animation, id]);
+
   return (
     <Flex
       flexDirection="column"
@@ -152,7 +157,7 @@ function MobileMenuContainer(props) {
           <Text variant="title" mt={2} alignSelf="center">
             Properties
           </Text>
-          {props.children}
+          {children}
         </Flex>
       </Animated.Flex>
     </Flex>

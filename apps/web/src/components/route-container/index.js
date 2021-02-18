@@ -8,11 +8,11 @@ import useMobile from "../../utils/use-mobile";
 import { navigate } from "../../navigation";
 
 function RouteContainer(props) {
-  const { id, type, title, subtitle, buttons } = props;
+  const { id, type, title, subtitle, buttons, component } = props;
   return (
     <>
       <Header type={type} title={title} subtitle={subtitle} buttons={buttons} />
-      <Flex id={id} flexDirection="column" flex={1} />
+      {component || <Flex id={id} flexDirection="column" flex={1} />}
     </>
   );
 }

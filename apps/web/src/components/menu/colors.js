@@ -7,7 +7,7 @@ import { Flex } from "rebass";
 import useMobile from "../../utils/use-mobile";
 
 function Colors(props) {
-  const { id, color } = props.data;
+  const { id, color } = props.note;
   const setColor = useStore((store) => store.setColor);
   const isMobile = useMobile();
   return (

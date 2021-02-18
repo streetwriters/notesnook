@@ -48,6 +48,7 @@ function App() {
           </Suspense>
         )}
 
+        <GlobalMenuWrapper />
         <Flex
           flexDirection="column"
           id="app"
@@ -92,7 +93,6 @@ function App() {
                 <HashRouter />
               </Flex>
             </Flex>
-            <GlobalMenuWrapper />
           </Flex>
           <StatusBar />
           <ThemeTransition />

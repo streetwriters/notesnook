@@ -94,15 +94,17 @@ function useContextMenu() {
   const [items, setItems] = useState([]);
   const [title, setTitle] = useState();
   const [state, setState] = useState();
+  const [data, setData] = useState();
   useEffect(() => {
     const onGlobalContextMenu = (e) => {
-      const { items, title, internalEvent, state } = e.detail;
+      const { items, title, internalEvent, data, state } = e.detail;
       setState(state);
       if (state === "close") {
         return;
       }
       setItems(items);
       setTitle(title);
+      setData(data);
       openMenu(internalEvent);
     };
     window.addEventListener("globalcontextmenu", onGlobalContextMenu);
@@ -110,7 +112,7 @@ function useContextMenu() {
       window.removeEventListener("globalcontextmenu", onGlobalContextMenu);
     };
   }, []);
-  return [items, title, state, closeMenu];
+  return [items, title, data, state, closeMenu];
 }
 
 export function useOpenContextMenu() {

@@ -8,7 +8,6 @@ import { store, useStore } from "../../stores/note-store";
 import { showPasswordDialog } from "../../common/dialog-controller";
 import { COLORS } from "../../common";
 import { db } from "../../common/db";
-import { useTheme } from "emotion-theming";
 import Colors from "../menu/colors";
 import { showExportDialog } from "../../common/dialog-controller";
 import { showItemDeletedToast } from "../../common/toasts";
@@ -16,91 +15,17 @@ import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 
-const pin = async (note) => {
-  await store.pin(note.id);
-  if (note.pinned) await showUnpinnedToast(note.id, "note");
-};
-
-function menuItems(note, context) {
-  return [
-    { title: "colors", component: <Colors data={note} /> },
-    {
-      title: "Add to notebook",
-      onClick: async () => {
-        await showMoveNoteDialog([note.id]);
-      },
-    },
-    {
-      title: note.pinned ? "Unpin" : "Pin",
-      onClick: async () => {
-        await pin(note);
-      },
-    },
-    {
-      title: note.favorite ? "Unfavorite" : "Favorite",
-      onClick: () => store.favorite(note),
-    },
-    {
-      title: "Export",
-      onClick: async () => {
-        if (await showExportDialog([note.id]))
-          showToast("success", `Note exported successfully!`);
-      },
-      onlyPro: true,
-    },
-    {
-      title: note.locked ? "Unlock" : "Lock",
-      onClick: async () => {
-        const { unlock, lock } = store.get();
-        if (!note.locked) {
-          if (await lock(note.id))
-            showToast("success", "Note locked successfully!");
-        } else {
-          if (await unlock(note.id))
-            showToast("success", "Note unlocked successfully!");
-        }
-      },
-      onlyPro: true,
-    },
-    {
-      visible: context?.type === "topic",
-      title: "Remove from topic",
-      onClick: async () => {
-        console.log("Remove from topic:", Object.isExtensible(note));
-        await db.notebooks
-          .notebook(context.value.id)
-          .topics.topic(context.value.topic)
-          .delete(note.id);
-        store.setContext(context);
-        await showToast("success", "Note removed from topic!");
-      },
-    },
-    {
-      title: "Move to Trash",
-      color: "red",
-      onClick: async () => {
-        if (note.locked) {
-          const res = await showPasswordDialog("unlock_note", (password) => {
-            return db.vault
-              .unlock(password)
-              .then(() => true)
-              .catch(() => false);
-          });
-          if (!res) return;
-        }
-        await store.delete(note.id).then(() => showItemDeletedToast(note));
-      },
-    },
-  ];
-}
-
 function Note(props) {
-  const { item, index, pinnable } = props;
+  const { item, index, context } = props;
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
   const isOpened = selectedNote === note.id;
-  const theme = useTheme();
-  const color = useMemo(() => COLORS[note.color], [note.color]);
+  const [shade, primary] = useMemo(() => {
+    if (!note.color) return ["shade", "primary"];
+    const noteColor = COLORS[note.color];
+    return [noteColor + "11", noteColor];
+  }, [note.color]);
+
   const notebook = useMemo(
     () =>
       !!note.notebooks?.length &&
@@ -111,33 +36,15 @@ function Note(props) {
   return (
     <ListItem
       selectable
-      focused={isOpened}
       item={note}
       title={note.title}
       body={note.headline}
       id={note.id}
       index={index}
-      header={
-        notebook && (
-          <Flex
-            alignSelf="flex-start"
-            justifySelf="flex-start"
-            alignContent="center"
-            justifyContent="center"
-          >
-            <Icon.Notebook size={12} color={color ? color : "primary"} />
-            <Text
-              variant="subBody"
-              color={color ? color : "primary"}
-              fontWeight="600"
-              ml={"3px"}
-            >
-              {notebook.title}
-            </Text>
-          </Flex>
-        )
-      }
-      bg={color}
+      menu={{
+        items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
+        extraData: { note, context },
+      }}
       onClick={() => {
         if (note.conflicted) {
           hashNavigate(`/notes/${note.id}/conflict`, true);
@@ -147,8 +54,23 @@ function Note(props) {
           hashNavigate(`/notes/${note.id}/edit`, true);
         }
       }}
-      info={
-        <>
+      header={
+        notebook && (
+          <Flex
+            alignSelf="flex-start"
+            justifySelf="flex-start"
+            alignContent="center"
+            justifyContent="center"
+          >
+            <Icon.Notebook size={12} color={primary} />
+            <Text variant="subBody" color={primary} fontWeight="600" ml={"3px"}>
+              {notebook.title}
+            </Text>
+          </Flex>
+        )
+      }
+      footer={
+        <Flex mt={1} sx={{ fontSize: "subBody", color: "fontTertiary" }}>
           {note.conflicted && (
             <Text
               mr={1}
@@ -162,35 +84,44 @@ function Note(props) {
               CONFLICT
             </Text>
           )}
-          <Flex variant="rowCenter">
-            {note.pinned && !props.context && (
-              <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
-            )}
-            <TimeAgo
-              live={false}
-              style={{ fontSize: theme.fontSizes["subBody"] }}
-              datetime={note.dateCreated}
+          {note.pinned && !props.context && (
+            <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
+          )}
+          <TimeAgo live={false} datetime={note.dateCreated} />
+          {note.locked && (
+            <Icon.Lock
+              size={13}
+              color={"fontTertiary"}
+              sx={{ ml: 1 }}
+              data-test-id={`note-${index}-locked`}
             />
-            {note.locked && (
-              <Icon.Lock
-                size={13}
-                color={theme.colors.fontTertiary}
-                sx={{ ml: 1 }}
-                data-test-id={`note-${index}-locked`}
-              />
-            )}
-            {note.favorite && (
-              <Icon.Star
-                color={theme.colors.favorite}
-                size={13}
-                sx={{ ml: 1 }}
-              />
-            )}
-          </Flex>
-        </>
+          )}
+          {note.favorite && (
+            <Icon.Star color={"favorite"} size={13} sx={{ ml: 1 }} />
+          )}
+          {isOpened && (
+            <Text
+              display="flex"
+              bg={shade}
+              justifyContent="center"
+              alignItems="center"
+              px="2px"
+              py="2px"
+              sx={{
+                position: "absolute",
+                bottom: 2,
+                right: 2,
+                borderRadius: "default",
+              }}
+              fontWeight="bold"
+              color={primary}
+              fontSize={8}
+            >
+              <Icon.Edit color={primary} size={8} /> EDITING NOW
+            </Text>
+          )}
+        </Flex>
       }
-      pinned={pinnable && note.pinned}
-      menuItems={menuItems(note, props.context)}
     />
   );
 }
@@ -210,3 +141,95 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.notebooks?.length === nextItem.notebooks?.length
   );
 });
+
+const pin = async (note) => {
+  await store.pin(note.id);
+  if (note.pinned) await showUnpinnedToast(note.id, "note");
+};
+
+const menuItems = [
+  {
+    key: "colors",
+    title: () => "Colors",
+    component: ({ data }) => <Colors note={data} />,
+  },
+  {
+    key: "addtonotebook",
+    title: () => "Add to notebook",
+    onClick: async ({ note }) => {
+      await showMoveNoteDialog([note.id]);
+    },
+  },
+  {
+    key: "pin",
+    title: ({ note }) => (note.pinned ? "Unpin" : "Pin"),
+    onClick: async ({ note }) => {
+      await pin(note);
+    },
+  },
+  {
+    key: "favorite",
+    title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
+    onClick: ({ note }) => store.favorite(note),
+  },
+  {
+    key: "export",
+    title: () => "Export",
+    onClick: async ({ note }) => {
+      if (await showExportDialog([note.id]))
+        showToast("success", `Note exported successfully!`);
+    },
+    isPro: true,
+  },
+  {
+    key: "unlocknote",
+    title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
+    onClick: async ({ note }) => {
+      const { unlock, lock } = store.get();
+      if (!note.locked) {
+        if (await lock(note.id))
+          showToast("success", "Note locked successfully!");
+      } else {
+        if (await unlock(note.id))
+          showToast("success", "Note unlocked successfully!");
+      }
+    },
+    isPro: true,
+  },
+  {
+    key: "movetotrash",
+    title: () => "Move to Trash",
+    color: "red",
+    onClick: async ({ note }) => {
+      if (note.locked) {
+        const res = await showPasswordDialog("unlock_note", (password) => {
+          return db.vault
+            .unlock(password)
+            .then(() => true)
+            .catch(() => false);
+        });
+        if (!res) return;
+      }
+      await store.delete(note.id).then(() => showItemDeletedToast(note));
+    },
+  },
+];
+
+const topicNoteMenuItems = [
+  ...menuItems,
+  [
+    {
+      key: "removefromtopic",
+      title: "Remove from topic",
+      onClick: async ({ note, context }) => {
+        console.log("Remove from topic:", Object.isExtensible(note));
+        await db.notebooks
+          .notebook(context.value.id)
+          .topics.topic(context.value.topic)
+          .delete(note.id);
+        store.setContext(context);
+        await showToast("success", "Note removed from topic!");
+      },
+    },
+  ],
+];

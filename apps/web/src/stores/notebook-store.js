@@ -13,18 +13,9 @@ class NotebookStore extends BaseStore {
     this.set((state) => (state.notebooks = db.notebooks.all));
   };
 
-  add = async (nb) => {
-    let notebook = await db.notebooks.add(nb);
-    if (notebook) {
-      this.refresh();
-    }
-  };
-
-  delete = async (id, index) => {
+  delete = async (id) => {
     await db.notebooks.delete(id);
-    this.set((state) => {
-      state.notebooks.splice(index, 1);
-    });
+    this.refresh();
     appStore.refreshMenuPins();
   };
 

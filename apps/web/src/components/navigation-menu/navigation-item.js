@@ -19,7 +19,7 @@ function NavigationItem(props) {
       title={title}
       onContextMenu={(event) => {
         if (!props.menu) return;
-        openContextMenu(event, props.menu.items, props.menu.data, false);
+        openContextMenu(event, props.menu.items, props.menu.extraData, false);
       }}
       onClick={() => {
         if (isMobile) toggleSideMenu(false);

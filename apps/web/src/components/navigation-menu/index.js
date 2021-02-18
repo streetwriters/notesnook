@@ -167,14 +167,15 @@ function NavigationMenu(props) {
               menu={{
                 items: [
                   {
-                    title: "Remove shortcut",
-                    onClick: async () => {
+                    key: "removeshortcut",
+                    title: () => "Remove shortcut",
+                    onClick: async ({ pin }) => {
                       await db.settings.unpin(pin.id);
                       refreshMenuPins();
                     },
                   },
                 ],
-                data: pin,
+                extraData: pin,
               }}
               icon={
                 pin.type === "notebook"
