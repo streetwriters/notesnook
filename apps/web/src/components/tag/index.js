@@ -22,7 +22,7 @@ function Tag({ item, index }) {
       selectable={false}
       index={index}
       title={<TagNode title={title} />}
-      info={`${noteIds.length} notes`}
+      footer={<Text variant="subBody">{noteIds.length} notes</Text>}
       menuItems={menuItems(item)}
       onClick={() => {
         navigate(`/tags/${id}`);
