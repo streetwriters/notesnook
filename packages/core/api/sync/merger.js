@@ -12,6 +12,9 @@ class Merger {
   }
 
   _migrate(item, deserialized) {
+    // it is a locked note, bail out.
+    if (deserialized.alg && deserialized.cipher) return deserialized;
+
     const version = item.v || 0;
     let type = deserialized.type;
     if (!type && deserialized.data) type = "tiny";
