@@ -1,13 +1,17 @@
 import makeMatcher from "wouter/matcher";
 import useHashLocation from "./use-hash-location";
 
+var lastRoute = null;
 export default function useHashRoutes(routes) {
   const [location] = useHashLocation();
   const matcher = makeMatcher();
   for (var key in routes) {
     const [match, params] = matcher(key, location);
     if (match) {
-      return routes[key](params);
+      const route = routes[key](params);
+      if (!route) return lastRoute;
+      lastRoute = route;
+      return route;
     }
   }
 }

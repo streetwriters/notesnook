@@ -21,12 +21,15 @@ import {
 import { hashNavigate } from ".";
 import { Suspense } from "react";
 import EditorLoading from "../components/editor/loading";
+import EditorPlaceholder from "../components/editor/-placeholder";
 const Editor = React.lazy(() => import("../components/editor"));
 
 const hashroutes = {
   "/": () => {
     closeOpenedDialog();
     if (isMobile() || isTablet()) editorStore.clearSession(false);
+
+    return !editorStore.get().session.state && <EditorPlaceholder />;
   },
   "/email/verify": () => {
     showEmailVerificationDialog();
@@ -60,6 +63,7 @@ const hashroutes = {
     );
   },
   "/notes/:noteId/unlock": ({ noteId }) => {
+    console.log("Unlocking", noteId);
     return (
       <RouteContainer
         buttons={{
