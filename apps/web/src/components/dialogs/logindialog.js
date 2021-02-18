@@ -21,7 +21,7 @@ function LoginDialog(props) {
     if (!window.PasswordCredential) return;
     (async function () {
       const credential = await navigator.credentials.get({
-        mediation: "optional",
+        mediation: "required",
         password: true,
       });
       if (credential) {
