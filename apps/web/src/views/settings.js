@@ -70,6 +70,7 @@ function subscriptionStatusToString(user) {
 function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
+  const refreshApp = useAppStore((store) => store.refresh);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
@@ -293,6 +294,7 @@ function Settings(props) {
               });
               if (!error) {
                 await showToast("success", "Backup restored!");
+                await refreshApp();
               } else {
                 throw new Error(error);
               }
