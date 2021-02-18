@@ -76,7 +76,7 @@ export const UserSection = ({noTextMode}) => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={Sync.run}
+            onPress={() =>  Sync.run()}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
