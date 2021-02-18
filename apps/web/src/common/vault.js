@@ -13,7 +13,7 @@ class Vault {
   }
 
   static unlockVault() {
-    return showPasswordDialog("unlock_vault", ({ password }) => {
+    return showPasswordDialog("lock_note", ({ password }) => {
       return db.vault
         .unlock(password)
         .then(() => true)

@@ -317,28 +317,28 @@ function getDialogData(type) {
         subtitle: "A vault stores your notes in a password-encrypted storage.",
         positiveButtonText: "Create vault",
       };
-    case "unlock_vault":
+    case "lock_note":
       return {
-        title: "Unlock your Vault",
-        subtitle: "Your vault will remain unlocked for 30 minutes.",
-        positiveButtonText: "Unlock vault",
+        title: "Lock note",
+        subtitle: "Please open your vault to encrypt & lock this note.",
+        positiveButtonText: "Lock note",
       };
     case "unlock_note":
       return {
-        title: "Unlock Note",
-        subtitle: "Unlocking will make this note openly available.",
+        title: "Unlock note",
+        subtitle: "Your note will be unencrypted and removed from the vault.",
         positiveButtonText: "Unlock note",
       };
     case "change_password":
       return {
-        title: "Change Vault Password",
+        title: "Change vault password",
         subtitle:
           "All locked notes will be re-encrypted with the new password.",
         positiveButtonText: "Change password",
       };
     case "change_account_password":
       return {
-        title: "Change Account Password",
+        title: "Change account password",
         subtitle:
           "All your data will be re-encrypted and synced with the new password.",
         positiveButtonText: "Change password",
