@@ -56,16 +56,13 @@ class EditorStore extends BaseStore {
     hashNavigate(`/notes/${note.id}/edit`, true);
   };
 
-  _getNote = (note) => {
-    const loadedNote = this.get().note;
-    if (loadedNote) return loadedNote;
-    return note.data;
-  };
-
   openSession = async (noteId) => {
     await db.notes.init();
 
     const session = this.get().session;
+
+    if (session.id === noteId) return;
+
     if (session.state === SESSION_STATES.unlocked) {
       this.set((state) => {
         state.session.id = noteId;
@@ -86,7 +83,6 @@ class EditorStore extends BaseStore {
     let content = await db.content.raw(note.contentId);
 
     this.set((state) => {
-      state.note = undefined;
       state.session = {
         ...DEFAULT_SESSION,
         ...note,
@@ -100,7 +96,6 @@ class EditorStore extends BaseStore {
 
   saveSession = (oldSession) => {
     this.set((state) => (state.session.isSaving = true));
-
     this._saveFn()(this.get().session).then(async (id) => {
       const note = db.notes.note(id)?.data;
       if (!note) {
