@@ -27,8 +27,8 @@ export default class Storage {
     return this.storage.getAllKeys();
   }
 
-  encrypt(password, data, compress) {
-    return this.storage.encrypt(password, data, compress);
+  encrypt(password, data) {
+    return this.storage.encrypt(password, data);
   }
 
   decrypt(password, cipher) {
