@@ -1,5 +1,11 @@
 import React, {Component, createRef} from 'react';
-import {InteractionManager, TouchableOpacity, View} from 'react-native';
+import {Platform} from 'react-native';
+import {
+  InteractionManager,
+  TouchableOpacity,
+  View,
+  Clipboard,
+} from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
@@ -16,6 +22,7 @@ import Navigation from '../../services/Navigation';
 import {getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
 import {
+  eCloseActionSheet,
   eCloseVaultDialog,
   eOnLoadNote,
   eOpenVaultDialog,
@@ -23,6 +30,7 @@ import {
 import {deleteItems} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
 import {ph, SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -402,6 +410,7 @@ export class VaultDialog extends Component {
   _copyNote(note) {
     let text = toTXT(note.content.data);
     text = `${note.title}\n \n ${text}`;
+    console.log(text, 'TEXT');
     Clipboard.setString(text);
     ToastEvent.show('Note copied to clipboard', 'success', 'local');
     this.close();
@@ -452,10 +461,11 @@ export class VaultDialog extends Component {
         this.password = credentials.password;
         this.onPress();
       } else {
+        eSendEvent(eCloseActionSheet);
+        await sleep(300);
         this.setState({
           visible: true,
         });
-        ToastEvent.show('Biometrics Authentication Failed', 'error', 'local');
       }
     } catch (e) {}
   };
