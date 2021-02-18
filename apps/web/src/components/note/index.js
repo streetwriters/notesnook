@@ -141,6 +141,8 @@ function Note(props) {
       onClick={() => {
         if (note.conflicted) {
           hashNavigate(`/notes/${note.id}/conflict`, true);
+        } else if (note.locked) {
+          hashNavigate(`/notes/${note.id}/unlock`, true);
         } else {
           hashNavigate(`/notes/${note.id}/edit`, true);
         }

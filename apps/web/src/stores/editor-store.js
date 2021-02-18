@@ -12,6 +12,7 @@ const SESSION_STATES = {
   new: "new",
   locked: "locked",
   unlocked: "unlocked",
+  opening: "opening",
 };
 const DEFAULT_SESSION = {
   notebooks: undefined,
@@ -45,7 +46,9 @@ class EditorStore extends BaseStore {
       state.session = {
         ...DEFAULT_SESSION,
         ...note,
+        id: undefined, // NOTE: we give a session id only after the note is opened.
         content: note.content,
+        totalWords: state.session.totalWords,
         state: SESSION_STATES.unlocked,
       };
     });
@@ -53,12 +56,21 @@ class EditorStore extends BaseStore {
     hashNavigate(`/notes/${note.id}/edit`, true);
   };
 
+  _getNote = (note) => {
+    const loadedNote = this.get().note;
+    if (loadedNote) return loadedNote;
+    return note.data;
+  };
+
   openSession = async (noteId) => {
     await db.notes.init();
 
     const session = this.get().session;
-    if (session.id === noteId && session.state === SESSION_STATES.unlocked) {
-      this.set((state) => (state.session.state = SESSION_STATES.new));
+    if (session.state === SESSION_STATES.unlocked) {
+      this.set((state) => {
+        state.session.id = noteId;
+        state.session.state = SESSION_STATES.new;
+      });
       return;
     }
 
@@ -74,6 +86,7 @@ class EditorStore extends BaseStore {
     let content = await db.content.raw(note.contentId);
 
     this.set((state) => {
+      state.note = undefined;
       state.session = {
         ...DEFAULT_SESSION,
         ...note,

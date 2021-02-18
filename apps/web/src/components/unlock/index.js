@@ -5,6 +5,7 @@ import * as Icon from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
 
 function Unlock(props) {
   const { noteId } = props;
@@ -12,6 +13,7 @@ function Unlock(props) {
   const [isWrong, setIsWrong] = useState(false);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
+  const setSelectedNote = useNoteStore((store) => store.setSelectedNote);
 
   const submit = useCallback(async () => {
     const password = passwordRef.current.value;
@@ -26,8 +28,9 @@ function Unlock(props) {
   }, [setIsWrong, noteId, openLockedSession]);
 
   useEffect(() => {
+    setSelectedNote(noteId);
     setIsEditorOpen(true);
-  }, [setIsEditorOpen]);
+  }, [setIsEditorOpen, setSelectedNote, noteId]);
 
   return (
     <Flex
@@ -40,11 +43,11 @@ function Unlock(props) {
       <Flex justifyContent="center" alignItems="center">
         <Icon.Unlock size={"heading"} color="text" />
         <Text variant="heading" ml={2} fontSize={48}>
-          Unlock Note
+          Open note
         </Text>
       </Flex>
       <Text variant="body" color="gray" textAlign="center">
-        Please unlock this note using your vault password.
+        Please unlock your vault to open this note for editing.
       </Text>
       <Input
         ref={passwordRef}
