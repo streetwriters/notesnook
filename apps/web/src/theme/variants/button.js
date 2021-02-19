@@ -26,7 +26,10 @@ class Default {
       cursor: "pointer",
       ":focus": {
         outline: "none",
-        opacity: 0.8,
+      },
+      ":focus-visible": {
+        border: "2px solid",
+        borderColor: "primary",
       },
     };
   }
