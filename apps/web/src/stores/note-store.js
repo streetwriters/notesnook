@@ -33,10 +33,6 @@ class NoteStore extends BaseStore {
       Config.get("selectedGroup"),
       Config.get("sortDirection", "desc")
     );
-    console.log(
-      "Refresh notes:",
-      notes.every((v) => Object.isExtensible(v))
-    );
     this.set((state) => {
       state.notes = qclone(notes);
     });
