@@ -90,6 +90,7 @@ function ListItem(props) {
         openContextMenu(e, menuItems, props.menu.extraData, false)
       }
       p={2}
+      tabIndex={props.index}
       justifyContent="center"
       sx={{
         height: "inherit",
@@ -100,6 +101,16 @@ function ListItem(props) {
         ":hover": {
           backgroundColor: shade,
         },
+        ":focus": {
+          outline: "none",
+        },
+        ":focus-visible": {
+          border: "1px solid",
+          borderColor: "primary",
+        },
+      }}
+      onKeyPress={(e) => {
+        if (e.key === "Enter") e.target.click();
       }}
       flexDirection="column"
       onClick={() => {
