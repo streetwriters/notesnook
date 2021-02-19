@@ -33,7 +33,7 @@ class Notebook extends React.Component {
         footer={
           <>
             <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
-              {notebook.topics.slice(1, 4).map((topic) => (
+              {notebook?.topics?.slice(1, 4).map((topic) => (
                 <Flex
                   key={topic.id}
                   onClick={(e) => {
