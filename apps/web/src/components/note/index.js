@@ -26,12 +26,19 @@ function Note(props) {
     return [noteColor + "11", noteColor];
   }, [note.color]);
 
-  const notebook = useMemo(
-    () =>
-      !!note.notebooks?.length &&
-      db.notebooks.notebook(note.notebooks[0].id)?.data,
-    [note.notebooks]
-  );
+  const notebooksText = useMemo(() => {
+    if (!note.notebooks?.length) return;
+    const firstNotebook = note.notebooks[0];
+    const title = db.notebooks.notebook(firstNotebook.id)?.title;
+    const remainingNotebooks = note.notebooks.length - 1;
+    let otherText = "";
+    if (remainingNotebooks) {
+      otherText = " & ";
+      otherText +=
+        remainingNotebooks === 1 ? "1 other" : `${remainingNotebooks} others`;
+    }
+    return title + otherText;
+  }, [note.notebooks]);
 
   return (
     <ListItem
@@ -56,7 +63,7 @@ function Note(props) {
         }
       }}
       header={
-        notebook && (
+        notebooksText && (
           <Flex
             alignSelf="flex-start"
             justifySelf="flex-start"
@@ -65,7 +72,7 @@ function Note(props) {
           >
             <Icon.Notebook size={12} color={primary} />
             <Text variant="subBody" color={primary} fontWeight="600" ml={"3px"}>
-              {notebook.title}
+              {notebooksText}
             </Text>
           </Flex>
         )
