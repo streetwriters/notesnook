@@ -42,7 +42,7 @@ function init_tiny(size) {
     }
 `,
     browser_spellcheck: true,
-    autoresize_bottom_margin: 50,
+    autoresize_bottom_margin: 120,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
     placeholder: 'Start writing your note here',
     object_resizing: true,
@@ -68,9 +68,16 @@ function init_tiny(size) {
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
+      editor.on('blur', () => {
+        reactNativeEventHandler('focus', null);
+      });
       editor.on('SetContent', (event) => {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
+        } 
+        if (event.paste) {
+          isLoading = false;
+          onChange(event);
         }
       });
       editor.on('ScrollIntoView', (e) => {
@@ -86,16 +93,22 @@ function init_tiny(size) {
     },
   });
 }
-
+window.prevContent = "";
 const onChange = (event) => {
-
+  if (event.type === "nodechange" && !event.selectionChange) return;
+  if (editor.getContent() === window.prevContent) return;
+  window.prevContent = editor.getContent();
+  
   if (isLoading) {
+    window.prevContent = editor.getContent();
     isLoading = false;
     return;
   }
   if (editor.plugins.wordcount.getCount() === 0) return;
   selectchange();
+
   reactNativeEventHandler('tiny', editor.getContent());
+
   reactNativeEventHandler('history', {
     undo: editor.undoManager.hasUndo(),
     redo: editor.undoManager.hasRedo(),
@@ -185,6 +198,7 @@ function selectchange() {
     if (listElm.nodeName === 'OL') {
       currentFormats.ol = style;
     } else {
+      if (!listElm) return;
       if (listElm.className === 'tox-checklist') {
         currentFormats.cl = true;
       } else {
