@@ -13,6 +13,7 @@ function CachedRouter() {
     NavigationEvents.publish("onNavigate", RouteResult);
 
     const key = RouteResult.key || "general";
+
     const routeContainer = document.getElementById("mainRouteContainer");
     routeContainer.childNodes.forEach((node) => {
       node.style.display = "none";
@@ -22,11 +23,15 @@ function CachedRouter() {
     if (route) {
       route.style.display = "flex";
       if (key !== "general") return;
+      else {
+        route.remove();
+        route = undefined;
+      }
     }
 
-    if (!cache[key] || !route) {
+    if (!cache[key]) {
       if (!route) {
-        cache[key] = true;
+        cache[key] = key !== "general";
         route = document.createElement("div");
         route.id = key;
         route.className = "route";
