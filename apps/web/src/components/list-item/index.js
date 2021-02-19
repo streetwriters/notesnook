@@ -169,9 +169,10 @@ function ListItem(props) {
           sx={{ position: "absolute", right: 1 }}
           size={22}
           color="icon"
-          onClick={(event) =>
-            openContextMenu(event, menuItems, props.menu.extraData, true)
-          }
+          onClick={(event) => {
+            event.stopPropagation();
+            openContextMenu(event, menuItems, props.menu.extraData, true);
+          }}
         />
       )}
     </Flex>
