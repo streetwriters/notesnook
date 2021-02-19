@@ -103,10 +103,9 @@ function Search({ type }) {
           alignItems="center"
           flexDirection="column"
         >
-          <SearchPlaceholder />
-          <Text mt={2} color="text">
-            Searching in {searchState.totalItems} {type}...
-          </Text>
+          <SearchPlaceholder
+            text={`Searching in ${searchState.totalItems} ${type}...`}
+          />
           <ProgressBar
             progress={100}
             width={"60%"}
