@@ -62,3 +62,10 @@ tox-tbtn tox-tbtn--select {
   font-size: 1.2rem !important;
   font-weight: bold !important;
 }
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__overflow,
+.tox .tox-toolbar__primary {
+  background: none !important;
+  border-bottom: 1px solid var(--border) !important;
+}
