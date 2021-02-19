@@ -42,7 +42,7 @@ function init_tiny(size) {
     }
 `,
     browser_spellcheck: true,
-    autoresize_bottom_margin: 50,
+    autoresize_bottom_margin: 120,
     imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
     placeholder: 'Start writing your note here',
     object_resizing: true,
