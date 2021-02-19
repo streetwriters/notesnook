@@ -223,7 +223,7 @@ function Item(props) {
       <Flex alignItems="center" justifyContent="center">
         <Icon />
         <Flex ml={1} flexDirection="column">
-          <Text as="span" fontSize="body">
+          <Text as="span" color="text" fontSize="body">
             {title}
           </Text>
           <Text variant="subBody">{totalNotes + " Notes"}</Text>
