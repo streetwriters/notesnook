@@ -83,7 +83,7 @@ const routes = {
     };
   },
   "/favorites": () => {
-    notestore.setContext({ type: "favorites" });
+    notestore.setContext({ type: "favorite" });
     return {
       key: "notes",
       title: "Favorites",
@@ -162,7 +162,6 @@ const routes = {
     component: <Settings />,
   }),
   "/search/:type": ({ type }) => ({
-    key: "search",
     type: "search",
     title: "Search",
     component: <Search type={type} />,

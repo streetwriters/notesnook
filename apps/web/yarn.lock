@@ -5377,6 +5377,13 @@ fast-diff@1.2.0:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.2.0.tgz#73ee11982d86caaf7959828d519cfe927fac5f03"
   integrity sha512-xJuoT5+L99XlZ8twedaRf6Ax2TgQVxvgZOYoPKqZufmJib0tL2tegPBOZb1pVNgIhlqDlA0eO0c3wBvQcmzx4w==
 
+fast-fuzzy@^1.10.8:
+  version "1.10.8"
+  resolved "https://registry.yarnpkg.com/fast-fuzzy/-/fast-fuzzy-1.10.8.tgz#4c45d38b4f55644a3b0144aa27f1a53c0b8fd06f"
+  integrity sha512-jXxymuLb3p4S873sWswpWS7GTAqFSnYLNdHCeB9gvXAmjskrAkfX9eu0lWDUFfHIXPSFZe8jsfw9t4KifR6YMg==
+  dependencies:
+    graphemesplit "^2.4.1"
+
 fast-glob@^3.1.1:
   version "3.2.5"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.2.5.tgz#7939af2a656de79a4f1901903ee8adcaa7cb9661"
@@ -5772,11 +5779,6 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
-fuzzysearch@^1.0.3:
-  version "1.0.3"
-  resolved "https://registry.yarnpkg.com/fuzzysearch/-/fuzzysearch-1.0.3.tgz#dffc80f6d6b04223f2226aa79dd194231096d008"
-  integrity sha1-3/yA9tawQiPyImqnndGUIxCW0Ag=
-
 gensync@^1.0.0-beta.1:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
@@ -5961,6 +5963,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   version "4.2.6"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.6.tgz#ff040b2b0853b23c3d31027523706f1885d76bee"
   integrity sha512-nTnJ528pbqxYanhpDYsi4Rd8MAeaBA67+RZ10CM1m3bTAVFEDcd5AuA4a6W5YkGZ1iNXHzZz8T6TBKLeBuNriQ==
+
+graphemesplit@^2.4.1:
+  version "2.4.2"
+  resolved "https://registry.yarnpkg.com/graphemesplit/-/graphemesplit-2.4.2.tgz#e3ff455b157ad0d40554dbd368c74d4ac7f3d97d"
+  integrity sha512-N44DD8cDcWCtZesOhe0zS0x1SVO5zQ0HE6XKlS/JHDB+vhyEvorzI/gsTN/ae0gjH4KEDtUvkjEI5w/sgu8QHw==
+  dependencies:
+    unicode-trie "^2.0.0"
 
 growly@^1.3.0:
   version "1.3.0"
@@ -8365,12 +8374,24 @@ normalize-url@^3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
+notes-core@../notes-core:
+  version "6.4.0"
+  dependencies:
+    fast-fuzzy "^1.10.8"
+    fast-sort "^2.0.1"
+    lean-he "^2.1.2"
+    no-internet "^1.5.2"
+    qclone "^1.0.4"
+    quill-delta-to-html "^0.12.0"
+    spark-md5 "^3.0.1"
+    turndown "^7.0.0"
+
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "6.4.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#1dfbf68df23d4ed3ed9a9846c0d9fb4bf55f2da5"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#79ed9fa31b34577426e632541b84f91ef65fc540"
   dependencies:
+    fast-fuzzy "^1.10.8"
     fast-sort "^2.0.1"
-    fuzzysearch "^1.0.3"
     lean-he "^2.1.2"
     no-internet "^1.5.2"
     qclone "^1.0.4"
@@ -8739,6 +8760,11 @@ package-hash@^4.0.0:
     hasha "^5.0.0"
     lodash.flattendeep "^4.4.0"
     release-zalgo "^1.0.0"
+
+pako@^0.2.5:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/pako/-/pako-0.2.9.tgz#f3f7522f4ef782348da8161bad9ecfd51bf83a75"
+  integrity sha1-8/dSL073gjSNqBYbrZ7P1Rv4OnU=
 
 pako@~1.0.5:
   version "1.0.11"
@@ -11808,6 +11834,11 @@ tiny-emitter@^2.0.0:
   resolved "https://registry.yarnpkg.com/tiny-emitter/-/tiny-emitter-2.1.0.tgz#1d1a56edfc51c43e863cbb5382a72330e3555423"
   integrity sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==
 
+tiny-inflate@^1.0.0:
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
+  integrity sha512-pkY1fj1cKHb2seWDy0B16HeWyczlJA9/WW3u3c4z/NiWDsO3DOU5D7nhTLE9CF0yXv/QZFY7sEJmj24dK+Rrqw==
+
 tinymce@^5.6.2, tinymce@^5.7.0:
   version "5.7.0"
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.7.0.tgz#bc565877e4041db83848a330dfa7916993110cba"
@@ -12056,6 +12087,14 @@ unicode-property-aliases-ecmascript@^1.0.4:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-1.1.0.tgz#dd57a99f6207bedff4628abefb94c50db941c8f4"
   integrity sha512-PqSoPh/pWetQ2phoj5RLiaqIk4kCNwoV3CI+LfGmWLKI3rE3kl1h59XpX2BjgDrmbxD9ARtQobPGU1SguCYuQg==
+
+unicode-trie@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/unicode-trie/-/unicode-trie-2.0.0.tgz#8fd8845696e2e14a8b67d78fa9e0dd2cad62fec8"
+  integrity sha512-x7bc76x0bm4prf1VLg79uhAzKw8DVboClSN5VxJuQ+LKDOVEW9CdH+VY7SP+vX7xCYQqzzgQpFqz15zeLvAtZQ==
+  dependencies:
+    pako "^0.2.5"
+    tiny-inflate "^1.0.0"
 
 union-value@^1.0.0:
   version "1.0.1"

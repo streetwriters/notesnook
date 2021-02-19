@@ -1,7 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
-import { notesFromContext } from "../common";
 import { db } from "../common/db";
 import SearchBox from "../components/search";
 import ProgressBar from "../components/progress-bar";
@@ -14,7 +13,7 @@ async function typeToItems(type, context) {
     case "notes":
       await db.notes.init();
       if (!context) return ["notes", db.notes.all];
-      const notes = notesFromContext(context);
+      const notes = context.notes;
       return ["notes", notes];
     case "notebooks":
       return ["notebooks", db.notebooks.all];
@@ -40,10 +39,47 @@ function Search({ type }) {
   const [results, setResults] = useState([]);
   const context = useNoteStore((store) => store.context);
 
+  const title = useMemo(() => {
+    switch (type) {
+      case "notes":
+        if (!context) return "all notes";
+        switch (context.type) {
+          case "topic":
+            const notebook = db.notebooks.notebook(context.value.id);
+            const topic = notebook.topics.topic(context.value.topic);
+            return `notes of ${topic._topic.title} in ${notebook.title}`;
+          case "tag":
+            const tag = db.tags.all.find((tag) => tag.id === context.value);
+            return `notes in #${tag.title}`;
+          case "favorite":
+            return "favorite notes";
+          case "color":
+            const color = db.colors.all.find((tag) => tag.id === context.value);
+            return `notes in color ${color.title}`;
+          default:
+            return;
+        }
+      case "notebooks":
+        return "all notebooks";
+      case "topics":
+        const notebook = db.notebooks.notebook(context.notebookId);
+        return `${notebook.title} topics`;
+      case "tags":
+        return "all tags";
+      case "trash":
+        return "all trash";
+      default:
+        return "";
+    }
+  }, [type, context]);
   return (
     <>
+      <Text variant="subtitle" mx={2}>
+        Searching {title}
+      </Text>
       <SearchBox
         onSearch={async (query) => {
+          if (!query) return;
           const [lookupType, items] = await typeToItems(type, context);
           setResults([]);
 
@@ -51,7 +87,6 @@ function Search({ type }) {
             showToast("error", `There are no items to search in.`);
             return;
           }
-
           setSearchState({ isSearching: true, totalItems: items.length });
           const results = await db.lookup[lookupType](items, query);
           setResults(results);

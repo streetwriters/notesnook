@@ -67,7 +67,7 @@ export function notesFromContext(context) {
       const topic = notebook.topics.topic(context.value.topic);
       notes = topic.all;
       break;
-    case "favorites":
+    case "favorite":
       notes = db.notes.favorites;
       break;
     default:
