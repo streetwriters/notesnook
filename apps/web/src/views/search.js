@@ -104,7 +104,7 @@ function Search({ type }) {
           flexDirection="column"
         >
           <SearchPlaceholder />
-          <Text mt={2}>
+          <Text mt={2} color="text">
             Searching in {searchState.totalItems} {type}...
           </Text>
           <ProgressBar
