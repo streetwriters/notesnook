@@ -225,19 +225,18 @@ const menuItems = [
 
 const topicNoteMenuItems = [
   ...menuItems,
-  [
-    {
-      key: "removefromtopic",
-      title: "Remove from topic",
-      onClick: async ({ note, context }) => {
-        console.log("Remove from topic:", Object.isExtensible(note));
-        await db.notebooks
-          .notebook(context.value.id)
-          .topics.topic(context.value.topic)
-          .delete(note.id);
-        store.setContext(context);
-        await showToast("success", "Note removed from topic!");
-      },
+  {
+    key: "removefromtopic",
+    title: () => "Remove from topic",
+    color: "red",
+    onClick: async ({ note, context }) => {
+      console.log("Remove from topic:", Object.isExtensible(note));
+      await db.notebooks
+        .notebook(context.value.id)
+        .topics.topic(context.value.topic)
+        .delete(note.id);
+      store.setContext(context);
+      await showToast("success", "Note removed from topic!");
     },
-  ],
+  },
 ];
