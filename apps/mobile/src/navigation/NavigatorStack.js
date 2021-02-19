@@ -2,13 +2,19 @@ import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
 import {Animated} from 'react-native';
+import SplashScreen from 'react-native-splash-screen';
 import Container from '../components/Container';
 import {updateEvent} from '../components/DialogManager/recievers';
-import { useTracked } from '../provider';
+import {useTracked} from '../provider';
 import {Actions} from '../provider/Actions';
-import {eSendEvent} from '../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
+import {eOpenSideMenu} from '../utils/Events';
 import {rootNavigatorRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
 import Favorites from '../views/Favorites';
@@ -75,14 +81,26 @@ const screenOptionsForAnimation = {
 
 export const NavigatorStack = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
-    const settings = state.settings;
-
+    const [, dispatch] = useTracked();
+    const [render, setRender] = React.useState(false);
     const onStateChange = React.useCallback(() => {
       dispatch({type: Actions.SELECTION_MODE, enabled: false});
       dispatch({type: Actions.CLEAR_SELECTION});
       eSendEvent('navigate');
     });
+
+    const updateRender = async () => {
+      if (!render) {
+        setRender(true);
+      }
+    };
+
+    React.useEffect(() => {
+      eSubscribeEvent(eOpenSideMenu, updateRender);
+      return () => {
+        eUnSubscribeEvent(eOpenSideMenu, updateRender);
+      };
+    }, []);
 
     return (
       <Container root={true}>
@@ -90,35 +108,37 @@ export const NavigatorStack = React.memo(
           onStateChange={onStateChange}
           independent={true}
           ref={rootNavigatorRef}>
-          <Stack.Navigator
-            initialRouteName={settings.homepage}
-            screenOptions={{
-              headerShown: false,
-              animationEnabled: false,
-              gestureEnabled: false,
-            }}>
-            <Stack.Screen name="Notes" component={Home} />
-            <Stack.Screen name="Notebooks" component={Folders} />
-            <Stack.Screen name="Favorites" component={Favorites} />
-            <Stack.Screen name="Trash" component={Trash} />
-            <Stack.Screen
-              options={screenOptionsForAnimation}
-              name="NotesPage"
-              component={Notes}
-            />
-            <Stack.Screen name="Tags" component={Tags} />
-            <Stack.Screen
-              options={screenOptionsForAnimation}
-              name="Notebook"
-              component={Notebook}
-            />
-            <Stack.Screen name="Settings" component={Settings} />
-            <Stack.Screen
-              options={screenOptionsForAnimation}
-              name="Search"
-              component={Search}
-            />
-          </Stack.Navigator>
+          {render && (
+            <Stack.Navigator
+              initialRouteName={SettingsService.get().homepage}
+              screenOptions={{
+                headerShown: false,
+                animationEnabled: false,
+                gestureEnabled: false,
+              }}>
+              <Stack.Screen name="Notes" component={Home} />
+              <Stack.Screen name="Notebooks" component={Folders} />
+              <Stack.Screen name="Favorites" component={Favorites} />
+              <Stack.Screen name="Trash" component={Trash} />
+              <Stack.Screen
+                options={screenOptionsForAnimation}
+                name="NotesPage"
+                component={Notes}
+              />
+              <Stack.Screen name="Tags" component={Tags} />
+              <Stack.Screen
+                options={screenOptionsForAnimation}
+                name="Notebook"
+                component={Notebook}
+              />
+              <Stack.Screen name="Settings" component={Settings} />
+              <Stack.Screen
+                options={screenOptionsForAnimation}
+                name="Search"
+                component={Search}
+              />
+            </Stack.Navigator>
+          )}
         </NavigationContainer>
       </Container>
     );
