@@ -30,7 +30,11 @@ const NotebooksProfile = createProfile(
       index={index}
       item={item}
       onClick={() => {
-        navigate(`/notebooks/${item.id}`);
+        if (item.topics.length === 1) {
+          navigate(`/notebooks/${item.id}/${item.topics[0].id}`);
+        } else {
+          navigate(`/notebooks/${item.id}`);
+        }
       }}
       onTopicClick={(notebook, topic) =>
         navigate(`/notebooks/${notebook.id}/${topic}`)
