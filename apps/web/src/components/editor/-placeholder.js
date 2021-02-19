@@ -1,5 +1,6 @@
 import React from "react";
 import { Button, Flex, Image, Text } from "rebass";
+import { hashNavigate } from "../../navigation";
 import * as Icon from "../icons";
 
 function EditorPlaceholder() {
@@ -22,7 +23,7 @@ function EditorPlaceholder() {
           justifyContent: "center",
         }}
         variant="tool"
-        onClick={() => {}}
+        onClick={() => hashNavigate("/notes/create")}
       >
         <Icon.Plus size={18} color="primary" />
         <Text ml={1}>Make a new note</Text>
