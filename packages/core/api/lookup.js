@@ -1,4 +1,5 @@
-import fuzzysearch from "fuzzysearch";
+import { search } from "fast-fuzzy";
+import { qclone } from "qclone";
 import { getContentFromData } from "../content-types";
 
 export default class Lookup {
@@ -11,29 +12,37 @@ export default class Lookup {
   }
 
   async notes(notes, query) {
+    notes = qclone(notes);
     const contents = await this._db.content.multi(
-      notes.map((note) => note.contentId)
+      notes.map((note) => note.contentId || "")
     );
-    const results = [];
-    notes.forEach((note) => {
-      const title = note.title;
+    const candidates = notes.map((note) => {
+      note.content = "";
       if (!note.locked) {
         let content = contents.find((content) => content.id === note.contentId);
+        if (!content) return note;
         content = getContentFromData(content.type, content.data);
-        if (fzs(query, title) || content.search(query)) results.push(note);
-      } else {
-        if (fzs(query, title)) results.push(note);
+        note.content = content.toHTML();
       }
+      return note;
     });
-    return results;
+    return search(query, candidates, {
+      keySelector: (item) => [item.title, item.content],
+      ignoreCase: false,
+    });
   }
 
   notebooks(array, query) {
-    return array.filter(
-      (nb) =>
-        fzs(query, nb.title + " " + nb.description) ||
-        nb.topics.some((topic) => fuzzysearch(query, topic.title))
-    );
+    return search(query, array, {
+      keySelector: (item) => {
+        return [
+          item.title,
+          item.description || "",
+          ...item.topics.map((t) => t.title),
+        ];
+      },
+      ignoreCase: true,
+    });
   }
 
   topics(array, query) {
@@ -49,10 +58,9 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return array.filter((item) => fzs(query, item.title));
+    return search(query, array, {
+      keySelector: (item) => item.title || "",
+      ignoreCase: true,
+    });
   }
-}
-
-function fzs(query, text) {
-  return fuzzysearch(query.toLowerCase(), text.toLowerCase());
 }
