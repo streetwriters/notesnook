@@ -45,6 +45,12 @@ class NoteStore extends BaseStore {
     this.setContext(context);
   };
 
+  clearContext = () => {
+    this.set((state) => {
+      state.context = undefined;
+    });
+  };
+
   setContext = (context) => {
     db.notes.init().then(() => {
       this.set((state) => {

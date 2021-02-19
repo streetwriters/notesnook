@@ -4,10 +4,15 @@ import ListContainer from "../components/list-container";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { db } from "../common/db";
 import { hashNavigate } from "../navigation";
+import useNavigate from "../utils/use-navigate";
 
 function Home() {
   const notes = useStore((store) => store.notes);
+  const clearContext = useStore((store) => store.clearContext);
   const [isLoading, setIsLoading] = useState(true);
+  useNavigate("home", () => {
+    clearContext();
+  });
 
   useEffect(() => {
     (async function () {
