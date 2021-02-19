@@ -4,17 +4,9 @@ import tinymce from "tinymce/tinymce";
   var global = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
   var replaceContent = function (editor, content) {
-    const rng = editor.selection.getRng();
-    let node = editor.selection.getNode();
-    const innerHTML = node.innerHTML;
-    node.remove();
     editor.undoManager.transact(function () {
-      setImmediate(() =>
-        editor.execCommand("mceInsertContent", false, content(innerHTML))
-      );
+      editor.execCommand("mceInsertContent", false, content("<br>"));
     });
-    editor.selection.setRng(rng, true);
-    editor.nodeChanged();
   };
 
   var addCodeBlock = function (editor, api, type) {
