@@ -55,7 +55,6 @@ function AppEffects({ isMobile, isTablet, setShow }) {
 
   useEffect(() => {
     EV.subscribe(EVENTS.userCheckStatus, async (type) => {
-      if (process.env.REACT_APP_CI) return { type, result: true };
       if (isUserPremium()) {
         return { type, result: true };
       } else {

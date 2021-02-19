@@ -99,6 +99,8 @@ export async function createBackup() {
 }
 
 export function isUserPremium() {
+  if (process.env.REACT_APP_CI) return true;
+
   const subStatus = userstore.get().user?.subscription?.type;
   return (
     subStatus === SUBSCRIPTION_STATUS.BETA ||
