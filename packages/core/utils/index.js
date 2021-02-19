@@ -9,7 +9,7 @@ export function groupBy(arr, key, sortSelector, sortDirection) {
 
   let groups = new Map();
   arr.forEach((item) => {
-    let groupTitle = item.pinned ? "" : key(item);
+    let groupTitle = item.pinned ? "Pinned" : key(item);
     let arr = groups.get(groupTitle) || [];
     arr.push(item);
     groups.set(groupTitle, arr);
