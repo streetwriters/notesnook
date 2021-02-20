@@ -17,11 +17,16 @@ import {
 } from './src/services/EventManager';
 import Navigation from './src/services/Navigation';
 import SettingsService from './src/services/SettingsService';
-import {changeAppScale} from './src/utils/Animations';
+import {
+  changeAppScale,
+  changeContainerScale,
+  ContainerScale,
+} from './src/utils/Animations';
 import {db} from './src/utils/DB';
 import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
 import {sleep} from './src/utils/TimeUtils';
 import EditorRoot from './src/views/Editor/EditorRoot';
+
 
 let initStatus = false;
 const App = () => {
@@ -42,9 +47,10 @@ const App = () => {
               ? 'smallTablet'
               : 'mobile',
           });
-          SplashScreen.hide();
         });
         await SettingsService.init();
+        eSendEvent(eOpenSideMenu);
+        SplashScreen.hide();
         await db.init();
       } catch (e) {
       } finally {
@@ -65,9 +71,10 @@ const App = () => {
     };
   }, []);
 
-  const loadMainApp = (origin) => {
+  const loadMainApp = () => {
     if (initStatus) {
-      eSendEvent('load_overlay', origin);
+      SettingsService.setAppLoaded();
+      eSendEvent('load_overlay');
       dispatch({type: Actions.ALL});
     }
   };
@@ -86,7 +93,6 @@ export default App;
 
 const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
-
 const Overlay = ({onLoad}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -99,12 +105,8 @@ const Overlay = ({onLoad}) => {
       init = true;
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
-      // if (!animation) {
       dispatch({type: Actions.LOADING, loading: false});
-      // }
     });
-    eSendEvent(eOpenSideMenu);
-    SettingsService.setAppLoaded();
     setOpacity(false);
     await sleep(150);
     Animated.timing(opacityV, {
@@ -117,13 +119,10 @@ const Overlay = ({onLoad}) => {
       duration: 150,
       easing: Easing.out(Easing.ease),
     }).start();
-    changeAppScale(1, 250);
+    changeContainerScale(ContainerScale, 1, 500);
     await sleep(150);
     setLoading(false);
     animation = false;
-    //if (init) {
-    //  dispatch({type: Actions.LOADING, loading: false});
-    //}
   };
 
   useEffect(() => {
