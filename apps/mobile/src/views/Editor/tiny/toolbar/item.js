@@ -12,8 +12,12 @@ import {
   eUnSubscribeEvent,
   eSendEvent,
 } from '../../../../services/EventManager';
+import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
+import { db } from '../../../../utils/DB';
+import { eShowGetPremium } from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
+import { sleep } from '../../../../utils/TimeUtils';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -101,6 +105,7 @@ const ToolbarItem = ({
       if (format === 'link') {
         properties.selection = data;
         properties.pauseSelectionChange = true;
+
         eSendEvent('showTooltip', {
           data: null,
           value: data['link'],
@@ -178,21 +183,20 @@ const ToolbarItem = ({
   };
 
   const onPress = async (event) => {
-    /*    if (premium && !PremiumService.get()) {
-  
-		let user = await db.user.getUser();
-		if (user && !user.isEmailConfirmed) {
-		  await sleep(500);
-		  PremiumService.showVerifyEmailDialog();
-		} else {
-		  eSendEvent(eShowGetPremium, {
-			context: 'editor',
-			title: 'Get Notesnook Pro',
-			desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
-		  });
-		}
-		return;
-    } */
+    if (premium && !PremiumService.get()) {
+      let user = await db.user.getUser();
+      if (user && !user.isEmailConfirmed) {
+        await sleep(500);
+        PremiumService.showVerifyEmailDialog();
+      } else {
+        eSendEvent(eShowGetPremium, {
+          context: 'editor',
+          title: 'Get Notesnook Pro',
+          desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+        });
+      }
+      return;
+    }
     if (type === 'settings') {
       eSendEvent('openEditorSettings');
       return;
@@ -252,7 +256,35 @@ const ToolbarItem = ({
     if (format === 'pre') {
       if (selected) {
         formatSelection(
-          `tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });`,
+          `(() => {
+            function replaceContent(editor, content) {
+              let rng = tinymce.activeEditor.selection.getRng();
+              let node = tinymce.activeEditor.selection.getNode();
+              let innerHTML = node.innerHTML;
+              node.remove();
+              tinymce.activeEditor.undoManager.transact(function () {
+                setTimeout(() =>
+                  tinymce.activeEditor.execCommand("mceInsertContent", false, content(innerHTML)),2
+                );
+              });
+              tinymce.activeEditor.selection.setRng(rng, true);
+              tinymce.activeEditor.nodeChanged();
+            };
+  
+            let node = tinymce.activeEditor.selection.getNode();
+            const innerTexts = node.textContent;
+            if (innerTexts.length <= 0) {
+              replaceContent(
+                tinymce.activeEditor,
+                (html) => {
+                  let replant = html.replace(regex, "<br>");
+                  return "<p>" + replant + "</p>"
+                }
+              );
+            } else {
+              tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });
+            }
+          })();`,
         );
         focusEditor(format);
         return;
