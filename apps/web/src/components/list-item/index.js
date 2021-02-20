@@ -87,7 +87,7 @@ function ListItem(props) {
     <Flex
       bg={isSelected ? shade : "background"}
       onContextMenu={(e) =>
-        openContextMenu(e, menuItems, props.menu.extraData, false)
+        openContextMenu(e, menuItems, props.menu?.extraData, false)
       }
       p={2}
       tabIndex={props.index}
