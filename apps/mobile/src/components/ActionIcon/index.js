@@ -16,7 +16,7 @@ export const ActionIcon = ({
   left = 10,
   right = 10,
   top = 30,
-  bottom = 30,
+  bottom = 10,
   testID,
   disabled,
   onLongPress,
