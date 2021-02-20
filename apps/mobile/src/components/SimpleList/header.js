@@ -1,14 +1,16 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import { Placeholder } from '../ListPlaceholders';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
+import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { Card } from './card';
+import {Card} from './card';
 
 export const Header = ({
   type,
@@ -18,6 +20,7 @@ export const Header = ({
   color,
   onPress,
   shouldShow = false,
+  icon,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -71,27 +74,39 @@ export const Header = ({
             type={type}
           />
         </View>
+
         <View
           style={{
             marginTop: 15,
           }}>
           <Heading
-            style={{marginBottom: paragraph ? -10 : 0}}
-            size={SIZE.xxxl * 1.5}>
-            <Heading size={SIZE.xxxl * 1.5} color={colors.accent}>
+            style={{marginBottom: paragraph ? 0 : 0}}
+            size={SIZE.xxxl * 1.2}>
+            <Heading size={SIZE.xxxl * 1.2} color={colors.accent}>
               {title.slice(0, 1) === '#' ? '#' : null}
             </Heading>
 
             {title.slice(0, 1) === '#' ? title.slice(1) : title}
           </Heading>
-          {paragraph && (
-            <Paragraph color={colors.icon}>
-              {'\n'}or
-              <Paragraph onPress={onPress} color={colors.accent}>
-                {' ' + paragraph}
-              </Paragraph>
-            </Paragraph>
-          )}
+
+         {
+           paragraph && <Button
+            height={20}
+            title={paragraph}
+            icon={icon}
+            style={{
+              alignSelf: 'flex-start',
+              paddingLeft: 0,
+            }}
+            textStyle={{
+              fontWeight:'normal'
+            }}
+            iconSize={SIZE.sm}
+            fontSize={SIZE.sm}
+            onPress={onPress}
+          />
+         } 
+
         </View>
       </View>
     </View>
