@@ -23,6 +23,7 @@ import {
   eOpenRecoveryKeyDialog,
   refreshNotesPage,
 } from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
@@ -40,9 +41,9 @@ const MODES = {
   changePassword: 3,
 };
 
-let email;
+let email = '';
 let username;
-let password;
+let password = '';
 let confirmPassword;
 let oldPassword;
 
@@ -71,7 +72,7 @@ const LoginDialog = () => {
       },
       button: 'Login',
       buttonFunc: () => loginUser(),
-      headerParagraph: 'create a new account',
+      headerParagraph: 'Create a new account',
       showForgotButton: true,
       loading: 'Please wait while we log in and sync your data.',
       showLoader: true,
@@ -87,7 +88,7 @@ const LoginDialog = () => {
       },
       button: 'Create Account',
       buttonFunc: () => signupUser(),
-      headerParagraph: 'login to your account',
+      headerParagraph: 'Login to your account',
       showForgotButton: false,
       loading: 'Please wait while we set up your account.',
       showLoader: true,
@@ -103,7 +104,7 @@ const LoginDialog = () => {
       },
       button: 'Send Recovery Email',
       buttonFunc: () => sendEmail(),
-      headerParagraph: 'login to your account',
+      headerParagraph: 'Login to your account',
       showForgotButton: false,
       loading:
         'Please follow the link in the email to set up your new password. If you are unable to find our email, check your spam folder.',
@@ -151,8 +152,8 @@ const LoginDialog = () => {
     _passConfirm.current?.clear();
     _username.current?.clear();
 
-    email = null;
-    password = null;
+    // email = null;
+    //  password = null;
     confirmPassword = null;
     oldPassword = null;
     setVisible(false);
@@ -165,7 +166,11 @@ const LoginDialog = () => {
 
   const loginUser = async () => {
     if (!password || !email || error) {
-      ToastEvent.show('Email or password is invalid', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Email or password is invalid',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     setLoading(true);
@@ -181,13 +186,19 @@ const LoginDialog = () => {
       PremiumService.setPremiumStatus();
       dispatch({type: Actions.USER, user: user});
       clearMessage(dispatch);
-      ToastEvent.show(`Logged in as ${user.email}`, 'success', 'local');
+      ToastEvent.show({
+        heading: 'Login successful',
+        message: `Logged in as ${user.email}`,
+        type: 'success',
+        context: 'local',
+      });
       await db.sync();
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
       close();
     } catch (e) {
+      console.log(e);
       setLoading(false);
       setStatus(null);
       if (user && !user.isEmailConfirmed) {
@@ -197,35 +208,53 @@ const LoginDialog = () => {
         console.log('showing verify email dialog');
         PremiumService.showVerifyEmailDialog();
       } else {
-        ToastEvent.show(e.message, 'error', 'local');
+        ToastEvent.show({
+          heading: user ? 'Failed to sync' : 'Login failed',
+          message: e.message,
+          type: 'error',
+          context: 'local',
+        });
       }
     }
   };
 
   const validateInfo = () => {
     if (!password || !email || !confirmPassword) {
-      ToastEvent.show('All fields are required', 'error', 'local');
+      ToastEvent.show({
+        heading: 'All fields required',
+        message: 'Fill all the fields and try again',
+        type: 'error',
+        context: 'local',
+      });
+
       return false;
     }
 
     if (error) {
-      ToastEvent.show('Signup information is invalid', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Invalid signup information',
+        message:
+          'Some or all information provided is invalid. Resolve all errors and try again.',
+        type: 'error',
+        context: 'local',
+      });
       return false;
     }
 
     if (!userConsent) {
-      ToastEvent.show(
-        'You must agree to our terms of service and privacy policy.',
-        'error',
-        'local',
-        5000,
-        () => {
+      ToastEvent.show({
+        heading: 'Cannot signup',
+        message: 'You must agree to our terms of service and privacy policy.',
+        type: 'error',
+        context: 'local',
+        actionText: 'I Agree',
+        duration: 5000,
+        func: () => {
           setUserConsent(true);
           signupUser();
           ToastEvent.hide();
         },
-        'I Agree',
-      );
+      });
       return false;
     }
 
@@ -250,13 +279,22 @@ const LoginDialog = () => {
     } catch (e) {
       setStatus(null);
       setLoading(false);
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        heading: 'Signup failed',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
   };
 
   const sendEmail = async () => {
     if (!email || error) {
-      ToastEvent.show('Account email is required.', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Account email is required.',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     try {
@@ -272,13 +310,23 @@ const LoginDialog = () => {
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
     } catch (e) {
       setStatus(null);
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        heading: 'Recovery email not sent',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
   };
 
   const changePassword = async () => {
     if (error || !oldPassword || !password) {
-      ToastEvent.show('All fields are required', 'error', 'local');
+      ToastEvent.show({
+        heading: 'All fields required',
+        message: 'Fill all the fields and try again.',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     setLoading(true);
@@ -287,7 +335,12 @@ const LoginDialog = () => {
       await db.user.changePassword(oldPassword, password);
     } catch (e) {
       setStatus(null);
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        heading: 'Failed to change password',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
     setStatus(null);
     setLoading(false);
@@ -608,11 +661,32 @@ const LoginDialog = () => {
                       marginLeft: 10,
                     }}>
                     By signing up you agree to our{' '}
-                    <Paragraph color={colors.accent}>
+                    <Paragraph
+                      onPress={() => {
+                        openLinkInBrowser('https://notesnook.com/tos', colors)
+                          .catch((e) => {})
+                          .then((r) => {
+                            console.log('closed');
+                          });
+                      }}
+                      color={colors.accent}>
                       terms of service{' '}
                     </Paragraph>
                     and{' '}
-                    <Paragraph color={colors.accent}>privacy policy.</Paragraph>
+                    <Paragraph
+                      onPress={() => {
+                        openLinkInBrowser(
+                          'https://notesnook.com/privacy',
+                          colors,
+                        )
+                          .catch((e) => {})
+                          .then((r) => {
+                            console.log('closed');
+                          });
+                      }}
+                      color={colors.accent}>
+                      privacy policy.
+                    </Paragraph>
                   </Paragraph>
                 </TouchableOpacity>
               </>
