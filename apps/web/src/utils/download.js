@@ -4,6 +4,7 @@ const map = {
   md: "text/markdown",
   html: "text/html",
   txt: "text/plain",
+  pdf: "application/pdf",
 };
 
 export default function download(filename, text, type) {

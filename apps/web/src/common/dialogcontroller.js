@@ -256,6 +256,15 @@ export function showExportDialog(noteIds) {
       icon={Icon.Export}
       onClose={() => perform(false)}
       exportNote={async (format) => {
+        if (format === "pdf") {
+          if (noteIds.length > 1)
+            showToast("error", "Multiple notes cannot be exported as PDF.");
+          const note = db.notes.note(noteIds[0]);
+          await exportToPDF(await note.export("html"));
+          perform(true);
+          return;
+        }
+
         var files = [];
         for (var noteId of noteIds) {
           const note = db.notes.note(noteId);
@@ -274,6 +283,41 @@ export function showExportDialog(noteIds) {
       }}
     />
   ));
+}
+
+async function exportToPDF(content) {
+  return new Promise((resolve) => {
+    import("print-js").then(async ({ default: printjs }) => {
+      printjs({
+        printable: content,
+        type: "raw-html",
+        onPrintDialogClose: () => {
+          resolve();
+        },
+      });
+
+      // TODO
+      // const doc = new jsPDF("p", "px", "letter");
+      // const div = document.createElement("div");
+      // const { width, height } = doc.internal.pageSize;
+      // div.innerHTML = content;
+      // div.style.width = width - 80 + "px";
+      // div.style.height = height - 80 + "px";
+      // div.style.position = "absolute";
+      // div.style.top = 0;
+      // div.style.left = 0;
+      // div.style.margin = "40px";
+      // div.style.fontSize = "11px";
+      // document.body.appendChild(div);
+
+      // await doc.html(div, {
+      //   callback: async (doc) => {
+      //     div.remove();
+      //     resolve(doc.output());
+      //   },
+      // });
+    });
+  });
 }
 
 export function showForgotPasswordDialog() {

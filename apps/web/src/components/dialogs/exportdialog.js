@@ -5,6 +5,13 @@ import Dialog from "./dialog";
 
 const formats = [
   {
+    type: "pdf",
+    title: "PDF",
+    icon: Icon.PDF,
+    subtitle:
+      "Can be opened in any PDF reader like Adobe Acrobat or Foxit Reader.",
+  },
+  {
     type: "md",
     title: "Markdown",
     icon: Icon.Markdown,
@@ -14,7 +21,7 @@ const formats = [
     type: "html",
     title: "HTML",
     icon: Icon.HTML,
-    subtitle: "Can be opened in any browser.",
+    subtitle: "Can be opened in any web browser like Google Chrome.",
   },
   {
     type: "txt",
@@ -29,7 +36,7 @@ function ExportDialog(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      description="You can export your note to Markdown, HTML, or Text."
+      description="You can export your note to Markdown, HTML, PDF or Text."
       onClose={props.onClose}
       scrollable
       negativeButton={{

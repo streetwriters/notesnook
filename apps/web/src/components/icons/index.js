@@ -103,6 +103,7 @@ export const Properties = createIcon(Icons.mdiDotsVertical);
 // FORMATS
 
 export const Markdown = createIcon(Icons.mdiLanguageMarkdownOutline);
+export const PDF = createIcon(Icons.mdiFilePdfOutline);
 export const HTML = createIcon(Icons.mdiLanguageHtml5);
 export const Text = createIcon(Icons.mdiFormatTitle);
 
