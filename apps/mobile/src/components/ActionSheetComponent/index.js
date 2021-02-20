@@ -127,7 +127,7 @@ export const ActionSheetComponent = ({
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-        ])
+        ]);
       }
     }
     setNote({...toAdd});
@@ -156,8 +156,8 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             share: true,
-            title:'Share note',
-            description:"Unlock note to share it."
+            title: 'Share note',
+            description: 'Unlock note to share it.',
           });
         } else {
           let text = await db.notes.note(note.id).export('txt');
@@ -189,9 +189,9 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             item: note,
-            title:'Delete note',
-            description:"Unlock note to delete it."
-          }); 
+            title: 'Delete note',
+            description: 'Unlock note to delete it.',
+          });
         } else {
           try {
             await deleteItems(note);
@@ -226,15 +226,19 @@ export const ActionSheetComponent = ({
             novault: true,
             locked: true,
             item: note,
-            title:'Copy note',
-            description:"Unlock note to copy to clipboard."
+            title: 'Copy note',
+            description: 'Unlock note to copy to clipboard.',
           });
         } else {
           let text = await db.notes.note(note.id).content();
           text = toTXT(text);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
-          ToastEvent.show('Note copied to clipboard', 'success', 'local');
+          ToastEvent.show({
+            heading: 'Note copied to clipboard',
+            type: 'success',
+            context: 'local',
+          });
         }
       },
     },
@@ -249,14 +253,17 @@ export const ActionSheetComponent = ({
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash
-        ])
+          Navigation.routeNames.Trash,
+        ]);
         type = note.type === 'trash' ? note.itemType : note.type;
-        ToastEvent.show(
-          type === 'note' ? 'Note restored' : 'Notebook restored',
-          'success',
-          'global',
-        );
+
+        ToastEvent.show({
+          heading:
+            type === 'note'
+              ? 'Note restored from trash'
+              : 'Notebook restored from trash',
+          type: 'success',
+        });
         close();
       },
     },
@@ -295,21 +302,21 @@ export const ActionSheetComponent = ({
         if (!note.id) return;
         if (note.type === 'note') {
           if (db.notes.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show(
-              'You cannot pin more than 3 notes',
-              'error',
-              'local',
-            );
+            ToastEvent.show({
+              heading: 'Cannot pin more than 3 notes',
+              type: 'error',
+              context: 'local',
+            });
             return;
           }
           await db.notes.note(note.id).pin();
         } else {
           if (db.notebooks.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show(
-              'You cannot pin more than 3 notes',
-              'error',
-              'local',
-            );
+            ToastEvent.show({
+              heading: 'Cannot pin more than 3 notebooks',
+              type: 'error',
+              context: 'local',
+            });
             return;
           }
           await db.notebooks.notebook(note.id).pin();
@@ -349,8 +356,10 @@ export const ActionSheetComponent = ({
       color: 'orange',
     },
     {
-      name: isPinnedToMenu ? 'Remove Shortcut from Menu' : 'Add Shortcut to Menu',
-      icon: isPinnedToMenu? 'link-variant-remove' : 'link-variant',
+      name: isPinnedToMenu
+        ? 'Remove Shortcut from Menu'
+        : 'Add Shortcut to Menu',
+      icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       func: async () => {
         try {
           if (isPinnedToMenu) {
@@ -730,12 +739,12 @@ export const ActionSheetComponent = ({
               .notebook(editing.actionAfterFirstSave.notebook)
               .topics.topic(editing.actionAfterFirstSave.id)
               .delete(note.id);
-              Navigation.setRoutesToUpdate([
-                Navigation.routeNames.Notebooks,
-                Navigation.routeNames.Notes,
-                Navigation.routeNames.NotesPage,
-                Navigation.routeNames.Notebook,
-              ]);
+            Navigation.setRoutesToUpdate([
+              Navigation.routeNames.Notebooks,
+              Navigation.routeNames.Notes,
+              Navigation.routeNames.NotesPage,
+              Navigation.routeNames.Notebook,
+            ]);
             setNote(db.notes.note(note.id).data);
             close();
           }}
@@ -778,7 +787,6 @@ export const ActionSheetComponent = ({
           }}
         />
       ) : null}
-      <Toast context="local" />
     </ScrollView>
   );
 };

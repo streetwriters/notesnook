@@ -117,7 +117,10 @@ const EditorRoot = () => {
       });
 
       if (checkNote() && isNotedEdited()) {
-        ToastEvent.show('Note Saved!', 'success');
+        ToastEvent.show({
+          heading: 'Note Saved',
+          type: 'success',
+        });
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', () => {

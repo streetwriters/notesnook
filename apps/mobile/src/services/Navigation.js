@@ -7,6 +7,17 @@ import {eSendEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
 let currentScreen = 'Notes';
+let homeLoaded = false;
+
+
+function getHomeLoaded() {
+  return homeLoaded;
+}
+
+function setHomeLoaded() {
+  homeLoaded(true);
+}
+
 let headerState = {
   heading: 'Notes',
   color: null,
@@ -20,7 +31,7 @@ const routeNames = {
   Notebook: 'Notebook',
   NotesPage: 'NotesPage',
   Tags: 'Tags',
-  Favorites: 'favorites',
+  Favorites: 'Favorites',
   Trash: 'Trash',
 };
 
@@ -35,8 +46,9 @@ function getHeaderState() {
 }
 
 function clearRouteFromUpdates(routeName) {
-  if (routesToUpdate.indexOf(routeName) === -1) {
-    routesToUpdate = routesToUpdate.slice(routesToUpdate.indexOf(routeName), 1);
+  if (routesToUpdate.indexOf(routeName) !== -1) {
+  routesToUpdate = [...new Set(routesToUpdate)]
+  routesToUpdate.splice(routesToUpdate.indexOf(routeName), 1);
   }
 }
 
@@ -47,15 +59,20 @@ function routeNeedsUpdate(routeName, callback) {
   }
 }
 
+/**
+ * 
+ * @param {array} routes 
+ */
 function setRoutesToUpdate(routes) {
 
   console.log(currentScreen, "current");
   if (routes.indexOf(currentScreen) > -1) {
     console.log('updating screen', currentScreen);
     if (
-      currentScreen === routeNames.NotesPage &&
+      currentScreen === routeNames.NotesPage||
       currentScreen === routeNames.Notebook
     ) {
+        console.log(currentScreen ,"CURRENT");
       eSendEvent(
         currentScreen === routeNames.NotesPage
           ? refreshNotesPage
@@ -64,12 +81,12 @@ function setRoutesToUpdate(routes) {
     } else {
       updateEvent({type: Actions[currentScreen.toUpperCase()]});
     }
-    routes = routes.slice(routes.indexOf(currentScreen), 1);
+    clearRouteFromUpdates(currentScreen);
+    routes.splice(routes.indexOf(currentScreen), 1);
   }
+
   routesToUpdate = routesToUpdate.concat(routes);
-  routesToUpdate.filter(function (item, pos) {
-    return routesToUpdate.indexOf(item) == pos;
-  });
+  routesToUpdate = [...new Set(routesToUpdate)];
 }
 
 /**
@@ -108,7 +125,7 @@ function setHeaderState(name, params, item) {
   headerState.verticalMenu = params.menu;
 
   if (headerState) {
-    eSendEvent('onHeaderStateChange', headerState);
+    eSendEvent('onHeaderStateChange', {...headerState});
   }
 }
 
@@ -122,8 +139,10 @@ function push(name, params, item) {
   rootNavigatorRef.current?.dispatch(StackActions.push(name, params));
 }
 
-function replace(...args) {
-  rootNavigatorRef.current?.dispatch(StackActions.replace(...args));
+function replace(name, params, item) {
+  currentScreen = name;
+  setHeaderState(name, params, item);
+  rootNavigatorRef.current?.dispatch(StackActions.replace(name,params));
 }
 
 function popToTop() {
@@ -162,4 +181,6 @@ export default {
   setRoutesToUpdate,
   routeNeedsUpdate,
   routeNames,
+  getHomeLoaded,
+  setHomeLoaded
 };

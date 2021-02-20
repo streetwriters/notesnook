@@ -15,6 +15,7 @@ import {
 } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
 import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { Toast } from '../Toast';
 import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
@@ -87,11 +88,14 @@ const ActionSheetWrapper = ({
       onOpen={_onOpen}
       keyboardShouldPersistTaps="always"
       premium={
+        <>
+        <Toast context="local" />
         <GetPremium
           context="sheet"
           close={() => fwdRef?.current?.hide()}
           offset={50}
         />
+        </>
       }
       onClose={_onClose}>
       {children}

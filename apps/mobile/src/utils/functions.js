@@ -39,7 +39,10 @@ export const deleteItems = async (item) => {
       Navigation.routeNames.Notebook,
     ]);
     updateEvent({type: Actions.MENU_PINS});
-    ToastEvent.show('Topics deleted', 'success');
+    ToastEvent.show({
+      heading: 'Topics deleted',
+      type: 'success',
+    });
   }
 
   if (notebooks?.length > 0) {
@@ -57,12 +60,10 @@ export const deleteItems = async (item) => {
 
   let itemsCopy = [...history.selectedItemsList];
   if (topics.length === 0 && (notes.length > 0 || notebooks.length > 0)) {
-    ToastEvent.show(
-      message,
-      'success',
-      'global',
-      6000,
-      async () => {
+    ToastEvent.show({
+      heading: message,
+      type: 'success',
+      func: async () => {
         let trash = db.trash;
         let ids = [];
         for (var i = 0; i < itemsCopy.length; i++) {
@@ -83,14 +84,16 @@ export const deleteItems = async (item) => {
         updateEvent({type: Actions.MENU_PINS});
         ToastEvent.hide();
       },
-      'Undo',
-    );
+      actionText: 'Undo',
+    });
   }
   Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
   updateEvent({type: Actions.CLEAR_SELECTION});
   updateEvent({type: Actions.COLORS});
   updateEvent({type: Actions.SELECTION_MODE, enabled: false});
 };
+
+
 
 export const openLinkInBrowser = async (link, colors) => {
   try {

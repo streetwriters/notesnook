@@ -37,7 +37,11 @@ export const UserSection = ({noTextMode}) => {
           activeOpacity={0.8}
           onPress={() => {
             if (user) {
-              ToastEvent.show('Logged in as ' + user?.email, 'success');
+              ToastEvent.show({
+                title: 'Logged in as ' + user?.email,
+                type: 'success',
+                context: 'local',
+              });
             } else {
               eSendEvent(eOpenLoginDialog);
             }

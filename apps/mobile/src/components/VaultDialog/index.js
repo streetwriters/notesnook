@@ -175,11 +175,12 @@ export class VaultDialog extends Component {
 
   close = () => {
     if (this.state.loading) {
-      ToastEvent.show(
-        'Please wait and do not close the app.',
-        'success',
-        'local',
-      );
+      ToastEvent.show({
+        title: this.state.title,
+        message: 'Please wait and do not close the app.',
+        type: 'success',
+        context: 'local',
+      });
       return;
     }
     Navigation.setRoutesToUpdate([
@@ -213,18 +214,32 @@ export class VaultDialog extends Component {
     if (this.state.loading) return;
 
     if (!this.password) {
-      ToastEvent.show('You must fill all the fields.', 'error', 'local');
+      ToastEvent.show({
+        title: 'Password not entered',
+        message: 'Enter a password for the vault and try again.',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     if (this.password && this.password.length < 3) {
-      ToastEvent.show('Password too short', 'error', 'local');
+      ToastEvent.show({
+        title: 'Password too short',
+        message: 'Password must be longer than 3 characters.',
+        type: 'error',
+        context: 'local',
+      });
 
       return;
     }
 
     if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
-        ToastEvent.show('Passwords do not match', 'error', 'local');
+        ToastEvent.show({
+          title: 'Passwords do not match',
+          type: 'error',
+          context: 'local',
+        });
         this.setState({
           passwordsDontMatch: true,
         });
@@ -246,7 +261,11 @@ export class VaultDialog extends Component {
           if (this.state.biometricUnlock) {
             this._enrollFingerprint(this.newPassword);
           }
-          ToastEvent.show('Vault password changed', 'success');
+          ToastEvent.show({
+            title: 'Vault password updated',
+            type: 'success',
+            context: 'local',
+          });
           this.close();
         })
         .catch((e) => {
@@ -254,12 +273,20 @@ export class VaultDialog extends Component {
             loading: false,
           });
           if (e.message === db.vault.ERRORS.wrongPassword) {
-            ToastEvent.show('Current password incorrect.', 'error', 'local');
+            ToastEvent.show({
+              title: 'Incorrect password',
+              type: 'error',
+              context: 'local',
+            });
           }
         });
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
-        ToastEvent.show('Password is invalid', 'error', 'local');
+        ToastEvent.show({
+          title: 'Incorrect password',
+          type: 'error',
+          context: 'local',
+        });
         this.setState({
           wrongPassword: true,
         });
@@ -287,7 +314,11 @@ export class VaultDialog extends Component {
 
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastEvent.show('Password is invalid', 'error', 'local');
+      ToastEvent.show({
+        title: 'Incorrect password',
+        type: 'error',
+        context: 'local',
+      });
       return;
     } else {
       db.vault.add(this.state.note.id).then((e) => {
@@ -298,7 +329,11 @@ export class VaultDialog extends Component {
 
   async _unlockNote() {
     if (!this.password || this.password.trim() === 0) {
-      ToastEvent.show('Password is invalid', 'error', 'local');
+      ToastEvent.show({
+        title: 'Incorrect password',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     if (this.state.permanant) {
@@ -349,7 +384,12 @@ export class VaultDialog extends Component {
             loading: false,
           });
           eSendEvent('vaultUpdated');
-          ToastEvent.show('Biometric unlocking enabled!', 'success');
+          ToastEvent.show({
+            title: 'Biometric unlocking enabled!',
+            message: 'Now you can unlock your notes with biometrics.',
+            type: 'success',
+            context: 'local',
+          });
           this.close();
         },
       );
@@ -369,7 +409,11 @@ export class VaultDialog extends Component {
       this.setState({
         loading: false,
       });
-      ToastEvent.show('Note added to vault', 'success', 'local');
+      ToastEvent.show({
+        title: 'Note added to vault',
+        type: 'success',
+        context: 'local',
+      });
       this.close();
     } else {
       eSendEvent('vaultUpdated');
@@ -412,7 +456,12 @@ export class VaultDialog extends Component {
     text = `${note.title}\n \n ${text}`;
     console.log(text, 'TEXT');
     Clipboard.setString(text);
-    ToastEvent.show('Note copied to clipboard', 'success', 'local');
+    Toast.show({
+      heading: 'Note copied',
+      type: 'success',
+      message: 'Note has been copied to clipboard!',
+      context: 'local',
+    });
     this.close();
   }
 
@@ -431,22 +480,35 @@ export class VaultDialog extends Component {
 
   _takeErrorAction(e) {
     if (e.message === db.vault.ERRORS.wrongPassword) {
-      ToastEvent.show('Password is incorrect', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Incorrect password',
+        type: 'error',
+        context: 'local',
+      });
+
       this.setState({
         wrongPassword: true,
       });
       return;
-    } else {
-    }
+    } 
   }
 
   _revokeFingerprintAccess = async () => {
     try {
       await BiometricService.resetCredentials();
       eSendEvent('vaultUpdated');
-      ToastEvent.show('Biometrics access revoked!', 'success');
+      ToastEvent.show({
+        title: 'Biometric unlocking disabled!',
+        type: 'success',
+        context: 'local',
+      });
+
     } catch (e) {
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        title: e.message,
+        type: 'success',
+        context: 'local',
+      });
     }
   };
 

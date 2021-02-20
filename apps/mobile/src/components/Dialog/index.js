@@ -41,7 +41,11 @@ export class Dialog extends Component {
         updateEvent({type: Actions.TRASH});
         updateEvent({type: Actions.CLEAR_SELECTION});
         updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-        ToastEvent.show('Permanantly deleted','success');
+        ToastEvent.show({
+          heading: 'Permanantly deleted items',
+          type: 'success',
+          context: 'local',
+        });
         this.hide();
         break;
       }
@@ -50,7 +54,12 @@ export class Dialog extends Component {
         updateEvent({type: Actions.TRASH});
         updateEvent({type: Actions.CLEAR_SELECTION});
         updateEvent({type: Actions.SELECTION_MODE, enabled: false});
-        ToastEvent.show('Trash cleared', 'success');
+        ToastEvent.show({
+          heading: 'Trash cleared',
+          message:"All notes and notebooks in the trash have been removed permanantly.",
+          type: 'success',
+          context: 'local',
+        });
         this.hide();
         break;
       }

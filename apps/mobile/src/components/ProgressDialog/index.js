@@ -133,7 +133,6 @@ const ProgressDialog = () => {
             />
           ))}
       </View>
-      <Toast context="local" />
     </ActionSheetWrapper>
   );
 };

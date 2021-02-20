@@ -67,13 +67,6 @@ const SimpleList = ({
     setLoading(false);
   }, [listData, deviceMode]);
 
-  /* 
-  const loadData = () => {
-    let mainData = [header, {type: 'empty'}];
-    mainData =
-      !listData || listData.length === 0 ? mainData : [header].concat(listData);
-    setDataProvider(dataProvider.cloneWithRows(mainData));
-  }; */
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -186,6 +179,9 @@ const SimpleList = ({
         return (
           <Header
             title={headerProps.heading}
+            paragraph={headerProps.paragraph}
+            onPress={headerProps.onPress}
+            icon={headerProps.icon}
             type={dataType}
             index={index}
             data={listData}

@@ -13,11 +13,16 @@ async function run() {
   if (Platform.OS === 'android') {
     let granted = await storage.requestPermission();
     if (!granted) {
-      ToastEvent.show('Backup failed! Storage access was denied.');
+      ToastEvent.show({
+        heading: 'Cannot backup data',
+        message: 'You must provide phone storage access to backup data.',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
   }
-  RNFetchBlob = require('rn-fetch-blob').default
+  RNFetchBlob = require('rn-fetch-blob').default;
   eSendEvent(eOpenProgressDialog, {
     title: 'Backing up your data',
     paragraph:
@@ -40,8 +45,14 @@ async function run() {
       let path = await storage.checkAndCreateDir('backups/');
       await RNFetchBlob.fs.createFile(path + backupName, backup, 'utf8');
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
-      ToastEvent.show('Backup complete!', 'success');
-  
+
+      ToastEvent.show({
+        heading: 'Backup successful',
+        message: 'Your backup is stored in Notesnook folder on your phone.',
+        type: 'success',
+        context: 'local',
+      });
+
       eSendEvent(eOpenProgressDialog, {
         title: 'Backup complete',
         icon: 'cloud-upload',
@@ -70,7 +81,12 @@ async function run() {
     }
   } else {
     eSendEvent(eCloseProgressDialog);
-    ToastEvent.show('Backup failed!', 'success');
+    ToastEvent.show({
+      heading: 'Backup failed',
+      type: 'error',
+      context: 'local',
+    });
+
     return null;
   }
 }
@@ -80,7 +96,7 @@ async function getLastBackupDate() {
 }
 
 async function checkBackupRequired(type) {
-  if (type === "off") return;
+  if (type === 'off') return;
   let now = Date.now();
   let lastBackupDate = await getLastBackupDate();
   if (!lastBackupDate || lastBackupDate === 'never') {
@@ -89,13 +105,13 @@ async function checkBackupRequired(type) {
   lastBackupDate = parseInt(lastBackupDate);
 
   if (type === 'daily' && lastBackupDate + MS_DAY < now) {
-    console.log("daily")
+    console.log('daily');
     return true;
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
-    console.log("weekly")
+    console.log('weekly');
     return true;
   } else {
-    console.log("no need",lastBackupDate);
+    console.log('no need', lastBackupDate);
     return false;
   }
 }

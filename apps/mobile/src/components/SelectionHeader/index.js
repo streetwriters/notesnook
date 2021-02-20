@@ -34,7 +34,7 @@ export const SelectionHeader = () => {
 
   const onHeaderStateChange = (event) => {
     if (!event) return;
-    setHeaderTextState(event);
+     setHeaderTextState(event);
   };
 
   useEffect(() => {
@@ -85,7 +85,10 @@ export const SelectionHeader = () => {
       ]);
       dispatch({type: Actions.SELECTION_MODE, enabled: false});
       dispatch({type: Actions.CLEAR_SELECTION});
-      ToastEvent.show('Restore complete', 'success');
+      ToastEvent.show({
+        heading: 'Restore successful',
+        type: 'success',
+      });
     }
   };
 

@@ -22,6 +22,44 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+
+const features = [
+  {
+    title: 'Notesnook',
+    description: 'A safe place to write and stay organized.',
+    icon: require('../../assets/images/notesnook-logo-png.png'),
+    type: 'image',
+  },
+  {
+    title: 'Made to protect your privacy',
+    description:
+      'Your data is encrypted on your device. No one but you can read your notes.',
+    icon: PRIVACY_SVG,
+    link: 'https://notesnook.com',
+  },
+  {
+    icon: SYNC_SVG,
+    title: 'While keeping you in sync',
+    description:
+      'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
+    link: 'https://notesnook.com',
+  },
+  {
+    icon: ORGANIZE_SVG,
+    title: 'And helping you stay organized',
+    description:
+      'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
+    link: 'https://notesnook.com',
+  },
+  {
+    icon: COMMUNITY_SVG,
+    title: 'Join our community',
+    description:
+      'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
+    link: 'https://discord.gg/zQBK97EE22',
+  },
+];
+
 const SplashScreen = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -31,50 +69,12 @@ const SplashScreen = () => {
   const opacity = useValue(0);
   const translateY = useValue(20);
   const translateY2 = useValue(0);
-  const features = [
-    {
-      title: 'Notesnook',
-      description: 'A safe place to write and stay organized.',
-      icon: require('../../assets/images/notesnook-logo-png.png'),
-      type: 'image',
-    },
-    {
-      title: 'Made to protect your privacy',
-      description:
-        'Your data is encrypted on your device. No one but you can read your notes.',
-      icon: PRIVACY_SVG,
-      link: 'https://notesnook.com',
-    },
-    {
-      icon: SYNC_SVG,
-      title: 'While keeping you in sync',
-      description:
-        'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
-      link: 'https://notesnook.com',
-    },
-    {
-      icon: ORGANIZE_SVG,
-      title: 'And helping you stay organized',
-      description:
-        'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
-      link: 'https://notesnook.com',
-    },
-    {
-      icon: COMMUNITY_SVG,
-      title: 'Join our community',
-      description:
-        'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
-      link: 'https://discord.gg/zQBK97EE22',
-    },
-  ];
 
   useEffect(() => {
-    return;
     Storage.read('introCompleted').then(async (r) => {
-      setVisible(true);
-      await sleep(500);
       requestAnimationFrame(() => {
         if (!r) {
+          setVisible(true);
           timing(opacity, {
             toValue: 1,
             duration: 500,
@@ -136,7 +136,6 @@ const SplashScreen = () => {
               data={features}
               itemWidth={dWidth}
               sliderWidth={dWidth}
-              autoplay={true}
               loop={false}
               shouldOptimizeUpdates
               autoplayInterval={5000}
@@ -216,11 +215,9 @@ const SplashScreen = () => {
                           title="Learn more"
                           fontSize={SIZE.md}
                           onPress={() => {
-                            openLinkInBrowser(item.link, colors)
-                              .catch((e) => ToastEvent.show(e.message, 'error'))
-                              .then((r) => {
-                                console.log('closed');
-                              });
+                            try {
+                              openLinkInBrowser(item.link, colors);
+                            } catch (e) {}
                           }}
                         />
                       )}
@@ -245,6 +242,7 @@ const SplashScreen = () => {
               <Button
                 fontSize={SIZE.md}
                 onPress={async () => {
+                  await Storage.write('introCompleted', 'true');
                   await hide();
                 }}
                 height={50}
@@ -262,6 +260,7 @@ const SplashScreen = () => {
                   carouselRef.current?.snapToNext();
                 } else {
                   await hide();
+                  await Storage.write('introCompleted', 'true');
                   eSendEvent(eOpenLoginDialog, 1);
                 }
               }}

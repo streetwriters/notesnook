@@ -18,12 +18,12 @@ export function formatSelection(command) {
 }
 
 export function focusEditor(format) {
-
   eSendEvent("showTooltip");
   Platform.OS === 'android' && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
     tiny.call(EditorWebView, tiny.blur + ' ' + tiny.focusEditor);
   } else {
+
     tiny.call(EditorWebView, tiny.focusEditor);
   }
 }

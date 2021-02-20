@@ -31,7 +31,7 @@ export const UpdateDialog = () => {
     return () => {
       eUnSubscribeEvent('updateDialog', open);
     };
-  });
+  },[]);
 
   const format = (ver) => {
     if (!ver) return ""

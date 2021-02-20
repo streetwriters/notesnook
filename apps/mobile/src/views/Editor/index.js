@@ -79,11 +79,15 @@ const Editor = React.memo(
         <ScrollView
           bounces={false}
           bouncesZoom={false}
+          disableScrollViewPanResponder
+          keyboardDismissMode="none"
+          keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
           style={{
             height: '100%',
             width: '100%',
           }}
+          
           nestedScrollEnabled
           contentContainerStyle={{
             width: '100%',
@@ -94,6 +98,7 @@ const Editor = React.memo(
             testID={notesnook.ids.default.editor}
             ref={EditorWebView}
             onLoad={onLoad}
+            scrollEnabled={false}
             onRenderProcessGone={(event) => {
               onResetRequested();
             }}
@@ -103,9 +108,8 @@ const Editor = React.memo(
             injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
             onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
-            cacheEnabled={false}
+            cacheEnabled={true}
             domStorageEnabled={true}
-            scrollEnabled={false}
             bounces={false}
             allowFileAccess={true}
             scalesPageToFit={true}

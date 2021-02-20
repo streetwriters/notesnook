@@ -13,10 +13,10 @@ const CRYPT_CONFIG = Platform.select({
 
 async function isBiometryAvailable() {
   try {
-	  
     return await FingerprintScanner.isSensorAvailable();
   } catch (e) {
-    ToastEvent.show(e.message, 'error');
+    console.log(e, 'sensor not available');
+    //ToastEvent.show(e.message, 'error');
     return false;
   }
 }
@@ -44,16 +44,16 @@ async function resetCredentials() {
 }
 
 async function hasInternetCredentials() {
-	return await Keychain.hasInternetCredentials('nn_vault');
+  return await Keychain.hasInternetCredentials('nn_vault');
 }
 
-async function getCredentials(title,description) {
+async function getCredentials(title, description) {
   try {
     await FingerprintScanner.authenticate(
       Platform.select({
         ios: {
           fallbackEnabled: true,
-          description:description,
+          description: description,
         },
         android: {
           title: title,
@@ -66,15 +66,22 @@ async function getCredentials(title,description) {
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault', CRYPT_CONFIG);
   } catch (e) {
-	console.log('failed');
-	FingerprintScanner.release();
+    console.log('failed');
+    FingerprintScanner.release();
     if (e.name === 'DeviceLocked') {
-      ToastEvent.show(
-        'Authentication failed. Wait 30 seconds to try again.',
-        'error',
-      );
+      ToastEvent.show({
+        heading: 'Biometrics authentication failed.',
+        message: 'Wait 30 seconds to try again.',
+        type: 'error',
+        context: 'local',
+      });
     } else {
-      ToastEvent.show('Authentication failed. Tap to try again.', 'error');
+      ToastEvent.show({
+        heading: 'Authentication failed.',
+        message: 'Tap to try again.',
+        type: 'error',
+        context: 'local',
+      });
     }
     return null;
   }
@@ -87,5 +94,5 @@ export default {
   resetCredentials,
   getCredentials,
   storeCredentials,
-  hasInternetCredentials
+  hasInternetCredentials,
 };

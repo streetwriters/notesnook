@@ -21,7 +21,6 @@ async function setPremiumStatus() {
     } else {
       premiumStatus = user.subscription.type;
       updateEvent({type: Actions.PREMIUM, state: get()});
-      console.log('updating user');
       updateEvent({type: Actions.USER, user: user});
     }
   } catch (e) {
@@ -30,22 +29,21 @@ async function setPremiumStatus() {
 }
 
 function get() {
-  return true /*  (
+  return (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
     premiumStatus === 5 ||
     premiumStatus === 6
-  ); */
+  );
 }
 
 async function verify(callback, error) {
   try {
-    if (premiumStatus) {
+    if (!premiumStatus) {
       if (error) {
         error();
         return;
       }
-
       eSendEvent(eOpenPremiumDialog);
       return;
     } else {
@@ -99,14 +97,13 @@ const onUserStatusCheck = async (type) => {
       case CHECK_IDS.databaseSync:
         message = null;
         break;
-
     }
     if (message) {
       eSendEvent(eShowGetPremium, message);
     }
   }
 
-  return {type, result: true};
+  return {type, result: status};
 };
 
 const showVerifyEmailDialog = () => {
@@ -122,20 +119,32 @@ const showVerifyEmailDialog = () => {
           lastEmailTime &&
           Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
         ) {
-          ToastEvent.show(
-            'Please wait before requesting another email',
-            'error',
-            'local',
-          );
+          ToastEvent.show({
+            heading: 'Please wait before requesting another email',
+            type: 'error',
+            context: 'local',
+          });
           console.log('error');
           return;
         }
         await db.user.sendVerificationEmail();
         console.log('MAIN SENT');
         await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
-        ToastEvent.show('Verification email sent!', 'success', 'local');
+
+        ToastEvent.show({
+          heading: 'Verification email sent!',
+          message:
+            'We have sent you an email confirmation link. Please check your email inbox to verify your account. If you cannot find the email, check your spam folder.',
+          type: 'success',
+          context: 'local',
+        });
       } catch (e) {
-        ToastEvent.show(e.message, 'error', 'local');
+        ToastEvent.show({
+          heading: 'Could not send email',
+          message: e.message,
+          type: 'error',
+          context: 'local',
+        });
         //await MMKV.removeItem('lastEmailTime');
       }
     },

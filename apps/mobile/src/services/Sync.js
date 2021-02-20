@@ -2,7 +2,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
-import {eSendEvent, ToastEvent} from './EventManager';
+import {eSendEvent,  ToastEvent, } from './EventManager';
 
 const run = async (context = 'global') => {
   updateEvent({
@@ -12,25 +12,34 @@ const run = async (context = 'global') => {
 
   try {
     await db.sync();
-    ToastEvent.show('Sync Complete', 'success', context);
+    ToastEvent.show({
+      heading:"Sync complete",
+      type:"success",
+      message: "All your notes are encrypted and synced successfully!",
+      context: context,
+    });
   } catch (e) {
+    console.log(e);
     if (e.message === 'You need to login to sync.') {
-      ToastEvent.show(
-        e.message,
-        'error',
-        context,
-        5000,
-        () => {
+      ToastEvent.show({
+        heading:"Enable sync",
+        message: "Login to encrypt and sync notes.",
+        context: context,
+        func: () => {
           eSendEvent(eOpenLoginDialog);
         },
-        'Login',
-      );
+        actionText: 'Login',
+      });
     } else {
       updateEvent({
         type: Actions.SYNCING,
         syncing: false,
       });
-      ToastEvent.show(e.message, 'error', context, 3000);
+      ToastEvent.show({
+        heading:"Sync failed",
+        message: e.message,
+        context: context,
+      });
     }
   } finally {
     updateEvent({

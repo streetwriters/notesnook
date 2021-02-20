@@ -22,7 +22,7 @@ import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
-let RNFetchBlob
+let RNFetchBlob;
 const RestoreDialog = () => {
   const [visible, setVisible] = useState(false);
   const [restoring, setRestoring] = useState(false);
@@ -50,11 +50,12 @@ const RestoreDialog = () => {
   };
 
   const showIsWorking = () => {
-    ToastEvent.show(
-      'Please wait, we are restoring your data.',
-      'error',
-      'local',
-    );
+    ToastEvent.show({
+      heading: 'Restoring Backup',
+      message: 'Your backup data is being restored. please wait.',
+      type: 'error',
+      context: 'local',
+    });
   };
 
   return !visible ? null : (
@@ -91,11 +92,12 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     if (Platform.OS === 'android') {
       let granted = storage.requestPermission();
       if (!granted) {
-        ToastEvent.show(
-          'Restore Failed! Storage access denied',
-          'error',
-          'local',
-        );
+        ToastEvent.show({
+          heading: 'Cannot restore backup',
+          message: 'You must provide phone storage access to restore backups.',
+          type: 'error',
+          context: 'local',
+        });
         return;
       }
     }
@@ -105,11 +107,21 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       await db.backup.import(backup);
       setRestoring(false);
       dispatch({type: Actions.ALL});
-      ToastEvent.show('Restore Complete!', 'success', 'local');
+      ToastEvent.show({
+        heading: 'Restore successful',
+        message: 'Your backup data has been restored successfully.',
+        type: 'success',
+        context: 'local',
+      });
       close();
     } catch (e) {
       setRestoring(false);
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        heading: 'Restore failed',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
   };
 
@@ -117,14 +129,17 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     if (Platform.OS === 'android') {
       let granted = await storage.requestPermission();
       if (!granted) {
-        ToastEvent.show(
-          'Storage permission required to check for backups.',
-          'error',
-        );
+        ToastEvent.show({
+          heading: 'Backup check failed',
+          message:
+            'You must provide phone storage access to check for backups.',
+          type: 'success',
+          context: 'local',
+        });
         return;
       }
     }
-    RNFetchBlob = require('rn-fetch-blob').default
+    RNFetchBlob = require('rn-fetch-blob').default;
     try {
       let path = await storage.checkAndCreateDir('/backups/');
       let files = await RNFetchBlob.fs.lstat(path);
@@ -169,19 +184,24 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                         await db.backup.import(JSON.stringify(backup));
                         setRestoring(false);
                         dispatch({type: Actions.ALL});
-                        ToastEvent.show(
-                          'Restore Complete!',
-                          'success',
-                          'global',
-                        );
+
+                        ToastEvent.show({
+                          heading: 'Restore successful',
+                          message:
+                            'Your backup data has been restored successfully.',
+                          type: 'success',
+                          context: 'local',
+                        });
                         setVisible(false);
                       } catch (e) {
                         setRestoring(false);
-                        ToastEvent.show(
-                          'Invalid backup data',
-                          'error',
-                          'local',
-                        );
+                        ToastEvent.show({
+                          heading: 'Restore failed',
+                          message:
+                            'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
+                          type: 'error',
+                          context: 'local',
+                        });
                       }
                     });
                   })
@@ -285,7 +305,6 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           }
         />
       </View>
-      <Toast context="local" />
     </>
   );
 };

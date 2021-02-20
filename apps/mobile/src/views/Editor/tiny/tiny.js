@@ -11,25 +11,12 @@ window.blur();
 `;
 
 export const keyboardStateChanged = `(() => {
-	var range = editor.getSelection();
-	if (range) {
-	  if (range.length == 0) {
-		let correction = isTablet ? 215 : 60;
-		setTimeout(() => {
-		  document.querySelector('.app-main').scrollTo({
-			top:
-			  editor.getBounds(editor.getSelection().index).bottom -
-			  (window.innerHeight - correction),
-			behavior: 'smooth',
-		  });
-		}, 200);
-	  }
-	}
+	
 })();
 `;
 const blur = `
     document.activeElement.blur();
-	window.blur();
+	  window.blur();
 
 `;
 
@@ -114,7 +101,16 @@ isLoading = true;
 
 const html = (value) => `
 isLoading = true;
+tinymce.activeEditor.mode.set("readonly")
 tinymce.activeEditor.setContent(\`${value}\`);   
+setTimeout(() => {
+  document.activeElement.blur();
+  window.blur();
+  tinymce.activeEditor.mode.set("design")
+  document.activeElement.blur();
+  window.blur();
+
+},300)
 info.querySelector('#infowords').innerText =
 tinymce.activeEditor.plugins.wordcount.getCount() + " words";
 `;

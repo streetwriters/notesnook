@@ -1,23 +1,23 @@
-import React, { createRef } from 'react';
-import { Clipboard, View } from 'react-native';
+import React, {createRef} from 'react';
+import {Clipboard, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
-import { LOGO_BASE64 } from '../../assets/images/assets';
+import {LOGO_BASE64} from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let RNFetchBlob;
@@ -52,7 +52,12 @@ class RecoveryKeyDialog extends React.Component {
 
   close = () => {
     if (this.tapCount === 0) {
-      ToastEvent.show('Tap one more time to confirm.', 'success', 'local');
+      ToastEvent.show({
+        heading: 'Did you save recovery key?',
+        message: 'Tap one more time to confirm.',
+        type: 'success',
+        context: 'local',
+      });
       this.tapCount++;
       return;
     }
@@ -84,7 +89,12 @@ class RecoveryKeyDialog extends React.Component {
 
   saveQRCODE = async () => {
     if ((await Storage.requestPermission()) === false) {
-      ToastEvent.show('Storage access not granted!', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Storage access not granted',
+        message: 'You must provide access to phone storage to save QR-Code',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
 
@@ -101,11 +111,12 @@ class RecoveryKeyDialog extends React.Component {
             },
           ])
           .then((r) => {
-            ToastEvent.show(
-              'Recovery key saved to Gallery as ' + path + fileName,
-              'success',
-              'local',
-            );
+            ToastEvent.show({
+              heading: 'Recovery key QR-Code saved',
+              message: 'QR-Code image has been saved to Gallery at ' + path +  fileName,
+              type: 'success',
+              context: 'local',
+            });
           });
       });
     });
@@ -113,35 +124,39 @@ class RecoveryKeyDialog extends React.Component {
 
   saveToTextFile = async () => {
     if ((await Storage.requestPermission()) === false) {
-      ToastEvent.show('Storage access not granted!', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Storage access not granted',
+        message: 'You must provide access to phone storage to save recovery key text file.',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
     try {
       let path = await Storage.checkAndCreateDir('/');
-      let fileName = 'nn_' + "test" + '_recovery_key.txt';
-      RNFetchBlob = require('rn-fetch-blob').default
+      let fileName = 'nn_' + 'test' + '_recovery_key.txt';
+      RNFetchBlob = require('rn-fetch-blob').default;
       await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
-      ToastEvent.show(
-        'Recovery key saved as ' + path + fileName,
-        'success',
-        'local',
-      );
+      ToastEvent.show({
+        heading: 'Recovery key text file saved',
+        message: 'Recovery key saved in text file at ' + path + fileName,
+        type: 'success',
+        context: 'local',
+      });
       return path + fileName;
     } catch (e) {
-
-      alert(e.message)
-
+      alert(e.message);
     }
   };
 
   onOpen = async () => {
     //let k = await db.user.getEncryptionKey();
-   // this.user = await db.user.getUser();
-   // if (k) {
-   //   this.setState({
-   //     key: k.key,
-   //   });
-   // }
+    // this.user = await db.user.getUser();
+    // if (k) {
+    //   this.setState({
+    //     key: k.key,
+    //   });
+    // }
   };
 
   shareFile = async () => {
@@ -185,7 +200,6 @@ class RecoveryKeyDialog extends React.Component {
               padding: 10,
               marginTop: 10,
             }}>
-            
             <Paragraph
               color={colors.icon}
               size={SIZE.md}
@@ -194,7 +208,7 @@ class RecoveryKeyDialog extends React.Component {
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: 10,
-                marginBottom:10
+                marginBottom: 10,
               }}>
               {this.state.key}
             </Paragraph>
@@ -202,7 +216,11 @@ class RecoveryKeyDialog extends React.Component {
             <Button
               onPress={() => {
                 Clipboard.setString(this.state.key);
-                ToastEvent.show('Copied!', 'success', 'local');
+                ToastEvent.show({
+                  heading: 'Recovery key copied!',
+                  type: 'success',
+                  context: 'local',
+                });
               }}
               icon="content-copy"
               title="Copy to clipboard"
@@ -211,8 +229,6 @@ class RecoveryKeyDialog extends React.Component {
               fontSize={SIZE.md}
               height={50}
             />
-
-          
           </View>
           <Seperator />
 
@@ -225,7 +241,7 @@ class RecoveryKeyDialog extends React.Component {
               justifyContent: 'center',
               position: 'absolute',
               opacity: 0,
-              zIndex:-1
+              zIndex: -1,
             }}>
             {this.state.key ? (
               <QRCode
@@ -275,7 +291,6 @@ class RecoveryKeyDialog extends React.Component {
             fontSize={SIZE.md}
             onPress={this.close}
           />
-          <Toast context="local" />
         </View>
       </ActionSheetWrapper>
     );

@@ -1,13 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { Keyboard, TouchableOpacity, View } from 'react-native';
-import Animated, { Easing, useValue } from 'react-native-reanimated';
+import React, {useEffect, useState} from 'react';
+import {Keyboard, TouchableOpacity, View} from 'react-native';
+import Animated, {Easing, useValue} from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { dHeight, getElevation } from '../../utils';
-import { eHideToast, eShowToast } from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {dHeight, getElevation} from '../../utils';
+import {eHideToast, eShowToast} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 const {timing} = Animated;
 
@@ -21,9 +25,10 @@ export const Toast = ({context = 'global'}) => {
     backgroundColor: colors.errorBg,
     color: colors.errorText,
   });
+  const insets = useSafeAreaInsets();
 
-  let toastTranslate = useValue(dHeight);
-  let toastOpacity = useValue(1);
+  let toastTranslate = useValue(-dHeight);
+  let toastOpacity = useValue(0);
 
   const showToastFunc = async (data) => {
     if (data.context !== context) return;
@@ -43,7 +48,7 @@ export const Toast = ({context = 'global'}) => {
         color: colors.errorText,
       });
     }
-    toastTranslate.setValue(dHeight);
+    toastTranslate.setValue(-dHeight);
     toastTranslate.setValue(0);
     await sleep(50);
     timing(toastOpacity, {
@@ -98,7 +103,7 @@ export const Toast = ({context = 'global'}) => {
         easing: Easing.inOut(Easing.ease),
       }).start(async () => {
         await sleep(100);
-        toastTranslate.setValue(dHeight);
+        toastTranslate.setValue(-dHeight);
         toastMessages.shift();
         setData({});
       });
@@ -115,7 +120,7 @@ export const Toast = ({context = 'global'}) => {
 
   useEffect(() => {
     toastMessages = [];
-    toastTranslate.setValue(dHeight);
+    toastTranslate.setValue(-dHeight);
     toastOpacity.setValue(0);
     Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
     Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
@@ -137,11 +142,10 @@ export const Toast = ({context = 'global'}) => {
         alignItems: 'center',
         alignSelf: 'center',
         minHeight: 30,
-        bottom: keyboard ? 30 : 100,
+        top: insets.top + 10,
         position: 'absolute',
         zIndex: 999,
         elevation: 15,
-        opacity: toastOpacity,
         transform: [
           {
             translateY: toastTranslate,
@@ -154,29 +158,30 @@ export const Toast = ({context = 'global'}) => {
           ...getElevation(5),
           ...toastStyle,
           maxWidth: '95%',
-          backgroundColor: 'black',
+          backgroundColor: colors.nav,
           minWidth: data.func ? '95%' : '50%',
           alignSelf: 'center',
           borderRadius: 5,
+          opacity: toastOpacity,
           minHeight: 30,
           paddingVertical: 10,
-          paddingHorizontal: 15,
+          paddingLeft: 12,
+          paddingRight: 5,
           justifyContent: 'space-between',
           flexDirection: 'row',
           alignItems: 'center',
+          width: '95%',
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            maxWidth: !data.func ? '90%' : '75%',
+            flexGrow: 1,
+            flex: 1,
           }}>
           <View
             style={{
-              width: 25,
-              height: 25,
-              backgroundColor:
-                data.type === 'error' ? colors.errorText : colors.successText,
+              height: 30,
               borderRadius: 100,
               justifyContent: 'center',
               alignItems: 'center',
@@ -184,41 +189,47 @@ export const Toast = ({context = 'global'}) => {
             }}>
             <Icon
               name={data.type === 'success' ? 'check' : 'close'}
-              size={20}
-              color="white"
+              size={SIZE.lg}
+              color={data.type === 'error' ? colors.errorText : colors.accent}
             />
           </View>
 
-          <Paragraph
-            color="white"
-            onPress={() => {
-              hideToastFunc();
-            }}
+          <View
             style={{
-              width: '90%',
+              flexGrow: 1,
+              paddingRight: 25,
             }}>
-            {data.message}
-          </Paragraph>
+            {data?.heading && (
+              <Heading
+                color={colors.pri}
+                size={SIZE.md}
+                onPress={() => {
+                  hideToastFunc();
+                }}>
+                {data.heading}
+              </Heading>
+            )}
+
+            {data?.message && (
+              <Paragraph
+                color={colors.pri}
+                onPress={() => {
+                  hideToastFunc();
+                }}>
+                {data.message}
+              </Paragraph>
+            )}
+          </View>
         </View>
 
         {data.func ? (
-          <TouchableOpacity
+          <Button
+            fontSize={SIZE.md}
+            type={data.type === 'error' ? 'errorShade' : 'transparent'}
             onPress={data.func}
-            style={{
-              width: '15%',
-              height: '100%',
-              alignItems: 'center',
-              justifyContent: 'center',
-              borderRadius: 5,
-            }}
-            activeOpacity={0.5}>
-            <Paragraph
-              color={
-                data.type === 'error' ? colors.errorText : colors.successText
-              }>
-              {data.actionText}
-            </Paragraph>
-          </TouchableOpacity>
+            title={data.actionText}
+            height={30}
+          />
         ) : null}
       </Animated.View>
     </Animated.View>

@@ -123,7 +123,7 @@ export function post(type, value = null) {
 export const _onShouldStartLoadWithRequest = async (request) => {
   if (request.url.includes('https')) {
     openLinkInBrowser(request.url, appColors)
-      .catch((e) => ToastEvent.show(e.message, 'error'))
+      .catch((e) => {})
       .then((r) => {
         console.log('closed');
       });
@@ -201,6 +201,7 @@ export const loadNote = async (item) => {
     sendNoteEditedEvent({
       id: id,
     });
+   
     if (webviewInit) {
       await loadNoteInEditor();
     } else {
@@ -298,6 +299,7 @@ export const _onMessage = async (evt) => {
       webviewOK = true;
       break;
     case 'focus':
+      console.log('focus gained',message.value);
       editing.focusType = message.value;
       break;
     case 'selectionchange':
@@ -326,6 +328,7 @@ export async function clearEditor() {
   if (noteEdited && id) {
     await saveNote(false);
   }
+  editing.focusType = null;
   updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
   sendNoteEditedEvent({
     id: id,
@@ -411,6 +414,7 @@ export async function saveNote() {
       clearNote();
       return;
     }
+    console.log('saving note is called here')
     let locked = id ? db.notes.note(id).data.locked : null;
 
     let noteData = {
@@ -481,17 +485,18 @@ const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
+    console.log(content.data);
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
     tiny.call(EditorWebView, tiny.html(content.data));
-    setColors();
+   setColors();
     tiny.call(
       EditorWebView,
-      tiny.updateDateEdited(timeConverter(note.dateEdited)),
+     tiny.updateDateEdited(timeConverter(note.dateEdited)),
     );
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } else {
     await restoreEditorState();
   }
-  tiny.call(EditorWebView, tiny.clearHistory);
+ tiny.call(EditorWebView, tiny.clearHistory);
 };

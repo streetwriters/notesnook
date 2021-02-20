@@ -46,7 +46,11 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   const _onSubmit = async () => {
     if (!tagToAdd || tagToAdd === '' || tagToAdd.trimStart().length == 0) {
-      ToastEvent.show('Empty Tag', 'error', 'local');
+      ToastEvent.show({
+        heading: 'Tag field is empty',
+        type: 'error',
+        context: 'local',
+      });
       return;
     }
 
@@ -74,8 +78,12 @@ export const ActionSheetTagsSection = ({item, close}) => {
       });
       tagToAdd = '';
     } catch (e) {
-      //console.log(e.message);
-      ToastEvent.show(e.message, 'error', 'local');
+      ToastEvent.show({
+        heading: "Cannot add tag",
+        type: 'error',
+        message: error.message,
+        context: 'local',
+      });
     }
   };
 

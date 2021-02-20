@@ -91,7 +91,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
   const addNewNotebook = async () => {
     if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
-      return ToastEvent.show('Title is required', 'error', 'local');
+      return ToastEvent.show({
+        heading: 'Notebook title is required',
+        type: 'error',
+        context: 'local',
+      });
 
     await db.notebooks.add({
       title: newNotebookTitle,
@@ -106,7 +110,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
   const addNewTopic = async () => {
     if (!newTopicTitle || newTopicTitle.trim().length === 0) {
-      return ToastEvent.show('Title is required', 'error', 'local');
+      return ToastEvent.show({
+        heading: 'Topic title is required',
+        type: 'error',
+        context: 'local',
+      });
     }
     await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
     Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
@@ -459,7 +467,6 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           )}
         />
       </View>
-      <Toast context="local" />
     </>
   );
 };
