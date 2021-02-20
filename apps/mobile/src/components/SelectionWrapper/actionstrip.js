@@ -47,13 +47,19 @@ export const ActionStrip = ({note, setActionStrip}) => {
 
         if (note.type === 'note') {
           if (db.notes.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show('You cannot pin more than 3 notes', 'error');
+            ToastEvent.show({
+              heading: 'Cannot pin more than 3 notes',
+              type: 'error',
+            });
             return;
           }
           await db.notes.note(note.id).pin();
         } else {
           if (db.notebooks.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show('You cannot pin more than 3 notebooks', 'error');
+            ToastEvent.show({
+              heading: 'Cannot pin more than 3 notebooks',
+              type: 'error',
+            });
             return;
           }
           await db.notebooks.notebook(note.id).pin();
@@ -89,7 +95,10 @@ export const ActionStrip = ({note, setActionStrip}) => {
         try {
           if (isPinnedToMenu) {
             await db.settings.unpin(note.id);
-            ToastEvent.show('Shortcut removed from menu', 'success');
+            ToastEvent.show({
+              heading: 'Shortcut removed from menu',
+              type: 'success',
+            });
           } else {
             if (note.type === 'topic') {
               await db.settings.pin(note.type, {
@@ -99,8 +108,10 @@ export const ActionStrip = ({note, setActionStrip}) => {
             } else {
               await db.settings.pin(note.type, {id: note.id});
             }
-
-            ToastEvent.show('Shortcut added to menu', 'success');
+            ToastEvent.show({
+              heading: 'Shortcut added to menu',
+              type: 'success',
+            });
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});
@@ -121,15 +132,18 @@ export const ActionStrip = ({note, setActionStrip}) => {
             novault: true,
             locked: true,
             item: note,
-            title:'Copy note',
-            description:"Unlock note to copy to clipboard."
+            title: 'Copy note',
+            description: 'Unlock note to copy to clipboard.',
           });
         } else {
           let delta = await db.notes.note(note.id).content();
           let text = toTXT(delta);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
-          ToastEvent.show('Note copied to clipboard', 'success');
+          ToastEvent.show({
+            heading: 'Note copied to clipboard',
+            type: 'success',
+          });
         }
         setActionStrip(false);
       },
@@ -147,10 +161,14 @@ export const ActionStrip = ({note, setActionStrip}) => {
           Navigation.routeNames.Trash,
         ]);
 
-        ToastEvent.show(
-          item.type === 'note' ? 'Note restored' : 'Notebook restored',
-          'success',
-        );
+        ToastEvent.show({
+          heading:
+            item.type === 'note'
+              ? 'Note restored from trash'
+              : 'Notebook restored from trash',
+          type: 'success',
+        });
+
         setActionStrip(false);
       },
       visible: note.type === 'trash',
