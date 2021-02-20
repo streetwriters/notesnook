@@ -1,3 +1,4 @@
+import { EV, EVENTS } from "../common";
 import Indexer from "./indexer";
 
 export default class IndexedCollection {
@@ -32,9 +33,11 @@ export default class IndexedCollection {
     delete item.remote;
     delete item.migrated;
     await this.indexer.write(item.id, item);
+    EV.publish(EVENTS.databaseUpdated, item);
   }
 
   removeItem(id) {
+    EV.publish(EVENTS.databaseUpdated, id);
     return this.updateItem({
       id,
       deleted: true,
@@ -43,6 +46,7 @@ export default class IndexedCollection {
   }
 
   async deleteItem(id) {
+    EV.publish(EVENTS.databaseUpdated, id);
     await this.indexer.deindex(id);
     return await this.indexer.remove(id);
   }
