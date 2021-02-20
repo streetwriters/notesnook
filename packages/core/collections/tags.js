@@ -1,5 +1,6 @@
 import Collection from "./collection";
 import { qclone } from "qclone";
+import { makeId } from "../utils/id";
 
 export default class Tags extends Collection {
   tag(id) {
