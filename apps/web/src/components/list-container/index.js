@@ -58,6 +58,7 @@ function ListContainer(props) {
                           switch (index) {
                             default:
                               const item = props.items[index];
+                              if (!item) return "";
                               return item.id || item.title;
                           }
                         }}
@@ -66,6 +67,7 @@ function ListContainer(props) {
                         estimatedItemSize={profile.estimatedItemHeight}
                         itemSize={(index) => {
                           const item = props.items[index];
+                          if (!item) return 0;
                           if (item.type === "header") {
                             if (!item.title) return 0;
                             return 29;
@@ -77,6 +79,7 @@ function ListContainer(props) {
                       >
                         {({ index, style }) => {
                           const item = props.items[index];
+                          if (!item) return null;
                           return (
                             <div key={item.id || item.title} style={style}>
                               {item.type === "header" ? (
