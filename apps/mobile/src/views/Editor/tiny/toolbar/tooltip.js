@@ -1,20 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, View} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
-import Animated, {Easing, timing} from 'react-native-reanimated';
-import {useTracked} from '../../../../provider';
-import {DDS} from '../../../../services/DeviceDetection';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Animated, { Easing, timing } from 'react-native-reanimated';
+import { useTracked } from '../../../../provider';
+import { DDS } from '../../../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../../../services/EventManager';
-import {editing, getElevation} from '../../../../utils';
+import { editing } from '../../../../utils';
 import { normalize } from '../../../../utils/SizeUtils';
-import {sleep} from '../../../../utils/TimeUtils';
+import { sleep } from '../../../../utils/TimeUtils';
 import ColorGroup from './colorgroup';
-import {execCommands} from './commands';
-import {formatSelection, properties} from './constants';
+import { execCommands } from './commands';
+import { formatSelection, properties } from './constants';
 import ToolbarItem from './item';
 import ToolbarLinkInput from './linkinput';
 
@@ -62,7 +62,8 @@ const Tooltip = () => {
     if (!data) return;
 
     let time = editing.tooltip === 'table' || data.type === 'table' ? 400 : 100;
-    if (data && editing.tooltip) {
+
+    if (data && editing.tooltip && editing.tooltip !== data.type) {
       let translate =
         editing.tooltip === 'table' || data.type === 'table' ? 400 : 70;
       animate(translate, time);
