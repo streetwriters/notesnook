@@ -22,7 +22,7 @@ export const Empty = ({loading = true, placeholderData}) => {
 
   const onHeaderStateChange = (event) => {
     if (!event) return;
-    setHeaderTextState(event);
+     setHeaderTextState(event);
   };
   useEffect(() => {
     eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
@@ -48,6 +48,7 @@ export const Empty = ({loading = true, placeholderData}) => {
         }}>
         <Heading>{placeholderData.heading}</Heading>
         <Paragraph
+          textBreakStrategy="balanced"
           style={{
             textAlign: 'center',
             width: '80%',
