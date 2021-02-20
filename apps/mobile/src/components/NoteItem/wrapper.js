@@ -16,12 +16,15 @@ import {db} from '../../utils/DB';
 import {DDS} from '../../services/DeviceDetection';
 import {tabBarRef} from '../../utils/Refs';
 import {notesnook} from '../../../e2e/test.ids';
+import {history} from '../../utils';
+import { useWindowDimensions } from 'react-native';
 
 export const NoteWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors} = state;
   const [note, setNote] = useState(item);
-
+  const {fontScale} = useWindowDimensions();
+  
   useEffect(() => {
     setNote(item);
   }, [item]);
@@ -48,34 +51,26 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
     };
   }, [note]);
 
-  const style = useMemo(() => {
-    return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
-  }, [selectionMode]);
-
-  const onLongPress = () => {
-    if (!selectionMode) {
-      dispatch({type: Actions.SELECTION_MODE, enabled: true});
-    }
-    dispatch({type: Actions.SELECTED_ITEMS, item: note});
-  };
-
+ 
   const onPress = async () => {
     if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
     }
 
-    if (selectionMode) {
-      onLongPress();
+    if (history.selectedItemsList.length > 0) {
+      dispatch({type: Actions.SELECTED_ITEMS, item: note});
       return;
-    } else if (note.locked) {
+    }
+
+    if (note.locked) {
       openVault({
         item: item,
         novault: true,
         locked: true,
         goToEditor: true,
-        title:'Open note',
-        description:"Unlock note to open it in editor."
+        title: 'Open note',
+        description: 'Unlock note to open it in editor.',
       });
       return;
     }
@@ -93,14 +88,12 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
     <SelectionWrapper
       index={index}
       testID={notesnook.ids.note.get(index)}
-      onLongPress={onLongPress}
       onPress={onPress}
       item={note}>
       <NoteItem
         colors={colors}
-        customStyle={style}
-        selectionMode={selectionMode}
         item={note}
+        fontScale={fontScale}
         isTrash={isTrash}
       />
     </SelectionWrapper>

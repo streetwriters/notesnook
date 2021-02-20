@@ -1,9 +1,11 @@
 import React from 'react';
+import { useWindowDimensions } from 'react-native';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
+import { history } from '../../utils';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
@@ -19,7 +21,7 @@ export const NotebookItem = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-
+  const {fontScale} = useWindowDimensions();
   const showActionSheet = () => {
     let rowItems = isTrash
       ? ['Restore', 'Remove']
@@ -40,7 +42,7 @@ export const NotebookItem = ({
     <View
       style={[
         {
-          height: isTopic ? 80 : 110,
+          height: isTopic ? 80 * fontScale : 110 * fontScale,
           justifyContent: 'space-between',
           alignItems: 'center',
           flexDirection: 'row',
@@ -50,7 +52,6 @@ export const NotebookItem = ({
           borderBottomColor: item.pinned ? 'transparent' : colors.nav,
           width: '100%',
         },
-        customStyle,
       ]}>
       <View
         style={{
@@ -97,6 +98,7 @@ export const NotebookItem = ({
                   <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={() => {
+                      if (history.selectedItemsList.length > 0) return;
                       let routeName = 'NotesPage';
                       let params = {...topic, menu: false};
                       let headerState = {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {View} from 'react-native';
+import {useWindowDimensions, View} from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
@@ -13,7 +13,7 @@ import Paragraph from '../Typography/Paragraph';
 const TagItem = ({item, index}) => {
   const [state] = useTracked();
   const {colors} = state;
-
+  const {fontScale} = useWindowDimensions();
   const onPress = () => {
     Navigation.navigate(
       'NotesPage',
@@ -39,7 +39,7 @@ const TagItem = ({item, index}) => {
       opacity={1}
       customStyle={{
         paddingHorizontal: 12,
-        height: 80,
+        height: 80  * fontScale,
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 1.5,

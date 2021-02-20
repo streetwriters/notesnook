@@ -6,6 +6,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Navigation from '../../services/Navigation';
 import {rootNavigatorRef} from '../../utils/Refs';
+import { history } from '../../utils';
 
 export const NotebookWrapper = ({
   item,
@@ -15,31 +16,14 @@ export const NotebookWrapper = ({
   isTopic,
 }) => {
   const [state, dispatch] = useTracked();
-  const {selectionMode, preventDefaultMargins} = state;
 
-  const style = useMemo(() => {
-    return {width: selectionMode ? '90%' : '100%', marginHorizontal: 0};
-  }, [selectionMode]);
-
-  const onLongPress = () => {
-    if (item.title === 'General') return;
-    if (!selectionMode) {
-      dispatch({
-        type: Actions.SELECTION_MODE,
-        enabled: !selectionMode,
-      });
-    }
-
-    dispatch({
-      type: Actions.SELECTED_ITEMS,
-      item: item,
-    });
-  };
 
   const onPress = () => {
-    if (selectionMode) {
-  
-      onLongPress();
+    if (history.selectedItemsList.length > 0) {
+      dispatch({
+        type: Actions.SELECTED_ITEMS,
+        item: item,
+      });
       return;
     }
     let routeName = isTopic ? 'NotesPage' : 'Notebook';
@@ -59,7 +43,6 @@ export const NotebookWrapper = ({
   };
   return (
     <SelectionWrapper
-      onLongPress={onLongPress}
       pinned={pinned}
       testID={
         isTopic
@@ -70,9 +53,7 @@ export const NotebookWrapper = ({
       onPress={onPress}
       item={item}>
       <NotebookItem
-        hideMore={preventDefaultMargins}
         isTopic={isTopic}
-        customStyle={style}
         item={item}
         index={index}
         isTrash={isTrash}

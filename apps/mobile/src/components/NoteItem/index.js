@@ -66,7 +66,7 @@ export default class NoteItem extends React.Component {
   };
 
   render() {
-    let {colors, item, customStyle, isTrash} = this.props;
+    let {colors, item, customStyle, isTrash,fontScale} = this.props;
     return (
       <View
         style={[
@@ -79,7 +79,7 @@ export default class NoteItem extends React.Component {
             alignSelf: 'center',
             borderBottomWidth: 1,
             borderBottomColor: colors.nav,
-            height: 100,
+            height: 100 * fontScale,
           },
           customStyle ? customStyle : {},
         ]}>
@@ -115,7 +115,7 @@ export default class NoteItem extends React.Component {
                   {db.notebooks.notebook(item.notebooks[0]?.id)?.title + ' '}{' '}
                   {item.notebooks.length > 1
                     ? '& ' + (item.notebooks.length - 1) + ' others'
-                    : ''} 
+                    : ''}
                 </Heading>
               </TouchableOpacity>
             </View>
@@ -125,15 +125,11 @@ export default class NoteItem extends React.Component {
             color={COLORS_NOTE[item.color]}
             numberOfLines={1}
             size={SIZE.md}>
-            {item?.title.replace('\n', '')}
+            {item.title}
           </Heading>
 
-          {item?.headline ? (
-            <Paragraph numberOfLines={2}>
-              {item.headline[item.headline.length - 1] === '\n'
-                ? item.headline.slice(0, item.headline.length - 1)
-                : item.headline}
-            </Paragraph>
+          {item.headline ? (
+            <Paragraph numberOfLines={2}>{item.headline}</Paragraph>
           ) : null}
 
           <View
