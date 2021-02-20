@@ -15,7 +15,12 @@ import SearchService from '../../services/SearchService';
 import {editing, InteractionManager} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
-import {eOnLoadNote, eScrollEvent, refreshNotesPage} from '../../utils/Events';
+import {
+  eOnLoadNote,
+  eOpenAddTopicDialog,
+  eScrollEvent,
+  refreshNotesPage,
+} from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
@@ -27,22 +32,16 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (data) => {
+  const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
       if (localLoad) {
         setLocalLoad(false);
       }
-
       Navigation.routeNeedsUpdate('NotesPage', () => {
-        
         init();
       });
 
-      params = route.params;
-      if (data) {
-        params = data;
-      }
-      if (route.params.menu) {
+      if (params.menu) {
         navigation.setOptions({
           animationEnabled: false,
           gestureEnabled: false,
@@ -53,26 +52,26 @@ export const Notes = ({route, navigation}) => {
           gestureEnabled: Platform.OS === 'ios',
         });
       }
-      let allNotes = [];
+
+      let _notes = [];
       if (params.type === 'tag') {
-        allNotes = db.notes.tagged(params.tag?.id);
+        _notes = db.notes.tagged(params.tag?.id);
       } else if (params.type === 'color') {
-        allNotes = db.notes.colored(params.color?.id);
+        _notes = db.notes.colored(params.color?.id);
       } else {
-        allNotes = db.notebooks
+        _notes = db.notebooks
           .notebook(params.notebookId)
-          .topics.topic(params.title).all;
+          .topics.topic(params.id).all;
       }
 
       if (
         (params.type === 'tag' || params.type === 'color') &&
-        (!allNotes || allNotes.length === 0)
+        (!_notes || _notes.length === 0)
       ) {
         Navigation.goBack();
       }
 
-      setNotes([...allNotes]);
-      setActionAfterFirstSave();
+      setNotes([..._notes]);
       updateSearch();
       dispatch({
         type: Actions.CONTAINER_BOTTOM_BUTTON,
@@ -82,7 +81,7 @@ export const Notes = ({route, navigation}) => {
         },
       });
       ranAfterInteractions = false;
-    });
+    }, time);
   };
 
   useEffect(() => {
@@ -121,10 +120,14 @@ export const Notes = ({route, navigation}) => {
   };
 
   const init = (data) => {
+    if (data) {
+      setLocalLoad(true);
+      params = data;
+      setActionAfterFirstSave();
+    }
     if (!ranAfterInteractions) {
-      console.log('focus');
       ranAfterInteractions = true;
-      runAfterInteractions(data);
+      runAfterInteractions(data ? 500 : 1);
     }
 
     if (!pageIsLoaded) {
@@ -149,7 +152,7 @@ export const Notes = ({route, navigation}) => {
     });
   };
 
-  const onFocus = useCallback(() => {
+  const onFocus = () => {
     eSendEvent(eScrollEvent, {
       name:
         params.type === 'tag'
@@ -158,7 +161,7 @@ export const Notes = ({route, navigation}) => {
       type: 'in',
     });
     init();
-  }, []);
+  };
 
   const onBlur = useCallback(() => {
     setNotes([]);
@@ -208,7 +211,7 @@ export const Notes = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = useCallback(() => {
+  const _onPressBottomButton = () => {
     setActionAfterFirstSave();
 
     if (DDS.isPhone || DDS.isSmallTab) {
@@ -216,12 +219,12 @@ export const Notes = ({route, navigation}) => {
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
-  }, [params.type]);
+  };
 
   return (
     <>
       <SimpleList
-        listData={notes}
+        listData={notes.reverse()}
         type="notes"
         refreshCallback={() => {
           init();
@@ -232,6 +235,20 @@ export const Notes = ({route, navigation}) => {
               ? '#' + params.title
               : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
           color: params.type === 'color' ? params.title.toLowerCase() : null,
+          paragraph:
+            route.params.type === 'topic' && route.params.title !== 'General'
+              ? 'Edit topic'
+              : null,
+          onPress: () => {
+            console.log(route.params);
+            if (route.params.type !== 'topic') return;
+
+            eSendEvent(eOpenAddTopicDialog, {
+              notebookId: route.params.notebookId,
+              toEdit: route.params,
+            });
+          },
+          icon: 'pencil',
         }}
         loading={loading || localLoad}
         focused={() => navigation.isFocused()}

@@ -10,6 +10,7 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
+import { InteractionManager } from '../../utils';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -18,9 +19,6 @@ export const Folders = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const InteractionManager = {
-    runAfterInteractions:(func) => setTimeout(func,300)
-  }
   const onFocus = useCallback(() => {
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;

@@ -12,6 +12,7 @@ import {InteractionManager} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
+  eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
   eScrollEvent,
 } from '../../utils/Events';
@@ -24,17 +25,20 @@ export const Notebook = ({route, navigation}) => {
 
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = () => {
+  const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
+      let notebook = db.notebooks.notebook(params.notebook?.id).data;
+      params.notebook = notebook;
+      params.title = params.notebook.title
+      setTopics(notebook.topics);
       if (loading) {
         setLoading(false);
       }
-      Navigation.routeNeedsUpdate('Notebooks', () => {
+      Navigation.routeNeedsUpdate('Notebook', () => {
         onLoad();
       });
-
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-      if (route.params.menu) {
+      if (params.menu) {
         navigation.setOptions({
           animationEnabled: false,
           gestureEnabled: false,
@@ -47,17 +51,16 @@ export const Notebook = ({route, navigation}) => {
       }
       updateSearch();
       ranAfterInteractions = false;
-    });
+    },time);
   };
-  const onLoad = () => {
-    InteractionManager.runAfterInteractions(() => {
-      setTopics(db.notebooks.notebook(route.params.notebook.id).data.topics);
-    });
+  const onLoad = (data) => {
+    if (data) {
+      setLoading(true);
+      params = data;
+    }
+    console.log('calling on load')
+    runAfterInteractions(data? 500 : 1);
   };
-
-  useEffect(() => {
-    onLoad();
-  }, [route.params]);
 
   useEffect(() => {
     eSubscribeEvent(eOnNewTopicAdded, onLoad);
@@ -113,8 +116,8 @@ export const Notebook = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = () => {
-    let n = route.params.notebook;
-    eSendEvent(eOpenAddTopicDialog, n.id);
+    let n = params.notebook;
+    eSendEvent(eOpenAddTopicDialog, {notebookId: n.id});
   };
 
   return (
@@ -127,11 +130,16 @@ export const Notebook = ({route, navigation}) => {
         }}
         headerProps={{
           heading: params.title,
+          paragraph: 'Edit notebook',
+          onPress: () => {
+            eSendEvent(eOpenAddNotebookDialog, params.notebook);
+          },
+          icon: 'pencil',
         }}
         loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
-          heading: route.params.notebook.title,
+          heading: params.notebook.title,
           paragraph: 'You have not added any topics yet.',
           button: 'Add a topic',
           action: _onPressBottomButton,
