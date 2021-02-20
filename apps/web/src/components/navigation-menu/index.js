@@ -184,6 +184,7 @@ function NavigationMenu(props) {
                   ? Icon.Tag2
                   : Icon.Topic
               }
+              isShortcut
               selected={shouldSelectNavItem(location, pin)}
               onClick={() => {
                 if (pin.type === "notebook") {
