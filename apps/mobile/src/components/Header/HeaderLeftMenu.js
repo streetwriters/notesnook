@@ -19,7 +19,7 @@ export const HeaderLeftMenu = () => {
 
   const onHeaderStateChange = (event) => {
     if (!event) return;
-    setHeaderTextState(event);
+     setHeaderTextState(event);
   };
 
   useEffect(() => {

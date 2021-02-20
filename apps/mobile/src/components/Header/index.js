@@ -26,7 +26,7 @@ export const Header = ({root}) => {
 
   const onHeaderStateChange = (event) => {
     if (!event) return;
-    setHeaderTextState(event);
+     setHeaderTextState(event);
   };
 
   useEffect(() => {
@@ -35,11 +35,6 @@ export const Header = ({root}) => {
       eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
     };
   }, []);
-
-
-
-
-
 
   const onScroll = (y) => {
     if (y > 150) {

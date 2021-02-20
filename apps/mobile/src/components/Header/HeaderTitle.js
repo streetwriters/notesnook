@@ -17,7 +17,7 @@ export const HeaderTitle = () => {
   const [headerTextState, setHeaderTextState] = useState(Navigation.getHeaderState());
 
   const onHeaderStateChange = (event) => {
-        setHeaderTextState(event);
+         setHeaderTextState(event);
   };
   useEffect(() => {
     eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);

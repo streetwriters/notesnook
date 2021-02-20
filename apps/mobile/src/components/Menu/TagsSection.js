@@ -1,9 +1,8 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, InteractionManager, View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -12,12 +11,10 @@ import {
 import Navigation from '../../services/Navigation';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
-import {refreshNotesPage} from '../../utils/Events';
-import {rootNavigatorRef} from '../../utils/Refs';
-import {normalize, ph, pv, SIZE} from '../../utils/SizeUtils';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogHeader from '../Dialog/dialog-header';
+import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -46,7 +43,7 @@ export const TagsSection = () => {
         id: item.id,
         type: item.type,
       });
-      rootNavigatorRef.current?.setParams(params);
+      eSendEvent(eOnNewTopicAdded, params);
     } else if (item.type === 'tag') {
       params = params = {
         title: item.title,
@@ -85,26 +82,6 @@ export const TagsSection = () => {
         contentContainerStyle={{
           flexGrow: 1,
         }}
-        ListEmptyComponent={
-          <View
-            style={{
-              flexGrow: 1,
-              minHeight: '40%',
-              justifyContent: 'center',
-              alignItems: 'center',
-              paddingHorizontal: '10%',
-            }}>
-            <Heading style={{marginBottom: 2.5}} size={SIZE.md}>
-              Shortcuts
-            </Heading>
-            <Paragraph
-              style={{textAlign: 'center'}}
-              color={colors.icon}
-              size={SIZE.sm}>
-              You can add shortcuts of notebooks, topics and tags here.
-            </Paragraph>
-          </View>
-        }
         keyExtractor={(item, index) => item.id}
         renderItem={({item, index}) => (
           <PinItem item={item} index={index} onPress={onPress} />
@@ -120,7 +97,7 @@ const PinItem = ({item, index, onPress}) => {
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
-
+  const fwdRef = useRef();
   const onHeaderStateChange = (event) => {
     if (event?.id === item.id) {
       setHeaderTextState(event);
@@ -135,36 +112,45 @@ const PinItem = ({item, index, onPress}) => {
       eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
     };
   }, []);
+
+  const icons = {
+    topic: 'format-title',
+    notebook: 'book-outline',
+    tag: 'pound',
+  };
+
   return (
     <>
       {visible && (
-        <BaseDialog visible={true}>
-          <View
-            style={{
-              ...getElevation(5),
-              width: DDS.isTab ? 350 : '80%',
-              maxHeight: 350,
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-              paddingHorizontal: ph,
-              paddingVertical: pv,
-            }}>
-            <DialogHeader title="Remove Shortcut" paragraph={`Remove this ${item.type} from menu`} />
-            <DialogButtons
-              positiveTitle="Remove"
-              negativeTitle="Cancel"
-              onPressNegative={() => setVisible(false)}
-              onPressPositive={async () => {
-                await db.settings.unpin(item.id);
-                dispatch({type: Actions.MENU_PINS});
-              }}
-            />
-          </View>
-        </BaseDialog>
+        <ActionSheetWrapper
+          onClose={() => {
+            setVisible(false);
+          }}
+          gestureEnabled={false}
+          fwdRef={fwdRef}
+          visible={true}>
+          <Button
+            title="Remove Shortcut"
+            type="error"
+            onPress={async () => {
+              await db.settings.unpin(item.id);
+              dispatch({type: Actions.MENU_PINS});
+            }}
+            fontSize={SIZE.md}
+            width="95%"
+            height={50}
+            customStyle={{
+              marginBottom: 30,
+            }}
+          />
+        </ActionSheetWrapper>
       )}
       <PressableButton
         type="transparent"
-        onLongPress={() => setVisible(true)}
+        onLongPress={() => {
+          setVisible(true);
+          fwdRef.current?.show();
+        }}
         onPress={() => onPress(item)}
         customStyle={{
           flexDirection: 'row',
@@ -180,30 +166,30 @@ const PinItem = ({item, index, onPress}) => {
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
+            flex: 1,
           }}>
           <View
             style={{
-              width: 30,
+              width: 35,
               justifyContent: 'center',
-              alignItems: 'flex-start',
             }}>
-            {item.type === 'notebook' ? (
-              <Icon color={color} size={SIZE.md} name="book-outline" />
-            ) : item.type === 'tag' ? (
-              <Icon color={color} size={SIZE.md} name="pound" />
-            ) : (
-              <Heading
-                style={{textAlign: 'center', width: 12}}
-                color={color}
-                size={SIZE.md}>
-                T
-              </Heading>
-            )}
+            <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />
+            <Icon
+              style={{
+                position: 'absolute',
+                bottom: -5,
+                left: -6,
+              }}
+              color={color}
+              size={SIZE.xs}
+              name="arrow-top-right-thick"
+            />
           </View>
           <View
             style={{
               alignItems: 'flex-start',
-              width: '75%',
+              flexGrow: 1,
+              flex: 1,
             }}>
             {headerTextState?.id === item.id ? (
               <Heading
@@ -211,20 +197,18 @@ const PinItem = ({item, index, onPress}) => {
                   flexWrap: 'wrap',
                 }}
                 color={colors.heading}
-                size={SIZE.md}>
+                size={SIZE.lg}>
                 {item.title}
               </Heading>
             ) : (
               <Paragraph
-                style={{
-                  flexWrap: 'wrap',
-                }}
+                numberOfLines={1}
                 color={colors.heading}
                 size={SIZE.md}>
                 {item.title}
               </Paragraph>
             )}
-            <Paragraph
+            {/*    <Paragraph
               style={{marginTop: 2.5}}
               size={SIZE.xs}
               color={colors.icon}>
@@ -233,7 +217,7 @@ const PinItem = ({item, index, onPress}) => {
               {item.type === 'topic'
                 ? 'in ' + db.notebooks.notebook(item.notebookId).data.title
                 : null}
-            </Paragraph>
+            </Paragraph> */}
           </View>
         </View>
 

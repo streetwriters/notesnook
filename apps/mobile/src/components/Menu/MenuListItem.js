@@ -38,7 +38,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
 
   const onHeaderStateChange = (event) => {
     if (event.id === item.name.toLowerCase() + '_navigation') {
-      setHeaderTextState(event);
+       setHeaderTextState(event);
     } else {
       setHeaderTextState(null);
     }
@@ -74,7 +74,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
         }}>
         <Icon
           style={{
-            width: 30,
+            width: 35,
             textAlignVertical: 'center',
             textAlign: 'left',
           }}
@@ -84,7 +84,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
               ? colors.accent
               : colors.pri
           }
-          size={SIZE.md}
+          size={SIZE.lg - 2}
         />
         {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
           <Heading color={colors.accent} size={SIZE.md}>

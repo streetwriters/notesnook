@@ -20,7 +20,7 @@ export const HeaderRightMenu = () => {
 
   const onHeaderStateChange = (event) => {
     if (!event) return;
-    setHeaderTextState(event);
+     setHeaderTextState(event);
   };
 
   useEffect(() => {

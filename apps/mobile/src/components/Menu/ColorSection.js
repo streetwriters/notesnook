@@ -25,6 +25,8 @@ export const ColorSection = () => {
       dispatch({type: Actions.COLORS});
     }
   }, [loading]);
+  
+
   return colorNotes.map((item, index) => (
     <ColorItem key={item.id} item={item} index={index} />
   ));
@@ -37,7 +39,7 @@ const ColorItem = ({item, index}) => {
 
   const onHeaderStateChange = (event) => {
       if (event?.id === item.id) {
-        setHeaderTextState(event);
+         setHeaderTextState(event);
       } else {
         setHeaderTextState(null);
       }
@@ -91,14 +93,14 @@ const ColorItem = ({item, index}) => {
         }}>
         <View
           style={{
-            width: 30,
+            width: 35,
             justifyContent: 'center',
             alignItems: 'flex-start',
           }}>
           <View
             style={{
-              width: SIZE.md,
-              height: SIZE.md,
+              width: SIZE.lg - 2,
+              height: SIZE.lg - 2, 
               backgroundColor: COLORS_NOTE[item.title],
               borderRadius: 100,
               justifyContent: 'center',
