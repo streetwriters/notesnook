@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	useWindowDimensions,
 	View
 } from 'react-native';
 import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
@@ -21,7 +22,8 @@ export const SectionHeader = ({
   }) => {
 	const [state] = useTracked();
 	const {colors} = state;
-  
+    const {fontScale} = useWindowDimensions();
+
 	return (
 	  <View
 		style={{
@@ -30,14 +32,14 @@ export const SectionHeader = ({
 		  width: '100%',
 		  justifyContent: 'space-between',
 		  paddingHorizontal: 12,
-		  height: 30,
+		  height: 30 * fontScale,
 		  backgroundColor:
 			index === 1
 			  ? headerProps.color
 				? colors[headerProps.color]
 				: colors.shade
 			  : colors.nav,
-		  marginTop: index === 1 ? 0 : 5,
+		  marginTop: index === 1 ? 0 : 5 * fontScale,
 		}}>
 		<TouchableWithoutFeedback
 		  onPress={() => {
