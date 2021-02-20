@@ -75,10 +75,10 @@ class Settings {
           .notebook(pin.data.notebookId)
           .topics.topic(pin.data.id)._topic;
       } else if (pin.type === "tag") {
-        item =
-          this._db.tags.tag(pin.data.id) || this._db.tags.tag(pin.data.title);
+        item = this._db.tags.tag(pin.data.id);
       }
       if (item) prev.push(item);
+      else this.unpin(pin.data.id); // TODO risky.
       return prev;
     }, []);
   }

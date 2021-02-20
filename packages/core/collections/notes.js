@@ -145,15 +145,24 @@ export default class Notes extends Collection {
   }
 
   tagged(tagId) {
-    const tag = this._db.tags.tag(tagId);
-    if (!tag || tag.noteIds.length <= 0) return [];
-    return tag.noteIds.map((id) => this._collection.getItem(id));
+    return this._getTagItems(tagId, "tags");
   }
 
   colored(colorId) {
-    const color = this._db.colors.tag(colorId);
-    if (!color || color.noteIds.length <= 0) return [];
-    return color.noteIds.map((id) => this._collection.getItem(id));
+    return this._getTagItems(colorId, "colors");
+  }
+
+  /**
+   * @private
+   */
+  _getTagItems(tagId, collection) {
+    const tag = this._db[collection].tag(tagId);
+    if (!tag || tag.noteIds.length <= 0) return [];
+    return tag.noteIds.reduce((arr, id) => {
+      const item = this._collection.getItem(id);
+      if (item) arr.push(item);
+      return arr;
+    }, []);
   }
 
   /**

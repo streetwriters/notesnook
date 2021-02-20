@@ -14,6 +14,7 @@ class Migrations {
   async init() {
     this.dbVersion =
       (await this._db.context.read("v")) || CURRENT_DATABASE_VERSION;
+    this._db.context.write("v", this.dbVersion);
   }
 
   async migrate() {

@@ -1,7 +1,5 @@
 import Collection from "./collection";
-import getId from "../utils/id";
 import { qclone } from "qclone";
-import set from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
@@ -20,7 +18,7 @@ export default class Tags extends Collection {
       title: tagId,
     };
 
-    let id = tag.id || getId();
+    let id = tag.id || makeId(tag.title);
     let notes = tag.noteIds || [];
 
     if (notes.find((id) => id === noteId)) return id;

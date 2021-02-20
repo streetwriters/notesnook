@@ -1,3 +1,4 @@
+import SparkMD5 from "spark-md5";
 /**
  *
  * @param {number} size
@@ -24,4 +25,8 @@ function cryptoRandom(size, type) {
 
 export default function () {
   return cryptoRandom(12, "hex");
+}
+
+export function makeId(text) {
+  return SparkMD5.hash(text);
 }

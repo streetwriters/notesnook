@@ -60,7 +60,8 @@ export const migrations = {
       return item;
     },
   },
-  5.1: {
+  5.1: {},
+  5.2: {
     note: false,
     notebook: false,
     tag: false,
