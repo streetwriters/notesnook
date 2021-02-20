@@ -23,7 +23,7 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const translatePrem = new Animated.Value(-dWidth * 5);
+export const translatePrem = new Animated.Value(-dWidth);
 export const opacityPrem = new Animated.Value(0);
 let timer = null;
 let currentMsg = {
@@ -47,7 +47,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       };
       setMsg(currentMsg);
       opacityPrem.setValue(0);
-      translatePrem.setValue(-dWidth * 5);
+      translatePrem.setValue(-dWidth);
       return;
     }
 
@@ -57,13 +57,18 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         timer = null;
       }
       opacityPrem.setValue(0);
-      translatePrem.setValue(-dWidth * 5);
+      translatePrem.setValue(-dWidth);
       currentMsg = {
         title: event.title,
         desc: event.desc,
       };
       setMsg(currentMsg);
       opacityPrem.setValue(1);
+      Animated.timing(opacityPrem, {
+        toValue: 1,
+        duration: 300,
+        easing: Easing.inOut(Easing.ease),
+      }).start();
       Animated.timing(translatePrem, {
         toValue: 0,
         duration: 300,
@@ -71,8 +76,8 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       }).start();
 
       let timer = setTimeout(async () => {
-        Animated.timing(translatePrem, {
-          toValue: dWidth * 2,
+        Animated.timing(opacityPrem, {
+          toValue: -0,
           duration: 150,
           easing: Easing.inOut(Easing.ease),
         }).start();
@@ -80,18 +85,18 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
           title: '',
           desc: '',
         };
+        await sleep(150);
         setMsg(currentMsg);
-        await sleep(200);
         opacityPrem.setValue(0);
-        translatePrem.setValue(-dWidth * 5);
-      }, 5000);
+        translatePrem.setValue(-dWidth);
+      }, 3000);
     }
   };
 
   useEffect(() => {
     eSubscribeEvent(eShowGetPremium, open);
     return () => {
-      translatePrem.setValue(-dWidth * 5);
+      translatePrem.setValue(-dWidth);
       eUnSubscribeEvent(eShowGetPremium, open);
     };
   }, []);
@@ -100,7 +105,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     open(null);
     eSendEvent(eCloseActionSheet);
     if (editing.isFocused) {
-      tiny.call(EditorWebView,tiny.blur)
+      tiny.call(EditorWebView, tiny.blur);
     }
     await sleep(300);
     eSendEvent(eOpenPremiumDialog);
@@ -124,7 +129,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
         maxWidth: DDS.isLargeTablet() ? 400 : '100%',
         transform: [
           {
-            translateX: translatePrem,
+            translateY: translatePrem,
           },
         ],
       }}>
