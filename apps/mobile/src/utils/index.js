@@ -1,20 +1,20 @@
-import {Dimensions, NativeModules, Platform} from 'react-native';
-import {eSendEvent} from '../services/EventManager';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
-import {MMKV} from './mmkv';
-import {defaultState} from '../provider/DefaultState';
 import {createRef} from 'react';
-import {dummyRef} from '../components/DummyText';
-import {SIZE} from './SizeUtils';
+import {Dimensions, NativeModules, Platform} from 'react-native';
 import RNTooltips from 'react-native-tooltips';
+import {updateEvent} from '../components/DialogManager/recievers';
+import {dummyRef} from '../components/DummyText';
+import {Actions} from '../provider/Actions';
+import {defaultState} from '../provider/DefaultState';
+import {eSendEvent} from '../services/EventManager';
+import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
+import {SIZE} from './SizeUtils';
 
 export const InteractionManager = {
-  runAfterInteractions: (func,time) => setTimeout(func, time || 500),
+  runAfterInteractions: (func, time = 500) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1220;
+export const APP_VERSION = 1300;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -159,7 +159,7 @@ export const SUBSCRIPTION_STATUS_STRINGS = {
 };
 
 export const SUBSCRIPTION_PROVIDER = {
-  0: null,  
+  0: null,
   1: {
     type: 'iOS',
     title: 'Subscribed on iOS',
@@ -176,8 +176,7 @@ export const SUBSCRIPTION_PROVIDER = {
   3: {
     type: 'Web',
     title: 'Subscribed on Web',
-    desc:
-      'You subscribed to Notesnook Pro on the Web/Desktop App.',
+    desc: 'You subscribed to Notesnook Pro on the Web/Desktop App.',
     icon: 'web',
   },
 };
