@@ -7,9 +7,13 @@ import TrashPlaceholder from "../components/placeholders/trash-placeholder";
 import { showToast } from "../utils/toast";
 import { Text } from "rebass";
 import useNavigate from "../utils/use-navigate";
+import { db } from "../common/db";
 
 function Trash() {
-  useNavigate("trash", () => store.refresh());
+  useNavigate("trash", async () => {
+    await db.notes.init();
+    store.refresh();
+  });
   const items = useStore((store) => store.trash);
   const clearTrash = useStore((store) => store.clear);
 
