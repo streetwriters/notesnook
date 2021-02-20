@@ -41,9 +41,9 @@ class Merger {
 
   async _mergeArray(array, get, set) {
     if (!array) return;
-    return Promise.all(
-      array.map(async (item) => await this._mergeItem(item, get, set))
-    );
+    for (let item of array) {
+      await this._mergeItem(item, get, set);
+    }
   }
 
   async _mergeItemWithConflicts(remoteItem, get, add, resolve) {
