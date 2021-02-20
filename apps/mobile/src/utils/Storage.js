@@ -4,13 +4,11 @@ import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
 import {generateSecureRandom} from 'react-native-securerandom';
 import {MMKV} from './mmkv';
 import Sodium from 'react-native-sodium';
-import * as Keychain from "react-native-keychain";
+import * as Keychain from 'react-native-keychain';
 
 let RNFetchBlob;
 async function read(key, isArray = false) {
-  //let per = performance.now();
   let data = await MMKV.getItem(key);
-  //console.log("[INIT S1]",key + "_key", performance.now() - per);
   if (!data) return null;
   data = JSON.parse(data);
   return data;
@@ -50,56 +48,48 @@ async function clear() {
   return await MMKV.clearStore();
 }
 
-async function encrypt(password, data, _compress) {
+async function encrypt(password, data) {
   let message = {
-    type: _compress ? 'b64' : 'plain',
-    data: _compress ? compress(data) : data,
+    type: 'plain',
+    data: data,
   };
   let result = await Sodium.encrypt(password, message);
 
   return {
     ...result,
-    alg: getAlgorithm(7, _compress ? 1 : 0),
+    alg: getAlgorithm(7),
   };
 }
 
-function getAlgorithm(base64Variant, _compress) {
-  return `xcha-argon2i13-${_compress}-${base64Variant}`;
+function getAlgorithm(base64Variant) {
+  return `xcha-argon2i13-${base64Variant}`;
 }
 
 async function decrypt(password, data) {
-  let algorithm = parseAlgorithm(data.alg);
-
-  data.output = algorithm.isCompress ? 'b64' : 'plain';
-  let result = await Sodium.decrypt(password, data);
-
-  if (algorithm.isCompress) {
-    return decompress(result);
-  }
-  return result;
+  data.output = 'plain';
+  return await Sodium.decrypt(password, data);
 }
 
 function parseAlgorithm(alg) {
   if (!alg) return {};
-  const [enc, kdf, compressed, base64variant] = alg.split('-');
+  const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split('-');
   return {
     encryptionAlgorithm: enc,
     kdfAlgorithm: kdf,
+    compressionAlgorithm: compressionAlg,
     isCompress: compressed === '1',
     base64_variant: base64variant,
   };
 }
 
 let CRYPT_CONFIG = Platform.select({
-    ios: {
-      accessible:Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    },
-    android: {},
-  });
+  ios: {
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  },
+  android: {},
+});
 
 async function deriveCryptoKey(name, data) {
-
-
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
     await Keychain.setInternetCredentials(
@@ -113,7 +103,6 @@ async function deriveCryptoKey(name, data) {
 }
 
 async function getCryptoKey(name) {
-
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
       let credentials = await Keychain.getInternetCredentials(
@@ -128,7 +117,6 @@ async function getCryptoKey(name) {
 }
 
 async function removeCryptoKey(name) {
-
   try {
     let result = await Keychain.resetInternetCredentials('notesnook');
     return result;
@@ -183,31 +171,31 @@ async function checkAndCreateDir(path) {
 async function hash(password, email) {
   return await Sodium.hashPassword(password, email);
 }
-
-let lzutf8;
-
+/* 
 function compress(data) {
-  if (!lzutf8) {
-    lzutf8 = require('lzutf8');
-  }
-  return lzutf8.compress(data, {
-    blockSize: 64 * 64 * 1024,
-    outputEncoding: 'Base64',
-    inputEncoding: 'String',
-  });
+  return urlEncode(base64.fromByteArray(pako.gzip(data)));
 }
 
 function decompress(data) {
-  if (!lzutf8) {
-    lzutf8 = require('lzutf8');
-  }
-  return lzutf8.decompress(data, {
-    blockSize: 64 * 64 * 1024,
-    inputEncoding: 'Base64',
-    outputEncoding: 'String',
+  console.log(data);
+  return pako.ungzip(base64.toByteArray(urlDecode(data)),{
+    to:"string"
   });
 }
 
+
+
+var urlEncode = function(encoded) {
+  return encoded.replace('+', '-').replace('/', '_').replace(/=+$/, '');
+};
+
+var urlDecode = function(encoded) {
+  encoded = encoded.replace('-', '+').replace('_', '/');
+  while (encoded.length % 4)
+    encoded += '=';
+  return encoded;
+};
+ */
 export default {
   read,
   write,
