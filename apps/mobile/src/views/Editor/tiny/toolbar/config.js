@@ -95,7 +95,6 @@ export const TOOLBAR_CONFIG = [
       format: 'h2',
       type: 'format',
       showTitle: false,
-      premium: true,
       fullname: 'Heading 2',
     },
     {
@@ -110,7 +109,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Paragraph',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Paragraph',
         },
         {
@@ -118,7 +116,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Heading 2',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Heading 2',
         },
         {
@@ -126,7 +123,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Heading 3',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Heading 3',
         },
         {
@@ -134,7 +130,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Heading 4',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Heading 4',
         },
         {
@@ -142,7 +137,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Heading 5',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Heading 5',
         },
         {
@@ -150,7 +144,6 @@ export const TOOLBAR_CONFIG = [
           text: 'Heading 6',
           type: 'format',
           showTitle: false,
-          premium: true,
           fullname: 'Heading 6',
         },
       ],
@@ -192,7 +185,6 @@ export const TOOLBAR_CONFIG = [
     },
   ],
   [
-   
     {
       format: 'hilitecolor',
       type: 'tooltip',
@@ -234,7 +226,6 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       groupType: 'link',
       fullname: 'Link',
-      premium: true,
       group: [
         {
           format: 'link',
@@ -281,6 +272,7 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       fullname: 'Table',
       groupType: 'table',
+      premium: true,
     },
   ],
   [
@@ -298,7 +290,7 @@ export const TOOLBAR_CONFIG = [
       premium: true,
     },
   ],
- 
+
   [
     {
       format: 'ltr',
