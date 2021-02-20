@@ -1,6 +1,7 @@
 import {createDrawerNavigator} from '@react-navigation/drawer';
 import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
+import {View} from 'react-native';
 import {State} from 'react-native-gesture-handler';
 import {Menu} from '../components/Menu';
 import {useTracked} from '../provider';
@@ -27,12 +28,21 @@ const onStateChange = (state) => {
   }
 };
 
+const onNavigatorStateChange = (e) => {
+  if (e.history.find((i) => i.type === 'drawer')) {
+    changeContainerScale(ContainerScale, 0.95, 250);
+    changeContainerScale(DrawerScale, 1, 250);
+  } else {
+    changeContainerScale(DrawerScale, 0.95, 250);
+    changeContainerScale(ContainerScale, 1, 250);
+  }
+}
+
 export const NavigationStack = ({component = NavigatorStack}) => {
   const [state] = useTracked();
   const {deviceMode} = state;
   const [locked, setLocked] = React.useState(false);
-  const [initRender, setInitRender] = React.useState(true);
-
+  
   const setGestureDisabled = () => {
     setLocked(true);
   };
@@ -40,11 +50,6 @@ export const NavigationStack = ({component = NavigatorStack}) => {
   const setGestureEnabled = () => {
     if (locked) {
       setLocked(false);
-    }
-    if (initRender) {
-      sleep(300).then(() => {
-        setInitRender(false);
-      });
     }
   };
 
@@ -55,19 +60,11 @@ export const NavigationStack = ({component = NavigatorStack}) => {
       eUnSubscribeEvent(eOpenSideMenu, setGestureEnabled);
       eUnSubscribeEvent(eCloseSideMenu, setGestureDisabled);
     };
-  }, [locked, initRender]);
+  }, [locked]);
 
   return (
     <NavigationContainer
-      onStateChange={(c) => {
-        if (c.history.find((i) => i.type === 'drawer')) {
-          changeContainerScale(ContainerScale, 0.95, 250);
-          changeContainerScale(DrawerScale, 1, 250);
-        } else {
-          changeContainerScale(DrawerScale, 0.95, 250);
-          changeContainerScale(ContainerScale, 1, 250);
-        }
-      }}
+      onStateChange={onNavigatorStateChange}
       ref={sideMenuRef}>
       <Drawer.Navigator
         screenOptions={{
@@ -77,14 +74,16 @@ export const NavigationStack = ({component = NavigatorStack}) => {
         onStateChange={onStateChange}
         drawerStyle={{
           width: deviceMode !== 'mobile' ? 0 : '75%',
-          opacity: initRender ? 0 : 1,
           borderRightWidth: 0,
         }}
         edgeWidth={200}
         drawerType="slide"
         drawerContent={deviceMode !== 'mobile' ? () => <></> : DrawerComponent}
         initialRouteName="Main">
-        <Drawer.Screen name="Main" component={component} />
+        <Drawer.Screen
+          name="Main"
+          component={component}
+        />
       </Drawer.Navigator>
     </NavigationContainer>
   );
