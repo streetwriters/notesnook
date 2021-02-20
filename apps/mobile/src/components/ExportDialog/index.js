@@ -1,16 +1,16 @@
-import React, { Fragment, useEffect, useState } from 'react';
-import { Platform, StyleSheet, TouchableOpacity, View } from 'react-native';
+import React, {Fragment, useEffect, useState} from 'react';
+import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { ToastEvent } from '../../services/EventManager';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {ToastEvent} from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
-import { getElevation } from '../../utils';
-import { ph, pv, SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { GetPremium } from '../ActionSheetComponent/GetPremium';
+import {getElevation} from '../../utils';
+import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {GetPremium} from '../ActionSheetComponent/GetPremium';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
@@ -62,6 +62,7 @@ const ExportDialog = () => {
   const save = async (func, name) => {
     if (exporting) return;
     setExporting(true);
+    setComplete(false);
     let res;
     for (var i = 0; i < notes.length; i++) {
       let note = notes[i];
@@ -80,6 +81,7 @@ const ExportDialog = () => {
     );
 
     setResult(res);
+    setExporting(false);
     setComplete(true);
   };
 
@@ -90,7 +92,8 @@ const ExportDialog = () => {
         await save(Exporter.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
-      desc: 'Most commonly used, opens on any device.',
+      desc:
+        'Can be opened in any pdf reader like Adobe Acrobat or Foxit Reader',
       id: notesnook.ids.dialogs.export.pdf,
     },
     {
@@ -99,7 +102,7 @@ const ExportDialog = () => {
         await save(Exporter.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
-      desc: 'Most commonly used, opens on any device.',
+      desc: 'Can be opened in any plain-text or markdown editor',
       id: notesnook.ids.dialogs.export.md,
     },
     {
@@ -108,7 +111,7 @@ const ExportDialog = () => {
         await save(Exporter.saveToText, 'Text');
       },
       icon: 'card-text',
-      desc: 'A plain text file with no formatting.',
+      desc: 'Can be opened in any plain text editor',
       id: notesnook.ids.dialogs.export.text,
     },
     {
@@ -117,7 +120,7 @@ const ExportDialog = () => {
         await save(Exporter.saveToHTML, 'Html');
       },
       icon: 'language-html5',
-      desc: 'A file that can be opened in a browser.',
+      desc: 'Can be opened in any web browser like Google Chrome.',
       id: notesnook.ids.dialogs.export.html,
     },
   ];
@@ -141,7 +144,7 @@ const ExportDialog = () => {
           paragraph={
             exporting
               ? null
-              : 'Export your note in any of the following formats.'
+              : 'All exports are saved in Notesnook/exported folder in phone storage'
           }
         />
 
@@ -176,15 +179,19 @@ const ExportDialog = () => {
                     size={SIZE.xxxl}
                   />
                 </View>
-                <Heading
-                  style={{marginLeft: 5, maxWidth: '90%'}}
-                  size={SIZE.md}>
-                  {item.title}
-                  {'\n'}
-                  <Paragraph size={SIZE.sm} color={colors.icon}>
+                <View>
+                  <Heading
+                    style={{marginLeft: 5, maxWidth: '90%'}}
+                    size={SIZE.md}>
+                    {item.title}
+                  </Heading>
+                  <Paragraph
+                    style={{marginLeft: 5, maxWidth: '90%'}}
+                    size={SIZE.sm}
+                    color={colors.icon}>
                     {item.desc}
                   </Paragraph>
-                </Heading>
+                </View>
               </TouchableOpacity>
             </Fragment>
           ))}
@@ -206,16 +213,18 @@ const ExportDialog = () => {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true,
                       }).catch((e) => {
-                        //console.log(e);
-                        ToastEvent.show(
-                          `No application found to open ${result.name} file`,
-                        );
+                        ToastEvent.show({
+                          heading: 'Cannot open',
+                          message: `No application found to open ${result.name} file.`,
+                          type: 'success',
+                          context: 'local',
+                        });
                       });
                     }
                   : null
               }
               loading={exporting && !complete}
-              doneText={complete && 'Note Exported!'}
+              doneText={complete && 'Exported as ' + result.name}
             />
           </View>
         </View>
