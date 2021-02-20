@@ -23,7 +23,7 @@ PODS:
   - MMKV (1.2.7):
     - MMKVCore (~> 1.2.7)
   - MMKVCore (1.2.7)
-  - Permission-PhotoLibrary (2.2.2):
+  - Permission-PhotoLibrary (3.0.0):
     - RNPermissions
   - pop (1.0.12)
   - RCTRequired (0.63.4)
@@ -194,6 +194,8 @@ PODS:
   - React-jsinspector (0.63.4)
   - react-native-document-picker (4.1.1):
     - React-Core
+  - react-native-fingerprint-scanner (5.0.0):
+    - React-Core
   - react-native-get-random-values (1.5.0):
     - React
   - react-native-html-to-pdf-lite (0.9.1):
@@ -285,7 +287,7 @@ PODS:
     - React-Core
   - RNCMaskedView (0.1.10):
     - React
-  - RNDeviceInfo (6.2.1):
+  - RNDeviceInfo (8.0.0):
     - React-Core
   - RNExitApp (1.1.0):
     - React
@@ -295,9 +297,11 @@ PODS:
     - React-Core
   - RNIap (5.2.0):
     - React-Core
-  - RNKeychain (6.2.0):
+  - RNInAppBrowser (3.5.1):
     - React-Core
-  - RNPermissions (2.2.2):
+  - RNKeychain (4.0.5):
+    - React
+  - RNPermissions (3.0.0):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
@@ -337,7 +341,7 @@ DEPENDENCIES:
   - Folly (from `../node_modules/react-native/third-party-podspecs/Folly.podspec`)
   - glog (from `../node_modules/react-native/third-party-podspecs/glog.podspec`)
   - MMKV
-  - Permission-PhotoLibrary (from `../node_modules/react-native-permissions/ios/PhotoLibrary.podspec`)
+  - Permission-PhotoLibrary (from `../node_modules/react-native-permissions/ios/PhotoLibrary/Permission-PhotoLibrary.podspec`)
   - RCTRequired (from `../node_modules/react-native/Libraries/RCTRequired`)
   - RCTTypeSafety (from `../node_modules/react-native/Libraries/TypeSafety`)
   - React (from `../node_modules/react-native/`)
@@ -351,6 +355,7 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
+  - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf-lite (from `../node_modules/react-native-html-to-pdf-lite`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
@@ -381,6 +386,7 @@ DEPENDENCIES:
   - RNFileViewer (from `../node_modules/react-native-file-viewer`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNIap (from `../node_modules/react-native-iap`)
+  - RNInAppBrowser (from `../node_modules/react-native-inappbrowser-reborn`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
   - RNPrivacySnapshot (from `../node_modules/react-native-privacy-snapshot`)
@@ -417,7 +423,7 @@ EXTERNAL SOURCES:
   glog:
     :podspec: "../node_modules/react-native/third-party-podspecs/glog.podspec"
   Permission-PhotoLibrary:
-    :path: "../node_modules/react-native-permissions/ios/PhotoLibrary.podspec"
+    :path: "../node_modules/react-native-permissions/ios/PhotoLibrary/Permission-PhotoLibrary.podspec"
   RCTRequired:
     :path: "../node_modules/react-native/Libraries/RCTRequired"
   RCTTypeSafety:
@@ -440,6 +446,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
+  react-native-fingerprint-scanner:
+    :path: "../node_modules/react-native-fingerprint-scanner"
   react-native-get-random-values:
     :path: "../node_modules/react-native-get-random-values"
   react-native-html-to-pdf-lite:
@@ -500,6 +508,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNIap:
     :path: "../node_modules/react-native-iap"
+  RNInAppBrowser:
+    :path: "../node_modules/react-native-inappbrowser-reborn"
   RNKeychain:
     :path: "../node_modules/react-native-keychain"
   RNPermissions:
@@ -544,7 +554,7 @@ SPEC CHECKSUMS:
   glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
   MMKV: 22e5136f7d00197bc0fc9694b7f71519f0d1ca12
   MMKVCore: 607b7b05f2c2140056b5d338e45f2c14bf3f4232
-  Permission-PhotoLibrary: 8227a6ed9f6a971537afe63742d54f5f23a38fe2
+  Permission-PhotoLibrary: cb9cdc1e3744e26ab404297a8e289d50c8ee27e8
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCTRequired: 082f10cd3f905d6c124597fd1c14f6f2655ff65e
   RCTTypeSafety: 8c9c544ecbf20337d069e4ae7fd9a377aadf504b
@@ -557,6 +567,7 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 93bd528844ad21dc07aab1c67cb10abae6df6949
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
+  react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
@@ -582,13 +593,14 @@ SPEC CHECKSUMS:
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCCheckbox: 80ee60cd2e67b46986e8e244db520655372deab4
   RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
-  RNDeviceInfo: 9b6aba9ffaed69ecb72bd13c7bcb0debf277bc9f
+  RNDeviceInfo: 87d2d175c760f6bcf58acd036f887e8b2392802c
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
   RNIap: 64d7d32ba6edde36921858399433c9ca0a5245e6
-  RNKeychain: 612de9918c1170d51094404616fd49b2818176f9
-  RNPermissions: 5df468064df661a4c8c017e2791ce90d7695eea5
+  RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
+  RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
+  RNPermissions: 99dd8d4a30ff13509b949ca63cd1f69edc461775
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
   RNScreens: 45c457af3d2ee9e08fc01e70da87e653d46b1198
@@ -603,6 +615,6 @@ SPEC CHECKSUMS:
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
 
-PODFILE CHECKSUM: 221f4e1fcc0976630135f88e7c95ccec5cc28b8e
+PODFILE CHECKSUM: f0ade2eb6953463d4a2ddff2196b3727eee679f6
 
-COCOAPODS: 1.10.0
+COCOAPODS: 1.10.1

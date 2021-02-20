@@ -6,7 +6,7 @@ platform :ios, '10.0'
 permissions_path = '../node_modules/react-native-permissions/ios'
 
 pod 'Base64'
-pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary.podspec"
+pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary/Permission-PhotoLibrary.podspec"
 pod 'SexyTooltip',:git => 'https://github.com/prscX/SexyTooltip.git'
 pod 'RNTooltips', :path => '../node_modules/react-native-tooltips/ios'
 
