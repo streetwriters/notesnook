@@ -1,9 +1,9 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
-import Crypto from "./crypto";
+import NNCrypto from "./nncrypto";
 
-const crypto = new Crypto();
+const crypto = new NNCrypto();
 extendPrototype(localforage);
 
 localforage.config({

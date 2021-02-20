@@ -1,4 +1,4 @@
-class CryptoWorker {
+export default class NNCryptoWorker {
   constructor() {
     this.isReady = false;
     this.initializing = false;
@@ -88,99 +88,5 @@ class CryptoWorker {
 
   hashPassword = (password, userId) => {
     return this._communicate("hashPassword", { password, userId });
-  };
-}
-
-const NCrypto =
-  "Worker" in window || "Worker" in global ? CryptoWorker : Crypto;
-export default NCrypto;
-
-function loadScript(url) {
-  return new Promise((resolve) => {
-    // adding the script tag to the head as suggested before
-    var head = document.getElementsByTagName("head")[0];
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src = url;
-
-    // then bind the event to the callback function
-    // there are several events for cross browser compatibility
-    script.onreadystatechange = resolve;
-    script.onload = resolve;
-
-    // fire the loading
-    head.appendChild(script);
-  });
-}
-
-/**
- *
- * @param {string} alg
- */
-function parseAlgorithm(alg) {
-  if (!alg) return {};
-  const [enc, kdf, compressed, compressionAlg, base64variant] = alg.split("-");
-  return {
-    encryptionAlgorithm: enc,
-    kdfAlgorithm: kdf,
-    isCompressed: compressed === "1",
-    compressionAlgorithm: compressionAlg,
-    base64_variant: base64variant,
-  };
-}
-
-class Crypto {
-  isReady = false;
-  constructor() {
-    this.sodium = undefined;
-  }
-  async _initialize() {
-    if (this.isReady) return;
-    return new Promise(async (resolve) => {
-      window.sodium = {
-        onload: (_sodium) => {
-          if (this.isReady) return;
-          this.isReady = true;
-          this.sodium = _sodium;
-          loadScript("/crypto.worker.js").then(resolve);
-        },
-      };
-      await loadScript("sodium.js");
-    });
-  }
-
-  /**
-   *
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string} plainData - the plaintext data
-   * @param {boolean}
-   */
-  encrypt = async (passwordOrKey, plainData) => {
-    await this._initialize();
-    return global.ncrypto.encrypt.call(this, passwordOrKey, {
-      type: "plain",
-      data: plainData,
-    });
-  };
-
-  /**
-   *
-   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
-   */
-  decrypt = async (passwordOrKey, cipherData) => {
-    await this._initialize();
-    cipherData.output = "text";
-    return global.ncrypto.decrypt.call(this, passwordOrKey, cipherData);
-  };
-
-  deriveKey = async (password, salt, exportKey = false) => {
-    await this._initialize();
-    return global.ncrypto.deriveKey.call(this, password, salt, exportKey);
-  };
-
-  hashPassword = async (password, userId) => {
-    await this._initialize();
-    return global.ncrypto.hashPassword.call(this, password, userId);
   };
 }

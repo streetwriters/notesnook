@@ -238,7 +238,7 @@ const webCryptoPolyfill = (seed, sodium) => {
   self.crypto = crypto;
 };
 
-function getAlgorithm(base64Variant, compress) {
-  //Template: encryptionAlgorithm-kdfAlgorithm-compressionFlag-base64variant
-  return `xcha-argon2i13-${compress}-none-${base64Variant}`;
+function getAlgorithm(base64Variant) {
+  //Template: encryptionAlgorithm-kdfAlgorithm-base64variant
+  return `xcha-argon2i13-${base64Variant}`;
 }
