@@ -19,6 +19,7 @@
     "immer": "^8.0.1",
     "localforage": "^1.7.3",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
+    "notes-core": "npm:@streetwriters/notesnook-core@latest",
     "print-js": "^1.6.0",
     "qclone": "^1.0.4",
     "react": "^17.0.1",
