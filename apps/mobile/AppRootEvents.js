@@ -124,6 +124,7 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
 
+    
       return () => {
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
@@ -277,6 +278,7 @@ export const AppRootEvents = React.memo(
         await db.sync(false);
         dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       } catch (e) {
+        dispatch({type: Actions.SYNCING, syncing: false});
       } finally {
         dispatch({type: Actions.SYNCING, syncing: false});
       }
@@ -287,6 +289,7 @@ export const AppRootEvents = React.memo(
       dispatch({type: Actions.CLEAR_ALL});
       dispatch({type: Actions.SYNCING, syncing: false});
       setLoginMessage(dispatch);
+      await sleep(500);
       await PremiumService.setPremiumStatus();
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
@@ -297,7 +300,7 @@ export const AppRootEvents = React.memo(
           eSendEvent(eOpenLoginDialog);
         },
         icon: 'logout',
-        actionText: 'Relogin',
+        actionText: 'Login',
         noProgress: true,
       });
     };
@@ -316,6 +319,7 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async () => {
       try {
         let user = await db.user.fetchUser(true);
+
         if (user) {
           attachIAPListeners();
           clearMessage(dispatch);
@@ -325,6 +329,7 @@ export const AppRootEvents = React.memo(
             setEmailVerifyMessage(dispatch);
             return;
           }
+          console.log("RUNNING SYNC")
           await Sync.run();
         } else {
           await PremiumService.setPremiumStatus();
@@ -354,7 +359,13 @@ export const AppRootEvents = React.memo(
 
     const onSubscriptionError = async (error) => {
       console.log('IAP ERROR', error);
-      ToastEvent.show(error.message, 'error', 'local');
+      ToastEvent.show({
+        heading: 'Failed to subscribe',
+        type: 'error',
+        message: error.message,
+        context: 'local',
+      });
+
       if (Platform.OS === 'ios') {
         await RNIap.clearTransactionIOS();
       }
@@ -365,7 +376,7 @@ export const AppRootEvents = React.memo(
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
           if (!user) return;
-          fetch('http://192.168.10.7:6264/apple/verify', {
+          fetch('https://payments.streetwriters.co/apple/verify', {
             method: 'POST',
             body: JSON.stringify({
               receipt_data: receipt,
