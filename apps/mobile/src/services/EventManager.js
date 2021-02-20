@@ -23,8 +23,8 @@ export const eSendEvent = (eventName, data) => {
  * @typedef {Object} vaultType
  * @property {Object} item
  * @property {boolean} novault
-* @property {string} title
-* @property {string} description
+ * @property {string} title
+ * @property {string} description
  * @property {boolean} locked
  * @property {boolean} permanant
  * @property {boolean} goToEditor
@@ -54,38 +54,31 @@ export function sendNoteEditedEvent(data) {
 }
 
 export const ToastEvent = {
-  show: (
-    message,
-    type = 'error',
-    context = 'global',
-    duration = 3000,
-    func = null,
-    actionText = '',
-  ) => {
+  /**
+   * @typedef {Object} event
+   * @property {string} heading
+   * @property {string} message
+   * @property {"global" | "local"} context
+   * @property {"error" | "success"} type
+   * @property {number} duration
+   * @property {function} func
+   * @property {string} actionText
+   *
+   * @param {event} data
+   */
+  show: (data) =>
     eSendEvent(eShowToast, {
-      message,
-      type,
-      context,
-      duration,
-      func,
-      actionText,
-    });
-  },
-  hide: (
-    message,
-    type = 'error',
-    context = 'global',
-    duration = 3000,
-    func = null,
-    actionText = '',
-  ) => {
-    eSendEvent(eHideToast, {
-      message,
-      type,
-      context,
-      duration,
-      func,
-      actionText,
-    });
-  },
+      heading: data.heading,
+      message: data.message,
+      type: data.type || 'error',
+      context: data.context || 'global',
+      duration: data.duration || 3000,
+      func: data.func || null,
+      actionText: data.actionText || null,
+    }),
+  hide: () => eSendEvent(eHideToast),
 };
+
+/*
+
+*/
