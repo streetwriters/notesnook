@@ -7,9 +7,9 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import * as Keychain from 'react-native-keychain';
 import {enabled} from 'react-native-privacy-snapshot';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
@@ -69,7 +69,7 @@ import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {timeConverter} from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -140,13 +140,21 @@ export const Settings = ({navigation}) => {
 
   const otherItems = [
     {
-      name: 'Privacy Policy',
+      name: 'Terms of service',
       func: async () => {
-        openLinkInBrowser('https://www.notesnook.com/privacy.html', colors)
-          .catch((e) => ToastEvent.show(e.message, 'error'))
-          .then((r) => {
-            console.log('closed');
-          });
+        try {
+          await openLinkInBrowser('https://notesnook.com/tos', colors);
+        } catch (e) {}
+      },
+      desc: 'Read our terms of service',
+    },
+
+    {
+      name: 'Privacy policy',
+      func: async () => {
+        try {
+          await openLinkInBrowser('https://notesnook.com/privacy', colors);
+        } catch (e) {}
       },
       desc: 'Read our privacy policy',
     },
@@ -155,7 +163,11 @@ export const Settings = ({navigation}) => {
       func: async () => {
         if (!version) return;
         if (version.mobile <= APP_VERSION) {
-          ToastEvent.show('You are using the latest version', 'success');
+          ToastEvent.show({
+            heading: 'No new updates',
+            type: 'success',
+            message: 'You are using the latest version',
+          });
           return;
         }
         eSendEvent('updateDialog', version);
@@ -167,7 +179,7 @@ export const Settings = ({navigation}) => {
           : 'You are using the latest version',
     },
     {
-      name: 'Join our Discord Community',
+      name: 'Join our Discord community',
 
       func: async () => {
         eSendEvent(eOpenProgressDialog, {
@@ -184,11 +196,9 @@ export const Settings = ({navigation}) => {
           noProgress: true,
           icon: 'discord',
           action: async () => {
-            openLinkInBrowser('https://discord.gg/zQBK97EE22', colors)
-              .catch((e) => ToastEvent.show(e.message, 'error'))
-              .then((r) => {
-                console.log('closed');
-              });
+            try {
+              await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
+            } catch (e) {}
           },
           actionText: 'Join Now',
         });
@@ -196,13 +206,11 @@ export const Settings = ({navigation}) => {
       desc: 'We are not ghosts, chat with us and share your experience.',
     },
     {
-      name: 'About',
+      name: 'About Notesnook',
       func: async () => {
-        openLinkInBrowser('https://www.notesnook.com', colors)
-          .catch((e) => ToastEvent.show(e.message, 'error'))
-          .then((r) => {
-            console.log('closed');
-          });
+        try {
+          await openLinkInBrowser('https://notesnook.com', colors);
+        } catch (e) {}
       },
       desc: format(APP_VERSION),
     },
@@ -280,10 +288,37 @@ const AccoutLogoutSection = () => {
   const {colors, user} = state;
   const [visible, setVisible] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   return (
     user && (
       <>
+        {loading && (
+          <BaseDialog visible={true}>
+            <View
+              style={{
+                width: '100%',
+                height: '100%',
+                backgroundColor: colors.bg,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Heading color={colors.pri} size={SIZE.md}>
+                Logging out
+              </Heading>
+              <View
+                style={{
+                  flexDirection: 'row',
+                  height: 10,
+                  width: 100,
+                  marginTop: 15,
+                }}>
+                <AnimatedProgress fill={colors.accent} total={8} current={8} />
+              </View>
+            </View>
+          </BaseDialog>
+        )}
+
         {visible && (
           <BaseDialog visible={true}>
             <DialogContainer>
@@ -296,8 +331,12 @@ const AccoutLogoutSection = () => {
                 negativeTitle="Cancel"
                 onPressNegative={() => setVisible(false)}
                 onPressPositive={async () => {
-                  await db.user.logout();
                   setVisible(false);
+                  setLoading(true);
+                  await sleep(10);
+                  await db.user.logout();
+                  await sleep(10);
+                  setLoading(false);
                 }}
               />
             </DialogContainer>
@@ -344,17 +383,22 @@ const AccoutLogoutSection = () => {
                 <Button
                   onPress={async () => {
                     if (!passwordValue) {
-                      ToastEvent.show(
-                        'Account Password Required.',
-                        'error',
-                        'local',
-                      );
+                      ToastEvent.show({
+                        heading: 'Account Password is required',
+                        type: 'error',
+                        context: 'local',
+                      });
                       return;
                     }
                     try {
                       await db.user.deleteUser(passwordValue);
                     } catch (e) {
-                      ToastEvent.show(e.message, 'error', 'local');
+                      ToastEvent.show({
+                        heading: 'Failed to delete account',
+                        message: e.message,
+                        type: 'error',
+                        context: 'local',
+                      });
                     }
                     close();
                   }}
@@ -673,38 +717,38 @@ const SettingsUserSection = () => {
               </View>
 
               {user?.subscription?.provider &&
-                SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
-                  <Button
-                    title={
-                      SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
-                    }
-                    onPress={() => {
-                      eSendEvent(eOpenProgressDialog, {
-                        title:
-                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                            .title,
-                        paragraph:
-                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                            .desc,
-                        noProgress: true,
-                        icon:
-                          SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                            .icon,
-                      });
-                    }}
-                    style={{
-                      alignSelf: 'flex-end',
-                      marginTop: 10,
-                      borderRadius: 3,
-                    }}
-                    fontSize={11}
-                    textStyle={{
-                      fontWeight: 'normal',
-                    }}
-                    height={20}
-                    type="accent"
-                  />
-                )  : null}
+              SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
+                <Button
+                  title={
+                    SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
+                  }
+                  onPress={() => {
+                    eSendEvent(eOpenProgressDialog, {
+                      title:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .title,
+                      paragraph:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .desc,
+                      noProgress: true,
+                      icon:
+                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
+                          .icon,
+                    });
+                  }}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginTop: 10,
+                    borderRadius: 3,
+                  }}
+                  fontSize={11}
+                  textStyle={{
+                    fontWeight: 'normal',
+                  }}
+                  height={20}
+                  type="accent"
+                />
+              ) : null}
             </View>
           </View>
           {[
@@ -933,6 +977,11 @@ const SettingsAppearanceSection = () => {
                   onPress={async () => {
                     menuRef.current?.hide();
                     await SettingsService.set('homepage', item.name);
+                    ToastEvent.show({
+                      heading: 'Homepage set to ' + item.name,
+                      message: 'Restart the app for changes to take effect.',
+                      type: 'success',
+                    });
                   }}
                   style={{
                     backgroundColor:
@@ -1192,9 +1241,13 @@ const SettingsBackupAndRestore = () => {
                     if (Platform.OS === 'android') {
                       let granted = await Storage.requestPermission();
                       if (!granted) {
-                        ToastEvent.show(
-                          'You must give storage access to enable auto backups.',
-                        );
+                        ToastEvent.show({
+                          heading: 'Could not enable auto backups',
+                          message:
+                            'You must give storage access to enable auto backups.',
+                          type: 'error',
+                          context: 'local',
+                        });
                         return;
                       }
                     }
@@ -1227,16 +1280,14 @@ const SettingsBackupAndRestore = () => {
         tagline="Encrypt all your backups."
         onPress={async () => {
           if (!user) {
-            ToastEvent.show(
-              'You must login to enable encryption',
-              'error',
-              'global',
-              6000,
-              () => {
+            ToastEvent.show({
+              heading: 'Login required to enable encryption',
+              type: 'error',
+              func: () => {
                 eSendEvent(eOpenLoginDialog);
               },
-              'Login',
-            );
+              actionText: 'Login',
+            });
             return;
           }
           await SettingsService.set(
