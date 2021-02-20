@@ -1,10 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Linking, View} from 'react-native';
-import {eSendEvent} from '../../../../services/EventManager';
+import {TextInput, View} from 'react-native';
 import {Button} from '../../../../components/Button';
-import Input from '../../../../components/Input';
 import {useTracked} from '../../../../provider';
+import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
+import {normalize, SIZE} from '../../../../utils/SizeUtils';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -13,10 +15,6 @@ import {
   properties,
 } from './constants';
 import LinkPreview from './linkpreview';
-import tiny from '../tiny';
-import {EditorWebView} from '../../Functions';
-import {openLinkInBrowser} from '../../../../utils/functions';
-import {normalize, SIZE} from '../../../../utils/SizeUtils';
 
 let inputValue = null;
 
@@ -34,6 +32,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       inputRef.current?.focus();
       tiny.call(EditorWebView, tiny.restoreRange);
     }
+    inputValue = value;
     properties.inputMode = value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING;
     editing.tooltip = format;
     properties.userBlur = false;
@@ -49,6 +48,18 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     };
   }, [format]);
 
+  useEffect(() => {
+    if (value && mode === INPUT_MODE.EDITING) {
+      if (properties.pauseSelectionChange) {
+        setTimeout(() => {
+          properties.pauseSelectionChange = false;
+        }, 100);
+      }
+      inputRef.current?.focus();
+      return;
+    }
+  }, [mode]);
+
   const onChangeText = (value) => {
     inputValue = value;
   };
@@ -60,23 +71,14 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     properties.userBlur = true;
     if (inputValue === '' || !inputValue) {
       formatSelection(execCommands.unlink);
+      setVisible(false);
     } else {
       formatSelection(execCommands[format](inputValue));
     }
-    tiny.call(EditorWebView, tiny.restoreRange + tiny.clearRange);
-
-    setVisible(false);
     editing.tooltip = null;
+    setMode(INPUT_MODE.NO_EDIT);
     focusEditor(format);
     properties.userBlur = false;
-  };
-
-  const onPress = async () => {
-    openLinkInBrowser(value, colors)
-      .catch((e) => ToastEvent.show(e.message, 'error'))
-      .then((r) => {
-        console.log('closed');
-      });
   };
 
   const onBlur = async () => {
@@ -101,26 +103,32 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
       ) : (
         <>
-          <Input
-            fwdRef={inputRef}
-            onBlurInput={onBlur}
-            onPress={onPress}
-            height={normalize(45) }
+          <TextInput
+            ref={inputRef}
+            onBlur={onBlur}
+            style={{
+              height: normalize(50),
+              color: colors.pri,
+              zIndex: 10,
+              flexGrow: 1,
+            }}
+            autoCapitalize="none"
+            autoCorrect={false}
             onSubmit={onSubmit}
             onChangeText={onChangeText}
             defaultValue={value}
             blurOnSubmit={false}
-            loading={mode === INPUT_MODE.NO_EDIT}
             placeholder="Enter link"
+            placeholderTextColor={colors.nav}
           />
 
           {mode === INPUT_MODE.EDITING && (
             <Button
               title="Save"
               onPress={onSubmit}
-              height={normalize(40) }
+              height={normalize(40)}
               fontSize={SIZE.md}
-              style={{marginLeft: 10}}
+              style={{marginLeft: 10, paddingHorizontal: 12}}
             />
           )}
         </>

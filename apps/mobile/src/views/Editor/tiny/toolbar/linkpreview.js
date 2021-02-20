@@ -1,19 +1,18 @@
-import {getLinkPreview} from 'link-preview-js';
-import React, {useEffect, useState} from 'react';
-import {Image, View} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import { getLinkPreview } from 'link-preview-js';
+import React, { useEffect, useState } from 'react';
+import { Image, ScrollView, View } from 'react-native';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../../../components/Button';
+import { ActionIcon } from '../../../../components/ActionIcon';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
-import {useTracked} from '../../../../provider';
-import {ToastEvent} from '../../../../services/EventManager';
-import {openLinkInBrowser} from '../../../../utils/functions';
-import {SIZE} from '../../../../utils/SizeUtils';
-import {INPUT_MODE, properties} from './constants';
+import { useTracked } from '../../../../provider';
+import { openLinkInBrowser } from '../../../../utils/functions';
+import { SIZE } from '../../../../utils/SizeUtils';
+import { INPUT_MODE, properties } from './constants';
 
 let prevLink = {};
-let prevHeight = 65;
+let prevHeight = 50;
 const LinkPreview = ({setMode, value, onSubmit}) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -50,14 +49,16 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           marginVertical: 5,
           borderWidth: 1,
           borderColor: colors.nav,
+          backgroundColor: colors.nav,
         }}
-        resizeMode="cover"
+        resizeMode="center"
         source={{uri: imageLink}}
       />
     ) : faviconLink ? (
       <View
         style={{
           borderColor: colors.nav,
+          backgroundColor: colors.nav,
           borderWidth: 1,
           marginVertical: 5,
           borderRadius: 5,
@@ -82,14 +83,14 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           backgroundColor: colors.shade,
           borderRadius: 5,
         }}>
-        <Icon size={40} color={colors.accent} name="web" />
+        <Icon size={height - 4} color={colors.accent} name="web" />
       </View>
     );
   };
 
   const openLink = () => {
     openLinkInBrowser(value, colors)
-      .catch((e) => ToastEvent.show(e.message, 'error'))
+      .catch((e) => {})
       .then((r) => {
         console.log('closed');
       });
@@ -106,56 +107,26 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           flex: 1,
         }}>
         <TouchableOpacity onPress={openLink} activeOpacity={1}>
-          <Heading
-            numberOfLines={1}
-            style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-            size={SIZE.sm}>
-            {name ? name + ': ' + title : title ? title : 'Web Link'}
-          </Heading>
-
-          <Paragraph
-            style={{flexWrap: 'wrap', maxWidth: '90%', paddingLeft: 5}}
-            numberOfLines={2}
-            color={colors.icon}
-            size={SIZE.xs}>
-            {description ? description : link?.value ? link.value : value}
-          </Paragraph>
-
-          <View
+          <ScrollView
             style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              width: '100%',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Button
-                onPress={() => {
-                  setMode(INPUT_MODE.EDITING);
-                  properties.inputMode = INPUT_MODE.EDITING;
-                }}
-                style={{
-                  paddingHorizontal: 6,
-                }}
-                height={25}
-                fontSize={SIZE.sm}
-                title="Edit"
-              />
-              <Button
-                type="errorShade"
-                onPress={() => {
-                  onSubmit('clear');
-                }}
-                height={25}
-                fontSize={SIZE.sm}
-                title="Remove"
-              />
-            </View>
-          </View>
+              marginRight: 10,
+            }}
+            horizontal
+            showsHorizontalScrollIndicator={false}>
+            <Heading numberOfLines={1} style={{paddingLeft: 5}} size={SIZE.sm}>
+              {name ? name + ': ' + title : title ? title : 'Web Link'}
+            </Heading>
+          </ScrollView>
+
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <Paragraph
+              style={{flexWrap: 'wrap', paddingLeft: 5}}
+              numberOfLines={1}
+              color={colors.icon}
+              size={SIZE.xs}>
+              {description ? description : link?.value ? link.value : value}
+            </Paragraph>
+          </ScrollView>
         </TouchableOpacity>
       </View>
     );
@@ -166,12 +137,40 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
       {renderImage(link.image, link.favicon)}
       {renderText(link.name, link.title, link.description)}
 
-      <Button
-        type="shade"
-        title="Visit"
-        icon="open-in-new"
-        onPress={openLink}
-      />
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <ActionIcon
+          onPress={() => {
+            onSubmit('clear');
+          }}
+          customStyle={{
+            width: 40,
+            marginHorizontal: 10,
+            height: 40,
+          }}
+          name="delete"
+          size={SIZE.xl}
+          color={colors.pri}
+        />
+        <ActionIcon
+          onPress={async () => {
+            properties.pauseSelectionChange = true;
+            setMode(INPUT_MODE.EDITING);
+            properties.inputMode = INPUT_MODE.EDITING;
+          }}
+          customStyle={{
+            width: 40,
+            marginHorizontal: 10,
+            height: 40,
+          }}
+          name="pencil"
+          size={SIZE.xl}
+          color={colors.pri}
+        />
+      </View>
     </>
   );
 };
