@@ -14,8 +14,10 @@ import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
@@ -135,8 +137,17 @@ export class AddNotebookDialog extends React.Component {
     let {topics} = this.state;
     let edit = this.props.toEdit;
 
-    if (!this.title || this.title?.trim().length === 0)
-      return ToastEvent.show('Notebook title is required', 'error', 'local');
+    if (!this.title || this.title?.trim().length === 0) {
+      ToastEvent.show({
+        heading: 'Notebook title is required',
+        type: 'error',
+        context: 'local',
+      });
+      this.setState({
+        loading: false,
+      });
+      return;
+    }
 
     let id = edit && edit.id ? edit.id : null;
 
@@ -191,8 +202,16 @@ export class AddNotebookDialog extends React.Component {
         id: id,
       });
     }
+    updateEvent({type: Actions.MENU_PINS});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.Notebooks,
+      Navigation.routeNames.Notebook,
+      Navigation.routeNames.NotesPage,
+    ]);
+    this.setState({
+      loading: false,
+    });
     this.close();
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
   };
 
   onSubmit = (forward = true) => {
@@ -242,13 +261,7 @@ export class AddNotebookDialog extends React.Component {
 
   render() {
     const {colors, toEdit} = this.props;
-    const {
-      titleFocused,
-      descFocused,
-      topics,
-      visible,
-      topicInputFocused,
-    } = this.state;
+    const {topics, visible, topicInputFocused} = this.state;
     if (!visible) return null;
     return (
       <Modal
@@ -256,8 +269,9 @@ export class AddNotebookDialog extends React.Component {
         transparent={true}
         animated
         animationType={DDS.isTab ? 'fade' : 'slide'}
-        onShow={() => {
+        onShow={async () => {
           this.topicsToDelete = [];
+          await sleep(300);
           this.titleRef?.focus();
         }}
         onRequestClose={this.close}>

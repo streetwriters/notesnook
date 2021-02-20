@@ -24,7 +24,8 @@ import {
   eShowGetPremium,
   eThemeUpdated,
 } from '../../utils/Events';
-import { EditorSettings } from '../../views/Editor/EditorSettings';
+import { sleep } from '../../utils/TimeUtils';
+import {EditorSettings} from '../../views/Editor/EditorSettings';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {AddNotebookDialog} from '../AddNotebookDialog';
@@ -118,13 +119,13 @@ export class DialogManager extends Component {
     }
   };
 
-  showAddTopic = (notebook) => {
-    if (notebook) {
-      this.setState({
-        item: notebook,
-      });
-    }
-    this.addTopicsDialog.open();
+  showAddTopic = () => {
+    let item = this.state.item;
+    console.log(item);
+    this.addTopicsDialog.open({
+      notebookId: item?.type !== 'topic' ? item.id : item.notebookId,
+      toEdit:item?.type === 'topic' ? item : null,
+    });
   };
 
   hideAddTopic = () => {
@@ -152,8 +153,6 @@ export class DialogManager extends Component {
 
     eSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
-
-
 
     eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
     eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
@@ -204,7 +203,7 @@ export class DialogManager extends Component {
   showAddNotebook = (data) => {
     this.setState(
       {
-        item: data.item ? data.item : {},
+        item: data.item ? data.item : data.type === "notebook" ? data : {},
       },
       () => {
         this.addNotebooksDialog.open();
@@ -239,8 +238,8 @@ export class DialogManager extends Component {
               novault: true,
               locked: true,
               deleteNote: true,
-              title:'Delete note',
-              description:"Unlock to delete note."
+              title: 'Delete note',
+              description: 'Unlock to delete note.',
             });
           } else {
             this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
@@ -255,8 +254,8 @@ export class DialogManager extends Component {
           openVault({
             item: this.state.item,
             novault: false,
-            title:'Create vault',
-            description:"Set a password to create a vault and lock note."
+            title: 'Create vault',
+            description: 'Set a password to create a vault and lock note.',
           });
           break;
         }
@@ -265,8 +264,8 @@ export class DialogManager extends Component {
             item: this.state.item,
             novault: true,
             locked: true,
-            title:'Open note',
-            description:"Unlock note to open in editor"
+            title: 'Lock note',
+            description: 'Give access to vault to lock this note.',
           });
           break;
         }
@@ -276,8 +275,8 @@ export class DialogManager extends Component {
             novault: true,
             locked: true,
             permanant: true,
-            title:'Unlock note',
-            description:"Remove note from the vault."
+            title: 'Unlock note',
+            description: 'Remove note from the vault.',
           });
           break;
         }
@@ -351,13 +350,10 @@ export class DialogManager extends Component {
         />
         <AddTopicDialog
           ref={(ref) => (this.addTopicsDialog = ref)}
-          toEdit={item?.type === 'topic' ? item : null}
-          notebookID={item?.type !== 'topic' ? item.id : item.notebookId}
           close={() => {
-            console.log("closing")
             this.setState({
-              item:{}
-            })
+              item: {},
+            });
           }}
           colors={colors}
         />
