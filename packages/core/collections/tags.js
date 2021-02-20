@@ -46,7 +46,7 @@ export default class Tags extends Collection {
 
   async remove(tagTitle, noteId) {
     if (!tagTitle || !noteId) new Error("tagTitle and noteId cannot be falsy.");
-    let tag = this.all.find((t) => t.title === tagTitle);
+    let tag = this.all.find((t) => t.title === tagTitle || t.id === tagTitle);
     if (!tag) throw new Error(`No tag with title "${tagTitle}" found.`);
     tag = qclone(tag);
     const noteIndex = tag.noteIds.indexOf(noteId);

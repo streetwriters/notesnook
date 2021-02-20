@@ -25,10 +25,10 @@ export default class Notes extends Collection {
 
     if (noteArg.remote || noteArg.migrated) {
       if (oldNote) {
-        if (oldNote.color !== noteArg.color) {
+        if (!!oldNote.color && oldNote.color !== noteArg.color) {
           await this._db.colors.remove(oldNote.color, id);
         }
-        if (oldNote.tags) {
+        if (!!oldNote.tags) {
           for (let tag of oldNote.tags) {
             await this._db.tags.remove(tag, id);
           }
