@@ -18,10 +18,7 @@ function TrashItem({ item, index }) {
       body={item.headline || item.description}
       index={index}
       footer={
-        <Flex
-          sx={{ fontSize: "subBody", color: "fontTertiary" }}
-          variant="rowCenter"
-        >
+        <Flex mt={1} sx={{ fontSize: "subBody", color: "fontTertiary" }}>
           <TimeAgo datetime={item.dateDeleted || item.dateCreated} />
           <Text as="span" mx={1}>
             •

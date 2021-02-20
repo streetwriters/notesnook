@@ -14,7 +14,11 @@ function Topic({ item, index, onClick }) {
       item={topic}
       onClick={onClick}
       title={topic.title}
-      footer={<Text variant="subBody">{topic.totalNotes} Notes</Text>}
+      footer={
+        <Text mt={1} variant="subBody">
+          {topic.totalNotes} Notes
+        </Text>
+      }
       index={index}
       menu={{
         items: topic.title === "General" ? generalTopicMenuItems : menuItems,
