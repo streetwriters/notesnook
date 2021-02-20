@@ -175,7 +175,7 @@ function NavigationMenu(props) {
                     },
                   },
                 ],
-                extraData: pin,
+                extraData: { pin },
               }}
               icon={
                 pin.type === "notebook"
