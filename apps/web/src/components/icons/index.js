@@ -42,14 +42,14 @@ function createIcon(name, rotate = false) {
 }
 
 export const Plus = createIcon(Icons.mdiPlus);
-export const Note = createIcon(Icons.mdiHomeOutline);
+export const Note = createIcon(Icons.mdiHomeVariantOutline);
 export const Minus = createIcon(Icons.mdiMinus);
-export const Notebook = createIcon(Icons.mdiNotebookOutline);
-export const Notebook2 = createIcon(Icons.mdiBookOpenOutline);
+export const Notebook = createIcon(Icons.mdiBookOutline);
+export const Notebook2 = createIcon(Icons.mdiBookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
 export const ArrowRight = createIcon(Icons.mdiArrowRight);
 export const Move = createIcon(Icons.mdiBookPlusMultipleOutline);
-export const Topic = createIcon(Icons.mdiBookmarkOutline);
+export const Topic = createIcon(Icons.mdiFormatTitle);
 export const Alert = createIcon(Icons.mdiAlert);
 export const Vault = createIcon(Icons.mdiShieldOutline);
 export const Unlock = createIcon(Icons.mdiLockOpenOutline);
@@ -79,13 +79,14 @@ export const Loading = createIcon(Icons.mdiLoading, true);
 export const Export = createIcon(Icons.mdiExportVariant);
 export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
 export const Expand = createIcon(Icons.mdiArrowExpandDown);
+export const Shortcut = createIcon(Icons.mdiArrowTopRightThick);
 
 /** Properties Icons */
 export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
 export const ChevronRight = createIcon(Icons.mdiChevronRight);
 export const Close = createIcon(Icons.mdiClose);
-export const Tag = createIcon(Icons.mdiTagMultipleOutline);
-export const Tag2 = createIcon(Icons.mdiTagOutline);
+export const Tag = createIcon(Icons.mdiPound);
+export const Tag2 = createIcon(Icons.mdiPound);
 export const Pin = createIcon(Icons.mdiPinOutline);
 export const PinFilled = createIcon(Icons.mdiPin);
 
