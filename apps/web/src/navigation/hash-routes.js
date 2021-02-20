@@ -63,7 +63,6 @@ const hashroutes = {
     );
   },
   "/notes/:noteId/unlock": ({ noteId }) => {
-    console.log("Unlocking", noteId);
     return (
       <RouteContainer
         buttons={{

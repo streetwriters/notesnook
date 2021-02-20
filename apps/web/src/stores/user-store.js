@@ -34,7 +34,6 @@ class UserStore extends BaseStore {
       });
       EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
-        console.log("USER UPGRAED", subscription);
         this.set((state) => (state.user.subscription = subscription));
       });
       EV.subscribe(EVENTS.userEmailConfirmed, async () => {
@@ -42,7 +41,9 @@ class UserStore extends BaseStore {
         window.location.reload();
       });
 
-      EV.subscribe(EVENTS.databaseSyncRequested, () => this.sync(false));
+      EV.subscribe(EVENTS.databaseSyncRequested, async () => {
+        await this.sync(false);
+      });
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
         this.set((state) => {
           state.user = {};

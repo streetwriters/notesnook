@@ -64,7 +64,6 @@ const routes = {
       type: "topic",
       value: { id: notebookId, topic: topicId },
     });
-    console.log(topic, notebook);
     return {
       key: "notes",
       type: "notes",

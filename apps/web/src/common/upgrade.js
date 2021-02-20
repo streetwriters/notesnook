@@ -48,7 +48,7 @@ async function upgrade(user) {
   });
 
   cart.cart.setCartLockedFlag(true);
-  cart.cart.checkout().then(console.log); // start checkout process
+  cart.cart.checkout(); // start checkout process
 }
 
 export { upgrade };

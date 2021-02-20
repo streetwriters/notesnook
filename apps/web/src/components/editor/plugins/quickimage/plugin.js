@@ -16,12 +16,10 @@ import tinymce from "tinymce/tinymce";
         if (!file) return null;
         var reader = new FileReader();
         reader.onload = function (e) {
-          console.log(e, reader);
           minifyImg(
             reader.result,
             600,
             (r) => {
-              console.log(r);
               var content = `<img src="${r}">`;
               editor.insertContent(content);
               reader.onerror = null;
