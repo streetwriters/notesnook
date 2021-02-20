@@ -5,12 +5,11 @@ import { Text } from "rebass";
 import { store as appStore } from "../../stores/app-store";
 import { db } from "../../common/db";
 
-const menuItems = (item) => [
+const menuItems = [
   {
-    title: db.settings.isPinned(item.id)
-      ? "Remove shortcut"
-      : "Create shortcut",
-    onClick: () => appStore.pinItemToMenu(item),
+    title: ({ tag }) =>
+      db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
+    onClick: ({ tag }) => appStore.pinItemToMenu(tag),
   },
 ];
 
@@ -23,7 +22,7 @@ function Tag({ item, index }) {
       index={index}
       title={<TagNode title={title} />}
       footer={<Text variant="subBody">{noteIds.length} notes</Text>}
-      menuItems={menuItems(item)}
+      menu={{ items: menuItems, extraData: { tag: item } }}
       onClick={() => {
         navigate(`/tags/${id}`);
       }}
