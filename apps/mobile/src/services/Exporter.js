@@ -3,6 +3,8 @@ import {db} from '../utils/DB';
 import {ToastEvent} from './EventManager';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
+import showdown from 'showdown';
+import jsdom from 'jsdom-jscore-rn';
 
 let RNFetchBlob;
 
@@ -11,14 +13,19 @@ async function saveToPDF(note) {
   if (Platform.OS === 'android') {
     let hasPermission = await Storage.requestPermission();
     if (!hasPermission) {
-      ToastEvent.show('Failed to get storage permission');
+      ToastEvent.show({
+        heading: 'Cannot export',
+        message: 'You must provide phone storage access to backup data.',
+        type: 'error',
+        context: 'local',
+      });
       return null;
     }
   }
-  
+
   await Storage.checkAndCreateDir('/exported/PDF/');
   let html = await db.notes.note(note).export('html');
-  let he = require("he");
+  let he = require('he');
   html = he.decode(html);
   let options = {
     html: html,
@@ -40,12 +47,24 @@ async function saveToMarkdown(note) {
   if (Platform.OS === 'android') {
     let hasPermission = await Storage.requestPermission();
     if (!hasPermission) {
-      ToastEvent.show('Failed to get storage permission');
+      ToastEvent.show({
+        heading: 'Cannot export',
+        message: 'You must provide phone storage access to backup data.',
+        type: 'error',
+        context: 'local',
+      });
       return null;
     }
   }
-  RNFetchBlob = require('rn-fetch-blob').default
-  let markdown = await db.notes.note(note.id).export('md');
+
+  RNFetchBlob = require('rn-fetch-blob').default;
+
+  let converter = new showdown.Converter();
+  let dom = jsdom.html();
+  let content = await db.notes.note(note.id).content();
+  let markdown = converter.makeMarkdown(content, dom);
+
+  markdown = await db.notes.note(note.id).export('md', markdown);
 
   path = path + note.title + '.md';
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
@@ -62,11 +81,16 @@ async function saveToText(note) {
   if (Platform.OS === 'android') {
     let hasPermission = await Storage.requestPermission();
     if (!hasPermission) {
-      ToastEvent.show('Failed to get storage permission');
+      ToastEvent.show({
+        heading: 'Cannot export',
+        message: 'You must provide phone storage access to backup data.',
+        type: 'error',
+        context: 'local',
+      });
       return null;
     }
   }
-  RNFetchBlob = require('rn-fetch-blob').default
+  RNFetchBlob = require('rn-fetch-blob').default;
   let text = await db.notes.note(note.id).export('txt');
   path = path + note.title + '.txt';
   await RNFetchBlob.fs.writeFile(path, text, 'utf8');
@@ -83,11 +107,16 @@ async function saveToHTML(note) {
   if (Platform.OS === 'android') {
     let hasPermission = await Storage.requestPermission();
     if (!hasPermission) {
-      ToastEvent.show('Failed to get storage permission');
+      ToastEvent.show({
+        heading: 'Cannot export',
+        message: 'You must provide phone storage access to backup data.',
+        type: 'error',
+        context: 'local',
+      });
       return null;
     }
   }
-  RNFetchBlob = require('rn-fetch-blob').default
+  RNFetchBlob = require('rn-fetch-blob').default;
   let html = await db.notes.note(note.id).export('html');
   path = path + note.title + '.html';
   await RNFetchBlob.fs.writeFile(path, html, 'utf8');
