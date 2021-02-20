@@ -50,8 +50,9 @@ export default class Note {
   /**
    *
    * @param {"html"|"md"|"txt"} format - Format to export into
+   * @param {string?} rawContent - Use this raw content instead of generating itself
    */
-  async export(to = "html") {
+  async export(to = "html", rawContent) {
     const templateData = {
       metadata: this.data,
       title: this.title,
@@ -66,13 +67,13 @@ export default class Note {
 
     switch (to) {
       case "html":
-        templateData.content = content.toHTML();
+        templateData.content = rawContent || content.toHTML();
         return HTMLBuilder.buildHTML(templateData);
       case "txt":
-        templateData.content = content.toTXT();
+        templateData.content = rawContent || content.toTXT();
         return TextBuilder.buildText(templateData);
       case "md":
-        templateData.content = content.toMD();
+        templateData.content = rawContent || content.toMD();
         return MarkdownBuilder.buildMarkdown(templateData);
       default:
         throw new Error("Export format not supported.");
