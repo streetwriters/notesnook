@@ -12,6 +12,7 @@ import * as Icon from "../components/icons";
 import download from "../utils/download";
 import { zip } from "../utils/zip";
 import Config from "../utils/config";
+import Dialogs from "../components/dialogs";
 
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
@@ -23,10 +24,8 @@ function showDialog(dialog) {
         hashNavigate("/", true);
         resolve(result);
       };
-      return import("../components/dialogs").then(({ default: Dialogs }) => {
-        const PropDialog = dialog(Dialogs, perform);
-        ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-      });
+      const PropDialog = dialog(Dialogs, perform);
+      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
     });
   }
   return Promise.reject("No element with id 'dialogContainer'");
