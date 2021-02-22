@@ -53,12 +53,13 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
-      if (!this.has(noteId) || !note || note.data.deleted || !note.notebooks)
-        return this;
+
+      if (!this.has(noteId) || !note || note.data.deleted) return this;
+
       let index = topic.notes.indexOf(noteId);
       topic.notes.splice(index, 1);
 
-      let array = note.notebooks;
+      let array = note.notebooks || [];
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
       if (notebookIndex === -1) break;
 
