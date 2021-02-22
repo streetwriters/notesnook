@@ -160,6 +160,10 @@ function TinyMCE(props) {
         span.diff-ins {
           background-color: #CAFFFB;  
         }
+
+        pre.codeblock {
+          overflow-x: auto;
+        }
 `,
         toolbar: simple
           ? false
