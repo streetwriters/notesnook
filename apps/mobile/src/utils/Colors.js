@@ -24,7 +24,7 @@ const fixedColors = {
   fg: ACCENT.color,
   normal: 'black',
   icon: 'gray',
-  transGray:"#00000010",
+  transGray: '#00000010',
   errorBg: '#FFB6C1',
   errorText: '#ff6961',
   successBg: '#DFF2BF',
@@ -102,4 +102,15 @@ export function setAccentColor(color) {
   ACCENT.shade = color + '12';
 
   return ACCENT;
+}
+
+export function updateStatusBarColor() {
+  StatusBar.setBarStyle(
+    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
+    true,
+  );
+  if (Platform.OS === 'android') {
+    StatusBar.setBackgroundColor('transparent', true);
+    StatusBar.setTranslucent(true, true);
+  }
 }

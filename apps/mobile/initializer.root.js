@@ -1,39 +1,41 @@
 import {
   activateKeepAwake,
-  deactivateKeepAwake
+  deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
-import React, { useCallback, useEffect, useState } from 'react';
-import { Dimensions, View } from 'react-native';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Dimensions, View} from 'react-native';
 import ScrollableTabView from 'react-native-scrollable-tab-view';
-import { notesnook } from './e2e/test.ids';
+import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
-import { DialogManager } from './src/components/DialogManager';
-import { DummyText } from './src/components/DummyText';
-import { Menu } from './src/components/Menu';
+import {DialogManager} from './src/components/DialogManager';
+import {DummyText} from './src/components/DummyText';
+import {Menu} from './src/components/Menu';
 import Splash from './src/components/SplashScreen';
-import { Toast } from './src/components/Toast';
-import { NavigationStack } from './src/navigation/Drawer';
-import { NavigatorStack } from './src/navigation/NavigatorStack';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { DDS } from './src/services/DeviceDetection';
+import {Toast} from './src/components/Toast';
+import {NavigationStack} from './src/navigation/Drawer';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
-import { editing, setWidthHeight } from './src/utils';
+import {editing, setWidthHeight} from './src/utils';
+import {updateStatusBarColor} from './src/utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eCloseSideMenu,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenSideMenu
+  eOpenSideMenu,
 } from './src/utils/Events';
-import { editorRef, tabBarRef } from './src/utils/Refs';
-import { EditorWrapper } from './src/views/Editor/EditorWrapper';
-import { EditorWebView, getNote } from './src/views/Editor/Functions';
+import {editorRef, tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {EditorWrapper} from './src/views/Editor/EditorWrapper';
+import {EditorWebView, getNote} from './src/views/Editor/Functions';
 import tiny from './src/views/Editor/tiny/tiny';
 let {width, height} = Dimensions.get('window');
 let layoutTimer = null;
@@ -51,13 +53,17 @@ const onChangeTab = async (obj) => {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }
+    sleep(1000).then(() => {
+      updateStatusBarColor();
+    });
   } else {
     if (obj.from === 1) {
+      updateStatusBarColor();
       deactivateKeepAwake();
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
-      eSendEvent("showTooltip");
+      eSendEvent('showTooltip');
       editing.movedAway = true;
       tiny.call(EditorWebView, tiny.blur);
     }
@@ -182,7 +188,6 @@ const AppStack = React.memo(
       let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
-        
         DDS.setSize(size);
         //console.log(deviceMode, 'MODE__');
         dispatch({type: Actions.DEVICE_MODE, state: deviceMode});

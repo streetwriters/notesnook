@@ -109,6 +109,7 @@ const Overlay = ({onLoad}) => {
     });
     setOpacity(false);
     await sleep(150);
+    eSendEvent(eOpenSideMenu);
     Animated.timing(opacityV, {
       toValue: 0,
       duration: 150,

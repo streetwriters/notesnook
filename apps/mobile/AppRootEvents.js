@@ -19,7 +19,7 @@ import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
 import {APP_VERSION, editing} from './src/utils';
-import {COLOR_SCHEME} from './src/utils/Colors';
+import {COLOR_SCHEME, updateStatusBarColor} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
   eClearEditor,
@@ -36,16 +36,6 @@ let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
 
-function updateStatusBarColor() {
-  StatusBar.setBarStyle(
-    COLOR_SCHEME.night ? 'light-content' : 'dark-content',
-    true,
-  );
-  if (Platform.OS === 'android') {
-    StatusBar.setBackgroundColor('transparent', true);
-    StatusBar.setTranslucent(true, true);
-  }
-}
 
 async function storeAppState() {
   if (editing.currentlyEditing) {
