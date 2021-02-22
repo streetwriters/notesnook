@@ -72,7 +72,7 @@ export const Menu = React.memo(
             borderRadius: 10,
             transform: [
               {
-                scale: DrawerScale,
+                scale:deviceMode !== 'mobile' ? 1 : DrawerScale,
               },
             ],
           }}>
