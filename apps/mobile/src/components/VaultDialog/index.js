@@ -22,6 +22,7 @@ import Navigation from '../../services/Navigation';
 import {getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
 import {
+  eClearEditor,
   eCloseActionSheet,
   eCloseVaultDialog,
   eOnLoadNote,
@@ -31,6 +32,7 @@ import {deleteItems} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
 import {ph, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import { getNote } from '../../views/Editor/Functions';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -321,7 +323,11 @@ export class VaultDialog extends Component {
       });
       return;
     } else {
+
       db.vault.add(this.state.note.id).then((e) => {
+        if (this.state.note.id === getNote().id) {
+          eSendEvent(eClearEditor);
+        }
         this.close();
       });
     }
@@ -406,6 +412,9 @@ export class VaultDialog extends Component {
     }
     if (this.state.note && this.state.note.id && !this.state.note.locked) {
       await db.vault.add(this.state.note.id);
+      if (this.state.note.id === getNote().id) {
+        eSendEvent(eClearEditor);
+      }
       this.setState({
         loading: false,
       });
