@@ -68,7 +68,7 @@ export const HeaderTitle = () => {
   return (
     <Animated.View
       style={{
-        opacity: DDS.isLargeTablet() ? 1 : opacity,
+        opacity: DDS.isTab ? 1 : opacity,
       }}>
       <Heading color={headerTextState?.color}>
         <Heading color={colors.accent}>
