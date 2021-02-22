@@ -21,8 +21,8 @@
     "test": "jest"
   },
   "dependencies": {
-    "fast-fuzzy": "^1.10.8",
     "fast-sort": "^2.0.1",
+    "fuzzysort": "^1.1.4",
     "lean-he": "^2.1.2",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",

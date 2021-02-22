@@ -1,4 +1,4 @@
-import { search } from "fast-fuzzy";
+import * as fuzzysort from "fuzzysort";
 import { qclone } from "qclone";
 import { getContentFromData } from "../content-types";
 
@@ -26,23 +26,11 @@ export default class Lookup {
       }
       return note;
     });
-    return search(query, candidates, {
-      keySelector: (item) => [item.title, item.content],
-      ignoreCase: false,
-    });
+    return fzs(query, candidates, ["title", "content"]);
   }
 
   notebooks(array, query) {
-    return search(query, array, {
-      keySelector: (item) => {
-        return [
-          item.title,
-          item.description || "",
-          ...item.topics.map((t) => t.title),
-        ];
-      },
-      ignoreCase: true,
-    });
+    return fzs(query, array, ["title", "description"]);
   }
 
   topics(array, query) {
@@ -58,9 +46,12 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return search(query, array, {
-      keySelector: (item) => item.title || "",
-      ignoreCase: true,
-    });
+    return fzs(query, array, ["title"]);
   }
+}
+
+function fzs(query, array, fields) {
+  return fuzzysort
+    .go(query, array, { allowTypo: true, keys: fields })
+    .map((result) => result.obj);
 }

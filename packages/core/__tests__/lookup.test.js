@@ -52,8 +52,8 @@ test("search notes with an empty note", () =>
 test("search notebooks", () =>
   notebookTest().then(async ({ db }) => {
     await db.notebooks.add(TEST_NOTEBOOK2);
-    let filtered = db.lookup.notebooks(db.notebooks.all, "hello");
-    expect(filtered.length).toBe(1);
+    let filtered = db.lookup.notebooks(db.notebooks.all, "Description");
+    expect(filtered.length).toBeGreaterThan(0);
   }));
 
 test("search topics", () =>
