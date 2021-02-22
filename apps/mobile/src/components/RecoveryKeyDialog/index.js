@@ -9,6 +9,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import { db } from '../../utils/DB';
 import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
@@ -150,13 +151,13 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   onOpen = async () => {
-    //let k = await db.user.getEncryptionKey();
-    // this.user = await db.user.getUser();
-    // if (k) {
-    //   this.setState({
-    //     key: k.key,
-    //   });
-    // }
+    let k = await db.user.getEncryptionKey();
+    this.user = await db.user.getUser();
+    if (k) {
+      this.setState({
+        key: k.key,
+      });
+    }
   };
 
   shareFile = async () => {
@@ -275,7 +276,7 @@ class RecoveryKeyDialog extends React.Component {
 
           <Button
             onPress={this.shareFile}
-            title="Save to Cloud"
+            title="Share to Cloud"
             width="100%"
             type="accent"
             fontSize={SIZE.md}
