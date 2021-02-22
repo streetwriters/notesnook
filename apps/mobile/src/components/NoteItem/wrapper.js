@@ -65,7 +65,7 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
 
     if (note.locked) {
       openVault({
-        item: item,
+        item: note,
         novault: true,
         locked: true,
         goToEditor: true,
