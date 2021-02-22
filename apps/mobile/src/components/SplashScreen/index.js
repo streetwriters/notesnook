@@ -205,6 +205,7 @@ const SplashScreen = () => {
                             fontWeight: 'normal',
                             textAlign: 'center',
                             alignSelf: 'center',
+                            maxWidth:"80%"
                           }}>
                           {item.description}
                         </Paragraph>
