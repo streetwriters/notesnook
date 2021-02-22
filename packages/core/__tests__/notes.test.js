@@ -63,6 +63,18 @@ test("note without a title should get title from content", () =>
     expect(note.title).toBe("HelloThis is colorful");
   }));
 
+test("note should get headline from content", () =>
+  noteTest({
+    ...TEST_NOTE,
+    content: {
+      type: TEST_NOTE.content.type,
+      data: "<p>This is a very colorful existence.</p>",
+    },
+  }).then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    expect(note.headline).toBe("This is a very colorful existence.");
+  }));
+
 test("note title should allow trailing space", () =>
   noteTest({ title: "Hello ", content: TEST_NOTE.content }).then(
     async ({ db, id }) => {

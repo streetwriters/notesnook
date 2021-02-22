@@ -61,13 +61,15 @@ export default Tiny;
 function getHeadlineFromText(text) {
   for (var i = 0; i < text.length; ++i) {
     const char = text[i];
+    const nextChar = text[i + 1];
     if (
       char === "\n" ||
       char === "\t" ||
       char === "\r" ||
-      char === "." ||
+      (char === "." && nextChar === " ") ||
       i >= 120
     ) {
+      if (char === ".") ++i;
       return text.substring(0, i);
     }
   }
