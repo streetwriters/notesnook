@@ -38,7 +38,7 @@ let noteEdited = false;
 let note = null;
 let id = null;
 let content = {
-  data: "",
+  data: '',
   type: 'tiny',
 };
 let title = '';
@@ -155,9 +155,9 @@ function clearNote() {
   note = null;
   title = '';
   noteEdited = false;
-  id = null;r
+  id = null;
   content = {
-    data: "",
+    data: '',
     type: 'tiny',
   };
 }
@@ -169,18 +169,16 @@ let webviewTimer = null;
 export const loadNote = async (item) => {
   editing.currentlyEditing = true;
   tiny.call(EditorWebView, tiny.blur);
-
   if (item && item.type === 'new') {
     await clearEditor();
     clearNote();
     noteEdited = false;
     id = null;
     await sleep(20);
-
     if (Platform.OS === 'android') {
       textInput.current?.focus();
-      tiny.call(EditorWebView, tiny.focusEditor);
       EditorWebView.current?.requestFocus();
+      tiny.call(EditorWebView, tiny.focusEditor);
     } else {
       tiny.call(EditorWebView, tiny.focusEditor);
     }
@@ -260,7 +258,7 @@ export const _onMessage = async (evt) => {
       onNoteChange();
       break;
     case 'title':
-      console.log("TITLE",message.value);
+      console.log('TITLE', message.value);
       noteEdited = true;
       title = message.value;
       eSendEvent('editorScroll', {
@@ -455,7 +453,7 @@ export async function saveNote() {
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } catch (e) {
-    console.log(e,'error in saving');
+    console.log(e, 'error in saving');
   }
 }
 
