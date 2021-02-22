@@ -106,6 +106,7 @@ const Overlay = ({onLoad}) => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
       dispatch({type: Actions.LOADING, loading: false});
+      eSendEvent(eOpenSideMenu);
     });
     setOpacity(false);
     await sleep(150);
