@@ -100,7 +100,6 @@ const onChange = (event) => {
   window.prevContent = editor.getContent();
   
   if (isLoading) {
-    window.prevContent = editor.getContent();
     isLoading = false;
     return;
   }

@@ -36,7 +36,7 @@ function attachTitleInputListeners() {
     onTitleChange();
   };
 
-  titleInput.onkeypress = function (evt) {
+  document.getElementById('titleInput').onkeypress = function (evt) {
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
       if (tinymce.activeEditor) {
@@ -49,7 +49,7 @@ function attachTitleInputListeners() {
     }
   };
 
-  titleInput.addEventListener('focus', function (evt) {
+  document.getElementById('titleInput').addEventListener('focus', function (evt) {
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
@@ -60,20 +60,19 @@ function attachTitleInputListeners() {
     }
   });
 
-  titleInput.onkeydown = function (evt) {
-    onTitleChange(evt);
-  };
 
-  titleInput.onchange = function (evt) {
+  document.getElementById('titleInput').onchange = function (evt) {
     autosize();
   };
-  titleInput.onkeyup = function (evt) {
+  document.getElementById('titleInput').onkeyup = function (evt) {
     onTitleChange(evt);
   };
 }
 
 function onTitleChange(ele) {
-  if (isLoading) return;
+  if (isLoading) {
+    return;
+  }
   let titleMessage = {
     type: 'title',
     value: titleInput.value,
@@ -95,7 +94,7 @@ function onTitleChange(ele) {
 
 function autosize() {
   let ele = document.getElementById('textCopy');
-  ele.innerHTML = titleInput.value.replace(/\n/g, '<br/>');
+  ele.innerHTML = document.getElementById('titleInput').value.replace(/\n/g, '<br/>');
   let newHeight = document.getElementById('titlebar').scrollHeight;
   let css = document.createElement('style');
   css.type = 'text/css';
