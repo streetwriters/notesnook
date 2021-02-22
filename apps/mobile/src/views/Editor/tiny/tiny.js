@@ -99,6 +99,10 @@ const isLoading = `
 isLoading = true;
 `;
 
+const notLoading = `
+isLoading = false;
+`;
+
 const html = (value) => `
 isLoading = true;
 tinymce.activeEditor.mode.set("readonly")
@@ -167,4 +171,5 @@ export default {
   setTitle,
   restoreRange,
   isLoading,
+  notLoading
 };
