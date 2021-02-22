@@ -98,10 +98,14 @@ export default class Sync {
     // check for conflicts and throw
     // await this._db.conflicts.check();
 
-    // update our lastSynced time
-    if (serverResponse.lastSynced) {
-      await this._db.context.write("lastSynced", serverResponse.lastSynced);
-    }
+    // TODO test this.
+    // we won't be updating lastSynced time here because
+    // it can cause the lastSynced time to move ahead of any
+    // last edited (but unsynced) time resulting in edited notes
+    // not getting synced.
+    // if (serverResponse.lastSynced) {
+    //   await this._db.context.write("lastSynced", serverResponse.lastSynced);
+    // }
   }
 
   async _send(data, token) {
