@@ -101,6 +101,9 @@ const onAppStateChanged = async (state) => {
       await MMKV.removeItem('appState');
     }
   } else {
+    if (getNote().locked) {
+      eSendEvent(eClearEditor);
+    }
     await storeAppState();
     if (SettingsService.get().privacyScreen) {
       enabled(true);
@@ -124,7 +127,6 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
 
-    
       return () => {
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
@@ -144,7 +146,7 @@ export const AppRootEvents = React.memo(
 
     const onNoteRemoved = async (id) => {
       try {
-        console.log("removing note");
+        console.log('removing note');
         await db.notes.remove(id);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Favorites,
@@ -329,7 +331,7 @@ export const AppRootEvents = React.memo(
             setEmailVerifyMessage(dispatch);
             return;
           }
-          console.log("RUNNING SYNC")
+          console.log('RUNNING SYNC');
           await Sync.run();
         } else {
           await PremiumService.setPremiumStatus();

@@ -32,7 +32,7 @@ import {deleteItems} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
 import {ph, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import { getNote } from '../../views/Editor/Functions';
+import {getNote} from '../../views/Editor/Functions';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
@@ -141,6 +141,7 @@ export class VaultDialog extends Component {
     if (biometry) {
       available = true;
     }
+
     this.setState({
       note: data.item,
       novault: data.novault,
@@ -321,15 +322,18 @@ export class VaultDialog extends Component {
         type: 'error',
         context: 'local',
       });
+      console.log('returning from here');
       return;
     } else {
-
-      db.vault.add(this.state.note.id).then((e) => {
-        if (this.state.note.id === getNote().id) {
-          eSendEvent(eClearEditor);
-        }
-        this.close();
+      await db.vault.add(this.state.note.id);
+      if (this.state.note.id === getNote().id) {
+        eSendEvent(eClearEditor);
+      }
+      this.close();
+      this.setState({
+        loading: false,
       });
+   
     }
   }
 
@@ -499,7 +503,7 @@ export class VaultDialog extends Component {
         wrongPassword: true,
       });
       return;
-    } 
+    }
   }
 
   _revokeFingerprintAccess = async () => {
@@ -511,7 +515,6 @@ export class VaultDialog extends Component {
         type: 'success',
         context: 'local',
       });
-
     } catch (e) {
       ToastEvent.show({
         title: e.message,
@@ -564,7 +567,8 @@ export class VaultDialog extends Component {
     if (!visible) return null;
     return (
       <BaseDialog
-        onShow={() => {
+        onShow={async () => {
+          await sleep(300);
           passInputRef.current?.focus();
         }}
         statusBarTranslucent={false}
