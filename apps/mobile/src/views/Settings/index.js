@@ -891,9 +891,13 @@ const SettingsAppearanceSection = () => {
               marginHorizontal: 5,
               width: DDS.isLargeTablet()
                 ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
+                : DDS.isSmallTab
+                ? (dWidth * 0.5 - 24 - 6 * 12) / 6
                 : (dWidth - 24 - 6 * 12) / 6,
               height: DDS.isLargeTablet()
                 ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
+                : DDS.isSmallTab
+                ? (dWidth * 0.5 - 24 - 6 * 12) / 6
                 : (dWidth - 24 - 6 * 12) / 6,
               borderRadius: 100,
             }}>
