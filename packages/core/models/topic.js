@@ -24,7 +24,6 @@ export default class Topic {
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
       if (this.has(noteId) || !note || note.data.deleted) continue;
-      topic.notes.push(noteId);
 
       let array = note.notebooks || [];
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
@@ -43,6 +42,8 @@ export default class Topic {
         id: noteId,
         notebooks: array,
       });
+
+      topic.notes.push(noteId);
       topic.totalNotes++;
     }
     return await this._save(topic);
@@ -59,10 +60,10 @@ export default class Topic {
 
       let array = note.notebooks;
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
-      if (notebookIndex === -1) return;
+      if (notebookIndex === -1) break;
 
       const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
-      if (topicIndex === -1) return;
+      if (topicIndex === -1) break;
 
       array[notebookIndex].topics.splice(topicIndex, 1);
       if (array[notebookIndex].topics.length <= 0)
