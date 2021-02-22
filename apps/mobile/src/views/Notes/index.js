@@ -100,6 +100,7 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const setActionAfterFirstSave = () => {
+    console.log('setting action after first save',params);
     if (params.type === 'tag') {
       editing.actionAfterFirstSave = {
         type: 'tag',
@@ -123,8 +124,9 @@ export const Notes = ({route, navigation}) => {
     if (data) {
       setLocalLoad(true);
       params = data;
-      setActionAfterFirstSave();
+ 
     }
+    setActionAfterFirstSave();
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions(data ? 500 : 1);
@@ -213,7 +215,6 @@ export const Notes = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     setActionAfterFirstSave();
-
     if (DDS.isPhone || DDS.isSmallTab) {
       tabBarRef.current?.goToPage(1);
     } else {
