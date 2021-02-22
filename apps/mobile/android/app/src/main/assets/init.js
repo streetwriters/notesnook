@@ -40,6 +40,9 @@ function init_tiny(size) {
     span.diff-ins {
       background-color: #CAFFFB;  
     }
+    pre.codeblock {
+      overflow-x:auto;
+    }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
