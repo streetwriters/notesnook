@@ -68,9 +68,6 @@ function init_tiny(size) {
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
-      editor.on('blur', () => {
-        reactNativeEventHandler('focus', null);
-      });
       editor.on('SetContent', (event) => {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
