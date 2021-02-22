@@ -1,23 +1,20 @@
-import { createRef } from 'react';
-import { Platform } from 'react-native';
-import { updateEvent } from '../../components/DialogManager/recievers';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, sendNoteEditedEvent } from '../../services/EventManager';
+import {createRef} from 'react';
+import {Platform} from 'react-native';
+import {updateEvent} from '../../components/DialogManager/recievers';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
-import {
-  eOnLoadNote,
-  eShowGetPremium
-} from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {editing} from '../../utils';
+import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eShowGetPremium} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
@@ -41,7 +38,7 @@ let noteEdited = false;
 let note = null;
 let id = null;
 let content = {
-  data: [],
+  data: "",
   type: 'tiny',
 };
 let title = '';
@@ -158,9 +155,9 @@ function clearNote() {
   note = null;
   title = '';
   noteEdited = false;
-  id = null;
+  id = null;r
   content = {
-    data: [],
+    data: "",
     type: 'tiny',
   };
 }
@@ -179,6 +176,7 @@ export const loadNote = async (item) => {
     noteEdited = false;
     id = null;
     await sleep(20);
+
     if (Platform.OS === 'android') {
       textInput.current?.focus();
       tiny.call(EditorWebView, tiny.focusEditor);
@@ -189,19 +187,19 @@ export const loadNote = async (item) => {
     if (!webviewInit) {
       EditorWebView.current?.reload();
     }
+    tiny.call(EditorWebView, tiny.notLoading);
   } else {
     if (id === item.id) {
       return;
     }
     eSendEvent('loadingNote', item);
-
     editing.isFocused = false;
     clearTimer();
     await setNote(item);
     sendNoteEditedEvent({
       id: id,
     });
-   
+
     if (webviewInit) {
       await loadNoteInEditor();
     } else {
@@ -262,6 +260,7 @@ export const _onMessage = async (evt) => {
       onNoteChange();
       break;
     case 'title':
+      console.log("TITLE",message.value);
       noteEdited = true;
       title = message.value;
       eSendEvent('editorScroll', {
@@ -273,6 +272,7 @@ export const _onMessage = async (evt) => {
       eSendEvent('editorScroll', message);
       break;
     case 'noteLoaded':
+      tiny.call(EditorWebView, tiny.notLoading);
       eSendEvent('loadingNote');
       break;
     case 'premium':
@@ -293,13 +293,12 @@ export const _onMessage = async (evt) => {
       webviewInit = true;
       webviewOK = true;
       loadNoteInEditor();
-
       break;
     case 'running':
       webviewOK = true;
       break;
     case 'focus':
-      console.log('focus gained',message.value);
+      console.log('focus gained', message.value);
       editing.focusType = message.value;
       break;
     case 'selectionchange':
@@ -414,7 +413,7 @@ export async function saveNote() {
       clearNote();
       return;
     }
-    console.log('saving note is called here')
+    console.log('saving note is called here');
     let locked = id ? db.notes.note(id).data.locked : null;
 
     let noteData = {
@@ -425,6 +424,8 @@ export async function saveNote() {
       },
       id: id,
     };
+
+    console.log(noteData);
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
@@ -454,7 +455,7 @@ export async function saveNote() {
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } catch (e) {
-    console.log(e);
+    console.log(e,'error in saving');
   }
 }
 
@@ -489,14 +490,14 @@ const loadNoteInEditor = async () => {
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
     tiny.call(EditorWebView, tiny.html(content.data));
-   setColors();
+    setColors();
     tiny.call(
       EditorWebView,
-     tiny.updateDateEdited(timeConverter(note.dateEdited)),
+      tiny.updateDateEdited(timeConverter(note.dateEdited)),
     );
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } else {
     await restoreEditorState();
   }
- tiny.call(EditorWebView, tiny.clearHistory);
+  tiny.call(EditorWebView, tiny.clearHistory);
 };
