@@ -54,6 +54,15 @@ test("lock a note", () =>
     expect(content.data.cipher).toBeDefined();
   }));
 
+test("locked note is not favorited", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+    const note = db.notes.note(id);
+
+    expect(note.data.favorite).toBeFalsy();
+  }));
+
 test("unlock a note", () =>
   noteTest().then(async ({ db, id }) => {
     await db.vault.create("password");

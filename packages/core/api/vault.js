@@ -184,9 +184,9 @@ export default class Vault {
     let { id, content: { type, data } = {}, contentId } = note;
 
     if (!data || !type || !contentId) {
-      note = this._db.notes.note(id);
-      if (note.data.locked) return;
-      contentId = note.data.contentId;
+      note = this._db.notes.note(id).data;
+      if (note.locked) return;
+      contentId = note.contentId;
       let content = await this._db.content.raw(contentId);
       data = content.data;
       type = content.type;
