@@ -8375,7 +8375,7 @@ normalize-url@^3.0.0:
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
 notes-core@../notes-core:
-  version "6.6.0"
+  version "6.6.1"
   dependencies:
     fast-fuzzy "^1.10.8"
     fast-sort "^2.0.1"
@@ -8387,8 +8387,8 @@ notes-core@../notes-core:
     turndown "^7.0.0"
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "6.6.0"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#2d2f08ecfdd1e1cb9f1ba11619dd5457efb75200"
+  version "6.6.1"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#5476c67cb9e3b5f8aaa475f7d31755ca386bf79d"
   dependencies:
     fast-fuzzy "^1.10.8"
     fast-sort "^2.0.1"
