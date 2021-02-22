@@ -5779,6 +5779,11 @@ functional-red-black-tree@^1.0.1:
   resolved "https://registry.yarnpkg.com/functional-red-black-tree/-/functional-red-black-tree-1.0.1.tgz#1b0ab3bd553b2a0d6399d29c0e3ea0b252078327"
   integrity sha1-GwqzvVU7Kg1jmdKcDj6gslIHgyc=
 
+fuzzysort@^1.1.4:
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/fuzzysort/-/fuzzysort-1.1.4.tgz#a0510206ed44532cbb52cf797bf5a3cb12acd4ba"
+  integrity sha512-JzK/lHjVZ6joAg3OnCjylwYXYVjRiwTY6Yb25LvfpJHK8bjisfnZJ5bY8aVWwTwCXgxPNgLAtmHL+Hs5q1ddLQ==
+
 gensync@^1.0.0-beta.1:
   version "1.0.0-beta.2"
   resolved "https://registry.yarnpkg.com/gensync/-/gensync-1.0.0-beta.2.tgz#32a6ee76c3d7f52d46b2b1ae5d93fea8580a25e0"
@@ -8374,24 +8379,12 @@ normalize-url@^3.0.0:
   resolved "https://registry.yarnpkg.com/normalize-url/-/normalize-url-3.3.0.tgz#b2e1c4dc4f7c6d57743df733a4f5978d18650559"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
 
-notes-core@../notes-core:
-  version "6.6.1"
-  dependencies:
-    fast-fuzzy "^1.10.8"
-    fast-sort "^2.0.1"
-    lean-he "^2.1.2"
-    no-internet "^1.5.2"
-    qclone "^1.0.4"
-    quill-delta-to-html "^0.12.0"
-    spark-md5 "^3.0.1"
-    turndown "^7.0.0"
-
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
-  version "6.6.1"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#5476c67cb9e3b5f8aaa475f7d31755ca386bf79d"
+  version "6.6.2"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#8e70cfac7ad5d18c794e148d7e62cf41bef921a5"
   dependencies:
-    fast-fuzzy "^1.10.8"
     fast-sort "^2.0.1"
+    fuzzysort "^1.1.4"
     lean-he "^2.1.2"
     no-internet "^1.5.2"
     qclone "^1.0.4"
