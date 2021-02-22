@@ -180,11 +180,11 @@ class MoveDialog extends React.Component {
                       action={
                         this._topicHasNotes(topic, props.noteIds) ? (
                           <Text color="error" fontSize="body">
-                            Remove from
+                            Remove note
                           </Text>
                         ) : (
                           <Text color="primary" fontSize="body">
-                            Add to
+                            Add note
                           </Text>
                         )
                       }

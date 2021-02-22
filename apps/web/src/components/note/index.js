@@ -163,7 +163,7 @@ const menuItems = [
   },
   {
     key: "addtonotebook",
-    title: () => "Add to notebook",
+    title: () => "Add to notebook(s)",
     onClick: async ({ note }) => {
       await showMoveNoteDialog([note.id]);
     },
