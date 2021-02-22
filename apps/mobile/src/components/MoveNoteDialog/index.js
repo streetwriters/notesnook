@@ -6,7 +6,6 @@ import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   sendNoteEditedEvent,
@@ -14,17 +13,12 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {
-  eOnNewTopicAdded,
-  eOpenMoveNoteDialog,
-  refreshNotesPage,
-} from '../../utils/Events';
+import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -84,7 +78,7 @@ export default MoveNoteDialog;
 
 const MoveNoteComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectedItemsList} = state;
+  const {colors, selectedItemsList, notebooks} = state;
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
@@ -105,7 +99,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     });
     notebookInput.current?.clear();
     notebookInput.current?.blur();
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
+    dispatch({type: Actions.NOTEBOOKS});
   };
 
   const addNewTopic = async () => {
@@ -117,7 +111,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       });
     }
     await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
+    dispatch({type: Actions.NOTEBOOKS});
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
@@ -144,7 +138,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           forced: true,
         });
       }
-      Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
+      dispatch({type: Actions.NOTEBOOKS});
 
       return;
     }
@@ -167,7 +161,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
         forced: true,
       });
     }
-    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks]);
+    dispatch({type: Actions.NOTEBOOKS});
   };
 
   return (
@@ -208,7 +202,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           }}
           keyboardShouldPersistTaps="always"
           keyboardDismissMode="none"
-          data={state.notebooks}
+          data={notebooks}
           ListFooterComponent={
             <View
               style={{
