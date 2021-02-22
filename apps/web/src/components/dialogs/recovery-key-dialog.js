@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
-import Logo from "../../assets/notesnook-small.png";
+import Logo from "../../assets/notesnook-logo.png";
 import download from "../../utils/download";
 import ClipboardJS from "clipboard";
 import { captureMessage } from "@sentry/react";
