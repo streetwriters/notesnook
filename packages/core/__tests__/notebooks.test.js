@@ -22,16 +22,6 @@ test("get all notebooks", () =>
     expect(db.notebooks.all.length).toBeGreaterThan(0);
   }));
 
-test("search all notebooks", () =>
-  notebookTest({
-    ...TEST_NOTEBOOK,
-    title: "I will be searched.",
-    description: "searched description",
-  }).then(({ db }) => {
-    let filtered = db.notebooks.filter("searhed");
-    expect(filtered.length).toBeGreaterThan(0);
-  }));
-
 test("pin a notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
