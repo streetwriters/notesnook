@@ -168,8 +168,8 @@ class PremiumDialog extends React.Component {
             }}>
             <Carousel
               data={this.features}
-              itemWidth={dWidth}
-              sliderWidth={dWidth}
+              itemWidth={DDS.isTab ? 475 : dWidth}
+              sliderWidth={DDS.isTab ? 475 : dWidth}
               autoplay
               loop
               autoplayInterval={5000}
@@ -180,12 +180,13 @@ class PremiumDialog extends React.Component {
                   style={{
                     paddingVertical: 5,
                     marginBottom: 10,
+                    width:"100%",
                   }}>
                   <View
                     style={{
-                      flexWrap: 'wrap',
                       width: '95%',
                       alignItems: 'center',
+                      alignSelf:'center'
                     }}>
                     <SvgXml
                       xml={item.icon(colors.accent)}
@@ -211,6 +212,7 @@ class PremiumDialog extends React.Component {
                         fontWeight: 'normal',
                         textAlign: 'center',
                         alignSelf: 'center',
+                        maxWidth: "80%"
                       }}>
                       {item.description}
                     </Paragraph>
