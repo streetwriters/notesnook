@@ -28,7 +28,6 @@ const notebookInput = createRef();
 const topicInput = createRef();
 const actionSheetRef = createRef();
 const MoveNoteDialog = () => {
-  const [, dispatch] = useTracked();
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
 
