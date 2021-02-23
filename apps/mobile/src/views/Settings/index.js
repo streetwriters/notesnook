@@ -268,17 +268,17 @@ const SectionHeader = ({title}) => {
   const {colors} = state;
 
   return (
-    <Heading
-      size={SIZE.sm}
-      color={colors.accent}
+    <View
       style={{
-        textAlignVertical: 'center',
-        paddingHorizontal: 12,
         height: 30,
         backgroundColor: colors.nav,
+        paddingHorizontal: 12,
+        justifyContent: 'center',
       }}>
-      {title}
-    </Heading>
+      <Heading size={SIZE.sm} color={colors.accent}>
+        {title}
+      </Heading>
+    </View>
   );
 };
 
