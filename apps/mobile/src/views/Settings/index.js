@@ -652,7 +652,9 @@ const SettingsUserSection = () => {
                     paddingVertical: 2.5,
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
+
                     {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
+
                   </Heading>
                 </View>
               </View>
@@ -677,7 +679,7 @@ const SettingsUserSection = () => {
                     </Paragraph>
                     <Paragraph color={colors.pri}>
                       {user.subscription.type === 2
-                        ? 'You signed up for our Beta Program on ' +
+                        ? 'You signed up on ' +
                           timeConverter(user.subscription.start)
                         : user.subscription.type === 1
                         ? 'Your trial period started on ' +
@@ -853,16 +855,20 @@ const SettingsAppearanceSection = () => {
           paddingHorizontal: 12,
         }}>
         {[
-          '#e6194b',
-          '#ffe119',
-          '#0560FF',
-          '#f58231',
-          '#911eb4',
-          '#46f0f0',
-          '#f032e6',
-          '#bcf60c',
-          '#fabebe',
-          '#00c853',
+          "#FF5722",
+          "#FFA000",
+          "#1B5E20",
+          "#01c352",
+          "#757575",
+          "#0560ff",
+          "#009688",
+          "#2196F3",
+          "#880E4F",
+          "#9C27B0",
+          "#9381ff",
+          "#FF1744",
+          "#B71C1C",
+          "#ffadad"
         ].map((item) => (
           <PressableButton
             key={item}
