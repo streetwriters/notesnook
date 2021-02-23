@@ -16,7 +16,7 @@ function attachTitleInputListeners() {
         scrollTimer = setTimeout(() => {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
-              visible: event.target.documentElement.scrollTop.scrollTop,
+              visible: event.target.documentElement.scrollTop,
               title: document.getElementById('titleInput').value,
               type: 'scroll',
             }),
