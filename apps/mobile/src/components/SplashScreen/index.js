@@ -22,6 +22,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {DDS} from '../../services/DeviceDetection';
 
 const features = [
   {
@@ -59,13 +60,14 @@ const features = [
     link: 'https://discord.gg/zQBK97EE22',
   },
 ];
-
+let currentIndex = 0;
 const SplashScreen = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const carouselRef = useRef();
   const [isNext, setIsNext] = useState(true);
+
   const opacity = useValue(0);
   const translateY = useValue(20);
   const translateY2 = useValue(0);
@@ -130,7 +132,7 @@ const SplashScreen = () => {
               },
             ],
           }}>
-          <View style={{}}>
+          <View>
             <Carousel
               ref={carouselRef}
               data={features}
@@ -138,11 +140,6 @@ const SplashScreen = () => {
               sliderWidth={dWidth}
               loop={false}
               shouldOptimizeUpdates
-              autoplayInterval={5000}
-              autoplayDelay={3000}
-              onEndReached={() => {
-                setIsNext(false);
-              }}
               renderItem={({item, index}) => (
                 <View
                   style={{
@@ -205,7 +202,7 @@ const SplashScreen = () => {
                             fontWeight: 'normal',
                             textAlign: 'center',
                             alignSelf: 'center',
-                            maxWidth:"80%"
+                            maxWidth: DDS.isTab ? 350 : '80%',
                           }}>
                           {item.description}
                         </Paragraph>
@@ -259,6 +256,10 @@ const SplashScreen = () => {
               onPress={async () => {
                 if (isNext) {
                   carouselRef.current?.snapToNext();
+                  currentIndex++;
+                  if (currentIndex === 4) {
+                    setIsNext(false);
+                  }
                 } else {
                   await hide();
                   await Storage.write('introCompleted', 'true');
