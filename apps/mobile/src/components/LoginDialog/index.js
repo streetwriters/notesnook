@@ -349,7 +349,7 @@ const LoginDialog = () => {
   return !visible ? null : (
     <Modal
       animated={true}
-      animationType={DDS.isLargeTablet() ? 'fade' : 'slide'}
+      animationType={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={true}
       onRequestClose={close}
       visible={true}
@@ -435,8 +435,8 @@ const LoginDialog = () => {
         style={{
           opacity: 1,
           flex: 1,
-          paddingTop: DDS.isLargeTablet() ? 0 : insets.top,
-          backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : colors.bg,
+          paddingTop: DDS.isTab ? 0 : insets.top,
+          backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
           width: '100%',
           height: '100%',
           alignSelf: 'center',
@@ -444,7 +444,7 @@ const LoginDialog = () => {
           alignItems: 'center',
           overflow: 'hidden',
         }}>
-        {DDS.isLargeTablet() ? (
+        {DDS.isTab ? (
           <TouchableOpacity
             onPress={close}
             style={{
@@ -457,15 +457,15 @@ const LoginDialog = () => {
         ) : null}
         <View
           style={{
-            maxHeight: DDS.isLargeTablet() ? '90%' : '100%',
+            maxHeight: DDS.isTab ? '90%' : '100%',
             minHeight: '50%',
-            height: DDS.isLargeTablet() ? null : '100%',
-            width: DDS.isLargeTablet() ? 500 : '100%',
-            borderRadius: DDS.isLargeTablet() ? 5 : 0,
+            height: DDS.isTab ? null : '100%',
+            width: DDS.isTab ? 500 : '100%',
+            borderRadius: DDS.isTab ? 5 : 0,
             backgroundColor: colors.bg,
             zIndex: 10,
-            ...getElevation(DDS.isLargeTablet() ? 5 : 0),
-            paddingBottom: DDS.isLargeTablet() ? 20 : 0,
+            ...getElevation(DDS.isTab ? 5 : 0),
+            paddingBottom: DDS.isTab ? 20 : 0,
           }}>
           <View
             style={{
@@ -475,7 +475,7 @@ const LoginDialog = () => {
               paddingHorizontal: 12,
               height: 50,
             }}>
-            {DDS.isLargeTablet() ? (
+            {DDS.isTab ? (
               <ActionIcon
                 name="close"
                 size={SIZE.xxxl}
