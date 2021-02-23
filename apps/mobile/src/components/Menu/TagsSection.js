@@ -196,8 +196,8 @@ const PinItem = ({item, index, onPress}) => {
                 style={{
                   flexWrap: 'wrap',
                 }}
-                color={colors.heading}
-                size={SIZE.lg}>
+                color={colors.accent}
+                size={SIZE.md}>
                 {item.title}
               </Heading>
             ) : (
@@ -208,16 +208,6 @@ const PinItem = ({item, index, onPress}) => {
                 {item.title}
               </Paragraph>
             )}
-            {/*    <Paragraph
-              style={{marginTop: 2.5}}
-              size={SIZE.xs}
-              color={colors.icon}>
-              {item.type.slice(0, 1).toUpperCase() +
-                item.type.slice(1, item.type.length)}{' '}
-              {item.type === 'topic'
-                ? 'in ' + db.notebooks.notebook(item.notebookId).data.title
-                : null}
-            </Paragraph> */}
           </View>
         </View>
 
