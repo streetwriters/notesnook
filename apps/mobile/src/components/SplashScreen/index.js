@@ -23,6 +23,7 @@ import Paragraph from '../Typography/Paragraph';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../services/DeviceDetection';
+import { openLinkInBrowser } from '../../utils/functions';
 
 const features = [
   {
@@ -74,8 +75,9 @@ const SplashScreen = () => {
 
   useEffect(() => {
     Storage.read('introCompleted').then(async (r) => {
+  
       requestAnimationFrame(() => {
-        if (!r) {
+        if (r) {
           setVisible(true);
           timing(opacity, {
             toValue: 1,
@@ -215,7 +217,10 @@ const SplashScreen = () => {
                           onPress={() => {
                             try {
                               openLinkInBrowser(item.link, colors);
-                            } catch (e) {}
+                            } catch (e) {
+
+                              console.log(e,"ERROR")
+                            }
                           }}
                         />
                       )}
