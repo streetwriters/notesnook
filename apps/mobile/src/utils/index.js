@@ -152,7 +152,7 @@ export const SUBSCRIPTION_STATUS = {
 export const SUBSCRIPTION_STATUS_STRINGS = {
   0: 'Basic',
   1: 'Trial',
-  2: 'Beta',
+  2: Platform.OS === "ios" ? "Pro" : 'Beta',
   5: 'Pro',
   6: 'Expired',
   7: 'Pro',
