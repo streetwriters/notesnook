@@ -170,7 +170,7 @@ const PinItem = ({item, index, onPress}) => {
           }}>
           <View
             style={{
-              width: 35,
+              width: 30,
               justifyContent: 'center',
             }}>
             <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />

@@ -5,6 +5,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
 import {DrawerScale} from '../../utils/Animations';
 import {
   ACCENT,
@@ -72,7 +73,7 @@ export const Menu = React.memo(
             borderRadius: 10,
             transform: [
               {
-                scale:deviceMode !== 'mobile' ? 1 : DrawerScale,
+                scale: deviceMode !== 'mobile' ? 1 : DrawerScale,
               },
             ],
           }}>
@@ -104,20 +105,22 @@ export const Menu = React.memo(
             )}
           />
 
-          {BottomItemsList.slice(1, 2).map((item, index) => (
-            <MenuListItem
-              testID={
-                item.name == 'Night mode'
-                  ? notesnook.ids.menu.nightmode
-                  : item.name
-              }
-              key={item.name}
-              item={item}
-              index={index}
-              ignore={true}
-              rightBtn={BottomItemsList[0]}
-            />
-          ))}
+          {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 2).map(
+            (item, index) => (
+              <MenuListItem
+                testID={
+                  item.name == 'Night mode'
+                    ? notesnook.ids.menu.nightmode
+                    : item.name
+                }
+                key={item.name}
+                item={item}
+                index={index}
+                ignore={true}
+                rightBtn={DDS.isLargeTablet() ? null : BottomItemsList[0]}
+              />
+            ),
+          )}
 
           <View
             style={{

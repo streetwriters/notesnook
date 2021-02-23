@@ -1,7 +1,7 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
@@ -23,13 +23,13 @@ export const UserSection = ({noTextMode}) => {
         width: '100%',
         alignSelf: 'center',
         backgroundColor: colors.nav,
-        paddingBottom:Platform.OS === "ios" ? insets.bottom/2 : null
+        paddingBottom: Platform.OS === 'ios' ? insets.bottom / 2 : null,
       }}>
       <View
         style={{
-          flexDirection: 'row',
+          flexDirection: DDS.isLargeTablet() ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
+          alignItems: DDS.isLargeTablet() ? 'flex-start' : 'center',
           paddingRight: 8,
           paddingLeft: 8,
         }}>
@@ -38,9 +38,9 @@ export const UserSection = ({noTextMode}) => {
           onPress={() => {
             if (user) {
               ToastEvent.show({
-                title: 'Logged in as ' + user?.email,
+                heading: 'Logged in as ' + user?.email,
                 type: 'success',
-                context: 'local',
+                context: 'global',
               });
             } else {
               eSendEvent(eOpenLoginDialog);
@@ -49,7 +49,8 @@ export const UserSection = ({noTextMode}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingVertical: 10,
+            paddingVertical: DDS.isLargeTablet() ? 5 : 10,
+            paddingTop: 10,
           }}>
           <Icon
             style={{
@@ -80,11 +81,12 @@ export const UserSection = ({noTextMode}) => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() =>  Sync.run()}
+            onPress={() => Sync.run()}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingVertical: 10,
+              paddingVertical: DDS.isLargeTablet() ? 0 : 10,
+              paddingBottom: 10,
             }}>
             <Paragraph
               style={{

@@ -74,7 +74,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
         }}>
         <Icon
           style={{
-            width: 35,
+            width: 30,
             textAlignVertical: 'center',
             textAlign: 'left',
           }}
