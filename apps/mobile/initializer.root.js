@@ -211,11 +211,14 @@ const AppStack = React.memo(
       if (DDS.isLargeTablet()) {
         //console.log('setting large tab');
         setDeviceMode('tablet', size);
+        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
       } else if (DDS.isSmallTab) {
         //console.log('setting small tab');
         setDeviceMode('smallTablet', size);
+        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
       } else {
         setDeviceMode('mobile', size);
+        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
       }
     }
 
