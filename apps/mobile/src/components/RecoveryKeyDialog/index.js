@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
@@ -114,7 +114,8 @@ class RecoveryKeyDialog extends React.Component {
           .then((r) => {
             ToastEvent.show({
               heading: 'Recovery key QR-Code saved',
-              message: 'QR-Code image has been saved to Gallery at ' + path +  fileName,
+              message:
+                'QR-Code image has been saved to Gallery at ' + path + fileName,
               type: 'success',
               context: 'local',
             });
@@ -127,7 +128,8 @@ class RecoveryKeyDialog extends React.Component {
     if ((await Storage.requestPermission()) === false) {
       ToastEvent.show({
         heading: 'Storage access not granted',
-        message: 'You must provide access to phone storage to save recovery key text file.',
+        message:
+          'You must provide access to phone storage to save recovery key text file.',
         type: 'error',
         context: 'local',
       });
@@ -163,11 +165,14 @@ class RecoveryKeyDialog extends React.Component {
   shareFile = async () => {
     let path = await this.saveToTextFile();
     if (!path) return;
-    Share.open({
-      url: 'file:/' + path,
-      title: 'Save recovery key to cloud',
-      message: 'Saving backup file to cloud storage',
-    }).catch((e) => console.log);
+    try {
+      await Share.open({
+        url: 'file:/' + path,
+        title: 'Save recovery key to cloud',
+        message: this.state.key,
+        failOnCancel: false,
+      });
+    } catch (e) {}
   };
 
   render() {
@@ -191,7 +196,7 @@ class RecoveryKeyDialog extends React.Component {
           <DialogHeader
             title="Your data recovery key"
             paragraph="If you forget your password, you can recover your
-            data and reset your password using your data recovery key."
+            data and reset your password only using this recovery key."
           />
 
           <View
