@@ -898,12 +898,16 @@ const SettingsAppearanceSection = () => {
               alignItems: 'center',
               marginVertical: 5,
               marginHorizontal: 5,
-              width: 50,
-              height: 50,
+              width: DDS.isLargeTablet() ? 40 : 50,
+              height: DDS.isLargeTablet() ? 40 : 50,
               borderRadius: 100,
             }}>
             {colors.accent === item ? (
-              <Icon size={SIZE.xxl} color="white" name="check" />
+              <Icon
+                size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
+                color="white"
+                name="check"
+              />
             ) : null}
           </PressableButton>
         ))}
