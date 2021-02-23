@@ -132,6 +132,7 @@ async function getRandomBytes(length) {
 }
 
 async function requestPermission() {
+  if (Platform.OS === "ios") return true;
   let granted = false;
   try {
     const response = await requestMultiple([
