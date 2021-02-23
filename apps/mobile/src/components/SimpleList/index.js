@@ -39,7 +39,7 @@ const SimpleList = ({
   },
 }) => {
   const [state] = useTracked();
-  const {colors, deviceMode} = state;
+  const {colors, deviceMode, messageBoardState} = state;
   const [_loading, setLoading] = useState(true);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
@@ -67,7 +67,6 @@ const SimpleList = ({
     setLoading(false);
   }, [listData, deviceMode]);
 
-
   const _onRefresh = async () => {
     await Sync.run();
     if (refreshCallback) {
@@ -86,7 +85,6 @@ const SimpleList = ({
       return emptyData.getDataForIndex(index).type;
     },
     (type, dim) => {
-
       switch (type) {
         case 'empty':
           dim.width = width;
@@ -141,7 +139,13 @@ const SimpleList = ({
         case 'MAIN_HEADER':
           dim.width = width;
           dim.height =
-            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 195;
+            dataType === 'search'
+              ? 0
+              : DDS.isLargeTablet()
+              ? messageBoardState.visible
+                ? 50
+                : 0
+              : 195;
           break;
         default:
           dim.width = width;
