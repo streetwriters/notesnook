@@ -5,6 +5,7 @@ import {eSendEvent, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import Share from 'react-native-share';
+import {Platform} from 'react-native';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -22,6 +23,7 @@ async function run() {
       return;
     }
   }
+
   RNFetchBlob = require('rn-fetch-blob').default;
   eSendEvent(eOpenProgressDialog, {
     title: 'Backing up your data',
@@ -42,7 +44,7 @@ async function run() {
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now() + '.nnbackup';
-      let path = await storage.checkAndCreateDir('backups/');
+      let path = await storage.checkAndCreateDir('/backups/');
       await RNFetchBlob.fs.createFile(path + backupName, backup, 'utf8');
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
 
@@ -57,16 +59,18 @@ async function run() {
         title: 'Backup complete',
         icon: 'cloud-upload',
         paragraph:
-          'Share your backup to your cloud storage such as Dropbox or Google Drive.',
+          'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
         noProgress: true,
         actionText: 'Share Backup File',
         actionsArray: [
           {
             action: () => {
               Share.open({
-                url: 'file:/' + path + backupName,
+                url:
+                  Platform.OS === 'ios'
+                    ? path + backupName
+                    : 'file:/' + path + backupName,
                 title: 'Save Backup to Cloud',
-                message: 'Saving backup file to cloud storage',
               }).catch((e) => console.log);
             },
             actionText: 'Share Backup File',
