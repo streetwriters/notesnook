@@ -138,7 +138,7 @@ export const Toast = ({context = 'global'}) => {
   return (
     <Animated.View
       style={{
-        width: DDS.isTab ? 300 : '100%',
+        width: DDS.isTab ? 400 : '100%',
         alignItems: 'center',
         alignSelf: 'center',
         minHeight: 30,
@@ -213,6 +213,10 @@ export const Toast = ({context = 'global'}) => {
             {data?.message ? (
               <Paragraph
                 color={colors.pri}
+                style={{
+                  maxWidth: '100%',
+                  paddingRight: 10,
+                }}
                 onPress={() => {
                   hideToastFunc();
                 }}>
