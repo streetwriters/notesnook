@@ -32,7 +32,7 @@ import {
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {toolbarRef} from './tiny/toolbar/constants';
 
 let handleBack;
 let tapCount = 0;
@@ -47,12 +47,12 @@ const EditorHeader = () => {
   }, [colors.bg]);
 
   const _onBackPress = async () => {
-    eSendEvent("showTooltip");
+    eSendEvent('showTooltip');
     toolbarRef.current?.scrollTo({
-      x:0,
-      y:0,
-      animated:false
-    })
+      x: 0,
+      y: 0,
+      animated: false,
+    });
     editing.isFocused = false;
     editing.currentlyEditing = false;
     if (DDS.isLargeTablet()) {
@@ -104,25 +104,30 @@ const EditorHeader = () => {
           marginTop: Platform.OS === 'ios' ? 0 : insets.top,
           zIndex: 10,
         }}>
-        {DDS.isLargeTablet() && !fullscreen ? null : (
-          <ActionIcon
-            onLongPress={async () => {
-              await _onBackPress();
-              Navigation.popToTop();
-            }}
-            testID={notesnook.ids.default.header.buttons.back}
-            name="arrow-left"
-            color={colors.heading}
-            onPress={_onBackPress}
-            bottom={5}
-            customStyle={{
-              marginLeft: -5,
-            }}
-          />
-        )}
-
-        {DDS.isLargeTablet() && <EditorTitle />}
-
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}>
+          {DDS.isLargeTablet() && !fullscreen ? null : (
+            <ActionIcon
+              onLongPress={async () => {
+                await _onBackPress();
+                Navigation.popToTop();
+              }}
+              testID={notesnook.ids.default.header.buttons.back}
+              name="arrow-left"
+              color={colors.heading}
+              onPress={_onBackPress}
+              bottom={5}
+              customStyle={{
+                marginLeft: -5,
+              }}
+            />
+          )}
+          {fullscreen && <View style={{width: 20}} />}
+          {DDS.isLargeTablet() && <EditorTitle />}
+        </View>
         <View
           style={{
             flexDirection: 'row',

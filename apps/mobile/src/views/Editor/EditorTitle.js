@@ -6,7 +6,8 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import { post, _onMessage } from './Functions';
+import { EditorWebView, post, _onMessage } from './Functions';
+import tiny from './tiny/tiny';
 
 const opacityVal = new Animated.Value(0);
 const translateY = new Animated.Value(-700);
@@ -23,6 +24,7 @@ export const EditorTitle = () => {
   const {colors} = state;
   const [title, setTitle] = useState(null);
   const onScroll = async (data) => {
+
     if (data.visible === undefined || data.visible === null) return;
     if (data.visible > 190) {
       translateY.setValue(0);
@@ -49,8 +51,8 @@ export const EditorTitle = () => {
     <Animated.View
       style={{
         opacity: opacityVal,
-        maxWidth: DDS.isLargeTablet() ? '100%' : '100%',
-        paddingLeft:20,
+        maxWidth: '100%',
+        paddingLeft:0,
         transform: [
           {
             translateY: translateY,
@@ -69,6 +71,7 @@ export const EditorTitle = () => {
         placeholder="Note title"
         onChangeText={(text) => {
           setTitle(text);
+          tiny.call(EditorWebView,tiny.setTitle(text));
           _onMessage({
             nativeEvent: {
               data: JSON.stringify({
