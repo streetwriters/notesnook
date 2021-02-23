@@ -42,6 +42,7 @@ import {
   AndroidModule,
   APP_VERSION,
   dWidth,
+  getElevation,
   MenuItemsList,
   setSetting,
   SUBSCRIPTION_PROVIDER,
@@ -652,9 +653,7 @@ const SettingsUserSection = () => {
                     paddingVertical: 2.5,
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
-
                     {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
-
                   </Heading>
                 </View>
               </View>
@@ -842,33 +841,37 @@ const SettingsAppearanceSection = () => {
           Change the accent color of the app.
         </Paragraph>
       </View>
-      <View
+      <ScrollView
+        horizontal={true}
+        showsHorizontalScrollIndicator={false}
         style={{
           borderRadius: 5,
           padding: 5,
           marginTop: 10,
           marginBottom: pv + 5,
           width: '100%',
+          paddingHorizontal: 12,
+        }}
+        contentContainerStyle={{
           alignSelf: 'center',
           flexDirection: 'row',
           flexWrap: 'wrap',
-          paddingHorizontal: 12,
         }}>
         {[
-          "#FF5722",
-          "#FFA000",
-          "#1B5E20",
-          "#01c352",
-          "#757575",
-          "#0560ff",
-          "#009688",
-          "#2196F3",
-          "#880E4F",
-          "#9C27B0",
-          "#9381ff",
-          "#FF1744",
-          "#B71C1C",
-          "#ffadad"
+          '#FF5722',
+          '#FFA000',
+          '#1B5E20',
+          '#01c352',
+          '#757575',
+          '#0560ff',
+          '#009688',
+          '#2196F3',
+          '#880E4F',
+          '#9C27B0',
+          '#9381ff',
+          '#FF1744',
+          '#B71C1C',
+          '#ffadad',
         ].map((item) => (
           <PressableButton
             key={item}
@@ -895,24 +898,17 @@ const SettingsAppearanceSection = () => {
               alignItems: 'center',
               marginVertical: 5,
               marginHorizontal: 5,
-              width: DDS.isLargeTablet()
-                ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
-                : DDS.isSmallTab
-                ? (dWidth * 0.5 - 24 - 6 * 12) / 6
-                : (dWidth - 24 - 6 * 12) / 6,
-              height: DDS.isLargeTablet()
-                ? ((dWidth - 24 - 6 * 12) * 0.85 * 0.28) / 6
-                : DDS.isSmallTab
-                ? (dWidth * 0.5 - 24 - 6 * 12) / 6
-                : (dWidth - 24 - 6 * 12) / 6,
+              width: 50,
+              height: 50,
               borderRadius: 100,
             }}>
             {colors.accent === item ? (
-              <Icon size={SIZE.lg} color="white" name="check" />
+              <Icon size={SIZE.xxl} color="white" name="check" />
             ) : null}
           </PressableButton>
         ))}
-      </View>
+        <View style={{width: 50}} />
+      </ScrollView>
 
       <CustomButton
         title="System Theme"
