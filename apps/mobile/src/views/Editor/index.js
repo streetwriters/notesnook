@@ -83,6 +83,7 @@ const Editor = React.memo(
           keyboardDismissMode="none"
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
           style={{
             height: '100%',
             width: '100%',
@@ -98,7 +99,7 @@ const Editor = React.memo(
             testID={notesnook.ids.default.editor}
             ref={EditorWebView}
             onLoad={onLoad}
-            scrollEnabled={false}
+            scrollEnabled={true}
             onRenderProcessGone={(event) => {
               onResetRequested();
             }}
