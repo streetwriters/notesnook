@@ -9,8 +9,11 @@ import {
 } from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
 import {eSendEvent, ToastEvent} from './EventManager';
+import * as RNIap from 'react-native-iap';
+import {itemSkus} from '../utils';
 
 let premiumStatus = 0;
+let products = [];
 
 async function setPremiumStatus() {
   try {
@@ -18,14 +21,24 @@ async function setPremiumStatus() {
     if (!user) {
       premiumStatus = null;
       updateEvent({type: Actions.PREMIUM, state: get()});
+
+  
     } else {
       premiumStatus = user.subscription.type;
       updateEvent({type: Actions.PREMIUM, state: get()});
       updateEvent({type: Actions.USER, user: user});
+      if (!get()) {
+        await RNIap.initConnection();
+        products = await RNIap.getSubscriptions(itemSkus);
+      }
     }
   } catch (e) {
     premiumStatus = null;
   }
+}
+
+function getProducts() {
+  return products;
 }
 
 function get() {
@@ -159,4 +172,5 @@ export default {
   get,
   onUserStatusCheck,
   showVerifyEmailDialog,
+  getProducts
 };
