@@ -1,4 +1,5 @@
 import React, {createRef} from 'react';
+import { Platform } from 'react-native';
 import {Clipboard, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
@@ -137,7 +138,7 @@ class RecoveryKeyDialog extends React.Component {
     }
     try {
       let path = await Storage.checkAndCreateDir('/');
-      let fileName = 'nn_' + 'test' + '_recovery_key.txt';
+      let fileName = 'nn_' + this.user?.email + '_recovery_key.txt';
       RNFetchBlob = require('rn-fetch-blob').default;
       await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
       ToastEvent.show({
@@ -167,9 +168,8 @@ class RecoveryKeyDialog extends React.Component {
     if (!path) return;
     try {
       await Share.open({
-        url: 'file:/' + path,
+        url: Platform.OS === "ios" ? path : 'file:/' + path,
         title: 'Save recovery key to cloud',
-        message: this.state.key,
         failOnCancel: false,
       });
     } catch (e) {}
