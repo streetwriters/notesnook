@@ -16,7 +16,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="428" height="926"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notesnook-text" translatesAutoresizingMaskIntoConstraints="NO" id="2H9-jf-dzi">
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="notesnook-text.png" translatesAutoresizingMaskIntoConstraints="NO" id="2H9-jf-dzi">
                                 <rect key="frame" x="124" y="373" width="180" height="180"/>
                                 <constraints>
                                     <constraint firstAttribute="width" secondItem="2H9-jf-dzi" secondAttribute="height" multiplier="1:1" id="EdT-Pq-83y"/>
@@ -41,6 +41,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="notesnook-text" width="1280" height="1280"/>
+        <image name="notesnook-text.png" width="1280" height="1280"/>
     </resources>
 </document>
