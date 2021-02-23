@@ -103,7 +103,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     }
     try {
       setRestoring(true);
-      let backup = await RNFetchBlob.fs.readFile('file:/' + item.path, 'utf8');
+      let prefix = Platform.OS === 'ios' ? '' : 'file:/';
+      let backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
       await db.backup.import(backup);
       setRestoring(false);
       dispatch({type: Actions.ALL});
@@ -111,7 +112,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         heading: 'Restore successful',
         message: 'Your backup data has been restored successfully.',
         type: 'success',
-        context: 'local',
+        context: 'global',
       });
       close();
     } catch (e) {
