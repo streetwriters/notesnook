@@ -28,7 +28,7 @@ export const HeaderTitle = () => {
 
 
   const onScroll = async (y) => {
-    if (DDS.isLargeTablet()) return;
+    if (DDS.isTab) return;
     if (typeof y !== 'number') {
       if (y.type === 'back') {
         scrollPostions[y.name] = null;
