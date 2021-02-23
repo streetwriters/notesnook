@@ -708,7 +708,12 @@ const SettingsUserSection = () => {
                         title={
                           user.subscription.type === 6
                             ? 'Resubscribe to Notesnook Pro'
-                            : 'Subscribe to Notesnook Pro'
+                            : `Subscribe to Notesnook Pro (${
+                                PremiumService.getProducts().length > 0
+                                  ? PremiumService.getProducts()[0]
+                                      .localizedPrice
+                                  : '$4.49'
+                              } / Month)`
                         }
                         height={50}
                         type="transparent"
