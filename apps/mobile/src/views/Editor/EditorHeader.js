@@ -39,7 +39,7 @@ let tapCount = 0;
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, fullscreen} = state;
+  const {colors, fullscreen, deviceMode} = state;
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
