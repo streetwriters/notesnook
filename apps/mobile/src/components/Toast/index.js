@@ -37,7 +37,7 @@ export const Toast = ({context = 'global'}) => {
     }
     toastMessages.push(data);
     if (toastMessages?.length > 1) return;
-
+    console.log(data);
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
@@ -199,7 +199,7 @@ export const Toast = ({context = 'global'}) => {
               flexGrow: 1,
               paddingRight: 25,
             }}>
-            {data?.heading && (
+            {data?.heading ? (
               <Heading
                 color={colors.pri}
                 size={SIZE.md}
@@ -208,9 +208,9 @@ export const Toast = ({context = 'global'}) => {
                 }}>
                 {data.heading}
               </Heading>
-            )}
+            ) : null}
 
-            {data?.message && (
+            {data?.message ? (
               <Paragraph
                 color={colors.pri}
                 onPress={() => {
@@ -218,7 +218,7 @@ export const Toast = ({context = 'global'}) => {
                 }}>
                 {data.message}
               </Paragraph>
-            )}
+            ) : null}
           </View>
         </View>
 
