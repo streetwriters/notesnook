@@ -100,7 +100,7 @@ export const NavigatorStack = React.memo(
       return () => {
         eUnSubscribeEvent(eOpenSideMenu, updateRender);
       };
-    }, []);
+    }, [render]);
 
     return (
       <Container root={true}>
