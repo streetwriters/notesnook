@@ -1,16 +1,14 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {Placeholder} from '../ListPlaceholders';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { Placeholder } from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
-import {Card} from './card';
+import { Card } from './card';
 
 export const Header = ({
   type,
@@ -89,24 +87,23 @@ export const Header = ({
             {title.slice(0, 1) === '#' ? title.slice(1) : title}
           </Heading>
 
-         {
-           paragraph && <Button
-            height={20}
-            title={paragraph}
-            icon={icon}
-            style={{
-              alignSelf: 'flex-start',
-              paddingLeft: 0,
-            }}
-            textStyle={{
-              fontWeight:'normal'
-            }}
-            iconSize={SIZE.sm}
-            fontSize={SIZE.sm}
-            onPress={onPress}
-          />
-         } 
-
+          {paragraph ? (
+            <Button
+              height={20}
+              title={paragraph}
+              icon={icon}
+              style={{
+                alignSelf: 'flex-start',
+                paddingLeft: 0,
+              }}
+              textStyle={{
+                fontWeight: 'normal',
+              }}
+              iconSize={SIZE.sm}
+              fontSize={SIZE.sm}
+              onPress={onPress}
+            />
+          ): null}
         </View>
       </View>
     </View>
