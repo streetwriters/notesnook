@@ -875,6 +875,8 @@
   }
 
   function diff_dual_pane(before, after) {
+    if (!before || !after) return { before, after };
+
     var ops;
     if (before === after) {
       return return_dual_pane(before, after);
