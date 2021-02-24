@@ -204,6 +204,8 @@ export const AppRootEvents = React.memo(
       try {
         if (url.startsWith('https://app.notesnook.com/account/verified')) {
           await onEmailVerified();
+        } else if (url.startsWith("ShareMedia://MainApp")) {
+          await checkIntentState()
         } else {
           return;
         }

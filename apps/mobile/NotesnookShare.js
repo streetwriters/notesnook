@@ -10,7 +10,7 @@ import {
   View,
 } from 'react-native';
 import {ScrollView, TextInput} from 'react-native-gesture-handler';
-
+import SplashScreen from 'react-native-splash-screen';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {SIZE} from './src/utils/SizeUtils';
@@ -42,17 +42,19 @@ export default class NotesnookShare extends Component {
 
   async componentDidMount() {
     try {
-      ShareExtension = require("rn-extensions-share").default
-      validator = require("validator").default
-      linkPreview = require("link-preview-js")
+      SplashScreen.hide();
+      ShareExtension = require('rn-extensions-share').default;
+      validator = require('validator').default;
+      linkPreview = require('link-preview-js');
       const data = await ShareExtension.data();
+     
       let text;
       if (!data) {
         this.setState({
-          loadingIntent:false,
-          text:"",
-          title:""
-        })
+          loadingIntent: false,
+          text: '',
+          title: '',
+        });
         return;
       }
       let item = data[0];
@@ -60,7 +62,8 @@ export default class NotesnookShare extends Component {
         text = item.value;
       }
       if (validator.isURL(text)) {
-        linkPreview.getLinkPreview(text)
+        linkPreview
+          .getLinkPreview(text)
           .then((r) => {
             if (r?.siteName) {
               this.setState({
@@ -98,11 +101,11 @@ export default class NotesnookShare extends Component {
 
       this.initialText = text;
     } catch (e) {
-        this.setState({
-          loadingIntent:false,
-          text:"",
-          title:""
-        })
+      this.setState({
+        loadingIntent: false,
+        text: '',
+        title: '',
+      });
       console.log('errrr', e);
     }
   }
@@ -443,7 +446,7 @@ export default class NotesnookShare extends Component {
                       paddingTop: 0,
                       marginBottom: 10,
                       paddingHorizontal: 12,
-                      minHeight:100
+                      minHeight: 100,
                     }}
                     textAlignVertical="top"
                     placeholderTextColor={this.state.colors.icon}

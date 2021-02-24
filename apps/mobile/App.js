@@ -1,30 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import Orientation from 'react-native-orientation';
-import Animated, {Easing} from 'react-native-reanimated';
+import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {AppRootEvents} from './AppRootEvents';
-import {RootView} from './initializer.root';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
-import {DDS} from './src/services/DeviceDetection';
+import { AppRootEvents } from './AppRootEvents';
+import { RootView } from './initializer.root';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
-import Navigation from './src/services/Navigation';
 import SettingsService from './src/services/SettingsService';
 import {
-  changeAppScale,
   changeContainerScale,
-  ContainerScale,
+  ContainerScale
 } from './src/utils/Animations';
-import {db} from './src/utils/DB';
-import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
-import {sleep} from './src/utils/TimeUtils';
+import { db } from './src/utils/DB';
+import { eDispatchAction, eOpenSideMenu } from './src/utils/Events';
+import { sleep } from './src/utils/TimeUtils';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
 
