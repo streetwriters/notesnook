@@ -91,7 +91,7 @@ const onAppStateChanged = async (state) => {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (getNote().locked) {
+    if (getNote()?.locked) {
       eSendEvent(eClearEditor);
     }
     await storeAppState();
