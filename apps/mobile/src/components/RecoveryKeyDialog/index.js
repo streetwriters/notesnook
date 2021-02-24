@@ -1,25 +1,23 @@
-import React, {createRef} from 'react';
-import { Platform } from 'react-native';
-import {Clipboard, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Clipboard, Platform, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
-import {LOGO_BASE64} from '../../assets/images/assets';
+import { LOGO_BASE64 } from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/DB';
+import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 let RNFetchBlob;
@@ -101,27 +99,28 @@ class RecoveryKeyDialog extends React.Component {
     }
 
     this.svg.current?.toDataURL(async (data) => {
-      let path = await Storage.checkAndCreateDir('/');
-      RNFetchBlob = require('rn-fetch-blob').default;
-      let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
-      RNFetchBlob.fs.writeFile(path + fileName, data, 'base64').then((res) => {
-        RNFetchBlob.fs
-          .scanFile([
+      try {
+        let path = await Storage.checkAndCreateDir('/');
+        RNFetchBlob = require('rn-fetch-blob').default;
+        let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
+        await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
+
+        if (Platform.OS === 'android') {
+          await RNFetchBlob.fs.scanFile([
             {
               path: path + fileName,
               mime: 'image/png',
             },
-          ])
-          .then((r) => {
-            ToastEvent.show({
-              heading: 'Recovery key QR-Code saved',
-              message:
-                'QR-Code image has been saved to Gallery at ' + path + fileName,
-              type: 'success',
-              context: 'local',
-            });
-          });
-      });
+          ]);
+        }
+        ToastEvent.show({
+          heading: 'Recovery key QR-Code saved',
+          message:
+            'QR-Code image has been saved to Gallery at ' + path + fileName,
+          type: 'success',
+          context: 'local',
+        });
+      } catch (e) {}
     });
   };
 
@@ -168,7 +167,7 @@ class RecoveryKeyDialog extends React.Component {
     if (!path) return;
     try {
       await Share.open({
-        url: Platform.OS === "ios" ? path : 'file:/' + path,
+        url: Platform.OS === 'ios' ? path : 'file:/' + path,
         title: 'Save recovery key to cloud',
         failOnCancel: false,
       });
