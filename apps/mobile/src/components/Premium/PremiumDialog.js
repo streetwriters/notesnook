@@ -1,4 +1,5 @@
 import React, {createRef, useEffect, useRef, useState} from 'react';
+import {Platform} from 'react-native';
 import {View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Carousel from 'react-native-snap-carousel';
@@ -216,7 +217,7 @@ const InnerComponent = React.memo(
             }}
             fontSize={SIZE.md}
             title={
-              !user
+              user
                 ? `Subscribe for ${product?.localizedPrice || '$4.49'} / Month`
                 : 'Start Your Free 14 Day Trial'
             }
@@ -225,7 +226,7 @@ const InnerComponent = React.memo(
             width="100%"
           />
 
-          {user ? (
+          {!user ? (
             <Paragraph
               style={{
                 alignSelf: 'center',
@@ -235,10 +236,12 @@ const InnerComponent = React.memo(
             </Paragraph>
           ) : null}
 
-          {user ? (
+          {user && Platform.OS === 'ios' ? (
             <>
               <Paragraph
                 textBreakStrategy="balanced"
+                size={SIZE.xs + 1}
+                color={colors.icon}
                 style={{
                   alignSelf: 'center',
                   marginTop: 5,
@@ -262,12 +265,15 @@ const InnerComponent = React.memo(
                   paddingHorizontal: 12,
                 }}>
                 <Paragraph
+                  size={SIZE.xs + 1}
+                  color={colors.icon}
                   style={{
                     maxWidth: '100%',
                     textAlign: 'center',
                   }}>
                   By tapping Subscribe, you agree to our{' '}
                   <Paragraph
+                    size={SIZE.xs + 1}
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/tos', colors)
                         .catch((e) => {})
@@ -280,6 +286,7 @@ const InnerComponent = React.memo(
                   </Paragraph>
                   and{' '}
                   <Paragraph
+                    size={SIZE.xs + 1}
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/privacy', colors)
                         .catch((e) => {})
