@@ -47,6 +47,14 @@ export default class NotesnookShare extends Component {
       linkPreview = require("link-preview-js")
       const data = await ShareExtension.data();
       let text;
+      if (!data) {
+        this.setState({
+          loadingIntent:false,
+          text:"",
+          title:""
+        })
+        return;
+      }
       let item = data[0];
       if (item.type === 'text') {
         text = item.value;
@@ -90,6 +98,11 @@ export default class NotesnookShare extends Component {
 
       this.initialText = text;
     } catch (e) {
+        this.setState({
+          loadingIntent:false,
+          text:"",
+          title:""
+        })
       console.log('errrr', e);
     }
   }
@@ -430,7 +443,9 @@ export default class NotesnookShare extends Component {
                       paddingTop: 0,
                       marginBottom: 10,
                       paddingHorizontal: 12,
+                      minHeight:100
                     }}
+                    textAlignVertical="top"
                     placeholderTextColor={this.state.colors.icon}
                     onChangeText={(v) => this.setState({text: v})}
                     multiline={true}
