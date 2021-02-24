@@ -561,6 +561,9 @@ const SettingsUserSection = () => {
               {messageBoardState.message}
             </Paragraph>
             <Paragraph
+              style={{
+                maxWidth: '90%',
+              }}
               color={
                 messageBoardState.type === 'error' ? colors.red : colors.accent
               }>
