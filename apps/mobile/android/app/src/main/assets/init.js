@@ -21,9 +21,9 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      "mychecklist advlist autolink textpattern hr lists link noneditable image",
-      "searchreplace mycode",
-      "media imagetools table paste wordcount autoresize directionality",
+      'mychecklist advlist autolink textpattern hr lists link noneditable image',
+      'searchreplace mycode',
+      'media imagetools table paste wordcount autoresize directionality',
     ],
     toolbar: false,
     paste_data_images: true,
@@ -42,6 +42,24 @@ function init_tiny(size) {
     }
     pre.codeblock {
       overflow-x:auto;
+    }
+    img {
+      max-width:100% !important;
+      height:auto !important;
+    }
+    iframe {
+      max-width:100% !important;
+    }
+    table {
+      display: block !important;
+      overflow-x: auto !important;
+      white-space: nowrap  !important;
+      max-width:100% !important;
+      width:100% !important;
+      height:auto !important;
+    }
+    td {
+      min-width:20vw !important;
     }
 `,
     browser_spellcheck: true,
@@ -74,7 +92,7 @@ function init_tiny(size) {
       editor.on('SetContent', (event) => {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
-        } 
+        }
         if (event.paste) {
           isLoading = false;
           onChange(event);
@@ -93,12 +111,12 @@ function init_tiny(size) {
     },
   });
 }
-window.prevContent = "";
+window.prevContent = '';
 const onChange = (event) => {
-  if (event.type === "nodechange" && !event.selectionChange) return;
+  if (event.type === 'nodechange' && !event.selectionChange) return;
   if (editor.getContent() === window.prevContent) return;
   window.prevContent = editor.getContent();
-  
+
   if (isLoading) {
     isLoading = false;
     return;

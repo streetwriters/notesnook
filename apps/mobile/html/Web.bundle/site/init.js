@@ -43,6 +43,24 @@ function init_tiny(size) {
     pre.codeblock {
       overflow-x:auto;
     }
+    img {
+      max-width:100% !important;
+      height:auto !important;
+    }
+    iframe {
+      max-width:100% !important;
+    }
+    table {
+      display: block !important;
+      overflow-x: auto !important;
+      white-space: nowrap  !important;
+      max-width:100% !important;
+      width:100% !important;
+      height:auto !important;
+    }
+    td {
+      min-width:20vw !important;
+    }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
