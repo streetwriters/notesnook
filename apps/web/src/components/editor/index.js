@@ -20,6 +20,7 @@ import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
 import Banner from "../banner";
 import EditorLoading from "./loading";
+import { useTheme } from "emotion-theming";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
@@ -35,6 +36,7 @@ function Editor({ noteId }) {
   const toggleProperties = useStore((store) => store.toggleProperties);
   const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
+  const theme = useTheme();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
@@ -122,6 +124,7 @@ function Editor({ noteId }) {
             toolbar.style.top = "40px";
             toolbar.style.bottom = "auto";
             toolbar.style.width = `${title.clientWidth}px`;
+            toolbar.style.backgroundColor = theme.colors["background"];
             editor.isToolbarSticky = true;
           } else if (
             e.target.scrollTop < hideOffset - 20 &&
@@ -149,7 +152,7 @@ function Editor({ noteId }) {
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "900px"}
-          width={isFocusMode ? "50%" : "100%"}
+          width={["100%", "100%", isFocusMode ? "50%" : "100%"]}
           mt={[0, 0, 25]}
         >
           <Header />
