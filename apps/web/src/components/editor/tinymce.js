@@ -27,6 +27,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { isUserPremium } from "../../common";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
+import { isTablet } from "../../utils/dimensions";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -145,7 +146,7 @@ function TinyMCE(props) {
         width: "100%",
         plugins:
           "paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
-        toolbar_mode: "sliding",
+        toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_selection_toolbar:
           "bold italic code h2 h3 quicklink blockquote",
