@@ -7,6 +7,7 @@ import { showNotesMovedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import Field from "../field";
 import { store as notestore } from "../../stores/note-store";
+import { getTotalNotes } from "../../common";
 
 class MoveDialog extends React.Component {
   _inputRef;
@@ -119,7 +120,7 @@ class MoveDialog extends React.Component {
                   data-test-id={`notebook-${index}`}
                   icon={Icon.Notebook}
                   title={notebook.title}
-                  totalNotes={notebook.totalNotes}
+                  totalNotes={getTotalNotes(notebook)}
                   onClick={(e) => {
                     this.setState({
                       currentOpenedIndex:
@@ -176,7 +177,7 @@ class MoveDialog extends React.Component {
                       indent={1}
                       icon={Icon.Topic}
                       title={topic.title}
-                      totalNotes={topic.totalNotes}
+                      totalNotes={topic.notes.length}
                       action={
                         this._topicHasNotes(topic, props.noteIds) ? (
                           <Text color="error" fontSize="body">

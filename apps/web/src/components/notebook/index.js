@@ -7,6 +7,7 @@ import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { hashNavigate } from "../../navigation";
+import { getTotalNotes } from "../../common";
 
 class Notebook extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -64,7 +65,7 @@ class Notebook extends React.Component {
               <Text as="span" mx={1}>
                 •
               </Text>
-              <Text>{notebook.totalNotes} Notes</Text>
+              <Text>{getTotalNotes(notebook)} Notes</Text>
             </Flex>
           </>
         }

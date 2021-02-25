@@ -110,3 +110,9 @@ export function isUserPremium() {
     subStatus === SUBSCRIPTION_STATUS.TRIAL
   );
 }
+
+export function getTotalNotes(notebook) {
+  return notebook.topics.reduce((sum, topic) => {
+    return sum + topic.notes.length;
+  }, 0);
+}

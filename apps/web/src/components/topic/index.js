@@ -16,7 +16,7 @@ function Topic({ item, index, onClick }) {
       title={topic.title}
       footer={
         <Text mt={1} variant="subBody">
-          {topic.totalNotes} Notes
+          {topic.notes.length} Notes
         </Text>
       }
       index={index}
@@ -31,7 +31,7 @@ function Topic({ item, index, onClick }) {
 export default React.memo(Topic, (prev, next) => {
   return (
     prev?.item?.title === next?.item?.title &&
-    prev?.item?.totalNotes === next?.item?.totalNotes
+    prev?.item?.notes.length === next?.item?.notes.length
   );
 });
 
