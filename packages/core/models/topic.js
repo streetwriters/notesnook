@@ -12,7 +12,7 @@ export default class Topic {
   }
 
   get totalNotes() {
-    return this._topic.totalNotes;
+    return this._topic.notes.length;
   }
 
   has(noteId) {
@@ -44,7 +44,6 @@ export default class Topic {
       });
 
       topic.notes.push(noteId);
-      topic.totalNotes++;
     }
     return await this._save(topic);
   }
@@ -74,7 +73,6 @@ export default class Topic {
         id: noteId,
         notebooks: array,
       });
-      topic.totalNotes--;
     }
     return await this._save(topic);
   }

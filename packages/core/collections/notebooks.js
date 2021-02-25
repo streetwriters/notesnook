@@ -74,7 +74,6 @@ export default class Notebooks extends Collection {
       dateEdited: notebook.dateEdited,
       pinned: !!notebook.pinned,
       topics: notebook.topics || [],
-      totalNotes: notebook.totalNotes || 0,
     };
     if (
       !oldNotebook &&

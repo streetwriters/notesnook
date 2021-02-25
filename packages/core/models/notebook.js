@@ -11,6 +11,12 @@ export default class Notebook {
     this._db = db;
   }
 
+  get totalNotes() {
+    return this._notebook.topics.reduce((sum, topic) => {
+      return sum + topic.notes.length;
+    }, 0);
+  }
+
   get title() {
     return this._notebook.title;
   }

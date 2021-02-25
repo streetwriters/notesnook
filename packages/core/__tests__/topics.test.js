@@ -24,11 +24,31 @@ test("add topic to notebook", () =>
 test("add note to topic", () =>
   notebookTest().then(async ({ db, id }) => {
     let topics = db.notebooks.notebook(id).topics;
-    await topics.add("Home");
-    let topic = topics.topic("Home");
+    let topic = topics.topic("hello");
     let noteId = await db.notes.add(TEST_NOTE);
     await topic.add(noteId);
-    expect(topics.all.find((v) => v.title === "Home").notes.length).toBe(1);
+
+    topic = topics.topic("hello");
+    expect(topic.totalNotes).toBe(1);
+    expect(db.notebooks.notebook(id).totalNotes).toBe(1);
+  }));
+
+test("delete note to topic", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let topics = db.notebooks.notebook(id).topics;
+    let topic = topics.topic("hello");
+    let noteId = await db.notes.add(TEST_NOTE);
+    await topic.add(noteId);
+
+    topic = topics.topic("hello");
+    expect(topic.totalNotes).toBe(1);
+    expect(db.notebooks.notebook(id).totalNotes).toBe(1);
+
+    await topic.delete(noteId);
+
+    topic = topics.topic("hello");
+    expect(topic.totalNotes).toBe(0);
+    expect(db.notebooks.notebook(id).totalNotes).toBe(0);
   }));
 
 test("edit topic title", () =>

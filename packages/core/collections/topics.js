@@ -46,7 +46,6 @@ export default class Topics {
     let allTopics = [...notebook.topics, ...topics];
 
     notebook.topics = [];
-    notebook.totalNotes = 0;
     for (let t of allTopics) {
       let topic = makeTopic(t, this._notebookId);
 
@@ -60,7 +59,6 @@ export default class Topics {
 
       let index = notebook.topics.findIndex((t) => t.id === topic.id);
       if (index > -1) {
-        notebook.totalNotes -= notebook.topics[index].totalNotes;
         notebook.topics[index] = {
           ...notebook.topics[index],
           ...topic,
@@ -68,8 +66,6 @@ export default class Topics {
       } else {
         notebook.topics.push(topic);
       }
-
-      notebook.totalNotes += topic.totalNotes;
     }
     return this._db.notebooks._collection.addItem(notebook);
   }
@@ -121,7 +117,6 @@ export function makeTopic(topic, notebookId) {
     title: topic.trim(),
     dateCreated: Date.now(),
     dateEdited: Date.now(),
-    totalNotes: 0,
     notes: [],
   };
 }

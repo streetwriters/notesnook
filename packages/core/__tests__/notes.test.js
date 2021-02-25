@@ -48,8 +48,8 @@ test("delete note", () =>
     expect(db.notes.note(id)).toBeUndefined();
     expect(topic.all.findIndex((v) => v.id === id)).toBe(-1);
 
-    expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(0);
-    expect(topics.topic("General")._topic.totalNotes).toBe(0);
+    expect(db.notebooks.notebook(notebookId).totalNotes).toBe(0);
+    expect(topics.topic("General").totalNotes).toBe(0);
   }));
 
 test("get all notes", () =>
@@ -179,7 +179,7 @@ test("add note to topic", () =>
     topic = topics.topic("Home");
     expect(topic.all.length).toBe(1);
     expect(topic.totalNotes).toBe(1);
-    expect(db.notebooks.notebook(notebookId).data.totalNotes).toBe(1);
+    expect(db.notebooks.notebook(notebookId).totalNotes).toBe(1);
     let note = db.notes.note(id);
     expect(note.notebooks.some((n) => n.id === notebookId)).toBe(true);
   }));
