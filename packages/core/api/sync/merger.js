@@ -115,7 +115,8 @@ class Merger {
       (item) => this._db.content.add(item),
       async (local, remote) => {
         // if hashes are equal do nothing
-        if (SparkMD5.hash(local.data) === SparkMD5.hash(remote.data)) return;
+        if (!remote || SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
+          return;
 
         // merge conflicts resolver
         const note = this._db.notes.note(local.noteId).data;
