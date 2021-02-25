@@ -1,21 +1,72 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import { Flex, Box, Text } from "rebass";
 import SimpleEditor from "./simpleeditor";
 import ContentToggle from "./content-toggle";
 import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
 import { hashNavigate } from "../../navigation";
 import diff from "./differ";
+import { showToast } from "../../utils/toast";
 
 function SplitEditor(props) {
   const { noteId } = props;
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
+  const sync = useUserStore((store) => store.sync);
   const [conflictedNote, setConflictedNote] = useState();
   const [remoteContent, setRemoteContent] = useState();
   const [localContent, setLocalContent] = useState();
   const [htmlDiff, setHtmlDiff] = useState({});
+
+  const resolveConflict = useCallback(
+    async (selectedContent, otherContent) => {
+      const note = conflictedNote;
+      if (!note) return;
+
+      selectedContent = {
+        data: selectedContent,
+        type: "tiny",
+        resolved: true,
+      };
+
+      await db.notes.add({
+        id: note.id,
+        content: selectedContent,
+        conflicted: false,
+      });
+      if (otherContent) {
+        otherContent = {
+          data: otherContent,
+          type: "tiny",
+        };
+        await db.notes.add({
+          ...note,
+          content: otherContent,
+          id: undefined,
+          dateCreated: undefined,
+          dateEdited: undefined,
+          conflicted: false,
+          title: note.title + " (DUPLICATE)",
+        });
+      }
+      notesStore.refresh();
+      hashNavigate(`/notes/${note.id}/edit`, true);
+
+      const conflictsCount = db.notes.conflicted?.length;
+      if (conflictsCount) {
+        showToast(
+          "success",
+          `Conflict resolved. ${conflictsCount} conflicts left.`
+        );
+      } else {
+        showToast("success", "All conflicts resolved. Starting sync.");
+        await sync();
+      }
+    },
+    [conflictedNote, sync]
+  );
 
   useEffect(() => {
     (async function () {
@@ -27,13 +78,16 @@ function SplitEditor(props) {
       }
       notesStore.setSelectedNote(noteId);
       note = note.data;
+
       const content = await db.content.raw(note.contentId);
+      if (!content.conflicted) resolveConflict(content.data);
+
       setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
       setRemoteContent(content.conflicted);
       setHtmlDiff(diff.diff_dual_pane(content.data, content.conflicted.data));
     })();
-  }, [noteId]);
+  }, [noteId, resolveConflict]);
 
   useEffect(() => {
     setIsEditorOpen(true);
@@ -72,11 +126,11 @@ function SplitEditor(props) {
         >
           <ContentToggle
             label="Current note"
+            resolveConflict={resolveConflict}
             dateEdited={localContent.dateEdited}
             isSelected={selectedDelta === 0}
             isOtherSelected={selectedDelta === 1}
             onToggle={() => setSelectedDelta((s) => (s === 0 ? -1 : 0))}
-            note={conflictedNote}
             editors={() => ({
               selectedEditor: remoteEditor.current.editor,
               otherEditor: localEditor.current.editor,
@@ -123,8 +177,8 @@ function SplitEditor(props) {
               pb: 1,
               pt: [1, 1, 0],
             }}
+            resolveConflict={resolveConflict}
             label="Incoming note"
-            note={conflictedNote}
             isSelected={selectedDelta === 1}
             isOtherSelected={selectedDelta === 0}
             dateEdited={remoteContent.dateEdited}

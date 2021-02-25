@@ -1,9 +1,6 @@
-import React, { useCallback } from "react";
+import React from "react";
 import { Flex, Text, Button } from "rebass";
 import { timeConverter } from "../../utils/time";
-import { store as notestore } from "../../stores/note-store";
-import { db } from "../../common/db";
-import { hashNavigate } from "../../navigation";
 import diff from "./differ";
 
 function ContentToggle(props) {
@@ -15,42 +12,8 @@ function ContentToggle(props) {
     label,
     dateEdited,
     editors,
-    note,
+    resolveConflict,
   } = props;
-
-  const resolveConflict = useCallback(
-    async (selectedContent, otherContent) => {
-      selectedContent = {
-        data: selectedContent,
-        type: "tiny",
-        resolved: true,
-      };
-
-      await db.notes.add({
-        id: note.id,
-        content: selectedContent,
-        conflicted: false,
-      });
-      if (otherContent) {
-        otherContent = {
-          data: otherContent,
-          type: "tiny",
-        };
-        await db.notes.add({
-          ...note,
-          content: otherContent,
-          id: undefined,
-          dateCreated: undefined,
-          dateEdited: undefined,
-          conflicted: false,
-          title: note.title + " (DUPLICATE)",
-        });
-      }
-      notestore.refresh();
-      hashNavigate(`/notes/${note.id}/edit`, true);
-    },
-    [note]
-  );
 
   return (
     <Flex flexDirection="column" sx={sx}>
