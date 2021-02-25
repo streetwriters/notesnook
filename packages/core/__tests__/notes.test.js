@@ -75,6 +75,18 @@ test("note should get headline from content", () =>
     expect(note.headline).toBe("This is a very colorful existence.");
   }));
 
+test("note should get headline from content containing only lists", () =>
+  noteTest({
+    ...TEST_NOTE,
+    content: {
+      type: TEST_NOTE.content.type,
+      data: `<ol style="list-style-type: decimal;" data-mce-style="list-style-type: decimal;"><li>Hello I won't be a headline :(</li><li>Me too.</li><li>Gold.</li></ol>`,
+    },
+  }).then(async ({ db, id }) => {
+    let note = db.notes.note(id);
+    expect(note.headline).toBe("Hello I won't be a headline :(Me too.Gold.");
+  }));
+
 test("note title should allow trailing space", () =>
   noteTest({ title: "Hello ", content: TEST_NOTE.content }).then(
     async ({ db, id }) => {

@@ -15,9 +15,9 @@ class Tiny {
   }
 
   toTXT() {
-    if (window.DOMParser) {
+    if ("DOMParser" in window || "DOMParser" in global) {
       let doc = new DOMParser().parseFromString(this.data, "text/html");
-      return (doc.body || doc.firstElementChild).textContent || "";
+      return doc.body.textContent.trim();
     } else {
       return decode(
         this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
