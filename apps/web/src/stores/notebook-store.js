@@ -11,6 +11,7 @@ class NotebookStore extends BaseStore {
 
   refresh = () => {
     this.set((state) => (state.notebooks = db.notebooks.all));
+    this.setSelectedNotebook(this.get().selectedNotebookId);
   };
 
   delete = async (id) => {
@@ -29,6 +30,7 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
+    if (!id) return;
     this.set((state) => {
       state.selectedNotebookTopics = db.notebooks.notebook(id).topics.all;
       state.selectedNotebookId = id;
