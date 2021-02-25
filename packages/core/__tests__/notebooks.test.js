@@ -40,3 +40,9 @@ test("unpin a notebook", () =>
     notebook = db.notebooks.notebook(id);
     expect(notebook.data.pinned).toBe(false);
   }));
+
+test("updating notebook with empty title should throw", () =>
+  notebookTest().then(async ({ db, id }) => {
+    expect(id).toBeDefined();
+    await expect(db.notebooks.add({ id, title: "" })).rejects.toThrow();
+  }));

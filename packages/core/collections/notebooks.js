@@ -24,13 +24,12 @@ export default class Notebooks extends Collection {
     )
       return;
 
-    if (!oldNotebook && !notebookArg.title)
-      throw new Error("Notebook must contain at least a title.");
-
     let notebook = {
       ...oldNotebook,
       ...notebookArg,
     };
+
+    if (!notebook.title) throw new Error("Notebook must contain a title.");
 
     notebook = {
       id,
