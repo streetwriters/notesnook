@@ -11,8 +11,9 @@ export default class Notebooks extends Collection {
     let localNotebook = this._collection.getItem(id);
 
     if (localNotebook && localNotebook.topics?.length) {
-      // merge new and old topics
+      const lastSyncedTimestamp = await this._db.lastSynced();
 
+      // merge new and old topics
       // We need to handle 3 cases:
       for (let oldTopic of localNotebook.topics) {
         const newTopicIndex = remoteNotebook.topics.findIndex(
@@ -21,9 +22,9 @@ export default class Notebooks extends Collection {
         const newTopic = remoteNotebook.topics[newTopicIndex];
 
         // CASE 1: if topic exists in old notebook but not in new notebook, it's deleted.
-        // However, if the dateEdited of topic in the old notebook is > the dateEdited of newNotebook
+        // However, if the dateEdited of topic in the old notebook is > lastSyncedTimestamp
         // it was newly added or edited so add it to the new notebook.
-        if (!newTopic && oldTopic.dateEdited > remoteNotebook.dateEdited) {
+        if (!newTopic && oldTopic.dateEdited > lastSyncedTimestamp) {
           remoteNotebook.topics.push(oldTopic);
         }
 

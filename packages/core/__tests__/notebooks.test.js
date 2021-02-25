@@ -117,6 +117,8 @@ test("merge notebook with topic removed that is edited in the local notebook", (
     const newNotebook = { ...notebook.data, remote: true };
     newNotebook.topics.splice(1, 1); // remove hello topic
 
+    await StorageInterface.write("lastSynced", Date.now());
+
     await delay(500);
 
     await notebook.topics.add({
