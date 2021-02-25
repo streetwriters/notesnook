@@ -23,26 +23,21 @@ const AppLoader = ({onLoad}) => {
   const [opacity, setOpacity] = useState(true);
 
   const load = async () => {
+    eSendEvent(eOpenSideMenu);
+    setOpacity(false);
+    await sleep(2);
+    Animated.timing(opacityV, {
+      toValue: 0,
+      duration: 150,
+      easing: Easing.out(Easing.ease),
+    }).start();
     db.notes.init().then(() => {
       dispatch({type: Actions.NOTES});
       dispatch({type: Actions.FAVORITES});
       dispatch({type: Actions.LOADING, loading: false});
       eSendEvent(eOpenSideMenu);
     });
-    eSendEvent(eOpenSideMenu);
-    setOpacity(false);
-    await sleep(50);
-    Animated.timing(opacityV, {
-      toValue: 0,
-      duration: 150,
-      easing: Easing.out(Easing.ease),
-    }).start();
-    Animated.timing(scaleV, {
-      toValue: 1,
-      duration: 150,
-      easing: Easing.out(Easing.ease),
-    }).start();
-    changeContainerScale(ContainerScale, 1, 500);
+    changeContainerScale(ContainerScale, 1, 600);
     await sleep(150);
     setLoading(false);
     animation = false;
