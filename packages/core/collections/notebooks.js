@@ -25,7 +25,7 @@ export default class Notebooks extends Collection {
         // However, if the dateEdited of topic in the old notebook is > lastSyncedTimestamp
         // it was newly added or edited so add it to the new notebook.
         if (!newTopic && oldTopic.dateEdited > lastSyncedTimestamp) {
-          remoteNotebook.topics.push(oldTopic);
+          remoteNotebook.topics.push({ ...oldTopic, dateEdited: Date.now() });
         }
 
         // CASE 2: if topic exists in new notebook but not in old notebook, it's new.
@@ -33,10 +33,14 @@ export default class Notebooks extends Collection {
 
         // CASE 3: if topic exists in both notebooks:
         //      if oldTopic.dateEdited > newTopic.dateEdited: we keep oldTopic.
-        if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
-          remoteNotebook.topics[newTopicIndex] = oldTopic;
+        else if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
+          remoteNotebook.topics[newTopicIndex] = {
+            ...oldTopic,
+            dateEdited: Date.now(),
+          };
         }
       }
+      remoteNotebook.dateEdited = Date.now(); // we update the dateEdited so it can be synced back
     }
     return await this._collection.addItem(remoteNotebook);
   }
