@@ -8379,7 +8379,7 @@ notes-core@../notes-core:
 
 "notes-core@git+ssh://git@github.com:streetwriters/notesnook-core.git":
   version "6.6.3"
-  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#caf0520faa0c8c6842622b82795473276dabb11a"
+  resolved "git+ssh://git@github.com:streetwriters/notesnook-core.git#b3d6c4cc47b7a80cefb3597620bd782ad014a842"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysort "^1.1.4"
