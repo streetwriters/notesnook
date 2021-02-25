@@ -63,8 +63,10 @@ export function notesFromContext(context) {
       notes = db.notes.colored(context.value);
       break;
     case "topic":
-      const notebook = db.notebooks.notebook(context.value.id);
-      const topic = notebook.topics.topic(context.value.topic);
+      const notebook = db.notebooks.notebook(context?.value?.id);
+      if (!notebook) break;
+      const topic = notebook.topics?.topic(context?.value?.topic);
+      if (!topic) break;
       notes = topic.all;
       break;
     case "favorite":
