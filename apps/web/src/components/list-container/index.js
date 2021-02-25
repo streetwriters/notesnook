@@ -81,7 +81,10 @@ function ListContainer(props) {
                           const item = props.items[index];
                           if (!item) return null;
                           return (
-                            <div key={item.id || item.title} style={style}>
+                            <div
+                              key={item.id || item.title}
+                              style={{ ...style, zIndex: 1 }}
+                            >
                               {item.type === "header" ? (
                                 <GroupHeader
                                   title={item.title}

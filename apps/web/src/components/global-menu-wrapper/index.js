@@ -29,7 +29,7 @@ function GlobalMenuWrapper() {
   }, [state, animation]);
 
   return (
-    <Animated.Flex initial={{ opacity: 0 }} animate={animation}>
+    <>
       <Menu
         id="globalContextMenu"
         menuItems={items}
@@ -43,7 +43,7 @@ function GlobalMenuWrapper() {
         }}
         closeMenu={closeMenu}
       />
-    </Animated.Flex>
+    </>
   );
 }
 export default GlobalMenuWrapper;
