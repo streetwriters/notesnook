@@ -6,12 +6,46 @@ import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
 import { qclone } from "qclone";
 
 export default class Notebooks extends Collection {
+  async merge(remoteNotebook) {
+    const id = remoteNotebook.id || getId();
+    let localNotebook = this._collection.getItem(id);
+
+    if (localNotebook && localNotebook.topics?.length) {
+      // merge new and old topics
+
+      // We need to handle 3 cases:
+      for (let oldTopic of localNotebook.topics) {
+        const newTopicIndex = remoteNotebook.topics.findIndex(
+          (t) => t.id === oldTopic.id
+        );
+        const newTopic = remoteNotebook.topics[newTopicIndex];
+
+        // CASE 1: if topic exists in old notebook but not in new notebook, it's deleted.
+        // However, if the dateEdited of topic in the old notebook is > the dateEdited of newNotebook
+        // it was newly added or edited so add it to the new notebook.
+        if (!newTopic && oldTopic.dateEdited > remoteNotebook.dateEdited) {
+          remoteNotebook.topics.push(oldTopic);
+        }
+
+        // CASE 2: if topic exists in new notebook but not in old notebook, it's new.
+        // This case will be automatically handled as the new notebook is our source of truth.
+
+        // CASE 3: if topic exists in both notebooks:
+        //      if oldTopic.dateEdited > newTopic.dateEdited: we keep oldTopic.
+        if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
+          remoteNotebook.topics[newTopicIndex] = oldTopic;
+        }
+      }
+    }
+    return await this._collection.addItem(remoteNotebook);
+  }
+
   async add(notebookArg) {
     if (!notebookArg) throw new Error("Notebook cannot be undefined or null.");
-
-    if (notebookArg.remote) {
-      return await this._collection.addItem(notebookArg);
-    }
+    if (notebookArg.remote)
+      throw new Error(
+        "Please use db.notebooks.merge to merge remote notebooks"
+      );
 
     //TODO reliably and efficiently check for duplicates.
     const id = notebookArg.id || getId();

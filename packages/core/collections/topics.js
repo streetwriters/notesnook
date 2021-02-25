@@ -111,7 +111,8 @@ export default class Topics {
   }
 }
 
-function makeTopic(topic, notebookId) {
+// we export this for testing.
+export function makeTopic(topic, notebookId) {
   if (typeof topic !== "string") return topic;
   return {
     type: "topic",
