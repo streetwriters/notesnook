@@ -93,9 +93,9 @@ function AppEffects({ isMobile, isTablet, setShow }) {
 
   useEffect(() => {
     toggleSideMenu(!isMobile);
-    if (!isMobile && !isTablet) setShow(true);
+    if (!isMobile && !isTablet && !isFocusMode) setShow(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMobile, isTablet, toggleSideMenu]);
+  }, [isMobile, isTablet, isFocusMode, toggleSideMenu]);
 
   return <React.Fragment />;
 }
