@@ -158,7 +158,7 @@ var minifyImg = function (
     canvas.height = newHeight;
     ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0, newWidth, newHeight);
-    newDataUrl = canvas.toDataURL(undefined, imageArguments);
+    newDataUrl = canvas.toDataURL(imageType, imageArguments);
     resolve(newDataUrl);
   });
 };
