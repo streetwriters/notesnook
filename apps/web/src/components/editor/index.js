@@ -20,7 +20,6 @@ import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
 import Banner from "../banner";
 import EditorLoading from "./loading";
-import { useTheme } from "emotion-theming";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
@@ -36,7 +35,6 @@ function Editor({ noteId }) {
   const toggleProperties = useStore((store) => store.toggleProperties);
   const updateWordCount = useStore((store) => store.updateWordCount);
   const init = useStore((store) => store.init);
-  const theme = useTheme();
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
@@ -112,32 +110,6 @@ function Editor({ noteId }) {
         flexDirection="column"
         overflow="hidden"
         overflowY="auto"
-        onScroll={(e) => {
-          const title = document.querySelector(".editorTitle");
-          const headerOffset = title.scrollHeight;
-          const hideOffset = headerOffset + 60 + 40;
-          const { editor } = editorRef.current;
-          if (e.target.scrollTop >= hideOffset && !editor.isToolbarSticky) {
-            editor.pauseScrollIntoView = true;
-            const toolbar = document.querySelector(".tox-editor-header");
-            toolbar.style.position = "fixed";
-            toolbar.style.top = "40px";
-            toolbar.style.bottom = "auto";
-            toolbar.style.width = `${title.clientWidth}px`;
-            toolbar.style.backgroundColor = theme.colors["background"];
-            editor.isToolbarSticky = true;
-          } else if (
-            e.target.scrollTop < hideOffset - 20 &&
-            editor.isToolbarSticky
-          ) {
-            editor.pauseScrollIntoView = true;
-            const toolbar = document.querySelector(".tox-editor-header");
-            toolbar.style.position = "relative";
-            toolbar.style.top = "0px";
-            toolbar.style.bottom = "auto";
-            editor.isToolbarSticky = false;
-          }
-        }}
       >
         <Animated.Flex
           variant="columnFill"

@@ -148,8 +148,6 @@ function TinyMCE(props) {
           "paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
-        quickbars_selection_toolbar:
-          "bold italic code h2 h3 quicklink blockquote",
         quickbars_insert_toolbar: false,
         skin_url: newSkin,
         content_css: newSkin,
@@ -191,6 +189,8 @@ function TinyMCE(props) {
         toolbar: simple
           ? false
           : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+        quickbars_selection_toolbar:
+          "bold italic underline strikethrough code h2 h3 quicklink blockquote",
         mobile: {
           toolbar_mode: "scrolling",
         },
@@ -209,14 +209,10 @@ function TinyMCE(props) {
         setup: (editor) => {
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();
-            if (editor.pauseScrollIntoView) {
-              editor.pauseScrollIntoView = false;
-            } else {
-              e.elm.scrollIntoView({
-                behavior: "smooth",
-                block: "nearest",
-              });
-            }
+            e.elm.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
           });
         },
         browser_spellcheck: true,
