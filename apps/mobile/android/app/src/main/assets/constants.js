@@ -174,13 +174,13 @@ function loadImage() {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
-          600,
+          1024,
           'image/jpeg',
           (r) => {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },
-          0.7,
+          0.8,
         );
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);
