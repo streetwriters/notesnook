@@ -46,6 +46,11 @@ function SignUpDialog(props) {
         as="form"
         onSubmit={(e) => {
           e.preventDefault();
+          if (error) {
+            setError("Please resolve all errors before continuing.");
+            return;
+          }
+
           const data = requiredValues.reduce((prev, curr) => {
             prev[curr] = e.target[curr].value;
             return prev;
@@ -87,9 +92,14 @@ function SignUpDialog(props) {
           type="password"
           autoComplete="new-password"
           validatePassword
+          onError={setError}
           sx={{ mt: 1 }}
         />
-        {error && <Text variant="error">{error}</Text>}
+        {error && typeof error === "string" && (
+          <Text variant="error" fontSize="body" mt={2}>
+            {error}
+          </Text>
+        )}
       </Box>
     </Dialog>
   );

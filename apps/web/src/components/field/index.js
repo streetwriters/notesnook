@@ -45,6 +45,7 @@ function Field(props) {
     defaultValue,
     placeholder,
     validatePassword,
+    onError,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
@@ -81,11 +82,13 @@ function Field(props) {
           onChange={(e) => {
             if (validatePassword) {
               const value = e.target.value;
-              setRules((rules) =>
-                rules.map((rule) => {
-                  return { ...rule, isValid: rule.validate(value) };
-                })
-              );
+              const mapped = rules.map((rule) => {
+                return { ...rule, isValid: rule.validate(value) };
+              });
+              if (onError) {
+                onError(mapped.some((m) => !m.isValid));
+              }
+              setRules(mapped);
             }
             if (onChange) onChange(e);
           }}
