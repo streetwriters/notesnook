@@ -48,6 +48,7 @@ export const Notebook = createIcon(Icons.mdiBookOutline);
 export const Notebook2 = createIcon(Icons.mdiBookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
 export const ArrowRight = createIcon(Icons.mdiArrowRight);
+export const ArrowDown = createIcon(Icons.mdiArrowDown);
 export const Move = createIcon(Icons.mdiBookPlusMultipleOutline);
 export const Topic = createIcon(Icons.mdiFormatTitle);
 export const Alert = createIcon(Icons.mdiAlert);

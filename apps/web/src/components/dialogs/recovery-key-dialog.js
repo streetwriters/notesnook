@@ -6,18 +6,19 @@ import Logo from "../../assets/notesnook-logo.png";
 import download from "../../utils/download";
 import ClipboardJS from "clipboard";
 import { captureMessage } from "@sentry/react";
-import { useStore as useUserStore } from "../../stores/user-store";
 import { Suspense } from "react";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
 function RecoveryKeyDialog(props) {
   const [key, setKey] = useState();
-  const { email } = useUserStore((store) => store.user);
+  const [email, setEmail] = useState();
   const [copyText, setCopyText] = useState("Copy to clipboard");
   useEffect(() => {
     (async () => {
+      const { email } = await db.user.getUser();
       const { key } = await db.user.getEncryptionKey();
+      setEmail(email);
       setKey(key);
     })();
   }, []);

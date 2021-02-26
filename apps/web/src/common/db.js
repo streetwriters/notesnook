@@ -8,10 +8,16 @@ var db;
 function initializeDatabase() {
   return import("notes-core/api").then(({ default: Database }) => {
     db = new Database(StorageInterface, EventSource);
+    // db.host({
+    //   API_HOST: "https://api.notesnook.com",
+    //   AUTH_HOST: "https://auth.streetwriters.co",
+    //   SSE_HOST: "https://events.streetwriters.co",
+    // });
+
     db.host({
-      API_HOST: "https://api.notesnook.com",
-      AUTH_HOST: "https://auth.streetwriters.co",
-      SSE_HOST: "https://events.streetwriters.co",
+      API_HOST: "http://localhost:5264",
+      AUTH_HOST: "http://localhost:8264",
+      SSE_HOST: "http://localhost:7264",
     });
 
     return db.init();
@@ -21,12 +27,6 @@ function initializeDatabase() {
 export { db, initializeDatabase };
 
 // export const db = new Database(StorageInterface, EventSource);
-
-// db.host({
-//   API_HOST: "http://localhost:5264",
-//   AUTH_HOST: "http://localhost:8264",
-//   SSE_HOST: "http://localhost:7264",
-// });
 
 // // db.host({
 // //   API_HOST: "http://192.168.10.7:5264",
