@@ -1,4 +1,5 @@
 import tinymce from "tinymce/tinymce";
+import Compressor from "compressorjs";
 
 (function () {
   tinymce.PluginManager.add("quickimage", function (editor, url) {
@@ -14,24 +15,25 @@ import tinymce from "tinymce/tinymce";
       input.onchange = function () {
         var file = this.files[0];
         if (!file) return null;
-        var reader = new FileReader();
-        reader.onload = function (e) {
-          minifyImg(
-            reader.result,
-            600,
-            (r) => {
-              var content = `<img src="${r}">`;
-              editor.insertContent(content);
-              reader.onerror = null;
-            },
-            1
-          );
 
-          reader.onerror = function () {
-            reader.onerror = null;
-          };
-        };
-        reader.readAsDataURL(file);
+        new Compressor(file, {
+          quality: 0.6,
+          mimeType: "image/jpeg",
+          width: 1024,
+          success(result) {
+            var reader = new FileReader();
+            reader.readAsDataURL(result);
+
+            reader.onloadend = function () {
+              var base64data = reader.result;
+              var content = `<img src="${base64data}"/>`;
+              editor.insertContent(content);
+            };
+          },
+          error(err) {
+            console.error(err.message);
+          },
+        });
       };
       input.dispatchEvent(new MouseEvent("click"));
     }
@@ -41,29 +43,6 @@ import tinymce from "tinymce/tinymce";
       tooltip: "Insert image",
       onAction: _onAction,
     });
-
-    var minifyImg = function (dataUrl, newWidth, resolve, quality) {
-      var image, oldWidth, oldHeight, newHeight, canvas, ctx, newDataUrl;
-      new Promise(function (resolve) {
-        image = new Image();
-        image.src = dataUrl;
-        resolve();
-      }).then(() => {
-        oldWidth = image.width;
-        oldHeight = image.height;
-
-        newHeight = Math.floor((oldHeight / oldWidth) * newWidth);
-
-        canvas = document.createElement("canvas");
-        canvas.width = newWidth;
-        canvas.height = newHeight;
-
-        ctx = canvas.getContext("2d");
-        ctx.drawImage(image, 0, 0, newWidth, newHeight);
-        newDataUrl = canvas.toDataURL(undefined, quality);
-        resolve(newDataUrl);
-      });
-    };
 
     editor.addCommand("InsertImage", function (ui, value) {
       _onAction();
