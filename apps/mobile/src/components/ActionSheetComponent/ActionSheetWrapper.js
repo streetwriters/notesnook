@@ -74,7 +74,7 @@ const ActionSheetWrapper = ({
   return (
     <ActionSheet
       ref={fwdRef}
-      hideUnderlay={largeTablet || smallTablet ? true : false}
+      hideUnderlay={true}
       containerStyle={style}
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
