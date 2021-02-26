@@ -10,6 +10,7 @@ const cache = {};
 function CachedRouter() {
   const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
   useEffect(() => {
+    if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult);
 
     const key = RouteResult.key || "general";
