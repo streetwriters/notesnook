@@ -1,23 +1,22 @@
-import React, {useEffect} from 'react';
-import {Keyboard, Platform, View} from 'react-native';
-import RNExitApp from 'react-native-exit-app';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
-import {ActionSheetEvent} from '../../components/DialogManager/recievers';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import React, { useEffect } from 'react';
+import { Keyboard, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
+import { ActionSheetEvent } from '../../components/DialogManager/recievers';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
-import {db} from '../../utils/DB';
+import { editing } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
-  eOpenFullscreenEditor,
+  eOpenFullscreenEditor
 } from '../../utils/Events';
-import {sideMenuRef, tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorTitle} from './EditorTitle';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
   clearEditor,
@@ -26,16 +25,12 @@ import {
   isNotedEdited,
   loadNote,
   post,
-  saveNote,
-  setColors,
-  setIntent,
+
+  setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
-import {toolbarRef} from './tiny/toolbar/constants';
-
-let handleBack;
-let tapCount = 0;
+import { toolbarRef } from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -81,10 +76,7 @@ const EditorHeader = () => {
         }
         post('keyboard');
       });
-      if (handleBack) {
-        handleBack.remove();
-        handleBack = null;
-      }
+     
     }
   };
 
@@ -115,6 +107,8 @@ const EditorHeader = () => {
                 await _onBackPress();
                 Navigation.popToTop();
               }}
+              top={50}
+              left={50}
               testID={notesnook.ids.default.header.buttons.back}
               name="arrow-left"
               color={colors.heading}
@@ -140,6 +134,7 @@ const EditorHeader = () => {
                 marginLeft: 10,
                 borderRadius: 5,
               }}
+              top={50}
               onPress={async () => {
                 await loadNote({type: 'new'});
               }}
@@ -152,6 +147,7 @@ const EditorHeader = () => {
                 customStyle={{
                   marginLeft: 10,
                 }}
+                top={50}
                 onPress={() => {
                   eSendEvent(eOpenFullscreenEditor);
                   editing.isFullscreen = true;
@@ -166,6 +162,8 @@ const EditorHeader = () => {
               customStyle={{
                 marginLeft: 10,
               }}
+              top={50}
+              right={50}
               onPress={async () => {
                 let note = getNote() && db.notes.note(getNote().id).data;
                 if (editing.isFocused) {
