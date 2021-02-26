@@ -50,7 +50,7 @@ const Editor = React.memo(
       setResetting(true);
       await sleep(10);
       setResetting(false);
-      await sleep(1000);
+      await sleep(10);
       setLocalLoading(false);
     };
 
@@ -62,15 +62,8 @@ const Editor = React.memo(
       };
     }, []);
 
-    return resetting ? (
-      <Loading
-        tagline={resetting ? 'Reloading Editor' : 'Loading Editor'}
-        height="100%"
-      />
-    ) : (
+    return resetting || localLoading ? null : (
       <>
-        {localLoading && <Loading tagline="Loading Editor" height="100%" />}
-
         <TextInput
           ref={textInput}
           style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
@@ -88,7 +81,6 @@ const Editor = React.memo(
             height: '100%',
             width: '100%',
           }}
-          
           nestedScrollEnabled
           contentContainerStyle={{
             width: '100%',
@@ -120,6 +112,7 @@ const Editor = React.memo(
             originWhitelist={['*']}
             source={source}
             style={style}
+            autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
         </ScrollView>
