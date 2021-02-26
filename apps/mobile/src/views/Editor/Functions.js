@@ -146,8 +146,13 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
-    content.data = data.data;
-    content.type = data.type;
+    if (!data) {
+      content.data = '';
+      content.type = 'tiny';
+    } else {
+      content.data = data.data;
+      content.type = data.type;
+    }
   }
 }
 
@@ -484,10 +489,25 @@ const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
-    console.log(content.data);
     tiny.call(EditorWebView, tiny.setTitle(title));
     intent = false;
-    tiny.call(EditorWebView, tiny.html(content.data));
+
+    if (!content || !content.data || content?.data?.length === 0) {
+      tiny.call(
+        EditorWebView,
+        `
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'noteLoaded',
+        value: true,
+      }),
+    );
+    `,
+      );
+    } else {
+      tiny.call(EditorWebView, tiny.html(content.data));
+    }
+
     setColors();
     tiny.call(
       EditorWebView,
