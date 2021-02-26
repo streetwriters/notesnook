@@ -1,5 +1,6 @@
 import { EV, EVENTS } from "../common";
 import id from "../utils/id";
+import setManipulator from "../utils/set";
 
 class Settings {
   /**
@@ -8,13 +9,7 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
-    this._settings = {
-      type: "settings",
-      id: id(),
-      pins: [],
-      dateEdited: 0,
-      dateCreated: Date.now(),
-    };
+    this._settings = undefined;
   }
 
   get raw() {
@@ -22,23 +17,28 @@ class Settings {
   }
 
   async merge(item) {
-    this._settings = {
-      ...this._settings,
-      ...item,
-    };
-    await this._db.context.write("settings", this._settings);
+    // TODO if (this.settings.dateEdited > (await this._db.lastSynced())) {
+    //   this._settings.pins = setManipulator.union(
+    //     this._settings.pins,
+    //     item.pins
+    //   );
+    // }
+    this._settings = item;
+    await this._db.context.write("settings", item);
   }
 
   async init() {
     var settings = await this._db.context.read("settings");
-    if (!settings) await this._db.context.write("settings", this._settings);
-    else this._settings = settings;
+    this._settings = settings;
     EV.subscribe(EVENTS.userLoggedOut, () => {
+      this._settings = undefined;
+    });
+    EV.subscribe(EVENTS.userSignedUp, () => {
       this._settings = {
         type: "settings",
         id: id(),
         pins: [],
-        dateEdited: 0,
+        dateEdited: Date.now(),
         dateCreated: Date.now(),
       };
     });
@@ -66,6 +66,7 @@ class Settings {
   }
 
   get pins() {
+    if (!this._settings) return [];
     return this._settings.pins.reduce((prev, pin) => {
       let item;
       if (pin.type === "notebook") {

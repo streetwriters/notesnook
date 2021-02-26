@@ -24,10 +24,10 @@ class Collector {
     };
   }
 
-  async collect(lastSyncedTimestamp, force) {
+  async collect(lastSyncedTimestamp) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
-    this.force = force;
+
     return {
       notes: await this._collect(this._db.notes.raw),
       notebooks: await this._collect(this._db.notebooks.raw),
@@ -44,11 +44,9 @@ class Collector {
   }
 
   _collect(array) {
-    if (this.force) {
-      return Promise.all(array.map(this._map));
-    }
     return Promise.all(
       array.reduce((prev, item) => {
+        if (!item) return prev;
         if (item.dateEdited > this._lastSyncedTimestamp || item.migrated)
           prev.push(this._map(item));
         return prev;

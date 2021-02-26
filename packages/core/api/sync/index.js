@@ -63,12 +63,14 @@ export default class Sync {
   }
 
   async start(full, force) {
+    if (force) await this._db.context.write("lastSynced", 0);
+
     let { lastSynced, token } = await this._performChecks();
 
     if (full) var serverResponse = await this._fetch(lastSynced, token);
 
     // we prepare local data before merging so we always have correct data
-    const data = await this._collector.collect(lastSynced, force);
+    const data = await this._collector.collect(lastSynced);
 
     if (full) {
       // merge the server response

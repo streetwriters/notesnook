@@ -25,6 +25,7 @@ export const EVENTS = {
   userLoggedIn: "user:loggedIn",
   userLoggedOut: "user:loggedOut",
   userFetched: "user:fetched",
+  userSignedUp: "user:signedUp",
   databaseSyncRequested: "db:syncRequested",
   databaseMigrated: "db:migrated",
   databaseUpdated: "db:updated",

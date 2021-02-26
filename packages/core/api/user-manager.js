@@ -39,6 +39,7 @@ class UserManager {
       password: hashedPassword,
       client_id: "notesnook",
     });
+    EV.publish(EVENTS.userSignedUp);
     return await this.login(email, password, true, hashedPassword);
   }
 
@@ -198,7 +199,7 @@ class UserManager {
     if (!token) return;
 
     // we hash the passwords beforehand
-    const { email } = await this.getUser();
+    const { email, salt } = await this.getUser();
     var hashedData = {};
     if (data.old_password)
       hashedData.old_password = await this._db.context.hash(
@@ -223,13 +224,14 @@ class UserManager {
       type,
       { newPassword: data.new_password },
       async () => {
-        const key = await this.getEncryptionKey();
-        const { email } = await this.getUser();
+        await this._db.sync(true);
+
         await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
           password: data.new_password,
-          salt: key.salt,
+          salt,
         });
-        await this._db.sync(true, true);
+
+        await this._db.sync(false, true);
       }
     );
     return true;
