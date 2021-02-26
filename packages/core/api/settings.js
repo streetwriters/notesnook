@@ -9,7 +9,13 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
-    this._settings = undefined;
+    this._settings = {
+      type: "settings",
+      id: id(),
+      pins: [],
+      dateEdited: Date.now(),
+      dateCreated: Date.now(),
+    };
   }
 
   get raw() {
@@ -29,11 +35,9 @@ class Settings {
 
   async init() {
     var settings = await this._db.context.read("settings");
-    this._settings = settings;
+    if (settings) this._settings = settings;
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = undefined;
-    });
-    EV.subscribe(EVENTS.userSignedUp, () => {
       this._settings = {
         type: "settings",
         id: id(),
@@ -66,7 +70,6 @@ class Settings {
   }
 
   get pins() {
-    if (!this._settings) return [];
     return this._settings.pins.reduce((prev, pin) => {
       let item;
       if (pin.type === "notebook") {
