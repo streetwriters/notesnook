@@ -121,9 +121,7 @@ export const _onShouldStartLoadWithRequest = async (request) => {
   if (request.url.includes('https')) {
     openLinkInBrowser(request.url, appColors)
       .catch((e) => {})
-      .then((r) => {
-        console.log('closed');
-      });
+      .then((r) => {});
 
     return false;
   } else {
@@ -195,6 +193,8 @@ export const loadNote = async (item) => {
     if (id === item.id) {
       return;
     }
+    eSendEvent('webviewreset');
+    webviewInit = false;
     eSendEvent('loadingNote', item);
     editing.isFocused = false;
     clearTimer();
@@ -221,14 +221,13 @@ const checkStatus = (reset = false) => {
     if (!webviewOK) {
       if (!reset) {
         checkStatus(true);
-        console.log('checking again');
+
         return;
       }
       webviewInit = false;
       EditorWebView = createRef();
       eSendEvent('webviewreset');
     } else {
-      console.log('webview is running', webviewOK);
     }
   }, 3500);
 };
@@ -256,20 +255,25 @@ export const _onMessage = async (evt) => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
-      content = {
-        type: message.type,
-        data: message.value,
-      };
-      onNoteChange();
+      if (message.value !== content.data) {
+        content = {
+          type: message.type,
+          data: message.value,
+        };
+        onNoteChange();
+      } else {
+        console.log('not saving');
+      }
       break;
     case 'title':
-      console.log('TITLE', message.value);
       noteEdited = true;
-      title = message.value;
-      eSendEvent('editorScroll', {
-        title: message.value,
-      });
-      onNoteChange();
+      if (message.value !== title) {
+        title = message.value;
+        eSendEvent('editorScroll', {
+          title: message.value,
+        });
+        onNoteChange();
+      }
       break;
     case 'scroll':
       eSendEvent('editorScroll', message);
@@ -301,7 +305,6 @@ export const _onMessage = async (evt) => {
       webviewOK = true;
       break;
     case 'focus':
-      console.log('focus gained', message.value);
       editing.focusType = message.value;
       break;
     case 'selectionchange':
@@ -416,7 +419,7 @@ export async function saveNote() {
       clearNote();
       return;
     }
-    console.log('saving note is called here');
+
     let locked = id ? db.notes.note(id).data.locked : null;
 
     let noteData = {
@@ -427,8 +430,6 @@ export async function saveNote() {
       },
       id: id,
     };
-
-    console.log(noteData);
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
@@ -457,9 +458,7 @@ export async function saveNote() {
     let n = db.notes.note(id)?.data?.dateEdited;
     tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
-  } catch (e) {
-    console.log(e, 'error in saving');
-  }
+  } catch (e) {}
 }
 
 export async function onWebViewLoad(premium, colors) {
