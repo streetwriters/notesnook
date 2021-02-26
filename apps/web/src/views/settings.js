@@ -75,7 +75,7 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
-  const version = useVersion();
+  const [, version] = useVersion();
 
   const toggleFollowSystemTheme = useThemeStore(
     (store) => store.toggleFollowSystemTheme

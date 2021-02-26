@@ -9,16 +9,16 @@ import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 
 function AppEffects({ isMobile, isTablet, setShow }) {
-  var refreshColors = useStore((store) => store.refreshColors);
-  var refreshMenuPins = useStore((store) => store.refreshMenuPins);
-  var isFocusMode = useStore((store) => store.isFocusMode);
-  var isEditorOpen = useStore((store) => store.isEditorOpen);
-  var toggleSideMenu = useStore((store) => store.toggleSideMenu);
-  var addReminder = useStore((store) => store.addReminder);
-  var initUser = useUserStore((store) => store.init);
-  var initNotes = useNotesStore((store) => store.init);
-  var setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  var version = useVersion();
+  const refreshColors = useStore((store) => store.refreshColors);
+  const refreshMenuPins = useStore((store) => store.refreshMenuPins);
+  const isFocusMode = useStore((store) => store.isFocusMode);
+  const isEditorOpen = useStore((store) => store.isEditorOpen);
+  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const addReminder = useStore((store) => store.addReminder);
+  const initUser = useUserStore((store) => store.init);
+  const initNotes = useNotesStore((store) => store.init);
+  const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
+  const [version] = useVersion();
 
   useEffect(() => {
     (async function () {

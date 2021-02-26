@@ -3,8 +3,8 @@ import { db } from "../common/db";
 import config from "./config";
 
 var APP_VERSION = {
-  formatted: format(1310),
-  numerical: 1310,
+  formatted: format(1320),
+  numerical: 1320,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
@@ -23,7 +23,7 @@ function useVersion() {
     })();
   }, []);
 
-  return version;
+  return [version, APP_VERSION];
 }
 export default useVersion;
 
