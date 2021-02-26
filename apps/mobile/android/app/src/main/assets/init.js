@@ -111,11 +111,9 @@ function init_tiny(size) {
     },
   });
 }
-window.prevContent = '';
+window.prevContent = "";
 const onChange = (event) => {
   if (event.type === 'nodechange' && !event.selectionChange) return;
-  if (editor.getContent() === window.prevContent) return;
-  window.prevContent = editor.getContent();
 
   if (isLoading) {
     isLoading = false;
