@@ -95,8 +95,11 @@ class EditorStore extends BaseStore {
   };
 
   saveSession = (oldSession) => {
+    const session = this.get().session;
+    if (session.isSaving) return; // avoid multiple in-queue saves; only save one time.
     this.set((state) => (state.session.isSaving = true));
-    this._saveFn()(this.get().session).then(async (id) => {
+
+    this._saveFn()(session).then(async (id) => {
       const note = db.notes.note(id)?.data;
       if (!note) {
         noteStore.refresh();
