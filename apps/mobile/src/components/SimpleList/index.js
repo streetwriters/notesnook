@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import {RefreshControl, useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
@@ -8,6 +9,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
+import {sleep} from '../../utils/TimeUtils';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
@@ -19,9 +21,6 @@ import {SectionHeader} from './section-header';
 const header = {
   type: 'MAIN_HEADER',
 };
-const emptyData = new DataProvider((r1, r2) => {
-  return r1 !== r2;
-}).cloneWithRows([header, {type: 'empty'}]);
 
 const SimpleList = ({
   listData,
@@ -41,14 +40,11 @@ const SimpleList = ({
   const [state] = useTracked();
   const {colors, deviceMode, messageBoardState} = state;
   const [_loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }).cloneWithRows(
-      !listData || listData.length === 0
-        ? [header, {type: 'empty'}]
-        : [header].concat(listData),
-    ),
+    }),
   );
 
   const insets = useSafeAreaInsets();
@@ -57,15 +53,23 @@ const SimpleList = ({
   const dataType = type;
 
   useEffect(() => {
-    setDataProvider(
-      dataProvider.cloneWithRows(
-        !listData || listData.length === 0
-          ? [header, {type: 'empty'}]
-          : [header].concat(listData),
-      ),
-    );
-    setLoading(false);
-  }, [listData, deviceMode]);
+    if (loading) {
+      setDataProvider(dataProvider.cloneWithRows([header, {type: 'empty'}]));
+      setLoaded(false);
+    }
+
+    if (!loading) {
+      setDataProvider(
+        dataProvider.cloneWithRows(
+          !listData || listData.length === 0
+            ? [header, {type: 'empty'}]
+            : [header].concat(listData),
+        ),
+      );
+      setLoading(false);
+      sleep(100).then(() => setLoaded(true));
+    }
+  }, [listData, deviceMode, loading]);
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -79,28 +83,6 @@ const SimpleList = ({
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
   };
-
-  const emptyLayoutProvider = new LayoutProvider(
-    (index) => {
-      return emptyData.getDataForIndex(index).type;
-    },
-    (type, dim) => {
-      switch (type) {
-        case 'empty':
-          dim.width = width;
-          dim.height = dHeight - 250 - insets.top;
-          break;
-        case 'MAIN_HEADER':
-          dim.width = width;
-          dim.height =
-            dataType === 'search' ? 0 : DDS.isLargeTablet() ? 50 : 195;
-          break;
-        default:
-          dim.width = width;
-          dim.height = 0;
-      }
-    },
-  );
 
   const _layoutProvider = new LayoutProvider(
     (index) => {
@@ -243,19 +225,44 @@ const SimpleList = ({
     width: '100%',
   };
   return (
-    <RecyclerListView
-      ref={scrollRef}
-      layoutProvider={
-        loading || _loading ? emptyLayoutProvider : _layoutProvider
-      }
-      dataProvider={loading || _loading ? emptyData : dataProvider}
-      rowRenderer={_renderRow}
-      onScroll={_onScroll}
-      canChangeSize={true}
-      renderFooter={Footer}
-      scrollViewProps={scrollProps}
-      style={styles}
-    />
+    <>
+      {loaded && !loading ? null : (
+        <>
+          <View
+            style={{
+              position: 'absolute',
+              width: '100%',
+              height: '100%',
+              backgroundColor: colors.bg,
+              zIndex: 999,
+            }}>
+            <Header
+              title={headerProps.heading}
+              paragraph={headerProps.paragraph}
+              onPress={headerProps.onPress}
+              icon={headerProps.icon}
+              type={dataType}
+              index={0}
+            />
+            <Empty loading={true} placeholderData={placeholderData} />
+          </View>
+        </>
+      )}
+
+      {_loading ? null : (
+        <RecyclerListView
+          ref={scrollRef}
+          layoutProvider={_layoutProvider}
+          dataProvider={dataProvider}
+          rowRenderer={_renderRow}
+          onScroll={_onScroll}
+          canChangeSize={true}
+          renderFooter={listData.length === 0 ? null : Footer}
+          scrollViewProps={scrollProps}
+          style={styles}
+        />
+      )}
+    </>
   );
 };
 

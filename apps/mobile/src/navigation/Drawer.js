@@ -30,11 +30,11 @@ const onStateChange = (state) => {
 
 const onNavigatorStateChange = (e) => {
   if (e.history.find((i) => i.type === 'drawer')) {
-    changeContainerScale(ContainerScale, 0.95, 250);
-    changeContainerScale(DrawerScale, 1, 250);
+    //changeContainerScale(ContainerScale, 0.95, 250);
+    //changeContainerScale(DrawerScale, 1, 250);
   } else {
-    changeContainerScale(DrawerScale, 0.95, 250);
-    changeContainerScale(ContainerScale, 1, 250);
+    //changeContainerScale(DrawerScale, 0.95, 250);
+    //changeContainerScale(ContainerScale, 1, 250);
   }
 }
 

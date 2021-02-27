@@ -25,13 +25,14 @@
 				<a href="https://www.tiny.cloud/" target="_blank" id="infosaved">Powered by Tiny</a>
 			</div>
 		</div>
-		<textarea id="tiny_textarea"></textarea>
+		<textarea hidden id="tiny_textarea"></textarea>
 	</div>
 	<script>
 	let editor = null;
 	let isLoading = true;
 	let regex = /\n/gm;
 	</script>
+	<script src="./compressor.min.js"></script>
 	<script src="./listeners.js"></script>
 	<script src="./dist/main.js"></script>
 	<script src="./constants.js"></script>

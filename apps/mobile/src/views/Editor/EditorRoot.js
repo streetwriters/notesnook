@@ -28,7 +28,7 @@ import {
   saveNote,
   setIntent,
 } from './Functions';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {toolbarRef} from './tiny/toolbar/constants';
 
 let handleBack;
 let tapCount = 0;
@@ -67,7 +67,6 @@ const EditorRoot = () => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
       Keyboard.addListener('keyboardDidShow', () => {
-     
         if (!editing.movedAway) {
           editing.isFocused = true;
         }
@@ -82,7 +81,26 @@ const EditorRoot = () => {
     });
   };
 
-  const onCallClear = async () => {
+  const onCallClear = async (value) => {
+    if (value === 'removeHandler') {
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
+      return;
+    }
+    if (value === 'addHandler') {
+      if (handleBack) {
+        handleBack.remove();
+        handleBack = null;
+      }
+
+      handleBack = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onHardwareBackPress,
+      );
+      return;
+    }
     if (editing.currentlyEditing) {
       await _onBackPress();
     }
@@ -96,12 +114,12 @@ const EditorRoot = () => {
   };
 
   const _onBackPress = async () => {
-    eSendEvent("showTooltip");
+    eSendEvent('showTooltip');
     toolbarRef.current?.scrollTo({
-      x:0,
-      y:0,
-      animated:false
-    })
+      x: 0,
+      y: 0,
+      animated: false,
+    });
     editing.currentlyEditing = false;
     if (DDS.isLargeTablet()) {
       if (fullscreen) {

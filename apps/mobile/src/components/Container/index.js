@@ -13,7 +13,7 @@ export const Container = ({children, root}) => {
   return (
     <KeyboardAvoidingView behavior="padding" enabled={Platform.OS === 'ios'}
       style={{
-        backgroundColor:colors.nav,
+        backgroundColor:colors.bg,
         width:"100%",
         height:"100%"
       }}

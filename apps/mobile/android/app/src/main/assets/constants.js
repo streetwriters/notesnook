@@ -22,54 +22,53 @@ let pageTheme = {
 };
 
 const markdownPatterns = [
-  { start: "*", end: "*", format: "italic" },
-  { start: "**", end: "**", format: "bold" },
-  { start: "`", end: "`", format: "code" },
-  { start: "#", format: "h1" },
-  { start: "##", format: "h2" },
-  { start: "###", format: "h3" },
-  { start: "####", format: "h4" },
-  { start: "#####", format: "h5" },
-  { start: "######", format: "h6" },
-  { start: "* ", cmd: "InsertUnorderedList" },
-  { start: "- ", cmd: "InsertUnorderedList" },
-  { start: "> ", format: "blockquote" },
+  {start: '*', end: '*', format: 'italic'},
+  {start: '**', end: '**', format: 'bold'},
+  {start: '`', end: '`', format: 'code'},
+  {start: '#', format: 'h1'},
+  {start: '##', format: 'h2'},
+  {start: '###', format: 'h3'},
+  {start: '####', format: 'h4'},
+  {start: '#####', format: 'h5'},
+  {start: '######', format: 'h6'},
+  {start: '* ', cmd: 'InsertUnorderedList'},
+  {start: '- ', cmd: 'InsertUnorderedList'},
+  {start: '> ', format: 'blockquote'},
   {
-    start: "1. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "decimal" },
+    start: '1. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'decimal'},
   },
   {
-    start: "1) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "decimal" },
+    start: '1) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'decimal'},
   },
   {
-    start: "a. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-alpha" },
+    start: 'a. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-alpha'},
   },
   {
-    start: "a) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-alpha" },
+    start: 'a) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-alpha'},
   },
   {
-    start: "i. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-roman" },
+    start: 'i. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-roman'},
   },
   {
-    start: "i) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-roman" },
+    start: 'i) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-roman'},
   },
-  { start: "---", replacement: "<hr/>" },
-  { start: "--", replacement: "—" },
-  { start: "-", replacement: "—" },
-  { start: "(c)", replacement: "©" },
+  {start: '---', replacement: '<hr/>'},
+  {start: '--', replacement: '—'},
+  {start: '-', replacement: '—'},
+  {start: '(c)', replacement: '©'},
 ];
-
 
 function dark() {
   if (!tinymce.activeEditor) return;
@@ -144,22 +143,24 @@ var minifyImg = function (
   resolve,
   imageArguments = 0.7,
 ) {
-  var image, oldWidth, oldHeight, newHeight, canvas, ctx, newDataUrl;
-  new Promise(function (resolve) {
-    image = new Image();
-    image.src = dataUrl;
-    resolve('Done : ');
-  }).then((d) => {
-    oldWidth = image.width;
-    oldHeight = image.height;
-    newHeight = Math.floor((oldHeight / oldWidth) * newWidth);
-    canvas = document.createElement('canvas');
-    canvas.width = newWidth;
-    canvas.height = newHeight;
-    ctx = canvas.getContext('2d');
-    ctx.drawImage(image, 0, 0, newWidth, newHeight);
-    newDataUrl = canvas.toDataURL(undefined, imageArguments);
-    resolve(newDataUrl);
+  fetch(dataUrl).then(async (res) => {
+    let blob = await res.blob();
+    new Compressor(blob, {
+      quality: imageArguments,
+      width: newWidth,
+      mimeType:imageType,
+      success: (result) => {
+        let fileReader = new FileReader();
+        fileReader.onloadend = function () {
+          resolve(fileReader.result);
+          fileReader.onloadend = null;
+        };
+        fileReader.readAsDataURL(result);
+      },
+      error: (err) => {
+        console.log(err.message);
+      },
+    });
   });
 };
 
@@ -173,13 +174,13 @@ function loadImage() {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
-          600,
+          1024,
           'image/jpeg',
           (r) => {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },
-          0.7,
+          0.6,
         );
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);

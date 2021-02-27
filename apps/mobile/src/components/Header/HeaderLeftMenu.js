@@ -54,6 +54,9 @@ export const HeaderLeftMenu = () => {
             marginLeft: -5,
             marginRight:DDS.isLargeTablet()? 10 : 25,
           }}
+          left={40}
+          top={40}
+          right={DDS.isLargeTablet()? 10 : 25}
           onPress={onLeftButtonPress}
           onLongPress={() => {
             Navigation.popToTop();

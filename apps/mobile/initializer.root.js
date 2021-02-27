@@ -48,7 +48,7 @@ const onChangeTab = async (obj) => {
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
-
+    eSendEvent(eClearEditor, 'addHandler');
     if (!editing.currentlyEditing || !getNote()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
@@ -60,6 +60,7 @@ const onChangeTab = async (obj) => {
     if (obj.from === 1) {
       updateStatusBarColor();
       deactivateKeepAwake();
+      eSendEvent(eClearEditor, 'removeHandler');
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }

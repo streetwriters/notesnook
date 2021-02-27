@@ -27,9 +27,9 @@ function init_tiny(size) {
     ],
     toolbar: false,
     paste_data_images: true,
-    images_upload_handler: function (blobInfo, success, failure) {
-      success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
-    },
+   // images_upload_handler: function (blobInfo, success, failure) {
+   //   success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
+   // },
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
@@ -42,6 +42,24 @@ function init_tiny(size) {
     }
     pre.codeblock {
       overflow-x:auto;
+    }
+    img {
+      max-width:100% !important;
+      height:auto !important;
+    }
+    iframe {
+      max-width:100% !important;
+    }
+    table {
+      display: block !important;
+      overflow-x: auto !important;
+      white-space: nowrap  !important;
+      max-width:100% !important;
+      width:100% !important;
+      height:auto !important;
+    }
+    td {
+      min-width:20vw !important;
     }
 `,
     browser_spellcheck: true,
@@ -96,8 +114,7 @@ function init_tiny(size) {
 window.prevContent = "";
 const onChange = (event) => {
   if (event.type === "nodechange" && !event.selectionChange) return;
-  if (editor.getContent() === window.prevContent) return;
-  window.prevContent = editor.getContent();
+ 
   
   if (isLoading) {
     isLoading = false;

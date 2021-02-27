@@ -60,13 +60,13 @@ export const execCommands = {
         formatSelection(`
         minifyImg(
           "${b64}",
-          600,
+          1024,
           'image/jpeg',
           (r) => {
             var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
             editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
           },
-          0.7,
+          0.6,
         );
         `);
       });

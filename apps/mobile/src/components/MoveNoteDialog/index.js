@@ -12,6 +12,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import { getTotalNotes } from '../../utils';
 import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
@@ -81,7 +82,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
-
+  const [noteExists, setNoteExists] = useState([]);
   const addNewNotebook = async () => {
     if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
       return ToastEvent.show({
@@ -117,14 +118,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   };
 
   const handlePress = async (item, index) => {
-    if (
-      note?.notebooks?.findIndex(
-        (o) =>
-          o.topics.findIndex((i) => {
-            return i === item.id;
-          }) > -1,
-      ) > -1
-    ) {
+    if (note && item.notes.indexOf(note.id) > -1) {
       await db.notebooks
         .notebook(item.notebookId)
         .topics.topic(item.id)
@@ -162,6 +156,19 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     }
     dispatch({type: Actions.NOTEBOOKS});
   };
+
+  useEffect(() => {
+    if (!note?.id) return;
+    let ids = [];
+    for (let i = 0; i < notebooks.length; i++) {
+      for (let t = 0; t < notebooks[i].topics.length; t++) {
+        if (notebooks[i].topics[t].notes.indexOf(note.id) > -1) {
+          ids.push(notebooks[i].id);
+        }
+      }
+    }
+    setNoteExists(ids);
+  }, []);
 
   return (
     <>
@@ -290,7 +297,9 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   marginBottom: 5,
                   borderBottomWidth: 1,
                   borderBottomColor:
-                    expanded === item.id ? colors.accent : colors.nav,
+                    expanded === item.id || noteExists.indexOf(item.id) > -1
+                      ? colors.accent
+                      : colors.nav,
                 }}>
                 <View
                   style={{
@@ -303,13 +312,16 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   }}>
                   <View>
                     <Heading
-                      color={expanded === item.id ? colors.accent : null}
+                      color={
+                        expanded === item.id || noteExists.indexOf(item.id) > -1
+                          ? colors.accent
+                          : null
+                      }
                       size={SIZE.md}>
                       {item.title}
                     </Heading>
                     <Paragraph size={SIZE.xs} color={colors.icon}>
-                      Notebook{' '}
-                      {item.totalNotes +
+                      {getTotalNotes(item) +
                         ' notes' +
                         ' & ' +
                         item.topics.length +
@@ -431,12 +443,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                           {item.title}
                         </Paragraph>
                         <Paragraph color={colors.icon} size={SIZE.xs}>
-                          {item.totalNotes + ' notes'}
+                          {item.notes.length + ' notes'}
                         </Paragraph>
                       </View>
-                      {note?.notebooks?.findIndex(
-                        (o) => o.topics.indexOf(item.id) > -1,
-                      ) > -1 ? (
+                      {note && item.notes.indexOf(note.id) > -1 ? (
                         <Button
                           onPress={() => handlePress(item, index)}
                           title="Remove note"

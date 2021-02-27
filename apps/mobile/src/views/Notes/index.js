@@ -22,6 +22,7 @@ import {
   refreshNotesPage,
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
+import {sleep} from '../../utils/TimeUtils';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -32,15 +33,33 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 300) => {
+  const runAfterInteractions = (time = 150) => {
     InteractionManager.runAfterInteractions(() => {
-      if (localLoad) {
-        setLocalLoad(false);
-      }
       Navigation.routeNeedsUpdate('NotesPage', () => {
         init();
       });
-
+      let _notes = [];
+      if (params.type === 'tag') {
+        _notes = db.notes.tagged(params.tag?.id);
+      } else if (params.type === 'color') {
+        _notes = db.notes.colored(params.color?.id);
+      } else {
+        _notes = db.notebooks
+          .notebook(params.notebookId)
+          .topics.topic(params.id).all;
+      }
+      if (
+        (params.type === 'tag' || params.type === 'color') &&
+        (!_notes || _notes.length === 0)
+      ) {
+        Navigation.goBack();
+      }
+      setNotes(_notes);
+      if (localLoad) {
+        sleep(10).then((r) => {
+          setLocalLoad(false);
+        });
+      }
       if (params.menu) {
         navigation.setOptions({
           animationEnabled: false,
@@ -52,26 +71,6 @@ export const Notes = ({route, navigation}) => {
           gestureEnabled: Platform.OS === 'ios',
         });
       }
-
-      let _notes = [];
-      if (params.type === 'tag') {
-        _notes = db.notes.tagged(params.tag?.id);
-      } else if (params.type === 'color') {
-        _notes = db.notes.colored(params.color?.id);
-      } else {
-        _notes = db.notebooks
-          .notebook(params.notebookId)
-          .topics.topic(params.id).all;
-      }
-
-      if (
-        (params.type === 'tag' || params.type === 'color') &&
-        (!_notes || _notes.length === 0)
-      ) {
-        Navigation.goBack();
-      }
-
-      setNotes([..._notes]);
       updateSearch();
       dispatch({
         type: Actions.CONTAINER_BOTTOM_BUTTON,
@@ -100,7 +99,6 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const setActionAfterFirstSave = () => {
-    console.log('setting action after first save',params);
     if (params.type === 'tag') {
       editing.actionAfterFirstSave = {
         type: 'tag',
@@ -124,12 +122,11 @@ export const Notes = ({route, navigation}) => {
     if (data) {
       setLocalLoad(true);
       params = data;
- 
     }
     setActionAfterFirstSave();
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
-      runAfterInteractions(data ? 500 : 1);
+      runAfterInteractions(data ? 150 : 1);
     }
 
     if (!pageIsLoaded) {
@@ -222,47 +219,53 @@ export const Notes = ({route, navigation}) => {
     }
   };
 
+  const headerProps = {
+    heading:
+      params.type === 'tag'
+        ? '#' + params.title
+        : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+    color: params.type === 'color' ? params.title.toLowerCase() : null,
+    paragraph:
+      route.params.type === 'topic' && route.params.title !== 'General'
+        ? 'Edit topic'
+        : null,
+    onPress: () => {
+      if (route.params.type !== 'topic') return;
+      eSendEvent(eOpenAddTopicDialog, {
+        notebookId: route.params.notebookId,
+        toEdit: route.params,
+      });
+    },
+    icon: 'pencil',
+  };
+
+  const _refreshCallback = () => {
+    init();
+  };
+
+  const placeholderData = {
+    heading: 'Your notes',
+    paragraph: 'You have not added any notes yet.',
+    button: 'Add your first Note',
+    action: _onPressBottomButton,
+    loading: 'Loading your notes.',
+  };
+
+  const isFocused = () => navigation.isFocused();
+
   return (
     <>
       <SimpleList
         listData={notes.reverse()}
         type="notes"
-        refreshCallback={() => {
-          init();
-        }}
-        headerProps={{
-          heading:
-            params.type === 'tag'
-              ? '#' + params.title
-              : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-          color: params.type === 'color' ? params.title.toLowerCase() : null,
-          paragraph:
-            route.params.type === 'topic' && route.params.title !== 'General'
-              ? 'Edit topic'
-              : null,
-          onPress: () => {
-            console.log(route.params);
-            if (route.params.type !== 'topic') return;
-
-            eSendEvent(eOpenAddTopicDialog, {
-              notebookId: route.params.notebookId,
-              toEdit: route.params,
-            });
-          },
-          icon: 'pencil',
-        }}
+        refreshCallback={_refreshCallback}
+        headerProps={headerProps}
         loading={loading || localLoad}
-        focused={() => navigation.isFocused()}
+        focused={isFocused}
         placeholderText={`Add some notes to this" ${
           params.type ? params.type : 'topic.'
         }`}
-        placeholderData={{
-          heading: 'Your notes',
-          paragraph: 'You have not added any notes yet.',
-          button: 'Add your first Note',
-          action: _onPressBottomButton,
-          loading: 'Loading your notes.',
-        }}
+        placeholderData={placeholderData}
       />
       <ContainerBottomButton
         title="Create a new note"
