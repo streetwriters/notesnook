@@ -201,11 +201,6 @@ function TinyMCE(props) {
         target_list: false,
         link_title: false,
         imagetools_toolbar: "rotateleft rotateright | flipv fliph",
-        image_upload_handler: function (blobInfo, success) {
-          success(
-            "data:" + blobInfo.blob().type + ";base64," + blobInfo.base64()
-          );
-        },
         setup: (editor) => {
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();
