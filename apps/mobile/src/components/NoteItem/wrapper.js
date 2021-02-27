@@ -53,7 +53,7 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
 
  
   const onPress = async () => {
-    if (!note.conflicted) {
+    if (note.conflicted) {
       eSendEvent(eShowMergeDialog, note);
       return;
     }
