@@ -11,6 +11,7 @@ import getId from "../utils/id";
 import { EV, EVENTS } from "../common";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
+import sort from "fast-sort";
 
 export default class Notes extends Collection {
   async add(noteArg) {
@@ -158,11 +159,12 @@ export default class Notes extends Collection {
   _getTagItems(tagId, collection) {
     const tag = this._db[collection].tag(tagId);
     if (!tag || tag.noteIds.length <= 0) return [];
-    return tag.noteIds.reduce((arr, id) => {
+    const array = tag.noteIds.reduce((arr, id) => {
       const item = this._collection.getItem(id);
       if (item) arr.push(item);
       return arr;
     }, []);
+    return sort(array).desc((note) => note.dateCreated);
   }
 
   /**

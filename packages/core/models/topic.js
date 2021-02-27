@@ -1,4 +1,6 @@
 import { qclone } from "qclone";
+import sort from "fast-sort";
+
 export default class Topic {
   /**
    * @param {Object} topic
@@ -83,11 +85,11 @@ export default class Topic {
   }
 
   get all() {
-    return this._topic.notes
-      .map((note) => {
-        let fullNote = this._db.notes.note(note);
-        if (fullNote) return fullNote.data;
-      })
-      .filter((v) => v);
+    const notes = this._topic.notes.reduce((arr, noteId) => {
+      let note = this._db.notes.note(noteId);
+      if (note) arr.push(note.data);
+      return arr;
+    }, []);
+    return sort(notes).desc((note) => note.dateCreated);
   }
 }

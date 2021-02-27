@@ -1,5 +1,4 @@
-import Collection from "./collection";
-import getId from "../utils/id";
+import sort from "fast-sort";
 import { get7DayTimestamp } from "../utils/date";
 
 export default class Trash {
@@ -14,10 +13,6 @@ export default class Trash {
       notebooks: db.notebooks,
     };
   }
-  // async init() {
-  //   await super.init();
-  //   await this.cleanup();
-  // }
 
   async init() {
     await this.cleanup();
@@ -38,7 +33,7 @@ export default class Trash {
       const collection = this.collections[key];
       trashItems.push(...collection.deleted);
     }
-    return trashItems;
+    return sort(trashItems).desc((item) => item.dateDeleted);
   }
 
   _getItem(id) {

@@ -1,6 +1,4 @@
-import Indexer from "./indexer";
 import sort from "fast-sort";
-import { EV, EVENTS } from "../common";
 import IndexedCollection from "./indexed-collection";
 
 export default class CachedCollection extends IndexedCollection {
