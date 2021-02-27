@@ -330,9 +330,13 @@ function onNoteChange() {
 export async function clearEditor() {
   tiny.call(EditorWebView, tiny.reset, true);
   clearTimer();
-  if (noteEdited && id) {
-    await saveNote(false);
+  if (
+    (content?.data && content.data?.trim().length > 0) ||
+    (title && title.trim().length > 0)
+  ) {
+    await saveNote();
   }
+  clearNote();
   editing.focusType = null;
   updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
   sendNoteEditedEvent({
@@ -346,8 +350,6 @@ export async function clearEditor() {
   saveCounter = 0;
   tiny.call(EditorWebView, tiny.updateDateEdited(''), true);
   tiny.call(EditorWebView, tiny.updateSavingState(''), true);
-
-  clearNote();
 }
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
