@@ -27,7 +27,7 @@ function EditorPlaceholder() {
           justifyContent: "center",
         }}
         variant="tool"
-        onClick={() => hashNavigate("/notes/create")}
+        onClick={() => hashNavigate("")}
       >
         <Icon.Plus size={18} color="primary" />
         <Text ml={1}>Make a new note</Text>

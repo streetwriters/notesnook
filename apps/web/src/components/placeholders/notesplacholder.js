@@ -13,7 +13,8 @@ function NotesPlaceholder() {
       callToAction={{
         text: "Make your first note",
         icon: Icon.Plus,
-        onClick: () => hashNavigate("/notes/create"),
+        onClick: () =>
+          hashNavigate("/notes/create", { replace: true, addNonce: true }),
       }}
     />
   );

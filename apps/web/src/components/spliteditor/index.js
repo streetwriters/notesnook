@@ -52,7 +52,7 @@ function SplitEditor(props) {
         });
       }
       notesStore.refresh();
-      hashNavigate(`/notes/${note.id}/edit`, true);
+      hashNavigate(`/notes/${note.id}/edit`, { replace: true });
 
       const conflictsCount = db.notes.conflicted?.length;
       if (conflictsCount) {
@@ -73,7 +73,7 @@ function SplitEditor(props) {
       await db.notes.init();
       let note = db.notes.note(noteId);
       if (!note) {
-        hashNavigate(`/notes/create`, true);
+        hashNavigate(`/notes/create`, { replace: true });
         return;
       }
       notesStore.setSelectedNote(noteId);

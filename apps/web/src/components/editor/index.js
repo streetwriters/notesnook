@@ -23,10 +23,10 @@ import EditorLoading from "./loading";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
-function Editor({ noteId }) {
+function Editor({ noteId, nonce }) {
   const editorRef = useRef();
   const sessionState = useStore((store) => store.session.state);
-  const sessionId = useStore((store) => store.session.id);
+  const sessionNonce = useStore((store) => store.session.nonce);
   const contentType = useStore((store) => store.session.content?.type);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
@@ -49,12 +49,12 @@ function Editor({ noteId }) {
 
   const startSession = useCallback(
     async function startSession(noteId) {
-      if (noteId === 0) newSession();
+      if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId);
       }
     },
-    [newSession, openSession]
+    [newSession, openSession, nonce]
   );
 
   useEffect(() => {
@@ -89,7 +89,7 @@ function Editor({ noteId }) {
         editor.off("init", setContents);
       };
     }
-  }, [editorRef, contentType, sessionState]);
+  }, [editorRef, contentType, sessionState, sessionNonce]);
 
   return (
     <Flex

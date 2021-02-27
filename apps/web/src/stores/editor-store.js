@@ -53,7 +53,7 @@ class EditorStore extends BaseStore {
       };
     });
     appStore.setIsEditorOpen(true);
-    hashNavigate(`/notes/${note.id}/edit`, true);
+    hashNavigate(`/notes/${note.id}/edit`, { replace: true });
   };
 
   openSession = async (noteId) => {
@@ -77,8 +77,10 @@ class EditorStore extends BaseStore {
 
     noteStore.setSelectedNote(note.id);
 
-    if (note.locked) return hashNavigate(`/notes/${noteId}/unlock`, true);
-    if (note.conflicted) return hashNavigate(`/notes/${noteId}/conflict`, true);
+    if (note.locked)
+      return hashNavigate(`/notes/${noteId}/unlock`, { replace: true });
+    if (note.conflicted)
+      return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
     let content = await db.content.raw(note.contentId);
 
@@ -98,16 +100,14 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     if (session.isSaving) return; // avoid multiple in-queue saves; only save one time.
     this.set((state) => (state.session.isSaving = true));
-
     this._saveFn()(session).then(async (id) => {
-      const note = db.notes.note(id)?.data;
+      let note = db.notes.note(id)?.data;
       if (!note) {
         noteStore.refresh();
         return;
       }
       /* eslint-disable */
       storeSync: {
-        const session = this.get().session;
         if (oldSession?.tags?.length !== session.tags.length)
           tagStore.refresh();
 
@@ -119,6 +119,9 @@ class EditorStore extends BaseStore {
         if (type === "topic") await db.notes.move(value, id);
         else if (type === "color") await db.notes.note(id).color(value);
         else if (type === "tag") await db.notes.note(id).tag(value);
+
+        // update the note.
+        note = db.notes.note(id)?.data;
       }
       /* eslint-enable */
 
@@ -127,28 +130,28 @@ class EditorStore extends BaseStore {
       }
 
       this.set((state) => {
-        state.session.id = id;
+        state.session.id = note.id;
         state.session.title = note.title;
         state.session.isSaving = false;
         state.session.color = note.color;
         state.session.tags = note.tags;
+        state.session.notebooks = note.notebooks;
       });
 
       noteStore.refresh();
       if (!oldSession?.id) {
-        hashNavigate(`/notes/${id}/edit`, true, true);
+        hashNavigate(`/notes/${id}/edit`, { replace: true });
       }
     });
   };
 
-  newSession = (context) => {
-    if (!context) {
-      context = noteStore.get().context;
-    }
+  newSession = (nonce) => {
+    let context = noteStore.get().context;
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
         context,
+        nonce,
         state: SESSION_STATES.new,
       };
     });
@@ -166,7 +169,7 @@ class EditorStore extends BaseStore {
     });
     noteStore.setSelectedNote(0);
     this.toggleProperties(false);
-    if (shouldNavigate) hashNavigate(`/`, true);
+    if (shouldNavigate) hashNavigate(`/`, { replace: true });
   };
 
   setSession = (set) => {

@@ -55,11 +55,11 @@ function Note(props) {
       }}
       onClick={() => {
         if (note.conflicted) {
-          hashNavigate(`/notes/${note.id}/conflict`, true);
+          hashNavigate(`/notes/${note.id}/conflict`, { replace: true });
         } else if (note.locked) {
-          hashNavigate(`/notes/${note.id}/unlock`, true);
+          hashNavigate(`/notes/${note.id}/unlock`, { replace: true });
         } else {
-          hashNavigate(`/notes/${note.id}/edit`, true);
+          hashNavigate(`/notes/${note.id}/edit`, { replace: true });
         }
       }}
       header={

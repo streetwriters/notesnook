@@ -39,7 +39,8 @@ export const SELECTION_OPTIONS_MAP = {
 export const CREATE_BUTTON_MAP = {
   notes: {
     title: "Make a note",
-    onClick: () => hashNavigate("/notes/create", true),
+    onClick: () =>
+      hashNavigate("/notes/create", { addNonce: true, replace: true }),
   },
   notebooks: {
     title: "Create a notebook",

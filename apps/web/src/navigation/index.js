@@ -23,8 +23,13 @@ export function navigate(url, replaceOrQuery, replace) {
   window.history[`${replace ? "replace" : "push"}State`](null, null, url);
   dispatchEvent(new PopStateEvent("popstate", null));
 }
+let last = 0;
+export function hashNavigate(
+  url,
+  { replace = false, notify = true, addNonce = false } = {}
+) {
+  if (addNonce) url += `/${++last}`;
 
-export function hashNavigate(url, replace, notify = true) {
   window.history[`${replace ? "replace" : "push"}State`](null, null, `#${url}`);
   if (notify) dispatchEvent(new HashChangeEvent("hashchange"));
   // if (typeof url !== "string") {

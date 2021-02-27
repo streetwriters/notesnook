@@ -47,15 +47,16 @@ const hashroutes = {
     showEditTopicDialog(notebookId, topicId);
   },
   "/notes/create": () => {
-    //editorStore.get().newSession(noteStore.get().context);
+    hashNavigate("/notes/create", { addNonce: true, replace: true });
+  },
+  "/notes/create/:nonce": ({ nonce }) => {
     return (
       <Suspense fallback={<EditorLoading />}>
-        <Editor noteId={0} />
+        <Editor noteId={0} nonce={nonce} />
       </Suspense>
     );
   },
   "/notes/:noteId/edit": ({ noteId }) => {
-    // editorStore.openSession(noteId);
     return (
       <Suspense fallback={<EditorLoading text="Opening note..." />}>
         <Editor noteId={noteId} />
@@ -69,7 +70,11 @@ const hashroutes = {
           back: isMobile()
             ? {
                 title: "Go back",
-                action: () => hashNavigate("/notes/create"),
+                action: () =>
+                  hashNavigate("/notes/create", {
+                    addNonce: true,
+                    replace: true,
+                  }),
               }
             : undefined,
         }}
