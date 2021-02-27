@@ -2,14 +2,18 @@ import React, {useEffect, useState} from 'react';
 import {Platform, ScrollView, TextInput} from 'react-native';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
-import {Loading} from '../../components/Loading';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
+  getNote,
   injectedJS,
   onWebViewLoad,
   sourceUri,
@@ -40,18 +44,19 @@ const Editor = React.memo(
     const [state] = useTracked();
     const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
-    const [localLoading, setLocalLoading] = useState(false);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    const onResetRequested = async () => {
-      setLocalLoading(true);
+    const onResetRequested = async (noload) => {
+      !noload && eSendEvent('loadingNote', getNote()?.id ? getNote() : {});
       setResetting(true);
-      await sleep(10);
+      await sleep(30);
       setResetting(false);
-      await sleep(10);
-      setLocalLoading(false);
+      if (!getNote()) {
+        await sleep(10);
+        eSendEvent('loadingNote', null);
+      }
     };
 
     useEffect(() => {
@@ -62,7 +67,7 @@ const Editor = React.memo(
       };
     }, []);
 
-    return resetting || localLoading ? null : (
+    return resetting ? null : (
       <>
         <TextInput
           ref={textInput}
