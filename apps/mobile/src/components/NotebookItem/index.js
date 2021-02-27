@@ -1,11 +1,11 @@
 import React from 'react';
-import { useWindowDimensions } from 'react-native';
+import {useWindowDimensions} from 'react-native';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { history } from '../../utils';
+import {getTotalNotes, history} from '../../utils';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
@@ -22,6 +22,7 @@ export const NotebookItem = ({
   const [state] = useTracked();
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
+  const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
     let rowItems = isTrash
       ? ['Restore', 'Remove']
@@ -192,10 +193,10 @@ export const NotebookItem = ({
             style={{
               marginRight: 10,
             }}>
-            {item && item.totalNotes && item.totalNotes > 1
-              ? item.totalNotes + ' Notes'
-              : item.totalNotes === 1
-              ? item.totalNotes + ' Note'
+            {item && totalNotes > 1
+              ? totalNotes + ' Notes'
+              : totalNotes === 1
+              ? totalNotes + ' Note'
               : '0 Notes'}
           </Paragraph>
 

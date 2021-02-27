@@ -11,7 +11,7 @@ import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 
 export const InteractionManager = {
-  runAfterInteractions: (func, time = 500) => setTimeout(func, time),
+  runAfterInteractions: (func, time = 150) => setTimeout(func, time),
 };
 
 export const APP_VERSION = 1300;
@@ -108,6 +108,15 @@ export function setWidthHeight(size) {
   dHeight = size.height;
 }
 
+export function getTotalNotes(notebook) {
+  if (notebook.type === 'topic') {
+    return notebook.notes.length;
+  }
+  return notebook.topics.reduce((sum, topic) => {
+    return sum + topic.notes.length;
+  }, 0);
+}
+
 export const itemSkus = Platform.select({
   ios: ['com.streetwriters.notesnook.sub.mo'],
   android: ['com.streetwriters.notesnook.sub.mo'],
@@ -152,7 +161,7 @@ export const SUBSCRIPTION_STATUS = {
 export const SUBSCRIPTION_STATUS_STRINGS = {
   0: 'Basic',
   1: 'Trial',
-  2: Platform.OS === "ios" ? "Pro" : 'Beta',
+  2: Platform.OS === 'ios' ? 'Pro' : 'Beta',
   5: 'Pro',
   6: 'Expired',
   7: 'Pro',
