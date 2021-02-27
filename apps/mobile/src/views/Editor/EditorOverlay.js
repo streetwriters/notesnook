@@ -42,9 +42,9 @@ const EditorOverlay = () => {
         easing: Easing.out(Easing.ease),
       }).start(async () => {
         await sleep(150);
-        setLoading(false);
         setProgress(1);
         opacity.setValue(1);
+        setLoading(false);
         clearTimeout(timer);
         clearTimeout(timerError);
       });
