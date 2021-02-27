@@ -92,6 +92,17 @@ export const NavigatorStack = React.memo(
     const updateRender = async () => {
       if (!render) {
         setRender(true);
+        Navigation.navigate(
+          SettingsService.get().homepage,
+          {
+            menu: true,
+          },
+          {
+            heading: SettingsService.get().homepage,
+            id: SettingsService.get().homepage.toLowerCase() + '_navigation',
+          },
+        );
+
       }
     };
 
