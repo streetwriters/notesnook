@@ -83,6 +83,7 @@ class Database {
 
     this.trash = new Trash(this);
 
+    await this.trash.cleanup();
     await this.settings.init();
     await this.outbox.init();
     await this.user.init();

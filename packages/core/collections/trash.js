@@ -19,14 +19,18 @@ export default class Trash {
   //   await this.cleanup();
   // }
 
-  // async cleanup() {
-  //   const sevenDayPreviousTimestamp = Date.now() - get7DayTimestamp();
-  //   this.all.forEach(async (item) => {
-  //     if (item.dateDeleted < sevenDayPreviousTimestamp) {
-  //       await this.delete(item.id);
-  //     }
-  //   });
-  // }
+  async init() {
+    await this.cleanup();
+  }
+
+  async cleanup() {
+    const sevenDayPreviousTimestamp = Date.now() - get7DayTimestamp();
+    this.all.forEach(async (item) => {
+      if (item.dateDeleted < sevenDayPreviousTimestamp) {
+        await this.delete(item.id);
+      }
+    });
+  }
 
   get all() {
     let trashItems = [];
