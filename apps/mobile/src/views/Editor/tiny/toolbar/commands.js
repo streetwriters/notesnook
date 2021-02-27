@@ -66,7 +66,7 @@ export const execCommands = {
             var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
             editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
           },
-          0.8,
+          0.6,
         );
         `);
       });
