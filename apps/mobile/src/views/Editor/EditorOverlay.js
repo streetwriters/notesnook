@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
-import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import {Button} from '../../components/Button';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { Button } from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 
 let timer = null;
 let timerError = null;
@@ -69,7 +68,7 @@ const EditorOverlay = () => {
         justifyContent: 'center',
         alignItems: 'center',
         opacity: opacity,
-        top: 0,
+        top: loading? 0 : 6000,
         zIndex: 100,
       }}>
       <View
