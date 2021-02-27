@@ -68,7 +68,7 @@ export const AppScale = new Animated.Value(0.95);
 export const AppBorders = new Animated.Value(10);
 export const ContainerScale = new Animated.Value(0.95);
 export const EditorScalee = new Animated.Value(1);
-export const DrawerScale = new Animated.Value(0.95);
+export const DrawerScale = new Animated.Value(1);
 
 export function changeContainerScale(op, scale, duration = 500, callback) {
   timing(op, {

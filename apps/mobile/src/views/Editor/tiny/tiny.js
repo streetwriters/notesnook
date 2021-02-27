@@ -1,4 +1,4 @@
-import {EditorWebView, getWebviewInit} from '../Functions';
+import { getWebviewInit } from '../Functions';
 
 const reset = `
 isLoading = true;

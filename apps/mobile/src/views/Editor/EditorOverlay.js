@@ -29,15 +29,13 @@ const EditorOverlay = () => {
     clearTimeout(timerError);
     setProgress(2);
     if (_loading) {
-      timer = setTimeout(() => {
-        setLoading(_loading);
-        timerError = setTimeout(() => {
-          setError(true);
-        }, 3000);
-      },1000)
+      setLoading(_loading);
+      timerError = setTimeout(() => {
+        setError(true);
+      }, 4000);
     } else {
       setProgress(4);
-      await sleep(10);
+      await sleep(1);
       setError(false);
       timing(opacity, {
         toValue: 0,
@@ -45,11 +43,11 @@ const EditorOverlay = () => {
         easing: Easing.out(Easing.ease),
       }).start(async () => {
         await sleep(150);
+        setLoading(false);
         setProgress(1);
         opacity.setValue(1);
         clearTimeout(timer);
         clearTimeout(timerError);
-        setLoading(false);
       });
     }
   };
@@ -71,7 +69,7 @@ const EditorOverlay = () => {
         justifyContent: 'center',
         alignItems: 'center',
         opacity: opacity,
-        top: loading ? 0 : 6000,
+        top: 0,
         zIndex: 100,
       }}>
       <View
@@ -89,11 +87,17 @@ const EditorOverlay = () => {
             height: 10,
             width: 100,
             marginBottom: 15,
+            borderRadius: 5,
+            overflow: 'hidden',
+            backgroundColor:colors.nav
           }}>
-          <AnimatedProgress
-            fill={error ? 'red' : colors.accent}
-            total={4}
-            current={progress}
+          <Animated.View
+            style={{
+              height: 10,
+              borderRadius: 5,
+              width:100,
+              backgroundColor:colors.accent
+            }}
           />
         </View>
 
@@ -101,16 +105,18 @@ const EditorOverlay = () => {
           textBreakStrategy="balanced"
           style={{textAlign: 'center', marginBottom: 5}}
           size={SIZE.lg}>
-          {loading?.title ? loading.title : 'Loading Note'}
+          {loading?.title ? loading.title : 'Loading editor'}
         </Heading>
 
-        <Paragraph
-          textBreakStrategy="balanced"
-          style={{textAlign: 'center'}}
-          color={colors.icon}
-          size={SIZE.sm}>
-          {loading && timeConverter(loading.dateEdited)}
-        </Paragraph>
+        {loading?.dateEdited ? (
+          <Paragraph
+            textBreakStrategy="balanced"
+            style={{textAlign: 'center'}}
+            color={colors.icon}
+            size={SIZE.sm}>
+            {timeConverter(loading.dateEdited)}
+          </Paragraph>
+        ) : null}
       </View>
 
       {error && (
