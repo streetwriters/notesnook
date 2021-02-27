@@ -16,6 +16,7 @@ import {
   eOpenAddTopicDialog,
   eScrollEvent,
 } from '../../utils/Events';
+import {sleep} from '../../utils/TimeUtils';
 
 export const Notebook = ({route, navigation}) => {
   const [topics, setTopics] = useState(route.params.notebook.topics);
@@ -25,15 +26,18 @@ export const Notebook = ({route, navigation}) => {
 
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 300) => {
+  const runAfterInteractions = (time = 150) => {
     InteractionManager.runAfterInteractions(() => {
       let notebook = db.notebooks.notebook(params.notebook?.id).data;
       params.notebook = notebook;
-      params.title = params.notebook.title
+      params.title = params.notebook.title;
       setTopics(notebook.topics);
-      if (loading) {
-        setLoading(false);
-      }
+      sleep(10).then((r) => {
+        if (loading) {
+          setLoading(false);
+        }
+      });
+
       Navigation.routeNeedsUpdate('Notebook', () => {
         onLoad();
       });
@@ -51,15 +55,15 @@ export const Notebook = ({route, navigation}) => {
       }
       updateSearch();
       ranAfterInteractions = false;
-    },time);
+    }, time);
   };
   const onLoad = (data) => {
     if (data) {
       setLoading(true);
       params = data;
     }
-    console.log('calling on load')
-    runAfterInteractions(data? 500 : 1);
+
+    runAfterInteractions(data ? 150 : 1);
   };
 
   useEffect(() => {
