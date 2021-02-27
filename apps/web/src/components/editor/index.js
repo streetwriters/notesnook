@@ -89,8 +89,7 @@ function Editor({ noteId }) {
         editor.off("init", setContents);
       };
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editorRef, contentType, sessionId]);
+  }, [editorRef, contentType, sessionState]);
 
   return (
     <Flex
