@@ -60,10 +60,17 @@ export const ActionSheetComponent = ({
   getRef,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, premiumUser, user} = state;
+  const {colors, user} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [note, setNote] = useState(item);
+  const [noteInTopic, setNoteInTopic] = useState(
+    editing.actionAfterFirstSave.type === 'topic' &&
+      db.notebooks
+        .notebook(editing.actionAfterFirstSave.notebook)
+        .topics.topic(editing.actionAfterFirstSave.id)
+        .has(item.id),
+  );
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -138,12 +145,12 @@ export const ActionSheetComponent = ({
       name: 'Add to',
       icon: 'book-outline',
       func: () => {
+        close();
         dispatch({type: Actions.CLEAR_SELECTION});
         dispatch({type: Actions.SELECTED_ITEMS, item: note});
-        close();
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);
-        }, 400);
+        }, 300);
       },
     },
     {
@@ -151,6 +158,7 @@ export const ActionSheetComponent = ({
       icon: 'share-variant',
       func: async () => {
         if (note.locked) {
+          close();
           openVault({
             item: item,
             novault: true,
@@ -181,8 +189,9 @@ export const ActionSheetComponent = ({
       name: 'Delete',
       icon: 'delete',
       func: async () => {
+        close();
         if (note.locked) {
-          close();
+      
           await sleep(300);
           openVault({
             deleteNote: true,
@@ -194,12 +203,12 @@ export const ActionSheetComponent = ({
           });
         } else {
           try {
+            close();
             await deleteItems(note);
           } catch (e) {
             //console.log(e);
           }
         }
-        close();
       },
     },
     {
@@ -246,6 +255,7 @@ export const ActionSheetComponent = ({
       name: 'Restore',
       icon: 'delete-restore',
       func: async () => {
+        close();
         await db.trash.restore(note.id);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Tags,
@@ -264,7 +274,7 @@ export const ActionSheetComponent = ({
               : 'Notebook restored from trash',
           type: 'success',
         });
-        close();
+    
       },
     },
     {
@@ -300,6 +310,7 @@ export const ActionSheetComponent = ({
       icon: 'pin',
       func: async () => {
         if (!note.id) return;
+        close();
         if (note.type === 'note') {
           if (db.notes.pinned.length === 3 && !note.pinned) {
             ToastEvent.show({
@@ -322,7 +333,7 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).pin();
         }
         localRefresh(item.type);
-        close();
+    
       },
       close: false,
       check: true,
@@ -335,6 +346,7 @@ export const ActionSheetComponent = ({
       icon: 'star',
       func: async () => {
         if (!note.id) return;
+        close();
         if (note.type === 'note') {
           await db.notes.note(note.id).favorite();
         } else {
@@ -346,7 +358,7 @@ export const ActionSheetComponent = ({
           forced: true,
         });
         localRefresh(item.type, true);
-        close();
+     
       },
       close: false,
       check: true,
@@ -361,6 +373,7 @@ export const ActionSheetComponent = ({
         : 'Add Shortcut to Menu',
       icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       func: async () => {
+        close();
         try {
           if (isPinnedToMenu) {
             await db.settings.unpin(note.id);
@@ -377,6 +390,7 @@ export const ActionSheetComponent = ({
           setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});
         } catch (e) {}
+
       },
       close: false,
       check: true,
@@ -724,11 +738,7 @@ export const ActionSheetComponent = ({
         </PressableButton>
       ) : null}
 
-      {editing.actionAfterFirstSave.type === 'topic' &&
-      note.notebooks?.length > 0 &&
-      note?.notebooks?.findIndex(
-        (o) => o.topics.indexOf(editing.actionAfterFirstSave.id) > -1,
-      ) > -1 ? (
+      {noteInTopic ? (
         <PressableButton
           type="accent"
           accentColor="red"
