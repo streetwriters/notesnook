@@ -93,7 +93,7 @@ async function validateUser(title, description) {
       Platform.select({
         ios: {
           fallbackEnabled: true,
-          description: description,
+          description: title,
         },
         android: {
           title: title,

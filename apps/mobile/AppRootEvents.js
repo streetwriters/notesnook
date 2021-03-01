@@ -82,22 +82,31 @@ async function reconnectSSE(connection) {
 }
 
 let prevState = null;
-
+let showingDialog = false;
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
-    if (
-      SettingsService.get().privacyScreen ||
-      SettingsService.get().appLockMode === 'background'
-    ) {
-      enabled(false);
-      if (prevState === 'background') {
-        SplashScreen.show();
+    if (SettingsService.get().appLockMode === 'background') {
+      //enabled(false);
+      if (prevState === 'background' && !showingDialog) {
+        showingDialog = true;
+        prevState = 'active';
+        if (Platform.OS === 'android') {
+          SplashScreen.show();
+        } else {
+          eSendEvent('load_overlay', 'hide');
+        }
+
         let result = await BiometricService.validateUser(
           'Unlock to access your notes',
         );
         if (result) {
-          SplashScreen.hide();
+          showingDialog = false;
+          if (Platform.OS === 'android') {
+            SplashScreen.hide();
+          } else {
+            eSendEvent('load_overlay', 'show');
+          }
         } else {
           RNExitApp.exitApp();
           return;
