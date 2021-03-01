@@ -81,6 +81,8 @@ async function reconnectSSE(connection) {
   } catch (e) {}
 }
 
+let prevState = null;
+
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
@@ -89,23 +91,27 @@ const onAppStateChanged = async (state) => {
       SettingsService.get().appLockMode === 'background'
     ) {
       enabled(false);
-      SplashScreen.show();
-      let result = await BiometricService.validateUser(
-        'Unlock to access your notes',
-      );
-      if (result) {
-        SplashScreen.hide();
-      } else {
-        RNExitApp.exitApp();
-        return;
+      if (prevState === 'background') {
+        SplashScreen.show();
+        let result = await BiometricService.validateUser(
+          'Unlock to access your notes',
+        );
+        if (result) {
+          SplashScreen.hide();
+        } else {
+          RNExitApp.exitApp();
+          return;
+        }
       }
     }
+    prevState = 'active';
     await reconnectSSE();
     await checkIntentState();
     if (getWebviewInit()) {
       await MMKV.removeItem('appState');
     }
   } else {
+    prevState = 'background';
     if (
       getNote()?.locked &&
       SettingsService.get().appLockMode === 'background'
