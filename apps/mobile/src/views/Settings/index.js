@@ -1028,7 +1028,7 @@ const SettingsAppearanceSection = () => {
 const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
   const {colors, settings} = state;
-  const [appLockVisible, setAppLockVisible] = useState(true);
+  const [appLockVisible, setAppLockVisible] = useState(false);
 
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
@@ -1038,26 +1038,15 @@ const SettingsPrivacyAndSecurity = () => {
 
   const checkVaultStatus = useCallback(() => {
     InteractionManager.runAfterInteractions(() => {
-      db.vault.add('check_no_vault').catch(async (e) => {
-        let biometry = await BiometricService.isBiometryAvailable();
+      db.vault.exists().then(async (r) => {
+        let available = await BiometricService.isBiometryAvailable();
         let fingerprint = await BiometricService.hasInternetCredentials();
-        let available = false;
-        if (biometry) {
-          available = true;
-        }
-        if (e.message === db.vault.ERRORS.noVault) {
-          setVaultStatus({
-            exists: false,
-            biometryEnrolled: fingerprint,
-            isBiometryAvailable: available,
-          });
-        } else {
-          setVaultStatus({
-            exists: true,
-            biometryEnrolled: fingerprint,
-            isBiometryAvailable: available,
-          });
-        }
+
+        setVaultStatus({
+          exists: r,
+          biometryEnrolled: fingerprint,
+          isBiometryAvailable: available ? true : false,
+        });
       });
     });
   });
@@ -1184,15 +1173,6 @@ const SettingsPrivacyAndSecurity = () => {
             setSetting(settings, 'privacyScreen', !settings.privacyScreen);
           }}
           maxWidth="90%"
-          customComponent={
-            <Icon
-              size={SIZE.xl}
-              color={settings.privacyScreen ? colors.accent : colors.icon}
-              name={
-                settings.privacyScreen ? 'toggle-switch' : 'toggle-switch-off'
-              }
-            />
-          }
         />
       )}
 
