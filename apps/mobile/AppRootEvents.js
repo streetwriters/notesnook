@@ -86,8 +86,14 @@ let showingDialog = false;
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
+    if (
+      SettingsService.get().appLockMode !== 'background' &&
+      !SettingsService.get().privacyScreen
+    ) {
+      enabled(false);
+    }
+
     if (SettingsService.get().appLockMode === 'background') {
-      //enabled(false);
       if (prevState === 'background' && !showingDialog) {
         showingDialog = true;
         prevState = 'active';

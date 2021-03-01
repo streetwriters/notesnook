@@ -1100,7 +1100,7 @@ const SettingsPrivacyAndSecurity = () => {
                   settings.appLockMode === item.value ? 'accent' : 'transparent'
                 }
                 onPress={() => {
-                  setSetting(settings, 'appLockMode', item.value);
+                  SettingsService.set('appLockMode',item.value)
                 }}
                 customStyle={{
                   justifyContent: 'flex-start',
@@ -1151,7 +1151,8 @@ const SettingsPrivacyAndSecurity = () => {
           Platform.OS === 'android'
             ? AndroidModule.setSecureMode(!settings.privacyScreen)
             : enabled(true);
-          setSetting(settings, 'privacyScreen', !settings.privacyScreen);
+
+          SettingsService.set('privacyScreen', !settings.privacyScreen);
         }}
         maxWidth="90%"
         customComponent={
