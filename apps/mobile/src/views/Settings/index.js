@@ -1167,10 +1167,7 @@ const SettingsPrivacyAndSecurity = () => {
           title="App lock"
           tagline="Require biometrics to access your notes."
           onPress={() => {
-            Platform.OS === 'android'
-              ? AndroidModule.setSecureMode(!settings.privacyScreen)
-              : enabled(true);
-            setSetting(settings, 'privacyScreen', !settings.privacyScreen);
+            setAppLockVisible(true);
           }}
           maxWidth="90%"
         />

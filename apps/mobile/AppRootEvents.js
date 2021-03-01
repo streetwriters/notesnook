@@ -20,7 +20,7 @@ import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, editing} from './src/utils';
+import {AndroidModule, APP_VERSION, editing} from './src/utils';
 import {COLOR_SCHEME, updateStatusBarColor} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
@@ -86,7 +86,7 @@ const onAppStateChanged = async (state) => {
     updateStatusBarColor();
     if (
       SettingsService.get().privacyScreen ||
-      SettingsService.get().appLockMode !== 'none'
+      SettingsService.get().appLockMode === 'background'
     ) {
       enabled(false);
       SplashScreen.show();
@@ -106,13 +106,17 @@ const onAppStateChanged = async (state) => {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (getNote()?.locked && SettingsService.get().appLockMode === 'none') {
+    if (
+      getNote()?.locked &&
+      SettingsService.get().appLockMode === 'background'
+    ) {
       eSendEvent(eClearEditor);
     }
     await storeAppState();
+
     if (
       SettingsService.get().privacyScreen ||
-      SettingsService.get().appLockMode !== 'none'
+      SettingsService.get().appLockMode === 'background'
     ) {
       enabled(true);
     }
