@@ -31,6 +31,7 @@ export const defaultState = {
     sortOrder: 'desc',
     screenshotMode: true,
     privacyScreen: false,
+    appLockMode:'launch'
   },
   currentScreen: 'Notes',
   deviceMode:null,
