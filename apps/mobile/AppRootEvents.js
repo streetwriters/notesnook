@@ -4,10 +4,12 @@ import React, {useEffect} from 'react';
 import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
+import SplashScreen from 'react-native-splash-screen';
 import {updateEvent} from './src/components/DialogManager/recievers';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
+import BiometricService from './src/services/BiometricService';
 import {eSendEvent, ToastEvent} from './src/services/EventManager';
 import {
   clearMessage,
@@ -32,10 +34,10 @@ import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
+import RNExitApp from 'react-native-exit-app';
 let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
-
 
 async function storeAppState() {
   if (editing.currentlyEditing) {
@@ -82,8 +84,21 @@ async function reconnectSSE(connection) {
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
-    if (SettingsService.get().privacyScreen) {
+    if (
+      SettingsService.get().privacyScreen ||
+      SettingsService.get().appLockMode !== 'none'
+    ) {
       enabled(false);
+      SplashScreen.show();
+      let result = await BiometricService.validateUser(
+        'Unlock to access your notes',
+      );
+      if (result) {
+        SplashScreen.hide();
+      } else {
+        RNExitApp.exitApp();
+        return;
+      }
     }
     await reconnectSSE();
     await checkIntentState();
@@ -91,11 +106,14 @@ const onAppStateChanged = async (state) => {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (getNote()?.locked) {
+    if (getNote()?.locked && SettingsService.get().appLockMode === 'none') {
       eSendEvent(eClearEditor);
     }
     await storeAppState();
-    if (SettingsService.get().privacyScreen) {
+    if (
+      SettingsService.get().privacyScreen ||
+      SettingsService.get().appLockMode !== 'none'
+    ) {
       enabled(true);
     }
   }
