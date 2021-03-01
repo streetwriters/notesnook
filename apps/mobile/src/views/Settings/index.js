@@ -1083,7 +1083,11 @@ const SettingsPrivacyAndSecurity = () => {
   return (
     <>
       {appLockVisible && (
-        <BaseDialog visible={true}>
+        <BaseDialog
+          onRequestClose={() => {
+            setAppLockVisible(false);
+          }}
+          visible={true}>
           <DialogContainer height={450}>
             <DialogHeader
               title="App lock mode"
@@ -1129,7 +1133,7 @@ const SettingsPrivacyAndSecurity = () => {
             ))}
 
             <DialogButtons
-              negativeTitle="Cancel"
+              negativeTitle="Close"
               onPressNegative={() => {
                 setAppLockVisible(false);
               }}
