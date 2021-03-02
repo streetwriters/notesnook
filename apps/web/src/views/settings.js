@@ -600,7 +600,7 @@ function AccountStatus(props) {
             onClick={async () => {
               const token = await db.user.tokenManager.getAccessToken();
               await http.post(
-                `http://localhost:9264/subscriptions/cancel`,
+                `https://subscriptions.streetwriters.co/subscriptions/cancel`,
                 null,
                 token
               );
