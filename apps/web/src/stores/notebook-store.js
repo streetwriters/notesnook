@@ -3,6 +3,7 @@ import createStore from "../common/store";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
+import { qclone } from "qclone";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
@@ -10,7 +11,7 @@ class NotebookStore extends BaseStore {
   selectedNotebookId = 0;
 
   refresh = () => {
-    this.set((state) => (state.notebooks = db.notebooks.all));
+    this.set((state) => (state.notebooks = qclone(db.notebooks.all)));
     this.setSelectedNotebook(this.get().selectedNotebookId);
   };
 
@@ -33,7 +34,7 @@ class NotebookStore extends BaseStore {
     const notebook = db.notebooks.notebook(id);
     if (!notebook) return;
     this.set((state) => {
-      state.selectedNotebookTopics = notebook.topics.all;
+      state.selectedNotebookTopics = qclone(notebook.topics.all);
       state.selectedNotebookId = id;
     });
   };
