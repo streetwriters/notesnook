@@ -10,6 +10,7 @@ const requiredValues = ["email", "password"];
 function SignUpDialog(props) {
   const { onClose } = props;
   const [error, setError] = useState();
+  const [passwordError, setPasswordError] = useState();
   const isSigningIn = useStore((store) => store.isSigningIn);
   const signup = useStore((store) => store.signup);
 
@@ -46,7 +47,7 @@ function SignUpDialog(props) {
         as="form"
         onSubmit={(e) => {
           e.preventDefault();
-          if (error) {
+          if (passwordError) {
             setError("Please resolve all errors before continuing.");
             return;
           }
@@ -92,7 +93,7 @@ function SignUpDialog(props) {
           type="password"
           autoComplete="new-password"
           validatePassword
-          onError={setError}
+          onError={setPasswordError}
           sx={{ mt: 1 }}
         />
         {error && typeof error === "string" && (
