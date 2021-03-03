@@ -11,7 +11,9 @@ class NotebookStore extends BaseStore {
   selectedNotebookId = 0;
 
   refresh = () => {
-    this.set((state) => (state.notebooks = qclone(db.notebooks.all)));
+    this.set((state) => {
+      state.notebooks = db.notebooks.all;
+    });
     this.setSelectedNotebook(this.get().selectedNotebookId);
   };
 
@@ -31,10 +33,10 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
-    const notebook = db.notebooks.notebook(id);
-    if (!notebook) return;
+    const topics = db.notebooks.notebook(id)?.topics.all;
+    if (!topics) return;
     this.set((state) => {
-      state.selectedNotebookTopics = qclone(notebook.topics.all);
+      state.selectedNotebookTopics = topics;
       state.selectedNotebookId = id;
     });
   };

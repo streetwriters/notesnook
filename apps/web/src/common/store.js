@@ -1,6 +1,6 @@
-import produce, { immerable } from "immer";
+import produce, { immerable, setAutoFreeze } from "immer";
 import create from "zustand";
-
+setAutoFreeze(false);
 function immer(config) {
   return function (set, get, api) {
     const obj = config(
