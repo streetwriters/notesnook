@@ -234,7 +234,7 @@ const topicNoteMenuItems = [
         .notebook(context.value.id)
         .topics.topic(context.value.topic)
         .delete(note.id);
-      store.setContext(context);
+      store.refresh();
       await showToast("success", "Note removed from topic!");
     },
   },
