@@ -34,28 +34,31 @@ class Notebook extends React.Component {
         footer={
           <>
             <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
-              {notebook?.topics?.slice(1, 4).map((topic) => (
-                <Flex
-                  key={topic.id}
-                  onClick={(e) => {
-                    onTopicClick(notebook, topic.id);
-                    e.stopPropagation();
-                  }}
-                  bg="primary"
-                  px={1}
-                  sx={{
-                    marginRight: 1,
-                    borderRadius: "default",
-                    color: "static",
-                    paddingTop: "2px",
-                    paddingBottom: "2px",
-                  }}
-                >
-                  <Text variant="body" color="static" fontSize={11}>
-                    {topic.title}
-                  </Text>
-                </Flex>
-              ))}
+              {notebook?.topics
+                ?.filter((v) => v.title !== "General")
+                .slice(0, 3)
+                .map((topic) => (
+                  <Flex
+                    key={topic.id}
+                    onClick={(e) => {
+                      onTopicClick(notebook, topic.id);
+                      e.stopPropagation();
+                    }}
+                    bg="primary"
+                    px={1}
+                    sx={{
+                      marginRight: 1,
+                      borderRadius: "default",
+                      color: "static",
+                      paddingTop: "2px",
+                      paddingBottom: "2px",
+                    }}
+                  >
+                    <Text variant="body" color="static" fontSize={11}>
+                      {topic.title}
+                    </Text>
+                  </Flex>
+                ))}
             </Flex>
             <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
               {notebook.pinned && (
