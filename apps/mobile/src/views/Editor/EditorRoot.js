@@ -22,12 +22,14 @@ import {
   checkNote,
   clearEditor,
   clearTimer,
+  EditorWebView,
   isNotedEdited,
   loadNote,
   post,
   saveNote,
   setIntent,
 } from './Functions';
+import tiny, { keyboardStateChanged } from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
 let handleBack;
@@ -66,12 +68,7 @@ const EditorRoot = () => {
   const load = async (item) => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-      Keyboard.addListener('keyboardDidShow', () => {
-        if (!editing.movedAway) {
-          editing.isFocused = true;
-        }
-        post('keyboard');
-      });
+      Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -141,12 +138,7 @@ const EditorRoot = () => {
         });
       }
       await clearEditor();
-      Keyboard.removeListener('keyboardDidShow', () => {
-        if (!editing.movedAway) {
-          editing.isFocused = true;
-        }
-        post('keyboard');
-      });
+      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
       if (handleBack) {
         handleBack.remove();
         handleBack = null;

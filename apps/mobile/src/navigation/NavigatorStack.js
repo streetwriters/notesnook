@@ -92,7 +92,7 @@ export const NavigatorStack = React.memo(
     const updateRender = async () => {
       if (!render) {
         setRender(true);
-        Navigation.navigate(
+        Navigation.setHeaderState(
           SettingsService.get().homepage,
           {
             menu: true,
