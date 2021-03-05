@@ -1,5 +1,5 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, SafeAreaView, TouchableOpacity, View} from 'react-native';
+import {Modal, SafeAreaView, TouchableOpacity, View, Text} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -432,6 +432,9 @@ const MergeEditor = () => {
                   style={{maxWidth: '80%'}}
                   color={colors.icon}
                   size={SIZE.xs}>
+                  <Text style={{color: colors.accent, fontWeight: 'bold'}}>
+                    (This Device)
+                  </Text>{' '}
                   Saved on {timeConverter(primaryData.dateEdited)}
                 </Paragraph>
                 <Icon
@@ -576,6 +579,9 @@ const MergeEditor = () => {
                   style={{maxWidth: '80%'}}
                   color={colors.icon}
                   size={SIZE.xs}>
+                  <Text style={{color: 'red', fontWeight: 'bold'}}>
+                    (Incoming)
+                  </Text>{' '}
                   Saved on {timeConverter(secondaryData.dateEdited)}
                 </Paragraph>
                 <Icon

@@ -256,7 +256,7 @@ export const Notes = ({route, navigation}) => {
   return (
     <>
       <SimpleList
-        listData={notes.reverse()}
+        listData={notes}
         type="notes"
         refreshCallback={_refreshCallback}
         headerProps={headerProps}

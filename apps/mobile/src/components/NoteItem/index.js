@@ -54,8 +54,9 @@ export default class NoteItem extends React.Component {
   }
 
   showActionSheet = () => {
+    let item = db.notes.note(this.props.item.id).data
     ActionSheetEvent(
-      this.props.item,
+      item,
       this.props.isTrash ? false : true,
       this.props.isTrash ? false : true,
       this.props.isTrash
