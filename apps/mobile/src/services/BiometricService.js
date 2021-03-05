@@ -87,6 +87,44 @@ async function getCredentials(title, description) {
   }
 }
 
+async function validateUser(title, description) {
+  try {
+    await FingerprintScanner.authenticate(
+      Platform.select({
+        ios: {
+          fallbackEnabled: true,
+          description: title,
+        },
+        android: {
+          title: title,
+          description: description,
+          deviceCredentialAllowed: true,
+        },
+      }),
+    );
+    FingerprintScanner.release();
+    return true;
+  } catch (e) {
+    FingerprintScanner.release();
+    if (e.name === 'DeviceLocked') {
+      ToastEvent.show({
+        heading: 'Biometrics authentication failed.',
+        message: 'Wait 30 seconds to try again.',
+        type: 'error',
+        context: 'local',
+      });
+    } else {
+      ToastEvent.show({
+        heading: 'Authentication failed.',
+        message: 'Tap to try again.',
+        type: 'error',
+        context: 'local',
+      });
+    }
+    return false;
+  }
+}
+
 export default {
   isBiometryAvailable,
   enableFingerprintAuth,
@@ -95,4 +133,5 @@ export default {
   getCredentials,
   storeCredentials,
   hasInternetCredentials,
+  validateUser
 };

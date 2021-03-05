@@ -4,10 +4,12 @@ import React, {useEffect} from 'react';
 import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
+import SplashScreen from 'react-native-splash-screen';
 import {updateEvent} from './src/components/DialogManager/recievers';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
+import BiometricService from './src/services/BiometricService';
 import {eSendEvent, ToastEvent} from './src/services/EventManager';
 import {
   clearMessage,
@@ -18,7 +20,7 @@ import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, editing} from './src/utils';
+import {AndroidModule, APP_VERSION, editing} from './src/utils';
 import {COLOR_SCHEME, updateStatusBarColor} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
@@ -32,10 +34,10 @@ import {MMKV} from './src/utils/mmkv';
 import {sleep} from './src/utils/TimeUtils';
 import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
+import RNExitApp from 'react-native-exit-app';
 let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
-
 
 async function storeAppState() {
   if (editing.currentlyEditing) {
@@ -79,23 +81,64 @@ async function reconnectSSE(connection) {
   } catch (e) {}
 }
 
+let prevState = null;
+let showingDialog = false;
 const onAppStateChanged = async (state) => {
   if (state === 'active') {
     updateStatusBarColor();
-    if (SettingsService.get().privacyScreen) {
+    if (
+      SettingsService.get().appLockMode !== 'background' &&
+      !SettingsService.get().privacyScreen
+    ) {
       enabled(false);
     }
+
+    if (SettingsService.get().appLockMode === 'background') {
+      if (prevState === 'background' && !showingDialog) {
+        showingDialog = true;
+        prevState = 'active';
+        if (Platform.OS === 'android') {
+          SplashScreen.show();
+        } else {
+          eSendEvent('load_overlay', 'hide');
+        }
+
+        let result = await BiometricService.validateUser(
+          'Unlock to access your notes',
+        );
+        if (result) {
+          showingDialog = false;
+          if (Platform.OS === 'android') {
+            SplashScreen.hide();
+          } else {
+            eSendEvent('load_overlay', 'show');
+          }
+        } else {
+          RNExitApp.exitApp();
+          return;
+        }
+      }
+    }
+    prevState = 'active';
     await reconnectSSE();
     await checkIntentState();
     if (getWebviewInit()) {
       await MMKV.removeItem('appState');
     }
   } else {
-    if (getNote()?.locked) {
+    prevState = 'background';
+    if (
+      getNote()?.locked &&
+      SettingsService.get().appLockMode === 'background'
+    ) {
       eSendEvent(eClearEditor);
     }
     await storeAppState();
-    if (SettingsService.get().privacyScreen) {
+
+    if (
+      SettingsService.get().privacyScreen ||
+      SettingsService.get().appLockMode === 'background'
+    ) {
       enabled(true);
     }
   }
