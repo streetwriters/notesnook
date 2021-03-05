@@ -44,7 +44,7 @@ async function init() {
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
-  if (settings.privacyScreen) {
+  if (settings.privacyScreen || settings.appLockMode === "background") {
     if (Platform.OS === 'android') {
       AndroidModule.setSecureMode(true);
     } else {

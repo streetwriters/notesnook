@@ -1,4 +1,5 @@
-import { getWebviewInit } from '../Functions';
+import { editing } from '../../../utils';
+import { EditorWebView, getWebviewInit } from '../Functions';
 
 const reset = `
 isLoading = true;
@@ -10,8 +11,8 @@ document.activeElement.blur();
 window.blur();
 `;
 
-export const keyboardStateChanged = `(() => {
-	
+const keyboardStateChanged = `(() => {
+	tinyMCE.activeEditor.selection.scrollIntoView(false);
 })();
 `;
 const blur = `
@@ -150,6 +151,14 @@ const clearHistory = `
 tinymce.activeEditor.undoManager.clear();
 `;
 
+const onKeyboardShow = () => {
+    if (!editing.movedAway) {
+      editing.isFocused = true;
+      call(EditorWebView,keyboardStateChanged)
+    }
+  }
+  
+
 export default {
   undo,
   redo,
@@ -171,5 +180,7 @@ export default {
   setTitle,
   restoreRange,
   isLoading,
-  notLoading
+  notLoading,
+  keyboardStateChanged,
+  onKeyboardShow
 };

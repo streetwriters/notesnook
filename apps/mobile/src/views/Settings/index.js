@@ -1028,6 +1028,8 @@ const SettingsAppearanceSection = () => {
 const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
   const {colors, settings} = state;
+  const [appLockVisible, setAppLockVisible] = useState(false);
+
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
     biometryEnrolled: false,
@@ -1036,26 +1038,15 @@ const SettingsPrivacyAndSecurity = () => {
 
   const checkVaultStatus = useCallback(() => {
     InteractionManager.runAfterInteractions(() => {
-      db.vault.add('check_no_vault').catch(async (e) => {
-        let biometry = await BiometricService.isBiometryAvailable();
+      db.vault.exists().then(async (r) => {
+        let available = await BiometricService.isBiometryAvailable();
         let fingerprint = await BiometricService.hasInternetCredentials();
-        let available = false;
-        if (biometry) {
-          available = true;
-        }
-        if (e.message === db.vault.ERRORS.noVault) {
-          setVaultStatus({
-            exists: false,
-            biometryEnrolled: fingerprint,
-            isBiometryAvailable: available,
-          });
-        } else {
-          setVaultStatus({
-            exists: true,
-            biometryEnrolled: fingerprint,
-            isBiometryAvailable: available,
-          });
-        }
+
+        setVaultStatus({
+          exists: r,
+          biometryEnrolled: fingerprint,
+          isBiometryAvailable: available ? true : false,
+        });
       });
     });
   });
@@ -1068,18 +1059,100 @@ const SettingsPrivacyAndSecurity = () => {
     };
   }, []);
 
+  const modes = [
+    {
+      title: 'None',
+      value: 'none',
+      desc:
+        'Disable app lock. Notes will be accessible to anyone who opens the app',
+    },
+    {
+      title: 'Secure Mode',
+      value: 'launch',
+      desc:
+        'Lock app on launch and keep it unlocked when you switch to other apps.',
+    },
+    {
+      title: 'Strict Mode',
+      value: 'background',
+      desc:
+        'Lock app on launch and also when you switch from other apps or background.',
+    },
+  ];
+
   return (
     <>
+      {appLockVisible && (
+        <BaseDialog
+          onRequestClose={() => {
+            setAppLockVisible(false);
+          }}
+          visible={true}>
+          <DialogContainer height={450}>
+            <DialogHeader
+              title="App lock mode"
+              paragraph="Select the level of security you want to enable."
+            />
+            <Seperator />
+            {modes.map((item) => (
+              <PressableButton
+                type={
+                  settings.appLockMode === item.value ? 'accent' : 'transparent'
+                }
+                onPress={() => {
+                  SettingsService.set('appLockMode',item.value)
+                }}
+                customStyle={{
+                  justifyContent: 'flex-start',
+                  alignItems: 'flex-start',
+                  paddingHorizontal: 6,
+                  paddingVertical: 6,
+                  marginTop: 3,
+                  marginBottom: 3,
+                }}
+                style={{
+                  marginBottom: 10,
+                }}>
+                <Heading
+                  color={
+                    settings.appLockMode === item.value ? 'white' : colors.pri
+                  }
+                  style={{maxWidth: '95%'}}
+                  size={SIZE.md}>
+                  {item.title}
+                </Heading>
+                <Paragraph
+                  color={
+                    settings.appLockMode === item.value ? 'white' : colors.icon
+                  }
+                  style={{maxWidth: '95%'}}
+                  size={SIZE.sm}>
+                  {item.desc}
+                </Paragraph>
+              </PressableButton>
+            ))}
+
+            <DialogButtons
+              negativeTitle="Close"
+              onPressNegative={() => {
+                setAppLockVisible(false);
+              }}
+            />
+          </DialogContainer>
+        </BaseDialog>
+      )}
+
       <SectionHeader title="Privacy & Security" />
       <CustomButton
         key="privacyMode"
-        title="Privacy Mode"
+        title="Privacy mode"
         tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
         onPress={() => {
           Platform.OS === 'android'
             ? AndroidModule.setSecureMode(!settings.privacyScreen)
             : enabled(true);
-          setSetting(settings, 'privacyScreen', !settings.privacyScreen);
+
+          SettingsService.set('privacyScreen', !settings.privacyScreen);
         }}
         maxWidth="90%"
         customComponent={
@@ -1093,12 +1166,24 @@ const SettingsPrivacyAndSecurity = () => {
         }
       />
 
+      {vaultStatus.isBiometryAvailable && (
+        <CustomButton
+          key="appLock"
+          title="App lock"
+          tagline="Require biometrics to access your notes."
+          onPress={() => {
+            setAppLockVisible(true);
+          }}
+          maxWidth="90%"
+        />
+      )}
+
       {vaultStatus.exists ? (
         <>
           {vaultStatus.isBiometryAvailable ? (
             <CustomButton
               key="fingerprintVaultUnlock"
-              title="Vault Biometic Unlock"
+              title="Vault biometrics unlock"
               tagline="Access notes in vault using biometrics"
               onPress={() => {
                 openVault({

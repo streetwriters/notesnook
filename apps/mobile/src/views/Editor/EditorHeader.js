@@ -70,12 +70,7 @@ const EditorHeader = () => {
         });
       }
       await clearEditor();
-      Keyboard.removeListener('keyboardDidShow', () => {
-        if (!editing.movedAway) {
-          editing.isFocused = true;
-        }
-        post('keyboard');
-      });
+      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
      
     }
   };
