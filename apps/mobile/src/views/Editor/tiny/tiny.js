@@ -12,7 +12,7 @@ window.blur();
 `;
 
 const keyboardStateChanged = `(() => {
-	
+	tinyMCE.activeEditor.selection.scrollIntoView(false);
 })();
 `;
 const blur = `
