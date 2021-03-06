@@ -172,7 +172,7 @@ export const SUBSCRIPTION_PROVIDER = {
   1: {
     type: 'iOS',
     title: 'Subscribed on iOS',
-    desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase.',
+    desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.',
     icon: 'ios',
   },
   2: {

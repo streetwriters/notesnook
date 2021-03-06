@@ -697,7 +697,7 @@ const SettingsUserSection = () => {
                   </View>
                 ) : null}
 
-                {!user.isEmailConfirmed &&
+                {user.isEmailConfirmed &&
                   user.subscription.type !== 5 &&
                   user.subscription.type !== 2 && (
                     <>
@@ -710,13 +710,18 @@ const SettingsUserSection = () => {
                         fontSize={SIZE.md}
                         title={
                           user.subscription.type === 6
-                            ? 'Resubscribe to Notesnook Pro'
+                            ? `Resubscribe to Notesnook Pro (${
+                                PremiumService.getProducts().length > 0
+                                  ? PremiumService.getProducts()[0]
+                                      .localizedPrice
+                                  : '$4.49'
+                              } / mo)`
                             : `Subscribe to Notesnook Pro (${
                                 PremiumService.getProducts().length > 0
                                   ? PremiumService.getProducts()[0]
                                       .localizedPrice
                                   : '$4.49'
-                              } / Month)`
+                              } / mo)`
                         }
                         height={50}
                         type="transparent"
@@ -732,6 +737,7 @@ const SettingsUserSection = () => {
                     SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
                   }
                   onPress={() => {
+                    console.log('opening');
                     eSendEvent(eOpenProgressDialog, {
                       title:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
@@ -740,15 +746,13 @@ const SettingsUserSection = () => {
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
                       noProgress: true,
-                      icon:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .icon,
                     });
                   }}
                   style={{
                     alignSelf: 'flex-end',
                     marginTop: 10,
                     borderRadius: 3,
+                    zIndex: 10,
                   }}
                   fontSize={11}
                   textStyle={{
@@ -1100,7 +1104,7 @@ const SettingsPrivacyAndSecurity = () => {
                   settings.appLockMode === item.value ? 'accent' : 'transparent'
                 }
                 onPress={() => {
-                  SettingsService.set('appLockMode',item.value)
+                  SettingsService.set('appLockMode', item.value);
                 }}
                 customStyle={{
                   justifyContent: 'flex-start',

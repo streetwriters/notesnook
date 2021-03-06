@@ -20,9 +20,14 @@ import {eSendEvent} from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {dWidth, itemSkus} from '../../utils';
 import {db} from '../../utils/DB';
-import {eOpenLoginDialog} from '../../utils/Events';
+import {
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  eOpenProgressDialog,
+} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
@@ -86,6 +91,7 @@ export const PremiumComponent = React.memo(
     const [user, setUser] = useState(null);
     const [product, setProduct] = useState(null);
     const [products, setProducts] = useState([]);
+    const [buying, setBuying] = useState(false);
     const scrollViewRef = useRef();
 
     const getSkus = async () => {
@@ -111,12 +117,14 @@ export const PremiumComponent = React.memo(
     }, []);
 
     const buySubscription = async () => {
+      if (buying) return;
       if (!user) {
         close();
         setTimeout(() => {
           eSendEvent(eOpenLoginDialog);
         }, 400);
       } else {
+        setBuying(true);
         RNIap.requestSubscription(
           product?.productId,
           false,
@@ -125,10 +133,23 @@ export const PremiumComponent = React.memo(
           null,
           user.id,
         )
-          .then((r) => {
+          .then(async (r) => {
+            setBuying(false);
             close();
+            await sleep(1000);
+            eSendEvent(eOpenProgressDialog, {
+              title: 'Thank you for subscribing!',
+              paragraph: `Your Notesnook Pro subscription will be activated within a few hours. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
+              action: async () => {
+                eSendEvent(eCloseProgressDialog);
+              },
+              icon: 'check',
+              actionText: 'Continue',
+              noProgress: true,
+            });
           })
           .catch((e) => {
+            setBuying(false);
             console.log(e);
           });
       }
@@ -180,6 +201,7 @@ export const PremiumComponent = React.memo(
           <Button
             onPress={buySubscription}
             fontSize={SIZE.lg}
+            loading={buying}
             title={
               user
                 ? `Subscribe for ${product?.localizedPrice || '$4.49'} / Month`

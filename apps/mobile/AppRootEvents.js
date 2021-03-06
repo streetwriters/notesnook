@@ -289,10 +289,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async (userStatus) => {
-      console.log('STATUS CODE', userStatus);
-
       if (!PremiumService.get() && userStatus.type === 5) {
-        console.log('STATUS CODE IN', userStatus.type);
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
           paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
@@ -354,7 +351,6 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async () => {
       try {
         let user = await db.user.fetchUser(true);
-
         if (user) {
           attachIAPListeners();
           clearMessage(dispatch);
@@ -364,7 +360,6 @@ export const AppRootEvents = React.memo(
             setEmailVerifyMessage(dispatch);
             return;
           }
-          console.log('RUNNING SYNC');
           await Sync.run();
         } else {
           await PremiumService.setPremiumStatus();
@@ -384,9 +379,8 @@ export const AppRootEvents = React.memo(
 
     const onSuccessfulSubscription = async (subscription) => {
       const receipt = subscription.transactionReceipt;
-
+      console.log(receipt);
       if (prevTransactionId === subscription.transactionId) {
-        console.log('returning same ID');
         return;
       }
       await processReceipt(receipt);
@@ -407,6 +401,7 @@ export const AppRootEvents = React.memo(
     };
 
     const processReceipt = async (receipt) => {
+      console.log(receipt);
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
@@ -422,6 +417,7 @@ export const AppRootEvents = React.memo(
             },
           })
             .then(async (r) => {
+              if (!r.ok) return;
               let text = await r.text();
               if (text === 'Receipt already expired.') {
                 await RNIap.clearTransactionIOS();
