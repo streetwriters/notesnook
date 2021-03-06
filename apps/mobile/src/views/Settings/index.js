@@ -337,6 +337,7 @@ const AccoutLogoutSection = () => {
                   await sleep(10);
                   await db.user.logout();
                   await sleep(10);
+                  await Storage.write('introCompleted', 'true');
                   setLoading(false);
                 }}
               />
