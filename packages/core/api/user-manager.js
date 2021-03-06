@@ -1,7 +1,7 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { EV, EVENTS, NOTESNOOK_CORE_VERSION } from "../common";
+import { EV, EVENTS } from "../common";
 
 const ENDPOINTS = {
   signup: "/users",
