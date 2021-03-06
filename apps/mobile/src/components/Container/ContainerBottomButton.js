@@ -11,7 +11,7 @@ import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import RNTooltips from 'react-native-tooltips';
 
-//const translateY = new Animated.Value(0);
+const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({
   title,
   onPress,
@@ -19,7 +19,7 @@ export const ContainerBottomButton = ({
   shouldShow = false,
 }) => {
   const insets = useSafeAreaInsets();
-/* 
+
   function animate(translate) {
     Animated.timing(translateY, {
       toValue: translate,
@@ -46,7 +46,7 @@ export const ContainerBottomButton = ({
       Keyboard.removeListener('keyboardDidHide', onKeyboardHide);
     };
   }, []);
- */
+
   return DDS.isLargeTablet() && !shouldShow ? null : (
     <Animated.View
       style={{
@@ -57,14 +57,14 @@ export const ContainerBottomButton = ({
             ? insets.bottom - 10
             : insets.bottom + 12,
         zIndex: 10,
-      /*   transform: [
+        transform: [
           {
             translateY: translateY,
           },
           {
             translateX: translateY,
           },
-        ], */
+        ], 
       }}>
       <PressableButton
         testID={notesnook.ids.default.addBtn}
