@@ -588,11 +588,11 @@ function AccountStatus(props) {
           : ""}
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
-      {isBasic || remainingDays <= 0 ? (
+      {isBasic || isTrial || remainingDays <= 0 ? (
         <Button mt={2} onClick={showBuyDialog}>
           Upgrade to Notesnook Pro
         </Button>
-      ) : (
+      ) : isPro ? (
         <>
           <Button
             variant="list"
@@ -624,7 +624,7 @@ function AccountStatus(props) {
             Purchased on {provider}
           </Text>
         </>
-      )}
+      ) : null}
     </AccountStatusContainer>
   );
 }
