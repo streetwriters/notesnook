@@ -8,22 +8,22 @@ const passwordValidationRules = [
     title: "8 characters",
     validate: (password) => password.length >= 8,
   },
-  {
-    title: "1 lowercase letter",
-    validate: (password) => /[a-z]/.test(password),
-  },
-  {
-    title: "1 uppercase letter",
-    validate: (password) => /[A-Z]/.test(password),
-  },
-  {
-    title: "1 digit",
-    validate: (password) => /\d/.test(password),
-  },
-  {
-    title: "1 special character",
-    validate: (password) => /\W/.test(password),
-  },
+  // {
+  //   title: "1 lowercase letter",
+  //   validate: (password) => /[a-z]/.test(password),
+  // },
+  // {
+  //   title: "1 uppercase letter",
+  //   validate: (password) => /[A-Z]/.test(password),
+  // },
+  // {
+  //   title: "1 digit",
+  //   validate: (password) => /\d/.test(password),
+  // },
+  // {
+  //   title: "1 special character",
+  //   validate: (password) => /\W/.test(password),
+  // },
 ];
 
 function Field(props) {
