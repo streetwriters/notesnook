@@ -42,8 +42,8 @@ class Settings {
         type: "settings",
         id: id(),
         pins: [],
-        dateEdited: Date.now(),
-        dateCreated: Date.now(),
+        dateEdited: 0,
+        dateCreated: 0,
       };
     });
   }
