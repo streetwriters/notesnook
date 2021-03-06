@@ -18,16 +18,18 @@ class Merger {
     const version = item.v || 0;
     let type = deserialized.type;
     if (!type && deserialized.data) type = "tiny";
+
     const migrate = migrations[version][type];
     if (migrate) return migrate(deserialized);
     return deserialized;
   }
 
-  async _deserialize(item) {
+  async _deserialize(item, migrate = true) {
     const deserialized = JSON.parse(
       await this._db.context.decrypt(this.key, item)
     );
     deserialized.remote = true;
+    if (!migrate) return deserialized;
     return this._migrate(item, deserialized);
   }
 
@@ -88,7 +90,7 @@ class Merger {
     this.key = await this._db.user.getEncryptionKey();
 
     if (vaultKey) {
-      await this._db.vault._setKey(await this._deserialize(vaultKey));
+      await this._db.vault._setKey(await this._deserialize(vaultKey, false));
     }
 
     await this._mergeArray(
