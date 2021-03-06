@@ -68,7 +68,14 @@ function Dialog(props) {
       >
         {props.showClose && (
           <Icon.Close
-            sx={{ position: "absolute", top: 0, right: 30, mt: 38 }}
+            sx={{
+              position: "absolute",
+              cursor: "pointer",
+              top: 0,
+              right: 30,
+              mt: 38,
+              zIndex: 999,
+            }}
             size={26}
             onClick={props.onClose}
           />
