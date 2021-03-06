@@ -152,6 +152,9 @@ class UserManager {
         return await this.getUser();
       }
     } catch (e) {
+      if (e.message === "invalid_grant" || e.message === "invalid_client") {
+        return await this.logout(false, "Session expired.");
+      }
       console.error(e);
       return await this.getUser();
     }
