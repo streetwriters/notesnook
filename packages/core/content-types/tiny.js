@@ -21,7 +21,7 @@ class Tiny {
     } else {
       return decode(
         this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
-      );
+      ).trim();
     }
   }
 
