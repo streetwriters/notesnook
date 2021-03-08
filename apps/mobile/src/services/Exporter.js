@@ -5,6 +5,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
 import showdown from 'showdown';
 import jsdom from 'jsdom-jscore-rn';
+import { sanitizeFilename } from '../utils/filename';
 
 let RNFetchBlob;
 

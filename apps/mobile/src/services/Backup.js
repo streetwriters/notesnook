@@ -6,6 +6,7 @@ import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import Share from 'react-native-share';
 import {Platform} from 'react-native';
+import { sanitizeFilename } from '../utils/filename';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
