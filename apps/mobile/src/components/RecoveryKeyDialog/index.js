@@ -11,6 +11,7 @@ import {
 } from '../../services/EventManager';
 import { db } from '../../utils/DB';
 import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { sanitizeFilename } from '../../utils/filename';
 import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import { sleep } from '../../utils/TimeUtils';
@@ -102,8 +103,10 @@ class RecoveryKeyDialog extends React.Component {
       try {
         let path = await Storage.checkAndCreateDir('/');
         RNFetchBlob = require('rn-fetch-blob').default;
-        let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode.png';
-        await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
+        let fileName =   'nn_' + this.user.email + '_recovery_key_qrcode';
+        fileName = sanitizeFilename(fileName,{replacement:"_"});
+        fileName = fileName + ".png"
+        await RNFetchBlob.fs.writeFile(path +  fileName, data, 'base64');
 
         if (Platform.OS === 'android') {
           await RNFetchBlob.fs.scanFile([
@@ -137,9 +140,13 @@ class RecoveryKeyDialog extends React.Component {
     }
     try {
       let path = await Storage.checkAndCreateDir('/');
-      let fileName = 'nn_' + this.user?.email + '_recovery_key.txt';
+      let fileName = 'nn_' + this.user?.email + '_recovery_key';
+      fileName = sanitizeFilename(fileName,{replacement:"_"});
+      fileName = fileName + ".txt"
+
       RNFetchBlob = require('rn-fetch-blob').default;
       await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+
       ToastEvent.show({
         heading: 'Recovery key text file saved',
         message: 'Recovery key saved in text file at ' + path + fileName,

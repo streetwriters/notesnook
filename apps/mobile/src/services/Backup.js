@@ -44,8 +44,10 @@ async function run() {
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now() + '.nnbackup';
+      backupName = sanitizeFilename(backupName,{replacement:"_"});
       let path = await storage.checkAndCreateDir('/backups/');
-      await RNFetchBlob.fs.createFile(path + backupName, backup, 'utf8');
+      await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
+
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
 
       ToastEvent.show({
