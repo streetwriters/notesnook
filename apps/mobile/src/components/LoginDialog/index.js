@@ -19,7 +19,9 @@ import PremiumService from '../../services/PremiumService';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
+  eCloseProgressDialog,
   eOpenLoginDialog,
+  eOpenProgressDialog,
   eOpenRecoveryKeyDialog,
   refreshNotesPage,
 } from '../../utils/Events';
@@ -192,13 +194,19 @@ const LoginDialog = () => {
         type: 'success',
         context: 'local',
       });
+      close();
+      await sleep(300);
+      eSendEvent(eOpenProgressDialog, {
+        title: 'Syncing your data',
+        paragraph: 'Please wait while we sync all your data.',
+        noProgress: false,
+      });
       await db.sync();
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       dispatch({type: Actions.ALL});
       eSendEvent(refreshNotesPage);
-      close();
+      eSendEvent(eCloseProgressDialog);
     } catch (e) {
-      console.log(e);
       setLoading(false);
       setStatus(null);
       if (user && !user.isEmailConfirmed) {

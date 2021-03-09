@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
-import { ph, SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {SvgXml} from 'react-native-svg';
+import {WELCOME_SVG} from '../../assets/images/assets';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
+import {ph, SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -16,12 +17,12 @@ import Paragraph from '../Typography/Paragraph';
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [dialogData, setDialogData] = useState({
-    title: '',
-    paragraph: '',
-    icon: null,
-    button: null,
+    title: 'Welcome!',
+    paragraph: 'Please confirm your email to enable syncing.',
+    icon: 'check',
+    button: 'Thank You!',
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);
@@ -55,7 +56,8 @@ const ResultDialog = () => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Icon name={dialogData.icon} color={colors.accent} size={80} />
+        <SvgXml xml={WELCOME_SVG(colors.accent)} width={170} height={170} />
+
         <Heading
           size={SIZE.lg}
           style={{
