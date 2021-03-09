@@ -4,6 +4,7 @@ import { hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
+import { store as appStore } from "../stores/app-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { CHECK_IDS } from "notes-core/common";
@@ -58,6 +59,7 @@ export function showEditNotebookDialog(notebookId) {
         await notebookTopics.add(...topics);
 
         notebookStore.refresh();
+        appStore.refreshMenuPins();
 
         showToast("success", "Notebook edited successfully!");
         perform(true);
