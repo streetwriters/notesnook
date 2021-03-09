@@ -19,10 +19,10 @@ const ResultDialog = () => {
   const {colors} = state;
   const [visible, setVisible] = useState(true);
   const [dialogData, setDialogData] = useState({
-    title: 'Welcome!',
-    paragraph: 'Please confirm your email to enable syncing.',
+    title: 'Welcome to your private\nnote taking haven',
+    paragraph: 'Please confirm your email to encrypt and sync all your notes.',
     icon: 'check',
-    button: 'Thank You!',
+    button: 'Start taking notes',
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);
@@ -64,6 +64,7 @@ const ResultDialog = () => {
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10,
+            maxWidth: '80%',
           }}>
           {dialogData.title}
         </Heading>
@@ -72,11 +73,17 @@ const ResultDialog = () => {
           style={{
             alignSelf: 'center',
             textAlign: 'center',
+            maxWidth: '80%',
           }}>
           {dialogData.paragraph}
         </Paragraph>
         <Seperator />
-        <Button title={dialogData.button} width="100%" onPress={close} />
+        <Button
+          title={dialogData.button}
+          width="100%"
+          onPress={close}
+          fontSize={SIZE.md}
+        />
       </View>
     </BaseDialog>
   );
