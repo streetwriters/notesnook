@@ -4,7 +4,6 @@ import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
-import { qclone } from "qclone";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
