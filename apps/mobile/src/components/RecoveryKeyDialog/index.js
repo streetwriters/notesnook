@@ -1,22 +1,22 @@
-import React, { createRef } from 'react';
-import { Clipboard, Platform, View } from 'react-native';
+import React, {createRef} from 'react';
+import {Clipboard, Platform, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
-import { LOGO_BASE64 } from '../../assets/images/assets';
+import {LOGO_BASE64} from '../../assets/images/assets';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
-import { sanitizeFilename } from '../../utils/filename';
-import { SIZE } from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
+import {sanitizeFilename} from '../../utils/filename';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
@@ -68,13 +68,13 @@ class RecoveryKeyDialog extends React.Component {
       this.setState({
         visible: false,
       });
-
     });
     if (this.signup) {
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
           title: 'Welcome to your private\nnote taking haven',
-          paragraph: 'Please confirm your email to encrypt and sync all your notes.',
+          paragraph:
+            'Please confirm your email to encrypt and sync all your notes.',
           icon: 'check',
           button: 'Start taking notes',
         });
@@ -104,10 +104,10 @@ class RecoveryKeyDialog extends React.Component {
       try {
         let path = await Storage.checkAndCreateDir('/');
         RNFetchBlob = require('rn-fetch-blob').default;
-        let fileName =   'nn_' + this.user.email + '_recovery_key_qrcode';
-        fileName = sanitizeFilename(fileName,{replacement:"_"});
-        fileName = fileName + ".png"
-        await RNFetchBlob.fs.writeFile(path +  fileName, data, 'base64');
+        let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode';
+        fileName = sanitizeFilename(fileName, {replacement: '_'});
+        fileName = fileName + '.png';
+        await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
 
         if (Platform.OS === 'android') {
           await RNFetchBlob.fs.scanFile([
@@ -142,8 +142,8 @@ class RecoveryKeyDialog extends React.Component {
     try {
       let path = await Storage.checkAndCreateDir('/');
       let fileName = 'nn_' + this.user?.email + '_recovery_key';
-      fileName = sanitizeFilename(fileName,{replacement:"_"});
-      fileName = fileName + ".txt"
+      fileName = sanitizeFilename(fileName, {replacement: '_'});
+      fileName = fileName + '.txt';
 
       RNFetchBlob = require('rn-fetch-blob').default;
       await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
@@ -215,13 +215,14 @@ class RecoveryKeyDialog extends React.Component {
             }}>
             <Paragraph
               color={colors.icon}
-              size={SIZE.md}
+              size={SIZE.sm}
               numberOfLines={2}
               style={{
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: 10,
                 marginBottom: 10,
+                textAlign: 'center',
               }}>
               {this.state.key}
             </Paragraph>
