@@ -22,6 +22,7 @@ import "tinymce/plugins/media";
 import "./plugins/code";
 import "./plugins/shortlink";
 import "./plugins/quickimage";
+import "./plugins/checklist";
 import "./editor.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { isUserPremium } from "../../common";
@@ -145,7 +146,7 @@ function TinyMCE(props) {
         link_quicklink: true,
         width: "100%",
         plugins:
-          "paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
+          "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_insert_toolbar: false,
@@ -188,7 +189,7 @@ function TinyMCE(props) {
 `,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
         quickbars_selection_toolbar:
           "bold italic underline strikethrough code h2 h3 quicklink blockquote",
         mobile: {
