@@ -449,6 +449,7 @@ export const ActionSheetComponent = ({
           alignItems: 'flex-end',
           paddingHorizontal: 12,
           paddingVertical: pv,
+          height:50
         }}>
         <View
           style={{
@@ -459,9 +460,9 @@ export const ActionSheetComponent = ({
             style={{
               width: 30,
             }}
-            name={item.icon}
+            name={ item.icon}
             color={item.color || colors.accent}
-            size={SIZE.md}
+            size={SIZE.md + 2}
           />
           <Paragraph>{item.name}</Paragraph>
         </View>
@@ -473,7 +474,7 @@ export const ActionSheetComponent = ({
           }}>
           {item.switch ? (
             <Icon
-              size={SIZE.lg + 2}
+              size={SIZE.xxxl}
               color={item.on ? colors.accent : colors.icon}
               name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
             />
