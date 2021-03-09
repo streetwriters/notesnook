@@ -769,7 +769,17 @@ const SettingsUserSection = () => {
             {
               name: 'Save Data Recovery Key',
               func: async () => {
-                eSendEvent(eOpenRecoveryKeyDialog);
+                if (BiometricService.isBiometryAvailable() === false) {
+                  eSendEvent(eOpenRecoveryKeyDialog);
+                  return;
+                }
+                let result = await BiometricService.validateUser(
+                  "Verify it's you",
+                  '',
+                );
+                if (result) {
+                  eSendEvent(eOpenRecoveryKeyDialog);
+                }
               },
               desc:
                 'Recover your data using the recovery key if your password is lost.',
