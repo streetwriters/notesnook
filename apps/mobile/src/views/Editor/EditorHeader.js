@@ -170,7 +170,7 @@ const EditorHeader = () => {
                   note,
                   true,
                   true,
-                  ['Add to', 'Share', 'Export', 'Delete'],
+                  ['Add to', 'Share', 'Export', 'Delete','Copy'],
                   ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
                 );
               }}
