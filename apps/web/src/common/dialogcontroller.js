@@ -50,10 +50,10 @@ export function showEditNotebookDialog(notebookId) {
         const topics = qclone(nb.topics);
         delete nb.topics;
 
-        let notebook = await db.notebooks.add(nb);
+        let notebookId = await db.notebooks.add(nb);
 
         // add or delete topics as required
-        const notebookTopics = db.notebooks.notebook(notebook.id).topics;
+        const notebookTopics = db.notebooks.notebook(notebookId).topics;
         await notebookTopics.delete(...deletedTopics);
         await notebookTopics.add(...topics);
 
