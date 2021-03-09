@@ -1,6 +1,7 @@
 import { db } from "../common/db";
 import createStore from "../common/store";
 import { store as appStore } from "./app-store";
+import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { qclone } from "qclone";
@@ -21,6 +22,7 @@ class NotebookStore extends BaseStore {
     await db.notebooks.delete(id);
     this.refresh();
     appStore.refreshMenuPins();
+    noteStore.refresh();
   };
 
   pin = async (notebookId) => {
