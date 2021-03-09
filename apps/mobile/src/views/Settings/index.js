@@ -523,8 +523,7 @@ const SettingsUserSection = () => {
     let d2 = new Date(t2);
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
-
-    return diff < 0 ? 0 : diff;
+    return diff < 1 ? 0 : diff;
   };
 
   return (
@@ -688,7 +687,7 @@ const SettingsUserSection = () => {
                         ? 'Your trial period started on ' +
                           timeConverter(user.subscription.start)
                         : user.subscription.type === 6
-                        ? 'Your account will be downgraded to Basic in 3 days.'
+                        ? 'Your account will be downgraded to Basic in 3 days' 
                         : user.subscription.type === 7
                         ? 'You have cancelled your subscription.'
                         : user.subscription.type === 5
