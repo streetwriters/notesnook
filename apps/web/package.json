@@ -2,6 +2,7 @@
   "name": "notes-web",
   "version": "1.3.4",
   "private": true,
+  "main": "public/electron.js",
   "dependencies": {
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
@@ -39,9 +40,11 @@
     "tinymce": "^5.7.0",
     "uzip": "^0.20201231.0",
     "wouter": "^2.7.3",
-    "zustand": "^3.3.1"
+    "zustand": "^3.3.1",
+    "electron-serve": "^1.1.0"
   },
   "devDependencies": {
+    "@neutralinojs/neu": "^2.4.0",
     "@sentry/types": "^6.1.0",
     "@types/hookrouter": "^2.2.5",
     "@types/jest": "^26.0.20",
@@ -49,6 +52,8 @@
     "@types/quill": "^2.0.5",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
+    "electron": "^12.0.0",
+    "electron-builder": "^22.10.5",
     "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-import": "^2.20.2",
@@ -73,7 +78,10 @@
     "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "electron-dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
+    "electron-prod": "electron electron/main.js",
+    "electron-build": "electron-builder"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -92,5 +100,61 @@
       "last 3 ie version",
       "last 4 edge version"
     ]
+  },
+  "author": {
+    "name": "Streetwriters (Private) Ltd.",
+    "email": "support@streetwriters.co",
+    "url": "https://streetwriters.co"
+  },
+  "build": {
+    "productName": "Notesnook",
+    "appId": "com.streetwriters.notesnook",
+    "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
+    "files": [
+      "build/",
+      "node_modules/electron-serve"
+    ],
+    "mac": {
+      "target": [
+        "dmg"
+      ],
+      "type": "distribution",
+      "hardenedRuntime": true,
+      "entitlements": "assets/entitlements.mac.plist",
+      "entitlementsInherit": "assets/entitlements.mac.plist",
+      "gatekeeperAssess": false
+    },
+    "dmg": {
+      "contents": [
+        {
+          "x": 130,
+          "y": 220
+        },
+        {
+          "x": 410,
+          "y": 220,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ]
+    },
+    "linux": {
+      "target": [
+        "AppImage"
+      ],
+      "category": "Development"
+    },
+    "extraResources": [
+      "./assets/**"
+    ],
+    "directories": {
+      "buildResources": "assets",
+      "output": "dist/"
+    }
   }
 }

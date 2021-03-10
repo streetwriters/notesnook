@@ -25,3 +25,5 @@ yarn-error.log*
 .now
 
 __diff_output__
+
+dist
