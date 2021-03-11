@@ -46,7 +46,7 @@ const App = () => {
         };
 
         await SettingsService.init();
-        if (SettingsService.get().appLockMode !== 'none') {
+        if (SettingsService.get().appLockMode && SettingsService.get().appLockMode !== 'none') {
           let result = await BiometricService.validateUser(
             'Unlock to access your notes',
             '',
