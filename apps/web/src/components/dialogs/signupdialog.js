@@ -96,6 +96,17 @@ function SignUpDialog(props) {
           onError={setPasswordError}
           sx={{ mt: 1 }}
         />
+        <Text variant="body" fontSize="body" mt={2}>
+          By signing up on Notesnook you agree to our{" "}
+          <Text as="a" color="primary" href="https://notesnook.com/tos">
+            terms of service
+          </Text>{" "}
+          &amp;{" "}
+          <Text as="a" color="primary" href="https://notesnook.com/privacy">
+            privacy policy
+          </Text>
+          .
+        </Text>
         {error && typeof error === "string" && (
           <Text variant="error" fontSize="body" mt={2}>
             {error}
