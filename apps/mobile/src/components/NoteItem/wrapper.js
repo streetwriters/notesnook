@@ -17,14 +17,14 @@ import {DDS} from '../../services/DeviceDetection';
 import {tabBarRef} from '../../utils/Refs';
 import {notesnook} from '../../../e2e/test.ids';
 import {history} from '../../utils';
-import { useWindowDimensions } from 'react-native';
+import {useWindowDimensions} from 'react-native';
 
 export const NoteWrapper = ({item, index, isTrash = false}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [note, setNote] = useState(item);
   const {fontScale} = useWindowDimensions();
-  
+
   useEffect(() => {
     setNote(item);
   }, [item]);
@@ -51,21 +51,22 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
     };
   }, [note]);
 
- 
   const onPress = async () => {
-    if (note.conflicted) {
-      eSendEvent(eShowMergeDialog, note);
+    let _note = db.notes.note(note.id).data;
+    setNote(_note);
+    if (_note.conflicted) {
+      eSendEvent(eShowMergeDialog, _note);
       return;
     }
 
     if (history.selectedItemsList.length > 0) {
-      dispatch({type: Actions.SELECTED_ITEMS, item: note});
+      dispatch({type: Actions.SELECTED_ITEMS, item: _note});
       return;
     }
 
-    if (note.locked) {
+    if (_note.locked) {
       openVault({
-        item: note,
+        item: _note,
         novault: true,
         locked: true,
         goToEditor: true,
@@ -75,9 +76,9 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
       return;
     }
     if (isTrash) {
-      simpleDialogEvent(TEMPLATE_TRASH(note.type));
+      simpleDialogEvent(TEMPLATE_TRASH(_note.type));
     } else {
-      eSendEvent(eOnLoadNote, note);
+      eSendEvent(eOnLoadNote, _note);
     }
     if (DDS.isPhone || DDS.isSmallTab) {
       tabBarRef.current?.goToPage(1);
