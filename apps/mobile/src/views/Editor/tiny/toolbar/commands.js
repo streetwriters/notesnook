@@ -1,10 +1,14 @@
 import DocumentPicker from 'react-native-document-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {eSendEvent} from '../../../../services/EventManager';
+import {editing} from '../../../../utils';
 import {
   eCloseProgressDialog,
   eOpenProgressDialog,
 } from '../../../../utils/Events';
+import {sleep} from '../../../../utils/TimeUtils';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 import {formatSelection} from './constants';
 let RNFetchBlob;
 
@@ -54,14 +58,20 @@ export const execCommands = {
   table: (r, c) =>
     `tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} })`,
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
-  image: () => {
+  image: async () => {
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
     eSendEvent(eOpenProgressDialog, {
       noProgress: true,
       noIcon: true,
       actionsArray: [
         {
-          action: () => {
+          action: async () => {
             eSendEvent(eCloseProgressDialog);
+            await sleep(300);
             launchCamera(
               {
                 includeBase64: true,
@@ -97,8 +107,9 @@ export const execCommands = {
           icon: 'camera',
         },
         {
-          action: () => {
+          action: async () => {
             eSendEvent(eCloseProgressDialog);
+            await sleep(300);
             launchImageLibrary(
               {
                 includeBase64: true,
