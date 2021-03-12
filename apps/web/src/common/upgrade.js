@@ -1,7 +1,9 @@
+const MERCHANT_CODE = "250784034664";
+
 function loadTCheckout() {
   return new Promise((resolve) => {
     const config = {
-      app: { merchant: "250327951921", iframeLoad: "checkout" },
+      app: { merchant: MERCHANT_CODE, iframeLoad: "checkout" },
       cart: {
         host: "https://secure.2checkout.com",
         customization: "inline",
@@ -36,7 +38,7 @@ async function upgrade(user) {
 
   const { TwoCoInlineCart: cart } = window;
   if (!cart) return;
-  cart.setup.setMerchant("250327951921"); // your Merchant code
+  cart.setup.setMerchant(MERCHANT_CODE); // your Merchant code
   cart.billing.setEmail(user.email); // customer email address
   cart.shipping.setEmail(user.email); // customer Delivery email
   cart.cart.setExternalCustomerReference(user.id);
