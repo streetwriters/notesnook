@@ -35,10 +35,11 @@ import {sleep} from './src/utils/TimeUtils';
 import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 import RNExitApp from 'react-native-exit-app';
+import Storage from './src/utils/storage';
 let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
-
+let isUserReady = false;
 async function storeAppState() {
   if (editing.currentlyEditing) {
     let state = JSON.stringify({
@@ -69,6 +70,10 @@ async function checkIntentState() {
 }
 
 async function reconnectSSE(connection) {
+  if (!isUserReady) {
+    console.log("user is not ready")
+    return;
+  }
   let state = connection;
   try {
     if (!state) {
@@ -143,7 +148,7 @@ const onAppStateChanged = async (state) => {
     }
   }
 };
-
+let removeInternetStateListener;
 export const AppRootEvents = React.memo(
   () => {
     const [state, dispatch] = useTracked();
@@ -193,9 +198,7 @@ export const AppRootEvents = React.memo(
     };
 
     useEffect(() => {
-      let unsubscribe;
       if (!loading) {
-        unsubscribe = NetInfo.addEventListener(onInternetStateChanged);
         AppState.addEventListener('change', onAppStateChanged);
         (async () => {
           try {
@@ -227,7 +230,7 @@ export const AppRootEvents = React.memo(
         }
       }
       return () => {
-        unsubscribe && unsubscribe();
+        removeInternetStateListener && removeInternetStateListener();
         AppState.removeEventListener('change', onAppStateChanged);
         unsubIAP();
       };
@@ -323,6 +326,7 @@ export const AppRootEvents = React.memo(
       setLoginMessage(dispatch);
       await sleep(500);
       await PremiumService.setPremiumStatus();
+      await Storage.write('introCompleted', 'true');
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
@@ -350,17 +354,22 @@ export const AppRootEvents = React.memo(
 
     const setCurrentUser = async () => {
       try {
-        let user = await db.user.fetchUser(true);
+        let user = await db.user.getUser();
         if (user) {
+          dispatch({type: Actions.USER, user: user});
           attachIAPListeners();
           clearMessage(dispatch);
-          dispatch({type: Actions.USER, user: user});
           await PremiumService.setPremiumStatus();
           if (!user.isEmailConfirmed) {
             setEmailVerifyMessage(dispatch);
             return;
           }
+          removeInternetStateListener = NetInfo.addEventListener(
+            onInternetStateChanged,
+          );
           await Sync.run();
+          user = await db.user.fetchUser(true);
+          dispatch({type: Actions.USER, user: user});
         } else {
           await PremiumService.setPremiumStatus();
           setLoginMessage(dispatch);
@@ -374,7 +383,10 @@ export const AppRootEvents = React.memo(
         } else {
           console.log('unknown error', e);
         }
+      } finally {
+        isUserReady = true;
       }
+
     };
 
     const onSuccessfulSubscription = async (subscription) => {
