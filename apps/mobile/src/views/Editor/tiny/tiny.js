@@ -1,18 +1,18 @@
-import { editing } from '../../../utils';
-import { EditorWebView, getWebviewInit } from '../Functions';
+import {editing} from '../../../utils';
+import {EditorWebView, getWebviewInit} from '../Functions';
 
 const reset = `
 isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
-tinyMCE.activeEditor.setContent('');
+tinymce.activeEditor.setContent('');
 tinymce.activeEditor.undoManager.clear();
 document.activeElement.blur();
 window.blur();
 `;
 
 const keyboardStateChanged = `(() => {
-	tinyMCE.activeEditor.selection.scrollIntoView(false);
+    window.scrollBy(0,70)
 })();
 `;
 const blur = `
@@ -152,12 +152,11 @@ tinymce.activeEditor.undoManager.clear();
 `;
 
 const onKeyboardShow = () => {
-    if (!editing.movedAway) {
-      editing.isFocused = true;
-      call(EditorWebView,keyboardStateChanged)
-    }
+  if (!editing.movedAway) {
+    editing.isFocused = true;
+    call(EditorWebView, keyboardStateChanged);
   }
-  
+};
 
 export default {
   undo,
@@ -182,5 +181,5 @@ export default {
   isLoading,
   notLoading,
   keyboardStateChanged,
-  onKeyboardShow
+  onKeyboardShow,
 };
