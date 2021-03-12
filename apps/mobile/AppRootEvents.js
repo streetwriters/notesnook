@@ -10,7 +10,12 @@ import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
-import {eSendEvent, ToastEvent} from './src/services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -71,7 +76,7 @@ async function checkIntentState() {
 
 async function reconnectSSE(connection) {
   if (!isUserReady) {
-    console.log("user is not ready")
+    console.log('user is not ready');
     return;
   }
   let state = connection;
@@ -164,8 +169,12 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
-
+      eSubscribeEvent('userLoggedIn', setCurrentUser);
+      removeInternetStateListener = NetInfo.addEventListener(
+        onInternetStateChanged,
+      );
       return () => {
+        eUnSubscribeEvent('userLoggedIn', setCurrentUser);
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -184,7 +193,6 @@ export const AppRootEvents = React.memo(
 
     const onNoteRemoved = async (id) => {
       try {
-        console.log('removing note');
         await db.notes.remove(id);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Favorites,
@@ -352,7 +360,7 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const setCurrentUser = async () => {
+    const setCurrentUser = async (login) => {
       try {
         let user = await db.user.getUser();
         if (user) {
@@ -364,9 +372,6 @@ export const AppRootEvents = React.memo(
             setEmailVerifyMessage(dispatch);
             return;
           }
-          removeInternetStateListener = NetInfo.addEventListener(
-            onInternetStateChanged,
-          );
           await Sync.run();
           user = await db.user.fetchUser(true);
           dispatch({type: Actions.USER, user: user});
@@ -385,8 +390,10 @@ export const AppRootEvents = React.memo(
         }
       } finally {
         isUserReady = true;
+        if (login) {
+          eSendEvent(eCloseProgressDialog);
+        }
       }
-
     };
 
     const onSuccessfulSubscription = async (subscription) => {
@@ -399,7 +406,6 @@ export const AppRootEvents = React.memo(
     };
 
     const onSubscriptionError = async (error) => {
-      console.log('IAP ERROR', error);
       ToastEvent.show({
         heading: 'Failed to subscribe',
         type: 'error',

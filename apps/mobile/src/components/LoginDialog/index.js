@@ -16,6 +16,7 @@ import {
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
@@ -183,7 +184,7 @@ const LoginDialog = () => {
     try {
       await db.user.login(email.toLowerCase(), password, true);
       user = await db.user.getUser();
-      if (!user) throw new Error('Email or passoword incorrect!');
+      if (!user) throw new Error('Email or password incorrect!');
       setStatus('Syncing Your Data');
       PremiumService.setPremiumStatus();
       dispatch({type: Actions.USER, user: user});
@@ -196,33 +197,21 @@ const LoginDialog = () => {
       });
       close();
       await sleep(300);
+      eSendEvent('userLoggedIn', true);
       eSendEvent(eOpenProgressDialog, {
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false,
       });
-      await db.sync();
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      dispatch({type: Actions.ALL});
-      eSendEvent(refreshNotesPage);
-      eSendEvent(eCloseProgressDialog);
     } catch (e) {
       setLoading(false);
       setStatus(null);
-      if (user && !user.isEmailConfirmed) {
-        close();
-        setEmailVerifyMessage(dispatch);
-        await sleep(500);
-        console.log('showing verify email dialog');
-        PremiumService.showVerifyEmailDialog();
-      } else {
-        ToastEvent.show({
-          heading: user ? 'Failed to sync' : 'Login failed',
-          message: e.message,
-          type: 'error',
-          context: 'local',
-        });
-      }
+      ToastEvent.show({
+        heading: user ? 'Failed to sync' : 'Login failed',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
   };
 
