@@ -235,7 +235,7 @@ const ToolbarItem = ({
     }
 
     if (format === 'image') {
-      execCommands.image();
+      await execCommands.image();
       return;
     }
 
