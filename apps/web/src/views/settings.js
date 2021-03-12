@@ -67,6 +67,11 @@ function subscriptionStatusToString(user) {
   else return "Basic";
 }
 
+const otherItems = [
+  { title: "Terms of Service", link: "https://notesnook.com/tos" },
+  { title: "Privacy Policy", link: "https://notesnook.com/privacy" },
+];
+
 function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
@@ -370,13 +375,13 @@ function Settings(props) {
         >
           Other
         </Text>
-        {["Terms of Service", "Privacy Policy"].map((title) => (
+        {otherItems.map((item) => (
           <Button
-            key={title}
+            key={item.title}
             variant="list"
-            onClick={() => showToast("warn", "TBD")}
+            onClick={() => window.open(item.link, "_blank")}
           >
-            {title}
+            {item.title}
           </Button>
         ))}
         <TextWithTip
