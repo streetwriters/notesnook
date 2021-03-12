@@ -134,6 +134,7 @@ export const ActionSheetComponent = ({
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
+          Navigation.routeNames.Notes
         ]);
       }
     }
