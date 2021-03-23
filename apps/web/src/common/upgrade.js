@@ -1,56 +1,52 @@
-const MERCHANT_CODE = "250784034664";
+const VENDOR_ID = process.env.NODE_ENV === "development" ? 1506 : 128190;
+const PRODUCT_ID = process.env.NODE_ENV === "development" ? 9822 : 648884;
 
-function loadTCheckout() {
+function loadPaddle() {
   return new Promise((resolve) => {
-    const config = {
-      app: { merchant: MERCHANT_CODE, iframeLoad: "checkout" },
-      cart: {
-        host: "https://secure.2checkout.com",
-        customization: "inline",
-      },
-    };
     var script = document.createElement("script");
-    script.src =
-      "https://secure.avangate.com/checkout/client/twoCoInlineCart.js";
+    script.src = "https://cdn.paddle.com/paddle/paddle.js";
     script.async = true;
     var firstScriptElement = document.getElementsByTagName("script")[0];
     script.onload = function () {
-      for (var namespace in config) {
-        if (config.hasOwnProperty(namespace)) {
-          window["TwoCoInlineCart"].setup.setConfig(
-            namespace,
-            config[namespace]
-          );
-        }
-      }
-      window["TwoCoInlineCart"].register();
+      if (process.env.NODE_ENV === "development")
+        window.Paddle.Environment.set("sandbox");
+      window.Paddle.Setup({ vendor: VENDOR_ID });
       resolve();
     };
-
     firstScriptElement.parentNode.insertBefore(script, firstScriptElement);
   });
 }
 
 async function upgrade(user) {
-  if (!window.TwoCoInlineCart) {
-    await loadTCheckout();
+  if (!window.Paddle) {
+    await loadPaddle();
   }
 
-  const { TwoCoInlineCart: cart } = window;
-  if (!cart) return;
-  cart.setup.setMerchant(MERCHANT_CODE); // your Merchant code
-  cart.billing.setEmail(user.email); // customer email address
-  cart.shipping.setEmail(user.email); // customer Delivery email
-  cart.cart.setExternalCustomerReference(user.id);
-  cart.cart.setTest(true);
+  const { Paddle } = window;
+  if (!Paddle) return;
 
-  cart.products.add({
-    code: "com.streetwriters.notesnook",
-    quantity: 1,
+  Paddle.Checkout.open({
+    product: PRODUCT_ID,
+    email: user.email,
+    passthrough: JSON.stringify({
+      userId: user.id,
+    }),
   });
-
-  cart.cart.setCartLockedFlag(true);
-  cart.cart.checkout(); // start checkout process
 }
 
-export { upgrade };
+async function openPaddleDialog(overrideUrl) {
+  if (!window.Paddle) {
+    await loadPaddle();
+  }
+
+  const { Paddle } = window;
+  if (!Paddle) return;
+
+  Paddle.Checkout.open({
+    override: overrideUrl,
+    product: PRODUCT_ID,
+  });
+}
+
+export { upgrade, openPaddleDialog };
+// (async () => await upgrade())();

@@ -22,8 +22,8 @@ import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../common/dialog-controller";
 import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
-import http from "notes-core/utils/http";
 import { CHECK_IDS } from "notes-core/common";
+import { openPaddleDialog } from "../common/upgrade";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -601,14 +601,20 @@ function AccountStatus(props) {
         <>
           <Button
             variant="list"
+            onClick={async () => {
+              await openPaddleDialog(user.subscription.updateURL);
+            }}
+          >
+            <TextWithTip
+              text="Update payment method"
+              tip="Update the payment method you used to purchase this subscription."
+            />
+          </Button>
+          <Button
+            variant="list"
             sx={{ ":hover": { borderColor: "error" } }}
             onClick={async () => {
-              const token = await db.user.tokenManager.getAccessToken();
-              await http.post(
-                `https://subscriptions.streetwriters.co/subscriptions/cancel`,
-                null,
-                token
-              );
+              await openPaddleDialog(user.subscription.cancelURL);
             }}
           >
             <TextWithTip
