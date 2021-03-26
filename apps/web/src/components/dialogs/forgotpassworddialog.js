@@ -64,7 +64,7 @@ function ForgotPasswordDialog(props) {
           label="Email"
           name="email"
           autoComplete="email"
-          helpText="We will email you a 6-digit code to verify that it's you."
+          helpText="We will email you a recovery link that you can use to recover your account."
         />
         {error && <Text variant="error">{error}</Text>}
       </Box>
