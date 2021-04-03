@@ -1,4 +1,5 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
+import {Linking} from 'react-native';
 import {
   Appearance,
   InteractionManager,
@@ -178,6 +179,21 @@ export const Settings = ({navigation}) => {
         version?.mobile > APP_VERSION
           ? 'New update available.'
           : 'You are using the latest version',
+    },
+    {
+      name: `Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`,
+      func: async () => {
+        try {
+          await Linking.openURL(
+            Platform.OS === 'ios'
+              ? 'https://bit.ly/notesnook-ios'
+              : 'https://bit.ly/notesnook-and',
+          );
+        } catch (e) {}
+      },
+      desc: `Rate and review our app on ${
+        Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
+      } and let us know what you think.`,
     },
     {
       name: 'Join our Discord community',
@@ -556,14 +572,14 @@ const SettingsUserSection = () => {
           <View
             style={{
               marginLeft: 10,
-              maxWidth:'75%'
+              maxWidth: '75%',
             }}>
             <Paragraph color={colors.icon} size={SIZE.xs}>
               {messageBoardState.message}
             </Paragraph>
             <Paragraph
               style={{
-                maxWidth:"100%",
+                maxWidth: '100%',
               }}
               color={
                 messageBoardState.type === 'error' ? colors.red : colors.accent
@@ -688,7 +704,7 @@ const SettingsUserSection = () => {
                         ? 'Your trial period started on ' +
                           timeConverter(user.subscription.start)
                         : user.subscription.type === 6
-                        ? 'Your account will be downgraded to Basic in 3 days' 
+                        ? 'Your account will be downgraded to Basic in 3 days'
                         : user.subscription.type === 7
                         ? 'You have cancelled your subscription.'
                         : user.subscription.type === 5
