@@ -1,20 +1,20 @@
-import { createRef } from 'react';
-import { Platform } from 'react-native';
-import { updateEvent } from '../../components/DialogManager/recievers';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, sendNoteEditedEvent } from '../../services/EventManager';
+import {createRef} from 'react';
+import {Platform} from 'react-native';
+import {updateEvent} from '../../components/DialogManager/recievers';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
-import { eOnLoadNote, eShowGetPremium } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {editing} from '../../utils';
+import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eShowGetPremium} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
@@ -480,6 +480,7 @@ async function restoreEditorState() {
         tabBarRef.current?.goToPage(1);
       }
       MMKV.removeItem('appState');
+      eSendEvent('load_overlay', 'hide_editor');
     }
   }
 }

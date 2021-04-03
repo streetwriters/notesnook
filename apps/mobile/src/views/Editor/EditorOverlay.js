@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
-import { Button } from '../../components/Button';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
+import {Button} from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 
 let timer = null;
 let timerError = null;
@@ -41,7 +41,7 @@ const EditorOverlay = () => {
         duration: 150,
         easing: Easing.out(Easing.ease),
       }).start(async () => {
-        await sleep(150);
+        await sleep(200);
         setProgress(1);
         opacity.setValue(1);
         setLoading(null);
@@ -68,7 +68,7 @@ const EditorOverlay = () => {
         justifyContent: 'center',
         alignItems: 'center',
         opacity: opacity,
-        top: loading? 0 : 6000,
+        top: loading ? 0 : 6000,
         zIndex: 100,
       }}>
       <View
@@ -88,14 +88,14 @@ const EditorOverlay = () => {
             marginBottom: 15,
             borderRadius: 5,
             overflow: 'hidden',
-            backgroundColor:colors.nav
+            backgroundColor: colors.nav,
           }}>
           <Animated.View
             style={{
               height: 10,
               borderRadius: 5,
-              width:100,
-              backgroundColor:colors.accent
+              width: 100,
+              backgroundColor: colors.accent,
             }}
           />
         </View>
