@@ -27,8 +27,8 @@ const EditorOverlay = () => {
     clearTimeout(timer);
     clearTimeout(timerError);
     setProgress(2);
+    setLoading(_loading);
     if (_loading) {
-      setLoading(_loading);
       timerError = setTimeout(() => {
         setError(true);
       }, 4000);
@@ -44,7 +44,7 @@ const EditorOverlay = () => {
         await sleep(150);
         setProgress(1);
         opacity.setValue(1);
-        setLoading(false);
+        setLoading(null);
         clearTimeout(timer);
         clearTimeout(timerError);
       });

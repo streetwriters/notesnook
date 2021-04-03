@@ -49,7 +49,7 @@ const Editor = React.memo(
     };
 
     const onResetRequested = async (noload) => {
-      !noload && eSendEvent('loadingNote', getNote()?.id ? getNote() : {});
+      
       setResetting(true);
       await sleep(30);
       setResetting(false);
