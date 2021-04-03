@@ -14,10 +14,10 @@ import {
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
-import { db } from '../../../../utils/DB';
-import { eShowGetPremium } from '../../../../utils/Events';
+import {db} from '../../../../utils/DB';
+import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
-import { sleep } from '../../../../utils/TimeUtils';
+import {sleep} from '../../../../utils/TimeUtils';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -57,10 +57,10 @@ const ToolbarItem = ({
     return () => {
       eUnSubscribeEvent('onSelectionChange', onSelectionChange);
     };
-  }, []);
+  }, [selected]);
 
   useEffect(() => {
-    onSelectionChange(properties.selection);
+    onSelectionChange(properties.selection,true);
   }, []);
 
   const checkForChanges = (data) => {
@@ -71,6 +71,7 @@ const ToolbarItem = ({
         eSendEvent('showTooltip');
       }
     }
+  
     if (format === 'header' && type === 'tooltip') {
       let keys = group.map((i) => i.format);
       keys.forEach((k) => {
@@ -176,8 +177,9 @@ const ToolbarItem = ({
     }
   };
 
-  const onSelectionChange = (data) => {
-    if (properties.pauseSelectionChange) return;
+  const onSelectionChange = (data,isLocal) => {
+    console.log(data,properties.pauseSelectionChange);
+    if (properties.pauseSelectionChange && !isLocal) return;
 
     checkForChanges(data);
   };
