@@ -181,6 +181,15 @@ export const Settings = ({navigation}) => {
           : 'You are using the latest version',
     },
     {
+      name: `Report an issue`,
+      func: async () => {
+        try {
+          await Linking.openURL('https://github.com/streetwriters/notesnook');
+        } catch (e) {}
+      },
+      desc: `Facing an issue? Report it on our Github`,
+    },
+    {
       name: `Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`,
       func: async () => {
         try {
