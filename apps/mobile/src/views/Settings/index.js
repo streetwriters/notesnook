@@ -352,7 +352,7 @@ const AccoutLogoutSection = () => {
                   setLoading(true);
                   await sleep(10);
                   await db.user.logout();
-                  await sleep(10);
+                  await BiometricService.resetCredentials();
                   await Storage.write('introCompleted', 'true');
                   setLoading(false);
                 }}
