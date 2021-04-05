@@ -44,7 +44,7 @@ function ForgotPasswordDialog(props) {
           setError();
           setIsLoading(true);
           db.user
-            .recoverAccount(data.email)
+            .recoverAccount(data.email.toLowerCase())
             .then(() => {
               showToast(
                 "success",

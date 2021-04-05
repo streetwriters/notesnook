@@ -69,7 +69,7 @@ class UserStore extends BaseStore {
   login = (form) => {
     this.set((state) => (state.isLoggingIn = true));
     return db.user
-      .login(form.email, form.password, form.remember)
+      .login(form.email.toLowerCase(), form.password, form.remember)
       .then(() => {
         return showLoadingDialog({
           title: "Importing your data...",
@@ -93,7 +93,7 @@ class UserStore extends BaseStore {
   signup = (form) => {
     this.set((state) => (state.isSigningIn = true));
     return db.user
-      .signup(form.email, form.password)
+      .signup(form.email.toLowerCase(), form.password)
       .then(() => {
         return this.init();
       })
