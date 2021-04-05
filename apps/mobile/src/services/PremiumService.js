@@ -129,8 +129,8 @@ const showVerifyEmailDialog = () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
         if (
-          lastEmailTime &&
-          Date.now() - JSON.parse(lastEmailTime) < 60000 * 10
+          lastEmailTime 
+         && Date.now() - JSON.parse(lastEmailTime) < 60000 * 2
         ) {
           ToastEvent.show({
             heading: 'Please wait before requesting another email',
