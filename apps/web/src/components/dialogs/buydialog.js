@@ -194,7 +194,7 @@ function BuyDialog(props) {
             </Text>
           </Text>
           <Text as="span" variant="body" fontSize={30} color="text" mt={3}>
-            $6.99
+            $4.49
             <Text as="span" variant="body" color="primary" fontSize="subBody">
               /mo
             </Text>
