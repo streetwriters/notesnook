@@ -44,9 +44,9 @@ const MODES = {
   changePassword: 3,
 };
 
-let email = '';
+let email = 'uhhmylife94@gmail.com';
 let username;
-let password = '';
+let password = 'loveyouall123';
 let confirmPassword;
 let oldPassword;
 
@@ -56,7 +56,7 @@ const LoginDialog = () => {
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userConsent, setUserConsent] = useState(false);
+  const [userConsent, setUserConsent] = useState(true);
   const [mode, setMode] = useState(MODES.login);
   const [error, setError] = useState(false);
   const insets = useSafeAreaInsets();
@@ -641,7 +641,7 @@ const LoginDialog = () => {
                 <TouchableOpacity
                   disabled={loading}
                   onPress={() => {
-                    setUserConsent(!userConsent);
+                    //setUserConsent(!userConsent);
                   }}
                   activeOpacity={0.7}
                   style={{
@@ -650,23 +650,14 @@ const LoginDialog = () => {
                     alignItems: 'center',
                     height: 40,
                   }}>
-                  <Icon
-                    size={SIZE.lg}
-                    color={userConsent ? colors.accent : colors.icon}
-                    name={
-                      userConsent
-                        ? 'check-circle-outline'
-                        : 'checkbox-blank-circle-outline'
-                    }
-                  />
-
                   <Paragraph
+                    size={11}
                     style={{
                       maxWidth: '90%',
-                      marginLeft: 10,
                     }}>
                     By signing up you agree to our{' '}
                     <Paragraph
+                     size={11}
                       onPress={() => {
                         openLinkInBrowser('https://notesnook.com/tos', colors)
                           .catch((e) => {})
@@ -679,6 +670,7 @@ const LoginDialog = () => {
                     </Paragraph>
                     and{' '}
                     <Paragraph
+                     size={11}
                       onPress={() => {
                         openLinkInBrowser(
                           'https://notesnook.com/privacy',
