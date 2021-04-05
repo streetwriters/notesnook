@@ -38,6 +38,8 @@ const Input = ({
   onPress,
   height = 50,
   fontSize = SIZE.md,
+  returnKeyType,
+  returnKeyLabel
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -169,6 +171,9 @@ const Input = ({
             keyboardType={
               validationType === 'email' ? 'email-address' : 'default'
             }
+            returnKeyLabel={returnKeyLabel}
+            returnKeyType={returnKeyType}
+            keyboardAppearance={colors.night ? 'dark' : 'light'}
             onFocus={onFocus}
             onSubmitEditing={onSubmit}
             blurOnSubmit={blurOnSubmit}

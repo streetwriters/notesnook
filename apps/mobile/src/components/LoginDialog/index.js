@@ -529,12 +529,14 @@ const LoginDialog = () => {
                 onErrorCheck={(r) => {
                   setError(r);
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 validationType="email"
                 autoCapitalize="none"
                 errorMessage="Email is invalid"
                 placeholder="Email"
                 onSubmit={() => {
-                  if (mode === MODES.signup) {
+                  if (mode === MODES.signup || mode === MODES.login) {
                     _pass.current?.focus();
                   }
                 }}
@@ -550,6 +552,8 @@ const LoginDialog = () => {
                 onErrorCheck={(r) => {
                   setError(r);
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 secureTextEntry
                 autoCapitalize="none"
                 placeholder="Current password"
@@ -576,6 +580,8 @@ const LoginDialog = () => {
                   secureTextEntry
                   autoCapitalize="none"
                   placeholder="Password"
+                  returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}
+                  returnKeyType={mode === MODES.signup ? 'next' : 'done'}
                   errorMessage={mode === MODES.signup && 'Password is invalid'}
                   onSubmit={() => {
                     if (
@@ -617,6 +623,8 @@ const LoginDialog = () => {
                   loading={loading}
                   validationType="confirmPassword"
                   autoCapitalize="none"
+                  returnKeyLabel="Done"
+                  returnKeyType="done"
                   customValidator={() => password}
                   secureTextEntry
                   placeholder="Confirm password"
