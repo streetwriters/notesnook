@@ -320,6 +320,8 @@ export class AddNotebookDialog extends React.Component {
                 onSubmit={() => {
                   this.descriptionRef.focus();
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 defaultValue={toEdit ? toEdit.title : null}
               />
 
@@ -333,6 +335,8 @@ export class AddNotebookDialog extends React.Component {
                 onSubmit={() => {
                   this.topicInputRef.current?.focus();
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 defaultValue={toEdit ? toEdit.description : null}
               />
 
@@ -350,6 +354,8 @@ export class AddNotebookDialog extends React.Component {
                     });
                   }
                 }}
+                returnKeyLabel="Done"
+                returnKeyType="done"
                 onSubmit={() => {
                   this.onSubmit();
                 }}

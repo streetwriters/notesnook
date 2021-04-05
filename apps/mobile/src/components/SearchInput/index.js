@@ -53,6 +53,8 @@ export const SearchInput = (props) => {
           paddingHorizontal: 0,
           margin: 0,
         }}
+        returnKeyLabel="Search"
+        returnKeyType="search"
         textAlignVertical="center"
         onChangeText={onChangeText}
         multiline={false}

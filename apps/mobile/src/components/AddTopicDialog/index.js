@@ -128,6 +128,8 @@ export class AddTopicDialog extends React.Component {
             defaultValue={this.toEdit ? this.toEdit.title : null}
             placeholder="Enter title of topic"
             onSubmit={() => this.addNewTopic()}
+            returnKeyLabel="Done"
+            returnKeyType="done"
           />
 
           <DialogButtons
