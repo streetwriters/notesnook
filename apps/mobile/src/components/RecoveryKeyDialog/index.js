@@ -297,6 +297,18 @@ class RecoveryKeyDialog extends React.Component {
           />
           <Seperator />
 
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.sm}
+            numberOfLines={2}
+            style={{
+              width: '100%',
+              maxWidth: '100%',
+              marginBottom: 5,
+              textAlign: 'center',
+            }}>
+            Tap twice to confirm you have saved the recovery key.
+          </Paragraph>
           <Button
             title="I have saved the key."
             width="100%"
