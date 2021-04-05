@@ -311,12 +311,12 @@ export const AppRootEvents = React.memo(
           attachIAPListeners();
           clearMessage(dispatch);
           await PremiumService.setPremiumStatus();
+          await Sync.run();
+          user = await db.user.fetchUser(true);
           if (!user.isEmailConfirmed) {
             setEmailVerifyMessage(dispatch);
             return;
           }
-          await Sync.run();
-          user = await db.user.fetchUser(true);
           dispatch({type: Actions.USER, user: user});
         } else {
           await PremiumService.setPremiumStatus();
