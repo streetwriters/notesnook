@@ -85,6 +85,7 @@ async function reconnectSSE(connection) {
       state = await NetInfo.fetch();
     }
     let user = await db.user.getUser();
+
     if (user && state.isConnected && state.isInternetReachable) {
       await db.connectSSE();
     }
@@ -93,66 +94,7 @@ async function reconnectSSE(connection) {
 
 let prevState = null;
 let showingDialog = false;
-const onAppStateChanged = async (state) => {
-  if (state === 'active') {
-    updateStatusBarColor();
-    if (
-      SettingsService.get().appLockMode !== 'background' &&
-      !SettingsService.get().privacyScreen
-    ) {
-      enabled(false);
-    }
 
-    if (SettingsService.get().appLockMode === 'background') {
-      if (prevState === 'background' && !showingDialog) {
-        showingDialog = true;
-        prevState = 'active';
-        if (Platform.OS === 'android') {
-          SplashScreen.show();
-        } else {
-          eSendEvent('load_overlay', 'hide');
-        }
-
-        let result = await BiometricService.validateUser(
-          'Unlock to access your notes',
-        );
-        if (result) {
-          showingDialog = false;
-          if (Platform.OS === 'android') {
-            SplashScreen.hide();
-          } else {
-            eSendEvent('load_overlay', 'show');
-          }
-        } else {
-          RNExitApp.exitApp();
-          return;
-        }
-      }
-    }
-    prevState = 'active';
-    await reconnectSSE();
-    await checkIntentState();
-    if (getWebviewInit()) {
-      await MMKV.removeItem('appState');
-    }
-  } else {
-    prevState = 'background';
-    if (
-      getNote()?.locked &&
-      SettingsService.get().appLockMode === 'background'
-    ) {
-      eSendEvent(eClearEditor);
-    }
-    await storeAppState();
-
-    if (
-      SettingsService.get().privacyScreen ||
-      SettingsService.get().appLockMode === 'background'
-    ) {
-      enabled(true);
-    }
-  }
-};
 let removeInternetStateListener;
 export const AppRootEvents = React.memo(
   () => {
@@ -335,7 +277,7 @@ export const AppRootEvents = React.memo(
       await sleep(500);
       await PremiumService.setPremiumStatus();
       await Storage.write('introCompleted', 'true');
-     
+
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
@@ -449,6 +391,75 @@ export const AppRootEvents = React.memo(
             .catch((e) => {
               console.log(e, 'ERROR');
             });
+        }
+      }
+    };
+
+    const onAppStateChanged = async (state) => {
+      if (state === 'active') {
+        updateStatusBarColor();
+        if (
+          SettingsService.get().appLockMode !== 'background' &&
+          !SettingsService.get().privacyScreen
+        ) {
+          enabled(false);
+        }
+
+        if (SettingsService.get().appLockMode === 'background') {
+          if (prevState === 'background' && !showingDialog) {
+            showingDialog = true;
+            prevState = 'active';
+            if (Platform.OS === 'android') {
+              SplashScreen.show();
+            } else {
+              eSendEvent('load_overlay', 'hide');
+            }
+
+            let result = await BiometricService.validateUser(
+              'Unlock to access your notes',
+            );
+            if (result) {
+              showingDialog = false;
+              if (Platform.OS === 'android') {
+                SplashScreen.hide();
+              } else {
+                eSendEvent('load_overlay', 'show');
+              }
+            } else {
+              RNExitApp.exitApp();
+              return;
+            }
+          }
+        }
+        prevState = 'active';
+        await reconnectSSE();
+        await checkIntentState();
+        if (getWebviewInit()) {
+          await MMKV.removeItem('appState');
+        }
+        let user = await db.user.getUser();
+        if (user && !user.isEmailConfirmed) {
+          try {
+            let user = await db.user.fetchUser();
+            if (user.isEmailConfirmed) {
+              onEmailVerified(dispatch);
+            }
+          } catch (e) {}
+        }
+      } else {
+        prevState = 'background';
+        if (
+          getNote()?.locked &&
+          SettingsService.get().appLockMode === 'background'
+        ) {
+          eSendEvent(eClearEditor);
+        }
+        await storeAppState();
+        if (
+          SettingsService.get().privacyScreen ||
+          SettingsService.get().appLockMode === 'background'
+        ) {
+          enabled(true);
         }
       }
     };
