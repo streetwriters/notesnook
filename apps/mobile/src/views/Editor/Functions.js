@@ -118,7 +118,9 @@ export function post(type, value = null) {
 }
 
 export const _onShouldStartLoadWithRequest = async (request) => {
+
   if (request.url.includes('https')) {
+    if (Platform.OS === "ios" && !request.isTopFrame) return;
     openLinkInBrowser(request.url, appColors)
       .catch((e) => {})
       .then((r) => {});
@@ -127,6 +129,7 @@ export const _onShouldStartLoadWithRequest = async (request) => {
   } else {
     return true;
   }
+
 };
 
 export function checkNote() {
