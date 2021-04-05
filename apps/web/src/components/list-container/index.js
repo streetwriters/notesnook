@@ -83,7 +83,10 @@ function ListContainer(props) {
                           return (
                             <div
                               key={item.id || item.title}
-                              style={{ ...style, zIndex: 1 }}
+                              style={{
+                                ...style,
+                                zIndex: item.type === "header" ? 2 : 1,
+                              }}
                             >
                               {item.type === "header" ? (
                                 <GroupHeader
