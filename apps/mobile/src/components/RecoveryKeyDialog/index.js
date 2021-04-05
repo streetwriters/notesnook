@@ -70,6 +70,7 @@ class RecoveryKeyDialog extends React.Component {
       });
     });
     if (this.signup) {
+      this.signup = false;
       setTimeout(() => {
         eSendEvent(eOpenResultDialog, {
           title: 'Welcome to your private\nnote taking haven',
