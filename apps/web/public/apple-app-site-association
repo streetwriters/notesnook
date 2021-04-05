@@ -1,11 +1,24 @@
 {
-	"applinks:{
-		"apps":[],
-		"details":[
-			{
-				"appID":"com.streetwriters.notesnook",
-				"paths":["*]
-			}
-		]
-	}
+   "applinks":{
+      "apps":[
+         
+      ],
+      "details":[
+         {
+            "appID":"53CWBG3QUC.com.streetwriters.notesnook",
+            "paths":[
+               "*",
+               "/account/verified"
+            ],
+            "components":[
+               {
+                  "/":"/account/verified"
+               },
+               {
+                  "/":"*"
+               }
+            ]
+         }
+      ]
+   }
 }
