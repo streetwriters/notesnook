@@ -214,7 +214,7 @@ export const AppRootEvents = React.memo(
       let message =
         user?.subscription?.type === 2
           ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
-          : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for free for the next 14 days!';
+          : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for the next 14 days for free!';
       eSendEvent(eOpenProgressDialog, {
         title: 'Email confirmed!',
         paragraph: message,
@@ -362,7 +362,6 @@ export const AppRootEvents = React.memo(
     };
 
     const processReceipt = async (receipt) => {
-      console.log(receipt);
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
