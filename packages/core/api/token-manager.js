@@ -71,6 +71,10 @@ class TokenManager {
     return this._db.context.write("token", this.token);
   }
 
+  clearToken() {
+    this.token = undefined;
+  }
+
   async getAccessTokenFromAuthorizationCode(userId, authCode) {
     return await this.saveToken(
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.temporaryToken}`, {
