@@ -6,7 +6,6 @@ import { useQueryParams } from "../navigation";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
-
   useEffect(() => {
     if (!userId) window.location.href = "/";
   }, [userId]);
@@ -33,16 +32,9 @@ function EmailConfirmed() {
             <Icon.Success color="primary" size={32} sx={{ mr: 2 }} /> Email
             confirmed!
           </Text>
-
-          <Button
-            variant="secondary"
-            mt={1}
-            onClick={() => {
-              window.location.href = "/";
-            }}
-          >
-            Return to Notesnook
-          </Button>
+          <Text variant="body" mt={2}>
+            You can safely close this window and return to Notesnook.
+          </Text>
         </Flex>
       </Flex>
     </ThemeProvider>
