@@ -46,7 +46,7 @@ class Collector {
   _collect(array) {
     return Promise.all(
       array.reduce((prev, item) => {
-        if (!item) return prev;
+        if (!item || item.localOnly) return prev;
         if (item.dateEdited > this._lastSyncedTimestamp || item.migrated)
           prev.push(this._map(item));
         return prev;

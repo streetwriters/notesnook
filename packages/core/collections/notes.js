@@ -95,6 +95,7 @@ export default class Notes extends Collection {
       favorite: !!note.favorite,
       dateCreated: note.dateCreated,
       conflicted: !!note.conflicted,
+      localOnly: !!note.localOnly,
     };
 
     if (!oldNote || oldNote.deleted) {
