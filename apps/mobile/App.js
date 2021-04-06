@@ -51,7 +51,7 @@ const App = () => {
             await MMKV.setItem(
               'askForRating',
               JSON.stringify({
-                timestamp: Date.now() + 86400000 * 2,
+                timestamp: Date.now() + (86400000 * 2),
               }),
             );
           }
