@@ -439,7 +439,8 @@ export const AppRootEvents = React.memo(
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
           try {
-            let user = await db.user.fetchUser();
+            
+            let user = await db.user.fetchUser(true);
             if (user.isEmailConfirmed) {
               onEmailVerified(dispatch);
             }
