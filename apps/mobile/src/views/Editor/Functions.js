@@ -118,9 +118,8 @@ export function post(type, value = null) {
 }
 
 export const _onShouldStartLoadWithRequest = async (request) => {
-
   if (request.url.includes('https')) {
-    if (Platform.OS === "ios" && !request.isTopFrame) return;
+    if (Platform.OS === 'ios' && !request.isTopFrame) return;
     openLinkInBrowser(request.url, appColors)
       .catch((e) => {})
       .then((r) => {});
@@ -129,7 +128,6 @@ export const _onShouldStartLoadWithRequest = async (request) => {
   } else {
     return true;
   }
-
 };
 
 export function checkNote() {
@@ -494,7 +492,7 @@ const loadNoteInEditor = async () => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
-    tiny.call(EditorWebView, tiny.setTitle(title));
+    post('title', title);
     intent = false;
 
     if (!content || !content.data || content?.data?.length === 0) {
@@ -510,7 +508,7 @@ const loadNoteInEditor = async () => {
     `,
       );
     } else {
-      tiny.call(EditorWebView, tiny.html(content.data));
+      post('html', content.data);
     }
 
     setColors();

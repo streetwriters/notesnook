@@ -32,34 +32,35 @@ function attachTitleInputListeners() {
     if (tinymce.activeEditor) {
       tinymce.activeEditor && tinymce.activeEditor.focus();
     }
- 
+
     onTitleChange();
   };
 
   document.getElementById('titleInput').onkeypress = function (evt) {
+    autosize();
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
       if (tinymce.activeEditor) {
         tinymce.activeEditor && tinymce.activeEditor.focus();
       }
-     
 
       onTitleChange();
       return false;
     }
   };
 
-  document.getElementById('titleInput').addEventListener('focus', function (evt) {
-    if (window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(
-        JSON.stringify({
-          type: 'focus',
-          value: 'title',
-        }),
-      );
-    }
-  });
-
+  document
+    .getElementById('titleInput')
+    .addEventListener('focus', function (evt) {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(
+          JSON.stringify({
+            type: 'focus',
+            value: 'title',
+          }),
+        );
+      }
+    });
 
   document.getElementById('titleInput').onchange = function (evt) {
     autosize();
@@ -70,6 +71,7 @@ function attachTitleInputListeners() {
 }
 
 function onTitleChange(ele) {
+  autosize();
   if (isLoading) {
     return;
   }
@@ -84,7 +86,6 @@ function onTitleChange(ele) {
       tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
   }
 
-  autosize();
   if (titleMessage && typeof titleMessage.value === 'string') {
     if (window.ReactNativeWebView) {
       window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
@@ -94,7 +95,9 @@ function onTitleChange(ele) {
 
 function autosize() {
   let ele = document.getElementById('textCopy');
-  ele.innerHTML = document.getElementById('titleInput').value.replace(/\n/g, '<br/>');
+  ele.innerHTML = document
+    .getElementById('titleInput')
+    .value.replace(/\n/g, '<br/>');
   let newHeight = document.getElementById('titlebar').scrollHeight;
   let css = document.createElement('style');
   css.type = 'text/css';
@@ -105,4 +108,36 @@ function autosize() {
    `;
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);
+}
+
+function attachMessageListener() {
+  window.addEventListener('message', (data) => {
+    let message = JSON.parse(data.data);
+    let type = message.type;
+    let value = message.value;
+
+    switch (type) {
+      case 'html':
+        isLoading = true;
+        tinymce.activeEditor.mode.set('readonly');
+        tinymce.activeEditor.setContent(value);
+        setTimeout(() => {
+          document.activeElement.blur();
+          window.blur();
+          tinymce.activeEditor.mode.set('design');
+          document.activeElement.blur();
+          window.blur();
+        }, 300);
+        info.querySelector('#infowords').innerText =
+          tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+        break;
+      case 'title':
+        document.getElementById('titleInput').value = value;
+        setTimeout(() => {
+          autosize();
+        }, 100);
+      default:
+        break;
+    }
+  });
 }

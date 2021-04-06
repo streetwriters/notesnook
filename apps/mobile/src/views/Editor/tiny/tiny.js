@@ -1,5 +1,5 @@
 import {editing} from '../../../utils';
-import {EditorWebView, getWebviewInit} from '../Functions';
+import {EditorWebView, getWebviewInit, post} from '../Functions';
 
 const reset = `
 isLoading = true;
@@ -104,21 +104,7 @@ const notLoading = `
 isLoading = false;
 `;
 
-const html = (value) => `
-isLoading = true;
-tinymce.activeEditor.mode.set("readonly")
-tinymce.activeEditor.setContent(\`${value}\`);   
-setTimeout(() => {
-  document.activeElement.blur();
-  window.blur();
-  tinymce.activeEditor.mode.set("design")
-  document.activeElement.blur();
-  window.blur();
-
-},300)
-info.querySelector('#infowords').innerText =
-tinymce.activeEditor.plugins.wordcount.getCount() + " words";
-`;
+const html = (value) => post('html', value);
 
 const focusEditor = `
 tinymce.activeEditor.focus();

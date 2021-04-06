@@ -71,7 +71,7 @@ export const EditorTitle = () => {
         placeholder="Note title"
         onChangeText={(text) => {
           setTitle(text);
-          tiny.call(EditorWebView,tiny.setTitle(text));
+          post("title",text)
           _onMessage({
             nativeEvent: {
               data: JSON.stringify({
