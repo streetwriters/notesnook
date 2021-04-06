@@ -44,9 +44,9 @@ const MODES = {
   changePassword: 3,
 };
 
-let email = 'uhhmylife94@gmail.com';
+let email = '';
 let username;
-let password = 'loveyouall123';
+let password = '';
 let confirmPassword;
 let oldPassword;
 
