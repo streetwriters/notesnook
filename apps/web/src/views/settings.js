@@ -597,6 +597,20 @@ function AccountStatus(props) {
         <Button mt={2} onClick={showBuyDialog}>
           Upgrade to Notesnook Pro
         </Button>
+      ) : provider === "Streetwriters" ? (
+        <>
+          <Text
+            variant="subBody"
+            mt={1}
+            px={"4px"}
+            py={"2px"}
+            alignSelf="flex-end"
+            sx={{ borderRadius: "default" }}
+            color={"primary"}
+          >
+            Awarded by {provider}
+          </Text>
+        </>
       ) : isPro ? (
         <>
           <Button
