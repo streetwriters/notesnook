@@ -20,6 +20,7 @@ const BaseDialog = ({
   premium,
   statusBarTranslucent = true,
   transparent,
+  centered=true
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
@@ -49,6 +50,9 @@ const BaseDialog = ({
                 : 'rgba(0,0,0,0.3)',
             },
             styles.backdrop,
+            {
+              justifyContent:centered? "center" : "flex-start"
+            }
           ]}>
           <TouchableOpacity
             onPress={onRequestClose}

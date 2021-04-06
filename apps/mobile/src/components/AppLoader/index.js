@@ -11,7 +11,7 @@ import {
 } from '../../services/EventManager';
 import {changeContainerScale, ContainerScale} from '../../utils/Animations';
 import {db} from '../../utils/DB';
-import {eOpenSideMenu} from '../../utils/Events';
+import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
@@ -63,6 +63,13 @@ const AppLoader = ({onLoad}) => {
     await sleep(150);
     setLoading(false);
     animation = false;
+    let askForRating = await MMKV.getItem('askForRating');
+    if (askForRating !== 'never' || askForRating !== 'completed') {
+      askForRating = JSON.parse(askForRating);
+      if (askForRating.timestamp < Date.now()) {
+        eSendEvent(eOpenRateDialog);
+      }
+    }
   };
 
   useEffect(() => {

@@ -47,8 +47,13 @@ const App = () => {
           await db.init();
           let requireIntro = await MMKV.getItem('introCompleted');
           if (!requireIntro) {
-            console.log('loading default notes')
             await loadDefaultNotes();
+            await MMKV.setItem(
+              'askForRating',
+              JSON.stringify({
+                timestamp: Date.now() + 86400000 * 2,
+              }),
+            );
           }
         };
 
