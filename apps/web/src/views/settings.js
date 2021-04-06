@@ -68,8 +68,28 @@ function subscriptionStatusToString(user) {
 }
 
 const otherItems = [
-  { title: "Terms of Service", link: "https://notesnook.com/tos" },
-  { title: "Privacy Policy", link: "https://notesnook.com/privacy" },
+  {
+    title: "Terms of Service",
+    description: "Read our terms of service.",
+    link: "https://notesnook.com/tos",
+  },
+  {
+    title: "Privacy Policy",
+    description:
+      "We do not share, sell, read, or use your data. Read our privacy policy.",
+    link: "https://notesnook.com/privacy",
+  },
+  {
+    title: "Join our Discord community",
+    description:
+      "We are not ghosts. Come chat with us and share your experience.",
+    link: "https://discord.com/invite/zQBK97EE22",
+  },
+  {
+    title: "Use Notesnook on Mobile",
+    description: "Notesnook is available on Android & iOS",
+    link: "https://notesnook.com/",
+  },
 ];
 
 function Settings(props) {
@@ -379,9 +399,11 @@ function Settings(props) {
           <Button
             key={item.title}
             variant="list"
-            onClick={() => window.open(item.link, "_blank")}
+            as="a"
+            href={item.link}
+            target="_blank"
           >
-            {item.title}
+            <TextWithTip text={item.title} tip={item.description} />
           </Button>
         ))}
         <TextWithTip
