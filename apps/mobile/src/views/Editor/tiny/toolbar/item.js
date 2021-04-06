@@ -18,6 +18,7 @@ import {db} from '../../../../utils/DB';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
+import tiny from '../tiny';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -60,7 +61,7 @@ const ToolbarItem = ({
   }, [selected]);
 
   useEffect(() => {
-    onSelectionChange(properties.selection,true);
+    onSelectionChange(properties.selection, true);
   }, []);
 
   const checkForChanges = (data) => {
@@ -71,7 +72,7 @@ const ToolbarItem = ({
         eSendEvent('showTooltip');
       }
     }
-  
+
     if (format === 'header' && type === 'tooltip') {
       let keys = group.map((i) => i.format);
       keys.forEach((k) => {
@@ -177,8 +178,7 @@ const ToolbarItem = ({
     }
   };
 
-  const onSelectionChange = (data,isLocal) => {
-    console.log(data,properties.pauseSelectionChange);
+  const onSelectionChange = (data, isLocal) => {
     if (properties.pauseSelectionChange && !isLocal) return;
 
     checkForChanges(data);
@@ -257,37 +257,7 @@ const ToolbarItem = ({
 
     if (format === 'pre') {
       if (selected) {
-        formatSelection(
-          `(() => {
-            function replaceContent(editor, content) {
-              let rng = tinymce.activeEditor.selection.getRng();
-              let node = tinymce.activeEditor.selection.getNode();
-              let innerHTML = node.innerHTML;
-              node.remove();
-              tinymce.activeEditor.undoManager.transact(function () {
-                setTimeout(() =>
-                  tinymce.activeEditor.execCommand("mceInsertContent", false, content(innerHTML)),2
-                );
-              });
-              tinymce.activeEditor.selection.setRng(rng, true);
-              tinymce.activeEditor.nodeChanged();
-            };
-  
-            let node = tinymce.activeEditor.selection.getNode();
-            const innerTexts = node.textContent;
-            if (innerTexts.length <= 0) {
-              replaceContent(
-                tinymce.activeEditor,
-                (html) => {
-                  let replant = html.replace(regex, "<br>");
-                  return "<p>" + replant + "</p>"
-                }
-              );
-            } else {
-              tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });
-            }
-          })();`,
-        );
+        formatSelection(tiny.pre);
         focusEditor(format);
         return;
       } else {

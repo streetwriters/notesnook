@@ -21,6 +21,36 @@ const blur = `
 
 `;
 
+const pre = `(() => {
+  function replaceContent(editor, content) {
+    let rng = tinymce.activeEditor.selection.getRng();
+    let node = tinymce.activeEditor.selection.getNode();
+    let innerHTML = node.innerHTML;
+    node.remove();
+    tinymce.activeEditor.undoManager.transact(function () {
+      setTimeout(() =>
+        tinymce.activeEditor.execCommand("mceInsertContent", false, content(innerHTML)),2
+      );
+    });
+    tinymce.activeEditor.selection.setRng(rng, true);
+    tinymce.activeEditor.nodeChanged();
+  };
+
+  let node = tinymce.activeEditor.selection.getNode();
+  const innerTexts = node.textContent;
+  if (innerTexts.length <= 0) {
+    replaceContent(
+      tinymce.activeEditor,
+      (html) => {
+        let replant = html.replace(regex, "<br>");
+        return "<p>" + replant + "</p>"
+      }
+    );
+  } else {
+    tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });
+  }
+})();`
+
 const updateDateEdited = (value) => `
 	(() => {
 		info = document.querySelector(infoBar);
@@ -168,4 +198,5 @@ export default {
   notLoading,
   keyboardStateChanged,
   onKeyboardShow,
+  pre
 };
