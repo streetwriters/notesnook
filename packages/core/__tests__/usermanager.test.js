@@ -5,7 +5,7 @@ const SUCCESS_LOGIN_RESPONSE = {
   access_token: "access_token",
   refresh_token: "refresh_token",
 
-  sync: "sync",
+  scope: "sync",
   expires_in: 3600,
 };
 
