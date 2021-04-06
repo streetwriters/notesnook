@@ -245,7 +245,7 @@ const SplashScreen = () => {
               width={isNext ? null : '100%'}
               onPress={async () => {
                 if (isNext) {
-                  carouselRef.current?.snapToNext();
+                  carouselRef.current?.snapToItem(currentIndex + 1,true,true);
                   currentIndex++;
                   if (currentIndex === 4) {
                     setIsNext(false);

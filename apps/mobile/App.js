@@ -51,7 +51,7 @@ const App = () => {
             await MMKV.setItem(
               'askForRating',
               JSON.stringify({
-                timestamp: Date.now() + (86400000 * 2),
+                timestamp: Date.now() + 86400000 * 2,
               }),
             );
           }
@@ -104,6 +104,8 @@ const App = () => {
 
   async function loadDefaultNotes() {
     try {
+      const isCreated = await MMKV.getItem('defaultNoteCreated');
+      if (isCreated) return;
       const notes = await http.get(
         'https://app.notesnook.com/notes/index.json',
       );
@@ -117,6 +119,7 @@ const App = () => {
           content: {type: 'tiny', data: content},
         });
       }
+      await MMKV.setItem('defaultNoteCreated', 'yes');
     } catch (e) {
       console.log(e);
     }
