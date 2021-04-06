@@ -25,8 +25,10 @@ function initializeDatabase() {
     await db.init();
 
     if (!isAppHydrated()) {
-      setAppHydrated();
-      loadDefaultNotes(db);
+      try {
+        await loadDefaultNotes(db);
+        setAppHydrated();
+      } catch (e) {}
     }
   });
 }
