@@ -261,8 +261,8 @@ export function showExportDialog(noteIds) {
           if (noteIds.length > 1)
             showToast("error", "Multiple notes cannot be exported as PDF.");
           const note = db.notes.note(noteIds[0]);
-          await exportToPDF(await note.export("html"));
-          perform(true);
+          let result = await exportToPDF(await note.export("html"));
+          perform(result);
           return;
         }
 
@@ -287,8 +287,9 @@ export function showExportDialog(noteIds) {
 }
 
 async function exportToPDF(content) {
+  if (!content) return false;
   return new Promise((resolve) => {
-    import("print-js").then(async ({ default: printjs }) => {
+    return import("print-js").then(async ({ default: printjs }) => {
       printjs({
         printable: content,
         type: "raw-html",
@@ -296,7 +297,7 @@ async function exportToPDF(content) {
           resolve();
         },
       });
-
+      return true;
       // TODO
       // const doc = new jsPDF("p", "px", "letter");
       // const div = document.createElement("div");
