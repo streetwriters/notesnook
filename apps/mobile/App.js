@@ -1,3 +1,4 @@
+import http from 'notes-core/utils/http';
 import React, {useEffect} from 'react';
 import RNExitApp from 'react-native-exit-app';
 import Orientation from 'react-native-orientation';
@@ -18,6 +19,7 @@ import {
 import SettingsService from './src/services/SettingsService';
 import {db} from './src/utils/DB';
 import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
+import {MMKV} from './src/utils/mmkv';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
 let initStatus = false;
@@ -43,10 +45,18 @@ const App = () => {
           eSendEvent(eOpenSideMenu);
           SplashScreen.hide();
           await db.init();
+          let requireIntro = await MMKV.getItem('introCompleted');
+          if (!requireIntro) {
+            console.log('loading default notes')
+            await loadDefaultNotes();
+          }
         };
 
         await SettingsService.init();
-        if (SettingsService.get().appLockMode && SettingsService.get().appLockMode !== 'none') {
+        if (
+          SettingsService.get().appLockMode &&
+          SettingsService.get().appLockMode !== 'none'
+        ) {
           let result = await BiometricService.validateUser(
             'Unlock to access your notes',
             '',
@@ -86,6 +96,26 @@ const App = () => {
       dispatch({type: Actions.ALL});
     }
   };
+
+  async function loadDefaultNotes() {
+    try {
+      const notes = await http.get(
+        'https://app.notesnook.com/notes/index.json',
+      );
+      if (!notes) return;
+      for (let note of notes) {
+        const content = await http.get(note.mobileContent);
+        await db.notes.add({
+          title: note.title,
+          headline: note.headline,
+          localOnly: true,
+          content: {type: 'tiny', data: content},
+        });
+      }
+    } catch (e) {
+      console.log(e);
+    }
+  }
 
   return (
     <SafeAreaProvider>
