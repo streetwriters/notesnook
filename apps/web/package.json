@@ -159,6 +159,11 @@
     "directories": {
       "buildResources": "assets",
       "output": "dist/"
+    },
+    "publish": {
+      "provider": "github",
+      "repo": "notesnook",
+      "owner": "streetwriters"
     }
   }
 }
