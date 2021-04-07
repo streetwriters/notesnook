@@ -30,8 +30,6 @@ jobs:
           echo '${{ secrets.api_key }}' > ~/private_keys/AuthKey_${{ secrets.api_key_id }}.p8
       - name: Build/release Electron app
         uses: samuelmeuli/action-electron-builder@v1
-        env:
-          GH_TOKEN: {{secrets.PERSONAL_GH_TOKEN}}
         with:
           # GitHub token, automatically provided to the action
           # (No need to define this secret in the repo settings)
@@ -47,3 +45,4 @@ jobs:
           # macOS notarization API key
           API_KEY_ID: ${{ secrets.api_key_id }}
           API_KEY_ISSUER_ID: ${{ secrets.api_key_issuer_id }}
+          GH_TOKEN: {{secrets.PERSONAL_GH_TOKEN}}
