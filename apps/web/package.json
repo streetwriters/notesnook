@@ -53,6 +53,7 @@
     "chalk": "^4.1.0",
     "electron": "^12.0.0",
     "electron-builder": "^22.10.5",
+    "electron-builder-notarize": "^1.2.0",
     "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-import": "^2.20.2",
@@ -113,10 +114,13 @@
       "build/",
       "node_modules/electron-serve"
     ],
+    "afterSign": "electron-builder-notarize",
     "mac": {
       "target": [
         "dmg"
       ],
+      "category": "public.app-category.productivity",
+      "darkModeSupport": true,
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
@@ -144,9 +148,11 @@
     },
     "linux": {
       "target": [
-        "AppImage"
+        "AppImage",
+        "rpm",
+        "deb"
       ],
-      "category": "Development"
+      "category": "Productivity"
     },
     "extraResources": [
       "./assets/**"
