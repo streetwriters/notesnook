@@ -10,9 +10,9 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {changeContainerScale, ContainerScale} from '../../utils/Animations';
-import { db } from '../../utils/DB';
+import {db} from '../../utils/DB';
 import {eOpenSideMenu} from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
@@ -22,7 +22,18 @@ const AppLoader = ({onLoad}) => {
   const [loading, setLoading] = useState(true);
   const [opacity, setOpacity] = useState(true);
 
-  const load = async () => {
+  const load = async (value) => {
+    if (value === 'hide') {
+      setLoading(true);
+      opacityV.setValue(1);
+      return;
+    }
+    if (value === 'show') {
+      opacityV.setValue(0)
+      setLoading(false);
+      return;
+    }
+
     eSendEvent(eOpenSideMenu);
     setOpacity(false);
     await sleep(2);
@@ -81,11 +92,7 @@ const AppLoader = ({onLoad}) => {
               flexDirection: 'row',
               width: 100,
             }}>
-            <AnimatedProgress
-              fill={colors.accent}
-              current={4}
-              total={4}
-            />
+            <AnimatedProgress fill={colors.accent} current={4} total={4} />
           </View>
         </Animated.View>
       </Animated.View>
