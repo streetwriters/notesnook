@@ -329,7 +329,7 @@ export class VaultDialog extends Component {
       return;
     } else {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === getNote().id) {
+      if (this.state.note.id === getNote()?.id) {
         eSendEvent(eClearEditor);
       }
       this.close();
