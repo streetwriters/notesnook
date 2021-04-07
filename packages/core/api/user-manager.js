@@ -97,12 +97,12 @@ class UserManager {
   }
 
   async logout(revoke = true, reason) {
-    this.tokenManager.clearToken();
     try {
       if (revoke) await this.tokenManager.revokeToken();
     } catch (e) {
       console.error(e);
     } finally {
+      this.tokenManager.clearToken();
       await this._db.context.clear();
       EV.publish(EVENTS.userLoggedOut, reason);
     }

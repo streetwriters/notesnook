@@ -49,6 +49,7 @@ class Database {
       this.connectSSE.bind(this)
     );
     EV.subscribe(EVENTS.userLoggedOut, () => {
+      clearTimeout(this._syncTimeout);
       if (this.evtSource) {
         this.evtSource.close();
         this.evtSource = null;
