@@ -18,7 +18,7 @@ jobs:
           persist-credentials: false
 
       - name: Use Node.js 15.x
-        uses: actions/setup-node@latest
+        uses: actions/setup-node@v2.1.5
         with:
           node-version: 15.x
       - run: npm install
