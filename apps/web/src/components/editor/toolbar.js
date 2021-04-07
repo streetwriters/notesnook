@@ -184,13 +184,14 @@ export default Toolbar;
 
 /* View in fullscreen */
 function enterFullscreen(elem) {
+  // go full-screen
   if (elem.requestFullscreen) {
     elem.requestFullscreen();
   } else if (elem.webkitRequestFullscreen) {
-    /* Safari */
     elem.webkitRequestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
   } else if (elem.msRequestFullscreen) {
-    /* IE11 */
     elem.msRequestFullscreen();
   }
 }
@@ -198,19 +199,20 @@ function enterFullscreen(elem) {
 /* Close fullscreen */
 function exitFullscreen(elem) {
   if (
-    document.fullscreenElement ||
-    document.webkitFullscreenElement ||
-    document.mozFullScreenElement
-  ) {
-    document.exitFullscreen();
+    !document.fullscreenElement &&
+    !document.webkitFullscreenElement &&
+    !document.mozFullScreenElement
+  )
+    return;
+
+  // exit full-screen
+  if (elem.exitFullscreen) {
+    elem.exitFullscreen();
+  } else if (elem.webkitExitFullscreen) {
+    elem.webkitExitFullscreen();
+  } else if (elem.mozCancelFullScreen) {
+    elem.mozCancelFullScreen();
+  } else if (elem.msExitFullscreen) {
+    elem.msExitFullscreen();
   }
-  // if (elem.exitFullscreen) {
-  //   elem.exitFullscreen();
-  // } else if (elem.webkitExitFullscreen) {
-  //   /* Safari */
-  //   elem.webkitExitFullscreen();
-  // } else if (elem.msExitFullscreen) {
-  //   /* IE11 */
-  //   elem.msExitFullscreen();
-  // }
 }
