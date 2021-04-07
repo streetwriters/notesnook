@@ -9,12 +9,16 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
+    this._initSettings();
+  }
+
+  _initSettings() {
     this._settings = {
       type: "settings",
       id: id(),
       pins: [],
-      dateEdited: Date.now(),
-      dateCreated: Date.now(),
+      dateEdited: 0,
+      dateCreated: 0,
     };
   }
 
@@ -38,13 +42,7 @@ class Settings {
     if (settings) this._settings = settings;
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = undefined;
-      this._settings = {
-        type: "settings",
-        id: id(),
-        pins: [],
-        dateEdited: 0,
-        dateCreated: 0,
-      };
+      this._initSettings();
     });
   }
 
