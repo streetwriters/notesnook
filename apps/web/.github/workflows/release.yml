@@ -21,6 +21,7 @@ jobs:
         uses: actions/setup-node@v2.1.5
         with:
           node-version: 15.x
+      - run: chmod +x ./scripts/ci.sh && ./scripts/ci.sh
       - run: npm install
       - run: npm build
 
