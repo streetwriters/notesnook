@@ -186,13 +186,16 @@ export class VaultDialog extends Component {
       });
       return;
     }
+    sendNoteEditedEvent({
+      id: this.state.note.id,
+      forced: true,
+    });
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
       Navigation.routeNames.Favorites,
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Notebook,
     ]);
-
     this.password = null;
     this.confirmPassword = null;
     this.setState({
@@ -413,9 +416,9 @@ export class VaultDialog extends Component {
     if (this.state.biometricUnlock) {
       await this._enrollFingerprint(this.password);
     }
-    if (this.state.note && this.state.note.id && !this.state.note.locked) {
+    if (this.state.note?.id) {
       await db.vault.add(this.state.note.id);
-      if (this.state.note.id === getNote().id) {
+      if (this.state.note.id === getNote()?.id) {
         eSendEvent(eClearEditor);
       }
       this.setState({
@@ -424,7 +427,7 @@ export class VaultDialog extends Component {
       ToastEvent.show({
         title: 'Note added to vault',
         type: 'success',
-        context: 'local',
+        context: 'global',
       });
       this.close();
     } else {
@@ -437,15 +440,7 @@ export class VaultDialog extends Component {
     db.vault
       .remove(this.state.note.id, this.password)
       .then((r) => {
-        sendNoteEditedEvent({
-          id: this.state.note.id,
-          forced: true,
-        });
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.NotesPage,
-        ]);
+       
         this.close();
       })
       .catch((e) => {
@@ -567,7 +562,7 @@ export class VaultDialog extends Component {
     return (
       <BaseDialog
         onShow={async () => {
-          await sleep(300);
+          await sleep(100);
           passInputRef.current?.focus();
         }}
         statusBarTranslucent={false}
