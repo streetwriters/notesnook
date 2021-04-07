@@ -2,6 +2,7 @@ import StorageInterface from "../interfaces/storage";
 import EventSource from "eventsource";
 import Config from "../utils/config";
 import http from "notes-core/utils/http";
+import { EV, EVENTS } from "notes-core/common";
 
 /**
  * @type {import("notes-core/api").default}
@@ -26,8 +27,7 @@ function initializeDatabase() {
 
     if (!isAppHydrated()) {
       try {
-        await loadDefaultNotes(db);
-        setAppHydrated();
+        loadDefaultNotes(db);
       } catch (e) {}
     }
   });
@@ -58,7 +58,9 @@ async function loadDefaultNotes(db) {
     if (note.autoOpen) autoOpenId = id;
   }
 
+  EV.publish(EVENTS.appRefreshRequested);
   if (autoOpenId) quickNavigate(`/notes/${autoOpenId}/edit`);
+  setAppHydrated();
 }
 
 function quickNavigate(url) {
