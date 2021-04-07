@@ -2,7 +2,7 @@
   "name": "notes-web",
   "version": "1.3.4",
   "private": true,
-  "main": "public/electron.js",
+  "main": "./build/electron.js",
   "dependencies": {
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
