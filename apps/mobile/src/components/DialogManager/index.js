@@ -40,6 +40,7 @@ import PendingDialog from '../Premium/PendingDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
 import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
 import ProgressDialog from '../ProgressDialog';
+import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
@@ -380,6 +381,7 @@ export class DialogManager extends Component {
         <SortDialog colors={colors} />
         <JumpToDialog />
         <UpdateDialog />
+        <RateDialog/>
       </>
     );
   }

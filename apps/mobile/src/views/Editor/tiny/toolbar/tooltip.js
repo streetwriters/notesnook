@@ -73,6 +73,9 @@ const Tooltip = () => {
     setGroup(data);
     await sleep(5);
     animate(0, time);
+    if (editing.tooltip !== "link") {
+      properties.pauseSelectionChange = false;
+    }
   };
 
   let style = React.useMemo(() => {

@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
-import { ph, SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {SvgXml} from 'react-native-svg';
+import {WELCOME_SVG} from '../../assets/images/assets';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
+import {ph, SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -18,10 +19,10 @@ const ResultDialog = () => {
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
-    title: '',
-    paragraph: '',
-    icon: null,
-    button: null,
+    title: 'Welcome to your private\nnote taking haven',
+    paragraph: 'Please confirm your email to encrypt and sync all your notes.',
+    icon: 'check',
+    button: 'Start taking notes',
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);
@@ -55,13 +56,15 @@ const ResultDialog = () => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <Icon name={dialogData.icon} color={colors.accent} size={80} />
+        <SvgXml xml={WELCOME_SVG(colors.accent)} width={170} height={170} />
+
         <Heading
           size={SIZE.lg}
           style={{
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10,
+            maxWidth: '80%',
           }}>
           {dialogData.title}
         </Heading>
@@ -70,11 +73,17 @@ const ResultDialog = () => {
           style={{
             alignSelf: 'center',
             textAlign: 'center',
+            maxWidth: '80%',
           }}>
           {dialogData.paragraph}
         </Paragraph>
         <Seperator />
-        <Button title={dialogData.button} width="100%" onPress={close} />
+        <Button
+          title={dialogData.button}
+          width="100%"
+          onPress={close}
+          fontSize={SIZE.md}
+        />
       </View>
     </BaseDialog>
   );

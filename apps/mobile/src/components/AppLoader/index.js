@@ -11,7 +11,9 @@ import {
 } from '../../services/EventManager';
 import {changeContainerScale, ContainerScale} from '../../utils/Animations';
 import {db} from '../../utils/DB';
-import {eOpenSideMenu} from '../../utils/Events';
+import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
 
 const scaleV = new Animated.Value(0.95);
@@ -28,8 +30,17 @@ const AppLoader = ({onLoad}) => {
       opacityV.setValue(1);
       return;
     }
+    let appState = await MMKV.getItem('appState');
+    if (appState) {
+      appState = JSON.parse(appState);
+      if (!appState.movedAway) {
+        tabBarRef.current?.goToPage(1);
+        eSendEvent('loadingNote', appState.note);
+      }
+    }
+
     if (value === 'show') {
-      opacityV.setValue(0)
+      opacityV.setValue(0);
       setLoading(false);
       return;
     }
@@ -52,6 +63,13 @@ const AppLoader = ({onLoad}) => {
     await sleep(150);
     setLoading(false);
     animation = false;
+    let askForRating = await MMKV.getItem('askForRating');
+    if (askForRating !== 'never' || askForRating !== 'completed') {
+      askForRating = JSON.parse(askForRating);
+      if (askForRating.timestamp < Date.now()) {
+        eSendEvent(eOpenRateDialog);
+      }
+    }
   };
 
   useEffect(() => {

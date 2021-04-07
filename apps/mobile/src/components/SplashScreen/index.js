@@ -23,7 +23,7 @@ import Paragraph from '../Typography/Paragraph';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../services/DeviceDetection';
-import { openLinkInBrowser } from '../../utils/functions';
+import {openLinkInBrowser} from '../../utils/functions';
 
 const features = [
   {
@@ -217,8 +217,7 @@ const SplashScreen = () => {
                             try {
                               openLinkInBrowser(item.link, colors);
                             } catch (e) {
-
-                              console.log(e,"ERROR")
+                              console.log(e, 'ERROR');
                             }
                           }}
                         />
@@ -238,28 +237,15 @@ const SplashScreen = () => {
               position: 'absolute',
               bottom: 25,
             }}>
-            {isNext ? (
-              <View />
-            ) : (
-              <Button
-                fontSize={SIZE.md}
-                onPress={async () => {
-                  await Storage.write('introCompleted', 'true');
-                  await hide();
-                }}
-                height={50}
-                type="grayBg"
-                style={{paddingHorizontal: 24}}
-                title="Skip"
-              />
-            )}
+            <View />
 
             <Button
               fontSize={SIZE.md}
               height={50}
+              width={isNext ? null : '100%'}
               onPress={async () => {
                 if (isNext) {
-                  carouselRef.current?.snapToNext();
+                  carouselRef.current?.snapToItem(currentIndex + 1,true,true);
                   currentIndex++;
                   if (currentIndex === 4) {
                     setIsNext(false);
@@ -267,12 +253,11 @@ const SplashScreen = () => {
                 } else {
                   await hide();
                   await Storage.write('introCompleted', 'true');
-                  eSendEvent(eOpenLoginDialog, 1);
                 }
               }}
               style={{paddingHorizontal: 24}}
               type="accent"
-              title={isNext ? 'Next' : 'Sign up'}
+              title={isNext ? 'Next' : 'Start taking notes'}
             />
           </View>
         </Animated.View>

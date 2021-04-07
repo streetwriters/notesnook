@@ -16,10 +16,13 @@ import {
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
 import {getElevation} from '../../utils';
 import {db} from '../../utils/DB';
 import {
+  eCloseProgressDialog,
   eOpenLoginDialog,
+  eOpenProgressDialog,
   eOpenRecoveryKeyDialog,
   refreshNotesPage,
 } from '../../utils/Events';
@@ -53,7 +56,7 @@ const LoginDialog = () => {
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [userConsent, setUserConsent] = useState(false);
+  const [userConsent, setUserConsent] = useState(true);
   const [mode, setMode] = useState(MODES.login);
   const [error, setError] = useState(false);
   const insets = useSafeAreaInsets();
@@ -181,7 +184,7 @@ const LoginDialog = () => {
     try {
       await db.user.login(email.toLowerCase(), password, true);
       user = await db.user.getUser();
-      if (!user) throw new Error('Email or passoword incorrect!');
+      if (!user) throw new Error('Email or password incorrect!');
       setStatus('Syncing Your Data');
       PremiumService.setPremiumStatus();
       dispatch({type: Actions.USER, user: user});
@@ -192,29 +195,23 @@ const LoginDialog = () => {
         type: 'success',
         context: 'local',
       });
-      await db.sync();
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      dispatch({type: Actions.ALL});
-      eSendEvent(refreshNotesPage);
       close();
+      await sleep(300);
+      eSendEvent('userLoggedIn', true);
+      eSendEvent(eOpenProgressDialog, {
+        title: 'Syncing your data',
+        paragraph: 'Please wait while we sync all your data.',
+        noProgress: false,
+      });
     } catch (e) {
-      console.log(e);
       setLoading(false);
       setStatus(null);
-      if (user && !user.isEmailConfirmed) {
-        close();
-        setEmailVerifyMessage(dispatch);
-        await sleep(500);
-        console.log('showing verify email dialog');
-        PremiumService.showVerifyEmailDialog();
-      } else {
-        ToastEvent.show({
-          heading: user ? 'Failed to sync' : 'Login failed',
-          message: e.message,
-          type: 'error',
-          context: 'local',
-        });
-      }
+      ToastEvent.show({
+        heading: user ? 'Failed to sync' : 'Login failed',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
     }
   };
 
@@ -532,12 +529,14 @@ const LoginDialog = () => {
                 onErrorCheck={(r) => {
                   setError(r);
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 validationType="email"
                 autoCapitalize="none"
                 errorMessage="Email is invalid"
                 placeholder="Email"
                 onSubmit={() => {
-                  if (mode === MODES.signup) {
+                  if (mode === MODES.signup || mode === MODES.login) {
                     _pass.current?.focus();
                   }
                 }}
@@ -553,6 +552,8 @@ const LoginDialog = () => {
                 onErrorCheck={(r) => {
                   setError(r);
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 secureTextEntry
                 autoCapitalize="none"
                 placeholder="Current password"
@@ -579,6 +580,8 @@ const LoginDialog = () => {
                   secureTextEntry
                   autoCapitalize="none"
                   placeholder="Password"
+                  returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}
+                  returnKeyType={mode === MODES.signup ? 'next' : 'done'}
                   errorMessage={mode === MODES.signup && 'Password is invalid'}
                   onSubmit={() => {
                     if (
@@ -620,6 +623,8 @@ const LoginDialog = () => {
                   loading={loading}
                   validationType="confirmPassword"
                   autoCapitalize="none"
+                  returnKeyLabel="Done"
+                  returnKeyType="done"
                   customValidator={() => password}
                   secureTextEntry
                   placeholder="Confirm password"
@@ -636,7 +641,7 @@ const LoginDialog = () => {
                 <TouchableOpacity
                   disabled={loading}
                   onPress={() => {
-                    setUserConsent(!userConsent);
+                    //setUserConsent(!userConsent);
                   }}
                   activeOpacity={0.7}
                   style={{
@@ -645,23 +650,14 @@ const LoginDialog = () => {
                     alignItems: 'center',
                     height: 40,
                   }}>
-                  <Icon
-                    size={SIZE.lg}
-                    color={userConsent ? colors.accent : colors.icon}
-                    name={
-                      userConsent
-                        ? 'check-circle-outline'
-                        : 'checkbox-blank-circle-outline'
-                    }
-                  />
-
                   <Paragraph
+                    size={11}
                     style={{
                       maxWidth: '90%',
-                      marginLeft: 10,
                     }}>
                     By signing up you agree to our{' '}
                     <Paragraph
+                     size={11}
                       onPress={() => {
                         openLinkInBrowser('https://notesnook.com/tos', colors)
                           .catch((e) => {})
@@ -674,6 +670,7 @@ const LoginDialog = () => {
                     </Paragraph>
                     and{' '}
                     <Paragraph
+                     size={11}
                       onPress={() => {
                         openLinkInBrowser(
                           'https://notesnook.com/privacy',

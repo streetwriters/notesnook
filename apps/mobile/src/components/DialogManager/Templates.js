@@ -13,7 +13,7 @@ export const TEMPLATE_DELETE = type => {
 };
 
 export const TEMPLATE_PERMANANT_DELETE = {
-  title: `Delete Permanantly`,
+  title: `Delete permanantly`,
   paragraph: `Are you sure you want to delete this item permanantly from trash?`,
   positiveText: 'Delete',
   negativeText: 'Cancel',
@@ -33,7 +33,7 @@ export const TEMPLATE_TRASH = type => {
 };
 
 export const TEMPLATE_APPLY_CHANGES = {
-  title: `Apply Changes`,
+  title: `Apply changes`,
   paragraph: `Apply selected changes to note?`,
   positiveText: 'Apply',
   negativeText: 'Cancel',
@@ -65,7 +65,7 @@ export const TEMPLATE_EXIT = type => {
 
 export const TEMPLATE_INFO = dateCreated => {
   return {
-    title: `Note Info`,
+    title: `Note info`,
     paragraph: `Created on ${timeConverter(dateCreated)} `,
     positiveText: ``,
     negativeText: '',
@@ -77,7 +77,7 @@ export const TEMPLATE_INFO = dateCreated => {
 };
 
 export const TEMPLATE_EMPTY_TRASH = {
-  title: 'Empty Trash',
+  title: 'Clear trash',
   paragraph: 'Are you sure you want to clear the trash?',
   icon: 'delete-outline',
   positiveText: 'Clear',
@@ -85,7 +85,7 @@ export const TEMPLATE_EMPTY_TRASH = {
   action: dialogActions.ACTION_EMPTY_TRASH,
 };
 export const TEMPLATE_NEW_NOTE = {
-  title: 'Close Note',
+  title: 'Close note',
   paragraph: 'Are you sure you want to close this note?',
   icon: 'close',
   positiveText: 'Yes',

@@ -60,7 +60,7 @@ const ProgressDialog = () => {
         }}>
         {!dialogData?.noProgress ? (
           <ActivityIndicator size={50} color={colors.accent} />
-        ) : (
+        ) : dialogData?.noIcon ? null : (
           <Icon
             color={colors.accent}
             name={dialogData.icon || 'check'}
@@ -68,16 +68,19 @@ const ProgressDialog = () => {
           />
         )}
 
-        <Heading> {dialogData?.title}</Heading>
-        <Paragraph style={{textAlign: 'center'}}>
-          {dialogData?.paragraph}
-          {!dialogData?.noProgress ? (
-            <Paragraph color={colors.errorText}>
-              {' '}
-              Do not close the app.
-            </Paragraph>
-          ) : null}
-        </Paragraph>
+        {dialogData?.title && <Heading> {dialogData?.title}</Heading>}
+
+        {dialogData?.paragraph && (
+          <Paragraph style={{textAlign: 'center'}}>
+            {dialogData?.paragraph}
+            {!dialogData?.noProgress ? (
+              <Paragraph color={colors.errorText}>
+                {' '}
+                Do not close the app.
+              </Paragraph>
+            ) : null}
+          </Paragraph>
+        )}
       </View>
       <View
         style={{
@@ -117,12 +120,13 @@ const ProgressDialog = () => {
             fontSize={SIZE.md}
           />
         ) : null}
-        
+
         {dialogData?.actionsArray &&
           dialogData?.actionsArray.map((item) => (
             <Button
               onPress={item.action}
               title={item.actionText}
+              icon={item.icon && item.icon}
               type="accent"
               height={50}
               style={{

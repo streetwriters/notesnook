@@ -114,6 +114,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             }}
             autoCapitalize="none"
             autoCorrect={false}
+            returnKeyLabel="Done"
+            returnKeyType="done"
             onSubmit={onSubmit}
             onChangeText={onChangeText}
             defaultValue={value}

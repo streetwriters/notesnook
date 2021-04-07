@@ -15,7 +15,7 @@ export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
   const [localLoad, setLocalLoad] = useState(true);
-  const notes = state.notes;
+  const notes = state.notes.slice();
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 

@@ -333,7 +333,6 @@ export class VaultDialog extends Component {
       this.setState({
         loading: false,
       });
-   
     }
   }
 
@@ -608,6 +607,13 @@ export class VaultDialog extends Component {
                     ? 0
                     : 10
                 }
+                onSubmit={() => {
+                  changePassword
+                    ? changePassInputRef.current?.focus()
+                    : this.onPress;
+                }}
+                returnKeyLabel={changePassword ? 'Next' : this.state.title}
+                returnKeyType={changePassword ? 'next' : 'done'}
                 secureTextEntry
                 placeholder={changePassword ? 'Current password' : 'Password'}
               />
@@ -636,6 +642,9 @@ export class VaultDialog extends Component {
                 onChangeText={(value) => {
                   this.newPassword = value;
                 }}
+                onSubmit={this.onPress}
+                returnKeyLabel="Change"
+                returnKeyType="done"
                 secureTextEntry
                 placeholder={'New password'}
               />
@@ -651,7 +660,12 @@ export class VaultDialog extends Component {
                 onChangeText={(value) => {
                   this.password = value;
                 }}
+                returnKeyLabel="Next"
+                returnKeyType="next"
                 secureTextEntry
+                onSubmit={() => {
+                  confirmPassRef.current?.focus();
+                }}
                 placeholder="Password"
               />
 
@@ -665,6 +679,8 @@ export class VaultDialog extends Component {
                 errorMessage="Passwords do not match."
                 onErrorCheck={(e) => null}
                 marginBottom={0}
+                returnKeyLabel="Create"
+                returnKeyType="done"
                 onChangeText={(value) => {
                   this.confirmPassword = value;
                   if (value !== this.password) {
@@ -677,6 +693,7 @@ export class VaultDialog extends Component {
                     });
                   }
                 }}
+                onSubmit={this.onPress}
                 placeholder="Confirm password"
               />
             </View>

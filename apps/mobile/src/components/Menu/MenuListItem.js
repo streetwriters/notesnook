@@ -38,7 +38,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
 
   const onHeaderStateChange = (event) => {
     if (event.id === item.name.toLowerCase() + '_navigation') {
-       setHeaderTextState(event);
+      setHeaderTextState(event);
     } else {
       setHeaderTextState(null);
     }
@@ -105,13 +105,13 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
         <Button
           title={rightBtn.name}
           type="shade"
-          height={25}
+          height={30}
           fontSize={SIZE.xs}
-          
           iconSize={SIZE.xs}
           icon={rightBtn.icon}
           style={{
             borderRadius: 100,
+            paddingHorizontal: 16,
           }}
           onPress={rightBtn.func}
         />

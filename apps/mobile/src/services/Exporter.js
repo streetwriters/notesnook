@@ -5,6 +5,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';
 import showdown from 'showdown';
 import jsdom from 'jsdom-jscore-rn';
+import { sanitizeFilename } from '../utils/filename';
 
 let RNFetchBlob;
 
@@ -27,10 +28,10 @@ async function saveToPDF(note) {
   let html = await db.notes.note(note).export('html');
   let he = require('he');
   html = he.decode(html);
+  let fileName = sanitizeFilename(note.title, {replacement: '_'});
   let options = {
     html: html,
-    fileName:
-      Platform.OS === 'ios' ? '/exported/PDF/' + note.title : note.title,
+    fileName: Platform.OS === 'ios' ? '/exported/PDF/' + fileName : fileName,
     directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
   };
   let res = await RNHTMLtoPDF.convert(options);
@@ -66,7 +67,9 @@ async function saveToMarkdown(note) {
 
   markdown = await db.notes.note(note.id).export('md', markdown);
 
-  path = path + note.title + '.md';
+  let fileName = sanitizeFilename(note.title, {replacement: '_'});
+  path = path + fileName + '.md';
+
   await RNFetchBlob.fs.writeFile(path, markdown, 'utf8');
 
   return {
@@ -92,7 +95,10 @@ async function saveToText(note) {
   }
   RNFetchBlob = require('rn-fetch-blob').default;
   let text = await db.notes.note(note.id).export('txt');
-  path = path + note.title + '.txt';
+
+  let fileName = sanitizeFilename(note.title, {replacement: '_'});
+  path = path + fileName + '.txt';
+
   await RNFetchBlob.fs.writeFile(path, text, 'utf8');
 
   return {
@@ -118,7 +124,8 @@ async function saveToHTML(note) {
   }
   RNFetchBlob = require('rn-fetch-blob').default;
   let html = await db.notes.note(note.id).export('html');
-  path = path + note.title + '.html';
+  let fileName = sanitizeFilename(note.title, {replacement: '_'});
+  path = path + fileName + '.html';
   await RNFetchBlob.fs.writeFile(path, html, 'utf8');
 
   return {

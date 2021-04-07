@@ -10,7 +10,12 @@ import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
-import {eSendEvent, ToastEvent} from './src/services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
@@ -35,10 +40,11 @@ import {sleep} from './src/utils/TimeUtils';
 import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 import RNExitApp from 'react-native-exit-app';
+import Storage from './src/utils/storage';
 let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
-
+let isUserReady = false;
 async function storeAppState() {
   if (editing.currentlyEditing) {
     let state = JSON.stringify({
@@ -69,12 +75,17 @@ async function checkIntentState() {
 }
 
 async function reconnectSSE(connection) {
+  if (!isUserReady) {
+    console.log('user is not ready');
+    return;
+  }
   let state = connection;
   try {
     if (!state) {
       state = await NetInfo.fetch();
     }
     let user = await db.user.getUser();
+
     if (user && state.isConnected && state.isInternetReachable) {
       await db.connectSSE();
     }
@@ -83,67 +94,8 @@ async function reconnectSSE(connection) {
 
 let prevState = null;
 let showingDialog = false;
-const onAppStateChanged = async (state) => {
-  if (state === 'active') {
-    updateStatusBarColor();
-    if (
-      SettingsService.get().appLockMode !== 'background' &&
-      !SettingsService.get().privacyScreen
-    ) {
-      enabled(false);
-    }
 
-    if (SettingsService.get().appLockMode === 'background') {
-      if (prevState === 'background' && !showingDialog) {
-        showingDialog = true;
-        prevState = 'active';
-        if (Platform.OS === 'android') {
-          SplashScreen.show();
-        } else {
-          eSendEvent('load_overlay', 'hide');
-        }
-
-        let result = await BiometricService.validateUser(
-          'Unlock to access your notes',
-        );
-        if (result) {
-          showingDialog = false;
-          if (Platform.OS === 'android') {
-            SplashScreen.hide();
-          } else {
-            eSendEvent('load_overlay', 'show');
-          }
-        } else {
-          RNExitApp.exitApp();
-          return;
-        }
-      }
-    }
-    prevState = 'active';
-    await reconnectSSE();
-    await checkIntentState();
-    if (getWebviewInit()) {
-      await MMKV.removeItem('appState');
-    }
-  } else {
-    prevState = 'background';
-    if (
-      getNote()?.locked &&
-      SettingsService.get().appLockMode === 'background'
-    ) {
-      eSendEvent(eClearEditor);
-    }
-    await storeAppState();
-
-    if (
-      SettingsService.get().privacyScreen ||
-      SettingsService.get().appLockMode === 'background'
-    ) {
-      enabled(true);
-    }
-  }
-};
-
+let removeInternetStateListener;
 export const AppRootEvents = React.memo(
   () => {
     const [state, dispatch] = useTracked();
@@ -159,8 +111,12 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
-
+      eSubscribeEvent('userLoggedIn', setCurrentUser);
+      removeInternetStateListener = NetInfo.addEventListener(
+        onInternetStateChanged,
+      );
       return () => {
+        eUnSubscribeEvent('userLoggedIn', setCurrentUser);
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -179,7 +135,6 @@ export const AppRootEvents = React.memo(
 
     const onNoteRemoved = async (id) => {
       try {
-        console.log('removing note');
         await db.notes.remove(id);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Favorites,
@@ -193,9 +148,7 @@ export const AppRootEvents = React.memo(
     };
 
     useEffect(() => {
-      let unsubscribe;
       if (!loading) {
-        unsubscribe = NetInfo.addEventListener(onInternetStateChanged);
         AppState.addEventListener('change', onAppStateChanged);
         (async () => {
           try {
@@ -227,7 +180,7 @@ export const AppRootEvents = React.memo(
         }
       }
       return () => {
-        unsubscribe && unsubscribe();
+        removeInternetStateListener && removeInternetStateListener();
         AppState.removeEventListener('change', onAppStateChanged);
         unsubIAP();
       };
@@ -261,7 +214,7 @@ export const AppRootEvents = React.memo(
       let message =
         user?.subscription?.type === 2
           ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
-          : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for free for the next 14 days!';
+          : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for the next 14 days for free!';
       eSendEvent(eOpenProgressDialog, {
         title: 'Email confirmed!',
         paragraph: message,
@@ -289,10 +242,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async (userStatus) => {
-      console.log('STATUS CODE', userStatus);
-
       if (!PremiumService.get() && userStatus.type === 5) {
-        console.log('STATUS CODE IN', userStatus.type);
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
           paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
@@ -326,6 +276,8 @@ export const AppRootEvents = React.memo(
       setLoginMessage(dispatch);
       await sleep(500);
       await PremiumService.setPremiumStatus();
+      await Storage.write('introCompleted', 'true');
+
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
@@ -351,21 +303,21 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const setCurrentUser = async () => {
+    const setCurrentUser = async (login) => {
       try {
-        let user = await db.user.fetchUser(true);
-
+        let user = await db.user.getUser();
         if (user) {
+          dispatch({type: Actions.USER, user: user});
           attachIAPListeners();
           clearMessage(dispatch);
-          dispatch({type: Actions.USER, user: user});
           await PremiumService.setPremiumStatus();
+          await Sync.run();
+          user = await db.user.fetchUser(true);
           if (!user.isEmailConfirmed) {
             setEmailVerifyMessage(dispatch);
             return;
           }
-          console.log('RUNNING SYNC');
-          await Sync.run();
+          dispatch({type: Actions.USER, user: user});
         } else {
           await PremiumService.setPremiumStatus();
           setLoginMessage(dispatch);
@@ -379,21 +331,24 @@ export const AppRootEvents = React.memo(
         } else {
           console.log('unknown error', e);
         }
+      } finally {
+        isUserReady = true;
+        if (login) {
+          eSendEvent(eCloseProgressDialog);
+        }
       }
     };
 
     const onSuccessfulSubscription = async (subscription) => {
       const receipt = subscription.transactionReceipt;
-
+      console.log(receipt);
       if (prevTransactionId === subscription.transactionId) {
-        console.log('returning same ID');
         return;
       }
       await processReceipt(receipt);
     };
 
     const onSubscriptionError = async (error) => {
-      console.log('IAP ERROR', error);
       ToastEvent.show({
         heading: 'Failed to subscribe',
         type: 'error',
@@ -422,6 +377,7 @@ export const AppRootEvents = React.memo(
             },
           })
             .then(async (r) => {
+              if (!r.ok) return;
               let text = await r.text();
               if (text === 'Receipt already expired.') {
                 await RNIap.clearTransactionIOS();
@@ -434,6 +390,76 @@ export const AppRootEvents = React.memo(
             .catch((e) => {
               console.log(e, 'ERROR');
             });
+        }
+      }
+    };
+
+    const onAppStateChanged = async (state) => {
+      if (state === 'active') {
+        updateStatusBarColor();
+        if (
+          SettingsService.get().appLockMode !== 'background' &&
+          !SettingsService.get().privacyScreen
+        ) {
+          enabled(false);
+        }
+
+        if (SettingsService.get().appLockMode === 'background') {
+          if (prevState === 'background' && !showingDialog) {
+            showingDialog = true;
+            prevState = 'active';
+            if (Platform.OS === 'android') {
+              SplashScreen.show();
+            } else {
+              eSendEvent('load_overlay', 'hide');
+            }
+
+            let result = await BiometricService.validateUser(
+              'Unlock to access your notes',
+            );
+            if (result) {
+              showingDialog = false;
+              if (Platform.OS === 'android') {
+                SplashScreen.hide();
+              } else {
+                eSendEvent('load_overlay', 'show');
+              }
+            } else {
+              RNExitApp.exitApp();
+              return;
+            }
+          }
+        }
+        prevState = 'active';
+        await reconnectSSE();
+        await checkIntentState();
+        if (getWebviewInit()) {
+          await MMKV.removeItem('appState');
+        }
+        let user = await db.user.getUser();
+        if (user && !user.isEmailConfirmed) {
+          try {
+            
+            let user = await db.user.fetchUser(true);
+            if (user.isEmailConfirmed) {
+              onEmailVerified(dispatch);
+            }
+          } catch (e) {}
+        }
+      } else {
+        prevState = 'background';
+        if (
+          getNote()?.locked &&
+          SettingsService.get().appLockMode === 'background'
+        ) {
+          eSendEvent(eClearEditor);
+        }
+        await storeAppState();
+        if (
+          SettingsService.get().privacyScreen ||
+          SettingsService.get().appLockMode === 'background'
+        ) {
+          enabled(true);
         }
       }
     };

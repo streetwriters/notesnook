@@ -1,4 +1,5 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
+import {Linking} from 'react-native';
 import {
   Appearance,
   InteractionManager,
@@ -180,6 +181,30 @@ export const Settings = ({navigation}) => {
           : 'You are using the latest version',
     },
     {
+      name: `Report an issue`,
+      func: async () => {
+        try {
+          await Linking.openURL('https://github.com/streetwriters/notesnook');
+        } catch (e) {}
+      },
+      desc: `Facing an issue? Report it on our Github`,
+    },
+    {
+      name: `Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`,
+      func: async () => {
+        try {
+          await Linking.openURL(
+            Platform.OS === 'ios'
+              ? 'https://bit.ly/notesnook-ios'
+              : 'https://bit.ly/notesnook-and',
+          );
+        } catch (e) {}
+      },
+      desc: `Rate and review our app on ${
+        Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
+      } and let us know what you think.`,
+    },
+    {
       name: 'Join our Discord community',
 
       func: async () => {
@@ -336,7 +361,8 @@ const AccoutLogoutSection = () => {
                   setLoading(true);
                   await sleep(10);
                   await db.user.logout();
-                  await sleep(10);
+                  await BiometricService.resetCredentials();
+                  await Storage.write('introCompleted', 'true');
                   setLoading(false);
                 }}
               />
@@ -522,8 +548,7 @@ const SettingsUserSection = () => {
     let d2 = new Date(t2);
     let diff = d2.getTime() - d1.getTime();
     diff = (diff / (1000 * 3600 * 24)).toFixed(0);
-
-    return diff < 0 ? 0 : diff;
+    return diff < 1 ? 0 : diff;
   };
 
   return (
@@ -556,13 +581,14 @@ const SettingsUserSection = () => {
           <View
             style={{
               marginLeft: 10,
+              maxWidth: '75%',
             }}>
             <Paragraph color={colors.icon} size={SIZE.xs}>
               {messageBoardState.message}
             </Paragraph>
             <Paragraph
               style={{
-                maxWidth: '90%',
+                maxWidth: '100%',
               }}
               color={
                 messageBoardState.type === 'error' ? colors.red : colors.accent
@@ -687,7 +713,7 @@ const SettingsUserSection = () => {
                         ? 'Your trial period started on ' +
                           timeConverter(user.subscription.start)
                         : user.subscription.type === 6
-                        ? 'Your account will be downgraded to Basic in 3 days.'
+                        ? 'Your account will be downgraded to Basic in 3 days'
                         : user.subscription.type === 7
                         ? 'You have cancelled your subscription.'
                         : user.subscription.type === 5
@@ -697,7 +723,7 @@ const SettingsUserSection = () => {
                   </View>
                 ) : null}
 
-                {!user.isEmailConfirmed &&
+                {user.isEmailConfirmed &&
                   user.subscription.type !== 5 &&
                   user.subscription.type !== 2 && (
                     <>
@@ -710,13 +736,18 @@ const SettingsUserSection = () => {
                         fontSize={SIZE.md}
                         title={
                           user.subscription.type === 6
-                            ? 'Resubscribe to Notesnook Pro'
+                            ? `Resubscribe to Notesnook Pro (${
+                                PremiumService.getProducts().length > 0
+                                  ? PremiumService.getProducts()[0]
+                                      .localizedPrice
+                                  : '$4.49'
+                              } / mo)`
                             : `Subscribe to Notesnook Pro (${
                                 PremiumService.getProducts().length > 0
                                   ? PremiumService.getProducts()[0]
                                       .localizedPrice
                                   : '$4.49'
-                              } / Month)`
+                              } / mo)`
                         }
                         height={50}
                         type="transparent"
@@ -732,6 +763,7 @@ const SettingsUserSection = () => {
                     SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
                   }
                   onPress={() => {
+                    console.log('opening');
                     eSendEvent(eOpenProgressDialog, {
                       title:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
@@ -740,15 +772,13 @@ const SettingsUserSection = () => {
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
                       noProgress: true,
-                      icon:
-                        SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
-                          .icon,
                     });
                   }}
                   style={{
                     alignSelf: 'flex-end',
                     marginTop: 10,
                     borderRadius: 3,
+                    zIndex: 10,
                   }}
                   fontSize={11}
                   textStyle={{
@@ -764,7 +794,17 @@ const SettingsUserSection = () => {
             {
               name: 'Save Data Recovery Key',
               func: async () => {
-                eSendEvent(eOpenRecoveryKeyDialog);
+                if (BiometricService.isBiometryAvailable() === false) {
+                  eSendEvent(eOpenRecoveryKeyDialog);
+                  return;
+                }
+                let result = await BiometricService.validateUser(
+                  "Verify it's you",
+                  '',
+                );
+                if (result) {
+                  eSendEvent(eOpenRecoveryKeyDialog);
+                }
               },
               desc:
                 'Recover your data using the recovery key if your password is lost.',
@@ -1100,7 +1140,7 @@ const SettingsPrivacyAndSecurity = () => {
                   settings.appLockMode === item.value ? 'accent' : 'transparent'
                 }
                 onPress={() => {
-                  SettingsService.set('appLockMode',item.value)
+                  SettingsService.set('appLockMode', item.value);
                 }}
                 customStyle={{
                   justifyContent: 'flex-start',

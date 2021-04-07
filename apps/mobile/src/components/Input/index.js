@@ -38,6 +38,8 @@ const Input = ({
   onPress,
   height = 50,
   fontSize = SIZE.md,
+  returnKeyType,
+  returnKeyLabel
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -47,10 +49,10 @@ const Input = ({
   const [showError, setShowError] = useState(false);
   const [errorList, setErrorList] = useState({
     SHORT_PASS: true,
-    NO_ABC: true,
-    NO_CAPS_ABC: true,
-    NO_NUM: true,
-    SPECIAL: true,
+    //  NO_ABC: true,
+    //  NO_CAPS_ABC: true,
+    //  NO_NUM: true,
+    //  SPECIAL: true,
   });
 
   const color = error
@@ -166,6 +168,12 @@ const Input = ({
             autoCapitalize={autoCapitalize}
             onChangeText={onChange}
             onBlur={onBlur}
+            keyboardType={
+              validationType === 'email' ? 'email-address' : 'default'
+            }
+            returnKeyLabel={returnKeyLabel}
+            returnKeyType={returnKeyType}
+            keyboardAppearance={colors.night ? 'dark' : 'light'}
             onFocus={onFocus}
             onSubmitEditing={onSubmit}
             blurOnSubmit={blurOnSubmit}

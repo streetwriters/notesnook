@@ -47,12 +47,19 @@
 				<string>ShareMedia</string>
 			</array>
 		</dict>
-		<dict/>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>https</string>
+	</array>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>LSSupportsOpeningDocumentsInPlace</key>
@@ -68,10 +75,12 @@
 			</dict>
 		</dict>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Take a picture and add it to your note.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Only required by library- not requested in application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Access photos to be added to your notes</string>
+	<string>Add photos from gallery to your note.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>MaterialCommunityIcons.ttf</string>

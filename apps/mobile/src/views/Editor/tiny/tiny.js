@@ -1,18 +1,18 @@
-import { editing } from '../../../utils';
-import { EditorWebView, getWebviewInit } from '../Functions';
+import {editing} from '../../../utils';
+import {EditorWebView, getWebviewInit, post} from '../Functions';
 
 const reset = `
 isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
-tinyMCE.activeEditor.setContent('');
+tinymce.activeEditor.setContent('');
 tinymce.activeEditor.undoManager.clear();
 document.activeElement.blur();
 window.blur();
 `;
 
 const keyboardStateChanged = `(() => {
-	tinyMCE.activeEditor.selection.scrollIntoView(false);
+    window.scrollBy(0,70)
 })();
 `;
 const blur = `
@@ -20,6 +20,36 @@ const blur = `
 	  window.blur();
 
 `;
+
+const pre = `(() => {
+  function replaceContent(editor, content) {
+    let rng = tinymce.activeEditor.selection.getRng();
+    let node = tinymce.activeEditor.selection.getNode();
+    let innerHTML = node.innerHTML;
+    node.remove();
+    tinymce.activeEditor.undoManager.transact(function () {
+      setTimeout(() =>
+        tinymce.activeEditor.execCommand("mceInsertContent", false, content(innerHTML)),2
+      );
+    });
+    tinymce.activeEditor.selection.setRng(rng, true);
+    tinymce.activeEditor.nodeChanged();
+  };
+
+  let node = tinymce.activeEditor.selection.getNode();
+  const innerTexts = node.textContent;
+  if (innerTexts.length <= 0) {
+    replaceContent(
+      tinymce.activeEditor,
+      (html) => {
+        let replant = html.replace(regex, "<br>");
+        return "<p>" + replant + "</p>"
+      }
+    );
+  } else {
+    tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });
+  }
+})();`
 
 const updateDateEdited = (value) => `
 	(() => {
@@ -104,21 +134,7 @@ const notLoading = `
 isLoading = false;
 `;
 
-const html = (value) => `
-isLoading = true;
-tinymce.activeEditor.mode.set("readonly")
-tinymce.activeEditor.setContent(\`${value}\`);   
-setTimeout(() => {
-  document.activeElement.blur();
-  window.blur();
-  tinymce.activeEditor.mode.set("design")
-  document.activeElement.blur();
-  window.blur();
-
-},300)
-info.querySelector('#infowords').innerText =
-tinymce.activeEditor.plugins.wordcount.getCount() + " words";
-`;
+const html = (value) => post('html', value);
 
 const focusEditor = `
 tinymce.activeEditor.focus();
@@ -152,12 +168,11 @@ tinymce.activeEditor.undoManager.clear();
 `;
 
 const onKeyboardShow = () => {
-    if (!editing.movedAway) {
-      editing.isFocused = true;
-      call(EditorWebView,keyboardStateChanged)
-    }
+  if (!editing.movedAway) {
+    editing.isFocused = true;
+    call(EditorWebView, keyboardStateChanged);
   }
-  
+};
 
 export default {
   undo,
@@ -182,5 +197,6 @@ export default {
   isLoading,
   notLoading,
   keyboardStateChanged,
-  onKeyboardShow
+  onKeyboardShow,
+  pre
 };

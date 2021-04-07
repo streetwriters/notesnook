@@ -29,7 +29,11 @@ async function init() {
     await MMKV.setItem('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
+    if (!settings.appLockMode) {
+      settings.appLockMode = "none";
+    }
   }
+
   Navigation.setHeaderState(
     settings.homepage,
     {

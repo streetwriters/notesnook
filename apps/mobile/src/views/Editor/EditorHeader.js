@@ -131,6 +131,8 @@ const EditorHeader = () => {
               }}
               top={50}
               onPress={async () => {
+                EditorWebView.current?.postMessage("hello world");
+                return;
                 await loadNote({type: 'new'});
               }}
             />
@@ -170,7 +172,7 @@ const EditorHeader = () => {
                   note,
                   true,
                   true,
-                  ['Add to', 'Share', 'Export', 'Delete'],
+                  ['Add to', 'Share', 'Export', 'Delete','Copy'],
                   ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
                 );
               }}

@@ -11,11 +11,11 @@ export function validateEmail(email) {
 }
 
 export const ERRORS_LIST = {
-  SHORT_PASS: 'Longer than 6 characters',
-  NO_ABC: 'Atleast 1 lowercase letter.',
-  NO_CAPS_ABC: 'Atleast 1 capital letter.',
-  NO_NUM: 'Atleast 1 number',
-  SPECIAL: 'Atleast 1 special character',
+  SHORT_PASS: 'Atleast 8 characters',
+ // NO_ABC: 'Atleast 1 lowercase letter.',
+ // NO_CAPS_ABC: 'Atleast 1 capital letter.',
+ // NO_NUM: 'Atleast 1 number',
+ // SPECIAL: 'Atleast 1 special character',
 };
 
 export function validatePass(password) {
@@ -25,17 +25,17 @@ export function validatePass(password) {
 
   let errors = {
     SHORT_PASS: true,
-    NO_ABC: true,
-    NO_CAPS_ABC: true,
-    NO_NUM: true,
-    SPECIAL: true,
+  //  NO_ABC: true,
+  //  NO_CAPS_ABC: true,
+  //  NO_NUM: true,
+   // SPECIAL: true,
   };
 
-  if (password.length > 6) {
+  if (password.length >= 8) {
     errors.SHORT_PASS = false;
   }
 
-  if (password.match(/[a-z]+/)) {
+/*   if (password.match(/[a-z]+/)) {
     errors.NO_ABC = false;
   }
   if (password.match(/[A-Z]+/)) {
@@ -46,7 +46,7 @@ export function validatePass(password) {
   }
   if (password.match(/[$@#&!_]+/)) {
     errors.SPECIAL = false;
-  }
+  } */
   return errors;
 }
 

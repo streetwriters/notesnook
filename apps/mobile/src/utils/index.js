@@ -14,7 +14,7 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 150) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1310;
+export const APP_VERSION = 1350;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -172,7 +172,8 @@ export const SUBSCRIPTION_PROVIDER = {
   1: {
     type: 'iOS',
     title: 'Subscribed on iOS',
-    desc: 'You subscribed to Notesnook Pro on iOS using Apple In App Purchase.',
+    desc:
+      'You subscribed to Notesnook Pro on iOS using Apple In App Purchase. You can cancel anytime with your iTunes Account settings.',
     icon: 'ios',
   },
   2: {
@@ -215,6 +216,11 @@ export const BUTTON_TYPES = {
     primary: 'bg',
     text: 'accent',
     selected: 'bg',
+  },
+  white: {
+    primary: 'transparent',
+    text: 'light',
+    selected: 'transGray',
   },
   shade: {
     primary: 'shade',

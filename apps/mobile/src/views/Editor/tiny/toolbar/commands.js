@@ -1,5 +1,14 @@
 import DocumentPicker from 'react-native-document-picker';
-
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
+import {eSendEvent} from '../../../../services/EventManager';
+import {editing} from '../../../../utils';
+import {
+  eCloseProgressDialog,
+  eOpenProgressDialog,
+} from '../../../../utils/Events';
+import {sleep} from '../../../../utils/TimeUtils';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 import {formatSelection} from './constants';
 let RNFetchBlob;
 
@@ -49,32 +58,99 @@ export const execCommands = {
   table: (r, c) =>
     `tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} })`,
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
-  image: () => {
-    DocumentPicker.pick({
-      type: [DocumentPicker.types.images],
-    }).then((r) => {
-
-      RNFetchBlob = require('rn-fetch-blob').default
-      RNFetchBlob.fs.readFile(r.uri, 'base64').then((read) => {
-        let b64 = `data:${r.type};base64, ` + read;
-        formatSelection(`
-        minifyImg(
-          "${b64}",
-          1024,
-          'image/jpeg',
-          (r) => {
-            var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
-            editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+  image: async () => {
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
+    eSendEvent(eOpenProgressDialog, {
+      noProgress: true,
+      noIcon: true,
+      actionsArray: [
+        {
+          action: async () => {
+            eSendEvent(eCloseProgressDialog);
+            await sleep(300);
+            launchCamera(
+              {
+                includeBase64: true,
+                maxWidth: 1024,
+                mediaType: 'photo',
+              },
+              (response) => {
+                if (response.didCancel || response.errorMessage) {
+                  return;
+                }
+                console.log(
+                  response.type,
+                  response.errorCode,
+                  response.errorMessage,
+                );
+                let b64 = `data:${response.type};base64, ` + response.base64;
+                formatSelection(`
+              minifyImg(
+                "${b64}",
+                1024,
+                'image/jpeg',
+                (r) => {
+                  var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
+                  editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+                },
+                0.6,
+              );
+              `);
+              },
+            );
           },
-          0.6,
-        );
-        `);
-      });
+          actionText: 'Take photo',
+          icon: 'camera',
+        },
+        {
+          action: async () => {
+            eSendEvent(eCloseProgressDialog);
+            await sleep(300);
+            launchImageLibrary(
+              {
+                includeBase64: true,
+                maxWidth: 1024,
+                mediaType: 'photo',
+              },
+              (response) => {
+                if (response.didCancel || response.errorMessage) {
+                  return;
+                }
+                console.log(
+                  response.type,
+                  response.errorCode,
+                  response.errorMessage,
+                );
+                let b64 = `data:${response.type};base64, ` + response.base64;
+                formatSelection(`
+              minifyImg(
+                "${b64}",
+                1024,
+                'image/jpeg',
+                (r) => {
+                  var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
+                  editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+                },
+                0.6,
+              );
+              `);
+              },
+            );
+          },
+          actionText: 'Select from gallery',
+          icon: 'image-multiple',
+        },
+      ],
     });
+
+    return;
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
-  pre:`
+  pre: `
     tinymce.activeEditor.execCommand('CodeBlock')
   `,
-
 };
