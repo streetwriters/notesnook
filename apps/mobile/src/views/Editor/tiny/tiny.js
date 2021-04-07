@@ -12,7 +12,7 @@ window.blur();
 `;
 
 const keyboardStateChanged = `(() => {
-    window.scrollBy(0,70)
+    window.scrollBy(0,45)
 })();
 `;
 const blur = `
