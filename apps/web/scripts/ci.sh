@@ -9,7 +9,6 @@ function configure_ssh() {
   echo "Configuring environment with a custom ssh key to be able to fetch private dependencies..."
 
   local SSH_HOME="$1"/.ssh
-  local KEY_NAME=""
   echo "Using SSH_HOME='$SSH_HOME'"
 
   mkdir -p "$SSH_HOME"

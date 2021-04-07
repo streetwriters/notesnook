@@ -17,11 +17,10 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Use Node.js 15.x
-        uses: actions/setup-node@v2.1.5
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
         with:
-          node-version: 15.x
-      - run: chmod +x ./scripts/ci.sh && ./scripts/ci.sh
+          node-version: 12.x
       - run: npm install
       - run: npm build
 
