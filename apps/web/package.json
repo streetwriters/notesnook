@@ -106,7 +106,6 @@
     "url": "https://streetwriters.co"
   },
   "build": {
-    "extends": null,
     "productName": "Notesnook",
     "appId": "com.streetwriters.notesnook",
     "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
