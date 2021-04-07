@@ -78,7 +78,7 @@
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",
     "analyze": "source-map-explorer 'build/static/js/*.js'",
     "electron-dev": "ELECTRON_START_URL=http://localhost:3000 electron .",
-    "electron-prod": "electron electron/main.js",
+    "electron-prod": "electron build/electron.js",
     "electron-build": "electron-builder"
   },
   "eslintConfig": {
@@ -105,6 +105,7 @@
     "url": "https://streetwriters.co"
   },
   "build": {
+    "extends": null,
     "productName": "Notesnook",
     "appId": "com.streetwriters.notesnook",
     "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
