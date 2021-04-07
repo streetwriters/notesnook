@@ -53,39 +53,14 @@ export function hashNavigate(
   // dispatchEvent(new PopStateEvent("popstate", null));
 }
 
-export function useQueryParams(
-  parseFn = parseQuery
-  //serializeFn = serializeQuery
-) {
+export function useQueryParams(parseFn = parseQuery) {
   const [querystring] = useState(getQueryString());
-  // const setQueryParams = useCallback(
-  //   (params, { replace = true } = {}) => {
-  //     let path = getCurrentPath();
-  //     params = replace ? params : { ...parseFn(querystring), ...params };
-  //     const serialized = serializeFn(params).toString();
-  //     if (serialized) path += "?" + serialized;
-  //     if (!replace) path += getCurrentHash();
-  //     navigate(path);
-  //   },
-  //   [querystring]
-  // );
-  // Update state when route changes
-  // const updateQuery = useCallback(() => setQuerystring(getQueryString()), [
-  //   setQueryParams,
-  // ]);
-  //useLocationChange(updateQuery);
   return [parseFn(querystring)];
 }
 
 function parseQuery(querystring) {
   return Object.fromEntries(new URLSearchParams(querystring).entries());
 }
-
-// function serializeQuery(queryParams) {
-//   return new URLSearchParams(
-//     Object.entries(queryParams).filter(([, v]) => v !== null)
-//   );
-// }
 
 export function getQueryString() {
   return window.location.search;

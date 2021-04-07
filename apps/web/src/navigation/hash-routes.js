@@ -22,6 +22,9 @@ import { hashNavigate } from ".";
 import { Suspense } from "react";
 import EditorLoading from "../components/editor/loading";
 import EditorPlaceholder from "../components/editor/-placeholder";
+import { store as userStore } from "../stores/user-store";
+import { upgrade } from "../common/upgrade";
+import { isUserPremium } from "../common";
 const Editor = React.lazy(() => import("../components/editor"));
 
 const hashroutes = {
@@ -98,6 +101,12 @@ const hashroutes = {
   },
   "/login": () => {
     showLogInDialog();
+  },
+  "/buy/:code": ({ code }) => {
+    hashNavigate("/", { notify: false });
+    const user = userStore.get().user;
+    if (!user || isUserPremium()) return;
+    upgrade(user, code);
   },
 };
 

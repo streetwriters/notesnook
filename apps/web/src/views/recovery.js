@@ -81,36 +81,42 @@ function AccountRecovery() {
     <ThemeProvider>
       <Flex
         flexDirection="column"
+        bg="background"
         height="100%"
-        overflowY="auto"
-        alignItems="center"
         justifyContent="center"
-        p={2}
+        alignItems="center"
       >
-        <Image src={Logo} height={50} sx={{ position: "absolute", top: 2 }} />
-        <Text variant="heading" color="primary">
+        <Image src={Logo} height={30} mt={2} />
+        <Text variant="title" textAlign="center">
           Notesnook
         </Text>
-        {loading.isLoading ? (
-          <Flex flexDirection="column" mt={2}>
-            <Icon.Loading rotate color="primary" />
-            <Text variant="body" mt={2} fontSize={"title"}>
-              {loading.message}
-            </Text>
-          </Flex>
-        ) : (
-          <>
-            <Step
-              performAction={performAction}
-              onFinished={() => {
-                setStep((s) => ++s);
-              }}
-              onRestart={() => {
-                setStep(0);
-              }}
-            />
-          </>
-        )}
+        <Flex
+          flex="1"
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+        >
+          {loading.isLoading ? (
+            <Flex flexDirection="column" mt={2}>
+              <Icon.Loading rotate color="primary" />
+              <Text variant="body" mt={2} fontSize={"title"}>
+                {loading.message}
+              </Text>
+            </Flex>
+          ) : (
+            <>
+              <Step
+                performAction={performAction}
+                onFinished={() => {
+                  setStep((s) => ++s);
+                }}
+                onRestart={() => {
+                  setStep(0);
+                }}
+              />
+            </>
+          )}
+        </Flex>
       </Flex>
     </ThemeProvider>
   );
@@ -119,12 +125,7 @@ export default AccountRecovery;
 
 function Step({ heading, children }) {
   return (
-    <Flex
-      flexDirection="column"
-      justifyContent="center"
-      alignItems="center"
-      sx={{ width: ["90%", "50%", "20%"] }}
-    >
+    <Flex flexDirection="column" justifyContent="center" alignItems="center">
       <Text variant="heading" fontSize={24} mb={25} textAlign="center">
         {heading}
       </Text>

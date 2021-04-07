@@ -17,7 +17,7 @@ function loadPaddle() {
   });
 }
 
-async function upgrade(user) {
+async function upgrade(user, coupon) {
   if (!window.Paddle) {
     await loadPaddle();
   }
@@ -28,6 +28,7 @@ async function upgrade(user) {
   Paddle.Checkout.open({
     product: PRODUCT_ID,
     email: user.email,
+    coupon,
     passthrough: JSON.stringify({
       userId: user.id,
     }),
