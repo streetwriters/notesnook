@@ -9,13 +9,19 @@ function configure_ssh() {
   echo "Configuring environment with a custom ssh key to be able to fetch private dependencies..."
 
   local SSH_HOME="$1"/.ssh
+  local KEY_NAME=""
   echo "Using SSH_HOME='$SSH_HOME'"
 
   mkdir -p "$SSH_HOME"
 
-  echo "${GH_DEPLOY_KEY}" >"$SSH_HOME"/id_rsa # We must use "id_rsa" file name, using a custom name will fail
+  if [[ "$HOME" == "/vercel" ]]; then
+    KEY_NAME="id_rsa"
+  elif [[ "$HOME" == "/home/runner" ]]; then # On Github Actions
+    KEY_NAME="id_ed25519"
+  fi
+  echo "${GH_DEPLOY_KEY}" >"$SSH_HOME"/"$KEY_NAME" # We must use "id_rsa" file name, using a custom name will fail
   echo "GH_DEPLOY_KEY = ${GH_DEPLOY_KEY}"
-  chmod 400 "$SSH_HOME"/id_rsa
+  chmod 400 "$SSH_HOME"/"$KEY_NAME"
 
   ssh-keyscan -t rsa github.com >>"$SSH_HOME"/known_hosts # Look and make trust communications between github.com and the builder
 }
