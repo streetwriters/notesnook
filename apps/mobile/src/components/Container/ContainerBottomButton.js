@@ -54,7 +54,7 @@ export const ContainerBottomButton = ({
         right: 12,
         bottom:
           Platform.OS === 'ios' && insets.bottom !== 0
-            ? insets.bottom - 10
+            ? insets.bottom - 25
             : insets.bottom + 12,
         zIndex: 10,
         transform: [
