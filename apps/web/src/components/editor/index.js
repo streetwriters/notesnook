@@ -73,13 +73,12 @@ function Editor({ noteId, nonce }) {
       const editor = editorRef.current?.editor;
       if (!editor) return;
       function setContents() {
-        editor.undoManager.clear();
-        editor.undoManager.add();
-        editor.setDirty(false);
-
         // NOTE: workaround to not fire onEditorChange event on content load
         editor.isLoading = true;
         editor.setContent(data, { format: "html" });
+
+        editor.undoManager.reset();
+        editor.setDirty(false);
       }
       setContents();
       editor.on("init", setContents);
