@@ -1,5 +1,8 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {Dimensions} from 'react-native';
 import {Platform, ScrollView, TextInput} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
@@ -44,12 +47,14 @@ const Editor = React.memo(
     const [state] = useTracked();
     const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
+    const insets = useSafeAreaInsets();
+    const calculatedHeight =
+      Dimensions.get('window').height - (insets.top + insets.bottom + 50);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    const onResetRequested = async (noload) => {
-      
+    const onResetRequested = async noload => {
       setResetting(true);
       await sleep(30);
       setResetting(false);
@@ -74,30 +79,18 @@ const Editor = React.memo(
           style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
           blurOnSubmit={false}
         />
-        <ScrollView
-          bounces={false}
-          bouncesZoom={false}
-          disableScrollViewPanResponder
-          keyboardDismissMode="none"
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
+        <View
           style={{
-            height: '100%',
-            width: '100%',
+            height: calculatedHeight,
           }}
-          nestedScrollEnabled
-          contentContainerStyle={{
-            width: '100%',
-            height: '100%',
-          }}>
+          nestedScrollEnabled>
           <EditorHeader />
           <WebView
             testID={notesnook.ids.default.editor}
             ref={EditorWebView}
             onLoad={onLoad}
             scrollEnabled={true}
-            onRenderProcessGone={(event) => {
+            onRenderProcessGone={event => {
               onResetRequested();
             }}
             javaScriptEnabled={true}
@@ -120,7 +113,7 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
-        </ScrollView>
+        </View>
         <EditorToolbar />
       </>
     );

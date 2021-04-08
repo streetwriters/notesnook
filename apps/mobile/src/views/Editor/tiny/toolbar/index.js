@@ -25,6 +25,7 @@ const EditorToolbar = React.memo(
         <View
           style={{
             width: '100%',
+            minHeight: normalize(50),
           }}>
           <Tooltip />
           <ScrollView

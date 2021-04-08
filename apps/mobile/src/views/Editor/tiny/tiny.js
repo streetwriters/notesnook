@@ -11,12 +11,16 @@ document.activeElement.blur();
 window.blur();
 `;
 
-const keyboardStateChanged = `(() => {
-  window.scrollBy({
+/**
+ * window.scrollBy({
     top: 45,
     left: 0,
     behavior: 'smooth'
   })
+ */
+
+const keyboardStateChanged = `(() => {
+  
 })();
 `;
 const blur = `
