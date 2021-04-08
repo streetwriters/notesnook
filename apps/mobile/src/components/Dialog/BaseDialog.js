@@ -38,17 +38,18 @@ const BaseDialog = ({
       }}
       animationType={animation}
       onRequestClose={onRequestClose}>
-      <SafeAreaView>
+      <SafeAreaView
+        style={ {
+          backgroundColor: transparent
+            ? 'transparent'
+            : state.colors.night
+            ? 'rgba(255,255,255,0.15)'
+            : 'rgba(0,0,0,0.3)',
+        }}
+      >
         <KeyboardAvoidingView
           behavior={Platform.OS === 'ios' ? 'padding' : null}
           style={[
-            {
-              backgroundColor: transparent
-                ? 'transparent'
-                : state.colors.night
-                ? 'rgba(255,255,255,0.15)'
-                : 'rgba(0,0,0,0.3)',
-            },
             styles.backdrop,
             {
               justifyContent:centered? "center" : "flex-start"
