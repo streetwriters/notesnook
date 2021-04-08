@@ -12,6 +12,7 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
+import { normalize } from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
@@ -49,7 +50,7 @@ const Editor = React.memo(
     const [resetting, setResetting] = useState(false);
     const insets = useSafeAreaInsets();
     const calculatedHeight =
-      Dimensions.get('window').height - (insets.top + insets.bottom + 50);
+      Dimensions.get('window').height - (insets.top + insets.bottom + normalize(50));
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
