@@ -10,7 +10,7 @@ import { hashNavigate } from "../../navigation";
 
 const requiredValues = ["email", "password", "remember"];
 function LoginDialog(props) {
-  const { onClose, title, description, positiveText } = props;
+  const { onClose, title, description, positiveText, skipInit } = props;
   const [error, setError] = useState();
   const [credential, setCredential] = useState();
   const [email, setEmail] = useState();
@@ -110,7 +110,6 @@ function LoginDialog(props) {
           id="loginForm"
           as="form"
           onSubmit={(e) => {
-            console.log("SUBMIT", e);
             e.preventDefault();
             const form = new FormData(e.target);
             const data = requiredValues.reduce((prev, curr) => {
@@ -120,7 +119,7 @@ function LoginDialog(props) {
 
             setError();
 
-            login(data)
+            login(data, skipInit)
               .then(async () => {
                 // Instantiate PasswordCredential with the form
                 if (window.PasswordCredential) {

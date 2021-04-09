@@ -341,12 +341,13 @@ export function showLoadingDialog(dialogData) {
   ));
 }
 
-export const showLogInDialog = (title, description, positiveText) => {
+export const showLogInDialog = (title, description, positiveText, skipInit) => {
   return showDialog((Dialogs, perform) => (
     <Dialogs.LoginDialog
       title={title}
       description={description}
       positiveText={positiveText}
+      skipInit={skipInit}
       onClose={() => perform()}
     />
   ));

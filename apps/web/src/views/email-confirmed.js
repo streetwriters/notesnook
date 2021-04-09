@@ -140,7 +140,8 @@ function SaleBanner(props) {
           await showLogInDialog(
             `Login in to get ${discount}% off`,
             `Use the coupon "${coupon}" at checkout to get ${discount}% off your first month.`,
-            `Get ${discount}% off`
+            `Get ${discount}% off`,
+            true
           );
 
           user = await db.user.getUser();

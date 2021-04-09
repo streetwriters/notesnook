@@ -66,11 +66,12 @@ class UserStore extends BaseStore {
     });
   };
 
-  login = (form) => {
+  login = (form, skipInit = false) => {
     this.set((state) => (state.isLoggingIn = true));
     return db.user
       .login(form.email.toLowerCase(), form.password, form.remember)
       .then(() => {
+        if (skipInit) return true;
         return showLoadingDialog({
           title: "Importing your data...",
           subtitle:
