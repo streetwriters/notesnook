@@ -42,6 +42,10 @@ class UserManager {
   }
 
   async login(email, password, remember, hashedPassword) {
+    if (!hashedPassword) {
+      hashedPassword = await this._db.context.hash(password, email);
+    }
+
     await this.tokenManager.saveToken(
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,
