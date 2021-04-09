@@ -173,6 +173,7 @@ const onKeyboardShow = () => {
   if (!editing.movedAway) {
     editing.isFocused = true;
     if (Platform.OS === 'ios') {
+      if (editing.focusType === "title") return;
       call(EditorWebView, keyboardStateChanged);
     }
   }
