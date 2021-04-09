@@ -4,6 +4,7 @@
   "private": true,
   "main": "./build/electron.js",
   "dependencies": {
+    "@inlightmedia/react-countdown-timer": "^1.1.2",
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",

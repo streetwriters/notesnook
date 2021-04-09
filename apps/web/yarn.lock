@@ -1426,6 +1426,13 @@
   dependencies:
     "@hapi/hoek" "^9.0.0"
 
+"@inlightmedia/react-countdown-timer@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@inlightmedia/react-countdown-timer/-/react-countdown-timer-1.1.2.tgz#bf34d9d9b8098d8aba7117d254e2cb0ab318c25d"
+  integrity sha512-Ydh1Tf6f83S6a97PduDlNj/LaI2ZxTXZHpGEpiXEisfR8Afwuxd+AvZr4JUC9Mt5jLoyTHS4irShZEY+5PaAMw==
+  dependencies:
+    moment-mini "^2.24.0"
+
 "@istanbuljs/load-nyc-config@^1.0.0":
   version "1.1.0"
   resolved "https://registry.npmjs.org/@istanbuljs/load-nyc-config/-/load-nyc-config-1.1.0.tgz"

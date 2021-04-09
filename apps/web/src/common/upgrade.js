@@ -25,6 +25,10 @@ async function upgrade(user, coupon) {
   const { Paddle } = window;
   if (!Paddle) return;
 
+  if (coupon && window.umami) {
+    window.umami(`[${coupon}] redeemed!`, "offers");
+  }
+
   Paddle.Checkout.open({
     product: PRODUCT_ID,
     email: user.email,

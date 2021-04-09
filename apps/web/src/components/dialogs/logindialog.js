@@ -7,12 +7,10 @@ import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
 import { showForgotPasswordDialog } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
-import useHashLocation from "../../utils/use-hash-location";
 
 const requiredValues = ["email", "password", "remember"];
 function LoginDialog(props) {
-  const { onClose } = props;
-  const [, queryParams] = useHashLocation();
+  const { onClose, title, description, positiveText } = props;
   const [error, setError] = useState();
   const [credential, setCredential] = useState();
   const [email, setEmail] = useState();
@@ -23,9 +21,8 @@ function LoginDialog(props) {
   useEffect(() => {
     if (isLoggedIn) {
       onClose();
-      if (queryParams.redirect) hashNavigate(queryParams.redirect);
     }
-  }, [isLoggedIn, queryParams, onClose]);
+  }, [isLoggedIn, onClose]);
 
   useEffect(() => {
     if (!window.PasswordCredential) return;
@@ -61,7 +58,7 @@ function LoginDialog(props) {
       title={
         credential?.password
           ? `Signing in as ${credential.id}...`
-          : "Sign in to Your Account"
+          : title || "Sign in to your account"
       }
       description={
         <Flex alignItems="center">
@@ -71,15 +68,21 @@ function LoginDialog(props) {
             </Text>
           ) : (
             <Text as="span" fontSize="body" color="gray">
-              Don't have an account?{" "}
-              <Button
-                variant="anchor"
-                sx={{ textAlign: "left" }}
-                fontSize="body"
-                onClick={() => hashNavigate("/signup")}
-              >
-                Create an account here.
-              </Button>
+              {description ? (
+                description
+              ) : (
+                <>
+                  Don't have an account?{" "}
+                  <Button
+                    variant="anchor"
+                    sx={{ textAlign: "left" }}
+                    fontSize="body"
+                    onClick={() => hashNavigate("/signup")}
+                  >
+                    Create an account here.
+                  </Button>
+                </>
+              )}
             </Text>
           )}
         </Flex>
@@ -97,7 +100,7 @@ function LoginDialog(props) {
           form: "loginForm",
           type: "submit",
         },
-        text: "Sign in",
+        text: positiveText || "Sign in",
         loading: isLoggingIn,
         disabled: isLoggingIn,
       }}
@@ -131,9 +134,6 @@ function LoginDialog(props) {
                   onClose();
                 } else {
                   onClose();
-                }
-                if (queryParams.redirect) {
-                  hashNavigate(queryParams.redirect);
                 }
               })
               .catch((e) => setError(e.message));
