@@ -66,7 +66,7 @@ const AppLoader = ({onLoad}) => {
     let askForRating = await MMKV.getItem('askForRating');
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
-      if (askForRating.timestamp < Date.now()) {
+      if (askForRating?.timestamp < Date.now()) {
         eSendEvent(eOpenRateDialog);
       }
     }

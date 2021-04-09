@@ -1,3 +1,4 @@
+import {Platform} from 'react-native';
 import {editing} from '../../../utils';
 import {EditorWebView, getWebviewInit, post} from '../Functions';
 
@@ -11,16 +12,9 @@ document.activeElement.blur();
 window.blur();
 `;
 
-/**
- * window.scrollBy({
-    top: 45,
-    left: 0,
-    behavior: 'smooth'
-  })
- */
-
 const keyboardStateChanged = `(() => {
-  
+  let node = tinymce.activeEditor.selection.getNode();
+  node.scrollIntoView({behavior: "smooth", block: "end"});
 })();
 `;
 const blur = `
@@ -57,9 +51,9 @@ const pre = `(() => {
   } else {
     tinymce.activeEditor.execCommand("mceInsertNewLine", false, { shiftKey: true });
   }
-})();`
+})();`;
 
-const updateDateEdited = (value) => `
+const updateDateEdited = value => `
 	(() => {
 		info = document.querySelector(infoBar);
         info.querySelector('#infodate').innerText = "${value}";
@@ -69,7 +63,7 @@ const updateDateEdited = (value) => `
 	})();
 `;
 
-const updateSavingState = (value) => `
+const updateSavingState = value => `
 	(() => {
 		info = document.querySelector(infoBar);
         info.querySelector('#infosaved').innerText = "${value}";
@@ -88,7 +82,7 @@ const focusTitle = `
 document.getElementById("titleInput").focus();
 `;
 
-const setTitle = (value) => `
+const setTitle = value => `
 document.getElementById("titleInput").value = \`${value}\`;
 autosize();
 `;
@@ -97,7 +91,7 @@ const cacheRange = `current_selection_range = editor.selection.getRng();`;
 const restoreRange = `editor.selection.setRng(current_selection_range);`;
 const clearRange = `current_selection_range = null`;
 
-const toggleFormat = (format) => {
+const toggleFormat = format => {
   let command = `
 	tinymce.activeEditor.execCommand(${format});
 	`;
@@ -112,7 +106,7 @@ const formatWithValue = (format, value) => {
   return command;
 };
 
-export const nomenu = (enabled) => `
+export const nomenu = enabled => `
 	(() => {
 		let isenabled = ${enabled};
         let titleIn = document.getElementById('titlebar');
@@ -125,7 +119,7 @@ export const nomenu = (enabled) => `
         }
 	})();
 `;
-const updateTheme = (value) => `
+const updateTheme = value => `
 (() => {
   let v = ${value}
   pageTheme.colors = v;
@@ -142,7 +136,7 @@ const notLoading = `
 isLoading = false;
 `;
 
-const html = (value) => post('html', value);
+const html = value => post('html', value);
 
 const focusEditor = `
 tinymce.activeEditor.focus();
@@ -178,7 +172,9 @@ tinymce.activeEditor.undoManager.clear();
 const onKeyboardShow = () => {
   if (!editing.movedAway) {
     editing.isFocused = true;
-    call(EditorWebView, keyboardStateChanged);
+    if (Platform.OS === 'ios') {
+      call(EditorWebView, keyboardStateChanged);
+    }
   }
 };
 
@@ -206,5 +202,5 @@ export default {
   notLoading,
   keyboardStateChanged,
   onKeyboardShow,
-  pre
+  pre,
 };

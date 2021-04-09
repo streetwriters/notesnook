@@ -12,7 +12,7 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
-import { normalize } from '../../utils/SizeUtils';
+import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
@@ -49,8 +49,6 @@ const Editor = React.memo(
     const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
     const insets = useSafeAreaInsets();
-    const calculatedHeight =
-      Dimensions.get('window').height - (insets.top + insets.bottom + normalize(50));
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
@@ -73,6 +71,8 @@ const Editor = React.memo(
       };
     }, []);
 
+    const CustomView = Platform.OS === 'ios' ? ScrollView : View;
+
     return resetting ? null : (
       <>
         <TextInput
@@ -80,11 +80,26 @@ const Editor = React.memo(
           style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
           blurOnSubmit={false}
         />
-        <View
+
+        <CustomView
           style={{
-            height: calculatedHeight,
+            height: '100%',
+            width:"100%",
+            paddingBottom: Platform.OS === 'android' ? normalize(50) + 5 : null,
+          
           }}
-          nestedScrollEnabled>
+          bounces={false}
+          bouncesZoom={false}
+          disableScrollViewPanResponder
+          keyboardDismissMode="none"
+          keyboardShouldPersistTaps="always"
+          showsVerticalScrollIndicator={false}
+          scrollEnabled={false}
+          nestedScrollEnabled
+          contentContainerStyle={{
+            width: '100%',
+            height: '100%',
+          }}>
           <EditorHeader />
           <WebView
             testID={notesnook.ids.default.editor}
@@ -114,7 +129,7 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
-        </View>
+        </CustomView>
         <EditorToolbar />
       </>
     );

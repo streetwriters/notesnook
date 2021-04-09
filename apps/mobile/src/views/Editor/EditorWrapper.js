@@ -132,7 +132,8 @@ export const EditorWrapper = ({dimensions}) => {
           onHandlerStateChange={onHandlerStateChange}
           onGestureEvent={onGestureEvent}>
           <AnimatedKeyboardView
-            behavior={Platform.OS === 'ios' ? 'padding' : null}
+            behavior={Platform.OS === 'ios' ? "padding" : null}
+
             style={{
               transform: [
                 {

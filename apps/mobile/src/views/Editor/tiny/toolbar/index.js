@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { Platform } from 'react-native';
 import { ScrollView, View } from 'react-native';
 import { useTracked } from '../../../../provider';
 import { normalize } from '../../../../utils/SizeUtils';
@@ -26,6 +27,8 @@ const EditorToolbar = React.memo(
           style={{
             width: '100%',
             minHeight: normalize(50),
+            position:Platform.OS === "android" ? "absolute" : "relative",
+            bottom:Platform.OS === "android" ? 0 : null
           }}>
           <Tooltip />
           <ScrollView
