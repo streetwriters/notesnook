@@ -6,6 +6,8 @@ import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
@@ -69,13 +71,9 @@ const SimpleList = ({
       setLoading(false);
       setTimeout(() => {
         setLoaded(true)
-      },50);
+      },Navigation.getCurrentScreen() === SettingsService.get().homepage ? 1000 : 150);
     }
   }, [listData, deviceMode, loading]);
-
-  useEffect(() => {
-    console.log("rerendering");
-  })
 
   const _onRefresh = async () => {
     await Sync.run();

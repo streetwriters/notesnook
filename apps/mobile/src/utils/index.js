@@ -11,7 +11,7 @@ import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 
 export const InteractionManager = {
-  runAfterInteractions: (func, time = 150) => setTimeout(func, time),
+  runAfterInteractions: (func, time = 10) => setTimeout(func, time),
 };
 
 export const APP_VERSION = 1350;

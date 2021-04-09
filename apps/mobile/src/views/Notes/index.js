@@ -32,7 +32,7 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 150) => {
+  const runAfterInteractions = (time = 10) => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('NotesPage', () => {
         init();
