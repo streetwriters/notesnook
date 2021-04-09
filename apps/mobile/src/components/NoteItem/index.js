@@ -28,9 +28,6 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
       isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
     );
   };
- useEffect(() => {
-  console.log('rendering')
- });
   return (
     <View
       style={[
