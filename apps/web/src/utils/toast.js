@@ -12,8 +12,9 @@ import { store as appstore } from "../stores/app-store";
 function showToast(type, message, actions) {
   if (appstore.get().isFocusMode) return null;
   const IconComponent = Icon[toTitleCase(type)];
-
-  return CogoToast[type](
+  const toast = CogoToast[type];
+  if (!toast) return;
+  return toast(
     <ToastContainer type={type} message={message} actions={actions} />,
     {
       position: "top-right",

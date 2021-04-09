@@ -8955,6 +8955,11 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
+moment-mini@^2.24.0:
+  version "2.24.0"
+  resolved "https://registry.yarnpkg.com/moment-mini/-/moment-mini-2.24.0.tgz#fa68d98f7fe93ae65bf1262f6abb5fb6983d8d18"
+  integrity sha512-9ARkWHBs+6YJIvrIp0Ik5tyTTtP9PoV0Ssu2Ocq5y9v8+NOOpWiRshAp8c4rZVWTOe+157on/5G+zj5pwIQFEQ==
+
 move-concurrently@^1.0.1:
   version "1.0.1"
   resolved "https://registry.npmjs.org/move-concurrently/-/move-concurrently-1.0.1.tgz"
@@ -9218,7 +9223,7 @@ notes-core@../notes-core/:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.6.4"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#d3f0d008c4cd327fb7196f3d2595d06acf542d29"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#9f0527dad6b97bbce4739109e75594231148ae45"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysort "^1.1.4"

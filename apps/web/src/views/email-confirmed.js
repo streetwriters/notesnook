@@ -145,7 +145,7 @@ function SaleBanner(props) {
 
           user = await db.user.getUser();
           if (!user) {
-            showToast("Could not login. Please retry.");
+            showToast("error", "You are not logged in. Please try again.");
             return;
           }
           await upgrade(user, coupon);
