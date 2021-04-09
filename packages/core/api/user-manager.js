@@ -12,8 +12,6 @@ const ENDPOINTS = {
   verifyUser: "/account/verify",
   revoke: "/connect/revocation",
   recoverAccount: "/account/recover",
-  migrateStatus: "/migrate/status",
-  hcliMigrate: "/migrate/hcli",
 };
 
 class UserManager {
@@ -43,34 +41,7 @@ class UserManager {
     return await this.login(email, password, true, hashedPassword);
   }
 
-  async _getUserStatus(email) {
-    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.migrateStatus}`, {
-      email,
-    });
-  }
-
-  async _hcliMigrate(email, plaintextPassword, hashedPassword) {
-    return await http.post(`${constants.AUTH_HOST}${ENDPOINTS.hcliMigrate}`, {
-      username: email,
-      plaintext_password: plaintextPassword,
-      hashed_password: hashedPassword,
-    });
-  }
-
-  async _migrateUser(email, plaintextPassword) {
-    const status = await this._getUserStatus(email);
-    var hashedPassword = await this._db.context.hash(plaintextPassword, email);
-    if (!status.hcli) {
-      await this._hcliMigrate(email, plaintextPassword, hashedPassword);
-    }
-    return hashedPassword;
-  }
-
   async login(email, password, remember, hashedPassword) {
-    if (!hashedPassword) {
-      hashedPassword = await this._migrateUser(email, password);
-    }
-
     await this.tokenManager.saveToken(
       await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
         username: email,
