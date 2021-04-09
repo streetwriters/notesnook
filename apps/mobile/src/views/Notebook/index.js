@@ -32,12 +32,11 @@ export const Notebook = ({route, navigation}) => {
       params.notebook = notebook;
       params.title = params.notebook.title;
       setTopics(notebook.topics);
-      sleep(10).then((r) => {
+      setTimeout(() => {
         if (loading) {
           setLoading(false);
         }
-      });
-
+      },10)
       Navigation.routeNeedsUpdate('Notebook', () => {
         onLoad();
       });

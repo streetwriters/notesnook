@@ -22,7 +22,6 @@ import {
   refreshNotesPage,
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -56,9 +55,9 @@ export const Notes = ({route, navigation}) => {
       }
       setNotes(_notes);
       if (localLoad) {
-        sleep(10).then((r) => {
+        setTimeout(() => {
           setLocalLoad(false);
-        });
+        }, 10);
       }
       if (params.menu) {
         navigation.setOptions({
@@ -72,13 +71,16 @@ export const Notes = ({route, navigation}) => {
         });
       }
       updateSearch();
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: _onPressBottomButton,
-          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-        },
-      });
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+            color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
+          },
+        });
+      }
+
       ranAfterInteractions = false;
     }, time);
   };
@@ -118,7 +120,7 @@ export const Notes = ({route, navigation}) => {
     }
   };
 
-  const init = (data) => {
+  const init = data => {
     if (data) {
       setLocalLoad(true);
       params = data;

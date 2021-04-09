@@ -123,7 +123,6 @@ function setHeaderState(name, params, item) {
   currentScreen = name;
   headerState.currentScreen = name;
   headerState.verticalMenu = params.menu;
-
   if (headerState) {
     eSendEvent('onHeaderStateChange', {...headerState});
   }

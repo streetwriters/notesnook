@@ -11,21 +11,10 @@ const opacity = new Animated.Value(DDS.isLargeTablet() ? 1 : 0);
 
 let scrollPostions = {};
 
-export const HeaderTitle = () => {
+export const HeaderTitle = ({heading,headerColor}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const [headerTextState, setHeaderTextState] = useState(Navigation.getHeaderState());
-
-  const onHeaderStateChange = (event) => {
-         setHeaderTextState(event);
-  };
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
-
+ 
 
   const onScroll = async (y) => {
     if (DDS.isTab) return;
@@ -55,7 +44,7 @@ export const HeaderTitle = () => {
     } else {
       opacity.setValue(0);
     }
-    scrollPostions[headerTextState?.heading] = y;
+    scrollPostions[heading] = y;
   };
 
   useEffect(() => {
@@ -63,21 +52,21 @@ export const HeaderTitle = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [headerTextState?.heading]);
+  }, [heading]);
   
   return (
     <Animated.View
       style={{
         opacity: DDS.isTab ? 1 : opacity,
       }}>
-      <Heading color={headerTextState?.color}>
+      <Heading color={headerColor}>
         <Heading color={colors.accent}>
-          {headerTextState?.heading.slice(0, 1) === '#' ? '#' : null}
+          {heading.slice(0, 1) === '#' ? '#' : null}
         </Heading>
 
-        {headerTextState?.heading.slice(0, 1) === '#'
-          ? headerTextState?.heading.slice(1)
-          : headerTextState?.heading}
+        {heading.slice(0, 1) === '#'
+          ? heading.slice(1)
+          : heading}
       </Heading>
     </Animated.View>
   );

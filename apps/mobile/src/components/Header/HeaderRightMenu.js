@@ -10,26 +10,10 @@ import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 
-export const HeaderRightMenu = () => {
+export const HeaderRightMenu = ({currentScreen}) => {
   const [state] = useTracked();
   const {colors, containerBottomButton, syncing} = state;
-  const [headerTextState, setHeaderTextState] = useState(
-    Navigation.getHeaderState(),
-  );
-  const currentScreen = headerTextState.currentScreen;
-
-  const onHeaderStateChange = (event) => {
-    if (!event) return;
-     setHeaderTextState(event);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
-
+ 
   return (
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}

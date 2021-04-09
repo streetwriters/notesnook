@@ -67,9 +67,15 @@ const SimpleList = ({
         ),
       );
       setLoading(false);
-      sleep(100).then(() => setLoaded(true));
+      setTimeout(() => {
+        setLoaded(true)
+      },50);
     }
   }, [listData, deviceMode, loading]);
+
+  useEffect(() => {
+    console.log("rerendering");
+  })
 
   const _onRefresh = async () => {
     await Sync.run();

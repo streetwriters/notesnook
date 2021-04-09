@@ -74,7 +74,7 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
 };
 
 const screenOptionsForAnimation = {
-  animationEnabled: true,
+  animationEnabled: false,
   cardStyleInterpolator: forSlide,
   gestureEnabled: true,
 };

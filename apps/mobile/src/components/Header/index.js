@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import React, {useEffect, useState} from 'react';
+import {Platform, StyleSheet, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { dWidth } from '../../utils';
-import { eScrollEvent } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { SearchInput } from '../SearchInput';
-import { HeaderLeftMenu } from './HeaderLeftMenu';
-import { HeaderRightMenu } from './HeaderRightMenu';
-import { HeaderTitle } from './HeaderTitle';
+import {dWidth} from '../../utils';
+import {eScrollEvent} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {SearchInput} from '../SearchInput';
+import {HeaderLeftMenu} from './HeaderLeftMenu';
+import {HeaderRightMenu} from './HeaderRightMenu';
+import {HeaderTitle} from './HeaderTitle';
 
 export const Header = ({root}) => {
   const [state] = useTracked();
@@ -24,9 +24,9 @@ export const Header = ({root}) => {
   );
   const currentScreen = headerTextState.currentScreen;
 
-  const onHeaderStateChange = (event) => {
+  const onHeaderStateChange = event => {
     if (!event) return;
-     setHeaderTextState(event);
+    setHeaderTextState(event);
   };
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export const Header = ({root}) => {
     };
   }, []);
 
-  const onScroll = (y) => {
+  const onScroll = y => {
     if (y > 150) {
       setHide(false);
     } else {
@@ -65,42 +65,54 @@ export const Header = ({root}) => {
         },
       ]}>
       <View style={styles.leftBtnContainer}>
-        <HeaderLeftMenu />
+        <HeaderLeftMenu
+          headerMenuState={headerTextState.verticalMenu}
+          currentScreen={currentScreen}
+        />
 
-        {(Platform.OS === 'android' ||
-        Platform.isPad) && currentScreen !== 'Search' ? (
-          <HeaderTitle root={root} />
+        {(Platform.OS === 'android' || Platform.isPad) &&
+        currentScreen !== 'Search' ? (
+          <HeaderTitle
+            headerColor={headerTextState.color}
+            heading={headerTextState.heading}
+            currentScreen={currentScreen}
+            root={root}
+          />
         ) : null}
       </View>
       {Platform.OS !== 'android' &&
       !Platform.isPad &&
       currentScreen !== 'Search' ? (
-        <HeaderTitle root={root} />
+        <HeaderTitle
+          headerColor={headerTextState.color}
+          heading={headerTextState.heading}
+          currentScreen={currentScreen}
+          root={root}
+        />
       ) : null}
 
       {currentScreen === 'Search' ? (
-        <View
-          style={{
-            width: '80%',
-          }}>
-          <SearchInput />
-        </View>
-      ) : null}
-
-      {currentScreen === 'Search' ? (
-        <View style={[styles.rightBtnContainer, {right: 6}]}>
-          <ActionIcon
-            onPress={() => {
-              SearchService.search();
-            }}
-            name="magnify"
-            size={SIZE.xxxl}
-            color={colors.pri}
-            style={styles.rightBtn}
-          />
-        </View>
+        <>
+          <View
+            style={{
+              width: '80%',
+            }}>
+            <SearchInput />
+          </View>
+          <View style={[styles.rightBtnContainer, {right: 6}]}>
+            <ActionIcon
+              onPress={() => {
+                SearchService.search();
+              }}
+              name="magnify"
+              size={SIZE.xxxl}
+              color={colors.pri}
+              style={styles.rightBtn}
+            />
+          </View>
+        </>
       ) : (
-        <HeaderRightMenu />
+        <HeaderRightMenu currentScreen={currentScreen} />
       )}
     </View>
   );
