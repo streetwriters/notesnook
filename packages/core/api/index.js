@@ -186,6 +186,10 @@ class Database {
   version() {
     return http.get(`${Constants.API_HOST}/version`);
   }
+
+  announcement() {
+    return http.get(`${Constants.API_HOST}/announcements/recent`);
+  }
 }
 
 export default Database;
