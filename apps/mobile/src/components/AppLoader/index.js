@@ -9,6 +9,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
+import { editing } from '../../utils';
 import {changeContainerScale, ContainerScale} from '../../utils/Animations';
 import {db} from '../../utils/DB';
 import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
@@ -24,7 +25,7 @@ const AppLoader = ({onLoad}) => {
   const [loading, setLoading] = useState(true);
   const [opacity, setOpacity] = useState(true);
 
-  const load = async (value) => {
+  const load = async value => {
     if (value === 'hide') {
       setLoading(true);
       opacityV.setValue(1);
@@ -34,8 +35,10 @@ const AppLoader = ({onLoad}) => {
     if (appState) {
       appState = JSON.parse(appState);
       if (!appState.movedAway) {
-        tabBarRef.current?.goToPage(1);
         eSendEvent('loadingNote', appState.note);
+        editing.currentlyEditing = true;
+        tabBarRef.current?.goToPage(1);
+       
       }
     }
 
@@ -53,16 +56,15 @@ const AppLoader = ({onLoad}) => {
       duration: 150,
       easing: Easing.out(Easing.ease),
     }).start();
-    db.notes.init().then(() => {
-      dispatch({type: Actions.NOTES});
-      dispatch({type: Actions.FAVORITES});
-      dispatch({type: Actions.LOADING, loading: false});
-      eSendEvent(eOpenSideMenu);
-    });
     changeContainerScale(ContainerScale, 1, 600);
     await sleep(150);
     setLoading(false);
     animation = false;
+    await db.notes.init();
+    dispatch({type: Actions.NOTES});
+    dispatch({type: Actions.FAVORITES});
+    dispatch({type: Actions.LOADING, loading: false});
+    eSendEvent(eOpenSideMenu);
     let askForRating = await MMKV.getItem('askForRating');
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
