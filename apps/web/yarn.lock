@@ -9223,7 +9223,7 @@ notes-core@../notes-core/:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.6.4"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#9eb15a9484763dbee9a3a7715374d266f974bda7"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#11e5bf6838e79912ef68328025b2f1cd88eccaf9"
   dependencies:
     fast-sort "^2.0.1"
     fuzzysort "^1.1.4"

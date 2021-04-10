@@ -9,6 +9,7 @@ import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 import ScrollContainer from "../scroll-container";
 import ReminderBar from "../reminder-bar";
+import Announcement from "../announcement";
 
 const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
   <ScrollContainer {...props} forwardedRef={ref} />
@@ -43,6 +44,7 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
+          <Announcement />
           <ReminderBar />
           <Flex variant="columnFill" data-test-id="note-list">
             {props.children
@@ -52,7 +54,7 @@ function ListContainer(props) {
                     {({ height, width }) => (
                       <List
                         ref={listRef}
-                        height={height - 1} // TODO: we have to subtract 1 from total height so scrollbar doesn't appear (not tested widely)
+                        height={height}
                         width={width}
                         itemKey={(index) => {
                           switch (index) {
@@ -78,46 +80,59 @@ function ListContainer(props) {
                         itemCount={props.items.length}
                       >
                         {({ index, style }) => {
+                          //const item = pinnedItems[index] || props.items[pinnedItems.length + index];
                           const item = props.items[index];
                           if (!item) return null;
-                          return (
-                            <div
-                              key={item.id || item.title}
-                              style={{
-                                ...style,
-                                zIndex: item.type === "header" ? 2 : 1,
-                              }}
-                            >
-                              {item.type === "header" ? (
-                                <GroupHeader
-                                  title={item.title}
-                                  index={index}
-                                  groups={props.items.filter(
-                                    (v) =>
-                                      v.type === "header" &&
-                                      v.title !== item.title
-                                  )}
-                                  wasJumpedTo={index === jumpToIndex}
-                                  onJump={(title) => {
-                                    const index = props.items.findIndex(
-                                      (v) => v.title === title
-                                    );
-                                    if (index < 0) return;
-                                    setJumpToIndex(index);
-                                    listRef.current.scrollToItem(
-                                      index,
-                                      "center"
-                                    );
-                                    setTimeout(() => {
-                                      setJumpToIndex(-1);
-                                    }, 1900);
+
+                          switch (item.type) {
+                            case "header":
+                              return (
+                                <div
+                                  key={item.id || item.title}
+                                  style={{
+                                    ...style,
+                                    zIndex: 2,
                                   }}
-                                />
-                              ) : (
-                                profile.item(index, item, context)
-                              )}
-                            </div>
-                          );
+                                >
+                                  <GroupHeader
+                                    title={item.title}
+                                    index={index}
+                                    groups={props.items.filter(
+                                      (v) =>
+                                        v.type === "header" &&
+                                        v.title !== item.title
+                                    )}
+                                    wasJumpedTo={index === jumpToIndex}
+                                    onJump={(title) => {
+                                      const index = props.items.findIndex(
+                                        (v) => v.title === title
+                                      );
+                                      if (index < 0) return;
+                                      setJumpToIndex(index);
+                                      listRef.current.scrollToItem(
+                                        index,
+                                        "center"
+                                      );
+                                      setTimeout(() => {
+                                        setJumpToIndex(-1);
+                                      }, 1900);
+                                    }}
+                                  />
+                                </div>
+                              );
+                            default:
+                              return (
+                                <div
+                                  key={item.id || item.title}
+                                  style={{
+                                    ...style,
+                                    zIndex: 1,
+                                  }}
+                                >
+                                  {profile.item(index, item, context)}
+                                </div>
+                              );
+                          }
                         }}
                       </List>
                     )}
