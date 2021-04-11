@@ -25,6 +25,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {DDS} from '../../services/DeviceDetection';
 import {openLinkInBrowser} from '../../utils/functions';
 import {Modal} from 'react-native';
+import {SafeAreaView} from 'react-native';
+import {SvgToPngView} from '../ListPlaceholders';
 
 const features = [
   {
@@ -39,6 +41,7 @@ const features = [
       'Your data is encrypted on your device. No one but you can read your notes.',
     icon: PRIVACY_SVG,
     link: 'https://notesnook.com',
+    img:"privacy"
   },
   {
     icon: SYNC_SVG,
@@ -46,6 +49,7 @@ const features = [
     description:
       'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
     link: 'https://notesnook.com',
+    img:'sync'
   },
   {
     icon: ORGANIZE_SVG,
@@ -53,6 +57,7 @@ const features = [
     description:
       'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
     link: 'https://notesnook.com',
+    img:"sync"
   },
   {
     icon: COMMUNITY_SVG,
@@ -60,6 +65,7 @@ const features = [
     description:
       'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
     link: 'https://discord.gg/zQBK97EE22',
+    img:'community'
   },
 ];
 let currentIndex = 0;
@@ -75,7 +81,7 @@ const SplashScreen = () => {
   useEffect(() => {
     Storage.read('introCompleted').then(async r => {
       requestAnimationFrame(() => {
-        if (!r) {
+        if (r) {
           setVisible(true);
           timing(opacity, {
             toValue: 1,
@@ -94,7 +100,7 @@ const SplashScreen = () => {
   return (
     visible && (
       <Modal animationType="slide" statusBarTranslucent visible>
-        <Animated.View
+        <SafeAreaView
           style={{
             width: '100%',
             height: '100%',
@@ -119,8 +125,7 @@ const SplashScreen = () => {
                 onSnapToItem={i => {
                   currentIndex = i;
                 }}
-                activeAnimationType="timing"
-                shouldOptimizeUpdates
+                maxToRenderPerBatch={10}
                 renderItem={({item, index}) => (
                   <View
                     style={{
@@ -155,12 +160,14 @@ const SplashScreen = () => {
                             size={170}
                           />
                         ) : (
-                          <SvgXml
-                            xml={
+                          <SvgToPngView
+                            src={
                               item.icon
                                 ? item.icon(colors.accent)
                                 : NOTE_SVG(colors.accent)
                             }
+                            img={item.img}
+                            color={colors.accent}
                             width={250}
                             height={250}
                           />
@@ -249,7 +256,7 @@ const SplashScreen = () => {
               />
             </View>
           </Animated.View>
-        </Animated.View>
+        </SafeAreaView>
       </Modal>
     )
   );

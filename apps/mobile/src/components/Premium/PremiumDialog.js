@@ -7,14 +7,17 @@ class PremiumDialog extends React.Component {
     super(props);
     this.state = {
       visible: false,
+      promo:null
     };
     this.actionSheetRef = createRef();
   }
 
-  open() {
+  open(promoInfo) {
+    console.log(promoInfo)
     this.setState(
       {
         visible: true,
+        promo:promoInfo
       },
       () => {
         this.actionSheetRef.current?.setModalVisible(true);
@@ -35,7 +38,7 @@ class PremiumDialog extends React.Component {
   render() {
     return !this.state.visible ? null : (
       <ActionSheetWrapper onClose={this.onClose} fwdRef={this.actionSheetRef}>
-        <PremiumComponent close={this.close} />
+        <PremiumComponent promo={this.state.promo} close={this.close} />
       </ActionSheetWrapper>
     );
   }

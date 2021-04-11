@@ -26,7 +26,7 @@ export async function setSetting(settings, name, value) {
 export const scrollRef = createRef();
 export const AndroidModule = NativeModules.NNativeModule;
 
-export const getElevation = (elevation) => {
+export const getElevation = elevation => {
   return {
     elevation,
     shadowColor: 'black',
@@ -154,8 +154,9 @@ export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
   TRIAL: 1,
   BETA: 2,
-  TRIAL_EXPIRED: 3,
-  BETA_EXPIRED: 4,
+  PREMIUM: 5,
+  PREMIUM_EXPIRED: 6,
+  PREMIUM_CANCELLED: 7,
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {

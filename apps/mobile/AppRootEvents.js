@@ -322,6 +322,8 @@ export const AppRootEvents = React.memo(
           await PremiumService.setPremiumStatus();
           setLoginMessage(dispatch);
         }
+
+       
       } catch (e) {
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
@@ -336,6 +338,9 @@ export const AppRootEvents = React.memo(
         if (login) {
           eSendEvent(eCloseProgressDialog);
         }
+        let announcement = await db.announcement();
+        
+
       }
     };
 

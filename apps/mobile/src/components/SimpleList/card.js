@@ -12,6 +12,8 @@ export const Card = ({data, color}) => {
   const [state] = useTracked();
   const {selectionMode, messageBoardState} = state;
 
+
+
   return !messageBoardState.visible || selectionMode ? null : (
     <TouchableOpacity
       activeOpacity={0.8}
@@ -24,7 +26,7 @@ export const Card = ({data, color}) => {
         position: DDS.isLargeTablet() ? 'relative' : 'absolute',
         right: 0,
         top: 0,
-        zIndex: 999,
+        zIndex: 100,
         backgroundColor: messageBoardState.type === 'error' ? 'red' : color,
         width: '100%',
       }}>

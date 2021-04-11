@@ -185,8 +185,8 @@ export class DialogManager extends Component {
     eUnSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
   }
 
-  showPremiumDialog = () => {
-    this.premiumDialog.open();
+  showPremiumDialog = (prompoInfo) => {
+    this.premiumDialog.open(prompoInfo);
   };
 
   hidePremiumDialog = () => {

@@ -10,11 +10,13 @@ import Navigation from '../../services/Navigation';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
+import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
 import {sleep} from '../../utils/TimeUtils';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
+import {Announcement} from './announcement';
 import {Empty} from './empty';
 import {Footer} from './footer';
 import {Header} from './header';
@@ -69,9 +71,14 @@ const SimpleList = ({
         ),
       );
       setLoading(false);
-      setTimeout(() => {
-        setLoaded(true)
-      },Navigation.getCurrentScreen() === SettingsService.get().homepage ? 1000 : 150);
+      setTimeout(
+        () => {
+          setLoaded(true);
+        },
+        Navigation.getCurrentScreen() === SettingsService.get().homepage
+          ? 1000
+          : 150,
+      );
     }
   }, [listData, deviceMode, loading]);
 
@@ -82,14 +89,14 @@ const SimpleList = ({
     }
   };
 
-  const _onScroll = (event) => {
+  const _onScroll = event => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, y);
   };
 
   const _layoutProvider = new LayoutProvider(
-    (index) => {
+    index => {
       return dataProvider.getDataForIndex(index).type;
     },
     (type, dim) => {
@@ -230,6 +237,9 @@ const SimpleList = ({
   };
   return (
     <>
+      <Announcement
+        color={COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent}
+      />
       {loaded && !loading ? null : (
         <>
           <View
@@ -240,6 +250,11 @@ const SimpleList = ({
               backgroundColor: colors.bg,
               zIndex: 999,
             }}>
+            <Announcement
+              color={
+                COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
+              }
+            />
             <Header
               title={headerProps.heading}
               paragraph={headerProps.paragraph}
