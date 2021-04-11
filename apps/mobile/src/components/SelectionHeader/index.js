@@ -1,4 +1,5 @@
-import React from 'react';
+import React, {useEffect} from 'react';
+import {BackHandler} from 'react-native';
 import {View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
@@ -56,6 +57,20 @@ export const SelectionHeader = ({screen}) => {
       });
     }
   };
+
+  const onBackPress = () => {
+    dispatch({type: Actions.SELECTION_MODE, enabled: false});
+    dispatch({type: Actions.CLEAR_SELECTION});
+    return true;
+  };
+
+  useEffect(() => {
+    if (selectionMode) {
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    } else {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }
+  }, [selectionMode]);
 
   return !selectionMode ? null : (
     <View
