@@ -1,18 +1,20 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
+import {Image} from 'react-native';
 import {View} from 'react-native';
 import {SvgXml} from 'react-native-svg';
 import {
-  NOTE_SVG,
-  NOTEBOOK_SVG,
-  TAG_SVG,
   FAV_SVG,
-  TRASH_SVG,
-  SETTINGS_SVG,
-  SEARCH_SVG,
   LOGIN_SVG,
   LOGO_SVG,
+  NOTEBOOK_SVG,
+  NOTE_SVG,
+  SEARCH_SVG,
+  SETTINGS_SVG,
+  TAG_SVG,
+  TRASH_SVG,
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
+
 export const Placeholder = ({type, w, h, color}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -42,12 +44,44 @@ export const Placeholder = ({type, w, h, color}) => {
   };
 
   return (
+    <SvgToPngView
+      color={type === 'notes' ? color || colors.accent : colors.accent}
+      src={getSVG()}
+      img={type === 'topics' ? 'notebook' : type}
+      width={w}
+      height={h}
+    />
+  );
+};
+
+export const SvgToPngView = ({width, height, src, color, img}) => {
+  const [error, setError] = useState(false);
+
+  return (
     <View
       style={{
-        height: w || 250,
-        width: h || 250,
+        height: width || 250,
+        width: height || 250,
       }}>
-      <SvgXml xml={getSVG()} width="100%" height="100%" />
+      {error ? (
+        <SvgXml xml={src} width="100%" height="100%" />
+      ) : (
+        <Image
+          style={{
+            width: '100%',
+            height: '100%',
+          }}
+          onError={() => {
+            setError(true);
+          }}
+          source={{
+            uri: `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
+              '#',
+              '%23',
+            )}.png`,
+          }}
+        />
+      )}
     </View>
   );
 };
