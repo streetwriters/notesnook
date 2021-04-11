@@ -61,7 +61,7 @@ export const SelectionHeader = ({screen}) => {
     <View
       style={{
         width: '100%',
-        position: 'absolute',
+        position:"absolute",
         height: 50 + insets.top,
         paddingTop: insets.top,
         backgroundColor: colors.accent,

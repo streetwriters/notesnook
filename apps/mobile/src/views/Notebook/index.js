@@ -126,8 +126,9 @@ export const Notebook = ({route, navigation}) => {
 
   return (
     <>
-      <ContainerTopSection>
         <SelectionHeader screen="Notebook" />
+      <ContainerTopSection>
+      
         <Header
           title={params.title}
           isBack={!params.menu}

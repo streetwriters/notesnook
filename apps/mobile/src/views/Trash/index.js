@@ -36,7 +36,7 @@ export const Trash = ({route, navigation}) => {
       });
 
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-     
+
       updateSearch();
       ranAfterInteractions = false;
     });
@@ -97,8 +97,8 @@ export const Trash = ({route, navigation}) => {
 
   return (
     <>
+      <SelectionHeader screen="Trash" />
       <ContainerTopSection>
-        <SelectionHeader screen="Trash" />
         <Header
           title="Trash"
           isBack={false}

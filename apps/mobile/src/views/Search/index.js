@@ -52,9 +52,10 @@ export const Search = ({route, navigation}) => {
   }, []);
 
   return (
-    <>
+    <>  
+         <SelectionHeader screen="Search" />
       <ContainerTopSection>
-        <SelectionHeader screen="Search" />
+     
         <Header title="Search" isBack={true} screen="Search" />
       </ContainerTopSection>
       <SimpleList

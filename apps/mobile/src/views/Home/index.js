@@ -114,8 +114,8 @@ export const Home = ({route, navigation}) => {
 
   return (
     <>
+      <SelectionHeader screen="Notes" />
       <ContainerTopSection>
-        <SelectionHeader screen="Notes" />
         <Header
           title="Notes"
           isBack={false}

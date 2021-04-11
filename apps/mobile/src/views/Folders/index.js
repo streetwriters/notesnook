@@ -100,8 +100,9 @@ export const Folders = ({route, navigation}) => {
 
   return (
     <>
+            <SelectionHeader   screen="Notebooks" />
        <ContainerTopSection>
-       <SelectionHeader   screen="Notebooks" />
+ 
         <Header
           title="Notebooks"
           isBack={false}

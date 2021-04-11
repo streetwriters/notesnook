@@ -260,8 +260,9 @@ export const Notes = ({route, navigation}) => {
 
   return (
     <>
+           <SelectionHeader screen="NotesPage" />
       <ContainerTopSection>
-        <SelectionHeader screen="NotesPage" />
+   
         <Header
           title={headerProps.heading}
           isBack={!params.menu}

@@ -98,8 +98,9 @@ export const Favorites = ({route, navigation}) => {
 
   return (
     <>
-      <ContainerTopSection>
         <SelectionHeader screen="Favorites" />
+      <ContainerTopSection>
+      
         <Header title="Favorites" isBack={false} screen="Favorites" />
       </ContainerTopSection>
       <SimpleList

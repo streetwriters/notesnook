@@ -90,9 +90,10 @@ export const Tags = ({route, navigation}) => {
   };
 
   return (
-    <>
-      <ContainerTopSection>
+    <>  
         <SelectionHeader screen="Tags" />
+      <ContainerTopSection>
+      
         <Header title="Tags" isBack={false} screen="Tags" />
       </ContainerTopSection>
       <SimpleList
