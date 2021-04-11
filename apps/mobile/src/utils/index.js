@@ -1,5 +1,9 @@
 import {createRef} from 'react';
-import {Dimensions, NativeModules, Platform} from 'react-native';
+import {
+  Dimensions,
+  NativeModules,
+  Platform,
+} from 'react-native';
 import RNTooltips from 'react-native-tooltips';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {dummyRef} from '../components/DummyText';
@@ -11,7 +15,7 @@ import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 
 export const InteractionManager = {
-  runAfterInteractions: (func, time = 150) => setTimeout(func, time),
+  runAfterInteractions: (func, time = 400) => setTimeout(func, time),
 };
 
 export const APP_VERSION = 1350;
@@ -68,6 +72,7 @@ export const selection = {
 
 export const history = {
   selectedItemsList: [],
+  selectionMode: false,
 };
 
 export async function showContext(event, title) {

@@ -1,16 +1,19 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import React, {useCallback, useEffect, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/DB';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
+import {InteractionManager, scrollRef} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
+import {Header} from '../../components/Header/index';
+import SelectionHeader from '../../components/SelectionHeader';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
@@ -93,8 +96,6 @@ export const Home = ({route, navigation}) => {
   }, [notes]);
 
   const updateSearch = () => {
-
-    
     SearchService.update({
       placeholder: 'Type a keyword to search in notes',
       data: db?.notes?.all,
@@ -104,7 +105,6 @@ export const Home = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = async () => {
-
     if (!DDS.isLargeTablet()) {
       tabBarRef.current?.goToPage(1);
     } else {
@@ -114,12 +114,23 @@ export const Home = ({route, navigation}) => {
 
   return (
     <>
+      <ContainerTopSection>
+        <SelectionHeader screen="Notes" />
+        <Header
+          title="Notes"
+          isBack={false}
+          screen="Notes"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
+
       <SimpleList
         listData={notes}
         scrollRef={scrollRef}
         type="notes"
         isHome={true}
         pinned={true}
+        screen="Notes"
         loading={loading || localLoad}
         sortMenuButton={true}
         headerProps={{

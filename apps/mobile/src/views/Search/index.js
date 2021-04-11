@@ -1,4 +1,7 @@
 import React, {useCallback, useEffect} from 'react';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -48,13 +51,16 @@ export const Search = ({route, navigation}) => {
     };
   }, []);
 
-  
-
   return (
     <>
+      <ContainerTopSection>
+        <SelectionHeader screen="Search" />
+        <Header title="Search" isBack={true} screen="Search" />
+      </ContainerTopSection>
       <SimpleList
         listData={searchResults}
         type="search"
+        screen="Search"
         focused={() => navigation.isFocused()}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
@@ -68,7 +74,7 @@ export const Search = ({route, navigation}) => {
               SearchService.getSearchInformation().title
             }`,
           button: null,
-          loading:"Searching..."
+          loading: 'Searching...',
         }}
       />
     </>

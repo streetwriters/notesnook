@@ -1,8 +1,7 @@
 import React, {createRef, useCallback, useEffect, useState} from 'react';
-import {Linking} from 'react-native';
 import {
   Appearance,
-  InteractionManager,
+  Linking,
   Platform,
   ScrollView,
   TouchableOpacity,
@@ -13,10 +12,12 @@ import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
+import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
@@ -42,10 +43,8 @@ import SettingsService from '../../services/SettingsService';
 import {
   AndroidModule,
   APP_VERSION,
-  dWidth,
-  getElevation,
+  InteractionManager,
   MenuItemsList,
-  setSetting,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
@@ -75,7 +74,7 @@ import {sleep, timeConverter} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
-const format = (ver) => {
+const format = ver => {
   let parts = ver.toString().split('');
   return `v${parts[0]}.${parts[1]}.${parts[2]}${
     parts[3] === '0' ? '' : parts[3]
@@ -86,20 +85,11 @@ export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [version, setVersion] = useState(null);
-
+  const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
     eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
-    if (DDS.isLargeTablet()) {
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: null,
-        },
-      });
-    }
-
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
       data: [],
@@ -125,13 +115,16 @@ export const Settings = ({navigation}) => {
   }, []);
 
   useEffect(() => {
-    navigation.addListener('focus', onFocus);
-    db.version()
-      .then((ver) => {
-        console.log(ver, 'VERSION');
-        setVersion(ver);
-      })
-      .catch((e) => console.log(e, 'VER'));
+    InteractionManager.runAfterInteractions(() => {
+      setLoading(false);
+      navigation.addListener('focus', onFocus);
+      db.version()
+        .then(ver => {
+          console.log(ver, 'VERSION');
+          setVersion(ver);
+        })
+        .catch(e => console.log(e, 'VER'));
+    });
 
     return () => {
       pageIsLoaded = false;
@@ -243,47 +236,61 @@ export const Settings = ({navigation}) => {
   ];
 
   return (
-    <View
-      style={{
-        height: '100%',
-        backgroundColor: colors.bg,
-      }}>
-      <ScrollView
-        onScroll={(e) =>
-          eSendEvent(eScrollEvent, e.nativeEvent.contentOffset.y)
-        }
-        scrollEventThrottle={1}
+    <>
+      <ContainerTopSection>
+        <TopHeader title="Settings" isBack={false} screen="Settings" />
+      </ContainerTopSection>
+      <View
         style={{
-          paddingHorizontal: 0,
+          height: '100%',
+          backgroundColor: colors.bg,
         }}>
-        {!DDS.isLargeTablet() && (
-          <Header title="Settings" type="settings" messageCard={false} />
-        )}
-        <SettingsUserSection />
-        <SettingsAppearanceSection />
-        <SettingsPrivacyAndSecurity />
-        <SettingsBackupAndRestore />
-
-        <SectionHeader title="Other" />
-
-        {otherItems.map((item) => (
-          <CustomButton
-            key={item.name}
-            title={item.name}
-            tagline={item.desc}
-            onPress={item.func}
-          />
-        ))}
-
-        <AccoutLogoutSection />
-
-        <View
+        <ScrollView
+          onScroll={e =>
+            eSendEvent(eScrollEvent, {
+              y:e.nativeEvent.contentOffset.y,
+              screen:"Settings"
+            })
+          }
+          scrollEventThrottle={1}
           style={{
-            height: 400,
-          }}
-        />
-      </ScrollView>
-    </View>
+            paddingHorizontal: 0,
+          }}>
+          {!DDS.isLargeTablet() && (
+            <Header title="Settings" type="settings" messageCard={false} />
+          )}
+
+          <SettingsUserSection />
+          <SettingsAppearanceSection />
+
+          {!loading && (
+            <>
+              <SettingsPrivacyAndSecurity />
+              <SettingsBackupAndRestore />
+            </>
+          )}
+
+          <SectionHeader title="Other" />
+
+          {otherItems.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+            />
+          ))}
+
+          <AccoutLogoutSection />
+
+          <View
+            style={{
+              height: 400,
+            }}
+          />
+        </ScrollView>
+      </View>
+    </>
   );
 };
 
@@ -386,7 +393,7 @@ const AccoutLogoutSection = () => {
 
               <Input
                 placeholder="Enter account password"
-                onChangeText={(v) => {
+                onChangeText={v => {
                   passwordValue = v;
                 }}
                 secureTextEntry={true}
@@ -543,7 +550,7 @@ const SettingsUserSection = () => {
       type: 5,
     },
   }; */
-  const getTimeLeft = (t2) => {
+  const getTimeLeft = t2 => {
     let d1 = new Date(Date.now());
     let d2 = new Date(t2);
     let diff = d2.getTime() - d1.getTime();
@@ -816,7 +823,7 @@ const SettingsUserSection = () => {
               },
               desc: 'Setup a new password for your account.',
             },
-          ].map((item) => (
+          ].map(item => (
             <CustomButton
               key={item.name}
               title={item.name}
@@ -920,7 +927,7 @@ const SettingsAppearanceSection = () => {
           '#FF1744',
           '#B71C1C',
           '#ffadad',
-        ].map((item) => (
+        ].map(item => (
           <PressableButton
             key={item}
             customColor={
@@ -1078,7 +1085,7 @@ const SettingsPrivacyAndSecurity = () => {
 
   const checkVaultStatus = useCallback(() => {
     InteractionManager.runAfterInteractions(() => {
-      db.vault.exists().then(async (r) => {
+      db.vault.exists().then(async r => {
         let available = await BiometricService.isBiometryAvailable();
         let fingerprint = await BiometricService.hasInternetCredentials();
 
@@ -1134,7 +1141,7 @@ const SettingsPrivacyAndSecurity = () => {
               paragraph="Select the level of security you want to enable."
             />
             <Seperator />
-            {modes.map((item) => (
+            {modes.map(item => (
               <PressableButton
                 type={
                   settings.appLockMode === item.value ? 'accent' : 'transparent'
@@ -1316,7 +1323,7 @@ const SettingsBackupAndRestore = () => {
     <>
       <SectionHeader title="Backup & restore" />
 
-      {backupItemsList.map((item) => (
+      {backupItemsList.map(item => (
         <CustomButton
           key={item.name}
           title={item.name}
@@ -1373,7 +1380,7 @@ const SettingsBackupAndRestore = () => {
               title: 'Weekly',
               value: 'weekly',
             },
-          ].map((item) => (
+          ].map(item => (
             <TouchableOpacity
               activeOpacity={1}
               onPress={async () => {

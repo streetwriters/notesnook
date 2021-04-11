@@ -19,7 +19,6 @@ const run = async (context = 'global') => {
       context: context,
     });
   } catch (e) {
-    console.log(e);
     if (e.message === 'You need to login to sync.') {
       ToastEvent.show({
         heading:"Enable sync",

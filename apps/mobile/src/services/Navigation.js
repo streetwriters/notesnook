@@ -9,7 +9,6 @@ import SettingsService from './SettingsService';
 let currentScreen = 'Notes';
 let homeLoaded = false;
 
-
 function getHomeLoaded() {
   return homeLoaded;
 }
@@ -47,8 +46,8 @@ function getHeaderState() {
 
 function clearRouteFromUpdates(routeName) {
   if (routesToUpdate.indexOf(routeName) !== -1) {
-  routesToUpdate = [...new Set(routesToUpdate)]
-  routesToUpdate.splice(routesToUpdate.indexOf(routeName), 1);
+    routesToUpdate = [...new Set(routesToUpdate)];
+    routesToUpdate.splice(routesToUpdate.indexOf(routeName), 1);
   }
 }
 
@@ -60,19 +59,18 @@ function routeNeedsUpdate(routeName, callback) {
 }
 
 /**
- * 
- * @param {array} routes 
+ *
+ * @param {array} routes
  */
 function setRoutesToUpdate(routes) {
-
-  console.log(currentScreen, "current");
+  console.log(currentScreen, 'current');
   if (routes.indexOf(currentScreen) > -1) {
     console.log('updating screen', currentScreen);
     if (
-      currentScreen === routeNames.NotesPage||
+      currentScreen === routeNames.NotesPage ||
       currentScreen === routeNames.Notebook
     ) {
-        console.log(currentScreen ,"CURRENT");
+      console.log(currentScreen, 'CURRENT');
       eSendEvent(
         currentScreen === routeNames.NotesPage
           ? refreshNotesPage
@@ -124,7 +122,7 @@ function setHeaderState(name, params, item) {
   headerState.currentScreen = name;
   headerState.verticalMenu = params.menu;
   if (headerState) {
-    eSendEvent('onHeaderStateChange', {...headerState});
+    eSendEvent('onHeaderStateChange', {id: headerState.id});
   }
 }
 
@@ -133,15 +131,13 @@ function goBack() {
 }
 
 function push(name, params, item) {
-  currentScreen = name;
   setHeaderState(name, params, item);
   rootNavigatorRef.current?.dispatch(StackActions.push(name, params));
 }
 
 function replace(name, params, item) {
-  currentScreen = name;
   setHeaderState(name, params, item);
-  rootNavigatorRef.current?.dispatch(StackActions.replace(name,params));
+  rootNavigatorRef.current?.dispatch(StackActions.replace(name, params));
 }
 
 function popToTop() {
@@ -181,5 +177,5 @@ export default {
   routeNeedsUpdate,
   routeNames,
   getHomeLoaded,
-  setHomeLoaded
+  setHomeLoaded,
 };

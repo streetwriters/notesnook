@@ -3,7 +3,7 @@ import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import { Header } from '../Header';
 
-export const ContainerTopSection = ({root}) => {
+export const ContainerTopSection = ({children}) => {
   const [state] = useTracked();
   const {colors, selectionMode} = state;
 
@@ -20,7 +20,7 @@ export const ContainerTopSection = ({root}) => {
           },
         ],
       }}>
-      <Header root={root} />
+      {children}
     </View>
   );
 };
