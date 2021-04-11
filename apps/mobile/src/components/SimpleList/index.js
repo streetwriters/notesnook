@@ -237,9 +237,6 @@ const SimpleList = ({
   };
   return (
     <>
-      <Announcement
-        color={COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent}
-      />
       {loaded && !loading ? null : (
         <>
           <View
@@ -250,11 +247,6 @@ const SimpleList = ({
               backgroundColor: colors.bg,
               zIndex: 999,
             }}>
-            <Announcement
-              color={
-                COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
-              }
-            />
             <Header
               title={headerProps.heading}
               paragraph={headerProps.paragraph}
@@ -269,17 +261,24 @@ const SimpleList = ({
       )}
 
       {_loading ? null : (
-        <RecyclerListView
-          ref={scrollRef}
-          layoutProvider={_layoutProvider}
-          dataProvider={dataProvider}
-          rowRenderer={_renderRow}
-          onScroll={_onScroll}
-          canChangeSize={true}
-          renderFooter={listData.length === 0 ? null : Footer}
-          scrollViewProps={scrollProps}
-          style={styles}
-        />
+        <>
+          <Announcement
+            color={
+              COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
+            }
+          />
+          <RecyclerListView
+            ref={scrollRef}
+            layoutProvider={_layoutProvider}
+            dataProvider={dataProvider}
+            rowRenderer={_renderRow}
+            onScroll={_onScroll}
+            canChangeSize={true}
+            renderFooter={listData.length === 0 ? null : Footer}
+            scrollViewProps={scrollProps}
+            style={styles}
+          />
+        </>
       )}
     </>
   );
