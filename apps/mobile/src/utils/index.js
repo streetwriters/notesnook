@@ -13,6 +13,78 @@ import {eSendEvent} from '../services/EventManager';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
+import FastImage from "react-native-fast-image";
+const imgNames = [
+    "favorites",
+    "notes",
+    "notebooks",
+    "tags",
+    "trash",
+    "login",
+    "welcome",
+    "vault",
+    "accent",
+    "settings",
+    "backup",
+    "community",
+    "export",
+    "organize",
+    "privacy",
+    "sync",
+    "richtext",
+
+];
+const BaseURI = (img,color) => `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
+  '#',
+  '%23',
+)}.png`
+
+
+
+const allColors = [
+  "#00c853",
+  "#FF5722",
+  "#FFA000",
+  "#1B5E20",
+  "#01c352",
+  "#757575",
+  "#0560ff",
+  "#009688",
+  "#2196F3",
+  "#880E4F",
+  "#9C27B0",
+  "#9381ff",
+  "#FF1744",
+  "#B71C1C",
+  "#ffadad",
+];
+
+const noteColors = [
+  "#f44336",
+  "#FF9800",
+  "#FFD600",
+  "#4CAF50",
+  "#2196F3",
+  "#673AB7",
+  "#9E9E9E",
+],
+
+export function preloadImages(color) {
+  let uri = imgNames.map(name => {
+    return {
+      uri:BaseURI(name,color)
+    }
+  });
+  uri.concat(noteColors.map(color => {
+    return {
+      uri:BaseURI("notes",color)
+    }
+  }))
+  console.log(uri);
+  FastImage.preload(uri)
+}
+
+
 
 export const InteractionManager = {
   runAfterInteractions: (func, time = 400) => setTimeout(func, time),

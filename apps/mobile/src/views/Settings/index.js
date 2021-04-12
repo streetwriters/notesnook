@@ -45,6 +45,7 @@ import {
   APP_VERSION,
   InteractionManager,
   MenuItemsList,
+  preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
@@ -944,6 +945,7 @@ const SettingsAppearanceSection = () => {
             onPress={async () => {
               await PremiumService.verify(async () => {
                 changeAccentColor(item);
+                preloadImages(item);
                 await MMKV.setStringAsync('accentColor', item);
               });
             }}

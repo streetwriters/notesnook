@@ -86,7 +86,7 @@ export function setColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     COLOR_SCHEME.night ? 'light-content' : 'dark-content',
     true,
   );
-
+    
   if (Platform.OS === 'android') {
     AndroidModule.setBackgroundColor(COLOR_SCHEME.bg);
     StatusBar.setBackgroundColor('transparent', true);
