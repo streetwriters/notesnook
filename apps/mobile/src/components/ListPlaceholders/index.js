@@ -14,7 +14,7 @@ import {
   TRASH_SVG,
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
-
+import FastImage from 'react-native-fast-image'
 export const Placeholder = ({type, w, h, color}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -66,7 +66,7 @@ export const SvgToPngView = ({width, height, src, color, img}) => {
       {error ? (
         <SvgXml xml={src} width="100%" height="100%" />
       ) : (
-        <Image
+        <FastImage
           style={{
             width: '100%',
             height: '100%',
@@ -74,11 +74,12 @@ export const SvgToPngView = ({width, height, src, color, img}) => {
           onError={() => {
             setError(true);
           }}
+          
           source={{
             uri: `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
               '#',
               '%23',
-            )}.png`,
+            )}.png`, cache:"immutable",priority:"high"
           }}
         />
       )}

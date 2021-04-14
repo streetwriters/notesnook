@@ -81,7 +81,7 @@ const SplashScreen = () => {
   useEffect(() => {
     Storage.read('introCompleted').then(async r => {
       requestAnimationFrame(() => {
-        if (r) {
+        if (!r) {
           setVisible(true);
           timing(opacity, {
             toValue: 1,

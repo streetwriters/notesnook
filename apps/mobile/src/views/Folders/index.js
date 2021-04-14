@@ -11,6 +11,9 @@ import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
 import {InteractionManager} from '../../utils';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -97,9 +100,20 @@ export const Folders = ({route, navigation}) => {
 
   return (
     <>
+            <SelectionHeader   screen="Notebooks" />
+       <ContainerTopSection>
+ 
+        <Header
+          title="Notebooks"
+          isBack={false}
+          screen="Notesbooks"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={notebooks}
         type="notebooks"
+        screen="Notebooks"
         focused={() => navigation.isFocused()}
         loading={loading}
         placeholderData={{

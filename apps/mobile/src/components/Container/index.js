@@ -1,11 +1,10 @@
 import React from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView} from 'react-native';
+import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTracked } from '../../provider';
-import { getElevation } from '../../utils';
 import { ContainerScale } from '../../utils/Animations';
 import SelectionHeader from '../SelectionHeader';
-import {ContainerTopSection} from './ContainerTopSection';
+import { ContainerTopSection } from './ContainerTopSection';
 const AnimatedView = Animated.createAnimatedComponent(SafeAreaView);
 export const Container = ({children, root}) => {
   const [state] = useTracked();
@@ -30,8 +29,7 @@ export const Container = ({children, root}) => {
             }
           ]
         }}>
-        <SelectionHeader />
-        <ContainerTopSection root={root} />
+      
         {children}
       </AnimatedView>
     </KeyboardAvoidingView>

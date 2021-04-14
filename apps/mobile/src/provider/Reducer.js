@@ -8,14 +8,10 @@ import {defaultState} from './DefaultState';
 
 export const reducer = (state, action) => {
   switch (action.type) {
-
     case Actions.ALL: {
       return {
         ...state,
-        notes: db.notes.group(
-          SORT[sortSettings.sort],
-          sortSettings.sortOrder,
-        ),
+        notes: db.notes.group(SORT[sortSettings.sort], sortSettings.sortOrder),
         notebooks: db.notebooks.all,
         trash: db.trash.all,
         tags: db.tags.all,
@@ -56,10 +52,7 @@ export const reducer = (state, action) => {
     case Actions.NOTES:
       return {
         ...state,
-        notes: db.notes.group(
-          SORT[sortSettings.sort],
-          sortSettings.sortOrder,
-        )
+        notes: db.notes.group(SORT[sortSettings.sort], sortSettings.sortOrder),
       };
     case Actions.THEME: {
       return {
@@ -134,7 +127,7 @@ export const reducer = (state, action) => {
       } else {
         eSendEvent(eOpenSideMenu);
       }
-
+      history.selectionMode = action.enabled;
       return {
         ...state,
         selectionMode: action.enabled,
@@ -157,15 +150,18 @@ export const reducer = (state, action) => {
       if (selectedItems.length === 0) {
         eSendEvent(eOpenSideMenu);
       }
+      history.selectionMode =
+        selectedItems.length > 0 ? state.selectionMode : false;
       return {
         ...state,
         selectedItemsList: selectedItems,
-        selectionMode: selectedItems.length > 0 ? state.selectionMode : false,
+        selectionMode: history.selectionMode,
       };
     }
     case Actions.CLEAR_SELECTION: {
       history.selectedItemsList = [];
       eSendEvent(eOpenSideMenu);
+      history.selectionMode = false;
       return {
         ...state,
         selectedItemsList: [],
@@ -280,7 +276,7 @@ export const reducer = (state, action) => {
       return {
         ...state,
         searching: action.searching.isSearching,
-        searchStatus:action.searching.status
+        searchStatus: action.searching.status,
       };
     }
     case Actions.PREMIUM: {

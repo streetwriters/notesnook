@@ -1,5 +1,8 @@
 import React, {useCallback, useEffect} from 'react';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
 import {Placeholder} from '../../components/ListPlaceholders';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -7,7 +10,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager } from '../../utils';
+import {InteractionManager} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -17,16 +20,16 @@ export const Favorites = ({route, navigation}) => {
   let pageIsLoaded = false;
 
   let ranAfterInteractions = false;
- 
+
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       if (localLoad) {
         setLocalLoad(false);
       }
 
-      Navigation.routeNeedsUpdate('Favorites',() => {
-        dispatch({type:Actions.FAVORITES})
-      })
+      Navigation.routeNeedsUpdate('Favorites', () => {
+        dispatch({type: Actions.FAVORITES});
+      });
 
       eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
       updateSearch();
@@ -94,26 +97,34 @@ export const Favorites = ({route, navigation}) => {
   };
 
   return (
-    <SimpleList
-      listData={favorites}
-      type="notes"
-      refreshCallback={() => {
-        dispatch({type: Actions.FAVORITES});
-      }}
-      loading={loading || localLoad}
-      placeholderData={{
-        heading: 'Your favorites',
-        paragraph: 'You have not added any notes to favorites yet.',
-        button: null,
-        loading: 'Loading your favorites',
-      }}
-      headerProps={{
-        heading: 'Favorites',
-      }}
-      focused={() => navigation.isFocused()}
-      placeholder={<Placeholder type="favorites" />}
-      placeholderText="Notes you favorite appear here"
-    />
+    <>
+        <SelectionHeader screen="Favorites" />
+      <ContainerTopSection>
+      
+        <Header title="Favorites" isBack={false} screen="Favorites" />
+      </ContainerTopSection>
+      <SimpleList
+        listData={favorites}
+        type="notes"
+        refreshCallback={() => {
+          dispatch({type: Actions.FAVORITES});
+        }}
+        screen="Favorites"
+        loading={loading || localLoad}
+        placeholderData={{
+          heading: 'Your favorites',
+          paragraph: 'You have not added any notes to favorites yet.',
+          button: null,
+          loading: 'Loading your favorites',
+        }}
+        headerProps={{
+          heading: 'Favorites',
+        }}
+        focused={() => navigation.isFocused()}
+        placeholder={<Placeholder type="favorites" />}
+        placeholderText="Notes you favorite appear here"
+      />
+    </>
   );
 };
 

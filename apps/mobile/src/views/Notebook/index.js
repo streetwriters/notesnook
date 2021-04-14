@@ -1,32 +1,33 @@
-import React, {useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import React, { useEffect, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {db} from '../../utils/DB';
+import { InteractionManager } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eScrollEvent,
+  eScrollEvent
 } from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
 
 export const Notebook = ({route, navigation}) => {
   const [topics, setTopics] = useState(route.params.notebook.topics);
   const [loading, setLoading] = useState(true);
   let params = route.params;
   let pageIsLoaded = false;
-
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 150) => {
+  const runAfterInteractions = (time = 400) => {
     InteractionManager.runAfterInteractions(() => {
       let notebook = db.notebooks.notebook(params.notebook?.id).data;
       params.notebook = notebook;
@@ -36,14 +37,14 @@ export const Notebook = ({route, navigation}) => {
         if (loading) {
           setLoading(false);
         }
-      },10)
+      }, 10);
       Navigation.routeNeedsUpdate('Notebook', () => {
         onLoad();
       });
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: false,
+          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
@@ -56,13 +57,13 @@ export const Notebook = ({route, navigation}) => {
       ranAfterInteractions = false;
     }, time);
   };
-  const onLoad = (data) => {
+  const onLoad = data => {
     if (data) {
       setLoading(true);
       params = data;
     }
 
-    runAfterInteractions(data ? 150 : 1);
+    runAfterInteractions(data ? 400 : 1);
   };
 
   useEffect(() => {
@@ -125,12 +126,23 @@ export const Notebook = ({route, navigation}) => {
 
   return (
     <>
+        <SelectionHeader screen="Notebook" />
+      <ContainerTopSection>
+      
+        <Header
+          title={params.title}
+          isBack={!params.menu}
+          screen="Notebook"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={topics}
         type="topics"
         refreshCallback={() => {
           onLoad();
         }}
+        screen="Notebook"
         headerProps={{
           heading: params.title,
           paragraph: 'Edit notebook',

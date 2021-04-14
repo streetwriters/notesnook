@@ -1,6 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -32,7 +35,7 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 150) => {
+  const runAfterInteractions = (time = 400) => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('NotesPage', () => {
         init();
@@ -61,7 +64,7 @@ export const Notes = ({route, navigation}) => {
       }
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: false,
+          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
@@ -128,7 +131,7 @@ export const Notes = ({route, navigation}) => {
     setActionAfterFirstSave();
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
-      runAfterInteractions(data ? 150 : 1);
+      runAfterInteractions(data ? 400 : 1);
     }
 
     if (!pageIsLoaded) {
@@ -257,9 +260,20 @@ export const Notes = ({route, navigation}) => {
 
   return (
     <>
+           <SelectionHeader screen="NotesPage" />
+      <ContainerTopSection>
+   
+        <Header
+          title={headerProps.heading}
+          isBack={!params.menu}
+          screen="NotesPage"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={notes}
         type="notes"
+        screen="NotesPage"
         refreshCallback={_refreshCallback}
         headerProps={headerProps}
         loading={loading || localLoad}

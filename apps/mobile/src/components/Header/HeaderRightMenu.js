@@ -1,19 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import React from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
-import {dWidth} from '../../utils';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 
 export const HeaderRightMenu = ({currentScreen}) => {
   const [state] = useTracked();
-  const {colors, containerBottomButton, syncing} = state;
- 
+  const {colors, syncing} = state;
+
   return (
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
@@ -33,11 +31,9 @@ export const HeaderRightMenu = ({currentScreen}) => {
         />
       )}
 
-      {DDS.isLargeTablet() && containerBottomButton.onPress ? (
+      {DDS.isLargeTablet() ? (
         <Button
-          onPress={() => {
-            containerBottomButton.onPress();
-          }}
+          onPress={action}
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}

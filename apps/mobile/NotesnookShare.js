@@ -8,9 +8,9 @@ import {
   Text,
   TouchableOpacity,
   View,
+  ScrollView, 
+  TextInput
 } from 'react-native';
-import {ScrollView, TextInput} from 'react-native-gesture-handler';
-
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {SIZE} from './src/utils/SizeUtils';
