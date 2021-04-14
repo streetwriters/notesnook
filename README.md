@@ -6,9 +6,10 @@ We use best-in-class encryption algorithms **XChaCha20-Poly1305** & **Argon2** t
 #
 <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Download on Google Play" width="200"/>
 <img src="https://developer.apple.com/app-store/marketing/guidelines/images/badge-download-on-the-app-store.svg" alt="Download on App Store®" width="200"/>
-Try the [web app](https://app.notesnook.com).
-Read our [roadmap](https://github.com/ammarahm-ed/notesnook/edit/main/ROADMAP.md)
-Join our community on [Discord](https://discord.com/invite/zQBK97EE22) to talk to us.
+
+Try the [web app](https://app.notesnook.com).<br/>
+Read our [roadmap](https://github.com/ammarahm-ed/notesnook/edit/main/ROADMAP.md).<br/>
+Join our community on [Discord](https://discord.com/invite/zQBK97EE22) to talk to us.<br/>
 #
 <sup>1</sup>Google Play and the Google Play logo are trademarks of Google LLC.<br/>
 <sup>2</sup>Apple logo® is a trademark of Apple Inc.
