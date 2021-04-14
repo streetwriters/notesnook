@@ -1,14 +1,15 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
-import { Placeholder } from '../ListPlaceholders';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
+import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import { Card } from './card';
+import {Announcement} from './announcement';
+import {Card} from './card';
 
 export const Header = ({
   type,
@@ -103,7 +104,7 @@ export const Header = ({
               fontSize={SIZE.sm}
               onPress={onPress}
             />
-          ): null}
+          ) : null}
         </View>
       </View>
     </View>

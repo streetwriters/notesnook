@@ -9,12 +9,81 @@ import {eSendEvent} from '../services/EventManager';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
+import FastImage from 'react-native-fast-image';
+const imgNames = [
+  'favorites',
+  'notes',
+  'notebooks',
+  'tags',
+  'trash',
+  'login',
+  'welcome',
+  'vault',
+  'accent',
+  'settings',
+  'backup',
+  'community',
+  'export',
+  'organize',
+  'privacy',
+  'sync',
+  'richtext',
+];
+const BaseURI = (img, color) =>
+  `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
+    '#',
+    '%23',
+  )}.png`;
+
+const allColors = [
+  '#00c853',
+  '#FF5722',
+  '#FFA000',
+  '#1B5E20',
+  '#01c352',
+  '#757575',
+  '#0560ff',
+  '#009688',
+  '#2196F3',
+  '#880E4F',
+  '#9C27B0',
+  '#9381ff',
+  '#FF1744',
+  '#B71C1C',
+  '#ffadad',
+];
+
+const noteColors = [
+  '#f44336',
+  '#FF9800',
+  '#FFD600',
+  '#4CAF50',
+  '#2196F3',
+  '#673AB7',
+  '#9E9E9E',
+];
+
+export function preloadImages(color) {
+  let uri = imgNames.map(name => {
+    return {
+      uri: BaseURI(name, color),
+    };
+  });
+  uri.concat(
+    noteColors.map(color => {
+      return {
+        uri: BaseURI('notes', color),
+      };
+    }),
+  );
+  FastImage.preload(uri);
+}
 
 export const InteractionManager = {
-  runAfterInteractions: (func, time = 150) => setTimeout(func, time),
+  runAfterInteractions: (func, time = 400) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1350;
+export const APP_VERSION = 1360;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -26,7 +95,7 @@ export async function setSetting(settings, name, value) {
 export const scrollRef = createRef();
 export const AndroidModule = NativeModules.NNativeModule;
 
-export const getElevation = (elevation) => {
+export const getElevation = elevation => {
   return {
     elevation,
     shadowColor: 'black',
@@ -68,6 +137,7 @@ export const selection = {
 
 export const history = {
   selectedItemsList: [],
+  selectionMode: false,
 };
 
 export async function showContext(event, title) {
@@ -154,8 +224,9 @@ export const SUBSCRIPTION_STATUS = {
   BASIC: 0,
   TRIAL: 1,
   BETA: 2,
-  TRIAL_EXPIRED: 3,
-  BETA_EXPIRED: 4,
+  PREMIUM: 5,
+  PREMIUM_EXPIRED: 6,
+  PREMIUM_CANCELLED: 7,
 };
 
 export const SUBSCRIPTION_STATUS_STRINGS = {

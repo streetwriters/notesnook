@@ -1,5 +1,8 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {Dimensions} from 'react-native';
 import {Platform, ScrollView, TextInput} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
@@ -9,6 +12,7 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
+import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
@@ -44,12 +48,12 @@ const Editor = React.memo(
     const [state] = useTracked();
     const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
+    const insets = useSafeAreaInsets();
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    const onResetRequested = async (noload) => {
-      
+    const onResetRequested = async noload => {
       setResetting(true);
       await sleep(30);
       setResetting(false);
@@ -67,6 +71,8 @@ const Editor = React.memo(
       };
     }, []);
 
+    const CustomView = Platform.OS === 'ios' ? ScrollView : View;
+
     return resetting ? null : (
       <>
         <TextInput
@@ -74,7 +80,14 @@ const Editor = React.memo(
           style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
           blurOnSubmit={false}
         />
-        <ScrollView
+
+        <CustomView
+          style={{
+            height: '100%',
+            width:"100%",
+            paddingBottom: Platform.OS === 'android' ? normalize(50) + 5 : null,
+          
+          }}
           bounces={false}
           bouncesZoom={false}
           disableScrollViewPanResponder
@@ -82,10 +95,6 @@ const Editor = React.memo(
           keyboardShouldPersistTaps="always"
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
-          style={{
-            height: '100%',
-            width: '100%',
-          }}
           nestedScrollEnabled
           contentContainerStyle={{
             width: '100%',
@@ -97,7 +106,7 @@ const Editor = React.memo(
             ref={EditorWebView}
             onLoad={onLoad}
             scrollEnabled={true}
-            onRenderProcessGone={(event) => {
+            onRenderProcessGone={event => {
               onResetRequested();
             }}
             javaScriptEnabled={true}
@@ -120,7 +129,7 @@ const Editor = React.memo(
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
-        </ScrollView>
+        </CustomView>
         <EditorToolbar />
       </>
     );

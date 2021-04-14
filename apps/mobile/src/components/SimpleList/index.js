@@ -1,5 +1,4 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
 import {RefreshControl, useWindowDimensions} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
@@ -8,11 +7,13 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
+import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
+import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
+import {Announcement} from './announcement';
 import {Empty} from './empty';
 import {Footer} from './footer';
 import {Header} from './header';
@@ -22,6 +23,10 @@ const header = {
   type: 'MAIN_HEADER',
 };
 
+const empty = {
+  type: 'empty',
+};
+
 const SimpleList = ({
   listData,
   type,
@@ -29,23 +34,23 @@ const SimpleList = ({
   customRefreshing,
   refreshCallback,
   sortMenuButton,
-  scrollRef,
   jumpToDialog,
   placeholderData,
   loading,
   headerProps = {
     heading: 'Home',
   },
+  screen
 }) => {
   const [state] = useTracked();
   const {colors, deviceMode, messageBoardState} = state;
-  const [_loading, setLoading] = useState(true);
-  const [loaded, setLoaded] = useState(false);
+  const [_loading, _setLoading] = useState(true);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }),
+    }).cloneWithRows([header, empty]),
   );
+  const scrollRef = useRef();
 
   const insets = useSafeAreaInsets();
   const {width, fontScale} = useWindowDimensions();
@@ -53,21 +58,20 @@ const SimpleList = ({
   const dataType = type;
 
   useEffect(() => {
-    if (loading) {
-      setDataProvider(dataProvider.cloneWithRows([header, {type: 'empty'}]));
-      setLoaded(false);
-    }
-
     if (!loading) {
       setDataProvider(
         dataProvider.cloneWithRows(
           !listData || listData.length === 0
-            ? [header, {type: 'empty'}]
+            ? [header, empty]
             : [header].concat(listData),
         ),
       );
-      setLoading(false);
-      sleep(100).then(() => setLoaded(true));
+      setTimeout(() => {
+        _setLoading(false);
+      }, 500);
+    } else {
+      _setLoading(true);
+      setDataProvider(dataProvider.cloneWithRows([header, empty]));
     }
   }, [listData, deviceMode, loading]);
 
@@ -78,14 +82,17 @@ const SimpleList = ({
     }
   };
 
-  const _onScroll = (event) => {
+  const _onScroll = event => {
     if (!event) return;
     let y = event.nativeEvent.contentOffset.y;
-    eSendEvent(eScrollEvent, y);
+    eSendEvent(eScrollEvent, {
+      y,
+      screen
+    });
   };
 
   const _layoutProvider = new LayoutProvider(
-    (index) => {
+    index => {
       return dataProvider.getDataForIndex(index).type;
     },
     (type, dim) => {
@@ -188,6 +195,7 @@ const SimpleList = ({
           <Empty
             loading={loading || _loading}
             placeholderData={placeholderData}
+            headerProps={headerProps}
           />
         );
     }
@@ -226,42 +234,25 @@ const SimpleList = ({
   };
   return (
     <>
-      {loaded && !loading ? null : (
-        <>
-          <View
-            style={{
-              position: 'absolute',
-              width: '100%',
-              height: '100%',
-              backgroundColor: colors.bg,
-              zIndex: 999,
-            }}>
-            <Header
-              title={headerProps.heading}
-              paragraph={headerProps.paragraph}
-              onPress={headerProps.onPress}
-              icon={headerProps.icon}
-              type={dataType}
-              index={0}
-            />
-            <Empty loading={true} placeholderData={placeholderData} />
-          </View>
-        </>
-      )}
-
-      {_loading ? null : (
-        <RecyclerListView
-          ref={scrollRef}
-          layoutProvider={_layoutProvider}
-          dataProvider={dataProvider}
-          rowRenderer={_renderRow}
-          onScroll={_onScroll}
-          canChangeSize={true}
-          renderFooter={listData.length === 0 ? null : Footer}
-          scrollViewProps={scrollProps}
-          style={styles}
+      {!loading && (
+        <Announcement
+          color={
+            COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
+          }
         />
       )}
+      <RecyclerListView
+        ref={scrollRef}
+        layoutProvider={_layoutProvider}
+        dataProvider={dataProvider}
+        rowRenderer={_renderRow}
+        onScroll={_onScroll}
+        canChangeSize={true}
+        renderFooter={listData.length === 0 ? null : Footer}
+        scrollViewProps={scrollProps}
+        style={styles}
+      />
+      <JumpToDialog scrollRef={scrollRef} />
     </>
   );
 };

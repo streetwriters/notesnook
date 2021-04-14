@@ -1,9 +1,12 @@
 import React, {useCallback, useEffect, useState} from 'react';
 
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import {simpleDialogEvent} from '../../components/DialogManager/recievers';
 import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
+import {Header} from '../../components/Header';
 import {Placeholder} from '../../components/ListPlaceholders';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -33,14 +36,7 @@ export const Trash = ({route, navigation}) => {
       });
 
       eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: null,
-          },
-        });
-      }
+
       updateSearch();
       ranAfterInteractions = false;
     });
@@ -101,9 +97,19 @@ export const Trash = ({route, navigation}) => {
 
   return (
     <>
+      <SelectionHeader screen="Trash" />
+      <ContainerTopSection>
+        <Header
+          title="Trash"
+          isBack={false}
+          screen="Trash"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={trash}
         type="trash"
+        screen="Trash"
         focused={() => navigation.isFocused()}
         loading={loading}
         placeholderData={{

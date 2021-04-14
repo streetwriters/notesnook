@@ -10,6 +10,7 @@ import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
 import {ph, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
+import {SvgToPngView} from '../ListPlaceholders';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -33,7 +34,7 @@ const ResultDialog = () => {
     };
   }, []);
 
-  const open = (data) => {
+  const open = data => {
     setDialogData(data);
     setVisible(true);
   };
@@ -56,7 +57,13 @@ const ResultDialog = () => {
           justifyContent: 'center',
           alignItems: 'center',
         }}>
-        <SvgXml xml={WELCOME_SVG(colors.accent)} width={170} height={170} />
+        <SvgToPngView
+          src={WELCOME_SVG(colors.accent)}
+          color={colors.accent}
+          img="welcome"
+          width={170}
+          height={170}
+        />
 
         <Heading
           size={SIZE.lg}

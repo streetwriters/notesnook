@@ -1,33 +1,14 @@
-import React, { useEffect, useState } from 'react';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import React from 'react';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 
-export const HeaderLeftMenu = () => {
+export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
   const [state] = useTracked();
   const {colors, deviceMode} = state;
-  const [headerTextState, setHeaderTextState] = useState(
-    Navigation.getHeaderState(),
-  );
-
- const currentScreen = headerTextState.currentScreen;
- const headerMenuState = headerTextState.verticalMenu;
-
-  const onHeaderStateChange = (event) => {
-    if (!event) return;
-     setHeaderTextState(event);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {

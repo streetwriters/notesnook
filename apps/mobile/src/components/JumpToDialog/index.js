@@ -6,7 +6,7 @@ import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation, scrollRef} from '../../utils';
+import {getElevation, } from '../../utils';
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
@@ -17,7 +17,7 @@ import Heading from '../Typography/Heading';
 
 const offsets = [];
 let timeout = null;
-const JumpToDialog = () => {
+const JumpToDialog = ({scrollRef}) => {
   const [state] = useTracked();
   const {notes, colors, settings} = state;
   const [visible, setVisible] = useState(false);

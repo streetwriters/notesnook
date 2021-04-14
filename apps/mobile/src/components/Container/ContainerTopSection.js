@@ -3,24 +3,18 @@ import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import { Header } from '../Header';
 
-export const ContainerTopSection = ({root}) => {
+export const ContainerTopSection = ({children}) => {
   const [state] = useTracked();
   const {colors, selectionMode} = state;
 
-  return (
+  return !selectionMode && (
     <View
       style={{
         backgroundColor: colors.bg,
         width: '100%',
-        opacity: selectionMode ? 0 : 1,
         overflow: 'hidden',
-        transform: [
-          {
-            translateY: selectionMode ? -150 : 0,
-          },
-        ],
       }}>
-      <Header root={root} />
+      {children}
     </View>
   );
 };

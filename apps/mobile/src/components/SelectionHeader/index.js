@@ -1,15 +1,10 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect} from 'react';
+import {BackHandler} from 'react-native';
 import {View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent,
-} from '../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
@@ -19,43 +14,14 @@ import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
-export const SelectionHeader = () => {
-  // State
+export const SelectionHeader = ({screen}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const insets = useSafeAreaInsets();
-  const translateY = useValue(-150);
-  const opacity = useValue(0);
-
-  const [headerTextState, setHeaderTextState] = useState(
-    Navigation.getHeaderState(),
-  );
-  const currentScreen = headerTextState.currentScreen;
-
-  const onHeaderStateChange = (event) => {
-    if (!event) return;
-     setHeaderTextState(event);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
-
-  useEffect(() => {
-    translateY.setValue(selectionMode ? 0 : -150);
-    Animated.timing(opacity, {
-      duration: 200,
-      toValue: selectionMode ? 1 : 0,
-      easing: Easing.in(Easing.ease),
-    }).start();
-  }, [selectionMode]);
 
   const addToFavorite = async () => {
     if (selectedItemsList.length > 0) {
-      selectedItemsList.forEach((item) => {
+      selectedItemsList.forEach(item => {
         db.notes.note(item.id).favorite();
       });
       Navigation.setRoutesToUpdate([
@@ -71,7 +37,7 @@ export const SelectionHeader = () => {
   const restoreItem = async () => {
     if (selectedItemsList.length > 0) {
       let noteIds = [];
-      selectedItemsList.forEach((item) => {
+      selectedItemsList.forEach(item => {
         noteIds.push(item.id);
       });
       await db.trash.restore(...noteIds);
@@ -92,11 +58,24 @@ export const SelectionHeader = () => {
     }
   };
 
-  return (
-    <Animated.View
+  const onBackPress = () => {
+    dispatch({type: Actions.SELECTION_MODE, enabled: false});
+    dispatch({type: Actions.CLEAR_SELECTION});
+    return true;
+  };
+
+  useEffect(() => {
+    if (selectionMode) {
+      BackHandler.addEventListener('hardwareBackPress', onBackPress);
+    } else {
+      BackHandler.removeEventListener('hardwareBackPress', onBackPress);
+    }
+  }, [selectionMode]);
+
+  return !selectionMode ? null : (
+    <View
       style={{
         width: '100%',
-        position: 'absolute',
         height: 50 + insets.top,
         paddingTop: insets.top,
         backgroundColor: colors.accent,
@@ -104,13 +83,7 @@ export const SelectionHeader = () => {
         alignItems: 'center',
         flexDirection: 'row',
         zIndex: 999,
-        opacity: opacity,
         paddingHorizontal: 12,
-        transform: [
-          {
-            translateY: translateY,
-          },
-        ],
       }}>
       <View
         style={{
@@ -162,9 +135,9 @@ export const SelectionHeader = () => {
           right: 12,
           paddingTop: insets.top,
         }}>
-        {currentScreen === 'Trash' ||
-        currentScreen === 'Notebooks' ||
-        currentScreen === 'Notebook' ? null : (
+        {screen === 'Trash' ||
+        screen === 'Notebooks' ||
+        screen === 'Notebook' ? null : (
           <ActionIcon
             onPress={async () => {
               //dispatch({type: Actions.SELECTION_MODE, enabled: false});
@@ -180,7 +153,7 @@ export const SelectionHeader = () => {
           />
         )}
 
-        {currentScreen === 'Favorites' ? (
+        {screen === 'Favorites' ? (
           <ActionIcon
             onPress={addToFavorite}
             customStyle={{
@@ -192,7 +165,7 @@ export const SelectionHeader = () => {
           />
         ) : null}
 
-        {currentScreen === 'Trash' ? null : (
+        {screen === 'Trash' ? null : (
           <ActionIcon
             customStyle={{
               marginLeft: 10,
@@ -207,7 +180,7 @@ export const SelectionHeader = () => {
           />
         )}
 
-        {currentScreen === 'Trash' ? (
+        {screen === 'Trash' ? (
           <ActionIcon
             customStyle={{
               marginLeft: 10,
@@ -219,7 +192,7 @@ export const SelectionHeader = () => {
           />
         ) : null}
       </View>
-    </Animated.View>
+    </View>
   );
 };
 

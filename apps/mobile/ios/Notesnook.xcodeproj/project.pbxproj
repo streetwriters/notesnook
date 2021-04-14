@@ -16,7 +16,6 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* NotesnookTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* NotesnookTests.m */; };
-		539FE06D3E38F091251923E8 /* libPods-Notesnook-Make Note.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5269A46969D8091533003C72 /* libPods-Notesnook-Make Note.a */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
 		655FD77A253AD31C001D807D /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
@@ -25,6 +24,7 @@
 		65B5014B25A672B200E2D264 /* Make Note.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 65B5014025A672B200E2D264 /* Make Note.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		65B5020325A6756700E2D264 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65B5020225A6756700E2D264 /* File.swift */; };
 		65E0340B257B9FF100793428 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65E0340A257B9FF100793428 /* File.swift */; };
+		7C72B5EA418785B334F3B5EB /* libPods-Notesnook-Make Note.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		87CE5B71DC72F3D95B7B1AA5 /* libPods-Notesnook-tvOSTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */; };
 		A79A93DC9D0CAE8703462151 /* libPods-Notesnook-NotesnookTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 068FA9BDFA207A50B0A9E597 /* libPods-Notesnook-NotesnookTests.a */; };
@@ -87,10 +87,10 @@
 		279A4325E1D27BD3E720F35B /* Pods-Notesnook-Make Note.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.debug.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* Notesnook-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Notesnook-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* Notesnook-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Notesnook-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Add to Notes.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		47AE097A087A651BD60CAD7B /* Pods-Notesnook-Make Note.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Notesnook-Make Note.release.xcconfig"; path = "Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note.release.xcconfig"; sourceTree = "<group>"; };
 		4BD34AE0C0FD2416E48803B8 /* libPods-Notesnook.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		5269A46969D8091533003C72 /* libPods-Notesnook-Make Note.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-Notesnook-Make Note.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6515C42E2580AA2F00E83E39 /* StoreKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = StoreKit.framework; path = System/Library/Frameworks/StoreKit.framework; sourceTree = SDKROOT; };
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
@@ -159,7 +159,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				539FE06D3E38F091251923E8 /* libPods-Notesnook-Make Note.a in Frameworks */,
+				7C72B5EA418785B334F3B5EB /* libPods-Notesnook-Make Note.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -214,7 +214,7 @@
 				16C0296DE7A2B4102817F5C1 /* libPods-Notesnook-tvOS.a */,
 				A03E3F5851D27269540E147C /* libPods-Notesnook-tvOSTests.a */,
 				41D57E9831C724F59F18FBAE /* libPods-Notesnook-Add to Notes.a */,
-				5269A46969D8091533003C72 /* libPods-Notesnook-Make Note.a */,
+				35547D7C07E83F889159A73D /* libPods-Notesnook-Make Note.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -300,6 +300,7 @@
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
 				819D480147D052141ACC55A9 /* [CP] Copy Pods Resources */,
+				7BCAD189C704F43FAEC90BBD /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -323,7 +324,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				240525450DF9ABA0F332B52E /* [CP] Copy Pods Resources */,
 				65A7F34B255687E600699170 /* Embed App Extensions */,
-				56D19791378248CC84856BC2 /* Upload Debug Symbols to Sentry */,
+				3076721A343FFD631FFA5F12 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -505,7 +506,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		23B3F321642872B180473574 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -536,7 +537,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders-Hermes/AccessibilityResources.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -615,6 +616,24 @@
 			shellPath = /bin/sh;
 			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
+		3076721A343FFD631FFA5F12 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-frameworks.sh",
+				"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/iphoneos/hermes.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook/Pods-Notesnook-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		52B9E42E0FD77D180139A8C7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -636,20 +655,6 @@
 			shellPath = /bin/sh;
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
-		};
-		56D19791378248CC84856BC2 /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "Upload Debug Symbols to Sentry";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "#export SENTRY_PROPERTIES=sentry.properties\n#../node_modules/@sentry/cli/bin/sentry-cli upload-dsym\n";
 		};
 		658D06A625A7446E008C70C0 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -691,6 +696,24 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
+		7BCAD189C704F43FAEC90BBD /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-frameworks.sh",
+				"${PODS_ROOT}/hermes-engine/destroot/Library/Frameworks/iphoneos/hermes.framework",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/hermes.framework",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
 		819D480147D052141ACC55A9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -698,7 +721,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-NotesnookTests/Pods-Notesnook-NotesnookTests-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders-Hermes/AccessibilityResources.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -788,7 +811,7 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Notesnook-Make Note/Pods-Notesnook-Make Note-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders/AccessibilityResources.bundle",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core.common-CoreModulesHeaders-Hermes/AccessibilityResources.bundle",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/AntDesign.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/Entypo.ttf",
 				"${PODS_ROOT}/../../node_modules/react-native-vector-icons/Fonts/EvilIcons.ttf",
@@ -1006,13 +1029,14 @@
 			baseConfigurationReference = 19E7EB248446C3FE09F6E622 /* Pods-Notesnook.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Notesnook/NotesnookDebug.entitlements;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1340;
+				CURRENT_PROJECT_VERSION = 1360;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				ENABLE_BITCODE = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1084,7 +1108,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1106,12 +1130,13 @@
 			baseConfigurationReference = 77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Notesnook/Notesnook.entitlements;
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1340;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1360;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				HEADER_SEARCH_PATHS = (
@@ -1182,7 +1207,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.6;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"-ObjC",
@@ -1190,7 +1215,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook;
 				PRODUCT_NAME = Notesnook;
-				PROVISIONING_PROFILE_SPECIFIER = "Notesnook iOS Distribution";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Notesnook-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -1338,7 +1363,7 @@
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1340;
+				CURRENT_PROJECT_VERSION = 1360;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1411,7 +1436,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.6;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
@@ -1438,10 +1463,10 @@
 				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_ENTITLEMENTS = "Make Note/Make Note.entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 1340;
+				CURRENT_PROJECT_VERSION = 1360;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = 53CWBG3QUC;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
@@ -1514,11 +1539,11 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.3.4;
+				MARKETING_VERSION = 1.3.6;
 				MTL_FAST_MATH = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.streetwriters.notesnook.share;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "Notesnook Extension iOS Distribution 2";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SKIP_INSTALL = YES;
 				SWIFT_OBJC_BRIDGING_HEADER = "Make Note/Make Note-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
@@ -1530,6 +1555,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1558,6 +1584,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 i386";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1593,6 +1620,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				APPLICATION_EXTENSION_API_ONLY = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
 				CLANG_CXX_LIBRARY = "libc++";
@@ -1621,6 +1649,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = "arm64 i386";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;

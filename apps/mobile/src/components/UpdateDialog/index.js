@@ -20,7 +20,7 @@ export const UpdateDialog = () => {
   const [visible, setVisible] = useState(false);
   const [version, setVersion] = useState(null);
 
-  const open = (version) => {
+  const open = version => {
     setVersion(version);
     setVisible(true);
   };
@@ -31,10 +31,10 @@ export const UpdateDialog = () => {
     return () => {
       eUnSubscribeEvent('updateDialog', open);
     };
-  },[]);
+  }, []);
 
-  const format = (ver) => {
-    if (!ver) return ""
+  const format = ver => {
+    if (!ver) return '';
     let parts = ver.toString().split('');
     return `v${parts[0]}.${parts[1]}.${parts[2]}${
       parts[3] === '0' ? '' : parts[3]
@@ -45,7 +45,7 @@ export const UpdateDialog = () => {
     visible && (
       <BaseDialog
         onRequestClose={() => {
-          setVisible(false);
+          version.severity !== 2 && setVisible(false);
         }}
         visible={true}>
         <DialogContainer>
@@ -114,9 +114,7 @@ export const UpdateDialog = () => {
               let url_android =
                 'https://play.google.com/store/apps/details?id=com.streetwriters.notesnook';
               let url_ios = 'itms-apps://itunes.apple.com/app/id1544027013';
-              setVisible(false);
-
-              
+              version.severity !== 2 && setVisible(false);
               await Linking.openURL(
                 Platform.OS === 'android' ? url_android : url_ios,
               );

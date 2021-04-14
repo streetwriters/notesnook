@@ -14,15 +14,18 @@ import {itemSkus} from '../utils';
 
 let premiumStatus = 0;
 let products = [];
+let user = null
+
+function getUser() {
+  return user;
+}
 
 async function setPremiumStatus() {
   try {
-    let user = await db.user.getUser();
+    user = await db.user.getUser();
     if (!user) {
       premiumStatus = null;
       updateEvent({type: Actions.PREMIUM, state: get()});
-
-  
     } else {
       premiumStatus = user.subscription.type;
       updateEvent({type: Actions.PREMIUM, state: get()});
@@ -172,5 +175,6 @@ export default {
   get,
   onUserStatusCheck,
   showVerifyEmailDialog,
-  getProducts
+  getProducts,
+  getUser
 };

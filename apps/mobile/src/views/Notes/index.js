@@ -1,6 +1,9 @@
 import React, {useCallback, useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
@@ -22,7 +25,6 @@ import {
   refreshNotesPage,
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
 
 export const Notes = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -33,7 +35,7 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 150) => {
+  const runAfterInteractions = (time = 400) => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('NotesPage', () => {
         init();
@@ -56,13 +58,13 @@ export const Notes = ({route, navigation}) => {
       }
       setNotes(_notes);
       if (localLoad) {
-        sleep(10).then((r) => {
+        setTimeout(() => {
           setLocalLoad(false);
-        });
+        }, 10);
       }
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: false,
+          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
@@ -72,13 +74,16 @@ export const Notes = ({route, navigation}) => {
         });
       }
       updateSearch();
-      dispatch({
-        type: Actions.CONTAINER_BOTTOM_BUTTON,
-        state: {
-          onPress: _onPressBottomButton,
-          color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
-        },
-      });
+      if (DDS.isLargeTablet()) {
+        dispatch({
+          type: Actions.CONTAINER_BOTTOM_BUTTON,
+          state: {
+            onPress: _onPressBottomButton,
+            color: params.type == 'color' ? COLORS_NOTE[params.title] : null,
+          },
+        });
+      }
+
       ranAfterInteractions = false;
     }, time);
   };
@@ -118,7 +123,7 @@ export const Notes = ({route, navigation}) => {
     }
   };
 
-  const init = (data) => {
+  const init = data => {
     if (data) {
       setLocalLoad(true);
       params = data;
@@ -126,7 +131,7 @@ export const Notes = ({route, navigation}) => {
     setActionAfterFirstSave();
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
-      runAfterInteractions(data ? 150 : 1);
+      runAfterInteractions(data ? 400 : 1);
     }
 
     if (!pageIsLoaded) {
@@ -255,9 +260,20 @@ export const Notes = ({route, navigation}) => {
 
   return (
     <>
+           <SelectionHeader screen="NotesPage" />
+      <ContainerTopSection>
+   
+        <Header
+          title={headerProps.heading}
+          isBack={!params.menu}
+          screen="NotesPage"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={notes}
         type="notes"
+        screen="NotesPage"
         refreshCallback={_refreshCallback}
         headerProps={headerProps}
         loading={loading || localLoad}

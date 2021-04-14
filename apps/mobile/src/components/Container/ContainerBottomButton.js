@@ -54,7 +54,7 @@ export const ContainerBottomButton = ({
         right: 12,
         bottom:
           Platform.OS === 'ios' && insets.bottom !== 0
-            ? insets.bottom - 10
+            ? Platform.isPad ? insets.bottom - 12 : insets.bottom - 24
             : insets.bottom + 12,
         zIndex: 10,
         transform: [

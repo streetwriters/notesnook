@@ -1,7 +1,7 @@
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {defaultState} from '../provider/DefaultState';
-import {AndroidModule, sortSettings} from '../utils';
+import {AndroidModule, preloadImages, sortSettings} from '../utils';
 import {getColorScheme} from '../utils/ColorUtils';
 import {MMKV} from '../utils/mmkv';
 import {scale, updateSize} from '../utils/SizeUtils';
@@ -72,6 +72,7 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
+    preloadImages(newColors.accent)
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };

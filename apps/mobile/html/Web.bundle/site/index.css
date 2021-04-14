@@ -51,6 +51,8 @@ body {
 	font-size: 32px;
 	padding-top: 4px;
     padding-bottom: 5px;
+	padding-right: 0.5em;
+	padding-left: 0.5em;
   }
   
   #formBox > div {

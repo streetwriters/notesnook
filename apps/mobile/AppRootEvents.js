@@ -1,46 +1,46 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect} from 'react';
-import {Appearance, AppState, Linking, Platform, StatusBar} from 'react-native';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect } from 'react';
+import { Appearance, AppState, Linking, Platform } from 'react-native';
+import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
+import { enabled } from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import {updateEvent} from './src/components/DialogManager/recievers';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { updateEvent } from './src/components/DialogManager/recievers';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage,
+  setLoginMessage
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {AndroidModule, APP_VERSION, editing} from './src/utils';
-import {COLOR_SCHEME, updateStatusBarColor} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import { APP_VERSION, editing } from './src/utils';
+import { updateStatusBarColor } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
-
-import RNExitApp from 'react-native-exit-app';
+import { MMKV } from './src/utils/mmkv';
 import Storage from './src/utils/storage';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, getWebviewInit } from './src/views/Editor/Functions';
+
 let prevTransactionId = null;
 let subsriptionSuccessListener;
 let subsriptionErrorListener;
@@ -76,7 +76,6 @@ async function checkIntentState() {
 
 async function reconnectSSE(connection) {
   if (!isUserReady) {
-    console.log('user is not ready');
     return;
   }
   let state = connection;
@@ -166,18 +165,7 @@ export const AppRootEvents = React.memo(
             console.log(e);
           }
         })();
-        if (!__DEV__) {
-          try {
-            /*   Sentry.init({
-              dsn:
-                'https://317a5c31caf64d1e9b27abf15eb1a554@o477952.ingest.sentry.io/5519681',
-              release: 'notesnook-mobile@1.1.0',
-              
-            }); */
-          } catch (e) {
-            console.log(e);
-          }
-        }
+    
       }
       return () => {
         removeInternetStateListener && removeInternetStateListener();
@@ -322,6 +310,8 @@ export const AppRootEvents = React.memo(
           await PremiumService.setPremiumStatus();
           setLoginMessage(dispatch);
         }
+
+       
       } catch (e) {
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
@@ -336,6 +326,9 @@ export const AppRootEvents = React.memo(
         if (login) {
           eSendEvent(eCloseProgressDialog);
         }
+        let announcement = await db.announcement();
+        
+
       }
     };
 

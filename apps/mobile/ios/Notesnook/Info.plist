@@ -66,8 +66,6 @@
 	<true/>
 	<key>NSAppTransportSecurity</key>
 	<dict>
-		<key>NSAllowsArbitraryLoads</key>
-		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>localhost</key>
@@ -80,7 +78,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>Take a picture and add it to your note.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string></string>
+	<string>Only required by library- not requested in application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Add photos from gallery to your note.</string>
 	<key>UIAppFonts</key>

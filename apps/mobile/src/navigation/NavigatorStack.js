@@ -14,6 +14,7 @@ import {
 } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
+import {editing, history} from '../utils';
 import {eOpenSideMenu} from '../utils/Events';
 import {rootNavigatorRef} from '../utils/Refs';
 import {sleep} from '../utils/TimeUtils';
@@ -75,7 +76,7 @@ const forSlide = ({current, next, inverted, layouts: {screen}}) => {
 
 const screenOptionsForAnimation = {
   animationEnabled: true,
-  cardStyleInterpolator: forSlide,
+  cardStyleInterpolator: forFade,
   gestureEnabled: true,
 };
 
@@ -84,8 +85,10 @@ export const NavigatorStack = React.memo(
     const [, dispatch] = useTracked();
     const [render, setRender] = React.useState(false);
     const onStateChange = React.useCallback(() => {
-      dispatch({type: Actions.SELECTION_MODE, enabled: false});
-      dispatch({type: Actions.CLEAR_SELECTION});
+      if (history.selectionMode) {
+        dispatch({type: Actions.SELECTION_MODE, enabled: false});
+        dispatch({type: Actions.CLEAR_SELECTION});
+      }
       eSendEvent('navigate');
     });
 
@@ -102,7 +105,6 @@ export const NavigatorStack = React.memo(
             id: SettingsService.get().homepage.toLowerCase() + '_navigation',
           },
         );
-
       }
     };
 
@@ -126,6 +128,7 @@ export const NavigatorStack = React.memo(
                 headerShown: false,
                 animationEnabled: false,
                 gestureEnabled: false,
+              
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />

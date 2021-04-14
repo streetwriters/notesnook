@@ -10,7 +10,10 @@ import SearchService from '../../services/SearchService';
 import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
-import { InteractionManager } from '../../utils';
+import {InteractionManager} from '../../utils';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -20,11 +23,6 @@ export const Folders = ({route, navigation}) => {
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
@@ -39,7 +37,10 @@ export const Folders = ({route, navigation}) => {
         id: 'notebooks_navigation',
       },
     );
- 
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
+    }
   }, []);
 
   const runAfterInteractions = () => {
@@ -47,9 +48,9 @@ export const Folders = ({route, navigation}) => {
       if (loading) {
         setLoading(false);
       }
-      Navigation.routeNeedsUpdate('Notebooks',() => {
-        dispatch({type:Actions.NOTEBOOKS})
-      })
+      Navigation.routeNeedsUpdate('Notebooks', () => {
+        dispatch({type: Actions.NOTEBOOKS});
+      });
 
       eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
       updateSearch();
@@ -99,9 +100,20 @@ export const Folders = ({route, navigation}) => {
 
   return (
     <>
+            <SelectionHeader   screen="Notebooks" />
+       <ContainerTopSection>
+ 
+        <Header
+          title="Notebooks"
+          isBack={false}
+          screen="Notesbooks"
+          action={_onPressBottomButton}
+        />
+      </ContainerTopSection>
       <SimpleList
         listData={notebooks}
         type="notebooks"
+        screen="Notebooks"
         focused={() => navigation.isFocused()}
         loading={loading}
         placeholderData={{

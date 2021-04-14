@@ -1,61 +1,27 @@
-import React, { useEffect, useState } from 'react';
-import Animated from 'react-native-reanimated';
+import React, { useEffect } from 'react';
+import Animated, { useValue } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
 import { eScrollEvent } from '../../utils/Events';
 import Heading from '../Typography/Heading';
 
-const opacity = new Animated.Value(DDS.isLargeTablet() ? 1 : 0);
 
-let scrollPostions = {};
-
-export const HeaderTitle = () => {
+export const HeaderTitle = ({heading,headerColor,screen}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const [headerTextState, setHeaderTextState] = useState(Navigation.getHeaderState());
+  const opacity = useValue(DDS.isLargeTablet() ? 1 : 0)
 
-  const onHeaderStateChange = (event) => {
-         setHeaderTextState(event);
-  };
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    };
-  }, []);
-
-
-  const onScroll = async (y) => {
+  const onScroll = async (data) => {
+    if (data.screen !== screen) return;
     if (DDS.isTab) return;
-    if (typeof y !== 'number') {
-      if (y.type === 'back') {
-        scrollPostions[y.name] = null;
-        return;
-      }
-      if (scrollPostions[y.name]) {
-        if (scrollPostions[y.name] > 200) {
-          opacity.setValue(1);
-        } else {
-          scrollPostions[y.name] = 0;
-          opacity.setValue(0);
-        }
-      } else {
-        scrollPostions[y.name] = 0;
-        opacity.setValue(0);
-      }
-      return;
-    }
-
-    if (y > 75) {
-      let yVal = y - 75;
+    if (data.y > 75) {
+      let yVal = data.y - 75;
       o = yVal / 75;
       opacity.setValue(o);
     } else {
       opacity.setValue(0);
     }
-    scrollPostions[headerTextState?.heading] = y;
   };
 
   useEffect(() => {
@@ -63,21 +29,21 @@ export const HeaderTitle = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  }, [headerTextState?.heading]);
+  }, [heading]);
   
   return (
     <Animated.View
       style={{
         opacity: DDS.isTab ? 1 : opacity,
       }}>
-      <Heading color={headerTextState?.color}>
+      <Heading color={headerColor}>
         <Heading color={colors.accent}>
-          {headerTextState?.heading.slice(0, 1) === '#' ? '#' : null}
+          {heading.slice(0, 1) === '#' ? '#' : null}
         </Heading>
 
-        {headerTextState?.heading.slice(0, 1) === '#'
-          ? headerTextState?.heading.slice(1)
-          : headerTextState?.heading}
+        {heading.slice(0, 1) === '#'
+          ? heading.slice(1)
+          : heading}
       </Heading>
     </Animated.View>
   );

@@ -1,110 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
+import React, {useEffect, useState} from 'react';
+import {Platform, StyleSheet, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import { dWidth } from '../../utils';
-import { eScrollEvent } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { SearchInput } from '../SearchInput';
-import { HeaderLeftMenu } from './HeaderLeftMenu';
-import { HeaderRightMenu } from './HeaderRightMenu';
-import { HeaderTitle } from './HeaderTitle';
+import {dWidth} from '../../utils';
+import {eScrollEvent} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {SearchInput} from '../SearchInput';
+import {HeaderLeftMenu} from './HeaderLeftMenu';
+import {HeaderRightMenu} from './HeaderRightMenu';
+import {HeaderTitle} from './HeaderTitle';
 
-export const Header = ({root}) => {
-  const [state] = useTracked();
-  const {colors} = state;
-  const insets = useSafeAreaInsets();
-  const [hide, setHide] = useState(true);
-  const [headerTextState, setHeaderTextState] = useState(
-    Navigation.getHeaderState(),
-  );
-  const currentScreen = headerTextState.currentScreen;
+export const Header = React.memo(
+  ({root, title, screen, isBack, color, action}) => {
+    const [state] = useTracked();
+    const {colors} = state;
+    const insets = useSafeAreaInsets();
+    const [hide, setHide] = useState(true);
 
-  const onHeaderStateChange = (event) => {
-    if (!event) return;
-     setHeaderTextState(event);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
-    return () => {
-      eUnSubscribeEvent('onHeaderStateChange', onHeaderStateChange);
+    const onScroll = data => {
+      if (data.screen !== screen) return;
+      if (data.y > 150) {
+        setHide(false);
+      } else {
+        setHide(true);
+      }
     };
-  }, []);
 
-  const onScroll = (y) => {
-    if (y > 150) {
-      setHide(false);
-    } else {
-      setHide(true);
-    }
-  };
+    useEffect(() => {
+      eSubscribeEvent(eScrollEvent, onScroll);
+      return () => {
+        eUnSubscribeEvent(eScrollEvent, onScroll);
+      };
+    }, []);
 
-  useEffect(() => {
-    eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
-  }, []);
+    return (
+      <View
+        style={[
+          styles.container,
+          {
+            marginTop: Platform.OS === 'android' ? insets.top : null,
+            backgroundColor: colors.bg,
+            overflow: 'hidden',
+            borderBottomWidth: 1,
+            borderBottomColor: hide ? 'transparent' : colors.nav,
+            justifyContent: 'center',
+          },
+        ]}>
+        <View style={styles.leftBtnContainer}>
+          <HeaderLeftMenu headerMenuState={!isBack} currentScreen={screen} />
 
-  return (
-    <View
-      style={[
-        styles.container,
-        {
-          marginTop: Platform.OS === 'android' ? insets.top : null,
-          backgroundColor: colors.bg,
-          overflow: 'hidden',
-          borderBottomWidth: 1,
-          borderBottomColor: hide ? 'transparent' : colors.nav,
-          justifyContent: 'center',
-        },
-      ]}>
-      <View style={styles.leftBtnContainer}>
-        <HeaderLeftMenu />
-
-        {(Platform.OS === 'android' ||
-        Platform.isPad) && currentScreen !== 'Search' ? (
-          <HeaderTitle root={root} />
-        ) : null}
-      </View>
-      {Platform.OS !== 'android' &&
-      !Platform.isPad &&
-      currentScreen !== 'Search' ? (
-        <HeaderTitle root={root} />
-      ) : null}
-
-      {currentScreen === 'Search' ? (
-        <View
-          style={{
-            width: '80%',
-          }}>
-          <SearchInput />
+          {(Platform.OS === 'android' || Platform.isPad) &&
+          screen !== 'Search' ? (
+            <HeaderTitle
+              headerColor={color}
+              heading={title}
+              screen={screen}
+              root={root}
+            />
+          ) : null}
         </View>
-      ) : null}
-
-      {currentScreen === 'Search' ? (
-        <View style={[styles.rightBtnContainer, {right: 6}]}>
-          <ActionIcon
-            onPress={() => {
-              SearchService.search();
-            }}
-            name="magnify"
-            size={SIZE.xxxl}
-            color={colors.pri}
-            style={styles.rightBtn}
+        {Platform.OS !== 'android' && !Platform.isPad && screen !== 'Search' ? (
+          <HeaderTitle
+            headerColor={color}
+            heading={title}
+            screen={screen}
+            root={root}
           />
-        </View>
-      ) : (
-        <HeaderRightMenu />
-      )}
-    </View>
-  );
-};
+        ) : null}
+
+        {screen === 'Search' ? (
+          <>
+            <View
+              style={{
+                width: '80%',
+              }}>
+              <SearchInput />
+            </View>
+            <View style={[styles.rightBtnContainer, {right: 6}]}>
+              <ActionIcon
+                onPress={() => {
+                  SearchService.search();
+                }}
+                name="magnify"
+                size={SIZE.xxxl}
+                color={colors.pri}
+                style={styles.rightBtn}
+              />
+            </View>
+          </>
+        ) : (
+          <HeaderRightMenu action={action} currentScreen={screen} />
+        )}
+      </View>
+    );
+  },
+  (prev, next) => prev.title === next.title,
+);
 
 const styles = StyleSheet.create({
   container: {
