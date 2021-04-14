@@ -4,7 +4,7 @@ import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { upgrade } from "../../common/upgrade";
+import { upgrade } from "../../common/checkout";
 import { showSignUpDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
 import { ReactComponent as Backups } from "../../assets/backup.svg";

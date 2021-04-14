@@ -10,16 +10,21 @@ export default function useAnnouncement() {
 
   useEffect(() => {
     (async function () {
-      CACHED_ANNOUNCEMENT = CACHED_ANNOUNCEMENT || (await db.announcement());
+      try {
+        CACHED_ANNOUNCEMENT = CACHED_ANNOUNCEMENT || (await db.announcement());
 
-      if (
-        !CACHED_ANNOUNCEMENT ||
-        Config.get(CACHED_ANNOUNCEMENT.id) ||
-        !shouldShowAnnouncement(CACHED_ANNOUNCEMENT)
-      )
-        return;
-
-      setAnnouncement(CACHED_ANNOUNCEMENT);
+        
+      } catch (e) {
+        console.error(e);
+      } finally {
+        if (
+          !CACHED_ANNOUNCEMENT ||
+          Config.get(CACHED_ANNOUNCEMENT.id) ||
+          !shouldShowAnnouncement(CACHED_ANNOUNCEMENT)
+        )
+          return;
+        setAnnouncement(CACHED_ANNOUNCEMENT);
+      }
     })();
   }, []);
 
@@ -49,8 +54,14 @@ function shouldShowAnnouncement(announcement) {
     case "loggedOut":
       show = !userstore.get().isLoggedIn;
       break;
+    case "loggedIn":
+      show = userstore.get().isLoggedIn;
+      break;
     case "unverified":
       show = !userstore.get().user?.isEmailVerified;
+      break;
+    case "verified":
+      show = userstore.get().user?.isEmailVerified;
       break;
     case "proExpired":
       show =

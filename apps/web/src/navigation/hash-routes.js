@@ -23,7 +23,7 @@ import { Suspense } from "react";
 import EditorLoading from "../components/editor/loading";
 import EditorPlaceholder from "../components/editor/-placeholder";
 import { store as userStore } from "../stores/user-store";
-import { upgrade } from "../common/upgrade";
+import { upgrade } from "../common/checkout";
 import { isUserPremium } from "../common";
 const Editor = React.lazy(() => import("../components/editor"));
 

@@ -3,6 +3,10 @@ import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import useAnnouncement from "../../utils/useAnnouncement";
 import { hashNavigate } from "../../navigation";
+import { db } from "../../common/db";
+import { upgrade } from "../../common/checkout";
+import { showLogInDialog } from "../../common/dialog-controller";
+import { showToast } from "../../utils/toast";
 
 function Announcement() {
   const [announcement, removeAnnouncement] = useAnnouncement();
@@ -31,13 +35,34 @@ function Announcement() {
           m={0}
           mt={1}
           p={1}
-          onClick={() => {
+          onClick={async () => {
+            if (window.umami) {
+              window.umami(`[Announcement CTA] ${announcement.cta.text}`);
+            }
             switch (announcement.cta.type) {
               case "link":
                 window.open(announcement.cta.action, "_blank");
                 break;
               case "promo":
-                hashNavigate(`/login?redirect=/buy/${announcement.cta.action}`);
+                const coupon = announcement.cta.action;
+                let user = await db.user.getUser();
+                if (user) {
+                  await upgrade(user, coupon);
+                  return;
+                }
+                await showLogInDialog(
+                  `Login in to ${announcement.cta.text.toLowerCase()}`,
+                  `Use the coupon "${coupon}" at checkout to ${announcement.cta.text.toLowerCase()} your first month.`,
+                  announcement.cta.text,
+                  true
+                );
+
+                user = await db.user.getUser();
+                if (!user) {
+                  showToast("error", "You are not logged in. Please try again.");
+                  return;
+                }
+                await upgrade(user, coupon);
                 break;
               default:
                 return;

@@ -23,7 +23,7 @@ import { showPasswordDialog } from "../common/dialog-controller";
 import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import { CHECK_IDS } from "notes-core/common";
-import { openPaddleDialog } from "../common/upgrade";
+import { openPaddleDialog } from "../common/checkout";
 
 function importBackup() {
   return new Promise((resolve, reject) => {

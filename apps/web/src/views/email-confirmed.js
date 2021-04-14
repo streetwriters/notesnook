@@ -4,7 +4,7 @@ import ThemeProvider from "../components/theme-provider";
 import * as Icon from "../components/icons";
 import { useQueryParams } from "../navigation";
 import Logo from "../assets/logo.svg";
-import { upgrade } from "../common/upgrade";
+import { upgrade } from "../common/checkout";
 import { db } from "../common/db";
 import { showLogInDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
@@ -48,12 +48,12 @@ function EmailConfirmed() {
           <Text variant="body" mt={2}>
             You can safely close this window and return to Notesnook.
           </Text>
-          <SaleBanner
+          {/* <SaleBanner
             discount={80}
             coupon="EARLYBIRD"
             offerEndDate="2021-04-11T00:00:00Z"
             userId={userId}
-          />
+          /> */}
         </Flex>
       </Flex>
     </ThemeProvider>
