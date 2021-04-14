@@ -1,5 +1,4 @@
 # Notesnook
-# 
 Notesnook is a simple and cross-platform private notes app that keeps your notes organized and synced on your phone, tablet and computer. Take notes, capture ideas, create to-do lists, keep a journal, write your assignments and manage projects, we have got you covered. 
 
 We use best-in-class encryption algorithms **XChaCha20-Poly1305** & **Argon2** that are stronger & safer than AES256, impenetrable & future-proof. Your notes are encrypted on your device.
