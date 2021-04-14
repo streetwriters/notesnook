@@ -1,7 +1,7 @@
 import React from "react";
 import { initializeDatabase } from "./common/db";
 import "./index.css";
-import * as serviceWorker from "./serviceWorker";
+import * as serviceWorker from "./serviceWorkerRegistration";
 import { init, showReportDialog } from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { getAppVersion } from "./utils/useVersion";

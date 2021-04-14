@@ -27,3 +27,4 @@ yarn-error.log*
 __diff_output__
 
 dist
+public/workbox
