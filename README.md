@@ -1,3 +1,8 @@
+
+
+
+<img src="https://app.notesnook.com/apple-touch-icon.png" alt="Notesnook Logo" width="100" />
+
 # Notesnook
 Notesnook is a simple and cross-platform private notes app that keeps your notes organized and synced on your phone, tablet and computer. Take notes, capture ideas, create to-do lists, keep a journal, write your assignments and manage projects, we have got you covered. 
 
