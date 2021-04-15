@@ -13,9 +13,9 @@
 <p align="center"><img src="https://github.com/streetwriters/notesnook/raw/main/banners/crossplatform.jpg" alt="Notesnook - Take private notes" width="75%"/></p>
 </p>
 
-<div  style="display:flex;justify-content:center;align-items:center;">
+<p align="center">
 <a href="https://play.google.com/store/apps/details?id=com.streetwriters.notesnook">
-<img alt="Get it on Google Play" src="https://notesnook.com/static/google.db9b21a1.png" height="70px">
+<img alt="Get it on Google Play" src="https://github.com/streetwriters/notesnook/raw/main/badges/google.png" height="50px">
 </a>
 <a href="https://apps.apple.com/pk/app/notesnook-take-private-notes/id1544027013">
 <img alt="Download on the App Store" src="https://notesnook.com/static//apple.09f3b62d.png" height="50px">
@@ -23,9 +23,7 @@
 <a href="https://app.notesnook.com/">
 <img alt="Try Notesnook on the Web" src="https://github.com/streetwriters/notesnook/raw/main/badges/web.png" height="50px" style="margin-left: 15px">
 </a>
-</div>
-
----
+</p>
 
 ## 😎 Features
 
