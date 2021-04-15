@@ -6,7 +6,7 @@
 <h2 align="center">Take private notes, capture ideas, make lists & sync them anywhere</h2>
 
 <p align="center">
-<a href="https://discord.gg/5davZnhw3V"><img src="https://img.shields.io/discord/796015620436787241.svg?label=Chat with us&logo=discord&logoColor=ffffff&color=7389D8&labelColor=6A7EC2"/></a>
+<a href="https://discord.gg/5davZnhw3V"><img alt="Chat with us on Discord" src="https://img.shields.io/discord/796015620436787241?label=Chat%20with%20us&logo=discord&logoColor=white"/></a>
 <a href="https://GitHub.com/streetwriters/notesnook/issues/"><img src="https://img.shields.io/github/issues/streetwriters/notesnook.svg"/></a>
 </p>
 
