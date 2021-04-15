@@ -1,5 +1,6 @@
 ## Q2 2021
 
+- [ ] **Desktop apps** for macOS, Windows & Linux.
 - [ ] **Importing Notes** from files such as markdown, html, txt, docx and other note apps such as Evernote & Google Keep.
 - [ ] **Two-Factor-Authentication** via Auth app & SMS.
 - [ ] **Stylus & Drawing Support** to take notes by drawing on the screen. We will be adding a dedicated editor where you can draw and take notes.
