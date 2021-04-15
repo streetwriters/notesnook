@@ -8,6 +8,7 @@
 <p align="center">
 <a href="https://discord.gg/5davZnhw3V"><img alt="Chat with us on Discord" src="https://img.shields.io/discord/796015620436787241?label=Chat%20with%20us&logo=discord&logoColor=white"/></a>
 <a href="https://GitHub.com/streetwriters/notesnook/issues/"><img src="https://img.shields.io/github/issues/streetwriters/notesnook.svg"/></a>
+<a href="https://twitter.com/notesnook"><img alt="Follow us on Twitter @notesnook" src="https://img.shields.io/twitter/follow/notesnook?label=Follow%20us%20%40notesnook&logo=twitter&style=social"></a>
 </p>
 
 <p align="center"><img src="https://github.com/streetwriters/notesnook/raw/main/banners/crossplatform.jpg" alt="Notesnook - Take private notes" width="75%"/></p>
@@ -41,8 +42,20 @@ Privacy isn't the only thing we have:
 6. Focus mode (distraction-free mode)
 7. Export notes as HTML, MD, PDF & TXT
 8. Automatic backups
+9. Dark mode and custom accents
 
 **_Note: You can checkout a preview of all these features on [the website](https://notesnook.com/)._**
+
+## Support
+
+You can reach out to us via:
+
+1. [Email](mailto:support@streetwriters.co)
+2. [Discord](https://discord.gg/5davZnhw3V)
+3. [Twitter](https://twitter.com/notesnook)
+4. [Create an issue](https://github.com/streetwriters/notesnook/issues/new)
+
+We take all queries, issues, bug reports that you might have. Feel free to ask.
 
 ## 🛣️ Roadmap
 
@@ -107,6 +120,31 @@ Anyone offering privacy for free is scamming you to sell your data. Why? Because
 3. Your subscription is evidence that privacy is a global issue and should be addressed. That you care.
 
 If you still think $4.49/mo is too much, you are welcome to spend >$4.49/mo on some other privacy invasive note taking app. :)
+
+## Contribute
+
+Although Notesnook is not open source, you can still contribute to its development in the following ways:
+
+### Suggest a feature
+
+Have a cool idea for Notesnook? Open a feature request. It doesn't matter how outlandish it is; we'll hear you out.
+
+### Report a bug
+
+Bug reports are given utmost priority. Report it and we'll fix it ASAP.
+
+### Join our Discord server & help out in the community
+
+You can join [our Discord server](https://discord.gg/5davZnhw3V) and help other Notesnook users. We also post announcements, host polls, ask for early feedback there.
+
+### Help us out by giving social proof
+
+Social proof helps other people know what they are getting. If you have tried out Notesnook and loved it, you can give social proof:
+
+1. By tweeting about @notesnook on Twitter
+2. Posting on Facebook, Reddit or any other social media.
+
+We take all social proofs and publish them on the website for the public to see.
 
 ---
 
