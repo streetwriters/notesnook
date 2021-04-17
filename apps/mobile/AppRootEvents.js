@@ -327,7 +327,6 @@ export const AppRootEvents = React.memo(
         if (login) {
           eSendEvent(eCloseProgressDialog);
         }
-        let announcement = await db.announcement();
         
 
       }
