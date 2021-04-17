@@ -1,8 +1,12 @@
 {
-  "name": "notes-web",
+  "name": "notesnook",
+	"productName": "Notesnook",
+  "description": "Your private note taking space",
   "version": "1.3.4",
   "private": true,
   "main": "./build/electron.js",
+  "homepage": "https://notesnook.com/",
+  "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
     "@inlightmedia/react-countdown-timer": "^1.1.2",
     "@mdi/js": "^5.9.55",
@@ -16,6 +20,7 @@
     "compressorjs": "^1.0.7",
     "dayjs": "^1.10.4",
     "electron-serve": "^1.1.0",
+    "electron-updater": "^4.3.8",
     "emotion-theming": "^10.0.19",
     "eventsource": "^1.0.7",
     "fast-sort": "^2.1.1",
@@ -107,25 +112,46 @@
     "url": "https://streetwriters.co"
   },
   "build": {
-    "productName": "Notesnook",
     "appId": "com.streetwriters.notesnook",
+    "productName": "Notesnook",
     "copyright": "Copyright © 2021 Streetwriters (Private) Ltd.",
     "files": [
+      "!*.chunk.js.map",
+      "!*.chunk.js.LICENSE.txt",
       "build/",
-      "node_modules/electron-serve"
+      "!node_modules",
+      "node_modules/electron-updater",
+      "node_modules/lazy-val",
+      "node_modules/builder-util-runtime",
+      "node_modules/fs-extra",
+      "node_modules/js-yaml",
+      "node_modules/lodash.isequal",
+      "node_modules/semver",
+      "node_modules/debug",
+      "node_modules/ms",
+      "node_modules/lru-cache",
+      "node_modules/yallist",
+      "node_modules/universalify",
+      "node_modules/graceful-fs",
+      "node_modules/at-least-node",
+      "node_modules/jsonfile",
+      "node_modules/sax"
     ],
     "afterSign": "electron-builder-notarize",
+    "afterPack": "./scripts/removeLocales.js",
     "mac": {
       "target": [
         "dmg"
       ],
+      "electronLanguages": ["en-US"],
       "category": "public.app-category.productivity",
       "darkModeSupport": true,
       "type": "distribution",
       "hardenedRuntime": true,
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
-      "gatekeeperAssess": false
+      "gatekeeperAssess": false,
+      "icon": "assets/icons/icon.icns"
     },
     "dmg": {
       "contents": [
@@ -139,20 +165,30 @@
           "type": "link",
           "path": "/Applications"
         }
-      ]
+      ],
+      "icon": "assets/icons/volume.icns",
+      "title": "Install Notesnook"
     },
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "assets/icons/icon.ico"
+    },
+    "nsis": {
+      "oneClick": true,
+      "createDesktopShortcut": "always"
     },
     "linux": {
       "target": [
         "AppImage",
-        "rpm",
-        "deb"
+        "deb",
+        "rpm"
       ],
-      "category": "Productivity"
+      "category": "Office",
+      "icon": "assets/icons/icon.icns",
+      "description": "Your private note taking space",
+      "executableName": "Notesnook"
     },
     "extraResources": [
       "./assets/**"
