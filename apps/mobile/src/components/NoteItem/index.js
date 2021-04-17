@@ -17,9 +17,9 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
   const {colors} = state;
 
   const showActionSheet = () => {
-    let note = db.notes.note(item?.id)?.data;
+    let note = isTrash? item : db.notes.note(item?.id)?.data;
     ActionSheetEvent( 
-      note || item,
+      note ? note : item,
       isTrash ? false : true,
       isTrash ? false : true,
       isTrash
