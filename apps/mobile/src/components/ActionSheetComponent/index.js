@@ -134,7 +134,7 @@ export const ActionSheetComponent = ({
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes
+          Navigation.routeNames.Notes,
         ]);
       }
     }
@@ -192,7 +192,6 @@ export const ActionSheetComponent = ({
       func: async () => {
         close();
         if (note.locked) {
-      
           await sleep(300);
           openVault({
             deleteNote: true,
@@ -275,7 +274,6 @@ export const ActionSheetComponent = ({
               : 'Notebook restored from trash',
           type: 'success',
         });
-    
       },
     },
     {
@@ -334,7 +332,6 @@ export const ActionSheetComponent = ({
           await db.notebooks.notebook(note.id).pin();
         }
         localRefresh(item.type);
-    
       },
       close: false,
       check: true,
@@ -359,7 +356,6 @@ export const ActionSheetComponent = ({
           forced: true,
         });
         localRefresh(item.type, true);
-     
       },
       close: false,
       check: true,
@@ -391,7 +387,6 @@ export const ActionSheetComponent = ({
           setIsPinnedToMenu(db.settings.isPinned(note.id));
           dispatch({type: Actions.MENU_PINS});
         } catch (e) {}
-
       },
       close: false,
       check: true,
@@ -401,7 +396,7 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  const _renderRowItem = (rowItem) =>
+  const _renderRowItem = rowItem =>
     rowItems.includes(rowItem.name) ? (
       <TouchableOpacity
         onPress={rowItem.func}
@@ -432,7 +427,7 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-  const _renderColumnItem = (item) =>
+  const _renderColumnItem = item =>
     (note.id && columnItems.includes(item.name)) ||
     (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
       <TouchableOpacity
@@ -450,7 +445,7 @@ export const ActionSheetComponent = ({
           alignItems: 'flex-end',
           paddingHorizontal: 12,
           paddingVertical: pv,
-          height:50
+          height: 50,
         }}>
         <View
           style={{
@@ -461,7 +456,7 @@ export const ActionSheetComponent = ({
             style={{
               width: 30,
             }}
-            name={ item.icon}
+            name={item.icon}
             color={item.color || colors.accent}
             size={SIZE.md + 2}
           />
@@ -503,7 +498,7 @@ export const ActionSheetComponent = ({
     } else {
       db.vault
         .add(note.id)
-        .then((r) => {
+        .then(r => {
           let n = db.notes.note(note.id).data;
           if (n.locked) {
             close();
@@ -514,7 +509,7 @@ export const ActionSheetComponent = ({
           });
           localRefresh(note.type);
         })
-        .catch(async (e) => {
+        .catch(async e => {
           switch (e.message) {
             case db.vault.ERRORS.noVault:
               close('novault');
@@ -573,16 +568,17 @@ export const ActionSheetComponent = ({
           style={{
             paddingHorizontal: 12,
             alignItems: 'center',
-            marginVertical: 10,
+            marginTop:5,
+            marginBottom:10
           }}>
           <Heading size={SIZE.md}>{note?.title.replace('\n', '')}</Heading>
 
           <Paragraph
             numberOfLines={2}
             style={{
-              width: '100%',
+              width: '80%',
               textAlign: 'center',
-              maxWidth: '100%',
+              maxWidth: '80%',
             }}>
             {note.type === 'notebook' && note.description
               ? note.description
@@ -627,7 +623,7 @@ export const ActionSheetComponent = ({
                     .slice()
                     .sort((a, b) => a.dateEdited - b.dateEdited)
                     .slice(0, 6)
-                    .map((topic) => (
+                    .map(topic => (
                       <View
                         key={topic.id}
                         style={{
