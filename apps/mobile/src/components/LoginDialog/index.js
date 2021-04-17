@@ -59,6 +59,7 @@ const LoginDialog = () => {
   const [userConsent, setUserConsent] = useState(true);
   const [mode, setMode] = useState(MODES.login);
   const [error, setError] = useState(false);
+  const [focused, setFocused] = useState(false);
   const insets = useSafeAreaInsets();
 
   const _email = useRef();
@@ -87,7 +88,9 @@ const LoginDialog = () => {
     {
       headerButton: 'Sign Up',
       headerButtonFunc: () => {
+        _email.current?.blur();
         setMode(MODES.login);
+        onChangeFocus();
       },
       button: 'Create Account',
       buttonFunc: () => signupUser(),
@@ -97,13 +100,17 @@ const LoginDialog = () => {
       showLoader: true,
       buttonAlt: 'Login',
       buttonAltFunc: () => {
+        _email.current?.blur();
         setMode(MODES.login);
+        onChangeFocus();
       },
     },
     {
       headerButton: 'Forgot Password',
       headerButtonFunc: () => {
+        _email.current?.blur();
         setMode(MODES.login);
+        onChangeFocus();
       },
       button: 'Send Recovery Email',
       buttonFunc: () => sendEmail(),
@@ -343,6 +350,14 @@ const LoginDialog = () => {
     setLoading(false);
   };
 
+  const onChangeFocus = () => {
+    setFocused(!focused);
+    setTimeout(() => {
+      _email.current?.focus();
+      //setFocused(!focused);
+    }, 50);
+  };
+
   return !visible ? null : (
     <Modal
       animated={true}
@@ -350,6 +365,11 @@ const LoginDialog = () => {
       statusBarTranslucent={true}
       onRequestClose={close}
       visible={true}
+      onShow={() => {
+        setTimeout(() => {
+          _email.current?.focus();
+        }, 150);
+      }}
       transparent={true}>
       {status ? (
         <BaseDialog
@@ -403,29 +423,6 @@ const LoginDialog = () => {
               <ActivityIndicator size={SIZE.xxxl} color={colors.accent} />
             )}
           </View>
-          {/* <DialogContainer>
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginBottom: 10,
-              }}>
-              <Heading>{status}</Heading>
-              <Paragraph style={{textAlign: 'center'}}>
-                {current.loading}
-
-                {!current.showLoader ? null : (
-                  <Paragraph color={colors.errorText}>
-                    {' '}
-                    Do not close the app.
-                  </Paragraph>
-                )}
-              </Paragraph>
-            </View>
-            {!current.showLoader ? null : (
-              <ActivityIndicator color={colors.accent} />
-            )}
-          </DialogContainer> */}
         </BaseDialog>
       ) : null}
       <View
@@ -519,16 +516,19 @@ const LoginDialog = () => {
             style={{
               paddingHorizontal: 12,
               paddingTop: 12,
+              width: focused ? '100%' : '99.9%',
             }}>
             {mode === MODES.changePassword ? null : (
               <Input
                 fwdRef={_email}
-                onChangeText={(value) => {
+                onChangeText={value => {
                   email = value;
                 }}
-                onErrorCheck={(r) => {
+                onErrorCheck={r => {
                   setError(r);
                 }}
+                onFocusInput={onChangeFocus}
+                //onBlurInput={onChangeFocus}
                 returnKeyLabel="Next"
                 returnKeyType="next"
                 autoCompleteType="email"
@@ -547,10 +547,10 @@ const LoginDialog = () => {
             {mode !== MODES.changePassword ? null : (
               <Input
                 fwdRef={_oPass}
-                onChangeText={(value) => {
+                onChangeText={value => {
                   oldPassword = value;
                 }}
-                onErrorCheck={(r) => {
+                onErrorCheck={r => {
                   setError(r);
                 }}
                 returnKeyLabel="Next"
@@ -571,10 +571,10 @@ const LoginDialog = () => {
               <>
                 <Input
                   fwdRef={_pass}
-                  onChangeText={(value) => {
+                  onChangeText={value => {
                     password = value;
                   }}
-                  onErrorCheck={(r) => {
+                  onErrorCheck={r => {
                     setError(r);
                   }}
                   marginBottom={0}
@@ -617,10 +617,10 @@ const LoginDialog = () => {
               <>
                 <Input
                   fwdRef={_passConfirm}
-                  onChangeText={(value) => {
+                  onChangeText={value => {
                     confirmPassword = value;
                   }}
-                  onErrorCheck={(r) => {
+                  onErrorCheck={r => {
                     setError(r);
                   }}
                   loading={loading}
@@ -660,11 +660,11 @@ const LoginDialog = () => {
                     }}>
                     By signing up you agree to our{' '}
                     <Paragraph
-                     size={11}
+                      size={11}
                       onPress={() => {
                         openLinkInBrowser('https://notesnook.com/tos', colors)
-                          .catch((e) => {})
-                          .then((r) => {
+                          .catch(e => {})
+                          .then(r => {
                             console.log('closed');
                           });
                       }}
@@ -673,14 +673,14 @@ const LoginDialog = () => {
                     </Paragraph>
                     and{' '}
                     <Paragraph
-                     size={11}
+                      size={11}
                       onPress={() => {
                         openLinkInBrowser(
                           'https://notesnook.com/privacy',
                           colors,
                         )
-                          .catch((e) => {})
-                          .then((r) => {
+                          .catch(e => {})
+                          .then(r => {
                             console.log('closed');
                           });
                       }}
