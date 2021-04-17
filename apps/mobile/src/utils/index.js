@@ -83,7 +83,7 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 400) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1371;
+export const APP_VERSION = 1372;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
