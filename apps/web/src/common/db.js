@@ -58,9 +58,9 @@ async function loadDefaultNotes(db) {
     if (note.autoOpen) autoOpenId = id;
   }
 
-  EV.publish(EVENTS.appRefreshRequested);
   if (autoOpenId) quickNavigate(`/notes/${autoOpenId}/edit`);
   setAppHydrated();
+  EV.publish(EVENTS.appRefreshRequested);
 }
 
 function quickNavigate(url) {

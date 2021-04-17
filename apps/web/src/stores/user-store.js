@@ -19,6 +19,8 @@ class UserStore extends BaseStore {
   lastSynced = 0;
 
   init = () => {
+    EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
+
     db.user.getUser().then((user) => {
       if (!user) return false;
       this.set((state) => {
@@ -32,7 +34,6 @@ class UserStore extends BaseStore {
         state.user = user;
         state.isLoggedIn = true;
       });
-      EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         this.set((state) => (state.user.subscription = subscription));
       });
