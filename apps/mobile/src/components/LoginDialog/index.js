@@ -531,6 +531,7 @@ const LoginDialog = () => {
                 }}
                 returnKeyLabel="Next"
                 returnKeyType="next"
+                autoCompleteType="email"
                 validationType="email"
                 autoCapitalize="none"
                 errorMessage="Email is invalid"
@@ -555,6 +556,7 @@ const LoginDialog = () => {
                 returnKeyLabel="Next"
                 returnKeyType="next"
                 secureTextEntry
+                autoCompleteType="password"
                 autoCapitalize="none"
                 placeholder="Current password"
                 onSubmit={() => {
@@ -578,6 +580,7 @@ const LoginDialog = () => {
                   marginBottom={0}
                   validationType={mode === MODES.signup ? 'password' : null}
                   secureTextEntry
+                  autoCompleteType="password"
                   autoCapitalize="none"
                   placeholder="Password"
                   returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}

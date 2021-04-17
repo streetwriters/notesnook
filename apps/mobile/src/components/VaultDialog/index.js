@@ -602,6 +602,7 @@ export class VaultDialog extends Component {
                     ? 0
                     : 10
                 }
+                autoCompleteType="password"
                 onSubmit={() => {
                   changePassword
                     ? changePassInputRef.current?.focus()
@@ -655,6 +656,7 @@ export class VaultDialog extends Component {
                 onChangeText={(value) => {
                   this.password = value;
                 }}
+                autoCompleteType="password"
                 returnKeyLabel="Next"
                 returnKeyType="next"
                 secureTextEntry

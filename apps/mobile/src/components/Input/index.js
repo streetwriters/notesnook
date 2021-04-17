@@ -39,7 +39,8 @@ const Input = ({
   height = 50,
   fontSize = SIZE.md,
   returnKeyType,
-  returnKeyLabel
+  returnKeyLabel,
+  autoCompleteType
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -171,6 +172,7 @@ const Input = ({
             keyboardType={
               validationType === 'email' ? 'email-address' : 'default'
             }
+            importantForAutofill="auto"
             returnKeyLabel={returnKeyLabel}
             returnKeyType={returnKeyType}
             keyboardAppearance={colors.night ? 'dark' : 'light'}
@@ -181,6 +183,7 @@ const Input = ({
             secureTextEntry={secureTextEntry && secureEntry}
             placeholder={placeholder}
             placeholderTextColor={colors.icon}
+            autoCompleteType={autoCompleteType}
           />
 
           <View
