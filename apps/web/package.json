@@ -166,7 +166,7 @@
           "path": "/Applications"
         }
       ],
-      "icon": "assets/icons/volume.icns",
+      "icon": "assets/icons/icon.icns",
       "title": "Install Notesnook"
     },
     "win": {
