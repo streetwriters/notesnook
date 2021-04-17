@@ -111,6 +111,7 @@ function Dialog(props) {
                 data-test-id="dialog-yes"
                 sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
                 mx={1}
+                autoFocus={props.positiveButton.autoFocus}
                 disabled={props.positiveButton.disabled || false}
                 onClick={
                   !props.positiveButton.disabled

@@ -14,6 +14,7 @@ function Confirm(props) {
       positiveButton={{
         text: props.yesText,
         onClick: props.onYes,
+        autoFocus: !!props.yesText,
       }}
       negativeButton={
         props.noText && { text: props.noText, onClick: props.onNo }

@@ -45,6 +45,10 @@ class Primary {
       ":hover": {
         opacity: 0.8,
       },
+      ":focus-visible": {
+        border: "2px solid",
+        borderColor: "text",
+      },
     };
   }
 }
