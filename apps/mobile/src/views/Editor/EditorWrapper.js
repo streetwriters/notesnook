@@ -3,6 +3,7 @@ import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
 import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Editor from '.';
 import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
@@ -11,7 +12,6 @@ import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import {editorRef} from '../../utils/Refs';
 import EditorOverlay from './EditorOverlay';
-import Editor from "./index"
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -87,7 +87,7 @@ const AnimatedKeyboardView = Animated.createAnimatedComponent(
 
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const {colors, loading} = state;
   const insets = useSafeAreaInsets();
 
 
@@ -176,7 +176,7 @@ export const EditorWrapper = ({dimensions}) => {
               </Animated.Text>
             </View>
 
-            <Editor />
+            {loading ? null : <Editor />}
             <EditorOverlay />
           </AnimatedKeyboardView>
         </PanGestureHandler>

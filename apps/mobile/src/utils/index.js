@@ -83,7 +83,7 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 400) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1360;
+export const APP_VERSION = 1370;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -128,6 +128,7 @@ export const editing = {
   focusType: null,
   movedAway: true,
   tooltip: false,
+  isRestoringState:false
 };
 export const selection = {
   data: [],

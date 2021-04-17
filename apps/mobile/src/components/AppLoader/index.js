@@ -9,14 +9,14 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
-import { editing } from '../../utils';
+import {editing} from '../../utils';
 import {changeContainerScale, ContainerScale} from '../../utils/Animations';
 import {db} from '../../utils/DB';
 import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
-import { setNoteOnly } from '../../views/Editor/Functions';
+import {setNoteOnly} from '../../views/Editor/Functions';
 
 const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
@@ -32,6 +32,19 @@ const AppLoader = ({onLoad}) => {
       opacityV.setValue(1);
       return;
     }
+    let appState = await MMKV.getItem('appState');
+    if (appState) {
+      
+      appState = JSON.parse(appState);
+      if (!appState.movedAway && Date.now() < appState.timestamp + 3600000) {
+        editing.isRestoringState = true;
+        //setNoteOnly(appState.note);
+        editing.currentlyEditing = true;
+        tabBarRef.current?.goToPage(1);
+        eSendEvent('loadingNote', appState.note);
+      }
+    }
+
     if (value === 'show') {
       opacityV.setValue(0);
       setLoading(false);
@@ -49,7 +62,7 @@ const AppLoader = ({onLoad}) => {
     changeContainerScale(ContainerScale, 1, 600);
     await sleep(150);
     setLoading(false);
-    
+
     animation = false;
     await db.notes.init();
     dispatch({type: Actions.NOTES});

@@ -195,7 +195,7 @@ export const loadNote = async item => {
     }
     tiny.call(EditorWebView, tiny.notLoading);
   } else {
-    if (id === item.id) {
+    if (id === item.id && !item.forced) {
       return;
     }
     eSendEvent('loadingNote', item);
@@ -485,10 +485,9 @@ async function restoreEditorState() {
       appState.note.id &&
       Date.now() < appState.timestamp + 3600000
     ) {
+      editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
-      setNoteOnly(appState.note);
       editing.currentlyEditing = true;
-      editing.movedAway = true;
       tabBarRef.current?.goToPage(1);
       setTimeout(() => {
         eSendEvent(eOnLoadNote, appState.note);
@@ -496,6 +495,7 @@ async function restoreEditorState() {
       MMKV.removeItem('appState');
       editing.movedAway = false;
       eSendEvent('load_overlay', 'hide_editor');
+      editing.isRestoringState = false;
     }
   }
 }
