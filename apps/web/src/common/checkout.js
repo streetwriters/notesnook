@@ -1,3 +1,5 @@
+import { trackEvent } from "../utils/analytics";
+
 const VENDOR_ID = process.env.NODE_ENV === "development" ? 1506 : 128190;
 const PRODUCT_ID = process.env.NODE_ENV === "development" ? 9822 : 648884;
 
@@ -25,8 +27,10 @@ async function upgrade(user, coupon) {
   const { Paddle } = window;
   if (!Paddle) return;
 
-  if (coupon && window.umami) {
-    window.umami(`[${coupon}] redeemed!`, "offers");
+  if (coupon) {
+    trackEvent(`[${coupon}] redeemed!`, "offers");
+  } else {
+    trackEvent(`Checkout requested`, "checkout");
   }
 
   Paddle.Checkout.open({

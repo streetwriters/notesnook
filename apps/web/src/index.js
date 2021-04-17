@@ -6,6 +6,7 @@ import { init, showReportDialog } from "@sentry/react";
 import { Integrations } from "@sentry/tracing";
 import { getAppVersion } from "./utils/useVersion";
 import fromEntries from "object.fromentries";
+import Config from "./utils/config";
 
 if (!Object.fromEntries) {
   fromEntries.shim();
@@ -21,6 +22,7 @@ if (process.env.NODE_ENV === "production") {
       if (event.exception || event.extra.report === true) {
         showReportDialog();
       }
+      if (Config.get("telemetry") === "false") return null;
       return event;
     },
     release: `notesnook-web@${getAppVersion().formatted}`,

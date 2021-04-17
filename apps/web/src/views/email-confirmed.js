@@ -9,6 +9,7 @@ import { db } from "../common/db";
 import { showLogInDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import CountdownTimer from "@inlightmedia/react-countdown-timer";
+import { trackEvent } from "../utils/analytics";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -122,9 +123,7 @@ function SaleBanner(props) {
         fontSize="title"
         width="100%"
         onClick={async () => {
-          if (window.umami) {
-            window.umami(`[Email verified] Subscribe button clicked`, "offers");
-          }
+          trackEvent(`Email verification offer`, "offers");
 
           let user = await db.user.getUser();
           if (user && user.id === userId) {

@@ -7,7 +7,7 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
-import { showLogInDialog } from "../common/dialog-controller";
+import { confirm, showLogInDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
 import { createBackup, isUserPremium, SUBSCRIPTION_STATUS } from "../common";
@@ -24,6 +24,7 @@ import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
+import Config from "../utils/config";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -114,6 +115,10 @@ function Settings(props) {
   const [backupReminderOffset, setBackupReminderOffset] = usePersistentState(
     "backupReminderOffset",
     0
+  );
+  const [enableTelemetry, setEnableTelemetry] = usePersistentState(
+    "telemetry",
+    true
   );
 
   useEffect(() => {
@@ -387,7 +392,64 @@ function Settings(props) {
             />
           </Button>
         )}
-
+        <Text
+          variant="subtitle"
+          color="primary"
+          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
+        >
+          Telemetry
+        </Text>
+        <ToggleItem
+          title="Enable telemetry"
+          onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
+          offTip="Do not collect any data or crash reports"
+          premium="customize"
+          onToggled={() => {
+            setEnableTelemetry(!enableTelemetry);
+            Config.set("umami.disabled", !enableTelemetry);
+          }}
+          isToggled={enableTelemetry}
+        />
+        <Button
+          variant="list"
+          onClick={() => {
+            const details = [
+              <>
+                1. We use <b>Sentry</b> for collecting errors and crash reports.
+                Read Sentry privacy policy{" "}
+                <a
+                  href="https://sentry.io/privacy/"
+                  title="Sentry privacy policy"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  here.
+                </a>
+              </>,
+              "2. We send a tracker event when you click the CTA (Call to Action) button on an announcement or promo.",
+              "3. We send a tracker event when you open the checkout to buy Notesnook Pro.",
+              "4. We send a tracker event when you claim an offer or promo.",
+            ];
+            confirm(null, {
+              title: "Telemetry details",
+              subtitle:
+                "Read details of all the usage data we collect and send to our servers.",
+              message: (
+                <>
+                  {details.map((detail) => (
+                    <p>{detail}</p>
+                  ))}
+                </>
+              ),
+              yesText: "Okay",
+            });
+          }}
+        >
+          <TextWithTip
+            text="What do we collect?"
+            tip="Read details of all usage data we collect."
+          />
+        </Button>
         <Text
           variant="subtitle"
           color="primary"
@@ -453,9 +515,9 @@ function ToggleItem(props) {
     >
       <TextWithTip text={title} tip={isToggled ? onTip : offTip} />
       {isToggled ? (
-        <Icon.ToggleChecked size={30} color="primary" />
+        <Icon.ToggleChecked size={30} sx={{ flexShrink: 0 }} color="primary" />
       ) : (
-        <Icon.ToggleUnchecked size={30} />
+        <Icon.ToggleUnchecked size={30} sx={{ flexShrink: 0 }} />
       )}
     </Flex>
   );

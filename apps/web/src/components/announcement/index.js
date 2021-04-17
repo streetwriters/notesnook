@@ -2,11 +2,11 @@ import React from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import useAnnouncement from "../../utils/useAnnouncement";
-import { hashNavigate } from "../../navigation";
 import { db } from "../../common/db";
 import { upgrade } from "../../common/checkout";
 import { showLogInDialog } from "../../common/dialog-controller";
 import { showToast } from "../../utils/toast";
+import { trackEvent } from "../../utils/analytics";
 
 function Announcement() {
   const [announcement, removeAnnouncement] = useAnnouncement();
@@ -36,9 +36,7 @@ function Announcement() {
           mt={1}
           p={1}
           onClick={async () => {
-            if (window.umami) {
-              window.umami(`[Announcement CTA] ${announcement.cta.text}`);
-            }
+            trackEvent(announcement.cta.text, "Announcement CTA");
             switch (announcement.cta.type) {
               case "link":
                 window.open(announcement.cta.action, "_blank");
@@ -59,7 +57,10 @@ function Announcement() {
 
                 user = await db.user.getUser();
                 if (!user) {
-                  showToast("error", "You are not logged in. Please try again.");
+                  showToast(
+                    "error",
+                    "You are not logged in. Please try again."
+                  );
                   return;
                 }
                 await upgrade(user, coupon);
