@@ -11,6 +11,7 @@ import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import {editorRef} from '../../utils/Refs';
 import EditorOverlay from './EditorOverlay';
+import Editor from "./index"
 let prevVal = 0;
 let finalValue = 80;
 let anim2 = new Animated.Value(0);
@@ -84,22 +85,11 @@ const AnimatedKeyboardView = Animated.createAnimatedComponent(
   KeyboardAvoidingView,
 );
 
-let Editor;
-
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
-  const {colors, loading} = state;
-  const [loaded, setLoaded] = useState(false);
+  const {colors} = state;
   const insets = useSafeAreaInsets();
 
-  useEffect(() => {
-    if (!loading) {
-      if (!Editor) {
-        Editor = require('./index').default;
-      }
-      setLoaded(true);
-    }
-  }, [loading]);
 
   return (
     <View
@@ -186,7 +176,7 @@ export const EditorWrapper = ({dimensions}) => {
               </Animated.Text>
             </View>
 
-            {!loaded || loading ? null : <Editor />}
+            <Editor />
             <EditorOverlay />
           </AnimatedKeyboardView>
         </PanGestureHandler>

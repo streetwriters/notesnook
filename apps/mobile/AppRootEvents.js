@@ -51,6 +51,7 @@ async function storeAppState() {
       editing: editing.currentlyEditing,
       note: getNote(),
       movedAway: editing.movedAway,
+      timestamp:Date.now()
     });
     await MMKV.setItem('appState', state);
   }

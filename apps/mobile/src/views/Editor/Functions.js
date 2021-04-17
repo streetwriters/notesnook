@@ -91,7 +91,7 @@ export function clearTimer() {
   }
 }
 
-export const CHECK_STATUS = (premium) =>
+export const CHECK_STATUS = premium =>
   `(function() {
        setTimeout(() => {
         let msg = JSON.stringify({
@@ -107,6 +107,10 @@ export function getNote() {
   return note;
 }
 
+export function setNoteOnly(n) {
+  note = n;
+}
+
 export const textInput = createRef();
 
 export function post(type, value = null) {
@@ -117,12 +121,12 @@ export function post(type, value = null) {
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
-export const _onShouldStartLoadWithRequest = async (request) => {
+export const _onShouldStartLoadWithRequest = async request => {
   if (request.url.includes('https')) {
     if (Platform.OS === 'ios' && !request.isTopFrame) return;
     openLinkInBrowser(request.url, appColors)
-      .catch((e) => {})
-      .then((r) => {});
+      .catch(e => {})
+      .then(r => {});
 
     return false;
   } else {
@@ -170,7 +174,7 @@ let currentEditingTimer = null;
 
 let webviewTimer = null;
 
-export const loadNote = async (item) => {
+export const loadNote = async item => {
   editing.currentlyEditing = true;
   tiny.call(EditorWebView, tiny.blur);
   if (item && item.type === 'new') {
@@ -242,7 +246,7 @@ export function setIntentNote(item) {
   };
 }
 
-export const _onMessage = async (evt) => {
+export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
 
@@ -475,12 +479,22 @@ async function restoreEditorState() {
   let appState = await MMKV.getItem('appState');
   if (appState) {
     appState = JSON.parse(appState);
-    if (appState.editing && appState.note && appState.note.id) {
-      eSendEvent(eOnLoadNote, appState.note);
-      if (!appState.movedAway) {
-        tabBarRef.current?.goToPage(1);
-      }
+    if (
+      appState.editing &&
+      appState.note &&
+      appState.note.id &&
+      Date.now() < appState.timestamp + 3600000
+    ) {
+      eSendEvent('loadingNote', appState.note);
+      setNoteOnly(appState.note);
+      editing.currentlyEditing = true;
+      editing.movedAway = true;
+      tabBarRef.current?.goToPage(1);
+      setTimeout(() => {
+        eSendEvent(eOnLoadNote, appState.note);
+      }, 100);
       MMKV.removeItem('appState');
+      editing.movedAway = false;
       eSendEvent('load_overlay', 'hide_editor');
     }
   }

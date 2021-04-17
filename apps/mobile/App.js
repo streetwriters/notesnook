@@ -17,10 +17,13 @@ import {
   eUnSubscribeEvent,
 } from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
+import { editing } from './src/utils';
 import {db} from './src/utils/DB';
 import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
+import { tabBarRef } from './src/utils/Refs';
 import EditorRoot from './src/views/Editor/EditorRoot';
+import { setNoteOnly } from './src/views/Editor/Functions';
 
 let initStatus = false;
 const App = () => {

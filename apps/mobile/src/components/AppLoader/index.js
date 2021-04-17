@@ -16,6 +16,7 @@ import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
+import { setNoteOnly } from '../../views/Editor/Functions';
 
 const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
@@ -31,17 +32,6 @@ const AppLoader = ({onLoad}) => {
       opacityV.setValue(1);
       return;
     }
-    let appState = await MMKV.getItem('appState');
-    if (appState) {
-      appState = JSON.parse(appState);
-      if (!appState.movedAway) {
-        eSendEvent('loadingNote', appState.note);
-        editing.currentlyEditing = true;
-        tabBarRef.current?.goToPage(1);
-       
-      }
-    }
-
     if (value === 'show') {
       opacityV.setValue(0);
       setLoading(false);
@@ -59,6 +49,7 @@ const AppLoader = ({onLoad}) => {
     changeContainerScale(ContainerScale, 1, 600);
     await sleep(150);
     setLoading(false);
+    
     animation = false;
     await db.notes.init();
     dispatch({type: Actions.NOTES});
