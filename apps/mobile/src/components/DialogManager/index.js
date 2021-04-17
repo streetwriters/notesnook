@@ -24,7 +24,7 @@ import {
   eShowGetPremium,
   eThemeUpdated,
 } from '../../utils/Events';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {EditorSettings} from '../../views/Editor/EditorSettings';
 import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
@@ -82,7 +82,7 @@ export class DialogManager extends Component {
     );
   }
 
-  _showActionSheet = (data) => {
+  _showActionSheet = data => {
     this.setState(
       {
         actionSheetData: data,
@@ -108,7 +108,7 @@ export class DialogManager extends Component {
     // this.moveNoteDialog.close();
   };
 
-  loadNote = (i) => {
+  loadNote = i => {
     if (i && i.type === 'new') {
       this.setState({
         item: {},
@@ -125,7 +125,7 @@ export class DialogManager extends Component {
     console.log(item);
     this.addTopicsDialog.open({
       notebookId: item?.type !== 'topic' ? item.id : item.notebookId,
-      toEdit:item?.type === 'topic' ? item : null,
+      toEdit: item?.type === 'topic' ? item : null,
     });
   };
 
@@ -185,7 +185,7 @@ export class DialogManager extends Component {
     eUnSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
   }
 
-  showPremiumDialog = (prompoInfo) => {
+  showPremiumDialog = prompoInfo => {
     this.premiumDialog.open(prompoInfo);
   };
 
@@ -201,10 +201,10 @@ export class DialogManager extends Component {
     //this.loginDialog.close();
   };
 
-  showAddNotebook = (data) => {
+  showAddNotebook = data => {
     this.setState(
       {
-        item: data.item ? data.item : data.type === "notebook" ? data : {},
+        item: data.item ? data.item : data.type === 'notebook' ? data : {},
       },
       () => {
         this.addNotebooksDialog.open();
@@ -215,7 +215,7 @@ export class DialogManager extends Component {
     this.addNotebooksDialog.close();
   };
 
-  _showSimpleDialog = (data) => {
+  _showSimpleDialog = data => {
     this.setState(
       {
         simpleDialog: data,
@@ -225,7 +225,7 @@ export class DialogManager extends Component {
       },
     );
   };
-  _hideSimpleDialog = (data) => {
+  _hideSimpleDialog = data => {
     this.simpleDialog?.hide();
   };
 
@@ -322,7 +322,7 @@ export class DialogManager extends Component {
             }}>
             <ActionSheetComponent
               item={item}
-              setWillRefresh={(value) => {
+              setWillRefresh={value => {
                 this.willRefresh = true;
               }}
               getRef={() => this.actionSheet}
@@ -333,7 +333,7 @@ export class DialogManager extends Component {
               }
               rowItems={actionSheetData.rowItems}
               columnItems={actionSheetData.columnItems}
-              close={(value) => {
+              close={value => {
                 if (value) {
                   this.show = value;
                 }
@@ -344,13 +344,13 @@ export class DialogManager extends Component {
         )}
 
         <Dialog
-          ref={(ref) => (this.simpleDialog = ref)}
+          ref={ref => (this.simpleDialog = ref)}
           item={item}
           colors={colors}
           template={simpleDialog}
         />
         <AddTopicDialog
-          ref={(ref) => (this.addTopicsDialog = ref)}
+          ref={ref => (this.addTopicsDialog = ref)}
           close={() => {
             this.setState({
               item: {},
@@ -359,12 +359,12 @@ export class DialogManager extends Component {
           colors={colors}
         />
         <AddNotebookDialog
-          ref={(ref) => (this.addNotebooksDialog = ref)}
+          ref={ref => (this.addNotebooksDialog = ref)}
           toEdit={item}
           colors={colors}
         />
         <PremiumDialog
-          ref={(ref) => (this.premiumDialog = ref)}
+          ref={ref => (this.premiumDialog = ref)}
           colors={colors}
         />
         <LoginDialog colors={colors} />
@@ -379,9 +379,9 @@ export class DialogManager extends Component {
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
         <SortDialog colors={colors} />
-        
+
         <UpdateDialog />
-        <RateDialog/>
+        <RateDialog />
       </>
     );
   }

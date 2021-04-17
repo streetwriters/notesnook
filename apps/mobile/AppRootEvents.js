@@ -51,6 +51,7 @@ async function storeAppState() {
       editing: editing.currentlyEditing,
       note: getNote(),
       movedAway: editing.movedAway,
+      timestamp:Date.now()
     });
     await MMKV.setItem('appState', state);
   }
@@ -326,7 +327,6 @@ export const AppRootEvents = React.memo(
         if (login) {
           eSendEvent(eCloseProgressDialog);
         }
-        let announcement = await db.announcement();
         
 
       }

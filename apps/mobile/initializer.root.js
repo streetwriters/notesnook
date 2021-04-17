@@ -49,7 +49,7 @@ const onChangeTab = async (obj) => {
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
-    if (!editing.currentlyEditing || !getNote()) {
+    if (!editing.isRestoringState && (!editing.currentlyEditing || !getNote())) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }

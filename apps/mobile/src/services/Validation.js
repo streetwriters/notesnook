@@ -1,10 +1,8 @@
-import {db} from '../utils/DB';
-
-let regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+import validator from 'validator';
 
 export function validateEmail(email) {
   if (email && email.length > 0) {
-    return regex.test(email);
+    return validator.isEmail(email)
   } else {
     return false;
   }

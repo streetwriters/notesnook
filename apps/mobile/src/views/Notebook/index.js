@@ -29,8 +29,10 @@ export const Notebook = ({route, navigation}) => {
 
   const runAfterInteractions = (time = 400) => {
     InteractionManager.runAfterInteractions(() => {
-      let notebook = db.notebooks.notebook(params.notebook?.id).data;
-      params.notebook = notebook;
+      let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
+      if (notebook) {
+        params.notebook = notebook;
+      }
       params.title = params.notebook.title;
       setTopics(notebook.topics);
       setTimeout(() => {
