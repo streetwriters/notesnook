@@ -6,6 +6,8 @@ function Banner() {
     const os = getOS();
     if (os === "Android")
       return "https://play.google.com/store/apps/details?id=com.streetwriters.notesnook";
+    if (os === "iOS")
+      return "https://apps.apple.com/pk/app/notesnook-take-private-notes/id1544027013";
     return null;
   }, []);
   if (link === null) return null;
