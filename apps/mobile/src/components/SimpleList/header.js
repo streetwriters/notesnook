@@ -20,6 +20,7 @@ export const Header = ({
   onPress,
   shouldShow = false,
   icon,
+  screen
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -70,7 +71,7 @@ export const Header = ({
             color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
             w={normalize(150)}
             h={normalize(150)}
-            type={type}
+            type={screen === "Favorites" ? "favorites" : type}
           />
         </View>
 
