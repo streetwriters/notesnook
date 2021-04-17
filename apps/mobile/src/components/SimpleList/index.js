@@ -178,6 +178,7 @@ const SimpleList = ({
             type={dataType}
             index={index}
             data={listData}
+            screen={screen}
           />
         );
       case 'header':

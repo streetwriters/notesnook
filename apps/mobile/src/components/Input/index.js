@@ -39,7 +39,9 @@ const Input = ({
   height = 50,
   fontSize = SIZE.md,
   returnKeyType,
-  returnKeyLabel
+  returnKeyLabel,
+  autoCompleteType,
+  onFocusInput
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -123,6 +125,10 @@ const Input = ({
 
   const onFocus = () => {
     setFocus(true);
+    if (onFocusInput) {
+      onFocusInput()
+    }
+    
   };
 
   const style = {
@@ -143,12 +149,13 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height: 35,
+    height:35,
   };
 
   return (
     <>
       <View
+        importantForAccessibility="yes"
         style={{
           height: height,
           marginBottom: marginBottom,
@@ -171,6 +178,7 @@ const Input = ({
             keyboardType={
               validationType === 'email' ? 'email-address' : 'default'
             }
+            importantForAutofill="yes"
             returnKeyLabel={returnKeyLabel}
             returnKeyType={returnKeyType}
             keyboardAppearance={colors.night ? 'dark' : 'light'}
@@ -181,6 +189,7 @@ const Input = ({
             secureTextEntry={secureTextEntry && secureEntry}
             placeholder={placeholder}
             placeholderTextColor={colors.icon}
+            autoCompleteType={autoCompleteType}
           />
 
           <View

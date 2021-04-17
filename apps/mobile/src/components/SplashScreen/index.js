@@ -160,14 +160,14 @@ const SplashScreen = () => {
                             size={170}
                           />
                         ) : (
-                          <SvgToPngView
-                            src={
+                          <SvgXml
+                            xml={
                               item.icon
                                 ? item.icon(colors.accent)
                                 : NOTE_SVG(colors.accent)
                             }
-                            img={item.img}
-                            color={colors.accent}
+                            //img={item.img}
+                            //color={colors.accent}
                             width={250}
                             height={250}
                           />
