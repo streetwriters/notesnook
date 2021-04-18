@@ -132,6 +132,83 @@ function setTheme() {
 	  #titlebar {
 		display:flex !important;
 	  }
+
+    .tox .tox-tbtn:hover {
+      background: ${pageTheme.colors.shade} !important;
+    }
+    
+    .tox-textfield {
+      border-radius: 0px !important;
+      border-color: ${pageTheme.colors.nav} !important;
+      border-width: 0px 0px 2px 0px !important;
+      color: var(--text) !important;
+      padding: 10px !important;
+      font-size: 0.875rem !important;
+      line-height: 0.875rem !important;
+    }
+    
+    .tox-textfield:focus {
+      outline: none !important;
+      border-color: ${pageTheme.colors.accent} !important;
+      border-width: 0px 0px 2px 0px !important;
+      border-radius: 0px !important;
+    }
+    
+    .tox-textfield:hover {
+      border-color: ${pageTheme.colors.accent + '80'} !important;
+    }
+    
+    .tox-button {
+      background-color: ${pageTheme.colors.accent} !important;
+      color: white;
+      transition: opacity 300ms linear;
+      border-width: 0px !important;
+    }
+    
+    .tox-button:hover:not(.tox-button[disabled="disabled"]) {
+      opacity: 0.8;
+    }
+    
+    .tox-button--secondary,
+    .tox-button--icon {
+      background-color: ${pageTheme.colors.nav} !important;
+      color: ${pageTheme.colors.icon} !important;
+    }
+    .tox-button[disabled="disabled"] {
+      background-color:  ${pageTheme.colors.nav}  !important;
+      color: ${pageTheme.colors.icon} !important;
+    }
+    
+    tox-tbtn tox-tbtn--select {
+      border-radius: 5px !important;
+    }
+    
+    .tox-dialog {
+      border-radius: 5px !important;
+      border-width: 0px !important;
+      box-shadow: 4px 5px 18px 2px #00000038;
+      padding: 0px !important;
+      width: calc(100vw - 22px) !important;
+      margin-right:-2px !important;
+    }
+    
+    .tox-dialog__footer {
+      border-top: 0px !important;
+    }
+    
+    .tox-dialog__title {
+      color: ${pageTheme.colors.pri} !important;
+      font-size: 1.2rem !important;
+      font-weight: bold !important;
+    }
+    
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__overflow,
+    .tox .tox-toolbar__primary {
+      background: none !important;
+      border-bottom: 1px solid ${pageTheme.colors.nav} !important;
+    }
+
 	  `;
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);

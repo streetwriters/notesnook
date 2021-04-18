@@ -55,6 +55,7 @@ export const execCommands = {
   horizontal: `tinymce.activeEditor.execCommand('InsertHorizontalRule');`,
   rtl: `tinymce.activeEditor.execCommand('mceDirectionRTL');`,
   ltr: `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
+  magnify:`tinymce.activeEditor.execCommand('SearchReplace');`,
   table: (r, c) =>
     `tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} })`,
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
