@@ -6,7 +6,7 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {dHeight} from '../../utils';
+import {dHeight, dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
@@ -50,14 +50,17 @@ const SimpleList = ({
       return r1 !== r2;
     }).cloneWithRows([header, empty]),
   );
+  const [width,setWidth] = useState(dWidth)
   const scrollRef = useRef();
 
   const insets = useSafeAreaInsets();
-  const {width, fontScale} = useWindowDimensions();
+  
+  const {fontScale} = useWindowDimensions();
   const refreshing = false;
   const dataType = type;
 
   useEffect(() => {
+    setWidth(dWidth);
     if (!loading) {
       setDataProvider(
         dataProvider.cloneWithRows(
