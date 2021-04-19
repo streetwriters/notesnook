@@ -17,13 +17,10 @@ import {
   eUnSubscribeEvent,
 } from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
-import { editing } from './src/utils';
 import {db} from './src/utils/DB';
 import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
-import { tabBarRef } from './src/utils/Refs';
 import EditorRoot from './src/views/Editor/EditorRoot';
-import { setNoteOnly } from './src/views/Editor/Functions';
 
 let initStatus = false;
 const App = () => {
@@ -48,9 +45,11 @@ const App = () => {
           eSendEvent(eOpenSideMenu);
           SplashScreen.hide();
           await db.init();
+          console.log('db is ready');
           let requireIntro = await MMKV.getItem('introCompleted');
+          loadDefaultNotes();
+          console.log('loaded default note');
           if (!requireIntro) {
-            await loadDefaultNotes();
             await MMKV.setItem(
               'askForRating',
               JSON.stringify({
@@ -86,7 +85,7 @@ const App = () => {
     })();
   }, []);
 
-  const _dispatch = (data) => {
+  const _dispatch = data => {
     dispatch(data);
   };
 
@@ -98,6 +97,7 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
+    console.log('status on init', initStatus);
     if (initStatus) {
       SettingsService.setAppLoaded();
       eSendEvent('load_overlay');
@@ -107,6 +107,7 @@ const App = () => {
 
   async function loadDefaultNotes() {
     try {
+      console.log('creating note');
       const isCreated = await MMKV.getItem('defaultNoteCreated');
       if (isCreated) return;
       const notes = await http.get(
@@ -114,6 +115,7 @@ const App = () => {
       );
       if (!notes) return;
       for (let note of notes) {
+        console.log('getting content');
         const content = await http.get(note.mobileContent);
         await db.notes.add({
           title: note.title,
@@ -122,9 +124,11 @@ const App = () => {
           content: {type: 'tiny', data: content},
         });
       }
+      console.log('default note created');
       await MMKV.setItem('defaultNoteCreated', 'yes');
+      dispatch({type: Actions.ALL});
     } catch (e) {
-      console.log(e);
+      console.log(e, 'loading note on welcome');
     }
   }
 
