@@ -349,6 +349,9 @@ const MergeEditor = () => {
       statusBarTranslucent
       transparent={false}
       animationType="slide"
+      onRequestClose={()=> {
+        close()
+      }}
       visible={true}>
       <SafeAreaView
         style={{
