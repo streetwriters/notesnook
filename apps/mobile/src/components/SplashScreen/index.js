@@ -77,10 +77,12 @@ const SplashScreen = () => {
   const [isNext, setIsNext] = useState(true);
 
   const opacity = useValue(0);
+  const translateY = useValue(20);
+  const translateY2 = useValue(0);
 
   useEffect(() => {
-    Storage.read('introCompleted').then(async r => {
-      requestAnimationFrame(() => {
+    Storage.read('introCompleted').then(async (r) => {
+      setTimeout(() => {
         if (!r) {
           setVisible(true);
           timing(opacity, {
@@ -88,18 +90,42 @@ const SplashScreen = () => {
             duration: 500,
             easing: Easing.in(Easing.ease),
           }).start();
+          timing(translateY, {
+            toValue: 0,
+            duration: 500,
+            easing: Easing.in(Easing.ease),
+          }).start();
         }
-      });
+      },1);
     });
   }, []);
 
-  const hide = async () => {
+   const hide = async () => {
+    timing(translateY2, {
+      toValue: dHeight * 2,
+      duration: 500,
+      easing: Easing.in(Easing.ease),
+    }).start();
+    await sleep(500);
     setVisible(false);
   };
 
   return (
     visible && (
-      <Modal animationType="slide" statusBarTranslucent visible>
+      <Animated.View
+        style={{
+          zIndex: 999,
+          ...getElevation(10),
+          width: '100%',
+          height: '100%',
+          position: 'absolute',
+          backgroundColor: colors.bg,
+          transform: [
+            {
+              translateY: translateY2,
+            },
+          ],
+        }}>
         <SafeAreaView
           style={{
             width: '100%',
@@ -257,7 +283,7 @@ const SplashScreen = () => {
             </View>
           </Animated.View>
         </SafeAreaView>
-      </Modal>
+      </Animated.View>
     )
   );
 };
