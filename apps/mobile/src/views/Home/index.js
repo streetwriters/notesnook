@@ -106,6 +106,7 @@ export const Home = ({route, navigation}) => {
 
   const _onPressBottomButton = async () => {
     if (!DDS.isLargeTablet()) {
+      eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
