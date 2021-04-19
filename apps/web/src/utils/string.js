@@ -1,8 +1,5 @@
-import { captureMessage } from "@sentry/react";
-
 export function toTitleCase(str) {
-  if (!str) {
-    captureMessage("str is empty in toTitleCase");
+  if (!str || !str[0]) {
     return "";
   }
   return str[0].toUpperCase() + str.substring(1);

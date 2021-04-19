@@ -12,8 +12,6 @@
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",
-    "@sentry/react": "^6.1.0",
-    "@sentry/tracing": "^6.1.0",
     "@tinymce/tinymce-react": "^3.10.2",
     "clipboard": "^2.0.6",
     "cogo-toast": "^4.2.3",
@@ -29,7 +27,6 @@
     "localforage": "^1.7.3",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",
-    "object.fromentries": "^2.0.4",
     "print-js": "^1.6.0",
     "qclone": "^1.0.4",
     "react": "^17.0.1",
@@ -50,7 +47,6 @@
     "zustand": "^3.3.1"
   },
   "devDependencies": {
-    "@sentry/types": "^6.1.0",
     "@types/hookrouter": "^2.2.5",
     "@types/jest": "^26.0.20",
     "@types/jest-image-snapshot": "^4.1.0",

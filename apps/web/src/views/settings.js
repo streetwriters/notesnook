@@ -24,7 +24,6 @@ import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
-import Config from "../utils/config";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -406,7 +405,6 @@ function Settings(props) {
           premium="customize"
           onToggled={() => {
             setEnableTelemetry(!enableTelemetry);
-            Config.set("umami.disabled", !enableTelemetry);
           }}
           isToggled={enableTelemetry}
         />
@@ -414,21 +412,10 @@ function Settings(props) {
           variant="list"
           onClick={() => {
             const details = [
-              <>
-                1. We use <b>Sentry</b> for collecting errors and crash reports.
-                Read Sentry privacy policy{" "}
-                <a
-                  href="https://sentry.io/privacy/"
-                  title="Sentry privacy policy"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  here.
-                </a>
-              </>,
-              "2. We send a tracker event when you click the CTA (Call to Action) button on an announcement or promo.",
-              "3. We send a tracker event when you open the checkout to buy Notesnook Pro.",
-              "4. We send a tracker event when you claim an offer or promo.",
+              "1. We send an event whenever you open the web app along with the app version. All further navigation is not recorded.",
+              "2. We send an event when you click the CTA (Call to Action) button on an announcement or promo.",
+              "3. We send an event when you open the checkout to buy Notesnook Pro.",
+              "4. We send an event when you claim an offer or promo.",
             ];
             confirm(null, {
               title: "Telemetry details",
