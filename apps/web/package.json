@@ -1,6 +1,6 @@
 {
   "name": "notesnook",
-	"productName": "Notesnook",
+  "productName": "Notesnook",
   "description": "Your private note taking space",
   "version": "1.3.4",
   "private": true,
@@ -143,7 +143,9 @@
       "target": [
         "dmg"
       ],
-      "electronLanguages": ["en-US"],
+      "electronLanguages": [
+        "en-US"
+      ],
       "category": "public.app-category.productivity",
       "darkModeSupport": true,
       "type": "distribution",
