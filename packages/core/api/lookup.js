@@ -18,7 +18,9 @@ export default class Lookup {
     return notes.filter((note) => {
       let content = "";
       if (!note.locked) {
-        content = contents.find((content) => content.id === note.contentId);
+        content = contents.find(
+          (content) => !!content && content.id === note.contentId
+        );
         if (!content) return false;
         content = getContentFromData(content.type, content.data);
         content = content.toHTML();
