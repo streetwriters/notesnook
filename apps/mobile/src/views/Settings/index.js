@@ -249,8 +249,8 @@ export const Settings = ({navigation}) => {
         <ScrollView
           onScroll={e =>
             eSendEvent(eScrollEvent, {
-              y:e.nativeEvent.contentOffset.y,
-              screen:"Settings"
+              y: e.nativeEvent.contentOffset.y,
+              screen: 'Settings',
             })
           }
           scrollEventThrottle={1}
@@ -765,13 +765,15 @@ const SettingsUserSection = () => {
               </View>
 
               {user?.subscription?.provider &&
+              user.subscription.type !== 6 &&
+              user.subscription.type !== 7 &&
+              user.subscription.type !== 0 &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
                 <Button
                   title={
                     SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
                   }
                   onPress={() => {
-                    console.log('opening');
                     eSendEvent(eOpenProgressDialog, {
                       title:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
