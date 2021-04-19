@@ -34,20 +34,12 @@ const EditorOverlay = () => {
       }, 4000);
     } else {
       setProgress(4);
-      await sleep(1);
       setError(false);
-      timing(opacity, {
-        toValue: 0,
-        duration: 150,
-        easing: Easing.out(Easing.ease),
-      }).start(async () => {
-        await sleep(200);
-        setProgress(1);
-        opacity.setValue(1);
-        setLoading(null);
-        clearTimeout(timer);
-        clearTimeout(timerError);
-      });
+      setProgress(1);
+      opacity.setValue(1);
+      setLoading(null);
+      clearTimeout(timer);
+      clearTimeout(timerError);
     }
   };
 
