@@ -6,7 +6,6 @@ import { trackVisit } from "./utils/analytics";
 
 if (process.env.NODE_ENV === "production") {
   console.log = () => {};
-  trackVisit();
 }
 
 initializeDatabase().then(() => {
@@ -14,6 +13,7 @@ initializeDatabase().then(() => {
     import("./App").then(({ default: App }) => {
       render(<App />, document.getElementById("root"), () => {
         document.getElementById("splash").remove();
+        trackVisit();
         import("react-modal").then(({ default: Modal }) => {
           Modal.setAppElement("#root");
         });
