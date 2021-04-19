@@ -118,8 +118,8 @@ class Merger {
       async (local, remote) => {
         // if hashes are equal do nothing
         if (
-          !remote ||
-          remote === "undefined" ||
+          !remote.data ||
+          remote.data === "undefined" || //TODO not sure about this
           SparkMD5.hash(local.data) === SparkMD5.hash(remote.data)
         )
           return;
