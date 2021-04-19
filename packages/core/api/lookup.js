@@ -1,4 +1,3 @@
-import * as fuzzysort from "fuzzysort";
 import { qclone } from "qclone";
 import { getContentFromData } from "../content-types";
 
@@ -16,21 +15,22 @@ export default class Lookup {
     const contents = await this._db.content.multi(
       notes.map((note) => note.contentId || "")
     );
-    const candidates = notes.map((note) => {
-      note.content = "";
+    return notes.filter((note) => {
+      let content = "";
       if (!note.locked) {
-        let content = contents.find((content) => content.id === note.contentId);
-        if (!content) return note;
+        content = contents.find((content) => content.id === note.contentId);
+        if (!content) return false;
         content = getContentFromData(content.type, content.data);
-        note.content = content.toHTML();
+        content = content.toHTML();
       }
-      return note;
+      return search(query, note.title) || search(query, content);
     });
-    return fzs(query, candidates, ["title", "content"]);
   }
 
   notebooks(array, query) {
-    return fzs(query, array, ["title", "description"]);
+    return array.filter(
+      (item) => search(query, item.title) || search(query, item.description)
+    );
   }
 
   topics(array, query) {
@@ -46,12 +46,11 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return fzs(query, array, ["title"]);
+    return array.filter((item) => search(query, item.title));
   }
 }
 
-function fzs(query, array, fields) {
-  return fuzzysort
-    .go(query, array, { allowTypo: true, keys: fields })
-    .map((result) => result.obj);
+function search(query, string) {
+  const words = query.toLowerCase().split(" ");
+  return words.some((word) => string.toLowerCase().indexOf(word) > -1);
 }
