@@ -6,7 +6,7 @@ import useMobile from "../../utils/use-mobile";
 import Animated from "../animated";
 
 function Menu(props) {
-  const { menuItems, data, closeMenu, id, style, sx } = props;
+  const { menuItems, data, closeMenu, id, style, sx, state } = props;
   const isMobile = useMobile();
   const Container = useMemo(
     () => (isMobile ? MobileMenuContainer : MenuContainer),
@@ -14,7 +14,7 @@ function Menu(props) {
   );
 
   return (
-    <Container id={id} style={style} sx={sx}>
+    <Container id={id} style={style} sx={sx} state={state}>
       {menuItems.map(
         ({ title, key, onClick, component: Component, color, isPro }) => (
           <Flex
@@ -109,6 +109,7 @@ function MenuContainer({ id, style, sx, children }) {
 
 function MobileMenuContainer({ style, id, state, children }) {
   const animation = useAnimation();
+
   useEffect(() => {
     if (state === "open") {
       animation.start({ y: 0 });
