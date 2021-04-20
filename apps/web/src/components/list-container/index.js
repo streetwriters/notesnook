@@ -91,7 +91,7 @@ function ListContainer(props) {
                                   key={item.id || item.title}
                                   style={{
                                     ...style,
-                                    zIndex: 2,
+                                    zIndex: !index ? 3 : 2,
                                   }}
                                 >
                                   <GroupHeader
