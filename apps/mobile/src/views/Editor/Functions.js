@@ -202,23 +202,18 @@ export const loadNote = async item => {
       return;
     }
     await setNote(item);
+    clearTimer();
     eSendEvent('loadingNote', item);
+    webviewInit = false;
+    editing.isFocused = false;
+    eSendEvent('webviewreset');
     InteractionManager.runAfterInteractions(async () => {
-      eSendEvent('webviewreset');
-      webviewInit = false;
-      editing.isFocused = false;
-      clearTimer();
       sendNoteEditedEvent({
         id: id,
       });
-      if (webviewInit) {
-        await loadNoteInEditor();
-      } else {
-        EditorWebView.current?.reload();
-      }
       updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
       checkStatus();
-    }, 1);
+    }, 50);
   }
 };
 

@@ -20,26 +20,31 @@ const EditorOverlay = () => {
   const {colors} = state;
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
-  const [progress, setProgress] = useState(0);
   const opacity = useValue(1);
+  const translateY = useValue(6000);
 
-  const load = async (_loading) => {
+  const load = async _loading => {
     clearTimeout(timer);
     clearTimeout(timerError);
-    setProgress(2);
-    setLoading(_loading);
     if (_loading) {
+      opacity.setValue(1);
+      setLoading(_loading);
       timerError = setTimeout(() => {
         setError(true);
       }, 4000);
     } else {
-      setProgress(4);
-      setError(false);
-      setProgress(1);
-      opacity.setValue(1);
-      setLoading(null);
       clearTimeout(timer);
       clearTimeout(timerError);
+      setError(false);
+      timing(opacity, {
+        toValue: 0,
+        duration: 150,
+        easing: Easing.in(Easing.ease),
+      }).start();
+      setTimeout(() => {
+        opacity.setValue(1);
+        setLoading(null);
+      }, 150);
     }
   };
 
@@ -48,7 +53,7 @@ const EditorOverlay = () => {
     return () => {
       eUnSubscribeEvent('loadingNote', load);
     };
-  }, []);
+  }, [loading]);
 
   return (
     <Animated.View
@@ -60,7 +65,11 @@ const EditorOverlay = () => {
         justifyContent: 'center',
         alignItems: 'center',
         opacity: opacity,
-        top: loading ? 0 : 6000,
+        transform: [
+          {
+            translateY:loading? 0 : 6000,
+          },
+        ],
         zIndex: 100,
       }}>
       <View
@@ -122,7 +131,6 @@ const EditorOverlay = () => {
               marginTop: 10,
             }}
             onPress={() => {
-              setProgress(0);
               setError(false);
               eSendEvent('webviewreset');
             }}

@@ -47,8 +47,15 @@ function init_tiny(size) {
       max-width:100% !important;
       height:auto !important;
     }
+    .tox .tox-edit-area__iframe {
+      background-color:transparent !important;
+    }
+    body {
+      background-color:transparent !important;
+    }
     iframe {
       max-width:100% !important;
+      background-color:transparent !important;
     }
     table {
       display: block !important;
