@@ -10,6 +10,7 @@ import {
   View,
 } from 'react-native';
 import {useTracked} from '../../provider';
+import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 
 const BaseDialog = ({
   visible,
@@ -20,10 +21,11 @@ const BaseDialog = ({
   premium,
   statusBarTranslucent = true,
   transparent,
-  centered=true
+  centered = true,
 }) => {
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
+  const floating = useIsFloatingKeyboard();
 
   return (
     <Modal
@@ -39,21 +41,20 @@ const BaseDialog = ({
       animationType={animation}
       onRequestClose={onRequestClose}>
       <SafeAreaView
-        style={ {
+        style={{
           backgroundColor: transparent
             ? 'transparent'
             : state.colors.night
             ? 'rgba(255,255,255,0.15)'
             : 'rgba(0,0,0,0.3)',
-        }}
-      >
+        }}>
         <KeyboardAvoidingView
-          behavior={Platform.OS === 'ios' ? 'padding' : null}
+          enabled={!floating && Platform.OS === 'ios'}
           style={[
             styles.backdrop,
             {
-              justifyContent:centered? "center" : "flex-start"
-            }
+              justifyContent: centered ? 'center' : 'flex-start',
+            },
           ]}>
           <TouchableOpacity
             onPress={onRequestClose}

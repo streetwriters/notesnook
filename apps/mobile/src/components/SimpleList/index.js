@@ -213,6 +213,7 @@ const SimpleList = ({
             opacity: 0,
             elevation: 0,
           }}
+          
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressViewOffset={150}
@@ -235,6 +236,8 @@ const SimpleList = ({
     height: '100%',
     backgroundColor: colors.bg,
     width: '100%',
+    minHeight: 1, 
+    minWidth: 1
   };
   return (
     <>
@@ -251,6 +254,7 @@ const SimpleList = ({
         dataProvider={dataProvider}
         rowRenderer={_renderRow}
         onScroll={_onScroll}
+        
         canChangeSize={true}
         renderFooter={listData.length === 0 ? null : Footer}
         scrollViewProps={scrollProps}

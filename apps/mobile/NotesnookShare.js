@@ -1,4 +1,5 @@
 import React, {Component, createRef} from 'react';
+import {Keyboard} from 'react-native';
 import {
   ActivityIndicator,
   Appearance,
@@ -8,8 +9,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  ScrollView, 
-  TextInput
+  ScrollView,
+  TextInput,
 } from 'react-native';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
@@ -34,6 +35,7 @@ export default class NotesnookShare extends Component {
           ? COLOR_SCHEME_DARK
           : COLOR_SCHEME_LIGHT,
       height: 0,
+      floating: false,
     };
     this.initialText = '';
     this.textInputRef = createRef();
@@ -41,10 +43,14 @@ export default class NotesnookShare extends Component {
   }
 
   async componentDidMount() {
+    Keyboard.addListener(
+      'keyboardWillChangeFrame',
+      this.onKeyboardWillChangeFrame,
+    );
     try {
-      ShareExtension = require("rn-extensions-share").default
-      validator = require("validator").default
-      linkPreview = require("link-preview-js")
+      ShareExtension = require('rn-extensions-share').default;
+      validator = require('validator').default;
+      linkPreview = require('link-preview-js');
       const data = await ShareExtension.data();
       let text;
       let item = data[0];
@@ -52,8 +58,9 @@ export default class NotesnookShare extends Component {
         text = item.value;
       }
       if (validator.isURL(text)) {
-        linkPreview.getLinkPreview(text)
-          .then((r) => {
+        linkPreview
+          .getLinkPreview(text)
+          .then(r => {
             if (r?.siteName) {
               this.setState({
                 title: r.siteName,
@@ -74,7 +81,7 @@ export default class NotesnookShare extends Component {
               });
             }
           })
-          .catch((e) => {
+          .catch(e => {
             this.setState({
               title: 'Web Link',
               text: text,
@@ -92,6 +99,13 @@ export default class NotesnookShare extends Component {
     } catch (e) {
       console.log('errrr', e);
     }
+  }
+
+  componentWillUnmount() {
+    Keyboard.removeListener(
+      'keyboardWillChangeFrame',
+      this.onKeyboardWillChangeFrame,
+    );
   }
 
   close = () => {
@@ -174,6 +188,10 @@ export default class NotesnookShare extends Component {
     </View>
   );
 
+  onKeyboardWillChangeFrame = event => {
+    this.setState({floating: event.endCoordinates.width !== windowWidth});
+  };
+
   render() {
     return Platform.OS === 'ios' ? (
       <View
@@ -202,7 +220,7 @@ export default class NotesnookShare extends Component {
         </TouchableOpacity>
 
         <KeyboardAvoidingView
-          enabled={Platform.OS === 'ios'}
+          enabled={!this.state.floating && Platform.OS === 'ios'}
           style={{
             paddingVertical: 25,
             backgroundColor: this.state.colors.bg,
@@ -255,7 +273,7 @@ export default class NotesnookShare extends Component {
                     }}
                     placeholderTextColor={this.state.colors.icon}
                     value={this.state.title}
-                    onChangeText={(v) => this.setState({title: v})}
+                    onChangeText={v => this.setState({title: v})}
                     onSubmitEditing={() => {
                       this.textInputRef.current?.focus();
                     }}
@@ -297,7 +315,7 @@ export default class NotesnookShare extends Component {
                     paddingHorizontal: 12,
                   }}
                   placeholderTextColor={this.state.colors.icon}
-                  onChangeText={(v) => this.setState({text: v})}
+                  onChangeText={v => this.setState({text: v})}
                   multiline={true}
                   value={this.state.text}
                   blurOnSubmit={false}
@@ -317,7 +335,7 @@ export default class NotesnookShare extends Component {
     ) : (
       <Modal visible transparent>
         <View
-          onLayout={(event) => {
+          onLayout={event => {
             console.log(event.nativeEvent.layout.height);
             this.setState({
               height: event.nativeEvent.layout.height,
@@ -393,7 +411,7 @@ export default class NotesnookShare extends Component {
                       }}
                       placeholderTextColor={this.state.colors.icon}
                       value={this.state.title}
-                      onChangeText={(v) => this.setState({title: v})}
+                      onChangeText={v => this.setState({title: v})}
                       onSubmitEditing={() => {
                         this.textInputRef.current?.focus();
                       }}
@@ -432,7 +450,7 @@ export default class NotesnookShare extends Component {
                       paddingHorizontal: 12,
                     }}
                     placeholderTextColor={this.state.colors.icon}
-                    onChangeText={(v) => this.setState({text: v})}
+                    onChangeText={v => this.setState({text: v})}
                     multiline={true}
                     value={this.state.text}
                     placeholder="Type your note here"

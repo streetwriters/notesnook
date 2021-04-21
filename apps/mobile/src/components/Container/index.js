@@ -3,14 +3,16 @@ import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import Animated from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import { ContainerScale } from '../../utils/Animations';
+import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 import SelectionHeader from '../SelectionHeader';
 import { ContainerTopSection } from './ContainerTopSection';
 const AnimatedView = Animated.createAnimatedComponent(SafeAreaView);
 export const Container = ({children, root}) => {
   const [state] = useTracked();
   const {colors, } = state;
+  const floating = useIsFloatingKeyboard();
   return (
-    <KeyboardAvoidingView behavior="padding" enabled={Platform.OS === 'ios'}
+    <KeyboardAvoidingView behavior="padding" enabled={Platform.OS === 'ios' && !floating }
       style={{
         backgroundColor:colors.bg,
         width:"100%",

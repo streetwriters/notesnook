@@ -11,6 +11,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
 import {editorRef} from '../../utils/Refs';
+import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
 let prevVal = 0;
 let finalValue = 80;
@@ -89,7 +90,7 @@ export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
   const {colors, loading} = state;
   const insets = useSafeAreaInsets();
-
+  const floating = useIsFloatingKeyboard();
 
   return (
     <View
@@ -122,8 +123,8 @@ export const EditorWrapper = ({dimensions}) => {
           onHandlerStateChange={onHandlerStateChange}
           onGestureEvent={onGestureEvent}>
           <AnimatedKeyboardView
-            behavior={Platform.OS === 'ios' ? "padding" : null}
-
+            behavior="padding"
+            enabled={!floating && Platform.OS === 'ios'}
             style={{
               transform: [
                 {

@@ -206,7 +206,9 @@ export const loadNote = async item => {
     eSendEvent('loadingNote', item);
     webviewInit = false;
     editing.isFocused = false;
-    eSendEvent('webviewreset');
+    setTimeout(() => {
+      eSendEvent('webviewreset');
+    },1)
     InteractionManager.runAfterInteractions(async () => {
       sendNoteEditedEvent({
         id: id,
