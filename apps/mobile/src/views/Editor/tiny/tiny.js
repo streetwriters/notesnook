@@ -6,8 +6,13 @@ const reset = `
 isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
+window.prevContent = "";
 tinymce.activeEditor.setContent('');
 tinymce.activeEditor.undoManager.clear();
+info = document.querySelector(infoBar);
+info.querySelector('#infosaved').innerText = "";
+info.querySelector('#infodate').innerText = "";
+info.querySelector('#infowords').innerText = ""
 document.activeElement.blur();
 window.blur();
 `;

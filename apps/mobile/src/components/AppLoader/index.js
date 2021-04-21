@@ -1,22 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {editing} from '../../utils';
-import {changeContainerScale, ContainerScale} from '../../utils/Animations';
-import {db} from '../../utils/DB';
-import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {setNoteOnly} from '../../views/Editor/Functions';
+import { editing } from '../../utils';
+import { changeContainerScale, ContainerScale } from '../../utils/Animations';
+import { db } from '../../utils/DB';
+import { eOpenRateDialog, eOpenSideMenu } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import SplashScreen from '../SplashScreen';
 
 const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
@@ -27,6 +27,7 @@ const AppLoader = ({onLoad}) => {
   const [opacity, setOpacity] = useState(true);
 
   const load = async value => {
+    console.log('loading called here');
     if (value === 'hide') {
       setLoading(true);
       opacityV.setValue(1);
@@ -34,7 +35,6 @@ const AppLoader = ({onLoad}) => {
     }
     let appState = await MMKV.getItem('appState');
     if (appState) {
-      
       appState = JSON.parse(appState);
       if (!appState.movedAway && Date.now() < appState.timestamp + 3600000) {
         editing.isRestoringState = true;
@@ -86,41 +86,41 @@ const AppLoader = ({onLoad}) => {
     };
   }, []);
 
-  return (
-    loading && (
+  return loading ? (
+    <Animated.View
+      style={{
+        backgroundColor: opacity ? colors.bg : 'rgba(0,0,0,0)',
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+        zIndex: 999,
+        borderRadius: 10,
+      }}>
       <Animated.View
+        onTouchStart={() => {
+          setLoading(false);
+        }}
         style={{
-          backgroundColor: opacity ? colors.bg : 'rgba(0,0,0,0)',
+          backgroundColor: colors.bg,
           width: '100%',
           height: '100%',
-          position: 'absolute',
-          zIndex: 999,
+          justifyContent: 'center',
+          alignItems: 'center',
           borderRadius: 10,
+          opacity: opacityV,
         }}>
-        <Animated.View
-          onTouchStart={() => {
-            setLoading(false);
-          }}
+        <View
           style={{
-            backgroundColor: colors.bg,
-            width: '100%',
-            height: '100%',
-            justifyContent: 'center',
-            alignItems: 'center',
-            borderRadius: 10,
-            opacity: opacityV,
+            height: 10,
+            flexDirection: 'row',
+            width: 100,
           }}>
-          <View
-            style={{
-              height: 10,
-              flexDirection: 'row',
-              width: 100,
-            }}>
-            <AnimatedProgress fill={colors.accent} current={4} total={4} />
-          </View>
-        </Animated.View>
+          <AnimatedProgress fill={colors.accent} current={4} total={4} />
+        </View>
       </Animated.View>
-    )
+    </Animated.View>
+  ) : (
+    <SplashScreen />
   );
 };
 

@@ -1,45 +1,45 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect } from 'react';
-import { Appearance, AppState, Linking, Platform } from 'react-native';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect} from 'react';
+import {Appearance, AppState, Linking, Platform} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
+import {enabled} from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import { updateEvent } from './src/components/DialogManager/recievers';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
+import {updateEvent} from './src/components/DialogManager/recievers';
+import {useTracked} from './src/provider';
+import {Actions} from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { APP_VERSION, editing } from './src/utils';
-import { updateStatusBarColor } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {APP_VERSION, editing} from './src/utils';
+import {updateStatusBarColor} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
+import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, getWebviewInit } from './src/views/Editor/Functions';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -51,7 +51,7 @@ async function storeAppState() {
       editing: editing.currentlyEditing,
       note: getNote(),
       movedAway: editing.movedAway,
-      timestamp:Date.now()
+      timestamp: Date.now(),
     });
     await MMKV.setItem('appState', state);
   }
@@ -133,7 +133,7 @@ export const AppRootEvents = React.memo(
       };
     }, []);
 
-    const onNoteRemoved = async (id) => {
+    const onNoteRemoved = async id => {
       try {
         await db.notes.remove(id);
         Navigation.setRoutesToUpdate([
@@ -166,7 +166,6 @@ export const AppRootEvents = React.memo(
             console.log(e);
           }
         })();
-    
       }
       return () => {
         removeInternetStateListener && removeInternetStateListener();
@@ -175,7 +174,7 @@ export const AppRootEvents = React.memo(
       };
     }, [loading]);
 
-    const onInternetStateChanged = async (state) => {
+    const onInternetStateChanged = async state => {
       reconnectSSE(state);
     };
 
@@ -184,7 +183,7 @@ export const AppRootEvents = React.memo(
       dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
     };
 
-    const onUrlRecieved = async (res) => {
+    const onUrlRecieved = async res => {
       let url = res ? res.url : '';
       try {
         if (url.startsWith('https://app.notesnook.com/account/verified')) {
@@ -217,7 +216,7 @@ export const AppRootEvents = React.memo(
 
     const attachIAPListeners = async () => {
       await RNIap.initConnection()
-        .catch((e) => {
+        .catch(e => {
           console.log(e);
         })
         .then(() => {
@@ -230,7 +229,7 @@ export const AppRootEvents = React.memo(
         });
     };
 
-    const onAccountStatusChange = async (userStatus) => {
+    const onAccountStatusChange = async userStatus => {
       if (!PremiumService.get() && userStatus.type === 5) {
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
@@ -258,7 +257,7 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const onLogout = async (reason) => {
+    const onLogout = async reason => {
       dispatch({type: Actions.USER, user: null});
       dispatch({type: Actions.CLEAR_ALL});
       dispatch({type: Actions.SYNCING, syncing: false});
@@ -292,7 +291,7 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const setCurrentUser = async (login) => {
+    const setCurrentUser = async login => {
       try {
         let user = await db.user.getUser();
         if (user) {
@@ -311,8 +310,6 @@ export const AppRootEvents = React.memo(
           await PremiumService.setPremiumStatus();
           setLoginMessage(dispatch);
         }
-
-       
       } catch (e) {
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
@@ -327,12 +324,10 @@ export const AppRootEvents = React.memo(
         if (login) {
           eSendEvent(eCloseProgressDialog);
         }
-        
-
       }
     };
 
-    const onSuccessfulSubscription = async (subscription) => {
+    const onSuccessfulSubscription = async subscription => {
       const receipt = subscription.transactionReceipt;
       console.log(receipt);
       if (prevTransactionId === subscription.transactionId) {
@@ -341,7 +336,7 @@ export const AppRootEvents = React.memo(
       await processReceipt(receipt);
     };
 
-    const onSubscriptionError = async (error) => {
+    const onSubscriptionError = async error => {
       ToastEvent.show({
         heading: 'Failed to subscribe',
         type: 'error',
@@ -354,7 +349,8 @@ export const AppRootEvents = React.memo(
       }
     };
 
-    const processReceipt = async (receipt) => {
+    const processReceipt = async receipt => {
+      console.log('sending receipt');
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
@@ -369,10 +365,9 @@ export const AppRootEvents = React.memo(
               'Content-Type': 'application/json',
             },
           })
-            .then(async (r) => {
-              if (!r.ok) return;
-              let text = await r.text();
-              if (text === 'Receipt already expired.') {
+            .then(async r => {
+              console.log(r.ok, await r.text());
+              if (!r.ok) {
                 await RNIap.clearTransactionIOS();
               } else {
                 console.log('FINSIHING TRANSACTION');
@@ -380,14 +375,14 @@ export const AppRootEvents = React.memo(
                 await RNIap.clearTransactionIOS();
               }
             })
-            .catch((e) => {
+            .catch(e => {
               console.log(e, 'ERROR');
             });
         }
       }
     };
 
-    const onAppStateChanged = async (state) => {
+    const onAppStateChanged = async state => {
       if (state === 'active') {
         updateStatusBarColor();
         if (
@@ -432,7 +427,6 @@ export const AppRootEvents = React.memo(
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
           try {
-            
             let user = await db.user.fetchUser(true);
             if (user.isEmailConfirmed) {
               onEmailVerified(dispatch);

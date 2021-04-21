@@ -51,6 +51,10 @@ async function search() {
         status: `No search results found for "${term}" in ${searchInformation.title}`,
       },
     });
+    updateEvent({
+      type: Actions.SEARCH_RESULTS,
+      results: results,
+    });
     return;
   }
   updateEvent({

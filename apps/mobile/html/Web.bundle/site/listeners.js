@@ -8,7 +8,7 @@ function attachTitleInputListeners() {
     'DOMContentLoaded',
     () => {
       autosize();
-      document.body.onscroll = (event) => {
+      document.body.onscroll = event => {
         if (scrollTimer) {
           clearTimeout(scrollTimer);
           scrollTimer = null;
@@ -111,7 +111,7 @@ function autosize() {
 }
 
 function attachMessageListener() {
-  window.addEventListener('message', (data) => {
+  window.addEventListener('message', data => {
     let message = JSON.parse(data.data);
     let type = message.type;
     let value = message.value;
@@ -130,6 +130,13 @@ function attachMessageListener() {
         }, 300);
         info.querySelector('#infowords').innerText =
           tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+        break;
+      case 'htmldiff':
+        document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
+        break;
+      case 'theme':
+        pageTheme.colors = JSON.parse(value);
+        setTheme();
         break;
       case 'title':
         document.getElementById('titleInput').value = value;

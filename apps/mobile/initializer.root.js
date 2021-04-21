@@ -83,7 +83,7 @@ export const RootView = React.memo(
         <ContextMenu />
         <DummyText />
         <DialogManager />
-        <Splash />
+       
       </>
     );
   },

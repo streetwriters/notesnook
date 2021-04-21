@@ -315,6 +315,11 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Remove Formatting',
     },
+    {
+      format: 'magnify',
+      type: 'format',
+      fullname: 'Search & Replace',
+    },
     /*  {
       format: 'settings',
       type: 'settings',
