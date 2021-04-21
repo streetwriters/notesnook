@@ -22,56 +22,60 @@ let pageTheme = {
 };
 
 const markdownPatterns = [
-  { start: "*", end: "*", format: "italic" },
-  { start: "**", end: "**", format: "bold" },
-  { start: "`", end: "`", format: "code" },
-  { start: "#", format: "h1" },
-  { start: "##", format: "h2" },
-  { start: "###", format: "h3" },
-  { start: "####", format: "h4" },
-  { start: "#####", format: "h5" },
-  { start: "######", format: "h6" },
-  { start: "* ", cmd: "InsertUnorderedList" },
-  { start: "- ", cmd: "InsertUnorderedList" },
-  { start: "> ", format: "blockquote" },
+  {start: '*', end: '*', format: 'italic'},
+  {start: '**', end: '**', format: 'bold'},
+  {start: '`', end: '`', format: 'code'},
+  {start: '#', format: 'h1'},
+  {start: '##', format: 'h2'},
+  {start: '###', format: 'h3'},
+  {start: '####', format: 'h4'},
+  {start: '#####', format: 'h5'},
+  {start: '######', format: 'h6'},
+  {start: '* ', cmd: 'InsertUnorderedList'},
+  {start: '- ', cmd: 'InsertUnorderedList'},
+  {start: '> ', format: 'blockquote'},
   {
-    start: "1. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "decimal" },
+    start: '1. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'decimal'},
   },
   {
-    start: "1) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "decimal" },
+    start: '1) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'decimal'},
   },
   {
-    start: "a. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-alpha" },
+    start: 'a. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-alpha'},
   },
   {
-    start: "a) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-alpha" },
+    start: 'a) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-alpha'},
   },
   {
-    start: "i. ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-roman" },
+    start: 'i. ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-roman'},
   },
   {
-    start: "i) ",
-    cmd: "InsertOrderedList",
-    value: { "list-style-type": "lower-roman" },
+    start: 'i) ',
+    cmd: 'InsertOrderedList',
+    value: {'list-style-type': 'lower-roman'},
   },
-  { start: "---", replacement: "<hr/>" },
-  { start: "--", replacement: "—" },
-  { start: "-", replacement: "—" },
-  { start: "(c)", replacement: "©" },
+  {start: '---', replacement: '<hr/>'},
+  {start: '--', replacement: '—'},
+  {start: '-', replacement: '—'},
+  {start: '(c)', replacement: '©'},
 ];
 
-
 function dark() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').removeAttribute('disabled');
+    document.getElementById('light_sheet').setAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook/content.min.css',
@@ -88,6 +92,11 @@ function dark() {
 }
 
 function light() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').setAttribute('disabled');
+    document.getElementById('light_sheet').removeAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook-dark/content.min.css',
@@ -220,13 +229,13 @@ var minifyImg = function (
   resolve,
   imageArguments = 0.7,
 ) {
-  fetch(dataUrl).then(async (res) => {
+  fetch(dataUrl).then(async res => {
     let blob = await res.blob();
     new Compressor(blob, {
       quality: imageArguments,
       width: newWidth,
-      mimeType:imageType,
-      success: (result) => {
+      mimeType: imageType,
+      success: result => {
         let fileReader = new FileReader();
         fileReader.onloadend = function () {
           resolve(fileReader.result);
@@ -234,7 +243,7 @@ var minifyImg = function (
         };
         fileReader.readAsDataURL(result);
       },
-      error: (err) => {
+      error: err => {
         console.log(err.message);
       },
     });
@@ -247,13 +256,13 @@ function loadImage() {
     if (fileInput.files != null && fileInput.files[0] != null) {
       let reader = new FileReader();
       console.log(reader.readyState, 'READY STATE');
-      let load = (e) => {
+      let load = e => {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
           1024,
           'image/jpeg',
-          (r) => {
+          r => {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },

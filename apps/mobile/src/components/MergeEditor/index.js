@@ -105,17 +105,16 @@ const MergeEditor = () => {
   const insets = useSafeAreaInsets();
 
   const onPrimaryWebViewLoad = () => {
-    console.log(primaryData.data.length, secondaryData.data.length);
     let htmlDiff = {
       before: primaryData.data,
     };
     if (secondaryData.data) {
       htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
     }
-    postMessage(primaryWebView, 'html', htmlDiff.before);
+    postMessage(primaryWebView, 'htmldiff', htmlDiff.before);
     let theme = {...colors};
     theme.factor = normalize(1);
-    tiny.call(primaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
+    postMessage(primaryWebView, "theme" , JSON.stringify(theme));
   };
 
   const onSecondaryWebViewLoad = () => {
@@ -125,18 +124,17 @@ const MergeEditor = () => {
     if (secondaryData.data) {
       htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
     }
-    postMessage(secondaryWebView, 'html', htmlDiff.after);
+    postMessage(secondaryWebView, 'htmldiff', htmlDiff.after);
     let theme = {...colors};
     theme.factor = normalize(1);
-    tiny.call(secondaryWebView, tiny.updateTheme(JSON.stringify(theme)), true);
+    postMessage(secondaryWebView, "theme" , JSON.stringify(theme));
   };
 
   function postMessage(webview, type, value = null) {
     let message = {
-      type,
+      type:type,
       value,
     };
-    console.log(message,webview.current);
     webview.current?.postMessage(JSON.stringify(message));
   }
 

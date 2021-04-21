@@ -71,6 +71,11 @@ const markdownPatterns = [
 ];
 
 function dark() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').removeAttribute('disabled');
+    document.getElementById('light_sheet').setAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook/content.min.css',
@@ -87,6 +92,11 @@ function dark() {
 }
 
 function light() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').setAttribute('disabled');
+    document.getElementById('light_sheet').removeAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook-dark/content.min.css',
@@ -108,6 +118,8 @@ function setTheme() {
   } else {
     light();
   }
+
+
 
   let css = document.createElement('style');
   css.type = 'text/css';
