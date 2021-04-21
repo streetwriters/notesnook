@@ -387,8 +387,9 @@ const AccoutLogoutSection = () => {
             visible={true}>
             <DialogContainer>
               <DialogHeader
-                title="Delete Account"
-                paragraph="All your data will be removed permanantly. This action is IRREVERSIBLE."
+                title="Delete account"
+                paragraph="Your account will be deleted and all your data will be removed
+                permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE."
                 paragraphColor={colors.red}
               />
 
@@ -441,9 +442,7 @@ const AccoutLogoutSection = () => {
                   style={{
                     marginLeft: 10,
                   }}
-                  type="accent"
-                  accentColor="light"
-                  accentText="red"
+                  type="error"
                   title="Delete"
                 />
               </View>
@@ -457,13 +456,6 @@ const AccoutLogoutSection = () => {
             name: 'Logout',
             func: async () => {
               setVisible(true);
-            },
-          },
-          {
-            name: 'Delete My Account',
-            func: () => {
-              setDeleteAccount(true);
-              passwordValue = null;
             },
           },
         ].map((item, index) => (
@@ -490,6 +482,41 @@ const AccoutLogoutSection = () => {
             </Heading>
           </PressableButton>
         ))}
+
+        <PressableButton
+          onPress={() => {
+            setDeleteAccount(true);
+            passwordValue = null;
+          }}
+          type="error"
+          customStyle={{
+            borderWidth: 1,
+            borderRadius: 5,
+            paddingVertical: 10,
+            width: '95%',
+            alignItems: 'flex-start',
+            paddingHorizontal: 12,
+            marginTop: 25,
+            borderColor: colors.red,
+          }}>
+          <Heading
+            color={colors.red}
+            style={{
+              fontSize: SIZE.md,
+            }}>
+            Delete account
+          </Heading>
+          <Paragraph
+            style={{
+              flexWrap: 'wrap',
+              flexBasis: 1,
+            }}
+            color={colors.red}>
+            Your account will be deleted and all your data will be removed
+            permanantly. Make sure you have saved backup of your notes. This
+            action is IRREVERSIBLE.
+          </Paragraph>
+        </PressableButton>
       </>
     )
   );
