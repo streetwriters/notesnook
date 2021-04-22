@@ -128,7 +128,7 @@ class Tool {
       backgroundColor: "bgSecondary",
       borderRadius: "default",
       ":hover": {
-        backgroundColor: "#dbdbdb",
+        backgroundColor: "hover",
       },
     };
   }
