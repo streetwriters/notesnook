@@ -62,27 +62,33 @@ async function getCredentials(title, description) {
         },
       }),
     );
-    console.log('allowed');
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault', CRYPT_CONFIG);
   } catch (e) {
-    console.log('failed');
     FingerprintScanner.release();
+    let message = {
+      heading: 'Authentication with biometrics failed.',
+      message: 'Tap "Biometric Unlock" to try again.',
+      type: 'error',
+      context: 'local',
+    };
     if (e.name === 'DeviceLocked') {
-      ToastEvent.show({
+      message = {
         heading: 'Biometrics authentication failed.',
         message: 'Wait 30 seconds to try again.',
         type: 'error',
         context: 'local',
-      });
-    } else {
-      ToastEvent.show({
-        heading: 'Authentication failed.',
-        message: 'Tap to try again.',
+      };
+    } else if (e.name === 'UserFallback') {
+      message = {
+        heading: 'Authentication cancelled by user.',
+        message: 'Tap "Biometric Unlock" to try again.',
         type: 'error',
         context: 'local',
-      });
+      };
     }
+
+    setTimeout(() => ToastEvent.show(message), 1000);
     return null;
   }
 }
@@ -133,5 +139,5 @@ export default {
   getCredentials,
   storeCredentials,
   hasInternetCredentials,
-  validateUser
+  validateUser,
 };

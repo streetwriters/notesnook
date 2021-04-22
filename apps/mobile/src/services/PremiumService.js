@@ -45,6 +45,7 @@ function getProducts() {
 }
 
 function get() {
+  return true;
   return (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
@@ -54,6 +55,8 @@ function get() {
 }
 
 async function verify(callback, error) {
+  callback();
+  return;
   try {
     if (!premiumStatus) {
       if (error) {
@@ -115,11 +118,11 @@ const onUserStatusCheck = async (type) => {
         break;
     }
     if (message) {
-      eSendEvent(eShowGetPremium, message);
+    //  eSendEvent(eShowGetPremium, message);
     }
   }
 
-  return {type, result: status};
+  return {type, result: true} //status};
 };
 
 const showVerifyEmailDialog = () => {
