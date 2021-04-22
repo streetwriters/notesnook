@@ -12,6 +12,7 @@ function closeMenu() {
   );
   window.removeEventListener("click", onWindowClick);
   window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("blur", onWindowClick);
 }
 
 function getGlobalMenu() {
@@ -23,6 +24,7 @@ function onKeyDown(event) {
 }
 
 function onWindowClick() {
+  console.log("WINDOW CLICK!");
   closeMenu();
 }
 
@@ -64,6 +66,7 @@ function openMenu(e) {
 
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("click", onWindowClick);
+  window.addEventListener("blur", onWindowClick);
 }
 
 function getPosition(e) {
