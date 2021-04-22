@@ -555,6 +555,7 @@ export const ActionSheetComponent = ({
           width: '100%',
           height: '100%',
           position: 'absolute',
+          zIndex:1
         }}
         onPress={() => {
           Keyboard.dismiss();
@@ -570,6 +571,7 @@ export const ActionSheetComponent = ({
             paddingHorizontal: 12,
             alignItems: 'center',
             marginTop: 5,
+            zIndex:10
           }}>
           <Heading
             style={{
