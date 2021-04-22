@@ -116,7 +116,7 @@ function Toolbar(props) {
 
   return (
     <Flex m={2} justifyContent={"space-between"}>
-      <Flex justifyContent="center" alignItems="center">
+      <Flex justifyContent="center" alignItems="center" flex={1}>
         <Icon.ArrowLeft
           sx={{
             display: ["block", "block", "none"],
@@ -147,6 +147,9 @@ function Toolbar(props) {
             p: 0,
             borderWidth: 0,
             borderRadius: 0,
+            textOverflow: "ellipsis",
+            whiteSpace: "nowrap",
+            overflow: "hidden",
             ":focus": { borderWidth: 0 },
           }}
         />
@@ -161,8 +164,10 @@ function Toolbar(props) {
             title={tool.title}
             key={tool.title}
             sx={{
-              display: [tool.hideOnMobile ? "none" : "block", "block", "block"],
-              visibility: tool.hidden ? "collapse" : "visible",
+              display: [
+                tool.hideOnMobile ? "none" : "block",
+                tool.hidden ? "none" : "block",
+              ],
               color: tool.enabled ? "text" : "disabled",
               cursor: tool.enabled ? "pointer" : "not-allowed",
             }}
