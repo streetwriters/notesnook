@@ -7,16 +7,25 @@ import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
 import { showForgotPasswordDialog } from "../../common/dialog-controller";
 import { hashNavigate } from "../../navigation";
+import useHashLocation from "../../utils/use-hash-location";
 
 const requiredValues = ["email", "password", "remember"];
 function LoginDialog(props) {
   const { onClose, title, description, positiveText, skipInit } = props;
   const [error, setError] = useState();
+  const [, queryParams] = useHashLocation();
   const [credential, setCredential] = useState();
   const [email, setEmail] = useState();
   const isLoggingIn = useStore((store) => store.isLoggingIn);
   const login = useStore((store) => store.login);
   const isLoggedIn = useStore((store) => store.isLoggedIn);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      onClose();
+      if (queryParams.redirect) hashNavigate(queryParams.redirect);
+    }
+  }, [isLoggedIn, queryParams, onClose]);
 
   useEffect(() => {
     if (isLoggedIn) {
@@ -133,6 +142,9 @@ function LoginDialog(props) {
                   onClose();
                 } else {
                   onClose();
+                }
+                if (queryParams.redirect) {
+                  hashNavigate(queryParams.redirect);
                 }
               })
               .catch((e) => setError(e.message));
