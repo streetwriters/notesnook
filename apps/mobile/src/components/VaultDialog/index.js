@@ -639,6 +639,7 @@ export class VaultDialog extends Component {
                   onPress={() =>
                     this._onPressFingerprintAuth('Unlock note', '')
                   }
+                  icon="fingerprint"
                   width="100%"
                   title={'Biometric unlock'}
                   type="shade"
@@ -718,48 +719,27 @@ export class VaultDialog extends Component {
             !this.state.isBiometryEnrolled &&
             novault && (
               <Paragraph>
-                Unlock with password once to enable fingerprint access.
+                Unlock with password once to enable biometric access.
               </Paragraph>
             )}
 
           {this.state.isBiometryAvailable &&
           !this.state.fingerprintAccess &&
           ((!this.state.biometricUnlock && !changePassword) || !novault) ? (
-            <TouchableOpacity
+            <Button
               onPress={() => {
                 this.setState({
                   biometricUnlock: !biometricUnlock,
                 });
               }}
-              testID={notesnook.ids.dialogs.vault.fingerprint}
-              activeOpacity={0.7}
               style={{
-                flexDirection: 'row',
-                width: '100%',
-                alignItems: 'center',
-                height: 40,
-              }}>
-              <Icon
-                size={SIZE.lg}
-                color={biometricUnlock ? colors.accent : colors.icon}
-                name={
-                  biometricUnlock
-                    ? 'check-circle-outline'
-                    : 'checkbox-blank-circle-outline'
-                }
-              />
-
-              <Paragraph
-                style={{
-                  fontSize: SIZE.sm,
-                  //fontFamily: "sans-serif",
-                  color: colors.pri,
-                  maxWidth: '90%',
-                  marginLeft: 10,
-                }}>
-                Fingerprint Unlock
-              </Paragraph>
-            </TouchableOpacity>
+                marginTop: 10,
+              }}
+              icon="fingerprint"
+              width="100%"
+              title="Enable biometric unlocking"
+              type="shade"
+            />
           ) : null}
 
           <DialogButtons
