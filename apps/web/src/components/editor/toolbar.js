@@ -70,6 +70,7 @@ function Toolbar(props) {
         title: theme === "Dark" ? "Light mode" : "Dark mode",
         icon: Icon.Theme,
         hidden: !isFocusMode,
+        enabled: true,
         onClick: () => toggleNightMode(),
       },
       {
