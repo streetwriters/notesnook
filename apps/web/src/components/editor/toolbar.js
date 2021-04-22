@@ -99,6 +99,7 @@ function Toolbar(props) {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
+        hidden: isFocusMode,
         onClick: toggleProperties,
       },
     ],
