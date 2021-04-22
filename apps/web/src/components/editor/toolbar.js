@@ -90,8 +90,6 @@ function Toolbar(props) {
         enabled: true,
         hideOnMobile: true,
         onClick: () => {
-          if (isFocusMode) exitFullscreen(document);
-          else enterFullscreen(document.documentElement);
           toggleFocusMode();
           if (tinymce.activeEditor) tinymce.activeEditor.focus();
         },
@@ -186,38 +184,3 @@ function Toolbar(props) {
   );
 }
 export default Toolbar;
-
-/* View in fullscreen */
-function enterFullscreen(elem) {
-  // go full-screen
-  if (elem.requestFullscreen) {
-    elem.requestFullscreen();
-  } else if (elem.webkitRequestFullscreen) {
-    elem.webkitRequestFullscreen();
-  } else if (elem.mozRequestFullScreen) {
-    elem.mozRequestFullScreen();
-  } else if (elem.msRequestFullscreen) {
-    elem.msRequestFullscreen();
-  }
-}
-
-/* Close fullscreen */
-function exitFullscreen(elem) {
-  if (
-    !document.fullscreenElement &&
-    !document.webkitFullscreenElement &&
-    !document.mozFullScreenElement
-  )
-    return;
-
-  // exit full-screen
-  if (elem.exitFullscreen) {
-    elem.exitFullscreen();
-  } else if (elem.webkitExitFullscreen) {
-    elem.webkitExitFullscreen();
-  } else if (elem.mozCancelFullScreen) {
-    elem.mozCancelFullScreen();
-  } else if (elem.msExitFullscreen) {
-    elem.msExitFullscreen();
-  }
-}
