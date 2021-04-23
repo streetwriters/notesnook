@@ -221,7 +221,7 @@ export class VaultDialog extends Component {
 
     if (!this.password) {
       ToastEvent.show({
-        title: 'Password not entered',
+        heading: 'Password not entered',
         message: 'Enter a password for the vault and try again.',
         type: 'error',
         context: 'local',
@@ -230,7 +230,7 @@ export class VaultDialog extends Component {
     }
     if (this.password && this.password.length < 3) {
       ToastEvent.show({
-        title: 'Password too short',
+        heading: 'Password too short',
         message: 'Password must be longer than 3 characters.',
         type: 'error',
         context: 'local',
@@ -242,7 +242,7 @@ export class VaultDialog extends Component {
     if (!this.state.novault) {
       if (this.password !== this.confirmPassword) {
         ToastEvent.show({
-          title: 'Passwords do not match',
+          heading: 'Passwords do not match',
           type: 'error',
           context: 'local',
         });
@@ -268,7 +268,7 @@ export class VaultDialog extends Component {
             this._enrollFingerprint(this.newPassword);
           }
           ToastEvent.show({
-            title: 'Vault password updated',
+            heading: 'Vault password updated successfully',
             type: 'success',
             context: 'local',
           });
@@ -280,7 +280,8 @@ export class VaultDialog extends Component {
           });
           if (e.message === db.vault.ERRORS.wrongPassword) {
             ToastEvent.show({
-              title: 'Incorrect password',
+              heading: 'Incorrect password',
+              message:"Please enter the correct password and try again",
               type: 'error',
               context: 'local',
             });
@@ -289,7 +290,8 @@ export class VaultDialog extends Component {
     } else if (this.state.locked) {
       if (!this.password || this.password.trim() === 0) {
         ToastEvent.show({
-          title: 'Incorrect password',
+          heading: 'Incorrect password',
+          message:"Please enter the correct password and try again",
           type: 'error',
           context: 'local',
         });
@@ -321,7 +323,8 @@ export class VaultDialog extends Component {
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show({
-        title: 'Incorrect password',
+        message: 'Incorrect password',
+        message:"Please enter the correct password and try again",
         type: 'error',
         context: 'local',
       });
@@ -342,7 +345,8 @@ export class VaultDialog extends Component {
   async _unlockNote() {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show({
-        title: 'Incorrect password',
+        heading: 'Incorrect password',
+        message:"Please enter the correct password and try again",
         type: 'error',
         context: 'local',
       });
@@ -407,7 +411,7 @@ export class VaultDialog extends Component {
             this.close();
           } catch (e) {
             ToastEvent.show({
-              heading: 'Password is incorrect!',
+              heading: 'Incorrect password',
               message:
                 'Please enter the correct vault password to enable biometrics.',
               type: 'error',
@@ -529,7 +533,7 @@ export class VaultDialog extends Component {
     } catch (e) {
       ToastEvent.show({
         heading: 'Failed to disable Biometric unlocking.',
-        description: e.message,
+        message: e.message,
         type: 'success',
         context: 'local',
       });
@@ -625,6 +629,7 @@ export class VaultDialog extends Component {
                     ? changePassInputRef.current?.focus()
                     : this.onPress;
                 }}
+                autoCompleteType="password"
                 returnKeyLabel={changePassword ? 'Next' : this.state.title}
                 returnKeyType={changePassword ? 'next' : 'done'}
                 secureTextEntry
@@ -658,6 +663,7 @@ export class VaultDialog extends Component {
                 onChangeText={value => {
                   this.newPassword = value;
                 }}
+                autoCompleteType="password"
                 onSubmit={this.onPress}
                 returnKeyLabel="Change"
                 returnKeyType="done"
@@ -676,6 +682,7 @@ export class VaultDialog extends Component {
                 onChangeText={value => {
                   this.password = value;
                 }}
+                autoCompleteType="password"
                 returnKeyLabel="Next"
                 returnKeyType="next"
                 secureTextEntry
@@ -695,6 +702,7 @@ export class VaultDialog extends Component {
                 errorMessage="Passwords do not match."
                 onErrorCheck={e => null}
                 marginBottom={0}
+                autoCompleteType="password"
                 returnKeyLabel="Create"
                 returnKeyType="done"
                 onChangeText={value => {
