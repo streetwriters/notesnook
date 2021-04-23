@@ -29,6 +29,7 @@ import { isUserPremium } from "../../common";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
+import { KeyboardEventManager } from "../../utils/keyboard";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -134,6 +135,7 @@ function TinyMCE(props) {
       );
     }
   }, [tinymceRef, newSkin, oldSkin]);
+
   return (
     <Editor
       ref={tinymceRef}
@@ -227,10 +229,16 @@ function TinyMCE(props) {
         }
       }}
       onKeyDown={(e) => {
+        e.getModifierState = undefined;
+        KeyboardEventManager.publish("keydown", e);
         if (e.ctrlKey && e.key === "s") {
           e.preventDefault();
           onSave();
         }
+      }}
+      onKeyUp={(e) => {
+        e.getModifierState = undefined;
+        KeyboardEventManager.publish("keyup", e);
       }}
       onEditorChange={(content, editor) => {
         if (onWordCountChanged) {

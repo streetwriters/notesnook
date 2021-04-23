@@ -7,6 +7,7 @@ import { resetReminders } from "./common/reminders";
 import { isUserPremium } from "./common";
 import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
+import { registerKeyMap } from "./common/key-map";
 
 function AppEffects({ isMobile, isTablet, setShow }) {
   const refreshColors = useStore((store) => store.refreshColors);
@@ -65,6 +66,7 @@ function AppEffects({ isMobile, isTablet, setShow }) {
         return { type, result: false };
       }
     });
+    registerKeyMap();
   }, []);
 
   useEffect(() => {
