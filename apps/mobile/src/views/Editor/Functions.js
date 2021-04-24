@@ -310,6 +310,10 @@ export const _onMessage = async evt => {
     case 'running':
       webviewOK = true;
       break;
+    case 'imagepreview':
+      eSendEvent("ImagePreview",message.value)
+
+    break;  
     case 'focus':
       editing.focusType = message.value;
       break;
