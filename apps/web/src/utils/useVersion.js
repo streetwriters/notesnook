@@ -3,7 +3,11 @@ import { db } from "../common/db";
 import config from "./config";
 
 var APP_VERSION = {
-  formatted: format(1350),
+  formatted: format(
+    1350,
+    process.env.REACT_APP_GIT_HASH,
+    process.env.REACT_APP_PLATFORM
+  ),
   numerical: 1350,
   appUpdated: false,
   appUpdateable: false,
@@ -30,12 +34,14 @@ export default useVersion;
 /**
  *
  * @param {number} version
+ * @param {string} hash
+ * @param {"web"|"desktop"} type
  */
-function format(version) {
+function format(version, hash, type) {
   const parts = version.toString().split("");
   return `${parts[0]}.${parts[1]}.${parts[2]}${
     parts[3] && parts[3] !== "0" ? parts[3] : ""
-  }`;
+  }-${hash}-${type}`;
 }
 
 export function getAppVersion() {

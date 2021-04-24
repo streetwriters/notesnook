@@ -73,8 +73,9 @@
     "webpack-bundle-analyzer": "^4.4.0"
   },
   "scripts": {
-    "start": "REACT_APP_CI=true react-scripts start",
-    "build": "react-scripts build",
+    "start": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=web REACT_APP_CI=true react-scripts start",
+    "build": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=web react-scripts build",
+    "build:desktop": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "BROWSER=none react-scripts start",
     "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
