@@ -11,7 +11,7 @@ async function createWindow() {
     autoHideMenuBar: true,
     icon: path.join(
       __dirname,
-      os.platform() === "win32" ? "favicon.ico" : "favicon-32x32.png"
+      os.platform() === "win32" ? "app.ico" : "favicon-72x72.png"
     ),
   });
 

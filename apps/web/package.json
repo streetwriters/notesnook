@@ -150,7 +150,7 @@
       "entitlements": "assets/entitlements.mac.plist",
       "entitlementsInherit": "assets/entitlements.mac.plist",
       "gatekeeperAssess": false,
-      "icon": "assets/icons/icon.icns"
+      "icon": "assets/icons/app.icns"
     },
     "dmg": {
       "contents": [
@@ -165,14 +165,14 @@
           "path": "/Applications"
         }
       ],
-      "icon": "assets/icons/icon.icns",
+      "icon": "assets/icons/app.icns",
       "title": "Install Notesnook"
     },
     "win": {
       "target": [
         "nsis"
       ],
-      "icon": "assets/icons/icon.ico"
+      "icon": "assets/icons/app.ico"
     },
     "nsis": {
       "oneClick": true,
@@ -185,7 +185,7 @@
         "rpm"
       ],
       "category": "Office",
-      "icon": "assets/icons/icon.icns",
+      "icon": "assets/icons/app.icns",
       "description": "Your private note taking space",
       "executableName": "Notesnook"
     },
