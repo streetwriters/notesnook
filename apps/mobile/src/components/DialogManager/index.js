@@ -32,6 +32,7 @@ import {AddNotebookDialog} from '../AddNotebookDialog';
 import {AddTopicDialog} from '../AddTopicDialog';
 import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
+import ImagePreview from '../ImagePreview';
 import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
@@ -382,6 +383,8 @@ export class DialogManager extends Component {
 
         <UpdateDialog />
         <RateDialog />
+        <ImagePreview/>
+        <EditorSettings/>
       </>
     );
   }

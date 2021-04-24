@@ -68,7 +68,7 @@ export const TOOLBAR_CONFIG = [
       valueIcon: 'fontsize',
       fullname: 'Font Size',
       premium: true,
-      group: editor_font_size.map((item) => {
+      group: editor_font_size.map(item => {
         return {
           format: 'fontsize',
           formatValue: item,
@@ -82,7 +82,7 @@ export const TOOLBAR_CONFIG = [
       textValue: 'System Font',
       fullname: 'Font Family',
       premium: true,
-      group: font_names.map((item) => {
+      group: font_names.map(item => {
         return {
           format: 'fontname',
           formatValue: item.value,
@@ -154,7 +154,7 @@ export const TOOLBAR_CONFIG = [
       format: 'ol',
       type: 'tooltip',
       fullname: 'Ordered List',
-      group: orderedListStyles.map((style) => {
+      group: orderedListStyles.map(style => {
         return {
           format: 'ol',
           formatValue: style,
@@ -168,7 +168,7 @@ export const TOOLBAR_CONFIG = [
       format: 'ul',
       type: 'tooltip',
       fullname: 'Unordered List',
-      group: unorderedListStyles.map((style) => {
+      group: unorderedListStyles.map(style => {
         return {
           format: 'ul',
           formatValue: style === 'default' ? 'disc' : style,
@@ -190,7 +190,7 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       fullname: 'Text Highlight Color',
       groupType: 'hilitecolor',
-      group: editor_colors.map((item) => {
+      group: editor_colors.map(item => {
         return {
           format: 'hilitecolor',
           formatValue: item,
@@ -204,7 +204,7 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       fullname: 'Text Color',
       groupType: 'forecolor',
-      group: editor_colors.map((item) => {
+      group: editor_colors.map(item => {
         return {
           format: 'forecolor',
           formatValue: item,
@@ -267,11 +267,53 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Subscript',
       premium: true,
     },
+  ],
+  [
     {
       format: 'table',
       type: 'tooltip',
       fullname: 'Table',
       groupType: 'table',
+      premium: true,
+    },
+    {
+      format: 'tableconfig',
+      type: 'tooltip',
+      fullname: 'Table',
+      groupType: 'tableconfig',
+      group: [
+        {
+          format: 'tableprops',
+          type: 'format',
+          fullname: 'Table Settings',
+          premium: true,
+        },
+        {
+          format: 'tablerowprops',
+          type: 'format',
+          fullname: 'Table Row Settings',
+          premium: true,
+        },
+        {
+          format: 'tablesplitcell',
+          type: 'format',
+          fullname: 'Table Split Cell',
+          premium: true,
+        },
+        {
+          format: 'tablemergecell',
+          type: 'format',
+          fullname: 'Table Merge Cell',
+          premium: true,
+        },
+      ],
+      premium: true,
+    },
+
+    {
+      format: 'tabledelete',
+      type: 'format',
+      fullname: 'Remove Table',
       premium: true,
     },
   ],
@@ -320,10 +362,10 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Search & Replace',
     },
-    /*  {
+   /*   {
       format: 'settings',
       type: 'settings',
       fullname: 'Editor Settings',
-    },  */
+    },   */
   ],
 ];

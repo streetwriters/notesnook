@@ -179,7 +179,7 @@ export class VaultDialog extends Component {
   close = () => {
     if (this.state.loading) {
       ToastEvent.show({
-        title: this.state.title,
+        heading: this.state.title,
         message: 'Please wait and do not close the app.',
         type: 'success',
         context: 'local',
@@ -404,7 +404,7 @@ export class VaultDialog extends Component {
             eSendEvent('vaultUpdated');
             ToastEvent.show({
               heading: 'Biometric unlocking enabled!',
-              message: 'Now you can unlock your notes with biometrics.',
+              message: 'Now you can unlock notes in vault with biometrics.',
               type: 'success',
               context: 'global',
             });

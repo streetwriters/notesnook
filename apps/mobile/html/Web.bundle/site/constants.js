@@ -197,8 +197,10 @@ function setTheme() {
       border-width: 0px !important;
       box-shadow: 4px 5px 18px 2px #00000038;
       padding: 0px !important;
-      width: calc(100vw - 22px) !important;
-      margin-right:-2px !important;
+      max-width: 95vw !important;
+      margin-left:2.5vw,
+      margin-right:2.5vw,
+      align-self:center !important;
     }
     
     .tox-dialog__footer {
