@@ -57,6 +57,7 @@
     "electron": "^12.0.0",
     "electron-builder": "^22.10.5",
     "electron-builder-notarize": "^1.2.0",
+    "env-cmd": "^10.1.0",
     "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-import": "^2.20.2",
@@ -73,9 +74,9 @@
     "webpack-bundle-analyzer": "^4.4.0"
   },
   "scripts": {
-    "start": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=web REACT_APP_CI=true react-scripts start",
-    "build": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=web react-scripts build",
-    "build:desktop": "REACT_APP_GIT_HASH=\"$(git rev-parse --short HEAD)\" REACT_APP_PLATFORM=desktop react-scripts build",
+    "start": "env-cmd -e all,dev,web react-scripts start",
+    "build": "env-cmd -e all,web react-scripts build",
+    "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "BROWSER=none react-scripts start",
     "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
