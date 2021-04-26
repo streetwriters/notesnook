@@ -28,3 +28,4 @@ __diff_output__
 
 dist
 public/workbox
+scripts/secrets
