@@ -3,7 +3,7 @@ export CSC_KEY_PASSWORD="Loveyouall123"
 export API_KEY_ID="JD348FXHMN"
 export API_KEY_ISSUER_ID=""
 
-export GH_TOKEN="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"
+export GH_TOKEN=$(cat ./scripts/secrets/gh-token.txt)
 export ADBLOCK=true
 
 echo "Building..."
