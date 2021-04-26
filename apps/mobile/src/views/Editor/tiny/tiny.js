@@ -17,6 +17,13 @@ document.activeElement.blur();
 window.blur();
 `;
 
+const removeMarkdown = `
+ tinymce.activeEditor.plugins.textpattern.setPatterns("")
+`
+const setMarkdown = `
+ tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
+`
+
 const keyboardStateChanged = `(() => {
   let node = tinymce.activeEditor.selection.getNode();
   node.scrollIntoView({behavior: "smooth", block: "end"});
@@ -209,4 +216,6 @@ export default {
   keyboardStateChanged,
   onKeyboardShow,
   pre,
+  setMarkdown,
+  removeMarkdown
 };

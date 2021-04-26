@@ -5,6 +5,7 @@ import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import PremiumService from '../../services/PremiumService';
 import {editing, InteractionManager} from '../../utils';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
@@ -305,6 +306,11 @@ export const _onMessage = async evt => {
       setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
+      if (PremiumService.get()){
+        tiny.call(EditorWebView,tiny.setMarkdown,true)
+      } else {
+        tiny.call(EditorWebView,tiny.removeMarkdown,true)
+      }
       loadNoteInEditor();
       break;
     case 'running':
@@ -474,6 +480,11 @@ export async function saveNote(preventUpdate) {
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+  }
+  if (premium){
+    tiny.call(EditorWebView,tiny.setMarkdown,true)
+  } else {
+    tiny.call(EditorWebView,tiny.removeMarkdown,true)
   }
   setColors(colors);
 }
