@@ -33,6 +33,8 @@ const markdownPatterns = [
   {start: '######', format: 'h6'},
   {start: '* ', cmd: 'InsertUnorderedList'},
   {start: '- ', cmd: 'InsertUnorderedList'},
+  {start: '- [ ] ', cmd: 'InsertCheckList'},
+  {start: '- [x] ', cmd: 'InsertCheckList',value:"checked"},
   {start: '> ', format: 'blockquote'},
   {
     start: '1. ',
@@ -221,8 +223,44 @@ function setTheme() {
       border-bottom: 1px solid ${pageTheme.colors.nav} !important;
     }
 
-
+  
 	  `;
+
+  let node2 = `
+  .mce-content-body audio[data-mce-selected], 
+  .mce-content-body embed[data-mce-selected], 
+  .mce-content-body img[data-mce-selected], 
+  .mce-content-body object[data-mce-selected], 
+  .mce-content-body table[data-mce-selected], 
+  .mce-content-body video[data-mce-selected] {
+    outline: 3px solid ${pageTheme.colors.shade} !important;
+}
+
+#mceResizeHandlese {
+  height: 40px !important;
+  width: 40px !important;
+  border-radius:100px !important;
+}
+
+.mce-content-body div.mce-resizehandle {
+  background-color: ${pageTheme.colors.accent} !important;
+  border-color:  ${pageTheme.colors.accent} !important;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  height: 10px;
+  position: absolute;
+  width: 10px;
+  z-index: 10000;
+}`;
+
+  let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
+    'head',
+  )[0];
+  let css2 = document.createElement('style');
+  css2.appendChild(document.createTextNode(node2));
+  editorHead.appendChild(css2);
+
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);
 }
