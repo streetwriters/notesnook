@@ -282,7 +282,7 @@ function isNoteEmpty(note, content) {
 
 function getNoteHeadline(note, content) {
   if (note.locked) return "";
-  return note.headline || content.toHeadline();
+  return content.toHeadline();
 }
 
 function getNoteTitle(note, content) {
