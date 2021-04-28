@@ -11,7 +11,7 @@ class AddNotebookDialog extends React.Component {
   id = undefined;
   deletedTopics = [];
   state = {
-    topics: [{ title: "General" }],
+    topics: [],
     isEditting: false,
     editIndex: -1,
   };
@@ -177,7 +177,6 @@ class AddNotebookDialog extends React.Component {
           {this.state.topics.map((topic, index) => (
             <TopicItem
               key={topic.id || topic.title || index}
-              hideActions={topic.title === "General"}
               title={topic.title}
               isEditing={this.state.editIndex === index}
               onEdit={() => this.editTopic(index)}

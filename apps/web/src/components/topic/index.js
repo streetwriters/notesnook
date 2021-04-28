@@ -21,7 +21,7 @@ function Topic({ item, index, onClick }) {
       }
       index={index}
       menu={{
-        items: topic.title === "General" ? generalTopicMenuItems : menuItems,
+        items: menuItems,
         extraData: { topic },
       }}
     />
