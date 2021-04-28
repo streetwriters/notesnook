@@ -40,7 +40,6 @@ class AddNotebookDialog extends React.Component {
   }
 
   editTopic(index) {
-    if (index === 0) return;
     this._topicInputRef.value = this.state.topics[index].title;
     this._topicInputRef.focus();
     this.setState({ isEditting: true, editIndex: index });
