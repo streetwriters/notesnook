@@ -67,7 +67,7 @@ export class AddNotebookDialog extends React.Component {
     if (toEdit && toEdit.type === 'notebook') {
       let topicsList = [];
       toEdit.topics.forEach((item, index) => {
-        if (index === 0) return;
+        //if (index === 0) return;
         topicsList.push(item.title);
       });
       this.id = toEdit.id;
@@ -111,7 +111,7 @@ export class AddNotebookDialog extends React.Component {
     prevTopics.splice(index, 1);
     let edit = this.props.toEdit;
     if (edit && edit.id) {
-      let topicToDelete = edit.topics[index + 1];
+      let topicToDelete = edit.topics[index];
 
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
@@ -182,14 +182,14 @@ export class AddNotebookDialog extends React.Component {
       });
 
       let nextTopics = toEdit.topics.map((topic, index) => {
-        if (index === 0) return topic;
+        //if (index === 0) return topic;
         let copy = {...topic};
-        copy.title = prevTopics[index - 1];
+        copy.title = prevTopics[index];
         return copy;
       });
 
       prevTopics.forEach((title, index) => {
-        if (!nextTopics[index + 1]) {
+        if (!nextTopics[index]) {
           nextTopics.push(title);
         }
       });
@@ -217,6 +217,7 @@ export class AddNotebookDialog extends React.Component {
 
   onSubmit = (forward = true) => {
     this.hiddenInput.current?.focus();
+    let willFocus = true;
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
@@ -237,12 +238,14 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
+
       if (this.state.editTopic) {
         this.topicInputRef.current?.blur();
         Keyboard.dismiss();
         this.setState({
           editTopic: false,
         });
+        willFocus = false;
       }
       this.prevItem = null;
       this.prevIndex = null;
@@ -257,7 +260,7 @@ export class AddNotebookDialog extends React.Component {
     this.topicInputRef.current?.setNativeProps({
       text: '',
     });
-    this.topicInputRef.current?.focus();
+    willFocus && this.topicInputRef.current?.focus();
   };
 
   render() {
@@ -269,7 +272,7 @@ export class AddNotebookDialog extends React.Component {
         onShow={async () => {
           this.topicsToDelete = [];
           await sleep(300);
-          this.titleRef?.focus();
+          !this.props.toEdit && this.titleRef?.focus();
         }}
         onRequestClose={this.close}>
         <TextInput
@@ -288,6 +291,7 @@ export class AddNotebookDialog extends React.Component {
             styles.container,
             {
               backgroundColor: colors.bg,
+              paddingTop: Platform.OS === 'android' ? 30 : 5,
             },
           ]}>
           <DialogHeader
@@ -296,8 +300,8 @@ export class AddNotebookDialog extends React.Component {
             }
             paragraph={
               toEdit && toEdit.dateCreated
-                ? 'Edit your notebook'
-                : 'Add a new notebook'
+                ? 'You are editing ' + this.title + ' notebook.'
+                : 'Notebooks are the best way to organize your notes.'
             }
           />
 
