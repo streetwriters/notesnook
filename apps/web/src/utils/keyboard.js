@@ -11,9 +11,9 @@ GlobalKeyboard.addEventListener = (name, handler) => {
 GlobalKeyboard.removeEventListener = (name, handler) =>
   KeyboardEventManager.unsubscribe(name, handler);
 
-window.addEventListener("keydown", (e) => {
-  KeyboardEventManager.publish("keydown", e);
-});
+// window.addEventListener("keydown", (e) => {
+//   // KeyboardEventManager.publish("keydown", e);
+// });
 
 window.addEventListener("keyup", (e) => {
   KeyboardEventManager.publish("keyup", e);

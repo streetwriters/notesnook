@@ -1,5 +1,6 @@
 import hotkeys from "hotkeys-js";
 import { hashNavigate, navigate } from "../navigation";
+import { store as themestore } from "../stores/theme-store";
 import { GlobalKeyboard } from "../utils/keyboard";
 
 const KEYMAP = [
@@ -42,6 +43,69 @@ const KEYMAP = [
       e.preventDefault();
 
       navigate("/search/notes");
+    },
+  },
+  {
+    keys: ["alt+n"],
+    description: "Go to Notes",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/");
+    },
+  },
+  {
+    keys: ["alt+b"],
+    description: "Go to Notebooks",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/notebooks");
+    },
+  },
+  {
+    keys: ["alt+f"],
+    description: "Go to Favorites",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/favorites");
+    },
+  },
+  {
+    keys: ["alt+t"],
+    description: "Go to Tags",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/tags");
+    },
+  },
+  {
+    keys: ["alt+d"],
+    description: "Go to Trash",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/trash");
+    },
+  },
+  {
+    keys: ["alt+s"],
+    description: "Go to Settings",
+    global: false,
+    action: (e) => {
+      e.preventDefault();
+      navigate("/settings");
+    },
+  },
+  {
+    keys: ["command+d", "ctrl+d"],
+    description: "Toggle dark/light mode",
+    global: true,
+    action: (e) => {
+      e.preventDefault();
+      themestore.get().toggleNightMode();
     },
   },
 ];
