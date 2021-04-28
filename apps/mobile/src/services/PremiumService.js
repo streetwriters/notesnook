@@ -45,7 +45,7 @@ function getProducts() {
 }
 
 function get() {
-  return true;
+  //return true;
   return (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
@@ -55,8 +55,8 @@ function get() {
 }
 
 async function verify(callback, error) {
-  callback();
-  return;
+  //callback();
+  //return;
   try {
     if (!premiumStatus) {
       if (error) {
@@ -118,11 +118,11 @@ const onUserStatusCheck = async (type) => {
         break;
     }
     if (message) {
-    //  eSendEvent(eShowGetPremium, message);
+      eSendEvent(eShowGetPremium, message);
     }
   }
 
-  return {type, result: true} //status};
+  return {type, result: status};
 };
 
 const showVerifyEmailDialog = () => {
@@ -147,7 +147,6 @@ const showVerifyEmailDialog = () => {
           return;
         }
         await db.user.sendVerificationEmail();
-        console.log('MAIN SENT');
         await MMKV.setItem('lastEmailTime', JSON.stringify(Date.now()));
 
         ToastEvent.show({
@@ -164,7 +163,6 @@ const showVerifyEmailDialog = () => {
           type: 'error',
           context: 'local',
         });
-        //await MMKV.removeItem('lastEmailTime');
       }
     },
     actionText: 'Resend Confirmation Link',
