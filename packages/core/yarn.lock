@@ -4573,7 +4573,7 @@ shellwords@^0.1.1:
 
 "showdown@https://github.com/thecodrr/showdown":
   version "2.0.0-alpha1"
-  resolved "https://github.com/thecodrr/showdown#1c8e5b5d1981502721f88ff1a20a979ae2f23629"
+  resolved "https://github.com/thecodrr/showdown#416cbdfd09b87886360ed162503ac144524e7fae"
   dependencies:
     yargs "14.2.0"
 
