@@ -1,7 +1,8 @@
-import TurndownService from "turndown";
+import showdown from "showdown";
 import decode from "lean-he/decode";
 
-var turndownService = new TurndownService();
+var converter = new showdown.Converter();
+converter.setFlavor("original");
 
 const splitter = /\W+/gm;
 class Tiny {
@@ -26,7 +27,7 @@ class Tiny {
   }
 
   toMD() {
-    return turndownService.turndown(this.data);
+    return converter.makeMarkdown(this.data);
   }
 
   toTitle() {

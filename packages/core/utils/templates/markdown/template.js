@@ -1,10 +1,4 @@
-const template = `[//]: <> (DO NOT TOUCH THESE META TAGS)
-
-{{metaTags}}
-
-[//]: <> (METADATA TAGS END)
-
-# {{title}}
+const template = `# {{title}}
 
 {{content}}
 ---

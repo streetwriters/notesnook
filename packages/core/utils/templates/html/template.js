@@ -5,11 +5,9 @@ const template = `<!DOCTYPE html>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1" />
     <meta
       name="description"
-      content="Notesnook is the most secure, zero-knowledge based, encrypted note-taking app all compiled into one simple to use package that works on all major platforms."
+      content="{{headline}}"
     />
-    <title>{{title}} - Notesnook</title>
-    <!-- DO NOT TOUCH THESE TAGS -->
-    {{metaTags}}
+    <title>{{title}} - Notesnook</title> 
   </head>
   <body>
     <h1>{{title}}</h1>

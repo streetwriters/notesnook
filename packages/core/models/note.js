@@ -57,6 +57,7 @@ export default class Note {
       metadata: this.data,
       title: this.title,
       editedOn: this.dateEdited,
+      headline: this.headline,
       createdOn: this.data.dateCreated,
     };
     const { data, type } = await this._db.content.raw(this._note.contentId);
