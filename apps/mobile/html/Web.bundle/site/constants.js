@@ -233,22 +233,17 @@ function setTheme() {
     outline: 3px solid ${pageTheme.colors.shade} !important;
 }
 
-#mceResizeHandlese {
-  height: 40px !important;
-  width: 40px !important;
-  border-radius:100px !important;
-}
-
 .mce-content-body div.mce-resizehandle {
   background-color: ${pageTheme.colors.accent} !important;
   border-color:  ${pageTheme.colors.accent} !important;
   border-style: solid;
   border-width: 1px;
   box-sizing: border-box;
-  height: 10px;
+  height: 30px !important;
   position: absolute;
-  width: 10px;
+  width: 30px !important;
   z-index: 10000;
+  opacity:0.5;
 }`;
 
   let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(

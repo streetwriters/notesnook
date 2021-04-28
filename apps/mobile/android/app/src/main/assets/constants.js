@@ -33,7 +33,7 @@ const markdownPatterns = [
   {start: '######', format: 'h6'},
   {start: '* ', cmd: 'InsertUnorderedList'},
   {start: '- [ ] ', cmd: 'InsertCheckList'},
-  {start: '- [x] ', cmd: 'InsertCheckList',value:"checked"},
+  {start: '- [x] ', cmd: 'InsertCheckList', value: 'checked'},
   {start: '- ', cmd: 'InsertUnorderedList'},
   {start: '> ', format: 'blockquote'},
   {
@@ -235,11 +235,6 @@ function setTheme() {
     outline: 3px solid ${pageTheme.colors.shade} !important;
 }
 
-#mceResizeHandlese {
-  height: 40px !important;
-  width: 40px !important;
-  border-radius:100px !important;
-}
 
 .mce-content-body div.mce-resizehandle {
   background-color: ${pageTheme.colors.accent} !important;
@@ -247,11 +242,20 @@ function setTheme() {
   border-style: solid;
   border-width: 1px;
   box-sizing: border-box;
-  height: 10px;
+  height: 30px !important;
   position: absolute;
-  width: 10px;
+  width: 30px !important;
   z-index: 10000;
+  opacity:0.5;
 }`;
+
+  /*
+
+#mceResizeHandlese {
+  height: 40px !important;
+  width: 40px !important;
+  border-radius:100px !important;
+} */
 
   let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
     'head',
