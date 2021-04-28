@@ -39,9 +39,9 @@ test("delete note", () =>
   noteTest().then(async ({ db, id }) => {
     let notebookId = await db.notebooks.add(TEST_NOTEBOOK);
     let topics = db.notebooks.notebook(notebookId).topics;
-    let topic = topics.topic("General");
+    let topic = topics.topic("hello");
     await topic.add(id);
-    topic = topics.topic("General");
+    topic = topics.topic("hello");
 
     expect(topic.all.findIndex((v) => v.id === id)).toBeGreaterThan(-1);
     await db.notes.delete(id);
@@ -49,7 +49,7 @@ test("delete note", () =>
     expect(topic.all.findIndex((v) => v.id === id)).toBe(-1);
 
     expect(db.notebooks.notebook(notebookId).totalNotes).toBe(0);
-    expect(topics.topic("General").totalNotes).toBe(0);
+    expect(topics.topic("hello").totalNotes).toBe(0);
   }));
 
 test("get all notes", () =>

@@ -57,7 +57,6 @@ test("merge notebook with new topics", () =>
     await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
 
     expect(notebook.topics.has("Home")).toBe(true);
-    expect(notebook.topics.has("General")).toBe(true);
     expect(notebook.topics.has("hello")).toBe(true);
   }));
 
@@ -66,13 +65,12 @@ test("merge notebook with topics removed", () =>
     let notebook = db.notebooks.notebook(id);
 
     const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics.splice(1, 1); // remove hello topic
+    newNotebook.topics.splice(0, 1); // remove hello topic
     newNotebook.topics.push(makeTopic("Home", id));
 
     await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
 
     expect(notebook.topics.has("Home")).toBe(true);
-    expect(notebook.topics.has("General")).toBe(true);
     expect(notebook.topics.has("hello")).toBe(false);
   }));
 
@@ -81,7 +79,7 @@ test("merge notebook with topic edited", () =>
     let notebook = db.notebooks.notebook(id);
 
     const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics[1].title = "hello (edited)";
+    newNotebook.topics[0].title = "hello (edited)";
 
     await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
 
@@ -94,12 +92,12 @@ test("merge notebook when local notebook is also edited", () =>
     let notebook = db.notebooks.notebook(id);
 
     const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics[1].title = "hello (edited)";
+    newNotebook.topics[0].title = "hello (edited)";
 
     await delay(500);
 
     await notebook.topics.add({
-      ...notebook.topics.all[1],
+      ...notebook.topics.all[0],
       title: "hello (edited too)",
     });
 
@@ -115,7 +113,7 @@ test("merge notebook with topic removed that is edited in the local notebook", (
     let notebook = db.notebooks.notebook(id);
 
     const newNotebook = { ...notebook.data, remote: true };
-    newNotebook.topics.splice(1, 1); // remove hello topic
+    newNotebook.topics.splice(0, 1); // remove hello topic
 
     await StorageInterface.write("lastSynced", Date.now());
 

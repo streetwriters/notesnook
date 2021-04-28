@@ -80,12 +80,6 @@ export default class Notebooks extends Collection {
       pinned: !!notebook.pinned,
       topics: notebook.topics || [],
     };
-    if (
-      !oldNotebook &&
-      notebook.topics.findIndex((topic) => topic.title === "General") <= -1
-    ) {
-      notebook.topics.splice(0, 0, "General");
-    }
 
     await this._collection.addItem(notebook);
 

@@ -4,7 +4,7 @@ beforeEach(() => StorageInterface.clear());
 
 test("get empty topic", () =>
   notebookTest().then(({ db, id }) => {
-    let topic = db.notebooks.notebook(id).topics.topic("General");
+    let topic = db.notebooks.notebook(id).topics.topic("hello");
     expect(topic.all.length).toBe(0);
   }));
 
@@ -59,7 +59,7 @@ test("edit topic title", () =>
 
     let topic = topics.topic("Home");
 
-    expect(topics.all.length).toBe(3);
+    expect(topics.all.length).toBe(2);
 
     const oldDateEdited = topic._topic.dateEdited;
 
@@ -67,7 +67,7 @@ test("edit topic title", () =>
 
     await topics.add({ id: topic._topic.id, title: "Hello22" });
 
-    expect(topics.all.length).toBe(3);
+    expect(topics.all.length).toBe(2);
     expect(topics.topic(topic._topic.id)._topic.title).toBe("Hello22");
     expect(topics.topic(topic._topic.id)._topic.dateEdited).toBeGreaterThan(
       oldDateEdited
