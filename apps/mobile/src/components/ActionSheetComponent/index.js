@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Clipboard,
@@ -6,49 +6,43 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   openVault,
   sendNoteEditedEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
-import {editing, toTXT} from '../../utils';
+import { editing, toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
-  eOnNewTopicAdded,
-  eOpenMoveNoteDialog,
-  refreshNotesPage,
+  eOpenMoveNoteDialog
 } from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {opacity, pv, SIZE} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {PremiumTag} from '../Premium/PremiumTag';
-import {PressableButton} from '../PressableButton';
-import {Toast} from '../Toast';
+import { deleteItems } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { opacity, pv, SIZE } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ActionSheetColorsSection} from './ActionSheetColorsSection';
-import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import { ActionSheetColorsSection } from './ActionSheetColorsSection';
+import { ActionSheetTagsSection } from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -61,7 +55,7 @@ export const ActionSheetComponent = ({
   getRef,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, user} = state;
+  const {colors, user, lastSynced} = state;
   const [refreshing, setRefreshing] = useState(false);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [note, setNote] = useState(item);
@@ -570,11 +564,12 @@ export const ActionSheetComponent = ({
             paddingHorizontal: 12,
             alignItems: 'center',
             marginTop: 5,
-            zIndex:10
+            zIndex: 10,
           }}>
           <Heading
             style={{
-              maxWidth: '70%',
+              maxWidth: '90%',
+              textAlign: 'center',
             }}
             size={SIZE.md}>
             {note?.title.replace('\n', '')}
@@ -584,9 +579,9 @@ export const ActionSheetComponent = ({
             <Paragraph
               numberOfLines={2}
               style={{
-                width: '80%',
+                width: '90%',
                 textAlign: 'center',
-                maxWidth: '80%',
+                maxWidth: '90%',
               }}>
               {note.type === 'notebook' && note.description
                 ? note.description
@@ -682,9 +677,7 @@ export const ActionSheetComponent = ({
                   textAlignVertical: 'center',
                   textAlign: 'center',
                 }}>
-                {user && user.lastSynced && user.lastSynced > note.dateEdited
-                  ? 'Synced'
-                  : 'Sync Now'}
+                {user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'}
               </Paragraph>
             </TouchableOpacity>
           )}
@@ -797,10 +790,7 @@ export const ActionSheetComponent = ({
         <View>{columnItemsData.map(_renderColumnItem)}</View>
       ) : null}
 
-      {note.type === 'note' &&
-      user &&
-      user.lastSynced &&
-      user.lastSynced > note.dateEdited ? (
+      {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
         <PressableButton
           type="shade"
           customStyle={{
@@ -826,7 +816,7 @@ export const ActionSheetComponent = ({
               style={{
                 fontSize: SIZE.md,
               }}>
-              This note is encrypted & synced
+              This note is encrypted and synced
             </Heading>
             <Paragraph
               style={{
