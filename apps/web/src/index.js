@@ -2,18 +2,19 @@ import React from "react";
 import { initializeDatabase } from "./common/db";
 import "./index.css";
 import * as serviceWorker from "./serviceWorkerRegistration";
-import { trackVisit } from "./utils/analytics";
+import { loadTrackerScript } from "./utils/analytics";
 
 if (process.env.NODE_ENV === "production") {
+  loadTrackerScript();
   console.log = () => {};
 }
 
 initializeDatabase().then(() => {
   import("react-dom").then(({ render }) => {
     import("./App").then(({ default: App }) => {
-      render(<App />, document.getElementById("root"), () => {
+      render(<App />, document.getElementById("root"), async () => {
         document.getElementById("splash").remove();
-        trackVisit();
+
         import("react-modal").then(({ default: Modal }) => {
           Modal.setAppElement("#root");
         });
