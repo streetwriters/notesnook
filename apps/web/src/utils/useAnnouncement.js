@@ -12,8 +12,6 @@ export default function useAnnouncement() {
     (async function () {
       try {
         CACHED_ANNOUNCEMENT = CACHED_ANNOUNCEMENT || (await db.announcement());
-
-        
       } catch (e) {
         console.error(e);
       } finally {
@@ -35,7 +33,7 @@ export default function useAnnouncement() {
   return [announcement, remove];
 }
 
-const allowedPlatforms = ["all", "web", "desktop"];
+const allowedPlatforms = ["all", process.env.REACT_APP_PLATFORM];
 function shouldShowAnnouncement(announcement) {
   let show = allowedPlatforms.indexOf(announcement.platform) > -1;
   if (!show) return;
