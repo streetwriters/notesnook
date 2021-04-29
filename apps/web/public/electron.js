@@ -3,6 +3,11 @@ const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const url = require("url");
 const os = require("os");
+const isDev = require("electron-is-dev");
+
+try {
+  require("electron-reloader")(module);
+} catch (_) {}
 
 let mainWindow;
 
@@ -15,16 +20,21 @@ async function createWindow() {
     ),
   });
 
+  if (isDev)
+    mainWindow.webContents.openDevTools({ mode: "right", activate: true });
+
   mainWindow.maximize();
 
   // await loadURL(mainWindow);
   mainWindow.loadURL(
-    url.format({
-      pathname:
-        "index.html" /* Attention here: origin is path.join(__dirname, 'index.html') */,
-      protocol: "file",
-      slashes: true,
-    })
+    isDev
+      ? process.env.ELECTRON_START_URL
+      : url.format({
+          pathname:
+            "index.html" /* Attention here: origin is path.join(__dirname, 'index.html') */,
+          protocol: "file",
+          slashes: true,
+        })
   );
 
   mainWindow.on("closed", () => {
