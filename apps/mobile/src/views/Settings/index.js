@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import React, {createRef, useCallback, useEffect, useState} from 'react';
 import {
   Appearance,
@@ -566,25 +567,28 @@ const CustomButton = ({
   );
 };
 
+const getTimeLeft = t2 => {
+  let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
+  return {
+    time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
+    isHour: daysRemaining === 0,
+  };
+};
+
 const SettingsUserSection = () => {
   const [state] = useTracked();
   const {colors, user, messageBoardState} = state;
+  const subscriptionDaysLeft =
+    user && getTimeLeft(parseInt(user.subscription?.expiry));
+  const isExpired = user && subscriptionDaysLeft.time < 0;
+  const expiryDate =  dayjs(user?.subscription?.expiry).format(
+    'MMMM D, YYYY',
+  );
+  const startDate =  dayjs(user?.subscription?.start).format(
+    'MMMM D, YYYY',
+  )
+  console.log(user?.subscription)
 
-  /*  const user = {
-    email: 'ammarahmed6506@gmail.com',
-    subscription: {
-      provider: 1,
-      expiry: Date.now() + 86400000 * 2,
-      type: 5,
-    },
-  }; */
-  const getTimeLeft = t2 => {
-    let d1 = new Date(Date.now());
-    let d2 = new Date(t2);
-    let diff = d2.getTime() - d1.getTime();
-    diff = (diff / (1000 * 3600 * 24)).toFixed(0);
-    return diff < 1 ? 0 : diff;
-  };
 
   return (
     <>
@@ -732,27 +736,33 @@ const SettingsUserSection = () => {
                     <Paragraph
                       size={SIZE.lg}
                       color={
-                        getTimeLeft(parseInt(user.subscription.expiry)) > 5 ||
+                        (subscriptionDaysLeft.time > 5 &&
+                          !subscriptionDaysLeft.isHour) ||
                         user.subscription.type !== 6
                           ? colors.accent
                           : colors.red
                       }>
-                      {getTimeLeft(parseInt(user.subscription.expiry)) +
-                        ' Days Remaining'}{' '}
+                      {isExpired
+                        ? 'Your subscription has ended.'
+                        : `${subscriptionDaysLeft.time} ${
+                            subscriptionDaysLeft.isHour ? 'hours' : 'days'
+                          } remaining`}
                     </Paragraph>
                     <Paragraph color={colors.pri}>
                       {user.subscription.type === 2
                         ? 'You signed up on ' +
-                          timeConverter(user.subscription.start)
+                          startDate
                         : user.subscription.type === 1
                         ? 'Your trial period started on ' +
-                          timeConverter(user.subscription.start)
+                          startDate
                         : user.subscription.type === 6
-                        ? 'Your account will be downgraded to Basic in 3 days'
+                        ? subscriptionDaysLeft.time < -3
+                          ? 'Your subscription has ended'
+                          : 'Your account will be downgraded to Basic in 3 days'
                         : user.subscription.type === 7
-                        ? 'You have cancelled your subscription.'
+                        ? `Your subscription will end on ${expiryDate}.`
                         : user.subscription.type === 5
-                        ? 'Your subscription will auto renew every month.'
+                        ? `Your subscription will auto renew on ${expiryDate}.`
                         : null}
                     </Paragraph>
                   </View>
