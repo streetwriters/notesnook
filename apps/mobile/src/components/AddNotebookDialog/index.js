@@ -272,7 +272,7 @@ export class AddNotebookDialog extends React.Component {
         onShow={async () => {
           this.topicsToDelete = [];
           await sleep(300);
-          !this.props.toEdit && this.titleRef?.focus();
+          this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
         onRequestClose={this.close}>
         <TextInput
