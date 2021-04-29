@@ -572,7 +572,6 @@ function OptionsItem(props) {
 
 function AccountStatus(props) {
   const { user } = props;
-
   const {
     isTrial,
     isBeta,
@@ -581,12 +580,14 @@ function AccountStatus(props) {
     isProCancelled,
     isProExpired,
     remainingDays,
+    remainingHours,
   } = useMemo(() => {
     const type = user?.subscription?.type;
     const expiry = user?.subscription?.expiry;
     if (!type || !expiry) return { isBasic: true };
     return {
-      remainingDays: dayjs(expiry).diff(dayjs(), "day") + 1,
+      remainingDays: dayjs(expiry).diff(dayjs(), "day"),
+      remainingHours: dayjs(expiry).diff(dayjs(), "hours"),
       isTrial: type === SUBSCRIPTION_STATUS.TRIAL,
       isBasic: type === SUBSCRIPTION_STATUS.BASIC,
       isBeta: type === SUBSCRIPTION_STATUS.BETA,
@@ -653,8 +654,10 @@ function AccountStatus(props) {
         fontSize={26}
         mt={2}
       >
-        {remainingDays > 0
-          ? `${remainingDays} Days Remaining`
+        {remainingDays === 0
+          ? `${remainingHours} hours remaining`
+          : remainingDays > 0
+          ? `${remainingDays} days remaining`
           : isBeta
           ? "Your beta subscription has ended."
           : isTrial
