@@ -76,7 +76,7 @@ export const reducer = (state, action) => {
     case Actions.SETTINGS: {
       return {
         ...state,
-        settings: action.settings,
+        settings: {...action.settings},
       };
     }
     case Actions.TRASH: {

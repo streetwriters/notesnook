@@ -168,5 +168,13 @@ export const TOOLBAR_ICONS = {
   removeformat: 'format-clear',
   horizontal: 'border-horizontal',
   table: 'table-plus',
-  settings:'cog-outline'
+  settings:'cog-outline',
+  magnify:"magnify",
+  tableprops:"table-settings",
+  tabledelete:"table-remove",
+  tablesplitcell:"table-split-cell",
+  tablemergecell:"table-merge-cells",
+  tablerowprops:"table-row",
+  tablecolumnprops:"table-column",
+  tableconfig:"table-cog",
 };

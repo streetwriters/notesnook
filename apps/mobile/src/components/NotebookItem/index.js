@@ -92,10 +92,9 @@ export const NotebookItem = ({
             }}>
             {item && item.topics ? (
               item.topics
-                .slice(1)
                 .sort((a, b) => b.dateEdited - a.dateEdited)
                 .slice(0, 2)
-                .map((topic) => (
+                .map(topic => (
                   <TouchableOpacity
                     activeOpacity={0.8}
                     onPress={() => {
@@ -214,22 +213,20 @@ export const NotebookItem = ({
           ) : null}
         </View>
       </View>
-      {item.title === 'General' && item.type === 'topic' ? null : (
-        <ActionIcon
-          color={colors.heading}
-          name="dots-horizontal"
-          testID={notesnook.ids.notebook.menu}
-          size={SIZE.xl}
-          onPress={showActionSheet}
-          customStyle={{
-            justifyContent: 'center',
-            height: 35,
-            width: 35,
-            borderRadius: 100,
-            alignItems: 'center',
-          }}
-        />
-      )}
+      <ActionIcon
+        color={colors.heading}
+        name="dots-horizontal"
+        testID={notesnook.ids.notebook.menu}
+        size={SIZE.xl}
+        onPress={showActionSheet}
+        customStyle={{
+          justifyContent: 'center',
+          height: 35,
+          width: 35,
+          borderRadius: 100,
+          alignItems: 'center',
+        }}
+      />
     </View>
   );
 };

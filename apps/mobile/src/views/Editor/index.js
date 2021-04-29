@@ -25,6 +25,7 @@ import {
   _onMessage,
   _onShouldStartLoadWithRequest,
 } from './Functions';
+import tiny from './tiny/tiny';
 import EditorToolbar from './tiny/toolbar';
 
 const source =
@@ -48,10 +49,17 @@ const Editor = React.memo(
     const [state] = useTracked();
     const {premiumUser} = state;
     const [resetting, setResetting] = useState(false);
-    const insets = useSafeAreaInsets();
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
+
+    useEffect(()=>{
+      if (premiumUser) {
+        tiny.call(EditorWebView,tiny.setMarkdown,true)
+      }
+    },[premiumUser])
+
+
 
     const onResetRequested = async noload => {
       setResetting(true);

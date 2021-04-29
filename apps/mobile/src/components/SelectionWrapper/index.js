@@ -26,7 +26,6 @@ const SelectionWrapper = ({
 
   const _onLongPress = () => {
    if (history.selectedItemsList.length > 0 ) return;
-   if (item.type === 'topic' && item.title === 'General') return;
     setActionStrip(!actionStrip);
   };
 

@@ -16,9 +16,9 @@ export const db = new Database(
  */
 
 db.host( __DEV__ ? {
-  API_HOST: 'http://192.168.10.3:5264',
-  AUTH_HOST: 'http://192.168.10.3:8264',
-  SSE_HOST: 'http://192.168.10.3:7264',
+  API_HOST: 'https://api.notesnook.com',
+  AUTH_HOST: 'https://auth.streetwriters.co',
+  SSE_HOST: 'https://events.streetwriters.co',
 } : {
   API_HOST: 'https://api.notesnook.com',
   AUTH_HOST: 'https://auth.streetwriters.co',

@@ -32,6 +32,8 @@ const markdownPatterns = [
   {start: '#####', format: 'h5'},
   {start: '######', format: 'h6'},
   {start: '* ', cmd: 'InsertUnorderedList'},
+  {start: '- [ ] ', cmd: 'InsertCheckList'},
+  {start: '- [x] ', cmd: 'InsertCheckList', value: 'checked'},
   {start: '- ', cmd: 'InsertUnorderedList'},
   {start: '> ', format: 'blockquote'},
   {
@@ -66,11 +68,15 @@ const markdownPatterns = [
   },
   {start: '---', replacement: '<hr/>'},
   {start: '--', replacement: '—'},
-  {start: '-', replacement: '—'},
   {start: '(c)', replacement: '©'},
 ];
 
 function dark() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').removeAttribute('disabled');
+    document.getElementById('light_sheet').setAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook/content.min.css',
@@ -87,6 +93,11 @@ function dark() {
 }
 
 function light() {
+  if (document.getElementById('dark_sheet')) {
+    document.getElementById('dark_sheet').setAttribute('disabled');
+    document.getElementById('light_sheet').removeAttribute('disabled');
+  }
+
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
     'dist/skins/notesnook-dark/content.min.css',
@@ -125,13 +136,134 @@ function setTheme() {
 	#titleInput::-webkit-input-placeholder {
 	  color:${pageTheme.colors.icon}
 	}
+
 	.info-bar {
 	  color:${pageTheme.colors.icon};
 	}
 	  #titlebar {
 		display:flex !important;
 	  }
+    
+    .tox .tox-tbtn:hover {
+      background: ${pageTheme.colors.shade} !important;
+    }
+    
+    .tox-textfield {
+      border-radius: 0px !important;
+      border-color: ${pageTheme.colors.nav} !important;
+      border-width: 0px 0px 2px 0px !important;
+      color: var(--text) !important;
+      padding: 10px !important;
+      font-size: 0.875rem !important;
+      line-height: 0.875rem !important;
+    }
+    
+    .tox-textfield:focus {
+      outline: none !important;
+      border-color: ${pageTheme.colors.accent} !important;
+      border-width: 0px 0px 2px 0px !important;
+      border-radius: 0px !important;
+    }
+    
+    .tox-textfield:hover {
+      border-color: ${pageTheme.colors.accent + '80'} !important;
+    }
+    
+    .tox-button {
+      background-color: ${pageTheme.colors.accent} !important;
+      color: white;
+      transition: opacity 300ms linear;
+      border-width: 0px !important;
+    }
+    
+    .tox-button:hover:not(.tox-button[disabled="disabled"]) {
+      opacity: 0.8;
+    }
+    
+    .tox-button--secondary,
+    .tox-button--icon {
+      background-color: ${pageTheme.colors.nav} !important;
+      color: ${pageTheme.colors.icon} !important;
+    }
+    .tox-button[disabled="disabled"] {
+      background-color:  ${pageTheme.colors.nav}  !important;
+      color: ${pageTheme.colors.icon} !important;
+    }
+    
+    tox-tbtn tox-tbtn--select {
+      border-radius: 5px !important;
+    }
+    
+    .tox-dialog {
+      border-radius: 5px !important;
+      border-width: 0px !important;
+      box-shadow: 4px 5px 18px 2px #00000038;
+      padding: 0px !important;
+      max-width: 95vw !important;
+      margin-left:2.5vw,
+      margin-right:2.5vw,
+      align-self:center !important;
+    }
+    
+    .tox-dialog__footer {
+      border-top: 0px !important;
+    }
+    
+    .tox-dialog__title {
+      color: ${pageTheme.colors.pri} !important;
+      font-size: 1.2rem !important;
+      font-weight: bold !important;
+    }
+    
+    .tox .tox-toolbar,
+    .tox .tox-toolbar__overflow,
+    .tox .tox-toolbar__primary {
+      background: none !important;
+      border-bottom: 1px solid ${pageTheme.colors.nav} !important;
+    }
+
+  
 	  `;
+
+  let node2 = `
+  .mce-content-body audio[data-mce-selected], 
+  .mce-content-body embed[data-mce-selected], 
+  .mce-content-body img[data-mce-selected], 
+  .mce-content-body object[data-mce-selected], 
+  .mce-content-body table[data-mce-selected], 
+  .mce-content-body video[data-mce-selected] {
+    outline: 3px solid ${pageTheme.colors.shade} !important;
+}
+
+
+.mce-content-body div.mce-resizehandle {
+  background-color: ${pageTheme.colors.accent} !important;
+  border-color:  ${pageTheme.colors.accent} !important;
+  border-style: solid;
+  border-width: 1px;
+  box-sizing: border-box;
+  height: 30px !important;
+  position: absolute;
+  width: 30px !important;
+  z-index: 10000;
+  opacity:0.5;
+}`;
+
+  /*
+
+#mceResizeHandlese {
+  height: 40px !important;
+  width: 40px !important;
+  border-radius:100px !important;
+} */
+
+  let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
+    'head',
+  )[0];
+  let css2 = document.createElement('style');
+  css2.appendChild(document.createTextNode(node2));
+  editorHead.appendChild(css2);
+
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);
 }
@@ -143,13 +275,13 @@ var minifyImg = function (
   resolve,
   imageArguments = 0.7,
 ) {
-  fetch(dataUrl).then(async (res) => {
+  fetch(dataUrl).then(async res => {
     let blob = await res.blob();
     new Compressor(blob, {
       quality: imageArguments,
       width: newWidth,
-      mimeType:imageType,
-      success: (result) => {
+      mimeType: imageType,
+      success: result => {
         let fileReader = new FileReader();
         fileReader.onloadend = function () {
           resolve(fileReader.result);
@@ -157,7 +289,7 @@ var minifyImg = function (
         };
         fileReader.readAsDataURL(result);
       },
-      error: (err) => {
+      error: err => {
         console.log(err.message);
       },
     });
@@ -170,13 +302,13 @@ function loadImage() {
     if (fileInput.files != null && fileInput.files[0] != null) {
       let reader = new FileReader();
       console.log(reader.readyState, 'READY STATE');
-      let load = (e) => {
+      let load = e => {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
           1024,
           'image/jpeg',
-          (r) => {
+          r => {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },

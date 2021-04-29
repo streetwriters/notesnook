@@ -131,8 +131,6 @@ const EditorHeader = () => {
               }}
               top={50}
               onPress={async () => {
-                EditorWebView.current?.postMessage("hello world");
-                return;
                 await loadNote({type: 'new'});
               }}
             />

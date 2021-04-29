@@ -5,7 +5,8 @@ import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
+import PremiumService from '../../services/PremiumService';
+import {editing, InteractionManager} from '../../utils';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
@@ -175,14 +176,16 @@ let currentEditingTimer = null;
 let webviewTimer = null;
 
 export const loadNote = async item => {
+  console.log(item);
   editing.currentlyEditing = true;
   tiny.call(EditorWebView, tiny.blur);
   if (item && item.type === 'new') {
-    await clearEditor();
+    if (getNote()) {
+      await clearEditor();
+    }
     clearNote();
     noteEdited = false;
     id = null;
-    await sleep(20);
     if (Platform.OS === 'android') {
       textInput.current?.focus();
       EditorWebView.current?.requestFocus();
@@ -194,28 +197,27 @@ export const loadNote = async item => {
       EditorWebView.current?.reload();
     }
     tiny.call(EditorWebView, tiny.notLoading);
+    checkStatus();
   } else {
     if (id === item.id && !item.forced) {
       return;
     }
+    await setNote(item);
+    clearTimer();
     eSendEvent('loadingNote', item);
-    eSendEvent('webviewreset');
     webviewInit = false;
     editing.isFocused = false;
-    clearTimer();
-    await setNote(item);
-    sendNoteEditedEvent({
-      id: id,
-    });
-
-    if (webviewInit) {
-      await loadNoteInEditor();
-    } else {
-      EditorWebView.current?.reload();
-    }
-    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+    setTimeout(() => {
+      eSendEvent('webviewreset');
+    },1)
+    InteractionManager.runAfterInteractions(async () => {
+      sendNoteEditedEvent({
+        id: id,
+      });
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+      checkStatus();
+    }, 50);
   }
-  checkStatus();
 };
 
 const checkStatus = (reset = false) => {
@@ -304,11 +306,20 @@ export const _onMessage = async evt => {
       setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
+      if (PremiumService.get()){
+        tiny.call(EditorWebView,tiny.setMarkdown,true)
+      } else {
+        tiny.call(EditorWebView,tiny.removeMarkdown,true)
+      }
       loadNoteInEditor();
       break;
     case 'running':
       webviewOK = true;
       break;
+    case 'imagepreview':
+      eSendEvent("ImagePreview",message.value)
+
+    break;  
     case 'focus':
       editing.focusType = message.value;
       break;
@@ -339,22 +350,18 @@ export async function clearEditor() {
     (content?.data && content.data?.trim().length > 0) ||
     (title && title.trim().length > 0)
   ) {
-    await saveNote();
+    await saveNote(true);
   }
   clearNote();
   editing.focusType = null;
-  updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
-  sendNoteEditedEvent({
-    id: id,
-    forced: true,
-  });
   eSendEvent('historyEvent', {
     undo: 0,
     redo: 0,
   });
   saveCounter = 0;
-  tiny.call(EditorWebView, tiny.updateDateEdited(''), true);
-  tiny.call(EditorWebView, tiny.updateSavingState(''), true);
+  setTimeout(() => {
+    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
+  }, 1);
 }
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
@@ -420,7 +427,7 @@ async function addToCollection(id) {
   }
 }
 
-export async function saveNote() {
+export async function saveNote(preventUpdate) {
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
@@ -447,10 +454,10 @@ export async function saveNote() {
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Notebook,
         ]);
-        updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
       }
 
       if (!id) {
+        updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
         await addToCollection(noteId);
       }
       await setNoteInEditorAfterSaving(id, noteId);
@@ -459,18 +466,25 @@ export async function saveNote() {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);
     }
-    sendNoteEditedEvent({
-      id: id,
-    });
-    let n = db.notes.note(id)?.data?.dateEdited;
-    tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
-    tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+    if (!preventUpdate) {
+      sendNoteEditedEvent({
+        id: id,
+      });
+      let n = db.notes.note(id)?.data?.dateEdited;
+      tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
+      tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+    }
   } catch (e) {}
 }
 
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+  }
+  if (premium){
+    tiny.call(EditorWebView,tiny.setMarkdown,true)
+  } else {
+    tiny.call(EditorWebView,tiny.removeMarkdown,true)
   }
   setColors(colors);
 }

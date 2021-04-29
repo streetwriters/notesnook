@@ -61,6 +61,7 @@ async function saveToMarkdown(note) {
   RNFetchBlob = require('rn-fetch-blob').default;
 
   let converter = new showdown.Converter();
+  converter.setFlavor("original");
   let dom = jsdom.html();
   let content = await db.notes.note(note.id).content();
   let markdown = converter.makeMarkdown(content, dom);

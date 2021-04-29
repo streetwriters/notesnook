@@ -21,15 +21,15 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      "mychecklist advlist autolink textpattern hr lists link noneditable image",
-      "searchreplace mycode",
-      "media imagetools table paste wordcount autoresize directionality",
+      'mychecklist advlist autolink textpattern hr lists link noneditable image',
+      'searchreplace mycode',
+      'media imagetools table paste wordcount autoresize directionality',
     ],
     toolbar: false,
     paste_data_images: true,
-   // images_upload_handler: function (blobInfo, success, failure) {
-   //   success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
-   // },
+    /*   images_upload_handler: function (blobInfo, success, failure) {
+      success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
+    }, */
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
@@ -47,8 +47,15 @@ function init_tiny(size) {
       max-width:100% !important;
       height:auto !important;
     }
+    .tox .tox-edit-area__iframe {
+      background-color:transparent !important;
+    }
+    body {
+      background-color:transparent !important;
+    }
     iframe {
       max-width:100% !important;
+      background-color:transparent !important;
     }
     table {
       display: block !important;
@@ -59,20 +66,74 @@ function init_tiny(size) {
       height:auto !important;
     }
     td {
-      min-width:20vw !important;
+      min-width:10vw !important;
     }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
-    imagetools_toolbar: 'rotateleft rotateright | flipv fliph',
+    table_toolbar:
+      'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+    imagetools_toolbar:
+      'rotateleft rotateright | flipv fliph | imageoptions | deleteimage | imagepreview',
     placeholder: 'Start writing your note here',
     object_resizing: true,
+    resize: true,
+    mobile: {
+      resize: true,
+      object_resizing: true,
+    },
+    image_description: false,
+    image_caption: false,
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
       'Sans=sans-serif;' +
       'Classic=courier new;' +
       'Mono=monospace;',
+    setup: function (editor) {
+      editor.ui.registry.addButton('deleteimage', {
+        icon: 'remove',
+        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
+        tooltip: 'Remove image',
+        onAction: function () {
+          tinymce.activeEditor.execCommand('Delete');
+        },
+        onclick: function () {
+          tinymce.activeEditor.execCommand('Delete');
+        },
+      });
+      editor.ui.registry.addButton('imagepreview', {
+        icon: 'fullscreen',
+        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
+        tooltip: 'Preview image',
+        onAction: function () {
+        
+          if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+            var xhr = new XMLHttpRequest();
+            xhr.responseType = 'blob';
+
+            xhr.onload = function () {
+              var recoveredBlob = xhr.response;
+              var reader = new FileReader();
+              reader.onload = function () {
+                var blobAsDataUrl = reader.result;
+                reactNativeEventHandler('imagepreview', blobAsDataUrl);
+                reader.abort();
+                xhr.abort();
+              };
+              reader.readAsDataURL(recoveredBlob);
+            };
+            xhr.open(
+              'GET',
+              tinymce.activeEditor.selection.getNode().getAttribute('src'),
+            );
+            xhr.send();
+          }
+
+        },
+        onclick: function () {},
+      });
+    },
     init_instance_callback: function (edit) {
       editor = edit;
       setTheme();
@@ -89,16 +150,18 @@ function init_tiny(size) {
       editor.on('focus', () => {
         reactNativeEventHandler('focus', 'editor');
       });
-      editor.on('SetContent', (event) => {
+
+      editor.on('SetContent', event => {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
-        } 
+        }
         if (event.paste) {
           isLoading = false;
           onChange(event);
         }
       });
-      editor.on('ScrollIntoView', (e) => {
+
+      editor.on('ScrollIntoView', e => {
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
@@ -111,24 +174,26 @@ function init_tiny(size) {
     },
   });
 }
-window.prevContent = "";
-const onChange = (event) => {
-  if (event.type === "nodechange" && !event.selectionChange) return;
- 
-  
-  if (isLoading) {
-    isLoading = false;
-    return;
-  }
-  if (editor.plugins.wordcount.getCount() === 0) return;
-  selectchange();
+window.prevContent = '';
+const onChange = event => {
+  clearTimeout(changeTimer);
+  changeTimer = null;
+  changeTimer = setTimeout(() => {
+    if (event.type === 'nodechange' && !event.selectionChange) return;
+    if (isLoading) {
+      isLoading = false;
+      return;
+    }
+    if (editor.plugins.wordcount.getCount() === 0) return;
+    selectchange();
 
-  reactNativeEventHandler('tiny', editor.getContent());
+    reactNativeEventHandler('tiny', editor.getContent());
 
-  reactNativeEventHandler('history', {
-    undo: editor.undoManager.hasUndo(),
-    redo: editor.undoManager.hasRedo(),
-  });
+    reactNativeEventHandler('history', {
+      undo: editor.undoManager.hasUndo(),
+      redo: editor.undoManager.hasRedo(),
+    });
+  }, 1);
 };
 
 function getNodeColor(element) {
@@ -154,7 +219,7 @@ function selectchange() {
   let currentFormats = {};
   editor.formatter
     .matchAll(formats)
-    .forEach((format) => (currentFormats[format] = true));
+    .forEach(format => (currentFormats[format] = true));
 
   let node = editor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);

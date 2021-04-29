@@ -1,4 +1,3 @@
-import DocumentPicker from 'react-native-document-picker';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
@@ -10,7 +9,6 @@ import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 import {formatSelection} from './constants';
-let RNFetchBlob;
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -23,21 +21,21 @@ export const execCommands = {
   underline: `tinymce.activeEditor.execCommand('Underline');`,
   superscript: `tinymce.activeEditor.execCommand('Superscript');`,
   subscript: `tinymce.activeEditor.execCommand('Subscript');`,
-  forecolor: (color) =>
+  forecolor: color =>
     `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
-  hilitecolor: (color) =>
+  hilitecolor: color =>
     `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
 
-  fontname: (fontname) =>
+  fontname: fontname =>
     `tinymce.activeEditor.execCommand('FontName',false, '${fontname}');`,
 
   indent: `tinymce.activeEditor.execCommand('Indent');`,
   outdent: `tinymce.activeEditor.execCommand('Outdent');`,
   blockquote: `tinymce.activeEditor.execCommand('mceBlockQuote');`,
-  link: (link) =>
+  link: link =>
     `tinymce.activeEditor.execCommand('mceInsertLink',false, '${link}');`,
   unlink: `tinymce.activeEditor.execCommand('Unlink')`,
-  fontsize: (size) =>
+  fontsize: size =>
     `tinymce.activeEditor.execCommand('FontSize', false, '${size}');`,
   removeformat: `tinymce.activeEditor.execCommand('RemoveFormat');`,
   p: `tinymce.activeEditor.execCommand('FormatBlock', false, 'p');`,
@@ -47,21 +45,37 @@ export const execCommands = {
   h5: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h5');`,
   h6: `tinymce.activeEditor.execCommand('FormatBlock', false, 'h6');`,
   pre: `tinymce.activeEditor.execCommand('FormatBlock', false, 'pre');`,
-  ol: (style) =>
+  ol: style =>
     `tinymce.activeEditor.execCommand('InsertOrderedList', false, {'list-style-type': "${style}"});`,
-  ul: (style) =>
+  ul: style =>
     `tinymce.activeEditor.execCommand('InsertUnorderedList', false, {'list-style-type': "${style}"});`,
   removeList: `tinymce.activeEditor.execCommand('RemoveList');`,
   horizontal: `tinymce.activeEditor.execCommand('InsertHorizontalRule');`,
   rtl: `tinymce.activeEditor.execCommand('mceDirectionRTL');`,
   ltr: `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
+  magnify: `tinymce.activeEditor.execCommand('SearchReplace');`,
   table: (r, c) =>
-    `tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} })`,
+    `
+    (() => {
+      let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
+      if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
+        let rng = tinymce.activeEditor.selection.getRng()
+        tinymce.activeEditor.execCommand("mceInsertNewLine")
+        tinymce.activeEditor.nodeChanged()
+        tinymce.activeEditor.selection.setRng(rng)
+        
+     }  
+     tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
+     
+    })();  
+
+    `,
+
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
   image: async () => {
     if (editing.isFocused) {
       tiny.call(EditorWebView, tiny.blur);
-      await sleep(500);
+      await sleep(300);
       editing.isFocused = true;
     }
     eSendEvent(eOpenProgressDialog, {
@@ -78,29 +92,7 @@ export const execCommands = {
                 maxWidth: 1024,
                 mediaType: 'photo',
               },
-              (response) => {
-                if (response.didCancel || response.errorMessage) {
-                  return;
-                }
-                console.log(
-                  response.type,
-                  response.errorCode,
-                  response.errorMessage,
-                );
-                let b64 = `data:${response.type};base64, ` + response.base64;
-                formatSelection(`
-              minifyImg(
-                "${b64}",
-                1024,
-                'image/jpeg',
-                (r) => {
-                  var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
-                  editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
-                },
-                0.6,
-              );
-              `);
-              },
+              handleImageResponse,
             );
           },
           actionText: 'Take photo',
@@ -116,29 +108,7 @@ export const execCommands = {
                 maxWidth: 1024,
                 mediaType: 'photo',
               },
-              (response) => {
-                if (response.didCancel || response.errorMessage) {
-                  return;
-                }
-                console.log(
-                  response.type,
-                  response.errorCode,
-                  response.errorMessage,
-                );
-                let b64 = `data:${response.type};base64, ` + response.base64;
-                formatSelection(`
-              minifyImg(
-                "${b64}",
-                1024,
-                'image/jpeg',
-                (r) => {
-                  var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">";
-                  editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
-                },
-                0.6,
-              );
-              `);
-              },
+              handleImageResponse,
             );
           },
           actionText: 'Select from gallery',
@@ -153,4 +123,38 @@ export const execCommands = {
   pre: `
     tinymce.activeEditor.execCommand('CodeBlock')
   `,
+  tableprops:"tinymce.activeEditor.execCommand('mceTableProps');",
+  tabledelete:"tinymce.activeEditor.execCommand('mceTableDelete');",
+  tablesplitcell:"tinymce.activeEditor.execCommand('mceTableSplitCells');",
+  tablemergecell:"tinymce.activeEditor.execCommand('mceTableMergeCells');",
+  tablerowprops:"tinymce.activeEditor.execCommand('mceTableRowProps');",
+};
+
+const handleImageResponse = response => {
+  if (response.didCancel || response.errorMessage) {
+    return;
+  }
+
+  let b64 = `data:${response.type};base64, ` + response.base64;
+  formatSelection(`
+  (() => {
+    let pTag = "";
+    let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
+    if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
+      pTag = "<p></p>"
+    }
+    
+minifyImg(
+  "${b64}",
+  1024,
+  'image/jpeg',
+  (r) => {
+    var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
+    editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+  },
+  0.6,
+);
+
+})();
+`);
 };

@@ -6,11 +6,23 @@ const reset = `
 isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
+window.prevContent = "";
 tinymce.activeEditor.setContent('');
 tinymce.activeEditor.undoManager.clear();
+info = document.querySelector(infoBar);
+info.querySelector('#infosaved').innerText = "";
+info.querySelector('#infodate').innerText = "";
+info.querySelector('#infowords').innerText = ""
 document.activeElement.blur();
 window.blur();
 `;
+
+const removeMarkdown = `
+ tinymce.activeEditor.plugins.textpattern.setPatterns("")
+`
+const setMarkdown = `
+ tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
+`
 
 const keyboardStateChanged = `(() => {
   let node = tinymce.activeEditor.selection.getNode();
@@ -204,4 +216,6 @@ export default {
   keyboardStateChanged,
   onKeyboardShow,
   pre,
+  setMarkdown,
+  removeMarkdown
 };

@@ -8,7 +8,7 @@ import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 
-export const HeaderRightMenu = ({currentScreen}) => {
+export const HeaderRightMenu = ({currentScreen,action}) => {
   const [state] = useTracked();
   const {colors, syncing} = state;
 

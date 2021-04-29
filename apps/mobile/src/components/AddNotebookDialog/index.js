@@ -19,6 +19,7 @@ import {db} from '../../utils/DB';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
+import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
@@ -66,7 +67,7 @@ export class AddNotebookDialog extends React.Component {
     if (toEdit && toEdit.type === 'notebook') {
       let topicsList = [];
       toEdit.topics.forEach((item, index) => {
-        if (index === 0) return;
+        //if (index === 0) return;
         topicsList.push(item.title);
       });
       this.id = toEdit.id;
@@ -103,14 +104,14 @@ export class AddNotebookDialog extends React.Component {
     });
   };
 
-  onDelete = (index) => {
+  onDelete = index => {
     let {topics} = this.state;
     let prevTopics = topics;
     refs = [];
     prevTopics.splice(index, 1);
     let edit = this.props.toEdit;
     if (edit && edit.id) {
-      let topicToDelete = edit.topics[index + 1];
+      let topicToDelete = edit.topics[index];
 
       if (topicToDelete) {
         this.topicsToDelete.push(topicToDelete.id);
@@ -181,14 +182,14 @@ export class AddNotebookDialog extends React.Component {
       });
 
       let nextTopics = toEdit.topics.map((topic, index) => {
-        if (index === 0) return topic;
+        //if (index === 0) return topic;
         let copy = {...topic};
-        copy.title = prevTopics[index - 1];
+        copy.title = prevTopics[index];
         return copy;
       });
 
       prevTopics.forEach((title, index) => {
-        if (!nextTopics[index + 1]) {
+        if (!nextTopics[index]) {
           nextTopics.push(title);
         }
       });
@@ -216,6 +217,7 @@ export class AddNotebookDialog extends React.Component {
 
   onSubmit = (forward = true) => {
     this.hiddenInput.current?.focus();
+    let willFocus = true;
     let {topics} = this.state;
     if (!this.currentInputValue || this.currentInputValue?.trim().length === 0)
       return;
@@ -236,12 +238,14 @@ export class AddNotebookDialog extends React.Component {
         topics: prevTopics,
       });
       this.currentInputValue = null;
+
       if (this.state.editTopic) {
         this.topicInputRef.current?.blur();
         Keyboard.dismiss();
         this.setState({
           editTopic: false,
         });
+        willFocus = false;
       }
       this.prevItem = null;
       this.prevIndex = null;
@@ -256,7 +260,7 @@ export class AddNotebookDialog extends React.Component {
     this.topicInputRef.current?.setNativeProps({
       text: '',
     });
-    this.topicInputRef.current?.focus();
+    willFocus && this.topicInputRef.current?.focus();
   };
 
   render() {
@@ -264,154 +268,144 @@ export class AddNotebookDialog extends React.Component {
     const {topics, visible, topicInputFocused} = this.state;
     if (!visible) return null;
     return (
-      <Modal
-        visible={true}
-        transparent={true}
-        animated
-        animationType={DDS.isTab ? 'fade' : 'slide'}
+      <BaseDialog
         onShow={async () => {
           this.topicsToDelete = [];
           await sleep(300);
-          this.titleRef?.focus();
+          this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
         onRequestClose={this.close}>
-        <SafeAreaView>
-          <TextInput
-            ref={this.hiddenInput}
-            style={{
-              width: 1,
-              height: 1,
-              opacity: 0,
-              position: 'absolute',
+        <TextInput
+          ref={this.hiddenInput}
+          style={{
+            width: 1,
+            height: 1,
+            opacity: 0,
+            position: 'absolute',
+          }}
+          blurOnSubmit={false}
+        />
+
+        <View
+          style={[
+            styles.container,
+            {
+              backgroundColor: colors.bg,
+              paddingTop: Platform.OS === 'android' ? 30 : 5,
+            },
+          ]}>
+          <DialogHeader
+            title={
+              toEdit && toEdit.dateCreated ? 'Edit Notebook' : 'New Notebook'
+            }
+            paragraph={
+              toEdit && toEdit.dateCreated
+                ? 'You are editing ' + this.title + ' notebook.'
+                : 'Notebooks are the best way to organize your notes.'
+            }
+          />
+
+          <Input
+            fwdRef={ref => (this.titleRef = ref)}
+            testID={notesnook.ids.dialogs.notebook.inputs.title}
+            onChangeText={value => {
+              this.title = value;
+            }}
+            placeholder="Enter a title"
+            onSubmit={() => {
+              this.descriptionRef.focus();
+            }}
+            returnKeyLabel="Next"
+            returnKeyType="next"
+            defaultValue={toEdit ? toEdit.title : null}
+          />
+
+          <Input
+            fwdRef={ref => (this.descriptionRef = ref)}
+            testID={notesnook.ids.dialogs.notebook.inputs.description}
+            onChangeText={value => {
+              this.description = value;
+            }}
+            placeholder="Describe your notebook."
+            onSubmit={() => {
+              this.topicInputRef.current?.focus();
+            }}
+            returnKeyLabel="Next"
+            returnKeyType="next"
+            defaultValue={toEdit ? toEdit.description : null}
+          />
+
+          <Input
+            fwdRef={this.topicInputRef}
+            testID={notesnook.ids.dialogs.notebook.inputs.topic}
+            onChangeText={value => {
+              this.currentInputValue = value;
+              if (this.prevItem !== null) {
+                refs[this.prevIndex].setNativeProps({
+                  text: value,
+                  style: {
+                    borderBottomColor: colors.accent,
+                  },
+                });
+              }
+            }}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            onSubmit={() => {
+              this.onSubmit();
             }}
             blurOnSubmit={false}
+            button={{
+              icon: this.state.editTopic ? 'check' : 'plus',
+              onPress: this.onSubmit,
+              color: topicInputFocused ? colors.accent : colors.icon,
+            }}
+            placeholder="Add a topic"
           />
-          <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : null}
-            style={styles.wrapper}>
-            <TouchableOpacity onPress={this.close} style={styles.overlay} />
-            <View
-              style={[
-                styles.container,
-                {
-                  backgroundColor: colors.bg,
-                },
-              ]}>
-              <DialogHeader
-                title={
-                  toEdit && toEdit.dateCreated
-                    ? 'Edit Notebook'
-                    : 'New Notebook'
-                }
-                paragraph={
-                  toEdit && toEdit.dateCreated
-                    ? 'Edit your notebook'
-                    : 'Add a new notebook'
-                }
-              />
 
-              <Input
-                fwdRef={(ref) => (this.titleRef = ref)}
-                testID={notesnook.ids.dialogs.notebook.inputs.title}
-                onChangeText={(value) => {
-                  this.title = value;
-                }}
-                placeholder="Enter a title"
-                onSubmit={() => {
-                  this.descriptionRef.focus();
-                }}
-                returnKeyLabel="Next"
-                returnKeyType="next"
-                defaultValue={toEdit ? toEdit.title : null}
-              />
-
-              <Input
-                fwdRef={(ref) => (this.descriptionRef = ref)}
-                testID={notesnook.ids.dialogs.notebook.inputs.description}
-                onChangeText={(value) => {
-                  this.description = value;
-                }}
-                placeholder="Describe your notebook."
-                onSubmit={() => {
+          <FlatList
+            data={topics}
+            ref={ref => (this.listRef = ref)}
+            keyExtractor={(item, index) => item + index.toString()}
+            renderItem={({item, index}) => (
+              <TopicItem
+                item={item}
+                onPress={(item, index) => {
+                  this.prevIndex = index;
+                  this.prevItem = item;
+                  this.topicInputRef.current?.setNativeProps({
+                    text: item,
+                  });
                   this.topicInputRef.current?.focus();
+                  this.currentInputValue = item;
+                  this.setState({
+                    editTopic: true,
+                  });
                 }}
-                returnKeyLabel="Next"
-                returnKeyType="next"
-                defaultValue={toEdit ? toEdit.description : null}
+                onDelete={this.onDelete}
+                index={index}
+                colors={colors}
               />
+            )}
+          />
 
-              <Input
-                fwdRef={this.topicInputRef}
-                testID={notesnook.ids.dialogs.notebook.inputs.topic}
-                onChangeText={(value) => {
-                  this.currentInputValue = value;
-                  if (this.prevItem !== null) {
-                    refs[this.prevIndex].setNativeProps({
-                      text: value,
-                      style: {
-                        borderBottomColor: colors.accent,
-                      },
-                    });
-                  }
-                }}
-                returnKeyLabel="Done"
-                returnKeyType="done"
-                onSubmit={() => {
-                  this.onSubmit();
-                }}
-                blurOnSubmit={false}
-                button={{
-                  icon: this.state.editTopic ? 'check' : 'plus',
-                  onPress: this.onSubmit,
-                  color: topicInputFocused ? colors.accent : colors.icon,
-                }}
-                placeholder="Add a topic"
-              />
+          <DialogButtons
+            negativeTitle="Cancel"
+            positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
+            onPressPositive={this.addNewNotebook}
+            onPressNegative={this.close}
+            loading={this.state.loading}
+          />
+        </View>
 
-              <FlatList
-                data={topics}
-                ref={(ref) => (this.listRef = ref)}
-                keyExtractor={(item, index) => item + index.toString()}
-                renderItem={({item, index}) => (
-                  <TopicItem
-                    item={item}
-                    onPress={(item, index) => {
-                      this.prevIndex = index;
-                      this.prevItem = item;
-                      this.topicInputRef.current?.setNativeProps({
-                        text: item,
-                      });
-                      this.topicInputRef.current?.focus();
-                      this.currentInputValue = item;
-                      this.setState({
-                        editTopic: true,
-                      });
-                    }}
-                    onDelete={this.onDelete}
-                    index={index}
-                    colors={colors}
-                  />
-                )}
-              />
-
-              <DialogButtons
-                negativeTitle="Cancel"
-                positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
-                onPressPositive={this.addNewNotebook}
-                onPressNegative={this.close}
-                loading={this.state.loading}
-              />
-            </View>
-          </KeyboardAvoidingView>
-          <Toast context="local" />
-        </SafeAreaView>
-      </Modal>
+        <Toast context="local" />
+      </BaseDialog>
     );
   }
 }
 
 const TopicItem = ({item, index, colors, onPress, onDelete}) => {
-  const topicRef = (ref) => (refs[index] = ref);
+  const topicRef = ref => (refs[index] = ref);
 
   return (
     <View

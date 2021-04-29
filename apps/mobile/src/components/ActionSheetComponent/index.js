@@ -41,6 +41,7 @@ import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {opacity, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
 import {PremiumTag} from '../Premium/PremiumTag';
 import {PressableButton} from '../PressableButton';
 import {Toast} from '../Toast';
@@ -568,27 +569,35 @@ export const ActionSheetComponent = ({
           style={{
             paddingHorizontal: 12,
             alignItems: 'center',
-            marginTop:5,
-            marginBottom:10
+            marginTop: 5,
+            zIndex:10
           }}>
-          <Heading size={SIZE.md}>{note?.title.replace('\n', '')}</Heading>
-
-          <Paragraph
-            numberOfLines={2}
+          <Heading
             style={{
-              width: '80%',
-              textAlign: 'center',
-              maxWidth: '80%',
-            }}>
-            {note.type === 'notebook' && note.description
-              ? note.description
-              : null}
-            {note.type === 'note' && item.headline
-              ? note.headline[item.headline.length - 1] === '\n'
-                ? note.headline.slice(0, note.headline.length - 1)
-                : note.headline
-              : null}
-          </Paragraph>
+              maxWidth: '70%',
+            }}
+            size={SIZE.md}>
+            {note?.title.replace('\n', '')}
+          </Heading>
+
+          {note.headline || note.description ? (
+            <Paragraph
+              numberOfLines={2}
+              style={{
+                width: '80%',
+                textAlign: 'center',
+                maxWidth: '80%',
+              }}>
+              {note.type === 'notebook' && note.description
+                ? note.description
+                : null}
+              {note.type === 'note' && note.headline
+                ? note.headline[item.headline.length - 1] === '\n'
+                  ? note.headline.slice(0, note.headline.length - 1)
+                  : note.headline
+                : null}
+            </Paragraph>
+          ) : null}
 
           <Paragraph
             color={colors.icon}
@@ -673,7 +682,7 @@ export const ActionSheetComponent = ({
                   textAlignVertical: 'center',
                   textAlign: 'center',
                 }}>
-                {user && user.lastSynced > note.dateEdited
+                {user && user.lastSynced && user.lastSynced > note.dateEdited
                   ? 'Synced'
                   : 'Sync Now'}
               </Paragraph>
@@ -786,6 +795,49 @@ export const ActionSheetComponent = ({
 
       {columnItems.length > 0 ? (
         <View>{columnItemsData.map(_renderColumnItem)}</View>
+      ) : null}
+
+      {note.type === 'note' &&
+      user &&
+      user.lastSynced &&
+      user.lastSynced > note.dateEdited ? (
+        <PressableButton
+          type="shade"
+          customStyle={{
+            borderWidth: 1,
+            borderRadius: 5,
+            paddingVertical: 10,
+            width: '95%',
+            alignItems: 'flex-start',
+            paddingHorizontal: 12,
+            marginTop: 25,
+            borderColor: colors.accent,
+            flexDirection: 'row',
+            justifyContent: 'flex-start',
+          }}>
+          <Icon name="shield-check" color={colors.accent} size={40} />
+
+          <View
+            style={{
+              flex: 1,
+            }}>
+            <Heading
+              color={colors.accent}
+              style={{
+                fontSize: SIZE.md,
+              }}>
+              This note is encrypted & synced
+            </Heading>
+            <Paragraph
+              style={{
+                flexWrap: 'wrap',
+                flexBasis: 1,
+              }}
+              color={colors.accent}>
+              No one can read it except you.
+            </Paragraph>
+          </View>
+        </PressableButton>
       ) : null}
 
       {DDS.isTab ? (

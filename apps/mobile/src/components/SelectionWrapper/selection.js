@@ -32,7 +32,6 @@ export const SelectionIcon = ({setActionStrip, item}) => {
   }, [selectedItemsList, item.id]);
 
   onPress = () => {
-    if (item.title === 'General' && item.type === 'topic') return;
     dispatch({
       type: Actions.SELECTED_ITEMS,
       item: item,
@@ -51,9 +50,7 @@ export const SelectionIcon = ({setActionStrip, item}) => {
           alignItems: 'center',
           paddingRight: 8,
         }}>
-        {item.type !== 'topic' ||
-        (item.type === 'topic' && item.title !== 'General') ? (
-          <TouchableOpacity
+        <TouchableOpacity
             activeOpacity={1}
             onPress={onPress}
             style={{
@@ -71,7 +68,6 @@ export const SelectionIcon = ({setActionStrip, item}) => {
               }
             />
           </TouchableOpacity>
-        ) : null}
       </View>
     )
   );
