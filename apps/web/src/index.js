@@ -14,7 +14,6 @@ initializeDatabase().then(() => {
     import("./App").then(({ default: App }) => {
       render(<App />, document.getElementById("root"), async () => {
         document.getElementById("splash").remove();
-
         import("react-modal").then(({ default: Modal }) => {
           Modal.setAppElement("#root");
         });

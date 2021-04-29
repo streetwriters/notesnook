@@ -1,10 +1,9 @@
-const { app, BrowserWindow, protocol } = require("electron");
+const { app, BrowserWindow, protocol, ipcMain } = require("electron");
 const { autoUpdater } = require("electron-updater");
 const path = require("path");
 const url = require("url");
 const os = require("os");
 const isDev = require("electron-is-dev");
-
 try {
   require("electron-reloader")(module);
 } catch (_) {}
@@ -18,6 +17,11 @@ async function createWindow() {
       __dirname,
       os.platform() === "win32" ? "app.ico" : "favicon-72x72.png"
     ),
+    webPreferences: {
+      devTools: isDev,
+      nodeIntegration: true,
+      preload: __dirname + "/preload.js",
+    },
   });
 
   if (isDev)
@@ -68,4 +72,8 @@ app.on("activate", () => {
   if (mainWindow === null) {
     createWindow();
   }
+});
+
+ipcMain.on("fromRenderer", (event, ...args) => {
+  console.log(event, ...args);
 });
