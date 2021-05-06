@@ -274,6 +274,7 @@ export class AddNotebookDialog extends React.Component {
           await sleep(300);
           this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
+        statusBarTranslucent={false}
         onRequestClose={this.close}>
         <TextInput
           ref={this.hiddenInput}
@@ -291,7 +292,7 @@ export class AddNotebookDialog extends React.Component {
             styles.container,
             {
               backgroundColor: colors.bg,
-              paddingTop: Platform.OS === 'android' ? 30 : 5,
+              paddingTop: 5,
             },
           ]}>
           <DialogHeader
