@@ -25,14 +25,14 @@ const getDpi = (pd) => {
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
   if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
-    return size * 0.90;
+    return size * 0.93;
   } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
     if (Platform.OS === 'ios') {
       return size;
     }
-    return size * 0.90;
+    return size * 1;
   } else if (dSize <= 7 && pixelDensity >= 3 && !DDS.isTab) {
-    return size * 0.98;
+    return size * 1;
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
     return size * multiplier;
   } else if (dSize > 7.2 && dSize <= 8.5 && DDS.isTab) {
