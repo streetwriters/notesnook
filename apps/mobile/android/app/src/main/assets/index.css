@@ -43,7 +43,6 @@ body {
   overflow: hidden;
   position: absolute;
   height: 100%;
-
   padding-top: 4px;
   padding-bottom: 5px;
 }
@@ -101,8 +100,3 @@ body {
   border-radius: 5;
   margin-top: 0;
 }
-
-
-
-
-

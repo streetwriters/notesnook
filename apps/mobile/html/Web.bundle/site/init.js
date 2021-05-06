@@ -6,7 +6,7 @@ function reactNativeEventHandler(type, value) {
       JSON.stringify({
         type: type,
         value: value,
-      }),
+      })
     );
   }
 }
@@ -125,7 +125,7 @@ function init_tiny(size) {
             };
             xhr.open(
               'GET',
-              tinymce.activeEditor.selection.getNode().getAttribute('src'),
+              tinymce.activeEditor.selection.getNode().getAttribute('src')
             );
             xhr.send();
           }
@@ -147,11 +147,11 @@ function init_tiny(size) {
         });
       });
 
-      editor.on('focus', () => {
+      editor.on('focus', function() {
         reactNativeEventHandler('focus', 'editor');
       });
 
-      editor.on('SetContent', event => {
+      editor.on('SetContent', function(event) {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
@@ -161,7 +161,7 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('ScrollIntoView', e => {
+      editor.on('ScrollIntoView', function(e) {
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
@@ -175,10 +175,10 @@ function init_tiny(size) {
   });
 }
 window.prevContent = '';
-const onChange = event => {
+const onChange = function(event) {
   clearTimeout(changeTimer);
   changeTimer = null;
-  changeTimer = setTimeout(() => {
+  changeTimer = setTimeout(function() {
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
@@ -219,7 +219,7 @@ function selectchange() {
   let currentFormats = {};
   editor.formatter
     .matchAll(formats)
-    .forEach(format => (currentFormats[format] = true));
+    .forEach(function(format) {currentFormats[format] = true});
 
   let node = editor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);

@@ -6,25 +6,25 @@ function attachTitleInputListeners() {
   infoBar = '.info-bar';
   document.addEventListener(
     'DOMContentLoaded',
-    () => {
+    function() {
       autosize();
-      document.body.onscroll = event => {
+      document.body.onscroll = function(event) {
         if (scrollTimer) {
           clearTimeout(scrollTimer);
           scrollTimer = null;
         }
-        scrollTimer = setTimeout(() => {
+        scrollTimer = setTimeout(function() {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               visible: event.target.documentElement.scrollTop,
               title: document.getElementById('titleInput').value,
-              type: 'scroll',
-            }),
+              type: 'scroll'
+            })
           );
         }, 100);
       };
     },
-    false,
+    false
   );
 
   document.getElementById('formBox').onsubmit = function (evt) {
@@ -37,7 +37,6 @@ function attachTitleInputListeners() {
   };
 
   document.getElementById('titleInput').onkeypress = function (evt) {
-    autosize();
     if (evt.keyCode === 13 || evt.which === 13) {
       evt.preventDefault();
       if (tinymce.activeEditor) {
@@ -56,8 +55,8 @@ function attachTitleInputListeners() {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: 'focus',
-            value: 'title',
-          }),
+            value: 'title'
+          })
         );
       }
     });
@@ -77,7 +76,7 @@ function onTitleChange(ele) {
   }
   let titleMessage = {
     type: 'title',
-    value: titleInput.value,
+    value: titleInput.value
   };
 
   info = document.querySelector(infoBar);
@@ -88,7 +87,7 @@ function onTitleChange(ele) {
 
   if (titleMessage && typeof titleMessage.value === 'string') {
     if (window.ReactNativeWebView) {
-      window.ReactNativeWebView?.postMessage(JSON.stringify(titleMessage));
+      window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
     }
   }
 }
@@ -111,7 +110,12 @@ function autosize() {
 }
 
 function attachMessageListener() {
-  window.addEventListener('message', data => {
+  let isSafari = navigator.vendor.match(/apple/i);
+  let listenerHandler = document;
+  if (isSafari) {
+    listenerHandler = window;
+  }
+  listenerHandler.addEventListener('message', function(data) {
     let message = JSON.parse(data.data);
     let type = message.type;
     let value = message.value;
@@ -121,7 +125,7 @@ function attachMessageListener() {
         isLoading = true;
         tinymce.activeEditor.mode.set('readonly');
         tinymce.activeEditor.setContent(value);
-        setTimeout(() => {
+        setTimeout(function() {
           document.activeElement.blur();
           window.blur();
           tinymce.activeEditor.mode.set('design');
@@ -135,14 +139,15 @@ function attachMessageListener() {
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
         break;
       case 'theme':
-        pageTheme.colors = JSON.parse(value);
-        setTheme();
-        break;
+      pageTheme.colors = JSON.parse(value);
+      setTheme();   
+      break;  
       case 'title':
         document.getElementById('titleInput').value = value;
-        setTimeout(() => {
+        setTimeout(function() {
           autosize();
         }, 100);
+        break;
       default:
         break;
     }

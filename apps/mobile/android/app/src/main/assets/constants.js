@@ -17,8 +17,8 @@ let pageTheme = {
     nav: '#f0f0f0',
     pri: 'black',
     sec: 'white',
-    factor: 1,
-  },
+    factor: 1
+  }
 };
 
 const markdownPatterns = [
@@ -68,7 +68,7 @@ const markdownPatterns = [
   },
   {start: '---', replacement: '<hr/>'},
   {start: '--', replacement: '—'},
-  {start: '(c)', replacement: '©'},
+  {start: '(c)', replacement: '©'}
 ];
 
 function dark() {
@@ -79,16 +79,16 @@ function dark() {
 
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
-    'dist/skins/notesnook/content.min.css',
+    'dist/skins/notesnook/content.min.css'
   );
   tinymce.activeEditor.dom.styleSheetLoader.load(
-    'dist/skins/notesnook-dark/content.min.css',
+    'dist/skins/notesnook-dark/content.min.css'
   );
   tinymce.activeEditor.ui.styleSheetLoader.unload(
-    'dist/skins/notesnook/skin.min.css',
+    'dist/skins/notesnook/skin.min.css'
   );
   tinymce.activeEditor.ui.styleSheetLoader.load(
-    'dist/skins/notesnook-dark/skin.min.css',
+    'dist/skins/notesnook-dark/skin.min.css'
   );
 }
 
@@ -100,16 +100,16 @@ function light() {
 
   if (!tinymce.activeEditor) return;
   tinymce.activeEditor.dom.styleSheetLoader.unload(
-    'dist/skins/notesnook-dark/content.min.css',
+    'dist/skins/notesnook-dark/content.min.css'
   );
   tinymce.activeEditor.dom.styleSheetLoader.load(
-    'dist/skins/notesnook/content.min.css',
+    'dist/skins/notesnook/content.min.css'
   );
   tinymce.activeEditor.ui.styleSheetLoader.unload(
-    'dist/skins/notesnook-dark/skin.min.css',
+    'dist/skins/notesnook-dark/skin.min.css'
   );
   tinymce.activeEditor.ui.styleSheetLoader.load(
-    'dist/skins/notesnook/skin.min.css',
+    'dist/skins/notesnook/skin.min.css'
   );
 }
 
@@ -258,7 +258,7 @@ function setTheme() {
 } */
 
   let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
-    'head',
+    'head'
   )[0];
   let css2 = document.createElement('style');
   css2.appendChild(document.createTextNode(node2));
@@ -273,58 +273,59 @@ var minifyImg = function (
   newWidth,
   imageType = 'image/jpeg',
   resolve,
-  imageArguments = 0.7,
+  imageArguments = 0.7
 ) {
-  fetch(dataUrl).then(async res => {
-    let blob = await res.blob();
-    new Compressor(blob, {
-      quality: imageArguments,
-      width: newWidth,
-      mimeType: imageType,
-      success: result => {
-        let fileReader = new FileReader();
-        fileReader.onloadend = function () {
-          resolve(fileReader.result);
-          fileReader.onloadend = null;
-        };
-        fileReader.readAsDataURL(result);
-      },
-      error: err => {
-        console.log(err.message);
-      },
-    });
+  fetch(dataUrl).then(function(res) {
+    res.blob().then(function(blob) {
+      new Compressor(blob, {
+        quality: imageArguments,
+        width: newWidth,
+        mimeType: imageType,
+        success: function(result) {
+          let fileReader = new FileReader();
+          fileReader.onloadend = function () {
+            resolve(fileReader.result);
+            fileReader.onloadend = null;
+          };
+          fileReader.readAsDataURL(result);
+        },
+        error: function(err) {
+          console.log(err.message);
+        }
+      });
+    })
   });
 };
 
 function loadImage() {
   let fileInput = document.querySelector('#image-input');
-  let listener = () => {
+  let listener = function() {
     if (fileInput.files != null && fileInput.files[0] != null) {
       let reader = new FileReader();
       console.log(reader.readyState, 'READY STATE');
-      let load = e => {
+      let load = function(e) {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
           1024,
           'image/jpeg',
-          r => {
+          function(r) {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },
-          0.6,
+          0.6
         );
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);
       };
-      let error = () => {
+      let error = function() {
         console.log('error');
         reader.onload = null;
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);
         reader.removeEventListener('error', error);
       };
-      reader.onabort = () => {
+      reader.onabort = function() {
         console.log('abort');
       };
       reader.addEventListener('load', load);
