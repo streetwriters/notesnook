@@ -57,8 +57,8 @@ export const COLOR_SCHEME_LIGHT = {
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
   input: 'transparent',
-  heading: '#000000',
-  pri: '#24292e',
+  heading: '#212121',
+  pri: '#424242',
   sec: '#ffffff',
   light: '#ffffff',
 };
@@ -69,8 +69,8 @@ export const COLOR_SCHEME_DARK = {
   navbg: '#2b2b2b',
   input: '#2d2d2d',
   nav: '#2b2b2b',
-  heading: '#ffffff',
-  pri: '#D3D3D3',
+  heading: '#E8E8E8',
+  pri: '#C0C0C0',
   sec: 'black',
   light: '#ffffff',
 };

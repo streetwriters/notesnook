@@ -13,7 +13,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
 
-export const UserSection = ({noTextMode}) => {
+export const UserSection = () => {
   const [state] = useTracked();
   const {colors, syncing, user, lastSynced} = state;
   const insets = useSafeAreaInsets();
