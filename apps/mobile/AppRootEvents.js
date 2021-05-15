@@ -219,7 +219,11 @@ export const AppRootEvents = React.memo(
         .catch(e => {
           console.log(e);
         })
-        .then(() => {
+        .then(async () => {
+          //  let receipt = await RNIap.getReceiptIOS();
+          // if (receipt) {
+          //   processReceipt(receipt);
+          // }
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
             onSuccessfulSubscription,
           );
@@ -296,9 +300,9 @@ export const AppRootEvents = React.memo(
         let user = await db.user.getUser();
         if (user) {
           dispatch({type: Actions.USER, user: user});
-          attachIAPListeners();
           clearMessage(dispatch);
           await PremiumService.setPremiumStatus();
+          attachIAPListeners();
           await Sync.run();
           user = await db.user.fetchUser(true);
           if (!user.isEmailConfirmed) {
@@ -350,7 +354,6 @@ export const AppRootEvents = React.memo(
     };
 
     const processReceipt = async receipt => {
-      console.log('sending receipt');
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
@@ -366,14 +369,18 @@ export const AppRootEvents = React.memo(
             },
           })
             .then(async r => {
-              console.log(r.ok, await r.text());
+              let text = await r.text();
+              console.log(r.ok, text);
               if (!r.ok) {
-                await RNIap.clearTransactionIOS();
-              } else {
-                console.log('FINSIHING TRANSACTION');
-                await RNIap.finishTransactionIOS(prevTransactionId);
-                await RNIap.clearTransactionIOS();
+                if (text === 'Receipt already expired.') {
+                  console.log('RNIap.clearTransactionIOS');
+                  await RNIap.clearTransactionIOS();
+                }
+                return;
               }
+              console.log('Success', 'RNIap.finishTransactionIOS');
+              await RNIap.finishTransactionIOS(prevTransactionId);
+              await RNIap.clearTransactionIOS();
             })
             .catch(e => {
               console.log(e, 'ERROR');
