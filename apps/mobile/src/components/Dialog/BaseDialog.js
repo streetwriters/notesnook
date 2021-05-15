@@ -26,7 +26,6 @@ const BaseDialog = ({
   const [state, dispatch] = useTracked();
   const scaleValue = new Animated.Value(1);
   const floating = useIsFloatingKeyboard();
-
   return (
     <Modal
       visible={visible}
@@ -50,6 +49,7 @@ const BaseDialog = ({
         }}>
         <KeyboardAvoidingView
           enabled={!floating && Platform.OS === 'ios'}
+          behavior="padding"
           style={[
             styles.backdrop,
             {
