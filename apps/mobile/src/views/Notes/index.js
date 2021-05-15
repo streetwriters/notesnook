@@ -48,7 +48,7 @@ export const Notes = ({route, navigation}) => {
       } else {
         _notes = db.notebooks
           .notebook(params.notebookId)
-          .topics.topic(params.id).all;
+          ?.topics.topic(params.id)?.all
       }
       if (
         (params.type === 'tag' || params.type === 'color') &&

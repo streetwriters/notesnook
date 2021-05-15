@@ -1,5 +1,5 @@
 import React, {createRef} from 'react';
-import { Actions } from '../../provider/Actions';
+import {Actions} from '../../provider/Actions';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -13,7 +13,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import { updateEvent } from '../DialogManager/recievers';
+import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import {Toast} from '../Toast';
 
@@ -33,33 +33,35 @@ export class AddTopicDialog extends React.Component {
   }
 
   addNewTopic = async () => {
-    this.setState({loading: true});
-    if (!this.title || this.title?.trim() === '') {
-      ToastEvent.show({
-        heading: 'Topic title is required',
-        type: 'error',
-        context: 'local',
-      });
+    try {
+      this.setState({loading: true});
+      if (!this.title || this.title?.trim() === '') {
+        ToastEvent.show({
+          heading: 'Topic title is required',
+          type: 'error',
+          context: 'local',
+        });
+        this.setState({loading: false});
+        return;
+      }
+
+      if (!this.toEdit) {
+        await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
+      } else {
+        let topic = this.toEdit;
+        topic.title = this.title;
+
+        await db.notebooks.notebook(topic.notebookId).topics.add(topic);
+      }
       this.setState({loading: false});
-      return;
-    }
-
-    if (!this.toEdit) {
-      await db.notebooks.notebook(this.notebook.id).topics.add(this.title);
-    } else {
-      let topic = this.toEdit;
-      topic.title = this.title;
-
-      await db.notebooks.notebook(topic.notebookId).topics.add(topic);
-    }
-    this.setState({loading: false});
-    this.close();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notebook,
-      Navigation.routeNames.NotesPage,
-    ]);
-    updateEvent({type:Actions.MENU_PINS});
+      this.close();
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Notebooks,
+        Navigation.routeNames.Notebook,
+        Navigation.routeNames.NotesPage,
+      ]);
+      updateEvent({type: Actions.MENU_PINS});
+    } catch (e) {}
   };
 
   componentDidMount() {
@@ -121,7 +123,7 @@ export class AddTopicDialog extends React.Component {
 
           <Input
             fwdRef={this.titleRef}
-            onChangeText={(value) => {
+            onChangeText={value => {
               this.title = value;
             }}
             blurOnSubmit={false}
