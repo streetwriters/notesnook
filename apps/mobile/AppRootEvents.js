@@ -220,10 +220,6 @@ export const AppRootEvents = React.memo(
           console.log(e);
         })
         .then(async () => {
-          //  let receipt = await RNIap.getReceiptIOS();
-          // if (receipt) {
-          //   processReceipt(receipt);
-          // }
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
             onSuccessfulSubscription,
           );
@@ -234,6 +230,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async userStatus => {
+      console.log('account status',userStatus,PremiumService.get());
       if (!PremiumService.get() && userStatus.type === 5) {
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
@@ -333,7 +330,6 @@ export const AppRootEvents = React.memo(
 
     const onSuccessfulSubscription = async subscription => {
       const receipt = subscription.transactionReceipt;
-      console.log(receipt);
       if (prevTransactionId === subscription.transactionId) {
         return;
       }
