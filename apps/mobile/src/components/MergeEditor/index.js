@@ -518,7 +518,7 @@ const MergeEditor = () => {
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
               cacheMode="LOAD_DEFAULT"
               domStorageEnabled={true}
-              scrollEnabled={false}
+              scrollEnabled={true}
               bounces={false}
               allowFileAccess={true}
               scalesPageToFit={true}
@@ -664,7 +664,7 @@ const MergeEditor = () => {
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
               cacheMode="LOAD_DEFAULT"
               domStorageEnabled={true}
-              scrollEnabled={false}
+              scrollEnabled={true}
               bounces={false}
               allowFileAccess={true}
               scalesPageToFit={true}
