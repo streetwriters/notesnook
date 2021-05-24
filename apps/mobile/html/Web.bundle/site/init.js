@@ -6,7 +6,7 @@ function reactNativeEventHandler(type, value) {
       JSON.stringify({
         type: type,
         value: value,
-      })
+      }),
     );
   }
 }
@@ -91,22 +91,21 @@ function init_tiny(size) {
       'Classic=courier new;' +
       'Mono=monospace;',
     setup: function (editor) {
-    
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
-       tooltip: 'Remove image',
+        tooltip: 'Remove image',
         onAction: function () {
           tinymce.activeEditor.execCommand('Delete');
         },
         onclick: function () {
           tinymce.activeEditor.execCommand('Delete');
-        },
+        }
       });
+
       editor.ui.registry.addButton('imagepreview', {
         icon: 'fullscreen',
         tooltip: 'Preview image',
         onAction: function () {
-        
           if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
             var xhr = new XMLHttpRequest();
             xhr.responseType = 'blob';
@@ -124,13 +123,12 @@ function init_tiny(size) {
             };
             xhr.open(
               'GET',
-              tinymce.activeEditor.selection.getNode().getAttribute('src')
+              tinymce.activeEditor.selection.getNode().getAttribute('src'),
             );
             xhr.send();
           }
-
         },
-        onclick: function () {},
+        onclick: function () {}
       });
     },
     init_instance_callback: function (edit) {
@@ -146,11 +144,11 @@ function init_tiny(size) {
         });
       });
 
-      editor.on('focus', function() {
+      editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
       });
 
-      editor.on('SetContent', function(event) {
+      editor.on('SetContent', function (event) {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
@@ -160,11 +158,11 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('ScrollIntoView', function(e) {
+      editor.on('ScrollIntoView', function (e) {
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest',
+          block: 'nearest'
         });
       });
       editor.on('input', onChange);
@@ -174,10 +172,10 @@ function init_tiny(size) {
   });
 }
 window.prevContent = '';
-const onChange = function(event) {
+const onChange = function (event) {
   clearTimeout(changeTimer);
   changeTimer = null;
-  changeTimer = setTimeout(function() {
+  changeTimer = setTimeout(function () {
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
@@ -216,9 +214,9 @@ function selectchange() {
 
   let formats = Object.keys(editor.formatter.get());
   let currentFormats = {};
-  editor.formatter
-    .matchAll(formats)
-    .forEach(function(format) {currentFormats[format] = true});
+  editor.formatter.matchAll(formats).forEach(function (format) {
+    currentFormats[format] = true;
+  });
 
   let node = editor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);
