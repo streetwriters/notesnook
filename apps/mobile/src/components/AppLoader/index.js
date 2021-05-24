@@ -9,7 +9,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import { editing } from '../../utils';
+import { editing, InteractionManager } from '../../utils';
 import { changeContainerScale, ContainerScale } from '../../utils/Animations';
 import { db } from '../../utils/DB';
 import { eOpenRateDialog, eOpenSideMenu } from '../../utils/Events';
@@ -53,29 +53,30 @@ const AppLoader = ({onLoad}) => {
 
     eSendEvent(eOpenSideMenu);
     setOpacity(false);
-    await sleep(2);
-    Animated.timing(opacityV, {
-      toValue: 0,
-      duration: 150,
-      easing: Easing.out(Easing.ease),
-    }).start();
-    changeContainerScale(ContainerScale, 1, 600);
-    await sleep(150);
-    setLoading(false);
+    setTimeout(() => {
+      Animated.timing(opacityV, {
+        toValue: 0,
+        duration: 100,
+        easing: Easing.out(Easing.ease),
+      }).start();
+      changeContainerScale(ContainerScale, 1, 600);
 
-    animation = false;
-    await db.notes.init();
-    dispatch({type: Actions.NOTES});
-    dispatch({type: Actions.FAVORITES});
-    dispatch({type: Actions.LOADING, loading: false});
-    eSendEvent(eOpenSideMenu);
-    let askForRating = await MMKV.getItem('askForRating');
-    if (askForRating !== 'never' || askForRating !== 'completed') {
-      askForRating = JSON.parse(askForRating);
-      if (askForRating?.timestamp < Date.now()) {
-        eSendEvent(eOpenRateDialog);
-      }
-    }
+      setTimeout(async ()=>{
+        setLoading(false);  
+        await db.notes.init();
+        dispatch({type: Actions.NOTES});
+        dispatch({type: Actions.FAVORITES});
+        dispatch({type: Actions.LOADING, loading: false});
+        eSendEvent(eOpenSideMenu);
+        let askForRating = await MMKV.getItem('askForRating');
+        if (askForRating !== 'never' || askForRating !== 'completed') {
+          askForRating = JSON.parse(askForRating);
+          if (askForRating?.timestamp < Date.now()) {
+            eSendEvent(eOpenRateDialog);
+          }
+        }
+      },100)
+    },0);
   };
 
   useEffect(() => {
