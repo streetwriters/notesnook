@@ -168,7 +168,7 @@ function init_tiny(size) {
       editor.on('input', onChange);
       editor.on('keyup', onChange);
       editor.on('NodeChange', onChange);
-    },
+    }
   });
 }
 window.prevContent = '';
