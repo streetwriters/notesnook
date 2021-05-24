@@ -2,9 +2,15 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
-import {eSendEvent,  ToastEvent, } from './EventManager';
+import {eSendEvent, ToastEvent} from './EventManager';
+import {
+  beginBackgroundTask,
+  endBackgroundTask,
+} from 'react-native-begin-background-task';
+import {Platform} from 'react-native';
 
 const run = async (context = 'global') => {
+
   updateEvent({
     type: Actions.SYNCING,
     syncing: true,
@@ -13,16 +19,16 @@ const run = async (context = 'global') => {
   try {
     await db.sync();
     ToastEvent.show({
-      heading:"Sync complete",
-      type:"success",
-      message: "All your notes are encrypted and synced successfully!",
+      heading: 'Sync complete',
+      type: 'success',
+      message: 'All your notes are encrypted and synced successfully!',
       context: context,
     });
   } catch (e) {
     if (e.message === 'You need to login to sync.') {
       ToastEvent.show({
-        heading:"Enable sync",
-        message: "Login to encrypt and sync notes.",
+        heading: 'Enable sync',
+        message: 'Login to encrypt and sync notes.',
         context: context,
         func: () => {
           eSendEvent(eOpenLoginDialog);
@@ -35,7 +41,7 @@ const run = async (context = 'global') => {
         syncing: false,
       });
       ToastEvent.show({
-        heading:"Sync failed",
+        heading: 'Sync failed',
         message: e.message,
         context: context,
       });
@@ -50,6 +56,7 @@ const run = async (context = 'global') => {
       type: Actions.SYNCING,
       syncing: false,
     });
+
   }
 };
 

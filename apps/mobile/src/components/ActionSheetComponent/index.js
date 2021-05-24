@@ -22,7 +22,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
-import { editing, toTXT } from '../../utils';
+import { doInBackground, editing, toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -659,7 +659,7 @@ export const ActionSheetComponent = ({
             <TouchableOpacity
               activeOpacity={0.9}
               testID={notesnook.ids.dialogs.actionsheet.sync}
-              onPress={async () => await Sync.run('local')}
+              onPress={async () => await doInBackground(()=>Sync.run('local'))}
               style={{
                 borderColor: colors.accent,
                 paddingHorizontal: 5,

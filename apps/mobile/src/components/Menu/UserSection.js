@@ -7,6 +7,7 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
+import { doInBackground } from '../../utils';
 import {eOpenLoginDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
@@ -81,7 +82,7 @@ export const UserSection = () => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => Sync.run()}
+            onPress={async () => await doInBackground(async ()=>await Sync.run('local'))}
             style={{
               flexDirection: 'row',
               alignItems: 'center',

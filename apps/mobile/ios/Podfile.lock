@@ -236,6 +236,8 @@ PODS:
     - React-jsi (= 0.64.0)
     - React-perflogger (= 0.64.0)
   - React-jsinspector (0.64.0)
+  - react-native-begin-background-task (0.1.0):
+    - React
   - react-native-document-picker (4.1.1):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
@@ -411,6 +413,7 @@ DEPENDENCIES:
   - React-jsi (from `../node_modules/react-native/ReactCommon/jsi`)
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
+  - react-native-begin-background-task (from `../node_modules/react-native-begin-background-task`)
   - react-native-document-picker (from `../node_modules/react-native-document-picker`)
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
@@ -508,6 +511,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsiexecutor"
   React-jsinspector:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
+  react-native-begin-background-task:
+    :path: "../node_modules/react-native-begin-background-task"
   react-native-document-picker:
     :path: "../node_modules/react-native-document-picker"
   react-native-fingerprint-scanner:
@@ -639,6 +644,7 @@ SPEC CHECKSUMS:
   React-jsi: 74341196d9547cbcbcfa4b3bbbf03af56431d5a1
   React-jsiexecutor: 06a9c77b56902ae7ffcdd7a4905f664adc5d237b
   React-jsinspector: 0ae35a37b20d5e031eb020a69cc5afdbd6406301
+  react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
@@ -692,6 +698,6 @@ SPEC CHECKSUMS:
   toolbar-android: 85f3ef4d691469f2d304e7dee4bca013aa1ba1ff
   Yoga: 8c8436d4171c87504c648ae23b1d81242bdf3bbf
 
-PODFILE CHECKSUM: b0855a87f6220ed2901b0f35ebbd45aa7795a696
+PODFILE CHECKSUM: 09d36b8defe185bc54169d76956faad114955e6e
 
 COCOAPODS: 1.10.1

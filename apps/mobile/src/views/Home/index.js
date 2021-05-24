@@ -1,19 +1,19 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header/index';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager, scrollRef} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {Header} from '../../components/Header/index';
-import SelectionHeader from '../../components/SelectionHeader';
+import { InteractionManager, scrollRef } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
 export const Home = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
@@ -105,6 +105,7 @@ export const Home = ({route, navigation}) => {
   };
 
   const _onPressBottomButton = async () => {
+
     if (!DDS.isLargeTablet()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);

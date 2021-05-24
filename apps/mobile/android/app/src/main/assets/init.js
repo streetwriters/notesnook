@@ -74,7 +74,7 @@ function init_tiny(size) {
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     imagetools_toolbar:
-      'rotateleft rotateright | flipv fliph | imageoptions | deleteimage | imagepreview',
+      'rotateleft rotateright flipv fliph | imageoptions | deleteimage | imagepreview',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
@@ -91,10 +91,10 @@ function init_tiny(size) {
       'Classic=courier new;' +
       'Mono=monospace;',
     setup: function (editor) {
+    
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
-        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
-        tooltip: 'Remove image',
+       tooltip: 'Remove image',
         onAction: function () {
           tinymce.activeEditor.execCommand('Delete');
         },
@@ -104,7 +104,6 @@ function init_tiny(size) {
       });
       editor.ui.registry.addButton('imagepreview', {
         icon: 'fullscreen',
-        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
         tooltip: 'Preview image',
         onAction: function () {
         

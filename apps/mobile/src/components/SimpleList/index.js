@@ -6,7 +6,7 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {dHeight, dWidth} from '../../utils';
+import {dHeight, doInBackground, dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
@@ -40,7 +40,7 @@ const SimpleList = ({
   headerProps = {
     heading: 'Home',
   },
-  screen
+  screen,
 }) => {
   const [state] = useTracked();
   const {colors, deviceMode, messageBoardState} = state;
@@ -50,11 +50,11 @@ const SimpleList = ({
       return r1 !== r2;
     }).cloneWithRows([header, empty]),
   );
-  const [width,setWidth] = useState(dWidth)
+  const [width, setWidth] = useState(dWidth);
   const scrollRef = useRef();
 
   const insets = useSafeAreaInsets();
-  
+
   const {fontScale} = useWindowDimensions();
   const refreshing = false;
   const dataType = type;
@@ -79,7 +79,7 @@ const SimpleList = ({
   }, [listData, deviceMode, loading]);
 
   const _onRefresh = async () => {
-    await Sync.run();
+    await doInBackground(async () => await Sync.run('local'));
     if (refreshCallback) {
       refreshCallback();
     }
@@ -90,7 +90,7 @@ const SimpleList = ({
     let y = event.nativeEvent.contentOffset.y;
     eSendEvent(eScrollEvent, {
       y,
-      screen
+      screen,
     });
   };
 
@@ -213,7 +213,6 @@ const SimpleList = ({
             opacity: 0,
             elevation: 0,
           }}
-          
           tintColor={colors.accent}
           colors={[colors.accent]}
           progressViewOffset={150}
@@ -236,8 +235,8 @@ const SimpleList = ({
     height: '100%',
     backgroundColor: colors.bg,
     width: '100%',
-    minHeight: 1, 
-    minWidth: 1
+    minHeight: 1,
+    minWidth: 1,
   };
   return (
     <>
@@ -254,7 +253,6 @@ const SimpleList = ({
         dataProvider={dataProvider}
         rowRenderer={_renderRow}
         onScroll={_onScroll}
-        
         canChangeSize={true}
         renderFooter={listData.length === 0 ? null : Footer}
         scrollViewProps={scrollProps}

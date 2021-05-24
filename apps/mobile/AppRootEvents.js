@@ -1,45 +1,45 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect} from 'react';
-import {Appearance, AppState, Linking, Platform} from 'react-native';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect } from 'react';
+import { Appearance, AppState, Linking, Platform } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
+import { enabled } from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import {updateEvent} from './src/components/DialogManager/recievers';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { updateEvent } from './src/components/DialogManager/recievers';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage,
+  setLoginMessage
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, editing} from './src/utils';
-import {updateStatusBarColor} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import { APP_VERSION, doInBackground, editing } from './src/utils';
+import { updateStatusBarColor } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
+import { MMKV } from './src/utils/mmkv';
 import Storage from './src/utils/storage';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, getWebviewInit } from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -84,11 +84,12 @@ async function reconnectSSE(connection) {
     if (!state) {
       state = await NetInfo.fetch();
     }
-    let user = await db.user.getUser();
-
-    if (user && state.isConnected && state.isInternetReachable) {
-      await db.connectSSE();
-    }
+    await doInBackground(async () => {
+      let user = await db.user.getUser();
+      if (user && state.isConnected && state.isInternetReachable) {
+        await db.connectSSE();
+      }
+    });
   } catch (e) {}
 }
 
@@ -230,7 +231,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async userStatus => {
-      console.log('account status',userStatus,PremiumService.get());
+      console.log('account status', userStatus, PremiumService.get());
       if (!PremiumService.get() && userStatus.type === 5) {
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
@@ -247,15 +248,17 @@ export const AppRootEvents = React.memo(
     };
 
     const partialSync = async () => {
-      try {
-        dispatch({type: Actions.SYNCING, syncing: true});
-        await db.sync(false);
-        dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      } catch (e) {
-        dispatch({type: Actions.SYNCING, syncing: false});
-      } finally {
-        dispatch({type: Actions.SYNCING, syncing: false});
-      }
+      await doInBackground(async () => {
+        try {
+          dispatch({type: Actions.SYNCING, syncing: true});
+          await db.sync(false);
+          dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+        } catch (e) {
+          dispatch({type: Actions.SYNCING, syncing: false});
+        } finally {
+          dispatch({type: Actions.SYNCING, syncing: false});
+        }
+      });
     };
 
     const onLogout = async reason => {
@@ -293,6 +296,8 @@ export const AppRootEvents = React.memo(
     };
 
     const setCurrentUser = async login => {
+      await doInBackground(async () => {
+
       try {
         let user = await db.user.getUser();
         if (user) {
@@ -326,6 +331,9 @@ export const AppRootEvents = React.memo(
           eSendEvent(eCloseProgressDialog);
         }
       }
+
+      });
+
     };
 
     const onSuccessfulSubscription = async subscription => {

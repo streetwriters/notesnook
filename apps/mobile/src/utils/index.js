@@ -10,6 +10,12 @@ import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 import FastImage from 'react-native-fast-image';
+import BackgroundService from 'react-native-background-actions';
+import {
+  beginBackgroundTask,
+  endBackgroundTask,
+} from 'react-native-begin-background-task';
+
 const imgNames = [
   'favorites',
   'notes',
@@ -128,7 +134,7 @@ export const editing = {
   focusType: null,
   movedAway: true,
   tooltip: false,
-  isRestoringState:false
+  isRestoringState: false,
 };
 export const selection = {
   data: [],
@@ -169,6 +175,31 @@ export async function showContext(event, title) {
       });
     });
   });
+}
+
+export const bgTaskOptions = {
+  taskName: 'notesnookSync',
+  taskTitle: 'Notesnook Sync',
+  taskDesc: 'Syncing your notes.',
+  taskIcon: {
+    name: 'ic_stat_name',
+    type: 'drawable',
+  },
+  color: '#ffffff',
+};
+
+export async function doInBackground(cb) {
+  if (Platform.OS === 'ios') {
+    let bgTaskId;
+    bgTaskId = await beginBackgroundTask();
+    await cb();
+    await endBackgroundTask(bgTaskId);
+  } else {
+    await BackgroundService.start(async () => {
+      await cb();
+      await BackgroundService.stop();
+    },bgTaskOptions); 
+  }
 }
 
 export let dWidth = Dimensions.get('window').width;
