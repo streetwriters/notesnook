@@ -105,26 +105,36 @@ const MergeEditor = () => {
   const insets = useSafeAreaInsets();
 
   const onPrimaryWebViewLoad = () => {
-    let htmlDiff = {
-      before: primaryData.data,
-    };
-    if (secondaryData.data) {
-      htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
-    }
-    postMessage(primaryWebView, 'htmldiff', htmlDiff.before);
+   // console.log('on load called')
+    //return;
+   // console.log("on load called")
+    // let htmlDiff = {
+    //   before: primaryData.data,
+    // };
+    // console.log(secondaryData.data?.length,primaryData.data?.length);
+    // console.log('before entering')
+    // if (secondaryData.data) {
+    //   console.log("getting diff");
+    //   htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data); 
+    //   console.log("diff generated");
+    // }
+   // console.log('posting message')
+    postMessage(primaryWebView, 'htmldiff', primaryData?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
     postMessage(primaryWebView, "theme" , JSON.stringify(theme));
   };
 
   const onSecondaryWebViewLoad = () => {
-    let htmlDiff = {
-      before: primaryData.data,
-    };
-    if (secondaryData.data) {
-      htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
-    }
-    postMessage(secondaryWebView, 'htmldiff', htmlDiff.after);
+   // console.log('onload2')
+    //return;
+  //  let htmlDiff = {
+  //    before: primaryData.data,
+  //  };
+  //  if (secondaryData.data) {
+  //  htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
+  //  }
+   postMessage(secondaryWebView, 'htmldiff', secondaryData?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
     postMessage(secondaryWebView, "theme" , JSON.stringify(theme));
@@ -244,14 +254,16 @@ const MergeEditor = () => {
 
   const show = async (item) => {
     note = item;
+    console.log('getting raw data');
     let noteData = await db.content.raw(note.contentId);
-
-    switch (noteData.type) {
-      case 'tiny':
-        primaryData = noteData;
-        secondaryData = noteData.conflicted;
-    }
+    console.log('got raw data');
+   switch (noteData.type) {
+     case 'tiny':
+       primaryData = noteData;
+       secondaryData = noteData.conflicted;
+   }
     setVisible(true);
+    console.log('display');
     firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
     secondWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
     openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
@@ -446,7 +458,7 @@ const MergeEditor = () => {
                   <Text style={{color: colors.accent, fontWeight: 'bold'}}>
                     (This Device)
                   </Text>{' '}
-                  Saved on {timeConverter(primaryData.dateEdited)}
+                  Saved on {timeConverter(primaryData?.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}
@@ -593,7 +605,7 @@ const MergeEditor = () => {
                   <Text style={{color: 'red', fontWeight: 'bold'}}>
                     (Incoming)
                   </Text>{' '}
-                  Saved on {timeConverter(secondaryData.dateEdited)}
+                  Saved on {timeConverter(secondaryData?.dateEdited)}
                 </Paragraph>
                 <Icon
                   size={SIZE.lg}
