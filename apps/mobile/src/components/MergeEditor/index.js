@@ -13,7 +13,7 @@ import {
   eUnSubscribeEvent,
   sendNoteEditedEvent,
 } from '../../services/EventManager';
-import {dHeight} from '../../utils';
+import {dHeight, doInBackground} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eApplyChanges,
@@ -33,6 +33,7 @@ import {timeConverter} from '../../utils/TimeUtils';
 import tiny from '../../views/Editor/tiny/tiny';
 import diff from '../../utils/differ';
 import {openLinkInBrowser} from '../../utils/functions';
+import Sync from '../../services/Sync';
 
 const {Value, timing} = Animated;
 
@@ -250,6 +251,7 @@ const MergeEditor = () => {
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     close();
+    doInBackground(async () => {Sync.run()});
   };
 
   const show = async (item) => {
