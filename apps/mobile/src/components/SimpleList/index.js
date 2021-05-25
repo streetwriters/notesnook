@@ -79,7 +79,7 @@ const SimpleList = ({
   }, [listData, deviceMode, loading]);
 
   const _onRefresh = async () => {
-    await doInBackground(async () => await Sync.run('local'));
+    await Sync.run('local');
     if (refreshCallback) {
       refreshCallback();
     }

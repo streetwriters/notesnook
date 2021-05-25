@@ -1,23 +1,20 @@
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
+import {doInBackground} from '../utils';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
 import {eSendEvent, ToastEvent} from './EventManager';
-import {
-  beginBackgroundTask,
-  endBackgroundTask,
-} from 'react-native-begin-background-task';
-import {Platform} from 'react-native';
 
 const run = async (context = 'global') => {
-
   updateEvent({
     type: Actions.SYNCING,
     syncing: true,
   });
 
   try {
-    await db.sync();
+    await doInBackground(async () => {
+      await db.sync();
+    });
     ToastEvent.show({
       heading: 'Sync complete',
       type: 'success',
@@ -56,7 +53,6 @@ const run = async (context = 'global') => {
       type: Actions.SYNCING,
       syncing: false,
     });
-
   }
 };
 

@@ -1,18 +1,16 @@
 import React from 'react';
-import {Platform} from 'react-native';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { ActivityIndicator, Platform, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import { doInBackground } from '../../utils';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = () => {
   const [state] = useTracked();
@@ -82,7 +80,7 @@ export const UserSection = () => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={async () => await doInBackground(async ()=>await Sync.run('local'))}
+            onPress={async ()=>await Sync.run('local')}
             style={{
               flexDirection: 'row',
               alignItems: 'center',

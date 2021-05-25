@@ -195,10 +195,13 @@ export async function doInBackground(cb) {
     await cb();
     await endBackgroundTask(bgTaskId);
   } else {
-    await BackgroundService.start(async () => {
-      await cb();
-      await BackgroundService.stop();
-    },bgTaskOptions); 
+    return new Promise(async (res, rej) => {
+      await BackgroundService.start(async () => {
+        await cb();
+        await BackgroundService.stop();
+        res('done');
+      }, bgTaskOptions);
+    });
   }
 }
 

@@ -221,7 +221,7 @@ export const PremiumComponent = ({close, promo}) => {
               ? promo.text
               : user
               ? `Subscribe for ${product?.localizedPrice || '$4.49'} / mo`
-              : 'Start Your Free 14 Day Trial'
+              : 'Start Your 14 Day Free Trial'
           }
           type="accent"
           height={60}

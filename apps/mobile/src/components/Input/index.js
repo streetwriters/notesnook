@@ -41,7 +41,7 @@ const Input = ({
   returnKeyType,
   returnKeyLabel,
   autoCompleteType,
-  onFocusInput
+  onFocusInput,
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -63,7 +63,7 @@ const Input = ({
     ? customColor || colors.accent
     : colors.nav;
 
-  const validate = (value) => {
+  const validate = value => {
     if (!validationType) return;
     if (!value || value?.length === 0) {
       setError(false);
@@ -97,7 +97,7 @@ const Input = ({
     if (validationType === 'password') {
       let hasError = false;
 
-      Object.keys(isError).forEach((e) => {
+      Object.keys(isError).forEach(e => {
         if (isError[e] === true) {
           hasError = true;
         }
@@ -111,7 +111,7 @@ const Input = ({
     }
   };
 
-  const onChange = (value) => {
+  const onChange = value => {
     onChangeText(value);
     validate(value);
   };
@@ -126,9 +126,8 @@ const Input = ({
   const onFocus = () => {
     setFocus(true);
     if (onFocusInput) {
-      onFocusInput()
+      onFocusInput();
     }
-    
   };
 
   const style = {
@@ -149,7 +148,7 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height:35,
+    height: 35,
   };
 
   return (
@@ -283,9 +282,9 @@ const Input = ({
           style={{
             paddingTop: 5,
           }}>
-          {Object.keys(errorList).filter((k) => errorList[k] === true)
-            .length !== 0 ? (
-            Object.keys(ERRORS_LIST).map((error) => (
+          {Object.keys(errorList).filter(k => errorList[k] === true).length !==
+          0 ? (
+            Object.keys(ERRORS_LIST).map(error => (
               <View
                 style={{
                   flexDirection: 'row',
