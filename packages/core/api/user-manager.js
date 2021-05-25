@@ -27,7 +27,6 @@ class UserManager {
   async init() {
     const user = await this.getUser();
     if (!user) return;
-    if (!user.remember) await this.logout(true, "Session expired.");
   }
 
   async signup(email, password) {
@@ -38,10 +37,10 @@ class UserManager {
       client_id: "notesnook",
     });
     EV.publish(EVENTS.userSignedUp);
-    return await this.login(email, password, true, hashedPassword);
+    return await this.login(email, password, hashedPassword);
   }
 
-  async login(email, password, remember, hashedPassword) {
+  async login(email, password, hashedPassword) {
     if (!hashedPassword) {
       hashedPassword = await this._db.context.hash(password, email);
     }
@@ -56,7 +55,7 @@ class UserManager {
       })
     );
 
-    const user = await this.fetchUser(remember);
+    const user = await this.fetchUser();
     await this._db.context.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt,
@@ -105,7 +104,7 @@ class UserManager {
     return true;
   }
 
-  async fetchUser(remember = false) {
+  async fetchUser() {
     try {
       let token = await this.tokenManager.getAccessToken();
       if (!token) return;
@@ -121,16 +120,13 @@ class UserManager {
           await this.tokenManager._refreshToken(token);
         }
 
-        await this.setUser({ ...user, remember });
+        await this.setUser(user);
         EV.publish(EVENTS.userFetched, user);
         return user;
       } else {
         return await this.getUser();
       }
     } catch (e) {
-      if (e.message === "invalid_grant" || e.message === "invalid_client") {
-        return await this.logout(false, "Session expired.");
-      }
       console.error(e);
       return await this.getUser();
     }

@@ -1,5 +1,6 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
+import { EV, EVENTS, sendSessionExpiredEvent } from "../common";
 
 const ENDPOINTS = {
   token: "/connect/token",
@@ -8,6 +9,8 @@ const ENDPOINTS = {
   logout: "/account/logout",
 };
 
+var RETRIES = 0;
+var RETRIES_LIMIT = 1;
 class TokenManager {
   /**
    *
@@ -18,10 +21,10 @@ class TokenManager {
     this.token;
   }
 
-  async getToken(renew = true) {
+  async getToken(renew = true, forceRenew = false) {
     let token = this.token || (await this._db.context.read("token"));
     if (!token) return;
-    if (renew && this._isTokenExpired(token)) {
+    if (forceRenew || (renew && this._isTokenExpired(token))) {
       await this._refreshToken(token);
       return await this.getToken();
     }
@@ -34,10 +37,19 @@ class TokenManager {
     return Date.now() >= expiryMs;
   }
 
-  async getAccessToken() {
-    const token = await this.getToken();
-    if (!token) return;
-    return token.access_token;
+  async getAccessToken(forceRenew = false) {
+    try {
+      const token = await this.getToken(true, forceRenew);
+      if (!token) return;
+      return token.access_token;
+    } catch (e) {
+      console.error("Error getting access token:", e);
+      if (e.message === "invalid_grant" || e.message === "invalid_client") {
+        if (++RETRIES <= RETRIES_LIMIT) return await this.getAccessToken(true);
+        if (await sendSessionExpiredEvent()) return await this.getAccessToken();
+      }
+      return null;
+    }
   }
 
   async _refreshToken(token) {
