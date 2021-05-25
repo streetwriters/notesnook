@@ -5,10 +5,12 @@ import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "notes-core/common";
-import { showLoadingDialog } from "../common/dialog-controller";
+import { showLoadingDialog, showLogInDialog } from "../common/dialog-controller";
 import { Text } from "rebass";
 import { showToast } from "../utils/toast";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
+import Config from "../utils/config";
+import { onPageVisibilityChanged } from "../utils/page-visibility";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -21,12 +23,36 @@ class UserStore extends BaseStore {
   init = () => {
     EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
 
-    db.user.getUser().then((user) => {
+    EV.subscribe(EVENTS.userSessionExpired, async () => {
+      const user = this.get().user;
+      Config.set("sessionExpired", "true");
+      const loginResult = await showLogInDialog(
+        "Your session has expired.",
+        "Please login again to continue. If you press Cancel or close the dialog, all your data will be erased.",
+        "Login",
+        user.email,
+        true,
+        true
+      );
+      console.log("SESSION", loginResult);
+      Config.set("sessionExpired", "false");
+      if (!loginResult) {
+        await db.user.logout(false);
+        return { result: false };
+      }
+      return { result: true };
+    });
+
+    db.user.getUser().then(async (user) => {
       if (!user) return false;
+
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;
       });
+
+      if (Config.get("sessionExpired") === "true")
+        EV.publish(EVENTS.userSessionExpired);
     });
     return db.user.fetchUser(true).then(async (user) => {
       if (!user) return false;
@@ -45,6 +71,7 @@ class UserStore extends BaseStore {
       EV.subscribe(EVENTS.databaseSyncRequested, async () => {
         await this.sync(false);
       });
+
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
         this.set((state) => {
           state.user = {};
@@ -53,13 +80,15 @@ class UserStore extends BaseStore {
         config.clear();
         await appStore.refresh();
 
-        if (window.PasswordCredential) {
-          await navigator.credentials.preventSilentAccess();
-          if (navigator.credentials.requireUserMediation)
-            await navigator.credentials.requireUserMediation();
-        }
         if (!!reason) {
           await showAccountLoggedOutNotice(reason);
+        }
+      });
+
+      onPageVisibilityChanged(async (documentHidden) => {
+        if (!documentHidden) {
+          await db.connectSSE();
+          await this.sync();
         }
       });
       await this.sync();
@@ -70,7 +99,7 @@ class UserStore extends BaseStore {
   login = (form, skipInit = false) => {
     this.set((state) => (state.isLoggingIn = true));
     return db.user
-      .login(form.email.toLowerCase(), form.password, form.remember)
+      .login(form.email.toLowerCase(), form.password)
       .then(() => {
         if (skipInit) return true;
         return showLoadingDialog({

@@ -341,14 +341,23 @@ export function showLoadingDialog(dialogData) {
   ));
 }
 
-export const showLogInDialog = (title, description, positiveText, skipInit) => {
+export const showLogInDialog = (
+  title,
+  description,
+  positiveText,
+  email,
+  skipInit,
+  force
+) => {
   return showDialog((Dialogs, perform) => (
     <Dialogs.LoginDialog
       title={title}
       description={description}
       positiveText={positiveText}
       skipInit={skipInit}
-      onClose={() => perform()}
+      force={force}
+      email={email}
+      onClose={(res) => perform(res)}
     />
   ));
 };
@@ -471,8 +480,9 @@ export function showTopicDialog() {
 }
 
 export function showEditTopicDialog(notebookId, topicId) {
-  const topic = db.notebooks.notebook(notebookId)?.topics?.topic(topicId)
-    ?._topic;
+  const topic = db.notebooks
+    .notebook(notebookId)
+    ?.topics?.topic(topicId)?._topic;
   if (!topic) return;
   return showDialog((Dialogs, perform) => (
     <Dialogs.TopicDialog

@@ -42,6 +42,7 @@ function Field(props) {
     onKeyDown,
     onChange,
     inputRef,
+    disabled,
     defaultValue,
     placeholder,
     validatePassword,
@@ -76,6 +77,7 @@ function Field(props) {
           required={required}
           name={name}
           id={id}
+          disabled={disabled}
           placeholder={placeholder}
           autoComplete={autoComplete}
           type={type || "text"}
