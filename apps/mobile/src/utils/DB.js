@@ -4,7 +4,8 @@ import EventSource from 'rn-eventsource';
 import AndroidEventSource from './event-source';
 import Database from 'notes-core/api/index';
 
-global.Buffer = require('buffer').Buffer;
+
+
 export const db = new Database(
   Storage,
   Platform.OS === 'ios' ? EventSource : AndroidEventSource,
