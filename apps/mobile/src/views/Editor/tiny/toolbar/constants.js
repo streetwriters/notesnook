@@ -177,4 +177,6 @@ export const TOOLBAR_ICONS = {
   tablerowprops:"table-row",
   tablecolumnprops:"table-column",
   tableconfig:"table-cog",
+  imagepreview:"fullscreen",
+  removeimage:"delete"
 };

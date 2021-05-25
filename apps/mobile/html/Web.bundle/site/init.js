@@ -74,13 +74,13 @@ function init_tiny(size) {
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     imagetools_toolbar:
-      'rotateleft rotateright flipv fliph | imageoptions | deleteimage | imagepreview',
+      'rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
     mobile: {
-      resize: true,
-      object_resizing: true,
+      resize: false,
+      object_resizing: false,
     },
     image_description: false,
     image_caption: false,
@@ -95,10 +95,21 @@ function init_tiny(size) {
         icon: 'remove',
         tooltip: 'Remove image',
         onAction: function () {
-          tinymce.activeEditor.execCommand('Delete');
+          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
         },
         onclick: function () {
-          tinymce.activeEditor.execCommand('Delete');
+          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+
+        }
+      });
+      editor.ui.registry.addButton('imageopts', {
+        icon: 'image-options',
+        tooltip: 'Image properties',
+        onAction: function () {
+          reactNativeEventHandler("imageoptions");
+        },
+        onclick: function () {
+          reactNativeEventHandler("imageoptions");
         }
       });
 
@@ -284,5 +295,6 @@ function selectchange() {
       }
     }
   }
+  currentFormats.node = editor.selection.getNode().nodeName;
   reactNativeEventHandler('selectionchange', currentFormats);
 }

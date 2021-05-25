@@ -56,16 +56,17 @@ export const execCommands = {
   magnify: `tinymce.activeEditor.execCommand('SearchReplace');`,
   table: (r, c) =>
     `
-    (() => {
+    (function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
         tinymce.activeEditor.nodeChanged()
         tinymce.activeEditor.selection.setRng(rng)
-        
      }  
-     tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
+     editor.undoManager.transact(function() {
+      tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
+     }); 
      
     })();  
 
@@ -123,11 +124,62 @@ export const execCommands = {
   pre: `
     tinymce.activeEditor.execCommand('CodeBlock')
   `,
-  tableprops:"tinymce.activeEditor.execCommand('mceTableProps');",
-  tabledelete:"tinymce.activeEditor.execCommand('mceTableDelete');",
-  tablesplitcell:"tinymce.activeEditor.execCommand('mceTableSplitCells');",
-  tablemergecell:"tinymce.activeEditor.execCommand('mceTableMergeCells');",
-  tablerowprops:"tinymce.activeEditor.execCommand('mceTableRowProps');",
+  tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
+  tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
+  tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
+  tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
+  tablerowprops: "tinymce.activeEditor.execCommand('mceTableRowProps');",
+  imageResize25: `
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    tinymce.activeEditor.selection.getNode().style.width = "25%";
+  }
+  `,
+  imageResize50: `
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    tinymce.activeEditor.selection.getNode().style.width = "75%";
+  }
+  `,
+  imageResize100: `
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    tinymce.activeEditor.selection.getNode().style.width = "100%";
+  }
+  `,
+  imagepreview: `(function() {
+    if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+  
+      xhr.onload = function () {
+        var recoveredBlob = xhr.response;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var blobAsDataUrl = reader.result;
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'imagepreview',
+              value: blobAsDataUrl,
+            })
+          );
+          reader.abort();
+          xhr.abort();
+        };
+        reader.readAsDataURL(recoveredBlob);
+      };
+      xhr.open(
+        'GET',
+        tinymce.activeEditor.selection.getNode().getAttribute('src'),
+      );
+      xhr.send();
+    }
+  })();
+  `,
+  removeimage: `
+  (function() {
+    if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+    }  
+  })
+  `,
 };
 
 const handleImageResponse = response => {
@@ -137,7 +189,7 @@ const handleImageResponse = response => {
 
   let b64 = `data:${response.type};base64, ` + response.base64;
   formatSelection(`
-  (() => {
+  (function() {
     let pTag = "";
     let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
     if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
@@ -148,9 +200,9 @@ minifyImg(
   "${b64}",
   1024,
   'image/jpeg',
-  (r) => {
+  function(r) {
     var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
-    editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+    editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
   },
   0.6,
 );

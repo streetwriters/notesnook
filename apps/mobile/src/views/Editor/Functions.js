@@ -209,7 +209,7 @@ export const loadNote = async item => {
     editing.isFocused = false;
     setTimeout(() => {
       eSendEvent('webviewreset');
-    },1)
+    }, 1);
     InteractionManager.runAfterInteractions(async () => {
       sendNoteEditedEvent({
         id: id,
@@ -306,10 +306,10 @@ export const _onMessage = async evt => {
       setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
-      if (PremiumService.get()){
-        tiny.call(EditorWebView,tiny.setMarkdown,true)
+      if (PremiumService.get()) {
+        tiny.call(EditorWebView, tiny.setMarkdown, true);
       } else {
-        tiny.call(EditorWebView,tiny.removeMarkdown,true)
+        tiny.call(EditorWebView, tiny.removeMarkdown, true);
       }
       loadNoteInEditor();
       break;
@@ -317,9 +317,55 @@ export const _onMessage = async evt => {
       webviewOK = true;
       break;
     case 'imagepreview':
-      eSendEvent("ImagePreview",message.value)
+      eSendEvent('ImagePreview', message.value);
 
-    break;  
+      break;
+    case 'imageoptions':
+      if (editing.tooltip === 'imageoptions') {
+        eSendEvent('showTooltip');
+        break;
+      }
+      editing.tooltip = 'imageoptions';
+      eSendEvent('showTooltip', {
+        data: [
+          {
+            format: 'imageResize25',
+            text: '25%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'imageResize50',
+            text: '50%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'imageResize100',
+            text: '100%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'removeimage',
+            type: 'format',
+            fullname: 'Remove image',
+          },
+          {
+            format: 'imagepreview',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+        ],
+        title: 'imageoptions',
+        default: null,
+        type: 'imageoptions',
+        pageX: 0,
+      });
+      break;
     case 'focus':
       editing.focusType = message.value;
       break;
@@ -481,10 +527,10 @@ export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
     Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
-  if (premium){
-    tiny.call(EditorWebView,tiny.setMarkdown,true)
+  if (premium) {
+    tiny.call(EditorWebView, tiny.setMarkdown, true);
   } else {
-    tiny.call(EditorWebView,tiny.removeMarkdown,true)
+    tiny.call(EditorWebView, tiny.removeMarkdown, true);
   }
   setColors(colors);
 }

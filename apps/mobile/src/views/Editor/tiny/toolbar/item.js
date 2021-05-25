@@ -83,6 +83,7 @@ const ToolbarItem = ({
       });
       return;
     }
+    
     if (formats.indexOf(format) > -1 && format !== 'removeformat') {
       if (format === 'forecolor' || format === 'hilitecolor') {
         if (!data[format]) {
@@ -332,7 +333,7 @@ const ToolbarItem = ({
                   ? icon
                   : null,
             }}
-            size={SIZE.md}>
+            size={text.includes("%") ? SIZE.sm : SIZE.md}>
             {currentText || text}
           </Paragraph>
         ) : (

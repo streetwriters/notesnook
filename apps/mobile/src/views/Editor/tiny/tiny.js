@@ -24,7 +24,7 @@ const setMarkdown = `
  tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
 `
 
-const keyboardStateChanged = `(() => {
+const keyboardStateChanged = `(function() {
   let node = tinymce.activeEditor.selection.getNode();
   node.scrollIntoView({behavior: "smooth", block: "end"});
 })();
@@ -35,16 +35,16 @@ const blur = `
 
 `;
 
-const pre = `(() => {
+const pre = `(function() {
   function replaceContent(editor, content) {
     let rng = tinymce.activeEditor.selection.getRng();
     let node = tinymce.activeEditor.selection.getNode();
     let innerHTML = node.innerHTML;
     node.remove();
     tinymce.activeEditor.undoManager.transact(function () {
-      setTimeout(() =>
+      setTimeout(function() {
         tinymce.activeEditor.execCommand("mceInsertContent", false, content(innerHTML)),2
-      );
+      });
     });
     tinymce.activeEditor.selection.setRng(rng, true);
     tinymce.activeEditor.nodeChanged();
@@ -55,7 +55,7 @@ const pre = `(() => {
   if (innerTexts.length <= 0) {
     replaceContent(
       tinymce.activeEditor,
-      (html) => {
+      function(html) {
         let replant = html.replace(regex, "<br>");
         return "<p>" + replant + "</p>"
       }
@@ -66,7 +66,7 @@ const pre = `(() => {
 })();`;
 
 const updateDateEdited = value => `
-	(() => {
+	(function() {
 		info = document.querySelector(infoBar);
         info.querySelector('#infodate').innerText = "${value}";
         info.querySelector('#infowords').innerText =
@@ -76,7 +76,7 @@ const updateDateEdited = value => `
 `;
 
 const updateSavingState = value => `
-	(() => {
+	(function() {
 		info = document.querySelector(infoBar);
         info.querySelector('#infosaved').innerText = "${value}";
 	})();
@@ -119,7 +119,7 @@ const formatWithValue = (format, value) => {
 };
 
 export const nomenu = enabled => `
-	(() => {
+	(function() {
 		let isenabled = ${enabled};
         let titleIn = document.getElementById('titlebar');
         if (isenabled) {
@@ -132,7 +132,7 @@ export const nomenu = enabled => `
 	})();
 `;
 const updateTheme = value => `
-(() => {
+(function() {
   let v = ${value}
   pageTheme.colors = v;
   setTheme();
