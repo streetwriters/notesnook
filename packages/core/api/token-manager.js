@@ -45,7 +45,10 @@ class TokenManager {
     } catch (e) {
       console.error("Error getting access token:", e);
       if (e.message === "invalid_grant" || e.message === "invalid_client") {
-        if (++RETRIES <= RETRIES_LIMIT) return await this.getAccessToken(true);
+        if (++RETRIES <= RETRIES_LIMIT) {
+          RETRIES_LIMIT = 0;
+          return await this.getAccessToken(true);
+        }
         if (await sendSessionExpiredEvent()) return await this.getAccessToken();
       }
       return null;
