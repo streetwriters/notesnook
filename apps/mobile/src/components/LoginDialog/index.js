@@ -1,5 +1,7 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {Text} from 'react-native';
 import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
+import {color} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
@@ -387,7 +389,6 @@ const LoginDialog = () => {
               position: 'absolute',
               bottom: 0,
               paddingHorizontal: 12,
-              backgroundColor: colors.nav,
               paddingTop: 10,
               paddingBottom: 20,
               width: '100%',
@@ -511,6 +512,35 @@ const LoginDialog = () => {
             onPress={mode !== MODES.changePassword && current.headerButtonFunc}
             paragraph={mode !== MODES.changePassword && current.headerParagraph}
           />
+          {mode === MODES.signup && (
+            <View
+              style={{
+                width: '100%',
+                backgroundColor: colors.shade,
+                paddingHorizontal: 12,
+                paddingVertical: 12,
+                marginTop: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                flexShrink: 1,
+              }}>
+              <Icon
+                size={20}
+                style={{marginRight: 10}}
+                name="information"
+                color={colors.accent}
+              />
+              <Paragraph
+                style={{flexWrap: 'wrap', flex: 1}}
+                color={colors.accent}>
+                When you sign up, your{' '}
+                <Text style={{fontWeight: 'bold'}}>
+                  14 day free trial of Notesnook Pro
+                </Text>{' '}
+                will be activated.
+              </Paragraph>
+            </View>
+          )}
 
           <View
             style={{
@@ -528,7 +558,6 @@ const LoginDialog = () => {
                   setError(r);
                 }}
                 onFocusInput={onChangeFocus}
-                //onBlurInput={onChangeFocus}
                 returnKeyLabel="Next"
                 returnKeyType="next"
                 autoCompleteType="email"
@@ -643,15 +672,11 @@ const LoginDialog = () => {
               <>
                 <TouchableOpacity
                   disabled={loading}
-                  onPress={() => {
-                    //setUserConsent(!userConsent);
-                  }}
                   activeOpacity={0.7}
                   style={{
                     flexDirection: 'row',
                     width: '100%',
                     alignItems: 'center',
-                    height: 40,
                   }}>
                   <Paragraph
                     size={11}
