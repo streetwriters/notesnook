@@ -80,7 +80,7 @@ export const UserSection = () => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={async ()=>await Sync.run('local')}
+            onPress={async ()=>await Sync.run()}
             style={{
               flexDirection: 'row',
               alignItems: 'center',

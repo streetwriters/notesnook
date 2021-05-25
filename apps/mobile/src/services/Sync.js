@@ -12,9 +12,17 @@ const run = async (context = 'global') => {
   });
 
   try {
-    await doInBackground(async () => {
-      await db.sync();
+    let res = await doInBackground(async () => {
+      try {
+        await db.sync();
+        return true;
+      } catch (e) {
+        return e.message;
+      }
     });
+    console.log(res);
+    if (res !== true) throw new Error(res);
+    console.log('here too');
     ToastEvent.show({
       heading: 'Sync complete',
       type: 'success',

@@ -10,6 +10,7 @@ let RNFetchBlob;
 async function read(key, isArray = false) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
+ 
   data = JSON.parse(data);
   return data;
 }
@@ -170,7 +171,10 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  return await Sodium.hashPassword(password, email);
+  console.log(password,email,'calling');
+  let result =  await Sodium.hashPassword(password, email);
+  console.log(result,'result');
+  return result
 }
 /* 
 function compress(data) {

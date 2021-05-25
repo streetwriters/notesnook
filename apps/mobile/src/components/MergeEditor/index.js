@@ -251,7 +251,7 @@ const MergeEditor = () => {
     updateEvent({type: Actions.NOTES});
     updateEvent({type: Actions.FAVORITES});
     close();
-    doInBackground(async () => {Sync.run()});
+    await Sync.run();
   };
 
   const show = async (item) => {

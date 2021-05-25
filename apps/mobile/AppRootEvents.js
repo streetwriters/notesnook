@@ -87,9 +87,15 @@ async function reconnectSSE(connection) {
 
     let user = await db.user.getUser();
     if (user && state.isConnected && state.isInternetReachable) {
-      await doInBackground(async () => {
-        await db.connectSSE();
+      let res = await doInBackground(async () => {
+        try {
+          await db.connectSSE();
+          return true;
+        } catch (e) {
+          return e.message;
+        }
       });
+      if (res !== true) throw new Error(res);
     }
   } catch (e) {}
 }
@@ -110,6 +116,7 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
       EV.subscribe(EVENTS.userLoggedOut, onLogout);
       EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+      EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
@@ -119,6 +126,7 @@ export const AppRootEvents = React.memo(
       );
       return () => {
         eUnSubscribeEvent('userLoggedIn', setCurrentUser);
+        EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -134,6 +142,18 @@ export const AppRootEvents = React.memo(
         Linking.removeEventListener('url', onUrlRecieved);
       };
     }, []);
+
+    const onSessionExpired = async () => {
+      await Storage.write('loginSessionHasExpired', 'expired');
+      return new Promise((res, rej) => {
+        eSendEvent(eOpenLoginDialog, 4);
+        let onsuccess = () => {
+          res(true);
+          eUnSubscribeEvent('reLoginSuccess', onsuccess);
+        };
+        eSubscribeEvent('reLoginSuccess', onsuccess);
+      });
+    };
 
     const onNoteRemoved = async id => {
       try {
@@ -251,12 +271,24 @@ export const AppRootEvents = React.memo(
     const partialSync = async () => {
       try {
         dispatch({type: Actions.SYNCING, syncing: true});
-        await doInBackground(async () => {
-          await db.sync(false);
+        let res = await doInBackground(async () => {
+          try {
+            await db.sync(false);
+            return true;
+          } catch (e) {
+            return e.message;
+          }
         });
+        if (res !== true) throw new Error(res);
+
         dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
       } catch (e) {
         dispatch({type: Actions.SYNCING, syncing: false});
+        ToastEvent.show({
+          heading: 'Sync failed',
+          message: e.message,
+          context: context,
+        });
       } finally {
         dispatch({type: Actions.SYNCING, syncing: false});
       }
@@ -305,9 +337,16 @@ export const AppRootEvents = React.memo(
           await PremiumService.setPremiumStatus();
           attachIAPListeners();
           await Sync.run();
-          await doInBackground(async () => {
-            user = await db.user.fetchUser(true);
+          let res = await doInBackground(async () => {
+            try {
+              user = await db.user.fetchUser();
+              return true;
+            } catch (e) {
+              return e.message;
+            }
           });
+          if (res !== true) throw new Error(res);
+
           if (!user.isEmailConfirmed) {
             setEmailVerifyMessage(dispatch);
             return;
@@ -436,7 +475,7 @@ export const AppRootEvents = React.memo(
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
           try {
-            let user = await db.user.fetchUser(true);
+            let user = await db.user.fetchUser();
             if (user.isEmailConfirmed) {
               onEmailVerified(dispatch);
             }

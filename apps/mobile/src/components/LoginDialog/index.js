@@ -20,6 +20,7 @@ import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
 import {getElevation} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
   eCloseProgressDialog,
@@ -31,9 +32,13 @@ import {
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
+import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import {Header} from '../SimpleList/header';
 import Heading from '../Typography/Heading';
@@ -44,6 +49,7 @@ const MODES = {
   signup: 1,
   forgotPassword: 2,
   changePassword: 3,
+  sessionExpired: 4,
 };
 
 let email = '';
@@ -51,6 +57,15 @@ let username;
 let password = '';
 let confirmPassword;
 let oldPassword;
+
+function getEmail() {
+  return email.replace(/(.{2})(.*)(?=@)/, function (gp1, gp2, gp3) {
+    for (let i = 0; i < gp3.length; i++) {
+      gp2 += '*';
+    }
+    return gp2;
+  });
+}
 
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
@@ -62,6 +77,7 @@ const LoginDialog = () => {
   const [mode, setMode] = useState(MODES.login);
   const [error, setError] = useState(false);
   const [focused, setFocused] = useState(false);
+  const [confirm, setConfirm] = useState(false);
   const insets = useSafeAreaInsets();
 
   const _email = useRef();
@@ -140,19 +156,42 @@ const LoginDialog = () => {
       showLoader: true,
       buttonAlt: null,
     },
+    {
+      headerButton: 'Session expired',
+      headerButtonFunc: () => {},
+      button: 'Login',
+      buttonFunc: () => loginUser(),
+      headerParagraph: '',
+      showForgotButton: true,
+      loading: 'Please wait while we log in and sync your data.',
+      showLoader: true,
+      buttonAlt: 'Logout & delete data',
+      buttonAltFunc: () => {
+        setConfirm(true);
+      },
+    },
   ];
 
   const current = MODE_DATA[mode];
 
   useEffect(() => {
+    MMKV.getItem('loginSessionHasExpired').then(r => {
+      if (r === 'expired') {
+        open(MODES.sessionExpired);
+      }
+    });
     eSubscribeEvent(eOpenLoginDialog, open);
     return () => {
       eUnSubscribeEvent(eOpenLoginDialog, open);
     };
   }, []);
 
-  function open(mode) {
+  async function open(mode) {
     setMode(mode ? mode : MODES.login);
+    if (mode === MODES.sessionExpired) {
+      let user = await db.user.getUser();
+      email = user.email;
+    }
     setStatus(null);
     setVisible(true);
   }
@@ -191,7 +230,8 @@ const LoginDialog = () => {
     setStatus('Logging in');
     let user;
     try {
-      await db.user.login(email.toLowerCase(), password, true);
+      console.log(email, password);
+      await db.user.login(email.toLowerCase(), password);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
       setStatus('Syncing Your Data');
@@ -205,13 +245,18 @@ const LoginDialog = () => {
         context: 'local',
       });
       close();
-      await sleep(300);
-      eSendEvent('userLoggedIn', true);
-      eSendEvent(eOpenProgressDialog, {
-        title: 'Syncing your data',
-        paragraph: 'Please wait while we sync all your data.',
-        noProgress: false,
-      });
+      if (MODES.sessionExpired !== mode) {
+        await sleep(300);
+        eSendEvent('userLoggedIn', true);
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Syncing your data',
+          paragraph: 'Please wait while we sync all your data.',
+          noProgress: false,
+        });
+      } else {
+        await MMKV.removeItem('loginSessionHasExpired');
+        eSendEvent('reLoginSuccess');
+      }
     } catch (e) {
       setLoading(false);
       setStatus(null);
@@ -294,7 +339,7 @@ const LoginDialog = () => {
     }
   };
 
-  const sendEmail = async () => {
+  const sendEmail = async nostatus => {
     if (!email || error) {
       ToastEvent.show({
         heading: 'Account email is required.',
@@ -311,7 +356,7 @@ const LoginDialog = () => {
       ) {
         throw new Error('Please wait before requesting another email');
       }
-      setStatus('Password Recovery Email Sent!');
+      !nostatus && setStatus('Password Recovery Email Sent!');
       await db.user.recoverAccount(email);
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
     } catch (e) {
@@ -365,14 +410,49 @@ const LoginDialog = () => {
       animated={true}
       animationType={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={true}
-      onRequestClose={close}
+      onRequestClose={MODES.sessionExpired !== mode && close}
       visible={true}
       onShow={() => {
         setTimeout(() => {
+          if (MODES.sessionExpired === mode) {
+            _pass.current?.focus();
+            return;
+          }
           _email.current?.focus();
         }, 150);
       }}
       transparent={true}>
+      {confirm && (
+        <BaseDialog
+          onRequestClose={() => {
+            setConfirm(false);
+          }}
+          visible>
+          <DialogContainer>
+            <DialogHeader
+              title="Logout & delete data"
+              paragraph="All synced and unsynced data on this device will be removed. Do you want to proceed?"
+              paragraphColor="red"
+            />
+            <DialogButtons
+              negativeTitle="Cancel"
+              onPressNegative={() => {
+                setConfirm(false);
+              }}
+              positiveType="error"
+              positiveTitle="Logout"
+              onPressPositive={async () => {
+                await db.user.logout();
+                await BiometricService.resetCredentials();
+                await Storage.write('introCompleted', 'true');
+                setConfirm(false);
+                close();
+              }}
+            />
+          </DialogContainer>
+        </BaseDialog>
+      )}
+
       {status ? (
         <BaseDialog
           visible={true}
@@ -475,6 +555,7 @@ const LoginDialog = () => {
                 name="close"
                 size={SIZE.xxxl}
                 onPress={() => {
+                  if (MODES.sessionExpired === mode) return;
                   close();
                 }}
                 customStyle={{
@@ -489,6 +570,7 @@ const LoginDialog = () => {
                 name="arrow-left"
                 size={SIZE.xxxl}
                 onPress={() => {
+                  if (MODES.sessionExpired === mode) return;
                   close();
                 }}
                 customStyle={{
@@ -512,6 +594,33 @@ const LoginDialog = () => {
             onPress={mode !== MODES.changePassword && current.headerButtonFunc}
             paragraph={mode !== MODES.changePassword && current.headerParagraph}
           />
+          {mode === MODES.sessionExpired && (
+            <View
+              style={{
+                width: '100%',
+                paddingHorizontal: 12,
+                paddingVertical: 12,
+                marginTop: 10,
+                flexDirection: 'row',
+                alignItems: 'center',
+                flexShrink: 1,
+                backgroundColor: hexToRGBA(colors.red, 0.2),
+              }}>
+              <Icon
+                size={20}
+                style={{marginRight: 10}}
+                name="information"
+                color={colors.errorText}
+              />
+              <Paragraph
+                style={{flexWrap: 'wrap', flex: 1}}
+                color={colors.errorText}>
+                Please login to your account to access your notes on this device
+                and sync them.
+              </Paragraph>
+            </View>
+          )}
+
           {mode === MODES.signup && (
             <View
               style={{
@@ -557,6 +666,8 @@ const LoginDialog = () => {
                 onErrorCheck={r => {
                   setError(r);
                 }}
+                loading={MODES.sessionExpired === mode}
+                defaultValue={MODES.sessionExpired === mode ? getEmail() : null}
                 onFocusInput={onChangeFocus}
                 returnKeyLabel="Next"
                 returnKeyType="next"
@@ -629,18 +740,23 @@ const LoginDialog = () => {
               </>
             )}
 
-            {mode === MODES.login && (
-              <TouchableOpacity
-                onPress={() => {
-                  setMode(MODES.forgotPassword);
-                }}
-                style={{
-                  alignSelf: 'flex-end',
-                  marginTop: 2.5,
-                }}>
-                <Paragraph color={colors.accent}>Forgot password?</Paragraph>
-              </TouchableOpacity>
-            )}
+            {mode === MODES.login ||
+              (mode === MODES.sessionExpired && (
+                <TouchableOpacity
+                  onPress={() => {
+                    if (MODES.sessionExpired === mode) {
+                      sendEmail(true);
+                      return;
+                    }
+                    setMode(MODES.forgotPassword);
+                  }}
+                  style={{
+                    alignSelf: 'flex-end',
+                    marginTop: 2.5,
+                  }}>
+                  <Paragraph color={colors.accent}>Forgot password?</Paragraph>
+                </TouchableOpacity>
+              ))}
             <Seperator />
             {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
               <>
@@ -733,7 +849,7 @@ const LoginDialog = () => {
                 title={current.buttonAlt}
                 onPress={current.buttonAltFunc}
                 width="100%"
-                type="shade"
+                type={MODES.sessionExpired === mode ? 'error' : 'shade'}
                 fontSize={SIZE.md}
                 style={{
                   marginTop: 10,

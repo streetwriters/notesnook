@@ -5,7 +5,7 @@ import {updateEvent} from '../components/DialogManager/recievers';
 import {dummyRef} from '../components/DummyText';
 import {Actions} from '../provider/Actions';
 import {defaultState} from '../provider/DefaultState';
-import {eSendEvent} from '../services/EventManager';
+import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
@@ -192,14 +192,15 @@ export async function doInBackground(cb) {
   if (Platform.OS === 'ios') {
     let bgTaskId;
     bgTaskId = await beginBackgroundTask();
-    await cb();
+    let res = await cb();
     await endBackgroundTask(bgTaskId);
+    return res;
   } else {
     return new Promise(async (res, rej) => {
       await BackgroundService.start(async () => {
-        await cb();
+        let result = await cb();
         await BackgroundService.stop();
-        res('done');
+        res(result);
       }, bgTaskOptions);
     });
   }

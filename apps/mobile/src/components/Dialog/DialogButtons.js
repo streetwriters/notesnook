@@ -14,6 +14,7 @@ const DialogButtons = ({
   negativeTitle = 'Cancel',
   loading,
   doneText,
+  positiveType
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -59,7 +60,7 @@ const DialogButtons = ({
             style={{
               marginLeft: 10,
             }}
-            type="transparent"
+            type={positiveType || "transparent"}
             title={positiveTitle}
           />
         )}

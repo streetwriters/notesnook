@@ -659,7 +659,7 @@ export const ActionSheetComponent = ({
             <TouchableOpacity
               activeOpacity={0.9}
               testID={notesnook.ids.dialogs.actionsheet.sync}
-              onPress={async () => await Sync.run()}
+              onPress={async () => await Sync.run("local")}
               style={{
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
