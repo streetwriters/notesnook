@@ -27,24 +27,17 @@
  *   == '<p>this is some <ins class="diff-class">more </ins>text</p>'
  */
 (function () {
-  function is_end_of_tag(char) {
-    return char === ">";
-  }
-
   function is_start_of_tag(char) {
     return char === "<";
   }
-
+  const IS_CLOSE_TAG_REGEX = /^\s*<\s*\/[^>]+>\s*$/;
   function is_close_tag(tag) {
-    return /^\s*<\s*\/[^>]+>\s*$/.test(tag);
+    return IS_CLOSE_TAG_REGEX.test(tag);
   }
 
-  function is_whitespace(char) {
-    return /^\s+$/.test(char);
-  }
-
+  const IS_TAG_REGEX = /^\s*<[^>]+>\s*$/;
   function is_tag(token) {
-    return /^\s*<[^>]+>\s*$/.test(token);
+    return IS_TAG_REGEX.test(token);
   }
 
   function isnt_tag(token) {
@@ -61,26 +54,13 @@
    * @return {string|null} The name of the atomic tag if the word will be an atomic tag,
    *    null otherwise
    */
+  const IS_START_ATOMIC_TAG = /^<(iframe|object|math|svg|script)/;
   function is_start_of_atomic_tag(word) {
-    var result = /^<(iframe|object|math|svg|script)/.exec(word);
+    var result = IS_START_ATOMIC_TAG.exec(word);
     if (result) {
       result = result[1];
     }
     return result;
-  }
-
-  /*
-   * Checks if the current word is the end of an atomic tag (i.e. it has all the characters,
-   * except for the end bracket of the closing tag, such as '<iframe></iframe').
-   *
-   * @param {string} word The characters of the current token read so far.
-   * @param {string} tag The ending tag to look for.
-   *
-   * @return {boolean} True if the word is now a complete token (including the end tag),
-   *    false otherwise.
-   */
-  function is_end_of_atomic_tag(word, tag) {
-    return word.substring(word.length - tag.length - 2) === "</" + tag;
   }
 
   /*
@@ -90,8 +70,9 @@
    *
    * @return {boolean} True if the token is a void tag, false otherwise.
    */
+  const IS_VOID_TAG_REGEX = /^\s*<[^>]+\/>\s*$/;
   function is_void_tag(token) {
-    return /^\s*<[^>]+\/>\s*$/.test(token);
+    return IS_VOID_TAG_REGEX.test(token);
   }
 
   /*
@@ -175,96 +156,58 @@
    *
    * @return {Array.<string>} The list of tokens.
    */
+
   function html_to_tokens(html, components_search_rule) {
-    var mode = "char";
-    var current_word = "";
-    var current_atomic_tag = "";
-    var words = [];
-    for (var i = 0; i < html.length; i++) {
-      var char = html[i];
-      switch (mode) {
-        case "tag":
-          var atomic_tag = is_start_of_atomic_tag(current_word);
-          if (atomic_tag) {
-            mode = "atomic_tag";
-            current_atomic_tag = atomic_tag;
-            current_word += char;
-          } else if (is_end_of_tag(char)) {
-            current_word += ">";
-            words.push(current_word);
-            current_word = "";
-            if (is_whitespace(char)) {
-              mode = "whitespace";
-            } else {
-              mode = "char";
-            }
-          } else {
-            current_word += char;
-          }
-          break;
-        case "atomic_tag":
-          if (
-            is_end_of_tag(char) &&
-            is_end_of_atomic_tag(current_word, current_atomic_tag)
-          ) {
-            current_word += ">";
-            words.push(current_word);
-            current_word = "";
-            current_atomic_tag = "";
-            mode = "char";
-          } else {
-            current_word += char;
-          }
-          break;
-        case "char":
-          if (is_start_of_tag(char)) {
-            if (current_word) {
-              words.push(current_word);
-            }
-            current_word = "<";
-            mode = "tag";
-          } else if (/\s/.test(char)) {
-            if (current_word) {
-              words.push(current_word);
-            }
-            current_word = char;
-            mode = "whitespace";
-          } else if (/[\w\d#@]/.test(char)) {
-            current_word += char;
-          } else if (/&/.test(char)) {
-            if (current_word) {
-              words.push(current_word);
-            }
-            current_word = char;
-          } else {
-            current_word += char;
-            words.push(current_word);
-            current_word = "";
-          }
-          break;
-        case "whitespace":
-          if (is_start_of_tag(char)) {
-            if (current_word) {
-              words.push(current_word);
-            }
-            current_word = "<";
-            mode = "tag";
-          } else if (is_whitespace(char)) {
-            current_word += char;
-          } else {
-            if (current_word) {
-              words.push(current_word);
-            }
-            current_word = char;
-            mode = "char";
-          }
-          break;
-        default:
-          throw new Error("Unknown mode " + mode);
+    let words = [];
+    const range = {
+      start: 0,
+      end: 0,
+      tagOpen: false,
+      whitespaceOpen: false,
+      ampersandOpen: false,
+    };
+    for (var i = 0; i < html.length; ++i) {
+      const s = html[i];
+
+      if (s === " " || s === "\n" || s === "\r" || s === "\t") {
+        if (range.tagOpen || range.whitespaceOpen) continue;
+
+        //range.end = i;
+        if (range.start !== i) words.push(html.slice(range.start, i));
+
+        range.whitespaceOpen = true;
+        range.start = i;
+      } else if (range.whitespaceOpen) {
+        range.whitespaceOpen = false;
+        // range.end = i;
+        words.push(html.slice(range.start, i));
+        range.start = i;
+      }
+
+      if (s === "<") {
+        range.tagOpen = true;
+
+        if (range.start !== i) {
+          words.push(html.slice(range.start, i));
+        }
+
+        range.start = i;
+      } else if (s === ">") {
+        range.tagOpen = false;
+        words.push(html.slice(range.start, i + 1));
+        range.start = i + 1;
+      } else if (!range.ampersandOpen && s === "&") {
+        range.ampersandOpen = true;
+        if (range.start !== i) words.push(html.slice(range.start, i));
+        range.start = i;
+      } else if (range.ampersandOpen && s === ";") {
+        range.ampersandOpen = false;
+        words.push(html.slice(range.start, i + 1));
+        range.start = i + 1;
       }
     }
-    if (current_word) {
-      words.push(current_word);
+    if (range.start !== html.length) {
+      words.push(html.slice(range.start, html.length));
     }
 
     return components_search_rule
