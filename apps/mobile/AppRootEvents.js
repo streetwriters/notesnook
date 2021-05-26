@@ -148,7 +148,7 @@ export const AppRootEvents = React.memo(
       return new Promise((res, rej) => {
         eSendEvent(eOpenLoginDialog, 4);
         let onsuccess = () => {
-          res(true);
+          res({result: true});
           eUnSubscribeEvent('reLoginSuccess', onsuccess);
         };
         eSubscribeEvent('reLoginSuccess', onsuccess);
@@ -330,12 +330,15 @@ export const AppRootEvents = React.memo(
 
     const setCurrentUser = async login => {
       try {
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
+          return;
         let user = await db.user.getUser();
         if (user) {
           dispatch({type: Actions.USER, user: user});
           clearMessage(dispatch);
           await PremiumService.setPremiumStatus();
           attachIAPListeners();
+
           await Sync.run();
           let res = await doInBackground(async () => {
             try {

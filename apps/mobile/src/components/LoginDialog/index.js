@@ -9,6 +9,7 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
+import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -178,6 +179,11 @@ const LoginDialog = () => {
     MMKV.getItem('loginSessionHasExpired').then(r => {
       if (r === 'expired') {
         open(MODES.sessionExpired);
+        let onsuccess = () => {
+          eSendEvent('userLoggedIn');
+          eUnSubscribeEvent('reLoginSuccess', onsuccess);
+        };
+        eSubscribeEvent('reLoginSuccess', onsuccess);
       }
     });
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -230,7 +236,6 @@ const LoginDialog = () => {
     setStatus('Logging in');
     let user;
     try {
-      console.log(email, password);
       await db.user.login(email.toLowerCase(), password);
       user = await db.user.getUser();
       if (!user) throw new Error('Email or password incorrect!');
