@@ -1,3 +1,4 @@
+
 attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
@@ -5,8 +6,8 @@ function reactNativeEventHandler(type, value) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
-        value: value,
-      }),
+        value: value
+      })
     );
   }
 }
@@ -134,7 +135,7 @@ function init_tiny(size) {
             };
             xhr.open(
               'GET',
-              tinymce.activeEditor.selection.getNode().getAttribute('src'),
+              tinymce.activeEditor.selection.getNode().getAttribute('src')
             );
             xhr.send();
           }
@@ -151,7 +152,7 @@ function init_tiny(size) {
         selectchange();
         reactNativeEventHandler('history', {
           undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo(),
+          redo: editor.undoManager.hasRedo()
         });
       });
 
@@ -184,22 +185,25 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
-  clearTimeout(changeTimer);
-  changeTimer = null;
-  changeTimer = setTimeout(function () {
+  console.log('changed');
+
+ 
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
       return;
     }
     if (editor.plugins.wordcount.getCount() === 0) return;
+    clearTimeout(changeTimer);
+    changeTimer = null;   
+ changeTimer = setTimeout(function () {
     selectchange();
-
+    console.log('saving')
     reactNativeEventHandler('tiny', editor.getContent());
 
     reactNativeEventHandler('history', {
       undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo(),
+      redo: editor.undoManager.hasRedo()
     });
   }, 1);
 };
@@ -244,7 +248,7 @@ function selectchange() {
 
   currentFormats.current = {
     index: range.startOffset,
-    length: range.endOffset - range.startOffset,
+    length: range.endOffset - range.startOffset
   };
 
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;

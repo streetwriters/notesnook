@@ -185,23 +185,21 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
-  clearTimeout(changeTimer);
-  changeTimer = null;
-  changeTimer = setTimeout(function () {
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
       return;
     }
     if (editor.plugins.wordcount.getCount() === 0) return;
-    selectchange();
-
-    reactNativeEventHandler('tiny', editor.getContent());
-
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo()
-    });
+    clearTimeout(changeTimer);
+    changeTimer = null;   
+    changeTimer = setTimeout(function () {
+      selectchange();
+      reactNativeEventHandler('tiny', editor.getContent());
+      reactNativeEventHandler('history', {
+        undo: editor.undoManager.hasUndo(),
+        redo: editor.undoManager.hasRedo()
+      });
   }, 1);
 };
 
