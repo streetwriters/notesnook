@@ -65,7 +65,7 @@ export const execCommands = {
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
-        tinymce.activeEditor.nodeChanged()
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
         tinymce.activeEditor.selection.setRng(rng)
      }  
      editor.undoManager.transact(function() {
@@ -143,9 +143,11 @@ export const execCommands = {
         tinymce.activeEditor.dom.removeClass(node,"img_size_two")
       }
       tinymce.activeEditor.dom.addClass(node,"img_size_three")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
     });
-
-    tinymce.activeEditor.nodeChanged()
+ 
   }
 
   })();
@@ -162,8 +164,12 @@ export const execCommands = {
         tinymce.activeEditor.dom.removeClass(node,"img_size_three")
       }
       tinymce.activeEditor.dom.addClass(node,"img_size_two")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    
     });
-    tinymce.activeEditor.nodeChanged()
+   
   }
   })()
   
@@ -179,8 +185,11 @@ export const execCommands = {
         tinymce.activeEditor.dom.removeClass(node,"img_size_two")
       }
       tinymce.activeEditor.dom.addClass(node,"img_size_one")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+     
     });
-    tinymce.activeEditor.nodeChanged()
   }
   })()
   
@@ -217,7 +226,10 @@ export const execCommands = {
   removeimage: `
   (function() {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-    editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+    tinymce.activeEditor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+    setTimeout(function() {
+      tinymce.activeEditor.nodeChanged({selectionChange:true})
+    },100)
     }  
   })();
   `,
@@ -233,9 +245,10 @@ let node = tinymce.activeEditor.selection.getNode();
         tinymce.activeEditor.dom.removeClass(node,"img_float_none")
       }
       tinymce.activeEditor.dom.addClass(node,"img_float_left")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
     });
-    tinymce.activeEditor.nodeChanged()
-
   }
   })();
   
@@ -252,16 +265,18 @@ let node = tinymce.activeEditor.selection.getNode();
         tinymce.activeEditor.dom.removeClass(node,"img_float_none")
       }
       tinymce.activeEditor.dom.addClass(node,"img_float_right")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+     
     });
-    tinymce.activeEditor.nodeChanged()
-
   }
   })()
   
   `
   ,
   imagefloatnone:`(function () {
-let node = tinymce.activeEditor.selection.getNode();
+  let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
     tinymce.activeEditor.undoManager.transact(function() {
@@ -272,9 +287,10 @@ let node = tinymce.activeEditor.selection.getNode();
         tinymce.activeEditor.dom.removeClass(node,"img_float_right")
       }
       tinymce.activeEditor.dom.addClass(node,"img_float_none")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
     });
-    tinymce.activeEditor.nodeChanged()
-
   }
   })()
   

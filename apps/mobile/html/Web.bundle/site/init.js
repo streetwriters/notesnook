@@ -189,6 +189,7 @@ function init_tiny(size) {
       });
 
       editor.on('ScrollIntoView', function (e) {
+        
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
