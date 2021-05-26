@@ -8,12 +8,6 @@ export async function sendCheckUserStatusEvent(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
-export async function sendSessionExpiredEvent() {
-  const results = await EV.publishWithResult(EVENTS.userSessionExpired);
-  if (typeof results === "boolean") return results;
-  return results.some((r) => r.result === true);
-}
-
 export const CHECK_IDS = {
   noteColor: "note:color",
   noteTag: "note:tag",

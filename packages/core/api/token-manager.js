@@ -49,7 +49,7 @@ class TokenManager {
           return await this.getAccessToken(true);
         }
         RETRIES = 0;
-        if (await sendSessionExpiredEvent()) return await this.getAccessToken();
+        EV.publish(EVENTS.userSessionExpired);
       }
       return null;
     }
