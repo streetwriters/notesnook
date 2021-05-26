@@ -38,7 +38,7 @@ export const Header = ({
         alignItems: 'center',
       }}>
       {messageCard && (
-        <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
+        <Card announcement={announcement} color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
       )}
     </View>
   ) : (
@@ -47,7 +47,7 @@ export const Header = ({
         width: '100%',
       }}>
       {messageCard && (
-        <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
+        <Card announcement={announcement} color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
       )}
       <View
         style={{
