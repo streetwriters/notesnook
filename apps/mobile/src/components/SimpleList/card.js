@@ -9,10 +9,9 @@ import {SIZE} from '../../utils/SizeUtils';
 import useAnnouncement from '../../utils/useAnnouncement';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({data, color,announcement}) => {
+export const Card = ({data, color, announcement}) => {
   const [state] = useTracked();
   const {selectionMode, messageBoardState} = state;
-
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity
