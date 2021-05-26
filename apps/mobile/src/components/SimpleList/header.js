@@ -5,6 +5,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
+import useAnnouncement from '../../utils/useAnnouncement';
 import {Button} from '../Button';
 import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
@@ -20,12 +21,13 @@ export const Header = ({
   onPress,
   shouldShow = false,
   icon,
-  screen
+  screen,
+  announcement
 }) => {
   const [state] = useTracked();
   const {colors} = state;
 
-  return type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
+  return type === 'search' ? null : (DDS.isLargeTablet() && !shouldShow) || announcement ? (
     <View
       style={{
         minHeight: 50,

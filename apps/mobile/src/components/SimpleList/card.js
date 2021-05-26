@@ -6,15 +6,15 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {getElevation} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
+import useAnnouncement from '../../utils/useAnnouncement';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({data, color}) => {
+export const Card = ({data, color,announcement}) => {
   const [state] = useTracked();
   const {selectionMode, messageBoardState} = state;
 
 
-
-  return !messageBoardState.visible || selectionMode ? null : (
+  return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={messageBoardState.onPress}
@@ -23,7 +23,7 @@ export const Card = ({data, color}) => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        position: DDS.isLargeTablet() ? 'relative' : 'absolute',
+        position: DDS.isLargeTablet() || announcement ? 'relative' : 'absolute',
         right: 0,
         top: 0,
         zIndex: 100,

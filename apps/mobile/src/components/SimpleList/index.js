@@ -9,6 +9,7 @@ import Sync from '../../services/Sync';
 import {dHeight, doInBackground, dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
+import useAnnouncement from '../../utils/useAnnouncement';
 import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
@@ -52,12 +53,11 @@ const SimpleList = ({
   );
   const [width, setWidth] = useState(dWidth);
   const scrollRef = useRef();
-
   const insets = useSafeAreaInsets();
-
   const {fontScale} = useWindowDimensions();
   const refreshing = false;
   const dataType = type;
+  const [announcement, remove] = useAnnouncement();
 
   useEffect(() => {
     setWidth(dWidth);
@@ -76,7 +76,7 @@ const SimpleList = ({
       _setLoading(true);
       setDataProvider(dataProvider.cloneWithRows([header, empty]));
     }
-  }, [listData, deviceMode, loading]);
+  }, [listData, deviceMode, loading, announcement]);
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -133,8 +133,8 @@ const SimpleList = ({
           dim.height =
             dataType === 'search'
               ? 0
-              : DDS.isLargeTablet()
-              ? messageBoardState.visible
+              : DDS.isLargeTablet() || announcement
+              ? messageBoardState.visible && !announcement
                 ? 50
                 : 0
               : 195;
@@ -179,6 +179,7 @@ const SimpleList = ({
             onPress={headerProps.onPress}
             icon={headerProps.icon}
             type={dataType}
+            announcement={announcement}
             index={index}
             data={listData}
             screen={screen}
@@ -242,6 +243,8 @@ const SimpleList = ({
     <>
       {!loading && (
         <Announcement
+          announcement={announcement}
+          remove={remove}
           color={
             COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
           }

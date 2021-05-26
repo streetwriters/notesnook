@@ -24,14 +24,14 @@ export default function useAnnouncement() {
 
         setAnnouncement(CACHED_ANNOUNCEMENT);
       } catch (e) {
-        setAnnouncement();
+        setAnnouncement(null);
       }
     })();
   }, []);
 
   const remove = useCallback(async () => {
     await Storage.write('removedAnnouncement', CACHED_ANNOUNCEMENT.id);
-    setAnnouncement();
+    setAnnouncement(null);
   }, [announcement]);
   return [announcement, remove];
 }

@@ -12,15 +12,15 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Announcement = ({data, color}) => {
+export const Announcement = ({data, color,announcement,remove}) => {
   const [state] = useTracked();
+  const colors = state.colors;
   const {selectionMode} = state;
-  const [announcement, remove] = useAnnouncement();
 
   return !announcement || selectionMode ? null : (
     <View
       style={{
-        backgroundColor: color,
+        backgroundColor: colors.bg,
         width: '100%',
       }}>
       <View
@@ -35,28 +35,55 @@ export const Announcement = ({data, color}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
+          <Button
+            title="Announcement"
+            fontSize={12}
+            type="shade"
+            height={null}
+            icon="bullhorn"
+            style={{
+              paddingVertical: 4,
+            }}
+          />
+
+          <Button
+            title="Dismiss"
+            fontSize={12}
+            type="error"
+            height={null}
+            onPress={remove}
+            style={{
+              paddingVertical: 4,
+            }}
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
           {announcement?.title && (
             <Heading
               style={{
-                width: '90%',
+                width: '100%',
               }}
               size={SIZE.lg}
-              color="white">
+              color={colors.heading}>
               {announcement.title}
             </Heading>
           )}
-
-          <Icon onPress={remove} name="close" size={SIZE.xl} color="white" />
         </View>
 
         {announcement?.description && (
-          <Paragraph color="white">{announcement.description}</Paragraph>
+          <Paragraph color={colors.pri}>{announcement.description}</Paragraph>
         )}
         <Seperator />
 
         {announcement?.cta && (
           <Button
-            type="inverted"
+            type="accent"
             title={announcement.cta.text}
             fontSize={SIZE.md}
             onPress={async () => {
