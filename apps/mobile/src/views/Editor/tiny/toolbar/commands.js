@@ -53,7 +53,12 @@ export const execCommands = {
   horizontal: `tinymce.activeEditor.execCommand('InsertHorizontalRule');`,
   rtl: `tinymce.activeEditor.execCommand('mceDirectionRTL');`,
   ltr: `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
-  magnify: `tinymce.activeEditor.execCommand('SearchReplace');`,
+  magnify: `
+  tinymce.activeEditor.execCommand('SearchReplace');
+  setTimeout(function() {
+    document.querySelector(".tox-textfield").focus()
+  },100)
+  `,
   table: (r, c) =>
     `(function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
@@ -66,7 +71,7 @@ export const execCommands = {
      editor.undoManager.transact(function() {
       tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
      }); 
-
+     
     })();`,
 
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
