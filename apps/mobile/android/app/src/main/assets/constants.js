@@ -39,32 +39,32 @@ const markdownPatterns = [
   {
     start: '1. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'decimal'},
+    value: {'list-style-type': 'decimal'}
   },
   {
     start: '1) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'decimal'},
+    value: {'list-style-type': 'decimal'}
   },
   {
     start: 'a. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-alpha'},
+    value: {'list-style-type': 'lower-alpha'}
   },
   {
     start: 'a) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-alpha'},
+    value: {'list-style-type': 'lower-alpha'}
   },
   {
     start: 'i. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-roman'},
+    value: {'list-style-type': 'lower-roman'}
   },
   {
     start: 'i) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-roman'},
+    value: {'list-style-type': 'lower-roman'}
   },
   {start: '---', replacement: '<hr/>'},
   {start: '--', replacement: '—'},
