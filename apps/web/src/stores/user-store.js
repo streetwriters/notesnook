@@ -34,27 +34,27 @@ class UserStore extends BaseStore {
         true,
         true
       );
-      console.log("SESSION", loginResult);
       Config.set("sessionExpired", "false");
       if (!loginResult) {
         await db.user.logout(false);
-        return { result: false };
+      } else {
+        window.location.reload();
       }
-      return { result: true };
     });
 
     db.user.getUser().then(async (user) => {
       if (!user) return false;
-
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;
       });
-
       if (Config.get("sessionExpired") === "true")
         EV.publish(EVENTS.userSessionExpired);
     });
-    return db.user.fetchUser(true).then(async (user) => {
+
+    if (Config.get("sessionExpired") === "true") return;
+
+    return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
       this.set((state) => {
         state.user = user;
@@ -88,7 +88,6 @@ class UserStore extends BaseStore {
       onPageVisibilityChanged(async (documentHidden) => {
         if (!documentHidden) {
           await db.connectSSE();
-          await this.sync();
         }
       });
       await this.sync();
