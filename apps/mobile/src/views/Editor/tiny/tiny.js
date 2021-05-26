@@ -78,7 +78,7 @@ const updateDateEdited = value => `
 const updateSavingState = value => `
 	(function() {
 		info = document.querySelector(infoBar);
-        info.querySelector('#infosaved').innerText = "${value}";
+    info.querySelector('#infosaved').innerText = "${value}";
 	})();
 `;
 

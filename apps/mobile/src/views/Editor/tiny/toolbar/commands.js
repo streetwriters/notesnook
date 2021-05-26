@@ -55,8 +55,7 @@ export const execCommands = {
   ltr: `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
   magnify: `tinymce.activeEditor.execCommand('SearchReplace');`,
   table: (r, c) =>
-    `
-    (function() {
+    `(function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
@@ -67,10 +66,8 @@ export const execCommands = {
      editor.undoManager.transact(function() {
       tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
      }); 
-     
-    })();  
 
-    `,
+    })();`,
 
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
   image: async () => {
@@ -157,7 +154,7 @@ export const execCommands = {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               type: 'imagepreview',
-              value: blobAsDataUrl,
+              value: blobAsDataUrl
             })
           );
           reader.abort();
@@ -167,7 +164,7 @@ export const execCommands = {
       };
       xhr.open(
         'GET',
-        tinymce.activeEditor.selection.getNode().getAttribute('src'),
+        tinymce.activeEditor.selection.getNode().getAttribute('src')
       );
       xhr.send();
     }
@@ -178,7 +175,7 @@ export const execCommands = {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
     editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
     }  
-  })
+  })();
   `,
 };
 
@@ -196,7 +193,7 @@ const handleImageResponse = response => {
       pTag = "<p></p>"
     }
     
-minifyImg(
+  minifyImg(
   "${b64}",
   1024,
   'image/jpeg',
@@ -204,9 +201,9 @@ minifyImg(
     var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
     editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
   },
-  0.6,
-);
-
-})();
+  0.6
+  );
+  
+  })();
 `);
 };
