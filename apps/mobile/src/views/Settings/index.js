@@ -41,6 +41,7 @@ import {
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
+import Sync from '../../services/Sync';
 import {
   AndroidModule,
   APP_VERSION,
@@ -839,7 +840,7 @@ const SettingsUserSection = () => {
           </View>
           {[
             {
-              name: 'Save Data Recovery Key',
+              name: 'Save data recovery key',
               func: async () => {
                 if (BiometricService.isBiometryAvailable() === false) {
                   eSendEvent(eOpenRecoveryKeyDialog);
@@ -857,12 +858,20 @@ const SettingsUserSection = () => {
                 'Recover your data using the recovery key if your password is lost.',
             },
             {
-              name: 'Change Password',
+              name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
               },
               desc: 'Setup a new password for your account.',
             },
+            {
+              name: 'Having problems with syncing?',
+              func: async () => {
+                await Sync.run("global",true);
+              },
+              desc: 'Try force sync to resolve errors with syncing.',
+            },
+
           ].map(item => (
             <CustomButton
               key={item.name}

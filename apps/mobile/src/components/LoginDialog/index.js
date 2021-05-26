@@ -179,11 +179,6 @@ const LoginDialog = () => {
     MMKV.getItem('loginSessionHasExpired').then(r => {
       if (r === 'expired') {
         open(MODES.sessionExpired);
-        let onsuccess = () => {
-          eSendEvent('userLoggedIn');
-          eUnSubscribeEvent('reLoginSuccess', onsuccess);
-        };
-        eSubscribeEvent('reLoginSuccess', onsuccess);
       }
     });
     eSubscribeEvent(eOpenLoginDialog, open);
@@ -250,18 +245,16 @@ const LoginDialog = () => {
         context: 'local',
       });
       close();
-      if (MODES.sessionExpired !== mode) {
-        await sleep(300);
-        eSendEvent('userLoggedIn', true);
-        eSendEvent(eOpenProgressDialog, {
-          title: 'Syncing your data',
-          paragraph: 'Please wait while we sync all your data.',
-          noProgress: false,
-        });
-      } else {
+      if (MODES.sessionExpired === mode) {
         await MMKV.removeItem('loginSessionHasExpired');
-        eSendEvent('reLoginSuccess');
       }
+      await sleep(300);
+      eSendEvent('userLoggedIn', true);
+      eSendEvent(eOpenProgressDialog, {
+        title: 'Syncing your data',
+        paragraph: 'Please wait while we sync all your data.',
+        noProgress: false,
+      });
     } catch (e) {
       setLoading(false);
       setStatus(null);

@@ -145,14 +145,7 @@ export const AppRootEvents = React.memo(
 
     const onSessionExpired = async () => {
       await Storage.write('loginSessionHasExpired', 'expired');
-      return new Promise((res, rej) => {
-        eSendEvent(eOpenLoginDialog, 4);
-        let onsuccess = () => {
-          res({result: true});
-          eUnSubscribeEvent('reLoginSuccess', onsuccess);
-        };
-        eSubscribeEvent('reLoginSuccess', onsuccess);
-      });
+      eSendEvent(eOpenLoginDialog, 4);
     };
 
     const onNoteRemoved = async id => {

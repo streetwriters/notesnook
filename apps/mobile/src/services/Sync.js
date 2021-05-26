@@ -5,7 +5,7 @@ import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
 import {eSendEvent, ToastEvent} from './EventManager';
 
-const run = async (context = 'global') => {
+const run = async (context = 'global',forced) => {
   updateEvent({
     type: Actions.SYNCING,
     syncing: true,
@@ -14,7 +14,7 @@ const run = async (context = 'global') => {
   try {
     let res = await doInBackground(async () => {
       try {
-        await db.sync();
+        await db.sync(true,forced);
         return true;
       } catch (e) {
         return e.message;
