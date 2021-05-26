@@ -178,5 +178,8 @@ export const TOOLBAR_ICONS = {
   tablecolumnprops:"table-column",
   tableconfig:"table-cog",
   imagepreview:"fullscreen",
-  removeimage:"delete"
+  removeimage:"delete",
+  imagefloatleft:"format-float-left",
+  imagefloatright:"format-float-right",
+  imagefloatnone:"format-float-none",
 };

@@ -329,6 +329,11 @@ export const _onMessage = async evt => {
       eSendEvent('showTooltip', {
         data: [
           {
+            format: 'imagepreview',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+          {
             format: 'imageResize25',
             text: '25%',
             type: 'format',
@@ -350,14 +355,24 @@ export const _onMessage = async evt => {
             fullname: 'Resize to 25%',
           },
           {
-            format: 'removeimage',
+            format: 'imagefloatleft',
             type: 'format',
             fullname: 'Remove image',
           },
           {
-            format: 'imagepreview',
+            format: 'imagefloatright',
             type: 'format',
             fullname: 'Image preview',
+          },
+          {
+            format: 'imagefloatnone',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+          {
+            format: 'removeimage',
+            type: 'format',
+            fullname: 'Remove image',
           },
         ],
         title: 'imageoptions',

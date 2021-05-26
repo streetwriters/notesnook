@@ -131,20 +131,59 @@ export const execCommands = {
   tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
   tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
   tablerowprops: "tinymce.activeEditor.execCommand('mceTableRowProps');",
-  imageResize25: `
+  imageResize25: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
   if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-    tinymce.activeEditor.selection.getNode().style.width = "25%";
+
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_three")
+    });
+
+    tinymce.activeEditor.nodeChanged()
   }
+
+  })();
+  
   `,
-  imageResize50: `
+  imageResize50: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
   if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-    tinymce.activeEditor.selection.getNode().style.width = "75%";
+      tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_two")
+    });
+    tinymce.activeEditor.nodeChanged()
   }
+  })()
+  
   `,
-  imageResize100: `
+  imageResize100: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
   if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-    tinymce.activeEditor.selection.getNode().style.width = "100%";
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_one")
+    });
+    tinymce.activeEditor.nodeChanged()
   }
+  })()
+  
   `,
   imagepreview: `(function() {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
@@ -182,6 +221,65 @@ export const execCommands = {
     }  
   })();
   `,
+  imagefloatleft:`(function () {
+let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_left")
+    });
+    tinymce.activeEditor.nodeChanged()
+
+  }
+  })();
+  
+  `,
+  imagefloatright:`(function () {
+let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
+        tinymce.activeEditor.dom.removeClass(node, "img_float_left")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_right")
+    });
+    tinymce.activeEditor.nodeChanged()
+
+  }
+  })()
+  
+  `
+  ,
+  imagefloatnone:`(function () {
+let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_left")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_none")
+    });
+    tinymce.activeEditor.nodeChanged()
+
+  }
+  })()
+  
+  `
+
 };
 
 const handleImageResponse = response => {

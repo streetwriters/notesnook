@@ -35,6 +35,24 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
+    .img_float_left {
+      float:left;
+    }
+    .img_float_right {
+      float:right;
+    }
+    .img_float_none {
+      float:none;
+    }
+    .img_size_one {
+      width:100%;
+    }
+    .img_size_two {
+      width:50%;
+    }
+    .img_size_three {
+      width:25%;
+    }
     span.diff-del {
       background-color: #FDB0C0;  
     }
@@ -185,9 +203,6 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
-  console.log('changed');
-
- 
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
@@ -196,15 +211,13 @@ const onChange = function (event) {
     if (editor.plugins.wordcount.getCount() === 0) return;
     clearTimeout(changeTimer);
     changeTimer = null;   
- changeTimer = setTimeout(function () {
-    selectchange();
-    console.log('saving')
-    reactNativeEventHandler('tiny', editor.getContent());
-
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo()
-    });
+    changeTimer = setTimeout(function () {
+      selectchange();
+      reactNativeEventHandler('tiny', editor.getContent());
+      reactNativeEventHandler('history', {
+        undo: editor.undoManager.hasUndo(),
+        redo: editor.undoManager.hasRedo()
+      });
   }, 1);
 };
 
