@@ -184,6 +184,10 @@ const menuItems = [
     key: "export",
     title: () => "Export",
     onClick: async ({ note }) => {
+      if (note.locked) {
+        alert("Locked notes cannot be exported currently.");
+        return;
+      }
       if (await showExportDialog([note.id]))
         showToast("success", `Note exported successfully!`);
     },
