@@ -5,6 +5,7 @@ import { store as tagStore } from "./tag-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
+import getId from "notes-core/utils/id";
 import { hashNavigate } from "../navigation";
 
 const SESSION_STATES = {
@@ -15,6 +16,7 @@ const SESSION_STATES = {
   opening: "opening",
 };
 const DEFAULT_SESSION = {
+  contentId: undefined,
   notebooks: undefined,
   state: undefined,
   isSaving: false,
@@ -150,6 +152,7 @@ class EditorStore extends BaseStore {
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
+        contentId: getId(),
         context,
         nonce,
         state: SESSION_STATES.new,
