@@ -872,7 +872,7 @@ const SettingsUserSection = () => {
               func: async () => {
                 await Sync.run("global",true);
               },
-              desc: 'Try force sync to resolve errors with syncing.',
+              desc: 'Try force sync to resolve issues with syncing.',
             },
 
           ].map(item => (
