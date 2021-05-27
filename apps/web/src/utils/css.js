@@ -1,3 +1,20 @@
+export function removeCss(id) {
+  var link = document.getElementById(id);
+  link.remove();
+}
+
+export function injectCssSrc(id, src) {
+  var head = document.head;
+  var link = document.createElement("link");
+
+  link.id = id;
+  link.type = "text/css";
+  link.rel = "stylesheet";
+  link.href = src;
+
+  head.appendChild(link);
+}
+
 export function injectCss(rule) {
   let variableCss = document.getElementById("variables");
   let head = document.getElementsByTagName("head")[0];

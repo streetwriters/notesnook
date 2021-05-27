@@ -59,12 +59,7 @@ function ContentToggle(props) {
         mt={1}
         sx={{ fontSize: "subBody", color: "fontTertiary" }}
       >
-        {label}
-        {/* eslint-disable-next-line jsx-a11y/accessible-emoji */}
-        <Text as="span" role="img" fontSize={7} mx={1}>
-          ⚫
-        </Text>
-        {timeConverter(dateEdited, true)}
+        {label} | {timeConverter(dateEdited, true)}
       </Flex>
     </Flex>
   );

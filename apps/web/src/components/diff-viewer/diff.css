@@ -1,0 +1,7 @@
+span.diff-del {
+  background-color: #fdb0c0;
+}
+
+span.diff-ins {
+  background-color: #cafffb;
+}

@@ -14,7 +14,7 @@ body {
 :root,
 body,
 #root {
-  margin: 0;
+  margin: 0 !important;
   height: 100%;
 }
 
