@@ -13,7 +13,7 @@ We use best-in-class encryption algorithms XChaCha20-Poly1305 & Argon2 that are 
 
 Take notes, capture ideas, create to-do lists, keep a journal, write your assignments and manage projects, we have got you covered everywhere.
 
-# Features
+## Features
 
 Privacy isn't the only thing we have:
 
@@ -31,11 +31,11 @@ Privacy isn't the only thing we have:
 8. Automatic backups
 9. Dark mode and custom accents
 
-# Download
+## Download
 
 Notesnook is available to download on Android, iOS, Windows, MacOS, Linux and a web app that runs on any browser. Please head over to our [website](https://notesnook.com/) download Notesnook.
 
-# Support
+## Support
 
 Technical support questions are best asked on our [Discord](https://discord.com/invite/5davZnhw3V). We are available there 24/7 to respond to your queries. You can also chat with us there and other members who are using notesnook and share your experience.
 
