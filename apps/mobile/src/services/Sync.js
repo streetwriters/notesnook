@@ -5,7 +5,7 @@ import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
 import {eSendEvent, ToastEvent} from './EventManager';
 
-const run = async (context = 'global',forced) => {
+const run = async (context = 'global', forced) => {
   updateEvent({
     type: Actions.SYNCING,
     syncing: true,
@@ -14,19 +14,19 @@ const run = async (context = 'global',forced) => {
   try {
     let res = await doInBackground(async () => {
       try {
-        await db.sync(true,forced);
+        await db.sync(true, forced);
         return true;
       } catch (e) {
         return e.message;
       }
     });
-    console.log(res);
+ 
     if (res !== true) throw new Error(res);
-    console.log('here too');
+
     ToastEvent.show({
       heading: 'Sync complete',
       type: 'success',
-      message: 'All your notes are encrypted and synced successfully!',
+      message: 'All your notes are encrypted and synced!',
       context: context,
     });
   } catch (e) {

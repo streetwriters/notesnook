@@ -779,6 +779,9 @@ const SettingsUserSection = () => {
                           eSendEvent(eOpenPremiumDialog);
                         }}
                         width="100%"
+                        style={{
+                          paddingHorizontal:0
+                        }}
                         fontSize={SIZE.md}
                         title={
                           user.subscription.type === 6
