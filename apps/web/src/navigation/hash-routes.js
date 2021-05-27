@@ -9,7 +9,7 @@ import { closeOpenedDialog } from "../common/dialog-controller";
 import { showLogInDialog } from "../common/dialog-controller";
 import { showSignUpDialog } from "../common/dialog-controller";
 import RouteContainer from "../components/route-container";
-import SplitEditor from "../components/spliteditor";
+import DiffViewer from "../components/diff-viewer";
 import Unlock from "../components/unlock";
 import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
@@ -86,7 +86,7 @@ const hashroutes = {
     );
   },
   "/notes/:noteId/conflict": ({ noteId }) => {
-    return <SplitEditor noteId={noteId} />;
+    return <DiffViewer noteId={noteId} />;
   },
   "/signup": () => {
     showSignUpDialog();
