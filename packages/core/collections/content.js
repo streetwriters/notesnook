@@ -7,9 +7,10 @@ export default class Content extends Collection {
     if (content.deleted || content.migrated)
       return await this._collection.addItem(content);
 
-    if (content.id && (await this._collection.exists(content.id))) {
+    const oldContent = await this.raw(content.id);
+    if (content.id && oldContent) {
       content = {
-        ...(await this.raw(content.id)),
+        ...oldContent,
         ...content,
       };
     }
