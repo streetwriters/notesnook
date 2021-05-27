@@ -61,16 +61,6 @@ function SignUpDialog(props) {
 
           signup(data)
             .then(async () => {
-              // Instantiate PasswordCredential with the form
-              if (window.PasswordCredential) {
-                var c = new window.PasswordCredential({
-                  id: data.email,
-                  name: data.email,
-                  type: "password",
-                  password: data.password,
-                });
-                await navigator.credentials.store(c);
-              }
               onClose(true);
             })
             .catch((e) => setError(e.message));
