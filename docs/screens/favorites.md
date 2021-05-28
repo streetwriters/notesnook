@@ -2,18 +2,13 @@
 
 While you organize your notes with all different types of notebooks, tags and colors, favorites give you quick access to the notes that are most important to you in one tap.
 
+## How to add a note to favorites?
 ||| Desktop/Web
-
-#### How to add a note to favorites?
-
 1. Righ click on a note or click on the three-dot more button.
 2. Select favorite from the properties menu.
 3. That's it.
    ||| Mobile/Tablet
-
-#### How to add a note to favorites?
-
-1. Tap on the three-dot more button on right side on note.
+1. Press the `three-dot more` button on the note.
 
 <img style="width:300px;margin-bottom:15px" src="../static/color_note_step_1.jpg" alt="Click on the more button on right side of note."/>
 
