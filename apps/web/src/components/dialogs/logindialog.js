@@ -114,7 +114,9 @@ function LoginDialog(props) {
         <Button
           type="button"
           variant="anchor"
+          fontSize="body"
           sx={{ alignSelf: "flex-start" }}
+          mt={1}
           onClick={showForgotPasswordDialog}
         >
           Forgot password?
