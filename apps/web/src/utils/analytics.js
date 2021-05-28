@@ -30,6 +30,7 @@ export function trackEvent(eventName, eventType) {
 export function trackVisit() {
   if (Config.get("telemetry") === "false") return;
   if (window.umami) {
+    window.umami.trackView("/");
     trackEvent(
       `${getAppVersion().formatted}-${getPlatform().toLowerCase()}`,
       "version"
