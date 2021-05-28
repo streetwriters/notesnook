@@ -5,7 +5,7 @@ label: Favorites
 
 While you organize your notes with all different types of notebooks, tags and colors, favorites give you quick access to the notes that are most important to you in one tap.
 
-## How to add a note to favorites?
+## Add a note to favorites
 ||| Desktop/Web
 1. Righ click on a note or click on the three-dot more button to open `Note properties` menu
 2. Toggle favorite

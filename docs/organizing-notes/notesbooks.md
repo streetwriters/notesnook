@@ -119,7 +119,7 @@ Even with thousands of notes, using notebooks will always help you keep your not
 
 ## Remove note from a topic
 ||| Desktop/Web
-1. Right click on a note or click on the `three-dot more` button to open `Note properties` sheet
+1. Right click on a note or click on the `three-dot more` button to open `Note properties` menu
 2. Select `Add to Notebook(s)`
 3. The notebooks in which the note exists will appear green. Click on the notebook to expand topics
 4. Click on the topics in notebook from which you want to remove th note. **A single note can exist in multiple topics and notebooks.**

@@ -5,7 +5,7 @@ label: Colors
 
 Colors are a simple and fast way to organize your notes.
 
-## How to assign color to note
+## Assign color to note
 
 ||| Desktop/Web
 1. Click on the `three dot more` button or right click on a note to open `Note properties` menu
