@@ -1,4 +1,7 @@
-# Colors
+---
+label: Colors
+---
+# Organizing with colors
 
 Colors are a simple and fast way to organize your notes.
 

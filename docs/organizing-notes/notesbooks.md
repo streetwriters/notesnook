@@ -1,4 +1,8 @@
-# Notebooks
+---
+label: Notebooks
+---
+
+# Organizing with notebooks
 Even with thousands of notes, using notebooks will always help you keep your notes organized and tidy with easy access. Every notebook consists of different topics where you can add and create your notes.
 
 ## Creating a notebook
