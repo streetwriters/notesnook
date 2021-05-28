@@ -14,8 +14,24 @@ We are really exciting about what is coming to Notesnook by the end of Q2 2021.
 
 - [x] **[Desktop apps](https://github.com/streetwriters/notesnook/releases)** for macOS, Windows & Linux.
 - [x] **[Importing Notes](https://importer.notesnook.com)** from files such as markdown, html, txt, docx and other note apps such as Evernote & Google Keep.
-- [ ] **Two-Factor-Authentication** via Auth app & SMS.
-- [ ] **Stylus & Drawing Support** to take notes by drawing on the screen. We will be adding a dedicated editor where you can draw and take notes.
+- [ ] **Improve note tagging system:** Edit tag and add/remove multiple notes in a tag
+- [ ] **Encrypted file attachements and data compression**
 - [ ] **Note Publishing** on a public url that is viewable by anyone with a shareable link. The note can be encrypted if required before publishing so only people with the password can view it.
-- [ ] **Links:** A dedicated links screen where user can list all links and import browser bookmarks
+- [ ] **Stylus & Drawing Support** to take notes by drawing on the screen. We will be adding a dedicated editor where you can draw and take notes.
+- [ ] **Extend sorting** same as in notes to all collections such as Favorties, Tags, Notebooks, Topics etc.
 - [ ] **Widgets on Android & iOS** - Initially we are working on adding a Quick Note widget to add notes without opening app.
+- [ ] **Unified promo code system on all platforms**
+- [ ] Publish blog
+- [ ] Complete app documentation
+
+## `Q3 2021`
+
+- [ ] **Links:** A dedicated links screen where user can list all links and import browser bookmarks
+- [ ] **Two-Factor-Authentication** via Auth app & SMS.
+- [ ] **Websocket sync**
+- [ ] **Global Discord-like search** with advanced filtering
+- [ ] **Multiple vaults and notebook locking**
+- [ ] **Sync control** Turn syncing on/off for individual items
+- [ ] **Note interlinking**: Link notes, notebooks, topics, tags directly inside a note.
+- [ ] **New editor toolbar** on desktop
+- [ ] **Theme directory** that allows users to create and publish their own themes.
