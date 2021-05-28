@@ -29,11 +29,13 @@ jobs:
         id: retype
         with:
           config: docs/retype.json
+      - shell: bash
+        run: mkdir ./public_html && cp -r ${{ steps.retype.outputs.retype-output-path }}/* ./public_html
         # You may pin to the exact commit or the version.
         # uses: Burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
       - uses: blbecker/rsync-deploy@v1.0
         with:
-          source_dir: ${{ steps.retype.outputs.retype-output-path }}
+          source_dir: ./public_html
           destination_path: ${{ secrets.REMOTE_PATH }}
           destination_host: ${{ secrets.REMOTE_HOST }}
           deployment_user: ${{ secrets.REMOTE_USER }}
