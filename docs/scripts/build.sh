@@ -12,4 +12,4 @@ retype build --override "{ \"output\": \"./public_html\" }"
 
 echo -n "Injecting script: "
 
-cat ./js/injection.js >> ./public_html/resources/js/config.js
+cat ./docs/js/injection.js >> ./public_html/resources/js/config.js
