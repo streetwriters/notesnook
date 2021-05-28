@@ -502,3 +502,12 @@ export function showEditTopicDialog(notebookId, topicId) {
     />
   ));
 }
+
+export function showSessionExpiredDialog(email) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.SessionExpiredDialog
+      email={email}
+      onClose={(res) => perform(res)}
+    />
+  ));
+}

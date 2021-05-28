@@ -81,6 +81,11 @@ function Field(props) {
           placeholder={placeholder}
           autoComplete={autoComplete}
           type={type || "text"}
+          sx={{
+            ":disabled": {
+              bg: "bgSecondary",
+            },
+          }}
           onChange={(e) => {
             if (validatePassword) {
               const value = e.target.value;

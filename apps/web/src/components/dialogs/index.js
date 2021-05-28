@@ -11,6 +11,7 @@ import PasswordDialog from "./passworddialog";
 import RecoveryKeyDialog from "./recoverykeydialog";
 import SignUpDialog from "./signupdialog";
 import TopicDialog from "./topicdialog";
+import SessionExpiredDialog from "./sessionexpireddialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -26,5 +27,6 @@ const Dialogs = {
   RecoveryKeyDialog,
   SignUpDialog,
   TopicDialog,
+  SessionExpiredDialog,
 };
 export default Dialogs;
