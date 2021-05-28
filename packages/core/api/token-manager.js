@@ -18,11 +18,10 @@ class TokenManager {
    */
   constructor(db) {
     this._db = db;
-    this.token;
   }
 
   async getToken(renew = true, forceRenew = false) {
-    let token = this.token || (await this._db.context.read("token"));
+    let token = await this._db.context.read("token");
     if (!token) return;
     if (forceRenew || (renew && this._isTokenExpired(token))) {
       await this._refreshToken(token);
@@ -82,12 +81,8 @@ class TokenManager {
   }
 
   saveToken(tokenResponse) {
-    this.token = { ...tokenResponse, t: Date.now() };
-    return this._db.context.write("token", this.token);
-  }
-
-  clearToken() {
-    this.token = undefined;
+    let token = { ...tokenResponse, t: Date.now() };
+    return this._db.context.write("token", token);
   }
 
   async getAccessTokenFromAuthorizationCode(userId, authCode) {

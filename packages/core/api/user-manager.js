@@ -76,7 +76,6 @@ class UserManager {
     } catch (e) {
       console.error(e);
     } finally {
-      this.tokenManager.clearToken();
       await this._db.context.clear();
       EV.publish(EVENTS.userLoggedOut, reason);
     }
