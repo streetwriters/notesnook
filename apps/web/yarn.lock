@@ -5985,7 +5985,7 @@ fd-slicer@~1.1.0:
 
 figgy-pudding@^3.5.1:
   version "3.5.2"
-  resolved "https://registry.npmjs.org/figgy-pudding/-/figgy-pudding-3.5.2.tgz"
+  resolved "https://registry.yarnpkg.com/figgy-pudding/-/figgy-pudding-3.5.2.tgz#b4eee8148abb01dcf1d1ac34367d59e12fa61d6e"
   integrity sha512-0btnI/H8f2pavGMN8w40mlSKOfTK2SVJmBfBeVIj3kNw0swwgzyRq0d5TJVOwodFmtvpPeWPN/MCcfuWF0Ezbw==
 
 file-entry-cache@^6.0.0:
@@ -9166,17 +9166,6 @@ normalize-url@^4.1.0:
   resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-4.5.0.tgz"
   integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
 
-notes-core@../notes-core/:
-  version "6.6.6"
-  dependencies:
-    fast-sort "^2.0.1"
-    lean-he "^2.1.2"
-    no-internet "^1.5.2"
-    qclone "^1.0.4"
-    quill-delta-to-html "^0.12.0"
-    showdown "https://github.com/thecodrr/showdown"
-    spark-md5 "^3.0.1"
-
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.6.6"
   resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#de01236b4fdf690ea44227b2a31a50371a5bc294"
@@ -12300,9 +12289,9 @@ ssim.js@^3.1.0, ssim.js@^3.1.1:
   integrity sha512-Aj6Jl2z6oDmgYFFbQqK7fght19bXdOxY7Tj03nF+03M9gCBAjeIiO8/PlEGMfKDwYpw4q6iBqVq2YuREorGg/g==
 
 ssri@^6.0.1:
-  version "6.0.1"
-  resolved "https://registry.npmjs.org/ssri/-/ssri-6.0.1.tgz"
-  integrity sha512-3Wge10hNcT1Kur4PDFwEieXSCMCJs/7WvSACcrMYrNp+b8kDL1/0wJch5Ni2WrtwEa2IO8OsVfeKIciKCDx/QA==
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/ssri/-/ssri-6.0.2.tgz#157939134f20464e7301ddba3e90ffa8f7728ac5"
+  integrity sha512-cepbSq/neFK7xB6A50KHN0xHDotYzq58wWCa5LeWqnPrHG8GzfEjO/4O8kpmcGW+oaxkvhEJCWgbgNk4/ZV93Q==
   dependencies:
     figgy-pudding "^3.5.1"
 
