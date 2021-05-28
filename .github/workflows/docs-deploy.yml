@@ -31,7 +31,7 @@ jobs:
         # uses: Burnett01/rsync-deployments@23a557dceb19f9bb960ef40cf75cab5e9b37ec1f
       - uses: blbecker/rsync-deploy@v1.0
         with:
-          source_dir: ./public_html
+          source_dir: ./docs/public_html
           destination_path: ${{ secrets.REMOTE_PATH }}
           destination_host: ${{ secrets.REMOTE_HOST }}
           deployment_user: ${{ secrets.REMOTE_USER }}
