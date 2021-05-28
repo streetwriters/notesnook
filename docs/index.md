@@ -2,12 +2,12 @@
 icon: home
 label: Welcome
 ---
+# Welcome to Notesnook
 
 !!!info Work in Progress
 We are currently working on writing detailed docs for our app. The current version of docs is incomplete. If you would like to help us improve the docs, you can fork the repo on [github](https://github.com/streetwriters/notesnook) and send a pull request.
 !!!
 
-# Welcome to Notesnook
 
 Notesnook is a simple and cross-platform **private notes app** that keeps your notes organized and synced on your phone, tablet and computer.
 
