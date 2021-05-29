@@ -1,6 +1,6 @@
 {
   "input": ".",
-  "output": ".retype",
+  "output": "./public_html/",
   "branding": {
     "title": "Notesnook",
     "label": "Docs",
@@ -11,7 +11,7 @@
       }
     }
   },
-  "exclude": ["js/"],
+  "exclude": ["*node_modules/", "*__generator__/"],
   "favicon": "favicon.png",
   "meta": {
     "title": " | Notesnook Docs"

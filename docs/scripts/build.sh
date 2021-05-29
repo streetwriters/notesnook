@@ -4,12 +4,8 @@ dotnet tool install --global retypeapp
 
 echo -n "Changing directory..."
 
-cd docs/
+cd docs/__generator__
 
-echo -n "Building documentation: "
+yarn
 
-retype build --override "{ \"output\": \"./public_html\" }"
-
-echo -n "Injecting script: "
-
-cat ./js/injection.js >> ./public_html/resources/js/config.js
+yarn generate
