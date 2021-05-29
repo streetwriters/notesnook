@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import Menu from "../menu";
 import useContextMenu from "../../utils/useContextMenu";
-import Animated from "../animated";
 import { useAnimation } from "framer-motion";
 
 function GlobalMenuWrapper() {
