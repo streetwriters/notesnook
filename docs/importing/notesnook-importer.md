@@ -28,3 +28,7 @@ You can try out the importer by going to [https://importer.notesnook.com](https:
 10. Joplin
 
 **Don't see your notes app?** No worries, create an issue on [github](https://github.com/streetwriters/notesnook/issues)
+
+## Is it safe to import?
+Not a single byte of your data from other apps is sent to our servers. Everything is processed 100% on the client side inside this browser. 
+
