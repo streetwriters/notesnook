@@ -3,7 +3,7 @@ label: Pins
 ---
 
 # Pinning notes and notebooks
-You can pin up to 3 notes and notebooks in `Notes` and `Notebooks`. Pinning enables you to keep important notes/notebooks you are working on top. For example it's a great idea to pin your daily todo tasks on top.
+You can pin up to 3 notes and notebooks in `Notes` and `Notebooks` respectively. Pinning enables you to keep important notes/notebooks you are working on top. For example it's a great idea to pin your daily todo tasks on top.
 
 ## Pinning a note/notebook
 ||| Desktop/Web
