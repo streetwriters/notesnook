@@ -1,6 +1,6 @@
 ---
 icon: pencil
-order: 100
+order: 990
 label: Creating a note
 ---
 

@@ -4,7 +4,7 @@ order: 1000
 ---
 
 !!!info Notesnook importer is in Beta
-If you face any problem while importing notes from other note apps, please report the on our [github](https://github.com/streetwriters/notesnook/issues) and tell us on our [Discord](https://discord.com/invite/5davZnhw3V)
+If you face any problem while importing notes from other note apps, please report on our [github](https://github.com/streetwriters/notesnook/issues) and tell us on our [Discord](https://discord.com/invite/5davZnhw3V)
 !!!
 
 Notesnook importer is your one stop location to import notes from any notes app other there. We have added support for most of the popular note apps.
