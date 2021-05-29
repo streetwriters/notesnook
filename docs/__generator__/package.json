@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "jsdom": "^16.6.0",
     "sitemap": "^7.0.0"
   }
 }
