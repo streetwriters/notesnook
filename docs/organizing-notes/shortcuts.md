@@ -46,7 +46,7 @@ Managing those tags from there and finding what you are looking for becomes a pa
 ||| Desktop/Web
 1. On the side menu, right click on any shortcut to open `Shortcut properties`
 2. Click on `Remove shortcut` to remove it from side menu
-
 ||| Mobile/Tablet
 1. On the side menu, long press on any shortcut to open `Shortcut properties` sheet
 2. Press on `Remove shortcut` to remove it from side menu
+|||
