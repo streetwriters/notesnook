@@ -18,7 +18,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: 16.x
-      - run: npm install
+      - run: yarn
       - uses: microsoft/playwright-github-action@v1
       - name: Running tests
-        run: npm test
+        run: yarn test
