@@ -39,7 +39,9 @@ class EditorStore extends BaseStore {
   arePropertiesVisible = false;
 
   init = () => {
-    EV.subscribe(EVENTS.userLoggedOut, () => this.get().newSession());
+    EV.subscribe(EVENTS.userLoggedOut, () => {
+      hashNavigate("/notes/create", { addNonce: true });
+    });
   };
 
   refresh = async () => {

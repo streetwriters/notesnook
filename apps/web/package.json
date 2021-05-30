@@ -76,6 +76,7 @@
     "deploy": "./scripts/deploy.sh",
     "debug": "BROWSER=none react-scripts start",
     "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
+    "test:debug": "PWDEBUG=1 REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",
     "analyze": "source-map-explorer 'build/static/js/*.js'"

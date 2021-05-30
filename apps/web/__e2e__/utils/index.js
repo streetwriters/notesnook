@@ -18,9 +18,19 @@ function getTestId(id) {
 async function createNote(note, actionButtonId) {
   await page.click(getTestId(actionButtonId + "-action-button"));
 
+  await page.waitForSelector(".tox-edit-area__iframe");
+
   await page.fill(getTestId("editor-title"), note.title);
 
-  await page.type("#quill .ql-editor", note.content);
+  const frameElement = await page.$("iframe.tox-edit-area__iframe");
+
+  const frame = await frameElement.contentFrame();
+
+  await frame.click("html");
+
+  await frame.type("html", note.content);
+
+  await frame.type("body", note.content);
 }
 
 module.exports = {

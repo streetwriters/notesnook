@@ -9,6 +9,7 @@ import { EV, EVENTS } from "notes-core/common";
 import Config from "../utils/config";
 import { showToast } from "../utils/toast";
 import { qclone } from "qclone";
+import { hashNavigate } from "../navigation";
 
 class NoteStore extends BaseStore {
   notes = [];
@@ -17,9 +18,9 @@ class NoteStore extends BaseStore {
 
   init = () => {
     EV.subscribe(EVENTS.noteRemoved, (id) => {
-      const { session, newSession } = editorStore.get();
+      const { session } = editorStore.get();
       if (session.id === id) {
-        newSession();
+        hashNavigate("/notes/create", { addNonce: true });
       }
     });
   };
@@ -67,9 +68,9 @@ class NoteStore extends BaseStore {
     this.refreshContext();
     this.refresh();
     appStore.refreshColors();
-    const { session, newSession } = editorStore.get();
+    const { session } = editorStore.get();
     if (session.id === id) {
-      newSession();
+      hashNavigate("/notes/create", { addNonce: true });
     }
   };
 

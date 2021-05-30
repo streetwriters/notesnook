@@ -1,4 +1,4 @@
-const IS_CI = !!process.env.CI;
+const IS_CI = true; // !!process.env.CI;
 
 module.exports = {
   launchOptions: {
@@ -10,6 +10,6 @@ module.exports = {
     launchTimeout: 10000,
     debug: true,
   },
-  browsers: IS_CI ? ["firefox", "chromium", "webkit"] : ["chromium"],
+  browsers: IS_CI ? ["firefox", "chromium", "webkit"] : ["firefox"],
   devices: [],
 };

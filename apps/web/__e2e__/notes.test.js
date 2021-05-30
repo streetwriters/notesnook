@@ -25,7 +25,7 @@ const {
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 
-const testCISkip = process.env.CI ? test.skip : test;
+// const testCISkip = process.env.CI ? test.skip : test;
 
 var createNoteAndCheckPresence = async function createNoteAndCheckPresence(
   note = NOTE
@@ -51,7 +51,7 @@ async function deleteNoteAndCheckAbsence() {
 
   await clickMenuItem("movetotrash");
 
-  await confirmDialog();
+  // await confirmDialog();
 
   await expect(isToastPresent()).resolves.toBeTruthy();
 
@@ -78,10 +78,11 @@ async function lockUnlockNote(noteSelector, type) {
   await expect(isToastPresent()).resolves.toBeTruthy();
 }
 
-async function checkNotePinned(noteSelector) {
+async function checkNotePinned(noteSelector, pause) {
   await openContextMenu(noteSelector);
 
   const unpinSelector = Menu.new("menuitem").item("unpin").build();
+
   await expect(isPresent(unpinSelector)).resolves.toBeTruthy();
 
   await closeContextMenu(noteSelector);
@@ -231,12 +232,12 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
     await checkNotePresence();
   });
 
-  test("add a note to notebook", async () => {
+  test.skip("add a note to notebook", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await openContextMenu(noteSelector);
 
-    await clickMenuItem("addto");
+    await clickMenuItem("addtonotebook(s)");
 
     await addNoteToNotebook();
   });
@@ -318,6 +319,8 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
       isPresent(getTestId("properties-red-check"))
     ).resolves.toBeTruthy();
 
+    await page.click(getTestId("properties-close"));
+
     await checkNoteColored(noteSelector);
   });
 
@@ -355,7 +358,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
 
     await page.click(getTestId("properties-close"));
 
-    await checkNotePinned(noteSelector);
+    await checkNotePinned(noteSelector, true);
   });
 
   test("permanently delete a note", async () => {
@@ -380,15 +383,15 @@ describe("run tests only independently", () => {
   });
 
   beforeEach(async () => {
-    page = await browser.newPage();
     await page.goto("http://localhost:3000/");
   }, 600000);
 
   afterEach(async () => {
     await page.close();
+    page = await browser.newPage();
   });
 
-  testCISkip("lock a note", async () => {
+  test("lock a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await lockUnlockNote(noteSelector, "lock");
@@ -396,7 +399,7 @@ describe("run tests only independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  testCISkip("unlock a note permanently", async () => {
+  test("unlock a note permanently", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await lockUnlockNote(noteSelector, "lock");
@@ -422,7 +425,7 @@ describe("run tests only independently", () => {
     await closeContextMenu(noteSelector);
   });
 
-  testCISkip("lock a note from properties", async () => {
+  test("lock a note from properties", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
     await page.click(getTestId("properties"));
@@ -439,7 +442,7 @@ describe("run tests only independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  test("add a note to notebook from properties", async () => {
+  test.skip("add a note to notebook from properties", async () => {
     await createNoteAndCheckPresence();
 
     await page.click(getTestId("properties"));

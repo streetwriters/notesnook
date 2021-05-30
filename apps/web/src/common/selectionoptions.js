@@ -13,6 +13,7 @@ import {
 } from "../common/dialog-controller";
 import { showExportDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
+import { hashNavigate } from "../navigation";
 
 function createOption(key, title, icon, onClick) {
   return {
@@ -64,7 +65,7 @@ const DeleteOption = createOption(
     }
 
     if (isAnyNoteOpened) {
-      editorStore.newSession();
+      hashNavigate("/notes/create", { addNonce: true });
     }
 
     if (item.type === "note") {

@@ -27,6 +27,7 @@ function initializeDatabase() {
     await db.init();
 
     if (!isAppHydrated()) {
+      if (process.env.REACT_APP_CI) return;
       try {
         loadDefaultNotes(db);
       } catch (e) {}
