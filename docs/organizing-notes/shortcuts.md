@@ -1,4 +1,4 @@
-# Shortcuts
+# How to add shortcuts to side menu
 Unlike most note taking apps, you might have noticed that when you add a tag, create a notebook or a topic, they are not added automatically to the side menu for quick access. We have seen people with 100's of tags, all on the side menu. 
 
 Managing those tags from there and finding what you are looking for becomes a pain as your notes collection grows. To tackle this, we have added shortcuts in our app which give you the control of what you want to see on your side menu. You can add shortcuts of tags, notebooks, and topics to side menu.

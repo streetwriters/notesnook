@@ -3,7 +3,7 @@ icon: rocket
 order: -21
 ---
 
-# Roadmap
+# Notesnook roadmap
 
 We are constantly working on Notesnook to make it the best private note taking app.
 
