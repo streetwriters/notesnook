@@ -1,7 +1,7 @@
 ---
 icon: home
 label: Welcome
-order: 1000
+order: 1100
 ---
 
 # Welcome to Notesnook
