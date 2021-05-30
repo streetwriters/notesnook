@@ -1,6 +1,6 @@
 {
   "input": ".",
-  "output": "./public_html/",
+  "output": "public_html",
   "branding": {
     "title": "Notesnook",
     "label": "Docs",
