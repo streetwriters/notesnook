@@ -3,6 +3,7 @@ icon: home
 label: Welcome
 order: 1000
 ---
+
 # Welcome to Notesnook
 
 !!!info Work in Progress
