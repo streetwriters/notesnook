@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import * as Icon from "../icons";
 import ContentToggle from "./content-toggle";
@@ -32,7 +32,6 @@ function navigateConflicts(prev) {
     );
   } else nextConflict = conflicts[0];
   if (!nextConflict) return false;
-  console.log(nextConflict);
   currentConflict = nextConflict;
   currentConflict.scrollIntoView({ block: "center" });
 }
@@ -143,8 +142,7 @@ function DiffViewer(props) {
     setIsEditorOpen(true);
   }, [setIsEditorOpen]);
 
-  const [localEditor, remoteEditor] = [useRef(), useRef()];
-  const [selectedDelta, setSelectedDelta] = useState(-1);
+  const [selectedContent, setSelectedContent] = useState(-1);
 
   if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
@@ -210,13 +208,14 @@ function DiffViewer(props) {
               label="Current note"
               resolveConflict={resolveConflict}
               dateEdited={localContent.dateEdited}
-              isSelected={selectedDelta === 0}
-              isOtherSelected={selectedDelta === 1}
-              onToggle={() => setSelectedDelta((s) => (s === 0 ? -1 : 0))}
-              editors={() => ({
-                selectedEditor: remoteEditor.current.editor,
-                otherEditor: localEditor.current.editor,
-              })}
+              isSelected={selectedContent === 0}
+              isOtherSelected={selectedContent === 1}
+              onToggle={() => setSelectedContent((s) => (s === 0 ? -1 : 0))}
+              cleanDiff={async (html) => await differ.clean(html)}
+              editors={{
+                selectedEditor: "diffViewAfter",
+                otherEditor: "diffViewBefore",
+              }}
               sx={{
                 borderStyle: "solid",
                 borderWidth: 0,
@@ -263,14 +262,15 @@ function DiffViewer(props) {
               }}
               resolveConflict={resolveConflict}
               label="Incoming note"
-              isSelected={selectedDelta === 1}
-              isOtherSelected={selectedDelta === 0}
+              isSelected={selectedContent === 1}
+              isOtherSelected={selectedContent === 0}
               dateEdited={remoteContent.dateEdited}
-              onToggle={() => setSelectedDelta((s) => (s === 1 ? -1 : 1))}
-              editors={() => ({
-                selectedEditor: localEditor.current.editor,
-                otherEditor: remoteEditor.current.editor,
-              })}
+              onToggle={() => setSelectedContent((s) => (s === 1 ? -1 : 1))}
+              cleanDiff={async (html) => await differ.clean(html)}
+              editors={{
+                selectedEditor: "diffViewBefore",
+                otherEditor: "diffViewAfter",
+              }}
             />
             <ScrollSyncPane>
               <Box

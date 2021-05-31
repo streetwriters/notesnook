@@ -875,7 +875,7 @@ function onMessage(ev) {
       case "clean": {
         const { html } = data;
         const cleanHtml = diff.clean(html);
-        sendMessage("decrypt", { html: cleanHtml }, messageId);
+        sendMessage("clean", cleanHtml, messageId);
         break;
       }
       default:

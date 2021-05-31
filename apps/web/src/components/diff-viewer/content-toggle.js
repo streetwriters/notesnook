@@ -1,7 +1,6 @@
 import React from "react";
-import { Flex, Text, Button } from "rebass";
+import { Flex, Button } from "rebass";
 import { timeConverter } from "../../utils/time";
-import diff from "./differ";
 
 function ContentToggle(props) {
   const {
@@ -12,6 +11,7 @@ function ContentToggle(props) {
     label,
     dateEdited,
     editors,
+    cleanDiff,
     resolveConflict,
   } = props;
 
@@ -23,10 +23,12 @@ function ContentToggle(props) {
             variant="primary"
             mr={2}
             onClick={async () => {
-              const { selectedEditor, otherEditor } = editors();
+              const { selectedEditor, otherEditor } = editors;
               await resolveConflict(
-                diff.clean(selectedEditor.getContent({ format: "html" })),
-                diff.clean(otherEditor.getContent({ format: "html" }))
+                await cleanDiff(
+                  document.getElementById(selectedEditor).innerHTML
+                ),
+                await cleanDiff(document.getElementById(otherEditor).innerHTML)
               );
             }}
             p={1}
@@ -38,10 +40,20 @@ function ContentToggle(props) {
         <Button
           variant="primary"
           onClick={async () => {
+            console.log("isOtherSelected", isOtherSelected);
             if (isOtherSelected) {
-              const { selectedEditor } = editors();
+              const { selectedEditor } = editors;
+              console.log(
+                selectedEditor,
+                document.getElementById(selectedEditor).innerHTML,
+                await cleanDiff(
+                  document.getElementById(selectedEditor).innerHTML
+                )
+              );
               await resolveConflict(
-                diff.clean(selectedEditor.getContent({ format: "html" }))
+                await cleanDiff(
+                  document.getElementById(selectedEditor).innerHTML
+                )
               );
             } else {
               onToggle();
