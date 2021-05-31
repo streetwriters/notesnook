@@ -11,6 +11,9 @@ module.exports = {
   web: {
     REACT_APP_PLATFORM: "web",
   },
+  debug: {
+    PWDEBUG: 1,
+  },
   silent: {
     BROWSER: "none",
   },

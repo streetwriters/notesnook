@@ -25,6 +25,8 @@ const {
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 
+jest.setTimeout(35 * 1000);
+
 // const testCISkip = process.env.CI ? test.skip : test;
 
 var createNoteAndCheckPresence = async function createNoteAndCheckPresence(

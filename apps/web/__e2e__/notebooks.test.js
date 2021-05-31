@@ -13,6 +13,8 @@ const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 const { checkNotePresence, isPresent } = require("./utils/conditions");
 
+jest.setTimeout(35 * 1000);
+
 beforeEach(async () => {
   await page.goto("http://localhost:3000/");
 }, 600000);

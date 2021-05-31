@@ -75,8 +75,8 @@
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",
-    "test": "REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
-    "test:debug": "PWDEBUG=1 REACT_APP_CI=true BROWSER= jest --runInBand -c jest.e2e.config.js",
+    "test": "env-cmd -e dev,silent jest -c jest.e2e.config.js",
+    "test:debug": "env-cmd -e dev,debug,silent jest -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",
     "analyze": "source-map-explorer 'build/static/js/*.js'"

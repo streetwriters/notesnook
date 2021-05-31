@@ -9,5 +9,5 @@ module.exports = {
     command: `yarn debug`,
     port: 3000,
   },
-  browsers: IS_CI ? ["chromium", "firefox", "webkit"] : ["firefox"],
+  browsers: IS_CI ? ["chromium", "firefox", "webkit"] : ["webkit"],
 };
