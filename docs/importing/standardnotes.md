@@ -16,7 +16,7 @@ The following steps will help you import your notes from Standard notes easily.
 3. Click on `Download backup` to download your backup file. It will be .zip file. 
 
 4. Go to [Notesnook Importer](https://importer.notesnook.com) and select `Standard Notes` from list of apps.
-<img style="margin-bottom:15px;" src="../static/snnotes_import_step_3.png" alt="Go to [(https://importer.notesnook.com and select Standard Notes from list of apps."/>
+<img style="margin-bottom:15px;" src="../static/snnotes_import_step_3.png" alt="Go to https://importer.notesnook.com and select Standard Notes from list of apps."/>
 
 5. Drop the .zip backup file you exported earlier from Standard Notes in the box or click anywhere to open system file picker to select the backup.
 <img style="margin-bottom:15px;" src="../static/snnotes_import_step_4.png" alt="Drop the .zip backup file you exported earlier from Standard Notes in the box or click anywhere to open system file picker to select the backup."/>
