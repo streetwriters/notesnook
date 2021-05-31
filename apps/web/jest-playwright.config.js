@@ -1,4 +1,4 @@
-const IS_CI = true; // !!process.env.CI;
+const IS_CI = !!process.env.CI;
 
 module.exports = {
   launchOptions: {
@@ -8,9 +8,6 @@ module.exports = {
   serverOptions: {
     command: `yarn debug`,
     port: 3000,
-    launchTimeout: 10000,
-    debug: true,
   },
   browsers: IS_CI ? ["chromium", "firefox", "webkit"] : ["firefox"],
-  devices: [],
 };

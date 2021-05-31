@@ -11,6 +11,9 @@ module.exports = {
   web: {
     REACT_APP_PLATFORM: "web",
   },
+  silent: {
+    BROWSER: "none",
+  },
   desktop: {
     BROWSER: "none",
     REACT_APP_PLATFORM: "desktop",
