@@ -168,6 +168,19 @@ class UserManager {
     });
   }
 
+  async verifyPassword(password) {
+    try {
+      const user = await this.getUser();
+      if (!user) return false;
+      const key = await this.getEncryptionKey();
+      const cipher = await this._db.context.encrypt(key, "notesnook");
+      const plainText = await this._db.context.decrypt({ password }, cipher);
+      return plainText === "notesnook";
+    } catch (e) {
+      return false;
+    }
+  }
+
   async _updatePassword(type, data) {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
