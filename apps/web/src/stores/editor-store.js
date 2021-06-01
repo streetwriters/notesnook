@@ -152,7 +152,6 @@ class EditorStore extends BaseStore {
     this.set((state) => {
       state.session = {
         ...DEFAULT_SESSION,
-        contentId: getId(),
         context,
         nonce,
         state: SESSION_STATES.new,
