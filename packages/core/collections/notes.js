@@ -53,6 +53,8 @@ export default class Notes extends Collection {
       ...noteArg,
     };
 
+    if (oldNote) note.contentId = oldNote.contentId;
+
     if (!oldNote && !noteArg.content && !noteArg.contentId) return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
