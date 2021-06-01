@@ -3,13 +3,19 @@ import fastsort from "fast-sort";
 export function groupBy(arr, key, sortSelector, sortDirection) {
   if (sortSelector)
     fastsort(arr).by([
+      { desc: (t) => t.conflicted },
       { desc: (t) => t.pinned },
       { [sortDirection]: sortSelector },
     ]);
 
   let groups = new Map();
   arr.forEach((item) => {
-    let groupTitle = item.pinned ? "Pinned" : key(item);
+    let groupTitle = item.pinned
+      ? "Pinned"
+      : item.conflicted
+      ? "Conflicted"
+      : key(item);
+
     let arr = groups.get(groupTitle) || [];
     arr.push(item);
     groups.set(groupTitle, arr);
@@ -17,7 +23,8 @@ export function groupBy(arr, key, sortSelector, sortDirection) {
 
   let items = [];
   groups.forEach((groupItems, groupTitle) => {
-    items.push({ title: groupTitle, type: "header" });
+    let group = { title: groupTitle, type: "header" };
+    items.push(group);
     groupItems.forEach((item) => items.push(item));
   });
   return items;
