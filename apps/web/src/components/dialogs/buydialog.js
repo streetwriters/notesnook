@@ -203,12 +203,12 @@ function BuyDialog(props) {
             mt={1}
             fontSize="body"
             onClick={async () => {
-              props.onCancel();
               if (isLoggedIn) {
                 await upgrade(user);
               } else {
                 await showSignUpDialog();
               }
+              props.onCancel();
             }}
           >
             {isLoggedIn ? "Subscribe to Notesnook Pro" : "Sign up now"}

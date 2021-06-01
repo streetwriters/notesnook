@@ -4,7 +4,10 @@
     <meta charset="utf-8" />
     <!-- https://electronjs.org/docs/tutorial
                            /security#csp-meta-tag -->
-    <meta http-equiv="Content-Security-Policy" content="script-src 'self' https://analytics.streetwriters.co 'unsafe-inline';" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="script-src 'self' https://analytics.streetwriters.co https://cdn.paddle.com 'unsafe-inline';"
+    />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
@@ -46,10 +49,7 @@
       work correctly both with client-side routing and a non-root public URL.
       Learn how to configure a non-root public URL by running `npm run build`.
     -->
-    <meta
-      name="description"
-      content="Your private note taking space"
-    />
+    <meta name="description" content="Your private note taking space" />
     <meta
       property="og:title"
       content="Notesnook - Your private note taking space"
@@ -170,11 +170,15 @@
           />
         </g>
       </svg>
-      <p align="center" style="font-size: 14px; margin-top: 25px;">Taking too long?
-        <br>
-        <span>Reload the app by pressing <code class="key">Shift</code> + <code class="key">F5</code></span>
-        <br>
-        <br>
+      <p align="center" style="font-size: 14px; margin-top: 25px">
+        Taking too long?
+        <br />
+        <span
+          >Reload the app by pressing <code class="key">Shift</code> +
+          <code class="key">F5</code></span
+        >
+        <br />
+        <br />
         <em>If it still takes too long, please reload your browser.</em>
       </p>
     </div>
