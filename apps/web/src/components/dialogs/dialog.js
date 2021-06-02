@@ -50,14 +50,14 @@ function Dialog(props) {
       }}
     >
       <Flex
-        p={30}
+        p={props.padding || 30}
         flexDirection="column"
         width={["100%", "90%", props.width || "33%"]}
         maxHeight={["100%", "80%", "70%"]}
         height={["100%", "auto", "auto"]}
         bg="background"
         alignSelf={"center"}
-        m={[0, 2, 2]}
+        m={props.margin || [0, 2, 2]}
         overflowY={props.scrollable ? "auto" : "hidden"}
         sx={{
           position: "relative",
@@ -82,7 +82,7 @@ function Dialog(props) {
         )}
         <Flex
           flexDirection="column"
-          pb={2}
+          pb={props.headerPaddingBottom || 2}
           //sx={{ borderBottom: "1px solid", borderColor: "border" }}
         >
           {/* {props.icon && (

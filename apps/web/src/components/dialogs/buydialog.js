@@ -14,10 +14,34 @@ import { ReactComponent as RichText } from "../../assets/richtext.svg";
 import { ReactComponent as Sync } from "../../assets/sync.svg";
 import { ReactComponent as Vault } from "../../assets/vault.svg";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { Carousel } from "react-responsive-carousel";
 import { changeSvgTheme } from "../../utils/css";
 
 const premiumDetails = [
+  {
+    title: "Unlimited attachments",
+    description: "Your notes will be automatically synced to all your devices.",
+    illustration: {
+      icon: Sync,
+      width: "40%",
+    },
+  },
+  {
+    title: "Unlimited storage",
+    description: "Your notes will be automatically synced to all your devices.",
+    illustration: {
+      icon: Sync,
+      width: "40%",
+    },
+  },
+  {
+    title: "Unlimited notebooks & tags",
+    description:
+      "Make unlimited notebooks and tags, and assign colors to your notes for quick access.",
+    illustration: {
+      icon: Organize,
+      width: "40%",
+    },
+  },
   {
     title: "Automatic syncing",
     description: "Your notes will be automatically synced to all your devices.",
@@ -27,16 +51,7 @@ const premiumDetails = [
     },
   },
   {
-    title: "Unlimited organization",
-    description:
-      "Make unlimited notebooks and tags, and assign colors to your notes for quick access.",
-    illustration: {
-      icon: Organize,
-      width: "40%",
-    },
-  },
-  {
-    title: "Secure vault",
+    title: "Secure vault for notes",
     description:
       "Lock any note with a password and keep sensitive data under lock and key.",
     illustration: {
@@ -45,7 +60,7 @@ const premiumDetails = [
     },
   },
   {
-    title: "Full rich text editor",
+    title: "Full rich text editor + markdown support",
     description:
       "Add images, links, tables and lists to your notes, and use markdown for fast editing.",
     illustration: {
@@ -62,7 +77,7 @@ const premiumDetails = [
     },
   },
   {
-    title: "Automatic & encrypted backups",
+    title: "Automatic encrypted backups",
     description: "Enable daily or weekly backups with automatic encryption.",
     illustration: {
       icon: Backups,
@@ -78,7 +93,12 @@ const premiumDetails = [
     },
   },
   {
-    title: "Get the pro badge on Discord",
+    title: (
+      <>
+        Special Pro badge on{" "}
+        <a href="https://discord.gg/5davZnhw3V">our Discord server</a>
+      </>
+    ),
     description:
       "Pro users get access to special channels and priority support on our Discord server.",
     illustration: {
@@ -89,7 +109,6 @@ const premiumDetails = [
 ];
 
 function BuyDialog(props) {
-  const { initialIndex } = props;
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
   const accent = useThemeStore((store) => store.accent);
@@ -97,111 +116,65 @@ function BuyDialog(props) {
   return (
     <Dialog
       isOpen={true}
-      showClose
+      // showClose
       onClose={props.onCancel}
-      scrollable
       onOpen={() => changeSvgTheme(accent)}
+      padding={"0px"}
+      margin={"0px"}
+      headerPaddingBottom={"0px"}
     >
-      <Flex flexDirection="column" flex={1}>
-        <Carousel
-          infiniteLoop
-          autoPlay
-          showStatus={false}
-          swipeable
-          emulateTouch
-          showArrows
-          useKeyboardArrows
-          interval={5000}
-          stopOnHover
-          selectedItem={initialIndex}
-          showThumbs={false}
-          showIndicators={false}
-          renderArrowNext={(click, hasNext) => (
-            <Button
-              variant="icon"
-              disabled={!hasNext}
-              onClick={click}
-              sx={{ alignSelf: "center" }}
+      <Flex flexDirection="column" flex={1} overflowY="hidden">
+        <Flex bg="primary" p={5} sx={{ position: "relative" }}>
+          <Text variant="heading" fontSize="38px" color="static">
+            Notesnook Pro
+            <Text
+              variant="subBody"
+              color="static"
+              opacity={1}
+              fontWeight="normal"
+              fontSize="title"
             >
-              <Icon.ArrowRight
-                color={hasNext ? "text" : "grey"}
-                sx={{
-                  ":hover": {
-                    color: "primary",
-                  },
-                }}
-              />
-            </Button>
-          )}
-          renderArrowPrev={(click, hasPrev) => (
-            <Button
-              variant="icon"
-              disabled={!hasPrev}
-              sx={{ alignSelf: "center" }}
-              onClick={click}
-            >
-              <Icon.ArrowLeft
-                color={hasPrev ? "text" : "grey"}
-                sx={{
-                  ":hover": {
-                    color: "primary",
-                  },
-                }}
-              />
-            </Button>
-          )}
+              Ready to take the next step on your private note taking journey?
+            </Text>
+          </Text>
+          <Text
+            sx={{ position: "absolute", top: 0, right: 0 }}
+            variant="heading"
+            color="static"
+            opacity={0.2}
+            fontSize={90}
+          >
+            $4.49
+          </Text>
+        </Flex>
+        <Flex
+          flexDirection="column"
+          px={5}
+          pb={2}
+          overflowY="auto"
+          sx={{ position: "relative" }}
         >
           {premiumDetails.map((item) => (
-            <Flex
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="center"
-              width="100%"
-              height="100%"
-            >
-              <item.illustration.icon height={"150px"} />
-              <Text variant="heading" color="primary" mt={2} textAlign="center">
+            <Flex mt={2}>
+              <Icon.Checkmark color="primary" size={16} />
+              <Text variant="body" fontSize="title" ml={1}>
                 {item.title}
-              </Text>
-              <Text
-                variant="body"
-                fontSize="title"
-                color="grey"
-                mt={1}
-                textAlign="center"
-                maxWidth="80%"
-              >
-                {item.description}
               </Text>
             </Flex>
           ))}
-        </Carousel>
-        <Flex
-          flex={1}
-          flexDirection="column"
-          pt={2}
-          sx={{
-            borderRadius: "default",
-          }}
-          mt={25}
-        >
-          <Text variant="title" color="primary">
-            {isLoggedIn ? "Upgrade now" : "Try it Now"}
-            <Text variant="subBody" color="text">
-              {isLoggedIn
-                ? "Cancel anytime. No questions asked."
-                : "Start your 14 Day Trial (no credit card required)"}
-            </Text>
+        </Flex>
+        <Flex flexDirection="column" bg="shade" p={5} pt={2}>
+          <Text variant="heading" fontSize={32} color="primary">
+            Only for $4.49/mo
           </Text>
-          <Text as="span" variant="body" fontSize={30} color="text" mt={3}>
-            $4.49
-            <Text as="span" variant="body" color="primary" fontSize="subBody">
-              /mo
-            </Text>
+          <Text variant="subBody" color="text" my={1}>
+            {isLoggedIn
+              ? "Cancel anytime. No questions asked."
+              : "Start your 14 days free trial (no credit card required)"}
           </Text>
           <Button
-            mt={1}
-            fontSize="body"
+            fontSize="title"
+            fontWeight="bold"
             onClick={async () => {
               if (isLoggedIn) {
                 await upgrade(user);
@@ -211,7 +184,7 @@ function BuyDialog(props) {
               props.onCancel();
             }}
           >
-            {isLoggedIn ? "Subscribe to Notesnook Pro" : "Sign up now"}
+            Subscribe to Notesnook Pro
           </Button>
         </Flex>
       </Flex>
