@@ -1,9 +1,9 @@
-import {useCallback, useEffect, useState} from 'react';
-import {Platform} from 'react-native';
-import {SUBSCRIPTION_STATUS} from '.';
+import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+import { SUBSCRIPTION_STATUS } from '.';
 import PremiumService from '../services/PremiumService';
-import {db} from './DB';
-import Storage from './storage';
+import { db } from './DB';
+import { MMKV } from './mmkv';
 
 var CACHED_ANNOUNCEMENT;
 export default function useAnnouncement() {
@@ -16,19 +16,22 @@ export default function useAnnouncement() {
         
         if (
           !CACHED_ANNOUNCEMENT ||
-          (await Storage.read('removedAnnouncement')) ===
+          (await MMKV.getStringAsync('removedAnnouncement')) ===
             CACHED_ANNOUNCEMENT.id ||
           !shouldShowAnnouncement(CACHED_ANNOUNCEMENT)
         )
+          
           return;
 
         setAnnouncement(CACHED_ANNOUNCEMENT);
-      } catch (e) {}
+      } catch (e) {
+        setAnnouncement(null)
+      }
     })();
   }, []);
 
   const remove = useCallback(async () => {
-    await Storage.write('removedAnnouncement', CACHED_ANNOUNCEMENT.id);
+    await MMKV.setStringAsync('removedAnnouncement', CACHED_ANNOUNCEMENT.id);
     CACHED_ANNOUNCEMENT = null;
     setAnnouncement(null);
   }, [announcement]);
