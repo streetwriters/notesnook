@@ -69,3 +69,7 @@ tox-tbtn tox-tbtn--select {
   background: none !important;
   border-bottom: 1px solid var(--border) !important;
 }
+
+.mce-content-body:focus-visible {
+  outline: none;
+}

@@ -1971,13 +1971,13 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@tinymce/tinymce-react@^3.10.2":
-  version "3.10.2"
-  resolved "https://registry.npmjs.org/@tinymce/tinymce-react/-/tinymce-react-3.10.2.tgz"
-  integrity sha512-PcCGYuepfTidkNwSaTyEg5nVRrqQa9KJDBiCrfb7xRCkoNXeYKY4lFhnT84AcBe9BEcJ4HnCXoqCTnjOaF/R2w==
+"@tinymce/tinymce-react@^3.12.6":
+  version "3.12.6"
+  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-react/-/tinymce-react-3.12.6.tgz#8a4e2a5c5026b7a0c9c4c839af4d691804aa0604"
+  integrity sha512-a7/Ns7uVsSr2N0fCxn+OhDx8f9JqfywTlHbXsgcwlWB6vIBMIjjRBJ6PGo/5H0y2vfzO6fBzd4gc6h05Cm5R7A==
   dependencies:
     prop-types "^15.6.2"
-    tinymce "^5.7.0"
+    tinymce "^5.5.1"
 
 "@types/anymatch@*":
   version "1.3.1"
@@ -12843,10 +12843,10 @@ tiny-emitter@^2.0.0:
   resolved "https://registry.npmjs.org/tiny-emitter/-/tiny-emitter-2.1.0.tgz"
   integrity sha512-NB6Dk1A9xgQPMoGqC5CVXn123gWyte215ONT5Pp5a0yt4nlEoO1ZWeCwpncaekPHXO60i47ihFnZPiRPjRMq4Q==
 
-tinymce@^5.7.0:
-  version "5.7.0"
-  resolved "https://registry.npmjs.org/tinymce/-/tinymce-5.7.0.tgz"
-  integrity sha512-WikgMpJbqYPaucV3lfstCj+Y4NquZlK61gyuJ2eqDUBlSU+4fFh6rpwnelVTxuvtEyJsAVOl8HZmbzBfDJiLsQ==
+tinymce@5.8.1, tinymce@^5.5.1:
+  version "5.8.1"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.8.1.tgz#f6ace70e47cf6b5b0a63f52cf38e4ae04a35ba58"
+  integrity sha512-1zGXdZplWQafstlC7sri0ttCgMagsiXDc9N3I8JNrPOsWAeTfq4AAJWZoxsQBYn8gYcuPu/WzMKG5SoJjxI1VA==
 
 tmpl@1.0.x:
   version "1.0.4"

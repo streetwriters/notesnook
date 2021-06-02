@@ -124,27 +124,39 @@ function Editor({ noteId, nonce }) {
           mt={[0, 0, 25]}
         >
           <Header />
+          <Flex
+            id="editorToolbar"
+            sx={{
+              bg: "background",
+              position: "sticky",
+              top: 0,
+              zIndex: 999,
+              boxShadow: "0px 0px 15px 0px #0000002e",
+            }}
+          />
           <Suspense fallback={<EditorLoading />}>
             {contentType === "tiny" ? (
-              <ReactMCE
-                editorRef={editorRef}
-                onFocus={() => toggleProperties(false)}
-                onSave={saveSession}
-                onChange={(content) => {
-                  if (!content.length) content = "<p><br></pr>";
-                  setSession((state) => {
-                    state.session.content = {
-                      type: "tiny",
-                      data: content,
-                    };
-                  });
-                }}
-                changeInterval={500}
-                onWordCountChanged={updateWordCount}
-                onInit={async () => {
-                  await startSession(noteId);
-                }}
-              />
+              <>
+                <ReactMCE
+                  editorRef={editorRef}
+                  onFocus={() => toggleProperties(false)}
+                  onSave={saveSession}
+                  onChange={(content) => {
+                    if (!content.length) content = "<p><br></pr>";
+                    setSession((state) => {
+                      state.session.content = {
+                        type: "tiny",
+                        data: content,
+                      };
+                    });
+                  }}
+                  changeInterval={500}
+                  onWordCountChanged={updateWordCount}
+                  onInit={async () => {
+                    await startSession(noteId);
+                  }}
+                />
+              </>
             ) : null}
           </Suspense>
         </Animated.Flex>

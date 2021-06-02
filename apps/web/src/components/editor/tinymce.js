@@ -120,20 +120,20 @@ function TinyMCE(props) {
   const [oldSkin, newSkin] = useSkin();
   const tinymceRef = editorRef;
   useEffect(() => {
-    if (tinymceRef.current.editor.initialized) {
-      tinymceRef.current.editor.dom.styleSheetLoader.unload(
-        `${oldSkin}/content.min.css`
-      );
-      tinymceRef.current.editor.ui.styleSheetLoader.unload(
-        `${oldSkin}/skin.min.css`
-      );
-      tinymceRef.current.editor.dom.styleSheetLoader.load(
-        `${newSkin}/content.min.css`
-      );
-      tinymceRef.current.editor.ui.styleSheetLoader.load(
-        `${newSkin}/skin.min.css`
-      );
-    }
+    // if (tinymceRef.current.editor.initialized) {
+    tinymceRef.current.editor.dom.styleSheetLoader.unload(
+      `${oldSkin}/content.min.css`
+    );
+    tinymceRef.current.editor.ui.styleSheetLoader.unload(
+      `${oldSkin}/skin.min.css`
+    );
+    tinymceRef.current.editor.dom.styleSheetLoader.load(
+      `${newSkin}/content.min.css`
+    );
+    tinymceRef.current.editor.ui.styleSheetLoader.load(
+      `${newSkin}/skin.min.css`
+    );
+    // }
   }, [tinymceRef, newSkin, oldSkin]);
 
   return (
@@ -153,16 +153,8 @@ function TinyMCE(props) {
         contextmenu: false,
         quickbars_insert_toolbar: false,
         skin_url: newSkin,
-        content_css: newSkin,
+        // content_css: "",
         content_style: `
-        span.diff-del {
-          background-color: #FDB0C0;  
-        }
-
-        span.diff-ins {
-          background-color: #CAFFFB;  
-        }
-
         pre.codeblock {
           overflow-x: auto;
         }
@@ -213,9 +205,13 @@ function TinyMCE(props) {
             });
           });
         },
+        toolbar_persist: true,
         browser_spellcheck: true,
         autoresize_bottom_margin: 100,
+        fixed_toolbar_container_target:
+          document.getElementById("editorToolbar"),
       }}
+      inline
       onBeforeExecCommand={async (command) => {
         if (
           premiumCommands.some(
