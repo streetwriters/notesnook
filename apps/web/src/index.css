@@ -16,6 +16,7 @@ body,
 #root {
   margin: 0 !important;
   height: 100%;
+  overflow: hidden;
 }
 
 * {
