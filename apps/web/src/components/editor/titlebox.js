@@ -42,9 +42,8 @@ function TitleBox(props) {
   }, [shouldFocus]);
 
   return (
-    <Flex width="100%" sx={{ position: "relative" }} py={2}>
+    <Flex width="100%" sx={{ position: "relative" }} flexShrink={0}>
       <Text
-        as="pre"
         className="dummyEditorTitle"
         variant="heading"
         minHeight={[30, 30, 60]}

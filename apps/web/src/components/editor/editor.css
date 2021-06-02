@@ -67,9 +67,17 @@ tox-tbtn tox-tbtn--select {
 .tox .tox-toolbar__overflow,
 .tox .tox-toolbar__primary {
   background: none !important;
-  border-bottom: 1px solid var(--border) !important;
+  border-bottom: 0px solid var(--border) !important;
 }
 
 .mce-content-body:focus-visible {
   outline: none;
+}
+
+.mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  left: 0px !important;
+}
+
+.mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+  margin-top: 15px !important;
 }

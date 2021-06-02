@@ -1,10 +1,4 @@
-import React, {
-  useEffect,
-  useMemo,
-  useRef,
-  Suspense,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, Suspense, useCallback } from "react";
 import { Flex } from "rebass";
 import Properties from "../properties";
 import {
@@ -38,10 +32,6 @@ function Editor({ noteId, nonce }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const editorMargins = useMemo(() => {
-    if (isMobile || isTablet) return "0%";
-    else return "10px";
-  }, [isTablet, isMobile]);
 
   useEffect(() => {
     init();
@@ -107,16 +97,29 @@ function Editor({ noteId, nonce }) {
         overflow="hidden"
         overflowY="auto"
       >
+        <Flex
+          id="editorToolbar"
+          sx={{
+            bg: "background",
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
+            borderBottom: "1px solid",
+            borderBottomColor: "border",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        />
         <Animated.Flex
           variant="columnFill"
           className="editor"
           sx={{
-            mx: [0, 0, editorMargins],
+            mx: 3,
             alignSelf: ["stretch", "stretch", "center"],
           }}
           animate={{
-            marginRight: isFocusMode && !isTablet ? "25%" : editorMargins,
-            marginLeft: isFocusMode && !isTablet ? "25%" : editorMargins,
+            marginRight: isFocusMode && !isTablet ? "25%" : "15px",
+            marginLeft: isFocusMode && !isTablet ? "25%" : "15px",
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "900px"}
@@ -124,16 +127,7 @@ function Editor({ noteId, nonce }) {
           mt={[0, 0, 25]}
         >
           <Header />
-          <Flex
-            id="editorToolbar"
-            sx={{
-              bg: "background",
-              position: "sticky",
-              top: 0,
-              zIndex: 999,
-              boxShadow: "0px 0px 15px 0px #0000002e",
-            }}
-          />
+
           <Suspense fallback={<EditorLoading />}>
             {contentType === "tiny" ? (
               <>

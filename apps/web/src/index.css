@@ -26,9 +26,9 @@ body,
   transition: background-color 300ms linear, border-color 300ms linear;
 }
 
-* {
+/* * {
   font-family: sans-serif;
-}
+} */
 
 @keyframes fadeUp {
   0% {
