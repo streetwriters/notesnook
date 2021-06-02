@@ -99,9 +99,10 @@ const premiumCommands = [
 
 function useSkin() {
   const theme = useThemeStore((store) => store.theme);
+  const host = window.location.origin;
   return theme === "dark"
-    ? ["/skins/notesnook", "/skins/notesnook-dark"]
-    : ["/skins/notesnook-dark", "/skins/notesnook"];
+    ? [host + "/skins/notesnook", host + "/skins/notesnook-dark"]
+    : [host + "/skins/notesnook-dark", host + "/skins/notesnook"];
 }
 
 function TinyMCE(props) {
@@ -120,20 +121,18 @@ function TinyMCE(props) {
   const [oldSkin, newSkin] = useSkin();
   const tinymceRef = editorRef;
   useEffect(() => {
-    // if (tinymceRef.current.editor.initialized) {
     tinymceRef.current.editor.dom.styleSheetLoader.unload(
-      `${oldSkin}/content.min.css`
+      `${oldSkin}/content.inline.min.css`
     );
     tinymceRef.current.editor.ui.styleSheetLoader.unload(
       `${oldSkin}/skin.min.css`
     );
     tinymceRef.current.editor.dom.styleSheetLoader.load(
-      `${newSkin}/content.min.css`
+      `${newSkin}/content.inline.min.css`
     );
     tinymceRef.current.editor.ui.styleSheetLoader.load(
       `${newSkin}/skin.min.css`
     );
-    // }
   }, [tinymceRef, newSkin, oldSkin]);
 
   return (
@@ -206,12 +205,12 @@ function TinyMCE(props) {
           });
         },
         toolbar_persist: true,
+        toolbar_sticky: false,
         browser_spellcheck: true,
+        inline: true,
+        fixed_toolbar_container: "#editorToolbar",
         autoresize_bottom_margin: 100,
-        fixed_toolbar_container_target:
-          document.getElementById("editorToolbar"),
       }}
-      inline
       onBeforeExecCommand={async (command) => {
         if (
           premiumCommands.some(

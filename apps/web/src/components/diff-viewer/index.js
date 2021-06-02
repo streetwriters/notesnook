@@ -7,6 +7,7 @@ import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { useStore as useEditorStore } from "../../stores/editor-store";
 import { hashNavigate } from "../../navigation";
 import HTMLDiffer from "./differ";
 import { showToast } from "../../utils/toast";
@@ -42,6 +43,7 @@ function DiffViewer(props) {
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const theme = useThemeStore((store) => store.theme);
   const sync = useUserStore((store) => store.sync);
+  const clearSession = useEditorStore((store) => store.clearSession);
   const [conflictedNote, setConflictedNote] = useState();
   const [remoteContent, setRemoteContent] = useState();
   const [localContent, setLocalContent] = useState();
@@ -130,8 +132,9 @@ function DiffViewer(props) {
 
   useEffect(() => {
     let cssPath = "";
-    if (theme === "dark") cssPath = "/skins/notesnook-dark/content.min.css";
-    else cssPath = "/skins/notesnook/content.min.css";
+    if (theme === "dark")
+      cssPath = "/skins/notesnook-dark/content.inline.min.css";
+    else cssPath = "/skins/notesnook/content.inline.min.css";
     injectCssSrc("tmce", cssPath);
     return () => {
       removeCss("tmce");
@@ -139,8 +142,9 @@ function DiffViewer(props) {
   }, [theme]);
 
   useEffect(() => {
+    clearSession();
     setIsEditorOpen(true);
-  }, [setIsEditorOpen]);
+  }, [setIsEditorOpen, clearSession]);
 
   const [selectedContent, setSelectedContent] = useState(-1);
 

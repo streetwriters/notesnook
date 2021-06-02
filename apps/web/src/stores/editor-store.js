@@ -5,7 +5,6 @@ import { store as tagStore } from "./tag-store";
 import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
-import getId from "notes-core/utils/id";
 import { hashNavigate } from "../navigation";
 
 const SESSION_STATES = {
