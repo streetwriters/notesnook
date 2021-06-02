@@ -44,17 +44,15 @@ const ActionSheetWrapper = ({
       borderBottomLeftRadius: largeTablet ? 10 : 1,
       marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
-      paddingTop: gestureEnabled ? 10 : 18,
+      paddingTop: gestureEnabled ? 10 : 10,
     };
   }, [colors.bg, gestureEnabled]);
 
   const _onOpen = () => {
-    //changeAppScale(0.975, 150);
     onOpen && onOpen();
   };
 
   const _onClose = async () => {
-    //changeAppScale(1, 150);
     if (editing.isFocused === true) {
       textInput.current?.focus();
       await sleep(10);
@@ -77,7 +75,6 @@ const ActionSheetWrapper = ({
       containerStyle={style}
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
-      
       initialOffsetFromBottom={1}
       closeOnTouchBackdrop={closeOnTouchBackdrop}
       indicatorColor={

@@ -1,12 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {RefreshControl, useWindowDimensions} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {dHeight, doInBackground, dWidth} from '../../utils';
+import {dHeight, dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
 import useAnnouncement from '../../utils/useAnnouncement';
@@ -53,14 +52,12 @@ const SimpleList = ({
   );
   const [width, setWidth] = useState(dWidth);
   const scrollRef = useRef();
-  const insets = useSafeAreaInsets();
   const {fontScale} = useWindowDimensions();
   const refreshing = false;
   const dataType = type;
   const [announcement, remove] = useAnnouncement();
 
   useEffect(() => {
-    setWidth(dWidth);
     if (!loading) {
       setDataProvider(
         dataProvider.cloneWithRows(
@@ -74,9 +71,14 @@ const SimpleList = ({
       }, 500);
     } else {
       _setLoading(true);
+   
       setDataProvider(dataProvider.cloneWithRows([header, empty]));
     }
-  }, [listData, deviceMode, loading, announcement]);
+  }, [listData, loading, announcement]);
+
+  useEffect(() => {
+    setWidth(dWidth);
+  }, [deviceMode]);
 
   const _onRefresh = async () => {
     await Sync.run();
@@ -96,7 +98,7 @@ const SimpleList = ({
 
   const _layoutProvider = new LayoutProvider(
     index => {
-      return dataProvider.getDataForIndex(index).type;
+      return dataProvider.getDataForIndex(index)?.type || 'note';
     },
     (type, dim) => {
       switch (type) {
@@ -114,7 +116,7 @@ const SimpleList = ({
           break;
         case 'empty':
           dim.width = width;
-          dim.height = dHeight - 250 - insets.top;
+          dim.height = dHeight - 250 - 35;
           break;
         case 'topic':
           dim.width = width;
@@ -146,65 +148,63 @@ const SimpleList = ({
     },
   );
 
-  const _renderRow = (type, data, index) => {
-    switch (type) {
-      case 'note':
-        return <NoteWrapper item={data} pinned={data.pinned} index={index} />;
-      case 'notebook':
-        return (
-          <NotebookWrapper item={data} pinned={data.pinned} index={index} />
-        );
-      case 'tag':
-        return <TagItem item={data} index={index} />;
-      case 'topic':
-        return (
-          <NotebookWrapper
-            item={data}
-            isTopic={true}
-            pinned={data.pinned}
-            index={index}
-          />
-        );
-      case 'trash':
-        return data.itemType === 'note' ? (
-          <NoteWrapper item={data} index={index} isTrash={true} />
-        ) : (
-          <NotebookWrapper item={data} index={index} isTrash={true} />
-        );
-      case 'MAIN_HEADER':
-        return (
-          <Header
-            title={headerProps.heading}
-            paragraph={headerProps.paragraph}
-            onPress={headerProps.onPress}
-            icon={headerProps.icon}
-            type={dataType}
-            announcement={announcement}
-            index={index}
-            data={listData}
-            screen={screen}
-          />
-        );
-      case 'header':
-        return (
-          <SectionHeader
-            item={data}
-            index={index}
-            headerProps={headerProps}
-            jumpToDialog={jumpToDialog}
-            sortMenuButton={sortMenuButton}
-          />
-        );
-      case 'empty':
-        return (
-          <Empty
-            loading={loading || _loading}
-            placeholderData={placeholderData}
-            headerProps={headerProps}
-          />
-        );
+  useEffect(() => {
+    if (_layoutProvider) {
+      _layoutProvider.shouldRefreshWithAnchoring = false;
     }
-  };
+  }, []);
+
+  const _renderRow = React.useCallback(
+    (type, data, index) => {
+      switch (type) {
+        case 'note':
+          return <NoteWrapper item={data} index={index} />;
+        case 'notebook':
+        case 'topic':
+          return <NotebookWrapper item={data} index={index} />;
+        case 'tag':
+          return <TagItem item={data} index={index} />;
+        case 'trash':
+          return data.itemType === 'note' ? (
+            <NoteWrapper item={data} index={index} />
+          ) : (
+            <NotebookWrapper item={data} index={index} />
+          );
+        case 'MAIN_HEADER':
+          return (
+            <Header
+              title={headerProps.heading}
+              paragraph={headerProps.paragraph}
+              onPress={headerProps.onPress}
+              icon={headerProps.icon}
+              type={dataType}
+              announcement={announcement}
+              index={index}
+              screen={screen}
+            />
+          );
+        case 'header':
+          return (
+            <SectionHeader
+              item={data}
+              index={index}
+              headerProps={headerProps}
+              jumpToDialog={jumpToDialog}
+              sortMenuButton={sortMenuButton}
+            />
+          );
+        case 'empty':
+          return (
+            <Empty
+              loading={loading || _loading}
+              placeholderData={placeholderData}
+              headerProps={headerProps}
+            />
+          );
+      }
+    },
+    [_loading, placeholderData, headerProps, loading, announcement],
+  );
 
   let scrollProps = React.useMemo(() => {
     return {
@@ -239,6 +239,7 @@ const SimpleList = ({
     minHeight: 1,
     minWidth: 1,
   };
+
   return (
     <>
       {!loading && (
@@ -255,8 +256,8 @@ const SimpleList = ({
         layoutProvider={_layoutProvider}
         dataProvider={dataProvider}
         rowRenderer={_renderRow}
+        renderAheadOffset={0}
         onScroll={_onScroll}
-        canChangeSize={true}
         renderFooter={listData.length === 0 ? null : Footer}
         scrollViewProps={scrollProps}
         style={styles}

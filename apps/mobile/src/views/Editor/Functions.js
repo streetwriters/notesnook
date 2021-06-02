@@ -211,9 +211,11 @@ export const loadNote = async item => {
       eSendEvent('webviewreset');
     }, 1);
     InteractionManager.runAfterInteractions(async () => {
-      sendNoteEditedEvent({
-        id: id,
-      });
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
       updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
       checkStatus();
     }, 50);
@@ -401,7 +403,7 @@ function onNoteChange() {
     if (noteEdited) {
       saveNote();
     }
-  }, 500);
+  }, 1);
 }
 
 export async function clearEditor() {
@@ -528,9 +530,11 @@ export async function saveNote(preventUpdate) {
       await db.vault.save(noteData);
     }
     if (!preventUpdate) {
-      sendNoteEditedEvent({
-        id: id,
-      });
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
       let n = db.notes.note(id)?.data?.dateEdited;
       tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));

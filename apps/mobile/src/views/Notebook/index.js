@@ -27,7 +27,7 @@ export const Notebook = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 400) => {
+  const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
       try {
         let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;

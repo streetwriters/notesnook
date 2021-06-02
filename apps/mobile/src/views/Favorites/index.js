@@ -103,7 +103,7 @@ export const Favorites = ({route, navigation}) => {
         <Header title="Favorites" isBack={false} screen="Favorites" />
       </ContainerTopSection>
       <SimpleList
-        listData={favorites}
+        listData={state.notebooks}
         type="notes"
         refreshCallback={() => {
           dispatch({type: Actions.FAVORITES});

@@ -126,10 +126,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
       if (note && note.id) {
         setNote({...db.notes.note(note.id).data});
-        sendNoteEditedEvent({
-          id: note.id,
-          forced: true,
-        });
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Notes,
+        ]);
       }
       dispatch({type: Actions.NOTEBOOKS});
 
@@ -149,10 +150,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
 
-      sendNoteEditedEvent({
-        id: note.id,
-        forced: true,
-      });
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
     }
     dispatch({type: Actions.NOTEBOOKS});
   };

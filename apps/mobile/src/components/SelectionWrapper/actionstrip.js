@@ -1,17 +1,12 @@
 import React, {useEffect, useState} from 'react';
 import {Clipboard, View} from 'react-native';
+import Animated, {useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {
-  eSendEvent,
-  openVault,
-  sendNoteEditedEvent,
-  ToastEvent,
-} from '../../services/EventManager';
+import {openVault, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {dWidth, getElevation, toTXT} from '../../utils';
 import {db} from '../../utils/DB';
-import {refreshNotesPage} from '../../utils/Events';
 import {deleteItems} from '../../utils/functions';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
@@ -22,7 +17,8 @@ export const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode} = state;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
-  const [width, setWidth] = useState(dWidth);
+  const [width, setWidth] = useState(dWidth - 16);
+  const opacity = useValue(0);
   useEffect(() => {
     if (note.type === 'note') return;
     setIsPinnedToMenu(db.settings.isPinned(note.id));
@@ -34,8 +30,16 @@ export const ActionStrip = ({note, setActionStrip}) => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Notes,
     ]);
-    sendNoteEditedEvent({id: note.id, forced: true});
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      opacity.setValue(1);
+    }, 100);
+    return () => {
+      opacity.setValue(0);
+    };
+  }, [width]);
 
   const actions = [
     {
@@ -204,8 +208,10 @@ export const ActionStrip = ({note, setActionStrip}) => {
   ];
 
   return (
-    <View
-      onLayout={(event) => setWidth(event.nativeEvent.layout.width)}
+    <Animated.View
+      onLayout={event => {
+        setWidth(event.nativeEvent.layout.width);
+      }}
       style={{
         position: 'absolute',
         zIndex: 10,
@@ -214,13 +220,14 @@ export const ActionStrip = ({note, setActionStrip}) => {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
+        opacity: opacity,
       }}>
       <Button
         type="accent"
         title="Select"
         icon="check"
         tooltipText="Select Item"
-        onPress={(event) => {
+        onPress={event => {
           if (!selectionMode) {
             dispatch({type: Actions.SELECTION_MODE, enabled: true});
           }
@@ -235,7 +242,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
         height={30}
       />
       {actions.map(
-        (item) =>
+        item =>
           item.visible && (
             <View
               key={item.icon}
@@ -261,6 +268,6 @@ export const ActionStrip = ({note, setActionStrip}) => {
             </View>
           ),
       )}
-    </View>
+    </Animated.View>
   );
 };

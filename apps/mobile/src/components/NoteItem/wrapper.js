@@ -1,66 +1,32 @@
-import React, {useEffect, useMemo, useState} from 'react';
+import React from 'react';
+import {useWindowDimensions} from 'react-native';
 import NoteItem from '.';
-import SelectionWrapper from '../SelectionWrapper';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  openVault,
-} from '../../services/EventManager';
-import {eShowMergeDialog, eOnLoadNote, eOnNoteEdited} from '../../utils/Events';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, openVault} from '../../services/EventManager';
+import {history} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eShowMergeDialog} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
 import {simpleDialogEvent} from '../DialogManager/recievers';
 import {TEMPLATE_TRASH} from '../DialogManager/Templates';
-import {db} from '../../utils/DB';
-import {DDS} from '../../services/DeviceDetection';
-import {tabBarRef} from '../../utils/Refs';
-import {notesnook} from '../../../e2e/test.ids';
-import {history} from '../../utils';
-import {useWindowDimensions} from 'react-native';
+import SelectionWrapper from '../SelectionWrapper';
 
-export const NoteWrapper = ({item, index, isTrash = false}) => {
+export const NoteWrapper = React.memo(({item, index}) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const [note, setNote] = useState(item);
-  const {fontScale} = useWindowDimensions();
-
-  useEffect(() => {
-    setNote(item);
-  }, [item]);
-
-  const onNoteChange = (data) => {
-    if (!data || data.id !== item.id) {
-      return;
-    }
-    if (
-      !data.forced &&
-      data.title === item.title &&
-      data.headline === item.headline
-    ) {
-      return;
-    }
-    let _note = db.notes.note(item.id).data;
-    setNote(_note);
-  };
-
-  useEffect(() => {
-    eSubscribeEvent(eOnNoteEdited, onNoteChange);
-    return () => {
-      eUnSubscribeEvent(eOnNoteEdited, onNoteChange);
-    };
-  }, [note]);
+  const isTrash = item.type === 'trash';
 
   const onPress = async () => {
-    let _note = db.notes.note(note.id).data;
-    setNote(_note);
-    if (_note.conflicted) {
-      eSendEvent(eShowMergeDialog, _note);
+    let _note = db.notes.note(item.id).data;
+    if (history.selectedItemsList.length > 0) {
+      dispatch({type: Actions.SELECTED_ITEMS, item: _note});
       return;
     }
 
-    if (history.selectedItemsList.length > 0) {
-      dispatch({type: Actions.SELECTED_ITEMS, item: _note});
+    if (_note.conflicted) {
+      eSendEvent(eShowMergeDialog, _note);
       return;
     }
 
@@ -88,15 +54,14 @@ export const NoteWrapper = ({item, index, isTrash = false}) => {
   return (
     <SelectionWrapper
       index={index}
+      height={100}
       testID={notesnook.ids.note.get(index)}
       onPress={onPress}
-      item={note}>
+      item={item}>
       <NoteItem
-        colors={colors}
-        item={note}
-        fontScale={fontScale}
+        item={item}
         isTrash={isTrash}
       />
     </SelectionWrapper>
   );
-};
+});

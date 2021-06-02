@@ -1,24 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header/index';
+import React, {useCallback, useEffect, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/DB';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-export const Home = ({route, navigation}) => {
+import {InteractionManager, scrollRef} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {tabBarRef} from '../../utils/Refs';
+
+export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
   const [localLoad, setLocalLoad] = useState(true);
-  const notes = state.notes.slice();
+  const notes = state.notes;
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
@@ -56,7 +57,6 @@ export const Home = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
 
       Navigation.routeNeedsUpdate('Notes', () => {
-        console.log('updating notes as requested');
         dispatch({type: Actions.NOTES});
       });
 
@@ -104,16 +104,14 @@ export const Home = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = async () => {
-
+  const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isLargeTablet()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
-  };
-
+  }, []);
   return (
     <>
       <SelectionHeader screen="Notes" />
@@ -127,7 +125,7 @@ export const Home = ({route, navigation}) => {
       </ContainerTopSection>
 
       <SimpleList
-        listData={notes}
+        listData={state.notes}
         scrollRef={scrollRef}
         type="notes"
         isHome={true}
@@ -149,7 +147,7 @@ export const Home = ({route, navigation}) => {
         }}
       />
 
-      {!notes || notes.length === 0 ? null : (
+      {!state.notes || state.notes.length === 0 ? null : (
         <ContainerBottomButton
           title="Create a new note"
           onPress={_onPressBottomButton}

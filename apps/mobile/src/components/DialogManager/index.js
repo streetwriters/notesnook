@@ -123,7 +123,6 @@ export class DialogManager extends Component {
 
   showAddTopic = () => {
     let item = this.state.item;
-    console.log(item);
     this.addTopicsDialog.open({
       notebookId: item?.type !== 'topic' ? item.id : item.notebookId,
       toEdit: item?.type === 'topic' ? item : null,

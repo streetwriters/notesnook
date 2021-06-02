@@ -32,7 +32,7 @@ export const Tags = ({route, navigation}) => {
       });
 
       eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
-    
+
       updateSearch();
       ranAfterInteractions = false;
     });
@@ -90,14 +90,13 @@ export const Tags = ({route, navigation}) => {
   };
 
   return (
-    <>  
-        <SelectionHeader screen="Tags" />
+    <>
+      <SelectionHeader screen="Tags" />
       <ContainerTopSection>
-      
         <Header title="Tags" isBack={false} screen="Tags" />
       </ContainerTopSection>
       <SimpleList
-        listData={tags}
+        listData={state.tags}
         type="tags"
         headerProps={{
           heading: 'Tags',

@@ -128,7 +128,6 @@ export const NavigatorStack = React.memo(
                 headerShown: false,
                 animationEnabled: false,
                 gestureEnabled: false,
-              
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />

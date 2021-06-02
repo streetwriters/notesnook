@@ -6,6 +6,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
@@ -56,10 +57,11 @@ export const ActionSheetColorsSection = ({item, close}) => {
           }
           localRefresh();
           dispatch({type: Actions.COLORS});
-          sendNoteEditedEvent({
-            id: note.id,
-            forced: true,
-          });
+          Navigation.setRoutesToUpdate([
+            Navigation.routeNames.NotesPage,
+            Navigation.routeNames.Favorites,
+            Navigation.routeNames.Notes,
+          ]);
           eSendEvent(refreshNotesPage);
         }}
         customStyle={{

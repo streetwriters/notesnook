@@ -7,13 +7,13 @@ import Storage from './storage';
 
 var CACHED_ANNOUNCEMENT;
 export default function useAnnouncement() {
-  const [announcement, setAnnouncement] = useState();
+  const [announcement, setAnnouncement] = useState(CACHED_ANNOUNCEMENT);
 
   useEffect(() => {
     (async function () {
       try {
         CACHED_ANNOUNCEMENT = CACHED_ANNOUNCEMENT || (await db.announcement());
-
+        
         if (
           !CACHED_ANNOUNCEMENT ||
           (await Storage.read('removedAnnouncement')) ===
@@ -23,14 +23,13 @@ export default function useAnnouncement() {
           return;
 
         setAnnouncement(CACHED_ANNOUNCEMENT);
-      } catch (e) {
-        setAnnouncement(null);
-      }
+      } catch (e) {}
     })();
   }, []);
 
   const remove = useCallback(async () => {
     await Storage.write('removedAnnouncement', CACHED_ANNOUNCEMENT.id);
+    CACHED_ANNOUNCEMENT = null;
     setAnnouncement(null);
   }, [announcement]);
   return [announcement, remove];

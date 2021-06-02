@@ -34,6 +34,7 @@ import tiny from '../../views/Editor/tiny/tiny';
 import diff from '../../utils/differ';
 import {openLinkInBrowser} from '../../utils/functions';
 import Sync from '../../services/Sync';
+import Navigation from '../../services/Navigation';
 
 const {Value, timing} = Animated;
 
@@ -244,12 +245,11 @@ const MergeEditor = () => {
       });
     }
     eSendEvent(refreshNotesPage);
-    sendNoteEditedEvent({
-      id: note.id,
-      forced: true,
-    });
-    updateEvent({type: Actions.NOTES});
-    updateEvent({type: Actions.FAVORITES});
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes,
+    ]);
     close();
     await Sync.run();
   };

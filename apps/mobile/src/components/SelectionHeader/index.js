@@ -14,7 +14,7 @@ import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
-export const SelectionHeader = ({screen}) => {
+export const SelectionHeader = React.memo(({screen}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const insets = useSafeAreaInsets();
@@ -194,6 +194,6 @@ export const SelectionHeader = ({screen}) => {
       </View>
     </View>
   );
-};
+});
 
 export default SelectionHeader;

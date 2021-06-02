@@ -1,7 +1,6 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
-import { Header } from '../Header';
 
 export const ContainerTopSection = ({children}) => {
   const [state] = useTracked();

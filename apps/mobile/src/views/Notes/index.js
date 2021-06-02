@@ -35,7 +35,7 @@ export const Notes = ({route, navigation}) => {
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 400) => {
+  const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('NotesPage', () => {
         init();
@@ -48,7 +48,7 @@ export const Notes = ({route, navigation}) => {
       } else {
         _notes = db.notebooks
           .notebook(params.notebookId)
-          ?.topics.topic(params.id)?.all
+          ?.topics.topic(params.id)?.all;
       }
       if (
         (params.type === 'tag' || params.type === 'color') &&
@@ -260,9 +260,8 @@ export const Notes = ({route, navigation}) => {
 
   return (
     <>
-           <SelectionHeader screen="NotesPage" />
+      <SelectionHeader screen="NotesPage" />
       <ContainerTopSection>
-   
         <Header
           title={headerProps.heading}
           isBack={!params.menu}

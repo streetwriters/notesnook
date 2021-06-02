@@ -1,22 +1,14 @@
-import React, {useMemo} from 'react';
-import {notesnook} from '../../../e2e/test.ids';
+import React from 'react';
 import {NotebookItem} from '.';
-import SelectionWrapper from '../SelectionWrapper';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import Navigation from '../../services/Navigation';
-import {rootNavigatorRef} from '../../utils/Refs';
-import { history } from '../../utils';
+import {history} from '../../utils';
+import SelectionWrapper from '../SelectionWrapper';
 
-export const NotebookWrapper = ({
-  item,
-  index,
-  isTrash = false,
-  pinned = false,
-  isTopic,
-}) => {
+export const NotebookWrapper = React.memo(({item, index}) => {
   const [state, dispatch] = useTracked();
-
+  const isTrash = item.type === 'trash';
 
   const onPress = () => {
     if (history.selectedItemsList.length > 0) {
@@ -24,10 +16,12 @@ export const NotebookWrapper = ({
         type: Actions.SELECTED_ITEMS,
         item: item,
       });
+   
       return;
     }
-    let routeName = isTopic ? 'NotesPage' : 'Notebook';
-    let params = isTopic
+    let routeName = item.type === "topic" ? 'NotesPage' : 'Notebook';
+    
+    let params = item.type === "topic"
       ? {...item, menu: false}
       : {
           menu: false,
@@ -43,21 +37,17 @@ export const NotebookWrapper = ({
   };
   return (
     <SelectionWrapper
-      pinned={pinned}
-      testID={
-        isTopic
-          ? notesnook.ids.topic.get(index)
-          : notesnook.ids.notebook.get(index)
-      }
+      pinned={item.pinned}
       index={index}
       onPress={onPress}
+      height={item.type === 'topic' ? 80 : 110}
       item={item}>
       <NotebookItem
-        isTopic={isTopic}
+        isTopic={item.type === 'topic'}
         item={item}
         index={index}
         isTrash={isTrash}
       />
     </SelectionWrapper>
   );
-};
+});

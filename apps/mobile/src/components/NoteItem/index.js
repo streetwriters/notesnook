@@ -1,24 +1,23 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {Text, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { db } from '../../utils/DB';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
-import { TimeSince } from '../Menu/TimeSince';
+import {useTracked} from '../../provider';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {db} from '../../utils/DB';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
+import {TimeSince} from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
+const NoteItem = ({item, isTrash}) => {
   const [state] = useTracked();
   const {colors} = state;
 
   const showActionSheet = () => {
-    let note = isTrash? item : db.notes.note(item?.id)?.data;
-    ActionSheetEvent( 
+    let note = isTrash ? item : db.notes.note(item?.id)?.data;
+    ActionSheetEvent(
       note ? note : item,
       isTrash ? false : true,
       isTrash ? false : true,
@@ -28,66 +27,41 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
       isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
     );
   };
+
   return (
-    <View
-      style={[
-        {
-          justifyContent: 'flex-start',
-          alignItems: 'center',
-          flexDirection: 'row',
-          width: '100%',
-          paddingRight: 6,
-          alignSelf: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: colors.nav,
-          height: 100 * fontScale,
-        },
-        customStyle ? customStyle : {},
-      ]}>
+    <>
       <View
         style={{
           width: '92%',
           paddingRight: 5,
         }}>
         {!isTrash && item.notebooks && item.notebooks.length > 0 ? (
-          <View
+          <Heading
+            size={SIZE.xs}
             style={{
-              flexDirection: 'row',
-            }}>
-            <TouchableOpacity
-              activeOpacity={1}
-              style={{
-                paddingVertical: 1.5,
-                marginBottom: 2.5,
-                flexDirection: 'row',
-                alignItems: 'center',
-              }}>
-              <Icon
-                name="book-outline"
-                color={item.color ? COLORS_NOTE[item.color] : colors.accent}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 2.5,
-                }}
-              />
-              <Heading
-                size={SIZE.xs}
-                color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
-                {db.notebooks.notebook(item.notebooks[0]?.id)?.title + ' '}{' '}
-                {item.notebooks.length > 1
-                  ? '& ' + (item.notebooks.length - 1) + ' others'
-                  : ''}
-              </Heading>
-            </TouchableOpacity>
-          </View>
+              marginBottom: 2.5,
+            }}
+            color={item.color ? COLORS_NOTE[item.color] : colors.accent}>
+            <Icon
+              name="book-outline"
+              color={item.color ? COLORS_NOTE[item.color] : colors.accent}
+              size={SIZE.xs}
+            />{' '}
+            {db.notebooks.notebook(item.notebooks[0]?.id)?.title + ' '}{' '}
+            {item.notebooks.length > 1
+              ? '& ' + (item.notebooks.length - 1) + ' others'
+              : ''}
+          </Heading>
         ) : null}
 
-        <Heading
-          color={COLORS_NOTE[item.color]}
-          numberOfLines={1}
-          size={SIZE.md}>
-          {item.title}
-        </Heading>
+        <Text
+          style={{
+            color: COLORS_NOTE[item.color] || colors.heading,
+            fontSize: SIZE.md,
+            fontWeight: 'bold',
+          }}>
+          {item.title + ' '}
+        </Text>
 
         {item.headline ? (
           <Paragraph numberOfLines={2}>{item.headline}</Paragraph>
@@ -100,6 +74,7 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
             alignItems: 'center',
             width: '100%',
             marginTop: 2.5,
+            height: SIZE.md + 2,
           }}>
           {!isTrash ? (
             <>
@@ -166,9 +141,7 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
                 />
               ) : null}
             </>
-          ) : null}
-
-          {isTrash ? (
+          ) : (
             <>
               <Paragraph
                 color={colors.icon}
@@ -190,14 +163,12 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
                   : null}
               </Paragraph>
             </>
-          ) : null}
+          )}
         </View>
       </View>
-
       <ActionIcon
         color={colors.heading}
         name="dots-horizontal"
-        testID={notesnook.ids.note.menu}
         size={SIZE.xl}
         onPress={showActionSheet}
         customStyle={{
@@ -208,8 +179,8 @@ const NoteItem = ({item, customStyle, isTrash, fontScale}) => {
           alignItems: 'center',
         }}
       />
-    </View>
+    </>
   );
-}
+};
 
 export default NoteItem;

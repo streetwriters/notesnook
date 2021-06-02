@@ -1,5 +1,5 @@
 import React, {createRef, useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, ScrollView, View} from 'react-native';
+import {ActivityIndicator, Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import {FlatList} from 'react-native-gesture-handler';
 import {useTracked} from '../../provider';
@@ -18,7 +18,6 @@ import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
@@ -164,7 +163,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             paddingHorizontal: 8,
             paddingRight: 8,
             alignItems: 'center',
-            paddingTop: restoring ? 25 : 0,
+            paddingTop: restoring ? 8 : 0,
           }}>
           <DialogHeader
             title="Backups"
@@ -177,8 +176,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                   return;
                 }
                 DocumentPicker.pick()
-                  .then((r) => {
-                    fetch(r.uri).then(async (r) => {
+                  .then(r => {
+                    fetch(r.uri).then(async r => {
                       try {
                         let backup = await r.json();
                         setRestoring(true);
@@ -224,46 +223,34 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
           ListEmptyComponent={
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 100,
-              }}>
-              <Paragraph color={colors.icon}>No backups found.</Paragraph>
-            </View>
-          }
-          keyExtractor={(item) => item.filename}
-          ListHeaderComponent={
-            !restoring ? null : (
+            restoring ? (
               <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
+                  height: 100,
+                }}>
+                <Paragraph color={colors.icon}>No backups found.</Paragraph>
+              </View>
+            ) : (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
                 }}>
                 <ActivityIndicator color={colors.accent} />
                 <Paragraph color={colors.icon}>
                   Restoring backup. Please wait.
                 </Paragraph>
-
-                <Button
-                  title="Cancel"
-                  type="accent"
-                  onPress={() => {
-                    setRestoring(false);
-                  }}
-                  height={25}
-                  style={{
-                    marginTop: 5,
-                  }}
-                />
               </View>
             )
           }
+          keyExtractor={item => item.filename}
           style={{
             paddingHorizontal: 12,
           }}
-          data={files}
+          data={restoring ? [] : files}
           renderItem={({item, index}) => [
             <View
               style={{
@@ -298,11 +285,13 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             </View>,
           ]}
           ListFooterComponent={
-            <View
-              style={{
-                height: 150,
-              }}
-            />
+            restoring ? null : (
+              <View
+                style={{
+                  height: 150,
+                }}
+              />
+            )
           }
         />
       </View>

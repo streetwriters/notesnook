@@ -186,10 +186,11 @@ export class VaultDialog extends Component {
       });
       return;
     }
-    sendNoteEditedEvent({
-      id: this.state.note.id,
-      forced: true,
-    });
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes,
+    ]);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
       Navigation.routeNames.Favorites,

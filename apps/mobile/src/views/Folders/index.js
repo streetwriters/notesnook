@@ -11,9 +11,10 @@ import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
 import {DDS} from '../../services/DeviceDetection';
 import {InteractionManager} from '../../utils';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
+import {db} from '../../utils/DB';
 
 export const Folders = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
@@ -87,22 +88,21 @@ export const Folders = ({route, navigation}) => {
     }
   }, [notebooks]);
 
-  const updateSearch = () => {
+  const updateSearch = React.useCallback(() => {
     SearchService.update({
       placeholder: 'Type a keyword to search in notebooks',
-      data: notebooks,
+      data: db.notebooks.all,
       type: 'notebooks',
       title: 'Notebooks',
     });
-  };
+  }, []);
 
   const _onPressBottomButton = () => AddNotebookEvent();
 
   return (
     <>
-            <SelectionHeader   screen="Notebooks" />
-       <ContainerTopSection>
- 
+      <SelectionHeader screen="Notebooks" />
+      <ContainerTopSection>
         <Header
           title="Notebooks"
           isBack={false}
@@ -111,7 +111,7 @@ export const Folders = ({route, navigation}) => {
         />
       </ContainerTopSection>
       <SimpleList
-        listData={notebooks}
+        listData={state.notebooks}
         type="notebooks"
         screen="Notebooks"
         focused={() => navigation.isFocused()}
@@ -129,7 +129,7 @@ export const Folders = ({route, navigation}) => {
         placeholder={<Placeholder type="notebooks" />}
       />
 
-      {!notebooks || notebooks.length === 0 ? null : (
+      {!state.notebooks || state.notebooks.length === 0 ? null : (
         <ContainerBottomButton
           title="Create a new notebook"
           onPress={_onPressBottomButton}

@@ -37,9 +37,10 @@ const DialogHeader = ({icon, title, paragraph, button,paragraphColor}) => {
                 style={{
                   borderRadius: 100,
                 }}
+                fontSize={13}
                 title={button.title}
                 type="accent"
-                height={22}
+                height={25}
               />
             )}
           </View>

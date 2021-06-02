@@ -1,5 +1,4 @@
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
@@ -12,16 +11,9 @@ import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const NotebookItem = ({
-  item,
-  isTopic = false,
-  notebookID,
-  isTrash,
-  customStyle,
-}) => {
+export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const {fontScale} = useWindowDimensions();
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
     let rowItems = isTrash
@@ -39,21 +31,20 @@ export const NotebookItem = ({
     });
   };
 
+  const navigateToTopic = (topic) => {
+    if (history.selectedItemsList.length > 0) return;
+    let routeName = 'NotesPage';
+    let params = {...topic, menu: false};
+    let headerState = {
+      heading: topic.title,
+      id: topic.id,
+      type: topic.type,
+    };
+    Navigation.navigate(routeName, params, headerState);
+  };
+
   return (
-    <View
-      style={[
-        {
-          height: isTopic ? 80 * fontScale : 110 * fontScale,
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-          paddingRight: 6,
-          alignSelf: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: item.pinned ? 'transparent' : colors.nav,
-          width: '100%',
-        },
-      ]}>
+    <>
       <View
         style={{
           width: '90%',
@@ -88,7 +79,7 @@ export const NotebookItem = ({
               width: '80%',
               maxWidth: '80%',
               flexWrap: 'wrap',
-              paddingVertical: item.description ? 0 : 0,
+              paddingVertical: 0,
             }}>
             {item && item.topics ? (
               item.topics
@@ -97,17 +88,7 @@ export const NotebookItem = ({
                 .map(topic => (
                   <TouchableOpacity
                     activeOpacity={0.8}
-                    onPress={() => {
-                      if (history.selectedItemsList.length > 0) return;
-                      let routeName = 'NotesPage';
-                      let params = {...topic, menu: false};
-                      let headerState = {
-                        heading: topic.title,
-                        id: topic.id,
-                        type: topic.type,
-                      };
-                      Navigation.navigate(routeName, params, headerState);
-                    }}
+                    onPress={() => navigateToTopic(topic)}
                     key={topic.id}
                     style={{
                       borderRadius: 2.5,
@@ -173,19 +154,17 @@ export const NotebookItem = ({
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
             </>
-          ) : null}
-          {isTrash ? null : (
-            <>
-              <Paragraph
-                color={colors.icon}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 10,
-                }}>
-                {new Date(item.dateCreated).toDateString().substring(4)}
-              </Paragraph>
-            </>
+          ) : (
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.xs}
+              style={{
+                marginRight: 10,
+              }}>
+              {new Date(item.dateCreated).toDateString().substring(4)}
+            </Paragraph>
           )}
+
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
@@ -193,10 +172,10 @@ export const NotebookItem = ({
               marginRight: 10,
             }}>
             {item && totalNotes > 1
-              ? totalNotes + ' Notes'
+              ? totalNotes + ' notes'
               : totalNotes === 1
-              ? totalNotes + ' Note'
-              : '0 Notes'}
+              ? totalNotes + ' note'
+              : '0 notes'}
           </Paragraph>
 
           {item.pinned ? (
@@ -227,6 +206,6 @@ export const NotebookItem = ({
           alignItems: 'center',
         }}
       />
-    </View>
+    </>
   );
 };

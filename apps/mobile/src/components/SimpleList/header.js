@@ -1,18 +1,16 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import useAnnouncement from '../../utils/useAnnouncement';
-import {Button} from '../Button';
-import {Placeholder} from '../ListPlaceholders';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { Placeholder } from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import {Announcement} from './announcement';
-import {Card} from './card';
+import { Card } from './card';
 
-export const Header = ({
+export const Header = React.memo(({
   type,
   messageCard = true,
   title,
@@ -112,4 +110,4 @@ export const Header = ({
       </View>
     </View>
   );
-};
+});

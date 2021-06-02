@@ -13,7 +13,6 @@ export const SelectionIcon = ({setActionStrip, item}) => {
 
   useEffect(() => {
     if (selectionMode) {
-     
       setActionStrip(false);
       let exists = selectedItemsList.filter(
         (o) => o.dateCreated === item.dateCreated,

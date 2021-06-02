@@ -1,18 +1,16 @@
-import React, {useEffect} from 'react';
-import {View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {eOpenPremiumDialog} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import useAnnouncement from '../../utils/useAnnouncement';
-import {Button} from '../Button';
+import React from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { eOpenPremiumDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Announcement = ({data, color,announcement,remove}) => {
+export const Announcement = ({announcement,remove}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const {selectionMode} = state;

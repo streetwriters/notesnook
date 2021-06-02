@@ -82,12 +82,12 @@ export const Trash = ({route, navigation}) => {
     if (navigation.isFocused()) {
       updateSearch();
     }
-  }, [trash]);
+  }, [state.trash]);
 
   const updateSearch = () => {
     SearchService.update({
       placeholder: 'Search in trash',
-      data: trash,
+      data: state.trash,
       type: 'trash',
       title: 'Trash',
     });
@@ -107,7 +107,7 @@ export const Trash = ({route, navigation}) => {
         />
       </ContainerTopSection>
       <SimpleList
-        listData={trash}
+        listData={state.trash}
         type="trash"
         screen="Trash"
         focused={() => navigation.isFocused()}
@@ -126,7 +126,7 @@ export const Trash = ({route, navigation}) => {
         placeholderText="Deleted notes & notebooks appear here."
       />
 
-      {trash && trash.length !== 0 && (
+      {state.trash && state.trash.length !== 0 && (
         <ContainerBottomButton
           title="Clear all trash"
           onPress={_onPressBottomButton}
