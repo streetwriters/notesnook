@@ -141,11 +141,12 @@ export const reducer = (state, action) => {
     }
     case Actions.SELECTED_ITEMS: {
       let selectedItems = [...state.selectedItemsList];
-      if (selectedItems.includes(action.item)) {
+      if (selectedItems.findIndex(item => item.id === action.item.id) !== -1) {
         selectedItems.splice(selectedItems.indexOf(action.item), 1);
       } else {
         selectedItems.push(action.item);
       }
+      selectedItems = [...new Set(selectedItems)];
       history.selectedItemsList = selectedItems;
       if (selectedItems.length === 0) {
         eSendEvent(eOpenSideMenu);
