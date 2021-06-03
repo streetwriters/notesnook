@@ -90,6 +90,16 @@ function Toolbar(props) {
         },
       },
       {
+        title: isFocusMode ? "Normal mode" : "Focus mode",
+        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
+        enabled: true,
+        hideOnMobile: true,
+        onClick: () => {
+          toggleFocusMode();
+          if (tinymce.activeEditor) tinymce.activeEditor.focus();
+        },
+      },
+      {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
@@ -100,16 +110,6 @@ function Toolbar(props) {
         icon: Icon.Redo,
         enabled: redoable,
         onClick: () => tinymce.activeEditor.execCommand("Redo"),
-      },
-      {
-        title: isFocusMode ? "Normal mode" : "Focus mode",
-        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
-        enabled: true,
-        hideOnMobile: true,
-        onClick: () => {
-          toggleFocusMode();
-          if (tinymce.activeEditor) tinymce.activeEditor.focus();
-        },
       },
       {
         title: "Properties",
