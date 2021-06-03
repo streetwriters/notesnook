@@ -7,6 +7,9 @@ import { qclone } from "qclone";
 
 export default class Notebooks extends Collection {
   async merge(remoteNotebook) {
+    if (remoteNotebook.deleted)
+      return await this._collection.addItem(remoteNotebook);
+
     const id = remoteNotebook.id || getId();
     let localNotebook = this._collection.getItem(id);
 
