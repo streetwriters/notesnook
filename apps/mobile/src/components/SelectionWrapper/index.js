@@ -28,12 +28,10 @@ const SelectionWrapper = ({
   };
 
   const _onPress = async () => {
-
     if (actionStrip) {
       setActionStrip(false);
       return;
     }
-    console.log('clicking',onPress);
     await onPress();
   };
 

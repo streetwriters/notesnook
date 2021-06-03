@@ -1,17 +1,16 @@
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
 import NoteItem from '.';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, openVault} from '../../services/EventManager';
-import {history} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOnLoadNote, eShowMergeDialog} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_TRASH} from '../DialogManager/Templates';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, openVault } from '../../services/EventManager';
+import { history } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOnLoadNote, eShowMergeDialog } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
+import { simpleDialogEvent } from '../DialogManager/recievers';
+import { TEMPLATE_TRASH } from '../DialogManager/Templates';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NoteWrapper = React.memo(({item, index}) => {
@@ -20,7 +19,7 @@ export const NoteWrapper = React.memo(({item, index}) => {
 
   const onPress = async () => {
     let _note = db.notes.note(item.id).data;
-    if (history.selectedItemsList.length > 0) {
+    if (history.selectedItemsList.length > 0 ) {
       dispatch({type: Actions.SELECTED_ITEMS, item: _note});
       return;
     }

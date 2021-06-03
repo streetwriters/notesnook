@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
@@ -14,6 +14,7 @@ import Paragraph from '../Typography/Paragraph';
 export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const [state] = useTracked();
   const {colors} = state;
+  const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
     let rowItems = isTrash
@@ -31,10 +32,10 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     });
   };
 
-  const navigateToTopic = (topic) => {
+  const navigateToTopic = topic => {
     if (history.selectedItemsList.length > 0) return;
     let routeName = 'NotesPage';
-    let params = {...topic, menu: false};
+    let params = {...topic, menu: false, get: 'topics'};
     let headerState = {
       heading: topic.title,
       id: topic.id,
@@ -81,47 +82,32 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               flexWrap: 'wrap',
               paddingVertical: 0,
             }}>
-            {item && item.topics ? (
-              item.topics
-                .sort((a, b) => b.dateEdited - a.dateEdited)
-                .slice(0, 2)
-                .map(topic => (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => navigateToTopic(topic)}
-                    key={topic.id}
-                    style={{
-                      borderRadius: 2.5,
-                      backgroundColor: colors.accent,
-                      paddingHorizontal: 5,
-                      paddingVertical: 2,
-                      marginRight: 5,
-                      marginVertical: 2.5,
-                    }}>
-                    <Paragraph
-                      size={SIZE.xs}
-                      numberOfLines={1}
-                      style={{
-                        color: 'white',
-                        maxWidth: '100%',
-                      }}>
-                      {topic.title.length > 16
-                        ? topic.title.slice(0, 16) + '...'
-                        : topic.title}
-                    </Paragraph>
-                  </TouchableOpacity>
-                ))
-            ) : (
-              <Paragraph
-                color={colors.icon}
-                size={SIZE.xs}
+            {topics.map(topic => (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigateToTopic(topic)}
+                key={topic.id}
                 style={{
-                  paddingVertical: pv / 3,
-                  maxWidth: '100%',
+                  borderRadius: 2.5,
+                  backgroundColor: colors.accent,
+                  paddingHorizontal: 5,
+                  paddingVertical: 2,
+                  marginRight: 5,
+                  marginVertical: 2.5,
+                  maxWidth: 70,
                 }}>
-                This notebook has no topics.
-              </Paragraph>
-            )}
+                <Paragraph
+                  size={SIZE.xs}
+                  numberOfLines={1}
+                  lineBreakMode="tail"
+                  color="white"
+                  style={{
+                    maxWidth: '100%',
+                  }}>
+                  {topic.title}
+                </Paragraph>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 

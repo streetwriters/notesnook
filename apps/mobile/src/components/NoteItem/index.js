@@ -55,6 +55,7 @@ const NoteItem = ({item, isTrash}) => {
         ) : null}
 
         <Text
+          numberOfLines={1}
           style={{
             color: COLORS_NOTE[item.color] || colors.heading,
             fontSize: SIZE.md,
