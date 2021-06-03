@@ -1,10 +1,8 @@
 import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
 import * as React from 'react';
 import {Animated} from 'react-native';
-import SplashScreen from 'react-native-splash-screen';
+import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import {updateEvent} from '../components/DialogManager/recievers';
 import {useTracked} from '../provider';
 import {Actions} from '../provider/Actions';
 import {
@@ -14,10 +12,9 @@ import {
 } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
-import {editing, history} from '../utils';
+import {history} from '../utils';
 import {eOpenSideMenu} from '../utils/Events';
 import {rootNavigatorRef} from '../utils/Refs';
-import {sleep} from '../utils/TimeUtils';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
@@ -28,7 +25,7 @@ import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
-const Stack = createStackNavigator();
+const Stack = createNativeStackNavigator();
 
 const forFade = ({current}) => ({
   cardStyle: {
@@ -128,6 +125,7 @@ export const NavigatorStack = React.memo(
                 headerShown: false,
                 animationEnabled: false,
                 gestureEnabled: false,
+                stackAnimation: 'none',
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
