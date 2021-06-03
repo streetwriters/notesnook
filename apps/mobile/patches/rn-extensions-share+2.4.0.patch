@@ -1,0 +1,1101 @@
+diff --git a/node_modules/rn-extensions-share/.DS_Store b/node_modules/rn-extensions-share/.DS_Store
+new file mode 100644
+index 0000000..58fc5df
+Binary files /dev/null and b/node_modules/rn-extensions-share/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/.DS_Store b/node_modules/rn-extensions-share/android/.DS_Store
+new file mode 100644
+index 0000000..bb680c8
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/build.gradle b/node_modules/rn-extensions-share/android/build.gradle
+index da0d649..608117a 100644
+--- a/node_modules/rn-extensions-share/android/build.gradle
++++ b/node_modules/rn-extensions-share/android/build.gradle
+@@ -1,22 +1,26 @@
+ buildscript {
++  ext.kotlin_version = '1.4.0'
+   repositories {
+     jcenter()
++    google()
+   }
+ 
+   dependencies {
+-    classpath 'com.android.tools.build:gradle:1.1.3'
++    classpath 'com.android.tools.build:gradle:4.0.1'
++    classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+   }
+ }
+ 
+ apply plugin: 'com.android.library'
++apply plugin: 'kotlin-android'
+ 
+ android {
+-  compileSdkVersion 23
+-  buildToolsVersion "23.0.1"
++  compileSdkVersion 29
++  buildToolsVersion "29.0.2"
+ 
+   defaultConfig {
+-    minSdkVersion 16
+-    targetSdkVersion 22
++    minSdkVersion 21
++    targetSdkVersion 29
+     versionCode 1
+     versionName "1.0"
+   }
+@@ -26,9 +30,15 @@ android {
+ }
+ 
+ repositories {
+-  mavenCentral()
++  jcenter()
++  google()
++  maven {
++    // All of React Native (JS, Android binaries) is installed from npm
++    url "$rootDir/../node_modules/react-native/android"
++  }
+ }
+ 
+ dependencies {
+   implementation "com.facebook.react:react-native:+"
++  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+ }
+diff --git a/node_modules/rn-extensions-share/android/gradle.properties b/node_modules/rn-extensions-share/android/gradle.properties
+new file mode 100644
+index 0000000..d015431
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/gradle.properties
+@@ -0,0 +1,2 @@
++android.useAndroidX=true
++android.enableJetifier=true
+\ No newline at end of file
+diff --git a/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.jar b/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.jar
+new file mode 100644
+index 0000000..f6b961f
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.jar differ
+diff --git a/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.properties b/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.properties
+new file mode 100644
+index 0000000..847858c
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/gradle/wrapper/gradle-wrapper.properties
+@@ -0,0 +1,6 @@
++#Fri Aug 14 18:40:57 BST 2020
++distributionBase=GRADLE_USER_HOME
++distributionPath=wrapper/dists
++zipStoreBase=GRADLE_USER_HOME
++zipStorePath=wrapper/dists
++distributionUrl=https\://services.gradle.org/distributions/gradle-6.1.1-all.zip
+diff --git a/node_modules/rn-extensions-share/android/gradlew b/node_modules/rn-extensions-share/android/gradlew
+new file mode 100644
+index 0000000..cccdd3d
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/gradlew
+@@ -0,0 +1,172 @@
++#!/usr/bin/env sh
++
++##############################################################################
++##
++##  Gradle start up script for UN*X
++##
++##############################################################################
++
++# Attempt to set APP_HOME
++# Resolve links: $0 may be a link
++PRG="$0"
++# Need this for relative symlinks.
++while [ -h "$PRG" ] ; do
++    ls=`ls -ld "$PRG"`
++    link=`expr "$ls" : '.*-> \(.*\)$'`
++    if expr "$link" : '/.*' > /dev/null; then
++        PRG="$link"
++    else
++        PRG=`dirname "$PRG"`"/$link"
++    fi
++done
++SAVED="`pwd`"
++cd "`dirname \"$PRG\"`/" >/dev/null
++APP_HOME="`pwd -P`"
++cd "$SAVED" >/dev/null
++
++APP_NAME="Gradle"
++APP_BASE_NAME=`basename "$0"`
++
++# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++DEFAULT_JVM_OPTS=""
++
++# Use the maximum available, or set MAX_FD != -1 to use that value.
++MAX_FD="maximum"
++
++warn () {
++    echo "$*"
++}
++
++die () {
++    echo
++    echo "$*"
++    echo
++    exit 1
++}
++
++# OS specific support (must be 'true' or 'false').
++cygwin=false
++msys=false
++darwin=false
++nonstop=false
++case "`uname`" in
++  CYGWIN* )
++    cygwin=true
++    ;;
++  Darwin* )
++    darwin=true
++    ;;
++  MINGW* )
++    msys=true
++    ;;
++  NONSTOP* )
++    nonstop=true
++    ;;
++esac
++
++CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
++
++# Determine the Java command to use to start the JVM.
++if [ -n "$JAVA_HOME" ] ; then
++    if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
++        # IBM's JDK on AIX uses strange locations for the executables
++        JAVACMD="$JAVA_HOME/jre/sh/java"
++    else
++        JAVACMD="$JAVA_HOME/bin/java"
++    fi
++    if [ ! -x "$JAVACMD" ] ; then
++        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
++
++Please set the JAVA_HOME variable in your environment to match the
++location of your Java installation."
++    fi
++else
++    JAVACMD="java"
++    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
++
++Please set the JAVA_HOME variable in your environment to match the
++location of your Java installation."
++fi
++
++# Increase the maximum file descriptors if we can.
++if [ "$cygwin" = "false" -a "$darwin" = "false" -a "$nonstop" = "false" ] ; then
++    MAX_FD_LIMIT=`ulimit -H -n`
++    if [ $? -eq 0 ] ; then
++        if [ "$MAX_FD" = "maximum" -o "$MAX_FD" = "max" ] ; then
++            MAX_FD="$MAX_FD_LIMIT"
++        fi
++        ulimit -n $MAX_FD
++        if [ $? -ne 0 ] ; then
++            warn "Could not set maximum file descriptor limit: $MAX_FD"
++        fi
++    else
++        warn "Could not query maximum file descriptor limit: $MAX_FD_LIMIT"
++    fi
++fi
++
++# For Darwin, add options to specify how the application appears in the dock
++if $darwin; then
++    GRADLE_OPTS="$GRADLE_OPTS \"-Xdock:name=$APP_NAME\" \"-Xdock:icon=$APP_HOME/media/gradle.icns\""
++fi
++
++# For Cygwin, switch paths to Windows format before running java
++if $cygwin ; then
++    APP_HOME=`cygpath --path --mixed "$APP_HOME"`
++    CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
++    JAVACMD=`cygpath --unix "$JAVACMD"`
++
++    # We build the pattern for arguments to be converted via cygpath
++    ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
++    SEP=""
++    for dir in $ROOTDIRSRAW ; do
++        ROOTDIRS="$ROOTDIRS$SEP$dir"
++        SEP="|"
++    done
++    OURCYGPATTERN="(^($ROOTDIRS))"
++    # Add a user-defined pattern to the cygpath arguments
++    if [ "$GRADLE_CYGPATTERN" != "" ] ; then
++        OURCYGPATTERN="$OURCYGPATTERN|($GRADLE_CYGPATTERN)"
++    fi
++    # Now convert the arguments - kludge to limit ourselves to /bin/sh
++    i=0
++    for arg in "$@" ; do
++        CHECK=`echo "$arg"|egrep -c "$OURCYGPATTERN" -`
++        CHECK2=`echo "$arg"|egrep -c "^-"`                                 ### Determine if an option
++
++        if [ $CHECK -ne 0 ] && [ $CHECK2 -eq 0 ] ; then                    ### Added a condition
++            eval `echo args$i`=`cygpath --path --ignore --mixed "$arg"`
++        else
++            eval `echo args$i`="\"$arg\""
++        fi
++        i=$((i+1))
++    done
++    case $i in
++        (0) set -- ;;
++        (1) set -- "$args0" ;;
++        (2) set -- "$args0" "$args1" ;;
++        (3) set -- "$args0" "$args1" "$args2" ;;
++        (4) set -- "$args0" "$args1" "$args2" "$args3" ;;
++        (5) set -- "$args0" "$args1" "$args2" "$args3" "$args4" ;;
++        (6) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" ;;
++        (7) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" ;;
++        (8) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" "$args7" ;;
++        (9) set -- "$args0" "$args1" "$args2" "$args3" "$args4" "$args5" "$args6" "$args7" "$args8" ;;
++    esac
++fi
++
++# Escape application args
++save () {
++    for i do printf %s\\n "$i" | sed "s/'/'\\\\''/g;1s/^/'/;\$s/\$/' \\\\/" ; done
++    echo " "
++}
++APP_ARGS=$(save "$@")
++
++# Collect all arguments for the java command, following the shell quoting and substitution rules
++eval set -- $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS "\"-Dorg.gradle.appname=$APP_BASE_NAME\"" -classpath "\"$CLASSPATH\"" org.gradle.wrapper.GradleWrapperMain "$APP_ARGS"
++
++# by default we should be in the correct project dir, but when run from Finder on Mac, the cwd is wrong
++if [ "$(uname)" = "Darwin" ] && [ "$HOME" = "$PWD" ]; then
++  cd "$(dirname "$0")"
++fi
++
++exec "$JAVACMD" "$@"
+diff --git a/node_modules/rn-extensions-share/android/gradlew.bat b/node_modules/rn-extensions-share/android/gradlew.bat
+new file mode 100644
+index 0000000..e95643d
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/gradlew.bat
+@@ -0,0 +1,84 @@
++@if "%DEBUG%" == "" @echo off
++@rem ##########################################################################
++@rem
++@rem  Gradle startup script for Windows
++@rem
++@rem ##########################################################################
++
++@rem Set local scope for the variables with windows NT shell
++if "%OS%"=="Windows_NT" setlocal
++
++set DIRNAME=%~dp0
++if "%DIRNAME%" == "" set DIRNAME=.
++set APP_BASE_NAME=%~n0
++set APP_HOME=%DIRNAME%
++
++@rem Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
++set DEFAULT_JVM_OPTS=
++
++@rem Find java.exe
++if defined JAVA_HOME goto findJavaFromJavaHome
++
++set JAVA_EXE=java.exe
++%JAVA_EXE% -version >NUL 2>&1
++if "%ERRORLEVEL%" == "0" goto init
++
++echo.
++echo ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
++echo.
++echo Please set the JAVA_HOME variable in your environment to match the
++echo location of your Java installation.
++
++goto fail
++
++:findJavaFromJavaHome
++set JAVA_HOME=%JAVA_HOME:"=%
++set JAVA_EXE=%JAVA_HOME%/bin/java.exe
++
++if exist "%JAVA_EXE%" goto init
++
++echo.
++echo ERROR: JAVA_HOME is set to an invalid directory: %JAVA_HOME%
++echo.
++echo Please set the JAVA_HOME variable in your environment to match the
++echo location of your Java installation.
++
++goto fail
++
++:init
++@rem Get command-line arguments, handling Windows variants
++
++if not "%OS%" == "Windows_NT" goto win9xME_args
++
++:win9xME_args
++@rem Slurp the command line arguments.
++set CMD_LINE_ARGS=
++set _SKIP=2
++
++:win9xME_args_slurp
++if "x%~1" == "x" goto execute
++
++set CMD_LINE_ARGS=%*
++
++:execute
++@rem Setup the command line
++
++set CLASSPATH=%APP_HOME%\gradle\wrapper\gradle-wrapper.jar
++
++@rem Execute Gradle
++"%JAVA_EXE%" %DEFAULT_JVM_OPTS% %JAVA_OPTS% %GRADLE_OPTS% "-Dorg.gradle.appname=%APP_BASE_NAME%" -classpath "%CLASSPATH%" org.gradle.wrapper.GradleWrapperMain %CMD_LINE_ARGS%
++
++:end
++@rem End local scope for the variables with windows NT shell
++if "%ERRORLEVEL%"=="0" goto mainEnd
++
++:fail
++rem Set variable GRADLE_EXIT_CONSOLE if you need the _script_ return code instead of
++rem the _cmd.exe /c_ return code!
++if  not "" == "%GRADLE_EXIT_CONSOLE%" exit 1
++exit /b 1
++
++:mainEnd
++if "%OS%"=="Windows_NT" endlocal
++
++:omega
+diff --git a/node_modules/rn-extensions-share/android/rn-extensions-share.iml b/node_modules/rn-extensions-share/android/rn-extensions-share.iml
+new file mode 100644
+index 0000000..c3bda52
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/rn-extensions-share.iml
+@@ -0,0 +1,174 @@
++<?xml version="1.0" encoding="UTF-8"?>
++<module external.linked.project.id=":rn-extensions-share" external.linked.project.path="$MODULE_DIR$" external.root.project.path="$MODULE_DIR$/../../../android" external.system.id="GRADLE" type="JAVA_MODULE" version="4">
++  <component name="FacetManager">
++    <facet type="android-gradle" name="Android-Gradle">
++      <configuration>
++        <option name="GRADLE_PROJECT_PATH" value=":rn-extensions-share" />
++        <option name="LAST_SUCCESSFUL_SYNC_AGP_VERSION" value="3.5.3" />
++        <option name="LAST_KNOWN_AGP_VERSION" value="3.5.3" />
++      </configuration>
++    </facet>
++    <facet type="android" name="Android">
++      <configuration>
++        <option name="SELECTED_BUILD_VARIANT" value="debug" />
++        <option name="ASSEMBLE_TASK_NAME" value="assembleDebug" />
++        <option name="COMPILE_JAVA_TASK_NAME" value="compileDebugSources" />
++        <afterSyncTasks>
++          <task>generateDebugSources</task>
++        </afterSyncTasks>
++        <option name="ALLOW_USER_CONFIGURATION" value="false" />
++        <option name="MANIFEST_FILE_RELATIVE_PATH" value="/src/main/AndroidManifest.xml" />
++        <option name="RES_FOLDER_RELATIVE_PATH" value="/src/main/res" />
++        <option name="RES_FOLDERS_RELATIVE_PATH" value="" />
++        <option name="TEST_RES_FOLDERS_RELATIVE_PATH" value="" />
++        <option name="ASSETS_FOLDER_RELATIVE_PATH" value="/src/main/assets" />
++        <option name="PROJECT_TYPE" value="1" />
++      </configuration>
++    </facet>
++    <facet type="kotlin-language" name="Kotlin">
++      <configuration version="3" platform="JVM 1.6" useProjectSettings="false">
++        <compilerSettings>
++          <option name="additionalArguments" value="-Xallow-no-source-files" />
++        </compilerSettings>
++        <compilerArguments>
++          <option name="destination" value="$MODULE_DIR$/build/tmp/kotlin-classes/debug" />
++          <option name="classpath" value="$USER_HOME$/.gradle/caches/transforms-2/files-2.1/188fdac6135fcce03dc9af26e116abdc/jetified-react-native-0.63.4-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.facebook.infer.annotation/infer-annotation/0.11.2/f514ff4ca022a579d9cf7524846988b646ae4491/infer-annotation-0.11.2.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/3.0.2/25ea2e8b0c338a877313bd4672d3fe056ea78f0d/jsr305-3.0.2.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.facebook.yoga/proguard-annotations/1.14.1/3d015bb821875657ac8e4b808a223aae339defb2/proguard-annotations-1.14.1.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/javax.inject/javax.inject/1/6975da39a7040257bd51d21a231b76c915872d38/javax.inject-1.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/f409a39860538beb5101cde26866331b/appcompat-1.0.2-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/469ae7df98ae66e740b968a0c05fbb3f/fragment-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/d48c2f2c92cf517c588ebd60d84e60b4/vectordrawable-animated-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/7c295bf0e2180de139a847749735e3e1/legacy-support-core-ui-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/38d53d326d6bf040ef1467e6356b0ba7/swiperefreshlayout-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/7df373737929b6686cf54b83addc40f7/legacy-support-core-utils-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/9302c9bc544791a792e867f77e534715/vectordrawable-1.0.1-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/7652c6b384cff03cadb644dae4af7a93/loader-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/dd1bb5523c602d67a53793eb242d465d/viewpager-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/ec6ff34ce855c440b1443bdf231543ca/coordinatorlayout-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/dc4cec69309555b9551a971c46552bd1/drawerlayout-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/5d8ff8b903605a3f5088a124ba872d28/slidingpanelayout-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/3b270be3008a29d474523f414a16f670/customview-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/7bfea6380ded87373788c2e754cae48c/asynclayoutinflater-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/bf180c83c5782a6ea9e9dc6affe28fc5/core-1.0.1-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/0a47a108e49b08532705a95cb1f692fd/versionedparcelable-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/androidx.collection/collection/1.0.0/42858b26cafdaa69b6149f45dfc2894007bc2c7a/collection-1.0.0.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/c9bb4e60ed8aeb6245b84b5cf976ca4d/cursoradapter-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/168d370aae89603e5aae405b3de896fe/interpolator-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/4af4c9e5a02f4cbde8abbd21d39c40f2/lifecycle-runtime-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/a7c0be063d9857cdfb93c5c27cc889ce/documentfile-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/ddb52c72ada8e68b78e4d9aefe851fe7/localbroadcastmanager-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/d2819c2a3c590f793abebf4a4e9b23da/print-1.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/bf2f3d5438f69e0551070b7558bf6720/lifecycle-viewmodel-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/984bce2e1cef4319ca14ea69c935b058/lifecycle-livedata-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/51f85e8560c05bfc3c3369d827ffc708/lifecycle-livedata-core-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/androidx.lifecycle/lifecycle-common/2.0.0/e070ffae07452331bc5684734fce6831d531785c/lifecycle-common-2.0.0.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/95014f1ab4e946b4b6f9730b8326992b/core-runtime-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/androidx.arch.core/core-common/2.0.0/bb21b9a11761451b51624ac428d1f1bb5deeac38/core-common-2.0.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/androidx.annotation/annotation/1.0.0/45599f2cd5965ac05a1488fa2a5c0cdd7c499ead/annotation-1.0.0.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/1ab9973f765b7b72402800b3fba19424/fresco-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/80bb4bdf3ef982b357189cb170dd4634/jetified-fbcore-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/90b670c6bd188ed4e10818c847624913/drawee-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/a1cb947184d1e501eac96ce8c8b6c229/imagepipeline-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/985ada8572ec77a2813c8c6de24d622c/imagepipeline-base-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/a872730fd1baf77fb3a8e4e995f21152/soloader-0.9.0-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.facebook.soloader/annotation/0.9.0/dc58463712cb3e5f03d8ee5ac9743b9ced9afa77/annotation-0.9.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.facebook.soloader/nativeloader/0.9.0/677c7fbfcc847d7eb6082048d07b10afd4cff898/nativeloader-0.9.0.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/25f77b6ecc99036eaa681f8d67374064/nativeimagefilters-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/3b4399d70902150a21f9a750c7ebf43f/nativeimagetranscoder-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/transforms-2/files-2.1/df50fe956c6fb1368390ad0239ac3992/imagepipeline-okhttp3-2.0.0-api.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp-urlconnection/3.12.12/3cfbe11fb8c48d30600a70f90b3283fc858aea72/okhttp-urlconnection-3.12.12.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.squareup.okhttp3/okhttp/3.12.12/d3e1ce1d2b3119adf270b2d00d947beb03fe3321/okhttp-3.12.12.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.squareup.okio/okio/1.15.0/bc28b5a964c8f5721eb58ee3f3c47a9bcbf4f4d8/okio-1.15.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/com.facebook.fbjni/fbjni-java-only/0.0.3/c4540aecb99b9ec380acef6c10bb6f700de8ac2c/fbjni-java-only-0.0.3.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-jdk7/1.4.0/9cc187c3dfaf6e4001bdf962e3cdadff7690261b/kotlin-stdlib-jdk7-1.4.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib/1.4.0/63e75298e93d4ae0b299bb869cf0c627196f8843/kotlin-stdlib-1.4.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/org.jetbrains.kotlin/kotlin-stdlib-common/1.4.0/1c752cce0ead8d504ccc88a4fed6471fd83ab0dd/kotlin-stdlib-common-1.4.0.jar:/Users/ammarahmed/.gradle/caches/modules-2/files-2.1/org.jetbrains/annotations/13.0/919f0dfe192fb4e063e7dacadee7f8bb9a2672a9/annotations-13.0.jar:/Users/ammarahmed/Library/Android/sdk/platforms/android-29/android.jar" />
++          <option name="noStdlib" value="true" />
++          <option name="noReflect" value="true" />
++          <option name="moduleName" value="rn-extensions-share_debug" />
++          <option name="languageVersion" value="1.4" />
++          <option name="apiVersion" value="1.3" />
++          <option name="pluginOptions">
++            <array />
++          </option>
++          <option name="pluginClasspaths">
++            <array />
++          </option>
++          <option name="errors">
++            <ArgumentParseErrors />
++          </option>
++        </compilerArguments>
++      </configuration>
++    </facet>
++  </component>
++  <component name="NewModuleRootManager">
++    <output url="file://$MODULE_DIR$/build/intermediates/javac/debug/classes" />
++    <output-test url="file://$MODULE_DIR$/build/intermediates/javac/debugUnitTest/classes" />
++    <exclude-output />
++    <content url="file://$MODULE_DIR$">
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/ap_generated_sources/debug/out" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/aidl_source_output_dir/debug/compileDebugAidl/out" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/debug" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/renderscript_source_output_dir/debug/compileDebugRenderscript/out" isTestSource="false" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/debug" type="java-resource" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/debug" type="java-resource" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/ap_generated_sources/debugAndroidTest/out" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/aidl_source_output_dir/debugAndroidTest/compileDebugAndroidTestAidl/out" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/source/buildConfig/androidTest/debug" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/renderscript_source_output_dir/debugAndroidTest/compileDebugAndroidTestRenderscript/out" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/rs/androidTest/debug" type="java-test-resource" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/res/resValues/androidTest/debug" type="java-test-resource" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/build/generated/ap_generated_sources/debugUnitTest/out" isTestSource="true" generated="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/debug/shaders" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/rs" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTestDebug/shaders" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/rs" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/testDebug/shaders" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/res" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/resources" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/assets" type="java-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/aidl" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/java" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/rs" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/main/shaders" isTestSource="false" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/rs" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/androidTest/shaders" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/res" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/resources" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/assets" type="java-test-resource" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/aidl" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/java" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/rs" isTestSource="true" />
++      <sourceFolder url="file://$MODULE_DIR$/src/test/shaders" isTestSource="true" />
++      <excludeFolder url="file://$MODULE_DIR$/build" />
++    </content>
++    <orderEntry type="inheritedJdk" />
++    <orderEntry type="sourceFolder" forTests="false" />
++    <orderEntry type="library" name="Gradle: com.facebook.infer.annotation:infer-annotation:0.11.2@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.google.code.findbugs:jsr305:3.0.2@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.yoga:proguard-annotations:1.14.1@jar" level="project" />
++    <orderEntry type="library" name="Gradle: javax.inject:javax.inject:1@jar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.collection:collection:1.0.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-common:2.0.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.arch.core:core-common:2.0.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.0.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.soloader:annotation:0.9.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.soloader:nativeloader:0.9.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp-urlconnection:3.12.12@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.squareup.okhttp3:okhttp:3.12.12@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.squareup.okio:okio:1.15.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fbjni:fbjni-java-only:0.0.3@jar" level="project" />
++    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.4.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib:1.4.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: org.jetbrains.kotlin:kotlin-stdlib-common:1.4.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: org.jetbrains:annotations:13.0@jar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.react:react-native:0.63.4@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.appcompat:appcompat:1.0.2@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.fragment:fragment:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.vectordrawable:vectordrawable-animated:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-core-ui:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.swiperefreshlayout:swiperefreshlayout:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.legacy:legacy-support-core-utils:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.vectordrawable:vectordrawable:1.0.1@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.loader:loader:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.viewpager:viewpager:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.coordinatorlayout:coordinatorlayout:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.drawerlayout:drawerlayout:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.slidingpanelayout:slidingpanelayout:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.customview:customview:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.asynclayoutinflater:asynclayoutinflater:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.core:core:1.0.1@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.versionedparcelable:versionedparcelable:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.cursoradapter:cursoradapter:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.interpolator:interpolator:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-runtime:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.documentfile:documentfile:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.localbroadcastmanager:localbroadcastmanager:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.print:print:1.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-viewmodel:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.lifecycle:lifecycle-livedata-core:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: androidx.arch.core:core-runtime:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:fresco:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:fbcore:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:drawee:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:imagepipeline:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:imagepipeline-base:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.soloader:soloader:0.9.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:nativeimagefilters:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:nativeimagetranscoder:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: com.facebook.fresco:imagepipeline-okhttp3:2.0.0@aar" level="project" />
++    <orderEntry type="library" name="Gradle: android-android-29" level="project" />
++  </component>
++</module>
+\ No newline at end of file
+diff --git a/node_modules/rn-extensions-share/android/src/.DS_Store b/node_modules/rn-extensions-share/android/src/.DS_Store
+new file mode 100644
+index 0000000..df127ef
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/src/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/src/main/.DS_Store b/node_modules/rn-extensions-share/android/src/main/.DS_Store
+new file mode 100644
+index 0000000..6ea84c0
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/src/main/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/src/main/AndroidManifest.xml b/node_modules/rn-extensions-share/android/src/main/AndroidManifest.xml
+index bb67038..9369d8b 100644
+--- a/node_modules/rn-extensions-share/android/src/main/AndroidManifest.xml
++++ b/node_modules/rn-extensions-share/android/src/main/AndroidManifest.xml
+@@ -1,4 +1,4 @@
+ <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+-    package="chat.rocket">
++    package="chat.rocket.rnshareextension">
+     <uses-permission android:name="android.permission.INTERNET" />
+ </manifest>
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/.DS_Store b/node_modules/rn-extensions-share/android/src/main/java/.DS_Store
+new file mode 100644
+index 0000000..e93bf23
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/src/main/java/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/.DS_Store b/node_modules/rn-extensions-share/android/src/main/java/chat/.DS_Store
+new file mode 100644
+index 0000000..a867804
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/src/main/java/chat/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/.DS_Store b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/.DS_Store
+new file mode 100644
+index 0000000..08502ac
+Binary files /dev/null and b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/.DS_Store differ
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/RealPathUtil.java b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/RealPathUtil.java
+deleted file mode 100644
+index 641de63..0000000
+--- a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/RealPathUtil.java
++++ /dev/null
+@@ -1,223 +0,0 @@
+-// https://github.com/ivpusic/react-native-image-crop-picker/blob/master/android/src/main/java/com/reactnative/ivpusic/imagepicker/RealPathUtil.java
+-package chat.rocket;
+-
+-import android.annotation.TargetApi;
+-import android.content.ContentUris;
+-import android.content.Context;
+-import android.database.Cursor;
+-import android.net.Uri;
+-import android.os.Build;
+-import android.os.Environment;
+-import android.provider.DocumentsContract;
+-import android.provider.MediaStore;
+-
+-import java.io.File;
+-import java.io.FileOutputStream;
+-import java.io.IOException;
+-import java.io.InputStream;
+-
+-class RealPathUtil {
+-    @TargetApi(Build.VERSION_CODES.KITKAT)
+-    static String getRealPathFromURI(final Context context, final Uri uri) throws IOException {
+-
+-        final boolean isKitKat = Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT;
+-
+-        // DocumentProvider
+-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+-            // ExternalStorageProvider
+-            if (isExternalStorageDocument(uri)) {
+-                final String docId = DocumentsContract.getDocumentId(uri);
+-                final String[] split = docId.split(":");
+-                final String type = split[0];
+-
+-                if ("primary".equalsIgnoreCase(type)) {
+-                    return Environment.getExternalStorageDirectory() + "/" + split[1];
+-                } else {
+-                    final int splitIndex = docId.indexOf(':', 1);
+-                    final String tag = docId.substring(0, splitIndex);
+-                    final String path = docId.substring(splitIndex + 1);
+-
+-                    String nonPrimaryVolume = getPathToNonPrimaryVolume(context, tag);
+-                    if (nonPrimaryVolume != null) {
+-                        String result = nonPrimaryVolume + "/" + path;
+-                        File file = new File(result);
+-                        if (file.exists() && file.canRead()) {
+-                            return result;
+-                        }
+-                        return null;
+-                    }
+-                }
+-            }
+-            // DownloadsProvider
+-            else if (isDownloadsDocument(uri)) {
+-                final String id = DocumentsContract.getDocumentId(uri);
+-                final Uri contentUri = ContentUris.withAppendedId(
+-                        Uri.parse("content://downloads/public_downloads"), Long.valueOf(id));
+-
+-                return getDataColumn(context, contentUri, null, null);
+-            }
+-            // MediaProvider
+-            else if (isMediaDocument(uri)) {
+-                final String docId = DocumentsContract.getDocumentId(uri);
+-                final String[] split = docId.split(":");
+-                final String type = split[0];
+-
+-                Uri contentUri = null;
+-                if ("image".equals(type)) {
+-                    contentUri = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+-                } else if ("video".equals(type)) {
+-                    contentUri = MediaStore.Video.Media.EXTERNAL_CONTENT_URI;
+-                } else if ("audio".equals(type)) {
+-                    contentUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI;
+-                }
+-
+-                final String selection = "_id=?";
+-                final String[] selectionArgs = new String[] {
+-                        split[1]
+-                };
+-
+-                return getDataColumn(context, contentUri, selection, selectionArgs);
+-            }
+-        }
+-        // MediaStore (and general)
+-        else if ("content".equalsIgnoreCase(uri.getScheme())) {
+-            // Return the remote address
+-            if (isGooglePhotosUri(uri))
+-                return uri.getLastPathSegment();
+-            return getDataColumn(context, uri, null, null);
+-        }
+-        // File
+-        else if ("file".equalsIgnoreCase(uri.getScheme())) {
+-            return uri.getPath();
+-        }
+-
+-        return null;
+-    }
+-
+-    /**
+-     * If an image/video has been selected from a cloud storage, this method
+-     * should be call to download the file in the cache folder.
+-     *
+-     * @param context The context
+-     * @param fileName donwloaded file's name
+-     * @param uri file's URI
+-     * @return file that has been written
+-     */
+-    private static File writeToFile(Context context, String fileName, Uri uri) {
+-        String tmpDir = context.getCacheDir() + "/rocket-chat";
+-        Boolean created = new File(tmpDir).mkdir();
+-        fileName = fileName.substring(fileName.lastIndexOf('/') + 1);
+-        File path = new File(tmpDir);
+-        File file = new File(path, fileName);
+-        try {
+-            FileOutputStream oos = new FileOutputStream(file);
+-            byte[] buf = new byte[8192];
+-            InputStream is = context.getContentResolver().openInputStream(uri);
+-            int c = 0;
+-            while ((c = is.read(buf, 0, buf.length)) > 0) {
+-                oos.write(buf, 0, c);
+-                oos.flush();
+-            }
+-            oos.close();
+-            is.close();
+-        } catch (Exception e) {
+-            e.printStackTrace();
+-        }
+-        return file;
+-    }
+-
+-    /**
+-     * Get the value of the data column for this Uri. This is useful for
+-     * MediaStore Uris, and other file-based ContentProviders.
+-     *
+-     * @param context The context.
+-     * @param uri The Uri to query.
+-     * @param selection (Optional) Filter used in the query.
+-     * @param selectionArgs (Optional) Selection arguments used in the query.
+-     * @return The value of the _data column, which is typically a file path.
+-     */
+-    private static String getDataColumn(Context context, Uri uri, String selection,
+-                                        String[] selectionArgs) {
+-
+-        Cursor cursor = null;
+-        final String[] projection = {
+-                MediaStore.MediaColumns.DATA,
+-                MediaStore.MediaColumns.DISPLAY_NAME,
+-        };
+-
+-        try {
+-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+-                    null);
+-            if (cursor != null && cursor.moveToFirst()) {
+-                // Fall back to writing to file if _data column does not exist
+-                final int index = cursor.getColumnIndex(MediaStore.MediaColumns.DATA);
+-                String path = index > -1 ? cursor.getString(index) : null;
+-                if (path != null) {
+-                    return cursor.getString(index);
+-                } else {
+-                    final int indexDisplayName = cursor.getColumnIndexOrThrow(MediaStore.MediaColumns.DISPLAY_NAME);
+-                    String fileName = cursor.getString(indexDisplayName);
+-                    File fileWritten = writeToFile(context, fileName, uri);
+-                    return fileWritten.getAbsolutePath();
+-                }
+-            }
+-        } finally {
+-            if (cursor != null)
+-                cursor.close();
+-        }
+-        return null;
+-    }
+-
+-
+-    /**
+-     * @param uri The Uri to check.
+-     * @return Whether the Uri authority is ExternalStorageProvider.
+-     */
+-    private static boolean isExternalStorageDocument(Uri uri) {
+-        return "com.android.externalstorage.documents".equals(uri.getAuthority());
+-    }
+-
+-    /**
+-     * @param uri The Uri to check.
+-     * @return Whether the Uri authority is DownloadsProvider.
+-     */
+-    private static boolean isDownloadsDocument(Uri uri) {
+-        return "com.android.providers.downloads.documents".equals(uri.getAuthority());
+-    }
+-
+-    /**
+-     * @param uri The Uri to check.
+-     * @return Whether the Uri authority is MediaProvider.
+-     */
+-    private static boolean isMediaDocument(Uri uri) {
+-        return "com.android.providers.media.documents".equals(uri.getAuthority());
+-    }
+-
+-    /**
+-     * @param uri The Uri to check.
+-     * @return Whether the Uri authority is Google Photos.
+-     */
+-    private static boolean isGooglePhotosUri(Uri uri) {
+-        return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+-    }
+-
+-    @TargetApi(Build.VERSION_CODES.KITKAT)
+-    private static String getPathToNonPrimaryVolume(Context context, String tag) {
+-        File[] volumes = context.getExternalCacheDirs();
+-        if (volumes != null) {
+-            for (File volume : volumes) {
+-                if (volume != null) {
+-                    String path = volume.getAbsolutePath();
+-                    if (path != null) {
+-                        int index = path.indexOf(tag);
+-                        if (index != -1) {
+-                            return path.substring(0, index) + tag;
+-                        }
+-                    }
+-                }
+-            }
+-        }
+-        return null;
+-    }
+-
+-}
+\ No newline at end of file
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/ShareModule.java b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/ShareModule.java
+deleted file mode 100644
+index e76b511..0000000
+--- a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/ShareModule.java
++++ /dev/null
+@@ -1,109 +0,0 @@
+-package chat.rocket;
+-
+-import com.facebook.react.bridge.ReactContextBaseJavaModule;
+-import com.facebook.react.bridge.ReactApplicationContext;
+-import com.facebook.react.bridge.Promise;
+-import com.facebook.react.bridge.ReactMethod;
+-import com.facebook.react.bridge.WritableMap;
+-import com.facebook.react.bridge.WritableArray;
+-import com.facebook.react.bridge.Arguments;
+-
+-import android.app.Activity;
+-import android.content.Intent;
+-import android.net.Uri;
+-
+-import java.io.File;
+-import java.util.ArrayList;
+-
+-public class ShareModule extends ReactContextBaseJavaModule {
+-  private File tempFolder;
+-	public static final String CACHE_DIR = "rcShare";
+-
+-  public ShareModule(ReactApplicationContext reactContext) {
+-		super(reactContext);
+-  }
+-
+-  @Override
+-  public String getName() {
+-		return "ReactNativeShareExtension";
+-  }
+-
+-  @ReactMethod
+-  public void close() {
+-    getCurrentActivity().finish();
+-  }
+-
+-  @ReactMethod
+-  public void data(Promise promise) {
+-		promise.resolve(processIntent());
+-  }
+-
+-  public WritableArray processIntent() {
+-		WritableMap map = Arguments.createMap();
+-		WritableArray items = Arguments.createArray();
+-
+-		String text = "";
+-		String type = "";
+-		String action = "";
+-
+-		Activity currentActivity = getCurrentActivity();
+-
+-		if (currentActivity != null) {
+-				tempFolder = new File(currentActivity.getCacheDir(), CACHE_DIR);
+-
+-				Intent intent = currentActivity.getIntent();
+-				action = intent.getAction();
+-				type = intent.getType();
+-
+-				// Received some text
+-				if (Intent.ACTION_SEND.equals(action) && "text/plain".equals(type)) {
+-					text = intent.getStringExtra(Intent.EXTRA_TEXT);
+-
+-					map.putString("value", text);
+-					map.putString("type", "text");
+-
+-					items.pushMap(map);
+-				
+-				// Received a single file
+-				} else if (Intent.ACTION_SEND.equals(action)) {
+-					Uri uri = (Uri) intent.getParcelableExtra(Intent.EXTRA_STREAM);
+-
+-					if (uri != null) {
+-						try {
+-							text = "file://" + RealPathUtil.getRealPathFromURI(currentActivity, uri);
+-						} catch (Exception e) {
+-							e.printStackTrace();
+-						}
+-
+-						map.putString("value", text);
+-						map.putString("type", "media");
+-
+-						items.pushMap(map);
+-					}
+-
+-				// Received multiple files
+-				} else if (Intent.ACTION_SEND_MULTIPLE.equals(action)) {
+-					ArrayList<Uri> uris = intent.getParcelableArrayListExtra(Intent.EXTRA_STREAM);
+-
+-					for (Uri uri : uris) {
+-						String filePath = "";
+-						try {
+-							filePath = RealPathUtil.getRealPathFromURI(currentActivity, uri);
+-						} catch (Exception e) {
+-							e.printStackTrace();
+-						}
+-
+-						map = Arguments.createMap();
+-						text = "file://" + filePath;
+-
+-						map.putString("value", text);
+-						map.putString("type", "media");
+-
+-						items.pushMap(map);
+-					}
+-				}
+-		}
+-
+-		return items;
+-	}
+-}
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/SharePackage.java b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/SharePackage.java
+deleted file mode 100644
+index d7d4f2a..0000000
+--- a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/SharePackage.java
++++ /dev/null
+@@ -1,27 +0,0 @@
+-package chat.rocket;
+-
+-import com.facebook.react.bridge.ReactApplicationContext;
+-import com.facebook.react.bridge.JavaScriptModule;
+-import com.facebook.react.bridge.NativeModule;
+-import com.facebook.react.uimanager.ViewManager;
+-import com.facebook.react.ReactPackage;
+-
+-import java.util.Arrays;
+-import java.util.Collections;
+-import java.util.List;
+-
+-public class SharePackage implements ReactPackage {
+- 	@Override
+-	public List<NativeModule> createNativeModules(ReactApplicationContext reactContext) {
+-		return Arrays.<NativeModule>asList(new ShareModule(reactContext));
+-	}
+-
+-	public List<Class<? extends JavaScriptModule>> createJSModules() {
+-		return Collections.emptyList();
+-	}
+-
+-	@Override
+-	public List<ViewManager> createViewManagers(ReactApplicationContext reactContext) {
+-		return Collections.emptyList();
+-	}
+-}
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt
+new file mode 100644
+index 0000000..3f851f0
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/ShareModule.kt
+@@ -0,0 +1,119 @@
++package chat.rocket.rnshareextension
++
++import android.app.Activity
++import android.content.Context
++import android.content.Intent
++import android.content.Intent.ACTION_SEND
++import android.content.Intent.ACTION_SEND_MULTIPLE
++import android.graphics.Bitmap
++import android.graphics.BitmapFactory
++import android.net.Uri
++import android.os.Parcelable
++import com.facebook.react.bridge.*
++import java.io.File
++
++class ShareModule(reactContext: ReactApplicationContext?) : ReactContextBaseJavaModule(reactContext) {
++
++    override fun getName() = "ReactNativeShareExtension"
++
++    @ReactMethod
++    fun close() = currentActivity?.finish()
++
++    @ReactMethod
++    fun data(promise: Promise) = promise.resolve(processIntent(currentActivity))
++
++    private fun processIntent(activity: Activity?): WritableArray {
++
++        val items = Arguments.createArray()
++        val currentActivity = activity ?: return items
++
++        val intent = activity.intent
++
++        val result = when {
++            intent.action == ACTION_SEND && intent.isTypeOf("text/plain") -> actionSendText(intent)
++            intent.action == "android.intent.action.PROCESS_TEXT"  -> actionSendText(intent)
++            intent.action == ACTION_SEND && intent.isTypeOf("image/") -> actionSendImage(intent, currentActivity)
++            intent.action == ACTION_SEND_MULTIPLE && intent.isTypeOf("image/") -> actionSendMultiple(intent, currentActivity)
++            else -> emptyList()
++        }
++
++        result.map {
++            items.pushMap(it)
++        }
++
++        return items
++    }
++
++    private fun actionSendMultiple(intent: Intent, activity: Activity): List<WritableMap> {
++
++        val uris = intent.getParcelableArrayListExtra<Uri>(Intent.EXTRA_STREAM) as? List<Uri>
++                ?: emptyList()
++
++        return uris.mapNotNull {
++            createImageFilePathArgumentsMap(it, activity)
++        }
++    }
++
++    private fun actionSendImage(intent: Intent, activity: Activity): List<WritableMap> {
++
++        val uri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM) as? Uri
++                ?: return emptyList()
++
++        return createImageFilePathArgumentsMap(uri, activity)?.let { listOf(it) } ?: emptyList()
++    }
++
++    private fun actionSendText(intent: Intent): List<WritableMap> {
++
++        if (intent.action === "android.intent.action.PROCESS_TEXT") {
++
++            return intent.getStringExtra(Intent.EXTRA_PROCESS_TEXT)?.let { listOf(it.createMap("text")) }
++                    ?: return emptyList()
++        } else {
++            return intent.getStringExtra(Intent.EXTRA_TEXT)?.let { listOf(it.createMap("text")) }
++                    ?: return emptyList()
++        }
++
++
++    }
++
++    private fun createImageFilePathArgumentsMap(uri: Uri, activity: Activity): WritableMap? {
++
++        return runCatching { createPrivateCopy(activity, uri) }
++                .getOrDefault(null)
++                ?.createMap("media")
++    }
++
++    private fun storeImage(cacheDir: File, bitmap: Bitmap): String {
++
++        return File(cacheDir, "share-${System.currentTimeMillis()}.jpg").apply {
++            writeBitmap(bitmap, Bitmap.CompressFormat.JPEG, 85)
++        }.absolutePath
++    }
++
++    private fun createPrivateCopy(context: Context, uri: Uri): String? {
++
++        return context.contentResolver.openInputStream(uri).use {
++            val bitmap = BitmapFactory.decodeStream(it)
++            storeImage(context.cacheDir, bitmap)
++        }
++    }
++}
++
++private fun File.writeBitmap(bitmap: Bitmap, format: Bitmap.CompressFormat, quality: Int) {
++    outputStream().use { out ->
++        bitmap.compress(format, quality, out)
++        out.flush()
++    }
++}
++
++private fun String.createMap(type: String): WritableMap {
++
++    return Arguments.createMap().apply {
++        putString("value", this@createMap)
++        putString("type", type)
++    }
++}
++
++private fun Intent.isTypeOf(typePrefix: String): Boolean {
++    return type?.startsWith(typePrefix) == true
++}
+\ No newline at end of file
+diff --git a/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/SharePackage.kt b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/SharePackage.kt
+new file mode 100644
+index 0000000..3250275
+--- /dev/null
++++ b/node_modules/rn-extensions-share/android/src/main/java/chat/rocket/rnshareextension/SharePackage.kt
+@@ -0,0 +1,13 @@
++package chat.rocket.rnshareextension
++
++import com.facebook.react.ReactPackage
++import com.facebook.react.bridge.NativeModule
++import com.facebook.react.bridge.ReactApplicationContext
++import com.facebook.react.uimanager.ViewManager
++
++class SharePackage : ReactPackage {
++
++    override fun createNativeModules(reactContext: ReactApplicationContext) = listOf<NativeModule>(ShareModule(reactContext))
++
++    override fun createViewManagers(reactContext: ReactApplicationContext) = emptyList<ViewManager<*, *>>()
++}
+\ No newline at end of file
+diff --git a/node_modules/rn-extensions-share/rn-extensions-share.podspec b/node_modules/rn-extensions-share/rn-extensions-share.podspec
+index e523443..946214e 100644
+--- a/node_modules/rn-extensions-share/rn-extensions-share.podspec
++++ b/node_modules/rn-extensions-share/rn-extensions-share.podspec
+@@ -15,5 +15,5 @@ Pod::Spec.new do |s|
+   s.source       = { :git => "https://github.com/RocketChat/rn-extensions-share.git", :tag => "master" }
+   s.source_files  = "ios/*.{h,m}"
+ 
+-  s.dependency 'React'
++  s.dependency 'React-Core'
+ end
+\ No newline at end of file

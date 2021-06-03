@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-actions-sheet/src/index.js b/node_modules/react-native-actions-sheet/src/index.js
+index dfa8fad..0fdd3d5 100644
+--- a/node_modules/react-native-actions-sheet/src/index.js
++++ b/node_modules/react-native-actions-sheet/src/index.js
+@@ -626,7 +626,7 @@ export default class ActionSheet extends Component {
+           <SafeAreaView ref={this.safeAreaViewRef} style={styles.safearea}>
+             <View />
+           </SafeAreaView>
+-
++          {this.props.premium}
+           <FlatList
+             bounces={false}
+             keyboardShouldPersistTaps={keyboardShouldPersistTaps}
