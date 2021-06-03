@@ -453,7 +453,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                           onPress={() => handlePress(item, index)}
                           title="Remove note"
                           type="error"
-                          height={22}
+                          height={25}
+                          fontSize={SIZE.sm}
                           style={{
                             margin: 1,
                             marginRight: 5,
