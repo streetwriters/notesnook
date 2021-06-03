@@ -69,13 +69,18 @@ class Settings {
 
   get pins() {
     return this._settings.pins.reduce((prev, pin) => {
+      if (!pin || !pin.data) return;
+
       let item;
       if (pin.type === "notebook") {
-        item = this._db.notebooks.notebook(pin.data.id).data;
+        const notebook = this._db.notebooks.notebook(pin.data.id);
+        item = notebook ? notebook.data : null;
       } else if (pin.type === "topic") {
-        item = this._db.notebooks
-          .notebook(pin.data.notebookId)
-          .topics.topic(pin.data.id)._topic;
+        const notebook = this._db.notebooks.notebook(pin.data.notebookId);
+        if (!notebook) item = null;
+        const topic = notebook.topics.topic(pin.data.id);
+        if (!topic) item = null;
+        item = topic._topic;
       } else if (pin.type === "tag") {
         item = this._db.tags.tag(pin.data.id);
       }
