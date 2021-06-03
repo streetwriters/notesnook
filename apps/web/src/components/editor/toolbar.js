@@ -12,6 +12,7 @@ function Toolbar(props) {
   const sessionState = useStore((store) => store.session.state);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const toggleFocusMode = useAppStore((store) => store.toggleFocusMode);
   const setSession = useStore((store) => store.setSession);
@@ -74,6 +75,21 @@ function Toolbar(props) {
         onClick: () => toggleNightMode(),
       },
       {
+        title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
+        icon: isFullscreen ? Icon.ExitFullscreen : Icon.Fullscreen,
+        enabled: true,
+        hidden: !isFocusMode,
+        hideOnMobile: true,
+        onClick: () => {
+          if (isFullscreen) {
+            exitFullscreen(document);
+          } else {
+            enterFullscreen(document.documentElement);
+          }
+          setIsFullscreen((s) => !s);
+        },
+      },
+      {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
@@ -104,6 +120,7 @@ function Toolbar(props) {
       },
     ],
     [
+      isFullscreen,
       redoable,
       undoable,
       toggleFocusMode,
@@ -186,3 +203,38 @@ function Toolbar(props) {
   );
 }
 export default Toolbar;
+
+/* View in fullscreen */
+function enterFullscreen(elem) {
+  // go full-screen
+  if (elem.requestFullscreen) {
+    elem.requestFullscreen();
+  } else if (elem.webkitRequestFullscreen) {
+    elem.webkitRequestFullscreen();
+  } else if (elem.mozRequestFullScreen) {
+    elem.mozRequestFullScreen();
+  } else if (elem.msRequestFullscreen) {
+    elem.msRequestFullscreen();
+  }
+}
+
+/* Close fullscreen */
+function exitFullscreen(elem) {
+  if (
+    !document.fullscreenElement &&
+    !document.webkitFullscreenElement &&
+    !document.mozFullScreenElement
+  )
+    return;
+
+  // exit full-screen
+  if (elem.exitFullscreen) {
+    elem.exitFullscreen();
+  } else if (elem.webkitExitFullscreen) {
+    elem.webkitExitFullscreen();
+  } else if (elem.mozCancelFullScreen) {
+    elem.mozCancelFullScreen();
+  } else if (elem.msExitFullscreen) {
+    elem.msExitFullscreen();
+  }
+}

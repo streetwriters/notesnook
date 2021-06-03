@@ -135,3 +135,6 @@ export const SortDesc = createIcon(Icons.mdiSortDescending);
 
 export const PasswordInvisible = createIcon(Icons.mdiEye);
 export const PasswordVisible = createIcon(Icons.mdiEyeOff);
+
+export const Fullscreen = createIcon(Icons.mdiFullscreen);
+export const ExitFullscreen = createIcon(Icons.mdiFullscreenExit);
