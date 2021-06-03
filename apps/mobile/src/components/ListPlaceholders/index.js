@@ -16,8 +16,7 @@ import {
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
 import FastImage from 'react-native-fast-image';
-export const Placeholder = React.memo(
-  ({type, w, h, color}) => {
+export const Placeholder = ({type, w, h, color}) => {
     const [state, dispatch] = useTracked();
     const {colors} = state;
     const getSVG = () => {
@@ -53,10 +52,8 @@ export const Placeholder = React.memo(
         width={w}
         height={h}
       />
-    );
-  },
-  () => true,
-);
+    )
+  }
 
 export const SvgToPngView = ({width, height, src, color, img}) => {
   const [error, setError] = useState(false);

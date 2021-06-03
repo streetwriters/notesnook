@@ -407,24 +407,30 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
-  tiny.call(EditorWebView, tiny.reset, true);
-  clearTimer();
-  if (
-    (content?.data && content.data?.trim().length > 0) ||
-    (title && title.trim().length > 0)
-  ) {
-    await saveNote(true);
+  try {
+    tiny.call(EditorWebView, tiny.reset, true);
+    clearTimer();
+    if (
+      (content?.data &&
+        typeof content.data == 'string' &&
+        content.data?.trim().length > 0) ||
+      (title && title?.trim().length > 0)
+    ) {
+      await saveNote(true);
+    }
+    clearNote();
+    editing.focusType = null;
+    eSendEvent('historyEvent', {
+      undo: 0,
+      redo: 0,
+    });
+    saveCounter = 0;
+    setTimeout(() => {
+      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
+    }, 1);
+  } catch (e) {
+    console.log(e);
   }
-  clearNote();
-  editing.focusType = null;
-  eSendEvent('historyEvent', {
-    undo: 0,
-    redo: 0,
-  });
-  saveCounter = 0;
-  setTimeout(() => {
-    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
-  }, 1);
 }
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {

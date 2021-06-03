@@ -27,6 +27,7 @@ import {openLinkInBrowser} from '../../utils/functions';
 import {Modal} from 'react-native';
 import {SafeAreaView} from 'react-native';
 import {SvgToPngView} from '../ListPlaceholders';
+import { MMKV } from '../../utils/mmkv';
 
 const features = [
   {
@@ -81,7 +82,7 @@ const SplashScreen = () => {
   const translateY2 = useValue(0);
 
   useEffect(() => {
-    Storage.read('introCompleted').then(async (r) => {
+    MMKV.getStringAsync('introCompleted').then(async (r) => {
       setTimeout(() => {
         if (!r) {
           setVisible(true);

@@ -69,6 +69,7 @@ export const NavigationStack = ({component = NavigatorStack}) => {
           width: deviceMode !== 'mobile' ? 0 : '75%',
           borderRightWidth: 0,
         }}
+        
         edgeWidth={200}
         drawerType="slide"
         drawerContent={deviceMode !== 'mobile' ? () => <></> : DrawerComponent}
