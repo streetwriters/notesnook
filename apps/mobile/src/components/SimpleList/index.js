@@ -4,6 +4,7 @@ import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
+import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
 import {dHeight, dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
@@ -24,7 +25,10 @@ const header = {
 };
 
 const empty = {
-  type: 'empty',
+  type: 'empty_loading',
+};
+const empty_not = {
+  type: 'empty_not_loading',
 };
 
 const SimpleList = ({
@@ -44,11 +48,11 @@ const SimpleList = ({
 }) => {
   const [state] = useTracked();
   const {colors, deviceMode, messageBoardState} = state;
-  const [_loading, _setLoading] = useState(true);
+  const [_loading, _setLoading] = useState(false);
   const [dataProvider, setDataProvider] = useState(
     new DataProvider((r1, r2) => {
       return r1 !== r2;
-    }).cloneWithRows([header, empty]),
+    }),
   );
   const [width, setWidth] = useState(dWidth);
   const scrollRef = useRef();
@@ -59,19 +63,31 @@ const SimpleList = ({
 
   useEffect(() => {
     if (!loading) {
-      setDataProvider(
-        dataProvider.cloneWithRows(
-          !listData || listData.length === 0
-            ? [header, empty]
-            : [header].concat(listData),
-        ),
-      );
+      if (!dataProvider.getDataForIndex(1) || dataProvider.getDataForIndex(1).type.includes("empty")) {
+        setDataProvider(
+          dataProvider.cloneWithRows(
+            !listData || listData.length === 0
+              ? [header, empty_not]
+              : [header].concat(
+                  listData.length > 1 && SettingsService.get().homepage !== screen
+                    ? listData.slice(0, 1)
+                    : listData,
+                ),
+          ),
+        );
+      }
+      
+
+      if (
+        !listData ||
+        listData.length === 0 ||
+        SettingsService.get().homepage === screen
+      )
+        return;
       setTimeout(() => {
-        _setLoading(false);
-      }, 500);
+        setDataProvider(dataProvider.cloneWithRows([header].concat(listData)));
+      }, 150);
     } else {
-      _setLoading(true);
-   
       setDataProvider(dataProvider.cloneWithRows([header, empty]));
     }
   }, [listData, loading, announcement]);
@@ -85,16 +101,19 @@ const SimpleList = ({
     if (refreshCallback) {
       refreshCallback();
     }
-  };
+  }
 
-  const _onScroll = event => {
-    if (!event) return;
-    let y = event.nativeEvent.contentOffset.y;
-    eSendEvent(eScrollEvent, {
-      y,
-      screen,
-    });
-  };
+  const _onScroll = React.useCallback(
+    event => {
+      if (!event) return;
+      let y = event.nativeEvent.contentOffset.y;
+      eSendEvent(eScrollEvent, {
+        y,
+        screen,
+      });
+    },
+    [screen],
+  );
 
   const _layoutProvider = new LayoutProvider(
     index => {
@@ -147,15 +166,9 @@ const SimpleList = ({
       }
     },
   );
+  _layoutProvider.shouldRefreshWithAnchoring = false;
 
-  useEffect(() => {
-    if (_layoutProvider) {
-      _layoutProvider.shouldRefreshWithAnchoring = false;
-    }
-  }, []);
-
-  const _renderRow = React.useCallback(
-    (type, data, index) => {
+  const _renderRow = (type, data, index) => {
       switch (type) {
         case 'note':
           return <NoteWrapper item={data} index={index} />;
@@ -193,18 +206,24 @@ const SimpleList = ({
               sortMenuButton={sortMenuButton}
             />
           );
-        case 'empty':
+        case 'empty_not_loading':
           return (
             <Empty
-              loading={loading || _loading}
+              loading={false}
+              placeholderData={placeholderData}
+              headerProps={headerProps}
+            />
+          );
+        case 'empty_loading':
+          return (
+            <Empty
+              loading={true}
               placeholderData={placeholderData}
               headerProps={headerProps}
             />
           );
       }
-    },
-    [_loading, placeholderData, headerProps, loading, announcement],
-  );
+    }
 
   let scrollProps = React.useMemo(() => {
     return {
@@ -240,6 +259,8 @@ const SimpleList = ({
     minWidth: 1,
   };
 
+  const renderFooter = () => (listData.length === 0 ? null : <Footer/>);
+
   return (
     <>
       {!loading && (
@@ -258,7 +279,7 @@ const SimpleList = ({
         rowRenderer={_renderRow}
         renderAheadOffset={0}
         onScroll={_onScroll}
-        renderFooter={listData.length === 0 ? null : Footer}
+        renderFooter={renderFooter}
         scrollViewProps={scrollProps}
         style={styles}
       />

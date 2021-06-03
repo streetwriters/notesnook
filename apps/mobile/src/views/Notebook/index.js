@@ -22,54 +22,43 @@ import {
 
 export const Notebook = ({route, navigation}) => {
   const [topics, setTopics] = useState(route.params.notebook?.topics);
-  const [loading, setLoading] = useState(true);
   let params = route.params;
-  let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
   const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
-      try {
-        let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
-        if (notebook) {
-          params.notebook = notebook;
-        }
-        params.title = params.notebook.title;
-        if (notebook) {
-          setTopics(notebook.topics);
-        }
-        setTimeout(() => {
-          if (loading) {
-            setLoading(false);
-          }
-        }, 10);
-        Navigation.routeNeedsUpdate('Notebook', () => {
-          onLoad();
-        });
-        eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-        if (params.menu) {
-          navigation.setOptions({
-            animationEnabled: true,
-            gestureEnabled: false,
-          });
-        } else {
-          navigation.setOptions({
-            animationEnabled: true,
-            gestureEnabled: Platform.OS === 'ios',
-          });
-        }
-        updateSearch();
-        ranAfterInteractions = false;
-      } catch (e) {}
+      Navigation.routeNeedsUpdate('Notebook', () => {
+        onLoad();
+      });
     }, time);
+    try {
+      let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
+      if (notebook) {
+        params.notebook = notebook;
+        setTopics(notebook.topics);
+        params.title = params.notebook.title;
+      }
+      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
+      if (params.menu) {
+        navigation.setOptions({
+          animationEnabled: true,
+          gestureEnabled: false,
+        });
+      } else {
+        navigation.setOptions({
+          animationEnabled: true,
+          gestureEnabled: Platform.OS === 'ios',
+        });
+      }
+      updateSearch();
+      ranAfterInteractions = false;
+    } catch (e) {}
   };
   const onLoad = data => {
     if (data) {
-      setLoading(true);
       params = data;
     }
-
-    runAfterInteractions(data ? 400 : 1);
+    runAfterInteractions(data ? 300 : 1);
   };
 
   useEffect(() => {
@@ -84,11 +73,6 @@ export const Notebook = ({route, navigation}) => {
       ranAfterInteractions = true;
       runAfterInteractions();
     }
-
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
-    }
     Navigation.setHeaderState('Notebooks', params, {
       heading: params.title,
       id: params.notebook.id,
@@ -97,11 +81,6 @@ export const Notebook = ({route, navigation}) => {
   };
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     navigation.addListener('focus', onFocus);
     return () => {
       ranAfterInteractions = false;
@@ -156,7 +135,6 @@ export const Notebook = ({route, navigation}) => {
           },
           icon: 'pencil',
         }}
-        loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: params.notebook.title,

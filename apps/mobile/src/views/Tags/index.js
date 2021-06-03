@@ -16,37 +16,24 @@ import {eScrollEvent} from '../../utils/Events';
 export const Tags = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const tags = state.tags;
-  const [loading, setLoading] = useState(true);
-  let pageIsLoaded = false;
 
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
-
       Navigation.routeNeedsUpdate('Tags', () => {
         dispatch({type: Actions.TAGS});
       });
-
-      eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
-
-      updateSearch();
-      ranAfterInteractions = false;
     });
+    eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
+    updateSearch();
+    ranAfterInteractions = false;
   };
 
   const onFocus = useCallback(() => {
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions();
-    }
-
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
     }
     Navigation.setHeaderState(
       'Tags',
@@ -61,13 +48,8 @@ export const Tags = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
     navigation.addListener('focus', onFocus);
     return () => {
-      pageIsLoaded = false;
       ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Tags', type: 'back'});
       navigation.removeListener('focus', onFocus);
@@ -102,7 +84,6 @@ export const Tags = ({route, navigation}) => {
           heading: 'Tags',
         }}
         screen="Tags"
-        loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: 'Your tags',

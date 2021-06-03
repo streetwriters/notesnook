@@ -18,19 +18,13 @@ import {tabBarRef} from '../../utils/Refs';
 export const Home = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {loading} = state;
-  const [localLoad, setLocalLoad] = useState(true);
   const notes = state.notes;
-  let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions();
-    }
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
     }
 
     Navigation.setHeaderState(
@@ -48,40 +42,21 @@ export const Home = ({navigation}) => {
   const onBlur = useCallback(() => {}, []);
 
   const runAfterInteractions = () => {
+    updateSearch();
+    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+
     InteractionManager.runAfterInteractions(() => {
-      if (localLoad) {
-        setLocalLoad(false);
-      }
-
-      updateSearch();
-      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-
       Navigation.routeNeedsUpdate('Notes', () => {
         dispatch({type: Actions.NOTES});
       });
-
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: _onPressBottomButton,
-          },
-        });
-      }
-      ranAfterInteractions = false;
     });
+    ranAfterInteractions = false;
   };
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
-      pageIsLoaded = false;
       ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
@@ -112,6 +87,7 @@ export const Home = ({navigation}) => {
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
   }, []);
+
   return (
     <>
       <SelectionHeader screen="Notes" />
@@ -131,7 +107,7 @@ export const Home = ({navigation}) => {
         isHome={true}
         pinned={true}
         screen="Notes"
-        loading={loading || localLoad}
+        loading={loading}
         sortMenuButton={true}
         headerProps={{
           heading: 'Notes',

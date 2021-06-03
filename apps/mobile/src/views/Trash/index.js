@@ -19,38 +19,29 @@ import {eScrollEvent} from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const trash = state.trash;
-  const [loading, setLoading] = useState(true);
   let pageIsLoaded = false;
-
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
-
       Navigation.routeNeedsUpdate('Trash', () => {
         dispatch({type: Actions.TRASH});
       });
-
-      eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
-
-      updateSearch();
-      ranAfterInteractions = false;
     });
+
+    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
+    updateSearch();
+    ranAfterInteractions = false;
   };
 
   const onFocus = useCallback(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     if (!pageIsLoaded) {
       pageIsLoaded = true;
       return;
+    }
+    if (!ranAfterInteractions) {
+      ranAfterInteractions = true;
+      runAfterInteractions();
     }
     Navigation.setHeaderState(
       'Trash',
@@ -111,7 +102,6 @@ export const Trash = ({route, navigation}) => {
         type="trash"
         screen="Trash"
         focused={() => navigation.isFocused()}
-        loading={loading}
         placeholderData={{
           heading: 'Trash',
           paragraph:

@@ -12,49 +12,36 @@ import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {InteractionManager} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
+
 export const Favorites = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
   const favorites = state.favorites;
-  const [localLoad, setLocalLoad] = React.useState(true);
   const {loading} = state;
   let pageIsLoaded = false;
-
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (localLoad) {
-        setLocalLoad(false);
-      }
-
       Navigation.routeNeedsUpdate('Favorites', () => {
         dispatch({type: Actions.FAVORITES});
       });
-
-      eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
-      updateSearch();
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: null,
-          },
-        });
-      }
-      ranAfterInteractions = false;
     });
+    eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
+    updateSearch();
+    ranAfterInteractions = false;
   };
 
   const onFocus = useCallback(() => {
+    if (!pageIsLoaded) {
+      pageIsLoaded = true;
+      return;
+    }
+
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions();
     }
 
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
-    }
     Navigation.setHeaderState(
       'Favorites',
       {
@@ -103,13 +90,13 @@ export const Favorites = ({route, navigation}) => {
         <Header title="Favorites" isBack={false} screen="Favorites" />
       </ContainerTopSection>
       <SimpleList
-        listData={state.notebooks}
+        listData={state.favorites}
         type="notes"
         refreshCallback={() => {
           dispatch({type: Actions.FAVORITES});
         }}
         screen="Favorites"
-        loading={loading || localLoad}
+        loading={loading}
         placeholderData={{
           heading: 'Your favorites',
           paragraph: 'You have not added any notes to favorites yet.',
