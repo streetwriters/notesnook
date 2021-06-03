@@ -64,7 +64,7 @@ const ToolbarItem = ({
     onSelectionChange(properties.selection, true);
   }, []);
 
-  const checkForChanges = (data) => {
+  const checkForChanges = data => {
     properties.selection = data;
     let formats = Object.keys(data);
     if (!data['link'] && type === 'tooltip') {
@@ -74,16 +74,16 @@ const ToolbarItem = ({
     }
 
     if (format === 'header' && type === 'tooltip') {
-      let keys = group.map((i) => i.format);
-      keys.forEach((k) => {
+      let keys = group.map(i => i.format);
+      keys.forEach(k => {
         if (formats.includes(k)) {
-          setCurrentText(group.find((e) => e.format === k).text);
+          setCurrentText(group.find(e => e.format === k).text);
           setSelected(false);
         }
       });
       return;
     }
-    
+
     if (formats.indexOf(format) > -1 && format !== 'removeformat') {
       if (format === 'forecolor' || format === 'hilitecolor') {
         if (!data[format]) {
@@ -141,7 +141,7 @@ const ToolbarItem = ({
       }
 
       if (format === 'fontname' && type === 'tooltip') {
-        font_names.forEach((font) => {
+        font_names.forEach(font => {
           if (font.value === data[format]) {
             setCurrentText(font.name);
             setIcon(font.value);
@@ -185,7 +185,7 @@ const ToolbarItem = ({
     checkForChanges(data);
   };
 
-  const onPress = async (event) => {
+  const onPress = async event => {
     if (premium && !PremiumService.get()) {
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
@@ -285,10 +285,10 @@ const ToolbarItem = ({
         customColor={selected && color}
         customSelectedColor={selected && color}
         customOpacity={0.12}
-        onLongPress={(event) => {
+        onLongPress={event => {
           showTooltip(event, fullname, TOOLTIP_POSITIONS.TOP);
         }}
-        onPress={(e) => onPress(e)}
+        onPress={e => onPress(e)}
         customStyle={{
           borderRadius: 0,
           flexDirection: 'column',
@@ -333,7 +333,7 @@ const ToolbarItem = ({
                   ? icon
                   : null,
             }}
-            size={text.includes("%") ? SIZE.sm : SIZE.md}>
+            size={text.includes('%') ? SIZE.sm : SIZE.md}>
             {currentText || text}
           </Paragraph>
         ) : (
@@ -346,6 +346,25 @@ const ToolbarItem = ({
             size={SIZE.xl}
             allowFontScaling={false}
             color={selected ? (color ? color : colors.accent) : colors.pri}
+          />
+        )}
+
+        {type === 'tooltip' && (
+          <Icon
+            name="menu-right"
+            size={SIZE.sm}
+            allowFontScaling={false}
+            color={colors.icon}
+            style={{
+              position: 'absolute',
+              transform: [
+                {
+                  rotateZ: '-45deg',
+                },
+              ],
+              top: 0,
+              right: 0,
+            }}
           />
         )}
       </PressableButton>
