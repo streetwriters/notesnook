@@ -55,10 +55,10 @@ const ColorItem = ({item, index}) => {
 
   const onPress = (item) => {
     let params = {
+      ...item,
       type: 'color',
-      title: item.title,
-      color: item,
       menu: true,
+      get:'colored'
     };
     Navigation.navigate('NotesPage', params, {
       heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),

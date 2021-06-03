@@ -46,10 +46,10 @@ export const TagsSection = () => {
       eSendEvent(eOnNewTopicAdded, params);
     } else if (item.type === 'tag') {
       params = params = {
-        title: item.title,
-        tag: item,
+        ...item,
         type: 'tag',
         menu: true,
+        get:'tagged'
       };
       Navigation.navigate('NotesPage', params, {
         heading: '#' + item.title,
@@ -58,7 +58,7 @@ export const TagsSection = () => {
       });
       eSendEvent(refreshNotesPage, params);
     } else {
-      params = {...item, menu: true};
+      params = {...item, menu: true,get:'topics'};
       Navigation.navigate('NotesPage', params, {
         heading: item.title,
         id: item.id,

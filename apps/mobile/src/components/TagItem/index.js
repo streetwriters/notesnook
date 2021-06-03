@@ -18,9 +18,9 @@ const TagItem = ({item, index}) => {
     Navigation.navigate(
       'NotesPage',
       {
+        ...item,
         type: 'tag',
-        title: item.title,
-        tag: item,
+        get:'tagged'
       },
       {
         heading: '#' + item.title,
