@@ -8,33 +8,59 @@ import { showLogInDialog } from "../../common/dialog-controller";
 import { showToast } from "../../utils/toast";
 import { trackEvent } from "../../utils/analytics";
 
-function Announcement() {
-  const [announcement, removeAnnouncement] = useAnnouncement();
-  if (!announcement) return null;
+function Announcement({ announcement, removeAnnouncement }) {
   return (
     <Flex
-      bg={"shade"}
       // onClick={reminder?.action}
       flexDirection="column"
       p={2}
+      pt={0}
     >
       <Flex flex="1" justifyContent="space-between" alignItems="center">
-        <Text variant="title">{announcement.title}</Text>
-        <Icon.Close
-          size={20}
-          color="primary"
-          onClick={() => removeAnnouncement()}
-          sx={{ cursor: "pointer" }}
-        />
+        <Flex
+          justifyContent="center"
+          alignItems="center"
+          bg="shade"
+          px={1}
+          py={"1px"}
+          sx={{ borderRadius: "default" }}
+        >
+          <Icon.Announcement size={12} color="primary" sx={{ mr: "3px" }} />
+          <Text color="primary" variant="subBody" fontWeight="bold" mt={"2px"}>
+            Announcement
+          </Text>
+        </Flex>
+        <Text
+          bg="errorBg"
+          color="error"
+          px={1}
+          py={"1px"}
+          variant="subBody"
+          fontWeight="bold"
+          sx={{ cursor: "pointer", ":hover": { opacity: 0.7 } }}
+          onClick={() => {
+            removeAnnouncement && removeAnnouncement();
+          }}
+        >
+          Dismiss
+        </Text>
       </Flex>
+      <Text variant="heading" mt={1}>
+        {announcement.title}
+      </Text>
 
-      {announcement && <Text variant="body">{announcement.description}</Text>}
+      {announcement && (
+        <Text variant="body" lineHeight="18px">
+          {announcement.description}
+        </Text>
+      )}
 
       {announcement.cta && (
         <Button
           m={0}
           mt={1}
           p={1}
+          fontWeight="bold"
           onClick={async () => {
             trackEvent(announcement.cta.text, "Announcement CTA");
             switch (announcement.cta.type) {

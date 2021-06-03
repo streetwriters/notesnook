@@ -10,6 +10,7 @@ import ListProfiles from "../../common/list-profiles";
 import ScrollContainer from "../scroll-container";
 import ReminderBar from "../reminder-bar";
 import Announcement from "../announcement";
+import useAnnouncement from "../../utils/useAnnouncement";
 
 const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
   <ScrollContainer {...props} forwardedRef={ref} />
@@ -17,6 +18,7 @@ const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
 
 function ListContainer(props) {
   const { type, context } = props;
+  const [announcement, removeAnnouncement] = useAnnouncement();
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
@@ -44,8 +46,14 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          <Announcement />
-          <ReminderBar />
+          {announcement ? (
+            <Announcement
+              announcement={announcement}
+              removeAnnouncement={removeAnnouncement}
+            />
+          ) : (
+            <ReminderBar />
+          )}
           <Flex variant="columnFill" data-test-id="note-list">
             {props.children
               ? props.children

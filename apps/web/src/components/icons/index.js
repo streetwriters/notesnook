@@ -138,3 +138,5 @@ export const PasswordVisible = createIcon(Icons.mdiEyeOff);
 
 export const Fullscreen = createIcon(Icons.mdiFullscreen);
 export const ExitFullscreen = createIcon(Icons.mdiFullscreenExit);
+
+export const Announcement = createIcon(Icons.mdiBullhorn);
