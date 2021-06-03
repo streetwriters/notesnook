@@ -7,14 +7,18 @@ import {Actions} from '../../provider/Actions';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {
+  eOpenMoveNoteDialog,
+  eOpenSimpleDialog,
+  refreshNotesPage,
+} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
-export const SelectionHeader = React.memo(({screen}) => {
+export const SelectionHeader = React.memo(({screen, type, extras}) => {
   const [state, dispatch] = useTracked();
   const {colors, selectionMode, selectedItemsList} = state;
   const insets = useSafeAreaInsets();
@@ -72,7 +76,7 @@ export const SelectionHeader = React.memo(({screen}) => {
     }
   }, [selectionMode]);
 
-  return !selectionMode ? null : (
+  return !selectionMode || Navigation.getCurrentScreen() !== screen ? null : (
     <View
       style={{
         width: '100%',
@@ -137,7 +141,8 @@ export const SelectionHeader = React.memo(({screen}) => {
         }}>
         {screen === 'Trash' ||
         screen === 'Notebooks' ||
-        screen === 'Notebook' ? null : (
+        screen === 'Notebook' ||
+        type === 'topic' ? null : (
           <ActionIcon
             onPress={async () => {
               //dispatch({type: Actions.SELECTION_MODE, enabled: false});
@@ -149,6 +154,36 @@ export const SelectionHeader = React.memo(({screen}) => {
             }}
             color={colors.light}
             name="plus"
+            size={SIZE.xl}
+          />
+        )}
+
+        {type === 'topic' && (
+          <ActionIcon
+            onPress={async () => {
+              if (selectedItemsList.length > 0) {
+                await db.notebooks
+                  .notebook(extras.notebook)
+                  .topics.topic(extras.topic)
+                  .delete(...selectedItemsList.map(item => item.id));
+
+                eSendEvent(refreshNotesPage);
+                Navigation.setRoutesToUpdate([
+                  Navigation.routeNames.NotesPage,
+                  Navigation.routeNames.Favorites,
+                  Navigation.routeNames.Notes,
+                  Navigation.routeNames.Notebook,
+                  Navigation.routeNames.Notebooks,
+                ]);
+                dispatch({type: Actions.SELECTION_MODE, enabled: false});
+                dispatch({type: Actions.CLEAR_SELECTION});
+              }
+            }}
+            customStyle={{
+              marginLeft: 10,
+            }}
+            color={colors.light}
+            name="minus"
             size={SIZE.xl}
           />
         )}
