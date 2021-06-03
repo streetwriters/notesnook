@@ -85,7 +85,6 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
 
   const restore = async (item, index) => {
     if (restoring) {
-      showIsWorking();
       return;
     }
     if (Platform.OS === 'android') {
@@ -172,15 +171,15 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
               title: 'Open File Manager',
               onPress: () => {
                 if (restoring) {
-                  showIsWorking();
                   return;
                 }
                 DocumentPicker.pick()
                   .then(r => {
+                    setRestoring(true);
                     fetch(r.uri).then(async r => {
                       try {
                         let backup = await r.json();
-                        setRestoring(true);
+                       
                         await db.backup.import(JSON.stringify(backup));
                         setRestoring(false);
                         dispatch({type: Actions.ALL});
@@ -190,9 +189,9 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                           message:
                             'Your backup data has been restored successfully.',
                           type: 'success',
-                          context: 'local',
+                          context: 'global',
                         });
-                        setVisible(false);
+                        actionSheetRef.current?.hide();
                       } catch (e) {
                         setRestoring(false);
                         ToastEvent.show({
@@ -223,7 +222,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
           ListEmptyComponent={
-            restoring ? (
+            !restoring ? (
               <View
                 style={{
                   justifyContent: 'center',
