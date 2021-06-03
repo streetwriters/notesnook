@@ -7,12 +7,14 @@ import Sodium from 'react-native-sodium';
 import * as Keychain from 'react-native-keychain';
 
 let RNFetchBlob;
-async function read(key, isArray = false) {
+async function read(key) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
- 
-  data = JSON.parse(data);
-  return data;
+  try {
+    return JSON.parse(data);
+  } catch(e) {
+    return data;
+  }
 }
 
 async function write(key, data) {
