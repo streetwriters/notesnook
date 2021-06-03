@@ -76,15 +76,8 @@ class Merger {
   async merge(serverResponse, lastSynced) {
     if (!serverResponse) return false;
     this._lastSynced = lastSynced;
-    const {
-      notes,
-      synced,
-      notebooks,
-      content,
-      trash,
-      vaultKey,
-      settings,
-    } = serverResponse;
+    const { notes, synced, notebooks, content, trash, vaultKey, settings } =
+      serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
     this.key = await this._db.user.getEncryptionKey();
@@ -118,16 +111,19 @@ class Merger {
       async (local, remote) => {
         // if hashes are equal do nothing
         if (
+          !remote ||
+          !local ||
           !remote.data ||
           remote.data === "undefined" || //TODO not sure about this
           SparkMD5.hash(local.data) === SparkMD5.hash(remote.data)
         )
           return;
 
-        // merge conflicts resolver
-        const note = this._db.notes.note(local.noteId).data;
+        let note = this._db.notes.note(local.noteId);
+        if (!note || !note.data) return;
+        note = note.data;
 
-        if (local.deleted || note.locked) {
+        if (remote.deleted || local.deleted || note.locked) {
           // if note is locked or content is deleted we keep the most recent version.
           if (remote.dateEdited > local.dateEdited)
             await this._db.content.add({ id: local.id, ...remote });
