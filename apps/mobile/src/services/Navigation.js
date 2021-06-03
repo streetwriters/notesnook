@@ -2,7 +2,7 @@ import {DrawerActions, StackActions} from '@react-navigation/native';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
 import {eOnNewTopicAdded, refreshNotesPage} from '../utils/Events';
-import {rootNavigatorRef, sideMenuRef} from '../utils/Refs';
+import {rootNavigatorRef, sideMenuRef, tabBarRef} from '../utils/Refs';
 import {eSendEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
@@ -156,10 +156,10 @@ function popToTop() {
 }
 
 function openDrawer() {
-  sideMenuRef.current?.dispatch(DrawerActions.openDrawer());
+  tabBarRef.current?.openDrawer();
 }
 function closeDrawer() {
-  sideMenuRef.current?.dispatch(DrawerActions.closeDrawer());
+  tabBarRef.current?.closeDrawer();
 }
 
 export default {

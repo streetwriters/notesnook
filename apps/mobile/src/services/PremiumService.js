@@ -45,6 +45,7 @@ function getProducts() {
 }
 
 function get() {
+  return true;
   return (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
@@ -54,7 +55,8 @@ function get() {
 }
 
 async function verify(callback, error) {
-
+  callback();
+  return;
   try {
     if (!premiumStatus) {
       if (error) {
