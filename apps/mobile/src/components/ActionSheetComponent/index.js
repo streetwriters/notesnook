@@ -11,7 +11,7 @@ import {
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import { useNoteStore, useTracked, useTrackedNotes } from '../../provider';
 import { Actions } from '../../provider/Actions';
 import { DDS } from '../../services/DeviceDetection';
 import {
@@ -59,6 +59,7 @@ export const ActionSheetComponent = ({
   const [refreshing, setRefreshing] = useState(false);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [note, setNote] = useState(item);
+
   const [noteInTopic, setNoteInTopic] = useState(
     editing.actionAfterFirstSave.type === 'topic' &&
       db.notebooks
@@ -345,7 +346,11 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).favorite();
         }
-        dispatch({type: Actions.FAVORITES});
+        //dispatch({type: Actions.NOTES});
+        dispatchh({type:Actions.NOTES});
+        //setNotes()
+        //eSendEvent("onListUpdate",db.notes.note(note.id).data);
+        return;
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,

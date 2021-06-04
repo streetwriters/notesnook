@@ -2,26 +2,15 @@ import {
   activateKeepAwake,
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
-import {Component} from 'react';
-import {FlatList} from 'react-native';
-import {Dimensions, View} from 'react-native';
+import React, {Component, createRef, useEffect, useRef, useState} from 'react';
+import {Dimensions, FlatList, Keyboard, TextInput, View} from 'react-native';
 import Animated, {useValue} from 'react-native-reanimated';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
 import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
 import {Menu} from './src/components/Menu';
-import Splash from './src/components/SplashScreen';
 import {Toast} from './src/components/Toast';
-import {NavigationStack} from './src/navigation/Drawer';
 import {NavigatorStack} from './src/navigation/NavigatorStack';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
@@ -31,7 +20,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from './src/services/EventManager';
-import {editing, setWidthHeight} from './src/utils';
+import {dHeight, editing, setWidthHeight} from './src/utils';
 import {updateStatusBarColor} from './src/utils/Colors';
 import {
   eClearEditor,
@@ -51,17 +40,21 @@ let layoutTimer = null;
 let currentTab = 0;
 
 const onChangeTab = async obj => {
+  console.log(obj.i);
   if (obj.i === 1) {
+    console.log('making note');
     eSendEvent(eCloseSideMenu);
     editing.movedAway = false;
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
+    console.log(editing.currentlyEditing, getNote(), editing.isRestoringState);
     if (
       !editing.isRestoringState &&
       (!editing.currentlyEditing || !getNote())
     ) {
+      console.log('new note');
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }
@@ -156,8 +149,8 @@ const AppStack = React.memo(
     const {colors, deviceMode} = state;
     const [dimensions, setDimensions] = useState({width, height});
     const animatedOpacity = useValue(0);
-    const animatedZIndex = useValue(-10);
-
+    const animatedHeight = useValue(0);
+    const overlayRef = useRef();
     const showFullScreenEditor = () => {
       dispatch({type: Actions.FULLSCREEN, state: true});
       editorRef.current?.setNativeProps({
@@ -184,6 +177,7 @@ const AppStack = React.memo(
     };
 
     useEffect(() => {
+      toggleView(false);
       eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
@@ -225,13 +219,16 @@ const AppStack = React.memo(
       if (DDS.isLargeTablet()) {
         //console.log('setting large tab');
         setDeviceMode('tablet', size);
+        tabBarRef.current?.goToIndex(0)
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else if (DDS.isSmallTab) {
         //console.log('setting small tab');
         setDeviceMode('smallTablet', size);
+        tabBarRef.current?.goToIndex(0)
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else {
         setDeviceMode('mobile', size);
+        tabBarRef.current?.goToIndex(1)
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       }
     }
@@ -254,19 +251,30 @@ const AppStack = React.memo(
       }
     }
 
-    const onScroll = scroll => {
-      currentScroll = scroll;
-      if (scroll === 0) {
-        eSendEvent(eOpenSideMenu);
+    const onScroll = scrollOffset => {
+      if (scrollOffset > 299) {
+        animatedOpacity.setValue(0);
+        toggleView(false);
       } else {
-        eSendEvent(eCloseSideMenu);
+        let o = scrollOffset / 300;
+        let op = 0;
+        if (o < 0) {
+          op = 1;
+        } else {
+          op = 1 - o;
+        }
+        animatedOpacity.setValue(op);
+        toggleView(true);
       }
     };
 
-    const renderTabBar = useCallback(() => <></>, []);
-
     const toggleView = show => {
-      //animatedZIndex.setValue(show? 999 : -10)
+      overlayRef.current?.setNativeProps({
+        style: {
+          display: show ? 'flex' : 'none',
+          zIndex: show ? 999 : -10,
+        },
+      });
     };
 
     return (
@@ -277,11 +285,7 @@ const AppStack = React.memo(
           width: '100%',
           height: '100%',
           backgroundColor: colors.bg,
-        }}
-        //onMoveShouldSetResponderCapture={_moveResponder}
-        // onTouchEnd={_onTouchEnd}
-        //onStartShouldSetResponderCapture={_responder}
-      >
+        }}>
         {deviceMode && (
           <CustomTabs
             ref={tabBarRef}
@@ -289,65 +293,68 @@ const AppStack = React.memo(
               zIndex: 1,
             }}
             onDrawerStateChange={state => {
-              console.log(state);
+              //console.log(state);
             }}
+            initialIndex={deviceMode === 'smallTablet' ? 0 : 1}
             offsets={{
-              a: 300,
-              b: dimensions.width + 300,
-              c: dimensions.width * 2 + 300,
+              a: deviceMode === 'smallTablet' ? dimensions.width : 300,
+              b:
+                deviceMode === 'smallTablet'
+                  ? dimensions.width
+                  : dimensions.width + 300,
+              c:
+                deviceMode === 'smallTablet'
+                  ? dimensions.width * 2
+                  : dimensions.width * 2 + 300,
             }}
             items={[
               <View
                 style={{
                   height: '100%',
-                  width: 300,
+                  width:
+                    deviceMode === 'smallTablet'
+                      ? dimensions.width * 0.35
+                      : 300,
                 }}>
                 <Menu />
               </View>,
               <View
                 style={{
                   height: '100%',
-                  width: dimensions.width,
+                  width:
+                    deviceMode === 'mobile'
+                      ? dimensions.width
+                      : dimensions.width * 0.65,
                 }}>
-                <Animated.View
-                  onTouchEnd={() => {
-                    tabBarRef.current?.listRef?.current?.scrollToIndex({
-                      animated: true,
-                      index: 1,
-                      viewOffset: 0,
-                      viewPosition: 0,
-                    });
-                  }}
-                  style={{
-                    position: 'absolute',
-                    width: dimensions.width,
-                    backgroundColor: 'rgba(0,0,0,0.2)',
-                    opacity: animatedOpacity,
-                    height: '100%',
-                    zIndex: -10,
-                  }}
-                />
+                {deviceMode === 'mobile' && (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      width: '100%',
+                      height: '100%',
+                      display: 'none',
+                      zIndex: -10,
+                    }}
+                    ref={overlayRef}>
+                    <Animated.View
+                      onTouchEnd={() => {
+                        tabBarRef.current?.goToIndex(1)
+                      }}
+                      style={{
+                        backgroundColor: 'rgba(0,0,0,0.2)',
+                        opacity: animatedOpacity,
+                        width: '100%',
+                        height: '100%',
+                      }}
+                    />
+                  </View>
+                )}
+
                 <NavigatorStack />
               </View>,
               <EditorWrapper dimensions={dimensions} />,
             ]}
-            onScroll={scrollOffset => {
-              if (scrollOffset > 300) {
-                animatedOpacity.setValue(0);
-                toggleView(false);
-
-              } else {
-                let o = scrollOffset / 300;
-                let op = 0;
-                if (o < 0) {
-                  op = 1;
-                } else {
-                  op = 1 - o;
-                }
-                animatedOpacity.setValue(op);
-                toggleView(true)
-              }
-            }}
+            onScroll={onScroll}
             onChangeTab={onChangeTab}
           />
         )}
@@ -428,70 +435,92 @@ const AppStack = React.memo(
   () => true,
 );
 
-let OFFSET_A = 300;
-let OFFSET_B = 300 + Dimensions.get('window').width;
-let OFFSET_C = 300 + Dimensions.get('window').width * 2;
-
 class CustomTabs extends Component {
   constructor(props) {
     super(props);
     this.listRef = createRef();
-    this.scrollOffset = 300;
+    this.scrollOffset = props.initialIndex === 0 ? 0 : 300;
     this.page = 0;
+    this.currentDrawerState = false;
+    this.inputElement = createRef();
+    this.keyboardState = false;
+    this.scrollTimeout = null;
+    this.scrollEnabled = true;
+    this.responderAllowedScroll = false;
   }
+
 
   renderItem = ({item, index}) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {
-    let x = event.nativeEvent.locationX;
-    let y = event.nativeEvent.locationY;
+    // console.log(this.responderAllowedScroll,'allowed scrolling')
+    if (this.responderAllowedScroll) return;
+    let x = event.nativeEvent.pageX;
+    let y = event.nativeEvent.pageY;
+    this.hideKeyboardIfVisible();
+    let cOffset = this.scrollOffset.toFixed(0);
+    let pOffset = this.props.offsets.b.toFixed(0);
+    let heightCheck = !editing.tooltip
+      ? updatedDimensions.height - 70
+      : updatedDimensions.height - 140;
 
-    if (this.scrollOffset.toFixed(0) === this.props.offsets.b.toFixed(0)) {
-      if (x > 50 && y < Dimensions.get('window').height - 70) {
-        this.listRef.current?.getNativeScrollRef().setNativeProps({
-          scrollEnabled: false,
-        });
-        this.listRef.current?.scrollToIndex({
-          animated: true,
-          index: 2,
-          viewOffset: 0,
-          viewPosition: 0,
-        });
+    if (cOffset > pOffset - 50) {
+      if (x > 50 || y > heightCheck) {
+        this.responderAllowedScroll = false;
+        this.setScrollEnabled(false);
+        return;
       } else {
-        this.listRef.current?.getNativeScrollRef().setNativeProps({
-          scrollEnabled: true,
-        });
+        this.responderAllowedScroll = true;
+        this.setScrollEnabled(true);
+        return;
       }
     }
+    this.responderAllowedScroll = true;
   };
 
   openDrawer = () => {
     console.log('open');
     if (this.page === 0) {
-      this.listRef.current?.scrollToIndex({
-        animated: true,
-        index: 0,
-        viewOffset: 0,
-        viewPosition: 0,
-      });
+      this.goToIndex(0);
     }
   };
 
   closeDrawer = () => {
     console.log('close');
     if (this.page === 0) {
-      this.listRef.current?.scrollToIndex({
-        animated: true,
-        index: 1,
-        viewOffset: 0,
-        viewPosition: 0,
-      });
+      this.goToIndex(1);
     }
   };
 
-  setScrollEnabled = () => {};
+  hideKeyboardIfVisible() {
+    if ((editing.keyboardState || editing.isFocused) && this.scrollOffset < this.props.offsets.b - 50) {
+      editing.isFocused = false;
+      editing.keyboardState = false;
+      this.inputElement.current?.focus();
+      this.inputElement.current?.blur();
+    }
+  }
+
+  goToIndex(index, animated = true) {
+    // console.log('called me', index);
+    this.listRef.current?.scrollToIndex({
+      animated: animated,
+      index: index,
+      viewOffset: 0,
+      viewPosition: 0,
+    });
+  }
+
+  setScrollEnabled = enabled => {
+    this.scrollEnabled = enabled;
+    this.listRef.current?.getNativeScrollRef().setNativeProps({
+      scrollEnabled: enabled,
+    });
+  };
 
   onTouchEnd = () => {
+    //console.log('touch has ended');
+    this.responderAllowedScroll = false;
     this.listRef.current?.getNativeScrollRef().setNativeProps({
       scrollEnabled: true,
     });
@@ -499,46 +528,76 @@ class CustomTabs extends Component {
 
   onScroll = event => {
     this.scrollOffset = event.nativeEvent.contentOffset.x;
+    if (this.page === 1) {
+      this.hideKeyboardIfVisible();
+    }
     this.props.onScroll(this.scrollOffset);
+    if (this.scrollTimeout) {
+      clearTimeout(this.scrollTimeout);
+      this.scrollTimeout = null;
+    }
+    this.scrollTimeout = setTimeout(() => {
+      if (
+        this.scrollOffset !== this.props.offsets.a &&
+        this.page === 1 &&
+        !this.scrollEnabled
+      ) {
+        this.goToIndex(2, false);
+      }
+    }, 300);
   };
 
   goToPage = page => {
     if (page === 0) {
-      this.listRef.current?.scrollToIndex({
-        animated: true,
-        index: 1,
-        viewOffset: 0,
-        viewPosition: 0,
-      });
+      this.scrollOffset = this.props.offsets.a;
+      this.hideKeyboardIfVisible();
+      this.goToIndex(1);
     } else if (page === 1) {
-      this.listRef.current?.scrollToIndex({
-        animated: true,
-        index: 2,
-        viewOffset: 0,
-        viewPosition: 0,
-      });
+      this.goToIndex(2);
+    }
+    if (this.page !== page) {
+      this.props.onChangeTab({i: page, from: this.page});
+      this.page = page;
     }
   };
 
   keyExtractor = (item, index) => item;
 
   onScrollEnd = event => {
-    this.page = 0;
-    if (this.scrollOffset.toFixed(0) === this.props.offsets.b.toFixed(0)) {
-      this.page = 1;
+    //console.log('scroll end');
+    this.responderAllowedScroll = false;
+    let page = 0;
+    if (this.scrollOffset > this.props.offsets.b - 50) {
+      page = 1;
+    } else {
+      this.hideKeyboardIfVisible();
     }
-    this.props.onDrawerStateChange(this.page === 0 && this.scrollOffset < 10);
-    this.props.onChangeTab(this.page);
+    let drawerState = page === 0 && this.scrollOffset < 10;
+    if (drawerState !== this.currentDrawerState) {
+      this.currentDrawerState = drawerState;
+      this.props.onDrawerStateChange(this.currentDrawerState);
+    }
+    if (this.page !== page) {
+      console.log(page);
+      this.props.onChangeTab({i: page, from: this.page});
+      this.page = page;
+    }
   };
 
   render() {
     return (
       <View
         onTouchEnd={this.onTouchEnd}
-        onMoveShouldSetResponder={this.props.onMoveShouldSetResponder}
+        onMoveShouldSetResponderCapture={this.onMoveShouldSetResponder}
+        onStartShouldSetResponderCapture={this.onMoveShouldSetResponder}
         style={{
           flex: 1,
         }}>
+        <TextInput
+          ref={this.inputElement}
+          style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
+          blurOnSubmit={false}
+        />
         <FlatList
           ref={this.listRef}
           horizontal
@@ -551,11 +610,14 @@ class CustomTabs extends Component {
           initialNumToRender={100}
           alwaysBounceHorizontal={false}
           scrollToOverflowEnabled={false}
+          scrollsToTop={false}
+          scrollEventThrottle={1}
+          directionalLockEnabled
+          maintainVisibleContentPosition={true}
           overScrollMode="never"
-          decelerationRate="fast"
           maxToRenderPerBatch={100}
           removeClippedSubviews={false}
-          keyboardDismissMode="on-drag"
+          keyboardDismissMode="none"
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
           disableIntervalMomentum={true}
@@ -564,7 +626,7 @@ class CustomTabs extends Component {
             this.props.offsets.b,
             this.props.offsets.c,
           ]}
-          initialScrollIndex={1}
+          initialScrollIndex={this.props.initialIndex}
           data={['drawer', 'navigation', 'editor']}
           renderItem={this.renderItem}
         />

@@ -80,7 +80,7 @@ const screenOptionsForAnimation = {
 export const NavigatorStack = React.memo(
   () => {
     const [, dispatch] = useTracked();
-    const [render, setRender] = React.useState(false);
+    const [render, setRender] = React.useState(true);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
         dispatch({type: Actions.SELECTION_MODE, enabled: false});

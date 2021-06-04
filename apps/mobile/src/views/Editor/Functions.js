@@ -550,7 +550,7 @@ export async function saveNote(preventUpdate) {
 
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
-    Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    //Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
   if (premium) {
     tiny.call(EditorWebView, tiny.setMarkdown, true);
@@ -570,6 +570,7 @@ async function restoreEditorState() {
       appState.note.id &&
       Date.now() < appState.timestamp + 3600000
     ) {
+      console.log('restoring state');
       editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
@@ -581,8 +582,13 @@ async function restoreEditorState() {
       editing.movedAway = false;
       eSendEvent('load_overlay', 'hide_editor');
       editing.isRestoringState = false;
+      return;
     }
+    editing.isRestoringState = false;
+    return;
   }
+  editing.isRestoringState = false;
+
 }
 
 export let isFromIntent = false;

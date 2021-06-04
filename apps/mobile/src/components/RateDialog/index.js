@@ -1,25 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {Linking} from 'react-native';
-import {Platform} from 'react-native';
-import {View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { Linking, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogHeader from '../Dialog/dialog-header';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const RateDialog = () => {
   const [state] = useTracked();
-  const {notes, colors, settings} = state;
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
   const insets = useSafeAreaInsets();
 

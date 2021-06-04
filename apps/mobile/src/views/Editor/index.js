@@ -104,6 +104,7 @@ const Editor = React.memo(
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
           nestedScrollEnabled
+          
           contentContainerStyle={{
             width: '100%',
             height: '100%',

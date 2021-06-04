@@ -69,6 +69,10 @@ const noteColors = [
   '#9E9E9E',
 ];
 
+export const updateList = (items) => {
+  eSendEvent("onListUpdate",items);
+}
+
 export function preloadImages(color) {
   let uri = imgNames.map(name => {
     return {

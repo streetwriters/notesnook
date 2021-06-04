@@ -1,8 +1,6 @@
-import {Actions} from '../provider/Actions';
-import {db} from '../utils/DB';
-import {eOpenLoginDialog, eOpenProgressDialog} from '../utils/Events';
-import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
+import { Actions } from '../provider/Actions';
+import { eOpenLoginDialog } from '../utils/Events';
+import { eSendEvent } from './EventManager';
 import PremiumService from './PremiumService';
 
 export function setLoginMessage(dispatch) {

@@ -1,7 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import {EV, EVENTS} from 'notes-core/common';
 import React, {useEffect} from 'react';
-import {Appearance, AppState, Linking, Platform} from 'react-native';
+import {Appearance, AppState, Keyboard, Linking, Platform} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
@@ -143,6 +143,9 @@ export const AppRootEvents = React.memo(
       };
     }, []);
 
+  
+
+
     const onSessionExpired = async () => {
       await Storage.write('loginSessionHasExpired', 'expired');
       eSendEvent(eOpenLoginDialog, 4);
@@ -280,7 +283,7 @@ export const AppRootEvents = React.memo(
         ToastEvent.show({
           heading: 'Sync failed',
           message: e.message,
-          context: context,
+          context: "global",
         });
       } finally {
         dispatch({type: Actions.SYNCING, syncing: false});

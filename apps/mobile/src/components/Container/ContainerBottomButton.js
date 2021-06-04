@@ -6,7 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
+import {editing, getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import RNTooltips from 'react-native-tooltips';
@@ -29,11 +29,15 @@ export const ContainerBottomButton = ({
   }
 
   const onKeyboardHide = async () => {
+    console.log('called hide')
+    editing.keyboardState = false;
     if (DDS.isTab) return;
     animate(0);
   };
 
   const onKeyboardShow = async () => {
+    console.log('called show');
+    editing.keyboardState = true;
     if (DDS.isTab) return;
     animate(150);
   };

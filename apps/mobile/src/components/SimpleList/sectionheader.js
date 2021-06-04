@@ -34,12 +34,12 @@ export const SectionHeader = ({
 		  paddingHorizontal: 12,
 		  height: 30 * fontScale,
 		  backgroundColor:
-			index === 1
+			index === 0
 			  ? headerProps.color
 				? colors[headerProps.color]
 				: colors.shade
 			  : colors.nav,
-		  marginTop: index === 1 ? 0 : 5 * fontScale,
+		  marginTop: index === 0 ? 0 : 5 * fontScale,
 		}}>
 		<TouchableWithoutFeedback
 		  onPress={() => {
@@ -63,7 +63,7 @@ export const SectionHeader = ({
 			{!item.title || item.title === '' ? 'Pinned' : item.title}
 		  </Heading>
 		</TouchableWithoutFeedback>
-		{index === 1 && sortMenuButton ? <HeaderMenu /> : null}
+		{index === 0 && sortMenuButton ? <HeaderMenu /> : null}
 	  </View>
 	);
   };

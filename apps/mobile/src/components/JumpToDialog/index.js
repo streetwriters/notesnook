@@ -6,7 +6,7 @@ import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation, } from '../../utils';
+import {getElevation} from '../../utils';
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
@@ -26,7 +26,7 @@ const JumpToDialog = ({scrollRef}) => {
   const onPress = (item, index) => {
     let offset = 35 * index;
     let ind = notes.findIndex(
-      (i) => i.title === item.title && i.type === 'header',
+      i => i.title === item.title && i.type === 'header',
     );
     ind = ind + 1;
     ind = ind - (index + 1);
@@ -47,7 +47,7 @@ const JumpToDialog = ({scrollRef}) => {
     };
   }, []);
 
-  const onScroll = (y) => {
+  const onScroll = y => {
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
@@ -72,11 +72,11 @@ const JumpToDialog = ({scrollRef}) => {
 
   const loadOffsets = () => {
     notes
-      .filter((i) => i.type === 'header')
+      .filter(i => i.type === 'header')
       .map((item, index) => {
         let offset = 35 * index;
         let ind = notes.findIndex(
-          (i) => i.title === item.title && i.type === 'header',
+          i => i.title === item.title && i.type === 'header',
         );
         ind = ind + 1;
         ind = ind - (index + 1);
@@ -129,9 +129,9 @@ const JumpToDialog = ({scrollRef}) => {
               key="go to top"
               onPress={() => {
                 scrollRef.current?.scrollToOffset(0, 0, true);
-                close()
+                close();
               }}
-              type='shade'
+              type="shade"
               customStyle={{
                 minWidth: '20%',
                 maxWidth: '46%',
@@ -151,7 +151,7 @@ const JumpToDialog = ({scrollRef}) => {
               </Heading>
             </PressableButton>
             {notes
-              .filter((i) => i.type === 'header')
+              .filter(i => i.type === 'header')
               .map((item, index) => {
                 return item.title ? (
                   <PressableButton

@@ -28,6 +28,8 @@ const NoteItem = ({item, isTrash}) => {
     );
   };
 
+  
+
   return (
     <>
       <View
@@ -54,15 +56,12 @@ const NoteItem = ({item, isTrash}) => {
           </Heading>
         ) : null}
 
-        <Text
+        <Heading
           numberOfLines={1}
-          style={{
-            color: COLORS_NOTE[item.color] || colors.heading,
-            fontSize: SIZE.md,
-            fontWeight: 'bold',
-          }}>
-          {item.title + ' '}
-        </Text>
+          color={COLORS_NOTE[item.color] || colors.heading}
+          size={SIZE.md}>
+          {item.title}
+        </Heading>
 
         {item.headline ? (
           <Paragraph numberOfLines={2}>{item.headline}</Paragraph>
