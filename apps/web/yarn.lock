@@ -1754,6 +1754,37 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@stablelib/binary@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/binary/-/binary-1.0.1.tgz#c5900b94368baf00f811da5bdb1610963dfddf7f"
+  integrity sha512-ClJWvmL6UBM/wjkvv/7m5VP3GMr9t0osr4yVgLZsLCOz4hGN9gIAFEqnJ0TsSMAN+n840nf2cHZnA5/KFqHC7Q==
+  dependencies:
+    "@stablelib/int" "^1.0.1"
+
+"@stablelib/blake2s@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/blake2s/-/blake2s-1.0.1.tgz#0a3de2e2780172cafc9675784251a87849cf41c0"
+  integrity sha512-Nnp7ULL65b4zEOkf3IdfL74xHhZXMCg7HBjBYO666a0o+DIY6GDEhUCqH6dws8nsSZgZO+V5+s2VyYKKGdFMZw==
+  dependencies:
+    "@stablelib/binary" "^1.0.1"
+    "@stablelib/hash" "^1.0.1"
+    "@stablelib/wipe" "^1.0.1"
+
+"@stablelib/hash@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/hash/-/hash-1.0.1.tgz#3c944403ff2239fad8ebb9015e33e98444058bc5"
+  integrity sha512-eTPJc/stDkdtOcrNMZ6mcMK1e6yBbqRBaNW55XA1jU8w/7QdnCF0CmMmOD1m7VSkBR44PWrMHU2l6r8YEQHMgg==
+
+"@stablelib/int@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/int/-/int-1.0.1.tgz#75928cc25d59d73d75ae361f02128588c15fd008"
+  integrity sha512-byr69X/sDtDiIjIV6m4roLVWnNNlRGzsvxw+agj8CIEazqWGOQp2dTYgQhtyVXV9wpO6WyXRQUzLV/JRNumT2w==
+
+"@stablelib/wipe@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
+  integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
+
 "@styled-system/background@^5.1.2":
   version "5.1.2"
   resolved "https://registry.npmjs.org/@styled-system/background/-/background-5.1.2.tgz"
@@ -9168,8 +9199,9 @@ normalize-url@^4.1.0:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.6.6"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#d64ea76001f1a04564c2b06eaa5c44f165b014ea"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#73eaa0b2e44aca76de350151bc0e20cbdaf632ba"
   dependencies:
+    "@stablelib/blake2s" "^1.0.1"
     fast-sort "^2.0.1"
     lean-he "^2.1.2"
     no-internet "^1.5.2"
