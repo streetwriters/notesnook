@@ -35,3 +35,17 @@ export const EVENTS = {
 };
 
 export const CURRENT_DATABASE_VERSION = 5.2;
+
+export function setUserPersonalizationBytes(userSalt) {
+  USER_PERSONALIZATION_HASH = new Uint8Array(
+    Buffer.from(userSalt, "base64url"),
+    0,
+    8
+  );
+  if (
+    !USER_PERSONALIZATION_HASH.length ||
+    !USER_PERSONALIZATION_HASH.byteLength
+  )
+    USER_PERSONALIZATION_HASH = undefined;
+}
+export var USER_PERSONALIZATION_HASH = null;

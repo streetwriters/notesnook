@@ -22,6 +22,7 @@
     "test": "jest"
   },
   "dependencies": {
+    "@stablelib/blake2s": "^1.0.1",
     "fast-sort": "^2.0.1",
     "lean-he": "^2.1.2",
     "no-internet": "^1.5.2",

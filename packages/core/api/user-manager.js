@@ -1,7 +1,12 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import TokenManager from "./token-manager";
-import { EV, EVENTS } from "../common";
+import {
+  EV,
+  EVENTS,
+  setUserPersonalizationBytes,
+  USER_PERSONALIZATION_HASH,
+} from "../common";
 
 const ENDPOINTS = {
   signup: "/users",
@@ -27,6 +32,7 @@ class UserManager {
   async init() {
     const user = await this.getUser();
     if (!user) return;
+    setUserPersonalizationBytes(user.salt);
   }
 
   async signup(email, password) {
@@ -56,6 +62,7 @@ class UserManager {
     );
 
     const user = await this.fetchUser();
+    setUserPersonalizationBytes(user.salt);
     await this._db.context.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt,
