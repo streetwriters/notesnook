@@ -16,6 +16,7 @@ import { ReactComponent as Vault } from "../../assets/vault.svg";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { changeSvgTheme } from "../../utils/css";
 import getSymbolFromCurrency from "currency-symbol-map";
+import { trackEvent } from "../../utils/analytics";
 
 const premiumDetails = [
   {
@@ -136,6 +137,10 @@ function BuyDialog(props) {
       }
     })();
   }, [coupon]);
+
+  useEffect(() => {
+    trackEvent("view", "Buy dialog viewed.");
+  }, []);
 
   return (
     <Dialog
@@ -288,6 +293,7 @@ function BuyDialog(props) {
                 fontSize="title"
                 fontWeight="bold"
                 onClick={async () => {
+                  trackEvent("buy", "Subscribe button clicked.");
                   if (isLoggedIn) {
                     await upgrade(user, coupon);
                   } else {
