@@ -9,6 +9,7 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -71,6 +72,10 @@ function getEmail() {
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
+
+  const setUser = useUserStore(state => state.setUser);
+  const setLastSynced = useUserStore(state => state.setLastSynced)
+  
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -80,6 +85,7 @@ const LoginDialog = () => {
   const [focused, setFocused] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const insets = useSafeAreaInsets();
+
 
   const _email = useRef();
   const _pass = useRef();
@@ -236,8 +242,8 @@ const LoginDialog = () => {
       if (!user) throw new Error('Email or password incorrect!');
       setStatus('Syncing Your Data');
       PremiumService.setPremiumStatus();
-      dispatch({type: Actions.USER, user: user});
-      clearMessage(dispatch);
+      setUser(user);
+      clearMessage();
       ToastEvent.show({
         heading: 'Login successful',
         message: `Logged in as ${user.email}`,
@@ -318,10 +324,10 @@ const LoginDialog = () => {
       await db.user.signup(email, password);
       let user = await db.user.getUser();
       setStatus('Setting Crenditials');
-      dispatch({type: Actions.USER, user: user});
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      clearMessage(dispatch);
-      setEmailVerifyMessage(dispatch);
+      setUser(user);
+      setLastSynced(await db.lastSynced())
+      clearMessage();
+      setEmailVerifyMessage();
       close();
       await sleep(300);
       eSendEvent(eOpenRecoveryKeyDialog, true);

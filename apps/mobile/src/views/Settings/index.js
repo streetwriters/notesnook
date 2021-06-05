@@ -28,6 +28,7 @@ import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useMessageStore, useSettingStore, useUserStore } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
@@ -321,7 +322,9 @@ const SectionHeader = ({title}) => {
 let passwordValue = null;
 const AccoutLogoutSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, user} = state;
+  const {colors} = state;
+
+  const user = useUserStore(state => state.user);
   const [visible, setVisible] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -578,7 +581,10 @@ const getTimeLeft = t2 => {
 
 const SettingsUserSection = () => {
   const [state] = useTracked();
-  const {colors, user, messageBoardState} = state;
+  const {colors} = state;
+
+  const user = useUserStore(state => state.user);
+  const messageBoardState = useMessageStore(state => state.message);
   const subscriptionDaysLeft =
     user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
@@ -893,7 +899,8 @@ const SettingsUserSection = () => {
 const SettingsAppearanceSection = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const settings = {...state.settings};
+  const settings = useSettingStore(state => state.settings);
+
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -1127,7 +1134,9 @@ const SettingsAppearanceSection = () => {
 
 const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
-  const {colors, settings} = state;
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+
   const [appLockVisible, setAppLockVisible] = useState(false);
 
   const [vaultStatus, setVaultStatus] = React.useState({
@@ -1353,8 +1362,10 @@ const SettingsPrivacyAndSecurity = () => {
 
 const SettingsBackupAndRestore = () => {
   const [state] = useTracked();
-  const {colors, settings, user} = state;
-
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const user = useUserStore(state => state.user);
+  
   const backupItemsList = [
     {
       name: 'Backup data',

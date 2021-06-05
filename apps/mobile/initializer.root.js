@@ -1,39 +1,39 @@
 import {
   activateKeepAwake,
-  deactivateKeepAwake,
+  deactivateKeepAwake
 } from '@sayem314/react-native-keep-awake';
-import React, {Component, createRef, useEffect, useRef, useState} from 'react';
-import {Dimensions, FlatList, Keyboard, TextInput, View} from 'react-native';
-import Animated, {useValue} from 'react-native-reanimated';
-import {notesnook} from './e2e/test.ids';
+import React, { Component, createRef, useEffect, useRef, useState } from 'react';
+import { Dimensions, FlatList, TextInput, View } from 'react-native';
+import Animated, { useValue } from 'react-native-reanimated';
+import { notesnook } from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
-import {DialogManager} from './src/components/DialogManager';
-import {DummyText} from './src/components/DummyText';
-import {Menu} from './src/components/Menu';
-import {Toast} from './src/components/Toast';
-import {NavigatorStack} from './src/navigation/NavigatorStack';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
-import {DDS} from './src/services/DeviceDetection';
+import { DialogManager } from './src/components/DialogManager';
+import { DummyText } from './src/components/DummyText';
+import { Menu } from './src/components/Menu';
+import { Toast } from './src/components/Toast';
+import { NavigatorStack } from './src/navigation/NavigatorStack';
+import { useTracked } from './src/provider';
+import { useSettingStore } from './src/provider/stores';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
-import {dHeight, editing, setWidthHeight} from './src/utils';
-import {updateStatusBarColor} from './src/utils/Colors';
+import { editing, setWidthHeight } from './src/utils';
+import { updateStatusBarColor } from './src/utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eCloseSideMenu,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenSideMenu,
+  eOpenSideMenu
 } from './src/utils/Events';
-import {editorRef, tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
-import {EditorWrapper} from './src/views/Editor/EditorWrapper';
-import {EditorWebView, getNote} from './src/views/Editor/Functions';
+import { editorRef, tabBarRef } from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
+import { EditorWrapper } from './src/views/Editor/EditorWrapper';
+import { EditorWebView, getNote } from './src/views/Editor/Functions';
 import tiny from './src/views/Editor/tiny/tiny';
 let {width, height} = Dimensions.get('window');
 let layoutTimer = null;
@@ -49,7 +49,6 @@ const onChangeTab = async obj => {
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
-    console.log(editing.currentlyEditing, getNote(), editing.isRestoringState);
     if (
       !editing.isRestoringState &&
       (!editing.currentlyEditing || !getNote())
@@ -146,13 +145,18 @@ const _onTouchEnd = e => {
 const AppStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors, deviceMode} = state;
+    const {colors} = state;
+    
+    const deviceMode = useSettingStore(state => state.deviceMode);
+    const setFullscreen = useSettingStore(state => state.setFullscreen);
+    const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
+
     const [dimensions, setDimensions] = useState({width, height});
     const animatedOpacity = useValue(0);
-    const animatedHeight = useValue(0);
     const overlayRef = useRef();
+
     const showFullScreenEditor = () => {
-      dispatch({type: Actions.FULLSCREEN, state: true});
+      setFullscreen(true);
       editorRef.current?.setNativeProps({
         style: {
           position: 'absolute',
@@ -165,7 +169,7 @@ const AppStack = React.memo(
     };
 
     const closeFullScreenEditor = () => {
-      dispatch({type: Actions.FULLSCREEN, state: false});
+      setFullscreen(false);
       editorRef.current?.setNativeProps({
         style: {
           position: 'relative',
@@ -198,7 +202,7 @@ const AppStack = React.memo(
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
         //console.log(deviceMode, 'MODE__');
-        dispatch({type: Actions.DEVICE_MODE, state: deviceMode});
+        setDeviceModeState(deviceMode)
         return;
       }
 
@@ -235,8 +239,8 @@ const AppStack = React.memo(
 
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
-      dispatch({type: Actions.DEVICE_MODE, state: current});
-      dispatch({type: Actions.FULLSCREEN, state: false});
+      setDeviceModeState(current);
+      setFullscreen(false);
 
       editorRef.current?.setNativeProps({
         style: {

@@ -1,31 +1,30 @@
-import React, {useCallback, useEffect, useState} from 'react';
-
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {simpleDialogEvent} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EMPTY_TRASH} from '../../components/DialogManager/Templates';
-import {Header} from '../../components/Header';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { simpleDialogEvent } from '../../components/DialogManager/recievers';
+import { TEMPLATE_EMPTY_TRASH } from '../../components/DialogManager/Templates';
+import { Header } from '../../components/Header';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTrashStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
+import { InteractionManager } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
+
 
 export const Trash = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
+  const trash = useTrashStore(state => state.trash);
+  const setTrash = useTrashStore(state => state.setTrash);
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Trash', () => {
-        dispatch({type: Actions.TRASH});
+        setTrash();
       });
     });
 
@@ -73,12 +72,12 @@ export const Trash = ({route, navigation}) => {
     if (navigation.isFocused()) {
       updateSearch();
     }
-  }, [state.trash]);
+  }, [trash]);
 
   const updateSearch = () => {
     SearchService.update({
       placeholder: 'Search in trash',
-      data: state.trash,
+      data: trash,
       type: 'trash',
       title: 'Trash',
     });
@@ -98,7 +97,7 @@ export const Trash = ({route, navigation}) => {
         />
       </ContainerTopSection>
       <SimpleList
-        listData={state.trash}
+        listData={trash}
         type="trash"
         screen="Trash"
         focused={() => navigation.isFocused()}
@@ -116,7 +115,7 @@ export const Trash = ({route, navigation}) => {
         placeholderText="Deleted notes & notebooks appear here."
       />
 
-      {state.trash && state.trash.length !== 0 && (
+      {trash && trash.length !== 0 && (
         <ContainerBottomButton
           title="Clear all trash"
           onPress={_onPressBottomButton}

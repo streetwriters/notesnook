@@ -1,6 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
+import { useSelectionStore } from '../../provider/stores';
 import { eSendEvent } from '../../services/EventManager';
 import { eOpenPremiumDialog } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -13,7 +14,8 @@ import Paragraph from '../Typography/Paragraph';
 export const Announcement = ({announcement,remove}) => {
   const [state] = useTracked();
   const colors = state.colors;
-  const {selectionMode} = state;
+  
+  const selectionMode = useSelectionStore(state => state.selectionMode);
 
   return !announcement || selectionMode ? null : (
     <View

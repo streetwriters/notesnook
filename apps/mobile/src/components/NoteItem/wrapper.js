@@ -3,6 +3,7 @@ import NoteItem from '.';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import { Actions } from '../../provider/Actions';
+import { useSelectionStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, openVault } from '../../services/EventManager';
 import { history } from '../../utils';
@@ -14,13 +15,13 @@ import { TEMPLATE_TRASH } from '../DialogManager/Templates';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NoteWrapper = React.memo(({item, index}) => {
-  const [state, dispatch] = useTracked();
   const isTrash = item.type === 'trash';
-
+  const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
+  
   const onPress = async () => {
     let _note = db.notes.note(item.id).data;
     if (history.selectedItemsList.length > 0 ) {
-      dispatch({type: Actions.SELECTED_ITEMS, item: _note});
+      setSelectedItem(_note);
       return;
     }
 

@@ -3,6 +3,7 @@ import { ActivityIndicator, Platform, TouchableOpacity, View } from 'react-nativ
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
@@ -14,7 +15,12 @@ import { TimeSince } from './TimeSince';
 
 export const UserSection = () => {
   const [state] = useTracked();
-  const {colors, syncing, user, lastSynced} = state;
+  const {colors} = state;
+  
+  const user = useUserStore(state => state.user);
+  const syncing = useUserStore(state => state.syncing);
+  const lastSynced = useUserStore(state => state.lastSynced);
+
   const insets = useSafeAreaInsets();
   return (
     <View

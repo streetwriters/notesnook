@@ -2,6 +2,7 @@ import React from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
 import { SIZE } from '../../utils/SizeUtils';
@@ -10,7 +11,8 @@ import { Button } from '../Button';
 
 export const HeaderRightMenu = ({currentScreen,action}) => {
   const [state] = useTracked();
-  const {colors, syncing} = state;
+  const {colors} = state;
+  const syncing = useUserStore(state => state.syncing);
 
   return (
     <View style={styles.rightBtnContainer}>

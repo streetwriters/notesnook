@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import {View} from 'react-native';
 import {Actions} from '../../provider/Actions';
+import { useSelectionStore, useTrashStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import {getElevation, history} from '../../utils';
@@ -38,9 +39,8 @@ export class Dialog extends Component {
         let ids = [];
         history.selectedItemsList.forEach((item) => ids.push(item.id));
         await db.trash.delete(...ids);
-        updateEvent({type: Actions.TRASH});
-        updateEvent({type: Actions.CLEAR_SELECTION});
-        updateEvent({type: Actions.SELECTION_MODE, enabled: false});
+        useTrashStore.getState().setTrash();
+        useSelectionStore.getState().clearSelection();
         ToastEvent.show({
           heading: 'Permanantly deleted items',
           type: 'success',
@@ -51,9 +51,8 @@ export class Dialog extends Component {
       }
       case dialogActions.ACTION_EMPTY_TRASH: {
         await db.trash.clear();
-        updateEvent({type: Actions.TRASH});
-        updateEvent({type: Actions.CLEAR_SELECTION});
-        updateEvent({type: Actions.SELECTION_MODE, enabled: false});
+        useTrashStore.getState().setTrash();
+        useSelectionStore.getState().clearSelection();
         ToastEvent.show({
           heading: 'Trash cleared',
           message:"All notes and notebooks in the trash have been removed permanantly.",

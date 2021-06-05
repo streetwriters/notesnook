@@ -6,6 +6,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -46,8 +47,8 @@ const style = {
 
 const Editor = React.memo(
   () => {
-    const [state] = useTracked();
-    const {premiumUser} = state;
+    const premiumUser = useUserStore(state => state.premium);
+
     const [resetting, setResetting] = useState(false);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());

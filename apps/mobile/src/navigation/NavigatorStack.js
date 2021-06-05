@@ -5,6 +5,7 @@ import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
 import {useTracked} from '../provider';
 import {Actions} from '../provider/Actions';
+import { useSelectionStore } from '../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -81,10 +82,10 @@ export const NavigatorStack = React.memo(
   () => {
     const [, dispatch] = useTracked();
     const [render, setRender] = React.useState(true);
+    const clearSelection = useSelectionStore(state => state.clearSelection);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
-        dispatch({type: Actions.SELECTION_MODE, enabled: false});
-        dispatch({type: Actions.CLEAR_SELECTION});
+        clearSelection();
       }
       eSendEvent('navigate');
     });

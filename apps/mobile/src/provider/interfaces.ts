@@ -9,13 +9,13 @@ export interface NoteStore extends State {
     notes: Item[],
     loading: boolean,
     setLoading: (loading: boolean) => void,
-    setNotes: (items: Item[]) => void,
+    setNotes: (items?: Item[]) => void,
     clearNotes: () => void
 }
 
 export interface NotebookStore extends State {
     notebooks: Item[],
-    setNotebooks: (items: Item[]) => void,
+    setNotebooks: (items?: Item[]) => void,
     clearNotebooks: () => void
 }
 
@@ -23,7 +23,7 @@ export interface NotebookStore extends State {
 
 export interface FavoriteStore extends State {
     favorites: Item[],
-    setFavorites: (items: Item[]) => void,
+    setFavorites: (items?: Item[]) => void,
     clearFavorites: () => void
 }
 
@@ -31,14 +31,14 @@ export interface FavoriteStore extends State {
 
 export interface TagStore extends State {
     tags: Item[],
-    setTags: (items: Item[]) => void,
+    setTags: (items?: Item[]) => void,
     clearTags: () => void
 }
 
 
 export interface TrashStore extends State {
     trash: Item[],
-    setTrash: (items: Item[]) => void,
+    setTrash: (items?: Item[]) => void,
     clearTrash: () => void
 }
 

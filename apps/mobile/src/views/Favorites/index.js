@@ -6,6 +6,7 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useFavoriteStore, useNoteStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -14,16 +15,17 @@ import {InteractionManager} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Favorites = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const favorites = state.favorites;
-  const {loading} = state;
+  const favorites = useFavoriteStore(state => state.favorites);
+  const setFavorites = useFavoriteStore(state =>state.setFavorites);
+  const loading = useNoteStore(state => state.loading);
+ 
   let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Favorites', () => {
-        dispatch({type: Actions.FAVORITES});
+        setFavorites();
       });
     });
     eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
@@ -90,10 +92,10 @@ export const Favorites = ({route, navigation}) => {
         <Header title="Favorites" isBack={false} screen="Favorites" />
       </ContainerTopSection>
       <SimpleList
-        listData={state.favorites}
+        listData={favorites}
         type="notes"
         refreshCallback={() => {
-          dispatch({type: Actions.FAVORITES});
+          setFavorites();
         }}
         screen="Favorites"
         loading={loading}

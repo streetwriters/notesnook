@@ -1,20 +1,18 @@
-import {createRef} from 'react';
-import {Dimensions, NativeModules, Platform} from 'react-native';
-import RNTooltips from 'react-native-tooltips';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {dummyRef} from '../components/DummyText';
-import {Actions} from '../provider/Actions';
-import {defaultState} from '../provider/DefaultState';
-import {eSendEvent, ToastEvent} from '../services/EventManager';
-import {MMKV} from './mmkv';
-import {tabBarRef} from './Refs';
-import {SIZE} from './SizeUtils';
-import FastImage from 'react-native-fast-image';
+import { createRef } from 'react';
+import { Dimensions, NativeModules, Platform } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import {
   beginBackgroundTask,
-  endBackgroundTask,
+  endBackgroundTask
 } from 'react-native-begin-background-task';
+import FastImage from 'react-native-fast-image';
+import RNTooltips from 'react-native-tooltips';
+import { dummyRef } from '../components/DummyText';
+import { useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
+import { MMKV } from './mmkv';
+import { tabBarRef } from './Refs';
+import { SIZE } from './SizeUtils';
 
 const imgNames = [
   'favorites',
@@ -99,7 +97,7 @@ export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(s));
-  updateEvent({type: Actions.SETTINGS, settings: s});
+  useSettingStore.getState().setSettings(s)
 }
 
 export const scrollRef = createRef();
@@ -117,7 +115,7 @@ export const getElevation = elevation => {
 
 
 export const sortSettings = {
-  sort: defaultState.settings.sort,
+  sort: 'default',
   /**
    * @type {"desc" | "asc"}
    */

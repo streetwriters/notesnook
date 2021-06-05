@@ -4,6 +4,7 @@ import * as React from 'react';
 import { State } from 'react-native-gesture-handler';
 import { Menu } from '../components/Menu';
 import { useTracked } from '../provider';
+import { useSettingStore } from '../provider/stores';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
 import { eCloseSideMenu, eOpenSideMenu } from '../utils/Events';
 import { sideMenuRef, tabBarRef } from '../utils/Refs';
@@ -32,8 +33,7 @@ const onNavigatorStateChange = e => {
 };
 
 export const NavigationStack = ({component = NavigatorStack}) => {
-  const [state] = useTracked();
-  const {deviceMode} = state;
+  const deviceMode = useSettingStore(state => state.deviceMode);
   const [locked, setLocked] = React.useState(false);
 
   const setGestureDisabled = () => {

@@ -30,7 +30,8 @@ const {
 
 const ExportDialog = () => {
   const [state] = useTracked();
-  const {colors, tags, premiumUser} = state;
+  const {colors} = state;
+  
   const [visible, setVisible] = useState(false);
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);

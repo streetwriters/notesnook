@@ -4,6 +4,7 @@ import DocumentPicker from 'react-native-document-picker';
 import {FlatList} from 'react-native-gesture-handler';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { initialize } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -105,7 +106,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       let backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
       await db.backup.import(backup);
       setRestoring(false);
-      dispatch({type: Actions.ALL});
+      initialize();
       ToastEvent.show({
         heading: 'Restore successful',
         message: 'Your backup data has been restored successfully.',
@@ -182,7 +183,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                        
                         await db.backup.import(JSON.stringify(backup));
                         setRestoring(false);
-                        dispatch({type: Actions.ALL});
+                        initialize();
 
                         ToastEvent.show({
                           heading: 'Restore successful',

@@ -9,6 +9,7 @@ export const reducer = (state, action) => {
       };
     }
     default:
-      throw new Error('unknown action type');
+      return state
+      //throw new Error('unknown action type');
   }
 };

@@ -19,6 +19,7 @@ import {
   UserStore,
 } from './interfaces';
 
+
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
   loading: true,
@@ -232,3 +233,20 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
   },
   setMessage: message => set({message}),
 }));
+
+export function initialize() {
+  useMenuStore.getState().setColorNotes();
+  useMenuStore.getState().setMenuPins();
+  useNotebookStore.getState().setNotebooks();
+  useTagStore.getState().setTags();
+  useFavoriteStore.getState().setFavorites();
+  useNoteStore.getState().setNotes();
+}
+
+export function clearAllStores() {
+  useNotebookStore.getState().clearNotebooks();
+  useTagStore.getState().clearTags();
+  useFavoriteStore.getState().clearFavorites();
+  useNoteStore.getState().clearNotes();
+}
+

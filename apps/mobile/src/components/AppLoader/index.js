@@ -4,6 +4,7 @@ import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import { useTracked } from '../../provider';
 import { Actions } from '../../provider/Actions';
+import { useFavoriteStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -25,7 +26,9 @@ const AppLoader = ({onLoad}) => {
   const colors = state.colors;
   const [loading, setLoading] = useState(true);
   const [opacity, setOpacity] = useState(true);
-
+  const setNotes = useNoteStore(state => state.setNotes);
+  const setFavorites = useFavoriteStore(state => state.setFavorites);
+  const _setLoading = useNoteStore(state => state.setLoading)
   const load = async value => {
     console.log('loading called here');
     if (value === 'hide') {
@@ -64,9 +67,9 @@ const AppLoader = ({onLoad}) => {
       setTimeout(async ()=>{
         setLoading(false);  
         await db.notes.init();
-        dispatch({type: Actions.NOTES});
-        dispatch({type: Actions.FAVORITES});
-        dispatch({type: Actions.LOADING, loading: false});
+        setNotes();
+        setFavorites();
+        _setLoading(false);
         eSendEvent(eOpenSideMenu);
         let askForRating = await MMKV.getItem('askForRating');
         if (askForRating !== 'never' || askForRating !== 'completed') {

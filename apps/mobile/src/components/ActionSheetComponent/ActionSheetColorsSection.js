@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useMenuStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -20,7 +21,7 @@ import {PressableButton} from '../PressableButton';
 export const ActionSheetColorsSection = ({item, close}) => {
   const [, dispatch] = useTracked();
   const [note, setNote] = useState(item);
-
+  const setColorNotes = useMenuStore(state => state.setColorNotes)
   const localRefresh = () => {
     toAdd = db.notes.note(note.id);
     if (toAdd) {
@@ -56,7 +57,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
             await db.notes.note(note.id).color(color.name);
           }
           localRefresh();
-          dispatch({type: Actions.COLORS});
+          setColorNotes();
           Navigation.setRoutesToUpdate([
             Navigation.routeNames.NotesPage,
             Navigation.routeNames.Favorites,

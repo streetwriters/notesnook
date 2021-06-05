@@ -1,6 +1,7 @@
 import {DrawerActions, StackActions} from '@react-navigation/native';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
+import { useFavoriteStore, useNotebookStore, useNoteStore, useTagStore, useTrashStore } from '../provider/stores';
 import {eOnNewTopicAdded, refreshNotesPage} from '../utils/Events';
 import {rootNavigatorRef, sideMenuRef, tabBarRef} from '../utils/Refs';
 import {eSendEvent} from './EventManager';
@@ -77,7 +78,17 @@ function setRoutesToUpdate(routes) {
           : eOnNewTopicAdded,
       );
     } else {
-      updateEvent({type: Actions[currentScreen.toUpperCase()]});
+      if (currentScreen === routeNames.Notes) {
+        useNoteStore.getState().setNotes()
+      } else if (currentScreen === routeNames.Notebooks) {
+        useNotebookStore.getState().setNotebooks();
+      } else if (currentScreen === routeNames.Favorites) {
+        useFavoriteStore.getState().setFavorites();
+      } else if (currentScreen === routeNames.Tags) {
+        useTagStore.getState().setTags();
+      } else if (currentScreen === routeNames.Trash) {
+        useTrashStore.getState().setTrash();
+      }
     }
     clearRouteFromUpdates(currentScreen);
     routes.splice(routes.indexOf(currentScreen), 1);

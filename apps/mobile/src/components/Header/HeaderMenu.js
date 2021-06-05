@@ -2,6 +2,7 @@ import React from 'react';
 import { TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import { eSendEvent } from '../../services/EventManager';
 import { getElevation } from '../../utils';
 import { eOpenSortDialog } from '../../utils/Events';
@@ -10,7 +11,8 @@ import Heading from '../Typography/Heading';
 
 export const HeaderMenu = () => {
   const [state] = useTracked();
-  const {colors, settings} = state;
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
 
   return (
     <TouchableOpacity

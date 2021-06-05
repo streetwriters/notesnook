@@ -5,6 +5,7 @@ import { notesnook } from '../../../e2e/test.ids';
 import { ActionIcon } from '../../components/ActionIcon';
 import { ActionSheetEvent } from '../../components/DialogManager/recievers';
 import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -34,7 +35,9 @@ import { toolbarRef } from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, fullscreen, deviceMode} = state;
+  const {colors} = state;
+
+  const fullscreen = useSettingStore(state => state.fullscreen);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {

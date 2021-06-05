@@ -7,6 +7,7 @@ import Editor from '.';
 import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
+import { useNoteStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent} from '../../services/EventManager';
 import {eOnLoadNote} from '../../utils/Events';
@@ -88,7 +89,10 @@ const AnimatedKeyboardView = Animated.createAnimatedComponent(
 
 export const EditorWrapper = ({dimensions}) => {
   const [state] = useTracked();
-  const {colors, loading} = state;
+  const {colors} = state;
+  
+  const loading = useNoteStore(state => state.loading);
+
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
 

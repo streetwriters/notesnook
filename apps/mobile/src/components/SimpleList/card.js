@@ -1,16 +1,16 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {getElevation} from '../../utils';
-import {SIZE} from '../../utils/SizeUtils';
+import { notesnook } from '../../../e2e/test.ids';
+import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { getElevation } from '../../utils';
+import { SIZE } from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({color, announcement}) => {
-  const [state] = useTracked();
-  const {selectionMode, messageBoardState} = state;
+export const Card = ({color, announcement}) => {;
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const messageBoardState = useMessageStore(state => state.message);
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity

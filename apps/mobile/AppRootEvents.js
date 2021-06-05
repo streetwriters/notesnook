@@ -1,45 +1,46 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect} from 'react';
-import {Appearance, AppState, Keyboard, Linking, Platform} from 'react-native';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect } from 'react';
+import { Appearance, AppState, Linking, Platform } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
+import { enabled } from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import {updateEvent} from './src/components/DialogManager/recievers';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { updateEvent } from './src/components/DialogManager/recievers';
+import { useTracked } from './src/provider';
+import { Actions } from './src/provider/Actions';
+import { clearAllStores, initialize, useNoteStore, useUserStore } from './src/provider/stores';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage,
+  setLoginMessage
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, doInBackground, editing} from './src/utils';
-import {updateStatusBarColor} from './src/utils/Colors';
-import {db} from './src/utils/DB';
+import { APP_VERSION, doInBackground, editing } from './src/utils';
+import { updateStatusBarColor } from './src/utils/Colors';
+import { db } from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
+import { MMKV } from './src/utils/mmkv';
 import Storage from './src/utils/storage';
-import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
+import { sleep } from './src/utils/TimeUtils';
+import { getNote, getWebviewInit } from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -66,10 +67,10 @@ async function checkIntentState() {
         await db.notes.init();
       }
       eSendEvent('webviewreset');
-      updateEvent({type: Actions.NOTES});
+      useNoteStore.getState().setNotes();
       eSendEvent(refreshNotesPage);
       MMKV.removeItem('notesAddedFromIntent');
-      updateEvent({type: Actions.ALL});
+      initialize();
       eSendEvent(refreshNotesPage);
     }
   } catch (e) {}
@@ -107,7 +108,11 @@ let removeInternetStateListener;
 export const AppRootEvents = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {loading} = state;
+    const loading = useNoteStore(state => state.loading);
+    const setLastSynced = useUserStore(state => state.setLastSynced);
+    const setUser = useUserStore(state => state.setUser);
+    const setSyncing = useUserStore(state => state.setSyncing);
+
 
     useEffect(() => {
       Appearance.addChangeListener(SettingsService.setTheme);
@@ -197,8 +202,8 @@ export const AppRootEvents = React.memo(
     };
 
     const onSyncComplete = async () => {
-      dispatch({type: Actions.ALL});
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+      initialize();
+      setLastSynced(await db.lastSynced())
     };
 
     const onUrlRecieved = async res => {
@@ -214,7 +219,7 @@ export const AppRootEvents = React.memo(
 
     const onEmailVerified = async () => {
       let user = await db.user.getUser();
-      dispatch({type: Actions.USER, user: user});
+      setUser(user);
       if (!user) return;
       await PremiumService.setPremiumStatus();
       let message =
@@ -266,7 +271,7 @@ export const AppRootEvents = React.memo(
 
     const partialSync = async () => {
       try {
-        dispatch({type: Actions.SYNCING, syncing: true});
+        setSyncing(true);
         let res = await doInBackground(async () => {
           try {
             await db.sync(false);
@@ -276,29 +281,27 @@ export const AppRootEvents = React.memo(
           }
         });
         if (res !== true) throw new Error(res);
-
-        dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+        setLastSynced(await db.lastSynced())
       } catch (e) {
-        dispatch({type: Actions.SYNCING, syncing: false});
+        setSyncing(false);
         ToastEvent.show({
           heading: 'Sync failed',
           message: e.message,
           context: "global",
         });
       } finally {
-        dispatch({type: Actions.SYNCING, syncing: false});
+        setSyncing(false);
       }
     };
 
     const onLogout = async reason => {
-      dispatch({type: Actions.USER, user: null});
-      dispatch({type: Actions.CLEAR_ALL});
-      dispatch({type: Actions.SYNCING, syncing: false});
-      setLoginMessage(dispatch);
-      await sleep(500);
+      setUser(null);
+      clearAllStores();
+      setSyncing(false);
+      setLoginMessage();
+      await sleep(50);
       await PremiumService.setPremiumStatus();
       await Storage.write('introCompleted', 'true');
-
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
@@ -330,8 +333,8 @@ export const AppRootEvents = React.memo(
           return;
         let user = await db.user.getUser();
         if (user) {
-          dispatch({type: Actions.USER, user: user});
-          clearMessage(dispatch);
+          setUser(user);
+          clearMessage();
           await PremiumService.setPremiumStatus();
           attachIAPListeners();
 
@@ -347,20 +350,20 @@ export const AppRootEvents = React.memo(
           if (res !== true) throw new Error(res);
 
           if (!user.isEmailConfirmed) {
-            setEmailVerifyMessage(dispatch);
+            setEmailVerifyMessage();
             return;
           }
-          dispatch({type: Actions.USER, user: user});
+          setUser(user);
         } else {
           await PremiumService.setPremiumStatus();
-          setLoginMessage(dispatch);
+          setLoginMessage();
         }
       } catch (e) {
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
-          setEmailVerifyMessage(dispatch);
+          setEmailVerifyMessage();
         } else if (!user) {
-          setLoginMessage(dispatch);
+          setLoginMessage();
         } else {
           console.log('unknown error', e);
         }

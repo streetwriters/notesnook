@@ -1,6 +1,7 @@
 import React from 'react';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
 import { SIZE } from '../../utils/SizeUtils';
@@ -8,7 +9,8 @@ import { ActionIcon } from '../ActionIcon';
 
 export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
   const [state] = useTracked();
-  const {colors, deviceMode} = state;
+  const {colors} = state;
+  const deviceMode = useSettingStore(state => state.deviceMode);
 
   const onLeftButtonPress = () => {
     if (headerMenuState) {

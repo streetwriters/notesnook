@@ -24,7 +24,7 @@ const BaseDialog = ({
   centered = true,
 }) => {
   const [state, dispatch] = useTracked();
-  const scaleValue = new Animated.Value(1);
+  
   const floating = useIsFloatingKeyboard();
   return (
     <Modal

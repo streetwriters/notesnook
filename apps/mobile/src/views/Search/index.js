@@ -5,13 +5,19 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSearchStore } from '../../provider/stores';
 import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
 
 export const Search = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {searchResults, searching, searchStatus} = state;
+  
+  const searchResults = useSearchStore(state => state.searchResults);
+  const searching = useSearchStore(state => state.searching);
+  const searchStatus = useSearchStore(state => state.searchStatus);
+  const setSearchResults = useSearchStore(state => state.setSearchResults);
+  const setSearchStatus = useSearchStore(state => state.setSearchStatus)
 
   const onFocus = useCallback(() => {
     sleep(300).then(() => inputRef.current?.focus());
@@ -20,17 +26,8 @@ export const Search = ({route, navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
-      dispatch({
-        type: Actions.SEARCH_RESULTS,
-        results: [],
-      });
-      dispatch({
-        type: Actions.SEARCHING,
-        searching: {
-          isSearching: false,
-          status: null,
-        },
-      });
+      setSearchResults([]);
+      setSearchStatus(false,null);
       navigation.removeListener('focus', onFocus);
     };
   }, []);

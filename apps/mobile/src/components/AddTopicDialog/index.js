@@ -1,5 +1,6 @@
 import React, {createRef} from 'react';
 import {Actions} from '../../provider/Actions';
+import { useMenuStore } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -60,7 +61,7 @@ export class AddTopicDialog extends React.Component {
         Navigation.routeNames.Notebook,
         Navigation.routeNames.NotesPage,
       ]);
-      updateEvent({type: Actions.MENU_PINS});
+      useMenuStore.getState().setMenuPins();
     } catch (e) {}
   };
 
