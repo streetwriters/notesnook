@@ -90,23 +90,10 @@ export function showAddNotebookDialog() {
   ));
 }
 
-const itemIdToIndex = {
-  sync: 0,
-  editor: 3,
-  backups: 5,
-  customize: 6,
-  discord: 7,
-  [CHECK_IDS.noteExport]: 4,
-  [CHECK_IDS.noteColor]: 1,
-  [CHECK_IDS.noteTag]: 1,
-  [CHECK_IDS.notebookAdd]: 1,
-  [CHECK_IDS.vaultAdd]: 2,
-  [CHECK_IDS.backupEncrypt]: 5,
-};
-export function showBuyDialog(initialItemId) {
+export function showBuyDialog(couponCode) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.BuyDialog
-      initialIndex={itemIdToIndex[initialItemId]}
+      couponCode={couponCode}
       onCancel={() => perform(false)}
     />
   ));

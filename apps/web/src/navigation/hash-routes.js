@@ -1,6 +1,9 @@
 import React from "react";
 import Vault from "../common/vault";
-import { showEmailVerificationDialog } from "../common/dialog-controller";
+import {
+  showBuyDialog,
+  showEmailVerificationDialog,
+} from "../common/dialog-controller";
 import {
   showAddNotebookDialog,
   showEditNotebookDialog,
@@ -102,11 +105,11 @@ const hashroutes = {
   "/login": () => {
     showLogInDialog();
   },
+  "/buy": () => {
+    showBuyDialog();
+  },
   "/buy/:code": ({ code }) => {
-    hashNavigate("/", { notify: false });
-    const user = userStore.get().user;
-    if (!user || isUserPremium()) return;
-    upgrade(user, code);
+    showBuyDialog(code);
   },
 };
 

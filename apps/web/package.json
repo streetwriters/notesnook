@@ -16,6 +16,7 @@
     "clipboard": "^2.0.6",
     "cogo-toast": "^4.2.3",
     "compressorjs": "^1.0.7",
+    "currency-symbol-map": "^5.0.1",
     "dayjs": "^1.10.4",
     "electron-serve": "^1.1.0",
     "electron-updater": "^4.3.8",

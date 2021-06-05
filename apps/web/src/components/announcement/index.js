@@ -1,11 +1,7 @@
 import React from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
-import useAnnouncement from "../../utils/useAnnouncement";
-import { db } from "../../common/db";
-import { upgrade } from "../../common/checkout";
-import { showLogInDialog } from "../../common/dialog-controller";
-import { showToast } from "../../utils/toast";
+import { showBuyDialog } from "../../common/dialog-controller";
 import { trackEvent } from "../../utils/analytics";
 
 function Announcement({ announcement, removeAnnouncement }) {
@@ -65,31 +61,11 @@ function Announcement({ announcement, removeAnnouncement }) {
             trackEvent(announcement.cta.text, "Announcement CTA");
             switch (announcement.cta.type) {
               case "link":
-                window.open(announcement.cta.action, "_blank");
+                window.open(announcement.cta.action, "_self");
                 break;
               case "promo":
                 const coupon = announcement.cta.action;
-                let user = await db.user.getUser();
-                if (user) {
-                  await upgrade(user, coupon);
-                  return;
-                }
-                await showLogInDialog(
-                  `Login in to ${announcement.cta.text.toLowerCase()}`,
-                  `Use the coupon "${coupon}" at checkout to ${announcement.cta.text.toLowerCase()} your first month.`,
-                  announcement.cta.text,
-                  true
-                );
-
-                user = await db.user.getUser();
-                if (!user) {
-                  showToast(
-                    "error",
-                    "You are not logged in. Please try again."
-                  );
-                  return;
-                }
-                await upgrade(user, coupon);
+                await showBuyDialog(coupon);
                 break;
               default:
                 return;

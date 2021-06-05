@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Text, Flex, Button } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { upgrade } from "../../common/checkout";
+import { getCouponData, upgrade } from "../../common/checkout";
 import { showSignUpDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
 import { ReactComponent as Backups } from "../../assets/backup.svg";
@@ -15,6 +15,7 @@ import { ReactComponent as Sync } from "../../assets/sync.svg";
 import { ReactComponent as Vault } from "../../assets/vault.svg";
 import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
 import { changeSvgTheme } from "../../utils/css";
+import getSymbolFromCurrency from "currency-symbol-map";
 
 const premiumDetails = [
   {
@@ -109,9 +110,32 @@ const premiumDetails = [
 ];
 
 function BuyDialog(props) {
+  const { couponCode } = props;
+  const [coupon, setCoupon] = useState(couponCode);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
+  const [prices, setPrices] = useState();
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
   const accent = useThemeStore((store) => store.accent);
+
+  useEffect(() => {
+    (async function () {
+      try {
+        setIsLoading(true);
+        setError();
+        const data = await getCouponData(coupon);
+        setPrices({
+          ...data.paddlejs.vendor,
+          withoutDiscount: data.total[0],
+        });
+      } catch (e) {
+        setError(e.message);
+      } finally {
+        setIsLoading(false);
+      }
+    })();
+  }, [coupon]);
 
   return (
     <Dialog
@@ -144,7 +168,7 @@ function BuyDialog(props) {
             opacity={0.2}
             fontSize={90}
           >
-            $4.49
+            PRO
           </Text>
         </Flex>
         <Flex
@@ -163,32 +187,180 @@ function BuyDialog(props) {
             </Flex>
           ))}
         </Flex>
-        <Flex flexDirection="column" bg="shade" p={5} pt={2}>
-          <Text variant="heading" fontSize={32} color="primary">
-            Only for $4.49/mo
-          </Text>
-          <Text variant="subBody" color="text" my={1}>
-            {isLoggedIn
-              ? "Cancel anytime. No questions asked."
-              : "Start your 14 days free trial (no credit card required)"}
-          </Text>
-          <Button
-            fontSize="title"
-            fontWeight="bold"
-            onClick={async () => {
-              if (isLoggedIn) {
-                await upgrade(user);
-              } else {
-                await showSignUpDialog();
-              }
-              props.onCancel();
-            }}
-          >
-            Subscribe to Notesnook Pro
-          </Button>
+
+        <Flex
+          flexDirection="column"
+          bg={error ? "errorBg" : "shade"}
+          p={5}
+          pt={2}
+        >
+          {isLoading ? (
+            <Icon.Loading size={32} />
+          ) : error ? (
+            <>
+              <Text variant="title" color="error" fontWeight="normal">
+                {error}
+              </Text>
+              <Button
+                variant="primary"
+                bg="error"
+                color="static"
+                mt={2}
+                onClick={() => setCoupon()}
+              >
+                Try again
+              </Button>
+            </>
+          ) : (
+            <>
+              {coupon ? (
+                <Flex mb={1} alignItems="center" justifyContent="space-between">
+                  <Flex alignItems="center" justifyContent="center">
+                    <Text variant="subBody" mr={1}>
+                      Coupon:
+                    </Text>
+                    <Text
+                      variant="subBody"
+                      fontSize={10}
+                      bg="primary"
+                      color="static"
+                      px={1}
+                      py="3px"
+                      sx={{ borderRadius: "default" }}
+                    >
+                      {coupon}
+                    </Text>
+                  </Flex>
+
+                  <Flex>
+                    <Text
+                      sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+                      variant="subBody"
+                      color="primary"
+                      mr={1}
+                      onClick={() => {
+                        const code = window.prompt("Enter new coupon code:");
+                        setCoupon(code);
+                      }}
+                    >
+                      Change
+                    </Text>
+                    <Text
+                      sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+                      variant="subBody"
+                      color="error"
+                      onClick={() => {
+                        if (
+                          window.confirm(
+                            "Are you sure you want to remove this coupon?"
+                          )
+                        ) {
+                          setCoupon();
+                        }
+                      }}
+                    >
+                      Remove
+                    </Text>
+                  </Flex>
+                </Flex>
+              ) : (
+                <Text
+                  sx={{ cursor: "pointer", ":hover": { opacity: 0.8 } }}
+                  variant="subBody"
+                  color="primary"
+                  mr={1}
+                  onClick={() => {
+                    const code = window.prompt("Enter new coupon code:");
+                    setCoupon(code);
+                  }}
+                >
+                  Add coupon code
+                </Text>
+              )}
+              <Text variant="heading" fontSize={24} color="primary">
+                Only <MainPricing prices={prices} />
+              </Text>
+              <RecurringPricing prices={prices} />
+              <Text display="flex" variant="subBody" color="text" mt={1} mb={2}>
+                {isLoggedIn
+                  ? "Cancel anytime. No questions asked."
+                  : "Start your 14 days free trial (no credit card required)"}
+              </Text>
+              <Button
+                fontSize="title"
+                fontWeight="bold"
+                onClick={async () => {
+                  if (isLoggedIn) {
+                    await upgrade(user, coupon);
+                  } else {
+                    await showSignUpDialog();
+                  }
+                  props.onCancel();
+                }}
+              >
+                Subscribe to Notesnook Pro
+              </Button>
+            </>
+          )}
         </Flex>
       </Flex>
     </Dialog>
   );
 }
 export default BuyDialog;
+
+function MainPricing(props) {
+  const { prices } = props;
+
+  if (prices.withoutDiscount.net !== prices.prices.total)
+    return (
+      <>
+        <del>
+          <Price
+            currency={prices.withoutDiscount.currency}
+            price={prices.withoutDiscount.net}
+          />
+        </del>{" "}
+        <Price currency={prices.currency} price={prices.prices.total} />
+        {prices.recurring_prices.total === prices.prices.total
+          ? " per month"
+          : " your first month"}
+      </>
+    );
+  else
+    return (
+      <>
+        <Price currency={prices.currency} price={prices.prices.total} />
+        {" per month"}
+      </>
+    );
+}
+
+function RecurringPricing(props) {
+  const { prices } = props;
+
+  if (prices.prices.total === prices.recurring_prices.total) return null;
+  return (
+    <Text
+      display="flex"
+      variant="body"
+      mt={1}
+      fontWeight="bold"
+      color="primary"
+    >
+      And then{" "}
+      <Price currency={prices.currency} price={prices.recurring_prices.total} />{" "}
+      every month afterwards.
+    </Text>
+  );
+}
+
+function Price(props) {
+  const { currency, price } = props;
+  return (
+    <>
+      {getSymbolFromCurrency(currency)}
+      {price}
+    </>
+  );
+}
