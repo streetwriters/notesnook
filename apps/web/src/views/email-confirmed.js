@@ -23,38 +23,40 @@ function EmailConfirmed() {
         flexDirection="column"
         bg="background"
         height="100%"
-        justifyContent="center"
         alignItems="center"
+        overflowY="auto"
       >
-        <Image src={Logo} height={30} mt={2} />
-        <Text variant="title" textAlign="center">
-          Notesnook
-        </Text>
-        <Flex
-          flex="1"
-          flexDirection="column"
-          justifyContent="center"
-          alignItems="center"
-        >
-          <Text
-            display="flex"
-            variant="heading"
-            fontSize={32}
-            justifyContent="center"
-            alignItems="center"
+        <Flex flex={1} justifyContent="center" alignItems="center">
+          <Flex
+            maxWidth={["95%", "400px", "400px"]}
+            flexDirection="column"
+            sx={{
+              borderRadius: "default",
+              border: "1px solid",
+              borderTop: "none",
+              borderColor: "primary",
+            }}
           >
-            <Icon.Success color="primary" size={32} sx={{ mr: 2 }} /> Email
-            confirmed!
-          </Text>
-          <Text variant="body" mt={2}>
-            You can safely close this window and return to Notesnook.
-          </Text>
-          <SaleBanner
-            discount={50}
-            coupon="WRLD2021"
-            offerEndDate="2021-06-06T00:00:00Z"
-            userId={userId}
-          />
+            <Text
+              variant="heading"
+              fontSize={32}
+              bg="primary"
+              textAlign="center"
+              color="static"
+              py={20}
+              sx={{
+                borderRadius: "default",
+                borderBottomLeftRadius: "0px",
+                borderBottomRightRadius: "0px",
+              }}
+            >
+              <Text variant="title" color="static" textAlign="center">
+                Notesnook
+              </Text>
+              Email confirmed
+            </Text>
+            <SaleBanner discount={50} coupon="WRLD2021" userId={userId} />
+          </Flex>
         </Flex>
       </Flex>
     </ThemeProvider>
@@ -63,25 +65,10 @@ function EmailConfirmed() {
 export default EmailConfirmed;
 
 function SaleBanner(props) {
-  const { discount, coupon, offerEndDate, userId } = props;
+  const { discount, coupon, userId } = props;
 
   return (
-    <Flex
-      flexDirection="column"
-      mt={5}
-      justifyContent="center"
-      alignItems="center"
-      p={2}
-      maxWidth={["95%", "60%", "50%"]}
-      sx={{
-        borderRadius: "default",
-        border: "1px solid",
-        borderColor: "primary",
-      }}
-    >
-      <Text variant="heading" textAlign="center">
-        We proved them wrong!
-      </Text>
+    <Flex flexDirection="column" p={4}>
       <Text
         as="p"
         variant="body"
@@ -104,7 +91,7 @@ function SaleBanner(props) {
         </Text>
         <br />
       </Text>
-      <Text variant="title" mt={2}>
+      <Text variant="title" mt={2} textAlign="center">
         In celebration of this happy day, we are giving a special discount to
         all our new members.
       </Text>
@@ -114,46 +101,16 @@ function SaleBanner(props) {
         color="primary"
         textAlign="center"
         fontWeight="bold"
+        mt={2}
       >
         {discount}% OFF if you subscribe today!
       </Text>
-      <Text variant="body" textAlign="center" mt={1}>
-        Big companies say, "This X &amp; Y feature won't be possible if we went
-        zero-knowledge." We are here to call them out. Your contribution will
-        help us prove that giving up on privacy is just an excuse to rip users
-        off, sell their data and make money.
-      </Text>
-      {/* <Text variant="body" fontSize="title" textAlign="center">
-        *Use coupon{" "}
-        <Text as="b" color="primary">
-          {coupon}
-        </Text>{" "}
-        at checkout to get{" "}
-        <Text as="b" color="primary">
-          {discount}% off your first month.
-        </Text>
-      </Text> */}
-      {/* <CountdownTimer
-        dateTime={offerEndDate}
-        style={{
-          color: "black",
-          fontSize: 38,
-          padding: 0,
-          margin: 0,
-          fontWeight: "bold",
-        }}
-        shouldHidePrecedingZeros={true}
-        shouldShowTimeUnits
-        shouldShowSeparator={false}
-      />
-      <Text variant="body" color="error" fontWeight="bold">
-        Remaining to get {discount}% off your first month
-      </Text> */}
       <Button
         mt={2}
         fontSize="title"
         width="100%"
         fontWeight="bold"
+        sx={{ boxShadow: "2px 2px 15px 0px #00000044" }}
         onClick={async () => {
           trackEvent(`Email verification offer`, "offers");
 
@@ -185,8 +142,14 @@ function SaleBanner(props) {
       >
         Subscribe now to stand up for privacy!
       </Button>
-      <Text variant="body" fontSize="subBody" mt={1}>
-        *Use code <b>{coupon}</b> at checkout to get your discount.
+      <Text variant="body" textAlign="center" mt={2} color="fontTertiary">
+        Big companies say, "X feature won't be possible if we went
+        zero-knowledge." We are here to call them out. Your contribution will
+        help us prove that giving up on privacy is just an excuse to rip users
+        off, sell their data and make money.
+        <Text variant="body" fontSize="subBody" mt={1}>
+          *Use code <b>{coupon}</b> at checkout to get your discount.
+        </Text>
       </Text>
     </Flex>
   );
