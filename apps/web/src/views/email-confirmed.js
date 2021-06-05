@@ -1,15 +1,10 @@
 import React, { useEffect } from "react";
-import { Button, Flex, Text, Image } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
-import * as Icon from "../components/icons";
-import { useQueryParams } from "../navigation";
-import Logo from "../assets/logo.svg";
-import { upgrade } from "../common/checkout";
 import { db } from "../common/db";
-import { showLogInDialog } from "../common/dialog-controller";
-import { showToast } from "../utils/toast";
-// import CountdownTimer from "@inlightmedia/react-countdown-timer";
+import { showBuyDialog } from "../common/dialog-controller";
 import { trackEvent } from "../utils/analytics";
+import { useQueryParams } from "../navigation";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -113,34 +108,12 @@ function SaleBanner(props) {
         sx={{ boxShadow: "2px 2px 15px 0px #00000044" }}
         onClick={async () => {
           trackEvent(`Email verification offer`, "offers");
-
           let user = await db.user.getUser();
-          if (user && user.id === userId) {
-            await upgrade(user, coupon);
-            return;
-          } else if (user && user.id !== userId) {
-            const shouldLogout = window.confirm(
-              "You are already logged into a different Notesnook account. Do you want to logout?"
-            );
-            if (!shouldLogout) return;
-            await db.user.logout(true);
-          }
-          await showLogInDialog(
-            `Login in to get ${discount}% off`,
-            `Use the coupon "${coupon}" at checkout to get ${discount}% off your first month.`,
-            `Get ${discount}% off`,
-            true
-          );
-
-          user = await db.user.getUser();
-          if (!user) {
-            showToast("error", "You are not logged in. Please try again.");
-            return;
-          }
-          await upgrade(user, coupon);
+          if (user && user.id !== userId) await db.user.logout(true);
+          await showBuyDialog(coupon);
         }}
       >
-        Subscribe now to stand up for privacy!
+        Subscribe now and stand up for privacy!
       </Button>
       <Text variant="body" textAlign="center" mt={2} color="fontTertiary">
         Big companies say, "X feature won't be possible if we went

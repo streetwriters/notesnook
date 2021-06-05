@@ -5,7 +5,7 @@ import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { getCouponData, upgrade } from "../../common/checkout";
-import { showSignUpDialog } from "../../common/dialog-controller";
+import { showLogInDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
 import { ReactComponent as Backups } from "../../assets/backup.svg";
 import { ReactComponent as Export } from "../../assets/export.svg";
@@ -282,9 +282,7 @@ function BuyDialog(props) {
               </Text>
               <RecurringPricing prices={prices} />
               <Text display="flex" variant="subBody" color="text" mt={1} mb={2}>
-                {isLoggedIn
-                  ? "Cancel anytime. No questions asked."
-                  : "Start your 14 days free trial (no credit card required)"}
+                Cancel anytime. No questions asked.
               </Text>
               <Button
                 fontSize="title"
@@ -293,7 +291,8 @@ function BuyDialog(props) {
                   if (isLoggedIn) {
                     await upgrade(user, coupon);
                   } else {
-                    await showSignUpDialog();
+                    await showLogInDialog();
+                    await upgrade(user, coupon);
                   }
                   props.onCancel();
                 }}
