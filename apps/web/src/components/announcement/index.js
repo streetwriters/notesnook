@@ -26,7 +26,7 @@ function Announcement({ announcement, removeAnnouncement }) {
           sx={{ borderRadius: "default" }}
         >
           <Icon.Announcement size={12} color="primary" sx={{ mr: "3px" }} />
-          <Text color="primary" variant="subBody" fontWeight="bold" mt={"2px"}>
+          <Text color="primary" variant="subBody" fontWeight="bold">
             Announcement
           </Text>
         </Flex>

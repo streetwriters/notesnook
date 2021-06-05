@@ -41,7 +41,6 @@ function Unlock(props) {
       mx={2}
     >
       <Flex justifyContent="center" alignItems="center">
-        <Icon.Unlock size={"heading"} color="text" />
         <Text variant="heading" ml={2} fontSize={48}>
           Open note
         </Text>
