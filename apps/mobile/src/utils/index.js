@@ -115,8 +115,12 @@ export const getElevation = elevation => {
   };
 };
 
+
 export const sortSettings = {
   sort: defaultState.settings.sort,
+  /**
+   * @type {"desc" | "asc"}
+   */
   sortOrder: 'desc',
 };
 
