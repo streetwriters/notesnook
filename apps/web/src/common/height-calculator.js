@@ -8,12 +8,12 @@ const MAX_HEIGHTS = {
 };
 
 function getNoteHeight(item) {
-  const { notebook, headline } = item;
+  const { notebooks, headline } = item;
   let height = SINGLE_LINE_HEIGHT * 3;
   //if (title.length > 35) height += SINGLE_LINE_HEIGHT;
   if (headline?.length > 0) height += SINGLE_LINE_HEIGHT * 2;
   else height += SINGLE_LINE_HEIGHT;
-  if (notebook) height += SINGLE_LINE_HEIGHT / 2;
+  if (notebooks?.length) height += SINGLE_LINE_HEIGHT;
 
   return height * DEFAULT_FONT_SIZE;
 }
@@ -27,13 +27,12 @@ function getNotebookHeight(item) {
     height += SINGLE_LINE_HEIGHT; // title has become multiline
   }
 
-  if (topics.length > 1) {
+  if (topics.length > 0) {
     height += SINGLE_LINE_HEIGHT;
   }
 
   if (description?.length > 0) {
-    height += SINGLE_LINE_HEIGHT;
-    height += SINGLE_LINE_HEIGHT;
+    height += SINGLE_LINE_HEIGHT * 2;
   }
 
   return height * DEFAULT_FONT_SIZE;
