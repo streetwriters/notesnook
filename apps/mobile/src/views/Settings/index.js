@@ -218,6 +218,7 @@ export const Settings = ({navigation}) => {
       func: async () => {
         eSendEvent(eOpenProgressDialog, {
           title: 'Join our Discord Community',
+          iconColor: 'discord',
           paragraph:
             'We are not ghosts, chat with us and share your experience.',
           valueArray: [
@@ -1475,6 +1476,35 @@ const SettingsBackupAndRestore = () => {
         eSendEvent(eOpenRestoreDialog);
       },
       desc: 'Restore backup from phone storage.',
+    },
+    {
+      name: 'Import notes from other note apps',
+      desc: 'Get all your notes in one place with Notesnook Importer.',
+      func: () => {
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Notesnook Importer',
+          icon: 'import',
+          noProgress: true,
+          action: async () => {
+            try {
+              await openLinkInBrowser('https://importer.notenook.com', colors);
+            } catch (e) {}
+          },
+          actionText: 'Go to Notesnook Importer',
+          learnMore: 'Learn how this works',
+          learnMorePress: async () => {
+            try {
+              await openLinkInBrowser(
+                'https://docs.notesnook.com/importing/notesnook-importer/',
+                colors,
+              );
+            } catch (e) {}
+          },
+          paragraph:
+            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.',
+        });
+      },
+      new: true,
     },
   ];
 
