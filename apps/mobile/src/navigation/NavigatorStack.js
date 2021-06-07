@@ -1,40 +1,33 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
-import { createNativeStackNavigator } from 'react-native-screens/native-stack';
+import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import { useSelectionStore } from '../provider/stores';
+import {useSelectionStore} from '../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
-import { history } from '../utils';
-import { eOpenSideMenu } from '../utils/Events';
-import { rootNavigatorRef } from '../utils/Refs';
+import {history} from '../utils';
+import {eOpenSideMenu} from '../utils/Events';
+import {rootNavigatorRef} from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import { Search } from '../views/Search';
+import {Search} from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
 const Stack = createNativeStackNavigator();
 
-const forFade = ({current}) => ({
-  cardStyle: {
-    opacity: current.progress,
-  },
-});
-
 const screenOptionsForAnimation = {
-  animationEnabled: true,
-  cardStyleInterpolator: forFade,
   gestureEnabled: true,
+  stackAnimation: 'none',
 };
 
 export const NavigatorStack = React.memo(
@@ -83,7 +76,7 @@ export const NavigatorStack = React.memo(
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                stackAnimation: 'fade',
+                stackAnimation: 'none',
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
