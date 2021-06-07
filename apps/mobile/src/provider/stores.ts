@@ -202,7 +202,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   setSelectionMode: mode => set({selectionMode: mode}),
   setSelectedItem: item => {
     let selectedItems = get().selectedItemsList;
-    let index = selectedItems.findIndex((i: Item) => i.id === item.id);
+    let index = selectedItems.findIndex((i:any) => i.id === item.id);
     if (index !== -1) {
       selectedItems.splice(index, 1);
     } else {
@@ -236,7 +236,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     data: {},
     icon: 'account-outline',
   },
-  setMessage: message => set({message}),
+  setMessage: message => set({message:{...message}}),
 }));
 
 export function initialize() {
