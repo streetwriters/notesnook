@@ -94,7 +94,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                   paddingVertical: 2,
                   marginRight: 5,
                   marginVertical: 2.5,
-                  maxWidth: 70,
+                  maxWidth: 100,
                 }}>
                 <Paragraph
                   size={SIZE.xs}
@@ -117,6 +117,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 2.5,
+            minHeight:SIZE.md + 2
           }}>
           {isTrash ? (
             <>

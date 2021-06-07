@@ -4,7 +4,7 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
-import { useNoteStore, useSettingStore } from '../../provider/stores';
+import {useNoteStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
@@ -21,7 +21,7 @@ let timeout = null;
 const JumpToDialog = ({scrollRef}) => {
   const [state] = useTracked();
   const {colors} = state;
-  
+
   const notes = useNoteStore(state => state.notes);
   const settings = useSettingStore(state => state.settings);
 
@@ -36,7 +36,10 @@ const JumpToDialog = ({scrollRef}) => {
     ind = ind + 1;
     ind = ind - (index + 1);
     offset = offset + ind * 100 + 200;
-    scrollRef.current?.scrollToOffset(0, index === 0 ? 0 : offset, true);
+    scrollRef.current?.scrollToOffset({
+      offset: offset,
+      animated: true,
+    });
     close();
   };
 

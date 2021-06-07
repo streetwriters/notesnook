@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+	TouchableOpacity,
 	useWindowDimensions,
 	View
 } from 'react-native';
@@ -41,12 +42,15 @@ export const SectionHeader = ({
 			  : colors.nav,
 		  marginTop: index === 0 ? 0 : 5 * fontScale,
 		}}>
-		<TouchableWithoutFeedback
+		<TouchableOpacity
 		  onPress={() => {
+			  console.log('called')
 			if (jumpToDialog) {
+				console.log('sending event')
 			  eSendEvent(eOpenJumpToDialog);
 			}
 		  }}
+		  activeOpacity={0.9}
 		  hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
 		  style={{
 			height: '100%',
@@ -62,7 +66,7 @@ export const SectionHeader = ({
 			}}>
 			{!item.title || item.title === '' ? 'Pinned' : item.title}
 		  </Heading>
-		</TouchableWithoutFeedback>
+		</TouchableOpacity>
 		{index === 0 && sortMenuButton ? <HeaderMenu /> : null}
 	  </View>
 	);

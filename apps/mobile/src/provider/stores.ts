@@ -1,3 +1,4 @@
+import { Dimensions } from 'react-native';
 import create, {State} from 'zustand';
 import {eSendEvent} from '../services/EventManager';
 import {history, SORT, sortSettings} from '../utils';
@@ -143,6 +144,8 @@ export const useUserStore = create<UserStore>((set, get) => ({
   setLastSynced: lastSynced => set({lastSynced: lastSynced}),
 }));
 
+let {width, height} = Dimensions.get('window');
+
 export const useSettingStore = create<SettingStore>((set, get) => ({
   settings: {
     showToolbarOnTop: false,
@@ -161,9 +164,11 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   fullscreen: false,
   deviceMode: null,
+  dimensions:{width,height},
   setSettings: settings => set({settings}),
   setFullscreen: fullscreen => set({fullscreen}),
   setDeviceMode: mode => set({deviceMode: mode}),
+  setDimensions: dimensions => set({dimensions:dimensions})
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({

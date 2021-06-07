@@ -9,7 +9,7 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
-import { useUserStore } from '../../provider/stores';
+import {useUserStore} from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -74,8 +74,8 @@ const LoginDialog = () => {
   const colors = state.colors;
 
   const setUser = useUserStore(state => state.setUser);
-  const setLastSynced = useUserStore(state => state.setLastSynced)
-  
+  const setLastSynced = useUserStore(state => state.setLastSynced);
+
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -85,7 +85,6 @@ const LoginDialog = () => {
   const [focused, setFocused] = useState(false);
   const [confirm, setConfirm] = useState(false);
   const insets = useSafeAreaInsets();
-
 
   const _email = useRef();
   const _pass = useRef();
@@ -251,9 +250,6 @@ const LoginDialog = () => {
         context: 'local',
       });
       close();
-      if (MODES.sessionExpired === mode) {
-        await MMKV.removeItem('loginSessionHasExpired');
-      }
       await sleep(300);
       eSendEvent('userLoggedIn', true);
       eSendEvent(eOpenProgressDialog, {
@@ -261,6 +257,7 @@ const LoginDialog = () => {
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false,
       });
+      await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
       setLoading(false);
       setStatus(null);
@@ -325,7 +322,7 @@ const LoginDialog = () => {
       let user = await db.user.getUser();
       setStatus('Setting Crenditials');
       setUser(user);
-      setLastSynced(await db.lastSynced())
+      setLastSynced(await db.lastSynced());
       clearMessage();
       setEmailVerifyMessage();
       close();
@@ -554,7 +551,7 @@ const LoginDialog = () => {
               paddingHorizontal: 12,
               height: 50,
             }}>
-            {DDS.isTab ? (
+            {DDS.isTab && MODES.sessionExpired !== mode ? (
               <ActionIcon
                 name="close"
                 size={SIZE.xxxl}
@@ -569,7 +566,7 @@ const LoginDialog = () => {
                 }}
                 color={colors.heading}
               />
-            ) : (
+            ) : MODES.sessionExpired !== mode && (
               <ActionIcon
                 name="arrow-left"
                 size={SIZE.xxxl}
@@ -585,6 +582,7 @@ const LoginDialog = () => {
                 color={colors.heading}
               />
             )}
+
 
             <View />
           </View>

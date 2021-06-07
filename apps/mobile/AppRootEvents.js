@@ -6,10 +6,12 @@ import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import { enabled } from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import { updateEvent } from './src/components/DialogManager/recievers';
-import { useTracked } from './src/provider';
-import { Actions } from './src/provider/Actions';
-import { clearAllStores, initialize, useNoteStore, useUserStore } from './src/provider/stores';
+import {
+  clearAllStores,
+  initialize,
+  useNoteStore,
+  useUserStore
+} from './src/provider/stores';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
@@ -103,16 +105,14 @@ async function reconnectSSE(connection) {
 
 let prevState = null;
 let showingDialog = false;
-
 let removeInternetStateListener;
+
 export const AppRootEvents = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
     const loading = useNoteStore(state => state.loading);
     const setLastSynced = useUserStore(state => state.setLastSynced);
     const setUser = useUserStore(state => state.setUser);
     const setSyncing = useUserStore(state => state.setSyncing);
-
 
     useEffect(() => {
       Appearance.addChangeListener(SettingsService.setTheme);
@@ -147,9 +147,6 @@ export const AppRootEvents = React.memo(
         Linking.removeEventListener('url', onUrlRecieved);
       };
     }, []);
-
-  
-
 
     const onSessionExpired = async () => {
       await Storage.write('loginSessionHasExpired', 'expired');
@@ -203,7 +200,7 @@ export const AppRootEvents = React.memo(
 
     const onSyncComplete = async () => {
       initialize();
-      setLastSynced(await db.lastSynced())
+      setLastSynced(await db.lastSynced());
     };
 
     const onUrlRecieved = async res => {
@@ -233,7 +230,7 @@ export const AppRootEvents = React.memo(
       });
 
       if (user?.isEmailConfirmed) {
-        clearMessage(dispatch);
+        clearMessage();
       }
     };
 
@@ -281,13 +278,13 @@ export const AppRootEvents = React.memo(
           }
         });
         if (res !== true) throw new Error(res);
-        setLastSynced(await db.lastSynced())
+        setLastSynced(await db.lastSynced());
       } catch (e) {
         setSyncing(false);
         ToastEvent.show({
           heading: 'Sync failed',
           message: e.message,
-          context: "global",
+          context: 'global',
         });
       } finally {
         setSyncing(false);
@@ -330,7 +327,7 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async login => {
       try {
         if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
-          return;
+        return;
         let user = await db.user.getUser();
         if (user) {
           setUser(user);
@@ -479,7 +476,7 @@ export const AppRootEvents = React.memo(
           try {
             let user = await db.user.fetchUser();
             if (user.isEmailConfirmed) {
-              onEmailVerified(dispatch);
+              onEmailVerified();
             }
           } catch (e) {}
         }

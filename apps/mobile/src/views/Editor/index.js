@@ -13,6 +13,8 @@ import {
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
@@ -55,6 +57,11 @@ const Editor = React.memo(
     };
 
     useEffect(()=>{
+      setTimeout(async () => {
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
+        eSendEvent(eOpenLoginDialog, 4);
+      }, 1000);
+
       if (premiumUser) {
         tiny.call(EditorWebView,tiny.setMarkdown,true)
       }

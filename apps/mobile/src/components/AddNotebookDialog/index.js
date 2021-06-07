@@ -1,5 +1,6 @@
 import React, {createRef} from 'react';
 import {
+  ActionSheetIOS,
   Keyboard,
   KeyboardAvoidingView,
   Modal,
@@ -20,6 +21,7 @@ import {db} from '../../utils/DB';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';

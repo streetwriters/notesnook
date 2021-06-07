@@ -14,6 +14,7 @@ import SearchService from '../../services/SearchService';
 import { InteractionManager, scrollRef } from '../../utils';
 import { db } from '../../utils/DB';
 import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
 import { tabBarRef } from '../../utils/Refs';
 import Storage from '../../utils/storage';
 
@@ -83,11 +84,6 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-    let result = Storage.encrypt({
-      password:""
-    },"hello world");
-    console.log(result);
-    return;
     if (!DDS.isLargeTablet()) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);

@@ -1,6 +1,6 @@
 import React, {createRef} from 'react';
 import {Actions} from '../../provider/Actions';
-import { useMenuStore } from '../../provider/stores';
+import {useMenuStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,

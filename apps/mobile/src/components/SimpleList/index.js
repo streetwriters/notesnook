@@ -1,32 +1,25 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList} from 'react-native';
-import {RefreshControl, useWindowDimensions} from 'react-native';
-import {DataProvider, LayoutProvider, RecyclerListView} from 'recyclerlistview';
-import {useTracked} from '../../provider';
-import {useMessageStore, useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, RefreshControl } from 'react-native';
+import { useTracked } from '../../provider';
 import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
+  eSendEvent
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import {dHeight, dWidth} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {eScrollEvent} from '../../utils/Events';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { eScrollEvent } from '../../utils/Events';
 import useAnnouncement from '../../utils/useAnnouncement';
 import JumpToDialog from '../JumpToDialog';
-import {NotebookItem} from '../NotebookItem';
-import {NotebookWrapper} from '../NotebookItem/wrapper';
+import { NotebookItem } from '../NotebookItem';
+import { NotebookWrapper } from '../NotebookItem/wrapper';
 import NoteItem from '../NoteItem';
-import {NoteWrapper} from '../NoteItem/wrapper';
+import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import {Announcement} from './announcement';
-import {Empty} from './empty';
-import {Footer} from './footer';
-import {Header} from './header';
-import {SectionHeader} from './section-header';
+import { Announcement } from './announcement';
+import { Empty } from './empty';
+import { Footer } from './footer';
+import { Header } from './header';
+import { SectionHeader } from './section-header';
 
 const heights = {
   note: 100,
@@ -47,6 +40,7 @@ const TrashI = ({item, index}) => {
 let renderItems = {
   notes: NoteWrapper,
   notebooks: NotebookWrapper,
+  topics:NotebookWrapper,
   tags: TagItem,
   section: SectionHeader,
   trash: TrashI,

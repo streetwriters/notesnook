@@ -73,13 +73,20 @@ export type Settings = {
     appLockMode?: string,
 }
 
+type Dimensions = {
+    width:number,
+    height:number
+}
+
 export interface SettingStore extends State {
     settings: Settings,
     fullscreen: boolean,
     deviceMode: string | null,
+    dimensions:Dimensions
     setSettings: (settings: Settings) => void,
     setFullscreen: (fullscreen: boolean) => void,
-    setDeviceMode: (mode: string) => void
+    setDeviceMode: (mode: string) => void,
+    setDimensions: (dimensions:Dimensions) => void
 }
 
 

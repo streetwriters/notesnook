@@ -1,5 +1,11 @@
 import dayjs from 'dayjs';
-import React, {createRef, useCallback, useEffect, useState} from 'react';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Appearance,
   Linking,
@@ -28,7 +34,11 @@ import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import { useMessageStore, useSettingStore, useUserStore } from '../../provider/stores';
+import {
+  useMessageStore,
+  useSettingStore,
+  useUserStore,
+} from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
@@ -72,6 +82,7 @@ import {
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
@@ -579,23 +590,53 @@ const getTimeLeft = t2 => {
   };
 };
 
+let passwordVerifyValue = null;
 const SettingsUserSection = () => {
   const [state] = useTracked();
   const {colors} = state;
 
   const user = useUserStore(state => state.user);
   const messageBoardState = useMessageStore(state => state.message);
+  const [verifyUser, setVerifyUser] = useState(false);
   const subscriptionDaysLeft =
     user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
-  const expiryDate =  dayjs(user?.subscription?.expiry).format(
-    'MMMM D, YYYY',
-  );
-  const startDate =  dayjs(user?.subscription?.start).format(
-    'MMMM D, YYYY',
-  )
-  console.log(user?.subscription)
-
+  const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
+  const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+  const input = useRef();
+  const tryVerification = async () => {
+    if (!passwordVerifyValue) {
+      ToastEvent.show({
+        heading: 'Account Password is required',
+        type: 'error',
+        context: 'local',
+      });
+      return;
+    }
+    try {
+      let verify = await db.user.verifyPassword(passwordVerifyValue);
+      if (verify) {
+        setVerifyUser(false);
+        passwordVerifyValue = null;
+        await sleep(300);
+        eSendEvent(eOpenRecoveryKeyDialog);
+      } else {
+        ToastEvent.show({
+          heading: 'Incorrect password',
+          message: 'Please enter the correct password to save recovery key.',
+          type: 'error',
+          context: 'local',
+        });
+      }
+    } catch (e) {
+      ToastEvent.show({
+        heading: 'Incorrect password',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
+    }
+  };
 
   return (
     <>
@@ -757,11 +798,9 @@ const SettingsUserSection = () => {
                     </Paragraph>
                     <Paragraph color={colors.pri}>
                       {user.subscription.type === 2
-                        ? 'You signed up on ' +
-                          startDate
+                        ? 'You signed up on ' + startDate
                         : user.subscription.type === 1
-                        ? 'Your trial period started on ' +
-                          startDate
+                        ? 'Your trial period started on ' + startDate
                         : user.subscription.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
@@ -786,7 +825,7 @@ const SettingsUserSection = () => {
                         }}
                         width="100%"
                         style={{
-                          paddingHorizontal:0
+                          paddingHorizontal: 0,
                         }}
                         fontSize={SIZE.md}
                         title={
@@ -847,21 +886,71 @@ const SettingsUserSection = () => {
               ) : null}
             </View>
           </View>
+
+          {verifyUser && (
+            <BaseDialog
+              onRequestClose={() => {
+                setVerifyUser(false);
+                passwordVerifyValue = null;
+              }}
+              onShow={() => {
+                setTimeout(() => {
+                  input.current?.focus();
+                }, 300);
+              }}
+              statusBarTranslucent={false}
+              visible={true}>
+              <DialogContainer>
+                <DialogHeader
+                  title="Verify it's you"
+                  paragraph="To save your account recovery key, enter your account password"
+                />
+
+                <Input
+                  fwdRef={input}
+                  placeholder="Enter account password"
+                  onChangeText={v => {
+                    passwordVerifyValue = v;
+                  }}
+                  onSubmit={tryVerification}
+                  secureTextEntry={true}
+                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    alignSelf: 'flex-end',
+                  }}>
+                  <Button
+                    onPress={() => {
+                      setVerifyUser(false);
+                      passwordVerifyValue = null;
+                    }}
+                    fontSize={SIZE.md}
+                    type="gray"
+                    title="Cancel"
+                  />
+                  <Button
+                    onPress={tryVerification}
+                    fontSize={SIZE.md}
+                    style={{
+                      marginLeft: 10,
+                    }}
+                    type="transparent"
+                    title="Verify"
+                  />
+                </View>
+              </DialogContainer>
+              <Toast context="local" />
+            </BaseDialog>
+          )}
+
           {[
             {
               name: 'Save data recovery key',
               func: async () => {
-                if (BiometricService.isBiometryAvailable() === false) {
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                  return;
-                }
-                let result = await BiometricService.validateUser(
-                  "Verify it's you",
-                  '',
-                );
-                if (result) {
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                }
+                setVerifyUser(true);
               },
               desc:
                 'Recover your data using the recovery key if your password is lost.',
@@ -876,11 +965,10 @@ const SettingsUserSection = () => {
             {
               name: 'Having problems with syncing?',
               func: async () => {
-                await Sync.run("global",true);
+                await Sync.run('global', true);
               },
               desc: 'Try force sync to resolve issues with syncing.',
             },
-
           ].map(item => (
             <CustomButton
               key={item.name}
@@ -958,6 +1046,12 @@ const SettingsAppearanceSection = () => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
+        onMoveShouldSetResponderCapture={() => {
+          tabBarRef.current?.setScrollEnabled(false);
+        }}
+        onMomentumScrollEnd={() => {
+          tabBarRef.current?.setScrollEnabled(true);
+        }}
         style={{
           borderRadius: 5,
           padding: 5,
@@ -966,6 +1060,7 @@ const SettingsAppearanceSection = () => {
           width: '100%',
           paddingHorizontal: 12,
         }}
+        nestedScrollEnabled
         contentContainerStyle={{
           alignSelf: 'center',
           flexDirection: 'row',
@@ -1365,7 +1460,7 @@ const SettingsBackupAndRestore = () => {
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
-  
+
   const backupItemsList = [
     {
       name: 'Backup data',

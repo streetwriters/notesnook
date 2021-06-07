@@ -73,7 +73,7 @@ export const Notebook = ({route, navigation}) => {
       ranAfterInteractions = true;
       runAfterInteractions();
     }
-    Navigation.setHeaderState('Notebooks', params, {
+    Navigation.setHeaderState('Notebook', params, {
       heading: params.title,
       id: params.notebook.id,
       type: 'notebook',

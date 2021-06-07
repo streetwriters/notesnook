@@ -6,7 +6,7 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const DialogHeader = ({icon, title, paragraph, button,paragraphColor}) => {
+const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
 
@@ -46,7 +46,9 @@ const DialogHeader = ({icon, title, paragraph, button,paragraphColor}) => {
           </View>
 
           {paragraph ? (
-            <Paragraph color={paragraphColor || colors.icon}>{paragraph}</Paragraph>
+            <Paragraph color={paragraphColor || colors.icon}>
+              {paragraph}
+            </Paragraph>
           ) : null}
         </View>
       </View>
