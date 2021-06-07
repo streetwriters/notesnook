@@ -25,22 +25,7 @@ const NotesProfile = createProfile(
 );
 
 const NotebooksProfile = createProfile(
-  (index, item) => (
-    <Notebook
-      index={index}
-      item={item}
-      onClick={() => {
-        if (item.topics.length === 1) {
-          navigate(`/notebooks/${item.id}/${item.topics[0].id}`);
-        } else {
-          navigate(`/notebooks/${item.id}`);
-        }
-      }}
-      onTopicClick={(notebook, topic) =>
-        navigate(`/notebooks/${notebook.id}/${topic}`)
-      }
-    />
-  ),
+  (index, item) => <Notebook index={index} item={item} />,
   getNotebookHeight,
   MAX_HEIGHTS.notebook
 );

@@ -6,7 +6,7 @@ import { store as appStore } from "../../stores/app-store";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
-import { hashNavigate } from "../../navigation";
+import { hashNavigate, navigate } from "../../navigation";
 import { getTotalNotes } from "../../common";
 
 class Notebook extends React.Component {
@@ -15,18 +15,22 @@ class Notebook extends React.Component {
     const nextItem = nextProps.item;
     return (
       prevItem.pinned !== nextItem.pinned ||
-      prevItem.favorite !== nextItem.favorite ||
+      prevItem.title !== nextItem.title ||
+      prevItem.description !== nextItem.description ||
       prevItem !== nextItem
     );
   }
   render() {
-    const { item, index, onClick, onTopicClick } = this.props;
+    const { item, index } = this.props;
     const notebook = item;
+
     return (
       <ListItem
         selectable
         item={notebook}
-        onClick={onClick}
+        onClick={() => {
+          navigate(`/notebooks/${notebook.id}`);
+        }}
         title={notebook.title}
         body={notebook.description}
         index={index}
@@ -38,7 +42,7 @@ class Notebook extends React.Component {
                 <Flex
                   key={topic.id}
                   onClick={(e) => {
-                    onTopicClick(notebook, topic.id);
+                    navigate(`/notebooks/${notebook.id}/${topic.id}`);
                     e.stopPropagation();
                   }}
                   bg="primary"
