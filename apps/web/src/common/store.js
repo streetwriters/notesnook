@@ -1,6 +1,7 @@
 import produce, { immerable, setAutoFreeze } from "immer";
 import create from "zustand";
 setAutoFreeze(false);
+
 function immer(config) {
   return function (set, get, api) {
     const obj = config(
@@ -22,8 +23,8 @@ function immer(config) {
  * @returns {[import("zustand").UseStore<any>, any]}
  */
 function createStore(store) {
-  const [useStore, api] = create(immer(store.new.bind(store)));
-  return [useStore, api.getState()];
+  const useStore = create(immer(store.new.bind(store)));
+  return [useStore, useStore.getState()];
 }
 
 export default createStore;
