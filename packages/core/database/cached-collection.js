@@ -1,16 +1,19 @@
 import sort from "fast-sort";
 import IndexedCollection from "./indexed-collection";
+import MapStub from "../utils/map";
 
 export default class CachedCollection extends IndexedCollection {
   constructor(context, type) {
     super(context, type);
-    this.map = new Map();
+    this.type = type;
+    this.map;
   }
 
   async init() {
     await super.init();
     const data = await this.indexer.readMulti(this.indexer.indices);
-    this.map = new Map(data);
+    if (this.map && this.map.dispose) this.map.dispose();
+    this.map = new MapStub.Map(data, this.type);
   }
 
   async clear() {
@@ -41,6 +44,7 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   getRaw() {
+    if (!this.map) return [];
     return Array.from(this.map.values());
   }
 
