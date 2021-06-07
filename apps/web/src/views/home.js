@@ -17,7 +17,7 @@ function Home() {
   useEffect(() => {
     (async function () {
       const intitialized = db.notes.initialized;
-      if (!intitialized || !store.notes.length) {
+      if (!intitialized || !store.get().notes.length) {
         await db.notes.init();
         store.refresh();
         setIsLoading(false);
