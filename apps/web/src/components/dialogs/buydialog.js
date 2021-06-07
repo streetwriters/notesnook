@@ -139,7 +139,7 @@ function BuyDialog(props) {
   }, [coupon]);
 
   useEffect(() => {
-    trackEvent("view", "Buy dialog viewed.");
+    trackEvent("Buy dialog opened.", "buy");
   }, []);
 
   return (
@@ -293,7 +293,7 @@ function BuyDialog(props) {
                 fontSize="title"
                 fontWeight="bold"
                 onClick={async () => {
-                  trackEvent("buy", "Subscribe button clicked.");
+                  trackEvent("Subscribe button clicked.", "buy");
                   if (isLoggedIn) {
                     await upgrade(user, coupon);
                   } else {
