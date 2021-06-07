@@ -1,9 +1,9 @@
 import { Dimensions } from 'react-native';
-import create, {State} from 'zustand';
-import {eSendEvent} from '../services/EventManager';
-import {history, SORT, sortSettings} from '../utils';
-import {db} from '../utils/DB';
-import {eOpenSideMenu} from '../utils/Events';
+import create, { State } from 'zustand';
+import { eSendEvent } from '../services/EventManager';
+import { history, SORT, sortSettings } from '../utils';
+import { db } from '../utils/DB';
+import { eOpenSideMenu } from '../utils/Events';
 import {
   MenuStore,
   MessageStore,
@@ -24,7 +24,7 @@ import {
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
   loading: true,
-  setLoading: loading => set({loading: loading}),
+  setLoading: loading => set({ loading: loading }),
   setNotes: items => {
     if (!items) {
       set({
@@ -40,9 +40,9 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({notes: prev});
+    set({ notes: prev });
   },
-  clearNotes: () => set({notes: []}),
+  clearNotes: () => set({ notes: [] }),
 }));
 
 export const useNotebookStore = create<NotebookStore>((set, get) => ({
@@ -62,9 +62,9 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({notebooks: prev});
+    set({ notebooks: prev });
   },
-  clearNotebooks: () => set({notebooks: []}),
+  clearNotebooks: () => set({ notebooks: [] }),
 }));
 
 export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
@@ -84,9 +84,9 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({favorites: prev});
+    set({ favorites: prev });
   },
-  clearFavorites: () => set({favorites: []}),
+  clearFavorites: () => set({ favorites: [] }),
 }));
 
 export const useTagStore = create<TagStore>((set, get) => ({
@@ -106,9 +106,9 @@ export const useTagStore = create<TagStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({tags: prev});
+    set({ tags: prev });
   },
-  clearTags: () => set({tags: []}),
+  clearTags: () => set({ tags: [] }),
 }));
 
 export const useTrashStore = create<TrashStore>((set, get) => ({
@@ -128,9 +128,9 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
         prev[index] = item;
       }
     }
-    set({trash: prev});
+    set({ trash: prev });
   },
-  clearTrash: () => set({trash: []}),
+  clearTrash: () => set({ trash: [] }),
 }));
 
 export const useUserStore = create<UserStore>((set, get) => ({
@@ -138,13 +138,13 @@ export const useUserStore = create<UserStore>((set, get) => ({
   premium: false,
   lastSynced: 'Never',
   syncing: false,
-  setUser: user => set({user: user}),
-  setPremium: premium => set({premium: premium}),
-  setSyncing: syncing => set({syncing: syncing}),
-  setLastSynced: lastSynced => set({lastSynced: lastSynced}),
+  setUser: user => set({ user: user }),
+  setPremium: premium => set({ premium: premium }),
+  setSyncing: syncing => set({ syncing: syncing }),
+  setLastSynced: lastSynced => set({ lastSynced: lastSynced }),
 }));
 
-let {width, height} = Dimensions.get('window');
+let { width, height } = Dimensions.get('window');
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
   settings: {
@@ -164,32 +164,32 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   },
   fullscreen: false,
   deviceMode: null,
-  dimensions:{width,height},
-  setSettings: settings => set({settings}),
-  setFullscreen: fullscreen => set({fullscreen}),
-  setDeviceMode: mode => set({deviceMode: mode}),
-  setDimensions: dimensions => set({dimensions:dimensions})
+  dimensions: { width, height },
+  setSettings: settings => set({ settings }),
+  setFullscreen: fullscreen => set({ fullscreen }),
+  setDeviceMode: mode => set({ deviceMode: mode }),
+  setDimensions: dimensions => set({ dimensions: dimensions })
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
   menuPins: [],
   colorNotes: [],
-  setMenuPins: () => set({menuPins: db.settings.pins}),
-  setColorNotes: () => set({colorNotes: db.colors.all}),
+  setMenuPins: () => set({ menuPins: db.settings.pins }),
+  setColorNotes: () => set({ colorNotes: db.colors.all }),
 }));
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
-  setCurrentlyEditingNote: note => set({currentEditingNote: note}),
+  setCurrentlyEditingNote: note => set({ currentEditingNote: note }),
 }));
 
 export const useSearchStore = create<SearchStore>((set, get) => ({
   searchResults: [],
   searching: false,
   searchStatus: null,
-  setSearchResults: results => set({searchResults: results}),
+  setSearchResults: results => set({ searchResults: results }),
   setSearchStatus: (searching, status) =>
-    set({searching, searchStatus: status}),
+    set({ searching, searchStatus: status }),
 }));
 
 export const useSelectionStore = create<SelectionStore>((set, get) => ({
@@ -197,12 +197,12 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectionMode: false,
   setAll: all => {
     history.selectedItemsList = all;
-    set({selectedItemsList: all});
+    set({ selectedItemsList: all });
   },
-  setSelectionMode: mode => set({selectionMode: mode}),
+  setSelectionMode: mode => set({ selectionMode: mode }),
   setSelectedItem: item => {
     let selectedItems = get().selectedItemsList;
-    let index = selectedItems.findIndex((i:any) => i.id === item.id);
+    let index = selectedItems.findIndex((i: any) => i.id === item.id);
     if (index !== -1) {
       selectedItems.splice(index, 1);
     } else {
@@ -223,7 +223,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   },
   clearSelection: () => {
     eSendEvent(eOpenSideMenu);
-    set({selectionMode: false, selectedItemsList: []});
+    set({ selectionMode: false, selectedItemsList: [] });
   },
 }));
 
@@ -232,17 +232,19 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     visible: false,
     message: null,
     actionText: null,
-    onPress: () => {},
+    onPress: () => { },
     data: {},
     icon: 'account-outline',
   },
-  setMessage: message => set({message:{...message}}),
+  setMessage: message => set({ message: { ...message } }),
 }));
 
 export function initialize() {
+  if (!db) return;
   useMenuStore.getState().setColorNotes();
   useMenuStore.getState().setMenuPins();
   useNotebookStore.getState().setNotebooks();
+  useTrashStore.getState().setTrash();
   useTagStore.getState().setTags();
   useFavoriteStore.getState().setFavorites();
   useNoteStore.getState().setNotes();

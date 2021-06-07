@@ -1,15 +1,13 @@
 import React from 'react';
 import {
-  Animated,
   KeyboardAvoidingView,
   Modal,
   Platform,
   SafeAreaView,
   StyleSheet,
-  TouchableOpacity,
-  View,
+  TouchableOpacity
 } from 'react-native';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 
 const BaseDialog = ({

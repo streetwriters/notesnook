@@ -198,21 +198,6 @@ export const Settings = ({navigation}) => {
       desc: `Facing an issue? Report it on our Github`,
     },
     {
-      name: `Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`,
-      func: async () => {
-        try {
-          await Linking.openURL(
-            Platform.OS === 'ios'
-              ? 'https://bit.ly/notesnook-ios'
-              : 'https://bit.ly/notesnook-and',
-          );
-        } catch (e) {}
-      },
-      desc: `Rate and review our app on ${
-        Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
-      } and let us know what you think.`,
-    },
-    {
       name: 'Join our Discord community',
 
       func: async () => {
@@ -239,6 +224,27 @@ export const Settings = ({navigation}) => {
         });
       },
       desc: 'We are not ghosts, chat with us and share your experience.',
+    },
+    {
+      name: 'Documentation',
+      func: async () => {
+        try {
+          await openLinkInBrowser('https://docs.notesnook.com', colors);
+        } catch (e) {}
+      },
+      desc: 'Learn about every feature and how it works.',
+    },
+    {
+      name: 'Roadmap',
+      func: async () => {
+        try {
+          await openLinkInBrowser(
+            'https://docs.notesnook.com/roadmap/',
+            colors,
+          );
+        } catch (e) {}
+      },
+      desc: 'See what the future of Notesnook is going to be like.',
     },
     {
       name: 'About Notesnook',
@@ -287,6 +293,46 @@ export const Settings = ({navigation}) => {
           )}
 
           <SectionHeader title="Other" />
+
+          <PressableButton
+            onPress={async () => {
+              try {
+                await Linking.openURL(
+                  Platform.OS === 'ios'
+                    ? 'https://bit.ly/notesnook-ios'
+                    : 'https://bit.ly/notesnook-and',
+                );
+              } catch (e) {}
+            }}
+            type="shade"
+            customStyle={{
+              borderWidth: 1,
+              borderRadius: 5,
+              paddingVertical: 10,
+              width: '95%',
+              alignItems: 'flex-start',
+              paddingHorizontal: 12,
+              marginTop: 10,
+              borderColor: colors.accent,
+            }}>
+            <Heading
+              color={colors.accent}
+              style={{
+                fontSize: SIZE.md,
+              }}>
+              {`Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`}
+            </Heading>
+            <Paragraph
+              style={{
+                flexWrap: 'wrap',
+                flexBasis: 1,
+              }}
+              color={colors.pri}>
+              It took us a year to bring Notesnook to life, the best private
+              note taking app. It will take you a moment to rate it to let us
+              know what you think!
+            </Paragraph>
+          </PressableButton>
 
           {otherItems.map(item => (
             <CustomButton

@@ -215,6 +215,7 @@ export class VaultDialog extends Component {
   onPress = async () => {
     if (this.state.revokeFingerprintAccess) {
       await this._revokeFingerprintAccess();
+
       this.close();
       return;
     }
@@ -271,7 +272,7 @@ export class VaultDialog extends Component {
           ToastEvent.show({
             heading: 'Vault password updated successfully',
             type: 'success',
-            context: 'local',
+            context: 'global',
           });
           this.close();
         })
@@ -337,6 +338,11 @@ export class VaultDialog extends Component {
         eSendEvent(eClearEditor);
       }
       this.close();
+      ToastEvent.show({
+        message: 'Note locked successfully',
+        type: 'error',
+        context: 'local',
+      });
       this.setState({
         loading: false,
       });
@@ -452,6 +458,11 @@ export class VaultDialog extends Component {
       this.close();
     } else {
       eSendEvent('vaultUpdated');
+      ToastEvent.show({
+        heading: 'Vault created successfully',
+        type: 'success',
+        context: 'global',
+      });
       this.close();
     }
   }
@@ -460,6 +471,11 @@ export class VaultDialog extends Component {
     db.vault
       .remove(this.state.note.id, this.password)
       .then(r => {
+        ToastEvent.show({
+          heading: 'Note permanantly unlocked.',
+          type: 'success',
+          context: 'global',
+        });
         this.close();
       })
       .catch(e => {
@@ -486,7 +502,7 @@ export class VaultDialog extends Component {
       heading: 'Note copied',
       type: 'success',
       message: 'Note has been copied to clipboard!',
-      context: 'local',
+      context: 'global',
     });
     this.close();
   }
@@ -529,14 +545,14 @@ export class VaultDialog extends Component {
       ToastEvent.show({
         heading: 'Biometric unlocking disabled!',
         type: 'success',
-        context: 'local',
+        context: 'global',
       });
     } catch (e) {
       ToastEvent.show({
         heading: 'Failed to disable Biometric unlocking.',
         message: e.message,
         type: 'success',
-        context: 'local',
+        context: 'global',
       });
     }
   };

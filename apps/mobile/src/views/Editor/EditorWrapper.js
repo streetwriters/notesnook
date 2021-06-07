@@ -1,17 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {KeyboardAvoidingView, Platform, SafeAreaView, View} from 'react-native';
-import {PanGestureHandler, State} from 'react-native-gesture-handler';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React from 'react';
+import { KeyboardAvoidingView, Platform, SafeAreaView, View } from 'react-native';
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
-import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
+import { GetPremium } from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import { useNoteStore } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
-import {eOnLoadNote} from '../../utils/Events';
-import {editorRef} from '../../utils/Refs';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { eOnLoadNote } from '../../utils/Events';
+import { editorRef } from '../../utils/Refs';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
 let prevVal = 0;
@@ -22,6 +22,7 @@ const op2 = new Animated.Value(0);
 const op3 = new Animated.Value(0);
 
 const onHandlerStateChange = (evt) => {
+  console.log('handler here');
   if (evt.nativeEvent.state === State.END) {
     if (evt.nativeEvent.translationY >= finalValue) {
       eSendEvent(eOnLoadNote, {type: 'new'});
@@ -42,6 +43,7 @@ const onHandlerStateChange = (evt) => {
 };
 
 const onGestureEvent = (event) => {
+    console.log('gesture event');
   if (event.nativeEvent.translationY < 0) return;
 
   let v = event.nativeEvent.translationY;
@@ -124,6 +126,7 @@ export const EditorWrapper = ({dimensions}) => {
         />
         <PanGestureHandler
           minPointers={2}
+          
           onHandlerStateChange={onHandlerStateChange}
           onGestureEvent={onGestureEvent}>
           <AnimatedKeyboardView

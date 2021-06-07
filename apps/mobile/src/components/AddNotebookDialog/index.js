@@ -1,19 +1,8 @@
 import React, {createRef} from 'react';
-import {
-  ActionSheetIOS,
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
-import { useMenuStore } from '../../provider/stores';
+import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -21,11 +10,9 @@ import {db} from '../../utils/DB';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';

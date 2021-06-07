@@ -84,7 +84,6 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
 
-
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);

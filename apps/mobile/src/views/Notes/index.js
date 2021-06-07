@@ -52,6 +52,7 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
+    console.log('setting notes');
     setNotes(_notes);
     if (params.menu) {
       navigation.setOptions({

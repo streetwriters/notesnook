@@ -1,18 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl } from 'react-native';
 import { useTracked } from '../../provider';
-import {
-  eSendEvent
-} from '../../services/EventManager';
+import { eSendEvent } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
 import { COLORS_NOTE } from '../../utils/Colors';
 import { eScrollEvent } from '../../utils/Events';
 import useAnnouncement from '../../utils/useAnnouncement';
 import JumpToDialog from '../JumpToDialog';
-import { NotebookItem } from '../NotebookItem';
 import { NotebookWrapper } from '../NotebookItem/wrapper';
-import NoteItem from '../NoteItem';
 import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
 import { Announcement } from './announcement';
@@ -31,16 +27,16 @@ const heights = {
 
 const TrashI = ({item, index}) => {
   return item.itemType === 'note' ? (
-    <NoteItem item={item} index={index} />
+    <NoteWrapper item={item} index={index} />
   ) : (
-    <NotebookItem item={item} index={index} />
+    <NoteWrapper item={item} index={index} />
   );
 };
 
 let renderItems = {
   notes: NoteWrapper,
   notebooks: NotebookWrapper,
-  topics:NotebookWrapper,
+  topics: NotebookWrapper,
   tags: TagItem,
   section: SectionHeader,
   trash: TrashI,
@@ -72,15 +68,9 @@ const SimpleList = ({
   const refreshing = false;
 
   useEffect(() => {
-    if (!_loading) {
-      setDataProvider(listData);
-    }
-  }, [listData]);
-
-  useEffect(() => {
     if (!loading) {
       setDataProvider(
-        listData.length > 1 && SettingsService.get().homepage !== screen
+        listData.length >= 1 && SettingsService.get().homepage !== screen
           ? listData.slice(0, 1)
           : listData,
       );
@@ -102,7 +92,7 @@ const SimpleList = ({
     } else {
       setDataProvider([]);
     }
-  }, [loading]);
+  }, [loading, listData]);
 
   const renderItem = React.useCallback(
     ({item, index}) =>

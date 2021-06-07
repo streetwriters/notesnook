@@ -8,6 +8,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -30,7 +31,7 @@ const ProgressDialog = () => {
     };
   }, []);
 
-  const open = async (data) => {
+  const open = async data => {
     setDialogData(data);
     setVisible(true);
     await sleep(1);
@@ -62,7 +63,7 @@ const ProgressDialog = () => {
           <ActivityIndicator size={50} color={colors.accent} />
         ) : dialogData?.noIcon ? null : (
           <Icon
-            color={colors.accent}
+            color={colors[dialogData.iconColor] || colors.accent}
             name={dialogData.icon || 'check'}
             size={50}
           />
@@ -82,17 +83,27 @@ const ProgressDialog = () => {
           </Paragraph>
         )}
       </View>
+      {dialogData?.learnMore ? (
+        <Paragraph
+          style={{
+            alignSelf: 'center',
+          }}
+          onPress={dialogData.learnMorePress}
+          color={colors.icon}>
+          <Icon color={colors.icon} name="information-outline" size={14} />{' '}
+          {dialogData.learnMore}
+        </Paragraph>
+      ) : null}
       <View
         style={{
           paddingHorizontal: 12,
-          backgroundColor: colors.shade,
           marginBottom: 12,
         }}>
         {dialogData.valueArray &&
-          dialogData.valueArray.map((v) => (
+          dialogData.valueArray.map(v => (
             <Button
               title={v}
-              type="transparent"
+              type="gray"
               textStyle={{fontWeight: 'normal'}}
               fontSize={SIZE.sm}
               icon="check"
@@ -113,6 +124,8 @@ const ProgressDialog = () => {
           <Button
             onPress={dialogData.action}
             title={dialogData.actionText}
+            accentColor={dialogData.iconColor || 'accent'}
+            accentText="light"
             fontSize={SIZE.lg}
             type="accent"
             height={50}
@@ -122,7 +135,7 @@ const ProgressDialog = () => {
         ) : null}
 
         {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map((item) => (
+          dialogData?.actionsArray.map(item => (
             <Button
               onPress={item.action}
               title={item.actionText}

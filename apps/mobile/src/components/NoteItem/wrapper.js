@@ -1,8 +1,6 @@
 import React from 'react';
 import NoteItem from '.';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
 import { useSelectionStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, openVault } from '../../services/EventManager';

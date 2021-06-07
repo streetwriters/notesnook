@@ -9,6 +9,7 @@ export default class CustomTabs extends Component {
       this.listRef = createRef();
       this.scrollOffset = props.initialIndex === 0 ? 0 : this.props.offsets.a;
       this.page = 0;
+      this.nextPage = 0;
       this.currentDrawerState = false;
       this.inputElement = createRef();
       this.keyboardState = false;
@@ -58,6 +59,7 @@ export default class CustomTabs extends Component {
     };
   
     hideKeyboardIfVisible() {
+      if (this.nextPage === 1) return;
       if ((editing.keyboardState || editing.isFocused) && this.scrollOffset < this.props.offsets.b - 50) {
         editing.isFocused = false;
         editing.keyboardState = false;
@@ -67,6 +69,13 @@ export default class CustomTabs extends Component {
     }
   
     goToIndex(index, animated = true) {
+      if (index === 1) {
+        this.nextPage = 0;
+      } else if (index === 2) {
+        this.nextPage = 1
+      } else {
+        this.nextPage = 0;
+      }
       this.listRef.current?.scrollToIndex({
         animated: animated,
         index: index,
@@ -110,6 +119,7 @@ export default class CustomTabs extends Component {
     };
   
     goToPage = page => {
+      this.nextPage = page;
       if (page === 0) {
         this.scrollOffset = this.props.offsets.a;
         this.hideKeyboardIfVisible();

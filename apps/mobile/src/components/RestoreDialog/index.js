@@ -1,22 +1,21 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, View} from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {FlatList} from 'react-native-gesture-handler';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { FlatList } from 'react-native-gesture-handler';
+import { useTracked } from '../../provider';
 import { initialize } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/DB';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';

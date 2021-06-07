@@ -13,6 +13,7 @@ export const deleteItems = async (item) => {
     history.selectedItemsList.push(item);
   }
 
+
   let notes = history.selectedItemsList.filter((i) => i.type === 'note');
   let notebooks = history.selectedItemsList.filter(
     (i) => i.type === 'notebook',
@@ -21,6 +22,7 @@ export const deleteItems = async (item) => {
 
   if (notes?.length > 0) {
     let ids = notes.map((i) => i.id);
+    console.log(ids);
     await db.notes.delete(...ids);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
@@ -86,6 +88,7 @@ export const deleteItems = async (item) => {
       actionText: 'Undo',
     });
   }
+  history.selectedItemsList = [];
   Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
   useSelectionStore.getState().clearSelection();
   useMenuStore.getState().setColorNotes();

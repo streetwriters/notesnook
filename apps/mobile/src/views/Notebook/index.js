@@ -41,12 +41,10 @@ export const Notebook = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: Platform.OS === 'ios',
         });
       }

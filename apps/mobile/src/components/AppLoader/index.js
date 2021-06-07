@@ -3,20 +3,18 @@ import { View } from 'react-native';
 import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
 import { useFavoriteStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import { editing, InteractionManager } from '../../utils';
+import { editing } from '../../utils';
 import { changeContainerScale, ContainerScale } from '../../utils/Animations';
 import { db } from '../../utils/DB';
 import { eOpenRateDialog, eOpenSideMenu } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
 import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
 import SplashScreen from '../SplashScreen';
 
 const scaleV = new Animated.Value(0.95);
