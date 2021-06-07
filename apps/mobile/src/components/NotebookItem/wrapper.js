@@ -11,13 +11,15 @@ export const NotebookWrapper = React.memo(({item, index}) => {
   const isTrash = item.type === 'trash';
 
   const onPress = () => {
-    if (history.selectedItemsList.length > 0) {
+    if (history.selectedItemsList.length > 0 && history.selectionMode) {
       dispatch({
         type: Actions.SELECTED_ITEMS,
         item: item,
       });
    
       return;
+    }  else {
+      history.selectedItemsList = [];
     }
     let routeName = item.type === "topic" ? 'NotesPage' : 'Notebook';
     

@@ -244,8 +244,8 @@ PODS:
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
-  - react-native-get-random-values (1.5.0):
-    - React
+  - react-native-get-random-values (1.7.0):
+    - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
   - react-native-image-picker (3.2.1):
@@ -339,7 +339,7 @@ PODS:
     - React-Core
   - RNCCheckbox (0.5.6):
     - React-Core
-  - RNCMaskedView (0.1.10):
+  - RNCMaskedView (0.1.11):
     - React
   - RNDeviceInfo (8.0.0):
     - React-Core
@@ -351,7 +351,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.6.1)
   - RNFileViewer (2.1.4):
     - React-Core
-  - RNGestureHandler (1.9.0):
+  - RNGestureHandler (1.10.3):
     - React-Core
   - RNIap (5.2.14):
     - React-Core
@@ -363,10 +363,11 @@ PODS:
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
-  - RNReanimated (1.13.2):
+  - RNReanimated (1.13.3):
     - React-Core
-  - RNScreens (2.18.1):
+  - RNScreens (3.3.0):
     - React-Core
+    - React-RCTImage
   - RNSecureRandom (1.0.0):
     - React
   - RNShare (3.8.5):
@@ -377,8 +378,8 @@ PODS:
     - pop (~> 1.0)
     - React
     - SexyTooltip
-  - RNVectorIcons (7.1.0):
-    - React
+  - RNVectorIcons (8.1.0):
+    - React-Core
   - SDWebImage (5.11.0):
     - SDWebImage/Core (= 5.11.0)
   - SDWebImage/Core (5.11.0)
@@ -627,10 +628,10 @@ CHECKOUT OPTIONS:
 SPEC CHECKSUMS:
   Base64: cecfb41a004124895a7bcee567a89bae5a89d49b
   boost-for-react-native: 39c7adb57c4e60d6c5479dd8623128eb5b3f0f2c
-  DoubleConversion: cde416483dac037923206447da6e1454df403714
+  DoubleConversion: cf9b38bf0b2d048436d9a82ad2abe1404f11e7de
   FBLazyVector: 49cbe4b43e445b06bf29199b6ad2057649e4c8f5
   FBReactNativeSpec: 0dbfb4e1873b058cd9f25e5af95ee37ad357727a
-  glog: 40a13f7840415b9a77023fbcae0f1e6f43192af3
+  glog: 73c2498ac6884b13ede40eda8228cb1eee9d9d62
   hermes-engine: 7d97ba46a1e29bacf3e3c61ecb2804a5ddd02d4f
   libevent: 4049cae6c81cdb3654a443be001fb9bdceff7913
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
@@ -653,7 +654,7 @@ SPEC CHECKSUMS:
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
-  react-native-get-random-values: 1404bd5cc0ab0e287f75ee1c489555688fc65f89
+  react-native-get-random-values: 237bffb1c7e05fb142092681531810a29ba53015
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
   react-native-image-picker: 64d12e81f3d9dad0af107fe6536b295d51932ec0
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
@@ -680,24 +681,24 @@ SPEC CHECKSUMS:
   rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
   RNCCheckbox: 80ee60cd2e67b46986e8e244db520655372deab4
-  RNCMaskedView: 5a8ec07677aa885546a0d98da336457e2bea557f
+  RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNDeviceInfo: 87d2d175c760f6bcf58acd036f887e8b2392802c
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFastImage: d4870d58f5936111c56218dbd7fcfc18e65b58ff
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
-  RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
+  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNIap: f00befe6581a5953191108cb97d9b3872473337b
   RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
   RNPermissions: 99dd8d4a30ff13509b949ca63cd1f69edc461775
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
-  RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
-  RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
+  RNReanimated: 514a11da3a2bcc6c3dfd9de32b38e2b9bf101926
+  RNScreens: bf59f17fbf001f1025243eeed5f19419d3c11ef2
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   RNTooltips: e13180e4339e2a85daabd09507f62a5a32d3dc8a
-  RNVectorIcons: bc69e6a278b14842063605de32bec61f0b251a59
+  RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   SDWebImage: 7acbb57630ac7db4a495547fb73916ff3e432f6b
   SDWebImageWebPCoder: d0dac55073088d24b2ac1b191a71a8f8d0adac21
   SexyTooltip: 5c9b4dec52bfb317938cb0488efd9da3717bb6fd

@@ -19,9 +19,11 @@ export const NoteWrapper = React.memo(({item, index}) => {
 
   const onPress = async () => {
     let _note = db.notes.note(item.id).data;
-    if (history.selectedItemsList.length > 0 ) {
+    if (history.selectedItemsList.length > 0 && history.selectionMode) {
       dispatch({type: Actions.SELECTED_ITEMS, item: _note});
       return;
+    } else {
+      history.selectedItemsList = [];
     }
 
     if (_note.conflicted) {
