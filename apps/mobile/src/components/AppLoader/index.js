@@ -37,7 +37,8 @@ const AppLoader = ({onLoad}) => {
     let appState = await MMKV.getItem('appState');
     if (appState) {
       appState = JSON.parse(appState);
-      if (!appState.movedAway && Date.now() < appState.timestamp + 3600000) {
+      if (appState.note && !appState.movedAway && Date.now() < appState.timestamp + 3600000) {
+
         editing.isRestoringState = true;
         //setNoteOnly(appState.note);
         editing.currentlyEditing = true;
