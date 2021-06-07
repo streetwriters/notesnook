@@ -11,14 +11,14 @@ export default class Vault {
     this._db = db;
     this._context = db.context;
     this._key = "Notesnook";
-    this._password = "";
+    this._password = null;
     this.ERRORS = {
       noVault: "ERR_NO_VAULT",
       vaultLocked: "ERR_VAULT_LOCKED",
       wrongPassword: "ERR_WRONG_PASSWORD",
     };
     EV.subscribe(EVENTS.userLoggedOut, () => {
-      this._password = "";
+      this._password = null;
     });
   }
 
@@ -38,7 +38,7 @@ export default class Vault {
       );
       await this._context.write("vaultKey", encryptedData);
       this._password = password;
-      this._startEraser();
+      // this._startEraser();
     }
     return true;
   }
@@ -62,7 +62,7 @@ export default class Vault {
       throw new Error(this.ERRORS.wrongPassword);
     }
     this._password = password;
-    this._startEraser();
+    // this._startEraser();
     return true;
   }
 
@@ -82,7 +82,7 @@ export default class Vault {
 
   _startEraser() {
     setTimeout(() => {
-      this._password = "";
+      this._password = null;
     }, ERASE_TIME);
   }
 
