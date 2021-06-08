@@ -42,7 +42,10 @@ const AppLoader = ({onLoad}) => {
         editing.isRestoringState = true;
         //setNoteOnly(appState.note);
         editing.currentlyEditing = true;
-        tabBarRef.current?.goToPage(1);
+        if (!DDS.isTab) {
+          tabBarRef.current?.goToPage(1);
+        }
+
         eSendEvent('loadingNote', appState.note);
       }
     }

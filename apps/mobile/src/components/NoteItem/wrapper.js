@@ -44,7 +44,7 @@ export const NoteWrapper = React.memo(({item, index}) => {
     } else {
       eSendEvent(eOnLoadNote, _note);
     }
-    if (DDS.isPhone || DDS.isSmallTab) {
+    if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1);
     }
   };

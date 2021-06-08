@@ -573,7 +573,9 @@ async function restoreEditorState() {
       editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
-      tabBarRef.current?.goToPage(1);
+      if (!DDS.isTab) {
+       tabBarRef.current?.goToPage(1);
+      }
       setTimeout(() => {
         eSendEvent(eOnLoadNote, appState.note);
       }, 100);

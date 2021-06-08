@@ -84,7 +84,7 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-    if (!DDS.isLargeTablet()) {
+    if (!DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {

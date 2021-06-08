@@ -168,7 +168,7 @@ export const Notes = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     setActionAfterFirstSave();
-    if (DDS.isPhone || DDS.isSmallTab) {
+    if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
