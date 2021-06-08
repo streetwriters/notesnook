@@ -9,7 +9,7 @@ import {RootView} from './initializer.root';
 import AppLoader from './src/components/AppLoader';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
-import {initialize, useNoteStore, useSettingStore} from './src/provider/stores';
+import {initialize, useMessageStore, useNoteStore, useSettingStore} from './src/provider/stores';
 import BiometricService from './src/services/BiometricService';
 import {DDS} from './src/services/DeviceDetection';
 import {
@@ -28,6 +28,8 @@ const App = () => {
   const [, dispatch] = useTracked();
   const setDeviceMode = useSettingStore(state => state.setDeviceMode);
   useEffect(() => {
+
+    useMessageStore.getState().setAnnouncement();
     (async () => {
       try {
         Orientation.getOrientation((e, r) => {

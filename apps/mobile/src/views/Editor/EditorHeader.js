@@ -36,6 +36,7 @@ import { toolbarRef } from './tiny/toolbar/constants';
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
+  const deviceMode = useSettingStore(state => state.deviceMode)
 
   const fullscreen = useSettingStore(state => state.fullscreen);
   const insets = useSafeAreaInsets();
@@ -43,6 +44,10 @@ const EditorHeader = () => {
   useEffect(() => {
     setColors(colors);
   }, [colors.bg]);
+
+  const isLargeTablet = () => {
+    return deviceMode === "tablet"
+  }
 
   const _onBackPress = async () => {
     eSendEvent('showTooltip');
@@ -53,12 +58,12 @@ const EditorHeader = () => {
     });
     editing.isFocused = false;
     editing.currentlyEditing = false;
-    if (DDS.isLargeTablet()) {
+    if (deviceMode !== "mobile") {
       if (fullscreen) {
         eSendEvent(eCloseFullscreenEditor);
       }
     } else {
-      if (DDS.isPhone || DDS.isSmallTab) {
+      if (deviceMode === "mobile") {
         tabBarRef.current?.goToPage(0);
       }
       eSendEvent('historyEvent', {
@@ -99,7 +104,7 @@ const EditorHeader = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          {DDS.isLargeTablet() && !fullscreen ? null : (
+          {deviceMode !== "mobile" && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
                 await _onBackPress();
@@ -118,7 +123,7 @@ const EditorHeader = () => {
             />
           )}
           {fullscreen && <View style={{width: 20}} />}
-          {DDS.isLargeTablet() && <EditorTitle />}
+          {deviceMode !== "mobile" && <EditorTitle />}
         </View>
         <View
           style={{
@@ -138,7 +143,7 @@ const EditorHeader = () => {
               }}
             />
 
-            {DDS.isLargeTablet() && !fullscreen ? (
+            {deviceMode !== "mobile" && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}

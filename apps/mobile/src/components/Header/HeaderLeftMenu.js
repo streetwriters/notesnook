@@ -23,7 +23,7 @@ export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
 
   return (
     <>
-      {deviceMode === 'mobile' ||
+      {deviceMode !== "tablet"  ||
       currentScreen === 'Search' ||
       !headerMenuState ? (
         <ActionIcon

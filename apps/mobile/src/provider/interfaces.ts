@@ -137,6 +137,9 @@ export type Message = {
 export interface MessageStore extends State {
     message: Message
     setMessage: (message: Message) => void
+    announcement:any,
+    setAnnouncement:() => Promise<void>
+    remove:() => void
 }
 
 

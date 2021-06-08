@@ -47,6 +47,8 @@ const style = {
   backgroundColor: 'transparent',
 };
 
+const CustomView = Platform.OS === 'ios' ? ScrollView : View;
+
 const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
@@ -87,7 +89,6 @@ const Editor = React.memo(
       };
     }, []);
 
-    const CustomView = Platform.OS === 'ios' ? ScrollView : View;
 
     return resetting ? null : (
       <>
@@ -112,7 +113,6 @@ const Editor = React.memo(
           showsVerticalScrollIndicator={false}
           scrollEnabled={false}
           nestedScrollEnabled
-          
           contentContainerStyle={{
             width: '100%',
             height: '100%',

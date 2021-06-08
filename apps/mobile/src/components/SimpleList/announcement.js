@@ -1,7 +1,7 @@
 import React from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
-import { useSelectionStore } from '../../provider/stores';
+import { useMessageStore, useSelectionStore } from '../../provider/stores';
 import { eSendEvent } from '../../services/EventManager';
 import { eOpenPremiumDialog } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -11,9 +11,11 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Announcement = ({announcement,remove}) => {
+export const Announcement = () => {
   const [state] = useTracked();
   const colors = state.colors;
+  const announcement = useMessageStore().announcement;
+  const remove = useMessageStore().remove;
   
   const selectionMode = useSelectionStore(state => state.selectionMode);
 

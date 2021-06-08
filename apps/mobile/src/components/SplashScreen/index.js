@@ -27,7 +27,7 @@ import {openLinkInBrowser} from '../../utils/functions';
 import {Modal} from 'react-native';
 import {SafeAreaView} from 'react-native';
 import {SvgToPngView} from '../ListPlaceholders';
-import { MMKV } from '../../utils/mmkv';
+import {MMKV} from '../../utils/mmkv';
 
 const features = [
   {
@@ -42,7 +42,7 @@ const features = [
       'Your data is encrypted on your device. No one but you can read your notes.',
     icon: PRIVACY_SVG,
     link: 'https://notesnook.com',
-    img:"privacy"
+    img: 'privacy',
   },
   {
     icon: SYNC_SVG,
@@ -50,7 +50,7 @@ const features = [
     description:
       'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
     link: 'https://notesnook.com',
-    img:'sync'
+    img: 'sync',
   },
   {
     icon: ORGANIZE_SVG,
@@ -58,7 +58,7 @@ const features = [
     description:
       'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
     link: 'https://notesnook.com',
-    img:"sync"
+    img: 'sync',
   },
   {
     icon: COMMUNITY_SVG,
@@ -66,7 +66,7 @@ const features = [
     description:
       'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
     link: 'https://discord.gg/zQBK97EE22',
-    img:'community'
+    img: 'community',
   },
 ];
 let currentIndex = 0;
@@ -82,7 +82,7 @@ const SplashScreen = () => {
   const translateY2 = useValue(0);
 
   useEffect(() => {
-    MMKV.getStringAsync('introCompleted').then(async (r) => {
+    MMKV.getStringAsync('introCompleted').then(async r => {
       setTimeout(() => {
         if (!r) {
           setVisible(true);
@@ -97,11 +97,11 @@ const SplashScreen = () => {
             easing: Easing.in(Easing.ease),
           }).start();
         }
-      },1);
+      }, 1);
     });
   }, []);
 
-   const hide = async () => {
+  const hide = async () => {
     timing(translateY2, {
       toValue: dHeight * 2,
       duration: 500,
@@ -249,18 +249,14 @@ const SplashScreen = () => {
 
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
                 width: '100%',
                 position: 'absolute',
                 bottom: 25,
               }}>
-              <View />
-
               <Button
                 fontSize={SIZE.md}
                 height={50}
-                width={isNext ? null : '100%'}
+                width={isNext ? null : DDS.isTab ? 250 : '100%'}
                 onPress={async () => {
                   if (isNext) {
                     carouselRef.current?.snapToItem(
@@ -277,7 +273,10 @@ const SplashScreen = () => {
                     await Storage.write('introCompleted', 'true');
                   }
                 }}
-                style={{paddingHorizontal: 24}}
+                style={{
+                  paddingHorizontal: 24,
+                  alignSelf: !isNext ? 'center' : 'flex-end',
+                }}
                 type="accent"
                 title={isNext ? 'Next' : 'Start taking notes'}
               />

@@ -7,7 +7,7 @@ import Editor from '.';
 import { GetPremium } from '../../components/ActionSheetComponent/GetPremium';
 import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
-import { useNoteStore } from '../../provider/stores';
+import { useNoteStore, useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import { eOnLoadNote } from '../../utils/Events';
@@ -89,10 +89,10 @@ const AnimatedKeyboardView = Animated.createAnimatedComponent(
   KeyboardAvoidingView,
 );
 
-export const EditorWrapper = ({dimensions}) => {
+export const EditorWrapper = ({width,dimensions}) => {
   const [state] = useTracked();
   const {colors} = state;
-  
+  const deviceMode = useSettingStore(state => state.deviceMode)
   const loading = useNoteStore(state => state.loading);
 
   const insets = useSafeAreaInsets();
@@ -102,11 +102,11 @@ export const EditorWrapper = ({dimensions}) => {
     <View
       ref={editorRef}
       style={{
-        width: DDS.isLargeTablet() ? dimensions.width * 0.55 : dimensions.width,
+        width: width[deviceMode].c,
         height: '100%',
         backgroundColor: colors.bg,
         borderLeftWidth: 1,
-        borderLeftColor: DDS.isLargeTablet() ? colors.nav : 'transparent',
+        borderLeftColor: DDS.isTab ? colors.nav : 'transparent',
       }}>
       <SafeAreaView
         style={{

@@ -1,9 +1,12 @@
+import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
 import create, { State } from 'zustand';
 import { eSendEvent } from '../services/EventManager';
-import { history, SORT, sortSettings } from '../utils';
+import PremiumService from '../services/PremiumService';
+import { history, SORT, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/DB';
 import { eOpenSideMenu } from '../utils/Events';
+import { MMKV } from '../utils/mmkv';
 import {
   MenuStore,
   MessageStore,
@@ -237,6 +240,28 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     icon: 'account-outline',
   },
   setMessage: message => set({ message: { ...message } }),
+  announcement:null,
+  remove:async () => {
+    await MMKV.setStringAsync('removedAnnouncement', get().announcement.id);
+    set({announcement:null})
+  },
+  setAnnouncement:async function () {
+    try {
+      let announcement = await db.announcement()
+      if (
+        !announcement ||
+        (await MMKV.getStringAsync('removedAnnouncement')) ===
+        announcement.id ||
+        !shouldShowAnnouncement(announcement)
+      ) {
+        announcement = null;
+        return;
+      }
+      set({announcement:announcement})
+    } catch (e) {
+      set({announcement:null})
+    }
+  }
 }));
 
 export function initialize() {
@@ -255,5 +280,48 @@ export function clearAllStores() {
   useTagStore.getState().clearTags();
   useFavoriteStore.getState().clearFavorites();
   useNoteStore.getState().clearNotes();
+}
+
+const allowedPlatforms = ['all', 'mobile', Platform.OS];
+function shouldShowAnnouncement(announcement) {
+  let show = allowedPlatforms.indexOf(announcement.platform) > -1;
+  console.log(show);
+  if (!show) return;
+
+  const subStatus = PremiumService.getUser()?.subscription?.type;
+
+  switch (announcement.userType) {
+    case 'pro':
+      show = PremiumService.get()
+      break;
+    case 'trial':
+      show = subStatus === SUBSCRIPTION_STATUS.TRIAL;
+      break;
+    case 'trialExpired':
+      show = subStatus === SUBSCRIPTION_STATUS.BASIC;
+      break;
+    case 'loggedOut':
+      show = !PremiumService.getUser();
+      break;
+    case 'verified':
+      show = PremiumService.getUser()?.isEmailVerified;
+      break;
+    case 'loggedIn':
+      show = !!PremiumService.getUser();
+      break;
+    case 'unverified':
+      show = !PremiumService.getUser()?.isEmailVerified;
+      break;
+    case 'proExpired':
+      show =
+        subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
+        subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+      break;
+    case 'any':
+    default:
+      break;
+  }
+
+  return show;
 }
 

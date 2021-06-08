@@ -43,7 +43,7 @@ let currentTab = 0;
 const onChangeTab = async obj => {
   console.log(obj.i);
   if (obj.i === 1) {
-    console.log('going to editor')
+    console.log('going to editor');
     console.log('making note');
     eSendEvent(eCloseSideMenu);
     editing.movedAway = false;
@@ -71,7 +71,9 @@ const onChangeTab = async obj => {
       }
       eSendEvent('showTooltip');
       editing.movedAway = true;
-      tiny.call(EditorWebView, tiny.blur);
+      if (editing.currentlyEditing) {
+        tiny.call(EditorWebView, tiny.blur);
+      }
     }
     editing.isFocused = false;
     currentTab = 0;
@@ -101,9 +103,10 @@ const NativeStack = React.memo(
 
     const deviceMode = useSettingStore(state => state.deviceMode);
     const setFullscreen = useSettingStore(state => state.setFullscreen);
+    const fullscreen = useSettingStore(state => state.fullscreen);
     const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
-
-    const [dimensions, setDimensions] = useState({width, height});
+    const dimensions = useSettingStore(state => state.dimensions);
+    const setDimensions = useSettingStore(state => state.setDimensions);
     const animatedOpacity = useValue(0);
     const animatedTranslateY = useValue(-9999);
     const overlayRef = useRef();
@@ -112,10 +115,12 @@ const NativeStack = React.memo(
       setFullscreen(true);
       editorRef.current?.setNativeProps({
         style: {
-          position: 'absolute',
           width: dimensions.width,
           zIndex: 999,
-          paddingHorizontal: dimensions.width * 0.15,
+          paddingHorizontal:
+            deviceMode === 'smallTablet'
+              ? dimensions.width * 0
+              : dimensions.width * 0.15,
           backgroundColor: colors.bg,
         },
       });
@@ -125,8 +130,10 @@ const NativeStack = React.memo(
       setFullscreen(false);
       editorRef.current?.setNativeProps({
         style: {
-          position: 'relative',
-          width: dimensions.width * 0.55,
+          width:
+            deviceMode === 'smallTablet'
+              ? dimensions.width * 0.6
+              : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0,
         },
@@ -142,7 +149,7 @@ const NativeStack = React.memo(
         eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
         eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
       };
-    }, []);
+    }, [deviceMode]);
 
     const _onLayout = async event => {
       if (layoutTimer) {
@@ -154,8 +161,7 @@ const NativeStack = React.memo(
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
-        //console.log(deviceMode, 'MODE__');
-        setDeviceMode(current, size);
+        setDeviceMode(deviceMode, size);
         return;
       }
 
@@ -192,25 +198,44 @@ const NativeStack = React.memo(
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setDeviceModeState(current);
-      setFullscreen(false);
-
-      editorRef.current?.setNativeProps({
-        style: {
-          position: 'relative',
-          width: current === 'tablet' ? size.width * 0.55 : size.width,
-          zIndex: null,
-          paddingHorizontal: 0,
-        },
-      });
-      if (current === 'tablet') {
-        tabBarRef.current?.goToIndex(0);
+      if (fullscreen) {
+        editorRef.current?.setNativeProps({
+          style: {
+            width: size.width,
+            zIndex: 999,
+            paddingHorizontal:
+              current === 'smallTablet' ? size.width * 0 : size.width * 0.15,
+            backgroundColor: colors.bg,
+          },
+        });
       } else {
-        if (!editing.movedAway) {
-          tabBarRef.current?.goToIndex(2);
-        } else {
-          tabBarRef.current?.goToIndex(current === 'smallTablet' ? 0 : 1);
-        }
+        editorRef.current?.setNativeProps({
+          style: {
+            position: 'relative',
+            width:
+              current === 'tablet'
+                ? size.width * 0.55
+                : current === 'smallTablet'
+                ? size.width * 0.6
+                : size.width,
+            zIndex: null,
+            paddingHorizontal: 0,
+          },
+        });
       }
+
+      console.log('resetting tabs');
+      setTimeout(() => {
+        if (current === 'tablet') {
+          tabBarRef.current?.goToIndex(0);
+        } else {
+          if (!editing.movedAway) {
+            tabBarRef.current?.goToIndex(2);
+          } else {
+            tabBarRef.current?.goToIndex(1);
+          }
+        }
+      }, 1);
     }
 
     const onScroll = scrollOffset => {
@@ -226,7 +251,7 @@ const NativeStack = React.memo(
           op = 1 - o;
         }
         animatedOpacity.setValue(op);
-        toggleView(op < 0.05 ? false : true); 
+        toggleView(op < 0.05 ? false : true);
       }
     };
 
@@ -242,14 +267,32 @@ const NativeStack = React.memo(
         c: dimensions.width * 2 + dimensions.width * 0.75,
       },
       smallTablet: {
-        a: dimensions.width,
-        b: dimensions.width,
-        c: dimensions.width * 2,
+        a: fullscreen ? 0 : dimensions.width * 0.2,
+        b: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
+        c: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
       },
       tablet: {
-        a: dimensions.width,
+        a: 0,
+        b: 0,
+        c: 0,
+      },
+    };
+
+    const widths = {
+      mobile: {
+        a: dimensions.width * 0.75,
         b: dimensions.width,
         c: dimensions.width,
+      },
+      smallTablet: {
+        a: dimensions.width * 0.2,
+        b: dimensions.width * 0.4,
+        c: dimensions.width * 0.6,
+      },
+      tablet: {
+        a: dimensions.width * 0.15,
+        b: dimensions.width * 0.3,
+        c: dimensions.width * 0.55,
       },
     };
 
@@ -278,24 +321,14 @@ const NativeStack = React.memo(
               <View
                 style={{
                   height: '100%',
-                  width:
-                    deviceMode === 'smallTablet'
-                      ? dimensions.width * 0.35
-                      : deviceMode === 'smallTablet'
-                      ? dimensions.width * 0.15
-                      : dimensions.width * 0.75,
+                  width: fullscreen ? 0 : widths[deviceMode].a,
                 }}>
                 <Menu />
               </View>,
               <View
                 style={{
                   height: '100%',
-                  width:
-                    deviceMode === 'mobile'
-                      ? dimensions.width
-                      : deviceMode === 'tablet'
-                      ? dimensions.width * 0.3
-                      : dimensions.width * 0.65,
+                  width: fullscreen ? 0 : widths[deviceMode].b,
                 }}>
                 {deviceMode === 'mobile' && (
                   <Animated.View
@@ -312,14 +345,13 @@ const NativeStack = React.memo(
                         },
                       ],
                     }}
-                    ref={overlayRef}>
-                   
-                  </Animated.View>
+                    ref={overlayRef}
+                  />
                 )}
 
                 <NavigatorStack />
               </View>,
-              <EditorWrapper dimensions={dimensions} />,
+              <EditorWrapper width={widths} dimensions={dimensions} />,
             ]}
             onScroll={onScroll}
             onChangeTab={onChangeTab}

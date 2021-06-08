@@ -10,6 +10,7 @@ import {editing, getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import RNTooltips from 'react-native-tooltips';
+import { useSettingStore } from '../../provider/stores';
 
 const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({
@@ -19,6 +20,7 @@ export const ContainerBottomButton = ({
   shouldShow = false,
 }) => {
   const insets = useSafeAreaInsets();
+  const deviceMode = useSettingStore(state => state.deviceMode)
 
   function animate(translate) {
     Animated.timing(translateY, {
@@ -51,7 +53,7 @@ export const ContainerBottomButton = ({
     };
   }, []);
 
-  return DDS.isLargeTablet() && !shouldShow ? null : (
+  return deviceMode !== "mobile" && !shouldShow ? null : (
     <Animated.View
       style={{
         position: 'absolute',

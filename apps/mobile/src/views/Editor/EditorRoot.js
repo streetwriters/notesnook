@@ -22,6 +22,8 @@ import {
   clearEditor,
   clearTimer,
 
+  EditorWebView,
+
   isNotedEdited,
   loadNote
 } from './Functions';

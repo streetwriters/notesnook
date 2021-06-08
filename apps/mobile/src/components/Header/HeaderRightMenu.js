@@ -1,18 +1,19 @@
 import React from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {useSettingStore, useUserStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import Navigation from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
 
-export const HeaderRightMenu = ({currentScreen,action}) => {
+export const HeaderRightMenu = ({currentScreen, action}) => {
   const [state] = useTracked();
   const {colors} = state;
   const syncing = useUserStore(state => state.syncing);
+  const deviceMode = useSettingStore(state => state.deviceMode);
 
   return (
     <View style={styles.rightBtnContainer}>
@@ -33,7 +34,7 @@ export const HeaderRightMenu = ({currentScreen,action}) => {
         />
       )}
 
-      {DDS.isLargeTablet() ? (
+      {deviceMode !== "mobile"  ? (
         <Button
           onPress={action}
           testID={notesnook.ids.default.addBtn}

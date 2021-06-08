@@ -8,9 +8,10 @@ import { getElevation } from '../../utils';
 import { SIZE } from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({color, announcement}) => {;
+export const Card = ({color}) => {;
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
+  const announcement = useMessageStore().announcement;
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity

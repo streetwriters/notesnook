@@ -1,21 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, RefreshControl} from 'react-native';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { eScrollEvent } from '../../utils/Events';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {eScrollEvent} from '../../utils/Events';
 import useAnnouncement from '../../utils/useAnnouncement';
 import JumpToDialog from '../JumpToDialog';
-import { NotebookWrapper } from '../NotebookItem/wrapper';
-import { NoteWrapper } from '../NoteItem/wrapper';
+import {NotebookWrapper} from '../NotebookItem/wrapper';
+import {NoteWrapper} from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import { Announcement } from './announcement';
-import { Empty } from './empty';
-import { Footer } from './footer';
-import { Header } from './header';
-import { SectionHeader } from './section-header';
+import {Announcement} from './announcement';
+import {Empty} from './empty';
+import {Footer} from './footer';
+import {Header} from './header';
+import {SectionHeader} from './section-header';
 
 const heights = {
   note: 100,
@@ -62,7 +62,6 @@ const SimpleList = ({
 
   const [dataProvider, setDataProvider] = useState([]);
   const scrollRef = useRef();
-  const [announcement, remove] = useAnnouncement();
   const [_loading, _setLoading] = useState(true);
   const RenderItem = renderItems[type];
   const refreshing = false;
@@ -172,25 +171,14 @@ const SimpleList = ({
         }
         ListFooterComponent={<Footer />}
         ListHeaderComponent={
-          announcement ? (
-            <Announcement
-              announcement={announcement}
-              remove={remove}
-              color={
-                COLORS_NOTE[headerProps.heading?.toLowerCase()] || colors.accent
-              }
-            />
-          ) : (
-            <Header
-              title={headerProps.heading}
-              paragraph={headerProps.paragraph}
-              onPress={headerProps.onPress}
-              icon={headerProps.icon}
-              type={type}
-              announcement={announcement}
-              screen={screen}
-            />
-          )
+          <Header
+            title={headerProps.heading}
+            paragraph={headerProps.paragraph}
+            onPress={headerProps.onPress}
+            icon={headerProps.icon}
+            type={type}
+            screen={screen}
+          />
         }
       />
 
