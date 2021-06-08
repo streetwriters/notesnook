@@ -3,7 +3,7 @@ import {
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
 import React, {useEffect, useRef, useState} from 'react';
-import {Dimensions, View} from 'react-native';
+import {Dimensions, TouchableOpacity, View} from 'react-native';
 import Animated, {useValue} from 'react-native-reanimated';
 import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
@@ -43,6 +43,7 @@ let currentTab = 0;
 const onChangeTab = async obj => {
   console.log(obj.i);
   if (obj.i === 1) {
+    console.log('going to editor')
     console.log('making note');
     eSendEvent(eCloseSideMenu);
     editing.movedAway = false;
@@ -101,9 +102,10 @@ const NativeStack = React.memo(
     const deviceMode = useSettingStore(state => state.deviceMode);
     const setFullscreen = useSettingStore(state => state.setFullscreen);
     const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
-    
+
     const [dimensions, setDimensions] = useState({width, height});
     const animatedOpacity = useValue(0);
+    const animatedTranslateY = useValue(-9999);
     const overlayRef = useRef();
 
     const showFullScreenEditor = () => {
@@ -153,7 +155,7 @@ const NativeStack = React.memo(
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
         //console.log(deviceMode, 'MODE__');
-        setDeviceModeState(deviceMode);
+        setDeviceMode(current, size);
         return;
       }
 
@@ -174,25 +176,15 @@ const NativeStack = React.memo(
       if (DDS.isLargeTablet()) {
         //console.log('setting large tab');
         setDeviceMode('tablet', size);
-        tabBarRef.current?.goToIndex(0);
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else if (DDS.isSmallTab) {
         //console.log('setting small tab');
         setDeviceMode('smallTablet', size);
-        if (!editing.movedAway) {
-          tabBarRef.current?.goToIndex(2);
-        } else {
-          tabBarRef.current?.goToIndex(0);
-        }
 
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else {
         setDeviceMode('mobile', size);
-        if (!editing.movedAway) {
-          tabBarRef.current?.goToIndex(2);
-        } else {
-          tabBarRef.current?.goToIndex(1);
-        }
+
         sleep(300).then(r => eSendEvent(eOpenSideMenu));
       }
     }
@@ -210,6 +202,15 @@ const NativeStack = React.memo(
           paddingHorizontal: 0,
         },
       });
+      if (current === 'tablet') {
+        tabBarRef.current?.goToIndex(0);
+      } else {
+        if (!editing.movedAway) {
+          tabBarRef.current?.goToIndex(2);
+        } else {
+          tabBarRef.current?.goToIndex(current === 'smallTablet' ? 0 : 1);
+        }
+      }
     }
 
     const onScroll = scrollOffset => {
@@ -225,17 +226,13 @@ const NativeStack = React.memo(
           op = 1 - o;
         }
         animatedOpacity.setValue(op);
-        toggleView(true);
+        toggleView(op < 0.05 ? false : true); 
       }
     };
 
     const toggleView = show => {
-      overlayRef.current?.setNativeProps({
-        style: {
-          display: show ? 'flex' : 'none',
-          zIndex: show ? 999 : -10,
-        },
-      });
+      //console.log('toggling overlay view',show);
+      animatedTranslateY.setValue(show ? 0 : -9999);
     };
 
     const offsets = {
@@ -275,6 +272,7 @@ const NativeStack = React.memo(
             initialIndex={
               deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1
             }
+            toggleOverlay={toggleView}
             offsets={offsets[deviceMode]}
             items={[
               <View
@@ -300,27 +298,23 @@ const NativeStack = React.memo(
                       : dimensions.width * 0.65,
                 }}>
                 {deviceMode === 'mobile' && (
-                  <View
+                  <Animated.View
                     style={{
                       position: 'absolute',
                       width: '100%',
                       height: '100%',
-                      display: 'none',
-                      zIndex: -10,
+                      zIndex: 999,
+                      backgroundColor: 'rgba(0,0,0,0.2)',
+                      opacity: animatedOpacity,
+                      transform: [
+                        {
+                          translateY: animatedTranslateY,
+                        },
+                      ],
                     }}
                     ref={overlayRef}>
-                    <Animated.View
-                      onTouchEnd={() => {
-                        tabBarRef.current?.goToIndex(1);
-                      }}
-                      style={{
-                        backgroundColor: 'rgba(0,0,0,0.2)',
-                        opacity: animatedOpacity,
-                        width: '100%',
-                        height: '100%',
-                      }}
-                    />
-                  </View>
+                   
+                  </Animated.View>
                 )}
 
                 <NavigatorStack />
