@@ -6,7 +6,7 @@ export default class CachedCollection extends IndexedCollection {
   constructor(context, type) {
     super(context, type);
     this.type = type;
-    this.map;
+    this.map = new Map();
   }
 
   async init() {
@@ -44,7 +44,6 @@ export default class CachedCollection extends IndexedCollection {
   }
 
   getRaw() {
-    if (!this.map) return [];
     return Array.from(this.map.values());
   }
 
