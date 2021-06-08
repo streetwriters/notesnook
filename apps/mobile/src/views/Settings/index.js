@@ -226,6 +226,15 @@ export const Settings = ({navigation}) => {
       desc: 'We are not ghosts, chat with us and share your experience.',
     },
     {
+      name: 'Download on desktop',
+      func: async () => {
+        try {
+          await openLinkInBrowser('https://notesnook.com', colors);
+        } catch (e) {}
+      },
+      desc: 'Notesnook app can be downloaded on all platforms',
+    },
+    {
       name: 'Documentation',
       func: async () => {
         try {
