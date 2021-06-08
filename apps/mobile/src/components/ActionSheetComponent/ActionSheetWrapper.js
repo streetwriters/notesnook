@@ -72,6 +72,7 @@ const ActionSheetWrapper = ({
     <ActionSheet
       ref={fwdRef}
       hideUnderlay={true}
+      
       containerStyle={style}
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
@@ -96,7 +97,7 @@ const ActionSheetWrapper = ({
       }
       onClose={_onClose}>
       {children}
-      <View style={{height:Platform.OS === "ios" ? insets.bottom/2 : 0}}/>
+      <View style={{height:Platform.OS === "ios" ? insets.bottom/2 : 20}}/>
     </ActionSheet>
   );
 };

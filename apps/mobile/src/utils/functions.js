@@ -1,18 +1,18 @@
-import {Linking} from 'react-native';
-import {InAppBrowser} from 'react-native-inappbrowser-reborn';
-import {history} from '.';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
-import {eSendEvent, ToastEvent} from '../services/EventManager';
+import { Linking } from 'react-native';
+import { InAppBrowser } from 'react-native-inappbrowser-reborn';
+import { history } from '.';
+import { useMenuStore, useSelectionStore } from '../provider/stores';
+import { eSendEvent, ToastEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import {db} from './DB';
-import {eClearEditor} from './Events';
+import { db } from './DB';
+import { eClearEditor } from './Events';
 
 export const deleteItems = async (item) => {
   if (item && item.id && history.selectedItemsList.length === 0) {
     history.selectedItemsList = [];
     history.selectedItemsList.push(item);
   }
+
 
   let notes = history.selectedItemsList.filter((i) => i.type === 'note');
   let notebooks = history.selectedItemsList.filter(
@@ -22,6 +22,7 @@ export const deleteItems = async (item) => {
 
   if (notes?.length > 0) {
     let ids = notes.map((i) => i.id);
+    console.log(ids);
     await db.notes.delete(...ids);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
@@ -38,7 +39,7 @@ export const deleteItems = async (item) => {
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notebook,
     ]);
-    updateEvent({type: Actions.MENU_PINS});
+    useMenuStore.getState().setMenuPins();
     ToastEvent.show({
       heading: 'Topics deleted',
       type: 'success',
@@ -52,7 +53,7 @@ export const deleteItems = async (item) => {
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notes,
     ]);
-    updateEvent({type: Actions.MENU_PINS});
+    useMenuStore.getState().setMenuPins();
   }
 
   let msgPart = history.selectedItemsList.length === 1 ? ' item' : ' items';
@@ -80,17 +81,17 @@ export const deleteItems = async (item) => {
           Navigation.routeNames.Notebook,
           Navigation.routeNames.Trash,
         ]);
-        updateEvent({type: Actions.COLORS});
-        updateEvent({type: Actions.MENU_PINS});
+        useMenuStore.getState().setMenuPins();
+        useMenuStore.getState().setColorNotes();
         ToastEvent.hide();
       },
       actionText: 'Undo',
     });
   }
+  history.selectedItemsList = [];
   Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
-  updateEvent({type: Actions.CLEAR_SELECTION});
-  updateEvent({type: Actions.COLORS});
-  updateEvent({type: Actions.SELECTION_MODE, enabled: false});
+  useSelectionStore.getState().clearSelection();
+  useMenuStore.getState().setColorNotes();
 };
 
 

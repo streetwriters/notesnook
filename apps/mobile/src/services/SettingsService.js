@@ -8,8 +8,23 @@ import {scale, updateSize} from '../utils/SizeUtils';
 import {enabled} from 'react-native-privacy-snapshot';
 import {Platform} from 'react-native';
 import Navigation from './Navigation';
+import { useSettingStore } from '../provider/stores';
 
-let settings = defaultState.settings;
+let settings = {
+  showToolbarOnTop: false,
+  showKeyboardOnOpen: false,
+  fontScale: 1,
+  forcePortraitOnTablet: false,
+  useSystemTheme: false,
+  reminder: 'off',
+  encryptedBackup: false,
+  homepage: 'Notes',
+  sort: 'default',
+  sortOrder: 'desc',
+  screenshotMode: true,
+  privacyScreen: false,
+  appLockMode: 'none', //none or // background // launch
+};
 
 let appLoaded = false;
 
@@ -25,7 +40,21 @@ async function init() {
   scale.fontScale = 1;
   settings = await MMKV.getItem('appSettings');
   if (!settings) {
-    settings = defaultState.settings;
+    settings = {
+      showToolbarOnTop: false,
+      showKeyboardOnOpen: false,
+      fontScale: 1,
+      forcePortraitOnTablet: false,
+      useSystemTheme: false,
+      reminder: 'off',
+      encryptedBackup: false,
+      homepage: 'Notes',
+      sort: 'default',
+      sortOrder: 'desc',
+      screenshotMode: true,
+      privacyScreen: false,
+      appLockMode: 'none', //none or // background // launch
+    }
     await MMKV.setItem('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
@@ -64,7 +93,7 @@ async function init() {
   sortSettings.sort = settings.sort;
   sortSettings.sortOrder = settings.sortOrder;
   updateSize();
-  updateEvent({type: Actions.SETTINGS, settings: {...settings}});
+  useSettingStore.getState().setSettings({...settings});
   setTheme();
   return;
 }
@@ -81,7 +110,7 @@ async function set(name, value) {
   settings[name] = value;
   settings = {...settings};
   await MMKV.setItem('appSettings', JSON.stringify(settings));
-  updateEvent({type: Actions.SETTINGS, settings: settings});
+  useSettingStore.getState().setSettings({...settings});
 }
 
 function get() {

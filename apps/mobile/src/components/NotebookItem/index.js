@@ -1,13 +1,13 @@
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
 import Navigation from '../../services/Navigation';
-import {getTotalNotes, history} from '../../utils';
-import {pv, SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import { getTotalNotes, history } from '../../utils';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -94,7 +94,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                   paddingVertical: 2,
                   marginRight: 5,
                   marginVertical: 2.5,
-                  maxWidth: 70,
+                  maxWidth: 100,
                 }}>
                 <Paragraph
                   size={SIZE.xs}
@@ -117,6 +117,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 2.5,
+            minHeight:SIZE.md + 2
           }}>
           {isTrash ? (
             <>

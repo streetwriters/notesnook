@@ -1,28 +1,25 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTagStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
+import { InteractionManager } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const tags = state.tags;
-
+  const tags = useTagStore(state => state.tags);
+  const setTags = useTagStore(state =>state.setTags);
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Tags', () => {
-        dispatch({type: Actions.TAGS});
+        setTags();
       });
     });
     eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
@@ -78,7 +75,7 @@ export const Tags = ({route, navigation}) => {
         <Header title="Tags" isBack={false} screen="Tags" />
       </ContainerTopSection>
       <SimpleList
-        listData={state.tags}
+        listData={tags}
         type="tags"
         headerProps={{
           heading: 'Tags',

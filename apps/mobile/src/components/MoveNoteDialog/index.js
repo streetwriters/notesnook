@@ -5,6 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useNotebookStore, useSelectionStore } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -60,7 +61,6 @@ const MoveNoteDialog = () => {
       Navigation.routeNames.Notebook,
       Navigation.routeNames.Notebooks,
     ]);
-    //dispatch({type: Actions.CLEAR_SELECTION});
   };
 
   const update = (note) => {
@@ -78,7 +78,12 @@ export default MoveNoteDialog;
 
 const MoveNoteComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectedItemsList, notebooks} = state;
+  const {colors} = state;
+
+  const notebooks = useNotebookStore(state => state.notebooks);
+  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
+  const setNotebooks = useNotebookStore(state => state.setNotebooks);
+
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
   const [topicInputFocused, setTopicInputFocused] = useState(false);
@@ -99,7 +104,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     });
     notebookInput.current?.clear();
     notebookInput.current?.blur();
-    dispatch({type: Actions.NOTEBOOKS});
+    setNotebooks();
   };
 
   const addNewTopic = async () => {
@@ -111,7 +116,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       });
     }
     await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
-    dispatch({type: Actions.NOTEBOOKS});
+    setNotebooks();
     topicInput.current?.clear();
     topicInput.current?.blur();
     newTopicTitle = null;
@@ -132,7 +137,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           Navigation.routeNames.Notes,
         ]);
       }
-      dispatch({type: Actions.NOTEBOOKS});
+      setNotebooks();
 
       return;
     }
@@ -156,7 +161,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
         Navigation.routeNames.Notes,
       ]);
     }
-    dispatch({type: Actions.NOTEBOOKS});
+    setNotebooks();
   };
 
   useEffect(() => {

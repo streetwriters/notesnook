@@ -41,12 +41,10 @@ export const Notebook = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: Platform.OS === 'ios',
         });
       }
@@ -73,7 +71,7 @@ export const Notebook = ({route, navigation}) => {
       ranAfterInteractions = true;
       runAfterInteractions();
     }
-    Navigation.setHeaderState('Notebooks', params, {
+    Navigation.setHeaderState('Notebook', params, {
       heading: params.title,
       id: params.notebook.id,
       type: 'notebook',

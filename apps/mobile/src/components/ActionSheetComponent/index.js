@@ -11,8 +11,9 @@ import {
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import { useTracked, useTrackedNotes } from '../../provider';
 import { Actions } from '../../provider/Actions';
+import { useMenuStore, useNotebookStore, useNoteStore, useSelectionStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -55,10 +56,21 @@ export const ActionSheetComponent = ({
   getRef,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors, user, lastSynced} = state;
+  const {colors,} = state;
+
+  const setNotes = useNoteStore(state => state.setNotes);
+  const setNotebooks = useNotebookStore(state => state.setNotebooks);
+  const clearSelection = useSelectionStore(state => state.clearSelection);
+  const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
+  const setMenuPins = useMenuStore(state => state.setMenuPins);
+
+  const user = useUserStore(state => state.user);
+  const lastSynced = useUserStore(state => state.lastSynced);
+
   const [refreshing, setRefreshing] = useState(false);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [note, setNote] = useState(item);
+
   const [noteInTopic, setNoteInTopic] = useState(
     editing.actionAfterFirstSave.type === 'topic' &&
       db.notebooks
@@ -124,15 +136,17 @@ export const ActionSheetComponent = ({
     if (!toAdd || !toAdd.id) return;
 
     if (!nodispatch) {
-      dispatch({type: type});
-      if (type === 'note') {
-        Navigation.setRoutesToUpdate([
+      Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
           Navigation.routeNames.Notes,
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Tags,
+          Navigation.routeNames.Trash,
         ]);
-      }
     }
+
     setNote({...toAdd});
   };
 
@@ -142,8 +156,9 @@ export const ActionSheetComponent = ({
       icon: 'book-outline',
       func: () => {
         close();
-        dispatch({type: Actions.CLEAR_SELECTION});
-        dispatch({type: Actions.SELECTED_ITEMS, item: note});
+
+        clearSelection();
+        setSelectedItem(item);
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);
         }, 300);
@@ -345,7 +360,6 @@ export const ActionSheetComponent = ({
         } else {
           await db.notebooks.notebook(note.id).favorite();
         }
-        dispatch({type: Actions.FAVORITES});
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
@@ -381,7 +395,7 @@ export const ActionSheetComponent = ({
             }
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
-          dispatch({type: Actions.MENU_PINS});
+          setMenuPins();
         } catch (e) {}
       },
       close: false,

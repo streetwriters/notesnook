@@ -52,6 +52,9 @@ async function clear() {
 }
 
 async function encrypt(password, data) {
+  if (!password.password && !password.key) return undefined
+  if (password.password && password.password === "" && !password.key) return undefined
+
   let message = {
     type: 'plain',
     data: data,
@@ -69,6 +72,8 @@ function getAlgorithm(base64Variant) {
 }
 
 async function decrypt(password, data) {
+  if (!password.password && !password.key) return undefined
+  if (password.password && password.password === "" && !password.key) return undefined
   data.output = 'plain';
   return await Sodium.decrypt(password, data);
 }

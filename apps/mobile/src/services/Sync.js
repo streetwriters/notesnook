@@ -1,16 +1,15 @@
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
+import { initialize, useUserStore } from '../provider/stores';
 import {doInBackground} from '../utils';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
 import {eSendEvent, ToastEvent} from './EventManager';
 
 const run = async (context = 'global', forced) => {
-  updateEvent({
-    type: Actions.SYNCING,
-    syncing: true,
-  });
-
+  
+  let userstore = useUserStore.getState()
+  userstore.setSyncing(true);
   try {
     let res = await doInBackground(async () => {
       try {
@@ -41,10 +40,8 @@ const run = async (context = 'global', forced) => {
         actionText: 'Login',
       });
     } else {
-      updateEvent({
-        type: Actions.SYNCING,
-        syncing: false,
-      });
+    
+      userstore.setSyncing(false);
       ToastEvent.show({
         heading: 'Sync failed',
         message: e.message,
@@ -52,15 +49,9 @@ const run = async (context = 'global', forced) => {
       });
     }
   } finally {
-    updateEvent({
-      type: Actions.LAST_SYNC,
-      lastSync: await db.lastSynced(),
-    });
-    updateEvent({type: Actions.ALL});
-    updateEvent({
-      type: Actions.SYNCING,
-      syncing: false,
-    });
+    userstore.setLastSynced(await db.lastSynced())
+    initialize();
+    userstore.setSyncing(false);
   }
 };
 

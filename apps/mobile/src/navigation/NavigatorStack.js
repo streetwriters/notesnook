@@ -1,10 +1,8 @@
 import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
-import {Animated} from 'react-native';
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import {useTracked} from '../provider';
-import {Actions} from '../provider/Actions';
+import {useSelectionStore} from '../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -27,64 +25,18 @@ import Trash from '../views/Trash';
 
 const Stack = createNativeStackNavigator();
 
-const forFade = ({current}) => ({
-  cardStyle: {
-    opacity: current.progress,
-  },
-});
-
-const forSlide = ({current, next, inverted, layouts: {screen}}) => {
-  const progress = Animated.add(
-    current.progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 1],
-      extrapolate: 'clamp',
-    }),
-    next
-      ? next.progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 1],
-          extrapolate: 'clamp',
-        })
-      : 0,
-  );
-
-  return {
-    cardStyle: {
-      transform: [
-        {
-          translateX: Animated.multiply(
-            progress.interpolate({
-              inputRange: [0, 1, 2],
-              outputRange: [
-                screen.width, // Focused, but offscreen in the beginning
-                0, // Fully focused
-                screen.width * -0.3, // Fully unfocused
-              ],
-              extrapolate: 'clamp',
-            }),
-            inverted,
-          ),
-        },
-      ],
-    },
-  };
-};
-
 const screenOptionsForAnimation = {
-  animationEnabled: true,
-  cardStyleInterpolator: forFade,
   gestureEnabled: true,
+  stackAnimation: 'none',
 };
 
 export const NavigatorStack = React.memo(
   () => {
-    const [, dispatch] = useTracked();
-    const [render, setRender] = React.useState(false);
+    const [render, setRender] = React.useState(true);
+    const clearSelection = useSelectionStore(state => state.clearSelection);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
-        dispatch({type: Actions.SELECTION_MODE, enabled: false});
-        dispatch({type: Actions.CLEAR_SELECTION});
+        clearSelection();
       }
       eSendEvent('navigate');
     });
@@ -123,7 +75,6 @@ export const NavigatorStack = React.memo(
               initialRouteName={SettingsService.get().homepage}
               screenOptions={{
                 headerShown: false,
-                animationEnabled: false,
                 gestureEnabled: false,
                 stackAnimation: 'none',
               }}>

@@ -2,20 +2,19 @@ import {
   activateKeepAwake,
   deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
-import React, {useCallback, useEffect, useState} from 'react';
-import {Dimensions, View} from 'react-native';
-import ScrollableTabView from 'react-native-scrollable-tab-view';
+import React, {useEffect, useRef, useState} from 'react';
+import {Dimensions, TouchableOpacity, View} from 'react-native';
+import Animated, {useValue} from 'react-native-reanimated';
 import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
+import CustomTabs from './src/components/CustomTabs';
 import {DialogManager} from './src/components/DialogManager';
 import {DummyText} from './src/components/DummyText';
 import {Menu} from './src/components/Menu';
-import Splash from './src/components/SplashScreen';
 import {Toast} from './src/components/Toast';
-import {NavigationStack} from './src/navigation/Drawer';
 import {NavigatorStack} from './src/navigation/NavigatorStack';
 import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import {useSettingStore} from './src/provider/stores';
 import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
@@ -41,15 +40,21 @@ let {width, height} = Dimensions.get('window');
 let layoutTimer = null;
 let currentTab = 0;
 
-const onChangeTab = async (obj) => {
+const onChangeTab = async obj => {
+  console.log(obj.i);
   if (obj.i === 1) {
+    console.log('going to editor');
+    console.log('making note');
     eSendEvent(eCloseSideMenu);
     editing.movedAway = false;
     currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
-    if (!editing.isRestoringState && (!editing.currentlyEditing || !getNote())) {
+    if (
+      !editing.isRestoringState &&
+      (!editing.currentlyEditing || !getNote())
+    ) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }
@@ -66,7 +71,9 @@ const onChangeTab = async (obj) => {
       }
       eSendEvent('showTooltip');
       editing.movedAway = true;
-      tiny.call(EditorWebView, tiny.blur);
+      if (editing.currentlyEditing) {
+        tiny.call(EditorWebView, tiny.blur);
+      }
     }
     editing.isFocused = false;
     currentTab = 0;
@@ -78,92 +85,55 @@ export const RootView = React.memo(
   () => {
     return (
       <>
-        <NavigationStack component={AppStack} />
+        <NativeStack />
         <Toast />
         <ContextMenu />
         <DummyText />
         <DialogManager />
-       
       </>
     );
   },
   () => true,
 );
 
-let updatedDimensions = {
-  width: width,
-  height: height,
-};
-
-let currentScroll = 0;
-let startLocation = 0;
-let startLocationX = 0;
-const _responder = (e) => {
-  startLocation = e.nativeEvent.pageY;
-  startLocationX = e.nativeEvent.pageX;
-  _handleTouch();
-  return false;
-};
-const _moveResponder = (e) => {
-  _handleTouch();
-  return false;
-};
-
-let touchEndTimer = null;
-
-const _handleTouch = () => {
-  {
-    let heightCheck = !editing.tooltip
-      ? updatedDimensions.height - 70
-      : updatedDimensions.height - 140;
-    if (
-      (currentTab === 1 && startLocation > heightCheck) ||
-      (currentTab === 1 && startLocationX > 50) ||
-      (currentTab === 0 && startLocationX < 150)
-    ) {
-      if (currentScroll === 0 || currentScroll === 1) {
-        tabBarRef.current?.setScrollEnabled(false);
-      }
-    } else {
-      tabBarRef.current?.setScrollEnabled(true);
-    }
-  }
-};
-
-const _onTouchEnd = (e) => {
-  startLocation = 0;
-  clearTimeout(touchEndTimer);
-  touchEndTimer = null;
-  touchEndTimer = setTimeout(() => {
-    tabBarRef.current?.setScrollEnabled(true);
-  }, 200);
-};
-
-const AppStack = React.memo(
+const NativeStack = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
-    const {colors, deviceMode} = state;
-    const [dimensions, setDimensions] = useState({width, height});
+    const [state] = useTracked();
+    const {colors} = state;
+
+    const deviceMode = useSettingStore(state => state.deviceMode);
+    const setFullscreen = useSettingStore(state => state.setFullscreen);
+    const fullscreen = useSettingStore(state => state.fullscreen);
+    const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
+    const dimensions = useSettingStore(state => state.dimensions);
+    const setDimensions = useSettingStore(state => state.setDimensions);
+    const animatedOpacity = useValue(0);
+    const animatedTranslateY = useValue(-9999);
+    const overlayRef = useRef();
 
     const showFullScreenEditor = () => {
-      dispatch({type: Actions.FULLSCREEN, state: true});
+      setFullscreen(true);
       editorRef.current?.setNativeProps({
         style: {
-          position: 'absolute',
           width: dimensions.width,
           zIndex: 999,
-          paddingHorizontal: dimensions.width * 0.15,
+          paddingHorizontal:
+            deviceMode === 'smallTablet'
+              ? dimensions.width * 0
+              : dimensions.width * 0.15,
           backgroundColor: colors.bg,
         },
       });
     };
 
     const closeFullScreenEditor = () => {
-      dispatch({type: Actions.FULLSCREEN, state: false});
+      setFullscreen(false);
       editorRef.current?.setNativeProps({
         style: {
-          position: 'relative',
-          width: dimensions.width * 0.55,
+          width:
+            deviceMode === 'smallTablet'
+              ? dimensions.width * 0.6
+              : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0,
         },
@@ -171,6 +141,7 @@ const AppStack = React.memo(
     };
 
     useEffect(() => {
+      toggleView(false);
       eSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
       eSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
 
@@ -178,9 +149,9 @@ const AppStack = React.memo(
         eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
         eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
       };
-    }, []);
+    }, [deviceMode]);
 
-    const _onLayout = async (event) => {
+    const _onLayout = async event => {
       if (layoutTimer) {
         clearTimeout(layoutTimer);
         layoutTimer = null;
@@ -190,8 +161,7 @@ const AppStack = React.memo(
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
-        //console.log(deviceMode, 'MODE__');
-        dispatch({type: Actions.DEVICE_MODE, state: deviceMode});
+        setDeviceMode(deviceMode, size);
         return;
       }
 
@@ -212,45 +182,119 @@ const AppStack = React.memo(
       if (DDS.isLargeTablet()) {
         //console.log('setting large tab');
         setDeviceMode('tablet', size);
-        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
+        sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else if (DDS.isSmallTab) {
         //console.log('setting small tab');
         setDeviceMode('smallTablet', size);
-        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
+
+        sleep(300).then(r => eSendEvent(eOpenSideMenu));
       } else {
         setDeviceMode('mobile', size);
-        sleep(300).then((r) => eSendEvent(eOpenSideMenu));
+
+        sleep(300).then(r => eSendEvent(eOpenSideMenu));
       }
     }
 
     function setDeviceMode(current, size) {
       eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
-      dispatch({type: Actions.DEVICE_MODE, state: current});
-      dispatch({type: Actions.FULLSCREEN, state: false});
-
-      editorRef.current?.setNativeProps({
-        style: {
-          position: 'relative',
-          width: current === 'tablet' ? size.width * 0.55 : size.width,
-          zIndex: null,
-          paddingHorizontal: 0,
-        },
-      });
-      if (!editing.movedAway && current !== 'tablet') {
-        tabBarRef.current?.goToPage(1);
+      setDeviceModeState(current);
+      if (fullscreen) {
+        editorRef.current?.setNativeProps({
+          style: {
+            width: size.width,
+            zIndex: 999,
+            paddingHorizontal:
+              current === 'smallTablet' ? size.width * 0 : size.width * 0.15,
+            backgroundColor: colors.bg,
+          },
+        });
+      } else {
+        editorRef.current?.setNativeProps({
+          style: {
+            position: 'relative',
+            width:
+              current === 'tablet'
+                ? size.width * 0.55
+                : current === 'smallTablet'
+                ? size.width * 0.6
+                : size.width,
+            zIndex: null,
+            paddingHorizontal: 0,
+          },
+        });
       }
+
+      console.log('resetting tabs');
+      setTimeout(() => {
+        if (current === 'tablet') {
+          tabBarRef.current?.goToIndex(0);
+        } else {
+          if (!editing.movedAway) {
+            tabBarRef.current?.goToIndex(2);
+          } else {
+            tabBarRef.current?.goToIndex(1);
+          }
+        }
+      }, 1);
     }
 
-    const onScroll = (scroll) => {
-      currentScroll = scroll;
-      if (scroll === 0) {
-        eSendEvent(eOpenSideMenu);
+    const onScroll = scrollOffset => {
+      if (scrollOffset > 299) {
+        animatedOpacity.setValue(0);
+        toggleView(false);
       } else {
-        eSendEvent(eCloseSideMenu);
+        let o = scrollOffset / 300;
+        let op = 0;
+        if (o < 0) {
+          op = 1;
+        } else {
+          op = 1 - o;
+        }
+        animatedOpacity.setValue(op);
+        toggleView(op < 0.05 ? false : true);
       }
     };
 
-    const renderTabBar = useCallback(() => <></>, []);
+    const toggleView = show => {
+      //console.log('toggling overlay view',show);
+      animatedTranslateY.setValue(show ? 0 : -9999);
+    };
+
+    const offsets = {
+      mobile: {
+        a: dimensions.width * 0.75,
+        b: dimensions.width + dimensions.width * 0.75,
+        c: dimensions.width * 2 + dimensions.width * 0.75,
+      },
+      smallTablet: {
+        a: fullscreen ? 0 : dimensions.width * 0.2,
+        b: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
+        c: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
+      },
+      tablet: {
+        a: 0,
+        b: 0,
+        c: 0,
+      },
+    };
+
+    const widths = {
+      mobile: {
+        a: dimensions.width * 0.75,
+        b: dimensions.width,
+        c: dimensions.width,
+      },
+      smallTablet: {
+        a: dimensions.width * 0.2,
+        b: dimensions.width * 0.4,
+        c: dimensions.width * 0.6,
+      },
+      tablet: {
+        a: dimensions.width * 0.15,
+        b: dimensions.width * 0.3,
+        c: dimensions.width * 0.55,
+      },
+    };
 
     return (
       <View
@@ -260,92 +304,58 @@ const AppStack = React.memo(
           width: '100%',
           height: '100%',
           backgroundColor: colors.bg,
-        }}
-        onMoveShouldSetResponderCapture={_moveResponder}
-        onTouchEnd={_onTouchEnd}
-        onStartShouldSetResponderCapture={_responder}>
+        }}>
         {deviceMode && (
-          <ScrollableTabView
+          <CustomTabs
             ref={tabBarRef}
+            dimensions={dimensions}
             style={{
               zIndex: 1,
             }}
-            onScroll={onScroll}
-            initialPage={0}
-            prerenderingSiblingsNumber={Infinity}
-            onChangeTab={onChangeTab}
-            renderTabBar={renderTabBar}>
-            {deviceMode !== 'tablet' && (
+            initialIndex={
+              deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1
+            }
+            toggleOverlay={toggleView}
+            offsets={offsets[deviceMode]}
+            items={[
               <View
                 style={{
-                  width: dimensions.width,
                   height: '100%',
-                  borderRightColor: colors.nav,
-                  borderRightWidth: 1,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'flex-start',
+                  width: fullscreen ? 0 : widths[deviceMode].a,
                 }}>
-                {deviceMode === 'smallTablet' && (
-                  <View
+                <Menu />
+              </View>,
+              <View
+                style={{
+                  height: '100%',
+                  width: fullscreen ? 0 : widths[deviceMode].b,
+                }}>
+                {deviceMode === 'mobile' && (
+                  <Animated.View
                     style={{
+                      position: 'absolute',
+                      width: '100%',
                       height: '100%',
-                      width: dimensions.width * 0.35,
-                    }}>
-                    <Menu />
-                  </View>
+                      zIndex: 999,
+                      backgroundColor: 'rgba(0,0,0,0.2)',
+                      opacity: animatedOpacity,
+                      transform: [
+                        {
+                          translateY: animatedTranslateY,
+                        },
+                      ],
+                    }}
+                    ref={overlayRef}
+                  />
                 )}
 
-                <View
-                  style={{
-                    height: '100%',
-                    width:
-                      deviceMode === 'mobile'
-                        ? dimensions.width
-                        : dimensions.width * 0.65,
-                  }}>
-                  <NavigatorStack />
-                </View>
-              </View>
-            )}
-
-            <View
-              style={{
-                width: '100%',
-                height: '100%',
-                flexDirection: 'row',
-                backgroundColor: colors.bg,
-              }}>
-              {deviceMode === 'tablet' && (
-                <View
-                  style={{
-                    width: dimensions.width * 0.45,
-                    height: '100%',
-                    borderRightColor: colors.nav,
-                    borderRightWidth: 1,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                  }}>
-                  <View
-                    style={{
-                      height: '100%',
-                      width: dimensions.width * 0.15,
-                    }}>
-                    <Menu />
-                  </View>
-
-                  <View
-                    style={{
-                      height: '100%',
-                      width: dimensions.width * 0.3,
-                    }}>
-                    <NavigatorStack />
-                  </View>
-                </View>
-              )}
-              <EditorWrapper dimensions={dimensions} />
-            </View>
-          </ScrollableTabView>
+                <NavigatorStack />
+              </View>,
+              <EditorWrapper width={widths} dimensions={dimensions} />,
+            ]}
+            onScroll={onScroll}
+            onChangeTab={onChangeTab}
+          />
         )}
       </View>
     );

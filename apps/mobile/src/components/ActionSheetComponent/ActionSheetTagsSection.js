@@ -1,21 +1,15 @@
-import React, {createRef, useCallback, useEffect, useState} from 'react';
-import {TextInput, TouchableOpacity, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import React, { createRef, useCallback, useEffect, useState } from 'react';
+import { TextInput, TouchableOpacity, View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
 import {
-  eSendEvent,
-  sendNoteEditedEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
+import { db } from '../../utils/DB';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 
 const tagsInputRef = createRef();
 let prevQuery = null;

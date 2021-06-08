@@ -3,6 +3,7 @@ import {Clipboard, View} from 'react-native';
 import Animated, {useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useMenuStore, useNotebookStore, useSelectionStore } from '../../provider/stores';
 import {openVault, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {dWidth, getElevation, toTXT} from '../../utils';
@@ -15,7 +16,13 @@ import {TEMPLATE_PERMANANT_DELETE} from '../DialogManager/Templates';
 
 export const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode} = state;
+  const {colors} = state;
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const setNotebooks = useNotebookStore(state => state.setNotebooks);
+  const setMenuPins = useMenuStore(state => state.setMenuPins);
+  const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
+  const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
+  
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [width, setWidth] = useState(dWidth - 16);
   const opacity = useValue(0);
@@ -67,7 +74,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
             return;
           }
           await db.notebooks.notebook(note.id).pin();
-          dispatch({type: Actions.NOTEBOOKS});
+          setNotebooks();
         }
         updateNotes();
         setActionStrip(false);
@@ -118,7 +125,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
             });
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
-          dispatch({type: Actions.MENU_PINS});
+          setMenuPins()
 
           setActionStrip(false);
         } catch (e) {}
@@ -229,9 +236,9 @@ export const ActionStrip = ({note, setActionStrip}) => {
         tooltipText="Select Item"
         onPress={event => {
           if (!selectionMode) {
-            dispatch({type: Actions.SELECTION_MODE, enabled: true});
+            setSelectionMode(true);
           }
-          dispatch({type: Actions.SELECTED_ITEMS, item: note});
+          setSelectedItem(item);
           setActionStrip(false);
         }}
         style={{

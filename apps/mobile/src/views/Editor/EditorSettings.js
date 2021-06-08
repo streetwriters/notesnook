@@ -16,10 +16,13 @@ import {sleep} from '../../utils/TimeUtils';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Seperator from '../../components/Seperator';
 import SettingsService from '../../services/SettingsService';
+import { useSettingStore } from '../../provider/stores';
 
 export const EditorSettings = () => {
   const [state,dispatch] = useTracked();
-  const {colors, settings} = state;
+  const {colors} = state;
+  
+  const settings = useSettingStore(state => state.settings);
   
   const [visible, setVisible] = useState(false);
   const [savePreset, setSavePreset] = useState(false);

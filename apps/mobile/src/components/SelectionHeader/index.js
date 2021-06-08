@@ -4,6 +4,7 @@ import {View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSelectionStore } from '../../provider/stores';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
@@ -20,7 +21,13 @@ import Heading from '../Typography/Heading';
 
 export const SelectionHeader = React.memo(({screen, type, extras}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors} = state;
+  
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
+  const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
+  const clearSelection = useSelectionStore(state => state.clearSelection)
+
   const insets = useSafeAreaInsets();
 
   const addToFavorite = async () => {
@@ -33,8 +40,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
       ]);
-      dispatch({type: Actions.SELECTION_MODE, enabled: false});
-      dispatch({type: Actions.CLEAR_SELECTION});
+      setSelectionMode(false);
+      clearSelection();
     }
   };
 
@@ -53,8 +60,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Trash,
       ]);
-      dispatch({type: Actions.SELECTION_MODE, enabled: false});
-      dispatch({type: Actions.CLEAR_SELECTION});
+      setSelectionMode(false);
+      clearSelection();
       ToastEvent.show({
         heading: 'Restore successful',
         type: 'success',
@@ -63,8 +70,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
   };
 
   const onBackPress = () => {
-    dispatch({type: Actions.SELECTION_MODE, enabled: false});
-    dispatch({type: Actions.CLEAR_SELECTION});
+    setSelectionMode(false);
+    clearSelection();
     return true;
   };
 
@@ -109,8 +116,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             marginRight: 25,
           }}
           onPress={() => {
-            dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
-            dispatch({type: Actions.CLEAR_SELECTION});
+            setSelectionMode(!selectionMode)
+            clearSelection();
           }}
           color={colors.light}
           name="close"
@@ -145,7 +152,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         type === 'topic' ? null : (
           <ActionIcon
             onPress={async () => {
-              //dispatch({type: Actions.SELECTION_MODE, enabled: false});
+              //setSelectionMode(false);
               await sleep(100);
               eSendEvent(eOpenMoveNoteDialog);
             }}
@@ -175,8 +182,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
                   Navigation.routeNames.Notebook,
                   Navigation.routeNames.Notebooks,
                 ]);
-                dispatch({type: Actions.SELECTION_MODE, enabled: false});
-                dispatch({type: Actions.CLEAR_SELECTION});
+                setSelectionMode(false);
+                clearSelection();
               }
             }}
             customStyle={{

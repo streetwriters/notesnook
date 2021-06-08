@@ -9,6 +9,7 @@ import {RootView} from './initializer.root';
 import AppLoader from './src/components/AppLoader';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
+import {initialize, useMessageStore, useNoteStore, useSettingStore} from './src/provider/stores';
 import BiometricService from './src/services/BiometricService';
 import {DDS} from './src/services/DeviceDetection';
 import {
@@ -25,20 +26,21 @@ import EditorRoot from './src/views/Editor/EditorRoot';
 let initStatus = false;
 const App = () => {
   const [, dispatch] = useTracked();
-
+  const setDeviceMode = useSettingStore(state => state.setDeviceMode);
   useEffect(() => {
+
+    useMessageStore.getState().setAnnouncement();
     (async () => {
       try {
         Orientation.getOrientation((e, r) => {
           DDS.checkSmallTab(r);
-          dispatch({
-            type: Actions.DEVICE_MODE,
-            state: DDS.isLargeTablet()
+          setDeviceMode(
+            DDS.isLargeTablet()
               ? 'tablet'
               : DDS.isSmallTab
               ? 'smallTablet'
               : 'mobile',
-          });
+          );
         });
 
         let func = async () => {
@@ -101,7 +103,7 @@ const App = () => {
     if (initStatus) {
       SettingsService.setAppLoaded();
       eSendEvent('load_overlay');
-      dispatch({type: Actions.ALL});
+      initialize();
     }
   };
 
@@ -126,7 +128,7 @@ const App = () => {
       }
       console.log('default note created');
       await MMKV.setItem('defaultNoteCreated', 'yes');
-      dispatch({type: Actions.ALL});
+      useNoteStore.getState().setNotes();
     } catch (e) {
       console.log(e, 'loading note on welcome');
     }

@@ -7,6 +7,7 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useNotebookStore } from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -15,8 +16,8 @@ import {db} from '../../utils/DB';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Folders = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const notebooks = state.notebooks;
+  const notebooks = useNotebookStore(state => state.notebooks);
+  const setNotebooks = useNotebookStore(state => state.setNotebooks);
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
@@ -39,7 +40,7 @@ export const Folders = ({route, navigation}) => {
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notebooks', () => {
-        dispatch({type: Actions.NOTEBOOKS});
+        setNotebooks()
       });
     });
     eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
@@ -66,7 +67,7 @@ export const Folders = ({route, navigation}) => {
   const updateSearch = React.useCallback(() => {
     SearchService.update({
       placeholder: 'Type a keyword to search in notebooks',
-      data: db.notebooks.all,
+      data: notebooks,
       type: 'notebooks',
       title: 'Notebooks',
     });
@@ -86,7 +87,7 @@ export const Folders = ({route, navigation}) => {
         />
       </ContainerTopSection>
       <SimpleList
-        listData={state.notebooks}
+        listData={notebooks}
         type="notebooks"
         screen="Notebooks"
         focused={() => navigation.isFocused()}
@@ -102,7 +103,7 @@ export const Folders = ({route, navigation}) => {
         }}
       />
 
-      {!state.notebooks || state.notebooks.length === 0 ? null : (
+      {!notebooks || notebooks.length === 0 ? null : (
         <ContainerBottomButton
           title="Create a new notebook"
           onPress={_onPressBottomButton}

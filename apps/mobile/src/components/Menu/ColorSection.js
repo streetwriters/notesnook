@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useMenuStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -17,12 +18,13 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const ColorSection = () => {
-  const [state, dispatch] = useTracked();
-  const {colorNotes, loading} = state;
+  const colorNotes = useMenuStore(state => state.colorNotes);
+  const loading = useNoteStore(state => state.loading);
+  const setColorNotes = useMenuStore(state => state.setColorNotes);
 
   useEffect(() => {
     if (!loading) {
-      dispatch({type: Actions.COLORS});
+      setColorNotes();
     }
   }, [loading]);
   
@@ -33,7 +35,7 @@ export const ColorSection = () => {
 };
 
 const ColorItem = ({item, index}) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
 

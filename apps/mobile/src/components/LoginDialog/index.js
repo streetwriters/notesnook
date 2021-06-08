@@ -9,6 +9,7 @@ import Seperator from '../../components/Seperator';
 import {Toast} from '../../components/Toast';
 import {Actions} from '../../provider/Actions';
 import {useTracked} from '../../provider/index';
+import {useUserStore} from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -71,6 +72,10 @@ function getEmail() {
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
+
+  const setUser = useUserStore(state => state.setUser);
+  const setLastSynced = useUserStore(state => state.setLastSynced);
+
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -236,8 +241,8 @@ const LoginDialog = () => {
       if (!user) throw new Error('Email or password incorrect!');
       setStatus('Syncing Your Data');
       PremiumService.setPremiumStatus();
-      dispatch({type: Actions.USER, user: user});
-      clearMessage(dispatch);
+      setUser(user);
+      clearMessage();
       ToastEvent.show({
         heading: 'Login successful',
         message: `Logged in as ${user.email}`,
@@ -245,9 +250,6 @@ const LoginDialog = () => {
         context: 'local',
       });
       close();
-      if (MODES.sessionExpired === mode) {
-        await MMKV.removeItem('loginSessionHasExpired');
-      }
       await sleep(300);
       eSendEvent('userLoggedIn', true);
       eSendEvent(eOpenProgressDialog, {
@@ -255,6 +257,7 @@ const LoginDialog = () => {
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false,
       });
+      await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
       setLoading(false);
       setStatus(null);
@@ -318,10 +321,10 @@ const LoginDialog = () => {
       await db.user.signup(email, password);
       let user = await db.user.getUser();
       setStatus('Setting Crenditials');
-      dispatch({type: Actions.USER, user: user});
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
-      clearMessage(dispatch);
-      setEmailVerifyMessage(dispatch);
+      setUser(user);
+      setLastSynced(await db.lastSynced());
+      clearMessage();
+      setEmailVerifyMessage();
       close();
       await sleep(300);
       eSendEvent(eOpenRecoveryKeyDialog, true);
@@ -519,7 +522,7 @@ const LoginDialog = () => {
         }}>
         {DDS.isTab ? (
           <TouchableOpacity
-            onPress={close}
+            onPress={MODES.sessionExpired !== mode && close}
             style={{
               width: '100%',
               height: '100%',
@@ -548,7 +551,7 @@ const LoginDialog = () => {
               paddingHorizontal: 12,
               height: 50,
             }}>
-            {DDS.isTab ? (
+            {DDS.isTab && MODES.sessionExpired !== mode ? (
               <ActionIcon
                 name="close"
                 size={SIZE.xxxl}
@@ -563,7 +566,7 @@ const LoginDialog = () => {
                 }}
                 color={colors.heading}
               />
-            ) : (
+            ) : MODES.sessionExpired !== mode && (
               <ActionIcon
                 name="arrow-left"
                 size={SIZE.xxxl}
@@ -580,12 +583,14 @@ const LoginDialog = () => {
               />
             )}
 
+
             <View />
           </View>
 
           <Header
             color="transparent"
             type="login"
+            noAnnouncement={true}
             shouldShow
             title={current.headerButton}
             messageCard={false}

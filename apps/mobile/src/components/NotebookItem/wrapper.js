@@ -1,22 +1,21 @@
 import React from 'react';
-import {NotebookItem} from '.';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { NotebookItem } from '.';
+import { useSelectionStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
-import {history} from '../../utils';
+import { history } from '../../utils';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NotebookWrapper = React.memo(({item, index}) => {
-  const [state, dispatch] = useTracked();
   const isTrash = item.type === 'trash';
+  const setSelectedItem = useSelectionStore(state => state.setSelectedItem)
 
   const onPress = () => {
+
     if (history.selectedItemsList.length > 0 && history.selectionMode) {
       dispatch({
         type: Actions.SELECTED_ITEMS,
         item: item,
       });
-   
       return;
     }  else {
       history.selectedItemsList = [];

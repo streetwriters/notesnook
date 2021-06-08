@@ -5,6 +5,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSettingStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {DrawerScale} from '../../utils/Animations';
 import {
@@ -24,7 +25,10 @@ import {UserSection} from './UserSection';
 export const Menu = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors, deviceMode} = state;
+    const {colors} = state;
+    
+    const deviceMode = useSettingStore(state => state.deviceMode);
+
     const insets = useSafeAreaInsets();
     const noTextMode = false;
     function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {

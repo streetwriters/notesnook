@@ -1,16 +1,15 @@
-import {CHECK_IDS} from 'notes-core/common';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
-import {db} from '../utils/DB';
+import { CHECK_IDS } from 'notes-core/common';
+import * as RNIap from 'react-native-iap';
+import { useUserStore } from '../provider/stores';
+import { itemSkus } from '../utils';
+import { db } from '../utils/DB';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
-  eShowGetPremium,
+  eShowGetPremium
 } from '../utils/Events';
-import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
-import * as RNIap from 'react-native-iap';
-import {itemSkus} from '../utils';
+import { MMKV } from '../utils/mmkv';
+import { eSendEvent, ToastEvent } from './EventManager';
 
 let premiumStatus = 0;
 let products = [];
@@ -21,15 +20,16 @@ function getUser() {
 }
 
 async function setPremiumStatus() {
+  let userstore = useUserStore.getState();
   try {
     user = await db.user.getUser();
     if (!user) {
       premiumStatus = null;
-      updateEvent({type: Actions.PREMIUM, state: get()});
+      userstore.setPremium(get())
     } else {
       premiumStatus = user.subscription.type;
-      updateEvent({type: Actions.PREMIUM, state: get()});
-      updateEvent({type: Actions.USER, user: user});
+      userstore.setPremium(get())
+      userstore.setUser(user);
       if (!get()) {
         await RNIap.initConnection();
         products = await RNIap.getSubscriptions(itemSkus);
@@ -45,6 +45,7 @@ function getProducts() {
 }
 
 function get() {
+  return true;
   return (
     premiumStatus === 1 ||
     premiumStatus === 2 ||
@@ -54,7 +55,8 @@ function get() {
 }
 
 async function verify(callback, error) {
-
+  callback();
+  return;
   try {
     if (!premiumStatus) {
       if (error) {

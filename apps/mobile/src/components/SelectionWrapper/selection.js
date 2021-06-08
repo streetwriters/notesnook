@@ -3,11 +3,16 @@ import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSelectionStore } from '../../provider/stores';
 import {SIZE} from '../../utils/SizeUtils';
 
 export const SelectionIcon = ({setActionStrip, item}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors} = state;
+
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
+  const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const [selected, setSelected] = useState(false);
 
 
@@ -31,10 +36,7 @@ export const SelectionIcon = ({setActionStrip, item}) => {
   }, [selectedItemsList, item.id]);
 
   onPress = () => {
-    dispatch({
-      type: Actions.SELECTED_ITEMS,
-      item: item,
-    });
+    setSelectedItem(item);
   };
 
   return (

@@ -1,15 +1,13 @@
 import React from 'react';
 import {
-  Animated,
   KeyboardAvoidingView,
   Modal,
   Platform,
   SafeAreaView,
   StyleSheet,
-  TouchableOpacity,
-  View,
+  TouchableOpacity
 } from 'react-native';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 
 const BaseDialog = ({
@@ -24,7 +22,7 @@ const BaseDialog = ({
   centered = true,
 }) => {
   const [state, dispatch] = useTracked();
-  const scaleValue = new Animated.Value(1);
+  
   const floating = useIsFloatingKeyboard();
   return (
     <Modal

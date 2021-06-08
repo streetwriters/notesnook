@@ -138,6 +138,9 @@ export const Toast = ({context = 'global'}) => {
 
   return (
     <Animated.View
+      onTouchEnd={() => {
+        hideToastFunc();
+      }}
       style={{
         width: DDS.isTab ? 400 : '100%',
         alignItems: 'center',

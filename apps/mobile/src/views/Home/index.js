@@ -1,24 +1,28 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header/index';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager, scrollRef} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
+import { InteractionManager, scrollRef } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import Storage from '../../utils/storage';
 
 export const Home = ({navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {loading} = state;
-  const notes = state.notes;
+  const notes = useNoteStore(state => state.notes);
+  const setNotes = useNoteStore(state => state.setNotes);
+  const loading = useNoteStore(state => state.loading);
+  
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
@@ -47,7 +51,7 @@ export const Home = ({navigation}) => {
 
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notes', () => {
-        dispatch({type: Actions.NOTES});
+        setNotes()
       });
     });
     ranAfterInteractions = false;
@@ -80,7 +84,7 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-    if (!DDS.isLargeTablet()) {
+    if (!DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {
@@ -101,7 +105,7 @@ export const Home = ({navigation}) => {
       </ContainerTopSection>
 
       <SimpleList
-        listData={state.notes}
+        listData={notes}
         scrollRef={scrollRef}
         type="notes"
         isHome={true}
@@ -123,7 +127,7 @@ export const Home = ({navigation}) => {
         }}
       />
 
-      {!state.notes || state.notes.length === 0 ? null : (
+      {!notes || notes.length === 0 ? null : (
         <ContainerBottomButton
           title="Create a new note"
           onPress={_onPressBottomButton}

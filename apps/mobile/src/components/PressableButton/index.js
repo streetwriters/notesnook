@@ -33,6 +33,7 @@ export const PressableButton = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
+  
   const selectedColor = customSelectedColor ||
     colors[
       type === 'accent'

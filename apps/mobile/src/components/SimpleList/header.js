@@ -1,6 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
+import {useMessageStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
@@ -9,6 +10,7 @@ import {Button} from '../Button';
 import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import {Announcement} from './announcement';
 import {Card} from './card';
 
 export const Header = React.memo(
@@ -22,16 +24,17 @@ export const Header = React.memo(
     shouldShow = false,
     icon,
     screen,
-    announcement,
+    noAnnouncement
   }) => {
     const [state] = useTracked();
     const {colors} = state;
-
-    return type === 'search' ? null : (DDS.isLargeTablet() && !shouldShow) ||
-      announcement ? (
+    const announcement = useMessageStore(state => state.announcement)
+    const deviceMode = useSettingStore(state => state.deviceMode)
+    return announcement && !noAnnouncement ? (
+      <Announcement color={color || colors.accent} />
+    ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
       <View
         style={{
-          minHeight: 50,
           marginBottom: 5,
           padding: 0,
           width: '100%',
@@ -39,10 +42,7 @@ export const Header = React.memo(
           alignItems: 'center',
         }}>
         {messageCard && (
-          <Card
-            announcement={announcement}
-            color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
-          />
+          <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
         )}
       </View>
     ) : (
@@ -51,10 +51,7 @@ export const Header = React.memo(
           width: '100%',
         }}>
         {messageCard && (
-          <Card
-            announcement={announcement}
-            color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
-          />
+          <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
         )}
         <View
           style={{

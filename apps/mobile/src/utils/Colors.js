@@ -38,6 +38,7 @@ const fixedColors = {
   blue: '#2196F3',
   purple: '#673AB7',
   gray: '#9E9E9E',
+  discord:"#5865F2"
 };
 export var COLOR_SCHEME = {
   ...fixedColors,

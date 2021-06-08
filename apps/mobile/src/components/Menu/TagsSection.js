@@ -3,6 +3,7 @@ import {FlatList, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useMenuStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -20,12 +21,13 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const TagsSection = () => {
-  const [state, dispatch] = useTracked();
-  const {colors, menuPins, loading} = state;
+  const menuPins = useMenuStore(state => state.menuPins);
+  const loading = useNoteStore(state => state.loading);
+  const setMenuPins =useMenuStore(state => state.setMenuPins);
 
   useEffect(() => {
     if (!loading) {
-      dispatch({type: Actions.MENU_PINS});
+      setMenuPins();
     }
   }, [loading]);
 
@@ -94,6 +96,9 @@ export const TagsSection = () => {
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+
+  const setMenuPins =useMenuStore(state => state.setMenuPins);
+  
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
@@ -134,7 +139,7 @@ const PinItem = ({item, index, onPress}) => {
             type="error"
             onPress={async () => {
               await db.settings.unpin(item.id);
-              dispatch({type: Actions.MENU_PINS});
+              setMenuPins();
             }}
             fontSize={SIZE.md}
             width="95%"

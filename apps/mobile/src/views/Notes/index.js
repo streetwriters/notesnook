@@ -6,6 +6,7 @@ import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
+import { useNoteStore } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -25,9 +26,9 @@ import {
 import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {loading} = state;
   const [notes, setNotes] = useState([]);
+  const loading = useNoteStore(state =>state.loading);
+  
   let params = route.params ? route.params : null;
   let ranAfterInteractions = false;
 
@@ -51,6 +52,7 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
+    console.log('setting notes');
     setNotes(_notes);
     if (params.menu) {
       navigation.setOptions({
@@ -166,7 +168,7 @@ export const Notes = ({route, navigation}) => {
 
   const _onPressBottomButton = () => {
     setActionAfterFirstSave();
-    if (DDS.isPhone || DDS.isSmallTab) {
+    if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});

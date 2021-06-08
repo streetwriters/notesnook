@@ -2,6 +2,7 @@ import {createRef} from 'react';
 import {Platform} from 'react-native';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
+import {useEditorStore, useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -216,7 +217,7 @@ export const loadNote = async item => {
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Notes,
       ]);
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
       checkStatus();
     }, 50);
   }
@@ -425,9 +426,7 @@ export async function clearEditor() {
       redo: 0,
     });
     saveCounter = 0;
-    setTimeout(() => {
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
-    }, 1);
+    useEditorStore.getState().setCurrentlyEditingNote(null);
   } catch (e) {
     console.log(e);
   }
@@ -487,7 +486,7 @@ async function addToCollection(id) {
         type: null,
       };
       Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
-      updateEvent({type: Actions.COLORS});
+      useMenuStore.getState().setColorNotes();
       break;
     }
     default: {
@@ -526,7 +525,7 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id) {
-        updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
+        useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await addToCollection(noteId);
       }
       await setNoteInEditorAfterSaving(id, noteId);
@@ -550,7 +549,7 @@ export async function saveNote(preventUpdate) {
 
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
-    Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    //Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
   if (premium) {
     tiny.call(EditorWebView, tiny.setMarkdown, true);
@@ -570,10 +569,13 @@ async function restoreEditorState() {
       appState.note.id &&
       Date.now() < appState.timestamp + 3600000
     ) {
+      console.log('restoring state');
       editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
-      tabBarRef.current?.goToPage(1);
+      if (!DDS.isTab) {
+       tabBarRef.current?.goToPage(1);
+      }
       setTimeout(() => {
         eSendEvent(eOnLoadNote, appState.note);
       }, 100);
@@ -581,8 +583,12 @@ async function restoreEditorState() {
       editing.movedAway = false;
       eSendEvent('load_overlay', 'hide_editor');
       editing.isRestoringState = false;
+      return;
     }
+    editing.isRestoringState = false;
+    return;
   }
+  editing.isRestoringState = false;
 }
 
 export let isFromIntent = false;

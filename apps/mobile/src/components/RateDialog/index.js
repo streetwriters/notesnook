@@ -1,25 +1,20 @@
 import React, {useEffect, useState} from 'react';
-import {Linking} from 'react-native';
-import {Platform} from 'react-native';
-import {View} from 'react-native';
+import {Linking, Platform, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
 import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogHeader from '../Dialog/dialog-header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const RateDialog = () => {
   const [state] = useTracked();
-  const {notes, colors, settings} = state;
+  const {colors} = state;
   const [visible, setVisible] = useState(false);
   const insets = useSafeAreaInsets();
 
@@ -48,7 +43,7 @@ const RateDialog = () => {
         await MMKV.setItem(
           'askForRating',
           JSON.stringify({
-            timestamp: Date.now() + (86400000 * 2)
+            timestamp: Date.now() + 86400000 * 2,
           }),
         );
         setVisible(false);
@@ -67,8 +62,9 @@ const RateDialog = () => {
         }}>
         <Heading color={colors.light}>Rate Notesnook</Heading>
         <Paragraph size={SIZE.md} color={colors.light}>
-          If you find Notesnook useful, please take a moment to rate it. It
-          won't take more than a minute. Thanks for your support.
+          It took us a year to bring Notesnook to life, the best private note
+          taking app. It will take you a moment to rate it to let us know what
+          you think!
         </Paragraph>
 
         <View
@@ -92,7 +88,7 @@ const RateDialog = () => {
               await MMKV.setItem(
                 'askForRating',
                 JSON.stringify({
-                  timestamp: Date.now() + (86400000 * 2)
+                  timestamp: Date.now() + 86400000 * 2,
                 }),
               );
               setVisible(false);
