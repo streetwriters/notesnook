@@ -522,7 +522,7 @@ const LoginDialog = () => {
         }}>
         {DDS.isTab ? (
           <TouchableOpacity
-            onPress={close}
+            onPress={MODES.sessionExpired !== mode && close}
             style={{
               width: '100%',
               height: '100%',

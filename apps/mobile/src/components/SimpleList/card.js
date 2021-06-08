@@ -11,7 +11,7 @@ import Paragraph from '../Typography/Paragraph';
 export const Card = ({color}) => {;
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
-  const announcement = useMessageStore().announcement;
+  const announcement = useMessageStore(state => state.announcement);
   const deviceMode = useSettingStore(state => state.settings)
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (

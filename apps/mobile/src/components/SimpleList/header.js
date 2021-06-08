@@ -35,7 +35,6 @@ export const Header = React.memo(
     ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
       <View
         style={{
-          minHeight: 50,
           marginBottom: 5,
           padding: 0,
           width: '100%',
