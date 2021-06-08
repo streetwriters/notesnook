@@ -590,6 +590,7 @@ const LoginDialog = () => {
           <Header
             color="transparent"
             type="login"
+            noAnnouncement={true}
             shouldShow
             title={current.headerButton}
             messageCard={false}

@@ -1,7 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
-import {useMessageStore} from '../../provider/stores';
+import {useMessageStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
@@ -24,14 +24,15 @@ export const Header = React.memo(
     shouldShow = false,
     icon,
     screen,
+    noAnnouncement
   }) => {
     const [state] = useTracked();
     const {colors} = state;
-    const announcement = useMessageStore().announcement;
-
-    return announcement ? (
+    const announcement = useMessageStore(state => state.announcement)
+    const deviceMode = useSettingStore(state => state.deviceMode)
+    return announcement && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
-    ) : type === 'search' ? null : DDS.isLargeTablet() && !shouldShow ? (
+    ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
       <View
         style={{
           minHeight: 50,

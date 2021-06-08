@@ -278,8 +278,8 @@ export const Settings = ({navigation}) => {
           style={{
             paddingHorizontal: 0,
           }}>
-          {!DDS.isLargeTablet() && (
-            <Header title="Settings" type="settings" messageCard={false} />
+          {!DDS.isTab && (
+            <Header noAnnouncement={true} title="Settings" type="settings" messageCard={false} />
           )}
 
           <SettingsUserSection />

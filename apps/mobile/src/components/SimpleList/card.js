@@ -2,7 +2,7 @@ import React from 'react';
 import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { useMessageStore, useSelectionStore, useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { getElevation } from '../../utils';
 import { SIZE } from '../../utils/SizeUtils';
@@ -12,6 +12,7 @@ export const Card = ({color}) => {;
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
   const announcement = useMessageStore().announcement;
+  const deviceMode = useSettingStore(state => state.settings)
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity
@@ -22,7 +23,7 @@ export const Card = ({color}) => {;
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        position: DDS.isLargeTablet() || announcement ? 'relative' : 'absolute',
+        position: deviceMode !== "mobile" || announcement ? 'relative' : 'absolute',
         right: 0,
         top: 0,
         zIndex: 100,
