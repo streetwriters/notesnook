@@ -10,9 +10,15 @@ export const NotebookWrapper = React.memo(({item, index}) => {
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem)
 
   const onPress = () => {
-    if (history.selectedItemsList.length > 0) {
-      setSelectedItem(item);
+
+    if (history.selectedItemsList.length > 0 && history.selectionMode) {
+      dispatch({
+        type: Actions.SELECTED_ITEMS,
+        item: item,
+      });
       return;
+    }  else {
+      history.selectedItemsList = [];
     }
     let routeName = item.type === "topic" ? 'NotesPage' : 'Notebook';
     

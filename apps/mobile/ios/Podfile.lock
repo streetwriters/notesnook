@@ -349,7 +349,7 @@ PODS:
     - SDWebImageWebPCoder (~> 0.6.1)
   - RNFileViewer (2.1.4):
     - React-Core
-  - RNGestureHandler (1.9.0):
+  - RNGestureHandler (1.10.3):
     - React-Core
   - RNIap (5.2.14):
     - React-Core
@@ -680,7 +680,7 @@ SPEC CHECKSUMS:
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
   RNFastImage: d4870d58f5936111c56218dbd7fcfc18e65b58ff
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
-  RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
+  RNGestureHandler: a479ebd5ed4221a810967000735517df0d2db211
   RNIap: f00befe6581a5953191108cb97d9b3872473337b
   RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
