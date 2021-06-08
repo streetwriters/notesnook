@@ -9204,7 +9204,7 @@ normalize-url@^4.1.0:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.6.6"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#73eaa0b2e44aca76de350151bc0e20cbdaf632ba"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#46d72373b513df6c5c72b805c25611f5ec3605a2"
   dependencies:
     "@stablelib/blake2s" "^1.0.1"
     fast-sort "^2.0.1"
