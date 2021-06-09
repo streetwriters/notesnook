@@ -19,6 +19,7 @@ All your notes are encrypted and private by default. We can not read them even i
 4. Enter password for the vault and reenter to confirm.
 5. Press on `Create` button to create the vault.
 6. Now you will be able to lock your notes with the password for vault.
+|||
 
 ## Locking a note
 ||| Desktop/Web
@@ -31,6 +32,7 @@ All your notes are encrypted and private by default. We can not read them even i
 2. Press on `Add to vault` button in `Note properties` menu
 3. Enter password for the vault
 4. Press on `Lock` to add note to vault.
+|||
 
 ## Open/Edit/Delete a locked note
 To open, edit or delete a locked note, you must provide the password for the vault to unlock it.
@@ -60,3 +62,4 @@ To open, edit or delete a locked note, you must provide the password for the vau
 3. Press on `Change vault password`
 4. Click on Change to update password
 5. All your locked notes will be encrypted with the new password.
+|||
