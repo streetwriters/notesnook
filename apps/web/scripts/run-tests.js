@@ -21,7 +21,7 @@ function startTestRunner() {
       detached: true,
       stdio: "inherit",
     });
-    process.on("close", () => resolve());
+    process.on("close", () => resolve(process));
   });
 }
 
@@ -30,8 +30,9 @@ function startTestRunner() {
   const server = await startServer();
 
   console.log("Starting tests...");
-  await startTestRunner();
+  const testRunner = await startTestRunner();
 
   console.log("All done.");
   process.kill(-server.pid);
+  process.exit(testRunner.exitCode);
 })();
