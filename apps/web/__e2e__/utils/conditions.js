@@ -1,5 +1,6 @@
 /* eslint-disable no-undef */
 
+const { expect } = require("@playwright/test");
 const { getTestId, NOTE } = require(".");
 const List = require("./listitemidbuilder");
 

@@ -1,7 +1,6 @@
 /* eslint-disable no-undef */
+const { test, expect } = require("@playwright/test");
 const { getTestId, createNote, NOTE, NOTEBOOK } = require("./utils");
-const { toMatchImageSnapshot } = require("jest-image-snapshot");
-expect.extend({ toMatchImageSnapshot });
 const {
   navigateTo,
   openContextMenu,
@@ -13,15 +12,14 @@ const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 const { checkNotePresence, isPresent } = require("./utils/conditions");
 
-jest.setTimeout(35 * 1000);
+/**
+ * @type {Page}
+ */
+global.page = null;
 
-beforeEach(async () => {
+test.beforeEach(async ({ page: _page }) => {
+  global.page = _page;
   await page.goto("http://localhost:3000/");
-}, 600000);
-
-afterEach(async () => {
-  page.close();
-  page = await browser.newPage();
 });
 
 async function fillNotebookDialog(notebook) {
@@ -113,7 +111,7 @@ async function deleteNotebookAndCheckAbsence(notebookSelector) {
   await navigateTo("notebooks");
 }
 
-test("create a notebook", createNotebookAndCheckPresence);
+test("create a notebook", async () => await createNotebookAndCheckPresence());
 
 test("create a note inside a notebook", async () => {
   const notebookSelector = await createNotebookAndCheckPresence();
@@ -220,11 +218,4 @@ test("pin a notebook", async () => {
 
   // wait for the menu to properly close
   await page.waitForTimeout(500);
-
-  const notebook = await page.$(List.new("notebook").atIndex(0).build());
-  await expect(notebook.screenshot()).resolves.toMatchImageSnapshot({
-    failureThreshold: 5,
-    failureThresholdType: "percent",
-    allowSizeMismatch: true,
-  });
 });

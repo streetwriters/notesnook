@@ -5,9 +5,8 @@
  * TODO: We are still not checking if toast appears on delete/restore or not.
  */
 
+const { test, expect } = require("@playwright/test");
 const { getTestId, createNote, NOTE } = require("./utils");
-const { toMatchImageSnapshot } = require("jest-image-snapshot");
-expect.extend({ toMatchImageSnapshot });
 const {
   navigateTo,
   clickMenuItem,
@@ -25,13 +24,7 @@ const {
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 
-jest.setTimeout(35 * 1000);
-
-// const testCISkip = process.env.CI ? test.skip : test;
-
-var createNoteAndCheckPresence = async function createNoteAndCheckPresence(
-  note = NOTE
-) {
+async function createNoteAndCheckPresence(note = NOTE) {
   await createNote(note, "notes");
 
   // make sure the note has saved.
@@ -42,9 +35,7 @@ var createNoteAndCheckPresence = async function createNoteAndCheckPresence(
   await page.click(noteSelector, { button: "left" });
 
   return noteSelector;
-};
-
-const staticCreateNoteAndCheckPresence = createNoteAndCheckPresence.bind(this);
+}
 
 async function deleteNoteAndCheckAbsence() {
   const noteSelector = await createNoteAndCheckPresence();
@@ -93,11 +84,7 @@ async function checkNotePinned(noteSelector, pause) {
   await page.waitForTimeout(500);
 
   const note = await page.$(List.new("note").grouped().atIndex(0).build());
-  await expect(note.screenshot()).resolves.toMatchImageSnapshot({
-    failureThreshold: 5,
-    allowSizeMismatch: true,
-    failureThresholdType: "percent",
-  });
+  await expect(note.screenshot()).resolves.toMatchSnapshot("note-pinned.png");
 }
 
 async function checkNoteLocked(noteSelector) {
@@ -129,11 +116,7 @@ async function checkNoteColored(noteSelector) {
   await page.waitForTimeout(500);
 
   const note = await page.$(List.new("note").grouped().atIndex(0).build());
-  await expect(note.screenshot()).resolves.toMatchImageSnapshot({
-    failureThreshold: 5,
-    allowSizeMismatch: true,
-    failureThresholdType: "percent",
-  });
+  await expect(note.screenshot()).resolves.toMatchSnapshot("note-colored.png");
 
   await navigateTo("red");
 
@@ -142,11 +125,9 @@ async function checkNoteColored(noteSelector) {
 
   const coloredNote = await page.$(List.new("note").atIndex(0).build());
   if (!coloredNote) throw new Error("Colored note not present.");
-  await expect(coloredNote.screenshot()).resolves.toMatchImageSnapshot({
-    allowSizeMismatch: true,
-    failureThreshold: 5,
-    failureThresholdType: "percent",
-  });
+  await expect(coloredNote.screenshot()).resolves.toMatchSnapshot(
+    "note-colored-2.png"
+  );
 }
 
 async function addNoteToNotebook() {
@@ -169,59 +150,26 @@ async function addNoteToNotebook() {
   await checkNotePresence(0, false);
 }
 
-describe.each(["independent", "sequential"])("run tests %sly", (type) => {
-  beforeAll(async () => {
-    if (type === "sequential") {
-      await page.goto("http://localhost:3000/");
-    }
-  });
-  // clear all browser data after running all tests for a single case
-  // so this will clear all data after running test independently & sequentially.
-  afterAll(async () => {
-    try {
-      await jestPlaywright.resetContext();
-      await page.goto("http://localhost:3000/");
-    } catch (e) {}
+test.describe("run tests independently", () => {
+  /**
+   * @type {Page}
+   */
+  global.page = null;
+  test.beforeEach(async ({ page: _page }) => {
+    global.page = _page;
+    await page.goto("http://localhost:3000/");
   });
 
-  beforeEach(async () => {
-    // we only close and open new page when running tests independently
-    // otherwise we simply navigate to home.
-    if (type === "independent") {
-      if (page.isClosed()) page = await browser.newPage();
-      await page.goto("http://localhost:3000/");
-    } else {
-      // only navigate to Home if we are not at home
-      if ((await page.textContent(getTestId("routeHeader"))) !== "Notes")
-        await navigateTo("notes");
-    }
-  }, 600000);
-
-  // we have to reset the createNoteAndCheckPresence after every test
-  afterEach(async () => {
-    if (type === "independent") {
-      await page.close();
-      createNoteAndCheckPresence = staticCreateNoteAndCheckPresence;
-    } else {
-      createNoteAndCheckPresence = async function () {
-        let noteSelector = List.new("note").atIndex(0).grouped().build();
-        await page.click(noteSelector, { button: "left" });
-        return noteSelector;
-      };
-    }
+  test("create a note", async () => {
+    await createNoteAndCheckPresence();
   });
 
-  test("create a note", createNoteAndCheckPresence);
-
-  test("delete a note", deleteNoteAndCheckAbsence);
+  test("delete a note", async () => {
+    await deleteNoteAndCheckAbsence();
+  });
 
   test("restore a note", async () => {
-    const trashItemSelector =
-      type === "independent"
-        ? await deleteNoteAndCheckAbsence()
-        : List.new("trash").atIndex(0).title().build();
-
-    if (type === "sequential") await navigateTo("trash");
+    const trashItemSelector = await deleteNoteAndCheckAbsence();
 
     await openContextMenu(trashItemSelector);
 
@@ -234,15 +182,15 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
     await checkNotePresence();
   });
 
-  test.skip("add a note to notebook", async () => {
-    const noteSelector = await createNoteAndCheckPresence();
+  // test.skip("add a note to notebook", async () => {
+  //   const noteSelector = await createNoteAndCheckPresence();
 
-    await openContextMenu(noteSelector);
+  //   await openContextMenu(noteSelector);
 
-    await clickMenuItem("addtonotebook(s)");
+  //   await clickMenuItem("addtonotebook(s)");
 
-    await addNoteToNotebook();
-  });
+  //   await addNoteToNotebook();
+  // });
 
   test("favorite a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
@@ -267,11 +215,9 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
   test("unfavorite a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
-    if (type === "independent") {
-      await useContextMenu(noteSelector, async () => {
-        await clickMenuItem("favorite");
-      });
-    }
+    await useContextMenu(noteSelector, async () => {
+      await clickMenuItem("favorite");
+    });
 
     await page.waitForTimeout(500);
 
@@ -337,8 +283,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
   test("unpin a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 
-    if (type === "independent")
-      await useContextMenu(noteSelector, () => clickMenuItem("pin"));
+    await useContextMenu(noteSelector, () => clickMenuItem("pin"));
 
     await page.waitForTimeout(500);
 
@@ -377,21 +322,6 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
 
     await expect(page.$(trashItemSelector)).resolves.toBeFalsy();
   });
-});
-
-describe("run tests only independently", () => {
-  beforeAll(() => {
-    createNoteAndCheckPresence = staticCreateNoteAndCheckPresence;
-  });
-
-  beforeEach(async () => {
-    await page.goto("http://localhost:3000/");
-  }, 600000);
-
-  afterEach(async () => {
-    await page.close();
-    page = await browser.newPage();
-  });
 
   test("lock a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
@@ -406,7 +336,7 @@ describe("run tests only independently", () => {
 
     await lockUnlockNote(noteSelector, "lock");
 
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
 
     await lockUnlockNote(noteSelector, "unlock");
 
@@ -444,15 +374,15 @@ describe("run tests only independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  test.skip("add a note to notebook from properties", async () => {
-    await createNoteAndCheckPresence();
+  // test.skip("add a note to notebook from properties", async () => {
+  //   await createNoteAndCheckPresence();
 
-    await page.click(getTestId("properties"));
+  //   await page.click(getTestId("properties"));
 
-    await page.click(getTestId("properties-add-to-nb"));
+  //   await page.click(getTestId("properties-add-to-nb"));
 
-    await addNoteToNotebook();
-  });
+  //   await addNoteToNotebook();
+  // });
 
   test("assign a color to note from properties", async () => {
     const noteSelector = await createNoteAndCheckPresence();
