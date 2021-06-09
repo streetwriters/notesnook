@@ -21,5 +21,4 @@ jobs:
       - run: yarn
       - uses: microsoft/playwright-github-action@v1
       - name: Running tests
-        run: yarn playwright install
-        run: yarn test
+        run: yarn playwright install && yarn test
