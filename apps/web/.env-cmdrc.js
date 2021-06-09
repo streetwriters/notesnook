@@ -6,7 +6,7 @@ module.exports = {
     REACT_APP_GIT_HASH: gitHash,
   },
   dev: {
-    REACT_APP_CI: true,
+    REACT_APP_CI: "true",
   },
   web: {
     REACT_APP_PLATFORM: "web",
@@ -16,6 +16,8 @@ module.exports = {
     DEBUG: "pw:api",
   },
   silent: {
+    DISABLE_ESLINT_PLUGIN: "true",
+    FAST_REFRESH: "false",
     BROWSER: "none",
   },
   desktop: {
