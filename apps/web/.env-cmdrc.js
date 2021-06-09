@@ -12,7 +12,7 @@ module.exports = {
     REACT_APP_PLATFORM: "web",
   },
   debug: {
-    // PWDEBUG: 1,
+    PWDEBUG: 1,
     DEBUG: "pw:api",
   },
   silent: {

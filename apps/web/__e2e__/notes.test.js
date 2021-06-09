@@ -188,8 +188,7 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
     // we only close and open new page when running tests independently
     // otherwise we simply navigate to home.
     if (type === "independent") {
-      await page.close();
-      page = await browser.newPage();
+      if (page.isClosed()) page = await browser.newPage();
       await page.goto("http://localhost:3000/");
     } else {
       // only navigate to Home if we are not at home
@@ -199,8 +198,9 @@ describe.each(["independent", "sequential"])("run tests %sly", (type) => {
   }, 600000);
 
   // we have to reset the createNoteAndCheckPresence after every test
-  afterEach(() => {
+  afterEach(async () => {
     if (type === "independent") {
+      await page.close();
       createNoteAndCheckPresence = staticCreateNoteAndCheckPresence;
     } else {
       createNoteAndCheckPresence = async function () {
