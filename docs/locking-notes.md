@@ -48,6 +48,7 @@ To open, edit or delete a locked note, you must provide the password for the vau
 2. Press on `Remove from vault` button in `Note properties` menu
 3. Enter password for the vault
 4. Press on `Unlock` to  remove note from vault.
+|||
 
 ## Changing vault password
 ||| Desktop/Web
