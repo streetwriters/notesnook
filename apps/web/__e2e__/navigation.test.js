@@ -30,9 +30,5 @@ for (let route of routes) {
       route.header
     );
     await page.waitForTimeout(300);
-    const navItem = await page.$(getTestId(route.buttonId));
-    await expect(navItem.screenshot()).resolves.toMatchSnapshot(
-      `nav-item-${route.buttonId}.png`
-    );
   });
 }

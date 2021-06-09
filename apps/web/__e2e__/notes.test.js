@@ -82,9 +82,6 @@ async function checkNotePinned(noteSelector, pause) {
 
   // wait for the menu to properly close
   await page.waitForTimeout(500);
-
-  const note = await page.$(List.new("note").grouped().atIndex(0).build());
-  await expect(note.screenshot()).resolves.toMatchSnapshot("note-pinned.png");
 }
 
 async function checkNoteLocked(noteSelector) {
@@ -115,9 +112,6 @@ async function checkNoteColored(noteSelector) {
   // wait for the menu to properly close
   await page.waitForTimeout(500);
 
-  const note = await page.$(List.new("note").grouped().atIndex(0).build());
-  await expect(note.screenshot()).resolves.toMatchSnapshot("note-colored.png");
-
   await navigateTo("red");
 
   // wait for the page to render and notes to populate
@@ -125,9 +119,6 @@ async function checkNoteColored(noteSelector) {
 
   const coloredNote = await page.$(List.new("note").atIndex(0).build());
   if (!coloredNote) throw new Error("Colored note not present.");
-  await expect(coloredNote.screenshot()).resolves.toMatchSnapshot(
-    "note-colored-2.png"
-  );
 }
 
 async function addNoteToNotebook() {
