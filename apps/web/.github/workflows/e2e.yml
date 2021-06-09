@@ -15,10 +15,10 @@ jobs:
           persist-credentials: false
 
       - name: Use Node.js 16.x
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 16.x
       - run: yarn
-      - uses: microsoft/playwright-github-action@v1
-      - name: Running tests
-        run: yarn playwright install && yarn test
+      - run: yarn playwright install-deps
+      - run: yarn playwright install
+      - run: yarn test
