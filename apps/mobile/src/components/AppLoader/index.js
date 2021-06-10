@@ -1,21 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import { useTracked } from '../../provider';
-import { useFavoriteStore, useNoteStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {useTracked} from '../../provider';
+import {useFavoriteStore, useNoteStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
-import { editing } from '../../utils';
-import { changeContainerScale, ContainerScale } from '../../utils/Animations';
-import { db } from '../../utils/DB';
-import { eOpenRateDialog, eOpenSideMenu } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
+import {editing} from '../../utils';
+import {changeContainerScale, ContainerScale} from '../../utils/Animations';
+import {db} from '../../utils/DB';
+import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
 import SplashScreen from '../SplashScreen';
 
 const scaleV = new Animated.Value(0.95);
@@ -27,7 +27,7 @@ const AppLoader = ({onLoad}) => {
   const [opacity, setOpacity] = useState(true);
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
-  const _setLoading = useNoteStore(state => state.setLoading)
+  const _setLoading = useNoteStore(state => state.setLoading);
   const load = async value => {
     console.log('loading called here');
     if (value === 'hide') {
@@ -38,10 +38,12 @@ const AppLoader = ({onLoad}) => {
     let appState = await MMKV.getItem('appState');
     if (appState) {
       appState = JSON.parse(appState);
-      if (appState.note && !appState.movedAway && Date.now() < appState.timestamp + 3600000) {
-        console.log('loading app state')
+      if (
+        appState.note &&
+        !appState.movedAway &&
+        Date.now() < appState.timestamp + 3600000
+      ) {
         editing.isRestoringState = true;
-        //setNoteOnly(appState.note);
         editing.currentlyEditing = true;
         if (!DDS.isTab) {
           tabBarRef.current?.goToPage(1);
@@ -49,16 +51,13 @@ const AppLoader = ({onLoad}) => {
 
         eSendEvent('loadingNote', appState.note);
       }
-    } 
-    console.log('here again')
+    }
 
     if (value === 'show') {
-      console.log('returning')
       opacityV.setValue(0);
       setLoading(false);
       return;
     }
-    console.log('here now')
     eSendEvent(eOpenSideMenu);
     setOpacity(false);
     setTimeout(() => {
@@ -69,12 +68,10 @@ const AppLoader = ({onLoad}) => {
       }).start();
       changeContainerScale(ContainerScale, 1, 600);
 
-      setTimeout(async ()=>{
-        setLoading(false);  
-        console.log('loading notes')
+      setTimeout(async () => {
+        setLoading(false);
         await db.notes.init();
         setNotes();
-        console.log('setting notes')
         setFavorites();
         _setLoading(false);
         eSendEvent(eOpenSideMenu);
@@ -85,8 +82,8 @@ const AppLoader = ({onLoad}) => {
             eSendEvent(eOpenRateDialog);
           }
         }
-      },100)
-    },0);
+      }, 0);
+    }, 0);
   };
 
   useEffect(() => {
