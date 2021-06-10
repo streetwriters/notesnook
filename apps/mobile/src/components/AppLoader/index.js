@@ -18,18 +18,15 @@ import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import SplashScreen from '../SplashScreen';
 
-const scaleV = new Animated.Value(0.95);
 const opacityV = new Animated.Value(1);
 const AppLoader = ({onLoad}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [loading, setLoading] = useState(true);
-  const [opacity, setOpacity] = useState(true);
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);
   const load = async value => {
-    console.log('loading called here');
     if (value === 'hide') {
       setLoading(true);
       opacityV.setValue(1);
@@ -59,31 +56,24 @@ const AppLoader = ({onLoad}) => {
       return;
     }
     eSendEvent(eOpenSideMenu);
-    setOpacity(false);
-    setTimeout(() => {
-      Animated.timing(opacityV, {
-        toValue: 0,
-        duration: 100,
-        easing: Easing.out(Easing.ease),
-      }).start();
-      changeContainerScale(ContainerScale, 1, 600);
-
-      setTimeout(async () => {
-        setLoading(false);
-        await db.notes.init();
-        setNotes();
-        setFavorites();
-        _setLoading(false);
-        eSendEvent(eOpenSideMenu);
-        let askForRating = await MMKV.getItem('askForRating');
-        if (askForRating !== 'never' || askForRating !== 'completed') {
-          askForRating = JSON.parse(askForRating);
-          if (askForRating?.timestamp < Date.now()) {
-            eSendEvent(eOpenRateDialog);
-          }
-        }
-      }, 0);
-    }, 0);
+    Animated.timing(opacityV, {
+      toValue: 0,
+      duration: 100,
+      easing: Easing.out(Easing.ease),
+    }).start();
+    setLoading(false);
+    await db.notes.init();
+    setNotes();
+    setFavorites();
+    _setLoading(false);
+    eSendEvent(eOpenSideMenu);
+    let askForRating = await MMKV.getItem('askForRating');
+    if (askForRating !== 'never' || askForRating !== 'completed') {
+      askForRating = JSON.parse(askForRating);
+      if (askForRating?.timestamp < Date.now()) {
+        eSendEvent(eOpenRateDialog);
+      }
+    }
   };
 
   useEffect(() => {
@@ -97,7 +87,7 @@ const AppLoader = ({onLoad}) => {
   return loading ? (
     <Animated.View
       style={{
-        backgroundColor: opacity ? colors.bg : 'rgba(0,0,0,0)',
+        backgroundColor: colors.bg,
         width: '100%',
         height: '100%',
         position: 'absolute',
