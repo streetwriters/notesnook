@@ -5,7 +5,6 @@ import {ContainerTopSection} from '../../components/Container/ContainerTopSectio
 import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
 import {useNoteStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
