@@ -6,7 +6,7 @@ import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
-import { useNoteStore } from '../../provider/stores';
+import {useNoteStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -27,8 +27,8 @@ import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
   const [notes, setNotes] = useState([]);
-  const loading = useNoteStore(state =>state.loading);
-  
+  const loading = useNoteStore(state => state.loading);
+
   let params = route.params ? route.params : null;
   let ranAfterInteractions = false;
 
@@ -52,7 +52,7 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
-    console.log('setting notes');
+    console.log('setting notess');
     setNotes(_notes);
     if (params.menu) {
       navigation.setOptions({

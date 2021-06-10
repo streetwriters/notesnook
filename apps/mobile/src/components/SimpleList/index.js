@@ -69,7 +69,9 @@ const SimpleList = ({
   useEffect(() => {
     if (!loading) {
       setDataProvider(
-        listData.length >= 1 && SettingsService.get().homepage !== screen
+        dataProvider.length < 2 &&
+          listData.length >= 1 &&
+          SettingsService.get().homepage !== screen
           ? listData.slice(0, 1)
           : listData,
       );
