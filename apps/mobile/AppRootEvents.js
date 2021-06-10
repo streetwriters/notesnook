@@ -281,11 +281,14 @@ export const AppRootEvents = React.memo(
         setLastSynced(await db.lastSynced());
       } catch (e) {
         setSyncing(false);
-        ToastEvent.show({
-          heading: 'Sync failed',
-          message: e.message,
-          context: 'global',
-        });
+        let status = await NetInfo.fetch();
+        if (status.isConnected && status.isInternetReachable) {
+          ToastEvent.show({
+            heading: 'Sync failed',
+            message: e.message,
+            context: 'global',
+          });
+        }
       } finally {
         setSyncing(false);
       }

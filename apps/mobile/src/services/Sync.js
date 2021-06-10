@@ -1,14 +1,14 @@
+import NetInfo from '@react-native-community/netinfo';
 import {updateEvent} from '../components/DialogManager/recievers';
 import {Actions} from '../provider/Actions';
-import { initialize, useUserStore } from '../provider/stores';
+import {initialize, useUserStore} from '../provider/stores';
 import {doInBackground} from '../utils';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
 import {eSendEvent, ToastEvent} from './EventManager';
 
 const run = async (context = 'global', forced) => {
-  
-  let userstore = useUserStore.getState()
+  let userstore = useUserStore.getState();
   userstore.setSyncing(true);
   try {
     let res = await doInBackground(async () => {
@@ -19,7 +19,7 @@ const run = async (context = 'global', forced) => {
         return e.message;
       }
     });
- 
+
     if (res !== true) throw new Error(res);
 
     ToastEvent.show({
@@ -40,16 +40,18 @@ const run = async (context = 'global', forced) => {
         actionText: 'Login',
       });
     } else {
-    
       userstore.setSyncing(false);
-      ToastEvent.show({
-        heading: 'Sync failed',
-        message: e.message,
-        context: context,
-      });
+      let status = await NetInfo.fetch();
+      if (status.isConnected && status.isInternetReachable) {
+        ToastEvent.show({
+          heading: 'Sync failed',
+          message: e.message,
+          context: context,
+        });
+      }
     }
   } finally {
-    userstore.setLastSynced(await db.lastSynced())
+    userstore.setLastSynced(await db.lastSynced());
     initialize();
     userstore.setSyncing(false);
   }
