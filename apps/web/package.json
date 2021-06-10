@@ -72,7 +72,6 @@
     "eslint-plugin-react-hooks": "^4.2.0",
     "jest-image-snapshot": "^4.3.0",
     "jest-playwright-preset": "^1.4.5",
-    "playwright": "^1.8.1",
     "progress-bar-webpack-plugin": "^2.1.0",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.1.5",

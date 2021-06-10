@@ -50,8 +50,7 @@ function DiffViewer(props) {
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
-    async (selectedContent, otherContent) => {
-      const note = conflictedNote;
+    async (note, selectedContent, otherContent) => {
       if (!note) return;
 
       selectedContent = {
@@ -94,7 +93,7 @@ function DiffViewer(props) {
         await sync();
       }
     },
-    [conflictedNote, sync]
+    [sync]
   );
 
   useEffect(() => {
@@ -109,7 +108,7 @@ function DiffViewer(props) {
       note = note.data;
 
       const content = await db.content.raw(note.contentId);
-      if (!content.conflicted) resolveConflict(content.data);
+      if (!content.conflicted) return resolveConflict(note, content.data);
 
       setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
@@ -210,7 +209,7 @@ function DiffViewer(props) {
           >
             <ContentToggle
               label="Current note"
-              resolveConflict={resolveConflict}
+              resolveConflict={(data) => resolveConflict(conflictedNote, data)}
               dateEdited={localContent.dateEdited}
               isSelected={selectedContent === 0}
               isOtherSelected={selectedContent === 1}
@@ -264,7 +263,7 @@ function DiffViewer(props) {
                 pb: 1,
                 pt: [1, 1, 0],
               }}
-              resolveConflict={resolveConflict}
+              resolveConflict={(data) => resolveConflict(conflictedNote, data)}
               label="Incoming note"
               isSelected={selectedContent === 1}
               isOtherSelected={selectedContent === 0}
