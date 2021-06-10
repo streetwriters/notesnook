@@ -4,6 +4,7 @@ import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import { useTracked } from '../../provider';
 import { useFavoriteStore, useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -38,7 +39,7 @@ const AppLoader = ({onLoad}) => {
     if (appState) {
       appState = JSON.parse(appState);
       if (appState.note && !appState.movedAway && Date.now() < appState.timestamp + 3600000) {
-
+        console.log('loading app state')
         editing.isRestoringState = true;
         //setNoteOnly(appState.note);
         editing.currentlyEditing = true;
@@ -48,14 +49,16 @@ const AppLoader = ({onLoad}) => {
 
         eSendEvent('loadingNote', appState.note);
       }
-    }
+    } 
+    console.log('here again')
 
     if (value === 'show') {
+      console.log('returning')
       opacityV.setValue(0);
       setLoading(false);
       return;
     }
-
+    console.log('here now')
     eSendEvent(eOpenSideMenu);
     setOpacity(false);
     setTimeout(() => {
@@ -68,8 +71,10 @@ const AppLoader = ({onLoad}) => {
 
       setTimeout(async ()=>{
         setLoading(false);  
+        console.log('loading notes')
         await db.notes.init();
         setNotes();
+        console.log('setting notes')
         setFavorites();
         _setLoading(false);
         eSendEvent(eOpenSideMenu);
