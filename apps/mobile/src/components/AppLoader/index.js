@@ -29,6 +29,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 let passwordValue = null;
+let didVerifyUser = false;
 const opacityV = new Animated.Value(1);
 const AppLoader = ({onLoad}) => {
   const [state, dispatch] = useTracked();
@@ -93,6 +94,7 @@ const AppLoader = ({onLoad}) => {
 
   useEffect(() => {
     if (!verifyUser) {
+      if (!didVerifyUser) return;
       load();
     } else {
       db.user.getUser().then(u => {
@@ -114,12 +116,14 @@ const AppLoader = ({onLoad}) => {
   }, [verifyUser]);
 
   const onUnlockBiometrics = async () => {
-    let result = await BiometricService.validateUser(
+    let verified = await BiometricService.validateUser(
       'Unlock to access your notes',
       '',
     );
-    if (result) {
+    if (verified) {
+      didVerifyUser = true;
       setVerifyUser(false);
+      passwordValue = null;
     }
   };
 
@@ -128,7 +132,9 @@ const AppLoader = ({onLoad}) => {
     try {
       let verified = await db.user.verifyPassword(passwordValue);
       if (verified) {
+        didVerifyUser = true;
         setVerifyUser(false);
+        passwordValue = null;
       }
     } catch (e) {}
   };

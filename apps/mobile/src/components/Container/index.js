@@ -1,6 +1,5 @@
 import React from 'react';
-import { SafeAreaView } from 'react-native';
-import { KeyboardAvoidingView, Platform, View } from 'react-native';
+import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useTracked } from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 export const Container = ({children, root}) => {
