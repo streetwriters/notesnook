@@ -141,10 +141,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
   premium: false,
   lastSynced: 'Never',
   syncing: false,
+  verifyUser:false,
   setUser: user => set({ user: user }),
   setPremium: premium => set({ premium: premium }),
   setSyncing: syncing => set({ syncing: syncing }),
   setLastSynced: lastSynced => set({ lastSynced: lastSynced }),
+  setVerifyUser:(verified) => set({verifyUser:verified})
 }));
 
 let { width, height } = Dimensions.get('window');

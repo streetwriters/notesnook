@@ -9,7 +9,13 @@ import {RootView} from './initializer.root';
 import AppLoader from './src/components/AppLoader';
 import {useTracked} from './src/provider';
 import {Actions} from './src/provider/Actions';
-import {initialize, useMessageStore, useNoteStore, useSettingStore} from './src/provider/stores';
+import {
+  initialize,
+  useMessageStore,
+  useNoteStore,
+  useSettingStore,
+  useUserStore,
+} from './src/provider/stores';
 import BiometricService from './src/services/BiometricService';
 import {DDS} from './src/services/DeviceDetection';
 import {
@@ -27,8 +33,9 @@ let initStatus = false;
 const App = () => {
   const [, dispatch] = useTracked();
   const setDeviceMode = useSettingStore(state => state.setDeviceMode);
-  useEffect(() => {
+  const setVerifyUser = useUserStore(state => state.setVerifyUser);
 
+  useEffect(() => {
     useMessageStore.getState().setAnnouncement();
     (async () => {
       try {
@@ -66,19 +73,9 @@ const App = () => {
           SettingsService.get().appLockMode &&
           SettingsService.get().appLockMode !== 'none'
         ) {
-          let result = await BiometricService.validateUser(
-            'Unlock to access your notes',
-            '',
-          );
-          if (result) {
-            await func();
-          } else {
-            RNExitApp.exitApp();
-            return;
-          }
-        } else {
-          await func();
+          setVerifyUser(true);
         }
+        await func();
       } catch (e) {
       } finally {
         initStatus = true;

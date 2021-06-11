@@ -53,6 +53,8 @@ export interface UserStore extends State {
     setPremium: (premium: boolean) => void,
     setSyncing: (syncing: boolean) => void,
     setLastSynced: (lastSynced: string) => void,
+    verifyUser:boolean,
+    setVerifyUser:(verified:boolean) => void
 }
 
 
