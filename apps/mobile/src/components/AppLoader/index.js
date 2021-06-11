@@ -94,7 +94,10 @@ const AppLoader = ({onLoad}) => {
 
   useEffect(() => {
     if (!verifyUser) {
-      if (!didVerifyUser) return;
+      if (!didVerifyUser) {
+        onLoad();
+        return;
+      }
       load();
     } else {
       db.user.getUser().then(u => {

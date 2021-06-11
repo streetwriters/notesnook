@@ -53,8 +53,8 @@ export interface UserStore extends State {
     setPremium: (premium: boolean) => void,
     setSyncing: (syncing: boolean) => void,
     setLastSynced: (lastSynced: string) => void,
-    verifyUser:boolean,
-    setVerifyUser:(verified:boolean) => void
+    verifyUser: boolean,
+    setVerifyUser: (verified: boolean) => void
 }
 
 
@@ -76,19 +76,19 @@ export type Settings = {
 }
 
 type Dimensions = {
-    width:number,
-    height:number
+    width: number,
+    height: number
 }
 
 export interface SettingStore extends State {
     settings: Settings,
     fullscreen: boolean,
     deviceMode: string | null,
-    dimensions:Dimensions
+    dimensions: Dimensions
     setSettings: (settings: Settings) => void,
     setFullscreen: (fullscreen: boolean) => void,
     setDeviceMode: (mode: string) => void,
-    setDimensions: (dimensions:Dimensions) => void
+    setDimensions: (dimensions: Dimensions) => void
 }
 
 
@@ -128,20 +128,32 @@ export interface SelectionStore extends State {
 
 
 export type Message = {
-    visible: boolean,
-    message: string | null,
-    actionText: string | null,
-    onPress: () => void,
-    data: object,
-    icon: string,
+    visible: boolean
+    message: string | null
+    actionText: string | null
+    onPress: () => void
+    data: object
+    icon: string
+}
+
+export type Action = {
+    type:string
+    title:string
+    action:string
+}
+
+export type Announcement = {
+    title: string
+    description: string
+    ctas:Action[]
 }
 
 export interface MessageStore extends State {
     message: Message
     setMessage: (message: Message) => void
-    announcement:any,
-    setAnnouncement:() => Promise<void>
-    remove:() => void
+    announcements: Announcement[],
+    setAnnouncement: () => Promise<void>
+    remove: (id: string) => void
 }
 
 

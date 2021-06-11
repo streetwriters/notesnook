@@ -1,12 +1,12 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useMessageStore, useSelectionStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
-import { eOpenPremiumDialog } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {useMessageStore, useSelectionStore} from '../../provider/stores';
+import {eSendEvent} from '../../services/EventManager';
+import {eOpenPremiumDialog} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -14,12 +14,13 @@ import Paragraph from '../Typography/Paragraph';
 export const Announcement = () => {
   const [state] = useTracked();
   const colors = state.colors;
-  const announcement = useMessageStore().announcement;
-  const remove = useMessageStore().remove;
-  
+  const announcements = useMessageStore(state => state.announcements);
+  const remove = useMessageStore(state => state.remove);
+  let announcement = announcements.length > 0 ? announcements[0] : null;
+
   const selectionMode = useSelectionStore(state => state.selectionMode);
 
-  return !announcement || selectionMode ? null : (
+  return announcement || selectionMode ? null : (
     <View
       style={{
         backgroundColor: colors.bg,

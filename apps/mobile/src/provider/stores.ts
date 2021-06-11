@@ -141,12 +141,12 @@ export const useUserStore = create<UserStore>((set, get) => ({
   premium: false,
   lastSynced: 'Never',
   syncing: false,
-  verifyUser:false,
+  verifyUser: false,
   setUser: user => set({ user: user }),
   setPremium: premium => set({ premium: premium }),
   setSyncing: syncing => set({ syncing: syncing }),
   setLastSynced: lastSynced => set({ lastSynced: lastSynced }),
-  setVerifyUser:(verified) => set({verifyUser:verified})
+  setVerifyUser: (verified) => set({ verifyUser: verified })
 }));
 
 let { width, height } = Dimensions.get('window');
@@ -242,29 +242,47 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     icon: 'account-outline',
   },
   setMessage: message => set({ message: { ...message } }),
-  announcement:null,
-  remove:async () => {
-    await MMKV.setStringAsync('removedAnnouncement', get().announcement.id);
-    set({announcement:null})
+  announcements: [],
+  remove: async (id) => {
+    MMKV.setStringAsync(id, "removed");
+    let announcements = get().announcements
+    const copy = announcements.slice();
+    const index = copy.findIndex((announcement) => announcement.id === id);
+    if (index >= -1) {
+      copy.splice(index, 1);
+    }
+    set({ announcements: copy });
   },
-  setAnnouncement:async function () {
+  setAnnouncement: async function () {
+    let announcements = [];
     try {
       let announcement = await db.announcement()
+      let shouldShow = await shouldShowAnnouncement(announcement)
       if (
-        !announcement ||
-        (await MMKV.getStringAsync('removedAnnouncement')) ===
-        announcement.id ||
-        !shouldShowAnnouncement(announcement)
+        shouldShow
       ) {
-        announcement = null;
+        announcements = [];
         return;
       }
-      set({announcement:announcement})
+      set({ announcements: announcement })
     } catch (e) {
-      set({announcement:null})
+      set({ announcements: [] })
+    } finally {
+      set({ announcements: await getFiltered(announcements) })
     }
   }
 }));
+
+const getFiltered = async (announcements) => {
+  if (!announcements) return [];
+  let filtered = [];
+  for (var announcement of announcements) {
+    if (await shouldShowAnnouncement(announcement)) {
+      filtered.push(announcement);
+    }
+  }
+  return filtered;
+}
 
 export function initialize() {
   if (!db) return;
@@ -284,46 +302,51 @@ export function clearAllStores() {
   useNoteStore.getState().clearNotes();
 }
 
-const allowedPlatforms = ['all', 'mobile', Platform.OS];
-function shouldShowAnnouncement(announcement) {
-  let show = allowedPlatforms.indexOf(announcement.platform) > -1;
-  console.log(show);
-  if (!show) return;
+
+
+export const allowedPlatforms = ['all', 'mobile', Platform.OS];
+
+async function shouldShowAnnouncement(announcement) {
+  if (!announcement) return false;
+  let removed = await MMKV.getStringAsync(announcement.id) ===
+    "removed"
+  if (removed) return false;
+  let show = announcement.platforms.some(
+    (platform) => allowedPlatforms.indexOf(platform) > -1
+  );
+  if (!show) return false;
 
   const subStatus = PremiumService.getUser()?.subscription?.type;
-
-  switch (announcement.userType) {
-    case 'pro':
-      show = PremiumService.get()
-      break;
-    case 'trial':
-      show = subStatus === SUBSCRIPTION_STATUS.TRIAL;
-      break;
-    case 'trialExpired':
-      show = subStatus === SUBSCRIPTION_STATUS.BASIC;
-      break;
-    case 'loggedOut':
-      show = !PremiumService.getUser();
-      break;
-    case 'verified':
-      show = PremiumService.getUser()?.isEmailVerified;
-      break;
-    case 'loggedIn':
-      show = !!PremiumService.getUser();
-      break;
-    case 'unverified':
-      show = !PremiumService.getUser()?.isEmailVerified;
-      break;
-    case 'proExpired':
-      show =
-        subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
-        subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
-      break;
-    case 'any':
-    default:
-      break;
-  }
+  show = announcement.userTypes.some((userType) => {
+    switch (userType) {
+      case "pro":
+        return PremiumService.get()
+      case "trial":
+        return subStatus === SUBSCRIPTION_STATUS.TRIAL;
+      case "trialExpired":
+        return subStatus === SUBSCRIPTION_STATUS.BASIC;
+      case 'loggedOut':
+        show = !PremiumService.getUser();
+        break;
+      case 'verified':
+        show = PremiumService.getUser()?.isEmailVerified;
+        break;
+      case 'loggedIn':
+        show = !!PremiumService.getUser();
+        break;
+      case 'unverified':
+        show = !PremiumService.getUser()?.isEmailVerified;
+        break;
+      case 'proExpired':
+        show =
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+        break;
+      case "any":
+      default:
+        return true;
+    }
+  });
 
   return show;
 }
-
