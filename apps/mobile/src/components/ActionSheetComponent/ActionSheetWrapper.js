@@ -1,22 +1,18 @@
 import React from 'react';
-import { View } from 'react-native';
-import { Platform } from 'react-native';
+import {View} from 'react-native';
+import {Platform} from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { editing } from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { sleep } from '../../utils/TimeUtils';
-import {
-  EditorWebView,
-
-  textInput
-} from '../../views/Editor/Functions';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {editing} from '../../utils';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorWebView, textInput} from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
-import { Toast } from '../Toast';
-import { GetPremium } from './GetPremium';
+import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
+import {Toast} from '../Toast';
+import {GetPremium} from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -44,7 +40,7 @@ const ActionSheetWrapper = ({
       borderBottomLeftRadius: largeTablet ? 10 : 1,
       marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
-      paddingTop: gestureEnabled ? 10 : 10,
+      paddingTop: 10,
     };
   }, [colors.bg, gestureEnabled]);
 
@@ -71,8 +67,7 @@ const ActionSheetWrapper = ({
   return (
     <ActionSheet
       ref={fwdRef}
-      hideUnderlay={true}
-      
+      drawUnderStatusBar={false}
       containerStyle={style}
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
@@ -87,17 +82,17 @@ const ActionSheetWrapper = ({
       keyboardShouldPersistTaps="always"
       premium={
         <>
-        <Toast context="local" />
-        <GetPremium
-          context="sheet"
-          close={() => fwdRef?.current?.hide()}
-          offset={50}
-        />
+          <Toast context="local" />
+          <GetPremium
+            context="sheet"
+            close={() => fwdRef?.current?.hide()}
+            offset={50}
+          />
         </>
       }
       onClose={_onClose}>
       {children}
-      <View style={{height:Platform.OS === "ios" ? insets.bottom/2 : 20}}/>
+      <View style={{height: Platform.OS === 'ios' ? insets.bottom / 2 : 20}} />
     </ActionSheet>
   );
 };
