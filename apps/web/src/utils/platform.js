@@ -7,7 +7,7 @@ export function getPlatform() {
     os = null;
 
   if (macosPlatforms.indexOf(platform) !== -1) {
-    os = "Mac OS";
+    os = "macOS";
   } else if (iosPlatforms.indexOf(platform) !== -1) {
     os = "iOS";
   } else if (windowsPlatforms.indexOf(platform) !== -1) {

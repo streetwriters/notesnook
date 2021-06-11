@@ -9,8 +9,8 @@ import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
 import ScrollContainer from "../scroll-container";
 import ReminderBar from "../reminder-bar";
-import Announcement from "../announcement";
-import useAnnouncement from "../../utils/useAnnouncement";
+import Announcements from "../announcements";
+import useAnnouncements from "../../utils/use-announcements";
 
 const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
   <ScrollContainer {...props} forwardedRef={ref} />
@@ -18,7 +18,7 @@ const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
 
 function ListContainer(props) {
   const { type, context } = props;
-  const [announcement, removeAnnouncement] = useAnnouncement();
+  const [announcements, removeAnnouncement] = useAnnouncements();
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
@@ -46,9 +46,9 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          {announcement ? (
-            <Announcement
-              announcement={announcement}
+          {announcements.length ? (
+            <Announcements
+              announcements={announcements}
               removeAnnouncement={removeAnnouncement}
             />
           ) : (
