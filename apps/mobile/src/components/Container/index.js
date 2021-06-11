@@ -1,4 +1,5 @@
 import React from 'react';
+import { SafeAreaView } from 'react-native';
 import { KeyboardAvoidingView, Platform, View } from 'react-native';
 import { useTracked } from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
@@ -14,7 +15,7 @@ export const Container = ({children, root}) => {
         height:"100%"
       }}
     >
-      <View
+      <SafeAreaView
         style={{
           height: '100%',
           backgroundColor:colors.bg,
@@ -22,7 +23,7 @@ export const Container = ({children, root}) => {
         }}>
       
         {children}
-      </View>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

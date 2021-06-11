@@ -1,32 +1,29 @@
 import http from 'notes-core/utils/http';
-import React, {useEffect} from 'react';
-import RNExitApp from 'react-native-exit-app';
+import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {AppRootEvents} from './AppRootEvents';
-import {RootView} from './initializer.root';
+import { AppRootEvents } from './AppRootEvents';
+import { RootView } from './initializer.root';
 import AppLoader from './src/components/AppLoader';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import { useTracked } from './src/provider';
 import {
   initialize,
   useMessageStore,
   useNoteStore,
   useSettingStore,
-  useUserStore,
+  useUserStore
 } from './src/provider/stores';
-import BiometricService from './src/services/BiometricService';
-import {DDS} from './src/services/DeviceDetection';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
-import {db} from './src/utils/DB';
-import {eDispatchAction, eOpenSideMenu} from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
+import { db } from './src/utils/DB';
+import { eDispatchAction, eOpenSideMenu } from './src/utils/Events';
+import { MMKV } from './src/utils/mmkv';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
 let initStatus = false;
