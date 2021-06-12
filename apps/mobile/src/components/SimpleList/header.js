@@ -28,9 +28,11 @@ export const Header = React.memo(
   }) => {
     const [state] = useTracked();
     const {colors} = state;
-    const announcement = useMessageStore(state => state.announcement)
+    const announcements = useMessageStore(state => state.announcements)
     const deviceMode = useSettingStore(state => state.deviceMode)
-    return announcement && !noAnnouncement ? (
+
+
+    return announcements.length > 0 && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
     ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
       <View

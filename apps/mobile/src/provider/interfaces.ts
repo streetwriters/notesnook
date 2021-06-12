@@ -91,13 +91,12 @@ export interface SettingStore extends State {
     setDimensions: (dimensions: Dimensions) => void
 }
 
-
-
 export interface MenuStore extends State {
     menuPins: object[],
     colorNotes: object[],
     setMenuPins: () => void,
     setColorNotes: () => void
+    clearAll: () => void
 }
 
 
@@ -125,8 +124,6 @@ export interface SelectionStore extends State {
     clearSelection: () => void,
 }
 
-
-
 export type Message = {
     visible: boolean
     message: string | null
@@ -137,15 +134,21 @@ export type Message = {
 }
 
 export type Action = {
-    type:string
-    title:string
-    action:string
+    type: string
+    platforms: string[]
+    title: string
+    data: string
 }
 
 export type Announcement = {
     title: string
     description: string
-    ctas:Action[]
+    id: string
+    callToActions: Action[]
+    timestamp: number
+    platforms: string[]
+    isActive: boolean
+    userTypes: string[]
 }
 
 export interface MessageStore extends State {

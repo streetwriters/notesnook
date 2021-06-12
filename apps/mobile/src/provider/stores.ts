@@ -21,6 +21,7 @@ import {
   EditorStore,
   FavoriteStore,
   UserStore,
+  Announcement,
 } from './interfaces';
 
 
@@ -181,6 +182,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
   colorNotes: [],
   setMenuPins: () => set({ menuPins: db.settings.pins }),
   setColorNotes: () => set({ colorNotes: db.colors.all }),
+  clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
@@ -254,17 +256,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     set({ announcements: copy });
   },
   setAnnouncement: async function () {
-    let announcements = [];
+    let announcements: Announcement[] = [];
     try {
-      let announcement = await db.announcement()
-      let shouldShow = await shouldShowAnnouncement(announcement)
-      if (
-        shouldShow
-      ) {
+      announcements = await db.announcements()
+      if (!announcements) {
         announcements = [];
-        return;
       }
-      set({ announcements: announcement })
     } catch (e) {
       set({ announcements: [] })
     } finally {
@@ -300,9 +297,8 @@ export function clearAllStores() {
   useTagStore.getState().clearTags();
   useFavoriteStore.getState().clearFavorites();
   useNoteStore.getState().clearNotes();
+  useMenuStore.getState().clearAll();
 }
-
-
 
 export const allowedPlatforms = ['all', 'mobile', Platform.OS];
 

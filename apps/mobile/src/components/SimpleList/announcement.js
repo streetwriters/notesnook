@@ -17,10 +17,10 @@ export const Announcement = () => {
   const announcements = useMessageStore(state => state.announcements);
   const remove = useMessageStore(state => state.remove);
   let announcement = announcements.length > 0 ? announcements[0] : null;
-
+  console.log(announcements, 'ann');
   const selectionMode = useSelectionStore(state => state.selectionMode);
 
-  return announcement || selectionMode ? null : (
+  return !announcement || selectionMode ? null : (
     <View
       style={{
         backgroundColor: colors.bg,
@@ -83,30 +83,42 @@ export const Announcement = () => {
           <Paragraph color={colors.pri}>{announcement.description}</Paragraph>
         )}
         <Seperator />
-
-        {announcement?.cta && (
-          <Button
-            type="accent"
-            title={announcement.cta.text}
-            fontSize={SIZE.md}
-            onPress={async () => {
-              if (announcement.cta.type === 'link') {
-                try {
-                  await openLinkInBrowser(
-                    announcement.cta.action,
-                    state.colors,
-                  );
-                } catch (e) {}
-              } else if (announcement.cta.type === 'promo') {
-                eSendEvent(eOpenPremiumDialog, {
-                  promoCode: announcement.cta.action,
-                  text: announcement.cta.text,
-                });
-              }
-            }}
-            width="100%"
-          />
-        )}
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+          }}>
+          {announcement?.callToActions &&
+            announcement.callToActions.map((item, index) => (
+              <>
+                <Button
+                  type={index === 0 ? 'accent' : 'shade'}
+                  title={item.title}
+                  fontSize={SIZE.md}
+                  onPress={async () => {
+                    if (announcement.type === 'link') {
+                      try {
+                        await openLinkInBrowser(
+                          announcement.cta.action,
+                          state.colors,
+                        );
+                      } catch (e) {}
+                    } else if (announcement.type === 'promo') {
+                      eSendEvent(eOpenPremiumDialog, {
+                        promoCode: announcement.cta.action,
+                        text: announcement.cta.text,
+                      });
+                    }
+                  }}
+                  width="48%"
+                  style={{
+                    marginBottom: 10,
+                  }}
+                />
+              </>
+            ))}
+        </View>
       </View>
     </View>
   );
