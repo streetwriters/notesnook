@@ -146,7 +146,8 @@
     "afterPack": "./scripts/removeLocales.js",
     "mac": {
       "target": [
-        "dmg"
+        "dmg",
+        "zip"
       ],
       "electronLanguages": [
         "en-US"
