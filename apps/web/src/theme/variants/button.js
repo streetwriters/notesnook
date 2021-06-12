@@ -9,6 +9,7 @@ class ButtonFactory {
       anchor: new Anchor(),
       tool: new Tool(),
       icon: new Icon(),
+      shade: new Shade(),
       statusitem: new StatusItem(),
     };
   }
@@ -31,6 +32,9 @@ class Default {
         border: "2px solid",
         borderColor: "primary",
       },
+      ":hover": {
+        opacity: 0.8,
+      },
     };
   }
 }
@@ -41,15 +45,17 @@ class Primary {
       variant: "buttons.default",
       color: "static",
       bg: "primary",
-      transition: "opacity 300ms linear",
-      ":hover": {
-        opacity: 0.8,
-      },
       ":focus-visible": {
         border: "2px solid",
         borderColor: "text",
       },
     };
+  }
+}
+
+class Shade {
+  constructor() {
+    return { variant: "buttons.primary", color: "primary", bg: "shade" };
   }
 }
 

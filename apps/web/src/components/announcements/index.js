@@ -21,10 +21,7 @@ function Announcements({ announcements, removeAnnouncement }) {
         >
           <Icon.Announcement size={12} color="primary" sx={{ mr: "3px" }} />
           <Text color="primary" variant="subBody" fontWeight="bold">
-            Announcement{" "}
-            {announcements.length - 1 >= 1
-              ? `(${announcements.length - 1} more)`
-              : ""}
+            Announcement
           </Text>
         </Flex>
         <Text
@@ -34,8 +31,12 @@ function Announcements({ announcements, removeAnnouncement }) {
           py={"1px"}
           variant="subBody"
           fontWeight="bold"
-          sx={{ cursor: "pointer", ":hover": { opacity: 0.7 } }}
+          sx={{
+            cursor: "pointer",
+            ":hover": { opacity: 0.7 },
+          }}
           onClick={() => {
+            trackEvent(announcement.title, "dismissed");
             removeAnnouncement && removeAnnouncement(announcement.id);
           }}
         >
@@ -51,38 +52,55 @@ function Announcements({ announcements, removeAnnouncement }) {
           {announcement.description}
         </Text>
       )}
-
-      {announcement.callToActions?.map((action) =>
-        action.platforms.some(
-          (platform) => allowedPlatforms.indexOf(platform) > -1
-        ) ? (
-          <Button
-            m={0}
-            mt={1}
-            p={1}
-            fontWeight="bold"
-            onClick={async () => {
-              trackEvent(action.data, action.type);
-              switch (action.type) {
-                case "link":
-                  const url = new URL(action.data);
-                  if (url.origin === window.location.origin)
-                    window.open(action.data, "_self");
-                  else window.open(action.data, "_blank");
-                  break;
-                case "promo":
-                  const coupon = action.data;
-                  await showBuyDialog(coupon);
-                  break;
-                default:
-                  return;
+      <Flex justifyContent="space-evenly" mt={1}>
+        {announcement.callToActions?.map((action, index) =>
+          action.platforms.some(
+            (platform) => allowedPlatforms.indexOf(platform) > -1
+          ) ? (
+            <Button
+              flex={1}
+              m={0}
+              p={1}
+              as={action.type === "link" ? "a" : "button"}
+              href={action.type === "link" ? action.data : ""}
+              variant={
+                index === 0
+                  ? "primary"
+                  : index === 1
+                  ? "secondary"
+                  : index === 2
+                  ? "tertiary"
+                  : "shade"
               }
-            }}
-          >
-            {action.title}
-          </Button>
-        ) : null
-      )}
+              sx={{
+                ":first-of-type": {
+                  mr: 1,
+                },
+              }}
+              fontWeight="bold"
+              onClick={async () => {
+                trackEvent(action.data, action.type);
+                switch (action.type) {
+                  case "link":
+                    const url = new URL(action.data);
+                    if (url.origin === window.location.origin)
+                      window.open(action.data, "_self");
+                    else window.open(action.data, "_blank");
+                    break;
+                  case "promo":
+                    const coupon = action.data;
+                    await showBuyDialog(coupon);
+                    break;
+                  default:
+                    return;
+                }
+              }}
+            >
+              {action.title}
+            </Button>
+          ) : null
+        )}
+      </Flex>
     </Flex>
   );
 }

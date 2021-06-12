@@ -11,13 +11,14 @@ export default function useAnnouncements() {
   useEffect(() => {
     (async function () {
       try {
-        CACHED_ANNOUNCEMENTS =
-          CACHED_ANNOUNCEMENTS || (await db.announcements());
+        CACHED_ANNOUNCEMENTS = CACHED_ANNOUNCEMENTS.length
+          ? CACHED_ANNOUNCEMENTS
+          : await db.announcements();
       } catch (e) {
         console.error(e);
       } finally {
-        setAnnouncements((announcements) => {
-          const filtered = announcements.filter((announcement) =>
+        setAnnouncements(() => {
+          const filtered = CACHED_ANNOUNCEMENTS.filter((announcement) =>
             shouldShowAnnouncement(announcement)
           );
           return filtered;
