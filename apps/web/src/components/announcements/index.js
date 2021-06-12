@@ -52,41 +52,37 @@ function Announcements({ announcements, removeAnnouncement }) {
         </Text>
       )}
 
-      {announcement.callToActions?.map((callToAction) => (
-        <>
-          {callToAction.actions.map((action) =>
-            action.platforms.some(
-              (platform) => allowedPlatforms.indexOf(platform) > -1
-            ) ? (
-              <Button
-                m={0}
-                mt={1}
-                p={1}
-                fontWeight="bold"
-                onClick={async () => {
-                  trackEvent(action.data, callToAction.type);
-                  switch (callToAction.type) {
-                    case "link":
-                      const url = new URL(action.data);
-                      if (url.origin === window.location.origin)
-                        window.open(action.data, "_self");
-                      else window.open(action.data, "_blank");
-                      break;
-                    case "promo":
-                      const coupon = action.data;
-                      await showBuyDialog(coupon);
-                      break;
-                    default:
-                      return;
-                  }
-                }}
-              >
-                {action.title}
-              </Button>
-            ) : null
-          )}
-        </>
-      ))}
+      {announcement.callToActions?.map((action) =>
+        action.platforms.some(
+          (platform) => allowedPlatforms.indexOf(platform) > -1
+        ) ? (
+          <Button
+            m={0}
+            mt={1}
+            p={1}
+            fontWeight="bold"
+            onClick={async () => {
+              trackEvent(action.data, action.type);
+              switch (action.type) {
+                case "link":
+                  const url = new URL(action.data);
+                  if (url.origin === window.location.origin)
+                    window.open(action.data, "_self");
+                  else window.open(action.data, "_blank");
+                  break;
+                case "promo":
+                  const coupon = action.data;
+                  await showBuyDialog(coupon);
+                  break;
+                default:
+                  return;
+              }
+            }}
+          >
+            {action.title}
+          </Button>
+        ) : null
+      )}
     </Flex>
   );
 }
