@@ -187,8 +187,8 @@ class Database {
     return http.get(`${Constants.API_HOST}/version`);
   }
 
-  announcement() {
-    return http.get(`${Constants.API_HOST}/announcements/recent`);
+  announcements() {
+    return http.get(`${Constants.API_HOST}/announcements/active`);
   }
 }
 
