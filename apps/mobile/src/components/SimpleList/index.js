@@ -25,22 +25,19 @@ const heights = {
   header: 35,
 };
 
-const TrashI = ({item, index}) => {
-  return item.itemType === 'note' ? (
-    <NoteWrapper item={item} index={index} />
-  ) : (
-    <NoteWrapper item={item} index={index} />
-  );
+let renderItems = {
+  note: NoteWrapper,
+  notebook: NotebookWrapper,
+  topic: NotebookWrapper,
+  tag: TagItem,
+  section: SectionHeader,
 };
 
-let renderItems = {
-  notes: NoteWrapper,
-  notebooks: NotebookWrapper,
-  topics: NotebookWrapper,
-  tags: TagItem,
-  section: SectionHeader,
-  trash: TrashI,
-};
+const RenderItem = ({item,index}) => {
+  const Item = renderItems[item.itemType || item.type]
+
+  return <Item item={item} index={index} />
+}
 
 const SimpleList = ({
   listData,
@@ -63,7 +60,6 @@ const SimpleList = ({
   const [dataProvider, setDataProvider] = useState([]);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  const RenderItem = renderItems[type];
   const refreshing = false;
 
   useEffect(() => {
