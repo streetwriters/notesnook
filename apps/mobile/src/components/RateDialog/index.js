@@ -1,19 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Platform, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Linking, Platform, View } from 'react-native';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const RateDialog = () => {
-  const [state] = useTracked();
-  const {colors} = state;
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
 
