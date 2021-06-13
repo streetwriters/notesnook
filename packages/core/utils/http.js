@@ -10,6 +10,10 @@ function patch(url, data, token) {
   return bodyRequest(url, data, false, token, "PATCH");
 }
 
+patch.json = function (url, data, token) {
+  return bodyRequest(url, data, true, token, "PATCH");
+};
+
 function post(url, data, token) {
   return bodyRequest(url, data, false, token, "POST");
 }

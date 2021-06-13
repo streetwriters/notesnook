@@ -17,6 +17,7 @@ import Migrations from "./migrations";
 import Outbox from "./outbox";
 import UserManager from "./user-manager";
 import http from "../utils/http";
+import Monograph from "./monograph";
 
 /**
  * @type {EventSource}
@@ -69,6 +70,7 @@ class Database {
     this.settings = new Settings(this);
     this.migrations = new Migrations(this);
     this.outbox = new Outbox(this);
+    this.monograph = new Monograph(this);
 
     // collections
     /** @type {Notes} */
