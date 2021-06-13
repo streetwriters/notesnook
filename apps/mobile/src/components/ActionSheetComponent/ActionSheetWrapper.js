@@ -1,18 +1,17 @@
 import React from 'react';
-import {View} from 'react-native';
-import {Platform} from 'react-native';
+import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {editing} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorWebView, textInput} from '../../views/Editor/Functions';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { editing } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView, textInput } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
-import {Toast} from '../Toast';
-import {GetPremium} from './GetPremium';
+import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { Toast } from '../Toast';
+import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -24,23 +23,24 @@ const ActionSheetWrapper = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const largeTablet = DDS.isLargeTablet();
-  const smallTablet = DDS.isTab;
+  const deviceMode = useSettingStore(state => state.deviceMode);
+  const largeTablet = deviceMode === "tablet"
+  const smallTablet = deviceMode === "smallTablet"
+  
   const insets = useSafeAreaInsets();
   const style = React.useMemo(() => {
     return {
       width: largeTablet || smallTablet ? 500 : '100%',
-      borderTopRightRadius: 10,
-      borderTopLeftRadius: 10,
       backgroundColor: colors.bg,
-      padding: largeTablet ? 8 : 0,
       zIndex: 10,
-      paddingVertical: 10,
+      paddingTop:10,
+      paddingBottom:0,
       borderBottomRightRadius: largeTablet ? 10 : 1,
       borderBottomLeftRadius: largeTablet ? 10 : 1,
+      borderTopRightRadius: 10,
+      borderTopLeftRadius: 10,
       marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
-      paddingTop: 10,
     };
   }, [colors.bg, gestureEnabled]);
 
@@ -92,7 +92,7 @@ const ActionSheetWrapper = ({
       }
       onClose={_onClose}>
       {children}
-      <View style={{height: Platform.OS === 'ios' ? insets.bottom / 2 : 20}} />
+      <View style={{height: Platform.OS === 'ios' ? insets.bottom / 2 : 0}} />
     </ActionSheet>
   );
 };
