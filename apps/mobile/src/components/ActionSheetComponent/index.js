@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   ActivityIndicator,
   Clipboard,
@@ -6,44 +6,47 @@ import {
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked, useTrackedNotes } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { useMenuStore, useNotebookStore, useNoteStore, useSelectionStore, useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
-  eSendEvent,
-  openVault,
-  sendNoteEditedEvent,
-  ToastEvent
-} from '../../services/EventManager';
+  useMenuStore,
+  useSelectionStore,
+  useUserStore,
+} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
-import { doInBackground, editing, toTXT } from '../../utils';
+import {editing, toTXT} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { db } from '../../utils/DB';
-import {
-  eOpenMoveNoteDialog
-} from '../../utils/Events';
-import { deleteItems } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { opacity, pv, SIZE } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
-import { PressableButton } from '../PressableButton';
+import {db} from '../../utils/DB';
+import {eOpenMoveNoteDialog, eOpenPublishNoteDialog} from '../../utils/Events';
+import {deleteItems} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {opacity, pv, SIZE} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import BaseDialog from '../Dialog/base-dialog';
+import DialogButtons from '../Dialog/dialog-buttons';
+import DialogContainer from '../Dialog/dialog-container';
+import DialogHeader from '../Dialog/dialog-header';
+import Input from '../Input';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ActionSheetColorsSection } from './ActionSheetColorsSection';
-import { ActionSheetTagsSection } from './ActionSheetTagsSection';
+import {ActionSheetColorsSection} from './ActionSheetColorsSection';
+import {ActionSheetTagsSection} from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -56,98 +59,75 @@ export const ActionSheetComponent = ({
   getRef,
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors,} = state;
-
-  const setNotes = useNoteStore(state => state.setNotes);
-  const setNotebooks = useNotebookStore(state => state.setNotebooks);
+  const {colors} = state;
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
 
   const user = useUserStore(state => state.user);
   const lastSynced = useUserStore(state => state.lastSynced);
-
-  const [refreshing, setRefreshing] = useState(false);
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
+  const refreshing = false;
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
+    db.settings.isPinned(item.id),
+  );
   const [note, setNote] = useState(item);
 
-  const [noteInTopic, setNoteInTopic] = useState(
+  const noteInTopic =
     editing.actionAfterFirstSave.type === 'topic' &&
-      db.notebooks
-        .notebook(editing.actionAfterFirstSave.notebook)
-        .topics.topic(editing.actionAfterFirstSave.id)
-        .has(item.id),
-  );
+    db.notebooks
+      .notebook(editing.actionAfterFirstSave.notebook)
+      .topics.topic(editing.actionAfterFirstSave.id)
+      .has(item.id);
+
+  useEffect(() => {
+    if (item.id === null) return;
+
+    sleep(1000).then(() => {
+      setNote({...item});
+      if (item.type !== note) {
+        setIsPinnedToMenu(db.settings.isPinned(note.id));
+      }
+    });
+  }, [item]);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
   }
 
-  useEffect(() => {
-    if (item.dateCreated !== null) {
-      setNote({...item});
-      if (item.type !== note) {
-        setIsPinnedToMenu(db.settings.isPinned(note.id));
-      }
-    }
-  }, [item]);
-
   const localRefresh = (type, nodispatch = false) => {
     if (!note || !note.id) return;
-    let toAdd;
+    let _item;
 
     switch (type) {
       case 'note': {
-        toAdd = db.notes.note(note.id);
-        if (toAdd) {
-          toAdd = toAdd.data;
-        } else {
-          setTimeout(() => {
-            toAdd = db.notes.note(note.id);
-            if (toAdd) {
-              toAdd = toAdd.data;
-            }
-          }, 500);
-        }
-
+        _item = db.notes.note(note.id)?.data;
         break;
       }
       case 'notebook': {
-        toAdd = db.notebooks.notebook(note.id);
-        if (toAdd) {
-          toAdd = toAdd.data;
-        } else {
-          setTimeout(() => {
-            toAdd = db.notebooks.notebook(note.id);
-            if (toAdd) {
-              toAdd = toAdd.data;
-            }
-          }, 500);
-        }
+        _item = db.notebooks.notebook(note.id)?.data;
         break;
       }
       case 'topic': {
-        toAdd = db.notebooks.notebook(note.notebookId).topics.topic(note.title);
-
+        _item = db.notebooks.notebook(note.notebookId).topics.topic(note.title);
         break;
       }
     }
-    if (!toAdd || !toAdd.id) return;
+    if (!_item || !_item.id) return;
 
     if (!nodispatch) {
       Navigation.setRoutesToUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.Notebook,
-          Navigation.routeNames.Tags,
-          Navigation.routeNames.Trash,
-        ]);
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notebooks,
+        Navigation.routeNames.Notebook,
+        Navigation.routeNames.Tags,
+        Navigation.routeNames.Trash,
+      ]);
     }
 
-    setNote({...toAdd});
+    setNote({..._item});
   };
 
   const rowItemsData = [
@@ -156,7 +136,6 @@ export const ActionSheetComponent = ({
       icon: 'book-outline',
       func: () => {
         close();
-
         clearSelection();
         setSelectedItem(item);
         setTimeout(() => {
@@ -197,8 +176,27 @@ export const ActionSheetComponent = ({
       },
     },
     {
+      name: 'Edit Notebook',
+      icon: 'square-edit-outline',
+      func: () => {
+        close('notebook');
+      },
+    },
+    {
+      name: 'Edit Topic',
+      icon: 'square-edit-outline',
+      func: () => {
+        close('topic');
+      },
+    },
+    {
       name: 'Delete',
-      icon: 'delete',
+      title:
+        note.type !== 'notebook' && note.type !== 'note'
+          ? 'Delete ' + item.type
+          : 'Move to trash',
+      icon: 'delete-outline',
+      type: 'error',
       func: async () => {
         close();
         if (note.locked) {
@@ -215,24 +213,8 @@ export const ActionSheetComponent = ({
           try {
             close();
             await deleteItems(note);
-          } catch (e) {
-            //console.log(e);
-          }
+          } catch (e) {}
         }
-      },
-    },
-    {
-      name: 'Edit Notebook',
-      icon: 'square-edit-outline',
-      func: () => {
-        close('notebook');
-      },
-    },
-    {
-      name: 'Edit Topic',
-      icon: 'square-edit-outline',
-      func: () => {
-        close('topic');
       },
     },
     {
@@ -293,6 +275,15 @@ export const ActionSheetComponent = ({
         close('permanant_delete');
       },
     },
+    {
+      name: 'Publish',
+      icon: 'link-box-outline',
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenPublishNoteDialog,note);
+      },
+    },
   ];
 
   const columnItemsData = [
@@ -315,8 +306,49 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.night,
     },
     {
+      name: 'Vault',
+      title: note.locked ? 'Remove from vault' : 'Add to vault',
+      icon: note.locked ? 'shield-off-outline' : 'shield-outline',
+      func: async () => {
+        if (!note.id) return;
+        if (note.locked) {
+          close('unlock');
+        } else {
+          db.vault
+            .add(note.id)
+            .then(r => {
+              let n = db.notes.note(note.id).data;
+              if (n.locked) {
+                close();
+              }
+              Navigation.setRoutesToUpdate([
+                Navigation.routeNames.NotesPage,
+                Navigation.routeNames.Favorites,
+                Navigation.routeNames.Notes,
+              ]);
+              localRefresh(note.type);
+            })
+            .catch(async e => {
+              switch (e.message) {
+                case db.vault.ERRORS.noVault:
+                  close('novault');
+                  break;
+                case db.vault.ERRORS.vaultLocked:
+                  close('locked');
+                  break;
+                case db.vault.ERRORS.wrongPassword:
+                  close();
+                  break;
+              }
+            });
+        }
+      },
+      on: note.locked,
+    },
+    {
       name: 'Pin',
-      icon: 'pin',
+      title: note.pinned ? 'Unpin from top' : 'Pin to top',
+      icon: note.pinned ? 'pin-off-outline' : 'pin-outline',
       func: async () => {
         if (!note.id) return;
         close();
@@ -351,7 +383,8 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Favorite',
-      icon: 'star',
+      title: !note.favorite ? 'Add to favorites' : 'Remove from favorites',
+      icon: note.favorite ? 'star-off' : 'star-outline',
       func: async () => {
         if (!note.id) return;
         close();
@@ -375,9 +408,8 @@ export const ActionSheetComponent = ({
       color: 'orange',
     },
     {
-      name: isPinnedToMenu
-        ? 'Remove Shortcut from Menu'
-        : 'Add Shortcut to Menu',
+      name: 'Add Shortcut to Menu',
+      title: isPinnedToMenu ? 'Remove Shortcut' : 'Add Shortcut to Menu',
       icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       func: async () => {
         close();
@@ -403,6 +435,54 @@ export const ActionSheetComponent = ({
       on: isPinnedToMenu,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.pinMenu,
+    },
+    {
+      name: 'RemoveTopic',
+      title: 'Remove from topic',
+      hidden: !noteInTopic,
+      type: 'error',
+      func: async () => {
+        await db.notebooks
+          .notebook(editing.actionAfterFirstSave.notebook)
+          .topics.topic(editing.actionAfterFirstSave.id)
+          .delete(note.id);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Notebook,
+        ]);
+        setNote(db.notes.note(note.id).data);
+        close();
+      },
+    },
+    {
+      name: 'Delete',
+      title:
+        note.type !== 'notebook' && note.type !== 'note'
+          ? 'Delete ' + item.type
+          : 'Move to trash',
+      icon: 'delete-outline',
+      type: 'error',
+      func: async () => {
+        close();
+        if (note.locked) {
+          await sleep(300);
+          openVault({
+            deleteNote: true,
+            novault: true,
+            locked: true,
+            item: note,
+            title: 'Delete note',
+            description: 'Unlock note to delete it.',
+          });
+        } else {
+          try {
+            close();
+            await deleteItems(note);
+          } catch (e) {}
+        }
+      },
     },
   ];
 
@@ -437,104 +517,31 @@ export const ActionSheetComponent = ({
       </TouchableOpacity>
     ) : null;
 
-  const _renderColumnItem = item =>
+  const _renderColumnItem = (item, index) =>
     (note.id && columnItems.includes(item.name)) ||
     (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
-      <TouchableOpacity
-        key={item.name}
-        activeOpacity={opacity}
-        testID={item.id}
-        onPress={() => {
-          item.func();
-        }}
-        style={{
-          width: '100%',
-          alignSelf: 'center',
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          alignItems: 'flex-end',
-          paddingHorizontal: 12,
-          paddingVertical: pv,
-          height: 50,
-        }}>
-        <View
+      item.hidden ? null : (
+        <Button
+          title={item.title}
+          type={item.type ? item.type : item.on ? 'accent' : 'shade'}
+          onPress={item.func}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Icon
-            style={{
-              width: 30,
-            }}
-            name={item.icon}
-            color={item.color || colors.accent}
-            size={SIZE.md + 2}
-          />
-          <Paragraph>{item.name}</Paragraph>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          {item.switch ? (
-            <Icon
-              size={SIZE.xxxl}
-              color={item.on ? colors.accent : colors.icon}
-              name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
-            />
-          ) : undefined}
-
-          {item.check ? (
-            <Icon
-              name={
-                item.on
-                  ? 'check-circle-outline'
-                  : 'checkbox-blank-circle-outline'
-              }
-              color={item.on ? colors.accent : colors.icon}
-              size={SIZE.lg + 2}
-            />
-          ) : null}
-        </View>
-      </TouchableOpacity>
+            marginTop: 12,
+          }}
+          width={
+            columnItems.length % 2 !== 0 &&
+            ((item.type === 'note' &&
+              noteInTopic &&
+              index === columnItems.length - 2) ||
+              (!noteInTopic && index === columnItems.length - 1))
+              ? '100%'
+              : '48%'
+          }
+          icon={item.icon}
+          height={50}
+        />
+      )
     ) : null;
-
-  const onPressVaultButton = async () => {
-    if (!note.id) return;
-    if (note.locked) {
-      close('unlock');
-    } else {
-      db.vault
-        .add(note.id)
-        .then(r => {
-          let n = db.notes.note(note.id).data;
-          if (n.locked) {
-            close();
-          }
-          Navigation.setRoutesToUpdate([
-            Navigation.routeNames.NotesPage,
-            Navigation.routeNames.Favorites,
-            Navigation.routeNames.Notes,
-          ]);
-          localRefresh(note.type);
-        })
-        .catch(async e => {
-          switch (e.message) {
-            case db.vault.ERRORS.noVault:
-              close('novault');
-              break;
-            case db.vault.ERRORS.vaultLocked:
-              close('locked');
-              break;
-            case db.vault.ERRORS.wrongPassword:
-              close();
-              break;
-          }
-        });
-    }
-  };
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -554,12 +561,13 @@ export const ActionSheetComponent = ({
         }
       }}
       style={{
-        paddingBottom: 30,
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
       }}>
+     
+
       <TouchableOpacity
         style={{
           width: '100%',
@@ -675,7 +683,7 @@ export const ActionSheetComponent = ({
             <TouchableOpacity
               activeOpacity={0.9}
               testID={notesnook.ids.dialogs.actionsheet.sync}
-              onPress={async () => await Sync.run("local")}
+              onPress={async () => await Sync.run('local')}
               style={{
                 borderColor: colors.accent,
                 paddingHorizontal: 5,
@@ -722,74 +730,6 @@ export const ActionSheetComponent = ({
         </View>
       ) : null}
 
-      {note.type === 'note' ? (
-        <PressableButton
-          type={note.locked ? 'accent' : 'shade'}
-          accentColor="red"
-          customSelectedColor={note.locked && '#ff0000'}
-          customOpacity={note.locked && 0.12}
-          onPress={onPressVaultButton}
-          testID={notesnook.ids.dialogs.actionsheet.vault}
-          customStyle={{
-            width: '95%',
-            alignSelf: 'center',
-            height: 50,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          <Icon
-            name={note.locked ? 'shield-off' : 'shield'}
-            color={note.locked ? '#FF0000' : colors.accent}
-            size={SIZE.md}
-          />
-          <Paragraph
-            color={note.locked ? '#FF0000' : colors.accent}
-            size={SIZE.md}
-            style={{
-              marginLeft: 5,
-            }}>
-            {note.locked ? 'Remove from Vault' : 'Add to Vault'}
-          </Paragraph>
-        </PressableButton>
-      ) : null}
-
-      {noteInTopic ? (
-        <PressableButton
-          type="accent"
-          accentColor="red"
-          customSelectedColor="#ff0000"
-          customOpacity={0.12}
-          onPress={async () => {
-            await db.notebooks
-              .notebook(editing.actionAfterFirstSave.notebook)
-              .topics.topic(editing.actionAfterFirstSave.id)
-              .delete(note.id);
-            Navigation.setRoutesToUpdate([
-              Navigation.routeNames.Notebooks,
-              Navigation.routeNames.Notes,
-              Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Notebook,
-            ]);
-            setNote(db.notes.note(note.id).data);
-            close();
-          }}
-          testID={notesnook.ids.dialogs.actionsheet.vault}
-          customStyle={{
-            width: '95%',
-            alignSelf: 'center',
-            height: 50,
-            flexDirection: 'row',
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: 10,
-          }}>
-          <Paragraph color="#FF0000" size={SIZE.md}>
-            Remove from Topic
-          </Paragraph>
-        </PressableButton>
-      ) : null}
-
       {hasColors && note.id ? (
         <ActionSheetColorsSection close={close} item={note} />
       ) : null}
@@ -803,7 +743,16 @@ export const ActionSheetComponent = ({
       ) : null}
 
       {columnItems.length > 0 ? (
-        <View>{columnItemsData.map(_renderColumnItem)}</View>
+        <View
+          style={{
+            paddingHorizontal: 12,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+            marginTop: 6,
+          }}>
+          {columnItemsData.map(_renderColumnItem)}
+        </View>
       ) : null}
 
       {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
@@ -821,11 +770,12 @@ export const ActionSheetComponent = ({
             flexDirection: 'row',
             justifyContent: 'flex-start',
           }}>
-          <Icon name="shield-check" color={colors.accent} size={40} />
+          <Icon name="shield-key-outline" color={colors.accent} size={40} />
 
           <View
             style={{
               flex: 1,
+              marginLeft: 5,
             }}>
             <Heading
               color={colors.accent}

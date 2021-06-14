@@ -1,15 +1,13 @@
-import React, { createRef, useCallback, useEffect, useState } from 'react';
-import { TextInput, TouchableOpacity, View } from 'react-native';
-import { ScrollView } from 'react-native-gesture-handler';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import {
-  ToastEvent
-} from '../../services/EventManager';
+import React, {createRef, useCallback, useEffect, useState} from 'react';
+import {TextInput, TouchableOpacity, View} from 'react-native';
+import {ScrollView} from 'react-native-gesture-handler';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/DB';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import {db} from '../../utils/DB';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 
 const tagsInputRef = createRef();
 let prevQuery = null;
@@ -250,7 +248,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
           onBlur={() => {
             setFocused(false);
           }}
-          placeholder="#hashtag"
+          placeholder="Add a tag"
           onChangeText={_onChange}
           onSubmitEditing={_onSubmit}
           onKeyPress={_onKeyPress}
@@ -263,7 +261,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
 const TagItem = ({tag, note, localRefresh}) => {
   const onPress = async () => {
     let prevNote = {...note};
-    
+
     try {
       await db.notes
         .note(note.id)
