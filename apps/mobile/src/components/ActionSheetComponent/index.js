@@ -34,14 +34,9 @@ import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog, eOpenPublishNoteDialog} from '../../utils/Events';
 import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
-import {opacity, pv, SIZE} from '../../utils/SizeUtils';
+import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogContainer from '../Dialog/dialog-container';
-import DialogHeader from '../Dialog/dialog-header';
-import Input from '../Input';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -281,7 +276,7 @@ export const ActionSheetComponent = ({
       func: async () => {
         close();
         await sleep(300);
-        eSendEvent(eOpenPublishNoteDialog,note);
+        eSendEvent(eOpenPublishNoteDialog, note);
       },
     },
   ];
@@ -440,7 +435,7 @@ export const ActionSheetComponent = ({
       name: 'RemoveTopic',
       title: 'Remove from topic',
       hidden: !noteInTopic,
-      type: 'error',
+      icon: 'minus-circle-outline',
       func: async () => {
         await db.notebooks
           .notebook(editing.actionAfterFirstSave.notebook)
@@ -486,62 +481,61 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  const _renderRowItem = rowItem =>
-    rowItems.includes(rowItem.name) ? (
-      <TouchableOpacity
-        onPress={rowItem.func}
-        key={rowItem.name}
-        testID={'icon-' + rowItem.name}
+  const isFullWidthButton = index => {
+    let filtered = columnItemsData.filter(
+      i => columnItems.indexOf(i.name) > -1 && !i.hidden,
+    );
+    let colLength = filtered.length;
+
+    if (colLength % 2 === 0) return false;
+    if (index === colLength - 1) return true;
+  };
+
+  const _renderRowItem = rowItem => (
+    <TouchableOpacity
+      onPress={rowItem.func}
+      key={rowItem.name}
+      testID={'icon-' + rowItem.name}
+      style={{
+        alignItems: 'center',
+        width: DDS.isTab
+          ? (400 - 24) / rowItems.length
+          : (w - 25) / rowItems.length,
+      }}>
+      <Icon
         style={{
+          width: 50,
+          height: 40,
+          borderRadius: 100,
+          justifyContent: 'center',
           alignItems: 'center',
-          width: DDS.isTab
-            ? (400 - 24) / rowItems.length
-            : (w - 25) / rowItems.length,
-        }}>
-        <Icon
-          style={{
-            width: 50,
-            height: 40,
-            borderRadius: 100,
-            justifyContent: 'center',
-            alignItems: 'center',
-            textAlign: 'center',
-            textAlignVertical: 'center',
-            marginBottom: DDS.isTab ? 7 : 3.5,
-          }}
-          name={rowItem.icon}
-          size={DDS.isTab ? SIZE.xl : SIZE.lg}
-          color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
-        />
-        <Paragraph>{rowItem.name}</Paragraph>
-      </TouchableOpacity>
-    ) : null;
+          textAlign: 'center',
+          textAlignVertical: 'center',
+          marginBottom: DDS.isTab ? 7 : 3.5,
+        }}
+        name={rowItem.icon}
+        size={DDS.isTab ? SIZE.xl : SIZE.lg}
+        color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
+      />
+      <Paragraph>{rowItem.name}</Paragraph>
+    </TouchableOpacity>
+  );
 
   const _renderColumnItem = (item, index) =>
-    (note.id && columnItems.includes(item.name)) ||
-    (item.name === 'Dark Mode' && columnItems.includes(item.name)) ? (
-      item.hidden ? null : (
-        <Button
-          title={item.title}
-          type={item.type ? item.type : item.on ? 'accent' : 'shade'}
-          onPress={item.func}
-          style={{
-            marginTop: 12,
-          }}
-          width={
-            columnItems.length % 2 !== 0 &&
-            ((item.type === 'note' &&
-              noteInTopic &&
-              index === columnItems.length - 2) ||
-              (!noteInTopic && index === columnItems.length - 1))
-              ? '100%'
-              : '48%'
-          }
-          icon={item.icon}
-          height={50}
-        />
-      )
-    ) : null;
+    item.hidden ? null : (
+      <Button
+        key={item.title}
+        title={item.title}
+        type={item.type ? item.type : item.on ? 'accent' : 'shade'}
+        onPress={item.func}
+        style={{
+          marginTop: 12,
+        }}
+        width={isFullWidthButton(index) ? '100%' : '48%'}
+        icon={item.icon}
+        height={50}
+      />
+    );
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -566,8 +560,6 @@ export const ActionSheetComponent = ({
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
       }}>
-     
-
       <TouchableOpacity
         style={{
           width: '100%',
@@ -596,6 +588,7 @@ export const ActionSheetComponent = ({
               textAlign: 'center',
             }}
             size={SIZE.md}>
+            {note.type === 'tag' ? '#' : null}
             {note?.title.replace('\n', '')}
           </Heading>
 
@@ -625,11 +618,11 @@ export const ActionSheetComponent = ({
               textAlignVertical: 'center',
               marginTop: 2.5,
             }}>
-            {note.type === 'note'
+            {note.dateEdited
               ? 'Last edited on ' + timeConverter(note.dateEdited)
               : null}
-            {note.type !== 'note' && !note.dateDeleted
-              ? 'Created on ' + timeConverter(note.dateCreated)
+            {note.dateCreated && !note.dateDeleted
+              ? 'Last edited on ' + timeConverter(note.dateCreated)
               : null}
             {note.dateDeleted
               ? 'Deleted on ' + timeConverter(note.dateDeleted)
@@ -726,7 +719,9 @@ export const ActionSheetComponent = ({
             flexDirection: 'row',
             paddingHorizontal: 12,
           }}>
-          {rowItemsData.map(_renderRowItem)}
+          {rowItemsData
+            .filter(i => rowItems.indexOf(i.name) > -1)
+            .map(_renderRowItem)}
         </View>
       ) : null}
 
@@ -751,7 +746,9 @@ export const ActionSheetComponent = ({
             flexWrap: 'wrap',
             marginTop: 6,
           }}>
-          {columnItemsData.map(_renderColumnItem)}
+          {columnItemsData
+            .filter(i => columnItems.indexOf(i.name) > -1 && !i.hidden)
+            .map(_renderColumnItem)}
         </View>
       ) : null}
 
