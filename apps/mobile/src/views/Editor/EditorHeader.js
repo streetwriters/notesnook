@@ -1,23 +1,24 @@
-import React, { useEffect } from 'react';
-import { Keyboard, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import React, {useEffect} from 'react';
+import {Keyboard, Platform, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { db } from '../../utils/DB';
+import {editing} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
+  eOpenPublishNoteDialog,
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
@@ -26,17 +27,16 @@ import {
   isNotedEdited,
   loadNote,
   post,
-
-  setColors
+  setColors,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {toolbarRef} from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
-  const deviceMode = useSettingStore(state => state.deviceMode)
+  const deviceMode = useSettingStore(state => state.deviceMode);
 
   const fullscreen = useSettingStore(state => state.fullscreen);
   const insets = useSafeAreaInsets();
@@ -46,8 +46,8 @@ const EditorHeader = () => {
   }, [colors.bg]);
 
   const isLargeTablet = () => {
-    return deviceMode === "tablet"
-  }
+    return deviceMode === 'tablet';
+  };
 
   const _onBackPress = async () => {
     eSendEvent('showTooltip');
@@ -58,12 +58,12 @@ const EditorHeader = () => {
     });
     editing.isFocused = false;
     editing.currentlyEditing = false;
-    if (deviceMode !== "mobile") {
+    if (deviceMode !== 'mobile') {
       if (fullscreen) {
         eSendEvent(eCloseFullscreenEditor);
       }
     } else {
-      if (deviceMode === "mobile") {
+      if (deviceMode === 'mobile') {
         tabBarRef.current?.goToPage(0);
       }
       eSendEvent('historyEvent', {
@@ -79,7 +79,6 @@ const EditorHeader = () => {
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
-     
     }
   };
 
@@ -104,7 +103,7 @@ const EditorHeader = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          {deviceMode !== "mobile" && !fullscreen ? null : (
+          {deviceMode !== 'mobile' && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
                 await _onBackPress();
@@ -123,7 +122,7 @@ const EditorHeader = () => {
             />
           )}
           {fullscreen && <View style={{width: 20}} />}
-          {deviceMode !== "mobile" && <EditorTitle />}
+          {deviceMode !== 'mobile' && <EditorTitle />}
         </View>
         <View
           style={{
@@ -131,7 +130,7 @@ const EditorHeader = () => {
           }}>
           <>
             <ActionIcon
-              name="plus"
+              name="link-box-outline"
               color={colors.accent}
               customStyle={{
                 marginLeft: 10,
@@ -139,11 +138,17 @@ const EditorHeader = () => {
               }}
               top={50}
               onPress={async () => {
-                await loadNote({type: 'new'});
+                let note = getNote() && db.notes.note(getNote().id).data;
+                if (editing.isFocused) {
+                  tiny.call(EditorWebView, tiny.blur);
+                  await sleep(500);
+                  editing.isFocused = true;
+                }
+                eSendEvent(eOpenPublishNoteDialog, note);
               }}
             />
 
-            {deviceMode !== "mobile" && !fullscreen ? (
+            {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}
@@ -178,7 +183,7 @@ const EditorHeader = () => {
                   note,
                   true,
                   true,
-                  ['Add to', 'Share', 'Export', 'Delete','Copy'],
+                  ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
                   ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
                 );
               }}
