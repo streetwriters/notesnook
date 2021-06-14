@@ -14,7 +14,7 @@ const DialogContainer = ({width, height, ...restProps}) => {
       style={{
         ...getElevation(5),
         width: width || DDS.isTab ? 400 : '85%',
-        maxHeight: height || 350,
+        maxHeight: height || 450,
         borderRadius: 5,
         backgroundColor: colors.bg,
         paddingHorizontal: 12,

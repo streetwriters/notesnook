@@ -1,13 +1,13 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { getTotalNotes, history } from '../../utils';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {getTotalNotes, history} from '../../utils';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -25,7 +25,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
       ? []
       : item.type === 'topic'
       ? ['Add Shortcut to Menu', 'Remove Shortcut from Menu']
-      : ['Pin', 'Add Shortcut to Menu', 'Remove Shortcut from Menu'];
+      : ['Pin', 'Add Shortcut to Menu'];
 
     ActionSheetEvent(item, false, false, rowItems, columnItems, {
       notebookID: notebookID,
@@ -117,7 +117,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 2.5,
-            minHeight:SIZE.md + 2
+            minHeight: SIZE.md + 2,
           }}>
           {isTrash ? (
             <>

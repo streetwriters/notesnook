@@ -23,8 +23,8 @@ const NoteItem = ({item, isTrash}) => {
       isTrash ? false : true,
       isTrash
         ? ['Remove', 'Restore']
-        : ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
-      isTrash ? [] : ['Pin', 'Favorite', 'Add to Vault'],
+        : ['Add to', 'Share', 'Export','Copy','Publish'],
+      isTrash ? [] : ['Pin', 'Favorite', 'Vault','Delete','RemoveTopic'],
     );
   };
 
