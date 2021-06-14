@@ -30,10 +30,11 @@ async function setPremiumStatus() {
       premiumStatus = user.subscription.type;
       userstore.setPremium(get())
       userstore.setUser(user);
-      if (!get()) {
-        await RNIap.initConnection();
-        products = await RNIap.getSubscriptions(itemSkus);
-      }
+    }
+
+    if (!get()) {
+      await RNIap.initConnection();
+      products = await RNIap.getSubscriptions(itemSkus);
     }
   } catch (e) {
     premiumStatus = null;

@@ -93,12 +93,13 @@ const AppLoader = ({onLoad}) => {
   };
 
   useEffect(() => {
+    eSubscribeEvent('load_overlay', load);
     if (!verifyUser) {
       if (!didVerifyUser) {
         onLoad();
-        return;
+      } else {
+        load();
       }
-      load();
     } else {
       db.user.getUser().then(u => {
         if (u) {
@@ -106,10 +107,6 @@ const AppLoader = ({onLoad}) => {
         }
       });
     }
-  }, [verifyUser]);
-
-  useEffect(() => {
-    eSubscribeEvent('load_overlay', load);
     if (verifyUser) {
       onUnlockBiometrics();
     }

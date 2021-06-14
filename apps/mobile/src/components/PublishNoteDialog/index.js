@@ -1,24 +1,21 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  Clipboard,
-  Linking,
-  Platform,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Clipboard, TouchableOpacity, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTracked} from '../../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import {db} from '../../utils/DB';
 import {
   eClosePublishNoteDialog,
-  eCloseRateDialog,
   eOpenPublishNoteDialog,
-  eOpenRateDialog,
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
+import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
@@ -27,20 +24,13 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ActionIcon} from '../ActionIcon';
-import {useTracked} from '../../provider';
-import {db} from '../../utils/DB';
-import Navigation from '../../services/Navigation';
-import {openLinkInBrowser} from '../../utils/functions';
-
 let passwordValue = null;
 const PublishNoteDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
-  const [selfDestruct, setSelfDestruct] = useState(true);
+  const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [note, setNote] = useState(null);
   const publishUrl = `https://monograph.notesnook.com/${note?.publishId}`;
@@ -54,7 +44,7 @@ const PublishNoteDialog = () => {
     };
   }, []);
 
-  const open = (item) => {
+  const open = item => {
     setNote(item);
     setVisible(true);
   };
@@ -65,7 +55,7 @@ const PublishNoteDialog = () => {
   }, [visible]);
 
   const close = () => {
-      passwordValue = null;
+    passwordValue = null;
     actionSheetRef.current?.hide();
   };
 
@@ -118,7 +108,6 @@ const PublishNoteDialog = () => {
       centered={false}
       fwdRef={actionSheetRef}
       onClose={async () => {
-
         passwordValue = null;
         setVisible(false);
       }}>

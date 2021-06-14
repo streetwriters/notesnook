@@ -89,6 +89,8 @@ export interface SettingStore extends State {
     setFullscreen: (fullscreen: boolean) => void,
     setDeviceMode: (mode: string) => void,
     setDimensions: (dimensions: Dimensions) => void
+    appLoading:boolean
+    setAppLoading:(appLoading:boolean) => void
 }
 
 export interface MenuStore extends State {

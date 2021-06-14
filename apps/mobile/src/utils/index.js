@@ -230,7 +230,7 @@ export function getTotalNotes(notebook) {
 }
 
 export const itemSkus = Platform.select({
-  ios: ['com.streetwriters.notesnook.sub.mo'],
+  ios: ['com.streetwriters.notesnook.sub.mo','com.streetwriters.notesnook.sub.yr'],
   android: ['com.streetwriters.notesnook.sub.mo'],
 });
 

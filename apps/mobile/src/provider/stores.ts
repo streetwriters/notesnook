@@ -174,7 +174,9 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setSettings: settings => set({ settings }),
   setFullscreen: fullscreen => set({ fullscreen }),
   setDeviceMode: mode => set({ deviceMode: mode }),
-  setDimensions: dimensions => set({ dimensions: dimensions })
+  setDimensions: dimensions => set({ dimensions: dimensions }),
+  appLoading:true,
+  setAppLoading:(appLoading) => set({appLoading})
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -247,7 +249,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
   announcements: [],
   remove: async (id) => {
     MMKV.setStringAsync(id, "removed");
-    let announcements = get().announcements
+    let announcements = get().announcements;
     const copy = announcements.slice();
     const index = copy.findIndex((announcement) => announcement.id === id);
     if (index >= -1) {
@@ -307,6 +309,7 @@ async function shouldShowAnnouncement(announcement) {
   let removed = await MMKV.getStringAsync(announcement.id) ===
     "removed"
   if (removed) return false;
+  console.log(announcement);
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1
   );

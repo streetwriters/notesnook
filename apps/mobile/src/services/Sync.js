@@ -1,6 +1,4 @@
 import NetInfo from '@react-native-community/netinfo';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
 import {initialize, useUserStore} from '../provider/stores';
 import {doInBackground} from '../utils';
 import {db} from '../utils/DB';

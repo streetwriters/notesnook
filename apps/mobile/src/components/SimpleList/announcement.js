@@ -1,7 +1,11 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
-import {useMessageStore, useSelectionStore} from '../../provider/stores';
+import {
+  allowedPlatforms,
+  useMessageStore,
+  useSelectionStore,
+} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import {eOpenPremiumDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
@@ -17,9 +21,7 @@ export const Announcement = () => {
   const announcements = useMessageStore(state => state.announcements);
   const remove = useMessageStore(state => state.remove);
   let announcement = announcements.length > 0 ? announcements[0] : null;
-  console.log(announcements, 'ann');
   const selectionMode = useSelectionStore(state => state.selectionMode);
-
   return !announcement || selectionMode ? null : (
     <View
       style={{
@@ -38,23 +40,47 @@ export const Announcement = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
-          <Button
-            title="Announcement"
-            fontSize={12}
-            type="shade"
-            height={null}
-            icon="bullhorn"
+          <View
             style={{
-              paddingVertical: 4,
-            }}
-          />
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                backgroundColor: colors.accent,
+                borderRadius: 100,
+                width: 20,
+                height: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 2.5,
+              }}>
+              <Paragraph color={colors.light} size={SIZE.xs}>
+                {announcements.length}
+              </Paragraph>
+            </View>
+            <Button
+              title={'Announcement'}
+              fontSize={12}
+              type="shade"
+              height={null}
+              icon="bullhorn"
+              style={{
+                paddingVertical: 4,
+              }}
+            />
+          </View>
 
           <Button
             title="Dismiss"
             fontSize={12}
             type="error"
             height={null}
-            onPress={remove}
+            onPress={() => {
+              console.log(announcement);
+              return;
+              remove(announcement.id);
+            }}
             style={{
               paddingVertical: 4,
             }}
@@ -90,34 +116,47 @@ export const Announcement = () => {
             flexWrap: 'wrap',
           }}>
           {announcement?.callToActions &&
-            announcement.callToActions.map((item, index) => (
-              <>
-                <Button
-                  type={index === 0 ? 'accent' : 'shade'}
-                  title={item.title}
-                  fontSize={SIZE.md}
-                  onPress={async () => {
-                    if (announcement.type === 'link') {
-                      try {
-                        await openLinkInBrowser(
-                          announcement.cta.action,
-                          state.colors,
-                        );
-                      } catch (e) {}
-                    } else if (announcement.type === 'promo') {
+            announcement.callToActions.map((item, index) =>
+              item.platforms.some(
+                platform => allowedPlatforms.indexOf(platform) > -1,
+              ) ? (
+                <>
+                  <Button
+                    key={item.title}
+                    type={index === 0 ? 'accent' : 'shade'}
+                    title={item.title}
+                    fontSize={SIZE.md}
+                    onPress={async () => {
+
                       eSendEvent(eOpenPremiumDialog, {
-                        promoCode: announcement.cta.action,
-                        text: announcement.cta.text,
+                        promoCode:"com.streetwriters.notesnook.sub.mo",
+                        text: "Get 50% OFF",
                       });
-                    }
-                  }}
-                  width="48%"
-                  style={{
-                    marginBottom: 10,
-                  }}
-                />
-              </>
-            ))}
+
+                      return
+
+                      if (item.type === 'link') {
+                        try {
+                          await openLinkInBrowser(
+                            item.data,
+                            state.colors,
+                          );
+                        } catch (e) {}
+                      } else if (item.type === 'promo') {
+                        eSendEvent(eOpenPremiumDialog, {
+                          promoCode:item.data,
+                          text: item.title,
+                        });
+                      }
+                    }}
+                    width={'100%'}
+                    style={{
+                      marginBottom: 10,
+                    }}
+                  />
+                </>
+              ) : null,
+            )}
         </View>
       </View>
     </View>

@@ -618,11 +618,14 @@ export const ActionSheetComponent = ({
               textAlignVertical: 'center',
               marginTop: 2.5,
             }}>
-            {note.dateEdited
+            {note.type === 'note' || (note.type === 'tag' && note.dateEdited)
               ? 'Last edited on ' + timeConverter(note.dateEdited)
               : null}
-            {note.dateCreated && !note.dateDeleted
-              ? 'Last edited on ' + timeConverter(note.dateCreated)
+            {note.type !== 'note' &&
+            note.type !== 'tag' &&
+            note.dateCreated &&
+            !note.dateDeleted
+              ? ' Created on ' + timeConverter(note.dateCreated)
               : null}
             {note.dateDeleted
               ? 'Deleted on ' + timeConverter(note.dateDeleted)
@@ -753,19 +756,16 @@ export const ActionSheetComponent = ({
       ) : null}
 
       {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
-        <PressableButton
-          type="shade"
-          customStyle={{
-            borderWidth: 1,
-            borderRadius: 5,
+        <View
+          style={{
             paddingVertical: 10,
             width: '95%',
             alignItems: 'flex-start',
             paddingHorizontal: 12,
             marginTop: 25,
-            borderColor: colors.accent,
             flexDirection: 'row',
             justifyContent: 'flex-start',
+            alignSelf: 'center',
           }}>
           <Icon name="shield-key-outline" color={colors.accent} size={40} />
 
@@ -786,11 +786,11 @@ export const ActionSheetComponent = ({
                 flexWrap: 'wrap',
                 flexBasis: 1,
               }}
-              color={colors.accent}>
+              color={colors.pri}>
               No one can read it except you.
             </Paragraph>
           </View>
-        </PressableButton>
+        </View>
       ) : null}
 
       {DDS.isTab ? (

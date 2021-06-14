@@ -93,7 +93,6 @@ const App = () => {
   }, []);
 
   const loadMainApp = () => {
-    console.log('status on init', initStatus);
     if (initStatus) {
       SettingsService.setAppLoaded();
       eSendEvent('load_overlay');
