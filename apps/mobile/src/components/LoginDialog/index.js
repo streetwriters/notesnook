@@ -143,7 +143,7 @@ const LoginDialog = () => {
       loading:
         'Please follow the link in the email to set up your new password. If you are unable to find our email, check your spam folder.',
       showLoader: false,
-      buttonAlt: 'Login',
+      buttonAlt: 'Go back to Login',
       buttonAltFunc: () => {
         setMode(MODES.login);
       },
@@ -743,8 +743,7 @@ const LoginDialog = () => {
               </>
             )}
 
-            {mode === MODES.login ||
-              (mode === MODES.sessionExpired && (
+            {mode === MODES.login || mode === MODES.sessionExpired ? (
                 <TouchableOpacity
                   onPress={() => {
                     if (MODES.sessionExpired === mode) {
@@ -759,7 +758,7 @@ const LoginDialog = () => {
                   }}>
                   <Paragraph color={colors.accent}>Forgot password?</Paragraph>
                 </TouchableOpacity>
-              ))}
+              ) : null}
             <Seperator />
             {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
               <>
