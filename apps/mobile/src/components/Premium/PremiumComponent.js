@@ -92,6 +92,18 @@ const features = [
   },
 ];
 
+const promoCyclesMonthly = {
+  1: 'first month',
+  2: 'first 2 months',
+  3: 'first 3 months',
+};
+
+const promoCyclesYearly = {
+  1: 'first year',
+  2: 'first 2 years',
+  3: 'first 3 years',
+};
+
 export const PremiumComponent = ({close, promo}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -116,16 +128,26 @@ export const PremiumComponent = ({close, promo}) => {
             p => p.productId === 'com.streetwriters.notesnook.sub.yr',
           ),
         };
-        console.log(offers.monthly)
+        console.log(products.length);
         setOffers(offers);
 
-        if (!promo?.promoCode) {
+        if (promo?.promoCode) {
           let product = products.find(p => p.productId === promo.promoCode);
+          let isMonthly = product.productId.indexOf('.mo') > -1;
+          let cycleText = isMonthly
+            ? promoCyclesMonthly[
+                product.introductoryPriceCyclesAndroid ||
+                  product.introductoryPriceNumberOfPeriodsIOS
+              ]
+            : promoCyclesYearly[
+                product.introductoryPriceCyclesAndroid ||
+                  product.introductoryPriceNumberOfPeriodsIOS
+              ];
           setProduct({
             type: 'promo',
-            offerType:
-              product.productId.indexOf('.mo') > -1 ? 'monthly' : 'yearly',
+            offerType: isMonthly ? 'monthly' : 'yearly',
             data: product,
+            cycleText: cycleText,
           });
         } else {
           setProduct({
@@ -141,6 +163,10 @@ export const PremiumComponent = ({close, promo}) => {
   };
 
   useEffect(() => {
+    console.log(product);
+  }, [product]);
+
+  useEffect(() => {
     getSkus();
   }, []);
 
@@ -149,12 +175,12 @@ export const PremiumComponent = ({close, promo}) => {
     if (!user) {
       close();
       setTimeout(() => {
-        eSendEvent(eOpenLoginDialog);
+        eSendEvent(eOpenLoginDialog,1);
       }, 400);
     } else {
       setBuying(true);
       RNIap.requestSubscription(
-        product?.productId,
+        product?.data.productId,
         false,
         null,
         null,
@@ -243,6 +269,8 @@ export const PremiumComponent = ({close, promo}) => {
                 color: product?.type == 'monthly' ? colors.accent : colors.pri,
                 fontWeight: product?.type == 'monthly' ? 'bold' : 'normal',
                 paddingVertical: 15,
+                minWidth: 100,
+                textAlign: 'right',
               }}>
               Monthly
             </Paragraph>
@@ -260,6 +288,8 @@ export const PremiumComponent = ({close, promo}) => {
                 color: product?.type == 'yearly' ? colors.accent : colors.pri,
                 fontWeight: product?.type == 'yearly' ? 'bold' : 'normal',
                 paddingVertical: 15,
+                minWidth: 100,
+                textAlign: 'left',
               }}>
               Yearly
             </Paragraph>
@@ -269,22 +299,19 @@ export const PremiumComponent = ({close, promo}) => {
             style={{
               paddingVertical: 15,
               alignSelf: 'center',
+              textAlign: 'center',
             }}
-            size={SIZE.lg}
-            >
-            One time offer {product.data.localizedPrice}<Paragraph
+            size={SIZE.lg - 4}>
+            {product.data.introductoryPrice}
+            <Paragraph
               style={{
                 textDecorationLine: 'line-through',
                 color: colors.icon,
-                
               }}
-              size={SIZE.sm}
-              >
-              ({product.offerType === 'monthly'
-                ? offers?.monthly?.localizedPrice
-                : offers?.yearly?.localizedPrice})
-            </Paragraph>
-            
+              size={SIZE.sm}>
+              ({product.data.localizedPrice})
+            </Paragraph>{' '}
+            for {product.cycleText}
           </Heading>
         )}
 
@@ -297,7 +324,9 @@ export const PremiumComponent = ({close, promo}) => {
               promo
                 ? promo.text
                 : user
-                ? `Subscribe for ${product?.data?.localizedPrice} / ${product.type === "yearly"? "yr" : "mo"}`
+                ? `Subscribe for ${product?.data?.localizedPrice} / ${
+                    product.type === 'yearly' ? 'yr' : 'mo'
+                  }`
                 : 'Start Your 14 Day Free Trial'
             }
             type="accent"
@@ -318,11 +347,33 @@ export const PremiumComponent = ({close, promo}) => {
         {!user ? (
           <Paragraph
             color={colors.icon}
+            size={SIZE.xs + 1}
             style={{
               alignSelf: 'center',
               marginTop: 5,
+              textAlign: 'center',
             }}>
-            (No credit card required.)
+            Upon signing up, your 14 day free trial of Notesnook Pro will be
+            activated automatically.{' '}
+            <Paragraph size={SIZE.xs + 1} style={{fontWeight: 'bold'}}>
+              No credit card information is required.
+            </Paragraph>{' '}
+            Once the free trial period ends, your account will be downgraded to
+            basic free account.{' '}
+            <Paragraph
+              size={SIZE.xs + 1}
+              onPress={() => {
+                openLinkInBrowser('https://notesnook.com/#pricing', colors)
+                  .catch(e => {})
+                  .then(r => {
+                    console.log('closed');
+                  });
+              }}
+              color={colors.accent}
+              style={{fontWeight: 'bold'}}>
+              Visit our website to learn what is included in the basic free
+              account.
+            </Paragraph>
           </Paragraph>
         ) : null}
 
@@ -342,8 +393,9 @@ export const PremiumComponent = ({close, promo}) => {
                 <Paragraph size={SIZE.xs + 1} color={colors.accent}>
                   {product?.data?.localizedPrice}
                 </Paragraph>{' '}
-                will be charged to your iTunes Account for 1-{product?.type === "yearly"? "year": "month"} subscription
-                of Notesnook Pro.{'\n\n'}
+                will be charged to your iTunes Account for 1-
+                {product?.type === 'yearly' ? 'year' : 'month'} subscription of
+                Notesnook Pro.{'\n\n'}
                 Subscriptions will automatically renew unless cancelled within
                 24-hours before the end of the current period. You can cancel
                 anytime with your iTunes Account settings.
@@ -382,7 +434,7 @@ export const PremiumComponent = ({close, promo}) => {
                   maxWidth: '100%',
                   textAlign: 'center',
                 }}>
-                By tapping Subscribe, you agree to our{' '}
+                By subscribing, you agree to our{' '}
                 <Paragraph
                   size={SIZE.xs + 1}
                   onPress={() => {
