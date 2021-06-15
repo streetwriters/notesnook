@@ -15,12 +15,15 @@ class Monograph {
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token || !user.isEmailConfirmed) return;
-
-    const userMonographs = await http.get(`${Constants.API_HOST}/monographs`);
-    this.monographs = userMonographs.reduce((prev, curr) => {
-      prev[curr.noteId] = curr.id;
-      return prev;
-    }, {});
+    try {
+      const userMonographs = await http.get(`${Constants.API_HOST}/monographs`);
+      this.monographs = userMonographs.reduce((prev, curr) => {
+        prev[curr.noteId] = curr.id;
+        return prev;
+      }, {});
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   /**
