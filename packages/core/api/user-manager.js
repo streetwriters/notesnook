@@ -56,8 +56,7 @@ class UserManager {
         username: email,
         password: hashedPassword,
         grant_type: "password",
-        scope:
-          "notesnook.sync notesnook.monograph offline_access openid IdentityServerApi",
+        scope: "notesnook.sync offline_access openid IdentityServerApi",
         client_id: "notesnook",
       })
     );
