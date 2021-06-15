@@ -17,7 +17,7 @@ import {
 } from '../../services/EventManager';
 import {editing} from '../../utils';
 import {db} from '../../utils/DB';
-import {eOpenRateDialog, eOpenSideMenu} from '../../utils/Events';
+import {eOpenRateDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
@@ -71,7 +71,6 @@ const AppLoader = ({onLoad}) => {
       setLoading(false);
       return;
     }
-    eSendEvent(eOpenSideMenu);
     Animated.timing(opacityV, {
       toValue: 0,
       duration: 100,
@@ -82,7 +81,6 @@ const AppLoader = ({onLoad}) => {
     setNotes();
     setFavorites();
     _setLoading(false);
-    eSendEvent(eOpenSideMenu);
     let askForRating = await MMKV.getItem('askForRating');
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);

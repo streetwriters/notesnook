@@ -1,16 +1,13 @@
 import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
-import create, { State } from 'zustand';
-import { eSendEvent } from '../services/EventManager';
+import create from 'zustand';
 import PremiumService from '../services/PremiumService';
 import { history, SORT, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/DB';
-import { eOpenSideMenu } from '../utils/Events';
 import { MMKV } from '../utils/mmkv';
 import {
   MenuStore,
   MessageStore,
-  Item,
   NoteStore,
   NotebookStore,
   TagStore,
@@ -225,9 +222,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     }
     selectedItems = [...new Set(selectedItems)];
     history.selectedItemsList = selectedItems;
-    if (selectedItems.length === 0) {
-      eSendEvent(eOpenSideMenu);
-    }
+ 
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
 
@@ -237,7 +232,6 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     });
   },
   clearSelection: () => {
-    eSendEvent(eOpenSideMenu);
     set({ selectionMode: false, selectedItemsList: [] });
   },
 }));

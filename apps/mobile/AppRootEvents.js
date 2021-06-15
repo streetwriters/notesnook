@@ -300,15 +300,14 @@ export const AppRootEvents = React.memo(
       SettingsService.init();
       setSyncing(false);
       setLoginMessage();
-      await sleep(50);
       await PremiumService.setPremiumStatus();
-      await Storage.write('introCompleted', 'true');
+      await MMKV.setItem('introCompleted', 'true');
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
         action: async () => {
           eSendEvent(eCloseProgressDialog);
-          await sleep(50);
+          await sleep(300);
           eSendEvent(eOpenLoginDialog);
         },
         icon: 'logout',

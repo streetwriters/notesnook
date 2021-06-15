@@ -22,7 +22,7 @@ import {
 } from './src/services/EventManager';
 import SettingsService from './src/services/SettingsService';
 import { db } from './src/utils/DB';
-import { eDispatchAction, eOpenSideMenu } from './src/utils/Events';
+import { eDispatchAction } from './src/utils/Events';
 import { MMKV } from './src/utils/mmkv';
 import EditorRoot from './src/views/Editor/EditorRoot';
 
@@ -48,13 +48,10 @@ const App = () => {
         });
 
         let func = async () => {
-          eSendEvent(eOpenSideMenu);
           SplashScreen.hide();
           await db.init();
-          console.log('db is ready');
           let requireIntro = await MMKV.getItem('introCompleted');
           loadDefaultNotes();
-          console.log('loaded default note');
           if (!requireIntro) {
             await MMKV.setItem(
               'askForRating',

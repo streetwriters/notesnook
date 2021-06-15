@@ -1,24 +1,21 @@
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
 import * as React from 'react';
-import {createNativeStackNavigator} from 'react-native-screens/native-stack';
+import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import {useSelectionStore} from '../provider/stores';
+import { useSelectionStore, useSettingStore } from '../provider/stores';
 import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
+  eSendEvent
 } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
-import {history} from '../utils';
-import {eOpenSideMenu} from '../utils/Events';
-import {rootNavigatorRef} from '../utils/Refs';
+import { history } from '../utils';
+import { rootNavigatorRef } from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import {Search} from '../views/Search';
+import { Search } from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -32,8 +29,9 @@ const screenOptionsForAnimation = {
 
 export const NavigatorStack = React.memo(
   () => {
-    const [render, setRender] = React.useState(true);
+    const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
+    const settings = useSettingStore(state => state.settings);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
         clearSelection();
@@ -41,28 +39,21 @@ export const NavigatorStack = React.memo(
       eSendEvent('navigate');
     });
 
-    const updateRender = async () => {
+    React.useEffect(() => {
       if (!render) {
         setRender(true);
         Navigation.setHeaderState(
-          SettingsService.get().homepage,
+          settings.homepage,
           {
             menu: true,
           },
           {
-            heading: SettingsService.get().homepage,
-            id: SettingsService.get().homepage.toLowerCase() + '_navigation',
+            heading: settings.homepage,
+            id: settings.homepage.toLowerCase() + '_navigation',
           },
         );
       }
-    };
-
-    React.useEffect(() => {
-      eSubscribeEvent(eOpenSideMenu, updateRender);
-      return () => {
-        eUnSubscribeEvent(eOpenSideMenu, updateRender);
-      };
-    }, [render]);
+    },[settings])
 
     return (
       <Container root={true}>

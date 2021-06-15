@@ -1,53 +1,46 @@
 import {
   activateKeepAwake,
-  deactivateKeepAwake,
+  deactivateKeepAwake
 } from '@sayem314/react-native-keep-awake';
-import React, {useEffect, useRef, useState} from 'react';
-import {Dimensions, TouchableOpacity, View} from 'react-native';
-import Animated, {useValue} from 'react-native-reanimated';
-import {notesnook} from './e2e/test.ids';
+import React, { useEffect, useRef } from 'react';
+import { Dimensions, View } from 'react-native';
+import Animated, { useValue } from 'react-native-reanimated';
+import { notesnook } from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import CustomTabs from './src/components/CustomTabs';
-import {DialogManager} from './src/components/DialogManager';
-import {DummyText} from './src/components/DummyText';
-import {Menu} from './src/components/Menu';
-import {Toast} from './src/components/Toast';
-import {NavigatorStack} from './src/navigation/NavigatorStack';
-import {useTracked} from './src/provider';
-import {useSettingStore} from './src/provider/stores';
-import {DDS} from './src/services/DeviceDetection';
+import { DialogManager } from './src/components/DialogManager';
+import { DummyText } from './src/components/DummyText';
+import { Menu } from './src/components/Menu';
+import { Toast } from './src/components/Toast';
+import { NavigatorStack } from './src/navigation/NavigatorStack';
+import { useTracked } from './src/provider';
+import { useSettingStore } from './src/provider/stores';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from './src/services/EventManager';
-import {editing, setWidthHeight} from './src/utils';
-import {updateStatusBarColor} from './src/utils/Colors';
+import { editing, setWidthHeight } from './src/utils';
+import { updateStatusBarColor } from './src/utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
-  eCloseSideMenu,
+
   eOnLoadNote,
-  eOpenFullscreenEditor,
-  eOpenSideMenu,
+  eOpenFullscreenEditor
 } from './src/utils/Events';
-import {editorRef, tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
-import {EditorWrapper} from './src/views/Editor/EditorWrapper';
-import {EditorWebView, getNote} from './src/views/Editor/Functions';
+import { editorRef, tabBarRef } from './src/utils/Refs';
+import { sleep } from './src/utils/TimeUtils';
+import { EditorWrapper } from './src/views/Editor/EditorWrapper';
+import { EditorWebView, getNote } from './src/views/Editor/Functions';
 import tiny from './src/views/Editor/tiny/tiny';
-let {width, height} = Dimensions.get('window');
 let layoutTimer = null;
-let currentTab = 0;
 
 const onChangeTab = async obj => {
   console.log(obj.i);
   if (obj.i === 1) {
-    console.log('going to editor');
-    console.log('making note');
-    eSendEvent(eCloseSideMenu);
     editing.movedAway = false;
-    currentTab = 1;
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
@@ -76,8 +69,6 @@ const onChangeTab = async obj => {
       }
     }
     editing.isFocused = false;
-    currentTab = 0;
-    eSendEvent(eOpenSideMenu);
   }
 };
 
@@ -156,8 +147,7 @@ const NativeStack = React.memo(
         clearTimeout(layoutTimer);
         layoutTimer = null;
       }
-
-      let size = event?.nativeEvent?.layout;
+      let size = event?.nativeEvent?.layout
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
@@ -178,25 +168,17 @@ const NativeStack = React.memo(
 
       setWidthHeight(size);
       DDS.setSize(size);
-      //console.log(DDS.isLargeTablet(), size, DDS.isSmallTab);
-      if (DDS.isLargeTablet()) {
-        //console.log('setting large tab');
-        setDeviceMode('tablet', size);
-        sleep(300).then(r => eSendEvent(eOpenSideMenu));
-      } else if (DDS.isSmallTab) {
-        //console.log('setting small tab');
-        setDeviceMode('smallTablet', size);
 
-        sleep(300).then(r => eSendEvent(eOpenSideMenu));
+      if (DDS.isLargeTablet()) {
+        setDeviceMode('tablet', size);
+      } else if (DDS.isSmallTab) {
+        setDeviceMode('smallTablet', size);
       } else {
         setDeviceMode('mobile', size);
-
-        sleep(300).then(r => eSendEvent(eOpenSideMenu));
       }
     }
 
     function setDeviceMode(current, size) {
-      eSendEvent(current !== 'mobile' ? eCloseSideMenu : eOpenSideMenu);
       setDeviceModeState(current);
       if (fullscreen) {
         editorRef.current?.setNativeProps({

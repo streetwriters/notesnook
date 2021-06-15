@@ -77,8 +77,6 @@ export const Announcement = () => {
             type="error"
             height={null}
             onPress={() => {
-              console.log(announcement);
-              return;
               remove(announcement.id);
             }}
             style={{
