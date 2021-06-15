@@ -8,21 +8,41 @@ import { db } from './DB';
 import { eClearEditor } from './Events';
 
 export const deleteItems = async (item) => {
+  if (item && db.monographs.isPublished(item.id)) {
+    ToastEvent.show({
+      heading:"Can not delete note",
+      message:"Unpublish note to delete it",
+      type:"error",
+      context:"global"
+    })
+    return;
+  }
   if (item && item.id && history.selectedItemsList.length === 0) {
     history.selectedItemsList = [];
     history.selectedItemsList.push(item);
   }
-
 
   let notes = history.selectedItemsList.filter((i) => i.type === 'note');
   let notebooks = history.selectedItemsList.filter(
     (i) => i.type === 'notebook',
   );
   let topics = history.selectedItemsList.filter((i) => i.type === 'topic');
-
+  
   if (notes?.length > 0) {
-    let ids = notes.map((i) => i.id);
-    console.log(ids);
+
+    let ids = notes.map((i) => {
+      if (db.monographs.isPublished(i.id)) {
+        ToastEvent.show({
+          heading:"Some notes are published",
+          message:"Unpublish published notes to delete them",
+          type:"error",
+          context:"global"
+        })
+        return null;
+      }
+      return i.id
+    }).filter(n => n !== null);
+    
     await db.notes.delete(...ids);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
