@@ -120,7 +120,7 @@ class Monographs {
       throw new Error("This note is not published.");
 
     await http.delete(
-      `${Constants.API_HOST}/monographs/${note.publishId}`,
+      `${Constants.API_HOST}/monographs/${this.monographs[noteId]}`,
       token
     );
 
