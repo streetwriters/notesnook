@@ -20,6 +20,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
   const [suggestions, setSuggestions] = useState([]);
   const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(item);
+  console.log(item.tags);
 
   const localRefresh = () => {
     toAdd = db.notes.note(note.id).data;
@@ -72,7 +73,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
       ToastEvent.show({
         heading: 'Cannot add tag',
         type: 'error',
-        message: error.message,
+        message: e.message,
         context: 'local',
       });
     }
@@ -80,6 +81,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
 
   useEffect(() => {
     if (prevQuery) {
+      console.log(note.tags);
       getSuggestions(prevQuery, note);
     } else {
       getSuggestions(null, note);
@@ -91,6 +93,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
   }, []);
 
   const _onKeyPress = useCallback(async event => {
+    console.log('keypress', event.nativeEvent.key);
     if (event.nativeEvent.key === 'Backspace') {
       if (backPressCount === 0 && !tagToAdd) {
         backPressCount = 1;
@@ -113,11 +116,6 @@ export const ActionSheetTagsSection = ({item, close}) => {
           text: tagInputValue,
         });
       }
-    } else if (event.nativeEvent.key === ' ') {
-      await _onSubmit();
-      tagsInputRef.current?.setNativeProps({
-        text: '',
-      });
     } else if (event.nativeEvent.key === ',') {
       await _onSubmit();
       tagsInputRef.current?.setNativeProps({
@@ -148,19 +146,19 @@ export const ActionSheetTagsSection = ({item, close}) => {
         )
         .slice(0, 10);
     }
-
+    console.log(_suggestions);
     setSuggestions(_suggestions);
   };
 
   const _onChange = value => {
+    tagToAdd = value;
+    getSuggestions(value);
     if (value.endsWith(' ')) {
       _onSubmit();
       tagsInputRef.current?.setNativeProps({
         text: '',
       });
     }
-    tagToAdd = value;
-    getSuggestions(value);
     if (tagToAdd.length > 0) backPressCount = 0;
   };
 
@@ -215,14 +213,17 @@ export const ActionSheetTagsSection = ({item, close}) => {
           borderColor: focused ? colors.accent : colors.nav,
           alignItems: 'center',
         }}>
-        {note.tags.map((item, index) => (
-          <TagItem
-            key={item}
-            tag={item}
-            note={note}
-            localRefresh={localRefresh}
-          />
-        ))}
+        {note.tags.map(
+          (item, index) =>
+            item && (
+              <TagItem
+                key={item}
+                tag={item}
+                note={note}
+                localRefresh={localRefresh}
+              />
+            ),
+        )}
         <TextInput
           key="inputItem"
           style={{
@@ -279,7 +280,6 @@ const TagItem = ({tag, note, localRefresh}) => {
 
   return (
     <Button
-      key={tag.title}
       onPress={onPress}
       title={'#' + tag}
       type="accent"
