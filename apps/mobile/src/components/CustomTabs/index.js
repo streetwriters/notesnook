@@ -1,6 +1,7 @@
 import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
 import {FlatList, TextInput, View} from 'react-native';
+import { DDS } from '../../services/DeviceDetection';
 import {editing} from '../../utils';
 
 export default class CustomTabs extends Component {
@@ -34,8 +35,15 @@ export default class CustomTabs extends Component {
       ? this.props.dimensions.height - 70
       : this.props.dimensions.height - 140;
 
-    if (cOffset > pOffset - 50) {
-      if (x > 50 || y > heightCheck) {
+    if (DDS.isLargeTablet()) {
+      this.setScrollEnabled(false);
+      this.responderAllowedScroll = true;
+      return;
+    }  
+
+    if (cOffset > pOffset - 50 || DDS.isSmallTab) {
+      if ((!DDS.isSmallTab && x > 50 || y > heightCheck) || (DDS.isSmallTab && x > this.props.widths.b)) {
+
         this.responderAllowedScroll = false;
         this.setScrollEnabled(false);
         return;
@@ -161,7 +169,6 @@ export default class CustomTabs extends Component {
       this.currentDrawerState = drawerState;
       this.props.onDrawerStateChange(this.currentDrawerState);
     }
-    console.log(this.scrollOffset, this.props.offsets.a);
     this.props.toggleOverlay(
       Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10)
         ? true
@@ -175,9 +182,12 @@ export default class CustomTabs extends Component {
 
   onListTouchEnd = event => {
     if (this.lastOffset < 30 && event) {
-      if (event.nativeEvent.pageX > this.props.dimensions.width * 0.75) {
+      let width = this.props.dimensions.width;
+      let px = event.nativeEvent.pageX
+      if (px > width * 0.75 || (DDS.isSmallTab && px > this.props.widths.a)) {
         this.goToIndex(1);
       }
+
     }
   };
 

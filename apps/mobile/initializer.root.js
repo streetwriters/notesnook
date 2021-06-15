@@ -26,7 +26,6 @@ import { updateStatusBarColor } from './src/utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
-
   eOnLoadNote,
   eOpenFullscreenEditor
 } from './src/utils/Events';
@@ -122,12 +121,18 @@ const NativeStack = React.memo(
         style: {
           width:
             deviceMode === 'smallTablet'
-              ? dimensions.width * 0.6
+              ? dimensions.width - valueLimiter(dimensions.width * 0.4,300,450)
               : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0,
         },
       });
+      if (deviceMode === "smallTablet") {
+        setTimeout(() => {
+          tabBarRef.current?.goToIndex(1);
+        },100)
+      }
+     
     };
 
     useEffect(() => {
@@ -197,7 +202,7 @@ const NativeStack = React.memo(
               current === 'tablet'
                 ? size.width * 0.55
                 : current === 'smallTablet'
-                ? size.width * 0.6
+                ? size.width - valueLimiter(size.width * 0.4,300,450)
                 : size.width,
             zIndex: null,
             paddingHorizontal: 0,
@@ -238,6 +243,18 @@ const NativeStack = React.memo(
       animatedTranslateY.setValue(show ? 0 : -9999);
     };
 
+    const valueLimiter = (value,min,max) => {
+      if (value < min) {
+        return min
+      }
+
+      if (value > max) {
+        return max
+      }
+      
+      return value;
+    }
+
     const offsets = {
       mobile: {
         a: dimensions.width * 0.75,
@@ -245,9 +262,9 @@ const NativeStack = React.memo(
         c: dimensions.width * 2 + dimensions.width * 0.75,
       },
       smallTablet: {
-        a: fullscreen ? 0 : dimensions.width * 0.2,
-        b: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
-        c: fullscreen ? 0 : dimensions.width + dimensions.width * 0.2,
+        a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3,300,350),
+        b: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3,300,350),
+        c: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3,300,350),
       },
       tablet: {
         a: 0,
@@ -256,6 +273,8 @@ const NativeStack = React.memo(
       },
     };
 
+  
+
     const widths = {
       mobile: {
         a: dimensions.width * 0.75,
@@ -263,9 +282,9 @@ const NativeStack = React.memo(
         c: dimensions.width,
       },
       smallTablet: {
-        a: dimensions.width * 0.2,
-        b: dimensions.width * 0.4,
-        c: dimensions.width * 0.6,
+        a: valueLimiter(dimensions.width * 0.3,300,350),
+        b: valueLimiter(dimensions.width * 0.4,300,450),
+        c: dimensions.width - valueLimiter(dimensions.width * 0.4,300,450)
       },
       tablet: {
         a: dimensions.width * 0.15,
@@ -287,6 +306,7 @@ const NativeStack = React.memo(
           <CustomTabs
             ref={tabBarRef}
             dimensions={dimensions}
+            widths={widths[deviceMode]}
             style={{
               zIndex: 1,
             }}
