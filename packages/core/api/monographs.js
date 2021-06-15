@@ -8,7 +8,7 @@ class Monographs {
    */
   constructor(db) {
     this._db = db;
-    this.monographs;
+    this.monographs = [];
   }
 
   async init() {
@@ -16,14 +16,10 @@ class Monographs {
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token || !user.isEmailConfirmed) return;
     try {
-      const userMonographs = await http.get(
+      this.monographs = await http.get(
         `${Constants.API_HOST}/monographs`,
         token
       );
-      this.monographs = userMonographs.reduce((prev, curr) => {
-        prev[curr.noteId] = curr.id;
-        return prev;
-      }, {});
     } catch (e) {
       console.error(e);
     }
@@ -35,8 +31,7 @@ class Monographs {
    * @returns {boolean} Whether note is published or not.
    */
   isPublished(noteId) {
-    if (!this.monographs) return false;
-    return !!this.monographs[noteId];
+    return this.monographs.indexOf(noteId) > -1;
   }
 
   /**
@@ -45,8 +40,7 @@ class Monographs {
    * @returns Monograph Id
    */
   monograph(noteId) {
-    if (!this.monographs) return;
-    return this.monographs[noteId];
+    return this.monographs[this.monographs.indexOf(noteId)];
   }
 
   /**
@@ -71,9 +65,8 @@ class Monographs {
     if (!content) throw new Error("This note has no content.");
 
     const monograph = {
-      id: this.monographs[noteId],
+      id: noteId,
       title: note.title,
-      noteId: noteId,
       userId: user.id,
       selfDestruct: opts.selfDestruct,
     };
@@ -98,7 +91,7 @@ class Monographs {
       token
     );
 
-    this.monographs[noteId] = id;
+    this.monographs.push(id);
     return id;
   }
 
@@ -116,15 +109,12 @@ class Monographs {
     const note = this._db.notes.note(noteId);
     if (!note) throw new Error("No such note found.");
 
-    if (!this.monographs[noteId])
+    if (!this.isPublished(noteId))
       throw new Error("This note is not published.");
 
-    await http.delete(
-      `${Constants.API_HOST}/monographs/${this.monographs[noteId]}`,
-      token
-    );
+    await http.delete(`${Constants.API_HOST}/monographs/${noteId}`, token);
 
-    delete this.monographs[noteId];
+    this.monographs.splice(this.monographs.indexOf(noteId), 1);
   }
 }
 export default Monographs;
