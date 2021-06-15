@@ -306,6 +306,7 @@ export function clearAllStores() {
   useFavoriteStore.getState().clearFavorites();
   useNoteStore.getState().clearNotes();
   useMenuStore.getState().clearAll();
+  useTrashStore.getState().clearTrash();
 }
 
 export const allowedPlatforms = ['all', 'mobile', Platform.OS];
