@@ -35,6 +35,7 @@ class Monographs {
    * @returns {boolean} Whether note is published or not.
    */
   async isPublished(noteId) {
+    if (!this.monographs) return false;
     return !!this.monographs[noteId];
   }
 
@@ -44,6 +45,7 @@ class Monographs {
    * @returns Monograph Id
    */
   async monograph(noteId) {
+    if (!this.monographs) return;
     return this.monographs[noteId];
   }
 
