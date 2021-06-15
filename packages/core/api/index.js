@@ -90,7 +90,6 @@ class Database {
     await this.settings.init();
     await this.outbox.init();
     await this.user.init();
-    await this.monograph.init();
 
     await this.migrations.init();
     await this.migrations.migrate();
