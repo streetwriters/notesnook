@@ -11,7 +11,7 @@ import {ActionIcon} from '../ActionIcon';
 import {SearchInput} from '../SearchInput';
 import {HeaderLeftMenu} from './HeaderLeftMenu';
 import {HeaderRightMenu} from './HeaderRightMenu';
-import {HeaderTitle} from './HeaderTitle';
+import {Title} from './title';
 
 export const Header = React.memo(
   ({root, title, screen, isBack, color, action}) => {
@@ -54,7 +54,7 @@ export const Header = React.memo(
 
           {(Platform.OS === 'android' || Platform.isPad) &&
           screen !== 'Search' ? (
-            <HeaderTitle
+            <Title
               headerColor={color}
               heading={title}
               screen={screen}
@@ -63,7 +63,7 @@ export const Header = React.memo(
           ) : null}
         </View>
         {Platform.OS !== 'android' && !Platform.isPad && screen !== 'Search' ? (
-          <HeaderTitle
+          <Title
             headerColor={color}
             heading={title}
             screen={screen}

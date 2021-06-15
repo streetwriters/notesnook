@@ -2,7 +2,7 @@ import React from 'react';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
 import { useTracked } from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
-export const Container = ({children, root}) => {
+export const Container = ({children}) => {
   const [state] = useTracked();
   const {colors, } = state;
   const floating = useIsFloatingKeyboard();

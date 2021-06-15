@@ -32,7 +32,7 @@ let passwordValue = null;
 let didVerifyUser = false;
 const opacityV = new Animated.Value(1);
 const AppLoader = ({onLoad}) => {
-  const [state, dispatch] = useTracked();
+  const [state,] = useTracked();
   const colors = state.colors;
   const [loading, setLoading] = useState(true);
   const setNotes = useNoteStore(state => state.setNotes);
