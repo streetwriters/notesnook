@@ -16,7 +16,10 @@ class Monograph {
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token || !user.isEmailConfirmed) return;
     try {
-      const userMonographs = await http.get(`${Constants.API_HOST}/monographs`);
+      const userMonographs = await http.get(
+        `${Constants.API_HOST}/monographs`,
+        token
+      );
       this.monographs = userMonographs.reduce((prev, curr) => {
         prev[curr.noteId] = curr.id;
         return prev;
