@@ -5,7 +5,11 @@ import {notesnook} from '../../../e2e/test.ids';
 import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent} from '../../components/DialogManager/recievers';
 import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
+import {
+  useEditorStore,
+  useSettingStore,
+  useUserStore,
+} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -37,8 +41,11 @@ const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
-
+  const currentlyEditingNote = useEditorStore(
+    state => state.currentEditingNote,
+  );
   const fullscreen = useSettingStore(state => state.fullscreen);
+  const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
@@ -129,24 +136,48 @@ const EditorHeader = () => {
             flexDirection: 'row',
           }}>
           <>
-            <ActionIcon
-              name="link-box-outline"
-              color={colors.accent}
-              customStyle={{
-                marginLeft: 10,
-                borderRadius: 5,
-              }}
-              top={50}
-              onPress={async () => {
-                let note = getNote() && db.notes.note(getNote().id).data;
-                if (editing.isFocused) {
-                  tiny.call(EditorWebView, tiny.blur);
-                  await sleep(500);
-                  editing.isFocused = true;
-                }
-                eSendEvent(eOpenPublishNoteDialog, note);
-              }}
-            />
+            {currentlyEditingNote && (
+              <ActionIcon
+                name="cloud-upload-outline"
+                color={colors.accent}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5,
+                }}
+                top={50}
+                onPress={async () => {
+                  if (!user) {
+                    ToastEvent.show({
+                      heading: 'Login required',
+                      message: 'Login to publish to monograph',
+                      context: context,
+                      func: () => {
+                        eSendEvent(eOpenLoginDialog);
+                      },
+                      actionText: 'Login',
+                    });
+                    return;
+                  }
+
+                  if (!user.isEmailConfirmed) {
+                    ToastEvent.show({
+                      heading: 'Email not verified',
+                      message: 'Please verify your email first.',
+                      context: context,
+                    });
+                    return;
+                  }
+
+                  let note = getNote() && db.notes.note(getNote().id).data;
+                  if (editing.isFocused) {
+                    tiny.call(EditorWebView, tiny.blur);
+                    await sleep(500);
+                    editing.isFocused = true;
+                  }
+                  eSendEvent(eOpenPublishNoteDialog, note);
+                }}
+              />
+            )}
 
             {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
