@@ -208,7 +208,13 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     history.selectedItemsList = all;
     set({ selectedItemsList: all });
   },
-  setSelectionMode: mode => set({ selectionMode: mode }),
+  setSelectionMode: mode => {
+    if (!mode) {
+      history.selectedItemsList = [];
+      history.selectionMode = false;
+    }
+    set({ selectionMode: mode,selectedItemsList:mode? get().selectedItemsList : [] })
+  },
   setSelectedItem: item => {
     let selectedItems = get().selectedItemsList;
     let index = selectedItems.findIndex((i: any) => i.id === item.id);
