@@ -1,7 +1,7 @@
 import http from "../utils/http";
 import Constants from "../utils/constants";
 
-class Monograph {
+class Monographs {
   /**
    *
    * @param {import("./index").default} db
@@ -125,4 +125,4 @@ class Monograph {
     delete this.monographs[noteId];
   }
 }
-export default Monograph;
+export default Monographs;

@@ -17,7 +17,7 @@ import Migrations from "./migrations";
 import Outbox from "./outbox";
 import UserManager from "./user-manager";
 import http from "../utils/http";
-import Monograph from "./monograph";
+import Monographs from "./monographs";
 
 /**
  * @type {EventSource}
@@ -70,7 +70,7 @@ class Database {
     this.settings = new Settings(this);
     this.migrations = new Migrations(this);
     this.outbox = new Outbox(this);
-    this.monograph = new Monograph(this);
+    this.monographs = new Monographs(this);
 
     // collections
     /** @type {Notes} */
@@ -93,6 +93,8 @@ class Database {
 
     await this.migrations.init();
     await this.migrations.migrate();
+
+    this.monographs.init();
   }
 
   async connectSSE() {
