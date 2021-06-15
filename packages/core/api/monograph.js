@@ -8,9 +8,50 @@ class Monograph {
    */
   constructor(db) {
     this._db = db;
+    this.monographs;
   }
 
+  async init() {
+    const user = await this._db.user.getUser();
+    const token = await this._db.user.tokenManager.getAccessToken();
+    if (!user || !token) return;
+
+    const userMonographs = await http.get(`${Constants.API_HOST}/monographs`);
+    this.monographs = userMonographs.reduce((prev, curr) => {
+      prev[curr.noteId] = curr.id;
+      return prev;
+    }, {});
+  }
+
+  /**
+   * Check if note is published.
+   * @param {string} noteId id of the note
+   * @returns {boolean} Whether note is published or not.
+   */
+  async isPublished(noteId) {
+    return !!this.monographs[noteId];
+  }
+
+  /**
+   * Get note published monograph id
+   * @param {string} noteId id of the note
+   * @returns Monograph Id
+   */
+  async monograph(noteId) {
+    return this.monographs[noteId];
+  }
+
+  /**
+   * Publish a note as a monograph
+   * @param {string} noteId id of the note to publish
+   * @param {{password: string, selfDestruct: boolean}} opts Publish options
+   * @returns
+   */
   async publish(noteId, opts) {
+    if (!this.monographs) await this.init();
+
+    let update = !!this.isPublished(noteId);
+
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
@@ -22,7 +63,7 @@ class Monograph {
     if (!content) throw new Error("This note has no content.");
 
     const monograph = {
-      id: note.publishId,
+      id: this.monographs[noteId],
       title: note.title,
       noteId: noteId,
       userId: user.id,
@@ -41,7 +82,7 @@ class Monograph {
       });
     }
 
-    const method = opts.update ? http.patch.json : http.post.json;
+    const method = update ? http.patch.json : http.post.json;
 
     const { id } = await method(
       `${Constants.API_HOST}/monographs`,
@@ -49,10 +90,17 @@ class Monograph {
       token
     );
 
-    await this._db.notes.add({ id: note.id, publishId: id });
+    this.monographs[noteId] = id;
+    return id;
   }
 
+  /**
+   * Unpublish a note
+   * @param {string} noteId id of the note to unpublish
+   */
   async unpublish(noteId) {
+    if (!this.monographs) await this.init();
+
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token) throw new Error("Please login to publish a note.");
@@ -60,18 +108,15 @@ class Monograph {
     const note = this._db.notes.note(noteId);
     if (!note) throw new Error("No such note found.");
 
-    if (!note.publishId) throw new Error("This note is not published.");
+    if (!this.monographs[noteId])
+      throw new Error("This note is not published.");
 
     await http.delete(
       `${Constants.API_HOST}/monographs/${note.publishId}`,
       token
     );
 
-    await this._db.notes.add({ id: note.id, publishId: undefined });
-  }
-
-  update(noteId, opts) {
-    return this.publish(noteId, { ...opts, update: true });
+    delete this.monographs[noteId];
   }
 }
 export default Monograph;

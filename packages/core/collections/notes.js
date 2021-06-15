@@ -98,7 +98,6 @@ export default class Notes extends Collection {
       dateCreated: note.dateCreated,
       conflicted: !!note.conflicted,
       localOnly: !!note.localOnly,
-      publishId: note.publishId,
     };
 
     if (!oldNote || oldNote.deleted) {
