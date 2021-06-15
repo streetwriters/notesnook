@@ -20,7 +20,7 @@ export const NoteWrapper = React.memo(({item, index}) => {
     let _note = db.notes.note(item.id).data;
 
     if (history.selectedItemsList.length > 0 && history.selectionMode) {
-      dispatch({type: Actions.SELECTED_ITEMS, item: _note});
+      setSelectedItem(_note);
       return;
     } else {
       history.selectedItemsList = [];

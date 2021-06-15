@@ -12,10 +12,7 @@ export const NotebookWrapper = React.memo(({item, index}) => {
   const onPress = () => {
 
     if (history.selectedItemsList.length > 0 && history.selectionMode) {
-      dispatch({
-        type: Actions.SELECTED_ITEMS,
-        item: item,
-      });
+      setSelectedItem(item);
       return;
     }  else {
       history.selectedItemsList = [];

@@ -1,18 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {Clipboard, View} from 'react-native';
-import Animated, {useValue} from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import React, { useEffect, useState } from 'react';
+import { Clipboard, View } from 'react-native';
+import Animated, { useValue } from 'react-native-reanimated';
+import { useTracked } from '../../provider';
 import { useMenuStore, useNotebookStore, useSelectionStore } from '../../provider/stores';
-import {openVault, ToastEvent} from '../../services/EventManager';
+import { openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {dWidth, getElevation, toTXT} from '../../utils';
-import {db} from '../../utils/DB';
-import {deleteItems} from '../../utils/functions';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {simpleDialogEvent} from '../DialogManager/recievers';
-import {TEMPLATE_PERMANANT_DELETE} from '../DialogManager/Templates';
+import { dWidth, getElevation, toTXT } from '../../utils';
+import { db } from '../../utils/DB';
+import { deleteItems } from '../../utils/functions';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { simpleDialogEvent } from '../DialogManager/recievers';
+import { TEMPLATE_PERMANANT_DELETE } from '../DialogManager/Templates';
 
 export const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
@@ -238,7 +237,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
           if (!selectionMode) {
             setSelectionMode(true);
           }
-          setSelectedItem(item);
+          setSelectedItem(note);
           setActionStrip(false);
         }}
         style={{
