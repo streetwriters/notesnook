@@ -149,8 +149,8 @@ const EditorHeader = () => {
                   if (!user) {
                     ToastEvent.show({
                       heading: 'Login required',
-                      message: 'Login to publish to monograph',
-                      context: context,
+                      message: 'Login to publish',
+                      context: "global",
                       func: () => {
                         eSendEvent(eOpenLoginDialog);
                       },
@@ -163,7 +163,7 @@ const EditorHeader = () => {
                     ToastEvent.show({
                       heading: 'Email not verified',
                       message: 'Please verify your email first.',
-                      context: context,
+                      context: "global",
                     });
                     return;
                   }

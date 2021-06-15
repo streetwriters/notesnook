@@ -272,8 +272,29 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Publish',
-      icon: 'link-box-outline',
+      icon: 'cloud-upload-outline',
       func: async () => {
+        if (!user) {
+          ToastEvent.show({
+            heading: 'Login required',
+            message: 'Login to publish note',
+            context: 'local',
+            func: () => {
+              eSendEvent(eOpenLoginDialog);
+            },
+            actionText: 'Login',
+          });
+          return;
+        }
+
+        if (!user.isEmailConfirmed) {
+          ToastEvent.show({
+            heading: 'Email not verified',
+            message: 'Please verify your email first.',
+            context: 'local',
+          });
+          return;
+        }
         close();
         await sleep(300);
         eSendEvent(eOpenPublishNoteDialog, note);
