@@ -215,17 +215,7 @@ const PublishNoteDialog = () => {
                 />
               </View>
             )}
-
-            {isLocked ? (
-              <Input
-                onChangeText={value => (passwordValue = value)}
-                blurOnSubmit
-                secureTextEntry
-                placeholder="Enter Password"
-              />
-            ) : (
-              <Seperator />
-            )}
+            <Seperator />
 
             <TouchableOpacity
               onPress={() => {
@@ -310,6 +300,19 @@ const PublishNoteDialog = () => {
                 alignSelf: 'center',
                 marginTop: 10,
               }}>
+              {isLocked ? (
+                <>
+                  <Input
+                    onChangeText={value => (passwordValue = value)}
+                    blurOnSubmit
+                    secureTextEntry
+                    defaultValue={passwordValue}
+                    placeholder="Enter Password"
+                  />
+                  <Seperator half />
+                </>
+              ) : null}
+
               <Button
                 onPress={publishNote}
                 fontSize={SIZE.md}

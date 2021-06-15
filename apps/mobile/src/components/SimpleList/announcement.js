@@ -128,23 +128,13 @@ export const Announcement = () => {
                     fontSize={SIZE.md}
                     onPress={async () => {
 
-                      eSendEvent(eOpenPremiumDialog, {
-                        promoCode:"com.streetwriters.notesnook.sub.mo",
-                        text: "Get 50% OFF",
-                      });
-
-                      return
-
                       if (item.type === 'link') {
                         try {
-                          await openLinkInBrowser(
-                            item.data,
-                            state.colors,
-                          );
+                          await openLinkInBrowser(item.data, state.colors);
                         } catch (e) {}
                       } else if (item.type === 'promo') {
                         eSendEvent(eOpenPremiumDialog, {
-                          promoCode:item.data,
+                          promoCode: item.data,
                           text: item.title,
                         });
                       }

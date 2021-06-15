@@ -132,7 +132,7 @@ export const ActionSheetComponent = ({
       func: () => {
         close();
         clearSelection();
-        setSelectedItem(item);
+        setSelectedItem(note);
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);
         }, 300);
