@@ -1,16 +1,16 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect } from 'react';
-import { Appearance, AppState, Linking, Platform } from 'react-native';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect} from 'react';
+import {Appearance, AppState, Linking, Platform} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
+import {enabled} from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
 import {
   clearAllStores,
   initialize,
   useNoteStore,
-  useUserStore
+  useUserStore,
 } from './src/provider/stores';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
@@ -18,31 +18,31 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent
+  ToastEvent,
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { APP_VERSION, doInBackground, editing } from './src/utils';
-import { updateStatusBarColor } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {APP_VERSION, doInBackground, editing} from './src/utils';
+import {updateStatusBarColor} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage
+  refreshNotesPage,
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
+import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, getWebviewInit } from './src/views/Editor/Functions';
+import {sleep} from './src/utils/TimeUtils';
+import {getNote, getWebviewInit} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -297,6 +297,7 @@ export const AppRootEvents = React.memo(
     const onLogout = async reason => {
       setUser(null);
       clearAllStores();
+      SettingsService.init();
       setSyncing(false);
       setLoginMessage();
       await sleep(50);
@@ -330,7 +331,7 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async login => {
       try {
         if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
-        return;
+          return;
         let user = await db.user.getUser();
         if (user) {
           setUser(user);
