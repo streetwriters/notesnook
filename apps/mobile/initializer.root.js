@@ -3,7 +3,7 @@ import {
   deactivateKeepAwake
 } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useRef } from 'react';
-import { Dimensions, View } from 'react-native';
+import { View } from 'react-native';
 import Animated, { useValue } from 'react-native-reanimated';
 import { notesnook } from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
@@ -38,7 +38,6 @@ import tiny from './src/views/Editor/tiny/tiny';
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
-  console.log(obj.i);
   if (obj.i === 1) {
     editing.movedAway = false;
     activateKeepAwake();
@@ -205,8 +204,6 @@ const NativeStack = React.memo(
           },
         });
       }
-
-      console.log('resetting tabs');
       setTimeout(() => {
         if (current === 'tablet') {
           tabBarRef.current?.goToIndex(0);
@@ -238,7 +235,6 @@ const NativeStack = React.memo(
     };
 
     const toggleView = show => {
-      //console.log('toggling overlay view',show);
       animatedTranslateY.setValue(show ? 0 : -9999);
     };
 
