@@ -36,7 +36,7 @@ const DeleteOption = createOption(
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {
       if (item.id === editorStore.get().session.id) isAnyNoteOpened = true;
-      if (item.locked) return 0;
+      if (item.locked || db.monographs.isPublished(item.id)) return 0;
       return item.id;
     });
 
