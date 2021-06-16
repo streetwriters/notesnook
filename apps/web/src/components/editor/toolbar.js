@@ -7,9 +7,11 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import Animated from "../animated";
+import { showPublishView } from "../publish-view";
 
 function Toolbar(props) {
   const sessionState = useStore((store) => store.session.state);
+  const isLocked = useStore((store) => store.session.locked);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -112,6 +114,13 @@ function Toolbar(props) {
         onClick: () => tinymce.activeEditor.execCommand("Redo"),
       },
       {
+        title: "Publish",
+        icon: Icon.Publish,
+        enabled: !isLocked,
+        new: true,
+        onClick: () => showPublishView(store.get().session.id, "top"),
+      },
+      {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
@@ -126,6 +135,7 @@ function Toolbar(props) {
       toggleFocusMode,
       toggleProperties,
       isFocusMode,
+      isLocked,
       theme,
       toggleNightMode,
     ]
@@ -195,6 +205,20 @@ function Toolbar(props) {
               <Text display={["none", "none", "block"]} fontSize="body" ml={1}>
                 {tool.title}
               </Text>
+              {tool.new && (
+                <Text
+                  variant="subBody"
+                  fontSize={10}
+                  ml={1}
+                  bg="primary"
+                  color="static"
+                  px={"3px"}
+                  py="1px"
+                  sx={{ borderRadius: "default" }}
+                >
+                  NEW
+                </Text>
+              )}
             </Flex>
           </Button>
         ))}

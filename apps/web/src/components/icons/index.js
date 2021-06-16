@@ -141,6 +141,7 @@ export const Fullscreen = createIcon(Icons.mdiFullscreen);
 export const ExitFullscreen = createIcon(Icons.mdiFullscreenExit);
 
 export const Announcement = createIcon(Icons.mdiBullhorn);
+export const Publish = createIcon(Icons.mdiCloudUploadOutline);
 
 export const Copy = createIcon(Icons.mdiContentCopy);
 
@@ -148,3 +149,4 @@ export const Select = createIcon(Icons.mdiCheckboxMultipleMarkedCircleOutline);
 export const NotebookEdit = createIcon(Icons.mdiBookEditOutline);
 export const DeleteForver = createIcon(Icons.mdiDeleteForeverOutline);
 
+export const Monographs = createIcon(Icons.mdiTextBoxMultipleOutline);

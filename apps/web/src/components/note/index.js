@@ -14,6 +14,7 @@ import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
+import { showPublishView } from "../publish-view";
 
 function Note(props) {
   const { item, index, context } = props;
@@ -160,6 +161,18 @@ const menuItems = [
     key: "colors",
     title: () => "Colors",
     component: ({ data }) => <Colors note={data.note} />,
+  },
+  {
+    key: "publish",
+    isNew: true,
+    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
+    disableReason: "You cannot publish a locked note.",
+    icon: Icon.Publish,
+    title: ({ note }) =>
+      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
+    onClick: async ({ note }) => {
+      await showPublishView(note.id, "bottom");
+    },
   },
   {
     key: "addtonotebook",
