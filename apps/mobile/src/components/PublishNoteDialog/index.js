@@ -247,9 +247,7 @@ const PublishNoteDialog = () => {
                   width: '100%',
                   flexShrink: 1,
                 }}>
-                <Heading size={SIZE.md}>
-                  Password protection
-                </Heading>
+                <Heading size={SIZE.md}>Password protection</Heading>
                 <Paragraph>
                   Published note can only be viewed by someone with the
                   password.
@@ -284,9 +282,7 @@ const PublishNoteDialog = () => {
                   width: '100%',
                   flexShrink: 1,
                 }}>
-                <Heading size={SIZE.md}>
-                  Self destruct
-                </Heading>
+                <Heading size={SIZE.md}>Self destruct</Heading>
                 <Paragraph>
                   Published note link will be automatically deleted once it is
                   viewed by someone.
@@ -350,7 +346,7 @@ const PublishNoteDialog = () => {
           onPress={async () => {
             try {
               await openLinkInBrowser(
-                'https://docs.notesnook.com/notesnook-monograph/',
+                'https://docs.notesnook.com/monographs/',
                 colors.accent,
               );
             } catch (e) {}
