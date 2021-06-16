@@ -6,7 +6,7 @@ import useMobile from "../../utils/use-mobile";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {
-  const { icon: Icon, color, title, isLoading, isShortcut } = props;
+  const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const openContextMenu = useOpenContextMenu();
@@ -38,6 +38,13 @@ function NavigationItem(props) {
           color={props.selected && !color ? "primary" : color || "icon"}
           rotate={isLoading}
         />
+        {isNew && (
+          <Icons.Circle
+            size={6}
+            sx={{ position: "absolute", bottom: 0, left: "15px" }}
+            color={"primary"}
+          />
+        )}
         {isShortcut && (
           <Icons.Shortcut
             size={8}

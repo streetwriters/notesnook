@@ -38,6 +38,12 @@ const routes = [
     icon: Icon.StarOutline,
   },
   { title: "Tags", path: "/tags", icon: Icon.Tag },
+  {
+    title: "Monographs",
+    path: "/monographs",
+    icon: Icon.Monographs,
+    isNew: true,
+  },
   { title: "Trash", path: "/trash", icon: Icon.Trash },
 ];
 
@@ -131,6 +137,7 @@ function NavigationMenu(props) {
             key={item.path}
             title={item.title}
             icon={item.icon}
+            isNew={item.isNew}
             selected={
               item.path === "/"
                 ? location === item.path

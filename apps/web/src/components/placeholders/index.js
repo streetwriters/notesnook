@@ -18,7 +18,13 @@ function Placeholder(props) {
         sx={{ position: "relative" }}
       >
         <Image width={"100%"} height={"100px"} />
-        <Text variant="body" mt={2} color="fontTertiary">
+        <Text
+          variant="body"
+          mt={2}
+          color="fontTertiary"
+          textAlign="center"
+          mx={4}
+        >
           {text}
         </Text>
         {callToAction && (

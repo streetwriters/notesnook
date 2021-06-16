@@ -12,6 +12,7 @@ import { navigate } from "../navigation";
 import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
+import Monographs from "../views/monographs";
 
 const routes = {
   "/": () => ({
@@ -159,6 +160,12 @@ const routes = {
     key: "settings",
     title: "Settings",
     component: <Settings />,
+  }),
+  "/monographs": () => ({
+    key: "monographs",
+    type: "monographs",
+    title: "Monographs",
+    component: <Monographs />,
   }),
   "/search/:type": ({ type }) => ({
     type: "search",
