@@ -15,11 +15,13 @@ class Monographs {
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token || !user.isEmailConfirmed) return;
+    this.monographs = await this._db.context.read("monographs", true);
     try {
       this.monographs = await http.get(
         `${Constants.API_HOST}/monographs`,
         token
       );
+      await this._db.context.write("monographs", this.monographs);
     } catch (e) {
       console.error(e);
     }
