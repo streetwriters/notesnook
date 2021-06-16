@@ -20,14 +20,6 @@ body,
 }
 
 * {
-  -webkit-transition: background-color 300ms linear, border-color 300ms linear;
-  -moz-transition: background-color 300ms linear, border-color 300ms linear;
-  -o-transition: background-color 300ms linear, border-color 300ms linear;
-  -ms-transition: background-color 300ms linear, border-color 300ms linear;
-  transition: background-color 300ms linear, border-color 300ms linear;
-}
-
-* {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
     Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 }
