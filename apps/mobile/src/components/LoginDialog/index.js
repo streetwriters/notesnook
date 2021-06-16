@@ -1,48 +1,42 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Text} from 'react-native';
-import {ActivityIndicator, Modal, TouchableOpacity, View} from 'react-native';
-import {color} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {Toast} from '../../components/Toast';
-import {Actions} from '../../provider/Actions';
-import {useTracked} from '../../provider/index';
-import {useUserStore} from '../../provider/stores';
+import { Toast } from '../../components/Toast';
+import { useTracked } from '../../provider/index';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import Sync from '../../services/Sync';
-import {getElevation} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { getElevation } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
-  eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
-  refreshNotesPage,
+  eOpenRecoveryKeyDialog
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import {Header} from '../SimpleList/header';
+import { Header } from '../SimpleList/header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -407,10 +401,9 @@ const LoginDialog = () => {
   };
 
   return !visible ? null : (
-    <Modal
-      animated={true}
-      animationType={DDS.isTab ? 'fade' : 'slide'}
-      statusBarTranslucent={true}
+    <BaseDialog
+      animation={DDS.isTab ? 'fade' : 'slide'}
+      statusBarTranslucent={false}
       onRequestClose={MODES.sessionExpired !== mode && close}
       visible={true}
       onShow={() => {
@@ -422,6 +415,7 @@ const LoginDialog = () => {
           _email.current?.focus();
         }, 150);
       }}
+      background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
       {confirm && (
         <BaseDialog
@@ -507,66 +501,44 @@ const LoginDialog = () => {
           </View>
         </BaseDialog>
       ) : null}
-      <View
+
+      <ScrollView
         style={{
-          opacity: 1,
-          flex: 1,
-          paddingTop: DDS.isTab ? 0 : insets.top,
-          backgroundColor: DDS.isTab ? 'rgba(0,0,0,0.3)' : colors.bg,
-          width: '100%',
-          height: '100%',
-          alignSelf: 'center',
-          justifyContent: 'center',
-          alignItems: 'center',
-          overflow: 'hidden',
+          maxHeight: DDS.isTab ? '90%' : '100%',
+          minHeight: '50%',
+          height: DDS.isTab ? null : '100%',
+          width: DDS.isTab ? 500 : '100%',
+          borderRadius: DDS.isTab ? 5 : 0,
+          backgroundColor: colors.bg,
+          zIndex: 10,
+          ...getElevation(DDS.isTab ? 5 : 0),
+          paddingBottom: DDS.isTab ? 20 : 0,
         }}>
-        {DDS.isTab ? (
-          <TouchableOpacity
-            onPress={MODES.sessionExpired !== mode && close}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-              zIndex: 1,
-            }}
-          />
-        ) : null}
         <View
           style={{
-            maxHeight: DDS.isTab ? '90%' : '100%',
-            minHeight: '50%',
-            height: DDS.isTab ? null : '100%',
-            width: DDS.isTab ? 500 : '100%',
-            borderRadius: DDS.isTab ? 5 : 0,
-            backgroundColor: colors.bg,
-            zIndex: 10,
-            ...getElevation(DDS.isTab ? 5 : 0),
-            paddingBottom: DDS.isTab ? 20 : 0,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 12,
+            height: 50,
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              paddingHorizontal: 12,
-              height: 50,
-            }}>
-            {DDS.isTab && MODES.sessionExpired !== mode ? (
-              <ActionIcon
-                name="close"
-                size={SIZE.xxxl}
-                onPress={() => {
-                  if (MODES.sessionExpired === mode) return;
-                  close();
-                }}
-                customStyle={{
-                  width: 40,
-                  height: 40,
-                  marginLeft: -5,
-                }}
-                color={colors.heading}
-              />
-            ) : MODES.sessionExpired !== mode && (
+          {DDS.isTab && MODES.sessionExpired !== mode ? (
+            <ActionIcon
+              name="close"
+              size={SIZE.xxxl}
+              onPress={() => {
+                if (MODES.sessionExpired === mode) return;
+                close();
+              }}
+              customStyle={{
+                width: 40,
+                height: 40,
+                marginLeft: -5,
+              }}
+              color={colors.heading}
+            />
+          ) : (
+            MODES.sessionExpired !== mode && (
               <ActionIcon
                 name="arrow-left"
                 size={SIZE.xxxl}
@@ -581,289 +553,281 @@ const LoginDialog = () => {
                 }}
                 color={colors.heading}
               />
-            )}
-
-
-            <View />
-          </View>
-
-          <Header
-            color="transparent"
-            type="login"
-            noAnnouncement={true}
-            shouldShow
-            title={current.headerButton}
-            messageCard={false}
-            onPress={mode !== MODES.changePassword && current.headerButtonFunc}
-            paragraph={mode !== MODES.changePassword && current.headerParagraph}
-          />
-          {mode === MODES.sessionExpired && (
-            <View
-              style={{
-                width: '100%',
-                paddingHorizontal: 12,
-                paddingVertical: 12,
-                marginTop: 10,
-                flexDirection: 'row',
-                alignItems: 'center',
-                flexShrink: 1,
-                backgroundColor: hexToRGBA(colors.red, 0.2),
-              }}>
-              <Icon
-                size={20}
-                style={{marginRight: 10}}
-                name="information"
-                color={colors.errorText}
-              />
-              <Paragraph
-                style={{flexWrap: 'wrap', flex: 1}}
-                color={colors.errorText}>
-                Please login to your account to access your notes on this device
-                and sync them.
-              </Paragraph>
-            </View>
+            )
           )}
 
-          {mode === MODES.signup && (
-            <View
-              style={{
-                width: '100%',
-                backgroundColor: colors.shade,
-                paddingHorizontal: 12,
-                paddingVertical: 12,
-                marginTop: 10,
-                flexDirection: 'row',
-                alignItems: 'center',
-                flexShrink: 1,
-              }}>
-              <Icon
-                size={20}
-                style={{marginRight: 10}}
-                name="information"
-                color={colors.accent}
-              />
-              <Paragraph
-                style={{flexWrap: 'wrap', flex: 1}}
-                color={colors.accent}>
-                When you sign up, your{' '}
-                <Text style={{fontWeight: 'bold'}}>
-                  14 day free trial of Notesnook Pro
-                </Text>{' '}
-                will be activated.
-              </Paragraph>
-            </View>
-          )}
+          <View />
+        </View>
 
+        <Header
+          color="transparent"
+          type="login"
+          noAnnouncement={true}
+          shouldShow
+          title={current.headerButton}
+          messageCard={false}
+          onPress={mode !== MODES.changePassword && current.headerButtonFunc}
+          paragraph={mode !== MODES.changePassword && current.headerParagraph}
+        />
+        {mode === MODES.sessionExpired && (
           <View
             style={{
+              width: '100%',
               paddingHorizontal: 12,
-              paddingTop: 12,
-              width: focused ? '100%' : '99.9%',
+              paddingVertical: 12,
+              marginTop: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+              backgroundColor: hexToRGBA(colors.red, 0.2),
             }}>
-            {mode === MODES.changePassword ? null : (
-              <Input
-                fwdRef={_email}
-                onChangeText={value => {
-                  email = value;
-                }}
-                onErrorCheck={r => {
-                  setError(r);
-                }}
-                loading={MODES.sessionExpired === mode}
-                defaultValue={MODES.sessionExpired === mode ? getEmail() : null}
-                onFocusInput={onChangeFocus}
-                returnKeyLabel="Next"
-                returnKeyType="next"
-                autoCompleteType="email"
-                validationType="email"
-                autoCapitalize="none"
-                errorMessage="Email is invalid"
-                placeholder="Email"
-                onSubmit={() => {
-                  if (mode === MODES.signup || mode === MODES.login) {
-                    _pass.current?.focus();
-                  }
-                }}
-              />
-            )}
+            <Icon
+              size={20}
+              style={{marginRight: 10}}
+              name="information"
+              color={colors.errorText}
+            />
+            <Paragraph style={{maxWidth: '90%'}} color={colors.errorText}>
+              Please login to your account to access your notes on this device
+              and sync them.
+            </Paragraph>
+          </View>
+        )}
 
-            {mode !== MODES.changePassword ? null : (
+        {mode === MODES.signup && (
+          <View
+            style={{
+              width: '100%',
+              backgroundColor: colors.shade,
+              paddingHorizontal: 12,
+              paddingVertical: 12,
+              marginTop: 10,
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <Icon
+              size={20}
+              style={{marginRight: 10}}
+              name="information"
+              color={colors.accent}
+            />
+            <Paragraph style={{maxWidth: '90%'}} color={colors.accent}>
+              When you sign up, your{' '}
+              <Text style={{fontWeight: 'bold'}}>
+                14 day free trial of Notesnook Pro
+              </Text>{' '}
+              will be activated.
+            </Paragraph>
+          </View>
+        )}
+
+        <View
+          style={{
+            paddingHorizontal: 12,
+            paddingTop: 12,
+            width: focused ? '100%' : '99.9%',
+          }}>
+          {mode === MODES.changePassword ? null : (
+            <Input
+              fwdRef={_email}
+              onChangeText={value => {
+                email = value;
+              }}
+              onErrorCheck={r => {
+                setError(r);
+              }}
+              loading={MODES.sessionExpired === mode}
+              defaultValue={MODES.sessionExpired === mode ? getEmail() : null}
+              onFocusInput={onChangeFocus}
+              returnKeyLabel="Next"
+              returnKeyType="next"
+              autoCompleteType="email"
+              validationType="email"
+              autoCapitalize="none"
+              errorMessage="Email is invalid"
+              placeholder="Email"
+              onSubmit={() => {
+                if (mode === MODES.signup || mode === MODES.login) {
+                  _pass.current?.focus();
+                }
+              }}
+            />
+          )}
+
+          {mode !== MODES.changePassword ? null : (
+            <Input
+              fwdRef={_oPass}
+              onChangeText={value => {
+                oldPassword = value;
+              }}
+              onErrorCheck={r => {
+                setError(r);
+              }}
+              returnKeyLabel="Next"
+              returnKeyType="next"
+              secureTextEntry
+              autoCompleteType="password"
+              autoCapitalize="none"
+              placeholder="Current password"
+              onSubmit={() => {
+                if (mode === MODES.signup) {
+                  _pass.current?.focus();
+                }
+              }}
+            />
+          )}
+
+          {mode === MODES.forgotPassword ? null : (
+            <>
               <Input
-                fwdRef={_oPass}
+                fwdRef={_pass}
                 onChangeText={value => {
-                  oldPassword = value;
+                  password = value;
                 }}
                 onErrorCheck={r => {
                   setError(r);
                 }}
-                returnKeyLabel="Next"
-                returnKeyType="next"
+                marginBottom={0}
+                validationType={mode === MODES.signup ? 'password' : null}
                 secureTextEntry
                 autoCompleteType="password"
                 autoCapitalize="none"
-                placeholder="Current password"
+                placeholder="Password"
+                returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}
+                returnKeyType={mode === MODES.signup ? 'next' : 'done'}
+                errorMessage={mode === MODES.signup && 'Password is invalid'}
                 onSubmit={() => {
-                  if (mode === MODES.signup) {
-                    _pass.current?.focus();
+                  if (mode === MODES.signup || mode === MODES.changePassword) {
+                    _passConfirm.current?.focus();
+                  } else {
+                    current.buttonFunc();
                   }
                 }}
               />
-            )}
+            </>
+          )}
 
-            {mode === MODES.forgotPassword ? null : (
-              <>
-                <Input
-                  fwdRef={_pass}
-                  onChangeText={value => {
-                    password = value;
-                  }}
-                  onErrorCheck={r => {
-                    setError(r);
-                  }}
-                  marginBottom={0}
-                  validationType={mode === MODES.signup ? 'password' : null}
-                  secureTextEntry
-                  autoCompleteType="password"
-                  autoCapitalize="none"
-                  placeholder="Password"
-                  returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}
-                  returnKeyType={mode === MODES.signup ? 'next' : 'done'}
-                  errorMessage={mode === MODES.signup && 'Password is invalid'}
-                  onSubmit={() => {
-                    if (
-                      mode === MODES.signup ||
-                      mode === MODES.changePassword
-                    ) {
-                      _passConfirm.current?.focus();
-                    } else {
-                      current.buttonFunc();
-                    }
-                  }}
-                />
-              </>
-            )}
+          {mode === MODES.login || mode === MODES.sessionExpired ? (
+            <TouchableOpacity
+              onPress={() => {
+                if (MODES.sessionExpired === mode) {
+                  sendEmail(true);
+                  return;
+                }
+                setMode(MODES.forgotPassword);
+              }}
+              style={{
+                alignSelf: 'flex-end',
+                marginTop: 2.5,
+              }}>
+              <Paragraph color={colors.accent}>Forgot password?</Paragraph>
+            </TouchableOpacity>
+          ) : null}
+          <Seperator />
+          {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
+            <>
+              <Input
+                fwdRef={_passConfirm}
+                onChangeText={value => {
+                  confirmPassword = value;
+                }}
+                onErrorCheck={r => {
+                  setError(r);
+                }}
+                loading={loading}
+                validationType="confirmPassword"
+                autoCapitalize="none"
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                customValidator={() => password}
+                secureTextEntry
+                placeholder="Confirm password"
+                errorMessage="Passwords do not match"
+                onSubmit={() => {
+                  current.buttonFunc();
+                }}
+              />
+            </>
+          )}
 
-            {mode === MODES.login || mode === MODES.sessionExpired ? (
-                <TouchableOpacity
-                  onPress={() => {
-                    if (MODES.sessionExpired === mode) {
-                      sendEmail(true);
-                      return;
-                    }
-                    setMode(MODES.forgotPassword);
-                  }}
+          {mode !== MODES.signup ? null : (
+            <>
+              <TouchableOpacity
+                disabled={loading}
+                activeOpacity={0.7}
+                style={{
+                  flexDirection: 'row',
+                  width: '100%',
+                  alignItems: 'center',
+                }}>
+                <Paragraph
+                  size={11}
                   style={{
-                    alignSelf: 'flex-end',
-                    marginTop: 2.5,
+                    maxWidth: '90%',
                   }}>
-                  <Paragraph color={colors.accent}>Forgot password?</Paragraph>
-                </TouchableOpacity>
-              ) : null}
-            <Seperator />
-            {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
-              <>
-                <Input
-                  fwdRef={_passConfirm}
-                  onChangeText={value => {
-                    confirmPassword = value;
-                  }}
-                  onErrorCheck={r => {
-                    setError(r);
-                  }}
-                  loading={loading}
-                  validationType="confirmPassword"
-                  autoCapitalize="none"
-                  returnKeyLabel="Done"
-                  returnKeyType="done"
-                  customValidator={() => password}
-                  secureTextEntry
-                  placeholder="Confirm password"
-                  errorMessage="Passwords do not match"
-                  onSubmit={() => {
-                    current.buttonFunc();
-                  }}
-                />
-              </>
-            )}
-
-            {mode !== MODES.signup ? null : (
-              <>
-                <TouchableOpacity
-                  disabled={loading}
-                  activeOpacity={0.7}
-                  style={{
-                    flexDirection: 'row',
-                    width: '100%',
-                    alignItems: 'center',
-                  }}>
+                  By signing up you agree to our{' '}
                   <Paragraph
                     size={11}
-                    style={{
-                      maxWidth: '90%',
-                    }}>
-                    By signing up you agree to our{' '}
-                    <Paragraph
-                      size={11}
-                      onPress={() => {
-                        openLinkInBrowser('https://notesnook.com/tos', colors)
-                          .catch(e => {})
-                          .then(r => {
-                            console.log('closed');
-                          });
-                      }}
-                      color={colors.accent}>
-                      terms of service{' '}
-                    </Paragraph>
-                    and{' '}
-                    <Paragraph
-                      size={11}
-                      onPress={() => {
-                        openLinkInBrowser(
-                          'https://notesnook.com/privacy',
-                          colors,
-                        )
-                          .catch(e => {})
-                          .then(r => {
-                            console.log('closed');
-                          });
-                      }}
-                      color={colors.accent}>
-                      privacy policy.
-                    </Paragraph>
+                    onPress={() => {
+                      openLinkInBrowser('https://notesnook.com/tos', colors)
+                        .catch(e => {})
+                        .then(r => {
+                          console.log('closed');
+                        });
+                    }}
+                    color={colors.accent}>
+                    terms of service{' '}
                   </Paragraph>
-                </TouchableOpacity>
-              </>
-            )}
+                  and{' '}
+                  <Paragraph
+                    size={11}
+                    onPress={() => {
+                      openLinkInBrowser('https://notesnook.com/privacy', colors)
+                        .catch(e => {})
+                        .then(r => {
+                          console.log('closed');
+                        });
+                    }}
+                    color={colors.accent}>
+                    privacy policy.
+                  </Paragraph>
+                </Paragraph>
+              </TouchableOpacity>
+            </>
+          )}
 
-            {mode !== MODES.signup ? null : <Seperator />}
+          {mode !== MODES.signup ? null : <Seperator />}
 
+          <Button
+            title={current.button}
+            onPress={current.buttonFunc}
+            width="100%"
+            type="accent"
+            fontSize={SIZE.md}
+            height={50}
+          />
+
+          {current.buttonAlt && (
             <Button
-              title={current.button}
-              onPress={current.buttonFunc}
+              title={current.buttonAlt}
+              onPress={current.buttonAltFunc}
               width="100%"
-              type="accent"
+              type={MODES.sessionExpired === mode ? 'error' : 'shade'}
               fontSize={SIZE.md}
+              style={{
+                marginTop: 10,
+              }}
               height={50}
             />
-
-            {current.buttonAlt && (
-              <Button
-                title={current.buttonAlt}
-                onPress={current.buttonAltFunc}
-                width="100%"
-                type={MODES.sessionExpired === mode ? 'error' : 'shade'}
-                fontSize={SIZE.md}
-                style={{
-                  marginTop: 10,
-                }}
-                height={50}
-              />
-            )}
-          </View>
+          )}
         </View>
-        <Toast context="local" />
-      </View>
-    </Modal>
+        <View
+        style={{
+          height:50
+        }}
+        />
+      </ScrollView>
+      <Toast context="local" />
+    </BaseDialog>
   );
 };
 
