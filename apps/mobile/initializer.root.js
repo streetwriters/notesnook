@@ -110,7 +110,6 @@ const NativeStack = React.memo(
             deviceMode === 'smallTablet'
               ? dimensions.width * 0
               : dimensions.width * 0.15,
-          backgroundColor: colors.bg,
         },
       });
     };
@@ -144,7 +143,7 @@ const NativeStack = React.memo(
         eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
         eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
       };
-    }, [deviceMode]);
+    }, [deviceMode,dimensions,colors]);
 
     const _onLayout = async event => {
       if (layoutTimer) {
@@ -191,7 +190,6 @@ const NativeStack = React.memo(
             zIndex: 999,
             paddingHorizontal:
               current === 'smallTablet' ? size.width * 0 : size.width * 0.15,
-            backgroundColor: colors.bg,
           },
         });
       } else {
