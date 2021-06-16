@@ -248,7 +248,7 @@ const PublishNoteDialog = () => {
                   flexShrink: 1,
                 }}>
                 <Heading size={SIZE.md}>
-                  Password protection {isLocked ? 'enabled' : 'disabled'}
+                  Password protection
                 </Heading>
                 <Paragraph>
                   Published note can only be viewed by someone with the
@@ -285,7 +285,7 @@ const PublishNoteDialog = () => {
                   flexShrink: 1,
                 }}>
                 <Heading size={SIZE.md}>
-                  Self destruct {selfDestruct ? 'enabled' : 'disabled'}
+                  Self destruct
                 </Heading>
                 <Paragraph>
                   Published note link will be automatically deleted once it is

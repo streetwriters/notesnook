@@ -335,7 +335,6 @@ export const AppRootEvents = React.memo(
         if (user) {
           setUser(user);
           clearMessage();
-          await PremiumService.setPremiumStatus();
           attachIAPListeners();
 
           await Sync.run();
@@ -355,7 +354,6 @@ export const AppRootEvents = React.memo(
           }
           setUser(user);
         } else {
-          await PremiumService.setPremiumStatus();
           setLoginMessage();
         }
       } catch (e) {
@@ -368,6 +366,7 @@ export const AppRootEvents = React.memo(
           console.log('unknown error', e);
         }
       } finally {
+        await PremiumService.setPremiumStatus();
         isUserReady = true;
         if (login) {
           eSendEvent(eCloseProgressDialog);

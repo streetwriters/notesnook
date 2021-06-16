@@ -119,6 +119,7 @@ export const PremiumComponent = ({close, promo}) => {
       let _user = await db.user.getUser();
       setUser(_user);
       let products = PremiumService.getProducts();
+
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
@@ -175,7 +176,7 @@ export const PremiumComponent = ({close, promo}) => {
     if (!user) {
       close();
       setTimeout(() => {
-        eSendEvent(eOpenLoginDialog,1);
+        eSendEvent(eOpenLoginDialog, 1);
       }, 400);
     } else {
       setBuying(true);
@@ -262,7 +263,7 @@ export const PremiumComponent = ({close, promo}) => {
               onPress={() => {
                 setProduct({
                   type: 'monthly',
-                  data: offers.monthly,
+                  data: offers?.monthly,
                 });
               }}
               style={{
@@ -281,7 +282,7 @@ export const PremiumComponent = ({close, promo}) => {
               onPress={() => {
                 setProduct({
                   type: 'yearly',
-                  data: offers.yearly,
+                  data: offers?.yearly,
                 });
               }}
               style={{

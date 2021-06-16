@@ -229,7 +229,7 @@ export function getTotalNotes(notebook) {
   }, 0);
 }
 
-export const itemSkus = ['com.streetwriters.notesnook.sub.mo','com.streetwriters.notesnook.sub.yr',,'com.streetwriters.notesnook.sub.yr.15','com.streetwriters.notesnook.sub.mo.15','com.streetwriters.notesnook.sub.mo.ofr']
+export const itemSkus = ['com.streetwriters.notesnook.sub.mo','com.streetwriters.notesnook.sub.yr','com.streetwriters.notesnook.sub.yr.15','com.streetwriters.notesnook.sub.mo.15','com.streetwriters.notesnook.sub.mo.ofr']
 
 export const MenuItemsList = [
   {
