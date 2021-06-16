@@ -35,7 +35,10 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
         color: "primary",
         cursor: "pointer",
       }}
-      onClick={() => toggleSelection()}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleSelection();
+      }}
     />
   ) : (
     <Icon.CircleEmpty
@@ -43,7 +46,12 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
       sx={{
         marginLeft: 0,
         marginRight: 1,
+        bg: "transparent",
         cursor: "pointer",
+      }}
+      onClick={(e) => {
+        e.stopPropagation();
+        toggleSelection();
       }}
     />
   );
