@@ -116,5 +116,11 @@ class Monographs {
 
     this.monographs.splice(this.monographs.indexOf(noteId), 1);
   }
+
+  get all() {
+    return this._db.notes.all.filter(
+      (note) => this.monographs.indexOf(note.id) > -1
+    );
+  }
 }
 export default Monographs;
