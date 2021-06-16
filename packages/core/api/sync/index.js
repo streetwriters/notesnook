@@ -31,6 +31,7 @@ import http from "../../utils/http";
 import TokenManager from "../token-manager";
 import Collector from "./collector";
 import Merger from "./merger";
+import { areAllEmpty } from "./utils";
 export default class Sync {
   /**
    *
@@ -111,6 +112,8 @@ export default class Sync {
   }
 
   async _send(data, token) {
+    if (areAllEmpty(data)) return;
+
     let response = await http.post.json(
       `${Constants.API_HOST}/sync`,
       data,
