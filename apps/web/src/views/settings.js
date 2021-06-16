@@ -24,6 +24,8 @@ import { hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
+import Tip from "../components/tip";
+import Toggle from "../components/toggle";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -170,7 +172,7 @@ function Settings(props) {
         {isLoggedIn && (
           <>
             <Button variant="list" onClick={showRecoveryKeyDialog}>
-              <TextWithTip
+              <Tip
                 text="Backup data recovery key"
                 tip="In case you lose your password, you can recover your data using your recovery key."
               />
@@ -192,7 +194,7 @@ function Settings(props) {
                 }
               }}
             >
-              <TextWithTip text="Change account password" />
+              <Tip text="Change account password" />
             </Button>
             <Button
               variant="list"
@@ -214,7 +216,7 @@ function Settings(props) {
                 }
               }}
             >
-              <TextWithTip
+              <Tip
                 text="Logout"
                 tip="Log out of your account and clear all data."
               />
@@ -232,7 +234,7 @@ function Settings(props) {
                 );
               }}
             >
-              <TextWithTip
+              <Tip
                 color="error"
                 text="Delete account"
                 tip="Permanently delete account and logout from all devices."
@@ -248,7 +250,7 @@ function Settings(props) {
         >
           Appearance
         </Text>
-        <TextWithTip
+        <Tip
           text="Accent color"
           tip="Choose a color to use as accent color"
           sx={{ py: 2 }}
@@ -268,7 +270,7 @@ function Settings(props) {
             />
           ))}
         </Flex>
-        <ToggleItem
+        <Toggle
           title="Dark mode"
           onTip="Dark mode is on"
           offTip="Dark mode is off"
@@ -276,7 +278,7 @@ function Settings(props) {
           isToggled={theme === "dark"}
           onlyIf={!followSystemTheme}
         />
-        <ToggleItem
+        <Toggle
           title="Follow system theme"
           onTip="Switch app theme according to system"
           offTip="Keep app theme independent"
@@ -293,10 +295,7 @@ function Settings(props) {
           {"Backup & Restore"}
         </Text>
         <Button variant="list" onClick={createBackup}>
-          <TextWithTip
-            text="Backup data"
-            tip="Backup and download all your data"
-          />
+          <Tip text="Backup data" tip="Backup and download all your data" />
         </Button>
         <input
           type="file"
@@ -335,13 +334,10 @@ function Settings(props) {
             }
           }}
         >
-          <TextWithTip
-            text="Restore backup"
-            tip="Restore data from a backup file"
-          />
+          <Tip text="Restore backup" tip="Restore data from a backup file" />
         </Button>
 
-        <ToggleItem
+        <Toggle
           title="Encrypt backups"
           onTip="All backups will be encrypted"
           offTip="Backups will not be encrypted"
@@ -375,7 +371,7 @@ function Settings(props) {
               variant="list"
               onClick={() => hashNavigate("/vault/changePassword")}
             >
-              <TextWithTip text="Change vault password" />
+              <Tip text="Change vault password" />
             </Button>
           </>
         ) : (
@@ -385,7 +381,7 @@ function Settings(props) {
               hashNavigate("/vault/create");
             }}
           >
-            <TextWithTip
+            <Tip
               text="Create vault"
               tip="Create a password-encrypted vault for your notes"
             />
@@ -398,7 +394,7 @@ function Settings(props) {
         >
           Telemetry
         </Text>
-        <ToggleItem
+        <Toggle
           title="Enable telemetry"
           onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
           offTip="Do not collect any data or crash reports"
@@ -432,7 +428,7 @@ function Settings(props) {
             });
           }}
         >
-          <TextWithTip
+          <Tip
             text="What do we collect?"
             tip="Read details of all usage data we collect."
           />
@@ -452,63 +448,16 @@ function Settings(props) {
             href={item.link}
             target="_blank"
           >
-            <TextWithTip text={item.title} tip={item.description} />
+            <Tip text={item.title} tip={item.description} />
           </Button>
         ))}
-        <TextWithTip
-          sx={{ mt: 2 }}
-          text="About"
-          tip={`version ${version.formatted}`}
-        />
+        <Tip sx={{ mt: 2 }} text="About" tip={`version ${version.formatted}`} />
       </Flex>
     </ScrollContainer>
   );
 }
 
 export default Settings;
-
-function TextWithTip({ text, tip, sx, color }) {
-  return (
-    <Text color={color || "text"} fontSize="body" sx={sx}>
-      {text}
-      <Text color={"fontTertiary"} fontSize="subBody">
-        {tip}
-      </Text>
-    </Text>
-  );
-}
-
-function ToggleItem(props) {
-  const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
-
-  if (onlyIf === false) return null;
-  return (
-    <Flex
-      justifyContent="space-between"
-      alignItems="center"
-      onClick={async () => {
-        if (isUserPremium() || !premium) onToggled();
-        else {
-          await showBuyDialog(premium);
-        }
-      }}
-      py={2}
-      sx={{
-        cursor: "pointer",
-        borderBottom: "1px solid",
-        borderBottomColor: "border",
-        ":hover": { borderBottomColor: "primary" },
-      }}
-    >
-      <TextWithTip text={title} tip={isToggled ? onTip : offTip} />
-      {isToggled ? (
-        <Icon.ToggleChecked size={30} sx={{ flexShrink: 0 }} color="primary" />
-      ) : (
-        <Icon.ToggleUnchecked size={30} sx={{ flexShrink: 0 }} />
-      )}
-    </Flex>
-  );
-}
 
 function OptionsItem(props) {
   const {
@@ -534,7 +483,7 @@ function OptionsItem(props) {
         ":hover": { borderBottomColor: "primary" },
       }}
     >
-      <TextWithTip text={title} tip={tip} />
+      <Tip text={title} tip={tip} />
       <Flex
         justifyContent="space-evenly"
         mt={2}
@@ -693,7 +642,7 @@ function AccountStatus(props) {
               await openPaddleDialog(user.subscription.updateURL);
             }}
           >
-            <TextWithTip
+            <Tip
               text="Update payment method"
               tip="Update the payment method you used to purchase this subscription."
             />
@@ -705,7 +654,7 @@ function AccountStatus(props) {
               await openPaddleDialog(user.subscription.cancelURL);
             }}
           >
-            <TextWithTip
+            <Tip
               color="error"
               text="Cancel subscription"
               tip="You will be downgraded to the Basic plan at the end of your billing period."
