@@ -30,6 +30,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
       color="primary"
       size={16}
       sx={{
+        flexShrink: 0,
         marginLeft: 0,
         marginRight: 1,
         color: "primary",
@@ -44,6 +45,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
     <Icon.CircleEmpty
       size={16}
       sx={{
+        flexShrink: 0,
         marginLeft: 0,
         marginRight: 1,
         bg: "transparent",
@@ -133,28 +135,32 @@ function ListItem(props) {
       data-test-id={`${props.item.type}-${props.index}`}
     >
       {props.header}
-      <Text
-        color={text}
-        fontFamily={"heading"}
-        fontSize="title"
-        fontWeight={"bold"}
-        sx={{
-          display: "flex",
-          lineHeight: "1.4rem",
-          maxHeight: "1.4rem", // 1 lines, i hope
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-        }}
-        data-test-id={`${props.item.type}-${props.index}-title`}
-      >
+
+      <Flex>
         {isSelectionMode && (
           <ItemSelector
             isSelected={isSelected}
             toggleSelection={toggleSelection}
           />
         )}
-        {props.title}
-      </Text>
+        <Text
+          color={text}
+          fontFamily={"heading"}
+          fontSize="title"
+          fontWeight={"bold"}
+          sx={{
+            lineHeight: "1.4rem",
+            maxHeight: "1.4rem", // 1 lines, i hope
+            whiteSpace: "nowrap",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+          mr={4}
+          data-test-id={`${props.item.type}-${props.index}-title`}
+        >
+          {props.title}
+        </Text>
+      </Flex>
 
       <Text
         as="p"
