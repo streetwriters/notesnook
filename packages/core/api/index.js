@@ -98,6 +98,8 @@ class Database {
   }
 
   async connectSSE() {
+    this.monographs.init();
+
     if (!NNEventSource) return;
     if (this.evtSource) {
       this.evtSource.close();
