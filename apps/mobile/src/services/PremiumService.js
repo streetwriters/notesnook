@@ -34,11 +34,9 @@ async function setPremiumStatus() {
   } catch (e) {
     premiumStatus = null;
   } finally {
-    console.log('we are here')
     if (!get()) {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
-      console.log('products',products);
     }
   }
 }
