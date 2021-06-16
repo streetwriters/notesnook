@@ -58,15 +58,15 @@ export const ActionSheetComponent = ({
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
-
-  const user = useUserStore(state => state.user);
-  const lastSynced = useUserStore(state => state.lastSynced);
-  const refreshing = false;
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
     db.settings.isPinned(item.id),
   );
   const [note, setNote] = useState(item);
+  const user = useUserStore(state => state.user);
+  const lastSynced = useUserStore(state => state.lastSynced);
 
+  const refreshing = false;
+  const isPublished = db.monographs.isPublished(note.id);
   const noteInTopic =
     editing.actionAfterFirstSave.type === 'topic' &&
     db.notebooks
@@ -297,7 +297,7 @@ export const ActionSheetComponent = ({
         }
         if (note.locked) {
           ToastEvent.show({
-            heading: 'Locked not cannot be published',
+            heading: 'Locked notes cannot be published',
             type: 'error',
             context: 'local',
           });
@@ -703,33 +703,61 @@ export const ActionSheetComponent = ({
                 : null}
             </View>
           )}
-
-          {note.type !== 'note' || refreshing ? null : (
-            <TouchableOpacity
-              activeOpacity={0.9}
-              testID={notesnook.ids.dialogs.actionsheet.sync}
-              onPress={async () => await Sync.run('local')}
-              style={{
-                borderColor: colors.accent,
-                paddingHorizontal: 5,
-                borderRadius: 2.5,
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: 5,
-                borderWidth: 1,
-                height: 18,
-              }}>
-              <Paragraph
-                color={colors.accent}
-                size={SIZE.xs}
+          <View
+            style={{
+              flexDirection: 'row',
+            }}>
+            {note.type === 'note' && isPublished && (
+              <View
                 style={{
-                  textAlignVertical: 'center',
-                  textAlign: 'center',
+                  borderColor: colors.accent,
+                  paddingHorizontal: 5,
+                  borderRadius: 2.5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 5,
+                  borderWidth: 1,
+                  height: 18,
+                  marginRight: 5,
                 }}>
-                {user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'}
-              </Paragraph>
-            </TouchableOpacity>
-          )}
+                <Paragraph
+                  color={colors.accent}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: 'center',
+                    textAlign: 'center',
+                  }}>
+                  Published
+                </Paragraph>
+              </View>
+            )}
+            {note.type !== 'note' || refreshing ? null : (
+              <TouchableOpacity
+                activeOpacity={0.9}
+                testID={notesnook.ids.dialogs.actionsheet.sync}
+                onPress={async () => await Sync.run('local')}
+                style={{
+                  borderColor: colors.accent,
+                  paddingHorizontal: 5,
+                  borderRadius: 2.5,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginTop: 5,
+                  borderWidth: 1,
+                  height: 18,
+                }}>
+                <Paragraph
+                  color={colors.accent}
+                  size={SIZE.xs}
+                  style={{
+                    textAlignVertical: 'center',
+                    textAlign: 'center',
+                  }}>
+                  {user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'}
+                </Paragraph>
+              </TouchableOpacity>
+            )}
+          </View>
 
           {refreshing ? (
             <ActivityIndicator
