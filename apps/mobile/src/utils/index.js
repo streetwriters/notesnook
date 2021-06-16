@@ -1,18 +1,20 @@
-import { createRef } from 'react';
-import { Dimensions, NativeModules, Platform } from 'react-native';
+import {createRef} from 'react';
+import {Dimensions, NativeModules, Platform} from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import {
   beginBackgroundTask,
-  endBackgroundTask
+  endBackgroundTask,
 } from 'react-native-begin-background-task';
 import FastImage from 'react-native-fast-image';
 import RNTooltips from 'react-native-tooltips';
-import { dummyRef } from '../components/DummyText';
-import { useSettingStore } from '../provider/stores';
-import { eSendEvent } from '../services/EventManager';
-import { MMKV } from './mmkv';
-import { tabBarRef } from './Refs';
-import { SIZE } from './SizeUtils';
+import {dummyRef} from '../components/DummyText';
+import {useSettingStore} from '../provider/stores';
+import {eSendEvent} from '../services/EventManager';
+import Navigation from '../services/Navigation';
+import { refreshNotesPage } from './Events';
+import {MMKV} from './mmkv';
+import {tabBarRef} from './Refs';
+import {SIZE} from './SizeUtils';
 
 const imgNames = [
   'favorites',
@@ -67,9 +69,9 @@ const noteColors = [
   '#9E9E9E',
 ];
 
-export const updateList = (items) => {
-  eSendEvent("onListUpdate",items);
-}
+export const updateList = items => {
+  eSendEvent('onListUpdate', items);
+};
 
 export function preloadImages(color) {
   let uri = imgNames.map(name => {
@@ -91,13 +93,13 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1376;
+export const APP_VERSION = 1400;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(s));
-  useSettingStore.getState().setSettings(s)
+  useSettingStore.getState().setSettings(s);
 }
 
 export const scrollRef = createRef();
@@ -112,7 +114,6 @@ export const getElevation = elevation => {
     shadowRadius: 0.7 * elevation,
   };
 };
-
 
 export const sortSettings = {
   sort: 'default',
@@ -229,7 +230,13 @@ export function getTotalNotes(notebook) {
   }, 0);
 }
 
-export const itemSkus = ['com.streetwriters.notesnook.sub.mo','com.streetwriters.notesnook.sub.yr','com.streetwriters.notesnook.sub.yr.15','com.streetwriters.notesnook.sub.mo.15','com.streetwriters.notesnook.sub.mo.ofr']
+export const itemSkus = [
+  'com.streetwriters.notesnook.sub.mo',
+  'com.streetwriters.notesnook.sub.yr',
+  'com.streetwriters.notesnook.sub.yr.15',
+  'com.streetwriters.notesnook.sub.mo.15',
+  'com.streetwriters.notesnook.sub.mo.ofr',
+];
 
 export const MenuItemsList = [
   {
@@ -251,6 +258,26 @@ export const MenuItemsList = [
     name: 'Tags',
     icon: 'pound',
     close: true,
+  },
+  {
+    name: 'Monographs',
+    icon: 'text-box-multiple-outline',
+    close: true,
+    func: () => {
+      let params = (params = {
+        type: 'notes',
+        menu: true,
+        get: 'monographs',
+        title:"Monographs",
+        id:"monographs_navigation"
+      });
+      Navigation.navigate('NotesPage', params, {
+        heading: 'Monographs',
+        id: 'monographs_navigation',
+        type: 'notes',
+      });
+      eSendEvent(refreshNotesPage, params);
+    },
   },
   {
     name: 'Trash',
