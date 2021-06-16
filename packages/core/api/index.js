@@ -49,7 +49,8 @@ class Database {
       [EVENTS.userLoggedIn, EVENTS.userFetched],
       this.connectSSE.bind(this)
     );
-    EV.subscribe(EVENTS.userLoggedOut, () => {
+    EV.subscribe(EVENTS.userLoggedOut, async () => {
+      await this.monographs.deinit();
       clearTimeout(this._syncTimeout);
       if (this.evtSource) {
         this.evtSource.close();

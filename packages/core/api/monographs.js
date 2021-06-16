@@ -11,6 +11,11 @@ class Monographs {
     this.monographs = [];
   }
 
+  async deinit() {
+    this.monographs = [];
+    await this._db.context.write("monographs", this.monographs);
+  }
+
   async init() {
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
