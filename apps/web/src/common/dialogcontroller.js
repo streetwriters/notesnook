@@ -121,7 +121,7 @@ export function confirm(
 }
 
 export function showMultiDeleteConfirmation(type) {
-  let noun = type === "note" ? "Notes" : "Notebooks";
+  let noun = type === "note" ? "notes" : "notebooks";
 
   return confirm(Icon.Trash, {
     title: `Delete these ${noun}?`,

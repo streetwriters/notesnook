@@ -31,7 +31,7 @@ const DeleteOption = createOption(
   async function (state) {
     const item = state.selectedItems[0];
 
-    if (!(await showMultiDeleteConfirmation(item.type))) return;
+    if (!(await showMultiDeleteConfirmation(item.itemType))) return;
 
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {
