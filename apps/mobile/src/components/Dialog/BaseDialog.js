@@ -20,6 +20,7 @@ const BaseDialog = ({
   statusBarTranslucent = true,
   transparent,
   centered = true,
+  background = null
 }) => {
   const [state, dispatch] = useTracked();
   
@@ -39,7 +40,7 @@ const BaseDialog = ({
       onRequestClose={onRequestClose}>
       <SafeAreaView
         style={{
-          backgroundColor: transparent
+          backgroundColor:background? background : transparent
             ? 'transparent'
             : state.colors.night
             ? 'rgba(255,255,255,0.15)'
