@@ -295,6 +295,14 @@ export const ActionSheetComponent = ({
           });
           return;
         }
+        if (note.locked) {
+          ToastEvent.show({
+            heading: 'Locked not cannot be published',
+            type: 'error',
+            context: 'local',
+          });
+          return;
+        }
         close();
         await sleep(300);
         eSendEvent(eOpenPublishNoteDialog, note);

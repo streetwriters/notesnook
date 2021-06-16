@@ -1,41 +1,37 @@
-import React, {useEffect} from 'react';
-import {Keyboard, Platform, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
-import {ActionSheetEvent} from '../../components/DialogManager/recievers';
-import {useTracked} from '../../provider';
+import React, { useEffect } from 'react';
+import { Keyboard, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
+import { ActionSheetEvent } from '../../components/DialogManager/recievers';
+import { useTracked } from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
-import {db} from '../../utils/DB';
+import { editing } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
   eOpenFullscreenEditor,
-  eOpenPublishNoteDialog,
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorTitle} from './EditorTitle';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorTitle } from './EditorTitle';
 import {
   checkNote,
   clearEditor,
   EditorWebView,
   getNote,
-  isNotedEdited,
-  loadNote,
-  post,
-  setColors,
+  isNotedEdited, setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
-import {toolbarRef} from './tiny/toolbar/constants';
+import { toolbarRef } from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -87,6 +83,63 @@ const EditorHeader = () => {
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
     }
+  };
+
+  const publishNote = async () => {
+    if (!user) {
+      ToastEvent.show({
+        heading: 'Login required',
+        message: 'Login to publish',
+        context: 'global',
+        func: () => {
+          eSendEvent(eOpenLoginDialog);
+        },
+        actionText: 'Login',
+      });
+      return;
+    }
+
+    if (!user.isEmailConfirmed) {
+      ToastEvent.show({
+        heading: 'Email not verified',
+        message: 'Please verify your email first.',
+        context: 'global',
+      });
+      return;
+    }
+
+    let note = getNote() && db.notes.note(getNote().id).data;
+    if (note.locked) {
+      ToastEvent.show({
+        heading: 'Locked not cannot be published',
+        type: 'error',
+        context: 'global',
+      });
+      return;
+    }
+
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
+    eSendEvent(eOpenPublishNoteDialog, note);
+  };
+
+  const showActionsheet = async () => {
+    let note = getNote() && db.notes.note(getNote().id).data;
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
+    ActionSheetEvent(
+      note,
+      true,
+      true,
+      ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
+      ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+    );
   };
 
   return (
@@ -145,37 +198,7 @@ const EditorHeader = () => {
                   borderRadius: 5,
                 }}
                 top={50}
-                onPress={async () => {
-                  if (!user) {
-                    ToastEvent.show({
-                      heading: 'Login required',
-                      message: 'Login to publish',
-                      context: "global",
-                      func: () => {
-                        eSendEvent(eOpenLoginDialog);
-                      },
-                      actionText: 'Login',
-                    });
-                    return;
-                  }
-
-                  if (!user.isEmailConfirmed) {
-                    ToastEvent.show({
-                      heading: 'Email not verified',
-                      message: 'Please verify your email first.',
-                      context: "global",
-                    });
-                    return;
-                  }
-
-                  let note = getNote() && db.notes.note(getNote().id).data;
-                  if (editing.isFocused) {
-                    tiny.call(EditorWebView, tiny.blur);
-                    await sleep(500);
-                    editing.isFocused = true;
-                  }
-                  eSendEvent(eOpenPublishNoteDialog, note);
-                }}
+                onPress={publishNote}
               />
             )}
 
@@ -203,21 +226,7 @@ const EditorHeader = () => {
               }}
               top={50}
               right={50}
-              onPress={async () => {
-                let note = getNote() && db.notes.note(getNote().id).data;
-                if (editing.isFocused) {
-                  tiny.call(EditorWebView, tiny.blur);
-                  await sleep(500);
-                  editing.isFocused = true;
-                }
-                ActionSheetEvent(
-                  note,
-                  true,
-                  true,
-                  ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
-                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-                );
-              }}
+              onPress={showActionsheet}
             />
           </>
         </View>
