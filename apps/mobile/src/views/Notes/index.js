@@ -5,6 +5,7 @@ import {ContainerTopSection} from '../../components/Container/ContainerTopSectio
 import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
+import {useTracked} from '../../provider';
 import {useNoteStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -22,9 +23,12 @@ import {
   eScrollEvent,
   refreshNotesPage,
 } from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
+  const [state] = useTracked();
+  const colors = state.colors;
   const [notes, setNotes] = useState([]);
   const loading = useNoteStore(state => state.loading);
 
@@ -39,8 +43,10 @@ export const Notes = ({route, navigation}) => {
     }, time);
 
     let _notes = [];
-    if (params.type !== 'topic') {
+    if (params.type !== 'topic' && params.get !== 'monographs') {
       _notes = db.notes[params.get](params?.id);
+    } else if (params.get === 'monographs') {
+      _notes = db.monographs.all;
     } else {
       _notes = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id)
         ?.all;
@@ -51,7 +57,6 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
-    console.log('setting notess');
     setNotes(_notes);
     if (params.menu) {
       navigation.setOptions({
@@ -80,6 +85,7 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const setActionAfterFirstSave = () => {
+    if (params.get === 'monographs') return;
     editing.actionAfterFirstSave = {
       type: params.type,
       id: params.id,
@@ -165,7 +171,16 @@ export const Notes = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = () => {
+  const _onPressBottomButton = async () => {
+    if (params.get === 'monographs') {
+      try {
+        await openLinkInBrowser(
+          'https://docs.notesnook.com/monographs/',
+          colors.accent,
+        );
+      } catch (e) {}
+      return;
+    }
     setActionAfterFirstSave();
     if (!DDS.isTab) {
       tabBarRef.current?.goToPage(1);
@@ -180,10 +195,7 @@ export const Notes = ({route, navigation}) => {
         ? '#' + params.title
         : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
     color: params.type === 'color' ? params.title.toLowerCase() : null,
-    paragraph:
-      route.params.type === 'topic' && route.params.title !== 'General'
-        ? 'Edit topic'
-        : null,
+    paragraph: route.params.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
       if (route.params.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
@@ -199,11 +211,21 @@ export const Notes = ({route, navigation}) => {
   };
 
   const placeholderData = {
-    heading: 'Your notes',
-    paragraph: 'You have not added any notes yet.',
-    button: 'Add your first Note',
+    heading: params.get === 'monographs' ? 'Your monographs' : 'Your notes',
+    paragraph:
+      params.get === 'monographs'
+        ? 'You have not published any notes as monographs yet.'
+        : 'You have not added any notes yet.',
+    button:
+      params.get === 'monographs'
+        ? 'Learn about monographs'
+        : 'Add your first Note',
     action: _onPressBottomButton,
-    loading: 'Loading your notes.',
+    buttonIcon: 'information-outline',
+    loading:
+      params.get === 'monographs'
+        ? 'Loading published notes'
+        : 'Loading your notes.',
   };
 
   const isFocused = () => navigation.isFocused();
@@ -239,11 +261,13 @@ export const Notes = ({route, navigation}) => {
         }`}
         placeholderData={placeholderData}
       />
-      <ContainerBottomButton
-        title="Create a new note"
-        onPress={_onPressBottomButton}
-        color={params.type == 'color' ? params.title : null}
-      />
+      {params.get === 'monographs' ? null : (
+        <ContainerBottomButton
+          title="Create a new note"
+          onPress={_onPressBottomButton}
+          color={params.type == 'color' ? params.title : null}
+        />
+      )}
     </>
   );
 };
