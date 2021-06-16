@@ -11,6 +11,7 @@ function selectMenuItem(isSelected, toggleSelection) {
   return {
     key: "select",
     title: () => (isSelected ? "Unselect" : "Select"),
+    icon: Icon.Select,
     onClick: () => {
       const selectionState = selectionStore.get();
       if (!selectionState.isSelectionMode) {

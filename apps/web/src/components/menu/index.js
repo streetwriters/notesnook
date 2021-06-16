@@ -1,6 +1,6 @@
 import { useAnimation } from "framer-motion";
 import React, { useEffect, useMemo } from "react";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Box, Text, Button } from "rebass";
 import { isUserPremium } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import Animated from "../animated";
@@ -16,8 +16,22 @@ function Menu(props) {
   return (
     <Container id={id} style={style} sx={sx} state={state}>
       {menuItems.map(
-        ({ title, key, onClick, component: Component, color, isPro }) => (
-          <Flex
+        ({
+          title,
+          key,
+          onClick,
+          component: Component,
+          color,
+          isPro,
+          isNew,
+          disabled,
+          disableReason,
+          icon: Icon,
+        }) => (
+          <Button
+            variant="anchor"
+            title={disableReason || title(data)}
+            disabled={disabled && disabled(data)}
             data-test-id={`menuitem-${title(data)
               .split(" ")
               .join("")
@@ -33,29 +47,36 @@ function Menu(props) {
                 onClick(data);
               }
             }}
+            display="flex"
             flexDirection="row"
             alignItems="center"
-            justifyContent="space-between"
             py={"8px"}
             px={3}
             sx={{
               color: color || "text",
               cursor: "pointer",
-              ":hover": {
+              ":hover:not(:disabled)": {
                 backgroundColor: "shade",
               },
             }}
           >
+            {Icon && <Icon color={color || "text"} size={16} sx={{ mr: 1 }} />}
             {Component ? (
               <Component data={data} />
             ) : (
-              <Text as="span" fontFamily="body" fontSize="menu">
+              <Text
+                as="span"
+                textAlign="left"
+                fontFamily="body"
+                fontSize="menu"
+                flex={1}
+              >
                 {title(data)}
               </Text>
             )}
             {isPro && !isUserPremium() && (
               <Text
-                fontSize="body"
+                fontSize="subBody"
                 bg="primary"
                 color="static"
                 px={1}
@@ -64,7 +85,18 @@ function Menu(props) {
                 Pro
               </Text>
             )}
-          </Flex>
+            {isNew && (
+              <Text
+                fontSize="subBody"
+                bg="primary"
+                color="static"
+                px={1}
+                sx={{ borderRadius: "default" }}
+              >
+                NEW
+              </Text>
+            )}
+          </Button>
         )
       )}
     </Container>
@@ -90,7 +122,7 @@ function MenuContainer({ id, style, sx, children }) {
         ...sx,
       }}
     >
-      <Box width="100%">
+      <Flex flexDirection="column" width="100%">
         <Text
           fontFamily="body"
           fontSize="subtitle"
@@ -102,7 +134,7 @@ function MenuContainer({ id, style, sx, children }) {
           Properties
         </Text>
         {children}
-      </Box>
+      </Flex>
     </Flex>
   );
 }

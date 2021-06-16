@@ -87,15 +87,18 @@ const pin = async (notebook) => {
 const menuItems = [
   {
     title: () => "Edit",
+    icon: Icon.NotebookEdit,
     onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`),
   },
   {
     key: "pinnotebook",
+    icon: Icon.Pin,
     title: ({ notebook }) => (notebook.pinned ? "Unpin" : "Pin"),
     onClick: ({ notebook }) => pin(notebook),
   },
   {
     key: "shortcut",
+    icon: Icon.Shortcut,
     title: ({ notebook }) =>
       db.settings.isPinned(notebook.id) ? "Remove shortcut" : "Create shortcut",
     onClick: ({ notebook }) => appStore.pinItemToMenu(notebook),
@@ -103,6 +106,7 @@ const menuItems = [
   {
     title: () => "Move to trash",
     color: "red",
+    icon: Icon.Trash,
     onClick: async ({ notebook }) => {
       await store
         .delete(notebook.id)

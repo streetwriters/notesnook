@@ -35,6 +35,7 @@ export default TrashItem;
 const menuItems = [
   {
     title: () => "Restore",
+    icon: Icon.Restore,
     onClick: ({ item }) => {
       store.restore(item.id);
       showToast(
@@ -47,6 +48,7 @@ const menuItems = [
   },
   {
     title: () => "Delete",
+    icon: Icon.DeleteForver,
     color: "red",
     onClick: ({ item }) => {
       confirm(Icon.Trash, {

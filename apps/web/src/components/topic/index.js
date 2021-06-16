@@ -5,6 +5,7 @@ import { store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { hashNavigate } from "../../navigation";
 import { Text } from "rebass";
+import * as Icon from "../icons";
 
 function Topic({ item, index, onClick }) {
   const topic = item;
@@ -40,6 +41,7 @@ const generalTopicMenuItems = [
     key: "shortcut",
     title: ({ topic }) =>
       db.settings.isPinned(topic.id) ? "Remove shortcut" : "Create shortcut",
+    icon: Icon.Shortcut,
     onClick: ({ topic }) => appStore.pinItemToMenu(topic),
   },
 ];
@@ -48,6 +50,7 @@ const menuItems = [
   {
     key: "edit",
     title: () => "Edit",
+    icon: Icon.Edit,
     onClick: ({ topic }) =>
       hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`),
   },
@@ -55,6 +58,7 @@ const menuItems = [
   {
     key: "delete",
     title: () => "Delete",
+    icon: Icon.Trash,
     color: "red",
     onClick: async ({ topic }) => {
       await db.notebooks.notebook(topic.notebookId).topics.delete(topic.id);

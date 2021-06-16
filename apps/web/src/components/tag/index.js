@@ -4,11 +4,13 @@ import { navigate } from "../../navigation";
 import { Text } from "rebass";
 import { store as appStore } from "../../stores/app-store";
 import { db } from "../../common/db";
+import * as Icon from "../icons";
 
 const menuItems = [
   {
     title: ({ tag }) =>
       db.settings.isPinned(tag.id) ? "Remove shortcut" : "Create shortcut",
+    icon: Icon.Shortcut,
     onClick: ({ tag }) => appStore.pinItemToMenu(tag),
   },
 ];

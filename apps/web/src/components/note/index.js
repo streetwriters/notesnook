@@ -164,6 +164,7 @@ const menuItems = [
   {
     key: "addtonotebook",
     title: () => "Add to notebook(s)",
+    icon: Icon.AddToNotebook,
     onClick: async ({ note }) => {
       await showMoveNoteDialog([note.id]);
     },
@@ -171,6 +172,7 @@ const menuItems = [
   {
     key: "pin",
     title: ({ note }) => (note.pinned ? "Unpin" : "Pin"),
+    icon: Icon.Pin,
     onClick: async ({ note }) => {
       await pin(note);
     },
@@ -178,11 +180,13 @@ const menuItems = [
   {
     key: "favorite",
     title: ({ note }) => (note.favorite ? "Unfavorite" : "Favorite"),
+    icon: Icon.StarOutline,
     onClick: ({ note }) => store.favorite(note),
   },
   {
     key: "export",
     title: () => "Export",
+    icon: Icon.Export,
     onClick: async ({ note }) => {
       if (note.locked) {
         alert("Locked notes cannot be exported currently.");
@@ -196,6 +200,7 @@ const menuItems = [
   {
     key: "unlocknote",
     title: ({ note }) => (note.locked ? "Unlock" : "Lock"),
+    icon: Icon.Lock,
     onClick: async ({ note }) => {
       const { unlock, lock } = store.get();
       if (!note.locked) {
@@ -212,6 +217,9 @@ const menuItems = [
     key: "movetotrash",
     title: () => "Move to Trash",
     color: "red",
+    icon: Icon.Trash,
+    disabled: ({ note }) => db.monographs.isPublished(note.id),
+    disableReason: "Please unpublish this note to move it to trash",
     onClick: async ({ note }) => {
       if (note.locked) {
         const res = await showPasswordDialog("unlock_note", (password) => {
@@ -232,6 +240,7 @@ const topicNoteMenuItems = [
   {
     key: "removefromtopic",
     title: () => "Remove from topic",
+    icon: Icon.TopicRemove,
     color: "red",
     onClick: async ({ note, context }) => {
       await db.notebooks
