@@ -1,14 +1,13 @@
 import React from 'react';
-import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { COLORS_NOTE } from '../../utils/Colors';
-import { SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {COLORS_NOTE} from '../../utils/Colors';
+import {SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-
 
 export const Empty = ({
   loading = true,
@@ -53,7 +52,7 @@ export const Empty = ({
           <Button
             onPress={placeholderData.action}
             title={placeholderData.button}
-            icon="plus"
+            icon={placeholderData.buttonIcon || 'plus'}
             type="accent"
             fontSize={SIZE.md}
             accentColor="bg"
