@@ -25,6 +25,8 @@ class Default {
       fontSize: "body",
       borderRadius: "default",
       cursor: "pointer",
+      p: "7px",
+      px: 2,
       ":focus": {
         outline: "none",
       },
@@ -32,8 +34,12 @@ class Default {
         border: "2px solid",
         borderColor: "primary",
       },
-      ":hover": {
-        opacity: 0.8,
+      ":hover:not(:disabled)": {
+        filter: "brightness(85%)",
+      },
+      ":disabled": {
+        opacity: 0.5,
+        cursor: "not-allowed",
       },
     };
   }
@@ -45,6 +51,7 @@ class Primary {
       variant: "buttons.default",
       color: "static",
       bg: "primary",
+      px: 4,
       ":focus-visible": {
         border: "2px solid",
         borderColor: "text",
@@ -107,6 +114,8 @@ class Anchor {
       fontSize: "subBody",
       p: 0,
       m: 0,
+      px: 0,
+      py: 0,
     };
   }
 }
@@ -129,8 +138,7 @@ class Tool {
     return {
       variant: "buttons.default",
       color: "text",
-      p: 1,
-      px: 2,
+
       backgroundColor: "bgSecondary",
       borderRadius: "default",
       ":hover": {
