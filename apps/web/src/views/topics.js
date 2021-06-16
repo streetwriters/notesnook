@@ -1,8 +1,8 @@
 import React from "react";
-import { Flex } from "rebass";
 import ListContainer from "../components/list-container";
 import { useStore as useNbStore } from "../stores/notebook-store";
 import { hashNavigate } from "../navigation";
+import TopicsPlaceholder from "../components/placeholders/topics-placeholder";
 
 function Topics() {
   const selectedNotebookTopics = useNbStore(
@@ -16,7 +16,7 @@ function Topics() {
         type="topics"
         items={selectedNotebookTopics}
         context={{ notebookId: selectedNotebookId }}
-        placeholder={Flex}
+        placeholder={TopicsPlaceholder}
         button={{
           content: "Add a new topic",
           onClick: () => hashNavigate(`/topics/create`),
