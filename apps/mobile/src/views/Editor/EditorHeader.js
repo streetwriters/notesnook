@@ -45,8 +45,9 @@ const EditorHeader = () => {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
+    console.log('setting colors');
     setColors(colors);
-  }, [colors.bg]);
+  }, [colors]);
 
   const isLargeTablet = () => {
     return deviceMode === 'tablet';
@@ -111,7 +112,7 @@ const EditorHeader = () => {
     let note = getNote() && db.notes.note(getNote().id).data;
     if (note.locked) {
       ToastEvent.show({
-        heading: 'Locked not cannot be published',
+        heading: 'Locked notes cannot be published',
         type: 'error',
         context: 'global',
       });

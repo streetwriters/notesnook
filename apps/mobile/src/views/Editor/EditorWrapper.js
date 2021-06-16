@@ -104,7 +104,7 @@ export const EditorWrapper = ({width,dimensions}) => {
       style={{
         width: width[deviceMode].c,
         height: '100%',
-        backgroundColor: colors.bg,
+        backgroundColor: state.colors.bg,
         borderLeftWidth: 1,
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent',
       }}>
