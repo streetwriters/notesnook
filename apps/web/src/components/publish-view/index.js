@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ReactDOM from "react-dom";
 import { Flex, Text, Button } from "rebass";
 import * as Icon from "../icons";
@@ -15,6 +15,8 @@ function PublishView(props) {
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+
+  const noteTitle = useMemo(() => db.notes.note(noteId)?.title, [noteId]);
 
   useEffect(() => {
     setPublishId(db.monographs.monograph(noteId));
@@ -49,6 +51,9 @@ function PublishView(props) {
       p={2}
       flexDirection="column"
     >
+      <Text variant="body" fontWeight="bold" color="primary">
+        {noteTitle}
+      </Text>
       <Text variant="title">Publish note</Text>
       <Text variant="body" color="fontTertiary">
         This note will be published to a public URL.
