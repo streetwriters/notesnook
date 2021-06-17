@@ -123,6 +123,9 @@ function SaleBanner(props) {
         <Text variant="body" fontSize="subBody" mt={1}>
           *Use code <b>{coupon}</b> at checkout to get your discount.
         </Text>
+        <Text variant="body" fontSize="subBody" mt={1}>
+          ** Only the first 10 people get to claim the discount. Be the first.
+        </Text>
       </Text>
     </Flex>
   );
