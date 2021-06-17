@@ -1,9 +1,12 @@
 import { trackEvent } from "../utils/analytics";
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = false; // process.env.NODE_ENV === "development";
 
 const VENDOR_ID = isDev ? 1506 : 128190;
-const PRODUCT_ID = isDev ? 9822 : 648884;
+const PRODUCT_ID = (plan) => {
+  if (isDev) return plan === "monthly" ? 9822 : 0;
+  else return plan === "monthly" ? 648884 : 658759;
+};
 
 function loadPaddle(eventCallback) {
   return new Promise((resolve) => {
@@ -23,7 +26,7 @@ function loadPaddle(eventCallback) {
   });
 }
 
-async function upgrade(user, coupon) {
+async function upgrade(user, coupon, plan) {
   if (!window.Paddle) {
     await loadPaddle();
   }
@@ -38,7 +41,7 @@ async function upgrade(user, coupon) {
   }
 
   Paddle.Checkout.open({
-    product: PRODUCT_ID,
+    product: PRODUCT_ID(plan),
     email: user.email,
     coupon,
     passthrough: JSON.stringify({
@@ -61,10 +64,12 @@ async function openPaddleDialog(overrideUrl) {
   });
 }
 
-async function getCouponData(coupon) {
-  console.log(coupon);
+async function getCouponData(coupon, plan) {
   let url =
-    "https://checkout-service.paddle.com/checkout/97379638-chre9f4b00ed6b3-732b0e853d/coupon";
+    plan === "monthly"
+      ? "https://checkout-service.paddle.com/checkout/97379638-chre9f4b00ed6b3-732b0e853d/coupon"
+      : "https://checkout-service.paddle.com/checkout/98675996-chre252e5763eaf-15b142d0e3/coupon";
+
   const response = await fetch(url, {
     headers: {
       accept: "application/json, text/plain, */*",

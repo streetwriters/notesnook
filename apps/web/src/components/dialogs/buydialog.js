@@ -116,6 +116,7 @@ function BuyDialog(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
   const [prices, setPrices] = useState();
+  const [plan, setPlan] = useState("monthly");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
   const accent = useThemeStore((store) => store.accent);
@@ -125,7 +126,8 @@ function BuyDialog(props) {
       try {
         setIsLoading(true);
         setError();
-        const data = await getCouponData(coupon);
+        const data = await getCouponData(coupon, plan);
+        console.log(data);
         setPrices({
           ...data.paddlejs.vendor,
           withoutDiscount: data.total[0],
@@ -137,7 +139,7 @@ function BuyDialog(props) {
         setIsLoading(false);
       }
     })();
-  }, [coupon]);
+  }, [coupon, plan]);
 
   useEffect(() => {
     trackEvent("Buy dialog opened.", "buy");
@@ -219,6 +221,27 @@ function BuyDialog(props) {
             </>
           ) : (
             <>
+              <Button
+                variant="anchor"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+                onClick={() => {
+                  setPlan((s) => (s === "monthly" ? "yearly" : "monthly"));
+                }}
+              >
+                <Text variant="body" mr={1}>
+                  Monthly
+                </Text>
+                {plan === "monthly" ? (
+                  <Icon.ToggleUnchecked color="primary" />
+                ) : (
+                  <Icon.ToggleChecked color="primary" />
+                )}
+                <Text variant="body" ml={1}>
+                  Yearly
+                </Text>
+              </Button>
               {coupon ? (
                 <Flex mb={1} alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center" justifyContent="center">
@@ -284,9 +307,9 @@ function BuyDialog(props) {
                 </Text>
               )}
               <Text variant="heading" fontSize={24} color="primary">
-                Only <MainPricing prices={prices} />
+                Only <MainPricing prices={prices} plan={plan} />
               </Text>
-              <RecurringPricing prices={prices} />
+              <RecurringPricing prices={prices} plan={plan} />
               <Text display="flex" variant="subBody" color="text" mt={1} mb={2}>
                 Cancel anytime. No questions asked.
               </Text>
@@ -296,7 +319,7 @@ function BuyDialog(props) {
                 onClick={async () => {
                   trackEvent("Subscribe button clicked.", "buy");
                   if (isLoggedIn) {
-                    await upgrade(user, coupon);
+                    await upgrade(user, coupon, plan);
                   } else {
                     await showLogInDialog();
                     await upgrade(user, coupon);
@@ -316,7 +339,7 @@ function BuyDialog(props) {
 export default BuyDialog;
 
 function MainPricing(props) {
-  const { prices } = props;
+  const { prices, plan } = props;
 
   if (prices.withoutDiscount.net !== prices.prices.total)
     return (
@@ -329,21 +352,21 @@ function MainPricing(props) {
         </del>{" "}
         <Price currency={prices.currency} price={prices.prices.total} />
         {prices.recurring_prices.total === prices.prices.total
-          ? " per month"
-          : " your first month"}
+          ? ` per ${planToPeriod(plan)}`
+          : ` your first ${planToPeriod(plan)}`}
       </>
     );
   else
     return (
       <>
         <Price currency={prices.currency} price={prices.prices.total} />
-        {" per month"}
+        {` per ${planToPeriod(plan)}`}
       </>
     );
 }
 
 function RecurringPricing(props) {
-  const { prices } = props;
+  const { prices, plan } = props;
 
   if (prices.prices.total === prices.recurring_prices.total) return null;
   return (
@@ -356,7 +379,7 @@ function RecurringPricing(props) {
     >
       And then{" "}
       <Price currency={prices.currency} price={prices.recurring_prices.total} />{" "}
-      every month afterwards.
+      every {planToPeriod(plan)} afterwards.
     </Text>
   );
 }
@@ -369,4 +392,8 @@ function Price(props) {
       {price}
     </>
   );
+}
+
+function planToPeriod(plan) {
+  return plan === "monthly" ? "month" : "year";
 }
