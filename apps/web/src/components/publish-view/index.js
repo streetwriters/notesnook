@@ -91,7 +91,7 @@ function PublishView(props) {
           <Button
             variant="anchor"
             className="copyPublishLink"
-            data-clipboard-text={`https://monographs.notesnook.com/${publishId}`}
+            data-clipboard-text={`https://monograph.notesnook.com/${publishId}`}
           >
             <Icon.Copy size={20} color="primary" onClick={() => {}} />
           </Button>
