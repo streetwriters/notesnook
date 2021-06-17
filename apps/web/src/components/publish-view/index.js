@@ -73,14 +73,14 @@ function PublishView(props) {
               variant="subBody"
               as="a"
               target="_blank"
-              href={`https://monographs.notesnook.com/${publishId}`}
+              href={`https://monograph.notesnook.com/${publishId}`}
               sx={{
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
                 overflow: "hidden",
               }}
             >
-              {`https://monographs.notesnook.com/${publishId}`}
+              {`https://monograph.notesnook.com/${publishId}`}
             </Text>
           </Flex>
           <Button
