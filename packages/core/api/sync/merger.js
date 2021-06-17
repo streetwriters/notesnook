@@ -109,19 +109,21 @@ class Merger {
       (id) => this._db.content.raw(id),
       (item) => this._db.content.add(item),
       async (local, remote) => {
-        // if hashes are equal do nothing
-        if (
-          !remote ||
-          !local ||
-          !remote.data ||
-          remote.data === "undefined" || //TODO not sure about this
-          SparkMD5.hash(local.data) === SparkMD5.hash(remote.data)
-        )
-          return;
-
         let note = this._db.notes.note(local.noteId);
         if (!note || !note.data) return;
         note = note.data;
+
+        // if hashes are equal do nothing
+        if (
+          !note.locked &&
+          (!remote ||
+            !local ||
+            !local.data ||
+            !remote.data ||
+            remote.data === "undefined" || //TODO not sure about this
+            SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
+        )
+          return;
 
         if (remote.deleted || local.deleted || note.locked) {
           // if note is locked or content is deleted we keep the most recent version.
