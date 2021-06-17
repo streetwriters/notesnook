@@ -498,3 +498,12 @@ export function showSessionExpiredDialog(email) {
     />
   ));
 }
+
+export function showFeatureDialog(featureName) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.FeatureDialog
+      featureName={featureName}
+      onClose={(res) => perform(res)}
+    />
+  ));
+}

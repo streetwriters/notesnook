@@ -12,6 +12,7 @@ import RecoveryKeyDialog from "./recoverykeydialog";
 import SignUpDialog from "./signupdialog";
 import TopicDialog from "./topicdialog";
 import SessionExpiredDialog from "./sessionexpireddialog";
+import FeatureDialog from "./feature-dialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -28,5 +29,6 @@ const Dialogs = {
   SignUpDialog,
   TopicDialog,
   SessionExpiredDialog,
+  FeatureDialog,
 };
 export default Dialogs;

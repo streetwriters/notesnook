@@ -150,3 +150,8 @@ export const NotebookEdit = createIcon(Icons.mdiBookEditOutline);
 export const DeleteForver = createIcon(Icons.mdiDeleteForeverOutline);
 
 export const Monographs = createIcon(Icons.mdiTextBoxMultipleOutline);
+
+export const Rocket = createIcon(Icons.mdiRocketLaunchOutline);
+export const Share = createIcon(Icons.mdiShareVariantOutline);
+export const Password = createIcon(Icons.mdiFormTextboxPassword);
+export const Destruct = createIcon(Icons.mdiBomb);

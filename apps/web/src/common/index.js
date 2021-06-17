@@ -3,7 +3,10 @@ import SelectionOptions from "./selectionoptions";
 import { showToast } from "../utils/toast";
 import download from "../utils/download";
 import { Text } from "rebass";
-import { showLoadingDialog } from "../common/dialog-controller";
+import {
+  showFeatureDialog,
+  showLoadingDialog,
+} from "../common/dialog-controller";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
 import { hashNavigate } from "../navigation";
@@ -51,6 +54,13 @@ export const CREATE_BUTTON_MAP = {
     onClick: () => hashNavigate(`/topics/create`),
   },
 };
+
+export async function introduceFeatures() {
+  const features = ["monographs"];
+  for (let feature of features) {
+    if (!Config.get(`feature:${feature}`)) await showFeatureDialog(feature);
+  }
+}
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
 

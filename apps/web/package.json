@@ -8,7 +8,6 @@
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
-    "@inlightmedia/react-countdown-timer": "^1.1.2",
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
     "@rebass/forms": "^4.0.6",
@@ -37,7 +36,6 @@
     "react-dom": "^17.0.1",
     "react-modal": "^3.12.1",
     "react-qrcode-logo": "^2.2.1",
-    "react-responsive-carousel": "^3.2.12",
     "react-scripts": "4.0.2",
     "react-scroll-sync": "^0.9.0",
     "react-scrollbars-custom": "^4.0.25",

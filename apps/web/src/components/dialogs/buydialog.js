@@ -13,8 +13,6 @@ import { ReactComponent as Organize } from "../../assets/organize.svg";
 import { ReactComponent as RichText } from "../../assets/richtext.svg";
 import { ReactComponent as Sync } from "../../assets/sync.svg";
 import { ReactComponent as Vault } from "../../assets/vault.svg";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // requires a loader
-import { changeSvgTheme } from "../../utils/css";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { trackEvent } from "../../utils/analytics";
 
@@ -119,7 +117,6 @@ function BuyDialog(props) {
   const [plan, setPlan] = useState("monthly");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
-  const accent = useThemeStore((store) => store.accent);
 
   useEffect(() => {
     (async function () {
@@ -150,7 +147,6 @@ function BuyDialog(props) {
       isOpen={true}
       // showClose
       onClose={props.onCancel}
-      onOpen={() => changeSvgTheme(accent)}
       padding={"0px"}
       margin={"0px"}
       headerPaddingBottom={"0px"}
