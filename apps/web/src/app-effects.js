@@ -61,7 +61,7 @@ function AppEffects({ isMobile, isTablet, setShow }) {
       } else {
         if (type !== CHECK_IDS.databaseSync)
           await import("./common/dialogcontroller").then((dialogs) =>
-            dialogs.showBuyDialog(type)
+            dialogs.showBuyDialog()
           );
         return { type, result: false };
       }

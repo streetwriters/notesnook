@@ -62,6 +62,7 @@ async function openPaddleDialog(overrideUrl) {
 }
 
 async function getCouponData(coupon) {
+  console.log(coupon);
   let url =
     "https://checkout-service.paddle.com/checkout/97379638-chre9f4b00ed6b3-732b0e853d/coupon";
   const response = await fetch(url, {

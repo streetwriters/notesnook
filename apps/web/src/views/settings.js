@@ -504,7 +504,7 @@ function OptionsItem(props) {
               if (isUserPremium() || !premium)
                 onSelectionChanged(option, index);
               else {
-                await showBuyDialog(premium);
+                await showBuyDialog();
               }
             }}
             sx={{
@@ -617,7 +617,7 @@ function AccountStatus(props) {
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
       {isBasic || isTrial || remainingDays <= 0 ? (
-        <Button mt={2} onClick={showBuyDialog}>
+        <Button mt={2} onClick={() => showBuyDialog()}>
           Upgrade to Notesnook Pro
         </Button>
       ) : provider === "Streetwriters" ? (

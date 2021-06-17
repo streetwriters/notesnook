@@ -219,7 +219,7 @@ function TinyMCE(props) {
           !isUserPremium()
         ) {
           command.preventDefault();
-          await showBuyDialog("editor");
+          await showBuyDialog();
           return;
         }
       }}

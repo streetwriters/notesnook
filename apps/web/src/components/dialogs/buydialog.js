@@ -131,6 +131,7 @@ function BuyDialog(props) {
           withoutDiscount: data.total[0],
         });
       } catch (e) {
+        console.error(e);
         setError(e.message);
       } finally {
         setIsLoading(false);

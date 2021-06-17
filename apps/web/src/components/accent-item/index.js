@@ -17,7 +17,7 @@ function AccentItem(props) {
       onClick={async () => {
         if (isUserPremium()) setAccent(code);
         else {
-          await showBuyDialog("customize");
+          await showBuyDialog();
         }
       }}
       key={label}

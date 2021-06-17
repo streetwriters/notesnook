@@ -16,7 +16,7 @@ function Toggle(props) {
       onClick={async () => {
         if (isUserPremium() || !premium) onToggled();
         else {
-          await showBuyDialog(premium);
+          await showBuyDialog();
         }
       }}
       py={2}
