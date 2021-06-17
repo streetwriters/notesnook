@@ -33,6 +33,7 @@ export const Toast = ({context = 'global'}) => {
   const showToastFunc = async (data) => {
     if (data.context !== context) return;
     if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
+      console.log('returning from here')
       return;
     }
     toastMessages.push(data);
@@ -137,6 +138,9 @@ export const Toast = ({context = 'global'}) => {
 
   return (
     <Animated.View
+      onTouchEnd={() => {
+        hideToastFunc();
+      }}
       style={{
         width: DDS.isTab ? 400 : '100%',
         alignItems: 'center',

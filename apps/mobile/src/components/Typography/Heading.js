@@ -1,8 +1,7 @@
 import React from 'react';
-import { Platform } from 'react-native';
-import {Text} from 'react-native';
-import {useTracked} from '../../provider';
-import {SIZE} from '../../utils/SizeUtils';
+import { Text } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
 
 /**
  *
@@ -18,7 +17,6 @@ import {SIZE} from '../../utils/SizeUtils';
 const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
   const [state] = useTracked();
   const {colors} = state;
-  let fontSize = size || SIZE.xl;
 
   return (
     <Text

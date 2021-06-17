@@ -91,7 +91,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
             {item.name}
           </Heading>
         ) : (
-          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
+          <Paragraph color={colors.heading} size={SIZE.md}>{item.name}</Paragraph>
         )}
       </View>
 

@@ -1,17 +1,8 @@
 import React, {createRef} from 'react';
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  SafeAreaView,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
 import {FlatList, TextInput} from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
+import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -22,7 +13,6 @@ import {ActionIcon} from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
@@ -203,7 +193,7 @@ export class AddNotebookDialog extends React.Component {
         id: id,
       });
     }
-    updateEvent({type: Actions.MENU_PINS});
+    useMenuStore.getState().setMenuPins();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notebook,
@@ -274,6 +264,7 @@ export class AddNotebookDialog extends React.Component {
           await sleep(300);
           this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
+        statusBarTranslucent={false}
         onRequestClose={this.close}>
         <TextInput
           ref={this.hiddenInput}
@@ -291,7 +282,7 @@ export class AddNotebookDialog extends React.Component {
             styles.container,
             {
               backgroundColor: colors.bg,
-              paddingTop: Platform.OS === 'android' ? 30 : 5,
+              paddingTop: 5,
             },
           ]}>
           <DialogHeader

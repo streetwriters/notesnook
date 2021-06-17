@@ -4,19 +4,30 @@ import {View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSelectionStore } from '../../provider/stores';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {eOpenMoveNoteDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {
+  eOpenMoveNoteDialog,
+  eOpenSimpleDialog,
+  refreshNotesPage,
+} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {TEMPLATE_DELETE} from '../DialogManager/Templates';
 import Heading from '../Typography/Heading';
 
-export const SelectionHeader = ({screen}) => {
+export const SelectionHeader = React.memo(({screen, type, extras}) => {
   const [state, dispatch] = useTracked();
-  const {colors, selectionMode, selectedItemsList} = state;
+  const {colors} = state;
+  
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
+  const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
+  const clearSelection = useSelectionStore(state => state.clearSelection)
+
   const insets = useSafeAreaInsets();
 
   const addToFavorite = async () => {
@@ -29,8 +40,8 @@ export const SelectionHeader = ({screen}) => {
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
       ]);
-      dispatch({type: Actions.SELECTION_MODE, enabled: false});
-      dispatch({type: Actions.CLEAR_SELECTION});
+      setSelectionMode(false);
+      clearSelection();
     }
   };
 
@@ -49,8 +60,8 @@ export const SelectionHeader = ({screen}) => {
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Trash,
       ]);
-      dispatch({type: Actions.SELECTION_MODE, enabled: false});
-      dispatch({type: Actions.CLEAR_SELECTION});
+      setSelectionMode(false);
+      clearSelection();
       ToastEvent.show({
         heading: 'Restore successful',
         type: 'success',
@@ -59,8 +70,8 @@ export const SelectionHeader = ({screen}) => {
   };
 
   const onBackPress = () => {
-    dispatch({type: Actions.SELECTION_MODE, enabled: false});
-    dispatch({type: Actions.CLEAR_SELECTION});
+    setSelectionMode(false);
+    clearSelection();
     return true;
   };
 
@@ -72,7 +83,7 @@ export const SelectionHeader = ({screen}) => {
     }
   }, [selectionMode]);
 
-  return !selectionMode ? null : (
+  return !selectionMode || Navigation.getCurrentScreen() !== screen ? null : (
     <View
       style={{
         width: '100%',
@@ -105,8 +116,8 @@ export const SelectionHeader = ({screen}) => {
             marginRight: 25,
           }}
           onPress={() => {
-            dispatch({type: Actions.SELECTION_MODE, enabled: !selectionMode});
-            dispatch({type: Actions.CLEAR_SELECTION});
+            setSelectionMode(!selectionMode)
+            clearSelection();
           }}
           color={colors.light}
           name="close"
@@ -137,10 +148,11 @@ export const SelectionHeader = ({screen}) => {
         }}>
         {screen === 'Trash' ||
         screen === 'Notebooks' ||
-        screen === 'Notebook' ? null : (
+        screen === 'Notebook' ||
+        type === 'topic' ? null : (
           <ActionIcon
             onPress={async () => {
-              //dispatch({type: Actions.SELECTION_MODE, enabled: false});
+              //setSelectionMode(false);
               await sleep(100);
               eSendEvent(eOpenMoveNoteDialog);
             }}
@@ -149,6 +161,36 @@ export const SelectionHeader = ({screen}) => {
             }}
             color={colors.light}
             name="plus"
+            size={SIZE.xl}
+          />
+        )}
+
+        {type === 'topic' && (
+          <ActionIcon
+            onPress={async () => {
+              if (selectedItemsList.length > 0) {
+                await db.notebooks
+                  .notebook(extras.notebook)
+                  .topics.topic(extras.topic)
+                  .delete(...selectedItemsList.map(item => item.id));
+
+                eSendEvent(refreshNotesPage);
+                Navigation.setRoutesToUpdate([
+                  Navigation.routeNames.NotesPage,
+                  Navigation.routeNames.Favorites,
+                  Navigation.routeNames.Notes,
+                  Navigation.routeNames.Notebook,
+                  Navigation.routeNames.Notebooks,
+                ]);
+                setSelectionMode(false);
+                clearSelection();
+              }
+            }}
+            customStyle={{
+              marginLeft: 10,
+            }}
+            color={colors.light}
+            name="minus"
             size={SIZE.xl}
           />
         )}
@@ -194,6 +236,6 @@ export const SelectionHeader = ({screen}) => {
       </View>
     </View>
   );
-};
+});
 
 export default SelectionHeader;

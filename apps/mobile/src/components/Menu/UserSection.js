@@ -1,9 +1,14 @@
 import React from 'react';
-import {Platform} from 'react-native';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {useSettingStore, useUserStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
@@ -13,9 +18,15 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {TimeSince} from './TimeSince';
 
-export const UserSection = ({noTextMode}) => {
+export const UserSection = () => {
   const [state] = useTracked();
-  const {colors, syncing, user, lastSynced} = state;
+  const {colors} = state;
+
+  const user = useUserStore(state => state.user);
+  const syncing = useUserStore(state => state.syncing);
+  const lastSynced = useUserStore(state => state.lastSynced);
+  const deviceMode = useSettingStore(state => state.deviceMode);
+
   const insets = useSafeAreaInsets();
   return (
     <View
@@ -27,9 +38,9 @@ export const UserSection = ({noTextMode}) => {
       }}>
       <View
         style={{
-          flexDirection: DDS.isLargeTablet() ? 'column' : 'row',
+          flexDirection: deviceMode !== 'mobile' ? 'column' : 'row',
           justifyContent: 'space-between',
-          alignItems: DDS.isLargeTablet() ? 'flex-start' : 'center',
+          alignItems: deviceMode !== 'mobile' ? 'flex-start' : 'center',
           paddingRight: 8,
           paddingLeft: 8,
         }}>
@@ -49,7 +60,7 @@ export const UserSection = ({noTextMode}) => {
           style={{
             flexDirection: 'row',
             alignItems: 'center',
-            paddingVertical: DDS.isLargeTablet() ? 5 : 10,
+            paddingVertical: deviceMode !== 'mobile' ? 5 : 10,
             paddingTop: 10,
           }}>
           <Icon
@@ -69,7 +80,7 @@ export const UserSection = ({noTextMode}) => {
             {!user && (
               <Paragraph
                 style={{
-                  maxWidth: DDS.isLargeTablet() ? '96%' : '100%',
+                  maxWidth: deviceMode !== 'mobile' ? '96%' : '100%',
                 }}
                 color={colors.icon}>
                 Login to encrypt and sync your notes.
@@ -81,12 +92,14 @@ export const UserSection = ({noTextMode}) => {
         {user && (
           <TouchableOpacity
             activeOpacity={0.8}
-            onPress={() => Sync.run()}
+            onPress={async () => await Sync.run()}
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              paddingVertical: DDS.isLargeTablet() ? 0 : 10,
+              paddingVertical: deviceMode !== 'mobile' ? 0 : 10,
               paddingBottom: 10,
+              justifyContent: 'space-between',
+              width: deviceMode !== 'mobile' ? '100%' : null,
             }}>
             <Paragraph
               style={{

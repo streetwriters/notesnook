@@ -6,12 +6,15 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
@@ -44,16 +47,23 @@ const style = {
   backgroundColor: 'transparent',
 };
 
+const CustomView = Platform.OS === 'ios' ? ScrollView : View;
+
 const Editor = React.memo(
   () => {
-    const [state] = useTracked();
-    const {premiumUser} = state;
+    const premiumUser = useUserStore(state => state.premium);
+
     const [resetting, setResetting] = useState(false);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
     useEffect(()=>{
+      setTimeout(async () => {
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
+        eSendEvent(eOpenLoginDialog, 4);
+      }, 1000);
+
       if (premiumUser) {
         tiny.call(EditorWebView,tiny.setMarkdown,true)
       }
@@ -79,7 +89,6 @@ const Editor = React.memo(
       };
     }, []);
 
-    const CustomView = Platform.OS === 'ios' ? ScrollView : View;
 
     return resetting ? null : (
       <>

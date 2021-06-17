@@ -1,20 +1,20 @@
 import React, { useEffect } from 'react';
 import Animated, { useValue } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import { useSettingStore } from '../../provider/stores';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { eScrollEvent } from '../../utils/Events';
 import Heading from '../Typography/Heading';
 
-
-export const HeaderTitle = ({heading,headerColor,screen}) => {
+export const Title = ({heading,headerColor,screen}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const opacity = useValue(DDS.isLargeTablet() ? 1 : 0)
+  const deviceMode = useSettingStore(state => state.deviceMode);
+  const opacity = useValue(deviceMode !== "mobile" ? 1 : 0)
 
   const onScroll = async (data) => {
     if (data.screen !== screen) return;
-    if (DDS.isTab) return;
+    if (deviceMode !== "mobile") return;
     if (data.y > 75) {
       let yVal = data.y - 75;
       o = yVal / 75;
@@ -34,7 +34,7 @@ export const HeaderTitle = ({heading,headerColor,screen}) => {
   return (
     <Animated.View
       style={{
-        opacity: DDS.isTab ? 1 : opacity,
+        opacity: deviceMode !== "mobile" ? 1 : opacity,
       }}>
       <Heading color={headerColor}>
         <Heading color={colors.accent}>

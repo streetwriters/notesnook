@@ -1,32 +1,26 @@
-import React, {useCallback, useEffect, useState} from 'react';
+import React, {useCallback, useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import {AddNotebookEvent} from '../../components/DialogManager/recievers';
-import {Placeholder} from '../../components/ListPlaceholders';
+import {Header} from '../../components/Header';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import { useNotebookStore } from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
-import SearchService from '../../services/SearchService';
-import {eScrollEvent} from '../../utils/Events';
 import Navigation from '../../services/Navigation';
-import {DDS} from '../../services/DeviceDetection';
+import SearchService from '../../services/SearchService';
 import {InteractionManager} from '../../utils';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
-import SelectionHeader from '../../components/SelectionHeader';
+import {db} from '../../utils/DB';
+import {eScrollEvent} from '../../utils/Events';
 
 export const Folders = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const notebooks = state.notebooks;
-  const [loading, setLoading] = useState(true);
-  let pageIsLoaded = false;
+  const notebooks = useNotebookStore(state => state.notebooks);
+  const setNotebooks = useNotebookStore(state => state.setNotebooks);
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
-    }
     Navigation.setHeaderState(
       'Notebooks',
       {
@@ -45,33 +39,16 @@ export const Folders = ({route, navigation}) => {
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
       Navigation.routeNeedsUpdate('Notebooks', () => {
-        dispatch({type: Actions.NOTEBOOKS});
+        setNotebooks()
       });
-
-      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
-      updateSearch();
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: _onPressBottomButton,
-          },
-        });
-      }
-      ranAfterInteractions = false;
     });
+    eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
+    updateSearch();
+    ranAfterInteractions = false;
   };
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     navigation.addListener('focus', onFocus);
     return () => {
       ranAfterInteractions = false;
@@ -87,26 +64,25 @@ export const Folders = ({route, navigation}) => {
     }
   }, [notebooks]);
 
-  const updateSearch = () => {
+  const updateSearch = React.useCallback(() => {
     SearchService.update({
       placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
       title: 'Notebooks',
     });
-  };
+  }, []);
 
   const _onPressBottomButton = () => AddNotebookEvent();
 
   return (
     <>
-            <SelectionHeader   screen="Notebooks" />
-       <ContainerTopSection>
- 
+      <SelectionHeader screen="Notebooks" />
+      <ContainerTopSection>
         <Header
           title="Notebooks"
           isBack={false}
-          screen="Notesbooks"
+          screen="Notebooks"
           action={_onPressBottomButton}
         />
       </ContainerTopSection>
@@ -115,7 +91,6 @@ export const Folders = ({route, navigation}) => {
         type="notebooks"
         screen="Notebooks"
         focused={() => navigation.isFocused()}
-        loading={loading}
         placeholderData={{
           heading: 'Your notebooks',
           paragraph: 'You have not added any notebooks yet.',
@@ -126,7 +101,6 @@ export const Folders = ({route, navigation}) => {
         headerProps={{
           heading: 'Notebooks',
         }}
-        placeholder={<Placeholder type="notebooks" />}
       />
 
       {!notebooks || notebooks.length === 0 ? null : (

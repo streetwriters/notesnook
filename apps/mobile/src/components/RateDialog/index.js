@@ -1,32 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {Linking} from 'react-native';
-import {Platform} from 'react-native';
-import {View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import DialogButtons from '../Dialog/dialog-buttons';
-import DialogHeader from '../Dialog/dialog-header';
+import React, { useEffect, useRef, useState } from 'react';
+import { Linking, Platform, View } from 'react-native';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import { Button } from '../Button';
+import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const RateDialog = () => {
-  const [state] = useTracked();
-  const {notes, colors, settings} = state;
   const [visible, setVisible] = useState(false);
-  const insets = useSafeAreaInsets();
+  const actionSheetRef = useRef();
 
   useEffect(() => {
     eSubscribeEvent(eOpenRateDialog, open);
     eSubscribeEvent(eCloseRateDialog, close);
-
     return () => {
       eUnSubscribeEvent(eOpenRateDialog, open);
       eUnSubscribeEvent(eCloseRateDialog, close);
@@ -36,47 +26,68 @@ const RateDialog = () => {
   const open = () => {
     setVisible(true);
   };
+  useEffect(() => {
+    if (visible) {
+      actionSheetRef.current?.show();
+    }
+  }, [visible]);
 
   const close = () => {
-    setVisible(false);
+    actionSheetRef.current?.hide();
   };
 
   return !visible ? null : (
-    <BaseDialog
+    <ActionSheetWrapper
       centered={false}
-      onRequestClose={async () => {
+      fwdRef={actionSheetRef}
+      onClose={async () => {
         await MMKV.setItem(
           'askForRating',
           JSON.stringify({
-            timestamp: Date.now() + (86400000 * 2)
+            timestamp: Date.now() + 86400000 * 2,
           }),
         );
         setVisible(false);
-      }}
-      visible={true}>
+      }}>
       <View
         style={{
-          ...getElevation(5),
           width: '100%',
-          backgroundColor: colors.accent,
-          zIndex: 100,
-          bottom: 20,
           alignSelf: 'center',
-          padding: 12,
-          paddingTop: insets.top + 25,
+          paddingHorizontal: 12,
         }}>
-        <Heading color={colors.light}>Rate Notesnook</Heading>
-        <Paragraph size={SIZE.md} color={colors.light}>
-          If you find Notesnook useful, please take a moment to rate it. It
-          won't take more than a minute. Thanks for your support.
+        <Heading>Do you enjoy using Notesnook?</Heading>
+        <Paragraph size={SIZE.md}>
+          It took us a year to bring Notesnook to life. How has been your
+          experience using it. It will take you a moment to rate it. Please let
+          us know what you think!
         </Paragraph>
 
+        <Seperator half />
+        <Button
+          onPress={async () => {
+            await Linking.openURL(
+              Platform.OS === 'ios'
+                ? 'https://bit.ly/notesnook-ios'
+                : 'https://bit.ly/notesnook-and',
+            );
+
+            await MMKV.setItem('askForRating', 'completed');
+            setVisible(false);
+          }}
+          fontSize={SIZE.md}
+          width="100%"
+          height={50}
+          type="accent"
+          title="Rate now (It takes only a second)"
+        />
         <View
           style={{
-            flexDirection: 'row',
             alignItems: 'center',
-            justifyContent: 'flex-end',
-            paddingTop: 20,
+            justifyContent: 'space-between',
+            flexDirection: 'row',
+            paddingTop: 12,
+            width: '100%',
+            alignSelf: 'center',
           }}>
           <Button
             onPress={async () => {
@@ -84,7 +95,9 @@ const RateDialog = () => {
               setVisible(false);
             }}
             fontSize={SIZE.md}
-            type="white"
+            type="error"
+            width="48%"
+            height={50}
             title="Never"
           />
           <Button
@@ -92,33 +105,20 @@ const RateDialog = () => {
               await MMKV.setItem(
                 'askForRating',
                 JSON.stringify({
-                  timestamp: Date.now() + (86400000 * 2)
+                  timestamp: Date.now() + 86400000 * 2,
                 }),
               );
               setVisible(false);
             }}
             fontSize={SIZE.md}
-            type="white"
+            width="48%"
+            height={50}
+            type="shade"
             title="Later"
-          />
-          <Button
-            onPress={async () => {
-              await Linking.openURL(
-                Platform.OS === 'ios'
-                  ? 'https://bit.ly/notesnook-ios'
-                  : 'https://bit.ly/notesnook-and',
-              );
-
-              await MMKV.setItem('askForRating', 'completed');
-              setVisible(false);
-            }}
-            fontSize={SIZE.md}
-            type="white"
-            title="Rate now"
           />
         </View>
       </View>
-    </BaseDialog>
+    </ActionSheetWrapper>
   );
 };
 

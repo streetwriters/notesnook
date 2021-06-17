@@ -53,23 +53,26 @@ export const execCommands = {
   horizontal: `tinymce.activeEditor.execCommand('InsertHorizontalRule');`,
   rtl: `tinymce.activeEditor.execCommand('mceDirectionRTL');`,
   ltr: `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
-  magnify: `tinymce.activeEditor.execCommand('SearchReplace');`,
+  magnify: `
+  tinymce.activeEditor.execCommand('SearchReplace');
+  setTimeout(function() {
+    document.querySelector(".tox-textfield").focus()
+  },100)
+  `,
   table: (r, c) =>
-    `
-    (() => {
+    `(function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
-        tinymce.activeEditor.nodeChanged()
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
         tinymce.activeEditor.selection.setRng(rng)
-        
      }  
-     tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
+     editor.undoManager.transact(function() {
+      tinymce.activeEditor.execCommand('mceInsertTable', false, { rows: ${r}, columns: ${c} }); 
+     }); 
      
-    })();  
-
-    `,
+    })();`,
 
   cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
   image: async () => {
@@ -123,11 +126,176 @@ export const execCommands = {
   pre: `
     tinymce.activeEditor.execCommand('CodeBlock')
   `,
-  tableprops:"tinymce.activeEditor.execCommand('mceTableProps');",
-  tabledelete:"tinymce.activeEditor.execCommand('mceTableDelete');",
-  tablesplitcell:"tinymce.activeEditor.execCommand('mceTableSplitCells');",
-  tablemergecell:"tinymce.activeEditor.execCommand('mceTableMergeCells');",
-  tablerowprops:"tinymce.activeEditor.execCommand('mceTableRowProps');",
+  tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
+  tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
+  tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
+  tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
+  tablerowprops: "tinymce.activeEditor.execCommand('mceTableRowProps');",
+  imageResize25: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_three")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    });
+ 
+  }
+
+  })();
+  
+  `,
+  imageResize50: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+      tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_two")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    
+    });
+   
+  }
+  })()
+  
+  `,
+  imageResize100: `(function() {
+    let node = tinymce.activeEditor.selection.getNode();
+  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_size_one")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+     
+    });
+  }
+  })()
+  
+  `,
+  imagepreview: `(function() {
+    if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+      var xhr = new XMLHttpRequest();
+      xhr.responseType = 'blob';
+  
+      xhr.onload = function () {
+        var recoveredBlob = xhr.response;
+        var reader = new FileReader();
+        reader.onload = function () {
+          var blobAsDataUrl = reader.result;
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'imagepreview',
+              value: blobAsDataUrl
+            })
+          );
+          reader.abort();
+          xhr.abort();
+        };
+        reader.readAsDataURL(recoveredBlob);
+      };
+      xhr.open(
+        'GET',
+        tinymce.activeEditor.selection.getNode().getAttribute('src')
+      );
+      xhr.send();
+    }
+  })();
+  `,
+  removeimage: `
+  (function() {
+    if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    tinymce.activeEditor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+    setTimeout(function() {
+      tinymce.activeEditor.nodeChanged({selectionChange:true})
+    },100)
+    }  
+  })();
+  `,
+  imagefloatleft:`(function () {
+let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_left")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    });
+  }
+  })();
+  
+  `,
+  imagefloatright:`(function () {
+let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
+        tinymce.activeEditor.dom.removeClass(node, "img_float_left")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_right")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+     
+    });
+  }
+  })()
+  
+  `
+  ,
+  imagefloatnone:`(function () {
+  let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+   
+    tinymce.activeEditor.undoManager.transact(function() {
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_left")
+      }
+      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
+        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
+      }
+      tinymce.activeEditor.dom.addClass(node,"img_float_none")
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    });
+  }
+  })()
+  
+  `
+
 };
 
 const handleImageResponse = response => {
@@ -137,24 +305,24 @@ const handleImageResponse = response => {
 
   let b64 = `data:${response.type};base64, ` + response.base64;
   formatSelection(`
-  (() => {
+  (function() {
     let pTag = "";
     let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
     if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
       pTag = "<p></p>"
     }
     
-minifyImg(
+  minifyImg(
   "${b64}",
   1024,
   'image/jpeg',
-  (r) => {
+  function(r) {
     var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
-    editor.undoManager.transact(() => editor.execCommand("mceInsertContent",false,content)); 
+    editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
   },
-  0.6,
-);
-
-})();
+  0.6
+  );
+  
+  })();
 `);
 };

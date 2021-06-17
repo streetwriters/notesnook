@@ -18,9 +18,9 @@ const TagItem = ({item, index}) => {
     Navigation.navigate(
       'NotesPage',
       {
+        ...item,
         type: 'tag',
-        title: item.title,
-        tag: item,
+        get:'tagged'
       },
       {
         heading: '#' + item.title,
@@ -47,7 +47,11 @@ const TagItem = ({item, index}) => {
         width: '100%',
         justifyContent: 'space-between',
       }}>
-      <View>
+      <View
+      style={{
+        maxWidth:"92%"
+      }}
+      >
         <Heading size={SIZE.md}>
           <Heading
             size={SIZE.md}

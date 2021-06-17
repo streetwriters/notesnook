@@ -1,28 +1,37 @@
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
+import NetInfo from '@react-native-community/netinfo';
+import {initialize, useUserStore} from '../provider/stores';
+import {doInBackground} from '../utils';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
-import {eSendEvent,  ToastEvent, } from './EventManager';
+import {eSendEvent, ToastEvent} from './EventManager';
 
-const run = async (context = 'global') => {
-  updateEvent({
-    type: Actions.SYNCING,
-    syncing: true,
-  });
-
+const run = async (context = 'global', forced) => {
+  let userstore = useUserStore.getState();
+  userstore.setSyncing(true);
   try {
-    await db.sync();
+    let res = await doInBackground(async () => {
+      try {
+        await db.sync(true, forced);
+        return true;
+      } catch (e) {
+        return e.message;
+      }
+    });
+
+    if (res !== true) throw new Error(res);
+
     ToastEvent.show({
-      heading:"Sync complete",
-      type:"success",
-      message: "All your notes are encrypted and synced successfully!",
+      heading: 'Sync complete',
+      type: 'success',
+      message: 'All your notes are encrypted and synced!',
       context: context,
     });
   } catch (e) {
+    console.log(e);
     if (e.message === 'You need to login to sync.') {
       ToastEvent.show({
-        heading:"Enable sync",
-        message: "Login to encrypt and sync notes.",
+        heading: 'Enable sync',
+        message: 'Login to encrypt and sync notes.',
         context: context,
         func: () => {
           eSendEvent(eOpenLoginDialog);
@@ -30,26 +39,20 @@ const run = async (context = 'global') => {
         actionText: 'Login',
       });
     } else {
-      updateEvent({
-        type: Actions.SYNCING,
-        syncing: false,
-      });
-      ToastEvent.show({
-        heading:"Sync failed",
-        message: e.message,
-        context: context,
-      });
+      userstore.setSyncing(false);
+      let status = await NetInfo.fetch();
+      if (status.isConnected && status.isInternetReachable) {
+        ToastEvent.show({
+          heading: 'Sync failed',
+          message: e.message,
+          context: context,
+        });
+      }
     }
   } finally {
-    updateEvent({
-      type: Actions.LAST_SYNC,
-      lastSync: await db.lastSynced(),
-    });
-    updateEvent({type: Actions.ALL});
-    updateEvent({
-      type: Actions.SYNCING,
-      syncing: false,
-    });
+    userstore.setLastSynced(await db.lastSynced());
+    initialize();
+    userstore.setSyncing(false);
   }
 };
 

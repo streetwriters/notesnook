@@ -1,3 +1,4 @@
+
 attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
@@ -5,8 +6,8 @@ function reactNativeEventHandler(type, value) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
-        value: value,
-      }),
+        value: value
+      })
     );
   }
 }
@@ -34,6 +35,24 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
+    .img_float_left {
+      float:left;
+    }
+    .img_float_right {
+      float:right;
+    }
+    .img_float_none {
+      float:none;
+    }
+    .img_size_one {
+      width:100%;
+    }
+    .img_size_two {
+      width:50%;
+    }
+    .img_size_three {
+      width:25%;
+    }
     span.diff-del {
       background-color: #FDB0C0;  
     }
@@ -74,13 +93,13 @@ function init_tiny(size) {
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
     imagetools_toolbar:
-      'rotateleft rotateright | flipv fliph | imageoptions | deleteimage | imagepreview',
+      'rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
     mobile: {
-      resize: true,
-      object_resizing: true,
+      resize: false,
+      object_resizing: false,
     },
     image_description: false,
     image_caption: false,
@@ -93,21 +112,30 @@ function init_tiny(size) {
     setup: function (editor) {
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
-        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
         tooltip: 'Remove image',
         onAction: function () {
-          tinymce.activeEditor.execCommand('Delete');
+          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
         },
         onclick: function () {
-          tinymce.activeEditor.execCommand('Delete');
-        },
+          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+
+        }
       });
+      editor.ui.registry.addButton('imageopts', {
+        icon: 'image-options',
+        tooltip: 'Image properties',
+        onAction: function () {
+          reactNativeEventHandler("imageoptions");
+        },
+        onclick: function () {
+          reactNativeEventHandler("imageoptions");
+        }
+      });
+
       editor.ui.registry.addButton('imagepreview', {
         icon: 'fullscreen',
-        //image: 'http://p.yusukekamiyamane.com/icons/search/fugue/icons/calendar-blue.png',
         tooltip: 'Preview image',
         onAction: function () {
-        
           if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
             var xhr = new XMLHttpRequest();
             xhr.responseType = 'blob';
@@ -125,13 +153,12 @@ function init_tiny(size) {
             };
             xhr.open(
               'GET',
-              tinymce.activeEditor.selection.getNode().getAttribute('src'),
+              tinymce.activeEditor.selection.getNode().getAttribute('src')
             );
             xhr.send();
           }
-
         },
-        onclick: function () {},
+        onclick: function () {}
       });
     },
     init_instance_callback: function (edit) {
@@ -143,15 +170,15 @@ function init_tiny(size) {
         selectchange();
         reactNativeEventHandler('history', {
           undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo(),
+          redo: editor.undoManager.hasRedo()
         });
       });
 
-      editor.on('focus', () => {
+      editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
       });
 
-      editor.on('SetContent', event => {
+      editor.on('SetContent', function (event) {
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
@@ -161,38 +188,37 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('ScrollIntoView', e => {
+      editor.on('ScrollIntoView', function (e) {
+        
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest',
+          block: 'nearest'
         });
       });
       editor.on('input', onChange);
       editor.on('keyup', onChange);
       editor.on('NodeChange', onChange);
-    },
+    }
   });
 }
 window.prevContent = '';
-const onChange = event => {
-  clearTimeout(changeTimer);
-  changeTimer = null;
-  changeTimer = setTimeout(() => {
+const onChange = function (event) {
     if (event.type === 'nodechange' && !event.selectionChange) return;
     if (isLoading) {
       isLoading = false;
       return;
     }
     if (editor.plugins.wordcount.getCount() === 0) return;
-    selectchange();
-
-    reactNativeEventHandler('tiny', editor.getContent());
-
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo(),
-    });
+    clearTimeout(changeTimer);
+    changeTimer = null;   
+    changeTimer = setTimeout(function () {
+      selectchange();
+      reactNativeEventHandler('tiny', editor.getContent());
+      reactNativeEventHandler('history', {
+        undo: editor.undoManager.hasUndo(),
+        redo: editor.undoManager.hasRedo()
+      });
   }, 1);
 };
 
@@ -217,9 +243,9 @@ function selectchange() {
 
   let formats = Object.keys(editor.formatter.get());
   let currentFormats = {};
-  editor.formatter
-    .matchAll(formats)
-    .forEach(format => (currentFormats[format] = true));
+  editor.formatter.matchAll(formats).forEach(function (format) {
+    currentFormats[format] = true;
+  });
 
   let node = editor.selection.getNode();
   currentFormats.hilitecolor = getNodeBg(node);
@@ -236,7 +262,7 @@ function selectchange() {
 
   currentFormats.current = {
     index: range.startOffset,
-    length: range.endOffset - range.startOffset,
+    length: range.endOffset - range.startOffset
   };
 
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;
@@ -287,5 +313,6 @@ function selectchange() {
       }
     }
   }
+  currentFormats.node = editor.selection.getNode().nodeName;
   reactNativeEventHandler('selectionchange', currentFormats);
 }

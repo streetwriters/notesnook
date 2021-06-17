@@ -1,26 +1,31 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {
+  allowedPlatforms,
+  useMessageStore,
+  useSelectionStore,
+} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import {eOpenPremiumDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
-import useAnnouncement from '../../utils/useAnnouncement';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Announcement = ({data, color}) => {
+export const Announcement = () => {
   const [state] = useTracked();
-  const {selectionMode} = state;
-  const [announcement, remove] = useAnnouncement();
-
+  const colors = state.colors;
+  const announcements = useMessageStore(state => state.announcements);
+  const remove = useMessageStore(state => state.remove);
+  let announcement = announcements.length > 0 ? announcements[0] : null;
+  const selectionMode = useSelectionStore(state => state.selectionMode);
   return !announcement || selectionMode ? null : (
     <View
       style={{
-        backgroundColor: color,
+        backgroundColor: colors.bg,
         width: '100%',
       }}>
       <View
@@ -35,48 +40,112 @@ export const Announcement = ({data, color}) => {
             alignItems: 'center',
             justifyContent: 'space-between',
           }}>
+          <View
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+            }}>
+            <View
+              style={{
+                backgroundColor: colors.accent,
+                borderRadius: 100,
+                width: 20,
+                height: 20,
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginRight: 2.5,
+              }}>
+              <Paragraph color={colors.light} size={SIZE.xs}>
+                {announcements.length}
+              </Paragraph>
+            </View>
+            <Button
+              title={'Announcement'}
+              fontSize={12}
+              type="shade"
+              height={null}
+              icon="bullhorn"
+              style={{
+                paddingVertical: 4,
+              }}
+            />
+          </View>
+
+          <Button
+            title="Dismiss"
+            fontSize={12}
+            type="error"
+            height={null}
+            onPress={() => {
+              remove(announcement.id);
+            }}
+            style={{
+              paddingVertical: 4,
+            }}
+          />
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+          }}>
           {announcement?.title && (
             <Heading
               style={{
-                width: '90%',
+                width: '100%',
               }}
               size={SIZE.lg}
-              color="white">
+              color={colors.heading}>
               {announcement.title}
             </Heading>
           )}
-
-          <Icon onPress={remove} name="close" size={SIZE.xl} color="white" />
         </View>
 
         {announcement?.description && (
-          <Paragraph color="white">{announcement.description}</Paragraph>
+          <Paragraph color={colors.pri}>{announcement.description}</Paragraph>
         )}
         <Seperator />
+        <View
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            flexWrap: 'wrap',
+          }}>
+          {announcement?.callToActions &&
+            announcement.callToActions.map((item, index) =>
+              item.platforms.some(
+                platform => allowedPlatforms.indexOf(platform) > -1,
+              ) ? (
+                <>
+                  <Button
+                    key={item.title}
+                    type={index === 0 ? 'accent' : 'shade'}
+                    title={item.title}
+                    fontSize={SIZE.md}
+                    onPress={async () => {
 
-        {announcement?.cta && (
-          <Button
-            type="inverted"
-            title={announcement.cta.text}
-            fontSize={SIZE.md}
-            onPress={async () => {
-              if (announcement.cta.type === 'link') {
-                try {
-                  await openLinkInBrowser(
-                    announcement.cta.action,
-                    state.colors,
-                  );
-                } catch (e) {}
-              } else if (announcement.cta.type === 'promo') {
-                eSendEvent(eOpenPremiumDialog, {
-                  promoCode: announcement.cta.action,
-                  text: announcement.cta.text,
-                });
-              }
-            }}
-            width="100%"
-          />
-        )}
+                      if (item.type === 'link') {
+                        try {
+                          await openLinkInBrowser(item.data, state.colors);
+                        } catch (e) {}
+                      } else if (item.type === 'promo') {
+                        eSendEvent(eOpenPremiumDialog, {
+                          promoCode: item.data,
+                          text: item.title,
+                        });
+                      }
+                    }}
+                    width={'100%'}
+                    style={{
+                      marginBottom: 10,
+                    }}
+                  />
+                </>
+              ) : null,
+            )}
+        </View>
       </View>
     </View>
   );

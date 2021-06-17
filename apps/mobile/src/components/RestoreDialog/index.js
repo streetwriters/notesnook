@@ -1,24 +1,23 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, ScrollView, View} from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {FlatList} from 'react-native-gesture-handler';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { FlatList } from 'react-native-gesture-handler';
+import { useTracked } from '../../provider';
+import { initialize } from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/DB';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
 const actionSheetRef = createRef();
@@ -86,7 +85,6 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
 
   const restore = async (item, index) => {
     if (restoring) {
-      showIsWorking();
       return;
     }
     if (Platform.OS === 'android') {
@@ -107,7 +105,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       let backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
       await db.backup.import(backup);
       setRestoring(false);
-      dispatch({type: Actions.ALL});
+      initialize();
       ToastEvent.show({
         heading: 'Restore successful',
         message: 'Your backup data has been restored successfully.',
@@ -164,7 +162,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             paddingHorizontal: 8,
             paddingRight: 8,
             alignItems: 'center',
-            paddingTop: restoring ? 25 : 0,
+            paddingTop: restoring ? 8 : 0,
           }}>
           <DialogHeader
             title="Backups"
@@ -173,27 +171,27 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
               title: 'Open File Manager',
               onPress: () => {
                 if (restoring) {
-                  showIsWorking();
                   return;
                 }
                 DocumentPicker.pick()
-                  .then((r) => {
-                    fetch(r.uri).then(async (r) => {
+                  .then(r => {
+                    setRestoring(true);
+                    fetch(r.uri).then(async r => {
                       try {
                         let backup = await r.json();
-                        setRestoring(true);
+                       
                         await db.backup.import(JSON.stringify(backup));
                         setRestoring(false);
-                        dispatch({type: Actions.ALL});
+                        initialize();
 
                         ToastEvent.show({
                           heading: 'Restore successful',
                           message:
                             'Your backup data has been restored successfully.',
                           type: 'success',
-                          context: 'local',
+                          context: 'global',
                         });
-                        setVisible(false);
+                        actionSheetRef.current?.hide();
                       } catch (e) {
                         setRestoring(false);
                         ToastEvent.show({
@@ -224,46 +222,34 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
           ListEmptyComponent={
-            <View
-              style={{
-                justifyContent: 'center',
-                alignItems: 'center',
-                height: 100,
-              }}>
-              <Paragraph color={colors.icon}>No backups found.</Paragraph>
-            </View>
-          }
-          keyExtractor={(item) => item.filename}
-          ListHeaderComponent={
-            !restoring ? null : (
+            !restoring ? (
               <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
+                  height: 100,
+                }}>
+                <Paragraph color={colors.icon}>No backups found.</Paragraph>
+              </View>
+            ) : (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  height: 200,
                 }}>
                 <ActivityIndicator color={colors.accent} />
                 <Paragraph color={colors.icon}>
                   Restoring backup. Please wait.
                 </Paragraph>
-
-                <Button
-                  title="Cancel"
-                  type="accent"
-                  onPress={() => {
-                    setRestoring(false);
-                  }}
-                  height={25}
-                  style={{
-                    marginTop: 5,
-                  }}
-                />
               </View>
             )
           }
+          keyExtractor={item => item.filename}
           style={{
             paddingHorizontal: 12,
           }}
-          data={files}
+          data={restoring ? [] : files}
           renderItem={({item, index}) => [
             <View
               style={{
@@ -298,11 +284,13 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             </View>,
           ]}
           ListFooterComponent={
-            <View
-              style={{
-                height: 150,
-              }}
-            />
+            restoring ? null : (
+              <View
+                style={{
+                  height: 150,
+                }}
+              />
+            )
           }
         />
       </View>

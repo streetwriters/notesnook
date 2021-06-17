@@ -1,59 +1,51 @@
 import React from 'react';
-import {useWindowDimensions} from 'react-native';
 import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
 import {getTotalNotes, history} from '../../utils';
-import {pv, SIZE} from '../../utils/SizeUtils';
+import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const NotebookItem = ({
-  item,
-  isTopic = false,
-  notebookID,
-  isTrash,
-  customStyle,
-}) => {
+export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const {fontScale} = useWindowDimensions();
+  const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
     let rowItems = isTrash
       ? ['Restore', 'Remove']
-      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook', 'Delete'];
+      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook'];
 
     let columnItems = isTrash
       ? []
       : item.type === 'topic'
-      ? ['Add Shortcut to Menu', 'Remove Shortcut from Menu']
-      : ['Pin', 'Add Shortcut to Menu', 'Remove Shortcut from Menu'];
+      ? ['Add Shortcut to Menu', 'Delete']
+      : ['Pin', 'Add Shortcut to Menu','Delete'];
 
     ActionSheetEvent(item, false, false, rowItems, columnItems, {
       notebookID: notebookID,
     });
   };
 
+  const navigateToTopic = topic => {
+    if (history.selectedItemsList.length > 0) return;
+    let routeName = 'NotesPage';
+    let params = {...topic, menu: false, get: 'topics'};
+    let headerState = {
+      heading: topic.title,
+      id: topic.id,
+      type: topic.type,
+    };
+    Navigation.navigate(routeName, params, headerState);
+  };
+
   return (
-    <View
-      style={[
-        {
-          height: isTopic ? 80 * fontScale : 110 * fontScale,
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          flexDirection: 'row',
-          paddingRight: 6,
-          alignSelf: 'center',
-          borderBottomWidth: 1,
-          borderBottomColor: item.pinned ? 'transparent' : colors.nav,
-          width: '100%',
-        },
-      ]}>
+    <>
       <View
         style={{
           width: '90%',
@@ -88,59 +80,34 @@ export const NotebookItem = ({
               width: '80%',
               maxWidth: '80%',
               flexWrap: 'wrap',
-              paddingVertical: item.description ? 0 : 0,
+              paddingVertical: 0,
             }}>
-            {item && item.topics ? (
-              item.topics
-                .sort((a, b) => b.dateEdited - a.dateEdited)
-                .slice(0, 2)
-                .map(topic => (
-                  <TouchableOpacity
-                    activeOpacity={0.8}
-                    onPress={() => {
-                      if (history.selectedItemsList.length > 0) return;
-                      let routeName = 'NotesPage';
-                      let params = {...topic, menu: false};
-                      let headerState = {
-                        heading: topic.title,
-                        id: topic.id,
-                        type: topic.type,
-                      };
-                      Navigation.navigate(routeName, params, headerState);
-                    }}
-                    key={topic.id}
-                    style={{
-                      borderRadius: 2.5,
-                      backgroundColor: colors.accent,
-                      paddingHorizontal: 5,
-                      paddingVertical: 2,
-                      marginRight: 5,
-                      marginVertical: 2.5,
-                    }}>
-                    <Paragraph
-                      size={SIZE.xs}
-                      numberOfLines={1}
-                      style={{
-                        color: 'white',
-                        maxWidth: '100%',
-                      }}>
-                      {topic.title.length > 16
-                        ? topic.title.slice(0, 16) + '...'
-                        : topic.title}
-                    </Paragraph>
-                  </TouchableOpacity>
-                ))
-            ) : (
-              <Paragraph
-                color={colors.icon}
-                size={SIZE.xs}
+            {topics.map(topic => (
+              <TouchableOpacity
+                activeOpacity={0.8}
+                onPress={() => navigateToTopic(topic)}
+                key={topic.id}
                 style={{
-                  paddingVertical: pv / 3,
-                  maxWidth: '100%',
+                  borderRadius: 2.5,
+                  backgroundColor: colors.accent,
+                  paddingHorizontal: 5,
+                  paddingVertical: 2,
+                  marginRight: 5,
+                  marginVertical: 2.5,
+                  maxWidth: 100,
                 }}>
-                This notebook has no topics.
-              </Paragraph>
-            )}
+                <Paragraph
+                  size={SIZE.xs}
+                  numberOfLines={1}
+                  lineBreakMode="tail"
+                  color="white"
+                  style={{
+                    maxWidth: '100%',
+                  }}>
+                  {topic.title}
+                </Paragraph>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 
@@ -150,6 +117,7 @@ export const NotebookItem = ({
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 2.5,
+            minHeight: SIZE.md + 2,
           }}>
           {isTrash ? (
             <>
@@ -173,19 +141,17 @@ export const NotebookItem = ({
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
             </>
-          ) : null}
-          {isTrash ? null : (
-            <>
-              <Paragraph
-                color={colors.icon}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 10,
-                }}>
-                {new Date(item.dateCreated).toDateString().substring(4)}
-              </Paragraph>
-            </>
+          ) : (
+            <Paragraph
+              color={colors.icon}
+              size={SIZE.xs}
+              style={{
+                marginRight: 10,
+              }}>
+              {new Date(item.dateCreated).toDateString().substring(4)}
+            </Paragraph>
           )}
+
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
@@ -193,10 +159,10 @@ export const NotebookItem = ({
               marginRight: 10,
             }}>
             {item && totalNotes > 1
-              ? totalNotes + ' Notes'
+              ? totalNotes + ' notes'
               : totalNotes === 1
-              ? totalNotes + ' Note'
-              : '0 Notes'}
+              ? totalNotes + ' note'
+              : '0 notes'}
           </Paragraph>
 
           {item.pinned ? (
@@ -227,6 +193,6 @@ export const NotebookItem = ({
           alignItems: 'center',
         }}
       />
-    </View>
+    </>
   );
 };

@@ -1,52 +1,36 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
-import {Placeholder} from '../../components/ListPlaceholders';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
+import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTagStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {eScrollEvent} from '../../utils/Events';
+import { InteractionManager } from '../../utils';
+import { eScrollEvent } from '../../utils/Events';
 
 export const Tags = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const tags = state.tags;
-  const [loading, setLoading] = useState(true);
-  let pageIsLoaded = false;
-
+  const tags = useTagStore(state => state.tags);
+  const setTags = useTagStore(state =>state.setTags);
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
-      if (loading) {
-        setLoading(false);
-      }
-
       Navigation.routeNeedsUpdate('Tags', () => {
-        dispatch({type: Actions.TAGS});
+        setTags();
       });
-
-      eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
-    
-      updateSearch();
-      ranAfterInteractions = false;
     });
+    eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
+    updateSearch();
+    ranAfterInteractions = false;
   };
 
   const onFocus = useCallback(() => {
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions();
-    }
-
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
     }
     Navigation.setHeaderState(
       'Tags',
@@ -61,13 +45,8 @@ export const Tags = ({route, navigation}) => {
   }, []);
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
     navigation.addListener('focus', onFocus);
     return () => {
-      pageIsLoaded = false;
       ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Tags', type: 'back'});
       navigation.removeListener('focus', onFocus);
@@ -90,10 +69,9 @@ export const Tags = ({route, navigation}) => {
   };
 
   return (
-    <>  
-        <SelectionHeader screen="Tags" />
+    <>
+      <SelectionHeader screen="Tags" />
       <ContainerTopSection>
-      
         <Header title="Tags" isBack={false} screen="Tags" />
       </ContainerTopSection>
       <SimpleList
@@ -103,7 +81,6 @@ export const Tags = ({route, navigation}) => {
           heading: 'Tags',
         }}
         screen="Tags"
-        loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: 'Your tags',

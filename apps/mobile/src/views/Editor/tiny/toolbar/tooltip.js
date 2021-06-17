@@ -52,7 +52,8 @@ const Tooltip = () => {
 
   const show = async (data) => {
     properties.userBlur = true;
-    if (!data && editing.tooltip) {
+
+    if (!data) {
       editing.tooltip = null;
       animate(70, 100);
       await sleep(100);

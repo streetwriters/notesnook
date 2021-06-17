@@ -7,11 +7,14 @@ import Sodium from 'react-native-sodium';
 import * as Keychain from 'react-native-keychain';
 
 let RNFetchBlob;
-async function read(key, isArray = false) {
+async function read(key) {
   let data = await MMKV.getItem(key);
   if (!data) return null;
-  data = JSON.parse(data);
-  return data;
+  try {
+    return JSON.parse(data);
+  } catch(e) {
+    return data;
+  }
 }
 
 async function write(key, data) {
@@ -49,6 +52,9 @@ async function clear() {
 }
 
 async function encrypt(password, data) {
+  if (!password.password && !password.key) return undefined
+  if (password.password && password.password === "" && !password.key) return undefined
+
   let message = {
     type: 'plain',
     data: data,
@@ -66,6 +72,8 @@ function getAlgorithm(base64Variant) {
 }
 
 async function decrypt(password, data) {
+  if (!password.password && !password.key) return undefined
+  if (password.password && password.password === "" && !password.key) return undefined
   data.output = 'plain';
   return await Sodium.decrypt(password, data);
 }
@@ -170,7 +178,10 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  return await Sodium.hashPassword(password, email);
+  console.log(password,email,'calling');
+  let result =  await Sodium.hashPassword(password, email);
+  console.log(result,'result');
+  return result
 }
 /* 
 function compress(data) {

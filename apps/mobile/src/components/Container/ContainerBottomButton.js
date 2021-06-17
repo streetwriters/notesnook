@@ -6,10 +6,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
+import {editing, getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import RNTooltips from 'react-native-tooltips';
+import { useSettingStore } from '../../provider/stores';
 
 const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({
@@ -19,6 +20,7 @@ export const ContainerBottomButton = ({
   shouldShow = false,
 }) => {
   const insets = useSafeAreaInsets();
+  const deviceMode = useSettingStore(state => state.deviceMode)
 
   function animate(translate) {
     Animated.timing(translateY, {
@@ -29,11 +31,15 @@ export const ContainerBottomButton = ({
   }
 
   const onKeyboardHide = async () => {
+    console.log('called hide')
+    editing.keyboardState = false;
     if (DDS.isTab) return;
     animate(0);
   };
 
   const onKeyboardShow = async () => {
+    console.log('called show');
+    editing.keyboardState = true;
     if (DDS.isTab) return;
     animate(150);
   };
@@ -47,7 +53,7 @@ export const ContainerBottomButton = ({
     };
   }, []);
 
-  return DDS.isLargeTablet() && !shouldShow ? null : (
+  return deviceMode !== "mobile" && !shouldShow ? null : (
     <Animated.View
       style={{
         position: 'absolute',

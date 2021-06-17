@@ -1,15 +1,21 @@
 import {createRef} from 'react';
 import {Dimensions, NativeModules, Platform} from 'react-native';
+import BackgroundService from 'react-native-background-actions';
+import {
+  beginBackgroundTask,
+  endBackgroundTask,
+} from 'react-native-begin-background-task';
+import FastImage from 'react-native-fast-image';
 import RNTooltips from 'react-native-tooltips';
-import {updateEvent} from '../components/DialogManager/recievers';
 import {dummyRef} from '../components/DummyText';
-import {Actions} from '../provider/Actions';
-import {defaultState} from '../provider/DefaultState';
+import {useSettingStore} from '../provider/stores';
 import {eSendEvent} from '../services/EventManager';
+import Navigation from '../services/Navigation';
+import { refreshNotesPage } from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
-import FastImage from 'react-native-fast-image';
+
 const imgNames = [
   'favorites',
   'notes',
@@ -63,6 +69,10 @@ const noteColors = [
   '#9E9E9E',
 ];
 
+export const updateList = items => {
+  eSendEvent('onListUpdate', items);
+};
+
 export function preloadImages(color) {
   let uri = imgNames.map(name => {
     return {
@@ -83,13 +93,13 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1373;
+export const APP_VERSION = 1400;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
   s[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(s));
-  updateEvent({type: Actions.SETTINGS, settings: s});
+  useSettingStore.getState().setSettings(s);
 }
 
 export const scrollRef = createRef();
@@ -106,7 +116,10 @@ export const getElevation = elevation => {
 };
 
 export const sortSettings = {
-  sort: defaultState.settings.sort,
+  sort: 'default',
+  /**
+   * @type {"desc" | "asc"}
+   */
   sortOrder: 'desc',
 };
 
@@ -128,7 +141,7 @@ export const editing = {
   focusType: null,
   movedAway: true,
   tooltip: false,
-  isRestoringState:false
+  isRestoringState: false,
 };
 export const selection = {
   data: [],
@@ -171,6 +184,35 @@ export async function showContext(event, title) {
   });
 }
 
+export const bgTaskOptions = {
+  taskName: 'notesnookSync',
+  taskTitle: 'Notesnook Sync',
+  taskDesc: 'Syncing your notes.',
+  taskIcon: {
+    name: 'ic_stat_name',
+    type: 'drawable',
+  },
+  color: '#ffffff',
+};
+
+export async function doInBackground(cb) {
+  if (Platform.OS === 'ios') {
+    let bgTaskId;
+    bgTaskId = await beginBackgroundTask();
+    let res = await cb();
+    await endBackgroundTask(bgTaskId);
+    return res;
+  } else {
+    return new Promise(async (res, rej) => {
+      await BackgroundService.start(async () => {
+        let result = await cb();
+        await BackgroundService.stop();
+        res(result);
+      }, bgTaskOptions);
+    });
+  }
+}
+
 export let dWidth = Dimensions.get('window').width;
 export let dHeight = Dimensions.get('window').height;
 
@@ -188,10 +230,13 @@ export function getTotalNotes(notebook) {
   }, 0);
 }
 
-export const itemSkus = Platform.select({
-  ios: ['com.streetwriters.notesnook.sub.mo'],
-  android: ['com.streetwriters.notesnook.sub.mo'],
-});
+export const itemSkus = [
+  'com.streetwriters.notesnook.sub.mo',
+  'com.streetwriters.notesnook.sub.yr',
+  'com.streetwriters.notesnook.sub.yr.15',
+  'com.streetwriters.notesnook.sub.mo.15',
+  'com.streetwriters.notesnook.sub.mo.ofr',
+];
 
 export const MenuItemsList = [
   {
@@ -213,6 +258,26 @@ export const MenuItemsList = [
     name: 'Tags',
     icon: 'pound',
     close: true,
+  },
+  {
+    name: 'Monographs',
+    icon: 'text-box-multiple-outline',
+    close: true,
+    func: () => {
+      let params = (params = {
+        type: 'notes',
+        menu: true,
+        get: 'monographs',
+        title:"Monographs",
+        id:"monographs_navigation"
+      });
+      Navigation.navigate('NotesPage', params, {
+        heading: 'Monographs',
+        id: 'monographs_navigation',
+        type: 'notes',
+      });
+      eSendEvent(refreshNotesPage, params);
+    },
   },
   {
     name: 'Trash',

@@ -1,43 +1,40 @@
-import React, {useEffect} from 'react';
-import {BackHandler, InteractionManager, Keyboard} from 'react-native';
-import RNExitApp from 'react-native-exit-app';
-import {simpleDialogEvent} from '../../components/DialogManager/recievers';
-import {TEMPLATE_EXIT_FULLSCREEN} from '../../components/DialogManager/Templates';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import React, { useEffect } from 'react';
+import { BackHandler, InteractionManager, Keyboard } from 'react-native';
+import { simpleDialogEvent } from '../../components/DialogManager/recievers';
+import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
+import { useSettingStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {editing} from '../../utils';
+import { editing } from '../../utils';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
-  eOnLoadNote,
+  eOnLoadNote
 } from '../../utils/Events';
-import {sideMenuRef, tabBarRef} from '../../utils/Refs';
+import { tabBarRef } from '../../utils/Refs';
 import {
   checkNote,
   clearEditor,
   clearTimer,
+
   EditorWebView,
+
   isNotedEdited,
-  loadNote,
-  post,
-  saveNote,
-  setIntent,
+  loadNote
 } from './Functions';
-import tiny, { keyboardStateChanged } from './tiny/tiny';
-import {toolbarRef} from './tiny/toolbar/constants';
+import tiny from './tiny/tiny';
+import { toolbarRef } from './tiny/toolbar/constants';
 
 let handleBack;
-let tapCount = 0;
 
 const EditorRoot = () => {
-  const [state] = useTracked();
-  const {fullscreen} = state;
+  const fullscreen = useSettingStore(state => state.fullscreen);
+
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
     eSubscribeEvent(eClearEditor, onCallClear);

@@ -1,6 +1,5 @@
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
-import {db} from '../utils/DB';
+import { useSearchStore } from '../provider/stores';
+import { db } from '../utils/DB';
 
 let searchInformation = {
   placeholder: 'Search in all notes',
@@ -19,21 +18,15 @@ function setTerm(term) {
 }
 
 async function search() {
+  let searchstore = useSearchStore.getState();
+
   let term = keyword;
   if (!term || term.length === 0) {
-    updateEvent({
-      type: Actions.SEARCH_RESULTS,
-      results: [],
-    });
+    searchstore.setSearchResults([]);
     return;
   }
-  updateEvent({
-    type: Actions.SEARCHING,
-    searching: {
-      isSearching: true,
-      status: `Searching for "${term}" in ${searchInformation.title}`,
-    },
-  });
+  searchstore.setSearchStatus(true,`Searching for "${term}" in ${searchInformation.title}`)
+
   let results;
   if (!searchInformation.type) return;
 
@@ -43,31 +36,12 @@ async function search() {
   );
 
   if (!results || results.length === 0) {
-    updateEvent({type: Actions.SEARCHING, searching: false});
-    updateEvent({
-      type: Actions.SEARCHING,
-      searching: {
-        isSearching: false,
-        status: `No search results found for "${term}" in ${searchInformation.title}`,
-      },
-    });
-    updateEvent({
-      type: Actions.SEARCH_RESULTS,
-      results: results,
-    });
+    searchstore.setSearchStatus(false,`No search results found for "${term}" in ${searchInformation.title}`)
+    searchstore.setSearchResults(results);
     return;
   }
-  updateEvent({
-    type: Actions.SEARCHING,
-    searching: {
-      isSearching: false,
-      status: null,
-    },
-  });
-  updateEvent({
-    type: Actions.SEARCH_RESULTS,
-    results: results,
-  });
+  searchstore.setSearchStatus(false,null)
+  searchstore.setSearchResults(results);
 }
 
 function getSearchInformation() {

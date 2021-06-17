@@ -1,35 +1,34 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header/index';
+import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager, scrollRef} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {Header} from '../../components/Header/index';
-import SelectionHeader from '../../components/SelectionHeader';
-export const Home = ({route, navigation}) => {
-  const [state, dispatch] = useTracked();
-  const {loading} = state;
-  const [localLoad, setLocalLoad] = useState(true);
-  const notes = state.notes.slice();
-  let pageIsLoaded = false;
+import { InteractionManager, scrollRef } from '../../utils';
+import { db } from '../../utils/DB';
+import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import Storage from '../../utils/storage';
+
+export const Home = ({navigation}) => {
+  const notes = useNoteStore(state => state.notes);
+  const setNotes = useNoteStore(state => state.setNotes);
+  const loading = useNoteStore(state => state.loading);
+  
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
       runAfterInteractions();
-    }
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
     }
 
     Navigation.setHeaderState(
@@ -47,41 +46,21 @@ export const Home = ({route, navigation}) => {
   const onBlur = useCallback(() => {}, []);
 
   const runAfterInteractions = () => {
+    updateSearch();
+    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
+
     InteractionManager.runAfterInteractions(() => {
-      if (localLoad) {
-        setLocalLoad(false);
-      }
-
-      updateSearch();
-      eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
-
       Navigation.routeNeedsUpdate('Notes', () => {
-        console.log('updating notes as requested');
-        dispatch({type: Actions.NOTES});
+        setNotes()
       });
-
-      if (DDS.isLargeTablet()) {
-        dispatch({
-          type: Actions.CONTAINER_BOTTOM_BUTTON,
-          state: {
-            onPress: _onPressBottomButton,
-          },
-        });
-      }
-      ranAfterInteractions = false;
     });
+    ranAfterInteractions = false;
   };
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
-      pageIsLoaded = false;
       ranAfterInteractions = false;
       eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
@@ -104,14 +83,14 @@ export const Home = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = async () => {
-    if (!DDS.isLargeTablet()) {
+  const _onPressBottomButton = React.useCallback(async () => {
+    if (!DDS.isTab) {
       eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
     }
-  };
+  }, []);
 
   return (
     <>
@@ -132,7 +111,7 @@ export const Home = ({route, navigation}) => {
         isHome={true}
         pinned={true}
         screen="Notes"
-        loading={loading || localLoad}
+        loading={loading}
         sortMenuButton={true}
         headerProps={{
           heading: 'Notes',

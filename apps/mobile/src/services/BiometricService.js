@@ -3,6 +3,7 @@ import Storage from '../utils/storage';
 import {ToastEvent} from './EventManager';
 import * as Keychain from 'react-native-keychain';
 import {Platform} from 'react-native';
+import { MMKV } from '../utils/mmkv';
 
 const CRYPT_CONFIG = Platform.select({
   ios: {
@@ -27,7 +28,7 @@ async function enableFingerprintAuth() {
 }
 
 async function isFingerprintAuthEnabled() {
-  return await Storage.read('fingerprintAuthEnabled', 'enabled');
+  return await MMKV.getStringAsync('fingerprintAuthEnabled', 'enabled');
 }
 
 async function storeCredentials(password) {

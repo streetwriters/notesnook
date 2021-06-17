@@ -1,14 +1,18 @@
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { SIZE } from '../../utils/SizeUtils';
+import {useTracked} from '../../provider';
+import { useEditorStore } from '../../provider/stores';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 
 export const Filler = ({item, background}) => {
   const [state] = useTracked();
-  const {colors, currentEditingNote} = state;
+  const {colors} = state;
+  
+  const currentEditingNote = useEditorStore(state => state.currentEditingNote);
+
   const color = item.color || 'accent';
 
   return (
@@ -43,7 +47,7 @@ export const Filler = ({item, background}) => {
               size={SIZE.xxs}
               style={{
                 color: colors.red,
-                marginLeft: 5,
+                marginLeft: 2,
               }}>
               CONFLICTS
             </Heading>
@@ -65,7 +69,7 @@ export const Filler = ({item, background}) => {
             <Icon name="pencil-outline" size={SIZE.xxs} color={colors[color]} />
             <Heading
               size={SIZE.xxs}
-              style={{marginLeft: 5}}
+              style={{marginLeft: 2}}
               color={colors[color]}>
               EDITING NOW
             </Heading>

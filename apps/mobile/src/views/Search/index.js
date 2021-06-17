@@ -5,57 +5,37 @@ import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import { useSearchStore } from '../../provider/stores';
 import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
 
 export const Search = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  const {searchResults, searching, searchStatus} = state;
-
-  let pageIsLoaded = false;
+  
+  const searchResults = useSearchStore(state => state.searchResults);
+  const searching = useSearchStore(state => state.searching);
+  const searchStatus = useSearchStore(state => state.searchStatus);
+  const setSearchResults = useSearchStore(state => state.setSearchResults);
+  const setSearchStatus = useSearchStore(state => state.setSearchStatus)
 
   const onFocus = useCallback(() => {
     sleep(300).then(() => inputRef.current?.focus());
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
-    }
-    dispatch({
-      type: Actions.CURRENT_SCREEN,
-      screen: 'search',
-    });
-    dispatch({
-      type: Actions.HEADER_STATE,
-      state: false,
-    });
-    pageIsLoaded = true;
   }, []);
 
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
-      pageIsLoaded = false;
-      dispatch({
-        type: Actions.SEARCH_RESULTS,
-        results: [],
-      });
-      dispatch({
-        type: Actions.SEARCHING,
-        searching: {
-          isSearching: false,
-          status: null,
-        },
-      });
+      setSearchResults([]);
+      setSearchStatus(false,null);
       navigation.removeListener('focus', onFocus);
     };
   }, []);
 
   return (
-    <>  
-         <SelectionHeader screen="Search" />
+    <>
+      <SelectionHeader screen="Search" />
       <ContainerTopSection>
-     
         <Header title="Search" isBack={true} screen="Search" />
       </ContainerTopSection>
       <SimpleList

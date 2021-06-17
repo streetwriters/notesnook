@@ -1,71 +1,62 @@
-import React, { useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
+import React, {useEffect, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager } from '../../utils';
-import { db } from '../../utils/DB';
+import {InteractionManager} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eOnNewTopicAdded,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eScrollEvent
+  eScrollEvent,
 } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
-  const [topics, setTopics] = useState(route.params.notebook.topics);
-  const [loading, setLoading] = useState(true);
+  const [topics, setTopics] = useState(route.params.notebook?.topics);
   let params = route.params;
-  let pageIsLoaded = false;
   let ranAfterInteractions = false;
 
-  const runAfterInteractions = (time = 400) => {
+  const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
-      let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
-      if (notebook) {
-        params.notebook = notebook;
-      }
-      params.title = params.notebook.title;
-      setTopics(notebook.topics);
-      setTimeout(() => {
-        if (loading) {
-          setLoading(false);
-        }
-      }, 10);
       Navigation.routeNeedsUpdate('Notebook', () => {
         onLoad();
       });
+    }, time);
+    try {
+      let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
+      if (notebook) {
+        params.notebook = notebook;
+        setTopics(notebook.topics);
+        params.title = params.notebook.title;
+      }
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
       if (params.menu) {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: false,
         });
       } else {
         navigation.setOptions({
-          animationEnabled: true,
           gestureEnabled: Platform.OS === 'ios',
         });
       }
       updateSearch();
       ranAfterInteractions = false;
-    }, time);
+    } catch (e) {}
   };
   const onLoad = data => {
     if (data) {
-      setLoading(true);
       params = data;
     }
-
-    runAfterInteractions(data ? 400 : 1);
+    runAfterInteractions(data ? 300 : 1);
   };
 
   useEffect(() => {
@@ -80,12 +71,7 @@ export const Notebook = ({route, navigation}) => {
       ranAfterInteractions = true;
       runAfterInteractions();
     }
-
-    if (!pageIsLoaded) {
-      pageIsLoaded = true;
-      return;
-    }
-    Navigation.setHeaderState('Notebooks', params, {
+    Navigation.setHeaderState('Notebook', params, {
       heading: params.title,
       id: params.notebook.id,
       type: 'notebook',
@@ -93,11 +79,6 @@ export const Notebook = ({route, navigation}) => {
   };
 
   useEffect(() => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
-
     navigation.addListener('focus', onFocus);
     return () => {
       ranAfterInteractions = false;
@@ -128,9 +109,8 @@ export const Notebook = ({route, navigation}) => {
 
   return (
     <>
-        <SelectionHeader screen="Notebook" />
+      <SelectionHeader screen="Notebook" />
       <ContainerTopSection>
-      
         <Header
           title={params.title}
           isBack={!params.menu}
@@ -153,7 +133,6 @@ export const Notebook = ({route, navigation}) => {
           },
           icon: 'pencil',
         }}
-        loading={loading}
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: params.notebook.title,

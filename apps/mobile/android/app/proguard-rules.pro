@@ -38,3 +38,5 @@
   **[] $VALUES;
   public *;
 }
+
+-keep class **.R$* { *; }

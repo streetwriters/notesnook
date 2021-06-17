@@ -41,6 +41,7 @@ import PendingDialog from '../Premium/PendingDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
 import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
 import ProgressDialog from '../ProgressDialog';
+import PublishNoteDialog from '../PublishNoteDialog';
 import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
@@ -123,7 +124,6 @@ export class DialogManager extends Component {
 
   showAddTopic = () => {
     let item = this.state.item;
-    console.log(item);
     this.addTopicsDialog.open({
       notebookId: item?.type !== 'topic' ? item.id : item.notebookId,
       toEdit: item?.type === 'topic' ? item : null,
@@ -385,6 +385,7 @@ export class DialogManager extends Component {
         <RateDialog />
         <ImagePreview/>
         <EditorSettings/>
+        <PublishNoteDialog/>
       </>
     );
   }

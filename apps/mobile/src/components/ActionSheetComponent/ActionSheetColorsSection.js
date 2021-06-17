@@ -1,25 +1,21 @@
-import React, {useState} from 'react';
-import {View} from 'react-native';
+import React, { useState } from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
-import PremiumService from '../../services/PremiumService';
-import {dWidth} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
-import {eShowGetPremium, refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {PressableButton} from '../PressableButton';
+import { notesnook } from '../../../e2e/test.ids';
+import { useMenuStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import { dWidth } from '../../utils';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/DB';
+import { refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 
 export const ActionSheetColorsSection = ({item, close}) => {
-  const [, dispatch] = useTracked();
   const [note, setNote] = useState(item);
-
+  const setColorNotes = useMenuStore(state => state.setColorNotes)
   const localRefresh = () => {
     toAdd = db.notes.note(note.id);
     if (toAdd) {
@@ -55,11 +51,12 @@ export const ActionSheetColorsSection = ({item, close}) => {
             await db.notes.note(note.id).color(color.name);
           }
           localRefresh();
-          dispatch({type: Actions.COLORS});
-          sendNoteEditedEvent({
-            id: note.id,
-            forced: true,
-          });
+          setColorNotes();
+          Navigation.setRoutesToUpdate([
+            Navigation.routeNames.NotesPage,
+            Navigation.routeNames.Favorites,
+            Navigation.routeNames.Notes,
+          ]);
           eSendEvent(refreshNotesPage);
         }}
         customStyle={{

@@ -2,6 +2,7 @@ import {createRef} from 'react';
 import {Platform} from 'react-native';
 import {updateEvent} from '../../components/DialogManager/recievers';
 import {Actions} from '../../provider/Actions';
+import {useEditorStore, useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -209,12 +210,14 @@ export const loadNote = async item => {
     editing.isFocused = false;
     setTimeout(() => {
       eSendEvent('webviewreset');
-    },1)
+    }, 1);
     InteractionManager.runAfterInteractions(async () => {
-      sendNoteEditedEvent({
-        id: id,
-      });
-      updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: item.id});
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
       checkStatus();
     }, 50);
   }
@@ -306,10 +309,10 @@ export const _onMessage = async evt => {
       setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
-      if (PremiumService.get()){
-        tiny.call(EditorWebView,tiny.setMarkdown,true)
+      if (PremiumService.get()) {
+        tiny.call(EditorWebView, tiny.setMarkdown, true);
       } else {
-        tiny.call(EditorWebView,tiny.removeMarkdown,true)
+        tiny.call(EditorWebView, tiny.removeMarkdown, true);
       }
       loadNoteInEditor();
       break;
@@ -317,9 +320,70 @@ export const _onMessage = async evt => {
       webviewOK = true;
       break;
     case 'imagepreview':
-      eSendEvent("ImagePreview",message.value)
+      eSendEvent('ImagePreview', message.value);
 
-    break;  
+      break;
+    case 'imageoptions':
+      if (editing.tooltip === 'imageoptions') {
+        eSendEvent('showTooltip');
+        break;
+      }
+      editing.tooltip = 'imageoptions';
+      eSendEvent('showTooltip', {
+        data: [
+          {
+            format: 'imagepreview',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+          {
+            format: 'imageResize25',
+            text: '25%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'imageResize50',
+            text: '50%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'imageResize100',
+            text: '100%',
+            type: 'format',
+            showTitle: false,
+            fullname: 'Resize to 25%',
+          },
+          {
+            format: 'imagefloatleft',
+            type: 'format',
+            fullname: 'Remove image',
+          },
+          {
+            format: 'imagefloatright',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+          {
+            format: 'imagefloatnone',
+            type: 'format',
+            fullname: 'Image preview',
+          },
+          {
+            format: 'removeimage',
+            type: 'format',
+            fullname: 'Remove image',
+          },
+        ],
+        title: 'imageoptions',
+        default: null,
+        type: 'imageoptions',
+        pageX: 0,
+      });
+      break;
     case 'focus':
       editing.focusType = message.value;
       break;
@@ -340,28 +404,32 @@ function onNoteChange() {
     if (noteEdited) {
       saveNote();
     }
-  }, 500);
+  }, 1);
 }
 
 export async function clearEditor() {
-  tiny.call(EditorWebView, tiny.reset, true);
-  clearTimer();
-  if (
-    (content?.data && content.data?.trim().length > 0) ||
-    (title && title.trim().length > 0)
-  ) {
-    await saveNote(true);
+  try {
+    tiny.call(EditorWebView, tiny.reset, true);
+    clearTimer();
+    if (
+      (content?.data &&
+        typeof content.data == 'string' &&
+        content.data?.trim().length > 0) ||
+      (title && title?.trim().length > 0)
+    ) {
+      await saveNote(true);
+    }
+    clearNote();
+    editing.focusType = null;
+    eSendEvent('historyEvent', {
+      undo: 0,
+      redo: 0,
+    });
+    saveCounter = 0;
+    useEditorStore.getState().setCurrentlyEditingNote(null);
+  } catch (e) {
+    console.log(e);
   }
-  clearNote();
-  editing.focusType = null;
-  eSendEvent('historyEvent', {
-    undo: 0,
-    redo: 0,
-  });
-  saveCounter = 0;
-  setTimeout(() => {
-    updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: null});
-  }, 1);
 }
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
@@ -418,7 +486,7 @@ async function addToCollection(id) {
         type: null,
       };
       Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
-      updateEvent({type: Actions.COLORS});
+      useMenuStore.getState().setColorNotes();
       break;
     }
     default: {
@@ -457,7 +525,7 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id) {
-        updateEvent({type: Actions.CURRENT_EDITING_NOTE, id: noteId});
+        useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await addToCollection(noteId);
       }
       await setNoteInEditorAfterSaving(id, noteId);
@@ -467,9 +535,11 @@ export async function saveNote(preventUpdate) {
       await db.vault.save(noteData);
     }
     if (!preventUpdate) {
-      sendNoteEditedEvent({
-        id: id,
-      });
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
       let n = db.notes.note(id)?.data?.dateEdited;
       tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
@@ -479,12 +549,12 @@ export async function saveNote(preventUpdate) {
 
 export async function onWebViewLoad(premium, colors) {
   if (!checkNote()) {
-    Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
+    //Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
   }
-  if (premium){
-    tiny.call(EditorWebView,tiny.setMarkdown,true)
+  if (premium) {
+    tiny.call(EditorWebView, tiny.setMarkdown, true);
   } else {
-    tiny.call(EditorWebView,tiny.removeMarkdown,true)
+    tiny.call(EditorWebView, tiny.removeMarkdown, true);
   }
   setColors(colors);
 }
@@ -499,10 +569,13 @@ async function restoreEditorState() {
       appState.note.id &&
       Date.now() < appState.timestamp + 3600000
     ) {
+      console.log('restoring state');
       editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
-      tabBarRef.current?.goToPage(1);
+      if (!DDS.isTab) {
+       tabBarRef.current?.goToPage(1);
+      }
       setTimeout(() => {
         eSendEvent(eOnLoadNote, appState.note);
       }, 100);
@@ -510,8 +583,12 @@ async function restoreEditorState() {
       editing.movedAway = false;
       eSendEvent('load_overlay', 'hide_editor');
       editing.isRestoringState = false;
+      return;
     }
+    editing.isRestoringState = false;
+    return;
   }
+  editing.isRestoringState = false;
 }
 
 export let isFromIntent = false;

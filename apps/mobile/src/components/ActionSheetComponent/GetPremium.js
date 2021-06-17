@@ -1,25 +1,24 @@
-import React, {useEffect, useState} from 'react';
-import {Keyboard} from 'react-native';
-import {Platform, View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {dWidth, editing, getElevation} from '../../utils';
+import { dWidth, editing, getElevation } from '../../utils';
 import {
   eCloseActionSheet,
   eOpenPremiumDialog,
-  eShowGetPremium,
+  eShowGetPremium
 } from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorWebView, post} from '../../views/Editor/Functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 

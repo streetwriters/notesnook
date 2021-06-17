@@ -27,7 +27,7 @@ export const Button = ({
   accentText = 'light',
   onLongPress,
   tooltipText,
-  textStyle
+  textStyle,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -41,7 +41,7 @@ export const Button = ({
   return (
     <PressableButton
       onPress={onPress}
-      onLongPress={(event) => {
+      onLongPress={event => {
         if (onLongPress) {
           onLongPress();
           return;
@@ -81,9 +81,12 @@ export const Button = ({
         <Heading
           color={textColor}
           size={fontSize}
-          style={[{
-            marginLeft: icon || loading ? 5 : 0,
-          },textStyle]}>
+          style={[
+            {
+              marginLeft: icon || loading ? 5 : 0,
+            },
+            textStyle,
+          ]}>
           {title}
         </Heading>
       )}

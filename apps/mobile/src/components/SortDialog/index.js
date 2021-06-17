@@ -4,6 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {Actions} from '../../provider/Actions';
 import {defaultState} from '../../provider/DefaultState';
+import { useNoteStore } from '../../provider/stores';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import {getElevation, SORT, sortSettings} from '../../utils';
@@ -23,7 +24,21 @@ class SortDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      settings: defaultState.settings,
+      settings: {
+        showToolbarOnTop: false,
+        showKeyboardOnOpen: false,
+        fontScale: 1,
+        forcePortraitOnTablet: false,
+        useSystemTheme: false,
+        reminder: 'off',
+        encryptedBackup: false,
+        homepage: 'Notes',
+        sort: 'default',
+        sortOrder: 'desc',
+        screenshotMode: true,
+        privacyScreen: false,
+        appLockMode: 'none', //none or // background // launch
+      },
       visible: false,
     };
   }
@@ -104,7 +119,7 @@ class SortDialog extends React.Component {
                   await SettingsService.set('sortOrder', value);
                   sortSettings.sortOrder = value;
                   await this.getSettings();
-                  updateEvent({type: Actions.NOTES});
+                  useNoteStore.getState().setNotes();
                 }}
                 activeOpacity={1}
                 style={{
@@ -148,7 +163,7 @@ class SortDialog extends React.Component {
                   await SettingsService.set('sort', item);
                   await this.getSettings();
                   sortSettings.sort = item;
-                  updateEvent({type: Actions.NOTES});
+                  useNoteStore.getState().setNotes();
                 }}
                 type="transparent"
                 customStyle={{

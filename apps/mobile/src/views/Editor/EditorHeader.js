@@ -5,14 +5,19 @@ import { notesnook } from '../../../e2e/test.ids';
 import { ActionIcon } from '../../components/ActionIcon';
 import { ActionSheetEvent } from '../../components/DialogManager/recievers';
 import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import {
+  useEditorStore,
+  useSettingStore,
+  useUserStore
+} from '../../provider/stores';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { editing } from '../../utils';
 import { db } from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { sleep } from '../../utils/TimeUtils';
@@ -22,11 +27,7 @@ import {
   clearEditor,
   EditorWebView,
   getNote,
-  isNotedEdited,
-  loadNote,
-  post,
-
-  setColors
+  isNotedEdited, setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
@@ -34,12 +35,23 @@ import { toolbarRef } from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors, fullscreen, deviceMode} = state;
+  const {colors} = state;
+  const deviceMode = useSettingStore(state => state.deviceMode);
+  const currentlyEditingNote = useEditorStore(
+    state => state.currentEditingNote,
+  );
+  const fullscreen = useSettingStore(state => state.fullscreen);
+  const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
+    console.log('setting colors');
     setColors(colors);
-  }, [colors.bg]);
+  }, [colors]);
+
+  const isLargeTablet = () => {
+    return deviceMode === 'tablet';
+  };
 
   const _onBackPress = async () => {
     eSendEvent('showTooltip');
@@ -50,12 +62,12 @@ const EditorHeader = () => {
     });
     editing.isFocused = false;
     editing.currentlyEditing = false;
-    if (DDS.isLargeTablet()) {
+    if (deviceMode !== 'mobile') {
       if (fullscreen) {
         eSendEvent(eCloseFullscreenEditor);
       }
     } else {
-      if (DDS.isPhone || DDS.isSmallTab) {
+      if (deviceMode === 'mobile') {
         tabBarRef.current?.goToPage(0);
       }
       eSendEvent('historyEvent', {
@@ -71,8 +83,64 @@ const EditorHeader = () => {
       }
       await clearEditor();
       Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
-     
     }
+  };
+
+  const publishNote = async () => {
+    if (!user) {
+      ToastEvent.show({
+        heading: 'Login required',
+        message: 'Login to publish',
+        context: 'global',
+        func: () => {
+          eSendEvent(eOpenLoginDialog);
+        },
+        actionText: 'Login',
+      });
+      return;
+    }
+
+    if (!user.isEmailConfirmed) {
+      ToastEvent.show({
+        heading: 'Email not verified',
+        message: 'Please verify your email first.',
+        context: 'global',
+      });
+      return;
+    }
+
+    let note = getNote() && db.notes.note(getNote().id).data;
+    if (note.locked) {
+      ToastEvent.show({
+        heading: 'Locked notes cannot be published',
+        type: 'error',
+        context: 'global',
+      });
+      return;
+    }
+
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
+    eSendEvent(eOpenPublishNoteDialog, note);
+  };
+
+  const showActionsheet = async () => {
+    let note = getNote() && db.notes.note(getNote().id).data;
+    if (editing.isFocused) {
+      tiny.call(EditorWebView, tiny.blur);
+      await sleep(500);
+      editing.isFocused = true;
+    }
+    ActionSheetEvent(
+      note,
+      true,
+      true,
+      ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
+      ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
+    );
   };
 
   return (
@@ -96,7 +164,7 @@ const EditorHeader = () => {
             flexDirection: 'row',
             alignItems: 'center',
           }}>
-          {DDS.isLargeTablet() && !fullscreen ? null : (
+          {deviceMode !== 'mobile' && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
                 await _onBackPress();
@@ -115,27 +183,27 @@ const EditorHeader = () => {
             />
           )}
           {fullscreen && <View style={{width: 20}} />}
-          {DDS.isLargeTablet() && <EditorTitle />}
+          {deviceMode !== 'mobile' && <EditorTitle />}
         </View>
         <View
           style={{
             flexDirection: 'row',
           }}>
           <>
-            <ActionIcon
-              name="plus"
-              color={colors.accent}
-              customStyle={{
-                marginLeft: 10,
-                borderRadius: 5,
-              }}
-              top={50}
-              onPress={async () => {
-                await loadNote({type: 'new'});
-              }}
-            />
+            {currentlyEditingNote && (
+              <ActionIcon
+                name="cloud-upload-outline"
+                color={colors.accent}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5,
+                }}
+                top={50}
+                onPress={publishNote}
+              />
+            )}
 
-            {DDS.isLargeTablet() && !fullscreen ? (
+            {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
                 color={colors.heading}
@@ -159,21 +227,7 @@ const EditorHeader = () => {
               }}
               top={50}
               right={50}
-              onPress={async () => {
-                let note = getNote() && db.notes.note(getNote().id).data;
-                if (editing.isFocused) {
-                  tiny.call(EditorWebView, tiny.blur);
-                  await sleep(500);
-                  editing.isFocused = true;
-                }
-                ActionSheetEvent(
-                  note,
-                  true,
-                  true,
-                  ['Add to', 'Share', 'Export', 'Delete','Copy'],
-                  ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-                );
-              }}
+              onPress={showActionsheet}
             />
           </>
         </View>

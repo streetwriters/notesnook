@@ -1,13 +1,8 @@
 import React from 'react';
 import { KeyboardAvoidingView, Platform, SafeAreaView } from 'react-native';
-import Animated from 'react-native-reanimated';
 import { useTracked } from '../../provider';
-import { ContainerScale } from '../../utils/Animations';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
-import SelectionHeader from '../SelectionHeader';
-import { ContainerTopSection } from './ContainerTopSection';
-const AnimatedView = Animated.createAnimatedComponent(SafeAreaView);
-export const Container = ({children, root}) => {
+export const Container = ({children}) => {
   const [state] = useTracked();
   const {colors, } = state;
   const floating = useIsFloatingKeyboard();
@@ -19,21 +14,15 @@ export const Container = ({children, root}) => {
         height:"100%"
       }}
     >
-      <AnimatedView
+      <SafeAreaView
         style={{
           height: '100%',
           backgroundColor:colors.bg,
-          borderRadius:10,
           overflow:"hidden",
-          transform:[
-            {
-              scale:ContainerScale
-            }
-          ]
         }}>
       
         {children}
-      </AnimatedView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 };

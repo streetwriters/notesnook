@@ -25,12 +25,12 @@ const getDpi = (pd) => {
 const correction = (size, multiplier) => {
   let dSize = getDeviceSize();
   if (dSize >= 4 && dSize <= 5.3 && pixelDensity <= 3) {
-    return size * 0.90;
+    return size * 0.93;
   } else if (dSize > 5.3 && dSize < 7 && pixelDensity < 3 && !DDS.isTab) {
     if (Platform.OS === 'ios') {
       return size;
     }
-    return size * 0.90;
+    return size * 0.97;
   } else if (dSize <= 7 && pixelDensity >= 3 && !DDS.isTab) {
     return size * 0.98;
   } else if (dSize >= 6.5 && dSize <= 7.2 && DDS.isTab) {
@@ -63,10 +63,10 @@ export const normalize = (size) => {
 };
 export const SIZE = {
   xxs: normalize(9) * scale.fontScale,
-  xs: normalize(10.5) * scale.fontScale,
-  sm: normalize(13.5)  * scale.fontScale,
-  md: normalize(15) * scale.fontScale,
-  lg: normalize(21) * scale.fontScale,
+  xs: normalize(11) * scale.fontScale,
+  sm: normalize(14.5)  * scale.fontScale,
+  md: normalize(16) * scale.fontScale,
+  lg: normalize(22) * scale.fontScale,
   xl: normalize(24) * scale.fontScale,
   xxl: normalize(28) * scale.fontScale,
   xxxl: normalize(32) * scale.fontScale,
@@ -74,10 +74,10 @@ export const SIZE = {
 
 export function updateSize() {
   SIZE.xxs = normalize(9) * scale.fontScale;
-  SIZE.xs = normalize(10.5) * scale.fontScale;
-  SIZE.sm = normalize(13.5) * scale.fontScale;
-  SIZE.md = normalize(15) * scale.fontScale;
-  SIZE.lg = normalize(21) * scale.fontScale;
+  SIZE.xs = normalize(11) * scale.fontScale;
+  SIZE.sm = normalize(14.5) * scale.fontScale;
+  SIZE.md = normalize(16) * scale.fontScale;
+  SIZE.lg = normalize(22) * scale.fontScale;
   SIZE.xl = normalize(24) * scale.fontScale;
   SIZE.xxl = normalize(28) * scale.fontScale;
   SIZE.xxxl = normalize(32) * scale.fontScale;

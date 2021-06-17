@@ -4,9 +4,10 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
+import {useNoteStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation, } from '../../utils';
+import {getElevation} from '../../utils';
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
@@ -19,19 +20,26 @@ const offsets = [];
 let timeout = null;
 const JumpToDialog = ({scrollRef}) => {
   const [state] = useTracked();
-  const {notes, colors, settings} = state;
+  const {colors} = state;
+
+  const notes = useNoteStore(state => state.notes);
+  const settings = useSettingStore(state => state.settings);
+
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
   const onPress = (item, index) => {
     let offset = 35 * index;
     let ind = notes.findIndex(
-      (i) => i.title === item.title && i.type === 'header',
+      i => i.title === item.title && i.type === 'header',
     );
     ind = ind + 1;
     ind = ind - (index + 1);
     offset = offset + ind * 100 + 200;
-    scrollRef.current?.scrollToOffset(0, index === 0 ? 0 : offset, true);
+    scrollRef.current?.scrollToOffset({
+      offset: offset,
+      animated: true,
+    });
     close();
   };
 
@@ -47,7 +55,7 @@ const JumpToDialog = ({scrollRef}) => {
     };
   }, []);
 
-  const onScroll = (y) => {
+  const onScroll = y => {
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
@@ -72,11 +80,11 @@ const JumpToDialog = ({scrollRef}) => {
 
   const loadOffsets = () => {
     notes
-      .filter((i) => i.type === 'header')
+      .filter(i => i.type === 'header')
       .map((item, index) => {
         let offset = 35 * index;
         let ind = notes.findIndex(
-          (i) => i.title === item.title && i.type === 'header',
+          i => i.title === item.title && i.type === 'header',
         );
         ind = ind + 1;
         ind = ind - (index + 1);
@@ -129,9 +137,9 @@ const JumpToDialog = ({scrollRef}) => {
               key="go to top"
               onPress={() => {
                 scrollRef.current?.scrollToOffset(0, 0, true);
-                close()
+                close();
               }}
-              type='shade'
+              type="shade"
               customStyle={{
                 minWidth: '20%',
                 maxWidth: '46%',
@@ -151,7 +159,7 @@ const JumpToDialog = ({scrollRef}) => {
               </Heading>
             </PressableButton>
             {notes
-              .filter((i) => i.type === 'header')
+              .filter(i => i.type === 'header')
               .map((item, index) => {
                 return item.title ? (
                   <PressableButton

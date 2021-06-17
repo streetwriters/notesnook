@@ -3,6 +3,7 @@ import {FlatList, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {useMenuStore, useNoteStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -16,20 +17,22 @@ import {normalize, SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
+import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 export const TagsSection = () => {
-  const [state, dispatch] = useTracked();
-  const {colors, menuPins, loading} = state;
+  const menuPins = useMenuStore(state => state.menuPins);
+  const loading = useNoteStore(state => state.loading);
+  const setMenuPins = useMenuStore(state => state.setMenuPins);
 
   useEffect(() => {
     if (!loading) {
-      dispatch({type: Actions.MENU_PINS});
+      setMenuPins();
     }
   }, [loading]);
 
-  const onPress = (item) => {
+  const onPress = item => {
     let params;
     if (item.type === 'notebook') {
       params = {
@@ -46,10 +49,10 @@ export const TagsSection = () => {
       eSendEvent(eOnNewTopicAdded, params);
     } else if (item.type === 'tag') {
       params = params = {
-        title: item.title,
-        tag: item,
+        ...item,
         type: 'tag',
         menu: true,
+        get: 'tagged',
       };
       Navigation.navigate('NotesPage', params, {
         heading: '#' + item.title,
@@ -58,7 +61,7 @@ export const TagsSection = () => {
       });
       eSendEvent(refreshNotesPage, params);
     } else {
-      params = {...item, menu: true};
+      params = {...item, menu: true, get: 'topics'};
       Navigation.navigate('NotesPage', params, {
         heading: item.title,
         id: item.id,
@@ -94,11 +97,14 @@ export const TagsSection = () => {
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
+
+  const setMenuPins = useMenuStore(state => state.setMenuPins);
+
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
   const fwdRef = useRef();
-  const onHeaderStateChange = (event) => {
+  const onHeaderStateChange = event => {
     if (event?.id === item.id) {
       setHeaderTextState(event);
     } else {
@@ -129,12 +135,13 @@ const PinItem = ({item, index, onPress}) => {
           gestureEnabled={false}
           fwdRef={fwdRef}
           visible={true}>
+          <Seperator />
           <Button
             title="Remove Shortcut"
             type="error"
             onPress={async () => {
               await db.settings.unpin(item.id);
-              dispatch({type: Actions.MENU_PINS});
+              setMenuPins();
             }}
             fontSize={SIZE.md}
             width="95%"

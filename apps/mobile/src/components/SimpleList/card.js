@@ -1,20 +1,20 @@
 import React from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {getElevation} from '../../utils';
-import {SIZE} from '../../utils/SizeUtils';
+import { notesnook } from '../../../e2e/test.ids';
+import { useMessageStore, useSelectionStore, useSettingStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { getElevation } from '../../utils';
+import { SIZE } from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({data, color}) => {
-  const [state] = useTracked();
-  const {selectionMode, messageBoardState} = state;
+export const Card = ({color}) => {;
+  const selectionMode = useSelectionStore(state => state.selectionMode);
+  const messageBoardState = useMessageStore(state => state.message);
+  const announcement = useMessageStore(state => state.announcement);
+  const deviceMode = useSettingStore(state => state.settings)
 
-
-
-  return !messageBoardState.visible || selectionMode ? null : (
+  return !messageBoardState.visible || selectionMode || announcement ? null : (
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={messageBoardState.onPress}
@@ -23,7 +23,7 @@ export const Card = ({data, color}) => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        position: DDS.isLargeTablet() ? 'relative' : 'absolute',
+        position: deviceMode !== "mobile" || announcement ? 'relative' : 'absolute',
         right: 0,
         top: 0,
         zIndex: 100,

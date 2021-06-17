@@ -1,119 +1,59 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {createStackNavigator} from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
 import * as React from 'react';
-import {Animated} from 'react-native';
-import SplashScreen from 'react-native-splash-screen';
+import { createNativeStackNavigator } from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {useTracked} from '../provider';
-import {Actions} from '../provider/Actions';
+import { useSelectionStore, useSettingStore } from '../provider/stores';
 import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
+  eSendEvent
 } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
-import {editing, history} from '../utils';
-import {eOpenSideMenu} from '../utils/Events';
-import {rootNavigatorRef} from '../utils/Refs';
-import {sleep} from '../utils/TimeUtils';
+import { history } from '../utils';
+import { rootNavigatorRef } from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import {Search} from '../views/Search';
+import { Search } from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
-const Stack = createStackNavigator();
-
-const forFade = ({current}) => ({
-  cardStyle: {
-    opacity: current.progress,
-  },
-});
-
-const forSlide = ({current, next, inverted, layouts: {screen}}) => {
-  const progress = Animated.add(
-    current.progress.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 1],
-      extrapolate: 'clamp',
-    }),
-    next
-      ? next.progress.interpolate({
-          inputRange: [0, 1],
-          outputRange: [0, 1],
-          extrapolate: 'clamp',
-        })
-      : 0,
-  );
-
-  return {
-    cardStyle: {
-      transform: [
-        {
-          translateX: Animated.multiply(
-            progress.interpolate({
-              inputRange: [0, 1, 2],
-              outputRange: [
-                screen.width, // Focused, but offscreen in the beginning
-                0, // Fully focused
-                screen.width * -0.3, // Fully unfocused
-              ],
-              extrapolate: 'clamp',
-            }),
-            inverted,
-          ),
-        },
-      ],
-    },
-  };
-};
+const Stack = createNativeStackNavigator();
 
 const screenOptionsForAnimation = {
-  animationEnabled: true,
-  cardStyleInterpolator: forFade,
   gestureEnabled: true,
+  stackAnimation: 'none',
 };
 
 export const NavigatorStack = React.memo(
   () => {
-    const [, dispatch] = useTracked();
     const [render, setRender] = React.useState(false);
+    const clearSelection = useSelectionStore(state => state.clearSelection);
+    const settings = useSettingStore(state => state.settings);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
-        dispatch({type: Actions.SELECTION_MODE, enabled: false});
-        dispatch({type: Actions.CLEAR_SELECTION});
+        clearSelection();
       }
       eSendEvent('navigate');
     });
 
-    const updateRender = async () => {
+    React.useEffect(() => {
       if (!render) {
         setRender(true);
         Navigation.setHeaderState(
-          SettingsService.get().homepage,
+          settings.homepage,
           {
             menu: true,
           },
           {
-            heading: SettingsService.get().homepage,
-            id: SettingsService.get().homepage.toLowerCase() + '_navigation',
+            heading: settings.homepage,
+            id: settings.homepage.toLowerCase() + '_navigation',
           },
         );
       }
-    };
-
-    React.useEffect(() => {
-      eSubscribeEvent(eOpenSideMenu, updateRender);
-      return () => {
-        eUnSubscribeEvent(eOpenSideMenu, updateRender);
-      };
-    }, [render]);
+    },[settings])
 
     return (
       <Container root={true}>
@@ -126,9 +66,8 @@ export const NavigatorStack = React.memo(
               initialRouteName={SettingsService.get().homepage}
               screenOptions={{
                 headerShown: false,
-                animationEnabled: false,
                 gestureEnabled: false,
-              
+                stackAnimation: 'none',
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />

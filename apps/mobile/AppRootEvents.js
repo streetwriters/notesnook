@@ -6,9 +6,12 @@ import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
-import {updateEvent} from './src/components/DialogManager/recievers';
-import {useTracked} from './src/provider';
-import {Actions} from './src/provider/Actions';
+import {
+  clearAllStores,
+  initialize,
+  useNoteStore,
+  useUserStore,
+} from './src/provider/stores';
 import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
@@ -26,7 +29,7 @@ import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import {APP_VERSION, editing} from './src/utils';
+import {APP_VERSION, doInBackground, editing} from './src/utils';
 import {updateStatusBarColor} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {
@@ -66,10 +69,10 @@ async function checkIntentState() {
         await db.notes.init();
       }
       eSendEvent('webviewreset');
-      updateEvent({type: Actions.NOTES});
+      useNoteStore.getState().setNotes();
       eSendEvent(refreshNotesPage);
       MMKV.removeItem('notesAddedFromIntent');
-      updateEvent({type: Actions.ALL});
+      initialize();
       eSendEvent(refreshNotesPage);
     }
   } catch (e) {}
@@ -84,22 +87,32 @@ async function reconnectSSE(connection) {
     if (!state) {
       state = await NetInfo.fetch();
     }
-    let user = await db.user.getUser();
 
+    let user = await db.user.getUser();
     if (user && state.isConnected && state.isInternetReachable) {
-      await db.connectSSE();
+      let res = await doInBackground(async () => {
+        try {
+          await db.connectSSE();
+          return true;
+        } catch (e) {
+          return e.message;
+        }
+      });
+      if (res !== true) throw new Error(res);
     }
   } catch (e) {}
 }
 
 let prevState = null;
 let showingDialog = false;
-
 let removeInternetStateListener;
+
 export const AppRootEvents = React.memo(
   () => {
-    const [state, dispatch] = useTracked();
-    const {loading} = state;
+    const loading = useNoteStore(state => state.loading);
+    const setLastSynced = useUserStore(state => state.setLastSynced);
+    const setUser = useUserStore(state => state.setUser);
+    const setSyncing = useUserStore(state => state.setSyncing);
 
     useEffect(() => {
       Appearance.addChangeListener(SettingsService.setTheme);
@@ -108,6 +121,7 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.databaseSyncRequested, partialSync);
       EV.subscribe(EVENTS.userLoggedOut, onLogout);
       EV.subscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+      EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
@@ -117,6 +131,7 @@ export const AppRootEvents = React.memo(
       );
       return () => {
         eUnSubscribeEvent('userLoggedIn', setCurrentUser);
+        EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
         EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
         EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
@@ -132,6 +147,11 @@ export const AppRootEvents = React.memo(
         Linking.removeEventListener('url', onUrlRecieved);
       };
     }, []);
+
+    const onSessionExpired = async () => {
+      await Storage.write('loginSessionHasExpired', 'expired');
+      eSendEvent(eOpenLoginDialog, 4);
+    };
 
     const onNoteRemoved = async id => {
       try {
@@ -179,8 +199,8 @@ export const AppRootEvents = React.memo(
     };
 
     const onSyncComplete = async () => {
-      dispatch({type: Actions.ALL});
-      dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+      initialize();
+      setLastSynced(await db.lastSynced());
     };
 
     const onUrlRecieved = async res => {
@@ -196,7 +216,7 @@ export const AppRootEvents = React.memo(
 
     const onEmailVerified = async () => {
       let user = await db.user.getUser();
-      dispatch({type: Actions.USER, user: user});
+      setUser(user);
       if (!user) return;
       await PremiumService.setPremiumStatus();
       let message =
@@ -210,7 +230,7 @@ export const AppRootEvents = React.memo(
       });
 
       if (user?.isEmailConfirmed) {
-        clearMessage(dispatch);
+        clearMessage();
       }
     };
 
@@ -219,7 +239,7 @@ export const AppRootEvents = React.memo(
         .catch(e => {
           console.log(e);
         })
-        .then(() => {
+        .then(async () => {
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
             onSuccessfulSubscription,
           );
@@ -230,6 +250,7 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async userStatus => {
+      console.log('account status', userStatus, PremiumService.get());
       if (!PremiumService.get() && userStatus.type === 5) {
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
@@ -247,31 +268,46 @@ export const AppRootEvents = React.memo(
 
     const partialSync = async () => {
       try {
-        dispatch({type: Actions.SYNCING, syncing: true});
-        await db.sync(false);
-        dispatch({type: Actions.LAST_SYNC, lastSync: await db.lastSynced()});
+        setSyncing(true);
+        let res = await doInBackground(async () => {
+          try {
+            await db.sync(false);
+            return true;
+          } catch (e) {
+            return e.message;
+          }
+        });
+        if (res !== true) throw new Error(res);
+        setLastSynced(await db.lastSynced());
       } catch (e) {
-        dispatch({type: Actions.SYNCING, syncing: false});
+        setSyncing(false);
+        let status = await NetInfo.fetch();
+        if (status.isConnected && status.isInternetReachable) {
+          ToastEvent.show({
+            heading: 'Sync failed',
+            message: e.message,
+            context: 'global',
+          });
+        }
       } finally {
-        dispatch({type: Actions.SYNCING, syncing: false});
+        setSyncing(false);
       }
     };
 
     const onLogout = async reason => {
-      dispatch({type: Actions.USER, user: null});
-      dispatch({type: Actions.CLEAR_ALL});
-      dispatch({type: Actions.SYNCING, syncing: false});
-      setLoginMessage(dispatch);
-      await sleep(500);
+      setUser(null);
+      clearAllStores();
+      SettingsService.init();
+      setSyncing(false);
+      setLoginMessage();
       await PremiumService.setPremiumStatus();
-      await Storage.write('introCompleted', 'true');
-
+      await MMKV.setItem('introCompleted', 'true');
       eSendEvent(eOpenProgressDialog, {
         title: reason ? reason : 'User logged out',
         paragraph: `You have been logged out of your account.`,
         action: async () => {
           eSendEvent(eCloseProgressDialog);
-          await sleep(50);
+          await sleep(300);
           eSendEvent(eOpenLoginDialog);
         },
         icon: 'logout',
@@ -293,33 +329,44 @@ export const AppRootEvents = React.memo(
 
     const setCurrentUser = async login => {
       try {
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
+          return;
         let user = await db.user.getUser();
         if (user) {
-          dispatch({type: Actions.USER, user: user});
+          setUser(user);
+          clearMessage();
           attachIAPListeners();
-          clearMessage(dispatch);
-          await PremiumService.setPremiumStatus();
+
           await Sync.run();
-          user = await db.user.fetchUser(true);
+          let res = await doInBackground(async () => {
+            try {
+              user = await db.user.fetchUser();
+              return true;
+            } catch (e) {
+              return e.message;
+            }
+          });
+          if (res !== true) throw new Error(res);
+
           if (!user.isEmailConfirmed) {
-            setEmailVerifyMessage(dispatch);
+            setEmailVerifyMessage();
             return;
           }
-          dispatch({type: Actions.USER, user: user});
+          setUser(user);
         } else {
-          await PremiumService.setPremiumStatus();
-          setLoginMessage(dispatch);
+          setLoginMessage();
         }
       } catch (e) {
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
-          setEmailVerifyMessage(dispatch);
+          setEmailVerifyMessage();
         } else if (!user) {
-          setLoginMessage(dispatch);
+          setLoginMessage();
         } else {
           console.log('unknown error', e);
         }
       } finally {
+        await PremiumService.setPremiumStatus();
         isUserReady = true;
         if (login) {
           eSendEvent(eCloseProgressDialog);
@@ -329,7 +376,6 @@ export const AppRootEvents = React.memo(
 
     const onSuccessfulSubscription = async subscription => {
       const receipt = subscription.transactionReceipt;
-      console.log(receipt);
       if (prevTransactionId === subscription.transactionId) {
         return;
       }
@@ -350,7 +396,6 @@ export const AppRootEvents = React.memo(
     };
 
     const processReceipt = async receipt => {
-      console.log('sending receipt');
       if (receipt) {
         if (Platform.OS === 'ios') {
           let user = await db.user.getUser();
@@ -366,14 +411,18 @@ export const AppRootEvents = React.memo(
             },
           })
             .then(async r => {
-              console.log(r.ok, await r.text());
+              let text = await r.text();
+              console.log(r.ok, text);
               if (!r.ok) {
-                await RNIap.clearTransactionIOS();
-              } else {
-                console.log('FINSIHING TRANSACTION');
-                await RNIap.finishTransactionIOS(prevTransactionId);
-                await RNIap.clearTransactionIOS();
+                if (text === 'Receipt already expired.') {
+                  console.log('RNIap.clearTransactionIOS');
+                  await RNIap.clearTransactionIOS();
+                }
+                return;
               }
+              console.log('Success', 'RNIap.finishTransactionIOS');
+              await RNIap.finishTransactionIOS(prevTransactionId);
+              await RNIap.clearTransactionIOS();
             })
             .catch(e => {
               console.log(e, 'ERROR');
@@ -427,9 +476,9 @@ export const AppRootEvents = React.memo(
         let user = await db.user.getUser();
         if (user && !user.isEmailConfirmed) {
           try {
-            let user = await db.user.fetchUser(true);
+            let user = await db.user.fetchUser();
             if (user.isEmailConfirmed) {
-              onEmailVerified(dispatch);
+              onEmailVerified();
             }
           } catch (e) {}
         }

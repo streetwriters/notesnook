@@ -44,8 +44,9 @@ async function run() {
 
   if (!error) {
     try {
-      let backupName = 'notesnook_backup_' + Date.now() + '.nnbackup';
+      let backupName = 'notesnook_backup_' + Date.now();
       backupName = sanitizeFilename(backupName,{replacement:"_"});
+      backupName = backupName + '.nnbackup';
       let path = await storage.checkAndCreateDir('/backups/');
       await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
 

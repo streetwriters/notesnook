@@ -1,54 +1,49 @@
-import {Actions} from '../provider/Actions';
-import {db} from '../utils/DB';
-import {eOpenLoginDialog, eOpenProgressDialog} from '../utils/Events';
-import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
+import { useMessageStore } from '../provider/stores';
+import { eOpenLoginDialog } from '../utils/Events';
+import { eSendEvent } from './EventManager';
 import PremiumService from './PremiumService';
 
-export function setLoginMessage(dispatch) {
-  dispatch({
-    type: Actions.MESSAGE_BOARD_STATE,
-    state: {
-      visible: true,
-      message: 'You are not logged in',
-      actionText: 'Login to encrypt and sync notes.',
-      onPress: () => {
-        eSendEvent(eOpenLoginDialog);
-      },
-      data: {},
-      icon: 'account-outline',
-      type: 'normal',
-    },
-  });
+const loginMessage = {
+  visible: true,
+  message: 'You are not logged in',
+  actionText: 'Login to encrypt and sync notes.',
+  onPress: () => {
+    eSendEvent(eOpenLoginDialog);
+  },
+  data: {},
+  icon: 'account-outline',
+  type: 'normal',
+};
+
+export function setLoginMessage() {
+  useMessageStore.getState().setMessage(loginMessage);
 }
 
-export function setEmailVerifyMessage(dispatch) {
-  dispatch({
-    type: Actions.MESSAGE_BOARD_STATE,
-    state: {
-      visible: true,
-      message: 'Email not confirmed',
-      actionText: 'Please confrim your email to encrypt and sync notes.',
-      onPress: () => {
-        PremiumService.showVerifyEmailDialog();
-      },
-      data: {},
-      icon: 'alert',
-      type: 'error',
-    },
-  });
+const emailMessage = {
+  visible: true,
+  message: 'Email not confirmed',
+  actionText: 'Please confrim your email to encrypt and sync notes.',
+  onPress: () => {
+    PremiumService.showVerifyEmailDialog();
+  },
+  data: {},
+  icon: 'alert',
+  type: 'error',
+};
+
+export function setEmailVerifyMessage() {
+  useMessageStore.getState().setMessage(emailMessage);
 }
 
-export function clearMessage(dispatch) {
-  dispatch({
-    type: Actions.MESSAGE_BOARD_STATE,
-    state: {
-      visible: false,
-      message: '',
-      actionText: '',
-      onPress: null,
-      data: {},
-      icon: 'account-outline',
-    },
-  });
+const noMessage = {
+  visible: false,
+  message: '',
+  actionText: '',
+  onPress: null,
+  data: {},
+  icon: 'account-outline',
+};
+
+export function clearMessage() {
+  useMessageStore.getState().setMessage(noMessage);
 }

@@ -1,5 +1,11 @@
 import dayjs from 'dayjs';
-import React, {createRef, useCallback, useEffect, useState} from 'react';
+import React, {
+  createRef,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import {
   Appearance,
   Linking,
@@ -28,6 +34,11 @@ import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
+import {
+  useMessageStore,
+  useSettingStore,
+  useUserStore,
+} from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
@@ -41,6 +52,7 @@ import {
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
+import Sync from '../../services/Sync';
 import {
   AndroidModule,
   APP_VERSION,
@@ -70,6 +82,7 @@ import {
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
@@ -185,26 +198,12 @@ export const Settings = ({navigation}) => {
       desc: `Facing an issue? Report it on our Github`,
     },
     {
-      name: `Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`,
-      func: async () => {
-        try {
-          await Linking.openURL(
-            Platform.OS === 'ios'
-              ? 'https://bit.ly/notesnook-ios'
-              : 'https://bit.ly/notesnook-and',
-          );
-        } catch (e) {}
-      },
-      desc: `Rate and review our app on ${
-        Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
-      } and let us know what you think.`,
-    },
-    {
       name: 'Join our Discord community',
 
       func: async () => {
         eSendEvent(eOpenProgressDialog, {
           title: 'Join our Discord Community',
+          iconColor: 'discord',
           paragraph:
             'We are not ghosts, chat with us and share your experience.',
           valueArray: [
@@ -225,6 +224,36 @@ export const Settings = ({navigation}) => {
         });
       },
       desc: 'We are not ghosts, chat with us and share your experience.',
+    },
+    {
+      name: 'Download on desktop',
+      func: async () => {
+        try {
+          await openLinkInBrowser('https://notesnook.com', colors);
+        } catch (e) {}
+      },
+      desc: 'Notesnook app can be downloaded on all platforms',
+    },
+    {
+      name: 'Documentation',
+      func: async () => {
+        try {
+          await openLinkInBrowser('https://docs.notesnook.com', colors);
+        } catch (e) {}
+      },
+      desc: 'Learn about every feature and how it works.',
+    },
+    {
+      name: 'Roadmap',
+      func: async () => {
+        try {
+          await openLinkInBrowser(
+            'https://docs.notesnook.com/roadmap/',
+            colors,
+          );
+        } catch (e) {}
+      },
+      desc: 'See what the future of Notesnook is going to be like.',
     },
     {
       name: 'About Notesnook',
@@ -258,8 +287,8 @@ export const Settings = ({navigation}) => {
           style={{
             paddingHorizontal: 0,
           }}>
-          {!DDS.isLargeTablet() && (
-            <Header title="Settings" type="settings" messageCard={false} />
+          {!DDS.isTab && (
+            <Header noAnnouncement={true} title="Settings" type="settings" messageCard={false} />
           )}
 
           <SettingsUserSection />
@@ -273,6 +302,46 @@ export const Settings = ({navigation}) => {
           )}
 
           <SectionHeader title="Other" />
+
+          <PressableButton
+            onPress={async () => {
+              try {
+                await Linking.openURL(
+                  Platform.OS === 'ios'
+                    ? 'https://bit.ly/notesnook-ios'
+                    : 'https://bit.ly/notesnook-and',
+                );
+              } catch (e) {}
+            }}
+            type="shade"
+            customStyle={{
+              borderWidth: 1,
+              borderRadius: 5,
+              paddingVertical: 10,
+              width: '95%',
+              alignItems: 'flex-start',
+              paddingHorizontal: 12,
+              marginTop: 10,
+              borderColor: colors.accent,
+            }}>
+            <Heading
+              color={colors.accent}
+              style={{
+                fontSize: SIZE.md,
+              }}>
+              {`Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`}
+            </Heading>
+            <Paragraph
+              style={{
+                flexWrap: 'wrap',
+                flexBasis: 1,
+              }}
+              color={colors.pri}>
+              It took us a year to bring Notesnook to life, the best private
+              note taking app. It will take you a moment to rate it to let us
+              know what you think!
+            </Paragraph>
+          </PressableButton>
 
           {otherItems.map(item => (
             <CustomButton
@@ -320,7 +389,9 @@ const SectionHeader = ({title}) => {
 let passwordValue = null;
 const AccoutLogoutSection = () => {
   const [state, dispatch] = useTracked();
-  const {colors, user} = state;
+  const {colors} = state;
+
+  const user = useUserStore(state => state.user);
   const [visible, setVisible] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -575,20 +646,53 @@ const getTimeLeft = t2 => {
   };
 };
 
+let passwordVerifyValue = null;
 const SettingsUserSection = () => {
   const [state] = useTracked();
-  const {colors, user, messageBoardState} = state;
+  const {colors} = state;
+
+  const user = useUserStore(state => state.user);
+  const messageBoardState = useMessageStore(state => state.message);
+  const [verifyUser, setVerifyUser] = useState(false);
   const subscriptionDaysLeft =
     user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
-  const expiryDate =  dayjs(user?.subscription?.expiry).format(
-    'MMMM D, YYYY',
-  );
-  const startDate =  dayjs(user?.subscription?.start).format(
-    'MMMM D, YYYY',
-  )
-  console.log(user?.subscription)
-
+  const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
+  const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
+  const input = useRef();
+  const tryVerification = async () => {
+    if (!passwordVerifyValue) {
+      ToastEvent.show({
+        heading: 'Account Password is required',
+        type: 'error',
+        context: 'local',
+      });
+      return;
+    }
+    try {
+      let verify = await db.user.verifyPassword(passwordVerifyValue);
+      if (verify) {
+        setVerifyUser(false);
+        passwordVerifyValue = null;
+        await sleep(300);
+        eSendEvent(eOpenRecoveryKeyDialog);
+      } else {
+        ToastEvent.show({
+          heading: 'Incorrect password',
+          message: 'Please enter the correct password to save recovery key.',
+          type: 'error',
+          context: 'local',
+        });
+      }
+    } catch (e) {
+      ToastEvent.show({
+        heading: 'Incorrect password',
+        message: e.message,
+        type: 'error',
+        context: 'local',
+      });
+    }
+  };
 
   return (
     <>
@@ -750,11 +854,9 @@ const SettingsUserSection = () => {
                     </Paragraph>
                     <Paragraph color={colors.pri}>
                       {user.subscription.type === 2
-                        ? 'You signed up on ' +
-                          startDate
+                        ? 'You signed up on ' + startDate
                         : user.subscription.type === 1
-                        ? 'Your trial period started on ' +
-                          startDate
+                        ? 'Your trial period started on ' + startDate
                         : user.subscription.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
@@ -778,6 +880,9 @@ const SettingsUserSection = () => {
                           eSendEvent(eOpenPremiumDialog);
                         }}
                         width="100%"
+                        style={{
+                          paddingHorizontal: 0,
+                        }}
                         fontSize={SIZE.md}
                         title={
                           user.subscription.type === 6
@@ -837,31 +942,88 @@ const SettingsUserSection = () => {
               ) : null}
             </View>
           </View>
+
+          {verifyUser && (
+            <BaseDialog
+              onRequestClose={() => {
+                setVerifyUser(false);
+                passwordVerifyValue = null;
+              }}
+              onShow={() => {
+                setTimeout(() => {
+                  input.current?.focus();
+                }, 300);
+              }}
+              statusBarTranslucent={false}
+              visible={true}>
+              <DialogContainer>
+                <DialogHeader
+                  title="Verify it's you"
+                  paragraph="To save your account recovery key, enter your account password"
+                />
+
+                <Input
+                  fwdRef={input}
+                  placeholder="Enter account password"
+                  onChangeText={v => {
+                    passwordVerifyValue = v;
+                  }}
+                  onSubmit={tryVerification}
+                  secureTextEntry={true}
+                />
+
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    alignSelf: 'flex-end',
+                  }}>
+                  <Button
+                    onPress={() => {
+                      setVerifyUser(false);
+                      passwordVerifyValue = null;
+                    }}
+                    fontSize={SIZE.md}
+                    type="gray"
+                    title="Cancel"
+                  />
+                  <Button
+                    onPress={tryVerification}
+                    fontSize={SIZE.md}
+                    style={{
+                      marginLeft: 10,
+                    }}
+                    type="transparent"
+                    title="Verify"
+                  />
+                </View>
+              </DialogContainer>
+              <Toast context="local" />
+            </BaseDialog>
+          )}
+
           {[
             {
-              name: 'Save Data Recovery Key',
+              name: 'Save data recovery key',
               func: async () => {
-                if (BiometricService.isBiometryAvailable() === false) {
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                  return;
-                }
-                let result = await BiometricService.validateUser(
-                  "Verify it's you",
-                  '',
-                );
-                if (result) {
-                  eSendEvent(eOpenRecoveryKeyDialog);
-                }
+                setVerifyUser(true);
               },
               desc:
                 'Recover your data using the recovery key if your password is lost.',
             },
             {
-              name: 'Change Password',
+              name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
               },
               desc: 'Setup a new password for your account.',
+            },
+            {
+              name: 'Having problems with syncing?',
+              func: async () => {
+                await Sync.run('global', true);
+              },
+              desc: 'Try force sync to resolve issues with syncing.',
             },
           ].map(item => (
             <CustomButton
@@ -881,7 +1043,8 @@ const SettingsUserSection = () => {
 const SettingsAppearanceSection = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const settings = {...state.settings};
+  const settings = useSettingStore(state => state.settings);
+
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -939,6 +1102,12 @@ const SettingsAppearanceSection = () => {
       <ScrollView
         horizontal={true}
         showsHorizontalScrollIndicator={false}
+        onMoveShouldSetResponderCapture={() => {
+          tabBarRef.current?.setScrollEnabled(false);
+        }}
+        onMomentumScrollEnd={() => {
+          tabBarRef.current?.setScrollEnabled(true);
+        }}
         style={{
           borderRadius: 5,
           padding: 5,
@@ -947,6 +1116,7 @@ const SettingsAppearanceSection = () => {
           width: '100%',
           paddingHorizontal: 12,
         }}
+        nestedScrollEnabled
         contentContainerStyle={{
           alignSelf: 'center',
           flexDirection: 'row',
@@ -1115,7 +1285,9 @@ const SettingsAppearanceSection = () => {
 
 const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
-  const {colors, settings} = state;
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+
   const [appLockVisible, setAppLockVisible] = useState(false);
 
   const [vaultStatus, setVaultStatus] = React.useState({
@@ -1341,7 +1513,9 @@ const SettingsPrivacyAndSecurity = () => {
 
 const SettingsBackupAndRestore = () => {
   const [state] = useTracked();
-  const {colors, settings, user} = state;
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const user = useUserStore(state => state.user);
 
   const backupItemsList = [
     {
@@ -1357,6 +1531,35 @@ const SettingsBackupAndRestore = () => {
         eSendEvent(eOpenRestoreDialog);
       },
       desc: 'Restore backup from phone storage.',
+    },
+    {
+      name: 'Import notes from other note apps',
+      desc: 'Get all your notes in one place with Notesnook Importer.',
+      func: () => {
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Notesnook Importer',
+          icon: 'import',
+          noProgress: true,
+          action: async () => {
+            try {
+              await openLinkInBrowser('https://importer.notenook.com', colors);
+            } catch (e) {}
+          },
+          actionText: 'Go to Notesnook Importer',
+          learnMore: 'Learn how this works',
+          learnMorePress: async () => {
+            try {
+              await openLinkInBrowser(
+                'https://docs.notesnook.com/importing/notesnook-importer/',
+                colors,
+              );
+            } catch (e) {}
+          },
+          paragraph:
+            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.',
+        });
+      },
+      new: true,
     },
   ];
 
