@@ -4,6 +4,7 @@ order: -1
 label: Exporting notes
 ---
 You can export your notes as PDF, HTML, Markdown and Plain text files on desktop and mobile apps.
+
 +++ Desktop/Web
 1. Right click on a note to open `Note properties`
 2. Click on 'Export'

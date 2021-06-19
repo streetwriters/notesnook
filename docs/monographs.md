@@ -5,9 +5,9 @@ label: Monographs
 
 Sharing a note with someone can be such a tedious task. You have to copy/download/export it to a file and upload it to some cloud storage and then attach it in an email and send it to them. 
 
-With Notesnook, you don't need to do that anymore. Monographs enable you to share notes with anyone in just one click. Once a note is published as a monograph, you get a public url. 
+With Notesnook, you don't need to do that anymore. Monographs enable you to share your notes with anyone in just one click. Once a note is published as a monograph, you get a public url which you can send to the person who needs access to information in the note.
 
-You can share this url with anyone to view the contents of the note without downloading Notesnook. And the cool part is, you can encrypt monographs with a password!
+You can share this url with anyone to view the contents of the note without downloading Notesnook. And the cool part is, you can encrypt(lock) monographs with a password.
 
 ## How to publish a note?
 
@@ -24,7 +24,7 @@ You can share this url with anyone to view the contents of the note without down
 +++
 
 ## Password protection
-When you are sharing sensitive information with someone, you can ecrypt the monograph with a password. While you are on the Publish note dialog, turn on password protection and enter a password for the monograph. Then click publish to publish the note.
+When you are sharing sensitive information with someone, you can encrypt the monograph with a password. Only someone who has the password can decrypt and read the contents of the note. While you are on the Publish note dialog, turn on password protection and enter a password for the monograph. Then click publish to publish the note.
 
 ## Self destruct
 Self destruct means that the published note can be viewed only once. Once someone visits the public url to see the contents of the note, the monograph is deleted and it cannot be viewed again.

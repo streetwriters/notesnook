@@ -17,3 +17,5 @@ You are in a notes app, the first thing you want to do is make a note.
 3. Start writing in editor and your note will be created.
 4. As you write, note will be saved automatically whenever you stop for a second.
 +++
+
+And that is how you create your first private note on Notesnook!

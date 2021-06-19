@@ -12,8 +12,8 @@ There are [many](https://en.wikipedia.org/wiki/Comparison_of_note-taking_softwar
 
 These are the 4 problems that Notesnook solves:
 
-1. No compromise on security and user privacy
-2. No sacrifice on important note taking features (e.g. note locking, PDF exports, organize via notebooks, topics & tags)
+1. No compromise on security and user privacy. Everything encrypted by default.
+2. No sacrifice on important note taking features (e.g. note locking, PDF exports, organize via notebooks, topics & tags, note sharing)
 3. Provides a simple, easy to use user interface.
 4. Works exactly the same on all platforms.
 

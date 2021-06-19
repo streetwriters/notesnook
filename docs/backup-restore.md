@@ -5,7 +5,7 @@ label: Backup and restore
 ---
 
 ## How to Backup your notes
-It's always good to take a backup of your data so incase you lose access to your account, you don't lose your data. Backing up your data is really simple.
+It's always good to take a backup of your data so in case you lose access to your account, you don't lose your data. Backing up your data is really simple.
 
 +++ Desktop/Web
 1. Go to Settings from Sidebar
@@ -21,10 +21,10 @@ It's always good to take a backup of your data so incase you lose access to your
 You can also enable encrypted backups option in app settings. This will encrypt all your backup files with your account password.
 
 ### Backup Reminders (Desktop)
-The desktop app allows you to enable Backup Reminders which remind you to backup your data daily/weekly or monthly
+The desktop app allows you to enable Backup Reminders which remind you to backup your data daily/weekly or monthly.
 
 ### Automatic Backups (Mobile)
-On mobile apps you can enable automatic daily,weekly or monthly backups. Your data will backup automatically and backup file will be stored in your phone storage. 
+On mobile apps you can enable automatic daily, weekly or monthly backups. Your data will backup automatically and backup file will be stored in your phone storage. 
 
 ## How to restore your notes
 +++ Desktop/Web
