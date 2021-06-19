@@ -11,17 +11,17 @@ You can share this url with anyone to view the contents of the note without down
 
 ## How to publish a note?
 
-||| Desktop/Web
++++ Desktop/Web
 1. Right click on a note
 2. Click on `Publish` from Note properties to open publish note dialog.
 3. Click on `Publish` button to publish note.
 4. Copy the url and send it to respective person.
-||| Mobile/Tablet
++++ Mobile/Tablet
 1. Tap on `three-dot menu` button on a note.
 2. Tap on `Publish` in Note properties sheet to open Publish note sheet
 3. Tap on `Publish` button to publish note.
 4. Copy the url and send it to respective person.
-|||
++++
 
 ## Password protection
 When you are sharing sensitive information with someone, you can ecrypt the monograph with a password. While you are on the Publish note dialog, turn on password protection and enter a password for the monograph. Then click publish to publish the note.
@@ -30,13 +30,13 @@ When you are sharing sensitive information with someone, you can ecrypt the mono
 Self destruct means that the published note can be viewed only once. Once someone visits the public url to see the contents of the note, the monograph is deleted and it cannot be viewed again.
 
 ## Unpublish a monograph
-||| Desktop/Web
++++ Desktop/Web
 1. Right click on a note
 2. Click on `Publish` from Note properties to open publish note dialog.
 3. Click on `Unpublish` button to unpublish note.
-||| Mobile/Tablet
++++ Mobile/Tablet
 1. Tap on `three-dot menu` button on a note.
 2. Tap on `Publish` in Note properties sheet to open Publish note sheet
 3. Tap on `Unpublish` button to unpublish note.
-|||
++++
 
