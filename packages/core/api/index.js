@@ -171,7 +171,7 @@ class Database {
     clearTimeout(this._syncTimeout);
     this._syncTimeout = setTimeout(() => {
       EV.publish(EVENTS.databaseSyncRequested);
-    }, 15 * 1000);
+    }, 5 * 1000);
   }
 
   sync(full = true, force = false) {
