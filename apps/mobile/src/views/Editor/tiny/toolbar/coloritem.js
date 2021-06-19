@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
+import { View,TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
@@ -52,7 +51,6 @@ const ColorItem = ({value, format}) => {
 	  if (selected) {
 		formatSelection(format, null);
 	  } else {
-		  console.log(format,value);
 		formatSelection(execCommands[format](value));
 	  }
 	};
@@ -67,7 +65,7 @@ const ColorItem = ({value, format}) => {
 		  borderColor: colors.nav,
 		  borderRadius: 5,
 		  height:  normalize(40),
-		  width:  normalize(50),
+		  width:  normalize(40),
 		  marginRight: 5,
 		}}>
 		<View
