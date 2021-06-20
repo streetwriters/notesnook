@@ -5,7 +5,7 @@ label: Backup and restore
 ---
 
 ## How to Backup your notes
-It's always good to take a backup of your data so in case you lose access to your account, you don't lose your data. Backing up your data is really simple.
+It is always a good practice to take a backup of your data so in case you lose access to your account, you don't lose your notes. Backing up your data is very simple in notesnook.
 
 +++ Desktop/Web
 1. Go to Settings from Sidebar
