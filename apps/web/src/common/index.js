@@ -9,7 +9,7 @@ import {
 } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
-import { hashNavigate } from "../navigation";
+import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 
 export const COLORS = {
@@ -56,10 +56,16 @@ export const CREATE_BUTTON_MAP = {
 };
 
 export async function introduceFeatures() {
+  const hash = getCurrentHash().replace("#", "");
   const features = ["monographs"];
+  let reopen = false;
   for (let feature of features) {
-    if (!Config.get(`feature:${feature}`)) await showFeatureDialog(feature);
+    if (!Config.get(`feature:${feature}`)) {
+      reopen = true;
+      await showFeatureDialog(feature);
+    }
   }
+  if (reopen && !!hash) hashNavigate(hash);
 }
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
