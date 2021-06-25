@@ -98,13 +98,13 @@ const App = () => {
       try {
         checkOrientation();
         await SettingsService.init();
+        await loadDatabase();
         if (
           SettingsService.get().appLockMode &&
           SettingsService.get().appLockMode !== 'none'
         ) {
           setVerifyUser(true);
         }
-        await loadDatabase();
       } catch (e) {} finally {
         databaseHasLoaded = true;
         loadMainApp();

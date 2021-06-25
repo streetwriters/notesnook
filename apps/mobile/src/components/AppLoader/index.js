@@ -99,11 +99,11 @@ const AppLoader = ({onLoad}) => {
         load();
       }
     } else {
-      db.user.getUser().then(u => {
+      db?.user?.getUser().then(u => {
         if (u) {
           setUser(u);
         }
-      });
+      }).catch(() => {});
     }
     if (verifyUser) {
       onUnlockBiometrics();
