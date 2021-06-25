@@ -8,13 +8,13 @@ order: -20
 
 ## Why another note taking app?
 
-There are [many](https://en.wikipedia.org/wiki/Comparison_of_note-taking_software) note taking apps. Each has its own speciality but most don't care about your privacy or security. Those that do take out important features. Those that keep important features with privacy lack a good user interface. Those that provide a good user interface provide it only for 1 platform.
+There are [many](https://en.wikipedia.org/wiki/Comparison_of_note-taking_software) note taking apps. Each has its own speciality but most apps don't care about your privacy or security. Those that do take out important features. Those that keep important features with privacy lack a good user interface. Those that provide a good user interface provide it only for 1 platform.
 
 These are the 4 problems that Notesnook solves:
 
-1. No compromise on security and user privacy. Everything encrypted by default.
+1. No compromise on security and user privacy. All your notes are 100% private and encrypted by default.
 2. No sacrifice on important note taking features (e.g. note locking, PDF exports, organize via notebooks, topics & tags, note sharing)
-3. Provides a simple, easy to use user interface.
+3. Provides a simple, easy to use user interface that does not get in the way of note taking
 4. Works exactly the same on all platforms.
 
 At Notesnook we believe in `simple privacy`. Simple privacy means giving you full control of your data without making the process complicated. **You shouldn't have to perform any extra action to make your notes private.** That is where Notesnook shines.
@@ -54,7 +54,7 @@ Yes. Here's why:
 1. Free is not private.
 2. Privacy is not free.
 
-Anyone offering privacy for free is scamming you to sell your data. Why? Because every service out there has a business model. **There is no free in business models** because businesses need money to run. If they don't earn, they don't run.
+Anyone offering privacy for free is scamming you and selling your data. Why? Because every service out there has a business model. **There is no free in business models** because businesses need money to run. If they don't earn, they don't run.
 
 `$4.49/mo` is worth it because:
 

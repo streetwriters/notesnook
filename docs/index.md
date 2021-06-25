@@ -15,7 +15,7 @@ Notesnook is a simple and cross-platform **private notes app** that keeps all yo
 
 <img src="https://github.com/streetwriters/notesnook/raw/main/banners/crossplatform.jpg" alt="Notesnook - Take private notes"/>
 
-We use best-in-class encryption algorithms **XChaCha20-Poly1305 & Argon2** that are stronger & safer than AES256, impenetrable & future-proof. Your notes are encrypted on your device. They are are 100% private. **No one but you can read your notes (not even us).**
+We use best-in-class encryption algorithms **XChaCha20-Poly1305 & Argon2** that are stronger & safer than AES256, impenetrable & future-proof. Your notes are encrypted on your device. All your notes are 100% private. **No one but you can read your notes (not even us).**
 
 Take notes, capture ideas, create to-do lists, keep a journal, write your assignments and manage projects, we have got you covered everywhere.
 
@@ -23,22 +23,22 @@ Take notes, capture ideas, create to-do lists, keep a journal, write your assign
 
 Privacy isn't the only thing that Notesnook has to offer:
 
-1. Cross platform - Notesnook has apps on all platforms
-2. End to end encrypted private sync to unlimted devices
-3. Organize your notes using notebooks, tags and colors
+1. Cross platform - Notesnook has apps on all platforms and works even on your browser.
+2. End to end encrypted private note syncing to unlimted devices
+3. Organize your notes with notebooks, tags and colors
 4. Encrypt/lock your notes in a private vault locally
 5. Full rich text editor with markdown support
 6. Focus mode (distraction-free mode)
-7. Export notes as HTML, MD, PDF & TXT
+7. Export notes in HTML, Markdown, PDF & Text formats
 8. Automatic backups
 9. Dark mode and custom accents
 10. Notesnook Monograph - Share your notes on public url with one click in a safe and secure way
 
-Notesnook is specifically designed for each platform to give you the best possible private note taking experience.
+Notesnook is specifically designed for each platform to give you the best private note taking experience.
 
 ## Download
 
-Notesnook is available to download on Android, iOS, Windows, MacOS, and Linux. You can also use Notesnook on any modern browser. Please head over to our [website](https://notesnook.com/) download Notesnook.
+Notesnook is available to download on Android, iOS, Windows, MacOS, and Linux. Please head over to our [website](https://notesnook.com/) download Notesnook if you have not already.
 
 ## Support
 

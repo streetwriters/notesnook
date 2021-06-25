@@ -1,11 +1,12 @@
 ---
 icon: rocket
+label: Roadmap
 order: -21
 ---
 
 # Notesnook roadmap
 
-We are constantly working on Notesnook to make it the best private note taking app.
+We are constantly working on Notesnook to make it the best private notes app.
 
 Need a new feature in Notesnook? Chat with us on [Discord](https://discord.com/invite/5davZnhw3V) and let's discuss.
 
