@@ -53,10 +53,9 @@ function Announcements({ announcements, removeAnnouncement }) {
         </Text>
       )}
       <Flex justifyContent="space-evenly" mt={1}>
-        {announcement.callToActions?.map((action, index) =>
-          action.platforms.some(
-            (platform) => allowedPlatforms.indexOf(platform) > -1
-          ) ? (
+        {announcement.callToActions
+          ?.filter((platform) => allowedPlatforms.indexOf(platform) > -1)
+          .map((action, index) => (
             <Button
               flex={1}
               m={0}
@@ -98,8 +97,7 @@ function Announcements({ announcements, removeAnnouncement }) {
             >
               {action.title}
             </Button>
-          ) : null
-        )}
+          ))}
       </Flex>
     </Flex>
   );
