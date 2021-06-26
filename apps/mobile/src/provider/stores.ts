@@ -168,12 +168,15 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   fullscreen: false,
   deviceMode: null,
   dimensions: { width, height },
+  appLoading:true,
+  isIntroCompleted:false,
   setSettings: settings => set({ settings }),
   setFullscreen: fullscreen => set({ fullscreen }),
   setDeviceMode: mode => set({ deviceMode: mode }),
   setDimensions: dimensions => set({ dimensions: dimensions }),
-  appLoading:true,
-  setAppLoading:(appLoading) => set({appLoading})
+  setAppLoading:(appLoading) => set({appLoading}),
+  setIntroCompleted:(isIntroCompleted) => set({isIntroCompleted})
+
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({

@@ -32,13 +32,13 @@ let passwordValue = null;
 let didVerifyUser = false;
 const opacityV = new Animated.Value(1);
 const AppLoader = ({onLoad}) => {
-  const [state,] = useTracked();
+  const [state] = useTracked();
   const colors = state.colors;
   const [loading, setLoading] = useState(true);
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);
-  const [user, setUser] = useState();
+  const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
 
@@ -98,12 +98,6 @@ const AppLoader = ({onLoad}) => {
       } else {
         load();
       }
-    } else {
-      db?.user?.getUser().then(u => {
-        if (u) {
-          setUser(u);
-        }
-      }).catch(() => {});
     }
     if (verifyUser) {
       onUnlockBiometrics();

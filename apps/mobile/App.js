@@ -54,6 +54,7 @@ const loadDatabase = async () => {
   SplashScreen.hide();
   await db.init();
   let requireIntro = await MMKV.getItem('introCompleted');
+  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
   loadDefaultNotes();
   if (!requireIntro) {
     await MMKV.setItem(
@@ -98,13 +99,13 @@ const App = () => {
       try {
         checkOrientation();
         await SettingsService.init();
-        await loadDatabase();
         if (
           SettingsService.get().appLockMode &&
           SettingsService.get().appLockMode !== 'none'
         ) {
           setVerifyUser(true);
         }
+        await loadDatabase();
       } catch (e) {} finally {
         databaseHasLoaded = true;
         loadMainApp();

@@ -1,29 +1,28 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ActionSheetWrapper from '../../components/ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import Input from '../../components/Input';
-import {PressableButton} from '../../components/PressableButton';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import SettingsService from '../../services/SettingsService';
+import Paragraph from '../../components/Typography/Paragraph';
+import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import SettingsService from '../../services/SettingsService';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 
 export const EditorSettings = () => {
-  const [state,dispatch] = useTracked();
+  const [state, dispatch] = useTracked();
   const {colors} = state;
-  
+
   const settings = useSettingStore(state => state.settings);
-  
+
   const [visible, setVisible] = useState(false);
   const [savePreset, setSavePreset] = useState(false);
   const actionSheetRef = useRef();
@@ -68,7 +67,6 @@ export const EditorSettings = () => {
         }
         editorSettings[id] = !enabled;
         SettingsService.set('editorSettings', {...editorSettings});
-        
       }}
       customStyle={{
         flexDirection: 'row',

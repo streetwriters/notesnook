@@ -1,33 +1,27 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Image, View} from 'react-native';
+import {Image, SafeAreaView, View} from 'react-native';
 import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import Carousel from 'react-native-snap-carousel';
 import {SvgXml} from 'react-native-svg';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
+  COMMUNITY_SVG,
   NOTE_SVG,
-  SYNC_SVG,
   ORGANIZE_SVG,
   PRIVACY_SVG,
-  COMMUNITY_SVG,
+  SYNC_SVG,
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import {useSettingStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import {dHeight, dWidth, getElevation} from '../../utils';
-import {eOpenLoginDialog} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {DDS} from '../../services/DeviceDetection';
-import {openLinkInBrowser} from '../../utils/functions';
-import {Modal} from 'react-native';
-import {SafeAreaView} from 'react-native';
-import {SvgToPngView} from '../ListPlaceholders';
-import {MMKV} from '../../utils/mmkv';
 
 const features = [
   {
@@ -73,33 +67,30 @@ let currentIndex = 0;
 const SplashScreen = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(false);
   const carouselRef = useRef();
   const [isNext, setIsNext] = useState(true);
-
+  const isIntroCompleted = useSettingStore(state => state.isIntroCompleted);
+  const setIntroCompleted = useSettingStore(state => state.setIntroCompleted);
   const opacity = useValue(0);
   const translateY = useValue(20);
   const translateY2 = useValue(0);
 
   useEffect(() => {
-    MMKV.getStringAsync('introCompleted').then(async r => {
+    if (!isIntroCompleted) {
       setTimeout(() => {
-        if (!r) {
-          setVisible(true);
-          timing(opacity, {
-            toValue: 1,
-            duration: 500,
-            easing: Easing.in(Easing.ease),
-          }).start();
-          timing(translateY, {
-            toValue: 0,
-            duration: 500,
-            easing: Easing.in(Easing.ease),
-          }).start();
-        }
-      }, 1);
-    });
-  }, []);
+        timing(opacity, {
+          toValue: 1,
+          duration: 500,
+          easing: Easing.in(Easing.ease),
+        }).start();
+        timing(translateY, {
+          toValue: 0,
+          duration: 500,
+          easing: Easing.in(Easing.ease),
+        }).start();
+      }, 15);
+    }
+  }, [isIntroCompleted]);
 
   const hide = async () => {
     timing(translateY2, {
@@ -108,11 +99,11 @@ const SplashScreen = () => {
       easing: Easing.in(Easing.ease),
     }).start();
     await sleep(500);
-    setVisible(false);
+    setIntroCompleted(true);
   };
 
   return (
-    visible && (
+    !isIntroCompleted && (
       <Animated.View
         style={{
           zIndex: 999,
