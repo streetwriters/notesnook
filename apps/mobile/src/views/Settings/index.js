@@ -288,7 +288,12 @@ export const Settings = ({navigation}) => {
             paddingHorizontal: 0,
           }}>
           {!DDS.isTab && (
-            <Header noAnnouncement={true} title="Settings" type="settings" messageCard={false} />
+            <Header
+              noAnnouncement={true}
+              title="Settings"
+              type="settings"
+              messageCard={false}
+            />
           )}
 
           <SettingsUserSection />
@@ -1403,6 +1408,23 @@ const SettingsPrivacyAndSecurity = () => {
       )}
 
       <SectionHeader title="Privacy & Security" />
+      <CustomButton
+        key="telemetry"
+        title="Enable telemetry"
+        tagline="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
+        onPress={() => {
+          SettingsService.set('telemetry', !settings.telemetry);
+        }}
+        maxWidth="90%"
+        customComponent={
+          <Icon
+            size={SIZE.xl}
+            color={settings.telemetry ? colors.accent : colors.icon}
+            name={settings.telemetry ? 'toggle-switch' : 'toggle-switch-off'}
+          />
+        }
+      />
+
       <CustomButton
         key="privacyMode"
         title="Privacy mode"

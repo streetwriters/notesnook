@@ -15,6 +15,12 @@ import { refreshNotesPage } from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
+import * as ackeeTracker from "./ackee"
+export const Tracker = ackeeTracker.create('https://sa.streetwriters.co',{
+  ignoreLocalhost:true
+});
+
+
 
 const imgNames = [
   'favorites',

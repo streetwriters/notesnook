@@ -73,6 +73,7 @@ export type Settings = {
     screenshotMode?: boolean,
     privacyScreen?: boolean,
     appLockMode?: string,
+    telemetry:boolean
 }
 
 type Dimensions = {

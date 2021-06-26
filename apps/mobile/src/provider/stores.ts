@@ -164,6 +164,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     screenshotMode: true,
     privacyScreen: false,
     appLockMode: 'none',
+    telemetry:true,
   },
   fullscreen: false,
   deviceMode: null,

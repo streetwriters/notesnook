@@ -22,7 +22,8 @@ export const defaultSettings = {
   sortOrder: 'desc',
   screenshotMode: true,
   privacyScreen: false,
-  appLockMode: 'none', 
+  appLockMode: 'none',
+  telemetry:false 
 }
 
 let settings = {...defaultSettings}
