@@ -23,7 +23,7 @@ export const defaultSettings = {
   screenshotMode: true,
   privacyScreen: false,
   appLockMode: 'none',
-  telemetry:false 
+  telemetry:true 
 }
 
 let settings = {...defaultSettings}

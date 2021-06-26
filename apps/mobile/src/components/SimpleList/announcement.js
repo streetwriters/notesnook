@@ -125,7 +125,6 @@ export const Announcement = () => {
                     title={item.title}
                     fontSize={SIZE.md}
                     onPress={async () => {
-
                       if (item.type === 'link') {
                         try {
                           await openLinkInBrowser(item.data, state.colors);
