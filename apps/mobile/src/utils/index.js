@@ -20,8 +20,6 @@ export const Tracker = ackeeTracker.create('https://sa.streetwriters.co',{
   ignoreLocalhost:true
 });
 
-
-
 const imgNames = [
   'favorites',
   'notes',
@@ -99,7 +97,7 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1410;
+export const APP_VERSION = 1420;
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
