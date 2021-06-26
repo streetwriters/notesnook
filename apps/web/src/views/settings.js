@@ -398,7 +398,6 @@ function Settings(props) {
           title="Enable telemetry"
           onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
           offTip="Do not collect any data or crash reports"
-          premium="customize"
           onToggled={() => {
             setEnableTelemetry(!enableTelemetry);
           }}
