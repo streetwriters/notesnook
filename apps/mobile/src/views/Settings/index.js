@@ -86,6 +86,7 @@ import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
+import ToggleSwitch from 'toggle-switch-react-native';
 
 let menuRef = createRef();
 
@@ -1191,12 +1192,13 @@ const SettingsAppearanceSection = () => {
         onPress={switchTheme}
         maxWidth="90%"
         customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.useSystemTheme ? colors.accent : colors.icon}
-            name={
-              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
-            }
+          <ToggleSwitch
+            isOn={settings.useSystemTheme}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={switchTheme}
           />
         }
       />
@@ -1216,10 +1218,28 @@ const SettingsAppearanceSection = () => {
         }}
         maxWidth="90%"
         customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
+          <ToggleSwitch
+            isOn={colors.night}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={async isOn => {
+              if (!colors.night) {
+                await MMKV.setStringAsync(
+                  'theme',
+                  JSON.stringify({night: true}),
+                );
+                changeColorScheme(COLOR_SCHEME_DARK);
+              } else {
+                await MMKV.setStringAsync(
+                  'theme',
+                  JSON.stringify({night: false}),
+                );
+
+                changeColorScheme(COLOR_SCHEME_LIGHT);
+              }
+            }}
           />
         }
       />
@@ -1345,6 +1365,21 @@ const SettingsPrivacyAndSecurity = () => {
     },
   ];
 
+  const toggleBiometricUnlocking = () => {
+    openVault({
+      item: {},
+      fingerprintAccess: !vaultStatus.biometryEnrolled,
+      revokeFingerprintAccess: vaultStatus.biometryEnrolled,
+      novault: true,
+      title: vaultStatus.biometryEnrolled
+        ? 'Revoke biometric unlocking'
+        : 'Enable biometery unlock',
+      description: vaultStatus.biometryEnrolled
+        ? 'Disable biometric unlocking for notes in vault'
+        : 'Disable biometric unlocking for notes in vault',
+    });
+  };
+
   return (
     <>
       {appLockVisible && (
@@ -1417,10 +1452,15 @@ const SettingsPrivacyAndSecurity = () => {
         }}
         maxWidth="90%"
         customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.telemetry ? colors.accent : colors.icon}
-            name={settings.telemetry ? 'toggle-switch' : 'toggle-switch-off'}
+          <ToggleSwitch
+            isOn={settings.telemetry}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={isOn => {
+              SettingsService.set('telemetry', isOn);
+            }}
           />
         }
       />
@@ -1438,12 +1478,18 @@ const SettingsPrivacyAndSecurity = () => {
         }}
         maxWidth="90%"
         customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.privacyScreen ? colors.accent : colors.icon}
-            name={
-              settings.privacyScreen ? 'toggle-switch' : 'toggle-switch-off'
-            }
+          <ToggleSwitch
+            isOn={settings.privacyScreen}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={isOn => {
+              Platform.OS === 'android'
+                ? AndroidModule.setSecureMode(isOn)
+                : enabled(true);
+              SettingsService.set('privacyScreen', isOn);
+            }}
           />
         }
       />
@@ -1467,32 +1513,16 @@ const SettingsPrivacyAndSecurity = () => {
               key="fingerprintVaultUnlock"
               title="Vault biometrics unlock"
               tagline="Access notes in vault using biometrics"
-              onPress={() => {
-                openVault({
-                  item: {},
-                  fingerprintAccess: !vaultStatus.biometryEnrolled,
-                  revokeFingerprintAccess: vaultStatus.biometryEnrolled,
-                  novault: true,
-                  title: vaultStatus.biometryEnrolled
-                    ? 'Revoke biometric unlocking'
-                    : 'Enable biometery unlock',
-                  description: vaultStatus.biometryEnrolled
-                    ? 'Disable biometric unlocking for notes in vault'
-                    : 'Disable biometric unlocking for notes in vault',
-                });
-              }}
+              onPress={toggleBiometricUnlocking}
               maxWidth="90%"
               customComponent={
-                <Icon
-                  size={SIZE.xl}
-                  color={
-                    vaultStatus.biometryEnrolled ? colors.accent : colors.icon
-                  }
-                  name={
-                    vaultStatus.biometryEnrolled
-                      ? 'toggle-switch'
-                      : 'toggle-switch-off'
-                  }
+                <ToggleSwitch
+                  isOn={vaultStatus.biometryEnrolled}
+                  onColor={colors.accent}
+                  offColor={colors.icon}
+                  size="small"
+                  animationSpeed={150}
+                  onToggle={toggleBiometricUnlocking}
                 />
               }
             />
@@ -1584,6 +1614,21 @@ const SettingsBackupAndRestore = () => {
       new: true,
     },
   ];
+
+  const toggleEncryptedBackups = async () => {
+    if (!user) {
+      ToastEvent.show({
+        heading: 'Login required to enable encryption',
+        type: 'error',
+        func: () => {
+          eSendEvent(eOpenLoginDialog);
+        },
+        actionText: 'Login',
+      });
+      return;
+    }
+    await SettingsService.set('encryptedBackup', !settings.encryptedBackup);
+  };
 
   return (
     <>
@@ -1694,30 +1739,15 @@ const SettingsBackupAndRestore = () => {
       <CustomButton
         title="Backup encryption"
         tagline="Encrypt all your backups."
-        onPress={async () => {
-          if (!user) {
-            ToastEvent.show({
-              heading: 'Login required to enable encryption',
-              type: 'error',
-              func: () => {
-                eSendEvent(eOpenLoginDialog);
-              },
-              actionText: 'Login',
-            });
-            return;
-          }
-          await SettingsService.set(
-            'encryptedBackup',
-            !settings.encryptedBackup,
-          );
-        }}
+        onPress={toggleEncryptedBackups}
         customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.encryptedBackup ? colors.accent : colors.icon}
-            name={
-              settings.encryptedBackup ? 'toggle-switch' : 'toggle-switch-off'
-            }
+          <ToggleSwitch
+            isOn={settings.encryptedBackup}
+            onColor={colors.accent}
+            offColor={colors.icon}
+            size="small"
+            animationSpeed={150}
+            onToggle={toggleEncryptedBackups}
           />
         }
       />
