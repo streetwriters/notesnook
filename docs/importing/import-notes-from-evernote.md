@@ -28,7 +28,7 @@ The following steps will help you import your notes from EverNote easily.
 7. Click on `Download .nnbackup` to download the file.
 <img style="margin-bottom:15px;" src="../static/plain_text_import_step_3.png" alt="From the list of formats to import, select Plain Text."/>
 
-After you have downloaded the `.nnbackup` file, go to Notesnook app and [restore backup](../backup-restore.md) file to get all your notes.
+After you have downloaded the `.nnbackup` file, go to Notesnook app and [restore backup](../backup-and-restore-notes-in-notesnook.md) file to get all your notes.
 
 
 
