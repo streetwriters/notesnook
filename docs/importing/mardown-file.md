@@ -3,7 +3,7 @@ label: Markdown files
 order: 700
 route: /importing/how-do-i-import-notes-from-markdown-files
 ---
-# How to import notes from markdown files
+# How do I import notes from markdown files?
 
 To import markdown files to notesnook go to Notesnook Importer on your PC/Laptop.
 

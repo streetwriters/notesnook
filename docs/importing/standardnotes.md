@@ -3,7 +3,7 @@ label: Standard Notes
 order: 300
 route: /importing/how-do-i-import-notes-from-standard-notes
 ---
-# How do I import notes from Standard Notes
+# How do I import notes from Standard Notes?
 
 The following steps will help you import your notes from Standard notes easily.
 

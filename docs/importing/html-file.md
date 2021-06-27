@@ -3,7 +3,7 @@ label: Html files
 order: 800
 route: /importing/how-do-i-import-notes-from-html-files
 ---
-# How do I import notes from html files
+# How do I import notes from html files?
 
 To import html files to notesnook go to Notesnook Importer on your PC/Laptop.
 

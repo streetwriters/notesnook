@@ -3,7 +3,7 @@ label: Joplin
 order: -100
 route: /importing/how-do-i-import-notes-from-joplin
 ---
-# How do I import notes from Joplin notes app
+# How do I import notes from Joplin notes app?
 
 The following steps will help you import your notes from Joplin easily.
 
