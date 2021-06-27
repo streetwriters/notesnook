@@ -1,9 +1,10 @@
 ---
 label: EverNote
 order: 500
+route: /importing/how-do-i-import-notes-from-evernote
 ---
 
-# How to import notes from EverNote
+# How do I import notes from EverNote
 The following steps will help you import your notes from EverNote easily.
 
 1. Open EverNote app on Desktop.

@@ -1,8 +1,9 @@
 ---
 label: Plain text files
 order: 900
+route: /importing/how-do-i-import-notes-from-plain-text-files
 ---
-# How to import notes from plain text files
+# How do I import notes from plain text files
 
 To import plain text files to notesnook go to Notesnook Importer on your PC/Laptop.
 

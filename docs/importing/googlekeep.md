@@ -1,9 +1,10 @@
 ---
 label: Google Keep
 order: 400
+route: /importing/how-do-i-import-notes-from-google-keep
 ---
 
-# How to import notes from Google Keep
+# How do I import notes from Google Keep
 The following steps will help you import your notes from Google Keep easily.
 
 1. Go to [Google Takeout](https://takeout.google.com/settings/takeout) and Login to your account.

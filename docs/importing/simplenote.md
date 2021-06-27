@@ -1,8 +1,9 @@
 ---
 label: Simplenote
 order: 100
+route: /importing/how-do-i-import-notes-from-simplenote
 ---
-# How to import notes from Simplenotes
+# How to import notes from Simplenote notes app
 
 The following steps will help you import your notes from Simplenote easily.
 

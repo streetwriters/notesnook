@@ -1,9 +1,10 @@
 ---
 label: Bear Notes
 order: 200
+route: /importing/how-do-i-import-notes-from-bear-notes
 ---
 
-# How to import notes from Bear Notes
+# How do I import notes from Bear Notes
 The following steps will help you import your notes from Bear notes easily.
 
 1. Open Bear Notes app on Desktop.
