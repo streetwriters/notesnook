@@ -1,7 +1,6 @@
 ---
 label: Joplin
 order: -100
-route: /importing/how-do-i-import-notes-from-joplin
 ---
 # How do I import notes from Joplin notes app?
 

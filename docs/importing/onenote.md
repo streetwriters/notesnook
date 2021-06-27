@@ -1,7 +1,6 @@
 ---
 label: OneNote
 order: 600
-route: /importing/how-do-i-import-notes-from-onenote
 ---
 
 # How do I import notes from OneNote notes app?

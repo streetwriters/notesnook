@@ -1,6 +1,5 @@
 ---
 label: Tags
-route: /organizing-notes/how-do-I-add-tags-to-notes
 ---
 # How do I add tags to notes?
 

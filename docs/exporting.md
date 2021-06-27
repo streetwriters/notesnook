@@ -2,7 +2,6 @@
 icon: upload
 order: -1
 label: Exporting notes
-route: /how-do-I-export-notes-from-notesnook
 ---
 
 # How do I export notes from Notesnook?

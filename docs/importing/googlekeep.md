@@ -1,7 +1,6 @@
 ---
 label: Google Keep
 order: 400
-route: /importing/how-do-i-import-notes-from-google-keep
 ---
 
 # How do I import notes from Google Keep?

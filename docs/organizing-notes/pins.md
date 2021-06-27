@@ -1,6 +1,5 @@
 ---
 label: Pins
-route: /organizing-notes/how-do-I-pin-notes-and-notebooks
 ---
 
 # How do I pin notes and notebooks?

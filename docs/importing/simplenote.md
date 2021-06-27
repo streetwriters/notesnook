@@ -1,7 +1,6 @@
 ---
 label: Simplenote
 order: 100
-route: /importing/how-do-i-import-notes-from-simplenote
 ---
 # How to import notes from Simplenote notes app?
 

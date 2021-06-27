@@ -1,6 +1,5 @@
 ---
 label: Notebooks
-route: /organizing-notes/how-do-I-organize-notes-with-notebooks
 ---
 
 # How do I organize notes with notebooks?

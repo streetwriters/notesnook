@@ -1,6 +1,5 @@
 ---
 label: Shortcuts
-route: /organizing-notes/how-to-use-shortcuts-in-notesnook
 ---
 # How do I add shortcuts to side menu?
 

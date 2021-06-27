@@ -1,7 +1,6 @@
 ---
 label: EverNote
 order: 500
-route: /importing/how-do-i-import-notes-from-evernote
 ---
 
 # How do I import notes from EverNote?

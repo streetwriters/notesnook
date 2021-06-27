@@ -1,6 +1,5 @@
 ---
 label: Favorites
-route: /organizing-notes/how-can-I-add-notes-to-favorites
 ---
 # How can I add notes to favorites?
 

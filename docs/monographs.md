@@ -1,7 +1,6 @@
 ---
 order: -8
 label: Monographs
-route: /notesnook-monograph-note-sharing
 ---
 
 # Monographs

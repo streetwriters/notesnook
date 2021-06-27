@@ -1,7 +1,6 @@
 ---
 label: Bear Notes
 order: 200
-route: /importing/how-do-i-import-notes-from-bear-notes
 ---
 
 # How do I import notes from Bear Notes?

@@ -1,7 +1,6 @@
 ---
 label: Standard Notes
 order: 300
-route: /importing/how-do-i-import-notes-from-standard-notes
 ---
 # How do I import notes from Standard Notes?
 

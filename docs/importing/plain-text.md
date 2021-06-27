@@ -1,7 +1,6 @@
 ---
 label: Plain text files
 order: 900
-route: /importing/how-do-i-import-notes-from-plain-text-files
 ---
 # How do I import notes from plain text files?
 

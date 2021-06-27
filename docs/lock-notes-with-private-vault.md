@@ -2,7 +2,6 @@
 icon: lock
 order: -2
 label: Locking notes
-route: /how-do-I-lock-notes-with-private-vault
 ---
 
 # How do I lock notes with private vault?
