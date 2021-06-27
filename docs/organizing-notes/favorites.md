@@ -1,7 +1,8 @@
 ---
 label: Favorites
+route: /organizing-notes/how-can-I-add-notes-to-favorites
 ---
-# Favorites 
+# How can I add notes to favorites?
 
 While you organize your notes with all different types of notebooks, tags and colors, favorites give you quick access to the notes that are most important to you in one tap.
 

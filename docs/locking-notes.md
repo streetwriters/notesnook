@@ -2,7 +2,10 @@
 icon: lock
 order: -2
 label: Locking notes
+route: /how-do-I-lock-notes-with-private-vault
 ---
+
+# How do I lock notes with private vault?
 
 Notesnook is a private notes app. All your notes are encrypted and secure by default. We can not read them even if we want to on our servers. However you can still add an extra layer of security and encrypt your most important and sensitive notes by adding them to a vault. 
 

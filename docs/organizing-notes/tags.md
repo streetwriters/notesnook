@@ -1,8 +1,10 @@
 ---
 label: Tags
+route: /organizing-notes/how-do-I-add-tags-to-notes
 ---
-# How to add tags to notes
-Tags are a quick and easy way to organize your notes.
+# How do I add tags to notes?
+
+Tags are a quick and simple way to organize your notes.
 
 ## Tagging a note
 +++ Desktop/Web

@@ -1,7 +1,10 @@
 ---
 order: -8
 label: Monographs
+route: /notesnook-monograph-note-sharing
 ---
+
+# Monographs
 
 Sharing a note with someone can be such a tedious task. You have to copy/download/export it to a file and upload it to some cloud storage and then attach it in an email and send it to them. 
 

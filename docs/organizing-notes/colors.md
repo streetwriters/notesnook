@@ -1,7 +1,8 @@
 ---
 label: Colors
+route: /organizing-notes/how-do-I-organize-notes-with-colors
 ---
-# How to organize notes with colors
+# How do I organize notes with colors?
 
 Colors are a simple and fast way to organize your notes.
 
