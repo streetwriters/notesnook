@@ -87,8 +87,8 @@ function Announcements({ announcements, removeAnnouncement }) {
                     else window.open(action.data, "_blank");
                     break;
                   case "promo":
-                    const coupon = action.data;
-                    await showBuyDialog(coupon);
+                    const [coupon, plan] = action.data.split(":");
+                    await showBuyDialog(plan, coupon);
                     break;
                   default:
                     return;

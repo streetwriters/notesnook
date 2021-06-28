@@ -50,7 +50,7 @@ function EmailConfirmed() {
               </Text>
               Email confirmed
             </Text>
-            <SaleBanner discount={50} coupon="WRLD2021" userId={userId} />
+            <BlogPromoBanner link="" />
           </Flex>
         </Flex>
       </Flex>
@@ -58,6 +58,54 @@ function EmailConfirmed() {
   );
 }
 export default EmailConfirmed;
+
+function BlogPromoBanner(props) {
+  const { link } = props;
+  return (
+    <Flex flexDirection="column" p={4}>
+      <Text variant="heading" textAlign="center">
+        Do you know why we made notesnook?
+      </Text>
+      <Text variant="body" fontSize="title" mt={1}>
+        There are so many note taking apps out there. But none of them fix the
+        core issue with privacy.
+      </Text>
+
+      <Text variant="body" fontSize="title" mt={1}>
+        Privacy has become undesirable because you have to sacrifice so much.
+      </Text>
+
+      <Text variant="body" fontSize="title" mt={1}>
+        In your heart, you know privacy is important. But you can't give up on
+        that awesome feature.
+      </Text>
+
+      <Text variant="body" fontSize="title" mt={1}>
+        You are forced to keep using privacy invasive apps because...the
+        alternative is not as productive.
+      </Text>
+
+      <Text variant="title" mt={1}>
+        But we are going to change that.
+      </Text>
+      <Button
+        mt={2}
+        as="a"
+        href={link}
+        target="_blank"
+        fontSize="title"
+        width="100%"
+        fontWeight="bold"
+        sx={{ boxShadow: "2px 2px 15px 0px #00000044" }}
+        onClick={() =>
+          trackEvent(`Email verification blog promo`, "blog-promo")
+        }
+      >
+        How are we going to do that? Read on.
+      </Button>
+    </Flex>
+  );
+}
 
 function SaleBanner(props) {
   const { discount, coupon, userId } = props;
