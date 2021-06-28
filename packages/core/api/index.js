@@ -194,8 +194,11 @@ class Database {
     return http.get(`${Constants.API_HOST}/version`);
   }
 
-  announcements() {
-    return http.get(`${Constants.API_HOST}/announcements/active`);
+  async announcements() {
+    let url = `${Constants.API_HOST}/announcements/active`;
+    const user = await this.user.getUser();
+    if (user) url += `?userId=${user.id}`;
+    return http.get(url);
   }
 }
 
