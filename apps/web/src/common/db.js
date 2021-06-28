@@ -3,6 +3,7 @@ import EventSource from "eventsource";
 import Config from "../utils/config";
 import http from "notes-core/utils/http";
 import { EV, EVENTS } from "notes-core/common";
+import { getCurrentHash, hashNavigate } from "../navigation";
 
 /**
  * @type {import("notes-core/api").default}
@@ -47,6 +48,7 @@ async function loadDefaultNotes(db) {
   const notes = await http.get("/notes/index.json");
   if (!notes) return;
   let autoOpenId;
+  const hash = getCurrentHash().replaceAll("#", "");
   for (let note of notes) {
     const content = await http.get(note.webContent);
     let id = await db.notes.add({
@@ -58,12 +60,10 @@ async function loadDefaultNotes(db) {
     if (note.autoOpen) autoOpenId = id;
   }
 
-  if (autoOpenId) quickNavigate(`/notes/${autoOpenId}/edit`);
+  if (autoOpenId) {
+    hashNavigate(`/notes/${autoOpenId}/edit`);
+    if (hash) setTimeout(() => hashNavigate(hash), 100);
+  }
   setAppHydrated();
   EV.publish(EVENTS.appRefreshRequested);
-}
-
-function quickNavigate(url) {
-  window.history.replaceState(null, null, `#${url}`);
-  dispatchEvent(new HashChangeEvent("hashchange"));
 }

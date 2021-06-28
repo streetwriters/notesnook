@@ -57,15 +57,13 @@ export const CREATE_BUTTON_MAP = {
 
 export async function introduceFeatures() {
   const hash = getCurrentHash().replace("#", "");
+  if (!!hash) return;
   const features = ["monographs"];
-  let reopen = false;
   for (let feature of features) {
     if (!Config.get(`feature:${feature}`)) {
-      reopen = true;
       await showFeatureDialog(feature);
     }
   }
-  if (reopen && !!hash) hashNavigate(hash);
 }
 
 export const DEFAULT_CONTEXT = { colors: [], tags: [], notebook: {} };
