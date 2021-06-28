@@ -667,6 +667,7 @@ const SettingsUserSection = () => {
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
   const input = useRef();
+
   const tryVerification = async () => {
     if (!passwordVerifyValue) {
       ToastEvent.show({
@@ -698,6 +699,26 @@ const SettingsUserSection = () => {
         type: 'error',
         context: 'local',
       });
+    }
+  };
+
+  const manageSubscription = () => {
+    if (user.subscription.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED) {
+      if (user.subscription.provider === 3) {
+        ToastEvent.show({
+          heading: 'Subscribed on web',
+          message: 'Open your web browser to manage your subscription.',
+          type: 'success',
+        });
+        return;
+      }
+      Linking.openURL(
+        Platform.OS === 'ios'
+          ? 'https://apps.apple.com/account/subscriptions'
+          : 'https://play.google.com/store/account/subscriptions',
+      );
+    } else {
+      eSendEvent(eOpenPremiumDialog);
     }
   };
 
@@ -875,21 +896,30 @@ const SettingsUserSection = () => {
 
                 {user.isEmailConfirmed &&
                   user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-                  user.subscription.type !== SUBSCRIPTION_STATUS.BETA &&
-                  user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM_CANCELLED && (
+                  user.subscription.type !== SUBSCRIPTION_STATUS.BETA && (
                     <>
                       <Seperator />
                       <Button
-                        onPress={() => {
-                          eSendEvent(eOpenPremiumDialog);
-                        }}
+                        onPress={manageSubscription}
                         width="100%"
                         style={{
                           paddingHorizontal: 0,
                         }}
                         fontSize={SIZE.md}
                         title={
-                          user.subscription.type === 6
+                          user.subscription.provider === 3 &&
+                          user.subscription.type ===
+                            SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+                            ? 'Manage subscription from desktop app'
+                            : user.subscription.type ===
+                              SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+                            ? `Resubscribe from ${
+                                Platform.OS === 'ios'
+                                  ? 'App Store'
+                                  : 'Google Playstore'
+                              }`
+                            : user.subscription.type ===
+                              SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
                                 PremiumService.getProducts().length > 0
                                   ? PremiumService.getProducts()[0]
@@ -962,7 +992,7 @@ const SettingsUserSection = () => {
               <DialogContainer>
                 <DialogHeader
                   title="Verify it's you"
-                  paragraph="To save your account recovery key, enter your account password"
+                  paragraph="Enter your account password to save your data recovery key."
                 />
 
                 <Input
