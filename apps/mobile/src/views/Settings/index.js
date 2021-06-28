@@ -60,6 +60,7 @@ import {
   MenuItemsList,
   preloadImages,
   SUBSCRIPTION_PROVIDER,
+  SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
 import {
@@ -836,11 +837,7 @@ const SettingsUserSection = () => {
                 </View>
               </View>
               <View>
-                {user.subscription.type === 1 ||
-                user.subscription.type === 2 ||
-                user.subscription.type === 5 ||
-                user.subscription.type === 6 ||
-                user.subscription.type === 7 ? (
+                {user.subscription.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
                     <Seperator />
                     <Paragraph
@@ -877,8 +874,9 @@ const SettingsUserSection = () => {
                 ) : null}
 
                 {user.isEmailConfirmed &&
-                  user.subscription.type !== 5 &&
-                  user.subscription.type !== 2 && (
+                  user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+                  user.subscription.type !== SUBSCRIPTION_STATUS.BETA &&
+                  user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM_CANCELLED && (
                     <>
                       <Seperator />
                       <Button
@@ -913,9 +911,8 @@ const SettingsUserSection = () => {
               </View>
 
               {user?.subscription?.provider &&
-              user.subscription.type !== 6 &&
-              user.subscription.type !== 7 &&
-              user.subscription.type !== 0 &&
+              user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
+              user.subscription.type !== SUBSCRIPTION_STATUS.BASIC &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
                 <Button
                   title={
