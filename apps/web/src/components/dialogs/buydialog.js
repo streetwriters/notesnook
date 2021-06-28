@@ -114,7 +114,7 @@ function BuyDialog(props) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState();
   const [prices, setPrices] = useState();
-  const [plan, setPlan] = useState("monthly");
+  const [plan, setPlan] = useState(props.plan || "monthly");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const user = useUserStore((store) => store.user);
 

@@ -90,9 +90,10 @@ export function showAddNotebookDialog() {
   ));
 }
 
-export function showBuyDialog(couponCode) {
+export function showBuyDialog(plan, couponCode) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.BuyDialog
+      plan={plan}
       couponCode={couponCode}
       onCancel={() => perform(false)}
     />

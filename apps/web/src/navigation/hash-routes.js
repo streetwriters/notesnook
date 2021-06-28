@@ -111,7 +111,10 @@ const hashroutes = {
     showBuyDialog();
   },
   "/buy/:code": ({ code }) => {
-    showBuyDialog(code);
+    showBuyDialog("monthly", code);
+  },
+  "/buy/:plan/:code": ({ plan, code }) => {
+    showBuyDialog(plan, code);
   },
 };
 
