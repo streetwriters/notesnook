@@ -50,7 +50,8 @@ function shouldShowAnnouncement(announcement) {
   );
   if (!show) return false;
 
-  const subStatus = userstore.get().user?.subscription?.type;
+  const user = userstore.get().user;
+  const subStatus = user?.subscription?.type;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
       case "pro":
@@ -60,13 +61,13 @@ function shouldShowAnnouncement(announcement) {
       case "trialExpired":
         return subStatus === SUBSCRIPTION_STATUS.BASIC;
       case "loggedOut":
-        return !userstore.get().isLoggedIn;
+        return !user;
       case "loggedIn":
-        return userstore.get().isLoggedIn;
+        return !!user;
       case "unverified":
-        return !userstore.get().user?.isEmailVerified;
+        return user && !user.isEmailVerified;
       case "verified":
-        return userstore.get().user?.isEmailVerified;
+        return user && user.isEmailVerified;
       case "proExpired":
         return (
           subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
