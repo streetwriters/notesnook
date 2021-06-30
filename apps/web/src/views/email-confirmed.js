@@ -50,7 +50,7 @@ function EmailConfirmed() {
               </Text>
               Email confirmed
             </Text>
-            <BlogPromoBanner link="https://blog.notesnook.com/notesnook-private-note-taking-app/" />
+            <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
           </Flex>
         </Flex>
       </Flex>
