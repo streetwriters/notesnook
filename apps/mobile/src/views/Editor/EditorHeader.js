@@ -1,37 +1,38 @@
-import React, { useEffect } from 'react';
-import { Keyboard, Platform, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
+import React, {useEffect} from 'react';
+import {Keyboard, Platform, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
-  useUserStore
+  useUserStore,
 } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { db } from '../../utils/DB';
+import {editing} from '../../utils';
+import {db} from '../../utils/DB';
 import {
   eCloseFullscreenEditor,
   eOpenFullscreenEditor,
-  eOpenPublishNoteDialog
+  eOpenPublishNoteDialog,
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
   EditorWebView,
   getNote,
-  isNotedEdited, setColors
+  isNotedEdited,
+  setColors,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny from './tiny/tiny';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {toolbarRef} from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -45,45 +46,49 @@ const EditorHeader = () => {
   const insets = useSafeAreaInsets();
 
   useEffect(() => {
-    console.log('setting colors');
     setColors(colors);
   }, [colors]);
 
-  const isLargeTablet = () => {
-    return deviceMode === 'tablet';
-  };
-
   const _onBackPress = async () => {
-    eSendEvent('showTooltip');
-    toolbarRef.current?.scrollTo({
-      x: 0,
-      y: 0,
-      animated: false,
-    });
-    editing.isFocused = false;
-    editing.currentlyEditing = false;
-    if (deviceMode !== 'mobile') {
-      if (fullscreen) {
-        eSendEvent(eCloseFullscreenEditor);
-      }
-    } else {
-      if (deviceMode === 'mobile') {
-        tabBarRef.current?.goToPage(0);
-      }
-      eSendEvent('historyEvent', {
-        undo: 0,
-        redo: 0,
-      });
-
-      if (checkNote() && isNotedEdited()) {
-        ToastEvent.show({
-          heading: 'Note Saved',
-          type: 'success',
-        });
-      }
-      await clearEditor();
-      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
+    if (deviceMode !== 'mobile' && fullscreen) {
+      eSendEvent(eCloseFullscreenEditor);
+      return;
     }
+    tiny.call(EditorWebView,tiny.blur);
+    setTimeout(async () => {
+      eSendEvent('showTooltip');
+      toolbarRef.current?.scrollTo({
+        x: 0,
+        y: 0,
+        animated: false,
+      });
+      editing.isFocused = false;
+      editing.currentlyEditing = false;
+
+      if (deviceMode !== 'mobile') {
+        if (fullscreen) {
+          eSendEvent(eCloseFullscreenEditor);
+        }
+      } else {
+        if (deviceMode === 'mobile') {
+          tabBarRef.current?.goToPage(0);
+        }
+        eSendEvent('historyEvent', {
+          undo: 0,
+          redo: 0,
+        });
+
+        if (checkNote() && isNotedEdited()) {
+          ToastEvent.show({
+            heading: 'Note Saved',
+            type: 'success',
+            duration:1500
+          });
+        }
+        await clearEditor();
+        Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
+      }
+    }, 50);
   };
 
   const publishNote = async () => {
