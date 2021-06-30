@@ -797,7 +797,7 @@ export const ActionSheetComponent = ({
         />
       ) : null}
 
-      {columnItems.length > 0 ? (
+      {note.id && columnItems.length > 0 ? (
         <View
           style={{
             paddingHorizontal: 12,
