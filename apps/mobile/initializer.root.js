@@ -1,38 +1,38 @@
 import {
   activateKeepAwake,
-  deactivateKeepAwake
+  deactivateKeepAwake,
 } from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef } from 'react';
-import { View } from 'react-native';
-import Animated, { useValue } from 'react-native-reanimated';
-import { notesnook } from './e2e/test.ids';
+import React, {useEffect, useRef} from 'react';
+import {View} from 'react-native';
+import Animated, {useValue} from 'react-native-reanimated';
+import {notesnook} from './e2e/test.ids';
 import ContextMenu from './src/components/ContextMenu';
 import CustomTabs from './src/components/CustomTabs';
-import { DialogManager } from './src/components/DialogManager';
-import { DummyText } from './src/components/DummyText';
-import { Menu } from './src/components/Menu';
-import { Toast } from './src/components/Toast';
-import { NavigatorStack } from './src/navigation/NavigatorStack';
-import { useTracked } from './src/provider';
-import { useSettingStore } from './src/provider/stores';
-import { DDS } from './src/services/DeviceDetection';
+import {DialogManager} from './src/components/DialogManager';
+import {DummyText} from './src/components/DummyText';
+import {Menu} from './src/components/Menu';
+import {Toast} from './src/components/Toast';
+import {NavigatorStack} from './src/navigation/NavigatorStack';
+import {useTracked} from './src/provider';
+import {useSettingStore} from './src/provider/stores';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
 } from './src/services/EventManager';
-import { editing, setWidthHeight } from './src/utils';
-import { updateStatusBarColor } from './src/utils/Colors';
+import {editing, setWidthHeight} from './src/utils';
+import {updateStatusBarColor} from './src/utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor
+  eOpenFullscreenEditor,
 } from './src/utils/Events';
-import { editorRef, tabBarRef } from './src/utils/Refs';
-import { sleep } from './src/utils/TimeUtils';
-import { EditorWrapper } from './src/views/Editor/EditorWrapper';
-import { EditorWebView, getNote } from './src/views/Editor/Functions';
+import {editorRef, tabBarRef} from './src/utils/Refs';
+import {sleep} from './src/utils/TimeUtils';
+import {EditorWrapper} from './src/views/Editor/EditorWrapper';
+import {EditorWebView, getNote} from './src/views/Editor/Functions';
 import tiny from './src/views/Editor/tiny/tiny';
 let layoutTimer = null;
 
@@ -120,18 +120,18 @@ const NativeStack = React.memo(
         style: {
           width:
             deviceMode === 'smallTablet'
-              ? dimensions.width - valueLimiter(dimensions.width * 0.4,300,450)
+              ? dimensions.width -
+                valueLimiter(dimensions.width * 0.4, 300, 450)
               : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0,
         },
       });
-      if (deviceMode === "smallTablet") {
+      if (deviceMode === 'smallTablet') {
         setTimeout(() => {
           tabBarRef.current?.goToIndex(1);
-        },100)
+        }, 100);
       }
-     
     };
 
     useEffect(() => {
@@ -143,14 +143,14 @@ const NativeStack = React.memo(
         eUnSubscribeEvent(eOpenFullscreenEditor, showFullScreenEditor);
         eUnSubscribeEvent(eCloseFullscreenEditor, closeFullScreenEditor);
       };
-    }, [deviceMode,dimensions,colors]);
+    }, [deviceMode, dimensions, colors]);
 
     const _onLayout = async event => {
       if (layoutTimer) {
         clearTimeout(layoutTimer);
         layoutTimer = null;
       }
-      let size = event?.nativeEvent?.layout
+      let size = event?.nativeEvent?.layout;
       updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
@@ -200,7 +200,7 @@ const NativeStack = React.memo(
               current === 'tablet'
                 ? size.width * 0.55
                 : current === 'smallTablet'
-                ? size.width - valueLimiter(size.width * 0.4,300,450)
+                ? size.width - valueLimiter(size.width * 0.4, 300, 450)
                 : size.width,
             zIndex: null,
             paddingHorizontal: 0,
@@ -221,7 +221,7 @@ const NativeStack = React.memo(
     }
 
     const onScroll = scrollOffset => {
-      if (scrollOffset > 299) {
+      if (scrollOffset > offsets[deviceMode].a - 10) {
         animatedOpacity.setValue(0);
         toggleView(false);
       } else {
@@ -233,7 +233,7 @@ const NativeStack = React.memo(
           op = 1 - o;
         }
         animatedOpacity.setValue(op);
-        toggleView(op < 0.05 ? false : true);
+        toggleView(op < 0.1 ? false : true);
       }
     };
 
@@ -241,17 +241,17 @@ const NativeStack = React.memo(
       animatedTranslateY.setValue(show ? 0 : -9999);
     };
 
-    const valueLimiter = (value,min,max) => {
+    const valueLimiter = (value, min, max) => {
       if (value < min) {
-        return min
+        return min;
       }
 
       if (value > max) {
-        return max
+        return max;
       }
-      
+
       return value;
-    }
+    };
 
     const offsets = {
       mobile: {
@@ -260,9 +260,13 @@ const NativeStack = React.memo(
         c: dimensions.width * 2 + dimensions.width * 0.75,
       },
       smallTablet: {
-        a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3,300,350),
-        b: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3,300,350),
-        c: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3,300,350),
+        a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3, 300, 350),
+        b: fullscreen
+          ? 0
+          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
+        c: fullscreen
+          ? 0
+          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
       },
       tablet: {
         a: 0,
@@ -271,8 +275,6 @@ const NativeStack = React.memo(
       },
     };
 
-  
-
     const widths = {
       mobile: {
         a: dimensions.width * 0.75,
@@ -280,9 +282,9 @@ const NativeStack = React.memo(
         c: dimensions.width,
       },
       smallTablet: {
-        a: valueLimiter(dimensions.width * 0.3,300,350),
-        b: valueLimiter(dimensions.width * 0.4,300,450),
-        c: dimensions.width - valueLimiter(dimensions.width * 0.4,300,450)
+        a: valueLimiter(dimensions.width * 0.3, 300, 350),
+        b: valueLimiter(dimensions.width * 0.4, 300, 450),
+        c: dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450),
       },
       tablet: {
         a: dimensions.width * 0.15,
