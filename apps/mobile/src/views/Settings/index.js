@@ -1594,7 +1594,7 @@ const SettingsBackupAndRestore = () => {
           noProgress: true,
           action: async () => {
             try {
-              await openLinkInBrowser('https://importer.notenook.com', colors);
+              await openLinkInBrowser('https://importer.notesnook.com', colors);
             } catch (e) {}
           },
           actionText: 'Go to Notesnook Importer',
