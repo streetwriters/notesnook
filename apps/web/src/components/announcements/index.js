@@ -54,7 +54,7 @@ function Announcements({ announcements, removeAnnouncement }) {
       )}
       <Flex justifyContent="space-evenly" mt={1}>
         {announcement.callToActions
-          ?.filter((platform) => allowedPlatforms.indexOf(platform) > -1)
+          ?.filter((cta) => allowedPlatforms.indexOf(cta.platform) > -1)
           .map((action, index) => (
             <Button
               flex={1}
