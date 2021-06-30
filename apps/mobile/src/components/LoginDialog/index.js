@@ -503,6 +503,8 @@ const LoginDialog = () => {
       ) : null}
 
       <ScrollView
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         style={{
           maxHeight: DDS.isTab ? '90%' : '100%',
           minHeight: '50%',
