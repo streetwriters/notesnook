@@ -132,6 +132,7 @@ const EditorRoot = () => {
         ToastEvent.show({
           heading: 'Note Saved',
           type: 'success',
+          duration:1500
         });
       }
       await clearEditor();
