@@ -85,7 +85,6 @@ export const Home = ({navigation}) => {
 
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
-      eSendEvent(eOnLoadNote, {type: 'new'});
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
