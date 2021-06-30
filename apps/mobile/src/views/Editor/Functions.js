@@ -409,8 +409,6 @@ function onNoteChange() {
 
 export async function clearEditor() {
   try {
-    tiny.call(EditorWebView, tiny.reset, true);
-    clearTimer();
     if (
       (content?.data &&
         typeof content.data == 'string' &&
@@ -419,6 +417,8 @@ export async function clearEditor() {
     ) {
       await saveNote(true);
     }
+    tiny.call(EditorWebView, tiny.reset, true);
+    clearTimer();
     clearNote();
     editing.focusType = null;
     eSendEvent('historyEvent', {
@@ -494,8 +494,14 @@ async function addToCollection(id) {
     }
   }
 }
+let isSaving = false;
 
 export async function saveNote(preventUpdate) {
+  if (isSaving && !id) {
+    console.log('saving cancelled');
+    return;
+  }
+  isSaving = true;
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
@@ -545,6 +551,7 @@ export async function saveNote(preventUpdate) {
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
     }
   } catch (e) {}
+  isSaving = false;
 }
 
 export async function onWebViewLoad(premium, colors) {
@@ -574,7 +581,7 @@ async function restoreEditorState() {
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
       if (!DDS.isTab) {
-       tabBarRef.current?.goToPage(1);
+        tabBarRef.current?.goToPage(1);
       }
       setTimeout(() => {
         eSendEvent(eOnLoadNote, appState.note);
