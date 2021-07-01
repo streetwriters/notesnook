@@ -17,8 +17,8 @@ export function formatSelection(command) {
   EditorWebView.current?.injectJavaScript(command);
 }
 
-export function focusEditor(format) {
-  eSendEvent("showTooltip");
+export function focusEditor(format,kill=true) {
+  kill && eSendEvent("showTooltip");
   Platform.OS === 'android' && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
     tiny.call(EditorWebView, tiny.blur + ' ' + tiny.focusEditor);
