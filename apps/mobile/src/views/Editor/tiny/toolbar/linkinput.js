@@ -60,11 +60,11 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     }
   }, [mode]);
 
-  const onChangeText = (value) => {
+  const onChangeText = value => {
     inputValue = value;
   };
 
-  const onSubmit = (value) => {
+  const onSubmit = value => {
     if (value === 'clear') {
       inputValue = null;
     }
@@ -77,7 +77,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     }
     editing.tooltip = null;
     setMode(INPUT_MODE.NO_EDIT);
-    focusEditor(format);
+    focusEditor(format, false);
     properties.userBlur = false;
   };
 
@@ -121,7 +121,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             defaultValue={value}
             blurOnSubmit={false}
             placeholder="Enter link"
-            placeholderTextColor={colors.nav}
+            placeholderTextColor={colors.icon}
           />
 
           {mode === INPUT_MODE.EDITING && (
