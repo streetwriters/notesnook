@@ -46,11 +46,7 @@ const EditorRoot = () => {
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
-      handleBack = BackHandler.addEventListener('hardwareBackPress', () => {
-        simpleDialogEvent(TEMPLATE_EXIT_FULLSCREEN());
-        editing.isFullscreen = false;
-        return true;
-      });
+      handleBack = BackHandler.addEventListener('hardwareBackPress', _onBackPress);
     }
 
     return () => {
