@@ -267,7 +267,6 @@ export const AppRootEvents = React.memo(
     };
 
     const partialSync = async () => {
-      if (!useUserStore.getState().user) return;
       try {
         setSyncing(true);
         let res = await doInBackground(async () => {

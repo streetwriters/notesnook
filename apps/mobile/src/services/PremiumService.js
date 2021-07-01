@@ -24,7 +24,7 @@ async function setPremiumStatus() {
   try {
     user = await db.user.getUser();
     if (!user) {
-      premiumStatus = null;
+      premiumStatus = 0;
       userstore.setPremium(get());
     } else {
       premiumStatus = user.subscription.type;
@@ -32,7 +32,7 @@ async function setPremiumStatus() {
       userstore.setUser(user);
     }
   } catch (e) {
-    premiumStatus = null;
+    premiumStatus = 0;
   } finally {
     if (!get()) {
       await RNIap.initConnection();
@@ -111,7 +111,6 @@ const onUserStatusCheck = async type => {
       eSendEvent(eShowGetPremium, message);
     }
   }
-
   return {type, result: status};
 };
 
