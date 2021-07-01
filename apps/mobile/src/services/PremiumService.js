@@ -1,19 +1,19 @@
-import { CHECK_IDS } from 'notes-core/common';
+import {CHECK_IDS} from 'notes-core/common';
 import * as RNIap from 'react-native-iap';
-import { useUserStore } from '../provider/stores';
-import { itemSkus } from '../utils';
-import { db } from '../utils/DB';
+import {useUserStore} from '../provider/stores';
+import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
+import {db} from '../utils/DB';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
-  eShowGetPremium
+  eShowGetPremium,
 } from '../utils/Events';
-import { MMKV } from '../utils/mmkv';
-import { eSendEvent, ToastEvent } from './EventManager';
+import {MMKV} from '../utils/mmkv';
+import {eSendEvent, ToastEvent} from './EventManager';
 
 let premiumStatus = 0;
 let products = [];
-let user = null
+let user = null;
 
 function getUser() {
   return user;
@@ -25,10 +25,10 @@ async function setPremiumStatus() {
     user = await db.user.getUser();
     if (!user) {
       premiumStatus = null;
-      userstore.setPremium(get())
+      userstore.setPremium(get());
     } else {
       premiumStatus = user.subscription.type;
-      userstore.setPremium(get())
+      userstore.setPremium(get());
       userstore.setUser(user);
     }
   } catch (e) {
@@ -46,17 +46,10 @@ function getProducts() {
 }
 
 function get() {
-  
-  return (
-    premiumStatus === 1 ||
-    premiumStatus === 2 ||
-    premiumStatus === 5 ||
-    premiumStatus === 6
-  );
+  return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
 async function verify(callback, error) {
-  
   try {
     if (!premiumStatus) {
       if (error) {
@@ -65,16 +58,13 @@ async function verify(callback, error) {
       }
       eSendEvent(eOpenPremiumDialog);
       return;
-    } else {
-      if (!callback) console.warn('You must provide a callback function');
-      await callback();
     }
-  } catch (e) {
-    // show error dialog TODO
-  }
+    if (!callback) console.warn('You must provide a callback function');
+    await callback();
+  } catch (e) {}
 }
 
-const onUserStatusCheck = async (type) => {
+const onUserStatusCheck = async type => {
   let status = get();
   let message = null;
 
@@ -135,8 +125,8 @@ const showVerifyEmailDialog = () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
         if (
-          lastEmailTime 
-         && Date.now() - JSON.parse(lastEmailTime) < 60000 * 2
+          lastEmailTime &&
+          Date.now() - JSON.parse(lastEmailTime) < 60000 * 2
         ) {
           ToastEvent.show({
             heading: 'Please wait before requesting another email',
@@ -177,5 +167,5 @@ export default {
   onUserStatusCheck,
   showVerifyEmailDialog,
   getProducts,
-  getUser
+  getUser,
 };

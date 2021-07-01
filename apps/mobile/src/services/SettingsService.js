@@ -7,7 +7,6 @@ import { AndroidModule, preloadImages, sortSettings } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
-import Navigation from './Navigation';
 
 export const defaultSettings = {
   showToolbarOnTop: false,
@@ -23,7 +22,7 @@ export const defaultSettings = {
   screenshotMode: true,
   privacyScreen: false,
   appLockMode: 'none',
-  telemetry:false 
+  telemetry:true 
 }
 
 let settings = {...defaultSettings}
@@ -50,17 +49,6 @@ async function init() {
       settings.appLockMode = "none";
     }
   }
-
-  Navigation.setHeaderState(
-    settings.homepage,
-    {
-      menu: true,
-    },
-    {
-      heading: settings.homepage,
-      id: settings.homepage.toLowerCase() + '_navigation',
-    },
-  );
 
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
