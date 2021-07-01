@@ -107,41 +107,51 @@ const EditorRoot = () => {
     }
   };
 
-  const _onBackPress = async () => {
-    eSendEvent('showTooltip');
-    toolbarRef.current?.scrollTo({
-      x: 0,
-      y: 0,
-      animated: false,
-    });
-    editing.currentlyEditing = false;
-    if (DDS.isLargeTablet()) {
-      if (fullscreen) {
-        eSendEvent(eCloseFullscreenEditor);
-      }
-    } else {
-      if (DDS.isPhone || DDS.isSmallTab) {
-        tabBarRef.current?.goToPage(0);
-      }
-      eSendEvent('historyEvent', {
-        undo: 0,
-        redo: 0,
-      });
 
-      if (checkNote() && isNotedEdited()) {
-        ToastEvent.show({
-          heading: 'Note Saved',
-          type: 'success',
-          duration:1500
-        });
-      }
-      await clearEditor();
-      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
-      if (handleBack) {
-        handleBack.remove();
-        handleBack = null;
-      }
+  const _onBackPress = async () => {
+    if (DDS.isTab && fullscreen) {
+      eSendEvent(eCloseFullscreenEditor);
+      return;
     }
+    tiny.call(EditorWebView,tiny.blur);
+    setTimeout(async () => {
+      eSendEvent('showTooltip');
+      toolbarRef.current?.scrollTo({
+        x: 0,
+        y: 0,
+        animated: false,
+      });
+      editing.isFocused = false;
+      editing.currentlyEditing = false;
+
+      if (DDS.isTab) {
+        if (fullscreen) {
+          eSendEvent(eCloseFullscreenEditor);
+        }
+      } else {
+        if (!DDS.isTab) {
+          tabBarRef.current?.goToPage(0);
+        }
+        eSendEvent('historyEvent', {
+          undo: 0,
+          redo: 0,
+        });
+
+        if (checkNote() && isNotedEdited()) {
+          ToastEvent.show({
+            heading: 'Note Saved',
+            type: 'success',
+            duration:1500
+          });
+        }
+        await clearEditor();
+        Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
+        if (handleBack) {
+          handleBack.remove();
+          handleBack = null;
+        }
+      }
+    }, 50);
   };
 
   return <></>;

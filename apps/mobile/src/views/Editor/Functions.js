@@ -398,17 +398,18 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
+  clearTimer();
   try {
     if (
       (content?.data &&
         typeof content.data == 'string' &&
         content.data?.trim().length > 0) ||
-      (title && title?.trim().length > 0)
+      (title && title?.trim().length > 0) &&
+      id
     ) {
       await saveNote(true);
     }
     tiny.call(EditorWebView, tiny.reset, true);
-    clearTimer();
     clearNote();
     editing.focusType = null;
     eSendEvent('historyEvent', {
