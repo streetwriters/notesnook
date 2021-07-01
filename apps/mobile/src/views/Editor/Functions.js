@@ -175,7 +175,6 @@ let currentEditingTimer = null;
 let webviewTimer = null;
 
 export const loadNote = async item => {
-  console.log(item);
   editing.currentlyEditing = true;
   tiny.call(EditorWebView, tiny.blur);
   if (item && item.type === 'new') {
@@ -255,6 +254,7 @@ export const _onMessage = async evt => {
       break;
     case 'tiny':
       if (message.value !== content.data) {
+        noteEdited = true;
         content = {
           type: message.type,
           data: message.value,
@@ -263,8 +263,8 @@ export const _onMessage = async evt => {
       }
       break;
     case 'title':
-      noteEdited = true;
       if (message.value !== title) {
+        noteEdited = true;
         title = message.value;
         eSendEvent('editorScroll', {
           title: message.value,
@@ -394,7 +394,7 @@ function onNoteChange() {
     if (noteEdited) {
       saveNote();
     }
-  }, 1);
+  }, 500);
 }
 
 export async function clearEditor() {
