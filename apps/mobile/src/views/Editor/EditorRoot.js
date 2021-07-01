@@ -1,7 +1,5 @@
 import React, { useEffect } from 'react';
 import { BackHandler, InteractionManager, Keyboard } from 'react-native';
-import { simpleDialogEvent } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EXIT_FULLSCREEN } from '../../components/DialogManager/Templates';
 import { useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import {

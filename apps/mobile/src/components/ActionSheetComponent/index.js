@@ -16,6 +16,7 @@ import {Actions} from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
+  useTrashStore,
   useUserStore,
 } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
@@ -37,6 +38,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
+import {presentDialog} from '../Dialog/functions';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -264,10 +266,28 @@ export const ActionSheetComponent = ({
       },
     },
     {
-      name: 'Remove',
+      name: 'Delete',
       icon: 'delete',
-      func: () => {
-        close('permanant_delete');
+      func: async () => {
+        close();
+        await sleep(300);
+        presentDialog({
+          title: `Permanent delete`,
+          paragraph: `Are you sure you want to delete this ${note.itemType} permanantly from trash?`,
+          positiveText: 'Delete',
+          negativeText: 'Cancel',
+          positivePress: async () => {
+            await db.trash.delete(note.id);
+            useTrashStore.getState().setTrash();
+            useSelectionStore.getState().setSelectionMode(false);
+            ToastEvent.show({
+              heading: 'Permanantly deleted items',
+              type: 'success',
+              context: 'local',
+            });
+          },
+          positiveType: 'errorShade',
+        });
       },
     },
     {
