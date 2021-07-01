@@ -310,6 +310,10 @@ export const _onMessage = async evt => {
       eSendEvent('ImagePreview', message.value);
       break;
     case 'imageoptions':
+      if (editing.tooltip === 'imageoptions') {
+        eSendEvent('showTooltip');
+        break;
+      }
       showImageOptionsTooltip()
       break;
     case 'focus':
@@ -324,10 +328,6 @@ export const _onMessage = async evt => {
 };
 
 function showImageOptionsTooltip() {
-  if (editing.tooltip === 'imageoptions') {
-    eSendEvent('showTooltip');
-    break;
-  }
   editing.tooltip = 'imageoptions';
   eSendEvent('showTooltip', {
     data: [
