@@ -1,22 +1,20 @@
-import {createRef} from 'react';
-import {Platform} from 'react-native';
-import {updateEvent} from '../../components/DialogManager/recievers';
-import {Actions} from '../../provider/Actions';
-import {useEditorStore, useMenuStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, sendNoteEditedEvent} from '../../services/EventManager';
+import { createRef } from 'react';
+import { Platform } from 'react-native';
+import { useEditorStore, useMenuStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import {editing, InteractionManager} from '../../utils';
-import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
-import {eOnLoadNote, eShowGetPremium} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {normalize} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { editing, InteractionManager } from '../../utils';
+import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
+import { eOnLoadNote, eShowGetPremium } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { normalize } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
@@ -242,15 +240,6 @@ const checkStatus = (reset = false) => {
   }, 3500);
 };
 
-export function setIntentNote(item) {
-  id = null;
-  intent = true;
-  content = {
-    data: item.data,
-    type: 'tiny',
-  };
-}
-
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
@@ -271,8 +260,6 @@ export const _onMessage = async evt => {
           data: message.value,
         };
         onNoteChange();
-      } else {
-        console.log('not saving');
       }
       break;
     case 'title':
@@ -321,68 +308,9 @@ export const _onMessage = async evt => {
       break;
     case 'imagepreview':
       eSendEvent('ImagePreview', message.value);
-
       break;
     case 'imageoptions':
-      if (editing.tooltip === 'imageoptions') {
-        eSendEvent('showTooltip');
-        break;
-      }
-      editing.tooltip = 'imageoptions';
-      eSendEvent('showTooltip', {
-        data: [
-          {
-            format: 'imagepreview',
-            type: 'format',
-            fullname: 'Image preview',
-          },
-          {
-            format: 'imageResize25',
-            text: '25%',
-            type: 'format',
-            showTitle: false,
-            fullname: 'Resize to 25%',
-          },
-          {
-            format: 'imageResize50',
-            text: '50%',
-            type: 'format',
-            showTitle: false,
-            fullname: 'Resize to 25%',
-          },
-          {
-            format: 'imageResize100',
-            text: '100%',
-            type: 'format',
-            showTitle: false,
-            fullname: 'Resize to 25%',
-          },
-          {
-            format: 'imagefloatleft',
-            type: 'format',
-            fullname: 'Remove image',
-          },
-          {
-            format: 'imagefloatright',
-            type: 'format',
-            fullname: 'Image preview',
-          },
-          {
-            format: 'imagefloatnone',
-            type: 'format',
-            fullname: 'Image preview',
-          },
-          {
-            format: 'removeimage',
-            type: 'format',
-            fullname: 'Remove image',
-          },
-        ],
-        title: 'imageoptions',
-        default: null,
-        type: 'imageoptions',
-        pageX: 0,
-      });
+      showImageOptionsTooltip()
       break;
     case 'focus':
       editing.focusType = message.value;
@@ -394,6 +322,68 @@ export const _onMessage = async evt => {
       break;
   }
 };
+
+function showImageOptionsTooltip() {
+  if (editing.tooltip === 'imageoptions') {
+    eSendEvent('showTooltip');
+    break;
+  }
+  editing.tooltip = 'imageoptions';
+  eSendEvent('showTooltip', {
+    data: [
+      {
+        format: 'imagepreview',
+        type: 'format',
+        fullname: 'Image preview',
+      },
+      {
+        format: 'imageResize25',
+        text: '25%',
+        type: 'format',
+        showTitle: false,
+        fullname: 'Resize to 25%',
+      },
+      {
+        format: 'imageResize50',
+        text: '50%',
+        type: 'format',
+        showTitle: false,
+        fullname: 'Resize to 25%',
+      },
+      {
+        format: 'imageResize100',
+        text: '100%',
+        type: 'format',
+        showTitle: false,
+        fullname: 'Resize to 25%',
+      },
+      {
+        format: 'imagefloatleft',
+        type: 'format',
+        fullname: 'Remove image',
+      },
+      {
+        format: 'imagefloatright',
+        type: 'format',
+        fullname: 'Image preview',
+      },
+      {
+        format: 'imagefloatnone',
+        type: 'format',
+        fullname: 'Image preview',
+      },
+      {
+        format: 'removeimage',
+        type: 'format',
+        fullname: 'Remove image',
+      },
+    ],
+    title: 'imageoptions',
+    default: null,
+    type: 'imageoptions',
+    pageX: 0,
+  });
+}
 
 function onNoteChange() {
   clearTimeout(timer);
@@ -497,10 +487,7 @@ async function addToCollection(id) {
 let isSaving = false;
 
 export async function saveNote(preventUpdate) {
-  if (isSaving && !id) {
-    console.log('saving cancelled');
-    return;
-  }
+  if (isSaving && !id)  return;
   isSaving = true;
   try {
     if (id && !db.notes.note(id)) {
@@ -555,9 +542,6 @@ export async function saveNote(preventUpdate) {
 }
 
 export async function onWebViewLoad(premium, colors) {
-  if (!checkNote()) {
-    //Platform.OS === 'android' ? EditorWebView.current?.requestFocus() : null;
-  }
   if (premium) {
     tiny.call(EditorWebView, tiny.setMarkdown, true);
   } else {
@@ -597,8 +581,6 @@ async function restoreEditorState() {
   }
   editing.isRestoringState = false;
 }
-
-export let isFromIntent = false;
 
 const loadNoteInEditor = async () => {
   if (!webviewInit) return;

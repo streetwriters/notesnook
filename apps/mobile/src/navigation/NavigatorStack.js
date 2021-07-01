@@ -63,7 +63,7 @@ export const NavigatorStack = React.memo(
           ref={rootNavigatorRef}>
           {render && (
             <Stack.Navigator
-              initialRouteName={SettingsService.get().homepage}
+              initialRouteName={settings.homepage}
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,

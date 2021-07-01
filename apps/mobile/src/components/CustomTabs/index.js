@@ -154,7 +154,7 @@ export default class CustomTabs extends Component {
 
   keyExtractor = (item, index) => item;
 
-  onScrollEnd = event => {
+  onScrollEnd = () => {
     this.moved = false;
     this.responderAllowedScroll = false;
     let page = 0;
