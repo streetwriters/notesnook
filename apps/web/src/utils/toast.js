@@ -23,7 +23,7 @@ function showToast(type, message, actions) {
       renderIcon: () => {
         return (
           <ThemeProvider>
-            <IconComponent color={type} />
+            <IconComponent size={28} color={type} />
           </ThemeProvider>
         );
       },
@@ -39,12 +39,12 @@ function ToastContainer(props) {
         data-test-id="toast"
         justifyContent="center"
         alignContent="center"
-        my={1}
+        my={2}
       >
         <Text
           data-test-id="toast-message"
           variant="body"
-          fontSize="menu"
+          fontSize="body"
           color="text"
           mr={2}
         >
@@ -52,8 +52,9 @@ function ToastContainer(props) {
         </Text>
         {actions?.map((action) => (
           <Button
+            flexShrink={0}
             variant="anchor"
-            fontSize="menu"
+            fontSize="body"
             color={type}
             key={action.text}
             onClick={action.onClick}

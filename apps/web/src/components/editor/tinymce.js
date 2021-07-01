@@ -30,6 +30,7 @@ import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
 import { KeyboardEventManager } from "../../utils/keyboard";
+import { showToast } from "../../utils/toast";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -83,18 +84,12 @@ const markdownPatterns = [
 ];
 
 const premiumCommands = [
-  "InsertUnorderedList",
-  "InsertOrderedList",
-  "indent",
   "JustifyFull",
   "JustifyLeft",
   "JustifyRight",
   "JustifyCenter",
   "FontSize",
-  "mceApplyTextcolor",
-  "mceInsertContent",
   "mceMedia",
-  "mceDirectionRTL",
 ];
 
 function useSkin() {
@@ -146,8 +141,9 @@ function TinyMCE(props) {
         statusbar: false,
         link_quicklink: true,
         width: "100%",
-        plugins:
-          "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize",
+        plugins: isUserPremium()
+          ? "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize"
+          : "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize",
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_insert_toolbar: false,
@@ -182,7 +178,7 @@ function TinyMCE(props) {
 `,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
         quickbars_selection_toolbar:
           "bold italic underline strikethrough code h2 h3 quicklink blockquote",
         mobile: {
@@ -212,14 +208,39 @@ function TinyMCE(props) {
         autoresize_bottom_margin: 100,
       }}
       onBeforeExecCommand={async (command) => {
+        console.log(command);
         if (
-          premiumCommands.some(
-            (cmd) => command.command === cmd && !command?.value?.paste
-          ) &&
+          premiumCommands.some((cmd) => {
+            let isPremium = command.command === cmd && !command?.value?.paste;
+            if (
+              command.command === "mceInsertContent" &&
+              !command?.value?.paste
+            ) {
+              isPremium =
+                command.value.startsWith(`<pre`) ||
+                command.value.startsWith(`<table`) ||
+                command.value.startsWith(`<img`) ||
+                command.value.includes("tox-checklist");
+            }
+            return isPremium;
+          }) &&
           !isUserPremium()
         ) {
           command.preventDefault();
-          await showBuyDialog();
+          command.stopImmediatePropagation();
+          command.stopPropagation();
+          showToast(
+            "error",
+            "Upgrade to Pro to enjoy full rich text editor with markdown support.",
+            [
+              {
+                text: "Upgrade",
+                onClick: () => {
+                  showBuyDialog();
+                },
+              },
+            ]
+          );
           return;
         }
       }}
