@@ -45,7 +45,7 @@ function setAppHydrated() {
 }
 
 async function loadDefaultNotes(db) {
-  const notes = await http.get("/notes/index.json");
+  const notes = await http.get("/notes/index_v14.json");
   if (!notes) return;
   let autoOpenId;
   const hash = getCurrentHash().replaceAll("#", "");
