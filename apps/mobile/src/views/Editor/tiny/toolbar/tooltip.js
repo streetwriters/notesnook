@@ -52,7 +52,6 @@ const Tooltip = () => {
 
   const show = async (data) => {
     properties.userBlur = true;
-
     if (!data) {
       editing.tooltip = null;
       animate(70, 100);
@@ -199,6 +198,7 @@ const Tooltip = () => {
                 formatSelection(
                   execCommands.table(rowNumber + 1, columnNumber + 1),
                 );
+                console.log('hiding tooltip')
                 eSendEvent('showTooltip');
               }}
               style={{

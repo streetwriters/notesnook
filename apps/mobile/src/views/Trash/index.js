@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { simpleDialogEvent } from '../../components/DialogManager/recievers';
-import { TEMPLATE_EMPTY_TRASH } from '../../components/DialogManager/Templates';
+import { presentDialog } from '../../components/Dialog/functions';
 import { Header } from '../../components/Header';
 import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
@@ -13,7 +12,6 @@ import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { eScrollEvent } from '../../utils/Events';
-
 
 export const Trash = ({route, navigation}) => {
   const trash = useTrashStore(state => state.trash);
@@ -83,7 +81,27 @@ export const Trash = ({route, navigation}) => {
     });
   };
 
-  const _onPressBottomButton = () => simpleDialogEvent(TEMPLATE_EMPTY_TRASH);
+  const _onPressBottomButton = () => {
+    presentDialog({
+      title: 'Clear trash',
+      paragraph: 'Are you sure you want to clear the trash?',
+      positiveText: 'Clear',
+      negativeText: 'Cancel',
+      positivePress: async () => {
+        await db.trash.clear();
+        useTrashStore.getState().setTrash();
+        useSelectionStore.getState().clearSelection();
+        ToastEvent.show({
+          heading: 'Trash cleared',
+          message:
+            'All notes and notebooks in the trash have been removed permanantly.',
+          type: 'success',
+          context: 'local',
+        });
+      },
+      positiveType: 'errorShade',
+    });
+  };
 
   return (
     <>
