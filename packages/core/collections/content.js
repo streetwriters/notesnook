@@ -55,4 +55,17 @@ export default class Content extends Collection {
   all() {
     return this._collection.getItems(this._collection.indexer.indices);
   }
+
+  async cleanup() {
+    const allContent = await this.all();
+    let ids = [];
+    for (let content of allContent) {
+      const { noteId } = content;
+      if (!this._db.notes.note(noteId)) {
+        ids.push(content.id);
+        await this._collection.deleteItem(content.id);
+      }
+    }
+    return ids;
+  }
 }

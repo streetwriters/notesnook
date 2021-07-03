@@ -133,4 +133,18 @@ export default class Sync {
 
     return response.lastSynced;
   }
+
+  async cleanup() {
+    try {
+      let token = await this._tokenManager.getAccessToken();
+      if (!token) return;
+      const contentIds = await this._db.content.cleanup();
+      if (contentIds.length <= 0) return;
+      await http.post.json(
+        `${Constants.API_HOST}/sync/delete`,
+        { collection: "content", ids: contentIds },
+        token
+      );
+    } catch (e) {}
+  }
 }

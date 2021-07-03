@@ -96,6 +96,8 @@ class Database {
     await this.migrations.migrate();
 
     this.monographs.init();
+
+    await this.syncer.cleanup();
   }
 
   async connectSSE() {
