@@ -127,6 +127,7 @@ class AppStore extends BaseStore {
     return db
       .sync(full)
       .then(async () => {
+        showToast("Sync completed.");
         await this.updateLastSynced();
         return await this.refresh();
       })

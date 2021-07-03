@@ -10,7 +10,7 @@ import { hashNavigate, navigate } from "../../navigation";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
-  const sync = useUserStore((state) => state.sync);
+  const sync = useAppStore((state) => state.sync);
   const lastSynced = useAppStore((state) => state.lastSynced);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const isSyncing = useAppStore((state) => state.isSyncing);
