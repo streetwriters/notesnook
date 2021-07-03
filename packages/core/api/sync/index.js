@@ -82,7 +82,7 @@ export default class Sync {
     await this._db.conflicts.check();
 
     // send the data back to server
-    lastSynced = await this._send(data, lastSynced, token);
+    lastSynced = await this._send(data, token);
 
     // update our lastSynced time
     if (lastSynced) {
@@ -124,9 +124,7 @@ export default class Sync {
     // }
   }
 
-  async _send(data, lastSynced, token) {
-    if (lastSynced && areAllEmpty(data)) return;
-
+  async _send(data, token) {
     let response = await http.post.json(
       `${Constants.API_HOST}/sync`,
       data,
