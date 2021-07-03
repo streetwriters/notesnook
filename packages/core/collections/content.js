@@ -57,14 +57,18 @@ export default class Content extends Collection {
   }
 
   async cleanup() {
-    const allContent = await this.all();
+    const indices = this._collection.indexer.indices;
+    await this._db.notes.init();
+    const notes = this._db.notes._collection.getRaw();
     let ids = [];
-    for (let content of allContent) {
-      const { noteId } = content;
-      const note = this._db.notes._collection.getItem(noteId);
-      if (!note || note.contentId !== content.id) {
-        ids.push(content.id);
-        await this._collection.deleteItem(content.id);
+    for (let contentId of indices) {
+      const noteIndex = notes.findIndex((note) => note.contentId === contentId);
+      const isOrphaned = noteIndex === -1;
+      if (isOrphaned) {
+        ids.push(contentId);
+        await this._collection.deleteItem(contentId);
+      } else if (notes[noteIndex].localOnly) {
+        ids.push(contentId);
       }
     }
     return ids;

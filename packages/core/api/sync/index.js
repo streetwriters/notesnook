@@ -145,6 +145,8 @@ export default class Sync {
         { collection: "content", ids: contentIds },
         token
       );
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+    }
   }
 }
