@@ -82,7 +82,7 @@ export default class Sync {
     await this._db.conflicts.check();
 
     // send the data back to server
-    lastSynced = await this._send(data, token);
+    lastSynced = await this._send(data, lastSynced, token);
 
     // update our lastSynced time
     if (lastSynced) {
@@ -91,10 +91,23 @@ export default class Sync {
   }
 
   async eventMerge(serverResponse) {
-    let { lastSynced } = await this._performChecks();
+    let { lastSynced, token } = await this._performChecks();
+
+    const data = await this._collector.collect(lastSynced);
 
     // merge the server response
     await this._merger.merge(serverResponse, lastSynced);
+
+    // check for conflicts and throw
+    await this._db.conflicts.check();
+
+    // send the data back to server
+    lastSynced = await this._send(data, token);
+
+    // update our lastSynced time
+    if (lastSynced) {
+      await this._db.context.write("lastSynced", lastSynced);
+    }
 
     EV.publish(EVENTS.appRefreshRequested);
 
@@ -111,8 +124,8 @@ export default class Sync {
     // }
   }
 
-  async _send(data, token) {
-    if (areAllEmpty(data)) return;
+  async _send(data, lastSynced, token) {
+    if (lastSynced && areAllEmpty(data)) return;
 
     let response = await http.post.json(
       `${Constants.API_HOST}/sync`,
