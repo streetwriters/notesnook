@@ -33,7 +33,7 @@ async function loadDefaultNotes() {
   try {
     const isCreated = await MMKV.getItem('defaultNoteCreated');
     if (isCreated) return;
-    const notes = await http.get('https://app.notesnook.com/notes/index.json');
+    const notes = await http.get('https://app.notesnook.com/notes/index_14.json');
     if (!notes) return;
     for (let note of notes) {
       const content = await http.get(note.mobileContent);

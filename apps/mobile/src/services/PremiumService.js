@@ -37,6 +37,8 @@ async function setPremiumStatus() {
     if (!get()) {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
+    } else {
+      await subscriptions.clear();
     }
   }
 }
@@ -159,6 +161,102 @@ const showVerifyEmailDialog = () => {
   });
 };
 
+const subscriptions = {
+  get: async () => {
+    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (!_subscriptions) return [];
+    return JSON.parse(_subscriptions);
+  },
+  set: async subscription => {
+    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (_subscriptions) {
+      _subscriptions = JSON.parse(_subscriptions);
+    } else {
+      _subscriptions = [];
+    }
+    let index = _subscriptions.findIndex(
+      s => s.transactionId === transactionId,
+    );
+    if (index === -1) {
+      _subscriptions.unshift(subscription);
+    } else {
+      _subscriptions[index] = subscription;
+    }
+    await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+  },
+  remove: async transactionId => {
+    let _subscriptions = await MMKV.getItem('subscriptionsIOS');
+    if (_subscriptions) {
+      _subscriptions = JSON.parse(_subscriptions);
+    } else {
+      _subscriptions = [];
+    }
+    let index = _subscriptions.findIndex(
+      s => s.transactionId === transactionId,
+    );
+    if (index !== -1) {
+      _subscriptions.splice(index);
+      await MMKV.setItem('subscriptionsIOS', JSON.stringify(_subscriptions));
+    }
+  },
+  verify: async subscription => {
+    console.log(
+      'verifying: ',
+      subscription.transactionId,
+      new Date(subscription.transactionDate).toLocaleString(),
+    );
+
+    if (subscription.transactionReceipt) {
+      if (Platform.OS === 'ios') {
+        let user = await db.user.getUser();
+        if (!user) return;
+        let requestData = {
+          method: 'POST',
+          body: JSON.stringify({
+            receipt_data: subscription.transactionReceipt,
+            user_id: user.id,
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        };
+        try {
+          let result = await fetch(
+            'https://payments.streetwriters.co/apple/verify',
+            requestData,
+          );
+          let text = await result.text();
+          if (!result.ok) {
+            if (text === 'Receipt already expired.') {
+              await subscriptions.clear(subscription);
+              console.log('clearing because expired');
+            }
+            return;
+          }
+        } catch (e) {
+          console.log('subscription error', e);
+        }
+      }
+    }
+  },
+  clear: async _subscription => {
+    let _subscriptions = await subscriptions.get();
+    let subscription = null;
+    if (_subscription) {
+      subscription = _subscription;
+      console.log('got id to clear');
+    } else {
+      subscription = _subscriptions.length > 0 ? _subscriptions[0] : null;
+    }
+    if (subscription) {
+      await RNIap.finishTransactionIOS(subscription.transactionId);
+      await RNIap.clearTransactionIOS();
+      await subscriptions.remove(subscription.transactionId);
+      console.log('clearing subscriptions');
+    }
+  },
+};
+
 export default {
   verify,
   setPremiumStatus,
@@ -167,4 +265,5 @@ export default {
   showVerifyEmailDialog,
   getProducts,
   getUser,
+  subscriptions,
 };
