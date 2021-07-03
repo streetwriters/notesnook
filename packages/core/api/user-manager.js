@@ -85,6 +85,7 @@ class UserManager {
     } finally {
       await this._db.context.clear();
       EV.publish(EVENTS.userLoggedOut, reason);
+      EV.publish(EVENTS.appRefreshRequested);
     }
   }
 
