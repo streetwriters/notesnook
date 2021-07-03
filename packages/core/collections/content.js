@@ -61,7 +61,8 @@ export default class Content extends Collection {
     let ids = [];
     for (let content of allContent) {
       const { noteId } = content;
-      if (!this._db.notes.note(noteId)) {
+      const note = this._db.notes._collection.getItem(noteId);
+      if (!note || note.contentId !== content.id) {
         ids.push(content.id);
         await this._collection.deleteItem(content.id);
       }
