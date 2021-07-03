@@ -42,7 +42,7 @@ function DiffViewer(props) {
 
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const theme = useThemeStore((store) => store.theme);
-  const sync = useUserStore((store) => store.sync);
+  const sync = useAppStore((store) => store.sync);
   const clearSession = useEditorStore((store) => store.clearSession);
   const [conflictedNote, setConflictedNote] = useState();
   const [remoteContent, setRemoteContent] = useState();

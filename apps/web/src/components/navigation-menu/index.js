@@ -64,10 +64,10 @@ function NavigationMenu(props) {
   const isSideMenuOpen = useAppStore((store) => store.isSideMenuOpen);
   const refreshMenuPins = useAppStore((store) => store.refreshMenuPins);
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
-  const isSyncing = useUserStore((store) => store.isSyncing);
+  const isSyncing = useAppStore((store) => store.isSyncing);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   //const logout = useUserStore((store) => store.logout);
-  const sync = useUserStore((store) => store.sync);
+  const sync = useAppStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();

@@ -3,6 +3,7 @@ import { db } from "../common/db";
 import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";
+import { store as editorStore } from "./editor-store";
 import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
 import { isMobile } from "../utils/dimensions";
@@ -12,6 +13,7 @@ import { resetReminders } from "../common/reminders";
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = !isMobile();
+  isSyncing = false;
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
@@ -19,8 +21,10 @@ class AppStore extends BaseStore {
   globalMenu = { items: [], data: {} };
   reminders = [];
   menuPins = [];
+  lastSynced = 0;
 
   refresh = async () => {
+    await this.updateLastSynced();
     await resetReminders();
     noteStore.refresh();
     notebookStore.refresh();
@@ -109,6 +113,33 @@ class AppStore extends BaseStore {
       default:
         return;
     }
+  };
+
+  updateLastSynced = async () => {
+    const lastSynced = await db.lastSynced();
+    this.set((state) => (state.lastSynced = lastSynced));
+  };
+
+  sync = async (full = true) => {
+    this.updateLastSynced();
+    this.set((state) => (state.isSyncing = true));
+    return db
+      .sync(full)
+      .then(async () => {
+        await this.updateLastSynced();
+        return await this.refresh();
+      })
+      .catch(async (err) => {
+        console.error(err);
+        if (err.code === "MERGE_CONFLICT") await this.refresh();
+        else {
+          showToast("error", err.message);
+          console.error(err);
+        }
+      })
+      .finally(() => {
+        this.set((state) => (state.isSyncing = false));
+      });
   };
 }
 

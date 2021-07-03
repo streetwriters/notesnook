@@ -3,6 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
+import { useStore as useAppStore } from "../../stores/app-store";
 import { showLogInDialog } from "../../common/dialog-controller";
 import TimeAgo from "timeago-react";
 import { hashNavigate, navigate } from "../../navigation";
@@ -10,9 +11,9 @@ import { hashNavigate, navigate } from "../../navigation";
 function StatusBar() {
   const user = useUserStore((state) => state.user);
   const sync = useUserStore((state) => state.sync);
-  const lastSynced = useUserStore((state) => state.lastSynced);
+  const lastSynced = useAppStore((state) => state.lastSynced);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
-  const isSyncing = useUserStore((state) => state.isSyncing);
+  const isSyncing = useAppStore((state) => state.isSyncing);
 
   return (
     <Flex

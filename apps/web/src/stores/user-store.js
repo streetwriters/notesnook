@@ -19,9 +19,7 @@ class UserStore extends BaseStore {
   isLoggedIn = false;
   isLoggingIn = false;
   isSigningIn = false;
-  isSyncing = false;
   user = undefined;
-  lastSynced = 0;
 
   init = () => {
     EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
@@ -65,7 +63,7 @@ class UserStore extends BaseStore {
       });
 
       EV.subscribe(EVENTS.databaseSyncRequested, async () => {
-        await this.sync(false);
+        await appStore.sync(false);
       });
 
       EV.subscribe(EVENTS.userLoggedOut, async (reason) => {
@@ -86,7 +84,7 @@ class UserStore extends BaseStore {
           await db.connectSSE();
         }
       });
-      await this.sync();
+      await appStore.sync();
       return true;
     });
   };
@@ -125,28 +123,6 @@ class UserStore extends BaseStore {
       })
       .finally(() => {
         this.set((state) => (state.isSigningIn = false));
-      });
-  };
-
-  sync = (full = true) => {
-    this.set((state) => (state.isSyncing = true));
-    return db
-      .sync(full)
-      .then(async () => {
-        const lastSynced = await db.lastSynced();
-        this.set((state) => (state.lastSynced = lastSynced));
-        return await appStore.refresh();
-      })
-      .catch(async (err) => {
-        console.error(err);
-        if (err.code === "MERGE_CONFLICT") await appStore.refresh();
-        else {
-          showToast("error", err.message);
-          console.error(err);
-        }
-      })
-      .finally(() => {
-        this.set((state) => (state.isSyncing = false));
       });
   };
 }
