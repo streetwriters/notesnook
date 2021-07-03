@@ -3,6 +3,7 @@ import {initialize, useUserStore} from '../provider/stores';
 import {doInBackground} from '../utils';
 import {db} from '../utils/DB';
 import {eOpenLoginDialog} from '../utils/Events';
+import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
 import {eSendEvent, ToastEvent} from './EventManager';
 
 const run = async (context = 'global', forced) => {
@@ -52,6 +53,9 @@ const run = async (context = 'global', forced) => {
   } finally {
     userstore.setLastSynced(await db.lastSynced());
     initialize();
+    if (getNote()) {
+      await updateNoteInEditor();
+    }
     userstore.setSyncing(false);
   }
 };

@@ -201,10 +201,10 @@ export const AppRootEvents = React.memo(
 
     const onSyncComplete = async () => {
       initialize();
-      if (getNote()) {
-        //updateNoteInEditor();
-      }
       setLastSynced(await db.lastSynced());
+      if (getNote()) {
+        await updateNoteInEditor();
+      }
     };
 
     const onUrlRecieved = async res => {
