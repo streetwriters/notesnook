@@ -318,10 +318,12 @@ async function shouldShowAnnouncement(announcement) {
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1
   );
+  console.log("show",show)
   if (!show) return false;
 
   const subStatus = PremiumService.getUser()?.subscription?.type;
   show = announcement.userTypes.some((userType) => {
+    console.log(userType,subStatus);
     switch (userType) {
       case "pro":
         return PremiumService.get()

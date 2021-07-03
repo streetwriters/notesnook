@@ -1,6 +1,6 @@
 import {CHECK_IDS} from 'notes-core/common';
 import * as RNIap from 'react-native-iap';
-import {useUserStore} from '../provider/stores';
+import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
 import {db} from '../utils/DB';
 import {
@@ -34,6 +34,7 @@ async function setPremiumStatus() {
   } catch (e) {
     premiumStatus = 0;
   } finally {
+    useMessageStore.getState().setAnnouncement();
     if (!get()) {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
@@ -46,6 +47,7 @@ function getProducts() {
 }
 
 function get() {
+  console.log(premiumStatus, 'pro status');
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 

@@ -35,6 +35,7 @@ import diff from '../../utils/differ';
 import {openLinkInBrowser} from '../../utils/functions';
 import Sync from '../../services/Sync';
 import Navigation from '../../services/Navigation';
+import { getNote, updateNoteInEditor } from '../../views/Editor/Functions';
 
 const {Value, timing} = Animated;
 
@@ -250,6 +251,9 @@ const MergeEditor = () => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Notes,
     ]);
+    if (getNote()?.id === note.id) {
+      updateNoteInEditor();
+    }
     close();
     await Sync.run();
   };

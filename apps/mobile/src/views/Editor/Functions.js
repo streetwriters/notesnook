@@ -1,20 +1,25 @@
-import { createRef } from 'react';
-import { Platform } from 'react-native';
-import { useEditorStore, useMenuStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {createRef} from 'react';
+import {Platform} from 'react-native';
+import {presentDialog} from '../../components/Dialog/functions';
+import {useEditorStore, useMenuStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import { editing, InteractionManager } from '../../utils';
-import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
-import { eOnLoadNote, eShowGetPremium } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {editing, InteractionManager} from '../../utils';
+import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
+import {
+  eOnLoadNote,
+  eShowGetPremium,
+  eShowMergeDialog,
+} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
@@ -314,7 +319,7 @@ export const _onMessage = async evt => {
         eSendEvent('showTooltip');
         break;
       }
-      showImageOptionsTooltip()
+      showImageOptionsTooltip();
       break;
     case 'focus':
       editing.focusType = message.value;
@@ -404,8 +409,7 @@ export async function clearEditor() {
       (content?.data &&
         typeof content.data == 'string' &&
         content.data?.trim().length > 0) ||
-      (title && title?.trim().length > 0) &&
-      id
+      (title && title?.trim().length > 0 && id)
     ) {
       await saveNote(true);
     }
@@ -488,15 +492,23 @@ async function addToCollection(id) {
 let isSaving = false;
 
 export async function saveNote(preventUpdate) {
-  if (isSaving && !id)  return;
+  console.log('saving note now');
+  if (isSaving && !id) return;
   isSaving = true;
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
       return;
     }
-
-    let locked = id ? db.notes.note(id).data.locked : null;
+    let locked = false;
+    if (id) {
+      let _note = db.notes.note(id).data;
+      if (_note.conflicted) {
+        presentResolveConflictDialog(_note)
+        return;
+      }
+      locked = _note.locked;
+    }
 
     let noteData = {
       title,
@@ -581,6 +593,30 @@ async function restoreEditorState() {
     return;
   }
   editing.isRestoringState = false;
+}
+
+const presentResolveConflictDialog = (_note) => {
+  presentDialog({
+    title: 'Changes not saved',
+    paragraph: 'Please resolve conflicts to save changes',
+    positiveText: 'Resolve',
+    positivePress: () => {
+      eSendEvent(eShowMergeDialog, _note);
+    },
+  });
+}
+
+export async function updateNoteInEditor() {
+  console.log('updating note in editor')
+  let _note = db.notes.note(id).data;
+  if (_note.conflicted) {
+    presentResolveConflictDialog(_note)
+    return;
+  }
+  tiny.call(EditorWebView, tiny.isLoading);
+  await setNote(_note);
+  await loadNoteInEditor();
+  console.log('updated note in editor');
 }
 
 const loadNoteInEditor = async () => {

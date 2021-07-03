@@ -6,11 +6,12 @@ import { Header } from '../../components/Header';
 import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTrashStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
+import { useSelectionStore, useTrashStore } from '../../provider/stores';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
+import { db } from '../../utils/DB';
 import { eScrollEvent } from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {

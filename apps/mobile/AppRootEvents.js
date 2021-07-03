@@ -42,7 +42,7 @@ import {
 import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
+import {getNote, getWebviewInit, updateNoteInEditor} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -200,6 +200,9 @@ export const AppRootEvents = React.memo(
 
     const onSyncComplete = async () => {
       initialize();
+      if (getNote()) {
+        //updateNoteInEditor();
+      }
       setLastSynced(await db.lastSynced());
     };
 

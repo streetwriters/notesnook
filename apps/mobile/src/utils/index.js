@@ -243,6 +243,7 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.yr.15',
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
+  'com.streetwriters.notesnook.sub.yr.ofr',
 ];
 
 export const MenuItemsList = [

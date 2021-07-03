@@ -129,7 +129,7 @@ export const PremiumComponent = ({close, promo}) => {
             p => p.productId === 'com.streetwriters.notesnook.sub.yr',
           ),
         };
-        console.log(products.length);
+        console.log(products.map(p => p.productId));
         setOffers(offers);
 
         if (promo?.promoCode) {
