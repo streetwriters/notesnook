@@ -30,6 +30,7 @@ class AppStore extends BaseStore {
     notebookStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
+    await editorStore.refresh();
     this.refreshColors();
     this.refreshMenuPins();
   };

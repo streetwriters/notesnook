@@ -42,6 +42,11 @@ class EditorStore extends BaseStore {
     EV.subscribe(EVENTS.userLoggedOut, () => this.get().newSession());
   };
 
+  refresh = async () => {
+    const { id } = this.get().session;
+    await this.openSession(id, true);
+  };
+
   openLockedSession = async (note) => {
     this.set((state) => {
       state.session = {
@@ -57,12 +62,12 @@ class EditorStore extends BaseStore {
     hashNavigate(`/notes/${note.id}/edit`, { replace: true });
   };
 
-  openSession = async (noteId) => {
+  openSession = async (noteId, force) => {
     await db.notes.init();
 
     const session = this.get().session;
 
-    if (session.id === noteId) return;
+    if (session.id === noteId && !force) return;
 
     if (session.state === SESSION_STATES.unlocked) {
       this.set((state) => {
