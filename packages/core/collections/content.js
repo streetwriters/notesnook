@@ -26,6 +26,7 @@ export default class Content extends Collection {
       dateEdited: content.dateEdited,
       dateCreated: content.dateCreated,
       remote: content.remote,
+      localOnly: !!content.localOnly,
     });
     return id;
   }

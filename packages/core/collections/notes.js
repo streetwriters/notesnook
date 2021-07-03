@@ -80,6 +80,7 @@ export default class Notes extends Collection {
         data,
         conflicted,
         resolved,
+        localOnly: !!note.localOnly,
       });
     }
 
