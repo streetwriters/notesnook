@@ -5,6 +5,7 @@ import {Appearance, AppState, Linking, Platform} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
+import {abs} from 'react-native-reanimated';
 import SplashScreen from 'react-native-splash-screen';
 import {
   clearAllStores,
@@ -253,8 +254,8 @@ export const AppRootEvents = React.memo(
     };
 
     const onAccountStatusChange = async userStatus => {
-      console.log('account status', userStatus, PremiumService.get());
       if (!PremiumService.get() && userStatus.type === 5) {
+        PremiumService.subscriptions.clear();
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
           paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
@@ -378,11 +379,8 @@ export const AppRootEvents = React.memo(
     };
 
     const onSuccessfulSubscription = async subscription => {
-      const receipt = subscription.transactionReceipt;
-      if (prevTransactionId === subscription.transactionId) {
-        return;
-      }
-      await processReceipt(receipt);
+      await PremiumService.subscriptions.set(subscription);
+      await PremiumService.subscriptions.verify(subscription);
     };
 
     const onSubscriptionError = async error => {
@@ -392,46 +390,6 @@ export const AppRootEvents = React.memo(
         message: error.message,
         context: 'local',
       });
-
-      if (Platform.OS === 'ios') {
-        await RNIap.clearTransactionIOS();
-      }
-    };
-
-    const processReceipt = async receipt => {
-      if (receipt) {
-        if (Platform.OS === 'ios') {
-          let user = await db.user.getUser();
-          if (!user) return;
-          fetch('https://payments.streetwriters.co/apple/verify', {
-            method: 'POST',
-            body: JSON.stringify({
-              receipt_data: receipt,
-              user_id: user.id,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-            .then(async r => {
-              let text = await r.text();
-              console.log(r.ok, text);
-              if (!r.ok) {
-                if (text === 'Receipt already expired.') {
-                  console.log('RNIap.clearTransactionIOS');
-                  await RNIap.clearTransactionIOS();
-                }
-                return;
-              }
-              console.log('Success', 'RNIap.finishTransactionIOS');
-              await RNIap.finishTransactionIOS(prevTransactionId);
-              await RNIap.clearTransactionIOS();
-            })
-            .catch(e => {
-              console.log(e, 'ERROR');
-            });
-        }
-      }
     };
 
     const onAppStateChanged = async state => {

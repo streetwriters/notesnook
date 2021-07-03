@@ -73,6 +73,7 @@ import {
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
+  eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenProgressDialog,
@@ -88,6 +89,7 @@ import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import ToggleSwitch from 'toggle-switch-react-native';
+import * as RNIap from 'react-native-iap';
 
 let menuRef = createRef();
 
@@ -703,7 +705,10 @@ const SettingsUserSection = () => {
   };
 
   const manageSubscription = () => {
-    if (user.subscription.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED) {
+    if (
+      user.subscription.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+      Platform.OS === 'android'
+    ) {
       if (user.subscription.provider === 3) {
         ToastEvent.show({
           heading: 'Subscribed on web',
@@ -912,12 +917,9 @@ const SettingsUserSection = () => {
                             SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
                             ? 'Manage subscription from desktop app'
                             : user.subscription.type ===
-                              SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
-                            ? `Resubscribe from ${
-                                Platform.OS === 'ios'
-                                  ? 'App Store'
-                                  : 'Google Playstore'
-                              }`
+                                SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+                              Platform.OS === 'android'
+                            ? `Resubscribe from Google Playstore`
                             : user.subscription.type ===
                               SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
@@ -1058,15 +1060,52 @@ const SettingsUserSection = () => {
               },
               desc: 'Try force sync to resolve issues with syncing.',
             },
-          ].map(item => (
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              onPress={item.func}
-              tagline={item.desc}
-              color={item.name === 'Logout' ? colors.errorText : colors.pri}
-            />
-          ))}
+            {
+              name: 'Subscription not activated?',
+              func: async () => {
+                eSendEvent(eOpenProgressDialog, {
+                  title: 'Loading subscriptions',
+                  paragraph: `Please wait while we fetch your subscriptions.`,
+                });
+                let subscriptions = await RNIap.getPurchaseHistory();
+                subscriptions.sort(
+                  (a, b) => b.transactionDate - a.transactionDate,
+                );
+                let currentSubscription = subscriptions[0];
+                eSendEvent(eOpenProgressDialog, {
+                  title: 'Notesnook Pro',
+                  paragraph: `You subscribed to Notesnook Pro on ${new Date(
+                    currentSubscription.transactionDate,
+                  ).toLocaleString()}. Verify this subscription?`,
+                  action: async () => {
+                    eSendEvent(eOpenProgressDialog, {
+                      title: 'Verifying subscription',
+                      paragraph: `Please wait while we verify your subscription.`,
+                    });
+                    await PremiumService.subscriptions.verify(
+                      currentSubscription,
+                    );
+                    eSendEvent(eCloseProgressDialog);
+                  },
+                  icon: 'information-outline',
+                  actionText: 'Verify',
+                  noProgress: true,
+                });
+              },
+              desc: 'Verify your subscription to Notesnook Pro',
+            },
+          ].map(item =>
+            item.name === 'Subscription not activated?' &&
+            (Platform.OS !== 'ios' || PremiumService.get()) ? null : (
+              <CustomButton
+                key={item.name}
+                title={item.name}
+                onPress={item.func}
+                tagline={item.desc}
+                color={item.name === 'Logout' ? colors.errorText : colors.pri}
+              />
+            ),
+          )}
         </>
       ) : null}
     </>
