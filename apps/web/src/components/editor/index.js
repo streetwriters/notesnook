@@ -114,15 +114,25 @@ function Editor({ noteId, nonce }) {
           variant="columnFill"
           className="editor"
           sx={{
-            mx: 3,
+            mx: [3, 3, 0],
             alignSelf: ["stretch", "stretch", "center"],
           }}
           animate={{
-            marginRight: isFocusMode && !isTablet ? "25%" : "15px",
-            marginLeft: isFocusMode && !isTablet ? "25%" : "15px",
+            paddingRight:
+              isFocusMode && !isTablet
+                ? "25%"
+                : isTablet || isMobile
+                ? "20px"
+                : "35px",
+            paddingLeft:
+              isFocusMode && !isTablet
+                ? "25%"
+                : isTablet || isMobile
+                ? "20px"
+                : "35px",
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
-          maxWidth={isFocusMode ? "auto" : "900px"}
+          maxWidth={isFocusMode ? "auto" : "935px"}
           width={["100%", "100%", isFocusMode ? "50%" : "100%"]}
           mt={[0, 0, 25]}
         >
