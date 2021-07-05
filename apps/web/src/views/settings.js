@@ -98,6 +98,7 @@ function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
+  const sync = useAppStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
@@ -194,7 +195,16 @@ function Settings(props) {
                 }
               }}
             >
-              <Tip text="Change account password" />
+              <Tip
+                text="Change account password"
+                tip="Set a new password for your account"
+              />
+            </Button>
+            <Button variant="list" onClick={() => sync(true, true)}>
+              <Tip
+                text="Having problems with syncing?"
+                tip="Try force sync to resolve issues with syncing"
+              />
             </Button>
             <Button
               variant="list"

@@ -121,11 +121,11 @@ class AppStore extends BaseStore {
     this.set((state) => (state.lastSynced = lastSynced));
   };
 
-  sync = async (full = true) => {
+  sync = async (full = true, force = false) => {
     this.updateLastSynced();
     this.set((state) => (state.isSyncing = true));
     return db
-      .sync(full)
+      .sync(full, force)
       .then(async () => {
         showToast("Sync completed.");
         await this.updateLastSynced();
