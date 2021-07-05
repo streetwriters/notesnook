@@ -60,6 +60,7 @@ export default class Content extends Collection {
     const indices = this._collection.indexer.indices;
     await this._db.notes.init();
     const notes = this._db.notes._collection.getRaw();
+    if (!notes.length && indices.length > 0) return [];
     let ids = [];
     for (let contentId of indices) {
       const noteIndex = notes.findIndex((note) => note.contentId === contentId);
