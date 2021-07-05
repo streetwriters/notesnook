@@ -164,19 +164,19 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     screenshotMode: true,
     privacyScreen: false,
     appLockMode: 'none',
-    telemetry:true,
+    telemetry: true,
   },
   fullscreen: false,
   deviceMode: null,
   dimensions: { width, height },
-  appLoading:true,
-  isIntroCompleted:false,
+  appLoading: true,
+  isIntroCompleted: false,
   setSettings: settings => set({ settings }),
   setFullscreen: fullscreen => set({ fullscreen }),
   setDeviceMode: mode => set({ deviceMode: mode }),
   setDimensions: dimensions => set({ dimensions: dimensions }),
-  setAppLoading:(appLoading) => set({appLoading}),
-  setIntroCompleted:(isIntroCompleted) => set({isIntroCompleted})
+  setAppLoading: (appLoading) => set({ appLoading }),
+  setIntroCompleted: (isIntroCompleted) => set({ isIntroCompleted })
 
 }));
 
@@ -214,7 +214,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       history.selectedItemsList = [];
       history.selectionMode = false;
     }
-    set({ selectionMode: mode,selectedItemsList:mode? get().selectedItemsList : [] })
+    set({ selectionMode: mode, selectedItemsList: mode ? get().selectedItemsList : [] })
   },
   setSelectedItem: item => {
     let selectedItems = get().selectedItemsList;
@@ -226,7 +226,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     }
     selectedItems = [...new Set(selectedItems)];
     history.selectedItemsList = selectedItems;
- 
+
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
 
@@ -239,6 +239,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     set({ selectionMode: false, selectedItemsList: [] });
   },
 }));
+
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
   message: {
@@ -314,16 +315,14 @@ async function shouldShowAnnouncement(announcement) {
   let removed = await MMKV.getStringAsync(announcement.id) ===
     "removed"
   if (removed) return false;
-  console.log(announcement);
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1
   );
-  console.log("show",show)
+
   if (!show) return false;
 
   const subStatus = PremiumService.getUser()?.subscription?.type;
   show = announcement.userTypes.some((userType) => {
-    console.log(userType,subStatus);
     switch (userType) {
       case "pro":
         return PremiumService.get()

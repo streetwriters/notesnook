@@ -1063,6 +1063,7 @@ const SettingsUserSection = () => {
             {
               name: 'Subscription not activated?',
               func: async () => {
+                if (Platform.OS === "android") return;
                 eSendEvent(eOpenProgressDialog, {
                   title: 'Loading subscriptions',
                   paragraph: `Please wait while we fetch your subscriptions.`,

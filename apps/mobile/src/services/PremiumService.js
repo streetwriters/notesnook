@@ -49,7 +49,6 @@ function getProducts() {
 }
 
 function get() {
-  console.log(premiumStatus, 'pro status');
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
