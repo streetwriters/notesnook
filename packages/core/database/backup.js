@@ -62,7 +62,7 @@ export default class Backup {
    *
    * @param {string} data the backup data
    */
-  async import(data) {
+  async import(data, key) {
     if (!data) return;
 
     let backup = JSON.parse(data);
@@ -71,15 +71,15 @@ export default class Backup {
 
     backup = this._migrateBackup(backup);
 
+    if (!this._verify(backup))
+      throw new Error("Backup file has been tempered, aborting...");
+
     let db = backup.data;
     //check if we have encrypted data
     if (db.salt && db.iv) {
-      const key = await this._db.user.getEncryptionKey();
-      db = JSON.parse(await this._db.context.decrypt(key, db));
+      if (!key) key = await this._db.user.getEncryptionKey();
+      backup.data = JSON.parse(await this._db.context.decrypt(key, db));
     }
-
-    if (!this._verify(backup))
-      throw new Error("Backup file has been tempered, aborting...");
 
     await this._migrateData(backup);
   }
