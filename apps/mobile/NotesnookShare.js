@@ -1,4 +1,4 @@
-import React, {Component, createRef} from 'react';
+import React, {Component, createRef, useEffect, useRef, useState} from 'react';
 import {Keyboard} from 'react-native';
 import {
   ActivityIndicator,
@@ -12,15 +12,184 @@ import {
   ScrollView,
   TextInput,
 } from 'react-native';
+import sanitize from 'sanitize-html';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
 import {SIZE} from './src/utils/SizeUtils';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
+import absolutify from 'absolutify';
+import {Dimensions} from 'react-native';
+import validator from 'validator';
+import linkPreview from 'link-preview-js';
+import ShareExtension from 'rn-extensions-share';
 
-let validator;
-let linkPreview;
-let ShareExtension;
+async function sanitizeHtml(site) {
+  try {
+    let html = await fetch(site);
+    html = await html.text();
+    let siteHtml = sanitize(html, {
+      allowedTags: [
+        'address',
+        'article',
+        'aside',
+        'footer',
+        'header',
+        'h1',
+        'h2',
+        'h3',
+        'h4',
+        'h5',
+        'h6',
+        'hgroup',
+        'main',
+        'nav',
+        'section',
+        'blockquote',
+        'dd',
+        'div',
+        'dl',
+        'dt',
+        'figcaption',
+        'figure',
+        'hr',
+        'li',
+        'main',
+        'ol',
+        'p',
+        'pre',
+        'ul',
+        'a',
+        'abbr',
+        'b',
+        'bdi',
+        'bdo',
+        'br',
+        'cite',
+        'code',
+        'data',
+        'dfn',
+        'em',
+        'i',
+        'kbd',
+        'mark',
+        'q',
+        'rb',
+        'rp',
+        'rt',
+        'rtc',
+        'ruby',
+        's',
+        'samp',
+        'small',
+        'span',
+        'strong',
+        'sub',
+        'sup',
+        'time',
+        'u',
+        'var',
+        'wbr',
+        'caption',
+        'col',
+        'colgroup',
+        'table',
+        'tbody',
+        'td',
+        'tfoot',
+        'th',
+        'thead',
+        'tr',
+        'img',
+      ],
+    });
+    return absolutify(siteHtml, site);
+  } catch (e) {
+    return '';
+  }
+}
+
+function makeHtmlFromUrl(url) {
+  return `<a href='${url}' target='_blank'>${url}</a>`;
+}
+
+function makeHtmlFromPlainText(text) {
+  return `<p>${text}</p>`;
+}
+
+const ShareApp = () => {
+  const [colors, setColors] = useState(
+    Appearance.getColorScheme() === 'dark'
+      ? COLOR_SCHEME_DARK
+      : COLOR_SCHEME_LIGHT,
+  );
+  const [note, setNote] = useState({
+    title: null,
+    id: null,
+    content: {
+      type: 'tiny',
+      data: null,
+    },
+  });
+  const [loadingIntent, setLoadingIntent] = useState(true);
+  const [height, setHeight] = useState(0);
+  const [floating, setFloating] = useState(false);
+  const [rawData, setRawData] = useState({
+    type: null,
+    value: null,
+  });
+  const textInputRef = useRef();
+  const titleInputRef = useRef();
+
+  useEffect(() => {
+    Keyboard.addListener('keyboardWillChangeFrame', onKeyboardWillChangeFrame);
+    return () => {
+      Keyboard.removeListener(
+        'keyboardWillChangeFrame',
+        onKeyboardWillChangeFrame,
+      );
+    };
+  });
+
+  const onKeyboardWillChangeFrame = event => {
+    setFloating(event.endCoordinates.width !== windowWidth);
+  };
+
+  const showLinkPreview = async link => {
+    let _note = {...note};
+    _note.title = 'Web link share';
+    _note.content.data = !note.content.data
+      ? makeHtmlFromUrl(link)
+      : note.content.data + '\n' + makeHtmlFromUrl(link);
+    try {
+      let preview = await linkPreview.getLinkPreview(link);
+      note.title = preview.siteName || preview.title;
+    } catch (e) {}
+    setNote(_note);
+  };
+
+  const loadData = async () => {
+    const data = await ShareExtension.data();
+    for (item of data) {
+      if (item.type === 'text') {
+        if (validator.isURL(item.value)) {
+          await showLinkPreview(item.value);
+        } else {
+          setNote(note => {
+            note.title = 'Web link share';
+            note.content.data = note.content.data
+              ? note.content.data + '\n' + makeHtmlFromPlainText(item.value)
+              : makeHtmlFromPlainText(item.value);
+          });
+        }
+      }
+    }
+  };
+};
+
+
+
+
 export default class NotesnookShare extends Component {
   constructor(props, context) {
     super(props, context);
@@ -48,9 +217,6 @@ export default class NotesnookShare extends Component {
       this.onKeyboardWillChangeFrame,
     );
     try {
-      ShareExtension = require('rn-extensions-share').default;
-      validator = require('validator').default;
-      linkPreview = require('link-preview-js');
       const data = await ShareExtension.data();
       let text;
       let item = data[0];
@@ -154,50 +320,19 @@ export default class NotesnookShare extends Component {
     this.close();
   };
 
-  saveBtn = () => (
-    <View
-      style={{
-        paddingHorizontal: 12,
-      }}>
-      <TouchableOpacity
-        onPress={this.onPress}
-        activeOpacity={0.8}
-        style={{
-          backgroundColor: this.state.colors.accent,
-          width: '100%',
-          height: 50,
-          borderRadius: 5,
-          justifyContent: 'center',
-          alignItems: 'center',
-          flexDirection: 'row',
-        }}>
-        {this.state.loading && (
-          <ActivityIndicator color={this.state.colors.light} />
-        )}
-
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: 'bold',
-            color: this.state.colors.light,
-            marginLeft: this.state.loading ? 10 : 0,
-          }}>
-          Save Note
-        </Text>
-      </TouchableOpacity>
-    </View>
-  );
-
   onKeyboardWillChangeFrame = event => {
     this.setState({floating: event.endCoordinates.width !== windowWidth});
   };
 
   render() {
-    return Platform.OS === 'ios' ? (
+    return (
       <View
         style={{
-          width: '100%',
-          height: '100%',
+          width:
+            Dimensions.get('window').width > 500
+              ? 500
+              : Dimensions.get('window').width,
+          height: Dimensions.get('window').height,
           justifyContent: 'flex-end',
         }}>
         <TouchableOpacity
@@ -321,7 +456,37 @@ export default class NotesnookShare extends Component {
                   blurOnSubmit={false}
                   placeholder="Type your note here"
                 />
-                {this.saveBtn()}
+                <View
+                  style={{
+                    paddingHorizontal: 12,
+                  }}>
+                  <TouchableOpacity
+                    onPress={this.onPress}
+                    activeOpacity={0.8}
+                    style={{
+                      backgroundColor: this.state.colors.accent,
+                      width: '100%',
+                      height: 50,
+                      borderRadius: 5,
+                      justifyContent: 'center',
+                      alignItems: 'center',
+                      flexDirection: 'row',
+                    }}>
+                    {this.state.loading && (
+                      <ActivityIndicator color={this.state.colors.light} />
+                    )}
+
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: 'bold',
+                        color: this.state.colors.light,
+                        marginLeft: this.state.loading ? 10 : 0,
+                      }}>
+                      Save Note
+                    </Text>
+                  </TouchableOpacity>
+                </View>
                 <View
                   style={{
                     height: 25,
@@ -332,136 +497,6 @@ export default class NotesnookShare extends Component {
           )}
         </KeyboardAvoidingView>
       </View>
-    ) : (
-      <Modal visible transparent>
-        <View
-          onLayout={event => {
-            console.log(event.nativeEvent.layout.height);
-            this.setState({
-              height: event.nativeEvent.layout.height,
-            });
-          }}
-          style={{
-            justifyContent: 'flex-end',
-            width: '100%',
-            height: '100%',
-          }}>
-          <TouchableOpacity
-            activeOpacity={0}
-            onPress={() => {
-              ShareExtension.close();
-            }}
-            style={{
-              width: '100%',
-              height: '100%',
-              position: 'absolute',
-            }}
-          />
-          <View
-            style={{
-              paddingVertical: 25,
-              backgroundColor: this.state.colors.bg,
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10,
-              width: '100%',
-              paddingTop: 15,
-            }}>
-            {this.state.loadingIntent ? (
-              <View
-                style={{
-                  height: 150,
-                  width: '100%',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <ActivityIndicator color={this.state.colors.accent} />
-
-                <Text
-                  style={{
-                    color: this.state.colors.pri,
-                    fontSize: SIZE.md,
-                    marginTop: 5,
-                  }}>
-                  Parsing Data...
-                </Text>
-              </View>
-            ) : (
-              <>
-                <ScrollView
-                  style={{
-                    maxHeight: this.state.height * 0.8,
-                  }}>
-                  <View
-                    style={{
-                      flexDirection: 'row',
-                      alignItems: 'center',
-                      borderBottomWidth: 1,
-                      borderBottomColor: this.state.colors.nav,
-                      paddingHorizontal: 12,
-                      justifyContent: 'space-between',
-                    }}>
-                    <TextInput
-                      ref={this.titleInputRef}
-                      style={{
-                        fontSize: SIZE.lg,
-                        fontWeight: 'bold',
-                        color: this.state.colors.pri,
-                        flexGrow: 1,
-                        maxWidth: '85%',
-                      }}
-                      placeholderTextColor={this.state.colors.icon}
-                      value={this.state.title}
-                      onChangeText={v => this.setState({title: v})}
-                      onSubmitEditing={() => {
-                        this.textInputRef.current?.focus();
-                      }}
-                      blurOnSubmit={false}
-                      placeholder="Note title"
-                    />
-
-                    <TouchableOpacity
-                      onPress={this.close}
-                      activeOpacity={0.8}
-                      style={{
-                        width: 70,
-                        height: 40,
-                        borderRadius: 5,
-                        justifyContent: 'center',
-                        alignItems: 'center',
-                        flexDirection: 'row',
-                      }}>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          color: this.state.colors.accent,
-                          marginLeft: this.state.loading ? 10 : 0,
-                        }}>
-                        Cancel
-                      </Text>
-                    </TouchableOpacity>
-                  </View>
-                  <TextInput
-                    ref={this.textInputRef}
-                    style={{
-                      fontSize: 15,
-                      color: this.state.colors.pri,
-                      paddingTop: 0,
-                      marginBottom: 10,
-                      paddingHorizontal: 12,
-                    }}
-                    placeholderTextColor={this.state.colors.icon}
-                    onChangeText={v => this.setState({text: v})}
-                    multiline={true}
-                    value={this.state.text}
-                    placeholder="Type your note here"
-                  />
-                </ScrollView>
-                {this.saveBtn()}
-              </>
-            )}
-          </View>
-        </View>
-      </Modal>
     );
   }
 }

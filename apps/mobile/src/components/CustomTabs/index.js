@@ -88,6 +88,7 @@ export default class CustomTabs extends Component {
   }
 
   goToIndex(index, animated = true) {
+    console.log('gotToIndex',index)
     let offset = 0;
     if (index === 1) {
       this.nextPage = 0;
@@ -119,6 +120,7 @@ export default class CustomTabs extends Component {
   };
 
   onScroll = event => {
+    console.log('scrolling keyboard');
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
     this.props.onScroll(this.scrollOffset);
@@ -221,9 +223,8 @@ export default class CustomTabs extends Component {
           scrollsToTop={false}
           scrollEventThrottle={1}
           directionalLockEnabled
-          overScrollMode="never"
+          overScrollMode="auto"
           maxToRenderPerBatch={100}
-          removeClippedSubviews={false}
           keyboardDismissMode="none"
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}

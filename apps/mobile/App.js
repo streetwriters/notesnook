@@ -29,6 +29,7 @@ import EditorRoot from './src/views/Editor/EditorRoot';
 
 let databaseHasLoaded = false;
 
+
 async function loadDefaultNotes() {
   try {
     const isCreated = await MMKV.getItem('defaultNoteCreated');

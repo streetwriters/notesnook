@@ -1,28 +1,29 @@
-import React, { useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header/index';
+import React, {useCallback, useEffect} from 'react';
+import sanitize from 'sanitize-html';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
-import { useNoteStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
+import {useNoteStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/DB';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
+import {InteractionManager, scrollRef} from '../../utils';
+import {db} from '../../utils/DB';
+import {eOnLoadNote, eScrollEvent} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
 import Storage from '../../utils/storage';
-
+import absolutify from 'absolutify';
 export const Home = ({navigation}) => {
   const notes = useNoteStore(state => state.notes);
   const setNotes = useNoteStore(state => state.setNotes);
   const loading = useNoteStore(state => state.loading);
-  
+
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
@@ -51,7 +52,7 @@ export const Home = ({navigation}) => {
 
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notes', () => {
-        setNotes()
+        setNotes();
       });
     });
     ranAfterInteractions = false;
