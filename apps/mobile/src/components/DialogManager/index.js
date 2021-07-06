@@ -37,6 +37,7 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
+import TagsDialog from '../TagsDialog';
 import { UpdateDialog } from '../UpdateDialog';
 import { VaultDialog } from '../VaultDialog';
 
@@ -301,6 +302,7 @@ export class DialogManager extends Component {
         <ImagePreview />
         <EditorSettings />
         <PublishNoteDialog />
+        <TagsDialog/>
       </>
     );
   }
