@@ -23,7 +23,6 @@
     "zx": "^2.0.0"
   },
   "scripts": {
-    "bundle": "esbuild ./electron.js ./preload.js --minify --external:electron --bundle --outdir=./build --platform=node",
     "release": "yarn zx ./scripts/publish.mjs"
   },
   "author": {

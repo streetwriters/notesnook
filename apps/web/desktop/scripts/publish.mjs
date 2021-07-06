@@ -12,6 +12,6 @@ cd(`${__dirname}${sep}..${sep}`);
 
 await $`yarn copyfiles -a ..${sep}build .${sep}build`;
 
-await $`yarn bundle`;
+await $`esbuild .${sep}electron.js .${sep}preload.js --minify --external:electron --external:fsevents --bundle --outdir=.${sep}build --platform=node`;
 
 await $`electron-builder -c.extraMetadata.main=.${sep}build${sep}electron.js`;
