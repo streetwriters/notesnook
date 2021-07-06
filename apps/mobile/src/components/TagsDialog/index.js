@@ -1,0 +1,244 @@
+import React, {useEffect, useRef, useState} from 'react';
+import {ScrollView, View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTracked} from '../../provider';
+import {useTagStore} from '../../provider/stores';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import {db} from '../../utils/DB';
+import {eCloseTagsDialog, eOpenTagsDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import Input from '../Input';
+import {PressableButton} from '../PressableButton';
+import Paragraph from '../Typography/Paragraph';
+
+const TagsDialog = () => {
+  const [state] = useTracked();
+  const colors = state.colors;
+  const [visible, setVisible] = useState(false);
+  const [note, setNote] = useState(null);
+  const allTags = useTagStore(state => state.tags);
+  const [tags, setTags] = useState(allTags);
+  const [query, setQuery] = useState(null);
+  const inputRef = useRef();
+  const actionSheetRef = useRef();
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenTagsDialog, open);
+    eSubscribeEvent(eCloseTagsDialog, close);
+    return () => {
+      eUnSubscribeEvent(eOpenTagsDialog, open);
+      eUnSubscribeEvent(eCloseTagsDialog, close);
+    };
+  }, []);
+
+  useEffect(() => {
+    sortTags();
+  }, [allTags, note, query]);
+
+  const sortTags = () => {
+    let _tags = [...allTags];
+    _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
+    if (query) {
+      _tags = _tags.filter(t => t.title.startsWith(query));
+    }
+
+    if (!note || !note.tags) {
+      setTags(_tags);
+      return;
+    }
+    let noteTags = [];
+    for (tag of note.tags) {
+      let index = _tags.findIndex(t => t.title === tag);
+      if (index !== -1) {
+        noteTags.push(_tags[index]);
+        _tags.splice(index, 1);
+      }
+    }
+    noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
+
+    setTags([...noteTags, ..._tags]);
+  };
+
+  const open = item => {
+    setNote(item);
+    useTagStore.getState().setTags();
+    setVisible(true);
+  };
+
+  useEffect(() => {
+    if (visible) {
+      actionSheetRef.current?.show();
+    }
+  }, [visible]);
+
+  const close = () => {
+    setQuery(null);
+    actionSheetRef.current?.hide();
+  };
+
+  const onSubmit = async () => {
+    let _query = query;
+    if (!_query || _query === '' || _query.trimStart().length == 0) {
+      ToastEvent.show({
+        heading: 'Tag field is empty',
+        type: 'error',
+        context: 'local',
+      });
+      return;
+    }
+
+    if (_query.startsWith('#')) {
+      _query = _query.slice(1);
+    }
+
+    let tag = _query;
+    tag = tag.trim();
+    if (tag.includes(' ')) {
+      tag = tag.replace(' ', '_');
+    }
+    if (tag.includes(',')) {
+      tag = tag.replace(',', '');
+    }
+    setNote({...note, tags: note.tags ? [...note.tags, tag] : [tag]});
+    inputRef.current?.setNativeProps({
+      text:""
+    })
+    try {
+      await db.notes.note(note.id).tag(tag);
+      useTagStore.getState().setTags();
+      setNote(db.notes.note(note.id).data);
+      setQuery(null);
+    } catch (e) {
+      ToastEvent.show({
+        heading: 'Cannot add tag',
+        type: 'error',
+        message: e.message,
+        context: 'local',
+      });
+    }
+  };
+
+  return !visible ? null : (
+    <ActionSheetWrapper
+      centered={false}
+      fwdRef={actionSheetRef}
+      onClose={async () => {
+        setQuery(null);
+        setVisible(false);
+      }}>
+      <View
+        style={{
+          width: '100%',
+          alignSelf: 'center',
+          paddingHorizontal: 12,
+          minHeight: '80%',
+        }}>
+        <Input
+          button={{
+            icon: 'magnify',
+            color: colors.accent,
+            onPress: () => {},
+            size: SIZE.lg,
+          }}
+          fwdRef={inputRef}
+          autoCapitalize="none"
+          onChangeText={v => {
+            setQuery(v);
+          }}
+          height={50}
+          placeholder="Search or add tag"
+        />
+
+        <ScrollView nestedScrollEnabled>
+          {query ? (
+            <PressableButton
+              key={"query_item"}
+              customStyle={{
+                flexDirection: 'row',
+                marginVertical: 5,
+                justifyContent: 'space-between',
+                padding: 12,
+              }}
+              onPress={onSubmit}
+              type="shade">
+              <Paragraph color={colors.accent}>Add {'#' + query}</Paragraph>
+              <Icon name="plus" color={colors.accent} size={SIZE.lg} />
+            </PressableButton>
+          ) : null}
+          {tags.map(item => (
+            <TagItem 
+            key={item.title} tag={item} note={note} setNote={setNote} />
+          ))}
+        </ScrollView>
+      </View>
+    </ActionSheetWrapper>
+  );
+};
+
+export default TagsDialog;
+
+const TagItem = ({tag, note, setNote}) => {
+  const [state] = useTracked();
+  const colors = state.colors;
+
+  const onPress = async () => {
+    let prevNote = {...note};
+    try {
+      if (prevNote.tags.indexOf(tag.title) !== -1) {
+        await db.notes
+          .note(note.id)
+          .untag(prevNote.tags[prevNote.tags.indexOf(tag.title)]);
+      } else {
+        await db.notes.note(note.id).tag(tag.title);
+      }
+      setNote(db.notes.note(note.id).data);
+    } catch (e) {
+    } finally {
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+      ]);
+    }
+  };
+
+  return (
+    <PressableButton
+      customStyle={{
+        flexDirection: 'row',
+        marginVertical: 5,
+        justifyContent: 'space-between',
+        padding: 12,
+      }}
+      onPress={onPress}
+      type={
+        note && note.tags.findIndex(t => t === tag.title) !== -1
+          ? 'accent'
+          : 'grayBg'
+      }>
+      <Paragraph
+        color={
+          note && note?.tags.findIndex(t => t === tag.title) !== -1
+            ? colors.light
+            : colors.pri
+        }>
+        {'#' + tag.title}
+      </Paragraph>
+      <Icon
+        name={
+          note && note?.tags.findIndex(t => t === tag.title) !== -1
+            ? 'minus'
+            : 'plus'
+        }
+        color={
+          note && note?.tags.findIndex(t => t === tag.title) !== -1
+            ? colors.light
+            : colors.accent
+        }
+        size={SIZE.lg}
+      />
+    </PressableButton>
+  );
+};

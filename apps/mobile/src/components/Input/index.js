@@ -218,7 +218,7 @@ const Input = ({
             {button && (
               <ActionIcon
                 name={button.icon}
-                size={20}
+                size={SIZE.lg}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
