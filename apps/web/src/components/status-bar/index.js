@@ -130,7 +130,7 @@ function statusToInfoText(status) {
   return type === "checking"
     ? "Checking for updates..."
     : type === "updated"
-    ? "Latest version"
+    ? "You are on latest version"
     : type === "downloading"
     ? `${Math.round(progress)}% updating...`
     : type === "completed"
