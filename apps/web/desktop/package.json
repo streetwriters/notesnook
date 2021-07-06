@@ -19,11 +19,12 @@
     "electron-builder": "^22.11.7",
     "electron-builder-notarize": "^1.2.0",
     "electron-reloader": "^1.2.1",
-    "esbuild": "^0.12.15"
+    "esbuild": "^0.12.15",
+    "zx": "^2.0.0"
   },
   "scripts": {
     "bundle": "esbuild ./electron.js ./preload.js --minify --external:electron --bundle --outdir=./build --platform=node",
-    "release": "./scripts/publish.sh"
+    "release": "yarn zx ./scripts/publish.mjs"
   },
   "author": {
     "name": "Streetwriters (Private) Ltd.",
