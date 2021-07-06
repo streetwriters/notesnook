@@ -160,7 +160,6 @@ function call(webview, func, noqueue) {
   } else {
     if (noqueue) return;
     setTimeout(() => {
-      console.log('run after delay');
       webview.current?.injectJavaScript(func);
     }, 1000);
   }

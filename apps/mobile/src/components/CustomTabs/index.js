@@ -120,7 +120,6 @@ export default class CustomTabs extends Component {
   };
 
   onScroll = event => {
-    console.log('scrolling keyboard');
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
     this.props.onScroll(this.scrollOffset);

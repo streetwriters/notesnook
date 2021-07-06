@@ -23,7 +23,6 @@ export const Announcement = () => {
   let announcement = announcements.length > 0 ? announcements[0] : null;
   const selectionMode = useSelectionStore(state => state.selectionMode);
   
-  console.log(announcement,'announcement');
 
   return !announcement || selectionMode ? null : (
     <View

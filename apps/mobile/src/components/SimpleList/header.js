@@ -31,7 +31,6 @@ export const Header = React.memo(
     const announcements = useMessageStore(state => state.announcements)
     const deviceMode = useSettingStore(state => state.deviceMode)
 
-    console.log(announcements)
     return announcements.length > 0 && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
     ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
