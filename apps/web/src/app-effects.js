@@ -12,6 +12,7 @@ import { registerKeyMap } from "./common/key-map";
 function AppEffects({ isMobile, isTablet, setShow }) {
   const refreshColors = useStore((store) => store.refreshColors);
   const refreshMenuPins = useStore((store) => store.refreshMenuPins);
+  const updateLastSynced = useStore((store) => store.updateLastSynced);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
@@ -39,12 +40,14 @@ function AppEffects({ isMobile, isTablet, setShow }) {
       refreshMenuPins();
       initUser();
       initNotes();
+      updateLastSynced();
       (async function () {
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
       })();
     },
     [
+      updateLastSynced,
       refreshColors,
       refreshMenuPins,
       initUser,
