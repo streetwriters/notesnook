@@ -9190,21 +9190,9 @@ normalize-url@^4.1.0:
   resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-4.5.0.tgz"
   integrity sha512-2s47yzUxdexf1OhyRi4Em83iQk0aPvwTddtFz4hnSSw9dCEsLEGf6SwIO8ss/19S9iBb5sJaOuTvTGDeZI00BQ==
 
-notes-core@../notes-core:
-  version "6.7.2"
-  dependencies:
-    "@stablelib/blake2s" "^1.0.1"
-    fast-sort "^2.0.1"
-    lean-he "^2.1.2"
-    no-internet "^1.5.2"
-    qclone "^1.0.4"
-    quill-delta-to-html "^0.12.0"
-    showdown "https://github.com/thecodrr/showdown"
-    spark-md5 "^3.0.1"
-
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.7.2"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#9e4c529dd23fdcba51048fca349229c0a13cbb0b"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#c7a13b8a0af11ec4b37c6e6de0c89983a6e87e78"
   dependencies:
     "@stablelib/blake2s" "^1.0.1"
     fast-sort "^2.0.1"
