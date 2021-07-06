@@ -1,3 +1,4 @@
+import "./commands";
 import React from "react";
 import { initializeDatabase } from "./common/db";
 import "./index.css";

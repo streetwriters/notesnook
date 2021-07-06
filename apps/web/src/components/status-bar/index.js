@@ -7,6 +7,9 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { showLogInDialog } from "../../common/dialog-controller";
 import TimeAgo from "timeago-react";
 import { hashNavigate, navigate } from "../../navigation";
+import useAutoUpdater from "../../hooks/use-auto-updater";
+import downloadUpdate from "../../commands/download-update";
+import installUpdate from "../../commands/install-update";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -15,6 +18,7 @@ function StatusBar() {
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const isSyncing = useAppStore((state) => state.isSyncing);
   const processingStatus = useAppStore((state) => state.processingStatus);
+  const updateStatus = useAutoUpdater();
 
   return (
     <Flex
@@ -83,6 +87,36 @@ function StatusBar() {
             </Text>
           </Flex>
         )}
+
+        {updateStatus && (
+          <Button
+            variant="statusitem"
+            display="flex"
+            onClick={() => {
+              if (updateStatus.type === "available") {
+                downloadUpdate();
+              } else if (updateStatus.type === "completed") {
+                installUpdate();
+              }
+            }}
+            sx={{ alignItems: "center", justifyContent: "center" }}
+          >
+            <Icon.Update
+              rotate={
+                updateStatus.type !== "updated" &&
+                updateStatus.type !== "completed" &&
+                updateStatus.type !== "available"
+              }
+              color={
+                updateStatus.type === "available" ? "primary" : "fontTertiary"
+              }
+              size={12}
+            />
+            <Text variant="subBody" ml={1}>
+              {statusToInfoText(updateStatus)}
+            </Text>
+          </Button>
+        )}
       </Flex>
       <EditorFooter />
     </Flex>
@@ -90,3 +124,18 @@ function StatusBar() {
 }
 
 export default StatusBar;
+
+function statusToInfoText(status) {
+  const { type, version, progress } = status;
+  return type === "checking"
+    ? "Checking for updates..."
+    : type === "updated"
+    ? "Latest version"
+    : type === "downloading"
+    ? `${Math.round(progress)}% updating...`
+    : type === "completed"
+    ? `v${version} downloaded (restart required)`
+    : type === "available"
+    ? `v${version} available`
+    : "";
+}
