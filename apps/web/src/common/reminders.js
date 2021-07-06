@@ -6,6 +6,9 @@ import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import { hashNavigate } from "../navigation";
+import { isDesktop } from "../utils/platform";
+import saveFile from "../commands/save-file";
+import { PATHS } from "@notesnook/desktop/paths";
 
 export async function shouldAddBackupReminder() {
   const backupReminderOffset = Config.get("backupReminderOffset", 0);
@@ -60,7 +63,12 @@ export const Reminders = {
 export async function resetReminders() {
   appStore.set((state) => (state.reminders = []));
   if (await shouldAddBackupReminder()) {
-    appStore.addReminder("backup", "high");
+    if (isDesktop()) {
+      const { data, filename, ext } = await createBackup(false);
+      saveFile(`${PATHS.backupsDirectory}/${filename}.${ext}`, data);
+    } else {
+      appStore.addReminder("backup", "high");
+    }
   }
   if (await shouldAddSignupReminder()) {
     appStore.addReminder("signup", "low");

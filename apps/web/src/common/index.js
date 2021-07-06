@@ -11,6 +11,7 @@ import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
+import { sanitizeFilename } from "../utils/filename";
 
 export const COLORS = {
   red: "#f44336",
@@ -93,7 +94,7 @@ export function notesFromContext(context) {
   return notes;
 }
 
-export async function createBackup() {
+export async function createBackup(save = true) {
   const encryptBackups = Config.get("encryptBackups", false);
   const data = await showLoadingDialog({
     title: "Creating backup",
@@ -107,12 +108,14 @@ export async function createBackup() {
       </Text>
     ),
   });
-  download(
-    `notesnook-backup-${new Date().toLocaleString("en")}`,
-    data,
-    "nnbackup"
+  const filename = sanitizeFilename(
+    `notesnook-backup-${new Date().toLocaleString("en")}`
   );
-  await showToast("success", "Backup created!");
+  const ext = "nnbackup";
+  showToast("success", "Backup created!");
+
+  if (!save) return { data, filename, ext };
+  else download(filename, data, ext);
 }
 
 export function isUserPremium() {

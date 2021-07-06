@@ -3,6 +3,7 @@ import React from "react";
 import { initializeDatabase } from "./common/db";
 import "./index.css";
 import * as serviceWorker from "./serviceWorkerRegistration";
+import "./utils/overrides";
 import { loadTrackerScript } from "./utils/analytics";
 
 if (process.env.NODE_ENV === "production") {

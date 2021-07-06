@@ -8,11 +8,7 @@ const map = {
 };
 
 export default function download(filename, text, type) {
-  downloadFile(
-    text,
-    sanitizeFilename(filename, { replacement: "-" }) + `.${type}`,
-    map[type]
-  );
+  downloadFile(text, sanitizeFilename(filename) + `.${type}`, map[type]);
 }
 
 function downloadFile(data, filename, mime, bom) {

@@ -48,7 +48,7 @@ function sanitize(input, replacement) {
   return sanitized.slice(0, 254).toLowerCase();
 }
 
-export function sanitizeFilename(input, options) {
-  var replacement = (options && options.replacement) || "";
+export function sanitizeFilename(input) {
+  var replacement = "-";
   return sanitize(input, replacement);
 }
