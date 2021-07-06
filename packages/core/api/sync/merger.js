@@ -11,11 +11,10 @@ class Merger {
     this._db = db;
   }
 
-  _migrate(item, deserialized) {
+  _migrate(deserialized, version) {
     // it is a locked note, bail out.
     if (deserialized.alg && deserialized.cipher) return deserialized;
 
-    const version = item.v || 0;
     let type = deserialized.type;
     if (!type && deserialized.data) type = "tiny";
 
@@ -30,7 +29,7 @@ class Merger {
     );
     deserialized.remote = true;
     if (!migrate) return deserialized;
-    return this._migrate(item, deserialized);
+    return this._migrate(deserialized, item.v);
   }
 
   async _mergeItem(remoteItem, get, add) {
