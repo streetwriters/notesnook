@@ -11,6 +11,7 @@ const ENDPOINTS = {
 
 var RETRIES = 0;
 var RETRIES_LIMIT = 1;
+const FIVE_MINUTES = 60 * 5;
 class TokenManager {
   /**
    *
@@ -32,7 +33,8 @@ class TokenManager {
 
   _isTokenExpired(token) {
     const { t, expires_in } = token;
-    const expiryMs = t + expires_in * 1000;
+    const marginedExpiryMs = expires_in - FIVE_MINUTES;
+    const expiryMs = t + marginedExpiryMs * 1000;
     return Date.now() >= expiryMs;
   }
 
