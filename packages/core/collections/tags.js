@@ -1,6 +1,7 @@
 import Collection from "./collection";
 import { qclone } from "qclone";
 import { makeId } from "../utils/id";
+import { deleteItem } from "../utils/array";
 
 export default class Tags extends Collection {
   tag(id) {
@@ -13,7 +14,10 @@ export default class Tags extends Collection {
       tagId = tagId.id;
     }
 
-    if (!tagId || !noteId) new Error("tagId and noteId cannot be falsy.");
+    if (!tagId || !noteId) {
+      console.error("tagId and noteId cannot be falsy.");
+      return;
+    }
 
     let tag = this.all.find((t) => t.id === tagId || t.title === tagId) || {
       title: tagId,
@@ -44,14 +48,26 @@ export default class Tags extends Collection {
   }
 
   async remove(tagTitle, noteId) {
-    if (!tagTitle || !noteId) new Error("tagTitle and noteId cannot be falsy.");
+    if (!tagTitle || !noteId) {
+      console.error(
+        "tag title and noteId cannot be undefined.",
+        tagTitle,
+        noteId
+      );
+      return;
+    }
+
     let tag = this.all.find((t) => t.title === tagTitle || t.id === tagTitle);
-    if (!tag) throw new Error(`No tag with title "${tagTitle}" found.`);
+    if (!tag) {
+      console.error(`No such tag found. Tag title:`, tagTitle);
+      return;
+    }
+
     tag = qclone(tag);
-    const noteIndex = tag.noteIds.indexOf(noteId);
-    if (noteIndex <= -1)
-      throw new Error(`No note of id "${noteId}" exists in this tag.`);
-    tag.noteIds.splice(noteIndex, 1);
+
+    if (!deleteItem(tag.noteIds, noteId))
+      console.error(`No such note exists in tag.`, tag.id, noteId);
+
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
     else {
       await this._db.settings.unpin(tag.id);
