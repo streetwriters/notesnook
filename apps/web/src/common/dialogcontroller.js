@@ -121,21 +121,37 @@ export function confirm(
   ));
 }
 
-export function showMultiDeleteConfirmation(type) {
-  let noun = type === "note" ? "notes" : "notebooks";
-
+export function showMultiDeleteConfirmation(length, permanentDelete) {
   return confirm(Icon.Trash, {
-    title: `Delete these ${noun}?`,
+    title: `Delete ${length} items?`,
     message: (
       <Text as="span">
-        These {type}s will be{" "}
+        These items will be{" "}
         <Text as="span" color="primary">
           kept in your Trash for 7 days
         </Text>{" "}
         after which they will be permanently removed.
       </Text>
     ),
-    yesText: `Delete these ${type}s`,
+    yesText: `Delete selected`,
+    noText: "Cancel",
+  });
+}
+
+export function showMultiPermanentDeleteConfirmation(length) {
+  return confirm(Icon.Trash, {
+    title: `Permanently delete ${length} items?`,
+    message: (
+      <Text as="span">
+        These items will be{" "}
+        <Text as="span" color="primary">
+          permanently deleted
+        </Text>
+        {". "}
+        This action is IRREVERSIBLE.
+      </Text>
+    ),
+    yesText: `Permanently delete selected`,
     noText: "Cancel",
   });
 }

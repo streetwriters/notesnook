@@ -3,20 +3,26 @@ import { store as selectionStore } from "../stores/selection-store";
 import { store as notesStore } from "../stores/note-store";
 import { store as nbStore } from "../stores/notebook-store";
 import { store as editorStore } from "../stores/editor-store";
+import { store as appStore } from "../stores/app-store";
 import { store as trashStore } from "../stores/trash-store";
 import { db } from "./db";
 import { showMoveNoteDialog } from "../common/dialog-controller";
-import { showMultiDeleteConfirmation } from "../common/dialog-controller";
+import {
+  showMultiDeleteConfirmation,
+  showMultiPermanentDeleteConfirmation,
+} from "../common/dialog-controller";
 import { showExportDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 
-function createOption(key, icon, onClick) {
+function createOption(key, title, icon, onClick) {
   return {
     key,
     icon,
+    title,
     onClick: async () => {
       await onClick.call(this, selectionStore.get());
       selectionStore.toggleSelectionMode(false);
+      appStore.setProcessingStatus();
     },
   };
 }
@@ -27,11 +33,20 @@ function createOptions(options = []) {
 
 const DeleteOption = createOption(
   "deleteOption",
+  "Delete",
   Icon.Trash,
   async function (state) {
     const item = state.selectedItems[0];
 
-    if (!(await showMultiDeleteConfirmation(item.itemType))) return;
+    const confirmDialog = item.dateDeleted
+      ? showMultiPermanentDeleteConfirmation
+      : showMultiDeleteConfirmation;
+    if (!(await confirmDialog(state.selectedItems.length))) return;
+
+    const statusText = `${
+      item.dateDeleted ? `Permanently deleting` : `Deleting`
+    } ${state.selectedItems.length} items...`;
+    appStore.setProcessingStatus(statusText);
 
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {
@@ -44,6 +59,7 @@ const DeleteOption = createOption(
       // we are in trash
       await db.trash.delete(...items);
       trashStore.refresh();
+      showToast("success", `${items.length} items permanently deleted!`);
       return;
     }
 
@@ -53,22 +69,26 @@ const DeleteOption = createOption(
 
     if (item.type === "note") {
       await db.notes.delete(...items);
-      notesStore.refresh();
     } else if (item.type === "notebook") {
       await db.notebooks.delete(...items);
-      nbStore.refresh();
     } else if (item.type === "topic") {
       await db.notebooks.notebook(item.notebookId).topics.delete(...items);
       nbStore.setSelectedNotebook(item.notebookId);
     }
+    appStore.refresh();
     showToast("success", `${items.length} ${item.type}s moved to trash!`);
   }
 );
 
 const UnfavoriteOption = createOption(
   "unfavoriteOption",
+  "Unfavorite",
   Icon.Star,
   function (state) {
+    appStore.setProcessingStatus(
+      `Unfavoriting ${state.selectedItems.length} notes...`
+    );
+
     // we know only notes can be favorited
     state.selectedItems.forEach(async (item) => {
       if (!item.favorite) return;
@@ -80,8 +100,13 @@ const UnfavoriteOption = createOption(
 
 const AddToNotebookOption = createOption(
   "atnOption",
+  "Add to notebook(s)",
   Icon.AddToNotebook,
   async function (state) {
+    appStore.setProcessingStatus(
+      `Adding ${state.selectedItems.length} notes to notebooks...`
+    );
+
     const items = state.selectedItems.map((item) => item.id);
     await showMoveNoteDialog(items);
     showToast("success", `${items.length} notes moved!`);
@@ -90,8 +115,13 @@ const AddToNotebookOption = createOption(
 
 const ExportOption = createOption(
   "exportOption",
+  "Export",
   Icon.Export,
   async function (state) {
+    appStore.setProcessingStatus(
+      `Exporting ${state.selectedItems.length} notes...`
+    );
+
     const items = state.selectedItems.map((item) => item.id);
     if (await showExportDialog(items)) {
       await showToast("success", `${items.length} notes exported!`);
@@ -101,11 +131,16 @@ const ExportOption = createOption(
 
 const RestoreOption = createOption(
   "restoreOption",
+  "Restore",
   Icon.Restore,
   async function (state) {
+    appStore.setProcessingStatus(
+      `Restoring ${state.selectedItems.length} items...`
+    );
+
     const items = state.selectedItems.map((item) => item.id);
     await db.trash.restore(...items);
-    trashStore.refresh();
+    appStore.refresh();
     showToast("success", `${items.length} items restored!`);
   }
 );

@@ -6,6 +6,7 @@ import {
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { SELECTION_OPTIONS_MAP } from "../../common";
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -85,10 +86,28 @@ function ListItem(props) {
   const menuItems = useMemo(() => {
     let items = props.menu?.items;
     if (!items) return [];
+
+    if (isSelectionMode) {
+      const options = SELECTION_OPTIONS_MAP[window.currentViewType];
+      items = options.map((option) => {
+        return {
+          key: option.key,
+          title: () => option.title,
+          icon: option.icon,
+          onClick: option.onClick,
+        };
+      });
+    }
     if (props.selectable)
       items = [selectMenuItem(isSelected, toggleSelection), ...items];
     return items;
-  }, [props.menu?.items, isSelected, toggleSelection, props.selectable]);
+  }, [
+    props.menu?.items,
+    isSelected,
+    isSelectionMode,
+    toggleSelection,
+    props.selectable,
+  ]);
 
   useEffect(() => {
     if (!isSelectionMode && isSelected) toggleSelection();

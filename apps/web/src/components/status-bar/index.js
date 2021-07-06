@@ -14,6 +14,7 @@ function StatusBar() {
   const lastSynced = useAppStore((state) => state.lastSynced);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const isSyncing = useAppStore((state) => state.isSyncing);
+  const processingStatus = useAppStore((state) => state.processingStatus);
 
   return (
     <Flex
@@ -73,6 +74,14 @@ function StatusBar() {
               Not logged in
             </Text>
           </Button>
+        )}
+        {processingStatus && (
+          <Flex ml={1} alignItems="center" justifyContent="center">
+            <Icon.Loading size={12} />
+            <Text variant="subBody" ml={1}>
+              {processingStatus}
+            </Text>
+          </Flex>
         )}
       </Flex>
       <EditorFooter />

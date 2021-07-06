@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
@@ -25,6 +25,11 @@ function Header(props) {
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
+  const selectAll = useSelectionStore((store) => store.selectAll);
+  const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
+  const toggleSelectionMode = useSelectionStore(
+    (store) => store.toggleSelectionMode
+  );
 
   if (!title && !subtitle) return null;
   return (
@@ -100,6 +105,24 @@ function Header(props) {
           {subtitle}
         </Text>
       )}
+      {isSelectionMode && (
+        <Flex
+          mb={2}
+          sx={{
+            cursor: "pointer",
+          }}
+          alignItems="center"
+          onClick={() => {
+            if (shouldSelectAll) toggleSelectionMode(false);
+            else selectAll();
+          }}
+        >
+          <Icon.Select size={16} sx={{ mr: 1 }} />
+          <Text variant="body">
+            {shouldSelectAll ? "Unselect all" : "Select all"}
+          </Text>
+        </Flex>
+      )}
     </Flex>
   );
 }
@@ -113,14 +136,13 @@ function SelectionOptions(props) {
   return (
     <Flex>
       {options.map((option) => (
-        <Box
+        <option.icon
+          title={option.title}
+          size={20}
           key={option.key}
           onClick={option.onClick}
-          mx={2}
-          sx={{ cursor: "pointer" }}
-        >
-          <option.icon size={20} />
-        </Box>
+          sx={{ cursor: "pointer", mx: 2 }}
+        />
       ))}
     </Flex>
   );

@@ -26,7 +26,9 @@ function ListContainer(props) {
   const listRef = useRef();
 
   useEffect(() => {
-    if (shouldSelectAll) setSelectedItems(props.items);
+    if (!props.items.length) return;
+    if (shouldSelectAll)
+      setSelectedItems(props.items.filter((item) => item.type !== "header"));
   }, [shouldSelectAll, setSelectedItems, props.items]);
 
   useEffect(() => {

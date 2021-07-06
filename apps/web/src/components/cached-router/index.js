@@ -12,6 +12,7 @@ function CachedRouter() {
   useEffect(() => {
     if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult);
+    window.currentViewType = RouteResult.type;
 
     const key = RouteResult.key || "general";
 
