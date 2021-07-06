@@ -6,7 +6,8 @@ import {
 } from "../common.js";
 import SparkMD5 from "spark-md5";
 
-const invalidKeys = ["user", "t", "lastBackupTime"];
+const invalidKeys = ["user", "t", "v", "lastBackupTime", "lastSynced"];
+const invalidIndices = ["tags", "colors"];
 const validTypes = ["mobile", "web", "node"];
 export default class Backup {
   /**
@@ -34,11 +35,11 @@ export default class Backup {
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
 
-    const keys = (await this._db.context.getAllKeys()).filter(
-      (key) => !invalidKeys.some((t) => t === key)
+    let keys = await this._db.context.getAllKeys();
+    let data = filterData(
+      Object.fromEntries(await this._db.context.readMulti(keys))
     );
 
-    let data = Object.fromEntries(await this._db.context.readMulti(keys));
     let hash = {};
 
     if (encrypt) {
@@ -115,10 +116,6 @@ export default class Backup {
 
     const collections = [
       {
-        index: data["notes"],
-        dbCollection: this._db.notes,
-      },
-      {
         index: data["notebooks"],
         dbCollection: this._db.notebooks,
       },
@@ -129,6 +126,10 @@ export default class Backup {
       {
         index: data["content"],
         dbCollection: this._db.content,
+      },
+      {
+        index: data["notes"],
+        dbCollection: this._db.notes,
       },
       {
         index: ["settings"],
@@ -160,4 +161,16 @@ export default class Backup {
       }
     }
   }
+}
+
+function filterData(data) {
+  let skippedKeys = [...invalidKeys, ...invalidIndices];
+  invalidIndices.forEach((key) => {
+    const index = data[key];
+    if (!index) return;
+    skippedKeys.push(...index);
+  });
+
+  skippedKeys.forEach((key) => delete data[key]);
+  return data;
 }
