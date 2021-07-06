@@ -2,13 +2,19 @@
 cd ../
 
 # Generate the web app build
+if ! yarn install; then
+    echo "Failed to install web app dependencies."
+    exit
+fi
+
+# Generate the web app build
 if ! yarn build:desktop; then
     echo "Failed to build web app."
     exit
 fi
 
 # Change back to desktop directory
-cd desktop
+cd ./desktop
 
 # Copy build files to desktop folder
 # NOTE: we have to do this because electron-builder cannot work in parent directories. 
