@@ -20,3 +20,7 @@ export function getPlatform() {
 
   return os;
 }
+
+export function isDesktop() {
+  return "api" in window;
+}

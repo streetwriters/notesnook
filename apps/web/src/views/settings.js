@@ -26,6 +26,7 @@ import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
+import openLink from "../commands/openLink";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -453,9 +454,9 @@ function Settings(props) {
           <Button
             key={item.title}
             variant="list"
-            as="a"
-            href={item.link}
-            target="_blank"
+            onClick={() => {
+              openLink(item.link, "_blank");
+            }}
           >
             <Tip text={item.title} tip={item.description} />
           </Button>
