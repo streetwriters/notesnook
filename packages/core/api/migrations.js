@@ -25,10 +25,6 @@ class Migrations {
 
     const collections = [
       {
-        index: this._db.notes.raw,
-        dbCollection: this._db.notes,
-      },
-      {
         index: this._db.notebooks.raw,
         dbCollection: this._db.notebooks,
       },
@@ -52,6 +48,10 @@ class Migrations {
         index: [this._db.settings.raw],
         dbCollection: this._db.settings,
         type: "settings",
+      },
+      {
+        index: this._db.notes.raw,
+        dbCollection: this._db.notes,
       },
     ];
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);

@@ -43,6 +43,10 @@ export default class Note {
     return this._note.notebooks;
   }
 
+  get deleted() {
+    return this._note.deleted;
+  }
+
   get dateEdited() {
     return this._note.dateEdited;
   }
