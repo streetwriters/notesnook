@@ -1,5 +1,6 @@
 import { qclone } from "qclone";
 import sort from "fast-sort";
+import { deleteItem, findById } from "../utils/array";
 
 export default class Topic {
   /**
@@ -18,7 +19,7 @@ export default class Topic {
   }
 
   has(noteId) {
-    return this._topic.notes.findIndex((n) => n === noteId) > -1;
+    return this._topic.notes.indexOf(noteId) > -1;
   }
 
   async add(...noteIds) {
@@ -54,26 +55,28 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
+      if (
+        !note ||
+        note.deleted ||
+        !deleteItem(topic.notes, noteId) ||
+        !note.notebooks
+      ) {
+        continue;
+      }
 
-      if (!this.has(noteId) || !note || note.data.deleted) return this;
+      let { notebooks } = note;
 
-      let index = topic.notes.indexOf(noteId);
-      topic.notes.splice(index, 1);
+      const notebook = findById(notebooks, this._notebookId);
+      if (!notebook) continue;
 
-      let array = note.notebooks || [];
-      const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
-      if (notebookIndex === -1) break;
+      const { topics } = notebook;
+      if (!deleteItem(topics, topic.id)) continue;
 
-      const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
-      if (topicIndex === -1) break;
-
-      array[notebookIndex].topics.splice(topicIndex, 1);
-      if (array[notebookIndex].topics.length <= 0)
-        array.splice(notebookIndex, 1);
+      if (topics.length <= 0) deleteItem(notebooks, notebook);
 
       await this._db.notes.add({
         id: noteId,
-        notebooks: array,
+        notebooks,
       });
     }
     return await this._save(topic);
