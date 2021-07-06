@@ -12,6 +12,7 @@ import { EV, EVENTS } from "../common";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
 import sort from "fast-sort";
+import { deleteItem } from "../utils/array";
 
 export default class Notes extends Collection {
   async add(noteArg) {
@@ -25,8 +26,10 @@ export default class Notes extends Collection {
     let oldNote = this._collection.getItem(id);
 
     if (noteArg.remote || noteArg.migrated) {
+      const { color, tags, notebooks } = noteArg;
+
       if (oldNote) {
-        if (!!oldNote.color && oldNote.color !== noteArg.color) {
+        if (!!oldNote.color && oldNote.color !== color) {
           await this._db.colors.remove(oldNote.color, id);
         }
         if (!!oldNote.tags) {
@@ -36,15 +39,39 @@ export default class Notes extends Collection {
         }
       }
 
-      if (noteArg.color) {
-        await this._db.colors.add(noteArg.color, id);
+      if (color) {
+        await this._db.colors.add(color, id);
       }
 
-      if (noteArg.tags && noteArg.tags.length) {
-        for (let tag of noteArg.tags) {
+      if (tags && tags.length) {
+        if (id === "7564b315c74abe6652fdc99a") console.log(tags);
+        for (let tag of tags) {
           await this._db.tags.add(tag, id);
         }
       }
+
+      if (notebooks) {
+        for (let i = 0; i < notebooks.length; ++i) {
+          const ref = notebooks[i];
+          let { id, topics } = ref;
+          const notebook = this._db.notebooks.notebook(id);
+          if (!notebook) {
+            notebooks.splice(i, 1);
+            continue;
+          }
+          for (let topicId of topics) {
+            const topic = notebook.topics.topic(topicId);
+            if (!topic || !topic.has(noteArg.id)) {
+              deleteItem(topics, topicId);
+              continue;
+            }
+          }
+          if (!topics.length) {
+            notebooks.splice(i, 1);
+          }
+        }
+      }
+
       return await this._collection.addItem(noteArg);
     }
 
