@@ -12,6 +12,30 @@ class Vault {
     });
   }
 
+  static async clearVault() {
+    if (!(await db.vault.exists())) return false;
+    return await showPasswordDialog("clear_vault", async ({ password }) => {
+      try {
+        await db.vault.clear(password);
+        return true;
+      } catch {
+        return false;
+      }
+    });
+  }
+
+  static async deleteVault() {
+    if (!(await db.vault.exists())) return false;
+    return await showPasswordDialog(
+      "delete_vault",
+      async ({ password, deleteAllLockedNotes }) => {
+        if (!(await db.user.verifyPassword(password))) return false;
+        await db.vault.delete(!!deleteAllLockedNotes);
+        return true;
+      }
+    );
+  }
+
   static unlockVault() {
     return showPasswordDialog("lock_note", ({ password }) => {
       return db.vault

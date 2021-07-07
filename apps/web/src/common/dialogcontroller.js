@@ -383,9 +383,25 @@ function getDialogData(type) {
   switch (type) {
     case "create_vault":
       return {
-        title: "Create Your Vault",
+        title: "Create your vault",
         subtitle: "A vault stores your notes in a password-encrypted storage.",
         positiveButtonText: "Create vault",
+      };
+    case "clear_vault":
+      return {
+        title: "Clear your vault",
+        subtitle:
+          "Enter vault password to unlock and remove all notes from the vault.",
+        positiveButtonText: "Clear vault",
+      };
+    case "delete_vault":
+      return {
+        title: "Delete your vault",
+        subtitle: "Enter your account password to delete your vault.",
+        positiveButtonText: "Delete vault",
+        checks: [
+          { key: "deleteAllLockedNotes", title: "Delete all locked notes?" },
+        ],
       };
     case "lock_note":
       return {
@@ -436,12 +452,13 @@ function getDialogData(type) {
 }
 
 export function showPasswordDialog(type, validate) {
-  const { title, subtitle, positiveButtonText } = getDialogData(type);
+  const { title, subtitle, positiveButtonText, checks } = getDialogData(type);
   return showDialog((Dialogs, perform) => (
     <Dialogs.PasswordDialog
       type={type}
       title={title}
       subtitle={subtitle}
+      checks={checks}
       positiveButtonText={positiveButtonText}
       validate={validate}
       onClose={() => perform(false)}

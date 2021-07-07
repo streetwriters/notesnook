@@ -92,7 +92,7 @@ function Dialog(props) {
             {props.title}
           </Text>
           {props.description && (
-            <Text variant="body" textAlign="left" color="gray" mt={1}>
+            <Text variant="body" textAlign="left" color="fontTertiary" mt={1}>
               {props.description}
             </Text>
           )}

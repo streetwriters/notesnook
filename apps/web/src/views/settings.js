@@ -2,6 +2,7 @@ import React, { useEffect, useMemo } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
+import { useStore as useNoteStore } from "../stores/note-store";
 import { useStore as useThemeStore } from "../stores/theme-store";
 import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
@@ -33,6 +34,7 @@ import Tip from "../components/tip";
 import Toggle from "../components/toggle";
 import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
+import Vault from "../common/vault";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -104,7 +106,9 @@ const otherItems = [
 function Settings(props) {
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
+  const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
+  const refreshNotes = useNoteStore((store) => store.refresh);
   const sync = useAppStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
@@ -244,7 +248,6 @@ function Settings(props) {
               />
             </Button>
             <Button
-              sx={{ borderColor: "error" }}
               variant="list"
               onClick={async () => {
                 return showPasswordDialog(
@@ -255,6 +258,10 @@ function Settings(props) {
                   }
                 );
               }}
+              sx={{ ":hover": { borderColor: "error" } }}
+              bg="errorBg"
+              mx={-2}
+              px={2}
             >
               <Tip
                 color="error"
@@ -402,7 +409,44 @@ function Settings(props) {
               variant="list"
               onClick={() => hashNavigate("/vault/changePassword")}
             >
-              <Tip text="Change vault password" />
+              <Tip
+                text="Change vault password"
+                tip={"Set a new password for your vault"}
+              />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if (await Vault.clearVault()) {
+                  refreshNotes();
+                  showToast("success", "Vault cleared.");
+                }
+              }}
+            >
+              <Tip
+                text="Clear vault"
+                tip="Unlock all locked notes and clear vault"
+              />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
+                  setIsVaultCreated(false);
+                  await refreshApp();
+                  showToast("success", "Vault deleted.");
+                }
+              }}
+              sx={{ ":hover": { borderColor: "error" } }}
+              bg="errorBg"
+              mx={-2}
+              px={2}
+            >
+              <Tip
+                color="error"
+                text="Delete vault"
+                tip="Delete vault (and optionally remove all locked notes)"
+              />
             </Button>
           </>
         ) : (

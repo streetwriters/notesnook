@@ -2,10 +2,11 @@ import React, { useState, useCallback, useMemo } from "react";
 import { Box, Text } from "rebass";
 import Dialog from "./dialog";
 import Field from "../field";
+import { Checkbox, Label } from "@rebass/forms";
 
 const requiredValues = ["password", "newPassword", "oldPassword"];
 function PasswordDialog(props) {
-  const { type } = props;
+  const { type, checks } = props;
   const [error, setError] = useState();
   const [isLoading, setIsLoading] = useState(false);
   const isChangePasswordDialog = useMemo(() => {
@@ -53,14 +54,8 @@ function PasswordDialog(props) {
         as="form"
         onSubmit={async (e) => {
           e.preventDefault();
-          const data = requiredValues.reduce((prev, curr) => {
-            if (!e.target[curr]) return prev;
-            prev[curr] = e.target[curr].value;
-            return prev;
-          }, {});
-
+          const data = Object.fromEntries(new FormData(e.target).entries());
           setError();
-
           await submit(data);
         }}
       >
@@ -87,6 +82,14 @@ function PasswordDialog(props) {
             name="newPassword"
           />
         ) : null}
+
+        {checks &&
+          checks.map((check) => (
+            <Label key={check.key} alignItems="center" fontSize="title" mt={2}>
+              <Checkbox id={check.key} name={check.key} />
+              {check.title}
+            </Label>
+          ))}
 
         {error && (
           <Text mt={1} variant={"error"}>
