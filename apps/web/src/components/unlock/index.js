@@ -1,29 +1,37 @@
 import React, { useRef, useState, useCallback, useEffect } from "react";
 import { Flex, Text, Button } from "rebass";
-import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useNoteStore } from "../../stores/note-store";
+import Field from "../field";
+import { showToast } from "../../utils/toast";
 
 function Unlock(props) {
   const { noteId } = props;
   const passwordRef = useRef();
   const [isWrong, setIsWrong] = useState(false);
+  const [isUnlocking, setIsUnlocking] = useState(false);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const setSelectedNote = useNoteStore((store) => store.setSelectedNote);
 
   const submit = useCallback(async () => {
+    setIsUnlocking(true);
     const password = passwordRef.current.value;
     try {
       const note = await db.vault.open(noteId, password);
       openLockedSession(note);
     } catch (e) {
-      if (e.message === db.vault.ERRORS.wrongPassword) {
+      if (e === "ciphertext cannot be decrypted using that key") {
         setIsWrong(true);
+      } else {
+        showToast("error", "Cannnot unlock note: " + e);
+        console.error(e);
       }
+    } finally {
+      setIsUnlocking(false);
     }
   }, [setIsWrong, noteId, openLockedSession]);
 
@@ -46,20 +54,19 @@ function Unlock(props) {
         </Text>
       </Flex>
       <Text variant="body" color="gray" textAlign="center">
-        Please unlock your vault to open this note for editing.
+        Please enter the password to open this note for editing.
       </Text>
-      <Input
-        ref={passwordRef}
+      <Field
+        id="vaultPassword"
+        inputRef={passwordRef}
         autoFocus
-        variant={isWrong ? "error" : "input"}
-        mt={5}
-        maxWidth={["95%", "95%", "50%"]}
-        placeholder="Enter vault password"
+        sx={{ mt: 2, width: ["95%", "95%", "50%"] }}
+        placeholder="Enter password"
         type="password"
         onKeyUp={async (e) => {
           if (e.key === "Enter") {
             await submit();
-          } else {
+          } else if (isWrong) {
             setIsWrong(false);
           }
         }}
@@ -68,11 +75,11 @@ function Unlock(props) {
         <Flex
           alignItems="center"
           justifyContent="center"
-          alignSelf="flex-start"
+          alignSelf="flex-center"
           color="error"
           mt={2}
         >
-          <Icon.Alert color="error" />
+          <Icon.Alert color="error" size={12} />
           <Text ml={1} fontSize={"body"}>
             Wrong password
           </Text>
@@ -80,11 +87,13 @@ function Unlock(props) {
       )}
       <Button
         mt={3}
+        variant="primary"
+        disabled={isUnlocking}
         onClick={async () => {
           await submit();
         }}
       >
-        Unlock
+        {isUnlocking ? "Unlocking..." : "Open note"}
       </Button>
     </Flex>
   );
