@@ -3,17 +3,18 @@ const { sep } = require("path");
 
 console.log(`Script directory:`, __dirname);
 
-// cd(`${__dirname}${sep}..${sep}..${sep}`);
+// cd(`${__dirname}/../../`);
 
 // await $`yarn install`;
 
 // await $`yarn build:desktop`;
 
-// cd(`${__dirname}${sep}..${sep}`);
+// cd(`${__dirname}/../`);
 
-// const err = await mv(`..${sep}build`, `.${sep}build`);
+// const err = await mv(`../build`, `./build`);
 // if (err) throw new Error("Error moving build directory.");
+await $`ls ./build`;
 
-await $`esbuild .${sep}electron.js .${sep}preload.js --minify --external:electron --external:fsevents --bundle --outdir=.${sep}build --platform=node`;
+await $`esbuild ./electron.js ./preload.js --minify --external:electron --external:fsevents --bundle --outdir=./build --platform=node`;
 
-await $`electron-builder -c.extraMetadata.main=.${sep}build${sep}electron.js`;
+await $`electron-builder -c.extraMetadata.main=./build/electron.js`;
