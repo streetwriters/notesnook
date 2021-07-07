@@ -16,8 +16,8 @@ jobs:
         uses: actions/setup-node@v2.1.5
         with:
           node-version: 15.x
-      - run: npm install
-      - run: npm build
+      - run: yarn install
+      - run: yarn build
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v2
