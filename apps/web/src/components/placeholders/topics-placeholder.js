@@ -4,7 +4,7 @@ import Placeholder from "./index";
 import * as Icon from "../icons";
 import { hashNavigate } from "../../navigation";
 
-function TopicsPlaceholder({ context: { notebookId } }) {
+function TopicsPlaceholder() {
   return (
     <Placeholder
       image={Notebook}
