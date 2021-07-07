@@ -100,10 +100,14 @@ export function showBuyDialog(plan, couponCode) {
   ));
 }
 
-export function confirm(
-  icon,
-  { title, subtitle, message, yesText, noText, yesAction }
-) {
+export function confirm({
+  title,
+  subtitle,
+  message,
+  yesText,
+  noText,
+  yesAction,
+}) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.Confirm
       title={title}
@@ -111,7 +115,6 @@ export function confirm(
       message={message}
       yesText={yesText}
       noText={noText}
-      icon={icon}
       onNo={() => perform(false)}
       onYes={() => {
         if (yesAction) yesAction();
@@ -121,8 +124,8 @@ export function confirm(
   ));
 }
 
-export function showMultiDeleteConfirmation(length, permanentDelete) {
-  return confirm(Icon.Trash, {
+export function showMultiDeleteConfirmation(length) {
+  return confirm({
     title: `Delete ${length} items?`,
     message: (
       <Text as="span">
@@ -139,7 +142,7 @@ export function showMultiDeleteConfirmation(length, permanentDelete) {
 }
 
 export function showMultiPermanentDeleteConfirmation(length) {
-  return confirm(Icon.Trash, {
+  return confirm({
     title: `Permanently delete ${length} items?`,
     message: (
       <Text as="span">
@@ -157,7 +160,7 @@ export function showMultiPermanentDeleteConfirmation(length) {
 }
 
 export function showLogoutConfirmation() {
-  return confirm(Icon.Logout, {
+  return confirm({
     title: `Logout?`,
     message:
       "Logging out will delete all local data and reset the app. Make sure you have synced your data before logging out.",
@@ -185,7 +188,7 @@ export function showLogoutConfirmation() {
 // }
 
 export function showAccountLoggedOutNotice(reason) {
-  return confirm(Icon.Logout, {
+  return confirm({
     title: reason,
     message: `You were logged out`,
     yesText: `Okay`,
@@ -193,7 +196,7 @@ export function showAccountLoggedOutNotice(reason) {
 }
 
 export function showAppUpdatedNotice(version) {
-  return confirm(Icon.Update, {
+  return confirm({
     title: `Welcome to v${version.formatted}`,
     message: (
       <Flex
@@ -219,7 +222,7 @@ export function showAppUpdatedNotice(version) {
 }
 
 export function showAppAvailableNotice(version) {
-  return confirm(Icon.Update, {
+  return confirm({
     title: `New version available`,
     message: (
       <Flex

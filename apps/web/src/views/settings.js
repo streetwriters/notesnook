@@ -443,7 +443,7 @@ function Settings(props) {
               "3. We send an event when you open the checkout to buy Notesnook Pro.",
               "4. We send an event when you claim an offer or promo.",
             ];
-            confirm(null, {
+            confirm({
               title: "Telemetry details",
               subtitle:
                 "Read details of all the usage data we collect and send to our servers.",

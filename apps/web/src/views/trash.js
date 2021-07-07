@@ -27,7 +27,7 @@ function Trash() {
         content: "Clear Trash",
         icon: Icon.Trash,
         onClick: function () {
-          confirm(Icon.Trash, {
+          confirm({
             title: "Clear Trash",
             subtitle: "Are you sure you want to clear all the trash?",
             yesText: "Clear trash",

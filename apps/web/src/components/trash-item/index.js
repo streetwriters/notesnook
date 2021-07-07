@@ -51,7 +51,7 @@ const menuItems = [
     icon: Icon.DeleteForver,
     color: "red",
     onClick: ({ item }) => {
-      confirm(Icon.Trash, {
+      confirm({
         title: `Permanently Delete ${toTitleCase(item.itemType)}`,
         subtitle: `Are you sure you want to permanently delete this ${item.itemType}?`,
         yesText: `Delete ${item.itemType}`,
