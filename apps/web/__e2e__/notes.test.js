@@ -101,9 +101,9 @@ async function checkNoteLocked(noteSelector) {
 }
 
 async function checkNoteColored(noteSelector) {
-  await openContextMenu(noteSelector);
+  await page.waitForTimeout(1000);
 
-  await page.waitForTimeout(500);
+  await openContextMenu(noteSelector);
 
   await expect(
     isPresent(Menu.new("menuitem").colorCheck("red").build())
