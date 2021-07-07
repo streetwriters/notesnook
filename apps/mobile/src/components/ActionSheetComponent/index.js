@@ -575,7 +575,7 @@ export const ActionSheetComponent = ({
       <Button
         key={item.title}
         title={item.title}
-        type={item.type ? item.type : item.on ? 'accent' : 'shade'}
+        type={item.type ? item.type : item.on ? 'accent' : 'grayBg'}
         onPress={item.func}
         style={{
           marginTop: 12,
