@@ -65,9 +65,6 @@
         "dmg",
         "zip"
       ],
-      "electronLanguages": [
-        "en-US"
-      ],
       "category": "public.app-category.productivity",
       "darkModeSupport": true,
       "type": "distribution",
