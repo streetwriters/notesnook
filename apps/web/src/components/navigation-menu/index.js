@@ -17,11 +17,11 @@ import { useLocation } from "wouter";
 
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
-    return route.startsWith(`/notebooks/${pin.id}`);
+    return route === `/notebooks/${pin.id}`;
   } else if (pin.type === "topic") {
-    return route.startsWith(`/notebooks/${pin.notebookId}/${pin.id}`);
+    return route === `/notebooks/${pin.notebookId}/${pin.id}`;
   } else if (pin.type === "tag") {
-    return route.startsWith(`/tags/${pin.id}`);
+    return route === `/tags/${pin.id}`;
   }
 }
 
