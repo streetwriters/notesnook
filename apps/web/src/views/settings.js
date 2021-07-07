@@ -10,7 +10,12 @@ import accents from "../theme/accents";
 import { confirm, showLogInDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
-import { createBackup, isUserPremium, SUBSCRIPTION_STATUS } from "../common";
+import {
+  createBackup,
+  isUserPremium,
+  SUBSCRIPTION_STATUS,
+  verifyAccount,
+} from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
@@ -173,7 +178,12 @@ function Settings(props) {
         )}
         {isLoggedIn && (
           <>
-            <Button variant="list" onClick={showRecoveryKeyDialog}>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if (await verifyAccount()) await showRecoveryKeyDialog();
+              }}
+            >
               <Tip
                 text="Backup data recovery key"
                 tip="In case you lose your password, you can recover your data using your recovery key."

@@ -410,6 +410,12 @@ function getDialogData(type) {
           "All your data will be re-encrypted and synced with the new password.",
         positiveButtonText: "Change password",
       };
+    case "verify_account":
+      return {
+        title: "Verify it's you",
+        subtitle: "Enter your account password to proceed.",
+        positiveButtonText: "Verify",
+      };
     case "delete_account":
       return {
         title: "Delete your account",
