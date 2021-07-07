@@ -133,7 +133,7 @@ const TagsDialog = () => {
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12,
-          minHeight:"60%"
+          minHeight: '60%',
         }}>
         <Input
           button={{
@@ -170,9 +170,11 @@ const TagsDialog = () => {
                 padding: 12,
               }}
               onPress={onSubmit}
-              type="shade">
-              <Paragraph color={colors.accent}>Add {'#' + query}</Paragraph>
-              <Icon name="plus" color={colors.accent} size={SIZE.lg} />
+              type="accent">
+              <Heading size={SIZE.sm} color={colors.light}>
+                Add "{'#' + query}"
+              </Heading>
+              <Icon name="plus" color={colors.light} size={SIZE.lg} />
             </PressableButton>
           ) : null}
           {!tags || tags.length === 0 ? (
@@ -243,17 +245,18 @@ const TagItem = ({tag, note, setNote}) => {
       onPress={onPress}
       type={
         note && note.tags.findIndex(t => t === tag.title) !== -1
-          ? 'accent'
+          ? 'shade'
           : 'grayBg'
       }>
-      <Paragraph
+      <Heading
+        size={SIZE.sm}
         color={
           note && note?.tags.findIndex(t => t === tag.title) !== -1
-            ? colors.light
+            ? colors.accent
             : colors.pri
         }>
         {'#' + tag.title}
-      </Paragraph>
+      </Heading>
       <Icon
         name={
           note && note?.tags.findIndex(t => t === tag.title) !== -1
@@ -262,7 +265,7 @@ const TagItem = ({tag, note, setNote}) => {
         }
         color={
           note && note?.tags.findIndex(t => t === tag.title) !== -1
-            ? colors.light
+            ? colors.accent
             : colors.accent
         }
         size={SIZE.lg}
