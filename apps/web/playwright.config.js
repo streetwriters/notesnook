@@ -8,6 +8,7 @@ module.exports = {
   // Each test is given 30 seconds
   timeout: 30000,
   workers: IS_CI ? 2 : 4,
+  reporter: "list",
   use: {
     headless: true,
 
