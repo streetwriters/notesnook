@@ -24,3 +24,7 @@ export function getPlatform() {
 export function isDesktop() {
   return "api" in window;
 }
+
+export function isTesting() {
+  return !!process.env.REACT_APP_TEST;
+}

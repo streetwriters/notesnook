@@ -52,8 +52,8 @@
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",
     "babel-eslint": "^10.1.0",
-    "concurrently": "^6.2.0",
     "chalk": "^4.1.0",
+    "concurrently": "^6.2.0",
     "env-cmd": "^10.1.0",
     "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
@@ -67,7 +67,8 @@
     "progress-bar-webpack-plugin": "^2.1.0",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.1.5",
-    "webpack-bundle-analyzer": "^4.4.0"
+    "webpack-bundle-analyzer": "^4.4.0",
+    "zx": "^2.0.0"
   },
   "scripts": {
     "start": "env-cmd -e all,dev,web react-scripts start",
@@ -75,7 +76,7 @@
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",
-    "test": "node ./scripts/run-tests.js",
+    "test": "yarn zx ./scripts/run-tests.mjs",
     "test:debug": "env-cmd -e dev,debug,silent jest -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",

@@ -13,6 +13,7 @@ import { store as userstore } from "../stores/user-store";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
+import { isTesting } from "../utils/platform";
 
 export const COLORS = {
   red: "#f44336",
@@ -59,7 +60,7 @@ export const CREATE_BUTTON_MAP = {
 
 export async function introduceFeatures() {
   const hash = getCurrentHash().replace("#", "");
-  if (!!hash) return;
+  if (!!hash || isTesting()) return;
   const features = ["monographs"];
   for (let feature of features) {
     if (!Config.get(`feature:${feature}`)) {

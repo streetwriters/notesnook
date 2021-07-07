@@ -130,7 +130,15 @@ async function addNoteToNotebook() {
 
   await page.click(List.new("notebook").atIndex(0).build());
 
+  await page.click(getTestId("mnd-new-topic"));
+
+  await page.type(getTestId("mnd-new-topic-title"), "Topic 1");
+
+  await page.press(getTestId("mnd-new-topic-title"), "Enter");
+
   await page.click(List.new("notebook").atIndex(0).topic(0).build());
+
+  await page.click(getTestId("dialog-no"));
 
   await expect(isToastPresent()).resolves.toBeTruthy();
 
@@ -175,15 +183,15 @@ test.describe("run tests independently", () => {
     await checkNotePresence();
   });
 
-  // test.skip("add a note to notebook", async () => {
-  //   const noteSelector = await createNoteAndCheckPresence();
+  test("add a note to notebook", async () => {
+    const noteSelector = await createNoteAndCheckPresence();
 
-  //   await openContextMenu(noteSelector);
+    await openContextMenu(noteSelector);
 
-  //   await clickMenuItem("addtonotebook(s)");
+    await clickMenuItem("addtonotebook(s)");
 
-  //   await addNoteToNotebook();
-  // });
+    await addNoteToNotebook();
+  });
 
   test("favorite a note", async () => {
     const noteSelector = await createNoteAndCheckPresence();
@@ -367,15 +375,15 @@ test.describe("run tests independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  // test.skip("add a note to notebook from properties", async () => {
-  //   await createNoteAndCheckPresence();
+  test("add a note to notebook from properties", async () => {
+    await createNoteAndCheckPresence();
 
-  //   await page.click(getTestId("properties"));
+    await page.click(getTestId("properties"));
 
-  //   await page.click(getTestId("properties-add-to-nb"));
+    await page.click(getTestId("properties-add-to-nb"));
 
-  //   await addNoteToNotebook();
-  // });
+    await addNoteToNotebook();
+  });
 
   test("assign a color to note from properties", async () => {
     const noteSelector = await createNoteAndCheckPresence();

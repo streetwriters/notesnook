@@ -130,6 +130,7 @@ class MoveDialog extends React.Component {
                   action={
                     currentOpenedIndex === index && (
                       <Icon.Plus
+                        data-test-id="mnd-new-topic"
                         size={20}
                         onClick={(e) => {
                           e.stopPropagation();

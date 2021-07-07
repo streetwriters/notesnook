@@ -16,6 +16,7 @@ module.exports = {
     DEBUG: "pw:api",
   },
   silent: {
+    REACT_APP_TEST: true,
     DISABLE_ESLINT_PLUGIN: "true",
     FAST_REFRESH: "false",
     BROWSER: "none",
