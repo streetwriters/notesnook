@@ -176,6 +176,10 @@ export default class Notes extends Collection {
     return this.raw.filter((item) => item.dateDeleted > 0);
   }
 
+  get locked() {
+    return this.all.filter((item) => item.locked === true);
+  }
+
   tagged(tagId) {
     return this._getTagItems(tagId, "tags");
   }
@@ -288,7 +292,10 @@ export default class Notes extends Collection {
       }
       // await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);
-      else await this._collection.removeItem(id);
+      else {
+        await this._collection.removeItem(id);
+        await this._db.content.remove(itemData.contentId);
+      }
     }
   }
 

@@ -1,8 +1,26 @@
 import { CHECK_IDS, EV, EVENTS, sendCheckUserStatusEvent } from "../common";
-import getId from "../utils/id";
 
 const ERASE_TIME = 1000 * 60 * 30;
+var ERASER_TIMEOUT = null;
 export default class Vault {
+  get _password() {
+    return this._vaultPassword;
+  }
+
+  set _password(value) {
+    this._vaultPassword = value;
+    if (value) {
+      this._startEraser();
+    }
+  }
+
+  _startEraser() {
+    clearTimeout(ERASER_TIMEOUT);
+    ERASER_TIMEOUT = setTimeout(() => {
+      this._password = null;
+    }, ERASE_TIME);
+  }
+
   /**
    *
    * @param {import('./index').default} db
@@ -10,8 +28,8 @@ export default class Vault {
   constructor(db) {
     this._db = db;
     this._context = db.context;
-    this._key = "Notesnook";
-    this._password = null;
+    this._key = "svvaads1212#2123";
+    this._vaultPassword = null;
     this.ERRORS = {
       noVault: "ERR_NO_VAULT",
       vaultLocked: "ERR_VAULT_LOCKED",
@@ -23,7 +41,7 @@ export default class Vault {
   }
 
   /**
-   * Creates a new vault (replacing if any older exists)
+   * Creates a new vault
    * @param {string} password The password
    * @returns {Promise<Boolean>}
    */
@@ -38,7 +56,6 @@ export default class Vault {
       );
       await this._context.write("vaultKey", encryptedData);
       this._password = password;
-      // this._startEraser();
     }
     return true;
   }
@@ -52,38 +69,45 @@ export default class Vault {
   async unlock(password) {
     const vaultKey = await this._context.read("vaultKey");
     if (!(await this.exists(vaultKey))) throw new Error(this.ERRORS.noVault);
-    var data;
     try {
-      data = await this._context.decrypt({ password }, vaultKey);
+      await this._context.decrypt({ password }, vaultKey);
     } catch (e) {
       throw new Error(this.ERRORS.wrongPassword);
     }
-    if (data !== this._key) {
-      throw new Error(this.ERRORS.wrongPassword);
-    }
     this._password = password;
-    // this._startEraser();
     return true;
   }
 
   async changePassword(oldPassword, newPassword) {
     if (await this.unlock(oldPassword)) {
-      const lockedNotes = this._db.notes.all.filter((v) => v.locked);
+      const lockedNotes = this._db.notes.locked;
       for (var note of lockedNotes) {
-        await this._unlockNote(note, true);
+        await this._unlockNote(note, oldPassword, true);
       }
       await this._context.remove("vaultKey");
       await this.create(newPassword);
       for (var note of lockedNotes) {
-        await this._lockNote(note);
+        await this._lockNote(note, newPassword);
       }
     }
   }
 
-  _startEraser() {
-    setTimeout(() => {
-      this._password = null;
-    }, ERASE_TIME);
+  async clear(password) {
+    if (await this.unlock(password)) {
+      for (var note of this._db.notes.locked) {
+        await this._unlockNote(note, password, true);
+      }
+    }
+  }
+
+  async delete(deleteAllLockedNotes = false) {
+    if (deleteAllLockedNotes) {
+      await this._db.notes.remove(
+        ...this._db.notes.locked.map((note) => note.id)
+      );
+    }
+    await this._context.remove("vaultKey");
+    this._password = null;
   }
 
   /**
@@ -94,7 +118,7 @@ export default class Vault {
     if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
 
     await this._check();
-    await this._lockNote({ id: noteId });
+    await this._lockNote({ id: noteId }, this._password);
   }
 
   /**
@@ -103,13 +127,9 @@ export default class Vault {
    * @param {string} password The password to unlock note with
    */
   async remove(noteId, password) {
-    if (await this.unlock(password)) {
-      const note = this._db.notes.note(noteId).data;
-      await this._unlockNote(note, true);
-    }
+    const note = this._db.notes.note(noteId).data;
+    await this._unlockNote(note, password, true);
   }
-
-  async clear(password) {}
 
   /**
    * Temporarily unlock (open) a note
@@ -117,21 +137,21 @@ export default class Vault {
    * @param {string} password The password to open note with
    */
   async open(noteId, password) {
-    if (await this.unlock(password)) {
-      const note = this._db.notes.note(noteId).data;
-      return this._unlockNote(note, false);
-    }
+    const note = this._db.notes.note(noteId).data;
+    const unlockedNote = await this._unlockNote(note, password, false);
+    this._password = password;
+    return unlockedNote;
   }
 
   /**
-   * Saves a note into the vault
+   * Saves a note in the vault
    * @param {{Object}} note The note to save into the vault
    */
   async save(note) {
     if (!note) return;
-    //await this._check();
-    //let id = note.id || getId();
-    return await this._lockNote(note);
+    // roll over erase timer
+    this._startEraser();
+    return await this._lockNote(note, this._password);
   }
 
   async exists(vaultKey) {
@@ -158,9 +178,9 @@ export default class Vault {
   }
 
   /** @private */
-  async _encryptContent(contentId, content, type) {
+  async _encryptContent(contentId, content, type, password) {
     let encryptedContent = await this._context.encrypt(
-      { password: this._password },
+      { password },
       JSON.stringify(content)
     );
 
@@ -168,11 +188,11 @@ export default class Vault {
   }
 
   /** @private */
-  async _decryptContent(contentId) {
+  async _decryptContent(contentId, password) {
     let encryptedContent = await this._db.content.raw(contentId);
 
     let decryptedContent = await this._context.decrypt(
-      { password: this._password },
+      { password },
       encryptedContent.data
     );
 
@@ -180,7 +200,7 @@ export default class Vault {
   }
 
   /** @private */
-  async _lockNote(note) {
+  async _lockNote(note, password) {
     let { id, content: { type, data } = {}, contentId } = note;
 
     if (!data || !type || !contentId) {
@@ -192,7 +212,7 @@ export default class Vault {
       type = content.type;
     }
 
-    await this._encryptContent(contentId, data, type);
+    await this._encryptContent(contentId, data, type, password);
 
     return await this._db.notes.add({
       id,
@@ -204,8 +224,8 @@ export default class Vault {
   }
 
   /** @private */
-  async _unlockNote(note, perm = false) {
-    let content = await this._decryptContent(note.contentId);
+  async _unlockNote(note, password, perm = false) {
+    let content = await this._decryptContent(note.contentId, password);
 
     if (perm) {
       await this._db.notes.add({
