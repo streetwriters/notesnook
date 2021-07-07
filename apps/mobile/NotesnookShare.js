@@ -13,6 +13,7 @@ import {
   useWindowDimensions,
   View,
 } from 'react-native';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
 import sanitize from 'sanitize-html';
@@ -22,6 +23,8 @@ import {db} from './src/utils/DB';
 import {SIZE} from './src/utils/SizeUtils';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
+
+const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 
 async function sanitizeHtml(site) {
   try {
@@ -84,6 +87,21 @@ const NotesnookShare = () => {
   const titleInputRef = useRef();
   const {width, height} = useWindowDimensions();
   const webviewRef = useRef();
+  const opacity = useValue(0);
+  const translate = useValue(1000);
+
+  const animate = (opacityV, translateV) => {
+    timing(opacity, {
+      toValue: opacityV,
+      duration: 300,
+      easing: Easing.in(Easing.ease),
+    }).start();
+    timing(translate, {
+      toValue: translateV,
+      duration: 300,
+      easing: Easing.in(Easing.ease),
+    }).start();
+  };
 
   useEffect(() => {
     Keyboard.addListener('keyboardWillChangeFrame', onKeyboardWillChangeFrame);
@@ -116,7 +134,7 @@ const NotesnookShare = () => {
 
   const loadData = async () => {
     try {
-      setNote(note => {
+      setNote(() => {
         defaultNote.content.data = null;
         return defaultNote;
       });
@@ -146,11 +164,16 @@ const NotesnookShare = () => {
   useEffect(() => {
     setNote(defaultNote);
     loadData();
+    sleep(300).then(() => {
+      animate(1, 0);
+    });
   }, []);
 
-  const close = () => {
+  const close = async () => {
     setNote(defaultNote);
     setLoadingIntent(true);
+    animate(0, 1000);
+    await sleep(300);
     ShareExtension.close();
   };
 
@@ -198,17 +221,17 @@ const NotesnookShare = () => {
       await add();
     }
     await Storage.write('notesAddedFromIntent', 'added');
-    await sleep(500);
     setLoading(false);
     close();
   };
 
   return (
-    <View
+    <Animated.View
       style={{
         width: width > 500 ? 500 : width,
         height: height,
         justifyContent: 'flex-end',
+        opacity: Platform.OS !== 'ios' ? opacity : 1,
       }}>
       <TouchableOpacity
         activeOpacity={1}
@@ -229,13 +252,18 @@ const NotesnookShare = () => {
         />
       </TouchableOpacity>
 
-      <KeyboardAvoidingView
+      <AnimatedKAV
         enabled={!floating && Platform.OS === 'ios'}
         style={{
           paddingVertical: 25,
           backgroundColor: colors.bg,
           borderTopRightRadius: 10,
           borderTopLeftRadius: 10,
+          transform: [
+            {
+              translateY: Platform.OS !== 'ios' ? translate : 0,
+            },
+          ],
         }}
         behavior="padding">
         {loadingIntent ? (
@@ -358,17 +386,37 @@ const NotesnookShare = () => {
                 textAlignVertical="top"
                 value={editorContentValue}
                 blurOnSubmit={false}
-                placeholder="Add some notes here"
+                placeholder="Add some additional notes here"
               />
 
               <View
                 style={{
                   paddingHorizontal: 12,
+                  flexDirection: 'row',
+                  justifyContent: validator.isURL(rawData.value)
+                    ? 'space-between'
+                    : 'flex-end',
                 }}>
+                <Button
+                  style={{
+                    width: null,
+                    paddingHorizontal: 10,
+                    backgroundColor: colors.nav,
+                    marginRight: 10,
+                  }}
+                  textStyle={{
+                    color: colors.icon,
+                  }}
+                  title="Cancel"
+                  onPress={close}
+                />
                 {validator.isURL(rawData.value) && (
                   <Button
                     title="Clip Webpage"
                     color={colors.accent}
+                    style={{
+                      marginRight: 10,
+                    }}
                     onPress={async () => {
                       let html = await sanitizeHtml(rawData.value);
                       console.log(html);
@@ -378,7 +426,6 @@ const NotesnookShare = () => {
                       });
                       onLoad();
                     }}
-                    loading={loading}
                   />
                 )}
 
@@ -387,19 +434,6 @@ const NotesnookShare = () => {
                   color={colors.accent}
                   onPress={onPress}
                   loading={loading}
-                />
-
-                <Button
-                  style={{
-                    width: null,
-                    paddingHorizontal: 10,
-                    backgroundColor: colors.nav,
-                  }}
-                  textStyle={{
-                    color: colors.icon,
-                  }}
-                  title="Cancel"
-                  onPress={close}
                 />
               </View>
               <View
@@ -410,8 +444,8 @@ const NotesnookShare = () => {
             </View>
           </>
         )}
-      </KeyboardAvoidingView>
-    </View>
+      </AnimatedKAV>
+    </Animated.View>
   );
 };
 
@@ -423,13 +457,14 @@ const Button = ({title, onPress, color, loading, style, textStyle}) => {
       style={[
         {
           backgroundColor: color,
-          width: '100%',
           height: 50,
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
           flexDirection: 'row',
           marginBottom: 10,
+          minWidth: 100,
+          paddingHorizontal: 20,
         },
         style,
       ]}>
@@ -438,7 +473,7 @@ const Button = ({title, onPress, color, loading, style, textStyle}) => {
       <Text
         style={[
           {
-            fontSize: 18,
+            fontSize: 15,
             fontWeight: 'bold',
             color: 'white',
             marginLeft: loading ? 10 : 0,
