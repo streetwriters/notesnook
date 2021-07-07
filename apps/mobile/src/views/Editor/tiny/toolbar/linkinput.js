@@ -111,6 +111,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               color: colors.pri,
               zIndex: 10,
               flexGrow: 1,
+              maxWidth:'85%'
             }}
             autoCapitalize="none"
             autoCorrect={false}
