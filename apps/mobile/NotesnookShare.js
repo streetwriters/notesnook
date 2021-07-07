@@ -1,113 +1,44 @@
-import React, {Component, createRef, useEffect, useRef, useState} from 'react';
-import {Keyboard, useWindowDimensions} from 'react-native';
+import absolutify from 'absolutify';
+import {getLinkPreview} from 'link-preview-js';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Appearance,
+  Keyboard,
   KeyboardAvoidingView,
-  Modal,
   Platform,
   Text,
-  TouchableOpacity,
-  View,
-  ScrollView,
   TextInput,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
 } from 'react-native';
+import WebView from 'react-native-webview';
+import ShareExtension from 'rn-extensions-share';
 import sanitize from 'sanitize-html';
+import validator from 'validator';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
 import {db} from './src/utils/DB';
-import {normalize, SIZE} from './src/utils/SizeUtils';
+import {SIZE} from './src/utils/SizeUtils';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
-import absolutify from 'absolutify';
-import {Dimensions} from 'react-native';
-import validator from 'validator';
-import {getLinkPreview} from 'link-preview-js';
-import ShareExtension from 'rn-extensions-share';
-import WebView from 'react-native-webview';
-import {
-  injectedJS,
-  sourceUri,
-  _onShouldStartLoadWithRequest,
-} from './src/views/Editor/Functions';
 
 async function sanitizeHtml(site) {
   try {
     let html = await fetch(site);
     html = await html.text();
     let siteHtml = sanitize(html, {
-      allowedTags: [
-        'address',
-        'article',
-        'aside',
-        'footer',
-        'header',
-        'h1',
-        'h2',
-        'h3',
-        'h4',
-        'h5',
-        'h6',
-        'hgroup',
-        'main',
-        'nav',
-        'section',
-        'blockquote',
-        'dd',
-        'div',
-        'dl',
-        'dt',
-        'figcaption',
-        'figure',
-        'hr',
-        'li',
-        'main',
-        'ol',
-        'p',
-        'pre',
-        'ul',
-        'a',
-        'abbr',
-        'b',
-        'bdi',
-        'bdo',
-        'br',
-        'cite',
-        'code',
-        'data',
-        'dfn',
-        'em',
-        'i',
-        'kbd',
-        'mark',
-        'q',
-        'rb',
-        'rp',
-        'rt',
-        'rtc',
-        'ruby',
-        's',
-        'samp',
-        'small',
-        'span',
-        'strong',
-        'sub',
-        'sup',
-        'time',
-        'u',
-        'var',
-        'wbr',
-        'caption',
-        'col',
-        'colgroup',
-        'table',
-        'tbody',
-        'td',
-        'tfoot',
-        'th',
-        'thead',
-        'tr',
+      allowedTags: sanitize.defaults.allowedTags.concat([
         'img',
-      ],
+        'style',
+        'head',
+        'link',
+      ]),
+      allowedClasses: true,
+      allowVulnerableTags: true,
+      allowedAttributes: false,
+      allowProtocolRelative: true,
+      allowedSchemes: false,
     });
     return absolutify(siteHtml, site);
   } catch (e) {
@@ -116,11 +47,12 @@ async function sanitizeHtml(site) {
 }
 
 function makeHtmlFromUrl(url) {
-  return `<a href='${url}' target='_blank'>${url}</a>`;
+  return `<a style="overflow-wrap:anywhere;white-space:pre-wrap" href='${url}' target='_blank'>${url}</a>`;
 }
 
 function makeHtmlFromPlainText(text) {
-  return `<p>${text}</p>`;
+  if (!text) return '';
+  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text}</p>`;
 }
 
 let defaultNote = {
@@ -255,7 +187,8 @@ const NotesnookShare = () => {
 
     let add = async () => {
       let _note = {...note};
-      _note.content.data = _note.content.data + `<p>${editorContentValue}</p>`;
+      _note.content.data =
+        _note.content.data + makeHtmlFromPlainText(editorContentValue);
       await db.notes.add(note);
     };
     if (db && db.notes) {
@@ -266,7 +199,8 @@ const NotesnookShare = () => {
     }
     await Storage.write('notesAddedFromIntent', 'added');
     await sleep(500);
-    this.close();
+    setLoading(false);
+    close();
   };
 
   return (
@@ -410,18 +344,23 @@ const NotesnookShare = () => {
                   fontSize: 15,
                   color: colors.pri,
                   marginBottom: 10,
-                  width: '100%',
+                  width: '95%',
                   maxHeight: '70%',
-                  paddingVertical: 10,
-                  paddingHorizontal: 12,
+                  padding: 12,
+                  backgroundColor: colors.nav,
+                  alignSelf: 'center',
+                  borderRadius: 5,
                 }}
                 placeholderTextColor={colors.icon}
                 onChangeText={v => (editorContentValue = v)}
                 multiline={true}
+                numberOfLines={3}
+                textAlignVertical="top"
                 value={editorContentValue}
                 blurOnSubmit={false}
                 placeholder="Add some notes here"
               />
+
               <View
                 style={{
                   paddingHorizontal: 12,
@@ -444,9 +383,9 @@ const NotesnookShare = () => {
                 )}
 
                 <Button
-                  title="Save note"
+                  title={loading ? 'Saving note' : 'Save note'}
                   color={colors.accent}
-                  onPress={() => {}}
+                  onPress={onPress}
                   loading={loading}
                 />
 
@@ -455,6 +394,9 @@ const NotesnookShare = () => {
                     width: null,
                     paddingHorizontal: 10,
                     backgroundColor: colors.nav,
+                  }}
+                  textStyle={{
+                    color: colors.icon,
                   }}
                   title="Cancel"
                   onPress={close}
@@ -473,7 +415,7 @@ const NotesnookShare = () => {
   );
 };
 
-const Button = ({title, onPress, color, loading, style}) => {
+const Button = ({title, onPress, color, loading, style, textStyle}) => {
   return (
     <TouchableOpacity
       onPress={onPress}
@@ -494,12 +436,15 @@ const Button = ({title, onPress, color, loading, style}) => {
       {loading && <ActivityIndicator color="white" />}
 
       <Text
-        style={{
-          fontSize: 18,
-          fontWeight: 'bold',
-          color: 'white',
-          marginLeft: loading ? 10 : 0,
-        }}>
+        style={[
+          {
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: 'white',
+            marginLeft: loading ? 10 : 0,
+          },
+          textStyle,
+        ]}>
         {title}
       </Text>
     </TouchableOpacity>
