@@ -10,6 +10,7 @@ import { sanitizeFilename } from '../utils/filename';
 let RNFetchBlob;
 
 const defaultStyle = `<style>
+
 .img_size_one {
   width:100%;
 }
@@ -88,6 +89,8 @@ async function saveToPDF(note) {
     html: html3,
     fileName: Platform.OS === 'ios' ? '/exported/PDF/' + fileName : fileName,
     directory: Platform.OS === 'ios' ? 'Documents' : androidSavePath,
+    width:595,
+    height:852
   };
   let res = await RNHTMLtoPDF.convert(options);
 
