@@ -5,7 +5,6 @@ import TimeAgo from "timeago-react";
 import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
-import { showPasswordDialog } from "../../common/dialog-controller";
 import { COLORS } from "../../common";
 import { db } from "../../common/db";
 import Colors from "../menu/colors";
@@ -15,6 +14,7 @@ import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
 import { hashNavigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
+import Vault from "../../common/vault";
 
 function Note(props) {
   const { item, index, context } = props;
@@ -235,13 +235,7 @@ const menuItems = [
     disableReason: "Please unpublish this note to move it to trash",
     onClick: async ({ note }) => {
       if (note.locked) {
-        const res = await showPasswordDialog("unlock_note", (password) => {
-          return db.vault
-            .unlock(password)
-            .then(() => true)
-            .catch(() => false);
-        });
-        if (!res) return;
+        if (!(await Vault.unlockNote(note.id))) return;
       }
       await store.delete(note.id).then(() => showItemDeletedToast(note));
     },

@@ -18,6 +18,7 @@ function PasswordDialog(props) {
       setIsLoading(true);
       setError(false);
       try {
+        console.log(data);
         if (await props.validate(data)) {
           props.onDone();
         } else {
@@ -25,7 +26,6 @@ function PasswordDialog(props) {
         }
       } catch (e) {
         setError(e.message);
-      } finally {
         setIsLoading(false);
       }
     },

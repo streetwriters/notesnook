@@ -63,8 +63,8 @@ class Vault {
           .remove(id, password)
           .then(() => true)
           .catch((e) => {
-            if (e.message === db.vault.ERRORS.wrongPassword) return false;
-            else console.error(e);
+            console.error(e);
+            return false;
           });
       }).then(resolve);
     });
