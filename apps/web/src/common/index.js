@@ -6,6 +6,7 @@ import { Text } from "rebass";
 import {
   showFeatureDialog,
   showLoadingDialog,
+  showPasswordDialog,
 } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { store as userstore } from "../stores/user-store";
@@ -133,4 +134,10 @@ export function getTotalNotes(notebook) {
   return notebook.topics.reduce((sum, topic) => {
     return sum + topic.notes.length;
   }, 0);
+}
+
+export function verifyAccount() {
+  return showPasswordDialog("verify_account", ({ password }) => {
+    return db.user.verifyPassword(password);
+  });
 }
