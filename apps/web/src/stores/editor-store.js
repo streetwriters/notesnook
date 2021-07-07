@@ -106,49 +106,56 @@ class EditorStore extends BaseStore {
     const session = this.get().session;
     if (session.isSaving) return; // avoid multiple in-queue saves; only save one time.
     this.set((state) => (state.session.isSaving = true));
-    this._saveFn()(session).then(async (id) => {
-      let note = db.notes.note(id)?.data;
-      if (!note) {
+    this._saveFn()(session)
+      .then(async (id) => {
+        let note = db.notes.note(id)?.data;
+        if (!note) {
+          noteStore.refresh();
+          return;
+        }
+        /* eslint-disable */
+        storeSync: {
+          if (oldSession?.tags?.length !== session.tags.length)
+            tagStore.refresh();
+
+          if (oldSession?.color !== session.color) appStore.refreshColors();
+
+          if (!oldSession?.context) break storeSync;
+
+          const { type, value } = oldSession.context;
+          if (type === "topic") await db.notes.move(value, id);
+          else if (type === "color") await db.notes.note(id).color(value);
+          else if (type === "tag") await db.notes.note(id).tag(value);
+
+          // update the note.
+          note = db.notes.note(id)?.data;
+        }
+        /* eslint-enable */
+
+        if (!this.get().session.id) {
+          noteStore.setSelectedNote(id);
+        }
+
+        this.set((state) => {
+          state.session.id = note.id;
+          state.session.title = note.title;
+          state.session.isSaving = false;
+          state.session.color = note.color;
+          state.session.tags = note.tags;
+          state.session.notebooks = note.notebooks;
+        });
+
         noteStore.refresh();
-        return;
-      }
-      /* eslint-disable */
-      storeSync: {
-        if (oldSession?.tags?.length !== session.tags.length)
-          tagStore.refresh();
-
-        if (oldSession?.color !== session.color) appStore.refreshColors();
-
-        if (!oldSession?.context) break storeSync;
-
-        const { type, value } = oldSession.context;
-        if (type === "topic") await db.notes.move(value, id);
-        else if (type === "color") await db.notes.note(id).color(value);
-        else if (type === "tag") await db.notes.note(id).tag(value);
-
-        // update the note.
-        note = db.notes.note(id)?.data;
-      }
-      /* eslint-enable */
-
-      if (!this.get().session.id) {
-        noteStore.setSelectedNote(id);
-      }
-
-      this.set((state) => {
-        state.session.id = note.id;
-        state.session.title = note.title;
-        state.session.isSaving = false;
-        state.session.color = note.color;
-        state.session.tags = note.tags;
-        state.session.notebooks = note.notebooks;
+        if (!oldSession?.id) {
+          hashNavigate(`/notes/${id}/edit`, { replace: true });
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+        if (session.locked) {
+          hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
+        }
       });
-
-      noteStore.refresh();
-      if (!oldSession?.id) {
-        hashNavigate(`/notes/${id}/edit`, { replace: true });
-      }
-    });
   };
 
   newSession = (nonce) => {
