@@ -20,6 +20,7 @@ const ActionSheetWrapper = ({
   onClose,
   onOpen,
   closeOnTouchBackdrop = true,
+  onHasReachedTop
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -72,6 +73,7 @@ const ActionSheetWrapper = ({
       gestureEnabled={gestureEnabled}
       extraScroll={largeTablet ? 50 : 0}
       initialOffsetFromBottom={1}
+      onPositionChanged={onHasReachedTop}
       closeOnTouchBackdrop={closeOnTouchBackdrop}
       indicatorColor={
         Platform.OS === 'ios'

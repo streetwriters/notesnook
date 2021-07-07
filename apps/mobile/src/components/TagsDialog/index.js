@@ -12,7 +12,7 @@ import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
-
+import Heading from '../Typography/Heading';
 const TagsDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -103,8 +103,8 @@ const TagsDialog = () => {
     }
     setNote({...note, tags: note.tags ? [...note.tags, tag] : [tag]});
     inputRef.current?.setNativeProps({
-      text:""
-    })
+      text: '',
+    });
     try {
       await db.notes.note(note.id).tag(tag);
       useTagStore.getState().setTags();
@@ -133,13 +133,12 @@ const TagsDialog = () => {
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12,
-          minHeight: '80%',
+          minHeight:"60%"
         }}>
         <Input
           button={{
             icon: 'magnify',
             color: colors.accent,
-            onPress: () => {},
             size: SIZE.lg,
           }}
           fwdRef={inputRef}
@@ -147,14 +146,23 @@ const TagsDialog = () => {
           onChangeText={v => {
             setQuery(v);
           }}
+          onSubmit={onSubmit}
           height={50}
-          placeholder="Search or add tag"
+          placeholder="Search or add a tag"
         />
 
-        <ScrollView nestedScrollEnabled>
+        <ScrollView
+          nestedScrollEnabled
+          overScrollMode="never"
+          scrollToOverflowEnabled={false}
+          keyboardDismissMode="none"
+          keyboardShouldPersistTaps="never"
+          onMomentumScrollEnd={() => {
+            actionSheetRef.current?.handleChildScrollEnd();
+          }}>
           {query ? (
             <PressableButton
-              key={"query_item"}
+              key={'query_item'}
               customStyle={{
                 flexDirection: 'row',
                 marginVertical: 5,
@@ -167,9 +175,29 @@ const TagsDialog = () => {
               <Icon name="plus" color={colors.accent} size={SIZE.lg} />
             </PressableButton>
           ) : null}
+          {!tags || tags.length === 0 ? (
+            <View
+              style={{
+                width: '100%',
+                height: 200,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              <Heading size={50} color={colors.icon}>
+                #
+              </Heading>
+              <Paragraph textBreakStrategy="balanced" color={colors.icon}>
+                You do not have any tags.
+              </Paragraph>
+            </View>
+          ) : null}
           {tags.map(item => (
-            <TagItem 
-            key={item.title} tag={item} note={note} setNote={setNote} />
+            <TagItem
+              key={item.title}
+              tag={item}
+              note={note}
+              setNote={setNote}
+            />
           ))}
         </ScrollView>
       </View>

@@ -32,7 +32,11 @@ import {
   setColorScheme,
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
-import {eOpenMoveNoteDialog, eOpenPublishNoteDialog} from '../../utils/Events';
+import {
+  eOpenMoveNoteDialog,
+  eOpenPublishNoteDialog,
+  eOpenTagsDialog,
+} from '../../utils/Events';
 import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
@@ -619,6 +623,7 @@ export const ActionSheetComponent = ({
           Keyboard.dismiss();
         }}
       />
+
       {!note || !note.id ? (
         <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
@@ -723,69 +728,77 @@ export const ActionSheetComponent = ({
                 : null}
             </View>
           )}
+
+          {hasTags && note ? (
+            <ActionSheetTagsSection
+              close={close}
+              item={note}
+              localRefresh={localRefresh}
+            />
+          ) : null}
+
           <View
             style={{
               flexDirection: 'row',
+              marginTop: 5,
             }}>
             {note.type === 'note' && isPublished && (
-              <View
+              <Button
+                title="Published"
+                type="shade"
+                height={30}
+                fontSize={SIZE.sm - 1}
                 style={{
-                  borderColor: colors.accent,
-                  paddingHorizontal: 5,
-                  borderRadius: 2.5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 5,
-                  borderWidth: 1,
-                  height: 18,
+                  margin: 1,
                   marginRight: 5,
-                }}>
-                <Paragraph
-                  color={colors.accent}
-                  size={SIZE.xs}
-                  style={{
-                    textAlignVertical: 'center',
-                    textAlign: 'center',
-                  }}>
-                  Published
-                </Paragraph>
-              </View>
+                  paddingHorizontal: 0,
+                  borderRadius: 100,
+                  paddingHorizontal: 12,
+                }}
+              />
             )}
             {note.type !== 'note' || refreshing ? null : (
-              <TouchableOpacity
-                activeOpacity={0.9}
-                testID={notesnook.ids.dialogs.actionsheet.sync}
+              <Button
                 onPress={async () => await Sync.run('local')}
+                title={
+                  user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'
+                }
+                type="shade"
+                height={30}
+                fontSize={SIZE.sm}
                 style={{
-                  borderColor: colors.accent,
-                  paddingHorizontal: 5,
-                  borderRadius: 2.5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginTop: 5,
-                  borderWidth: 1,
-                  height: 18,
-                }}>
-                <Paragraph
-                  color={colors.accent}
-                  size={SIZE.xs}
-                  style={{
-                    textAlignVertical: 'center',
-                    textAlign: 'center',
-                  }}>
-                  {user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'}
-                </Paragraph>
-              </TouchableOpacity>
+                  margin: 1,
+                  marginRight: 5,
+                  paddingHorizontal: 0,
+                  borderRadius: 100,
+                  paddingHorizontal: 12,
+                }}
+              />
+            )}
+
+            {note.type === 'note' && (
+              <Button
+                onPress={async () => {
+                  close();
+                  await sleep(300);
+                  eSendEvent(eOpenTagsDialog, note);
+                }}
+                title="Add tags"
+                type="accent"
+                icon="plus"
+                iconPosition="right"
+                height={30}
+                fontSize={SIZE.sm}
+                style={{
+                  margin: 1,
+                  marginRight: 5,
+                  paddingHorizontal: 0,
+                  borderRadius: 100,
+                  paddingHorizontal: 12,
+                }}
+              />
             )}
           </View>
-
-          {refreshing ? (
-            <ActivityIndicator
-              style={{marginTop: 5, height: 20}}
-              size={12}
-              color={colors.accent}
-            />
-          ) : null}
         </View>
       )}
 
@@ -807,14 +820,6 @@ export const ActionSheetComponent = ({
 
       {hasColors && note.id ? (
         <ActionSheetColorsSection close={close} item={note} />
-      ) : null}
-
-      {hasTags && note ? (
-        <ActionSheetTagsSection
-          close={close}
-          item={note}
-          localRefresh={localRefresh}
-        />
       ) : null}
 
       {note.id && columnItems.length > 0 ? (

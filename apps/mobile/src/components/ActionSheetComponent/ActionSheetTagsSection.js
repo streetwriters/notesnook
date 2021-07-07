@@ -1,27 +1,14 @@
-import React, {createRef, useCallback, useEffect, useState} from 'react';
-import {Text} from 'react-native';
-import {TextInput, TouchableOpacity, View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import React, {useState} from 'react';
+import {View} from 'react-native';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
-import {eOpenTagsDialog, refreshNotesPage} from '../../utils/Events';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 
-const tagsInputRef = createRef();
-let prevQuery = null;
-let tagToAdd = '';
-let backPressCount = 0;
-
 export const ActionSheetTagsSection = ({item, close}) => {
-  const [state, dispatch] = useTracked();
-  const {colors} = state;
-  const [suggestions, setSuggestions] = useState([]);
-  const [focused, setFocused] = useState(false);
   const [note, setNote] = useState(item);
 
   return note.id || note.dateCreated ? (
@@ -34,66 +21,47 @@ export const ActionSheetTagsSection = ({item, close}) => {
           flexDirection: 'row',
           flexWrap: 'wrap',
           alignItems: 'center',
+          justifyContent: 'center',
         }}>
         {note.tags.map(
-          (item, index) => item && <TagItem key={item} tag={item} />,
+          (item, index) =>
+            item && <TagItem key={item} tag={item} close={close} />,
         )}
-
-        <Button
-          onPress={async () => {
-            close();
-            await sleep(300);
-            eSendEvent(eOpenTagsDialog, note);
-          }}
-          title="Add new tag"
-          type="accent"
-          icon="plus"
-          iconPosition="right"
-          height={30}
-          fontSize={SIZE.sm}
-          style={{
-            margin: 1,
-            marginRight: 5,
-            paddingHorizontal: 0,
-            borderRadius: 100,
-            paddingHorizontal: 12,
-          }}
-        />
       </View>
     </View>
   ) : null;
 };
 
-const TagItem = ({tag}) => {
+const TagItem = ({tag, close}) => {
   const onPress = async () => {
-    let params = (params = {
-      ...item,
+    let tags = db.tags.all;
+    let _tag = tags.find(t => t.title === tag);
+    let params = {
+      ..._tag,
       type: 'tag',
-      menu: false,
       get: 'tagged',
-    });
+    };
     Navigation.navigate('NotesPage', params, {
-      heading: '#' + tag.title,
-      id: tag.id,
-      type: tag.type,
+      heading: '#' + _tag.title,
+      id: _tag.id,
+      type: _tag.type,
     });
     eSendEvent(refreshNotesPage, params);
+    await sleep(300);
     close();
   };
 
   const style = {
-    margin: 1,
-    marginRight: 5,
     paddingHorizontal: 0,
-    borderRadius: 100,
     paddingHorizontal: 12,
+    marginVertical: 5,
   };
 
   return (
     <Button
       onPress={onPress}
       title={'#' + tag}
-      type="grayBg"
+      type="gray"
       height={30}
       fontSize={SIZE.sm}
       style={style}
