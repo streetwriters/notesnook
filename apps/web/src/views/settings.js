@@ -315,8 +315,13 @@ function Settings(props) {
         >
           {"Backup & Restore"}
         </Text>
-        <Button variant="list" onClick={createBackup}>
-          <Tip text="Backup data" tip="Backup and download all your data" />
+        <Button
+          variant="list"
+          onClick={async () => {
+            if (await verifyAccount()) await createBackup();
+          }}
+        >
+          <Tip text="Backup data" tip="Create a backup file of all your data" />
         </Button>
         <input
           type="file"
