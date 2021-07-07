@@ -32,6 +32,7 @@ import { openPaddleDialog } from "../common/checkout";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
 import openLink from "../commands/openLink";
+import { isDesktop } from "../utils/platform";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -365,16 +366,20 @@ function Settings(props) {
 
         <Toggle
           title="Encrypt backups"
-          onTip="All backups will be encrypted"
-          offTip="Backups will not be encrypted"
+          onTip="All backup files will be encrypted"
+          offTip="Backup files will not be encrypted"
           onToggled={toggleEncryptBackups}
           premium={CHECK_IDS.backupEncrypt}
           isToggled={encryptBackups}
         />
 
         <OptionsItem
-          title="Backup reminders"
-          tip="Remind me to backup my data"
+          title={isDesktop() ? "Automatic backups" : "Backup reminders"}
+          tip={
+            isDesktop()
+              ? "Automatically backup my data"
+              : "Remind me to backup my data"
+          }
           options={["Never", "Daily", "Weekly", "Monthly"]}
           premium="backups"
           selectedOption={backupReminderOffset}
