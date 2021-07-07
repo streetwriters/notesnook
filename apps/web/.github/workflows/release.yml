@@ -3,7 +3,30 @@ name: Build/release
 on: workflow_dispatch
 
 jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
+        with:
+          persist-credentials: false
+
+      - name: Use Node.js 15.x
+        uses: actions/setup-node@v2.1.5
+        with:
+          node-version: 15.x
+      - run: npm install
+      - run: npm build
+
+      - name: Archive build artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: build
+          path: build/**/*
+
   release:
+    needs: build
     runs-on: ${{ matrix.os }}
 
     # Platforms to build on/for
@@ -21,6 +44,12 @@ jobs:
         uses: actions/setup-node@v2.1.5
         with:
           node-version: 15.x
+
+      - name: Download notesnook-web build
+        uses: actions/download-artifact@v2
+        with:
+          name: build
+          path: ./desktop
 
       - name: Prepare for app notarization (macOS)
         if: startsWith(matrix.os, 'macos')
