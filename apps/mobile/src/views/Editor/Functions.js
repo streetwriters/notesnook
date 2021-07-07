@@ -504,7 +504,7 @@ export async function saveNote(preventUpdate) {
     if (id) {
       let _note = db.notes.note(id).data;
       if (_note.conflicted) {
-        presentResolveConflictDialog(_note)
+        presentResolveConflictDialog(_note);
         return;
       }
       locked = _note.locked;
@@ -570,10 +570,10 @@ async function restoreEditorState() {
     if (
       appState.editing &&
       appState.note &&
+      !appState.note.locked &&
       appState.note.id &&
       Date.now() < appState.timestamp + 3600000
     ) {
-      console.log('restoring state');
       editing.isRestoringState = true;
       eSendEvent('loadingNote', appState.note);
       editing.currentlyEditing = true;
@@ -595,7 +595,7 @@ async function restoreEditorState() {
   editing.isRestoringState = false;
 }
 
-const presentResolveConflictDialog = (_note) => {
+const presentResolveConflictDialog = _note => {
   presentDialog({
     title: 'Changes not saved',
     paragraph: 'Please resolve conflicts to save changes',
@@ -604,13 +604,13 @@ const presentResolveConflictDialog = (_note) => {
       eSendEvent(eShowMergeDialog, _note);
     },
   });
-}
+};
 
 export async function updateNoteInEditor() {
-  console.log('updating note in editor')
+  console.log('updating note in editor');
   let _note = db.notes.note(id).data;
   if (_note.conflicted) {
-    presentResolveConflictDialog(_note)
+    presentResolveConflictDialog(_note);
     return;
   }
   tiny.call(EditorWebView, tiny.isLoading);

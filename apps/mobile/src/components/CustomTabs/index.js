@@ -236,7 +236,7 @@ export default class CustomTabs extends Component {
             this.props.offsets.c,
           ]}
           contentOffset={{
-            x: this.props.offsets.a,
+            x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b,
           }}
           data={['drawer', 'navigation', 'editor']}
           renderItem={this.renderItem}

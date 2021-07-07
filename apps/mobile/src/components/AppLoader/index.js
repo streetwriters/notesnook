@@ -54,11 +54,13 @@ const AppLoader = ({onLoad}) => {
       appState = JSON.parse(appState);
       if (
         appState.note &&
+        !appState.note.locked &&
         !appState.movedAway &&
         Date.now() < appState.timestamp + 3600000
       ) {
         editing.isRestoringState = true;
         editing.currentlyEditing = true;
+        editing.movedAway = false;
         if (!DDS.isTab) {
           tabBarRef.current?.goToPage(1);
         }
