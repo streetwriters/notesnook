@@ -21,6 +21,7 @@ function Unlock(props) {
     setIsUnlocking(true);
     const password = passwordRef.current.value;
     try {
+      if (!password) return;
       const note = await db.vault.open(noteId, password);
       openLockedSession(note);
     } catch (e) {
