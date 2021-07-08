@@ -23,14 +23,15 @@ import "./plugins/code";
 import "./plugins/shortlink";
 import "./plugins/quickimage";
 import "./plugins/checklist";
+import "./plugins/collapsibleheaders";
 import "./editor.css";
 import { Editor } from "@tinymce/tinymce-react";
-import { isUserPremium } from "../../common";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
 import { KeyboardEventManager } from "../../utils/keyboard";
 import { showToast } from "../../utils/toast";
+import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -99,42 +100,8 @@ function useSkin() {
     : [host + "/skins/notesnook-dark", host + "/skins/notesnook"];
 }
 
-const COLLAPSED_KEY = "c";
-const HIDDEN_KEY = "h";
-const collapsibleTags = { HR: 1, H2: 2, H3: 3, H4: 4, H5: 5 };
-
-function toggleElementVisibility(element, toggleState) {
-  if (!toggleState) element.classList.remove(HIDDEN_KEY);
-  else element.classList.add(HIDDEN_KEY);
-}
-
-function collapseElement(target) {
-  let sibling = target.nextSibling;
-  const isTargetCollapsed = target.classList.contains(COLLAPSED_KEY);
-  let skip = false;
-
-  while (
-    sibling &&
-    (!collapsibleTags[sibling.tagName] ||
-      collapsibleTags[sibling.tagName] > collapsibleTags[target.tagName])
-  ) {
-    const isCollapsed = sibling.classList.contains(COLLAPSED_KEY);
-    if (!isTargetCollapsed) {
-      if (isCollapsed) {
-        skip = true;
-        toggleElementVisibility(sibling, isTargetCollapsed);
-      } else if (skip && collapsibleTags[sibling.tagName]) {
-        skip = false;
-      }
-    }
-    if (!skip) {
-      toggleElementVisibility(sibling, isTargetCollapsed);
-    }
-    if (!sibling.nextSibling) break;
-    sibling = sibling.nextSibling;
-  }
-}
-
+const plugins =
+  "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize collapsibleheaders";
 function TinyMCE(props) {
   const {
     changeInterval,
@@ -149,6 +116,7 @@ function TinyMCE(props) {
     onInit,
   } = props;
   const [oldSkin, newSkin] = useSkin();
+  const isUserPremium = useIsUserPremium();
   const tinymceRef = editorRef;
   useEffect(() => {
     tinymceRef.current.editor.dom.styleSheetLoader.unload(
@@ -176,9 +144,7 @@ function TinyMCE(props) {
         statusbar: false,
         link_quicklink: true,
         width: "100%",
-        plugins: isUserPremium()
-          ? "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools textpattern noneditable quickbars autoresize"
-          : "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize",
+        plugins: isUserPremium ? `${plugins} textpattern` : plugins,
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_insert_toolbar: false,
@@ -234,14 +200,7 @@ function TinyMCE(props) {
               block: "nearest",
             });
           });
-          editor.on("NewBlock", (e) => {
-            const { newBlock } = e;
-            const target = newBlock?.previousElementSibling;
-            if (target?.classList.contains(COLLAPSED_KEY)) {
-              target.classList.remove(COLLAPSED_KEY);
-              collapseElement(target);
-            }
-          });
+          editor.on("NewBlock", (e) => {});
         },
         toolbar_persist: true,
         toolbar_sticky: false,
@@ -249,30 +208,6 @@ function TinyMCE(props) {
         inline: true,
         fixed_toolbar_container: "#editorToolbar",
         autoresize_bottom_margin: 100,
-      }}
-      // onNodeChange={(e) => {
-
-      // }}
-      onClick={(e, editor) => {
-        const { target } = e;
-        if (
-          e.offsetX < 0 &&
-          collapsibleTags[target.tagName] &&
-          target.parentElement.tagName === "DIV"
-        ) {
-          e.preventDefault();
-          e.stopImmediatePropagation();
-          e.stopPropagation();
-          editor.undoManager.transact(() => {
-            if (target.classList.contains(COLLAPSED_KEY)) {
-              target.classList.remove(COLLAPSED_KEY);
-            } else {
-              target.classList.add(COLLAPSED_KEY);
-            }
-            collapseElement(target);
-            onSave();
-          });
-        }
       }}
       onBeforeExecCommand={async (command) => {
         if (
@@ -290,7 +225,7 @@ function TinyMCE(props) {
             }
             return isPremium;
           }) &&
-          !isUserPremium()
+          !isUserPremium
         ) {
           command.preventDefault();
           command.stopImmediatePropagation();

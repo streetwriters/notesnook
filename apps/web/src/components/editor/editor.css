@@ -110,11 +110,6 @@ tox-tbtn tox-tbtn--select {
   content: "H5";
 }
 
-.mce-content-body blockquote::before {
-  content: "QUOTE";
-  margin-left: 0px !important;
-}
-
 .mce-content-body .c::before {
   color: var(--static);
   background-color: var(--primary);
