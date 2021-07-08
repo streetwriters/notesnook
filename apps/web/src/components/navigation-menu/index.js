@@ -55,6 +55,8 @@ const bottomRoutes = [
   },
 ];
 
+const NAVIGATION_MENU_WIDTH = "9em";
+
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
   const [location] = useLocation();
@@ -93,13 +95,13 @@ function NavigationMenu(props) {
         borderRightColor: "border",
         minWidth: [
           "85%",
-          isSideMenuOpen && !isFocusMode ? 150 : 0,
-          isFocusMode ? 0 : 150,
+          isSideMenuOpen && !isFocusMode ? NAVIGATION_MENU_WIDTH : 0,
+          isFocusMode ? 0 : NAVIGATION_MENU_WIDTH,
         ],
         maxWidth: [
           "85%",
-          isSideMenuOpen && !isFocusMode ? 150 : 0,
-          isFocusMode ? 0 : 150,
+          isSideMenuOpen && !isFocusMode ? NAVIGATION_MENU_WIDTH : 0,
+          isFocusMode ? 0 : NAVIGATION_MENU_WIDTH,
         ],
         zIndex: !isSideMenuOpen ? -1 : isMobile ? 999 : isTablet ? 1 : 1,
         height: ["100%", "auto", "auto"],

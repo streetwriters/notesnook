@@ -70,8 +70,9 @@ tox-tbtn tox-tbtn--select {
   border-bottom: 0px solid var(--border) !important;
 }
 
-.mce-content-body:focus-visible {
+.mce-content-body {
   outline: none;
+  height: 100%;
 }
 
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
@@ -79,7 +80,7 @@ tox-tbtn tox-tbtn--select {
 }
 
 .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
-  margin-top: 15px !important;
+  margin-top: 1em !important;
 }
 
 .mce-content-body *::before {

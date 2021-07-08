@@ -118,7 +118,7 @@ function MenuContainer({ id, style, sx, children }) {
         borderRadius: "default",
         border: "2px solid",
         borderColor: "border",
-        width: 180,
+        width: "11em",
         ...sx,
       }}
     >
