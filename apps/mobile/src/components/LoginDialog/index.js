@@ -772,9 +772,7 @@ const LoginDialog = () => {
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/tos', colors)
                         .catch(e => {})
-                        .then(r => {
-                          console.log('closed');
-                        });
+                        .then(r => {});
                     }}
                     color={colors.accent}>
                     terms of service{' '}
@@ -785,9 +783,7 @@ const LoginDialog = () => {
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/privacy', colors)
                         .catch(e => {})
-                        .then(r => {
-                          console.log('closed');
-                        });
+                        .then(r => {});
                     }}
                     color={colors.accent}>
                     privacy policy.

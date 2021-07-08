@@ -24,19 +24,8 @@ import tiny from './tiny/tiny';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
-
-export const params = 'platform=' + Platform.OS;
 export const sourceUri =
-  (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
-  'Web.bundle/loader.html';
-export const injectedJS = ` setTimeout(() => {
-  if (!window.location.search) {
-    var link = document.getElementById('progress-bar');
-     link.href = './site/index.html?${params}';
-     link.click();  
-   }
-},100);   
-      `;
+  Platform.OS === 'android' ? 'file:///android_asset/' : 'Web.bundle/site/';
 
 let webviewOK = true;
 let noteEdited = false;

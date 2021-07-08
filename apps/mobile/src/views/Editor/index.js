@@ -1,43 +1,31 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {Dimensions} from 'react-native';
-import {Platform, ScrollView, TextInput} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useState } from 'react';
+import { Platform, ScrollView, TextInput, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
+import { notesnook } from '../../../e2e/test.ids';
 import { useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
+import { getCurrentColors } from '../../utils/Colors';
 import { eOpenLoginDialog } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
-import {normalize} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { normalize } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
-  getNote,
-  injectedJS,
-  onWebViewLoad,
+  getNote, onWebViewLoad,
   sourceUri,
   textInput,
   _onMessage,
-  _onShouldStartLoadWithRequest,
+  _onShouldStartLoadWithRequest
 } from './Functions';
 import tiny from './tiny/tiny';
 import EditorToolbar from './tiny/toolbar';
 
-const source =
-  Platform.OS === 'ios'
-    ? {uri: sourceUri}
-    : {
-        uri: 'file:///android_asset/index.html',
-        baseUrl: 'file:///android_asset/',
-      };
+const source = {uri: sourceUri + 'index.html'}
 
 const style = {
   height: '100%',
@@ -129,7 +117,6 @@ const Editor = React.memo(
             javaScriptEnabled={true}
             focusable={true}
             keyboardDisplayRequiresUserAction={false}
-            injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
             onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
             cacheEnabled={true}

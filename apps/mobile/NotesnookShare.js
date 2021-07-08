@@ -7,6 +7,7 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  SafeAreaView,
   Text,
   TextInput,
   TouchableOpacity,
@@ -25,7 +26,7 @@ import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
-
+const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
 async function sanitizeHtml(site) {
   try {
     let html = await fetch(site);
@@ -89,8 +90,12 @@ const NotesnookShare = () => {
   const webviewRef = useRef();
   const opacity = useValue(0);
   const translate = useValue(1000);
+  const insets = {
+    top: Platform.OS === 'ios' ? 30 : 0,
+  };
 
   const animate = (opacityV, translateV) => {
+    if (Platform.OS === 'ios') return;
     timing(opacity, {
       toValue: opacityV,
       duration: 300,
@@ -114,7 +119,7 @@ const NotesnookShare = () => {
   });
 
   const onKeyboardWillChangeFrame = event => {
-    setFloating(event.endCoordinates.width !== windowWidth);
+    setFloating(event.endCoordinates.width !== width);
   };
 
   const showLinkPreview = async link => {
@@ -139,7 +144,6 @@ const NotesnookShare = () => {
         return defaultNote;
       });
       const data = await ShareExtension.data();
-      console.log(data.length);
       for (item of data) {
         if (item.type === 'text') {
           setRawData(item);
@@ -177,18 +181,7 @@ const NotesnookShare = () => {
     ShareExtension.close();
   };
 
-  const params = 'platform=' + Platform.OS;
-  const sourceUri =
-    (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
-    'Web.bundle/loader.html';
-  const injectedJS = `if (!window.location.search) {
-         var link = document.getElementById('progress-bar');
-          link.href = './site/plaineditor.html?${params}';
-          link.click();  
-    }`;
-
   const onLoad = () => {
-    console.log('loading', note.content.data);
     postMessage(webviewRef, 'htmldiff', note.content?.data);
     let theme = {...colors};
     theme.factor = 1;
@@ -222,11 +215,22 @@ const NotesnookShare = () => {
     }
     await Storage.write('notesAddedFromIntent', 'added');
     setLoading(false);
+    await sleep(300);
     close();
   };
 
+  const sourceUri = 'Plain.bundle/site/plaineditor.html';
+
+  const onShouldStartLoadWithRequest = request => {
+    if (request.url.includes('/site/plaineditor.html')) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   return (
-    <Animated.View
+    <AnimatedSAV
       style={{
         width: width > 500 ? 500 : width,
         height: height,
@@ -259,6 +263,7 @@ const NotesnookShare = () => {
           backgroundColor: colors.bg,
           borderTopRightRadius: 10,
           borderTopLeftRadius: 10,
+          marginBottom: insets.top,
           transform: [
             {
               translateY: Platform.OS !== 'ios' ? translate : 0,
@@ -337,10 +342,6 @@ const NotesnookShare = () => {
                     height: '100%',
                     backgroundColor: 'transparent',
                   }}
-                  injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
-                  onShouldStartLoadWithRequest={() => {
-                    return false;
-                  }}
                   cacheMode="LOAD_DEFAULT"
                   domStorageEnabled={true}
                   scrollEnabled={true}
@@ -350,6 +351,7 @@ const NotesnookShare = () => {
                   allowingReadAccessToURL={
                     Platform.OS === 'android' ? true : null
                   }
+                  onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
                   allowFileAccessFromFileURLs={true}
                   allowUniversalAccessFromFileURLs={true}
                   originWhitelist={['*']}
@@ -378,6 +380,10 @@ const NotesnookShare = () => {
                   backgroundColor: colors.nav,
                   alignSelf: 'center',
                   borderRadius: 5,
+                  marginTop: 10,
+                  minHeight: 80,
+                  paddingTop: 12,
+                  paddingBottom: 12,
                 }}
                 placeholderTextColor={colors.icon}
                 onChangeText={v => (editorContentValue = v)}
@@ -419,7 +425,6 @@ const NotesnookShare = () => {
                     }}
                     onPress={async () => {
                       let html = await sanitizeHtml(rawData.value);
-                      console.log(html);
                       setNote(note => {
                         note.content.data = html;
                         return note;
@@ -445,7 +450,7 @@ const NotesnookShare = () => {
           </>
         )}
       </AnimatedKAV>
-    </Animated.View>
+    </AnimatedSAV>
   );
 };
 
@@ -463,7 +468,7 @@ const Button = ({title, onPress, color, loading, style, textStyle}) => {
           alignItems: 'center',
           flexDirection: 'row',
           marginBottom: 10,
-          minWidth: 100,
+          minWidth: 80,
           paddingHorizontal: 20,
         },
         style,

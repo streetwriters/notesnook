@@ -88,7 +88,6 @@ export default class CustomTabs extends Component {
   }
 
   goToIndex(index, animated = true) {
-    console.log('gotToIndex',index)
     let offset = 0;
     if (index === 1) {
       this.nextPage = 0;
