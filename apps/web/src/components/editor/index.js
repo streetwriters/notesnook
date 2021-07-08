@@ -133,7 +133,7 @@ function Editor({ noteId, nonce }) {
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "935px"}
-          width={["100%", "100%", isFocusMode ? "50%" : "100%"]}
+          width={["100%", "100%", isFocusMode ? "auto" : "100%"]}
           mt={[0, 0, 25]}
         >
           <Header />
