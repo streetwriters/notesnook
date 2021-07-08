@@ -22,6 +22,10 @@ async function createNote(note, actionButtonId) {
 
   await page.fill(getTestId("editor-title"), note.title);
 
+  await page.waitForTimeout(100);
+
+  await page.focus(".mce-content-body");
+
   await page.type(".mce-content-body", note.content);
 }
 

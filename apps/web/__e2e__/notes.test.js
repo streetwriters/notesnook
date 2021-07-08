@@ -85,6 +85,8 @@ async function checkNotePinned(noteSelector, pause) {
 }
 
 async function checkNoteLocked(noteSelector) {
+  await page.waitForTimeout(500);
+
   await expect(
     isPresent(List.new("note").grouped().atIndex(0).locked().build())
   ).resolves.toBeTruthy();
