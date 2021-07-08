@@ -10,9 +10,10 @@ export const Title = ({heading,headerColor,screen}) => {
   const [state] = useTracked();
   const {colors} = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
-  const opacity = useValue(deviceMode !== "mobile" ? 1 : 0)
+  const opacity = useValue(deviceMode !== "mobile" || screen === "Settings" ? 1 : 0)
 
   const onScroll = async (data) => {
+    if (data.screen === "Settings") return;
     if (data.screen !== screen) return;
     if (deviceMode !== "mobile") return;
     if (data.y > 75) {

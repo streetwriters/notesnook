@@ -286,7 +286,7 @@ editor.on('NewBlock', function (e) {
   }
 });
 
-editor.on('mousedown', function (e) {
+editor.on('touchstart mousedown', function (e) {
   const {target} = e;
   if (
     e.offsetX < 6 &&

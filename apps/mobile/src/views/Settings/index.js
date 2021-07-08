@@ -14,10 +14,12 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import ToggleSwitch from 'toggle-switch-react-native';
 import {Button} from '../../components/Button';
 import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
@@ -87,9 +89,7 @@ import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
-import ToggleSwitch from 'toggle-switch-react-native';
-import * as RNIap from 'react-native-iap';
+import {sleep} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -105,6 +105,8 @@ export const Settings = ({navigation}) => {
   const {colors} = state;
   const [version, setVersion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -291,75 +293,71 @@ export const Settings = ({navigation}) => {
           style={{
             paddingHorizontal: 0,
           }}>
-          {!DDS.isTab && (
-            <Header
-              noAnnouncement={true}
-              title="Settings"
-              type="settings"
-              messageCard={false}
-            />
-          )}
-
           <SettingsUserSection />
           <SettingsAppearanceSection />
+          <SettingsPrivacyAndSecurity />
+          <SettingsBackupAndRestore />
 
-          {!loading && (
+          <SectionHeader
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            title="Other"
+          />
+
+          {!collapsed && (
             <>
-              <SettingsPrivacyAndSecurity />
-              <SettingsBackupAndRestore />
+              <PressableButton
+                onPress={async () => {
+                  try {
+                    await Linking.openURL(
+                      Platform.OS === 'ios'
+                        ? 'https://bit.ly/notesnook-ios'
+                        : 'https://bit.ly/notesnook-and',
+                    );
+                  } catch (e) {}
+                }}
+                type="shade"
+                customStyle={{
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  paddingVertical: 10,
+                  width: '95%',
+                  alignItems: 'flex-start',
+                  paddingHorizontal: 12,
+                  marginTop: 10,
+                  borderColor: colors.accent,
+                }}>
+                <Heading
+                  color={colors.accent}
+                  style={{
+                    fontSize: SIZE.md,
+                  }}>
+                  {`Rate us on ${
+                    Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
+                  }`}
+                </Heading>
+                <Paragraph
+                  style={{
+                    flexWrap: 'wrap',
+                    flexBasis: 1,
+                  }}
+                  color={colors.pri}>
+                  It took us a year to bring Notesnook to life, the best private
+                  note taking app. It will take you a moment to rate it to let
+                  us know what you think!
+                </Paragraph>
+              </PressableButton>
+
+              {otherItems.map(item => (
+                <CustomButton
+                  key={item.name}
+                  title={item.name}
+                  tagline={item.desc}
+                  onPress={item.func}
+                />
+              ))}
             </>
           )}
-
-          <SectionHeader title="Other" />
-
-          <PressableButton
-            onPress={async () => {
-              try {
-                await Linking.openURL(
-                  Platform.OS === 'ios'
-                    ? 'https://bit.ly/notesnook-ios'
-                    : 'https://bit.ly/notesnook-and',
-                );
-              } catch (e) {}
-            }}
-            type="shade"
-            customStyle={{
-              borderWidth: 1,
-              borderRadius: 5,
-              paddingVertical: 10,
-              width: '95%',
-              alignItems: 'flex-start',
-              paddingHorizontal: 12,
-              marginTop: 10,
-              borderColor: colors.accent,
-            }}>
-            <Heading
-              color={colors.accent}
-              style={{
-                fontSize: SIZE.md,
-              }}>
-              {`Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`}
-            </Heading>
-            <Paragraph
-              style={{
-                flexWrap: 'wrap',
-                flexBasis: 1,
-              }}
-              color={colors.pri}>
-              It took us a year to bring Notesnook to life, the best private
-              note taking app. It will take you a moment to rate it to let us
-              know what you think!
-            </Paragraph>
-          </PressableButton>
-
-          {otherItems.map(item => (
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              tagline={item.desc}
-              onPress={item.func}
-            />
-          ))}
 
           <AccoutLogoutSection />
 
@@ -376,22 +374,39 @@ export const Settings = ({navigation}) => {
 
 export default Settings;
 
-const SectionHeader = ({title}) => {
+const SectionHeader = ({title, collapsed, setCollapsed}) => {
   const [state] = useTracked();
   const {colors} = state;
 
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={() => {
+        setCollapsed(!collapsed);
+      }}
       style={{
-        height: 30,
+        height: 50,
         backgroundColor: colors.nav,
         paddingHorizontal: 12,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '95%',
+        alignSelf: 'center',
+        borderRadius: 5,
+        marginBottom: 5,
+        marginTop: 5,
       }}>
-      <Heading size={SIZE.sm} color={colors.accent}>
+      <Paragraph size={SIZE.md + 1} color={collapsed ? colors.icon : colors.accent}>
         {title}
-      </Heading>
-    </View>
+      </Paragraph>
+
+      <Icon
+        name={collapsed ? 'chevron-down' : 'chevron-up'}
+        color={collapsed ? colors.icon : colors.accent}
+        size={SIZE.lg}
+      />
+    </TouchableOpacity>
   );
 };
 
@@ -1117,7 +1132,7 @@ const SettingsAppearanceSection = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
-
+  const [collapsed, setCollapsed] = useState(true);
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -1155,143 +1170,132 @@ const SettingsAppearanceSection = () => {
 
   return (
     <>
-      <SectionHeader title="Appearance" />
-
-      <View
-        style={{
-          paddingHorizontal: 12,
-        }}>
-        <Paragraph
-          size={SIZE.md}
-          style={{
-            textAlignVertical: 'center',
-          }}>
-          Accent Color
-        </Paragraph>
-        <Paragraph size={SIZE.sm} color={colors.icon}>
-          Change the accent color of the app.
-        </Paragraph>
-      </View>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        onMoveShouldSetResponderCapture={() => {
-          tabBarRef.current?.setScrollEnabled(false);
-        }}
-        onMomentumScrollEnd={() => {
-          tabBarRef.current?.setScrollEnabled(true);
-        }}
-        style={{
-          borderRadius: 5,
-          padding: 5,
-          marginTop: 10,
-          marginBottom: pv + 5,
-          width: '100%',
-          paddingHorizontal: 12,
-        }}
-        nestedScrollEnabled
-        contentContainerStyle={{
-          alignSelf: 'center',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-        }}>
-        {[
-          '#FF5722',
-          '#FFA000',
-          '#1B5E20',
-          '#01c352',
-          '#757575',
-          '#0560ff',
-          '#009688',
-          '#2196F3',
-          '#880E4F',
-          '#9C27B0',
-          '#9381ff',
-          '#FF1744',
-          '#B71C1C',
-          '#ffadad',
-        ].map(item => (
-          <PressableButton
-            key={item}
-            customColor={
-              colors.accent === item
-                ? RGB_Linear_Shade(
-                    !colors.night ? -0.2 : 0.2,
-                    hexToRGBA(item, 1),
-                  )
-                : item
-            }
-            customSelectedColor={item}
-            alpha={!colors.night ? -0.1 : 0.1}
-            opacity={1}
-            onPress={async () => {
-              await PremiumService.verify(async () => {
-                changeAccentColor(item);
-                preloadImages(item);
-                await MMKV.setStringAsync('accentColor', item);
-              });
-            }}
-            customStyle={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-              marginHorizontal: 5,
-              width: DDS.isLargeTablet() ? 40 : 50,
-              height: DDS.isLargeTablet() ? 40 : 50,
-              borderRadius: 100,
-            }}>
-            {colors.accent === item ? (
-              <Icon
-                size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
-                color="white"
-                name="check"
-              />
-            ) : null}
-          </PressableButton>
-        ))}
-        <View style={{width: 50}} />
-      </ScrollView>
-
-      <CustomButton
-        title="System Theme"
-        tagline="Automatically switch to dark mode when the system theme changes."
-        onPress={switchTheme}
-        maxWidth="90%"
-        customComponent={
-          <ToggleSwitch
-            isOn={settings.useSystemTheme}
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={switchTheme}
-          />
-        }
+      <SectionHeader
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        title="Appearance"
       />
 
-      <CustomButton
-        title="Dark Mode"
-        tagline="Switch on dark mode at night to protect your eyes."
-        onPress={async () => {
-          if (!colors.night) {
-            await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-            changeColorScheme(COLOR_SCHEME_DARK);
-          } else {
-            await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+      {collapsed ? null : (
+        <>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              marginTop:5
+            }}>
+            <Paragraph
+              size={SIZE.md}
+              style={{
+                textAlignVertical: 'center',
+              }}>
+              Accent Color
+            </Paragraph>
+            <Paragraph size={SIZE.sm} color={colors.icon}>
+              Change the accent color of the app.
+            </Paragraph>
+          </View>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            onMoveShouldSetResponderCapture={() => {
+              tabBarRef.current?.setScrollEnabled(false);
+            }}
+            onMomentumScrollEnd={() => {
+              tabBarRef.current?.setScrollEnabled(true);
+            }}
+            style={{
+              borderRadius: 5,
+              padding: 5,
+              marginTop: 10,
+              marginBottom: pv + 5,
+              width: '100%',
+              paddingHorizontal: 12,
+            }}
+            nestedScrollEnabled
+            contentContainerStyle={{
+              alignSelf: 'center',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+            }}>
+            {[
+              '#FF5722',
+              '#FFA000',
+              '#1B5E20',
+              '#01c352',
+              '#757575',
+              '#0560ff',
+              '#009688',
+              '#2196F3',
+              '#880E4F',
+              '#9C27B0',
+              '#9381ff',
+              '#FF1744',
+              '#B71C1C',
+              '#ffadad',
+            ].map(item => (
+              <PressableButton
+                key={item}
+                customColor={
+                  colors.accent === item
+                    ? RGB_Linear_Shade(
+                        !colors.night ? -0.2 : 0.2,
+                        hexToRGBA(item, 1),
+                      )
+                    : item
+                }
+                customSelectedColor={item}
+                alpha={!colors.night ? -0.1 : 0.1}
+                opacity={1}
+                onPress={async () => {
+                  await PremiumService.verify(async () => {
+                    changeAccentColor(item);
+                    preloadImages(item);
+                    await MMKV.setStringAsync('accentColor', item);
+                  });
+                }}
+                customStyle={{
+                  flexDirection: 'row',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginVertical: 5,
+                  marginHorizontal: 5,
+                  width: DDS.isLargeTablet() ? 40 : 50,
+                  height: DDS.isLargeTablet() ? 40 : 50,
+                  borderRadius: 100,
+                }}>
+                {colors.accent === item ? (
+                  <Icon
+                    size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
+                    color="white"
+                    name="check"
+                  />
+                ) : null}
+              </PressableButton>
+            ))}
+            <View style={{width: 50}} />
+          </ScrollView>
 
-            changeColorScheme(COLOR_SCHEME_LIGHT);
-          }
-        }}
-        maxWidth="90%"
-        customComponent={
-          <ToggleSwitch
-            isOn={colors.night}
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={async isOn => {
+          <CustomButton
+            title="System Theme"
+            tagline="Automatically switch to dark mode when the system theme changes."
+            onPress={switchTheme}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.useSystemTheme}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={switchTheme}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Dark Mode"
+            tagline="Switch on dark mode at night to protect your eyes."
+            onPress={async () => {
               if (!colors.night) {
                 await MMKV.setStringAsync(
                   'theme',
@@ -1307,70 +1311,97 @@ const SettingsAppearanceSection = () => {
                 changeColorScheme(COLOR_SCHEME_LIGHT);
               }
             }}
-          />
-        }
-      />
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={colors.night}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={async isOn => {
+                  if (!colors.night) {
+                    await MMKV.setStringAsync(
+                      'theme',
+                      JSON.stringify({night: true}),
+                    );
+                    changeColorScheme(COLOR_SCHEME_DARK);
+                  } else {
+                    await MMKV.setStringAsync(
+                      'theme',
+                      JSON.stringify({night: false}),
+                    );
 
-      <CustomButton
-        title="Homepage"
-        tagline={'Default screen to open on app startup '}
-        onPress={async () => {
-          await PremiumService.verify(menuRef.current?.show);
-        }}
-        customComponent={
-          <Menu
-            ref={menuRef}
-            animationDuration={200}
-            style={{
-              borderRadius: 5,
-              backgroundColor: colors.bg,
-            }}
-            button={
-              <TouchableOpacity
-                onPress={async () => {
-                  await PremiumService.verify(menuRef.current?.show);
+                    changeColorScheme(COLOR_SCHEME_LIGHT);
+                  }
                 }}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Homepage"
+            tagline={'Default screen to open on app startup '}
+            onPress={async () => {
+              await PremiumService.verify(menuRef.current?.show);
+            }}
+            customComponent={
+              <Menu
+                ref={menuRef}
+                animationDuration={200}
                 style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}>
-                <Paragraph>{settings.homepage}</Paragraph>
-                <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
-              </TouchableOpacity>
-            }>
-            {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
-              (item, index) => (
-                <MenuItem
-                  key={item.name}
-                  onPress={async () => {
-                    menuRef.current?.hide();
-                    await SettingsService.set('homepage', item.name);
-                    ToastEvent.show({
-                      heading: 'Homepage set to ' + item.name,
-                      message: 'Restart the app for changes to take effect.',
-                      type: 'success',
-                    });
-                  }}
-                  style={{
-                    backgroundColor:
-                      settings.homepage === item.name
-                        ? colors.shade
-                        : 'transparent',
-                  }}
-                  textStyle={{
-                    fontSize: SIZE.md,
-                    color:
-                      settings.homepage === item.name
-                        ? colors.accent
-                        : colors.pri,
-                  }}>
-                  {item.name}
-                </MenuItem>
-              ),
-            )}
-          </Menu>
-        }
-      />
+                  borderRadius: 5,
+                  backgroundColor: colors.bg,
+                }}
+                button={
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await PremiumService.verify(menuRef.current?.show);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                    }}>
+                    <Paragraph>{settings.homepage}</Paragraph>
+                    <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+                  </TouchableOpacity>
+                }>
+                {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
+                  (item, index) => (
+                    <MenuItem
+                      key={item.name}
+                      onPress={async () => {
+                        menuRef.current?.hide();
+                        await SettingsService.set('homepage', item.name);
+                        ToastEvent.show({
+                          heading: 'Homepage set to ' + item.name,
+                          message:
+                            'Restart the app for changes to take effect.',
+                          type: 'success',
+                        });
+                      }}
+                      style={{
+                        backgroundColor:
+                          settings.homepage === item.name
+                            ? colors.shade
+                            : 'transparent',
+                      }}
+                      textStyle={{
+                        fontSize: SIZE.md,
+                        color:
+                          settings.homepage === item.name
+                            ? colors.accent
+                            : colors.pri,
+                      }}>
+                      {item.name}
+                    </MenuItem>
+                  ),
+                )}
+              </Menu>
+            }
+          />
+        </>
+      )}
     </>
   );
 };
@@ -1379,7 +1410,7 @@ const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
-
+  const [collapsed, setCollapsed] = useState(true);
   const [appLockVisible, setAppLockVisible] = useState(false);
 
   const [vaultStatus, setVaultStatus] = React.useState({
@@ -1509,153 +1540,162 @@ const SettingsPrivacyAndSecurity = () => {
         </BaseDialog>
       )}
 
-      <SectionHeader title="Privacy & Security" />
-      <CustomButton
-        key="telemetry"
-        title="Enable telemetry"
-        tagline="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
-        onPress={() => {
-          SettingsService.set('telemetry', !settings.telemetry);
-        }}
-        maxWidth="90%"
-        customComponent={
-          <ToggleSwitch
-            isOn={settings.telemetry}
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={isOn => {
-              SettingsService.set('telemetry', isOn);
-            }}
-          />
-        }
+      <SectionHeader
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        title="Privacy & Security"
       />
-
-      <CustomButton
-        key="privacyMode"
-        title="Privacy mode"
-        tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
-        onPress={() => {
-          Platform.OS === 'android'
-            ? AndroidModule.setSecureMode(!settings.privacyScreen)
-            : enabled(true);
-
-          SettingsService.set('privacyScreen', !settings.privacyScreen);
-        }}
-        maxWidth="90%"
-        customComponent={
-          <ToggleSwitch
-            isOn={settings.privacyScreen}
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={isOn => {
-              Platform.OS === 'android'
-                ? AndroidModule.setSecureMode(isOn)
-                : enabled(true);
-              SettingsService.set('privacyScreen', isOn);
-            }}
-          />
-        }
-      />
-
-      {vaultStatus.isBiometryAvailable && (
-        <CustomButton
-          key="appLock"
-          title="App lock"
-          tagline="Require biometrics to access your notes."
-          onPress={() => {
-            setAppLockVisible(true);
-          }}
-          maxWidth="90%"
-        />
-      )}
-
-      {vaultStatus.exists ? (
+      {collapsed ? null : (
         <>
-          {vaultStatus.isBiometryAvailable ? (
-            <CustomButton
-              key="fingerprintVaultUnlock"
-              title="Vault biometrics unlock"
-              tagline="Access notes in vault using biometrics"
-              onPress={toggleBiometricUnlocking}
-              maxWidth="90%"
-              customComponent={
-                <ToggleSwitch
-                  isOn={vaultStatus.biometryEnrolled}
-                  onColor={colors.accent}
-                  offColor={colors.icon}
-                  size="small"
-                  animationSpeed={150}
-                  onToggle={toggleBiometricUnlocking}
-                />
-              }
-            />
-          ) : null}
           <CustomButton
-            key="changeVaultPassword"
-            title="Change vault password"
-            tagline="Setup a new password for the vault"
+            key="telemetry"
+            title="Enable telemetry"
+            tagline="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
             onPress={() => {
-              openVault({
-                item: {},
-                changePassword: true,
-                novault: true,
-                title: 'Change vault password',
-                description: 'Set a new password for your vault.',
-              });
+              SettingsService.set('telemetry', !settings.telemetry);
             }}
-          />
-          <CustomButton
-            key="clearVault"
-            title="Clear vault"
-            tagline="Unlock all locked notes and clear vault."
-            onPress={() => {
-              openVault({
-                item: {},
-                clearVault: true,
-                novault: true,
-                title: 'Clear vault',
-                description:
-                  'Enter vault password to unlock and remove all notes from the vault.',
-              });
-            }}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.telemetry}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={isOn => {
+                  SettingsService.set('telemetry', isOn);
+                }}
+              />
+            }
           />
 
           <CustomButton
-            key="deleteVault"
-            title="Delete vault"
-            tagline="Delete vault (and optionally remove all notes)."
+            key="privacyMode"
+            title="Privacy mode"
+            tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
             onPress={() => {
-              openVault({
-                item: {},
-                deleteVault: true,
-                novault: true,
-                title: 'Delete vault',
-                description:
-                  'Enter your account password to delete your vault.',
-              });
+              Platform.OS === 'android'
+                ? AndroidModule.setSecureMode(!settings.privacyScreen)
+                : enabled(true);
+
+              SettingsService.set('privacyScreen', !settings.privacyScreen);
             }}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.privacyScreen}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={isOn => {
+                  Platform.OS === 'android'
+                    ? AndroidModule.setSecureMode(isOn)
+                    : enabled(true);
+                  SettingsService.set('privacyScreen', isOn);
+                }}
+              />
+            }
           />
+
+          {vaultStatus.isBiometryAvailable && (
+            <CustomButton
+              key="appLock"
+              title="App lock"
+              tagline="Require biometrics to access your notes."
+              onPress={() => {
+                setAppLockVisible(true);
+              }}
+              maxWidth="90%"
+            />
+          )}
+
+          {vaultStatus.exists ? (
+            <>
+              {vaultStatus.isBiometryAvailable ? (
+                <CustomButton
+                  key="fingerprintVaultUnlock"
+                  title="Vault biometrics unlock"
+                  tagline="Access notes in vault using biometrics"
+                  onPress={toggleBiometricUnlocking}
+                  maxWidth="90%"
+                  customComponent={
+                    <ToggleSwitch
+                      isOn={vaultStatus.biometryEnrolled}
+                      onColor={colors.accent}
+                      offColor={colors.icon}
+                      size="small"
+                      animationSpeed={150}
+                      onToggle={toggleBiometricUnlocking}
+                    />
+                  }
+                />
+              ) : null}
+              <CustomButton
+                key="changeVaultPassword"
+                title="Change vault password"
+                tagline="Setup a new password for the vault"
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    changePassword: true,
+                    novault: true,
+                    title: 'Change vault password',
+                    description: 'Set a new password for your vault.',
+                  });
+                }}
+              />
+              <CustomButton
+                key="clearVault"
+                title="Clear vault"
+                tagline="Unlock all locked notes and clear vault."
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    clearVault: true,
+                    novault: true,
+                    title: 'Clear vault',
+                    description:
+                      'Enter vault password to unlock and remove all notes from the vault.',
+                  });
+                }}
+              />
+
+              <CustomButton
+                key="deleteVault"
+                title="Delete vault"
+                tagline="Delete vault (and optionally remove all notes)."
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    deleteVault: true,
+                    novault: true,
+                    title: 'Delete vault',
+                    description:
+                      'Enter your account password to delete your vault.',
+                  });
+                }}
+              />
+            </>
+          ) : (
+            <CustomButton
+              key="createVault"
+              title="Create vault"
+              tagline="Secure your notes by adding the to the vault."
+              onPress={() => {
+                PremiumService.verify(() => {
+                  openVault({
+                    item: {},
+                    novault: false,
+                    title: 'Create vault',
+                    description:
+                      'Set a password to create vault and lock notes.',
+                  });
+                });
+              }}
+            />
+          )}
         </>
-      ) : (
-        <CustomButton
-          key="createVault"
-          title="Create vault"
-          tagline="Secure your notes by adding the to the vault."
-          onPress={() => {
-            PremiumService.verify(() => {
-              openVault({
-                item: {},
-                novault: false,
-                title: 'Create vault',
-                description: 'Set a password to create vault and lock notes.',
-              });
-            });
-          }}
-        />
       )}
     </>
   );
@@ -1667,6 +1707,7 @@ const SettingsBackupAndRestore = () => {
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
 
+  const [collapsed, setCollapsed] = useState(true);
   const backupItemsList = [
     {
       name: 'Backup data',
@@ -1730,125 +1771,137 @@ const SettingsBackupAndRestore = () => {
 
   return (
     <>
-      <SectionHeader title="Backup & restore" />
+      <SectionHeader
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        title="Backup & restore"
+      />
 
-      {backupItemsList.map(item => (
-        <CustomButton
-          key={item.name}
-          title={item.name}
-          tagline={item.desc}
-          onPress={item.func}
-        />
-      ))}
+      {!collapsed && (
+        <>
+          {backupItemsList.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+            />
+          ))}
 
-      <View
-        style={{
-          width: '100%',
-          marginHorizontal: 0,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 50,
-          paddingHorizontal: 12,
-        }}>
-        <View
-          style={{
-            maxWidth: '60%',
-          }}>
-          <Paragraph
-            size={SIZE.md}
+          <View
             style={{
-              textAlignVertical: 'center',
-              maxWidth: '100%',
+              width: '100%',
+              marginHorizontal: 0,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              height: 50,
+              paddingHorizontal: 12,
             }}>
-            Auto Backup
-          </Paragraph>
-          <Paragraph color={colors.icon} size={SIZE.sm}>
-            Backup your data automatically.
-          </Paragraph>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            overflow: 'hidden',
-            borderRadius: 5,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          {[
-            {
-              title: 'Never',
-              value: 'off',
-            },
-            {
-              title: 'Daily',
-              value: 'daily',
-            },
-            {
-              title: 'Weekly',
-              value: 'weekly',
-            },
-          ].map(item => (
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={async () => {
-                if (item.value === 'off') {
-                  await SettingsService.set('reminder', item.value);
-                } else {
-                  await PremiumService.verify(async () => {
-                    if (Platform.OS === 'android') {
-                      let granted = await Storage.requestPermission();
-                      if (!granted) {
-                        ToastEvent.show({
-                          heading: 'Could not enable auto backups',
-                          message:
-                            'You must give storage access to enable auto backups.',
-                          type: 'error',
-                          context: 'local',
-                        });
-                        return;
-                      }
-                    }
-                    await SettingsService.set('reminder', item.value);
-                    //await Backup.run();
-                  });
-                }
-              }}
-              key={item.value}
+            <View
               style={{
-                backgroundColor:
-                  settings.reminder === item.value ? colors.accent : colors.nav,
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 50,
-                height: 20,
+                maxWidth: '60%',
               }}>
               <Paragraph
-                color={settings.reminder === item.value ? 'white' : colors.icon}
-                size={SIZE.xs}>
-                {item.title}
+                size={SIZE.md}
+                style={{
+                  textAlignVertical: 'center',
+                  maxWidth: '100%',
+                }}>
+                Auto Backup
               </Paragraph>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
+              <Paragraph color={colors.icon} size={SIZE.sm}>
+                Backup your data automatically.
+              </Paragraph>
+            </View>
 
-      <CustomButton
-        title="Backup encryption"
-        tagline="Encrypt all your backups."
-        onPress={toggleEncryptedBackups}
-        customComponent={
-          <ToggleSwitch
-            isOn={settings.encryptedBackup}
-            onColor={colors.accent}
-            offColor={colors.icon}
-            size="small"
-            animationSpeed={150}
-            onToggle={toggleEncryptedBackups}
+            <View
+              style={{
+                flexDirection: 'row',
+                overflow: 'hidden',
+                borderRadius: 5,
+                justifyContent: 'center',
+                alignItems: 'center',
+              }}>
+              {[
+                {
+                  title: 'Never',
+                  value: 'off',
+                },
+                {
+                  title: 'Daily',
+                  value: 'daily',
+                },
+                {
+                  title: 'Weekly',
+                  value: 'weekly',
+                },
+              ].map(item => (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={async () => {
+                    if (item.value === 'off') {
+                      await SettingsService.set('reminder', item.value);
+                    } else {
+                      await PremiumService.verify(async () => {
+                        if (Platform.OS === 'android') {
+                          let granted = await Storage.requestPermission();
+                          if (!granted) {
+                            ToastEvent.show({
+                              heading: 'Could not enable auto backups',
+                              message:
+                                'You must give storage access to enable auto backups.',
+                              type: 'error',
+                              context: 'local',
+                            });
+                            return;
+                          }
+                        }
+                        await SettingsService.set('reminder', item.value);
+                        //await Backup.run();
+                      });
+                    }
+                  }}
+                  key={item.value}
+                  style={{
+                    backgroundColor:
+                      settings.reminder === item.value
+                        ? colors.accent
+                        : colors.nav,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 50,
+                    height: 20,
+                  }}>
+                  <Paragraph
+                    color={
+                      settings.reminder === item.value ? 'white' : colors.icon
+                    }
+                    size={SIZE.xs}>
+                    {item.title}
+                  </Paragraph>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          <CustomButton
+            title="Backup encryption"
+            tagline="Encrypt all your backups."
+            onPress={toggleEncryptedBackups}
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.encryptedBackup}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={toggleEncryptedBackups}
+              />
+            }
           />
-        }
-      />
+        </>
+      )}
     </>
   );
 };

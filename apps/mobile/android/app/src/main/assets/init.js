@@ -13,6 +13,55 @@ function reactNativeEventHandler(type, value) {
 }
 
 let changeTimer = null;
+const COLLAPSED_KEY = 'c';
+const HIDDEN_KEY = 'h';
+const collapsibleTags = {HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6};
+let styleElement;
+function addStyle() {
+  if (!styleElement) {
+    let doc = editor.dom.doc;
+    styleElement = doc.head.appendChild(document.createElement('style'));
+  }
+  styleElement.innerHTML =
+    '.mce-content-body .c::before{' +
+    'background-color:' +
+    pageTheme.colors.accent +
+    ';border-radius:3px;color:white}';
+  console.log('adding style');
+}
+
+function toggleElementVisibility(element, toggleState) {
+  if (!toggleState) element.classList.remove(HIDDEN_KEY);
+  else element.classList.add(HIDDEN_KEY);
+}
+
+function collapseElement(target) {
+  let sibling = target.nextSibling;
+  const isTargetCollapsed = target.classList.contains(COLLAPSED_KEY);
+  let skip = false;
+
+  while (
+    sibling &&
+    (!collapsibleTags[sibling.tagName] ||
+      collapsibleTags[sibling.tagName] > collapsibleTags[target.tagName])
+  ) {
+    const isCollapsed = sibling.classList.contains(COLLAPSED_KEY);
+    if (!isTargetCollapsed) {
+      if (isCollapsed) {
+        skip = true;
+        toggleElementVisibility(sibling, isTargetCollapsed);
+      } else if (skip && collapsibleTags[sibling.tagName]) {
+        skip = false;
+      }
+    }
+    if (!skip) {
+      toggleElementVisibility(sibling, isTargetCollapsed);
+    }
+    addStyle();
+    if (!sibling.nextSibling) break;
+    sibling = sibling.nextSibling;
+  }
+}
 
 function init_tiny(size) {
   tinymce.init({
@@ -35,6 +84,42 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
+    .mce-content-body *::before {
+      font-size: 11px;
+      font-weight: normal;
+      letter-spacing: 1.1px;
+      padding: 1px 3px 1px 3px;
+      margin-left: -12px;
+      margin-right: 5px;
+      cursor: row-resize;
+      margin-top:-3px;
+      vertical-align:middle;
+      }
+      
+      .mce-content-body h2::before {
+      content: "H2";
+      }
+      
+      .mce-content-body h3::before {
+      content: "H3";
+      }
+      
+      .mce-content-body h4::before {
+      content: "H4";
+      }
+      
+      .mce-content-body h5::before {
+      content: "H5";
+      }
+      
+      .mce-content-body blockquote::before {
+      content: "QUOTE";
+      margin-left: 0px !important;
+      }
+  
+      .h {
+        display: none;
+      }
     .img_float_left {
       float:left;
     }
@@ -187,6 +272,45 @@ function init_tiny(size) {
           onChange(event);
         }
       });
+
+
+editor.on('NewBlock', function (e) {
+  const {newBlock} = e;
+  let target;
+  if (newBlock) {
+    target = newBlock.previousElementSibling;
+  }
+  if (target && target.classList.contains(COLLAPSED_KEY)) {
+    target.classList.remove(COLLAPSED_KEY);
+    collapseElement(target);
+  }
+});
+
+editor.on('touchstart mousedown', function (e) {
+  const {target} = e;
+  if (
+    e.offsetX < 6 &&
+    collapsibleTags[target.tagName] &&
+    target.parentElement &&
+    target.parentElement.tagName === 'BODY'
+  ) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    e.stopPropagation();
+    editor.undoManager.transact(() => {
+      if (target.classList.contains(COLLAPSED_KEY)) {
+        target.classList.remove(COLLAPSED_KEY);
+      } else {
+        target.classList.add(COLLAPSED_KEY);
+      }
+      collapseElement(target);
+      console.log('element has collapsed');
+      reactNativeEventHandler('tiny', editor.getContent());
+    });
+  }
+});
+
+
 
       editor.on('ScrollIntoView', function (e) {
         
