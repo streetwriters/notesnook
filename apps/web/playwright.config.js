@@ -7,20 +7,21 @@ module.exports = {
 
   // Each test is given 30 seconds
   timeout: 30000,
-  workers: IS_CI ? 2 : 4,
+  workers: IS_CI ? 3 : 4,
   reporter: "list",
+  retries: 3,
   use: {
     headless: true,
 
     // Artifacts
-    screenshot: "only-on-failure",
-    video: "retry-with-video",
+    trace: IS_CI ? "off" : "retain-on-failure",
+    screenshot: IS_CI ? "off" : "only-on-failure",
+    video: IS_CI ? "off" : "retry-with-video",
   },
   projects: [
     {
       name: "Chromium",
       use: {
-        // Configure the browser to use.
         browserName: "chromium",
       },
     },
