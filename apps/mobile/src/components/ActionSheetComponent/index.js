@@ -555,9 +555,8 @@ export const ActionSheetComponent = ({
           ? (400 - 24) / rowItems.length
           : (w - 25) / rowItems.length,
       }}>
-      <Icon
+      <View
         style={{
-          width: 50,
           height: 40,
           borderRadius: 100,
           justifyContent: 'center',
@@ -565,11 +564,14 @@ export const ActionSheetComponent = ({
           textAlign: 'center',
           textAlignVertical: 'center',
           marginBottom: DDS.isTab ? 7 : 3.5,
-        }}
-        name={rowItem.icon}
-        size={DDS.isTab ? SIZE.xl : SIZE.lg}
-        color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
-      />
+        }}>
+        <Icon
+          name={rowItem.icon}
+          size={DDS.isTab ? SIZE.xl : SIZE.lg}
+          color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
+        />
+      </View>
+
       <Paragraph>{rowItem.name}</Paragraph>
     </TouchableOpacity>
   );
