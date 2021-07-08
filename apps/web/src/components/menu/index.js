@@ -51,9 +51,10 @@ function Menu(props) {
             display="flex"
             flexDirection="row"
             alignItems="center"
-            py={"8px"}
+            py={"0.7em"}
             px={3}
             sx={{
+              borderRadius: 0,
               color: color || "text",
               cursor: "pointer",
               ":hover:not(:disabled)": {
