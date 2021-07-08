@@ -3,10 +3,8 @@
 
 /**
  * TODO: We are still not checking if toast appears on delete/restore or not.
- */
-
-const { test, expect } = require("@playwright/test");
-const { getTestId, createNote, NOTE } = require("./utils");
+ */ const { test, expect } = require("@playwright/test");
+const { getTestId, createNote, NOTE, downloadFile } = require("./utils");
 const {
   navigateTo,
   clickMenuItem,
@@ -151,6 +149,27 @@ async function addNoteToNotebook() {
   await page.click(List.new("topic").atIndex(0).title().build());
 
   await checkNotePresence(0, false);
+}
+
+async function exportNote(format) {
+  const noteSelector = await createNoteAndCheckPresence();
+
+  await openContextMenu(noteSelector);
+
+  await page.click(Menu.new("menuitem").item("export").build());
+
+  // we need to override date time so
+  // date created & date edited remain fixed.
+  await page.evaluate(() => {
+    // eslint-disable-next-line no-extend-native
+    Date.prototype.toLocaleDateString = () => "xxx";
+  });
+
+  const output = await downloadFile(
+    getTestId(`export-dialog-${format}`),
+    "utf-8"
+  );
+  expect(output).toMatchSnapshot(`export-${format}.txt`);
 }
 
 test.describe("run tests independently", () => {
@@ -410,4 +429,8 @@ test.describe("run tests independently", () => {
       isPresent(getTestId("properties-tag-testtag"))
     ).resolves.toBeTruthy();
   });
+
+  test(`export note as txt`, async () => await exportNote("txt"));
+  test(`export note as md`, async () => await exportNote("md"));
+  test(`export note as html`, async () => await exportNote("html"));
 });

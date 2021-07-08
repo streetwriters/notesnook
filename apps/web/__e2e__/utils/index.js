@@ -1,4 +1,5 @@
 /* eslint-disable no-undef */
+const fs = require("fs");
 
 const NOTEBOOK = {
   title: "Test notebook 1",
@@ -29,9 +30,22 @@ async function createNote(note, actionButtonId) {
   await page.type(".mce-content-body", note.content);
 }
 
+async function downloadFile(downloadActionSelector, encoding) {
+  return new Promise(async (resolve) => {
+    page.on("download", async (download) => {
+      const path = await download.path();
+      resolve(fs.readFileSync(path, { encoding }).toString());
+    });
+    await page.waitForSelector(downloadActionSelector);
+
+    await page.click(downloadActionSelector);
+  });
+}
+
 module.exports = {
   NOTE,
   NOTEBOOK,
   getTestId,
   createNote,
+  downloadFile,
 };

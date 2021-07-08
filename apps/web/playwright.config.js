@@ -9,9 +9,10 @@ module.exports = {
   timeout: 30000,
   workers: IS_CI ? 3 : 4,
   reporter: "list",
-  retries: 3,
+  retries: IS_CI ? 3 : 0,
   use: {
     headless: true,
+    acceptDownloads: true,
 
     // Artifacts
     trace: IS_CI ? "off" : "retain-on-failure",

@@ -47,6 +47,7 @@ function ExportDialog(props) {
       <Flex flexDirection="column">
         {formats.map((format) => (
           <Button
+            data-test-id={`export-dialog-${format.type}`}
             variant="tertiary"
             sx={{ display: "flex" }}
             mb={1}
