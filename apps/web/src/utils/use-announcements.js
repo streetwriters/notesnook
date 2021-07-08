@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
-import { isUserPremium, SUBSCRIPTION_STATUS } from "../common";
+import { SUBSCRIPTION_STATUS } from "../common";
 import { db } from "../common/db";
 import Config from "./config";
 import { store as userstore } from "../stores/user-store";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 var CACHED_ANNOUNCEMENTS = [];
 export default function useAnnouncements() {

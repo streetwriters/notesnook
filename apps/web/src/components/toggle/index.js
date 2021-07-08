@@ -1,9 +1,9 @@
 import React from "react";
 import { Flex } from "reflexbox";
-import { isUserPremium } from "../../common";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import * as Icon from "../icons";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
 
 function Toggle(props) {
   const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;

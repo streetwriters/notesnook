@@ -4,10 +4,11 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import useVersion, { getCachedVersion } from "./utils/useVersion";
 import { resetReminders } from "./common/reminders";
-import { introduceFeatures, isUserPremium } from "./common";
+import { introduceFeatures } from "./common";
 import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";
+import { isUserPremium } from "./hooks/use-is-user-premium";
 
 function AppEffects({ isMobile, isTablet, setShow }) {
   const refreshColors = useStore((store) => store.refreshColors);

@@ -11,12 +11,7 @@ import accents from "../theme/accents";
 import { confirm, showLogInDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
-import {
-  createBackup,
-  isUserPremium,
-  SUBSCRIPTION_STATUS,
-  verifyAccount,
-} from "../common";
+import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
@@ -35,6 +30,7 @@ import Toggle from "../components/toggle";
 import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 function importBackup() {
   return new Promise((resolve, reject) => {

@@ -120,17 +120,6 @@ export async function createBackup(save = true) {
   else download(filename, data, ext);
 }
 
-export function isUserPremium() {
-  if (process.env.REACT_APP_CI) return true;
-
-  const subStatus = userstore.get().user?.subscription?.type;
-  return (
-    subStatus === SUBSCRIPTION_STATUS.BETA ||
-    subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
-    subStatus === SUBSCRIPTION_STATUS.TRIAL
-  );
-}
-
 export function getTotalNotes(notebook) {
   return notebook.topics.reduce((sum, topic) => {
     return sum + topic.notes.length;

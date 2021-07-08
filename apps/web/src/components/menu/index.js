@@ -1,12 +1,13 @@
 import { useAnimation } from "framer-motion";
 import React, { useEffect, useMemo } from "react";
 import { Flex, Box, Text, Button } from "rebass";
-import { isUserPremium } from "../../common";
+import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import useMobile from "../../utils/use-mobile";
 import Animated from "../animated";
 
 function Menu(props) {
   const { menuItems, data, closeMenu, id, style, sx, state } = props;
+  const isUserPremium = useIsUserPremium();
   const isMobile = useMobile();
   const Container = useMemo(
     () => (isMobile ? MobileMenuContainer : MenuContainer),
@@ -74,7 +75,7 @@ function Menu(props) {
                 {title(data)}
               </Text>
             )}
-            {isPro && !isUserPremium() && (
+            {isPro && !isUserPremium && (
               <Text
                 fontSize="subBody"
                 bg="primary"
