@@ -1063,7 +1063,7 @@ const SettingsUserSection = () => {
             {
               name: 'Subscription not activated?',
               func: async () => {
-                if (Platform.OS === "android") return;
+                if (Platform.OS === 'android') return;
                 eSendEvent(eOpenProgressDialog, {
                   title: 'Loading subscriptions',
                   paragraph: `Please wait while we fetch your subscriptions.`,
@@ -1605,6 +1605,37 @@ const SettingsPrivacyAndSecurity = () => {
                 novault: true,
                 title: 'Change vault password',
                 description: 'Set a new password for your vault.',
+              });
+            }}
+          />
+          <CustomButton
+            key="clearVault"
+            title="Clear vault"
+            tagline="Unlock all locked notes and clear vault."
+            onPress={() => {
+              openVault({
+                item: {},
+                clearVault: true,
+                novault: true,
+                title: 'Clear vault',
+                description:
+                  'Enter vault password to unlock and remove all notes from the vault.',
+              });
+            }}
+          />
+
+          <CustomButton
+            key="deleteVault"
+            title="Delete vault"
+            tagline="Delete vault (and optionally remove all notes)."
+            onPress={() => {
+              openVault({
+                item: {},
+                deleteVault: true,
+                novault: true,
+                title: 'Delete vault',
+                description:
+                  'Enter your account password to delete your vault.',
               });
             }}
           />
