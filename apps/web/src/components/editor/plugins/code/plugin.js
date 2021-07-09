@@ -16,7 +16,11 @@ import tinymce from "tinymce/tinymce";
       if (innerText.length <= 0) {
         replaceContent(
           editor,
-          (html) => `<p>${html.replace(/\n/gm, "<br>")}</p>`
+          (html) =>
+            `<p><code class='codeblock'>${html.replace(
+              /\n/gm,
+              "<br>"
+            )}</code></p>`
         );
       } else {
         editor.execCommand("mceInsertNewLine", false, { shiftKey: true });
@@ -31,7 +35,7 @@ import tinymce from "tinymce/tinymce";
           editor.execCommand(
             "mceInsertContent",
             false,
-            `<pre class='codeblock'>${content}</pre>`
+            `<pre class='codeblock'><code>${content}</code></pre>`
           );
         });
         editor.selection.setRng(rng);
@@ -40,7 +44,10 @@ import tinymce from "tinymce/tinymce";
         replaceContent(
           editor,
           (html) =>
-            `<pre class='codeblock'>${html.replace(/\n/gm, "<br>")}</pre>`
+            `<pre class='codeblock'><code>${html.replace(
+              /\n/gm,
+              "<br>"
+            )}</code></pre>`
         );
       }
     }
