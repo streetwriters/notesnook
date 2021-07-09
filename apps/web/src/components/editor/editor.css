@@ -132,8 +132,8 @@ h6::before {
 }
 
 pre.codeblock {
-  color: #24292e;
-  background-color: #f6f8fa;
+  color: var(--text);
+  background-color: var(--bgSecondary);
   line-height: 1.2;
   padding: 15px;
   border: 1px solid var(--border);
