@@ -1,15 +1,13 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
-import {useMessageStore, useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import {useMessageStore} from '../../provider/stores';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 import {Announcement} from './announcement';
 import {Card} from './card';
 
@@ -24,16 +22,15 @@ export const Header = React.memo(
     shouldShow = false,
     icon,
     screen,
-    noAnnouncement
+    noAnnouncement,
   }) => {
     const [state] = useTracked();
     const {colors} = state;
-    const announcements = useMessageStore(state => state.announcements)
-    const deviceMode = useSettingStore(state => state.deviceMode)
+    const announcements = useMessageStore(state => state.announcements);
 
     return announcements.length > 0 && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
-    ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
+    ) : type === 'search' ? null : !shouldShow ? (
       <View
         style={{
           marginBottom: 5,

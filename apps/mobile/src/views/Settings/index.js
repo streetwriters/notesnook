@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import {
   Appearance,
@@ -12,44 +12,43 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import { enabled } from 'react-native-privacy-snapshot';
+import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import {Button} from '../../components/Button';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import { Button } from '../../components/Button';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
-import {Header as TopHeader} from '../../components/Header/index';
+import { Header as TopHeader } from '../../components/Header/index';
 import Input from '../../components/Input';
-import {PressableButton} from '../../components/PressableButton';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {Header} from '../../components/SimpleList/header';
-import {Toast} from '../../components/Toast';
+import { Toast } from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   useMessageStore,
   useSettingStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -63,17 +62,17 @@ import {
   preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
-  SUBSCRIPTION_STATUS_STRINGS,
+  SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -82,14 +81,14 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {pv, SIZE} from '../../utils/SizeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { pv, SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -1221,7 +1220,7 @@ const SettingsAppearanceSection = () => {
               '#FF5722',
               '#FFA000',
               '#1B5E20',
-              '#01c352',
+              '#00c853',
               '#757575',
               '#0560ff',
               '#009688',
@@ -1257,11 +1256,11 @@ const SettingsAppearanceSection = () => {
                   flexDirection: 'row',
                   justifyContent: 'center',
                   alignItems: 'center',
-                  marginVertical: 5,
-                  marginHorizontal: 5,
+                  marginRight: 10,
+                  marginVertical:5,
                   width: DDS.isLargeTablet() ? 40 : 50,
                   height: DDS.isLargeTablet() ? 40 : 50,
-                  borderRadius: 100,
+                  borderRadius:100,
                 }}>
                 {colors.accent === item ? (
                   <Icon

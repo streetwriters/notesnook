@@ -25,9 +25,9 @@ export const HeaderMenu = () => {
         flexDirection: 'row',
         alignItems: 'center',
         zIndex: 10,
-        height: 22,
+        height: 25,
         backgroundColor: colors.accent,
-        paddingHorizontal: 8,
+        paddingHorizontal: 12,
         borderRadius: 100,
         ...getElevation(2)
       }}>

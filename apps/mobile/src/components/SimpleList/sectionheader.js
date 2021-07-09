@@ -26,13 +26,8 @@ export const SectionHeader = ({
         width: '100%',
         justifyContent: 'space-between',
         paddingHorizontal: 12,
-        height: 30 * fontScale,
-        backgroundColor:
-          index === 0
-            ? headerProps.color
-              ? colors[headerProps.color]
-              : colors.shade
-            : colors.nav,
+        height: 35 * fontScale,
+        backgroundColor: colors.nav,
         marginTop: index === 0 ? 0 : 5 * fontScale,
       }}>
       <TouchableOpacity

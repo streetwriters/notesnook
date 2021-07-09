@@ -496,7 +496,7 @@ const LoginDialog = () => {
                 type="accent"
               />
             ) : (
-              <ActivityIndicator size={SIZE.xxxl} color={colors.accent} />
+              <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
             )}
           </View>
         </BaseDialog>
@@ -527,7 +527,7 @@ const LoginDialog = () => {
           {DDS.isTab && MODES.sessionExpired !== mode ? (
             <ActionIcon
               name="close"
-              size={SIZE.xxxl}
+              size={SIZE.xxl}
               onPress={() => {
                 if (MODES.sessionExpired === mode) return;
                 close();
@@ -543,7 +543,7 @@ const LoginDialog = () => {
             MODES.sessionExpired !== mode && (
               <ActionIcon
                 name="arrow-left"
-                size={SIZE.xxxl}
+                size={SIZE.xxl}
                 onPress={() => {
                   if (MODES.sessionExpired === mode) return;
                   close();

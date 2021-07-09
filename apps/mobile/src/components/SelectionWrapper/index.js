@@ -66,6 +66,8 @@ const SelectionWrapper = ({
         paddingHorizontal: 12,
         marginTop: 0,
         height: height * fontScale,
+        borderBottomWidth:1,
+        borderColor:colors.nav
       }}>
       {actionStrip && (
         <ActionStrip note={item} setActionStrip={setActionStrip} />

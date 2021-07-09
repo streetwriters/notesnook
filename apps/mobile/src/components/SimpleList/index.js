@@ -1,21 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl} from 'react-native';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, RefreshControl } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {eScrollEvent} from '../../utils/Events';
-import useAnnouncement from '../../utils/useAnnouncement';
+import { eScrollEvent } from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
-import {NotebookWrapper} from '../NotebookItem/wrapper';
-import {NoteWrapper} from '../NoteItem/wrapper';
+import { NotebookWrapper } from '../NotebookItem/wrapper';
+import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import {Announcement} from './announcement';
-import {Empty} from './empty';
-import {Footer} from './footer';
-import {Header} from './header';
-import {SectionHeader} from './section-header';
+import { Empty } from './empty';
+import { Footer } from './footer';
+import { Header } from './header';
+import { SectionHeader } from './section-header';
 
 const heights = {
   note: 100,
@@ -165,6 +162,8 @@ const SimpleList = ({
             loading={loading || _loading}
             placeholderData={placeholderData}
             headerProps={headerProps}
+            type={type}
+            screen={screen}
           />
         }
         ListFooterComponent={<Footer />}

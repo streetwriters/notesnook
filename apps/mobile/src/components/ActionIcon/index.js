@@ -11,7 +11,7 @@ export const ActionIcon = ({
   name,
   color,
   customStyle,
-  size = SIZE.xxxl,
+  size = SIZE.xxl,
   iconStyle = {},
   left = 10,
   right = 10,

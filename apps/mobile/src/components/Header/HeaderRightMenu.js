@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import {ActivityIndicator, StyleSheet, View} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
@@ -8,17 +8,19 @@ import Navigation from '../../services/Navigation';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
-export const HeaderRightMenu = ({currentScreen, action}) => {
+export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const [state] = useTracked();
   const {colors} = state;
   const syncing = useUserStore(state => state.syncing);
   const deviceMode = useSettingStore(state => state.deviceMode);
-
+  const menuRef = useRef();
   return (
     <View style={styles.rightBtnContainer}>
       {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
-
       {currentScreen !== 'Settings' && (
         <ActionIcon
           onPress={async () => {
@@ -28,13 +30,12 @@ export const HeaderRightMenu = ({currentScreen, action}) => {
           }}
           testID={notesnook.ids.default.header.buttons.left}
           name="magnify"
-          size={SIZE.xxxl}
           color={colors.pri}
           customStyle={styles.rightBtn}
         />
       )}
 
-      {deviceMode !== "mobile"  ? (
+      {deviceMode !== 'mobile' ? (
         <Button
           onPress={action}
           testID={notesnook.ids.default.addBtn}
@@ -48,25 +49,51 @@ export const HeaderRightMenu = ({currentScreen, action}) => {
           }}
         />
       ) : null}
+
+      {rightButtons && (
+        <Menu
+          ref={menuRef}
+          animationDuration={200}
+          style={{
+            borderRadius: 5,
+            backgroundColor: colors.bg,
+          }}
+          button={
+            <ActionIcon
+              onPress={() => {
+                menuRef.current?.show();
+              }}
+              testID={notesnook.ids.default.header.buttons.left}
+              name="dots-vertical"
+              color={colors.pri}
+              customStyle={styles.rightBtn}
+            />
+          }>
+          {rightButtons.map((item, index) => (
+            <MenuItem
+              key={item.title}
+              onPress={() => {
+                menuRef.current?.hide();
+                item.func();
+              }}
+              textStyle={{
+                fontSize: SIZE.md,
+                color: colors.pri,
+              }}>
+              <Icon name={item.icon} size={SIZE.md} />
+              {'  ' + item.title}
+            </MenuItem>
+          ))}
+        </Menu>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'row',
-    zIndex: 11,
-    height: 50,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    width: '100%',
-  },
   rightBtnContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    position: 'absolute',
-    right: 6,
   },
   rightBtn: {
     justifyContent: 'center',

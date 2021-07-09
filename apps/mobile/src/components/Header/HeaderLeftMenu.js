@@ -45,7 +45,6 @@ export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
             Navigation.popToTop();
           }}
           name={!headerMenuState ? 'arrow-left' : 'menu'}
-          size={SIZE.xxxl}
           color={colors.pri}
           iconStyle={{
             marginLeft: !headerMenuState ? -5 : 0,

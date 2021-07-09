@@ -116,6 +116,13 @@ export const Notebook = ({route, navigation}) => {
           isBack={!params.menu}
           screen="Notebook"
           action={_onPressBottomButton}
+          rightButtons={[
+            {
+              icon: 'pencil',
+              title: 'Edit notebook',
+              func: () => eSendEvent(eOpenAddNotebookDialog, params.notebook),
+            },
+          ]}
         />
       </ContainerTopSection>
       <SimpleList

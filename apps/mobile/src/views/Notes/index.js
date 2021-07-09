@@ -221,7 +221,7 @@ export const Notes = ({route, navigation}) => {
         ? 'Learn about monographs'
         : 'Add your first Note',
     action: _onPressBottomButton,
-    buttonIcon: 'information-outline',
+    buttonIcon: params.get === 'monographs' ? 'information-outline' : null,
     loading:
       params.get === 'monographs'
         ? 'Loading published notes'
@@ -229,6 +229,20 @@ export const Notes = ({route, navigation}) => {
   };
 
   const isFocused = () => navigation.isFocused();
+
+  const headerRightButtons = [
+    {
+      icon: 'pencil',
+      title: 'Edit topic',
+      func: () => {
+        if (route.params.type !== 'topic') return;
+        eSendEvent(eOpenAddTopicDialog, {
+          notebookId: route.params.notebookId,
+          toEdit: route.params,
+        });
+      },
+    },
+  ];
 
   return (
     <>
@@ -246,6 +260,9 @@ export const Notes = ({route, navigation}) => {
           isBack={!params.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
+          rightButtons={
+            route.params.type !== 'topic' ? null : headerRightButtons
+          }
         />
       </ContainerTopSection>
       <SimpleList

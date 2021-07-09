@@ -118,7 +118,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
           }}
           color={colors.light}
           name="close"
-          size={SIZE.xxxl}
         />
 
         {Platform.OS === 'android' ? (
