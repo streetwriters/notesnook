@@ -233,7 +233,7 @@ export const execCommands = {
     }  
   })();
   `,
-  imagefloatleft:`(function () {
+  imagefloatleft: `(function () {
 let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -253,7 +253,7 @@ let node = tinymce.activeEditor.selection.getNode();
   })();
   
   `,
-  imagefloatright:`(function () {
+  imagefloatright: `(function () {
 let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -273,9 +273,8 @@ let node = tinymce.activeEditor.selection.getNode();
   }
   })()
   
-  `
-  ,
-  imagefloatnone:`(function () {
+  `,
+  imagefloatnone: `(function () {
   let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -294,8 +293,11 @@ let node = tinymce.activeEditor.selection.getNode();
   }
   })()
   
-  `
-
+  `,
+  'line-break': `
+  tinymce.activeEditor.undoManager.transact(function() {
+    tinymce.activeEditor.execCommand('InsertLineBreak');
+  });`,
 };
 
 const handleImageResponse = response => {

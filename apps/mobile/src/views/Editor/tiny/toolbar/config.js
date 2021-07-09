@@ -29,6 +29,11 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Strikethrough',
     },
     {
+      format: 'line-break',
+      type: 'format',
+      fullname: 'Line break',
+    },
+    {
       format: 'align',
       type: 'tooltip',
       valueIcon: 'alignleft',
@@ -354,7 +359,7 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Search & Replace',
     },
-   /*   {
+    /*   {
       format: 'settings',
       type: 'settings',
       fullname: 'Editor Settings',
