@@ -81,6 +81,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
         paddingHorizontal: 12,
         width: '100%',
         marginVertical: 10,
+        marginTop:20,
         alignItems: 'center',
         justifyContent: 'space-between',
       }}>

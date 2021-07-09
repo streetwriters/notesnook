@@ -19,13 +19,13 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const showActionSheet = () => {
     let rowItems = isTrash
       ? ['Restore', 'Remove']
-      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook'];
+      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook','Pin', 'Add Shortcut','Delete'];
 
     let columnItems = isTrash
       ? []
       : item.type === 'topic'
-      ? ['Add Shortcut to Menu', 'Delete']
-      : ['Pin', 'Add Shortcut to Menu','Delete'];
+      ? ['Add Shortcut', 'Delete']
+      : ['Pin', 'Add Shortcut','Delete'];
 
     ActionSheetEvent(item, false, false, rowItems, columnItems, {
       notebookID: notebookID,

@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
@@ -133,210 +134,8 @@ export const ActionSheetComponent = ({
 
   const rowItemsData = [
     {
-      name: 'Add to',
-      icon: 'book-outline',
-      func: () => {
-        close();
-        clearSelection();
-        setSelectedItem(note);
-        setTimeout(() => {
-          eSendEvent(eOpenMoveNoteDialog, note);
-        }, 300);
-      },
-    },
-    {
-      name: 'Share',
-      icon: 'share-variant',
-      func: async () => {
-        if (note.locked) {
-          close();
-          openVault({
-            item: item,
-            novault: true,
-            locked: true,
-            share: true,
-            title: 'Share note',
-            description: 'Unlock note to share it.',
-          });
-        } else {
-          let text = await db.notes.note(note.id).export('txt');
-          let m = `${note.title}\n \n ${text}`;
-          Share.open({
-            title: 'Share note to',
-            failOnCancel: false,
-            message: m,
-          });
-        }
-      },
-    },
-    {
-      name: 'Export',
-      icon: 'export',
-      func: () => {
-        close('export');
-      },
-    },
-    {
-      name: 'Edit Notebook',
-      icon: 'square-edit-outline',
-      func: () => {
-        close('notebook');
-      },
-    },
-    {
-      name: 'Edit Topic',
-      icon: 'square-edit-outline',
-      func: () => {
-        close('topic');
-      },
-    },
-    {
-      name: 'Delete',
-      title:
-        note.type !== 'notebook' && note.type !== 'note'
-          ? 'Delete ' + item.type
-          : 'Move to trash',
-      icon: 'delete-outline',
-      type: 'error',
-      func: async () => {
-        close();
-        if (note.locked) {
-          await sleep(300);
-          openVault({
-            deleteNote: true,
-            novault: true,
-            locked: true,
-            item: note,
-            title: 'Delete note',
-            description: 'Unlock note to delete it.',
-          });
-        } else {
-          try {
-            close();
-            await deleteItems(note);
-          } catch (e) {}
-        }
-      },
-    },
-    {
-      name: 'Copy',
-      icon: 'content-copy',
-      func: async () => {
-        if (note.locked) {
-          openVault({
-            copyNote: true,
-            novault: true,
-            locked: true,
-            item: note,
-            title: 'Copy note',
-            description: 'Unlock note to copy to clipboard.',
-          });
-        } else {
-          let text = await db.notes.note(note.id).content();
-          text = toTXT(text);
-          text = `${note.title}\n \n ${text}`;
-          Clipboard.setString(text);
-          ToastEvent.show({
-            heading: 'Note copied to clipboard',
-            type: 'success',
-            context: 'local',
-          });
-        }
-      },
-    },
-    {
-      name: 'Restore',
-      icon: 'delete-restore',
-      func: async () => {
-        close();
-        await db.trash.restore(note.id);
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.Tags,
-          Navigation.routeNames.Notes,
-          Navigation.routeNames.Notebooks,
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash,
-        ]);
-        type = note.type === 'trash' ? note.itemType : note.type;
-
-        ToastEvent.show({
-          heading:
-            type === 'note'
-              ? 'Note restored from trash'
-              : 'Notebook restored from trash',
-          type: 'success',
-        });
-      },
-    },
-    {
-      name: 'Delete',
-      icon: 'delete',
-      func: async () => {
-        close();
-        await sleep(300);
-        presentDialog({
-          title: `Permanent delete`,
-          paragraph: `Are you sure you want to delete this ${note.itemType} permanantly from trash?`,
-          positiveText: 'Delete',
-          negativeText: 'Cancel',
-          positivePress: async () => {
-            await db.trash.delete(note.id);
-            useTrashStore.getState().setTrash();
-            useSelectionStore.getState().setSelectionMode(false);
-            ToastEvent.show({
-              heading: 'Permanantly deleted items',
-              type: 'success',
-              context: 'local',
-            });
-          },
-          positiveType: 'errorShade',
-        });
-      },
-    },
-    {
-      name: 'Publish',
-      icon: 'cloud-upload-outline',
-      func: async () => {
-        if (!user) {
-          ToastEvent.show({
-            heading: 'Login required',
-            message: 'Login to publish note',
-            context: 'local',
-            func: () => {
-              eSendEvent(eOpenLoginDialog);
-            },
-            actionText: 'Login',
-          });
-          return;
-        }
-
-        if (!user.isEmailConfirmed) {
-          ToastEvent.show({
-            heading: 'Email not verified',
-            message: 'Please verify your email first.',
-            context: 'local',
-          });
-          return;
-        }
-        if (note.locked) {
-          ToastEvent.show({
-            heading: 'Locked notes cannot be published',
-            type: 'error',
-            context: 'local',
-          });
-          return;
-        }
-        close();
-        await sleep(300);
-        eSendEvent(eOpenPublishNoteDialog, note);
-      },
-    },
-  ];
-
-  const columnItemsData = [
-    {
       name: 'Dark Mode',
+      title: 'Dark mode',
       icon: 'theme-light-dark',
       func: () => {
         if (!colors.night) {
@@ -354,44 +153,17 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.night,
     },
     {
-      name: 'Vault',
-      title: note.locked ? 'Remove from vault' : 'Add to vault',
-      icon: note.locked ? 'shield-off-outline' : 'shield-outline',
-      func: async () => {
-        if (!note.id) return;
-        if (note.locked) {
-          close('unlock');
-        } else {
-          db.vault
-            .add(note.id)
-            .then(r => {
-              let n = db.notes.note(note.id).data;
-              if (n.locked) {
-                close();
-              }
-              Navigation.setRoutesToUpdate([
-                Navigation.routeNames.NotesPage,
-                Navigation.routeNames.Favorites,
-                Navigation.routeNames.Notes,
-              ]);
-              localRefresh(note.type);
-            })
-            .catch(async e => {
-              switch (e.message) {
-                case db.vault.ERRORS.noVault:
-                  close('novault');
-                  break;
-                case db.vault.ERRORS.vaultLocked:
-                  close('locked');
-                  break;
-                case db.vault.ERRORS.wrongPassword:
-                  close();
-                  break;
-              }
-            });
-        }
+      name: 'Add to notebook',
+      title: 'Add to notebook',
+      icon: 'book-outline',
+      func: () => {
+        close();
+        clearSelection();
+        setSelectedItem(note);
+        setTimeout(() => {
+          eSendEvent(eOpenMoveNoteDialog, note);
+        }, 300);
       },
-      on: note.locked,
     },
     {
       name: 'Pin',
@@ -455,9 +227,159 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.favorite,
       color: 'orange',
     },
+
     {
-      name: 'Add Shortcut to Menu',
-      title: isPinnedToMenu ? 'Remove Shortcut' : 'Add Shortcut to Menu',
+      name: 'Edit Notebook',
+      title: 'Edit notebook',
+      icon: 'square-edit-outline',
+      func: () => {
+        close('notebook');
+      },
+    },
+    {
+      name: 'Edit Topic',
+      title: 'Edit topic',
+      icon: 'square-edit-outline',
+      func: () => {
+        close('topic');
+      },
+    },
+    {
+      name: 'Copy',
+      title: 'Copy',
+      icon: 'content-copy',
+      func: async () => {
+        if (note.locked) {
+          openVault({
+            copyNote: true,
+            novault: true,
+            locked: true,
+            item: note,
+            title: 'Copy note',
+            description: 'Unlock note to copy to clipboard.',
+          });
+        } else {
+          let text = await db.notes.note(note.id).content();
+          text = toTXT(text);
+          text = `${note.title}\n \n ${text}`;
+          Clipboard.setString(text);
+          ToastEvent.show({
+            heading: 'Note copied to clipboard',
+            type: 'success',
+            context: 'local',
+          });
+        }
+      },
+    },
+    {
+      name: 'Restore',
+      icon: 'delete-restore',
+      func: async () => {
+        close();
+        await db.trash.restore(note.id);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Tags,
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notebooks,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Trash,
+        ]);
+        type = note.type === 'trash' ? note.itemType : note.type;
+
+        ToastEvent.show({
+          heading:
+            type === 'note'
+              ? 'Note restored from trash'
+              : 'Notebook restored from trash',
+          type: 'success',
+        });
+      },
+    },
+
+    {
+      name: 'Publish',
+      title: 'Publish',
+      icon: 'cloud-upload-outline',
+      func: async () => {
+        if (!user) {
+          ToastEvent.show({
+            heading: 'Login required',
+            message: 'Login to publish note',
+            context: 'local',
+            func: () => {
+              eSendEvent(eOpenLoginDialog);
+            },
+            actionText: 'Login',
+          });
+          return;
+        }
+
+        if (!user.isEmailConfirmed) {
+          ToastEvent.show({
+            heading: 'Email not verified',
+            message: 'Please verify your email first.',
+            context: 'local',
+          });
+          return;
+        }
+        if (note.locked) {
+          ToastEvent.show({
+            heading: 'Locked notes cannot be published',
+            type: 'error',
+            context: 'local',
+          });
+          return;
+        }
+        close();
+        await sleep(300);
+        eSendEvent(eOpenPublishNoteDialog, note);
+      },
+    },
+    {
+      name: 'Vault',
+      title: note.locked ? 'Remove from vault' : 'Add to vault',
+      icon: note.locked ? 'shield-off-outline' : 'shield-outline',
+      func: async () => {
+        if (!note.id) return;
+        if (note.locked) {
+          close('unlock');
+        } else {
+          db.vault
+            .add(note.id)
+            .then(r => {
+              let n = db.notes.note(note.id).data;
+              if (n.locked) {
+                close();
+              }
+              Navigation.setRoutesToUpdate([
+                Navigation.routeNames.NotesPage,
+                Navigation.routeNames.Favorites,
+                Navigation.routeNames.Notes,
+              ]);
+              localRefresh(note.type);
+            })
+            .catch(async e => {
+              switch (e.message) {
+                case db.vault.ERRORS.noVault:
+                  close('novault');
+                  break;
+                case db.vault.ERRORS.vaultLocked:
+                  close('locked');
+                  break;
+                case db.vault.ERRORS.wrongPassword:
+                  close();
+                  break;
+              }
+            });
+        }
+      },
+      on: note.locked,
+    },
+
+    {
+      name: 'Add Shortcut',
+      title: isPinnedToMenu ? 'Remove Shortcut' : 'Add Shortcut',
       icon: isPinnedToMenu ? 'link-variant-remove' : 'link-variant',
       func: async () => {
         close();
@@ -483,6 +405,40 @@ export const ActionSheetComponent = ({
       on: isPinnedToMenu,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.pinMenu,
+    },
+    {
+      name: 'Share',
+      title: 'Share',
+      icon: 'share-variant',
+      func: async () => {
+        if (note.locked) {
+          close();
+          openVault({
+            item: item,
+            novault: true,
+            locked: true,
+            share: true,
+            title: 'Share note',
+            description: 'Unlock note to share it.',
+          });
+        } else {
+          let text = await db.notes.note(note.id).export('txt');
+          let m = `${note.title}\n \n ${text}`;
+          Share.open({
+            title: 'Share note to',
+            failOnCancel: false,
+            message: m,
+          });
+        }
+      },
+    },
+    {
+      name: 'Export',
+      title: 'Export',
+      icon: 'export',
+      func: () => {
+        close('export');
+      },
     },
     {
       name: 'RemoveTopic',
@@ -532,18 +488,35 @@ export const ActionSheetComponent = ({
         }
       },
     },
+    {
+      name: 'PermDelete',
+      icon: 'delete',
+      func: async () => {
+        close();
+        await sleep(300);
+        presentDialog({
+          title: `Permanent delete`,
+          paragraph: `Are you sure you want to delete this ${note.itemType} permanantly from trash?`,
+          positiveText: 'Delete',
+          negativeText: 'Cancel',
+          positivePress: async () => {
+            await db.trash.delete(note.id);
+            useTrashStore.getState().setTrash();
+            useSelectionStore.getState().setSelectionMode(false);
+            ToastEvent.show({
+              heading: 'Permanantly deleted items',
+              type: 'success',
+              context: 'local',
+            });
+          },
+          positiveType: 'errorShade',
+        });
+      },
+    },
   ];
 
-  const isFullWidthButton = index => {
-    let filtered = columnItemsData.filter(
-      i => columnItems.indexOf(i.name) > -1 && !i.hidden,
-    );
-    let colLength = filtered.length;
-
-    if (colLength % 2 === 0) return false;
-    if (index === colLength - 1) return true;
-  };
-
+  const columnItemsData = [];
+  let columnsCount = rowItems.length < 5 ? rowItems.length : 5;
   const _renderRowItem = rowItem => (
     <TouchableOpacity
       onPress={rowItem.func}
@@ -553,17 +526,20 @@ export const ActionSheetComponent = ({
         alignItems: 'center',
         width: DDS.isTab
           ? (400 - 24) / rowItems.length
-          : (w - 25) / rowItems.length,
+          : (w - 24) / columnsCount,
+        marginBottom: 5,
       }}>
       <View
         style={{
-          height: 40,
-          borderRadius: 100,
+          height: 50,
+          width: 50,
+          borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
           textAlign: 'center',
           textAlignVertical: 'center',
           marginBottom: DDS.isTab ? 7 : 3.5,
+          backgroundColor: colors.nav,
         }}>
         <Icon
           name={rowItem.icon}
@@ -572,25 +548,11 @@ export const ActionSheetComponent = ({
         />
       </View>
 
-      <Paragraph>{rowItem.name}</Paragraph>
+      <Paragraph size={SIZE.sm} style={{textAlign: 'center'}}>
+        {rowItem.title}
+      </Paragraph>
     </TouchableOpacity>
   );
-
-  const _renderColumnItem = (item, index) =>
-    item.hidden ? null : (
-      <Button
-        key={item.title}
-        title={item.title}
-        type={item.type ? item.type : item.on ? 'accent' : 'grayBg'}
-        onPress={item.func}
-        style={{
-          marginTop: 12,
-        }}
-        width={isFullWidthButton(index) ? '100%' : '48%'}
-        icon={item.icon}
-        height={50}
-      />
-    );
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -688,49 +650,6 @@ export const ActionSheetComponent = ({
               : null}
           </Paragraph>
 
-          {note.type === 'notebook' && (
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '90%',
-                maxWidth: '90%',
-                flexWrap: 'wrap',
-              }}>
-              {note && note.topics && note.topics.length > 0
-                ? note.topics
-                    .slice()
-                    .sort((a, b) => a.dateEdited - b.dateEdited)
-                    .slice(0, 6)
-                    .map(topic => (
-                      <View
-                        key={topic.id}
-                        style={{
-                          borderRadius: 2.5,
-                          backgroundColor: colors.accent,
-                          paddingHorizontal: 5,
-                          paddingVertical: 2,
-                          marginRight: 5,
-                          marginVertical: 2.5,
-                        }}>
-                        <Paragraph
-                          size={SIZE.xs}
-                          numberOfLines={1}
-                          color="white"
-                          style={{
-                            maxWidth: '100%',
-                          }}>
-                          {topic.title.length > 16
-                            ? topic.title.slice(0, 16) + '...'
-                            : topic.title}
-                        </Paragraph>
-                      </View>
-                    ))
-                : null}
-            </View>
-          )}
-
           {hasTags && note ? (
             <ActionSheetTagsSection
               close={close}
@@ -743,7 +662,47 @@ export const ActionSheetComponent = ({
             style={{
               flexDirection: 'row',
               marginTop: 5,
+              width: '90%',
+              maxWidth: '90%',
+              flexWrap: 'wrap',
+              justifyContent: 'center',
             }}>
+            {note.type === 'notebook' &&
+            note &&
+            note.topics &&
+            note.topics.length > 0
+              ? note.topics
+                  .sort((a, b) => a.dateEdited - b.dateEdited)
+                  .slice(0, 6)
+                  .map(topic => (
+                    <Button
+                      key={topic.id}
+                      title={topic.title}
+                      type="accent"
+                      height={30}
+                      onPress={() => {
+                        close();
+                        let routeName = 'NotesPage';
+                        let params = {...topic, menu: false, get: 'topics'};
+                        let headerState = {
+                          heading: topic.title,
+                          id: topic.id,
+                          type: topic.type,
+                        };
+                        Navigation.navigate(routeName, params, headerState);
+                      }}
+                      fontSize={SIZE.sm - 1}
+                      style={{
+                        marginRight: 5,
+                        paddingHorizontal: 0,
+                        borderRadius: 100,
+                        paddingHorizontal: 12,
+                        marginTop: 5,
+                      }}
+                    />
+                  ))
+              : null}
+
             {note.type === 'note' && isPublished && (
               <Button
                 title="Published"
@@ -804,39 +763,28 @@ export const ActionSheetComponent = ({
         </View>
       )}
 
-      {note.id || note.dateCreated ? (
-        <View
-          style={{
-            width: '100%',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingVertical: 10,
-            flexDirection: 'row',
-            paddingHorizontal: 12,
-          }}>
-          {rowItemsData
-            .filter(i => rowItems.indexOf(i.name) > -1)
-            .map(_renderRowItem)}
-        </View>
-      ) : null}
-
       {hasColors && note.id ? (
         <ActionSheetColorsSection close={close} item={note} />
       ) : null}
 
-      {note.id && columnItems.length > 0 ? (
-        <View
+      {note.id || note.dateCreated ? (
+        <FlatList
+          data={rowItemsData.filter(
+            i => rowItems.indexOf(i.name) > -1 && !i.hidden,
+          )}
+          keyExtractor={(item) => item.title}
+          numColumns={rowItems.length < 5 ? rowItems.length : 5}
           style={{
-            paddingHorizontal: 12,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            flexWrap: 'wrap',
-            marginTop: 6,
-          }}>
-          {columnItemsData
-            .filter(i => columnItems.indexOf(i.name) > -1 && !i.hidden)
-            .map(_renderColumnItem)}
-        </View>
+            marginTop: note.type !== 'note' ? 10 : 0,
+          }}
+          columnWrapperStyle={{
+            justifyContent: 'flex-start',
+          }}
+          contentContainerStyle={{
+            alignSelf: 'center',
+          }}
+          renderItem={({item, index}) => _renderRowItem(item)}
+        />
       ) : null}
 
       {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
