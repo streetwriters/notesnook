@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {
-  ActivityIndicator,
   Clipboard,
   Dimensions,
   Keyboard,
@@ -44,7 +43,6 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {presentDialog} from '../Dialog/functions';
-import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
@@ -57,7 +55,6 @@ export const ActionSheetComponent = ({
   hasColors = false,
   hasTags = false,
   rowItems = [],
-  columnItems = [],
   getRef,
 }) => {
   const [state, dispatch] = useTracked();
@@ -515,7 +512,6 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  const columnItemsData = [];
   let columnsCount = rowItems.length < 5 ? rowItems.length : 5;
   const _renderRowItem = rowItem => (
     <TouchableOpacity
@@ -772,10 +768,13 @@ export const ActionSheetComponent = ({
           data={rowItemsData.filter(
             i => rowItems.indexOf(i.name) > -1 && !i.hidden,
           )}
-          keyExtractor={(item) => item.title}
+          keyExtractor={item => item.title}
           numColumns={rowItems.length < 5 ? rowItems.length : 5}
           style={{
             marginTop: note.type !== 'note' ? 10 : 0,
+            borderTopWidth: 1,
+            borderColor: colors.nav,
+            paddingTop: 20,
           }}
           columnWrapperStyle={{
             justifyContent: 'flex-start',

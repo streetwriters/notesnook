@@ -60,8 +60,8 @@ export const ActionSheetColorsSection = ({item, close}) => {
           eSendEvent(refreshNotesPage);
         }}
         customStyle={{
-          width: DDS.isTab ? 400 / 10 : dWidth / 10,
-          height: DDS.isTab ? 400 / 10 : dWidth / 10,
+          width: DDS.isTab ? 400 / 10 : dWidth / 9,
+          height: DDS.isTab ? 400 / 10 : dWidth / 9,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center',
