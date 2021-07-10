@@ -81,9 +81,8 @@ const TagItem = ({item, index}) => {
         name="dots-horizontal"
         size={SIZE.xl}
         onPress={() => {
-          let rowItems = [];
-          let columnItems = ['Add Shortcut to Menu', 'Remove Shortcut from Menu'];
-          ActionSheetEvent(item, false, false, rowItems, columnItems);
+          let rowItems = ['Add Shortcut to Menu', 'Remove Shortcut from Menu'];
+          ActionSheetEvent(item, false, false, rowItems);
         }}
         testID={notesnook.ids.tag.menu}
         customStyle={{

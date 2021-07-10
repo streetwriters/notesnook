@@ -1,10 +1,10 @@
 import React from 'react';
-import { TouchableOpacity, useWindowDimensions, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import { eOpenJumpToDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { HeaderMenu } from '../Header/HeaderMenu';
+import {TouchableOpacity, useWindowDimensions, View} from 'react-native';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
+import {eOpenJumpToDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {HeaderMenu} from '../Header/HeaderMenu';
 import Heading from '../Typography/Heading';
 
 export const SectionHeader = ({

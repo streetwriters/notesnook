@@ -285,6 +285,7 @@ const Input = ({
           0 ? (
             Object.keys(ERRORS_LIST).map(error => (
               <View
+                key={ERRORS_LIST[error]}
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',

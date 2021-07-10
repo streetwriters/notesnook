@@ -23,6 +23,7 @@ export const Header = React.memo(
     icon,
     screen,
     noAnnouncement,
+    height
   }) => {
     const [state] = useTracked();
     const {colors} = state;
@@ -48,12 +49,9 @@ export const Header = React.memo(
         style={{
           width: '100%',
         }}>
-        {messageCard && (
-          <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
-        )}
         <View
           style={{
-            minHeight: 195,
+            minHeight:height || 195,
             padding: 12,
             width: '100%',
             zIndex: 10,
@@ -66,9 +64,7 @@ export const Header = React.memo(
             style={{
               right: 0,
               paddingRight: 12,
-              opacity: 0.5,
               bottom: 0,
-              paddingHorizontal: 12,
               position: 'absolute',
             }}>
             <Placeholder
