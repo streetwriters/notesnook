@@ -27,6 +27,7 @@ export const editorTitleInput = createRef();
 export const sourceUri =
   Platform.OS === 'android' ? 'file:///android_asset/' : 'Web.bundle/site/';
 
+let EDITOR_SETTINGS = null;
 let webviewOK = true;
 let noteEdited = false;
 let note = null;
@@ -176,14 +177,24 @@ export const loadNote = async item => {
       await clearEditor();
     }
     clearNote();
+    
     noteEdited = false;
     id = null;
     if (Platform.OS === 'android') {
+      await sleep(100);
       textInput.current?.focus();
       EditorWebView.current?.requestFocus();
       tiny.call(EditorWebView, tiny.focusEditor);
     } else {
       tiny.call(EditorWebView, tiny.focusEditor);
+    }
+    if (EDITOR_SETTINGS) {
+      tiny.call(
+        EditorWebView,
+        EDITOR_SETTINGS.directionality === 'rtl'
+          ? `tinymce.activeEditor.execCommand('mceDirectionRTL');`
+          : `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
+      );
     }
     if (!webviewInit) {
       EditorWebView.current?.reload();
@@ -299,6 +310,10 @@ export const _onMessage = async evt => {
       break;
     case 'running':
       webviewOK = true;
+      break;
+    case 'editorSettings':
+      EDITOR_SETTINGS = message.value;
+      eSendEvent('editorSettingsEvent', message.value);
       break;
     case 'imagepreview':
       eSendEvent('ImagePreview', message.value);

@@ -119,7 +119,7 @@ function setTheme() {
   } else {
     light();
   }
-
+  addStyle();
   let css = document.createElement('style');
   css.type = 'text/css';
 

@@ -359,10 +359,10 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Search & Replace',
     },
-    /*   {
+    {
       format: 'settings',
       type: 'settings',
       fullname: 'Editor Settings',
-    },   */
+    },
   ],
 ];

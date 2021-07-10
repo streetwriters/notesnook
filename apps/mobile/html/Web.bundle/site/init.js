@@ -1,4 +1,3 @@
-
 attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
@@ -6,10 +5,51 @@ function reactNativeEventHandler(type, value) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
-        value: value
+        value: value,
       })
     );
   }
+}
+
+let DEFAULT_FONT_SIZE = '12pt';
+let EDITOR_SETTINGS = {
+  fontSize:12,
+  directionality:'ltr'
+}
+
+function loadSettings() {
+  let settings = localStorage.getItem('editorSettings');
+  if (settings) {
+    settings = JSON.parse(settings);
+    EDITOR_SETTINGS = settings;
+  } 
+}
+
+function changeDirection(rtl) {
+  loadSettings();
+  EDITOR_SETTINGS.directionality = rtl? 'rtl' : "ltr";
+  localStorage.setItem('editorSettings', JSON.stringify(EDITOR_SETTINGS));
+  if (rtl) {
+    tinymce.activeEditor.execCommand('mceDirectionRTL');
+  } else {
+    tinymce.activeEditor.execCommand('mceDirectionLTR');
+  }
+  reactNativeEventHandler('editorSettings', EDITOR_SETTINGS);
+}
+
+function changeFontSize(size) {
+  loadSettings();
+  DEFAULT_FONT_SIZE = `${size}pt`;
+  EDITOR_SETTINGS.fontSize = size;
+  localStorage.setItem('editorSettings', JSON.stringify(EDITOR_SETTINGS));
+  addStyle();
+  reactNativeEventHandler('editorSettings', EDITOR_SETTINGS);
+}
+
+function loadFontSize() {
+  loadSettings();
+  DEFAULT_FONT_SIZE = EDITOR_SETTINGS.fontSize + 'pt';
+  reactNativeEventHandler('editorSettings', EDITOR_SETTINGS);
 }
 
 let changeTimer = null;
@@ -17,17 +57,22 @@ const COLLAPSED_KEY = 'c';
 const HIDDEN_KEY = 'h';
 const collapsibleTags = {HR: 1, H2: 2, H3: 3, H4: 4, H5: 5, H6: 6};
 let styleElement;
+
 function addStyle() {
   if (!styleElement) {
     let doc = editor.dom.doc;
     styleElement = doc.head.appendChild(document.createElement('style'));
   }
-  styleElement.innerHTML =
-    '.mce-content-body .c::before{' +
-    'background-color:' +
-    pageTheme.colors.accent +
-    ';border-radius:3px;color:white}';
-  console.log('adding style');
+  styleElement.innerHTML = `
+  body {
+    font-size:${DEFAULT_FONT_SIZE} !important;
+  }
+  .mce-content-body .c::before{
+    background-color:${pageTheme.colors.accent};
+    border-radius:3px;
+    color:white;
+  }
+  `;
 }
 
 function toggleElementVisibility(element, toggleState) {
@@ -64,10 +109,12 @@ function collapseElement(target) {
 }
 
 function init_tiny(size) {
+  loadFontSize();
   tinymce.init({
     selector: '#tiny_textarea',
     menubar: false,
     min_height: size,
+    directionality:EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
@@ -156,6 +203,7 @@ function init_tiny(size) {
     }
     body {
       background-color:transparent !important;
+      font-size:${DEFAULT_FONT_SIZE}
     }
     iframe {
       max-width:100% !important;
@@ -177,8 +225,7 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-    imagetools_toolbar:
-      'rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
@@ -199,22 +246,25 @@ function init_tiny(size) {
         icon: 'remove',
         tooltip: 'Remove image',
         onAction: function () {
-          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
         },
         onclick: function () {
-          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
-
-        }
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
+        },
       });
       editor.ui.registry.addButton('imageopts', {
         icon: 'image-options',
         tooltip: 'Image properties',
         onAction: function () {
-          reactNativeEventHandler("imageoptions");
+          reactNativeEventHandler('imageoptions');
         },
         onclick: function () {
-          reactNativeEventHandler("imageoptions");
-        }
+          reactNativeEventHandler('imageoptions');
+        },
       });
 
       editor.ui.registry.addButton('imagepreview', {
@@ -243,7 +293,7 @@ function init_tiny(size) {
             xhr.send();
           }
         },
-        onclick: function () {}
+        onclick: function () {},
       });
     },
     init_instance_callback: function (edit) {
@@ -273,76 +323,72 @@ function init_tiny(size) {
         }
       });
 
+      editor.on('NewBlock', function (e) {
+        const {newBlock} = e;
+        let target;
+        if (newBlock) {
+          target = newBlock.previousElementSibling;
+        }
+        if (target && target.classList.contains(COLLAPSED_KEY)) {
+          target.classList.remove(COLLAPSED_KEY);
+          collapseElement(target);
+        }
+      });
 
-editor.on('NewBlock', function (e) {
-  const {newBlock} = e;
-  let target;
-  if (newBlock) {
-    target = newBlock.previousElementSibling;
-  }
-  if (target && target.classList.contains(COLLAPSED_KEY)) {
-    target.classList.remove(COLLAPSED_KEY);
-    collapseElement(target);
-  }
-});
-
-editor.on('touchstart mousedown', function (e) {
-  const {target} = e;
-  if (
-    e.offsetX < 6 &&
-    collapsibleTags[target.tagName] &&
-    target.parentElement &&
-    target.parentElement.tagName === 'BODY'
-  ) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    e.stopPropagation();
-    editor.undoManager.transact(() => {
-      if (target.classList.contains(COLLAPSED_KEY)) {
-        target.classList.remove(COLLAPSED_KEY);
-      } else {
-        target.classList.add(COLLAPSED_KEY);
-      }
-      collapseElement(target);
-      console.log('element has collapsed');
-      reactNativeEventHandler('tiny', editor.getContent());
-    });
-  }
-});
-
-
+      editor.on('touchstart mousedown', function (e) {
+        const {target} = e;
+        if (
+          e.offsetX < 6 &&
+          collapsibleTags[target.tagName] &&
+          target.parentElement &&
+          target.parentElement.tagName === 'BODY'
+        ) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          e.stopPropagation();
+          editor.undoManager.transact(() => {
+            if (target.classList.contains(COLLAPSED_KEY)) {
+              target.classList.remove(COLLAPSED_KEY);
+            } else {
+              target.classList.add(COLLAPSED_KEY);
+            }
+            collapseElement(target);
+            console.log('element has collapsed');
+            reactNativeEventHandler('tiny', editor.getContent());
+          });
+        }
+      });
 
       editor.on('ScrollIntoView', function (e) {
-        
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest'
+          block: 'nearest',
         });
       });
       editor.on('input', onChange);
       editor.on('keyup', onChange);
       editor.on('NodeChange', onChange);
-    }
+    },
   });
 }
 window.prevContent = '';
 const onChange = function (event) {
-    if (event.type === 'nodechange' && !event.selectionChange) return;
-    if (isLoading) {
-      isLoading = false;
-      return;
-    }
-    if (editor.plugins.wordcount.getCount() === 0) return;
-    clearTimeout(changeTimer);
-    changeTimer = null;   
-    changeTimer = setTimeout(function () {
-      selectchange();
-      reactNativeEventHandler('tiny', editor.getContent());
-      reactNativeEventHandler('history', {
-        undo: editor.undoManager.hasUndo(),
-        redo: editor.undoManager.hasRedo()
-      });
+  if (event.type === 'nodechange' && !event.selectionChange) return;
+  if (isLoading) {
+    isLoading = false;
+    return;
+  }
+  if (editor.plugins.wordcount.getCount() === 0) return;
+  clearTimeout(changeTimer);
+  changeTimer = null;
+  changeTimer = setTimeout(function () {
+    selectchange();
+    reactNativeEventHandler('tiny', editor.getContent());
+    reactNativeEventHandler('history', {
+      undo: editor.undoManager.hasUndo(),
+      redo: editor.undoManager.hasRedo()
+    });
   }, 1);
 };
 
@@ -386,13 +432,13 @@ function selectchange() {
 
   currentFormats.current = {
     index: range.startOffset,
-    length: range.endOffset - range.startOffset
+    length: range.endOffset - range.startOffset,
   };
 
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;
 
   if (currentFormats.fontsize === '') {
-    currentFormats.fontsize = '12pt';
+    currentFormats.fontsize = DEFAULT_FONT_SIZE;
 
     if (currentFormats.h2) {
       currentFormats.fontsize = '18pt';

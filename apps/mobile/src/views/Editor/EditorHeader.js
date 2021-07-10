@@ -54,7 +54,7 @@ const EditorHeader = () => {
       eSendEvent(eCloseFullscreenEditor);
       return;
     }
-    tiny.call(EditorWebView,tiny.blur);
+    tiny.call(EditorWebView, tiny.blur);
     setTimeout(async () => {
       eSendEvent('showTooltip');
       toolbarRef.current?.scrollTo({
@@ -82,7 +82,7 @@ const EditorHeader = () => {
           ToastEvent.show({
             heading: 'Note Saved',
             type: 'success',
-            duration:1500
+            duration: 1500,
           });
         }
         await clearEditor();
@@ -139,13 +139,18 @@ const EditorHeader = () => {
       await sleep(500);
       editing.isFocused = true;
     }
-    ActionSheetEvent(
-      note,
-      true,
-      true,
-      ['Add to', 'Share', 'Export', 'Delete', 'Copy'],
-      ['Dark Mode', 'Add to Vault', 'Pin', 'Favorite'],
-    );
+    ActionSheetEvent(note, true, true, [
+      'Add to notebook',
+      'Share',
+      'Export',
+      'Delete',
+      'Copy',
+      'Dark Mode',
+      'Add to Vault',
+      'Pin',
+      'Favorite',
+      'Publish',
+    ]);
   };
 
   return (
