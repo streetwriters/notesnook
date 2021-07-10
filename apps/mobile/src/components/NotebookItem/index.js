@@ -17,17 +17,13 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
-    let rowItems = isTrash
-      ? ['Restore', 'Remove']
-      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook','Pin', 'Add Shortcut','Delete'];
+    let rowItems =
+      item.type === 'topic'
+        ? ['Edit Topic', 'Add Shortcut', 'Delete']
+        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
+    rowItems = isTrash ? ['Restore', 'Remove'] : rowItems;
 
-    let columnItems = isTrash
-      ? []
-      : item.type === 'topic'
-      ? ['Add Shortcut', 'Delete']
-      : ['Pin', 'Add Shortcut','Delete'];
-
-    ActionSheetEvent(item, false, false, rowItems, columnItems, {
+    ActionSheetEvent(item, false, false, rowItems, {
       notebookID: notebookID,
     });
   };
