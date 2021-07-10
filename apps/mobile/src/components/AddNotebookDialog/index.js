@@ -14,7 +14,9 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
+import {Placeholder} from '../ListPlaceholders';
 import {Toast} from '../Toast';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
@@ -264,6 +266,7 @@ export class AddNotebookDialog extends React.Component {
           await sleep(300);
           this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
+        centered={false}
         statusBarTranslucent={false}
         onRequestClose={this.close}>
         <TextInput
@@ -358,6 +361,26 @@ export class AddNotebookDialog extends React.Component {
             data={topics}
             ref={ref => (this.listRef = ref)}
             keyExtractor={(item, index) => item + index.toString()}
+            ListEmptyComponent={
+              <View
+                style={{
+                  height: 500,
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                <Placeholder type="topics" w={150} h={150} />
+                <Heading>Topics</Heading>
+                <Paragraph
+                  textBreakStrategy="balanced"
+                  style={{
+                    textAlign: 'center',
+                    width: '80%',
+                  }}
+                  color={colors.icon}>
+                  You have not added any topics yet.
+                </Paragraph>
+              </View>
+            }
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
@@ -404,8 +427,9 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        borderBottomWidth: 1,
-        borderColor: colors.nav,
+        backgroundColor: colors.nav,
+        borderRadius: 5,
+        marginVertical: 5,
       }}>
       <TouchableOpacity
         style={{
@@ -419,12 +443,6 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           onPress(item, index);
         }}
       />
-      <Paragraph
-        style={{
-          marginRight: index === 0 ? 2 : 0,
-        }}>
-        {index + 1 + '.'}
-      </Paragraph>
       <TextInput
         ref={topicRef}
         editable={false}
