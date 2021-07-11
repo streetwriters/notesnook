@@ -43,6 +43,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {presentDialog} from '../Dialog/functions';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
@@ -514,7 +515,7 @@ export const ActionSheetComponent = ({
 
   let columnsCount = rowItems.length < 5 ? rowItems.length : 5;
   const _renderRowItem = rowItem => (
-    <TouchableOpacity
+    <View
       onPress={rowItem.func}
       key={rowItem.name}
       testID={'icon-' + rowItem.name}
@@ -525,29 +526,30 @@ export const ActionSheetComponent = ({
           : (w - 24) / columnsCount,
         marginBottom: 5,
       }}>
-      <View
-        style={{
-          height: 50,
-          width: 50,
+      <PressableButton
+        onPress={rowItem.func}
+        type="grayBg"
+        customStyle={{
+          height: (w - 24) / columnsCount - 12,
+          width: (w - 24) / columnsCount - 12,
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
           textAlign: 'center',
           textAlignVertical: 'center',
           marginBottom: DDS.isTab ? 7 : 3.5,
-          backgroundColor: colors.nav,
         }}>
         <Icon
           name={rowItem.icon}
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
           color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
         />
-      </View>
+      </PressableButton>
 
       <Paragraph size={SIZE.sm} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
-    </TouchableOpacity>
+    </View>
   );
 
   const onScrollEnd = () => {
