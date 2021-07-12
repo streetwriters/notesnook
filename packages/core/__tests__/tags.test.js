@@ -78,4 +78,14 @@ describe.each([
       tag = db[collection].tag(tag.id);
       expect(tag.alias).toBe(value + "-new");
     }));
+
+  test(`remove a ${action}`, () =>
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](value);
+
+      let tag = db[collection].tag(value);
+      await db[collection].remove(tag.id);
+      expect(db[collection].tag(value)).toBeUndefined();
+    }));
 });

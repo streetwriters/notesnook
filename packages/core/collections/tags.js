@@ -1,7 +1,8 @@
 import Collection from "./collection";
 import { qclone } from "qclone";
 import { makeId } from "../utils/id";
-import { deleteItem } from "../utils/array";
+import { deleteItem, deleteItems } from "../utils/array";
+import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
@@ -9,31 +10,29 @@ export default class Tags extends Collection {
     return tagItem;
   }
 
-  async add(tagId, noteId) {
-    if (tagId.id || tagId.title) {
-      tagId = tagId.id;
-    }
-
-    if (!tagId || !noteId) {
-      console.error("tagId and noteId cannot be falsy.");
+  async add(tagId, ...noteIds) {
+    if (!tagId) {
+      console.error("tagId cannot be undefined.");
       return;
     }
 
-    let tag = this.all.find((t) => t.id === tagId || t.title === tagId) || {
+    if (typeof tagId === "object") {
+      tagId = tagId.id;
+    }
+
+    let tag = this.tag(tagId) || {
       title: tagId,
     };
 
     let id = tag.id || makeId(tag.title);
     let notes = tag.noteIds || [];
 
-    if (notes.find((id) => id === noteId)) return id;
-
     tag = {
       type: "tag",
       alias: tag.title,
       id,
       title: tag.title,
-      noteIds: [...notes, noteId],
+      noteIds: setManipulator.union(notes, noteIds),
     };
 
     await this._collection.addItem(tag);
@@ -41,9 +40,9 @@ export default class Tags extends Collection {
   }
 
   async rename(tagId, newName) {
-    let tag = this.all.find((t) => t.id === tagId);
+    let tag = this.tag(tagId);
     if (!tag) {
-      console.error(`No such tag found. Tag id:`, tagId);
+      console.error(`No tag found. Tag id:`, tagId);
       return;
     }
     tag.alias = newName;
@@ -58,26 +57,29 @@ export default class Tags extends Collection {
     return this._collection.getItems();
   }
 
-  async remove(tagTitle, noteId) {
-    if (!tagTitle || !noteId) {
-      console.error(
-        "tag title and noteId cannot be undefined.",
-        tagTitle,
-        noteId
-      );
-      return;
-    }
-
-    let tag = this.all.find((t) => t.title === tagTitle || t.id === tagTitle);
+  async remove(tagId) {
+    let tag = this.tag(tagId);
     if (!tag) {
-      console.error(`No such tag found. Tag title:`, tagTitle);
+      console.error(`No tag found. Tag id:`, tagId);
+      return;
+    }
+    for (let noteId of tag.noteIds) {
+      const note = this._db.notes.note(noteId);
+      if (!note) continue;
+      await note.untag(tagId);
+    }
+    await this._db.settings.unpin(tagId);
+    await this._collection.deleteItem(tagId);
+  }
+
+  async untag(tagId, ...noteIds) {
+    let tag = this.tag(tagId);
+    if (!tag) {
+      console.error(`No such tag found. Tag title:`, tagId);
       return;
     }
 
-    tag = qclone(tag);
-
-    if (!deleteItem(tag.noteIds, noteId))
-      console.error(`No such note exists in tag.`, tag.id, noteId);
+    deleteItems(tag.noteIds, ...noteIds);
 
     if (tag.noteIds.length > 0) await this._collection.addItem(tag);
     else {

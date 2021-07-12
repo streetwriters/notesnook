@@ -34,7 +34,7 @@ export default class Notes extends Collection {
         }
         if (!!oldNote.tags) {
           for (let tag of oldNote.tags) {
-            await this._db.tags.remove(tag, id);
+            await this._db.tags.untag(tag, id);
           }
         }
       }
@@ -285,7 +285,7 @@ export default class Notes extends Collection {
         }
       }
       for (let tag of item.tags) {
-        await this._db.tags.remove(tag, id);
+        await this._db.tags.untag(tag, id);
       }
       if (item.data.color) {
         await this._db.colors.remove(item.data.color, id);

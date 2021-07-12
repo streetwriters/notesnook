@@ -101,7 +101,7 @@ export default class Note {
 
   async uncolor() {
     if (!this._note.color) return;
-    await this._db.colors.remove(this._note.color, this._note.id);
+    await this._db.colors.untag(this._note.color, this._note.id);
     await this._db.notes._collection.addItem({
       ...this._note,
       color: undefined,
@@ -136,7 +136,8 @@ export default class Note {
 
 async function addTag(tag) {
   if (this._note.tags.indexOf(tag) > -1)
-    throw new Error("Cannot add a duplicate tag.");
+    return console.error("Cannot add a duplicate tag.");
+
   let tagItem = await this._db.tags.add(tag, this._note.id);
   let arr = [...this._note.tags, tagItem.title];
   const note = { ...this._note, tags: arr };
@@ -145,10 +146,11 @@ async function addTag(tag) {
 
 async function removeTag(tag) {
   if (this._note.tags.indexOf(tag) <= -1)
-    throw new Error("This note is not tagged by the specified tag.");
+    return console.error("This note is not tagged by the specified tag.");
+
   let arr = [...this._note.tags];
   arr.splice(arr.indexOf(tag), 1);
   const note = { ...this._note, tags: arr };
-  await this._db.tags.remove(tag, note.id);
+  await this._db.tags.untag(tag, note.id);
   await this._db.notes._collection.addItem(note);
 }
