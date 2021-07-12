@@ -6,11 +6,14 @@ type DialogInfo = {
   paragraph?: string,
   positiveText?: string,
   negativeText?: string,
-  positivePress?: () => void,
+  positivePress?: (value:any) => void,
   onClose?: () => void,
   positiveType?: "transparent" | "gray" | "grayBg" | "accent" | "inverted" | "shade" | "error" | "errorShade",
   icon?: string,
-  paragraphColor: string
+  paragraphColor: string,
+  input:boolean,
+  inputPlaceholder:string,
+  defaultValue:string
 }
 
 export function presentDialog(data: DialogInfo): void {

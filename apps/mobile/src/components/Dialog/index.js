@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eCloseSimpleDialog, eOpenSimpleDialog } from '../../utils/Events';
-import { ph, pv } from '../../utils/SizeUtils';
+import React, {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eCloseSimpleDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {ph, pv} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import Input from '../Input';
 import Seperator from '../Seperator';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
@@ -18,6 +17,8 @@ export const Dialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
+  const [inputValue, setInputValue] = useState(null);
+  const inputRef = useRef();
   const [dialogInfo, setDialogInfo] = useState({
     title: '',
     paragraph: '',
@@ -25,20 +26,13 @@ export const Dialog = () => {
     negativeText: 'Cancel',
     positivePress: () => {},
     onClose: () => {},
-    negativeText: hide,
     positiveType: 'transparent',
     icon: null,
-    paragraphColor:colors.pri
+    paragraphColor: colors.pri,
+    input: false,
+    inputPlaceholder: 'Enter some text',
+    defaultValue: '',
   });
-
-  const show = data => {
-    setDialogInfo({...dialogInfo, ...data});
-    setVisible(true);
-  };
-
-  const hide = () => {
-    setVisible(false);
-  };
 
   useEffect(() => {
     eSubscribeEvent(eOpenSimpleDialog, show);
@@ -52,9 +46,19 @@ export const Dialog = () => {
 
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
-      await dialogInfo.positivePress();
+      inputRef.current?.blur();
+      await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
     }
     hide();
+  };
+
+  const show = data => {
+    setDialogInfo(data);
+    setVisible(true);
+  };
+
+  const hide = () => {
+    setVisible(false);
   };
 
   const onNegativePress = async () => {
@@ -74,10 +78,19 @@ export const Dialog = () => {
     paddingHorizontal: ph,
     paddingVertical: pv,
   };
-  
+
   return (
     visible && (
-      <BaseDialog visible={true} onRequestClose={hide}>
+      <BaseDialog
+        statusBarTranslucent={false}
+        onShow={async () => {
+          if (dialogInfo.input) {
+            await sleep(100);
+            inputRef.current?.focus();
+          }
+        }}
+        visible={true}
+        onRequestClose={hide}>
         <View style={style}>
           <DialogHeader
             title={dialogInfo.title}
@@ -86,6 +99,21 @@ export const Dialog = () => {
             paragraphColor={dialogInfo.paragraphColor}
           />
           <Seperator />
+
+          {dialogInfo.input && (
+            <Input
+              fwdRef={inputRef}
+              autoCapitalize="none"
+              onChangeText={value => {
+                setInputValue(value);
+              }}
+              defaultValue={dialogInfo.defaultValue}
+              onSubmit={onPressPositive}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              placeholder={dialogInfo.inputPlaceholder}
+            />
+          )}
 
           <DialogButtons
             onPressNegative={onNegativePress}
