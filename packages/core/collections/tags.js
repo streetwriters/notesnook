@@ -30,6 +30,7 @@ export default class Tags extends Collection {
 
     tag = {
       type: "tag",
+      alias: tag.title,
       id,
       title: tag.title,
       noteIds: [...notes, noteId],
@@ -37,6 +38,16 @@ export default class Tags extends Collection {
 
     await this._collection.addItem(tag);
     return tag;
+  }
+
+  async rename(tagId, newName) {
+    let tag = this.all.find((t) => t.id === tagId);
+    if (!tag) {
+      console.error(`No such tag found. Tag id:`, tagId);
+      return;
+    }
+    tag.alias = newName;
+    await this._collection.updateItem(tag);
   }
 
   get raw() {

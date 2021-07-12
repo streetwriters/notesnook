@@ -18,7 +18,7 @@ describe.each([
 ])("%s", (action, unaction, filter, value) => {
   let check = action === "tag" ? checkTagValue : checkColorValue;
   let collection = action === "tag" ? "tags" : "colors";
-  let key = action === "tag" ? "tags" : "color";
+  // let key = action === "tag" ? "tags" : "color";
 
   test(`${action} a note`, () =>
     noteTest().then(async ({ db, id }) => {
@@ -67,5 +67,15 @@ describe.each([
       const tag = db[collection].all.find((v) => v.title === value);
       const filteredNotes = db.notes[filter](tag.id);
       check(db.notes.note(filteredNotes[0]), value);
+    }));
+
+  test(`rename a ${action}`, () =>
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](value);
+      let tag = db[collection].tag(value);
+      await db[collection].rename(tag.id, value + "-new");
+      tag = db[collection].tag(tag.id);
+      expect(tag.alias).toBe(value + "-new");
     }));
 });
