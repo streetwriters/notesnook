@@ -31,7 +31,7 @@ import tinymce from "tinymce/tinymce";
           editor.execCommand(
             "mceInsertContent",
             false,
-            `<pre class='codeblock'>${content}</pre>`
+            `<pre spellcheck="false" class='codeblock'>${content}</pre>`
           );
         });
         editor.selection.setRng(rng);
@@ -40,32 +40,82 @@ import tinymce from "tinymce/tinymce";
         replaceContent(
           editor,
           (html) =>
-            `<pre class='codeblock'>${html.replace(/\n/gm, "<br>")}</pre>`
+            `<pre spellcheck="false" class='codeblock'>${html.replace(
+              /\n/gm,
+              "<br>"
+            )}</pre>`
         );
       }
     }
   };
 
+  var addInlineCode = function (editor) {
+    var content = editor.selection.getContent({ format: "text" });
+    content = content.replace(/^\n/gm, "") || "&nbsp;";
+
+    const rng = editor.selection.getRng();
+    editor.undoManager.transact(function () {
+      editor.execCommand(
+        "mceInsertContent",
+        false,
+        `<code spellcheck="false">${content}</pre>`
+      );
+    });
+    editor.selection.setRng(rng);
+    editor.nodeChanged();
+  };
+
   var register = function (editor) {
-    editor.addCommand("mceCode", function (api) {
+    editor.addCommand("mceCodeblock", function (api) {
       addCodeBlock(editor, api);
+    });
+
+    editor.addCommand("mceCode", function (api, value) {
+      addInlineCode(editor);
     });
   };
 
   var register$1 = function (editor) {
-    editor.ui.registry.addToggleButton("code", {
-      icon: "sourcecode",
-      tooltip: "Code",
+    editor.ui.registry.addToggleButton("codeblock", {
+      icon: "code-sample",
+      tooltip: "Codeblock",
       onAction: function (api) {
         return addCodeBlock(editor, api);
       },
       onSetup: getNodeChangeHandler(editor),
+    });
+    editor.ui.registry.addToggleButton("inlinecode", {
+      icon: "sourcecode",
+      tooltip: "Inline code",
+      onAction: function (api) {
+        return addInlineCode(editor);
+      },
+      onSetup: function (api) {
+        var nodeChangeHandler = function (e) {
+          if (e.element.tagName === "CODE") {
+            if (!e.element.innerHTML.trim().length) {
+              e.element.remove();
+            }
+            api.setActive(e.element.tagName === "PRE");
+          }
+        };
+
+        editor.on("NodeChange", nodeChangeHandler);
+        return function () {
+          return editor.off("NodeChange", nodeChangeHandler);
+        };
+      },
     });
   };
 
   var getNodeChangeHandler = function (editor) {
     return function (api) {
       var nodeChangeHandler = function (e) {
+        if (e.element.tagName === "CODE") {
+          if (!e.element.innerHTML.trim().length) {
+            e.element.remove();
+          }
+        }
         api.setActive(e.element.tagName === "PRE");
       };
 

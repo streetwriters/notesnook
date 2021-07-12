@@ -39,7 +39,7 @@ const markdownPatterns = [
   { start: "_", end: "_", format: "italic" },
   { start: "**", end: "**", format: "bold" },
   { start: "~~", end: "~~", format: "strikethrough" },
-  { start: "`", end: "`", format: "code" },
+  { start: "`", end: "`", cmd: "mceCode" },
   { start: "## ", format: "h2" },
   { start: "### ", format: "h3" },
   { start: "#### ", format: "h4" },
@@ -140,6 +140,9 @@ function TinyMCE(props) {
       onInit={onInit}
       initialValue={initialValue}
       init={{
+        //experimental
+        keep_styles: false,
+
         menubar: false,
         statusbar: false,
         link_quicklink: true,
@@ -179,7 +182,7 @@ function TinyMCE(props) {
 `,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough blockquote code | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
         quickbars_selection_toolbar:
           "bold italic underline strikethrough code h2 h3 quicklink blockquote",
         mobile: {
