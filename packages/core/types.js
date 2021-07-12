@@ -6,3 +6,7 @@
  *  sortDirection: "desc" | "asc"
  * }} GroupOptions
  */
+
+/**
+ * @typedef {"home" | "notes" | "notebooks" | "tags" | "topics" | "trash"} GroupingKey
+ */

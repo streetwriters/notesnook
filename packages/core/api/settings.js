@@ -44,7 +44,7 @@ class Settings {
 
   /**
    *
-   * @param {string} key
+   * @param {GroupingKey} key
    * @param {GroupOptions} groupOptions
    */
   async setGroupOptions(key, groupOptions) {
@@ -54,7 +54,7 @@ class Settings {
 
   /**
    *
-   * @param {string} key
+   * @param {GroupingKey} key
    * @returns {GroupOptions}
    */
   getGroupOptions(key) {
