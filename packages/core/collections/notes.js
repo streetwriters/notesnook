@@ -1,11 +1,4 @@
-import { groupBy, isHex } from "../utils";
 import Collection from "./collection";
-import {
-  getWeekGroupFromTimestamp,
-  months,
-  getLastWeekTimestamp,
-  get7DayTimestamp,
-} from "../utils/date";
 import Note from "../models/note";
 import getId from "../utils/id";
 import { EV, EVENTS } from "../common";
@@ -200,62 +193,6 @@ export default class Notes extends Collection {
       return arr;
     }, []);
     return sort(array).desc((note) => note.dateCreated);
-  }
-
-  /**
-   *
-   * @param {"abc"|"month"|"year"|"week"|undefined} by
-   * @param {"asc"|"desc"} sort
-   */
-  group(by, sort = "desc") {
-    let notes = this.all;
-
-    switch (by) {
-      case "abc":
-        return groupBy(
-          notes,
-          (note) => note.title[0].toUpperCase(),
-          (t) => t.title[0],
-          sort
-        );
-      case "month":
-        return groupBy(
-          notes,
-          (note) => months[new Date(note.dateCreated).getMonth()],
-          (t) => t.dateCreated,
-          sort
-        );
-      case "week":
-        return groupBy(
-          notes,
-          (note) => getWeekGroupFromTimestamp(note.dateCreated),
-          (t) => t.dateCreated,
-          sort
-        );
-      case "year":
-        return groupBy(
-          notes,
-          (note) => new Date(note.dateCreated).getFullYear().toString(),
-          (t) => t.dateCreated,
-          sort
-        );
-      default:
-        let timestamps = {
-          recent: getLastWeekTimestamp(7),
-          lastWeek: getLastWeekTimestamp(7) - get7DayTimestamp(), //seven day timestamp value
-        };
-        return groupBy(
-          notes,
-          (note) =>
-            note.dateCreated >= timestamps.recent
-              ? "Recent"
-              : note.dateCreated >= timestamps.lastWeek
-              ? "Last week"
-              : "Older",
-          (t) => t.dateCreated,
-          sort
-        );
-    }
   }
 
   delete(...ids) {

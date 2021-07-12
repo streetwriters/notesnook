@@ -1,5 +1,6 @@
 import { EV, EVENTS } from "../common";
 import id from "../utils/id";
+import "../types";
 import setManipulator from "../utils/set";
 
 class Settings {
@@ -12,31 +13,6 @@ class Settings {
     this._initSettings();
   }
 
-  _initSettings() {
-    this._settings = {
-      type: "settings",
-      id: id(),
-      pins: [],
-      dateEdited: 0,
-      dateCreated: 0,
-    };
-  }
-
-  get raw() {
-    return this._settings;
-  }
-
-  async merge(item) {
-    // TODO if (this.settings.dateEdited > (await this._db.lastSynced())) {
-    //   this._settings.pins = setManipulator.union(
-    //     this._settings.pins,
-    //     item.pins
-    //   );
-    // }
-    this._settings = item;
-    await this._db.context.write("settings", item);
-  }
-
   async init() {
     var settings = await this._db.context.read("settings");
     if (settings) this._settings = settings;
@@ -46,13 +22,53 @@ class Settings {
     });
   }
 
+  get raw() {
+    return this._settings;
+  }
+
+  async merge(item) {
+    if (this.settings.dateEdited > (await this._db.lastSynced())) {
+      this._settings.pins = setManipulator.union(
+        this._settings.pins,
+        item.pins
+      );
+      this._settings.groupOptions = {
+        ...item.groupOptions,
+        ...this._settings.groupOptions,
+      };
+    } else {
+      this._settings = item;
+    }
+    await this._db.context.write("settings", item);
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @param {GroupOptions} groupOptions
+   */
+  async setGroupOptions(key, groupOptions) {
+    this._settings.groupOptions[key] = groupOptions;
+    await this._saveSettings();
+  }
+
+  /**
+   *
+   * @param {string} key
+   * @returns {GroupOptions}
+   */
+  getGroupOptions(key) {
+    return this._settings.groupOptions[key];
+  }
+
   async pin(type, data) {
     if (type !== "notebook" && type !== "topic" && type !== "tag")
       throw new Error("This item cannot be pinned.");
     if (this.isPinned(data.id)) return;
     this._settings.pins.push({ type, data });
     this._settings.dateEdited = Date.now();
-    await this._db.context.write("settings", this._settings);
+
+    await this._saveSettings();
   }
 
   async unpin(id) {
@@ -60,7 +76,8 @@ class Settings {
     if (index <= -1) return;
     this._settings.pins.splice(index, 1);
     this._settings.dateEdited = Date.now();
-    await this._db.context.write("settings", this._settings);
+
+    await this._saveSettings();
   }
 
   isPinned(id) {
@@ -88,6 +105,21 @@ class Settings {
       else this.unpin(pin.data.id); // TODO risky.
       return prev;
     }, []);
+  }
+
+  _initSettings() {
+    this._settings = {
+      type: "settings",
+      id: id(),
+      pins: [],
+      groupOptions: {},
+      dateEdited: 0,
+      dateCreated: 0,
+    };
+  }
+
+  async _saveSettings() {
+    await this._db.context.write("settings", this._settings);
   }
 }
 export default Settings;
