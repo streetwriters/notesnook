@@ -473,6 +473,10 @@ const LoginDialog = () => {
       <ScrollView
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="none"
+        nestedScrollEnabled
+        onMomentumScrollEnd={() => {
+          actionSheetRef.current.handleChildScrollEnd();
+        }}
         style={{
           maxHeight: DDS.isTab ? '90%' : '100%',
           width: DDS.isTab ? 500 : '100%',
