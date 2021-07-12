@@ -15,6 +15,7 @@ class Settings {
 
   async init() {
     var settings = await this._db.context.read("settings");
+    if (!settings.groupOptions) settings.groupOptions = {};
     if (settings) this._settings = settings;
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = undefined;
@@ -58,7 +59,14 @@ class Settings {
    * @returns {GroupOptions}
    */
   getGroupOptions(key) {
-    return this._settings.groupOptions[key];
+    return (
+      this._settings.groupOptions[key] || {
+        groupId: undefined,
+        sortBy: "dateEdited",
+        groupBy: "dateEdited",
+        sortDirection: "desc",
+      }
+    );
   }
 
   async pin(type, data) {
