@@ -1,6 +1,7 @@
 import DB from "../../api";
 import StorageInterface from "../../__mocks__/storage.mock";
 import { getLastWeekTimestamp } from "../../utils/date";
+import { groupArray } from "../../utils/grouping";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
@@ -54,7 +55,12 @@ const groupedTest = (type) =>
       title: "Some title and title title",
       dateCreated: getLastWeekTimestamp() - 604800000 * 2,
     });
-    let grouped = db.notes.group(type);
+    let grouped = groupArray(db.notes.all, {
+      groupId: type,
+      sortDirection: "desc",
+      sortBy: "dateCreated",
+      groupBy: "dateCreated",
+    });
     expect(grouped.length).toBeGreaterThan(0);
     expect(grouped.some((i) => i.type === "header")).toBe(true);
   });

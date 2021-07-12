@@ -27,7 +27,7 @@ class Settings {
   }
 
   async merge(item) {
-    if (this.settings.dateEdited > (await this._db.lastSynced())) {
+    if (this._settings.dateEdited > (await this._db.lastSynced())) {
       this._settings.pins = setManipulator.union(
         this._settings.pins,
         item.pins

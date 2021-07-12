@@ -1,25 +1,20 @@
-import { groupBy } from "../utils";
-
-test("groupBy should work", () => {
-  let ret = groupBy([1, 2, 3, 1, 1, 1, 2, 2, 2, 3, 3, 3], (x) => x.toString());
-  expect(ret.length).toBe(15);
-  expect(ret.some((i) => i.title === "1")).toBeTruthy();
-  expect(ret.some((i) => i.title === "2")).toBeTruthy();
-  expect(ret.some((i) => i.title === "3")).toBeTruthy();
-});
+import { groupArray } from "../utils/grouping";
 
 test("group alphabetically", () => {
-  const sortedAlphabet = "abcdefghijlmnopqrstuvwxyz".split("");
-  const alphabet = "nopqrstuvwxyzabcdefghijlm".split("");
-  let ret = groupBy(
-    alphabet,
-    (x) => x[0],
-    (x) => x[0],
-    "asc"
-  ).filter((v) => v.title);
+  const sortedAlphabet = "abcdefghijlmnopqrstuvwxyz"
+    .split("")
+    .map((a) => ({ title: a }));
+  const alphabet = "nopqrstuvwxyzabcdefghijlm"
+    .split("")
+    .map((a) => ({ title: a, item: true }));
+  let ret = groupArray(alphabet, {
+    groupId: "abc",
+    sortDirection: "asc",
+    sortBy: "title",
+  }).filter((v) => !v.item);
   expect(
     sortedAlphabet.every((alpha, index) => {
-      return ret[index].title === alpha;
+      return ret[index].title === alpha.title.toUpperCase();
     })
   ).toBeTruthy();
 });

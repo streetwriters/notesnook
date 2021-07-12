@@ -42,8 +42,9 @@ const KEY_SELECTORS = {
  * @returns Grouped array
  */
 export function groupArray(array, options) {
-  const keySelector = KEY_SELECTORS[options.groupId];
-  if (sortSelector) fastsort(array).by(getSortSelectors(options));
+  const keySelector = KEY_SELECTORS[options.groupId || "default"];
+  if (options.sortBy && options.sortDirection)
+    fastsort(array).by(getSortSelectors(options));
 
   let groups = new Map();
   array.forEach((item) => {
