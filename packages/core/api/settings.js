@@ -10,13 +10,14 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
-    this._initSettings();
   }
 
   async init() {
+    this._initSettings();
     var settings = await this._db.context.read("settings");
-    if (!settings.groupOptions) settings.groupOptions = {};
     if (settings) this._settings = settings;
+    else await this._saveSettings();
+
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = undefined;
       this._initSettings();
