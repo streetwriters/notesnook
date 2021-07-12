@@ -1,7 +1,7 @@
 import Collection from "./collection";
 import { qclone } from "qclone";
 import { makeId } from "../utils/id";
-import { deleteItem, deleteItems } from "../utils/array";
+import { deleteItem, deleteItems, hasItem } from "../utils/array";
 import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
@@ -11,14 +11,9 @@ export default class Tags extends Collection {
   }
 
   async add(tagId, ...noteIds) {
-    if (!tagId) {
-      console.error("tagId cannot be undefined.");
-      return;
-    }
-
-    if (typeof tagId === "object") {
-      tagId = tagId.id;
-    }
+    if (!tagId) return console.error("tagId cannot be undefined.");
+    if (typeof tagId === "object")
+      throw new Error("tagId cannot be an object: " + JSON.stringify(tagId));
 
     let tag = this.tag(tagId) || {
       title: tagId,
@@ -63,11 +58,13 @@ export default class Tags extends Collection {
       console.error(`No tag found. Tag id:`, tagId);
       return;
     }
+
     for (let noteId of tag.noteIds) {
       const note = this._db.notes.note(noteId);
       if (!note) continue;
-      await note.untag(tagId);
+      if (hasItem(note.tags, tag.title)) await note.untag(tag.title);
     }
+
     await this._db.settings.unpin(tagId);
     await this._collection.deleteItem(tagId);
   }

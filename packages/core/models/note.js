@@ -3,6 +3,7 @@ import HTMLBuilder from "../utils/templates/html/builder";
 import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
 import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
+import { addItem, deleteItem } from "../utils/array";
 
 export default class Note {
   /**
@@ -114,11 +115,17 @@ export default class Note {
       !(await sendCheckUserStatusEvent(CHECK_IDS.noteTag))
     )
       return;
-    return await addTag.call(this, tag);
+
+    let tagItem = await this._db.tags.add(tag, this._note.id);
+    if (addItem(this._note.tags, tagItem.title))
+      await this._db.notes._collection.addItem(this._note);
   }
 
-  untag(tag) {
-    return removeTag.call(this, tag);
+  async untag(tag) {
+    if (deleteItem(this._note.tags, tag)) {
+      await this._db.notes._collection.addItem(this._note);
+    } else console.error("This note is not tagged by the specified tag.", tag);
+    await this._db.tags.untag(tag, this._note.id);
   }
 
   _toggle(prop) {
@@ -132,25 +139,4 @@ export default class Note {
   pin() {
     return this._toggle("pinned");
   }
-}
-
-async function addTag(tag) {
-  if (this._note.tags.indexOf(tag) > -1)
-    return console.error("Cannot add a duplicate tag.");
-
-  let tagItem = await this._db.tags.add(tag, this._note.id);
-  let arr = [...this._note.tags, tagItem.title];
-  const note = { ...this._note, tags: arr };
-  await this._db.notes._collection.addItem(note);
-}
-
-async function removeTag(tag) {
-  if (this._note.tags.indexOf(tag) <= -1)
-    return console.error("This note is not tagged by the specified tag.");
-
-  let arr = [...this._note.tags];
-  arr.splice(arr.indexOf(tag), 1);
-  const note = { ...this._note, tags: arr };
-  await this._db.tags.untag(tag, note.id);
-  await this._db.notes._collection.addItem(note);
 }

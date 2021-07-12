@@ -2,6 +2,13 @@ export function findItemAndDelete(array, predicate) {
   return deleteAtIndex(array, array.findIndex(predicate));
 }
 
+export function addItem(array, item) {
+  const index = array.indexOf(item);
+  if (index > -1) return false;
+  array.push(item);
+  return true;
+}
+
 export function deleteItem(array, item) {
   return deleteAtIndex(array, array.indexOf(item));
 }
@@ -14,6 +21,10 @@ export function deleteItems(array, ...items) {
 
 export function findById(array, id) {
   return array.find((item) => item.id === id);
+}
+
+export function hasItem(array, item) {
+  return array.indexOf(item) > -1;
 }
 
 function deleteAtIndex(array, index) {
