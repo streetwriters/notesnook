@@ -41,7 +41,15 @@ const KEY_SELECTORS = {
  * @param {GroupOptions} options
  * @returns Grouped array
  */
-export function groupArray(array, options) {
+export function groupArray(
+  array,
+  options = {
+    groupId: undefined,
+    sortBy: "dateEdited",
+    groupBy: "dateEdited",
+    sortDirection: "desc",
+  }
+) {
   const keySelector = KEY_SELECTORS[options.groupId || "default"];
   if (options.sortBy && options.sortDirection)
     fastsort(array).by(getSortSelectors(options));
