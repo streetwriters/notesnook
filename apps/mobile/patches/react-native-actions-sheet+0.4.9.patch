@@ -1,0 +1,35 @@
+diff --git a/node_modules/react-native-actions-sheet/src/index.js b/node_modules/react-native-actions-sheet/src/index.js
+index 7b2becc..4962a5b 100644
+--- a/node_modules/react-native-actions-sheet/src/index.js
++++ b/node_modules/react-native-actions-sheet/src/index.js
+@@ -388,7 +388,8 @@ export default class ActionSheet extends Component {
+ 
+     let correction = this.state.deviceHeight * 0.15;
+     let distanceFromTop = this.actionSheetHeight + correction - this.offsetY;
+-    if (distanceFromTop < 3) {
++
++    if (this.actionSheetHeight < this.offsetY) {
+       if (!this.isReachedTop) {
+         this.isReachedTop = true;
+         this.props.onPositionChanged && this.props.onPositionChanged(true);
+@@ -438,7 +439,7 @@ export default class ActionSheet extends Component {
+ 
+   _onKeyboardShow = (e) => {
+     this.setState({
+-      keyboard: true
++      keyboard: true,
+     });
+     const ReactNativeVersion = require("react-native/Libraries/Core/ReactNativeVersion");
+ 
+@@ -466,8 +467,10 @@ export default class ActionSheet extends Component {
+           if (gap >= 0) {
+             return;
+           }
++          let toValue = this.props.keyboardMode === "position" ? -(keyboardHeight + 15) : gap - 10
++          
+           Animated.timing(this.transformValue, {
+-            toValue: gap - 10,
++            toValue:toValue,
+             duration: 250,
+             useNativeDriver: true
+           }).start();
