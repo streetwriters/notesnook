@@ -41,10 +41,9 @@ function encrypt(password, data) {
 }
 
 function decrypt(key, data) {
-  return new Promise((resolve, reject) => {
-    if (!key || key.password === data.key.password) resolve(data.cipher);
-    else reject("Wrong password");
-  });
+  if (!key || key.password === data.key.password)
+    return Promise.resolve(data.cipher);
+  else throw new Error("Wrong password");
 }
 
 async function deriveCryptoKey(name, data) {
