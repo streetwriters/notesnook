@@ -8,5 +8,5 @@
  */
 
 /**
- * @typedef {"home" | "notes" | "notebooks" | "tags" | "topics" | "trash"} GroupingKey
+ * @typedef {"home" | "notes" | "notebooks" | "tags" | "topics" | "trash" | "favorites"} GroupingKey
  */
