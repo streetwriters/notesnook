@@ -43,7 +43,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {presentDialog} from '../Dialog/functions';
-import { PressableButton } from '../PressableButton';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
@@ -165,7 +165,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Pin',
-      title: note.pinned ? 'Unpin from top' : 'Pin to top',
+      title: note.pinned ? 'Unpin' : 'Pin to top',
       icon: note.pinned ? 'pin-off-outline' : 'pin-outline',
       func: async () => {
         if (!note.id) return;
@@ -201,7 +201,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Favorite',
-      title: !note.favorite ? 'Add to favorites' : 'Remove from favorites',
+      title: !note.favorite ? 'Favorite' : 'Unfavorite',
       icon: note.favorite ? 'star-off' : 'star-outline',
       func: async () => {
         if (!note.id) return;
@@ -405,6 +405,31 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.pinMenu,
     },
     {
+      name: 'Edit Tag',
+      title: 'Edit tag',
+      icon: 'square-edit-outline',
+      func: async () => {
+        close();
+        await sleep(300);
+        presentDialog({
+          title: 'Edit tag',
+          paragraph: 'Change the title of the tag',
+          positivePress: async value => {
+            await db.tags.rename(note.id,value);
+            Navigation.setRoutesToUpdate([
+              Navigation.routeNames.Notes,
+              Navigation.routeNames.NotesPage,
+              Navigation.routeNames.Tags
+            ]);
+          },
+          input: true,
+          defaultValue: note.title,
+          inputPlaceholder: 'Enter tag title',
+          positiveText: 'Save',
+        });
+      },
+    },
+    {
       name: 'Share',
       title: 'Share',
       icon: 'share-variant',
@@ -468,6 +493,24 @@ export const ActionSheetComponent = ({
       type: 'error',
       func: async () => {
         close();
+        if (note.type === 'tag') {
+          await sleep(300);
+          presentDialog({
+            title: 'Delete tag',
+            paragraph: 'This tag will be removed from all notes.',
+            positivePress: async value => {
+              await db.tags.remove(note.id);
+              Navigation.setRoutesToUpdate([
+                Navigation.routeNames.Notes,
+                Navigation.routeNames.NotesPage,
+                Navigation.routeNames.Tags
+              ]);
+            },
+            positiveText: 'Delete',
+            positiveType: 'errorShade',
+          });
+          return;
+        }
         if (note.locked) {
           await sleep(300);
           openVault({
@@ -513,7 +556,7 @@ export const ActionSheetComponent = ({
     },
   ];
 
-  let columnsCount = rowItems.length < 5 ? rowItems.length : 5;
+  let columnItemWidth = DDS.isTab ? (400 - 24) / rowItems.length : (w - 24) / 5;
   const _renderRowItem = rowItem => (
     <View
       onPress={rowItem.func}
@@ -521,17 +564,15 @@ export const ActionSheetComponent = ({
       testID={'icon-' + rowItem.name}
       style={{
         alignItems: 'center',
-        width: DDS.isTab
-          ? (400 - 24) / rowItems.length
-          : (w - 24) / columnsCount,
-        marginBottom: 5,
+        width: columnItemWidth,
+        marginBottom: 10,
       }}>
       <PressableButton
         onPress={rowItem.func}
-        type="grayBg"
+        type={rowItem.on ? 'accent' : 'grayBg'}
         customStyle={{
-          height: (w - 24) / columnsCount - 12,
-          width: (w - 24) / columnsCount - 12,
+          height: columnItemWidth - 12,
+          width: columnItemWidth - 12,
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
@@ -542,13 +583,17 @@ export const ActionSheetComponent = ({
         <Icon
           name={rowItem.icon}
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
-          color={rowItem.name === 'Delete' ? colors.errorText : colors.accent}
+          color={
+            rowItem.on
+              ? colors.light
+              : rowItem.name === 'Delete' || rowItem.name === 'PermDelete'
+              ? colors.errorText
+              : colors.icon
+          }
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.sm} style={{textAlign: 'center'}}>
-        {rowItem.title}
-      </Paragraph>
+      <Paragraph style={{textAlign: 'center'}}>{rowItem.title}</Paragraph>
     </View>
   );
 
@@ -779,10 +824,11 @@ export const ActionSheetComponent = ({
             paddingTop: 20,
           }}
           columnWrapperStyle={{
-            justifyContent: 'flex-start',
+            justifyContent: rowItems.length < 5 ? 'space-around' : 'flex-start',
           }}
           contentContainerStyle={{
             alignSelf: 'center',
+            width: rowItems.length < 5 ? '100%' : null,
           }}
           renderItem={({item, index}) => _renderRowItem(item)}
         />

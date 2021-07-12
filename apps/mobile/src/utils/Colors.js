@@ -11,7 +11,7 @@ export const ACCENT = {
 export const COLORS_NOTE = {
   red: '#f44336',
   orange: '#FF9800',
-  yellow: '#FFD600',
+  yellow: '#F9D71C',
   green: '#4CAF50',
   blue: '#2196F3',
   purple: '#673AB7',

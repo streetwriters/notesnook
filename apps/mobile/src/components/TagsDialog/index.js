@@ -156,7 +156,7 @@ const TagsDialog = () => {
           overScrollMode="never"
           scrollToOverflowEnabled={false}
           keyboardDismissMode="none"
-          keyboardShouldPersistTaps="never"
+          keyboardShouldPersistTaps="always"
           onMomentumScrollEnd={() => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}>
