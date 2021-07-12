@@ -130,13 +130,19 @@ export const sortSettings = {
   sortOrder: 'desc',
 };
 
-export const SORT = {
+export const GROUP = {
   default: null,
   alphabetical: 'abc',
   year: 'year',
   week: 'week',
   month: 'month',
 };
+
+export const SORT = {
+  dateEdited:"Date edited",
+  dateCreated:"Date created",
+  title:"Title",
+}
 
 export const editing = {
   currentlyEditing: false,

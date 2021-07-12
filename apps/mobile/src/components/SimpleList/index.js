@@ -179,7 +179,7 @@ const SimpleList = ({
         }
       />
 
-      <JumpToDialog scrollRef={scrollRef} />
+      <JumpToDialog screen={screen} type={screen === "Notes" ? "home" : type} scrollRef={scrollRef} />
     </>
   );
 };

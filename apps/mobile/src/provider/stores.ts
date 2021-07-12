@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import { history, SORT, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
+import { history, SORT, GROUP, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/DB';
 import { MMKV } from '../utils/mmkv';
 import {
@@ -20,7 +20,7 @@ import {
   UserStore,
   Announcement,
 } from './interfaces';
-
+import { groupArray } from "notes-core/utils/grouping"
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -29,7 +29,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   setNotes: items => {
     if (!items) {
       set({
-        notes: db.notes.group(SORT[sortSettings.sort], sortSettings.sortOrder),
+        notes: groupArray(db.notes.all, db.settings?.getGroupOptions("home")),
       });
       return;
     }
@@ -51,7 +51,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
   setNotebooks: items => {
     if (!items) {
       set({
-        notebooks: db.notebooks.all,
+        notebooks: groupArray(db.notebooks.all, db.settings?.getGroupOptions("notebooks")),
       });
       return;
     }
@@ -73,7 +73,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
   setFavorites: items => {
     if (!items) {
       set({
-        favorites: db.notes.favorites,
+        favorites: groupArray(db.notes.favorites, db.settings?.getGroupOptions("favorites")),
       });
       return;
     }
@@ -95,7 +95,7 @@ export const useTagStore = create<TagStore>((set, get) => ({
   setTags: items => {
     if (!items) {
       set({
-        tags: db.tags.all,
+        tags: groupArray(db.tags.all, db.settings?.getGroupOptions("tags")),
       });
       return;
     }
@@ -117,7 +117,7 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
   setTrash: items => {
     if (!items) {
       set({
-        trash: db.trash.all,
+        trash: groupArray(db.trash.all, db.settings?.getGroupOptions("trash")),
       });
       return;
     }

@@ -1,69 +1,44 @@
-import React, {createRef} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, { createRef } from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {Actions} from '../../provider/Actions';
-import {defaultState} from '../../provider/DefaultState';
-import { useNoteStore } from '../../provider/stores';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
-import {getElevation, SORT, sortSettings} from '../../utils';
-import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import Navigation from '../../services/Navigation';
+import { GROUP, SORT } from '../../utils';
+import { db } from '../../utils/DB';
+import { eCloseSortDialog, eOpenSortDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {updateEvent} from '../DialogManager/recievers';
-import {PressableButton} from '../PressableButton';
+import { Button } from '../Button';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
-
-const actionSheet = createRef();
+import Paragraph from '../Typography/Paragraph';
 
 class SortDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      settings: {
-        showToolbarOnTop: false,
-        showKeyboardOnOpen: false,
-        fontScale: 1,
-        forcePortraitOnTablet: false,
-        useSystemTheme: false,
-        reminder: 'off',
-        encryptedBackup: false,
-        homepage: 'Notes',
-        sort: 'default',
-        sortOrder: 'desc',
-        screenshotMode: true,
-        privacyScreen: false,
-        appLockMode: 'none', //none or // background // launch
-      },
+      groupOptions: db?.settings?.getGroupOptions(this.props.type),
       visible: false,
     };
+    this.actionSheet = createRef();
   }
 
   async open() {
     this.setState(
       {
         visible: true,
+        groupOptions: db.settings.getGroupOptions(this.props.type),
       },
       async () => {
-        actionSheet.current?.setModalVisible(true);
-        await this.getSettings();
+        this.actionSheet.current?.setModalVisible(true);
       },
     );
   }
 
-  async getSettings() {
-    let settings = await MMKV.getItem('appSettings');
-    this.setState({
-      settings: JSON.parse(settings),
-    });
-  }
-
   async close() {
-    actionSheet.current?.setModalVisible(false);
+    this.actionSheet.current?.setModalVisible(false);
     await sleep(100);
     this.setState({
       visible: false,
@@ -80,13 +55,22 @@ class SortDialog extends React.Component {
     eUnSubscribeEvent(eCloseSortDialog, this.close);
   }
 
+  updateGroupOptions = async () => {
+    await db.settings.setGroupOptions(this.props.type, _groupOptions);
+    this.setState({
+      groupOptions: _groupOptions,
+    });
+    Navigation.setRoutesToUpdate([this.props.screen]);
+  };
+
   render() {
     const {colors} = this.props;
+    const {groupOptions, visible} = this.state;
 
-    if (!this.state.visible) return null;
+    if (!visible) return null;
 
     return (
-      <ActionSheetWrapper fwdRef={actionSheet}>
+      <ActionSheetWrapper fwdRef={this.actionSheet}>
         <View
           style={{
             width: '100%',
@@ -94,6 +78,7 @@ class SortDialog extends React.Component {
             justifyContent: 'space-between',
             borderRadius: 10,
             paddingTop: 10,
+            paddingHorizontal: 12,
           }}>
           <View>
             <View
@@ -101,7 +86,6 @@ class SortDialog extends React.Component {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
-                paddingHorizontal: 12,
               }}>
               <Heading
                 size={SIZE.xl}
@@ -111,71 +95,93 @@ class SortDialog extends React.Component {
                 Sort by
               </Heading>
 
-              <TouchableOpacity
-                testID={notesnook.ids.dialogs.sortBy.order}
-                onPress={async () => {
-                  let value =
-                    this.state.settings?.sortOrder === 'asc' ? 'desc' : 'asc';
-                  await SettingsService.set('sortOrder', value);
-                  sortSettings.sortOrder = value;
-                  await this.getSettings();
-                  useNoteStore.getState().setNotes();
-                }}
-                activeOpacity={1}
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  backgroundColor: colors.accent,
-                  borderRadius: 100,
-                  paddingHorizontal: 8,
-                  height: 22,
-                  ...getElevation(2),
-                }}>
-                <Heading
-                  size={SIZE.sm}
-                  style={{
-                    marginRight: 5,
-                    color: 'white',
-                  }}>
-                  {this.state.settings?.sortOrder === 'asc'
+              <Button
+                title={
+                  groupOptions.sortDirection === 'asc'
                     ? 'Ascending'
-                    : 'Descending'}
-                </Heading>
-                <Icon
-                  color="white"
-                  name={
-                    this.state.settings?.sortOrder === 'asc'
-                      ? 'sort-ascending'
-                      : 'sort-descending'
-                  }
-                  size={SIZE.md}
-                />
-              </TouchableOpacity>
+                    : 'Descending'
+                }
+                icon={
+                  groupOptions.sortDirection === 'asc'
+                    ? 'sort-ascending'
+                    : 'sort-descending'
+                }
+                height={25}
+                iconPosition="right"
+                type="accent"
+                style={{
+                  borderRadius: 100,
+                }}
+                onPress={async () => {
+                  let _groupOptions = {
+                    ...groupOptions,
+                    sortDirection:
+                      groupOptions.sortDirection === 'asc' ? 'desc' : 'asc',
+                  };
+                  await this.updateGroupOptions(_groupOptions);
+                }}
+              />
             </View>
+
+            <Seperator />
+            <View
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-around',
+              }}>
+              {Object.keys(SORT).map((item, index) => (
+                <Button
+                  type="gray"
+                  title={SORT[item]}
+                  height={40}
+                  iconPosition="left"
+                  icon="checkbox-blank-circle-outline"
+                  fontSize={SIZE.sm}
+                  style={{
+                    backgroundColor: 'transparent',
+                  }}
+                  onPress={async () => {
+                    let _groupOptions = {
+                      ...groupOptions,
+                      sortBy: type === 'trash' ? 'dateDeleted' : item,
+                    };
+                    await this.updateGroupOptions(_groupOptions);
+                  }}
+                  iconSize={SIZE.lg}
+                />
+              ))}
+            </View>
+
+            <Seperator />
+            <View>
+              <Heading size={SIZE.xl}>Group by</Heading>
+            </View>
+
             <Seperator />
 
-            {Object.keys(SORT).map((item, index) => (
+            {Object.keys(GROUP).map((item, index) => (
               <PressableButton
                 key={item}
                 testID={'btn-' + item}
                 type={this.state.settings?.sort === item ? 'shade' : 'gray'}
                 onPress={async () => {
-                  await SettingsService.set('sort', item);
-                  await this.getSettings();
-                  sortSettings.sort = item;
-                  useNoteStore.getState().setNotes();
+                  let _groupOptions = {
+                    ...groupOptions,
+                    groupBy: GROUP[item],
+                  };
+                  this.updateGroupOptions(_groupOptions);
                 }}
-                type="transparent"
                 customStyle={{
                   width: '100%',
                   height: 50,
                   justifyContent: 'space-between',
                   flexDirection: 'row',
                   alignItems: 'center',
-                  borderRadius: 0,
+                  borderRadius: 5,
                   paddingHorizontal: 12,
+                  marginBottom: 10,
                 }}>
-                <Heading
+                <Paragraph
                   size={SIZE.sm}
                   color={
                     this.state.settings?.sort === item
@@ -183,19 +189,13 @@ class SortDialog extends React.Component {
                       : colors.pri
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
-                </Heading>
+                </Paragraph>
                 {this.state.settings?.sort === item ? (
                   <Icon color={colors.accent} name="check" size={SIZE.lg} />
                 ) : null}
               </PressableButton>
             ))}
           </View>
-
-          <View
-            style={{
-              height: 25,
-            }}
-          />
         </View>
       </ActionSheetWrapper>
     );

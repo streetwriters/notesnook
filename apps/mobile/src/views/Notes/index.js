@@ -1,3 +1,4 @@
+import {groupArray} from 'notes-core/utils/grouping';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
@@ -57,7 +58,7 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
-    setNotes(_notes);
+    setNotes(groupArray(_notes, 'notes'));
     if (params.menu) {
       navigation.setOptions({
         animationEnabled: true,

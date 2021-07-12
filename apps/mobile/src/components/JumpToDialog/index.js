@@ -21,10 +21,7 @@ let timeout = null;
 const JumpToDialog = ({scrollRef}) => {
   const [state] = useTracked();
   const {colors} = state;
-
   const notes = useNoteStore(state => state.notes);
-  const settings = useSettingStore(state => state.settings);
-
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
@@ -117,8 +114,7 @@ const JumpToDialog = ({scrollRef}) => {
           style={{
             alignSelf: 'center',
           }}>
-          {settings.sort.slice(0, 1).toUpperCase() +
-            settings.sort.slice(1, settings.sort.length)}
+          Jump to
         </Heading>
         <Seperator />
         <ScrollView
@@ -142,12 +138,11 @@ const JumpToDialog = ({scrollRef}) => {
               type="shade"
               customStyle={{
                 minWidth: '20%',
-                maxWidth: '46%',
                 width: null,
-                paddingHorizontal: 10,
+                paddingHorizontal: 12,
                 margin: 5,
                 borderRadius: 100,
-                height: 22,
+                height: 25,
               }}>
               <Heading
                 size={SIZE.sm}
@@ -168,12 +163,11 @@ const JumpToDialog = ({scrollRef}) => {
                     type={currentIndex === index ? 'accent' : 'shade'}
                     customStyle={{
                       minWidth: '20%',
-                      maxWidth: '46%',
                       width: null,
-                      paddingHorizontal: 0,
+                      paddingHorizontal: 12,
                       margin: 5,
                       borderRadius: 100,
-                      height: 22,
+                      height: 25,
                     }}>
                     <Heading
                       size={SIZE.sm}

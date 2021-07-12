@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {UIManager} from 'react-native';
 import {
   ActivityIndicator,
   ScrollView,
@@ -64,7 +65,7 @@ function getEmail() {
     return gp2;
   });
 }
-
+let offsetY = 0;
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -80,7 +81,7 @@ const LoginDialog = () => {
   const [error, setError] = useState(false);
   const [focused, setFocused] = useState(false);
   const [confirm, setConfirm] = useState(false);
-
+  const scrollViewRef = useRef();
   const actionSheetRef = useRef();
   const _email = useRef();
   const _pass = useRef();
@@ -471,6 +472,7 @@ const LoginDialog = () => {
       ) : null}
 
       <ScrollView
+        ref={scrollViewRef}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="none"
         nestedScrollEnabled
@@ -480,7 +482,7 @@ const LoginDialog = () => {
         style={{
           maxHeight: DDS.isTab ? '90%' : '100%',
           width: DDS.isTab ? 500 : '100%',
-          minHeight:!DDS.isTab && "90%",
+          minHeight: !DDS.isTab ? '90%' : null,
           height: MODES.sessionExpired === mode ? '100%' : null,
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,

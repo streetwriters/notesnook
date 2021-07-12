@@ -32,11 +32,7 @@ export const SectionHeader = ({
       }}>
       <TouchableOpacity
         onPress={() => {
-          console.log('called');
-          if (jumpToDialog) {
-            console.log('sending event');
-            eSendEvent(eOpenJumpToDialog);
-          }
+          eSendEvent(eOpenJumpToDialog);
         }}
         activeOpacity={0.9}
         hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
@@ -55,7 +51,7 @@ export const SectionHeader = ({
           {!item.title || item.title === '' ? 'Pinned' : item.title}
         </Heading>
       </TouchableOpacity>
-      {index === 0 && sortMenuButton ? <HeaderMenu /> : null}
+      {index === 0 ? <HeaderMenu /> : null}
     </View>
   );
 };
