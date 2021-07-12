@@ -4,7 +4,6 @@ import Dialog from "./dialog";
 import Field from "../field";
 import { Checkbox, Label } from "@rebass/forms";
 
-const requiredValues = ["password", "newPassword", "oldPassword"];
 function PasswordDialog(props) {
   const { type, checks } = props;
   const [error, setError] = useState();

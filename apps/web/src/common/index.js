@@ -9,7 +9,6 @@ import {
   showPasswordDialog,
 } from "../common/dialog-controller";
 import Config from "../utils/config";
-import { store as userstore } from "../stores/user-store";
 import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";

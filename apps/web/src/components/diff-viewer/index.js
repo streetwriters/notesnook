@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import * as Icon from "../icons";
 import ContentToggle from "./content-toggle";
@@ -6,7 +6,6 @@ import { store as notesStore } from "../../stores/note-store";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
-import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useEditorStore } from "../../stores/editor-store";
 import { hashNavigate } from "../../navigation";
 import HTMLDiffer from "./differ";
@@ -127,7 +126,7 @@ function DiffViewer(props) {
       conflicts = undefined;
       currentConflict = undefined;
     })();
-  }, []);
+  }, [noteId, resolveConflict]);
 
   useEffect(() => {
     let cssPath = "";

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import ListContainer from "../components/list-container";
 import SearchPlaceholder from "../components/placeholders/search-placeholder";
 import { db } from "../common/db";

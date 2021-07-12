@@ -7,7 +7,6 @@ import { store as notebookStore } from "../stores/notebook-store";
 import { store as appStore } from "../stores/app-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { CHECK_IDS } from "notes-core/common";
 import { Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import download from "../utils/download";

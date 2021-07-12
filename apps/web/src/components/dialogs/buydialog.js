@@ -3,7 +3,6 @@ import { Text, Flex, Button } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { useStore as useThemeStore } from "../../stores/theme-store";
 import { getCouponData, upgrade } from "../../common/checkout";
 import { showLogInDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
