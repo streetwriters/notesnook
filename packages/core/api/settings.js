@@ -16,7 +16,8 @@ class Settings {
     this._initSettings();
     var settings = await this._db.context.read("settings");
     if (settings) this._settings = settings;
-    else await this._saveSettings();
+    if (!this._settings.groupOptions) this._settings.groupOptions = {};
+    await this._saveSettings();
 
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._settings = undefined;
