@@ -295,7 +295,6 @@ export class DialogManager extends Component {
         <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
-        <SortDialog colors={colors} />
 
         <UpdateDialog />
         <RateDialog />

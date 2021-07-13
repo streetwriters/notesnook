@@ -1,18 +1,19 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, RefreshControl} from 'react-native';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import { eScrollEvent } from '../../utils/Events';
+import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
-import { NotebookWrapper } from '../NotebookItem/wrapper';
-import { NoteWrapper } from '../NoteItem/wrapper';
+import {NotebookWrapper} from '../NotebookItem/wrapper';
+import {NoteWrapper} from '../NoteItem/wrapper';
+import SortDialog from '../SortDialog';
 import TagItem from '../TagItem';
-import { Empty } from './empty';
-import { Footer } from './footer';
-import { Header } from './header';
-import { SectionHeader } from './section-header';
+import {Empty} from './empty';
+import {Footer} from './footer';
+import {Header} from './header';
+import {SectionHeader} from './section-header';
 
 const heights = {
   note: 100,
@@ -30,11 +31,11 @@ let renderItems = {
   section: SectionHeader,
 };
 
-const RenderItem = ({item,index}) => {
-  const Item = renderItems[item.itemType || item.type]
+const RenderItem = ({item, index}) => {
+  const Item = renderItems[item.itemType || item.type];
 
-  return <Item item={item} index={index} />
-}
+  return <Item item={item} index={index} />;
+};
 
 const SimpleList = ({
   listData,
@@ -179,7 +180,16 @@ const SimpleList = ({
         }
       />
 
-      <JumpToDialog screen={screen} type={screen === "Notes" ? "home" : type} scrollRef={scrollRef} />
+      <SortDialog
+        screen={screen}
+        type={screen === 'Notes' ? 'home' : type}
+        colors={colors}
+      />
+      <JumpToDialog
+        screen={screen}
+        type={screen === 'Notes' ? 'home' : type}
+        scrollRef={scrollRef}
+      />
     </>
   );
 };

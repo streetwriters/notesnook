@@ -27,8 +27,7 @@ export const SectionHeader = ({
         justifyContent: 'space-between',
         paddingHorizontal: 12,
         height: 35 * fontScale,
-        backgroundColor: colors.nav,
-        marginTop: index === 0 ? 0 : 5 * fontScale,
+        backgroundColor:colors.nav,
       }}>
       <TouchableOpacity
         onPress={() => {

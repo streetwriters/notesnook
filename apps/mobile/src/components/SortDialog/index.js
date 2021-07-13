@@ -19,7 +19,7 @@ class SortDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      groupOptions: db?.settings?.getGroupOptions(this.props.type),
+      groupOptions: null,
       visible: false,
     };
     this.actionSheet = createRef();
@@ -55,7 +55,9 @@ class SortDialog extends React.Component {
     eUnSubscribeEvent(eCloseSortDialog, this.close);
   }
 
-  updateGroupOptions = async () => {
+  updateGroupOptions = async (_groupOptions) => {
+    _groupOptions.groupId = this.props.type
+    console.log(this.props.type);
     await db.settings.setGroupOptions(this.props.type, _groupOptions);
     this.setState({
       groupOptions: _groupOptions,
@@ -131,11 +133,11 @@ class SortDialog extends React.Component {
               }}>
               {Object.keys(SORT).map((item, index) => (
                 <Button
-                  type="gray"
+                  type={groupOptions.sortBy === item? "transparent" : "gray"}
                   title={SORT[item]}
                   height={40}
                   iconPosition="left"
-                  icon="checkbox-blank-circle-outline"
+                  icon={groupOptions.sortBy === item ? "check-circle-outline" : "checkbox-blank-circle-outline"}
                   fontSize={SIZE.sm}
                   style={{
                     backgroundColor: 'transparent',
@@ -163,7 +165,7 @@ class SortDialog extends React.Component {
               <PressableButton
                 key={item}
                 testID={'btn-' + item}
-                type={this.state.settings?.sort === item ? 'shade' : 'gray'}
+                type={groupOptions.groupBy === GROUP[item] ? 'shade' : 'gray'}
                 onPress={async () => {
                   let _groupOptions = {
                     ...groupOptions,
@@ -181,16 +183,16 @@ class SortDialog extends React.Component {
                   paddingHorizontal: 12,
                   marginBottom: 10,
                 }}>
-                <Paragraph
+                <Heading
                   size={SIZE.sm}
                   color={
-                    this.state.settings?.sort === item
+                    groupOptions.groupBy === GROUP[item] 
                       ? colors.accent
-                      : colors.pri
+                      : colors.icon
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
-                </Paragraph>
-                {this.state.settings?.sort === item ? (
+                </Heading>
+                {groupOptions.groupBy === GROUP[item] ? (
                   <Icon color={colors.accent} name="check" size={SIZE.lg} />
                 ) : null}
               </PressableButton>
