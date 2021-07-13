@@ -54,40 +54,19 @@ const SimpleList = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-
-  const [dataProvider, setDataProvider] = useState([]);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
   const refreshing = false;
 
   useEffect(() => {
     if (!loading) {
-      setDataProvider(
-        dataProvider.length < 2 &&
-          listData.length >= 1 &&
-          SettingsService.get().homepage !== screen
-          ? listData.slice(0, 1)
-          : listData,
-      );
-
-      if (
-        !listData ||
-        listData.length === 0 ||
-        SettingsService.get().homepage === screen
-      ) {
-        setTimeout(() => {
-          _setLoading(false);
-        }, 1);
-        return;
-      }
       setTimeout(() => {
-        setDataProvider(listData);
         _setLoading(false);
-      }, 150);
+      }, 300);
     } else {
-      setDataProvider([]);
+      _setLoading(true);
     }
-  }, [loading, listData]);
+  }, [loading]);
 
   const renderItem = React.useCallback(
     ({item, index}) =>
@@ -140,7 +119,7 @@ const SimpleList = ({
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
-        data={dataProvider}
+        data={_loading ? listData.slice(0,9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}
         initialNumToRender={10}

@@ -56,8 +56,6 @@ class SortDialog extends React.Component {
   }
 
   updateGroupOptions = async (_groupOptions) => {
-    _groupOptions.groupId = this.props.type
-    console.log(this.props.type);
     await db.settings.setGroupOptions(this.props.type, _groupOptions);
     this.setState({
       groupOptions: _groupOptions,
@@ -133,6 +131,7 @@ class SortDialog extends React.Component {
               }}>
               {Object.keys(SORT).map((item, index) => (
                 <Button
+                  key={item}
                   type={groupOptions.sortBy === item? "transparent" : "gray"}
                   title={SORT[item]}
                   height={40}
@@ -171,6 +170,7 @@ class SortDialog extends React.Component {
                     ...groupOptions,
                     groupBy: GROUP[item],
                   };
+
                   this.updateGroupOptions(_groupOptions);
                 }}
                 customStyle={{

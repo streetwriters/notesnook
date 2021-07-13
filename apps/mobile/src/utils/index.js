@@ -131,7 +131,7 @@ export const sortSettings = {
 };
 
 export const GROUP = {
-  default: "dateEdited",
+  default: "default",
   alphabetical: 'abc',
   year: 'year',
   week: 'week',
