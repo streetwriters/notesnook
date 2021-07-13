@@ -44,13 +44,12 @@ const KEY_SELECTORS = {
 export function groupArray(
   array,
   options = {
-    groupId: undefined,
+    groupBy: undefined,
     sortBy: "dateEdited",
-    groupBy: "dateEdited",
     sortDirection: "desc",
   }
 ) {
-  const keySelector = KEY_SELECTORS[options.groupId || "default"];
+  const keySelector = KEY_SELECTORS[options.groupBy || "default"];
   if (options.sortBy && options.sortDirection)
     fastsort(array).by(getSortSelectors(options));
 
@@ -60,7 +59,7 @@ export function groupArray(
       ? "Pinned"
       : item.conflicted
       ? "Conflicted"
-      : keySelector(item, options.groupBy);
+      : keySelector(item, options.sortBy);
 
     let group = groups.get(groupTitle) || [];
     group.push(item);

@@ -56,10 +56,9 @@ const groupedTest = (type) =>
       dateCreated: getLastWeekTimestamp() - 604800000 * 2,
     });
     let grouped = groupArray(db.notes.all, {
-      groupId: type,
+      groupBy: type,
       sortDirection: "desc",
       sortBy: "dateCreated",
-      groupBy: "dateCreated",
     });
     expect(grouped.length).toBeGreaterThan(0);
     expect(grouped.some((i) => i.type === "header")).toBe(true);

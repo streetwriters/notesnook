@@ -63,9 +63,8 @@ class Settings {
   getGroupOptions(key) {
     return (
       this._settings.groupOptions[key] || {
-        groupId: undefined,
+        groupBy: undefined,
         sortBy: "dateEdited",
-        groupBy: "dateEdited",
         sortDirection: "desc",
       }
     );

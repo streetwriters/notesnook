@@ -1,7 +1,6 @@
 /**
  * @typedef {{
- *  groupId: "abc" | "year" | "month" | "week" | undefined,
- *  groupBy: "dateCreated" | "dateDeleted" | "dateEdited",
+ *  groupBy: "abc" | "year" | "month" | "week" | undefined,
  *  sortBy: "dateCreated" | "dateDeleted" | "dateEdited" | "title",
  *  sortDirection: "desc" | "asc"
  * }} GroupOptions

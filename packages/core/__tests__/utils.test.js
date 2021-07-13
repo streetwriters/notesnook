@@ -8,7 +8,7 @@ test("group alphabetically", () => {
     .split("")
     .map((a) => ({ title: a, item: true }));
   let ret = groupArray(alphabet, {
-    groupId: "abc",
+    groupBy: "abc",
     sortDirection: "asc",
     sortBy: "title",
   }).filter((v) => !v.item);
