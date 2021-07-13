@@ -74,9 +74,7 @@ const SimpleList = ({
         <SectionHeader
           item={item}
           index={index}
-          headerProps={headerProps}
-          jumpToDialog={jumpToDialog}
-          sortMenuButton={sortMenuButton}
+          type={screen === 'Notes' ? 'home' : type}
         />
       ) : (
         <RenderItem item={item} index={index} />
@@ -166,6 +164,7 @@ const SimpleList = ({
       />
       <JumpToDialog
         screen={screen}
+        data={listData}
         type={screen === 'Notes' ? 'home' : type}
         scrollRef={scrollRef}
       />

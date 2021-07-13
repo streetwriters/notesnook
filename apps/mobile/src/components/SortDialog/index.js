@@ -1,7 +1,7 @@
 import React, { createRef } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { GROUP, SORT } from '../../utils';
 import { db } from '../../utils/DB';
@@ -13,7 +13,6 @@ import { Button } from '../Button';
 import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 class SortDialog extends React.Component {
   constructor(props) {
@@ -25,7 +24,8 @@ class SortDialog extends React.Component {
     this.actionSheet = createRef();
   }
 
-  async open() {
+  async open(type) {
+    if (type !== this.props.type) return;
     this.setState(
       {
         visible: true,
@@ -61,6 +61,7 @@ class SortDialog extends React.Component {
       groupOptions: _groupOptions,
     });
     Navigation.setRoutesToUpdate([this.props.screen]);
+    eSendEvent('groupOptionsUpdate')
   };
 
   render() {

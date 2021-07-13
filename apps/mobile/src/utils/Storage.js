@@ -8,7 +8,9 @@ import * as Keychain from 'react-native-keychain';
 
 let RNFetchBlob;
 async function read(key) {
+  if (!key) return null;
   let data = await MMKV.getItem(key);
+
   if (!data) return null;
   try {
     return JSON.parse(data);

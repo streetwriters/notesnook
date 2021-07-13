@@ -4,7 +4,11 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
-import {useNoteStore, useSettingStore} from '../../provider/stores';
+import {
+  useMessageStore,
+  useNoteStore,
+  useSettingStore,
+} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
@@ -18,10 +22,10 @@ import Heading from '../Typography/Heading';
 
 const offsets = [];
 let timeout = null;
-const JumpToDialog = ({scrollRef}) => {
+const JumpToDialog = ({scrollRef, data, type, screen}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const notes = useNoteStore(state => state.notes);
+  const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
@@ -30,9 +34,12 @@ const JumpToDialog = ({scrollRef}) => {
     let ind = notes.findIndex(
       i => i.title === item.title && i.type === 'header',
     );
+    let messageState = useMessageStore.getState().message;
+    let msgOffset = messageState?.visible ? 60 : 10;
     ind = ind + 1;
     ind = ind - (index + 1);
-    offset = offset + ind * 100 + 200;
+    offset = offset + ind * 100 + msgOffset;
+    console.log(scrollRef.current?.scrollToOffset);
     scrollRef.current?.scrollToOffset({
       offset: offset,
       animated: true,
@@ -63,7 +70,8 @@ const JumpToDialog = ({scrollRef}) => {
     }, 200);
   };
 
-  const open = () => {
+  const open = _type => {
+    if (_type !== type) return;
     setVisible(true);
   };
 
@@ -83,9 +91,11 @@ const JumpToDialog = ({scrollRef}) => {
         let ind = notes.findIndex(
           i => i.title === item.title && i.type === 'header',
         );
+        let messageState = useMessageStore.getState().message;
+        let msgOffset = messageState?.visible ? 60 : 10;
         ind = ind + 1;
         ind = ind - (index + 1);
-        offset = offset + ind * 100 + 190;
+        offset = offset + ind * 100 + msgOffset;
         offsets.push(offset);
       });
   };
