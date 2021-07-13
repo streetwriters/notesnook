@@ -28,12 +28,14 @@ const KEY_SELECTORS = {
   month: (item, groupBy) => months[new Date(item[groupBy]).getMonth()],
   week: (item, groupBy) => getWeekGroupFromTimestamp(item[groupBy]),
   year: (item, groupBy) => new Date(item[groupBy]).getFullYear().toString(),
-  default: (item, groupBy) =>
-    item[groupBy] >= TIMESTAMPS.recent()
+  default: (item, groupBy) => {
+    if (groupBy === "title") groupBy = "dateEdited";
+    return item[groupBy] >= TIMESTAMPS.recent()
       ? "Recent"
       : item[groupBy] >= TIMESTAMPS.lastWeek()
       ? "Last week"
-      : "Older",
+      : "Older";
+  },
 };
 
 /**
