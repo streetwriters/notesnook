@@ -15,7 +15,12 @@ import {
 const getSortSelectors = (options) => [
   { desc: (t) => t.conflicted },
   { desc: (t) => t.pinned },
-  { [options.sortDirection]: (item) => item[options.sortBy] },
+  {
+    [options.sortDirection]: (item) => {
+      if (options.sortBy === "title") return item.title[0].toUpperCase();
+      return item[options.sortBy];
+    },
+  },
 ];
 
 const TIMESTAMPS = {
