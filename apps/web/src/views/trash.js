@@ -15,11 +15,14 @@ function Trash() {
     store.refresh();
   });
   const items = useStore((store) => store.trash);
+  const refresh = useStore((store) => store.refresh);
   const clearTrash = useStore((store) => store.clear);
 
   return (
     <ListContainer
       type="trash"
+      groupType="trash"
+      refresh={refresh}
       placeholder={TrashPlaceholder}
       items={items}
       button={{

@@ -1,72 +1,130 @@
 import * as Icon from "../icons";
-import React, { useState } from "react";
-import { Flex, Text } from "rebass";
+import React, { useMemo } from "react";
+import { Button, Flex, Text } from "rebass";
 import Animated from "../animated";
-import { usePersistentState } from "../../utils/hooks";
-import { useStore as useNoteStore } from "../../stores/note-store";
-import { useTheme } from "emotion-theming";
+import { db } from "../../common/db";
+import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { useStore as useSettingsStore } from "../../stores/setting-store";
+import useMobile from "../../utils/use-mobile";
 
-const groups = [
-  { type: undefined, title: "Default" },
-  { type: "abc", title: "Alphabetic" },
-  { type: "year", title: "Year" },
-  { type: "week", title: "Week" },
-  { type: "month", title: "Month" },
+const groupByToTitleMap = {
+  [undefined]: "Default",
+  default: "Default",
+  abc: "A - Z",
+  year: "Year",
+  week: "Week",
+  month: "Month",
+};
+
+const menuItems = [
+  {
+    key: "sortDirection:asc",
+    title: () => "Order by ascending",
+  },
+  { key: "sortDirection:desc", title: () => "Order by descending" },
+  { key: "orderSeperator", type: "seperator" },
+  {
+    key: "sortBy:dateCreated",
+    title: () => "Sort by date created",
+  },
+  {
+    key: "sortBy:dateEdited",
+    title: () => "Sort by date edited",
+  },
+  {
+    key: "sortBy:title",
+    title: () => "Sort by title",
+  },
+  { key: "sortSeperator", type: "seperator" },
+  { key: "groupBy:default", title: () => "Group by default" },
+  { key: "groupBy:year", title: () => "Group by year" },
+  { key: "groupBy:month", title: () => "Group by month" },
+  { key: "groupBy:week", title: () => "Group by week" },
+  { key: "groupBy:abc", title: () => "Group by A - Z" },
 ];
 
-function getGroupTitleByType(type) {
-  return groups.find((v) => v.type === type).title;
+function changeGroupOptions({ groupOptions, type, refresh }, { key: itemKey }) {
+  let [key, value] = itemKey.split(":");
+  groupOptions[key] = value;
+  if (key === "groupBy") {
+    if (value === "abc") groupOptions.sortBy = "title";
+    else groupOptions.sortBy = "dateEdited";
+}
+  db.settings.setGroupOptions(type, groupOptions);
+  refresh();
 }
 
+const getMenuItems = (groupOptions) => {
+  return menuItems.map((item) => {
+    if (item.type === "seperator") return item;
+    let [key, value] = item.key.split(":");
+
+    item.checked = groupOptions[key] === value;
+
+    if (key === "sortBy") {
+      if (value === "title")
+        item.disabled = () => groupOptions.groupBy !== "abc";
+      else item.disabled = () => groupOptions.groupBy === "abc";
+    }
+
+    item.onClick = changeGroupOptions;
+    return item;
+  });
+};
+
 function GroupHeader(props) {
-  const { title, groups, onJump, wasJumpedTo, index } = props;
-  const [selectedGroup] = usePersistentState("selectedGroup", undefined);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [menuType, setMenuType] = useState();
-  const theme = useTheme();
+  const { title, groups, onJump, index, type, refresh } = props;
+  const groupOptions = useMemo(() => db.settings.getGroupOptions(type), [type]);
+  const openContextMenu = useOpenContextMenu();
+
   if (!title) return null;
 
   return (
     <Animated.Flex
-      bg={"bgSecondary"}
-      flexDirection="column"
-      sx={{ cursor: "pointer" }}
-      animate={{
-        backgroundColor: wasJumpedTo
-          ? theme.colors["dimPrimary"]
-          : "bgSecondary",
-      }}
       transition={{ duration: 0.3, repeatType: "reverse", repeat: 3 }}
-      onClick={() => {
+      onClick={(e) => {
         if (groups.length <= 0) return;
-        setMenuType("jumpto");
-        setIsExpanded((s) => !s);
+        e.stopPropagation();
+        const items = groups.map((group) => ({
+          key: group.title,
+          title: () => group.title,
+          onClick: () => onJump(group.title),
+          checked: group.title === title,
+        }));
+        openContextMenu(e, items, {
+          title: "Jump to group",
+        });
       }}
-    >
-      <Flex
-        //my={2}
-        pl={2}
-        py={1}
+      p={1}
+      mx={1}
+      my={1}
+      py={index > 0 ? [2, "8px"] : 1}
         alignItems="center"
         justifyContent="space-between"
-        sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
+      bg="bgSecondary"
+      sx={{ borderRadius: "default" }}
       >
         <Text variant="subtitle" color="primary">
           {title}
         </Text>
+
         {index === 0 && (
+        <Flex mr={1}>
           <IconButton
-            text={getGroupTitleByType(selectedGroup)}
             icon={
-              isExpanded ? (
-                <Icon.ChevronUp size={18} />
-              ) : (
-                <Icon.ChevronDown size={18} />
-              )
+              groupOptions.sortDirection === "asc"
+                ? Icon.SortAsc
+                : Icon.SortDesc
             }
-            onClick={() => {
-              setMenuType("groupby");
-              setIsExpanded((s) => !s);
+            title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
+            onClick={(e) => {
+              const items = getMenuItems(groupOptions);
+              openContextMenu(e, items, {
+                title: "Group & sort",
+                groupOptions,
+                refresh,
+                type,
+              });
             }}
           />
         )}
@@ -99,121 +157,35 @@ function GroupHeader(props) {
           isVisible={menuType === "jumpto"}
           groups={groups}
         />
-        <GroupByMenu isVisible={menuType === "groupby"} />
       </Flex>
+      )}
     </Animated.Flex>
   );
 }
 export default GroupHeader;
 
 function IconButton(props) {
-  const { text, icon, onClick, textStyle, sx } = props;
+  const { text, title, onClick } = props;
+  const isMobile = useMobile();
   return (
-    <Flex
+    <Button
+      variant="secondary"
+      bg="transparent"
+      display="flex"
+      alignItems="center"
+      title={title}
+      p={1}
+      mr={[2, 0]}
+      sx={{ ":last-of-type": { mr: 0 } }}
       onClick={(e) => {
         e.stopPropagation();
         onClick(e);
       }}
-      px={1}
-      sx={{
-        borderRadius: "default",
-        cursor: "pointer",
-        ":hover": { bg: "hover" },
-        ...sx,
-      }}
-      alignItems="center"
     >
-      <Text variant="subtitle" fontWeight="normal" sx={textStyle}>
-        {text}
-      </Text>
-      {icon}
-    </Flex>
-  );
-}
-
-function JumpToGroupMenu(props) {
-  const { groups, isVisible, onJump } = props;
-  if (!isVisible) return null;
-  return (
-    <>
-      <Text color="primary" variant="title" mb={1}>
-        Jump to
-      </Text>
-      <Flex flexWrap="wrap">
-        {groups.map((group) => (
-          <IconButton
-            text={group.title}
-            textStyle={{ fontSize: "body" }}
-            onClick={() => onJump(group.title)}
-            sx={{ bg: "shade", mr: 1, mt: 1 }}
-          ></IconButton>
-        ))}
-      </Flex>
-    </>
-  );
-}
-
-function GroupByMenu(props) {
-  const { isVisible } = props;
-
-  const [sortDirection, setSortDirection] = usePersistentState(
-    "sortDirection",
-    "desc"
-  );
-  const [selectedGroup, setSelectedGroup] = usePersistentState(
-    "selectedGroup",
-    undefined
-  );
-  const refresh = useNoteStore((store) => store.refresh);
-
-  if (!isVisible) return null;
-  return (
-    <>
-      <Flex
-        pl={2}
-        pr={1}
-        mb={1}
-        justifyContent="space-between"
-        alignItems="center"
-      >
-        <Text color="primary" variant="title">
-          Group by
-        </Text>
-        <IconButton
-          text={sortDirection === "desc" ? "Ascending" : "Descending"}
-          icon={
-            sortDirection === "desc" ? (
-              <Icon.SortDesc size={14} />
-            ) : (
-              <Icon.SortAsc size={14} />
-            )
-          }
-          textStyle={{ mr: 1 }}
-          onClick={() => {
-            setSortDirection(sortDirection === "desc" ? "asc" : "desc");
-            refresh();
-          }}
-        />
-      </Flex>
-      {groups.map((item) => (
-        <Flex
-          key={item.title}
-          justifyContent="space-between"
-          alignItems="center"
-          p={1}
-          px={2}
-          sx={{ cursor: "pointer", ":hover": { bg: "shade" } }}
-          onClick={() => {
-            setSelectedGroup(item.type);
-            refresh();
-          }}
-        >
-          <Text variant="body">{item.title}</Text>
-          {selectedGroup === item.type && (
-            <Icon.Checkmark size={16} color="primary" />
+      {text && <Text variant="body">{text}</Text>}
+      {props.icon && (
+        <props.icon size={isMobile ? 20 : 14} sx={{ ml: text ? 1 : 0 }} />
           )}
-        </Flex>
-      ))}
-    </>
+    </Button>
   );
 }

@@ -9,11 +9,14 @@ function Topics() {
     (store) => store.selectedNotebookTopics
   );
   const selectedNotebookId = useNbStore((store) => store.selectedNotebookId);
+  const refresh = useNbStore((store) => store.setSelectedNotebook);
 
   return (
     <>
       <ListContainer
         type="topics"
+        groupType="topics"
+        refresh={() => refresh(selectedNotebookId)}
         items={selectedNotebookTopics}
         context={{ notebookId: selectedNotebookId }}
         placeholder={TopicsPlaceholder}

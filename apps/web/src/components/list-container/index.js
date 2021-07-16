@@ -24,7 +24,6 @@ function ListContainer(props) {
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
   const setSelectedItems = useSelectionStore((store) => store.setSelectedItems);
-  const [jumpToIndex, setJumpToIndex] = useState(-1);
   const listRef = useRef();
 
   useEffect(() => {
@@ -86,27 +85,21 @@ function ListContainer(props) {
                             case "header":
                               return (
                                   <GroupHeader
+                        type={groupType}
+                        refresh={refresh}
                                     title={item.title}
                                     index={index}
-                                    groups={props.items.filter(
-                                      (v) =>
-                                        v.type === "header" &&
-                                        v.title !== item.title
-                                    )}
-                                    wasJumpedTo={index === jumpToIndex}
+                        groups={props.items.filter((v) => v.type === "header")}
                                     onJump={(title) => {
                                       const index = props.items.findIndex(
                                         (v) => v.title === title
                                       );
                                       if (index < 0) return;
-                                      setJumpToIndex(index);
-                                      listRef.current.scrollToItem(
-                                        index,
-                                        "center"
-                                      );
-                                      setTimeout(() => {
-                                        setJumpToIndex(-1);
-                                      }, 1900);
+                          listRef.current.scrollToIndex({
+                            index,
+                            align: "center",
+                            behavior: "smooth",
+                          });
                                     }}
                                   />
                               );

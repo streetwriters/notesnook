@@ -10,6 +10,7 @@ import Config from "../utils/config";
 import { showToast } from "../utils/toast";
 import { qclone } from "qclone";
 import { hashNavigate } from "../navigation";
+import { groupArray } from "notes-core/utils/grouping";
 
 class NoteStore extends BaseStore {
   notes = [];
@@ -30,12 +31,11 @@ class NoteStore extends BaseStore {
   };
 
   refresh = () => {
-    const notes = db.notes.group(
-      Config.get("selectedGroup"),
-      Config.get("sortDirection", "desc")
-    );
     this.set((state) => {
-      state.notes = qclone(notes);
+      state.notes = groupArray(
+        db.notes.all,
+        db.settings.getGroupOptions("home")
+      );
     });
     this.refreshContext();
   };

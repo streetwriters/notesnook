@@ -12,6 +12,7 @@ function Monographs() {
   return (
     <ListContainer
       type="notes"
+      groupType="notes"
       items={monographs}
       placeholder={MonographsPlaceholder}
     />

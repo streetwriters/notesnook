@@ -4,17 +4,23 @@ import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
 import { hashNavigate } from "../navigation";
 import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
+import { groupArray } from "notes-core/utils/grouping";
+import { db } from "../common/db";
 
 function Notes() {
   const context = useNotesStore((store) => store.context);
+  const refreshContext = useNotesStore((store) => store.refreshContext);
+  const type = context?.type === "favorite" ? "favorites" : "notes";
   if (!context) return null;
   return (
     <ListContainer
       type="notes"
+      groupType={type}
+      refresh={refreshContext}
       context={{ ...context, notes: undefined }}
-      items={context.notes}
+      items={groupArray(context.notes, db.settings.getGroupOptions(type))}
       placeholder={
-        context.type === "favorites" ? FavoritesPlaceholder : NotesPlaceholder
+        context.type === "favorite" ? FavoritesPlaceholder : NotesPlaceholder
       }
       button={{
         content: "Make a new note",

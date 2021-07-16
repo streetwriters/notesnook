@@ -8,6 +8,7 @@ import useNavigate from "../utils/use-navigate";
 
 function Home() {
   const notes = useStore((store) => store.notes);
+  const refresh = useStore((store) => store.refresh);
   const clearContext = useStore((store) => store.clearContext);
   const [isLoading, setIsLoading] = useState(true);
   useNavigate("home", () => {
@@ -39,6 +40,8 @@ function Home() {
   return (
     <ListContainer
       type="home"
+      groupType="home"
+      refresh={refresh}
       isLoading={isLoading}
       items={notes}
       placeholder={NotesPlaceholder}

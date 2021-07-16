@@ -7,8 +7,15 @@ import useNavigate from "../utils/use-navigate";
 function Tags() {
   useNavigate("tags", () => store.refresh());
   const tags = useStore((store) => store.tags);
+  const refresh = useStore((store) => store.refresh);
   return (
-    <ListContainer type="tags" items={tags} placeholder={TagsPlaceholder} />
+    <ListContainer
+      type="tags"
+      groupType="tags"
+      refresh={refresh}
+      items={tags}
+      placeholder={TagsPlaceholder}
+    />
   );
 }
 

@@ -4,6 +4,7 @@ import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
+import { groupArray } from "notes-core/utils/grouping";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
@@ -12,7 +13,10 @@ class NotebookStore extends BaseStore {
 
   refresh = () => {
     this.set((state) => {
-      state.notebooks = db.notebooks.all;
+      state.notebooks = groupArray(
+        db.notebooks.all,
+        db.settings.getGroupOptions("notebooks")
+      );
     });
     this.setSelectedNotebook(this.get().selectedNotebookId);
   };
@@ -34,10 +38,13 @@ class NotebookStore extends BaseStore {
   };
 
   setSelectedNotebook = (id) => {
-    const topics = db.notebooks.notebook(id)?.topics.all;
+    const topics = db.notebooks.notebook(id)?.topics?.all;
     if (!topics) return;
     this.set((state) => {
-      state.selectedNotebookTopics = topics;
+      state.selectedNotebookTopics = groupArray(
+        topics,
+        db.settings.getGroupOptions("topics")
+      );
       state.selectedNotebookId = id;
     });
   };

@@ -3,12 +3,19 @@ import createStore from "../common/store";
 import BaseStore from "./index";
 import { store as appStore } from "./app-store";
 import { store as notestore } from "./note-store";
+import { groupArray } from "notes-core/utils/grouping";
 
 class TrashStore extends BaseStore {
   trash = [];
 
   refresh = () => {
-    this.set((state) => (state.trash = db.trash.all));
+    this.set(
+      (state) =>
+        (state.trash = groupArray(
+          db.trash.all,
+          db.settings.getGroupOptions("trash")
+        ))
+    );
   };
 
   delete = (id, commit = false) => {
@@ -23,7 +30,7 @@ class TrashStore extends BaseStore {
 
   restore = (id) => {
     return db.trash.restore(id).then(() => {
-      this.set((state) => (state.trash = db.trash.all));
+      this.refresh();
       appStore.refreshColors();
       notestore.refresh();
     });

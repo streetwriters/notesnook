@@ -1,4 +1,5 @@
 import { useAnimation } from "framer-motion";
+import { Check } from "../icons";
 import React, { useEffect, useMemo } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
@@ -15,91 +16,116 @@ function Menu(props) {
   );
 
   return (
-    <Container id={id} style={style} sx={sx} state={state}>
+    <Container id={id} title={data?.title} style={style} sx={sx} state={state}>
       {menuItems.map(
-        ({
-          title,
-          key,
-          onClick,
-          component: Component,
-          color,
-          isPro,
-          isNew,
-          disabled,
-          disableReason,
-          icon: Icon,
-        }) => (
-          <Button
-            variant="anchor"
-            title={disableReason || title(data)}
-            disabled={disabled && disabled(data)}
-            data-test-id={`menuitem-${title(data)
-              .split(" ")
-              .join("")
-              .toLowerCase()}`}
-            key={key}
-            onClick={async (e) => {
-              e.stopPropagation();
-              if (closeMenu) {
-                closeMenu();
+        (
+          {
+            title,
+            key,
+            onClick,
+            component: Component,
+            color,
+            isPro,
+            isNew,
+            disabled,
+            disableReason,
+            checked,
+            icon: Icon,
+            type,
+          },
+          index
+        ) =>
+          type === "seperator" ? (
+            <Box
+              key={key}
+              width="95%"
+              height="0.5px"
+              bg="border"
+              my={2}
+              alignSelf="center"
+            />
+          ) : (
+            <Button
+              variant="anchor"
+              title={
+                (disabled && disabled(data) && disableReason) || title(data)
               }
+              disabled={disabled && disabled(data)}
+              data-test-id={`menuitem-${title(data)
+                .split(" ")
+                .join("")
+                .toLowerCase()}`}
+              key={key}
+              onClick={async (e) => {
+                e.stopPropagation();
+                if (closeMenu) {
+                  closeMenu();
+                }
 
-              if (!Component) {
-                onClick(data);
-              }
-            }}
-            display="flex"
-            flexDirection="row"
-            alignItems="center"
-            py={"0.7em"}
-            px={3}
-            sx={{
-              borderRadius: 0,
-              color: color || "text",
-              cursor: "pointer",
-              ":hover:not(:disabled)": {
-                backgroundColor: "shade",
-              },
-            }}
-          >
-            {Icon && <Icon color={color || "text"} size={16} sx={{ mr: 1 }} />}
-            {Component ? (
-              <Component data={data} />
-            ) : (
-              <Text
-                as="span"
-                textAlign="left"
-                fontFamily="body"
-                fontSize="menu"
-                flex={1}
-              >
-                {title(data)}
-              </Text>
-            )}
-            {isPro && !isUserPremium && (
-              <Text
-                fontSize="subBody"
-                bg="primary"
-                color="static"
-                px={1}
-                sx={{ borderRadius: "default" }}
-              >
-                Pro
-              </Text>
-            )}
-            {isNew && (
-              <Text
-                fontSize="subBody"
-                bg="primary"
-                color="static"
-                px={1}
-                sx={{ borderRadius: "default" }}
-              >
-                NEW
-              </Text>
-            )}
-          </Button>
-        )
+                if (!Component) {
+                  onClick(data, menuItems[index]);
+                }
+              }}
+              display="flex"
+              flexDirection="row"
+              alignItems="center"
+              justifyContent="center"
+              py={"0.7em"}
+              px={3}
+              sx={{
+                borderRadius: 0,
+                color: color || "text",
+                cursor: "pointer",
+                ":hover:not(:disabled)": {
+                  backgroundColor: "hover",
+                },
+              }}
+            >
+              {Icon && (
+                <Icon
+                  color={color || "text"}
+                  size={15}
+                  sx={{ mr: 2, ml: -1 }}
+                />
+              )}
+              {Component ? (
+                <Component data={data} />
+              ) : (
+                <Text
+                  as="span"
+                  textAlign="left"
+                  fontFamily="body"
+                  fontSize="menu"
+                  flex={1}
+                >
+                  {title(data)}
+                </Text>
+              )}
+              {isPro && !isUserPremium && (
+                <Text
+                  fontSize="subBody"
+                  bg="primary"
+                  color="static"
+                  px={1}
+                  sx={{ borderRadius: "default" }}
+                >
+                  Pro
+                </Text>
+              )}
+              {isNew && (
+                <Text
+                  fontSize="subBody"
+                  bg="primary"
+                  color="static"
+                  px={1}
+                  sx={{ borderRadius: "default" }}
+                >
+                  NEW
+                </Text>
+              )}
+              {checked && <Check size={14} />}
+            </Button>
+          )
       )}
     </Container>
   );
@@ -108,7 +134,7 @@ export default React.memo(Menu, (prev, next) => {
   return prev.state === next.state;
 });
 
-function MenuContainer({ id, style, sx, children }) {
+function MenuContainer({ id, style, sx, title, children }) {
   return (
     <Flex
       id={id}
@@ -117,10 +143,11 @@ function MenuContainer({ id, style, sx, children }) {
       style={style}
       sx={{
         position: "relative",
-        borderRadius: "default",
-        border: "2px solid",
-        borderColor: "border",
         width: "11em",
+        borderRadius: "default",
+        boxShadow: "0px 10px 10px 0px #00000022",
+        border: "1px solid",
+        borderColor: "border",
         ...sx,
       }}
     >
@@ -133,7 +160,7 @@ function MenuContainer({ id, style, sx, children }) {
           px={3}
           sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
         >
-          Properties
+          {title || "Properties"}
         </Text>
         {children}
       </Flex>
@@ -141,7 +168,7 @@ function MenuContainer({ id, style, sx, children }) {
   );
 }
 
-function MobileMenuContainer({ style, id, state, children }) {
+function MobileMenuContainer({ style, id, state, title, children }) {
   const animation = useAnimation();
 
   useEffect(() => {
@@ -190,7 +217,7 @@ function MobileMenuContainer({ style, id, state, children }) {
         />
         <Flex flex="1" flexDirection="column" overflowY="scroll">
           <Text variant="title" mt={2} alignSelf="center">
-            Properties
+            {title || "Properties"}
           </Text>
           {children}
         </Flex>

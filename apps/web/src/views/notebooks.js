@@ -8,11 +8,14 @@ import useNavigate from "../utils/use-navigate";
 function Notebooks() {
   useNavigate("notebooks", () => store.refresh());
   const notebooks = useStore((state) => state.notebooks);
+  const refresh = useStore((state) => state.refresh);
 
   return (
     <>
       <ListContainer
         type="notebooks"
+        groupType="notebooks"
+        refresh={refresh}
         items={notebooks}
         placeholder={NotebooksPlaceholder}
         button={{
