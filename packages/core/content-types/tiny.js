@@ -67,8 +67,7 @@ function getHeadlineFromText(text) {
       char === "\n" ||
       char === "\t" ||
       char === "\r" ||
-      (char === "." && nextChar === " ") ||
-      i >= 120
+      (char === "." && nextChar === " ")
     ) {
       if (char === ".") ++i;
       return text.substring(0, i);
