@@ -38,6 +38,7 @@ class Title {
     return {
       variant: "text.heading",
       fontSize: "title",
+      fontWeight: "bold",
     };
   }
 }
@@ -46,6 +47,7 @@ class Subtitle {
     return {
       variant: "text.heading",
       fontSize: "subtitle",
+      fontWeight: "bold",
     };
   }
 }
