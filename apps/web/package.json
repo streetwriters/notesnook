@@ -38,7 +38,7 @@
     "react-scroll-sync": "^0.9.0",
     "react-scrollbars-custom": "^4.0.25",
     "react-virtualized-auto-sizer": "^1.0.4",
-    "react-window": "^1.8.6",
+    "react-virtuoso": "^1.9.3",
     "rebass": "^4.0.7",
     "timeago-react": "^3.0.2",
     "tinymce": "5.8.1",

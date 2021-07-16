@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Flex } from "rebass";
+import { Flex, Text } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
-import { VariableSizeList as List } from "react-window";
-import AutoSizer from "react-virtualized-auto-sizer";
+import { Virtuoso } from "react-virtuoso";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
@@ -13,11 +12,14 @@ import Announcements from "../announcements";
 import useAnnouncements from "../../utils/use-announcements";
 
 const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
-  <ScrollContainer {...props} forwardedRef={ref} />
+  <ScrollContainer
+    {...props}
+    forwardedRef={(scrollbarsRef) => (ref.current = scrollbarsRef)}
+  />
 ));
 
 function ListContainer(props) {
-  const { type, context } = props;
+  const { type, groupType, items, context, refresh } = props;
   const [announcements, removeAnnouncement] = useAnnouncements();
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
@@ -48,62 +50,41 @@ function ListContainer(props) {
         </Flex>
       ) : (
         <>
-          {announcements.length ? (
+          <Flex variant="columnFill" data-test-id="note-list">
+            <Virtuoso
+              data={items}
+              computeItemKey={(index) => items[index].id || items[index].title}
+              defaultItemHeight={profile.estimatedItemHeight}
+              totalCount={items.length}
+              overscan={10}
+              components={{
+                Scroller: CustomScrollbarsVirtualList,
+                Header: () =>
+                  announcements.length ? (
             <Announcements
               announcements={announcements}
               removeAnnouncement={removeAnnouncement}
             />
           ) : (
             <ReminderBar />
-          )}
-          <Flex variant="columnFill" data-test-id="note-list">
-            {props.children
-              ? props.children
-              : props.items.length > 0 && (
-                  <AutoSizer>
-                    {({ height, width }) => (
-                      <List
-                        ref={listRef}
-                        height={height}
-                        width={width}
-                        itemKey={(index) => {
-                          switch (index) {
-                            default:
-                              const item = props.items[index];
-                              if (!item) return "";
-                              return item.id || item.title;
-                          }
+                  ),
+                Footer: () => (
+                  <Text
+                    textAlign="center"
+                    color="fontTertiary"
+                    variant="body"
+                    py={2}
+                  >
+                    — End reached —
+                  </Text>
+                ),
                         }}
-                        outerElementType={CustomScrollbarsVirtualList}
-                        overscanCount={3}
-                        estimatedItemSize={profile.estimatedItemHeight}
-                        itemSize={(index) => {
-                          const item = props.items[index];
-                          if (!item) return 0;
-                          if (item.type === "header") {
-                            if (!item.title) return 0;
-                            return 29;
-                          } else {
-                            return profile.itemHeight(item);
-                          }
-                        }}
-                        itemCount={props.items.length}
-                      >
-                        {({ index, style }) => {
-                          //const item = pinnedItems[index] || props.items[pinnedItems.length + index];
-                          const item = props.items[index];
+              itemContent={(index, item) => {
                           if (!item) return null;
 
                           switch (item.type) {
                             case "header":
                               return (
-                                <div
-                                  key={item.id || item.title}
-                                  style={{
-                                    ...style,
-                                    zIndex: !index ? 3 : 2,
-                                  }}
-                                >
                                   <GroupHeader
                                     title={item.title}
                                     index={index}
@@ -128,26 +109,12 @@ function ListContainer(props) {
                                       }, 1900);
                                     }}
                                   />
-                                </div>
                               );
                             default:
-                              return (
-                                <div
-                                  key={item.id || item.title}
-                                  style={{
-                                    ...style,
-                                    zIndex: 1,
-                                  }}
-                                >
-                                  {profile.item(index, item, context)}
-                                </div>
-                              );
+                    return profile.item(index, item, context);
                           }
                         }}
-                      </List>
-                    )}
-                  </AutoSizer>
-                )}
+            />
           </Flex>
         </>
       )}
