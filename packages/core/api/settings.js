@@ -13,10 +13,8 @@ class Settings {
   }
 
   async init() {
-    this._initSettings();
     var settings = await this._db.context.read("settings");
-    if (settings) this._settings = settings;
-    if (!this._settings.groupOptions) this._settings.groupOptions = {};
+    this._initSettings(settings);
     await this._saveSettings();
 
     EV.subscribe(EVENTS.userLoggedOut, () => {
@@ -40,9 +38,9 @@ class Settings {
         ...this._settings.groupOptions,
       };
     } else {
-      this._settings = item;
+      this._initSettings(item);
     }
-    await this._db.context.write("settings", item);
+    await this._saveSettings();
   }
 
   /**
@@ -63,7 +61,7 @@ class Settings {
   getGroupOptions(key) {
     return (
       this._settings.groupOptions[key] || {
-        groupBy: undefined,
+        groupBy: "default",
         sortBy: "dateEdited",
         sortDirection: "desc",
       }
@@ -116,7 +114,7 @@ class Settings {
     }, []);
   }
 
-  _initSettings() {
+  _initSettings(settings) {
     this._settings = {
       type: "settings",
       id: id(),
@@ -124,6 +122,7 @@ class Settings {
       groupOptions: {},
       dateEdited: 0,
       dateCreated: 0,
+      ...(settings || {}),
     };
   }
 
