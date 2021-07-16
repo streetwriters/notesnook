@@ -37,31 +37,8 @@ export default class Notes extends Collection {
       }
 
       if (tags && tags.length) {
-        if (id === "7564b315c74abe6652fdc99a") console.log(tags);
         for (let tag of tags) {
           await this._db.tags.add(tag, id);
-        }
-      }
-
-      if (notebooks) {
-        for (let i = 0; i < notebooks.length; ++i) {
-          const ref = notebooks[i];
-          let { id, topics } = ref;
-          const notebook = this._db.notebooks.notebook(id);
-          if (!notebook) {
-            notebooks.splice(i, 1);
-            continue;
-          }
-          for (let topicId of topics) {
-            const topic = notebook.topics.topic(topicId);
-            if (!topic || !topic.has(noteArg.id)) {
-              deleteItem(topics, topicId);
-              continue;
-            }
-          }
-          if (!topics.length) {
-            notebooks.splice(i, 1);
-          }
         }
       }
 
