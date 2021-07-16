@@ -1,5 +1,5 @@
 import sort from "fast-sort";
-import { get7DayTimestamp } from "../utils/date";
+import dayjs from "dayjs";
 
 export default class Trash {
   /**
@@ -19,9 +19,8 @@ export default class Trash {
   }
 
   async cleanup() {
-    const sevenDayPreviousTimestamp = Date.now() - get7DayTimestamp();
     this.all.forEach(async (item) => {
-      if (item.dateDeleted < sevenDayPreviousTimestamp) {
+      if (dayjs(item.dateDeleted).add(7, "days").isBefore(dayjs())) {
         await this.delete(item.id);
       }
     });

@@ -1,6 +1,6 @@
 import DB from "../../api";
 import StorageInterface from "../../__mocks__/storage.mock";
-import { getLastWeekTimestamp } from "../../utils/date";
+import dayjs from "dayjs";
 import { groupArray } from "../../utils/grouping";
 
 const TEST_NOTEBOOK = {
@@ -48,19 +48,19 @@ const groupedTest = (type) =>
     await db.notes.add({
       ...TEST_NOTE,
       title: "Some title",
-      dateCreated: getLastWeekTimestamp() - 604800000,
+      dateCreated: dayjs().startOf("week").subtract(1, "day").unix(),
     });
     await db.notes.add({
       ...TEST_NOTE,
       title: "Some title and title title",
-      dateCreated: getLastWeekTimestamp() - 604800000 * 2,
+      dateCreated: dayjs().subtract(2, "weeks").unix(),
     });
     let grouped = groupArray(db.notes.all, {
       groupBy: type,
       sortDirection: "desc",
       sortBy: "dateCreated",
     });
-    expect(grouped.length).toBeGreaterThan(0);
+    expect(grouped.length).toBeGreaterThan(1);
     expect(grouped.some((i) => i.type === "header")).toBe(true);
   });
 

@@ -1,11 +1,7 @@
 import "../types";
 import fastsort from "fast-sort";
-import {
-  getWeekGroupFromTimestamp,
-  months,
-  getLastWeekTimestamp,
-  get7DayTimestamp,
-} from "./date";
+import dayjs from "dayjs";
+import { getWeekGroupFromTimestamp, months } from "./date";
 
 /**
  *
@@ -23,21 +19,16 @@ const getSortSelectors = (options) => [
   },
 ];
 
-const TIMESTAMPS = {
-  recent: () => getLastWeekTimestamp(7),
-  lastWeek: () => getLastWeekTimestamp(7) - get7DayTimestamp(), //seven day timestamp value
-};
-
 const KEY_SELECTORS = {
   abc: (item) => item.title[0].toUpperCase(),
-  month: (item, groupBy) => months[new Date(item[groupBy]).getMonth()],
+  month: (item, groupBy) => dayjs(item[groupBy]).format("MMMM"),
   week: (item, groupBy) => getWeekGroupFromTimestamp(item[groupBy]),
-  year: (item, groupBy) => new Date(item[groupBy]).getFullYear().toString(),
+  year: (item, groupBy) => dayjs(item[groupBy]).year(),
   default: (item, groupBy) => {
-    if (groupBy === "title") groupBy = "dateEdited";
-    return item[groupBy] >= TIMESTAMPS.recent()
+    const date = dayjs(item[groupBy]);
+    return date.isAfter(dayjs().subtract(1, "week"))
       ? "Recent"
-      : item[groupBy] >= TIMESTAMPS.lastWeek()
+      : date.isAfter(dayjs().subtract(2, "weeks"))
       ? "Last week"
       : "Older";
   },
@@ -51,7 +42,7 @@ const KEY_SELECTORS = {
 export function groupArray(
   array,
   options = {
-    groupBy: undefined,
+    groupBy: "default",
     sortBy: "dateEdited",
     sortDirection: "desc",
   }
