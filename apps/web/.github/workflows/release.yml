@@ -17,7 +17,7 @@ jobs:
         with:
           node-version: 15.x
       - run: yarn install
-      - run: yarn build
+      - run: yarn build:desktop
 
       - name: Archive build artifact
         uses: actions/upload-artifact@v2
