@@ -52,7 +52,7 @@ function Editor({ noteId, nonce }) {
     (async () => {
       await startSession(noteId);
     })();
-  }, [startSession, noteId]);
+  }, [startSession, noteId, nonce]);
 
   useEffect(() => {
     if (sessionState === SESSION_STATES.new) {
@@ -70,13 +70,16 @@ function Editor({ noteId, nonce }) {
         editor.undoManager.reset();
         editor.setDirty(false);
       }
+
+      if (!isMobile) editor.focus();
+
       setContents();
       editor.on("init", setContents);
       return () => {
         editor.off("init", setContents);
       };
     }
-  }, [editorRef, contentType, sessionState, sessionNonce]);
+  }, [editorRef, isMobile, contentType, sessionState, sessionNonce]);
 
   return (
     <Flex
