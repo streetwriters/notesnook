@@ -16,7 +16,7 @@ import DiffViewer from "../components/diff-viewer";
 import Unlock from "../components/unlock";
 import { store as appStore } from "../stores/app-store";
 import { store as editorStore } from "../stores/editor-store";
-import { isMobile, isTablet } from "../utils/dimensions";
+import { isMobile } from "../utils/dimensions";
 import {
   showEditTopicDialog,
   showTopicDialog,
@@ -30,8 +30,6 @@ const Editor = React.lazy(() => import("../components/editor"));
 const hashroutes = {
   "/": () => {
     closeOpenedDialog();
-    if (isMobile() || isTablet()) editorStore.clearSession(false);
-
     return !editorStore.get().session.state && <EditorPlaceholder />;
   },
   "/email/verify": () => {

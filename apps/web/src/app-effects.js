@@ -10,13 +10,14 @@ import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 
-function AppEffects({ isMobile, isTablet, setShow }) {
+function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
   const refreshColors = useStore((store) => store.refreshColors);
   const refreshMenuPins = useStore((store) => store.refreshMenuPins);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const isEditorOpen = useStore((store) => store.isEditorOpen);
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
+  const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
@@ -76,20 +77,9 @@ function AppEffects({ isMobile, isTablet, setShow }) {
   useEffect(() => {
     if (isFocusMode) {
       setShow(false);
-    } else {
-      if (!isTablet) setShow(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);
-
-  useEffect(() => {
-    if (!isMobile && !isTablet) return;
-    setShow(!isEditorOpen);
-    //setIsEditorOpen(!show);
-    // if (isTablet) toggleSideMenu(!isEditorOpen);
-    // if (!isEditorOpen && !isTablet && !isMobile) toggleSideMenu(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isEditorOpen, isMobile, isTablet]);
 
   useEffect(() => {
     introduceFeatures();
@@ -97,6 +87,16 @@ function AppEffects({ isMobile, isTablet, setShow }) {
       EV.unsubscribeAll();
     };
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    slideToIndex(isSideMenuOpen ? 0 : 1);
+  }, [isMobile, slideToIndex, isSideMenuOpen]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    slideToIndex(isEditorOpen ? 2 : 1);
+  }, [isMobile, slideToIndex, isEditorOpen]);
 
   useEffect(() => {
     toggleSideMenu(!isMobile);

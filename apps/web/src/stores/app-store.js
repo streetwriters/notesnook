@@ -5,13 +5,12 @@ import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";
 import { store as tagStore } from "./tag-store";
 import BaseStore from "./index";
-import { isMobile } from "../utils/dimensions";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
 
 class AppStore extends BaseStore {
   // default state
-  isSideMenuOpen = !isMobile();
+  isSideMenuOpen = false;
   isSyncing = false;
   isFocusMode = false;
   isEditorOpen = false;
