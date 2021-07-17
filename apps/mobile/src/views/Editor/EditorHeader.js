@@ -1,5 +1,11 @@
-import React, {useEffect} from 'react';
-import {Keyboard, Platform, View} from 'react-native';
+import React, {useEffect, useRef} from 'react';
+import {
+  BackHandler,
+  InteractionManager,
+  Keyboard,
+  Platform,
+  View,
+} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {notesnook} from '../../../e2e/test.ids';
 import {ActionIcon} from '../../components/ActionIcon';
@@ -10,12 +16,20 @@ import {
   useSettingStore,
   useUserStore,
 } from '../../provider/stores';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {DDS} from '../../services/DeviceDetection';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent,
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {editing} from '../../utils';
 import {db} from '../../utils/DB';
 import {
+  eClearEditor,
   eCloseFullscreenEditor,
+  eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenPublishNoteDialog,
 } from '../../utils/Events';
@@ -25,9 +39,11 @@ import {EditorTitle} from './EditorTitle';
 import {
   checkNote,
   clearEditor,
+  clearTimer,
   EditorWebView,
   getNote,
   isNotedEdited,
+  loadNote,
   setColors,
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
@@ -44,6 +60,7 @@ const EditorHeader = () => {
   const fullscreen = useSettingStore(state => state.fullscreen);
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
+  const handleBack = useRef();
 
   useEffect(() => {
     setColors(colors);
@@ -55,6 +72,9 @@ const EditorHeader = () => {
       return;
     }
     tiny.call(EditorWebView, tiny.blur);
+    if (deviceMode === 'mobile') {
+      editing.movedAway = true;
+    }
     setTimeout(async () => {
       eSendEvent('showTooltip');
       toolbarRef.current?.scrollTo({
@@ -151,6 +171,77 @@ const EditorHeader = () => {
       'Favorite',
       'Publish',
     ]);
+  };
+
+  useEffect(() => {
+    eSubscribeEvent(eOnLoadNote, load);
+    eSubscribeEvent(eClearEditor, onCallClear);
+    return () => {
+      eUnSubscribeEvent(eClearEditor, onCallClear);
+      eUnSubscribeEvent(eOnLoadNote, load);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (fullscreen && DDS.isTab) {
+      handleBack.current = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onBackPress,
+      );
+    }
+
+    return () => {
+      clearTimer();
+      if (handleBack.current) {
+        handleBack.current.remove();
+        handleBack.current = null;
+      }
+    };
+  }, [fullscreen]);
+
+  const load = async item => {
+    await loadNote(item);
+    InteractionManager.runAfterInteractions(() => {
+      Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+      if (!DDS.isTab) {
+        handleBack.current = BackHandler.addEventListener(
+          'hardwareBackPress',
+          _onHardwareBackPress,
+        );
+      }
+    });
+  };
+
+  const onCallClear = async value => {
+    if (value === 'removeHandler') {
+      if (handleBack.current) {
+        handleBack.current.remove();
+        handleBack.current = null;
+      }
+      return;
+    }
+    if (value === 'addHandler') {
+      if (handleBack.current) {
+        handleBack.current.remove();
+        handleBack.current = null;
+      }
+
+      handleBack.current = BackHandler.addEventListener(
+        'hardwareBackPress',
+        _onHardwareBackPress,
+      );
+      return;
+    }
+    if (editing.currentlyEditing) {
+      await _onBackPress();
+    }
+  };
+
+  const _onHardwareBackPress = async () => {
+    if (editing.currentlyEditing) {
+      await _onBackPress();
+      return true;
+    }
   };
 
   return (

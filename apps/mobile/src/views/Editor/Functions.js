@@ -3,7 +3,11 @@ import {Platform} from 'react-native';
 import {presentDialog} from '../../components/Dialog/functions';
 import {useEditorStore, useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
 import {editing, InteractionManager} from '../../utils';
@@ -75,10 +79,20 @@ export function isNotedEdited() {
   return noteEdited;
 }
 
-export function clearTimer() {
+export async function clearTimer(clear) {
   if (timer) {
     clearTimeout(timer);
     timer = null;
+    if (clear) {
+      if (
+        (content?.data &&
+          typeof content.data == 'string' &&
+          content.data?.trim().length > 0) ||
+        (title && title?.trim().length > 0 && id)
+      ) {
+        await saveNote(true);
+      }
+    }
   }
   if (currentEditingTimer) {
     clearTimeout(currentEditingTimer);
@@ -86,8 +100,7 @@ export function clearTimer() {
   }
 }
 
-export const CHECK_STATUS = premium =>
-  `(function() {
+export const CHECK_STATUS = `(function() {
        setTimeout(() => {
         let msg = JSON.stringify({
           data: true,
@@ -177,7 +190,7 @@ export const loadNote = async item => {
       await clearEditor();
     }
     clearNote();
-    
+
     noteEdited = false;
     id = null;
     if (Platform.OS === 'android') {
@@ -205,43 +218,50 @@ export const loadNote = async item => {
     if (id === item.id && !item.forced) {
       return;
     }
-    await setNote(item);
-    clearTimer();
+
     eSendEvent('loadingNote', item);
+    clearTimer();
+    await setNote(item);
     webviewInit = false;
     editing.isFocused = false;
-    setTimeout(() => {
-      eSendEvent('webviewreset');
+    setTimeout(async () => {
+      if (await checkStatus(true)) {
+        EditorWebView.current?.reload();
+      } else {
+        eSendEvent('webviewreset');
+      }
     }, 1);
     InteractionManager.runAfterInteractions(async () => {
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-      ]);
       useEditorStore.getState().setCurrentlyEditingNote(item.id);
-      checkStatus();
     }, 50);
   }
 };
 
-const checkStatus = (reset = false) => {
-  webviewOK = false;
-  EditorWebView.current?.injectJavaScript(CHECK_STATUS());
-  clearTimeout(webviewTimer);
-  webviewTimer = setTimeout(() => {
-    if (!webviewOK) {
-      if (!reset) {
-        checkStatus(true);
+const checkStatus = async noreset => {
+  return new Promise(resolve => {
+    webviewOK = false;
+    clearTimeout(webviewTimer);
+    webviewTimer = null;
+    const onWebviewOk = () => {
+      webviewOK = true;
+      webviewInit = true;
+      clearTimeout(webviewTimer);
+      webviewTimer = null;
+      resolve(true);
+      eUnSubscribeEvent('webviewOk', onWebviewOk);
+    };
+    eSubscribeEvent('webviewOk', onWebviewOk);
+    EditorWebView.current?.injectJavaScript(CHECK_STATUS);
 
-        return;
+    webviewTimer = setTimeout(() => {
+      if (!webviewOK && !noreset) {
+        webviewInit = false;
+        EditorWebView = createRef();
+        eSendEvent('webviewreset');
+        resolve(false);
       }
-      webviewInit = false;
-      EditorWebView = createRef();
-      eSendEvent('webviewreset');
-    } else {
-    }
-  }, 3500);
+    }, 1000);
+  });
 };
 
 export const _onMessage = async evt => {
@@ -309,6 +329,7 @@ export const _onMessage = async evt => {
       loadNoteInEditor();
       break;
     case 'running':
+      eSendEvent('webviewOk');
       webviewOK = true;
       break;
     case 'editorSettings':
@@ -407,16 +428,8 @@ function onNoteChange() {
 }
 
 export async function clearEditor() {
-  clearTimer();
+  await clearTimer(true);
   try {
-    if (
-      (content?.data &&
-        typeof content.data == 'string' &&
-        content.data?.trim().length > 0) ||
-      (title && title?.trim().length > 0 && id)
-    ) {
-      await saveNote(true);
-    }
     tiny.call(EditorWebView, tiny.reset, true);
     clearNote();
     editing.focusType = null;
@@ -496,7 +509,7 @@ async function addToCollection(id) {
 let isSaving = false;
 
 export async function saveNote(preventUpdate) {
-  console.log('saving note now');
+  if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
   try {

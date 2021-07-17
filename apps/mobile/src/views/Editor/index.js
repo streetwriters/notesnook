@@ -57,8 +57,6 @@ const Editor = React.memo(
       }
     },[premiumUser])
 
-
-
     const onResetRequested = async noload => {
       setResetting(true);
       await sleep(30);
@@ -71,7 +69,6 @@ const Editor = React.memo(
 
     useEffect(() => {
       eSubscribeEvent('webviewreset', onResetRequested);
-
       return () => {
         eUnSubscribeEvent('webviewreset', onResetRequested);
       };
@@ -130,6 +127,7 @@ const Editor = React.memo(
             originWhitelist={['*']}
             source={source}
             style={style}
+            
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
