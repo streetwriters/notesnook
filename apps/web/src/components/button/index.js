@@ -5,14 +5,9 @@ import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 
 //TODO use normal button
+const boxShadow = "1px 1px 10px 0px var(--primary)";
 function Button(props) {
   const theme = useTheme();
-  const isMobile = useMobile();
-  const isTablet = useTablet();
-  const boxShadow = useMemo(
-    () => `1px 1px 10px 0px ${theme.colors["primary"]}`,
-    [theme.colors]
-  );
   return (
     <Flex
       data-test-id={props.testId}
@@ -31,6 +26,7 @@ function Button(props) {
         color: "static",
         fontFamily: "body",
         fontWeight: "body",
+        zIndex: 999,
         boxShadow: [boxShadow, boxShadow, "none"],
         ":hover": {
           cursor: "pointer",
@@ -39,9 +35,7 @@ function Button(props) {
       }}
       onClick={props.onClick}
     >
-      {props.Icon && (
-        <props.Icon color="static" size={isMobile || isTablet ? 24 : 20} />
-      )}
+      {props.Icon && <props.Icon color="static" size={24} />}
       <Text
         display={["none", "none", "flex"]}
         as="span"
