@@ -271,6 +271,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Restore',
+      title:"Restore " + note.itemType,
       icon: 'delete-restore',
       func: async () => {
         close();
@@ -531,6 +532,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'PermDelete',
+      title:"Delete " + note.itemType,
       icon: 'delete',
       func: async () => {
         close();
@@ -569,7 +571,7 @@ export const ActionSheetComponent = ({
       }}>
       <PressableButton
         onPress={rowItem.func}
-        type={rowItem.on ? 'accent' : 'grayBg'}
+        type={rowItem.on ? 'shade' : 'grayBg'}
         customStyle={{
           height: columnItemWidth - 12,
           width: columnItemWidth - 12,
@@ -585,7 +587,7 @@ export const ActionSheetComponent = ({
           size={DDS.isTab ? SIZE.xl : SIZE.lg}
           color={
             rowItem.on
-              ? colors.light
+              ? colors.accent
               : rowItem.name === 'Delete' || rowItem.name === 'PermDelete'
               ? colors.errorText
               : colors.icon
@@ -721,7 +723,7 @@ export const ActionSheetComponent = ({
                     <Button
                       key={topic.id}
                       title={topic.title}
-                      type="accent"
+                      type="gray"
                       height={30}
                       onPress={() => {
                         close();
@@ -734,12 +736,12 @@ export const ActionSheetComponent = ({
                         };
                         Navigation.navigate(routeName, params, headerState);
                       }}
+                      icon="book-open-outline"
                       fontSize={SIZE.sm - 1}
                       style={{
                         marginRight: 5,
                         paddingHorizontal: 0,
-                        borderRadius: 100,
-                        paddingHorizontal: 12,
+                        paddingHorizontal: 6,
                         marginTop: 5,
                       }}
                     />
