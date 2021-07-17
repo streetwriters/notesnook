@@ -21,6 +21,7 @@ function Unlock(props) {
   const [isWrong, setIsWrong] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
   const openLockedSession = useEditorStore((store) => store.openLockedSession);
+  const clearSession = useEditorStore((store) => store.clearSession);
   const setIsEditorOpen = useAppStore((store) => store.setIsEditorOpen);
   const setSelectedNote = useNoteStore((store) => store.setSelectedNote);
 
@@ -44,9 +45,10 @@ function Unlock(props) {
   }, [setIsWrong, noteId, openLockedSession]);
 
   useEffect(() => {
+    clearSession(false);
     setSelectedNote(noteId);
     setIsEditorOpen(true);
-  }, [setIsEditorOpen, setSelectedNote, noteId]);
+  }, [clearSession, setIsEditorOpen, setSelectedNote, noteId]);
 
   return (
     <Flex
