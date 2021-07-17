@@ -18,7 +18,14 @@ function createProfile(item, itemHeight, estimatedItemHeight) {
 
 const NotesProfile = createProfile(
   (index, item, context) => (
-    <Note index={index} pinnable={!context} item={item} context={context} />
+    <Note
+      index={index}
+      pinnable={!context}
+      item={item}
+      tags={item.tags.slice()}
+      notebooks={item.notebooks?.slice()}
+      context={context}
+    />
   ),
   getNoteHeight,
   MAX_HEIGHTS.note

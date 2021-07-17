@@ -138,7 +138,6 @@ function Note(props) {
 export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
-
   return (
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
@@ -147,7 +146,8 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
-    prevItem.notebooks?.length === nextItem.notebooks?.length
+    prevProps.notebooks?.length === nextProps.notebooks?.length &&
+    prevProps.tags.length === nextProps.tags.length
   );
 });
 

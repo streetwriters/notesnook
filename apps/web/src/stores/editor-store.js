@@ -142,8 +142,6 @@ class EditorStore extends BaseStore {
           state.session.id = note.id;
           state.session.title = note.title;
           state.session.isSaving = false;
-          state.session.color = note.color;
-          state.session.tags = note.tags;
           state.session.notebooks = note.notebooks;
         });
 
@@ -240,6 +238,12 @@ class EditorStore extends BaseStore {
     if (!note) return;
 
     let index = tags.indexOf(value);
+
+    this.setSession((state) => {
+      if (index <= -1) state.session.tags.push(value);
+      else state.session.tags.splice(index, 1);
+    });
+
     if (index > -1) {
       await note.untag(value);
       appStore.refreshMenuPins();
@@ -247,9 +251,8 @@ class EditorStore extends BaseStore {
       await note.tag(value);
     }
 
-    this.setSession(
-      (state) => (state.session.tags = db.notes.note(id).data.tags)
-    );
+    tagStore.refresh();
+    noteStore.refresh();
   }
 }
 

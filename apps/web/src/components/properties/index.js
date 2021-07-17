@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import * as Icon from "../icons";
 import { Flex, Text, Button } from "rebass";
-import { Input } from "@rebass/forms";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { db } from "../../common/db";
@@ -27,12 +26,10 @@ function Properties() {
   const [notebook, setNotebook] = useState();
   const color = useStore((store) => store.session.color);
   const toggleLocked = useStore((store) => store.toggleLocked);
-  const tags = useStore((store) => store.session.tags);
   const sessionId = useStore((store) => store.session.id);
   const notebookData = useStore((store) => store.session.notebook);
   const setSession = useStore((store) => store.setSession);
   const setColor = useStore((store) => store.setColor);
-  const setTag = useStore((store) => store.setTag);
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
@@ -195,56 +192,6 @@ function Properties() {
                         />
                       )}
                     </Flex>
-                  ))}
-                </Flex>
-
-                <Input
-                  data-test-id="properties-tag"
-                  placeholder="#tag"
-                  mt={4}
-                  onKeyUp={async (event) => {
-                    if (
-                      event.key === "Enter" ||
-                      event.key === " " ||
-                      event.key === ","
-                    ) {
-                      const value = event.target.value;
-                      if (value.trim().length === 0) {
-                        event.target.value = "";
-                        return;
-                      }
-                      event.target.value = "";
-                      await setTag(value.trim().replace(",", ""));
-                    }
-                  }}
-                />
-                <Flex
-                  fontSize="body"
-                  sx={{ marginTop: 2 }}
-                  alignItems="center"
-                  justifyContent="flex-start"
-                  flexWrap="wrap"
-                >
-                  {tags.map((tag) => (
-                    <Text
-                      data-test-id={`properties-tag-${tag}`}
-                      key={tag}
-                      sx={{
-                        backgroundColor: "primary",
-                        color: "static",
-                        borderRadius: "default",
-                        padding: "2px 5px 2px 5px",
-                        marginBottom: 1,
-                        marginRight: 1,
-                        cursor: "pointer",
-                      }}
-                      fontSize={"subBody"}
-                      onClick={async () => {
-                        await setTag(tag);
-                      }}
-                    >
-                      #{tag}
-                    </Text>
                   ))}
                 </Flex>
               </>
