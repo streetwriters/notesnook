@@ -8,6 +8,7 @@ import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import { getTotalNotes } from "../../common";
+import IconTag from "../icon-tag";
 
 class Notebook extends React.Component {
   shouldComponentUpdate(nextProps) {
@@ -17,7 +18,7 @@ class Notebook extends React.Component {
       prevItem.pinned !== nextItem.pinned ||
       prevItem.title !== nextItem.title ||
       prevItem.description !== nextItem.description ||
-      prevItem !== nextItem
+      prevItem.topics.length !== nextItem.topics.length
     );
   }
   render() {
@@ -37,35 +38,32 @@ class Notebook extends React.Component {
         menu={{ items: menuItems, extraData: { notebook } }}
         footer={
           <>
-            <Flex sx={{ marginBottom: 1, marginTop: 1 }}>
-              {notebook?.topics.slice(0, 3).map((topic) => (
-                <Flex
-                  key={topic.id}
-                  onClick={(e) => {
-                    navigate(`/notebooks/${notebook.id}/${topic.id}`);
-                    e.stopPropagation();
-                  }}
-                  bg="primary"
-                  px={1}
-                  sx={{
-                    marginRight: 1,
-                    borderRadius: "default",
-                    color: "static",
-                    paddingTop: "2px",
-                    paddingBottom: "2px",
-                  }}
-                >
-                  <Text variant="body" color="static" fontSize={11}>
-                    {topic.title}
-                  </Text>
-                </Flex>
-              ))}
-            </Flex>
-            <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
+            {notebook?.topics && (
+              <Flex mb={1}>
+                {notebook?.topics.slice(0, 3).map((topic) => (
+                  <IconTag
+                    key={topic.id}
+                    text={topic.title}
+                    icon={Icon.Topic}
+                    onClick={(e) => {
+                      navigate(`/notebooks/${notebook.id}/${topic.id}`);
+                    }}
+                  />
+                ))}
+              </Flex>
+            )}
+            <Flex
+              sx={{ fontSize: "subBody", color: "fontTertiary" }}
+              alignItems="center"
+            >
               {notebook.pinned && (
-                <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
+                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
               )}
-              {new Date(notebook.dateCreated).toDateString().substring(4)}
+              {new Date(notebook.dateCreated).toLocaleDateString("en", {
+                month: "long",
+                day: "2-digit",
+                year: "numeric",
+              })}
               <Text as="span" mx={1}>
                 •
               </Text>
