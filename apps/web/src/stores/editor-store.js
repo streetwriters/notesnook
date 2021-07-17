@@ -40,7 +40,7 @@ class EditorStore extends BaseStore {
 
   init = () => {
     EV.subscribe(EVENTS.userLoggedOut, () => {
-      hashNavigate("/notes/create", { addNonce: true });
+      hashNavigate("/notes/create", { replace: true, addNonce: true });
     });
   };
 
