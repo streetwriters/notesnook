@@ -21,6 +21,7 @@ function Note(props) {
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
   const isOpened = selectedNote === note.id;
+
   const [shade, primary] = useMemo(() => {
     if (!note.color) return ["shade", "primary"];
     const noteColor = COLORS[note.color];
@@ -44,12 +45,18 @@ function Note(props) {
   return (
     <ListItem
       selectable
+      isFocused={isOpened}
       item={note}
       title={note.title}
       body={note.headline}
       id={note.id}
       index={index}
-      colors={{ shade, primary, text: note.color ? primary : "text" }}
+      colors={{
+        shade,
+        primary,
+        text: note.color ? primary : "text",
+        background: isOpened ? "bgSecondary" : "background",
+      }}
       menu={{
         items: context?.type === "topic" ? topicNoteMenuItems : menuItems,
         extraData: { note, context },
@@ -79,7 +86,15 @@ function Note(props) {
         )
       }
       footer={
-        <Flex mt={1} sx={{ fontSize: "subBody", color: "fontTertiary" }}>
+        <Flex
+          alignItems="center"
+          sx={{ fontSize: "subBody", color: "fontTertiary" }}
+        >
+          <TimeAgo
+            live={false}
+            datetime={note.dateCreated}
+            style={{ marginRight: 5 }}
+          />
           {note.conflicted && (
             <Text
               mr={1}
@@ -94,40 +109,18 @@ function Note(props) {
             </Text>
           )}
           {note.pinned && !props.context && (
-            <Icon.PinFilled color="primary" size={10} sx={{ mr: 1 }} />
+            <Icon.PinFilled size={13} color={primary} sx={{ mr: 1 }} />
           )}
-          <TimeAgo live={false} datetime={note.dateCreated} />
           {note.locked && (
             <Icon.Lock
               size={13}
               color={"fontTertiary"}
-              sx={{ ml: 1 }}
+              sx={{ mr: 1 }}
               data-test-id={`note-${index}-locked`}
             />
           )}
           {note.favorite && (
-            <Icon.Star color={"favorite"} size={13} sx={{ ml: 1 }} />
-          )}
-          {isOpened && (
-            <Text
-              display="flex"
-              bg={shade}
-              justifyContent="center"
-              alignItems="center"
-              px="2px"
-              py="2px"
-              sx={{
-                position: "absolute",
-                bottom: 2,
-                right: 2,
-                borderRadius: "default",
-              }}
-              fontWeight="bold"
-              color={primary}
-              fontSize={8}
-            >
-              <Icon.Edit color={primary} size={8} /> EDITING NOW
-            </Text>
+            <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
           )}
         </Flex>
       }
