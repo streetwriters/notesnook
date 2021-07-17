@@ -47,7 +47,7 @@ function Header(props) {
             />
           ) : (
             <Icon.Menu
-              onClick={toggleSideMenu}
+              onClick={() => toggleSideMenu(true)}
               sx={{
                 flexShrink: 0,
                 ml: 0,
