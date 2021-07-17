@@ -29,6 +29,7 @@ export const Button = ({
   tooltipText,
   textStyle,
   iconPosition = 'left',
+  hitSlop
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -41,6 +42,7 @@ export const Button = ({
 
   return (
     <PressableButton
+      hitSlop={hitSlop}
       onPress={onPress}
       onLongPress={event => {
         if (onLongPress) {
@@ -68,7 +70,7 @@ export const Button = ({
         ...style,
       }}>
       {loading && <ActivityIndicator color={textColor} />}
-      {icon && !loading && iconPosition === 'left' && (
+      {icon && !loading && iconPosition === 'left' ? (
         <Icon
           name={icon}
           style={{
@@ -77,12 +79,13 @@ export const Button = ({
           color={textColor}
           size={iconSize}
         />
-      )}
+      ): null}
 
       {!title ? null : (
         <Heading
           color={textColor}
           size={fontSize}
+          numberOfLines={1}
           style={[
             {
               marginLeft: icon || loading && iconPosition === "left" ? 5 : 0,
@@ -94,7 +97,7 @@ export const Button = ({
         </Heading>
       )}
 
-      {icon && !loading && iconPosition === 'right' && (
+      {icon && !loading && iconPosition === 'right' ? (
         <Icon
           name={icon}
           style={{
@@ -103,7 +106,7 @@ export const Button = ({
           color={textColor}
           size={iconSize}
         />
-      )}
+      ) : null}
     </PressableButton>
   );
 };
