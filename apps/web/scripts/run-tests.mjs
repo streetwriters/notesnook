@@ -3,6 +3,7 @@ const find = require("find-process");
 const { p, updateSnapshots, file, noServer } = argv;
 
 if (!noServer) {
+  await killServer();
   const res = nothrow($`yarn debug -p ${p || 3000}`);
   res.stdout.on("data", async (data) => {
     const message = data.toString();
