@@ -50,7 +50,7 @@ let subsriptionErrorListener;
 let isUserReady = false;
 async function storeAppState() {
   if (editing.currentlyEditing) {
-    if (getNote().locked) return;
+    if (getNote()?.locked) return;
     let state = JSON.stringify({
       editing: editing.currentlyEditing,
       note: getNote(),
