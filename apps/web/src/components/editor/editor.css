@@ -1,5 +1,5 @@
 .tox .tox-tbtn:hover {
-  background: var(--shade) !important;
+  background: var(--hover) !important;
 }
 
 .tox-textfield {
