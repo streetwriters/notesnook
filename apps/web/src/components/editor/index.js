@@ -12,7 +12,6 @@ import Header from "./header";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
-import Banner from "../banner";
 import EditorLoading from "./loading";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
@@ -89,9 +88,7 @@ function Editor({ noteId, nonce }) {
         alignSelf: "stretch",
         overflow: "hidden",
       }}
-      flex="1 1 auto"
     >
-      {isMobile && <Banner />}
       <Toolbar />
       <Flex
         variant="columnFill"
@@ -117,7 +114,6 @@ function Editor({ noteId, nonce }) {
           variant="columnFill"
           className="editor"
           sx={{
-            mx: [3, 3, 0],
             alignSelf: ["stretch", "stretch", "center"],
           }}
           animate={{
@@ -125,19 +121,19 @@ function Editor({ noteId, nonce }) {
               isFocusMode && !isTablet
                 ? "25%"
                 : isTablet || isMobile
-                ? "20px"
+                ? "10px"
                 : "35px",
             paddingLeft:
               isFocusMode && !isTablet
                 ? "25%"
                 : isTablet || isMobile
-                ? "20px"
+                ? "10px"
                 : "35px",
           }}
           transition={{ duration: 0.3, ease: "easeOut" }}
           maxWidth={isFocusMode ? "auto" : "935px"}
           width={["100%", "100%", isFocusMode ? "auto" : "100%"]}
-          mt={[0, 0, 25]}
+          mt={[2, 2, 25]}
         >
           <Header />
 

@@ -146,9 +146,10 @@ function Toolbar(props) {
       <Flex justifyContent="center" alignItems="center" flex={1}>
         <Icon.ArrowLeft
           sx={{
-            display: ["block", "block", "none"],
+            display: ["block", "none", "none"],
+            flexShrink: 0,
           }}
-          size={18}
+          size={24}
           onClick={() => {
             if (store.get().session.id) showToast("success", "Note saved!");
             if (isFocusMode) toggleFocusMode();
@@ -157,8 +158,14 @@ function Toolbar(props) {
         />
         <Animated.Input
           ml={[2, 2, 0]}
-          initial={{ opacity: isTitleVisible ? 1 : 0 }}
-          animate={{ opacity: isTitleVisible ? 1 : 0 }}
+          initial={{
+            opacity: isTitleVisible ? 1 : 0,
+            zIndex: isTitleVisible ? 1 : -1,
+          }}
+          animate={{
+            opacity: isTitleVisible ? 1 : 0,
+            zIndex: isTitleVisible ? 1 : -1,
+          }}
           transition={{ duration: 0.5 }}
           fontWeight="heading"
           fontSize="heading"
@@ -181,45 +188,46 @@ function Toolbar(props) {
           }}
         />
       </Flex>
-      <Flex justifyContent="flex-end">
+      <Flex alignItems="center" justifyContent="flex-end">
         {tools.map((tool) => (
           <Button
             data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
             disabled={!tool.enabled}
             variant="tool"
+            flexShrink={0}
             ml={2}
             title={tool.title}
             key={tool.title}
             sx={{
               display: [
-                tool.hideOnMobile ? "none" : "block",
-                tool.hidden ? "none" : "block",
+                tool.hideOnMobile ? "none" : "flex",
+                tool.hidden ? "none" : "flex",
               ],
               color: tool.enabled ? "text" : "disabled",
               cursor: tool.enabled ? "pointer" : "not-allowed",
             }}
             onClick={tool.onClick}
+            flexDirection="row"
+            alignItems="center"
           >
-            <Flex justifyContent="center" alignItems="center">
-              <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
-              <Text display={["none", "none", "block"]} fontSize="body" ml={1}>
-                {tool.title}
+            <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
+            <Text display={["none", "none", "block"]} variant="body" ml={1}>
+              {tool.title}
+            </Text>
+            {tool.new && (
+              <Text
+                variant="subBody"
+                fontSize={10}
+                ml={1}
+                bg="primary"
+                color="static"
+                px={"3px"}
+                py="1px"
+                sx={{ borderRadius: "default" }}
+              >
+                NEW
               </Text>
-              {tool.new && (
-                <Text
-                  variant="subBody"
-                  fontSize={10}
-                  ml={1}
-                  bg="primary"
-                  color="static"
-                  px={"3px"}
-                  py="1px"
-                  sx={{ borderRadius: "default" }}
-                >
-                  NEW
-                </Text>
-              )}
-            </Flex>
+            )}
           </Button>
         ))}
       </Flex>
