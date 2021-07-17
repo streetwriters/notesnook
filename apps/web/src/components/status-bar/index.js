@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Flex, Text } from "rebass";
+import { Box, Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -21,8 +21,9 @@ function StatusBar() {
   const updateStatus = useAutoUpdater();
 
   return (
-    <Flex
+    <Box
       bg="bgSecondary"
+      display={["none", "flex"]}
       sx={{ borderTop: "1px solid", borderTopColor: "border" }}
       justifyContent="space-between"
       px={2}
@@ -119,7 +120,7 @@ function StatusBar() {
         )}
       </Flex>
       <EditorFooter />
-    </Flex>
+    </Box>
   );
 }
 
