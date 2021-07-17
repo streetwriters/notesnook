@@ -13,6 +13,7 @@ function CachedRouter() {
     if (!RouteResult) return;
     NavigationEvents.publish("onNavigate", RouteResult);
     window.currentViewType = RouteResult.type;
+    window.currentViewKey = RouteResult.key;
 
     const key = RouteResult.key || "general";
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { Flex, Text } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
@@ -27,10 +27,9 @@ function ListContainer(props) {
   const listRef = useRef();
 
   useEffect(() => {
-    if (!props.items.length) return;
-    if (shouldSelectAll)
-      setSelectedItems(props.items.filter((item) => item.type !== "header"));
-  }, [shouldSelectAll, setSelectedItems, props.items]);
+    if (shouldSelectAll && window.currentViewKey === type)
+      setSelectedItems(items.filter((item) => item.type !== "header"));
+  }, [shouldSelectAll, type, setSelectedItems, items]);
 
   useEffect(() => {
     if (props.static) return;
@@ -60,12 +59,12 @@ function ListContainer(props) {
                 Scroller: CustomScrollbarsVirtualList,
                 Header: () =>
                   announcements.length ? (
-            <Announcements
-              announcements={announcements}
-              removeAnnouncement={removeAnnouncement}
-            />
-          ) : (
-            <ReminderBar />
+                    <Announcements
+                      announcements={announcements}
+                      removeAnnouncement={removeAnnouncement}
+                    />
+                  ) : (
+                    <ReminderBar />
                   ),
                 Footer: () => (
                   <Text
@@ -77,36 +76,36 @@ function ListContainer(props) {
                     — End reached —
                   </Text>
                 ),
-                        }}
+              }}
               itemContent={(index, item) => {
-                          if (!item) return null;
+                if (!item) return null;
 
-                          switch (item.type) {
-                            case "header":
-                              return (
-                                  <GroupHeader
+                switch (item.type) {
+                  case "header":
+                    return (
+                      <GroupHeader
                         type={groupType}
                         refresh={refresh}
-                                    title={item.title}
-                                    index={index}
+                        title={item.title}
+                        index={index}
                         groups={props.items.filter((v) => v.type === "header")}
-                                    onJump={(title) => {
-                                      const index = props.items.findIndex(
-                                        (v) => v.title === title
-                                      );
-                                      if (index < 0) return;
+                        onJump={(title) => {
+                          const index = props.items.findIndex(
+                            (v) => v.title === title
+                          );
+                          if (index < 0) return;
                           listRef.current.scrollToIndex({
                             index,
                             align: "center",
                             behavior: "smooth",
                           });
-                                    }}
-                                  />
-                              );
-                            default:
-                    return profile.item(index, item, context);
-                          }
                         }}
+                      />
+                    );
+                  default:
+                    return profile.item(index, item, context);
+                }
+              }}
             />
           </Flex>
         </>
