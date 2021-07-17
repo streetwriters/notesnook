@@ -1,7 +1,7 @@
 import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
 import {FlatList, TextInput, View} from 'react-native';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {editing} from '../../utils';
 
 export default class CustomTabs extends Component {
@@ -39,11 +39,14 @@ export default class CustomTabs extends Component {
       this.setScrollEnabled(false);
       this.responderAllowedScroll = true;
       return;
-    }  
+    }
 
     if (cOffset > pOffset - 50 || DDS.isSmallTab) {
-      if ((!DDS.isSmallTab && x > 50 || y > heightCheck) || (DDS.isSmallTab && x > this.props.widths.b)) {
-
+      if (
+        (!DDS.isSmallTab && x > 50) ||
+        y > heightCheck ||
+        (DDS.isSmallTab && x > this.props.widths.b)
+      ) {
         this.responderAllowedScroll = false;
         this.setScrollEnabled(false);
         return;
@@ -99,7 +102,6 @@ export default class CustomTabs extends Component {
       offset = 0;
       this.nextPage = 0;
     }
-
     this.listRef.current?.scrollToOffset({
       offset: offset,
       animated: animated,
@@ -121,6 +123,13 @@ export default class CustomTabs extends Component {
   onScroll = event => {
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
+
+    if (this.scrollOffset < this.props.offsets.b - 100 || this.nextPage !== 1) {
+      editing.movedAway = true;
+    } else {
+      editing.movedAway = false;
+      editing.currentlyEditing = true;
+    }
     this.props.onScroll(this.scrollOffset);
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout);
@@ -160,8 +169,11 @@ export default class CustomTabs extends Component {
     let page = 0;
     if (this.scrollOffset > this.props.offsets.b - 50) {
       page = 1;
+      this.nextPage = 1;
+      editing.movedAway = false;
     } else {
       this.nextPage = 0;
+      editing.movedAway = true;
       this.hideKeyboardIfVisible();
     }
     let drawerState = page === 0 && this.scrollOffset < 10;
@@ -183,11 +195,10 @@ export default class CustomTabs extends Component {
   onListTouchEnd = event => {
     if (this.lastOffset < 30 && event) {
       let width = this.props.dimensions.width;
-      let px = event.nativeEvent.pageX
+      let px = event.nativeEvent.pageX;
       if (px > width * 0.75 || (DDS.isSmallTab && px > this.props.widths.a)) {
         this.goToIndex(1);
       }
-
     }
   };
 
@@ -219,11 +230,13 @@ export default class CustomTabs extends Component {
           alwaysBounceHorizontal={false}
           scrollToOverflowEnabled={false}
           scrollsToTop={false}
-          scrollEventThrottle={1}
+          scrollEventThrottle={2}
           directionalLockEnabled
-          overScrollMode="auto"
+          overScrollMode="never"
           maxToRenderPerBatch={100}
           keyboardDismissMode="none"
+          disableVirtualization
+          removeClippedSubviews={Platform.OS === 'android'}
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
           disableIntervalMomentum={true}
