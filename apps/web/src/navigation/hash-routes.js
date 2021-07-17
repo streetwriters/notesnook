@@ -65,7 +65,7 @@ const hashroutes = {
     closeOpenedDialog();
     return (
       <Suspense fallback={<EditorLoading text="Opening note..." />}>
-        <Editor noteId={noteId} />
+        <Editor noteId={noteId} nonce={Math.random()} />
       </Suspense>
     );
   },
