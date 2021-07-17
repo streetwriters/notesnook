@@ -1,35 +1,11 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import {View} from 'react-native';
-import {useValue} from 'react-native-reanimated';
 import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
 import Heading from '../Typography/Heading';
 
-export const Title = ({heading, headerColor, screen}) => {
+export const Title = ({heading, headerColor}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const deviceMode = useSettingStore(state => state.deviceMode);
-  const opacity = useValue(1);
-
-  const onScroll = async data => {
-    if (data.screen === 'Settings') return;
-    if (data.screen !== screen) return;
-    if (deviceMode !== 'mobile') return;
-    if (data.y > 75) {
-      let yVal = data.y - 75;
-      o = yVal / 75;
-      opacity.setValue(o);
-    } else {
-      opacity.setValue(0);
-    }
-  };
-
-  useEffect(() => {
-    //eSubscribeEvent(eScrollEvent, onScroll);
-    return () => {
-      //eUnSubscribeEvent(eScrollEvent, onScroll);
-    };
-  }, []);
 
   return (
     <View
