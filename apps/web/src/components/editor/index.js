@@ -83,6 +83,7 @@ function Editor({ noteId, nonce }) {
   return (
     <Flex
       flexDirection="column"
+      flex={1}
       sx={{
         position: "relative",
         alignSelf: "stretch",
