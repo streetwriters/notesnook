@@ -15,8 +15,10 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
+  let isFocused =
+    headerTextState?.id === item.name.toLowerCase() + '_navigation';
 
-  const _onPress = (event) => {
+  const _onPress = event => {
     if (item.func) {
       item.func();
     } else {
@@ -36,7 +38,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
     }
   };
 
-  const onHeaderStateChange = (event) => {
+  const onHeaderStateChange = event => {
     if (event.id === item.name.toLowerCase() + '_navigation') {
       setHeaderTextState(event);
     } else {
@@ -56,16 +58,17 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      type="transparent"
+      type={!isFocused ? 'gray' : 'grayBg'}
       customStyle={{
-        width: '100%',
+        width:'100%',
         alignSelf: 'center',
-        borderRadius: 0,
+        borderRadius: 5,
         flexDirection: 'row',
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
         height: normalize(50),
+        marginBottom:5
       }}>
       <View
         style={{
@@ -78,20 +81,18 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
             textAlignVertical: 'center',
             textAlign: 'left',
           }}
-          name={item.icon}
-          color={
-            headerTextState?.id === item.name.toLowerCase() + '_navigation'
-              ? colors.accent
-              : colors.pri
-          }
+          name={ item.icon}
+          color={isFocused ? colors.accent : colors.pri}
           size={SIZE.lg - 2}
         />
-        {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
-          <Heading color={colors.accent} size={SIZE.md}>
+        {isFocused ? (
+          <Heading color={colors.heading} size={SIZE.md}>
             {item.name}
           </Heading>
         ) : (
-          <Paragraph color={colors.heading} size={SIZE.md}>{item.name}</Paragraph>
+          <Paragraph size={SIZE.md}>
+            {item.name}
+          </Paragraph>
         )}
       </View>
 
@@ -115,24 +116,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
           }}
           onPress={rightBtn.func}
         />
-      ) : (
-        <View
-          style={{
-            backgroundColor:
-              headerTextState?.id === item.name.toLowerCase() + '_navigation'
-                ? colors.accent
-                : 'transparent',
-            width: 7,
-            height: 7,
-            borderRadius: 100,
-            ...getElevation(
-              headerTextState?.id === item.name.toLowerCase() + '_navigation'
-                ? 1
-                : 0,
-            ),
-          }}
-        />
-      )}
+      ) : null}
     </PressableButton>
   );
 };

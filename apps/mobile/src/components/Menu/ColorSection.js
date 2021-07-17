@@ -1,19 +1,17 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
 import { useMenuStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getElevation} from '../../utils';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {refreshNotesPage} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { refreshNotesPage } from '../../utils/Events';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -73,20 +71,21 @@ const ColorItem = ({item, index}) => {
 
   return (
     <PressableButton
-      customColor="transparent"
+      customColor={headerTextState?.id === item.id?  "rgba(0,0,0,0.04)" : "transparent"}
       customSelectedColor={COLORS_NOTE[item.title]}
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={0.12}
       onPress={() => onPress(item)}
       customStyle={{
         width: '100%',
-        alignSelf: 'center',
-        borderRadius: 0,
-        flexDirection: 'row',
-        paddingHorizontal: 8,
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: normalize(50),
+          alignSelf: 'center',
+          borderRadius: 5,
+          flexDirection: 'row',
+          paddingHorizontal: 8,
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          height: normalize(50),
+          marginBottom: 5,
       }}>
       <View
         style={{
@@ -111,30 +110,15 @@ const ColorItem = ({item, index}) => {
           />
         </View>
         {headerTextState?.id === item.id ? (
-          <Heading color={COLORS_NOTE[item.title.toLowerCase()]} size={SIZE.md}>
+          <Heading color={colors.heading} size={SIZE.md}>
             {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
           </Heading>
         ) : (
-          <Paragraph color={colors.heading} size={SIZE.md}>
+          <Paragraph color={colors.pri} size={SIZE.md}>
             {item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
           </Paragraph>
         )}
       </View>
-
-      <View
-        style={{
-          backgroundColor:
-            headerTextState?.id === item.id
-              ? COLORS_NOTE[item.title.toLowerCase()]
-              : 'transparent',
-          width: 7,
-          height: 7,
-          borderRadius: 100,
-          ...getElevation(
-            headerTextState?.id === item.id + '_navigation' ? 1 : 0,
-          ),
-        }}
-      />
     </PressableButton>
   );
 };
