@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import { useNotebookStore, useSelectionStore } from '../../provider/stores';
+import {useNotebookStore, useSelectionStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -13,7 +13,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { getTotalNotes } from '../../utils';
+import {getTotalNotes} from '../../utils';
 import {db} from '../../utils/DB';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
@@ -63,7 +63,7 @@ const MoveNoteDialog = () => {
     ]);
   };
 
-  const update = (note) => {
+  const update = note => {
     setNote(note);
   };
 
@@ -80,7 +80,9 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  const notebooks = useNotebookStore(state => state.notebooks);
+  const notebooks = useNotebookStore(state =>
+    state.notebooks.filter(n => n.type === 'notebook'),
+  );
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
 
@@ -143,7 +145,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     }
 
     let noteIds = [];
-    selectedItemsList.forEach((i) => noteIds.push(i.id));
+    selectedItemsList.forEach(i => noteIds.push(i.id));
 
     await db.notes.move(
       {
@@ -167,10 +169,13 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   useEffect(() => {
     if (!note?.id) return;
     let ids = [];
+
     for (let i = 0; i < notebooks.length; i++) {
-      for (let t = 0; t < notebooks[i].topics.length; t++) {
-        if (notebooks[i].topics[t].notes.indexOf(note.id) > -1) {
-          ids.push(notebooks[i].id);
+      if (notebooks[i].topics) {
+        for (let t = 0; t < notebooks[i].topics.length; t++) {
+          if (notebooks[i].topics[t].notes.indexOf(note.id) > -1) {
+            ids.push(notebooks[i].id);
+          }
         }
       }
     }
@@ -237,7 +242,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
               }}>
               <TextInput
                 ref={notebookInput}
-                onChangeText={(value) => {
+                onChangeText={value => {
                   newNotebookTitle = value;
                 }}
                 testID={notesnook.ids.dialogs.addTo.addNotebook}
@@ -304,7 +309,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   marginBottom: 5,
                   borderBottomWidth: 1,
                   borderBottomColor:
-                    expanded === item.id || noteExists.indexOf(item.id) > -1
+                    noteExists.indexOf(item.id) > -1
                       ? colors.accent
                       : colors.nav,
                 }}>
@@ -320,20 +325,20 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                   <View>
                     <Heading
                       color={
-                        expanded === item.id || noteExists.indexOf(item.id) > -1
-                          ? colors.accent
-                          : null
+                        noteExists.indexOf(item.id) > -1 ? colors.accent : null
                       }
                       size={SIZE.md}>
                       {item.title}
                     </Heading>
-                    <Paragraph size={SIZE.xs} color={colors.icon}>
-                      {getTotalNotes(item) +
-                        ' notes' +
-                        ' & ' +
-                        item.topics.length +
-                        ' topics'}
-                    </Paragraph>
+                    {item.topics?.length > 0 ? (
+                      <Paragraph size={SIZE.xs} color={colors.icon}>
+                        {getTotalNotes(item) + ' notes' + ' & '}
+                        {item.topics.length === 1
+                          ? item.topics.length + ' topic'
+                          : item.topics.length + ' topics'}
+                      </Paragraph>
+                    ) : null}
+
                   </View>
 
                   <Icon
@@ -381,7 +386,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                         }}>
                         <TextInput
                           ref={topicInput}
-                          onChangeText={(value) => {
+                          onChangeText={value => {
                             newTopicTitle = value;
                           }}
                           testID={notesnook.ids.dialogs.addTo.addTopic}
@@ -456,10 +461,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       {note && item.notes.indexOf(note.id) > -1 ? (
                         <Button
                           onPress={() => handlePress(item, index)}
-                          title="Remove note"
+                          title="Remove"
                           type="error"
                           height={25}
-                          fontSize={SIZE.sm}
+                          fontSize={SIZE.xs + 1}
                           style={{
                             margin: 1,
                             marginRight: 5,
