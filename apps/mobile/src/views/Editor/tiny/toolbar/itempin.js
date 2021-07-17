@@ -28,13 +28,12 @@ const ToolbarItemPin = ({format, color}) => {
       toValue: val,
       duration: time,
       easing: Easing.in(Easing.ease),
-    }).start(async () => {
-      await sleep(time);
-      animating = false;
-    });
+    }).start();
+    await sleep(time);
+    animating = false;
   }
 
-  const show = async (data) => {
+  const show = async data => {
     if (data?.title === format) {
       setVisible(true);
       await sleep(5);
@@ -45,7 +44,7 @@ const ToolbarItemPin = ({format, color}) => {
       setVisible(false);
     }
   };
-  
+
   return (
     visible && (
       <Animated.View
