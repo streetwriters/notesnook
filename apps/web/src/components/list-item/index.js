@@ -1,5 +1,5 @@
 import React, { useEffect, useCallback, useMemo } from "react";
-import { Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import {
   store as selectionStore,
@@ -62,10 +62,13 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 
 function ListItem(props) {
   const {
-    colors: { shade = "shade", text = "text" } = {
+    colors: { shade, text, primary, background } = {
       shade: "shade",
+      primary: "primary",
       text: "text",
+      background: "background",
     },
+    isFocused,
   } = props;
 
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
@@ -115,7 +118,7 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={isSelected ? shade : "background"}
+      bg={isSelected ? shade : background}
       onContextMenu={(e) =>
         openContextMenu(e, menuItems, props.menu?.extraData, false)
       }
@@ -128,8 +131,10 @@ function ListItem(props) {
         borderBottomColor: "border",
         cursor: "pointer",
         position: "relative",
+        borderLeft: isFocused ? "3px solid" : "none",
+        borderLeftColor: primary,
         ":hover": {
-          backgroundColor: shade,
+          backgroundColor: "hover",
         },
         ":focus": {
           outline: "none",
@@ -155,18 +160,11 @@ function ListItem(props) {
     >
       {props.header}
 
-      <Flex>
-        {isSelectionMode && (
-          <ItemSelector
-            isSelected={isSelected}
-            toggleSelection={toggleSelection}
-          />
-        )}
         <Text
-          color={text}
-          fontFamily={"heading"}
-          fontSize="title"
+        data-test-id={`${props.item.type}-${props.index}-title`}
           fontWeight={"bold"}
+        color={text}
+        display={isSelectionMode ? "flex" : "block"}
           sx={{
             lineHeight: "1.4rem",
             maxHeight: "1.4rem", // 1 lines, i hope
@@ -174,41 +172,35 @@ function ListItem(props) {
             overflow: "hidden",
             textOverflow: "ellipsis",
           }}
-          mr={4}
-          data-test-id={`${props.item.type}-${props.index}-title`}
         >
+        {isSelectionMode && (
+          <ItemSelector
+            isSelected={isSelected}
+            toggleSelection={toggleSelection}
+          />
+        )}
           {props.title}
         </Text>
-      </Flex>
 
+      {props.body && (
       <Text
         as="p"
-        display={props.body ? "box" : "none"}
         variant="body"
+          data-test-id={`${props.item.type}-${props.index}-body`}
         sx={{
-          maxWidth: "90%",
-          cursor: "pointer",
-          lineHeight: "1.4em",
-          maxHeight: "2.8em", // 2 lines, i hope
+            lineHeight: `1.2rem`,
           overflow: "hidden",
           textOverflow: "ellipsis",
+            position: "relative",
+            display: "-webkit-box",
+            WebkitLineClamp: 4,
+            WebkitBoxOrient: "vertical",
         }}
-        data-test-id={`${props.item.type}-${props.index}-body`}
       >
         {props.body}
       </Text>
-      {props.footer}
-      {props.menu && (
-        <Icon.MoreVertical
-          sx={{ position: "absolute", right: 1 }}
-          size={22}
-          color="icon"
-          onClick={(event) => {
-            event.stopPropagation();
-            openContextMenu(event, menuItems, props.menu.extraData, true);
-          }}
-        />
       )}
+      {props.footer && <Box mt={1}>{props.footer}</Box>}
     </Flex>
   );
 }
