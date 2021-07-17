@@ -34,9 +34,6 @@ class Default {
         border: "2px solid",
         borderColor: "primary",
       },
-      ":hover:not(:disabled)": {
-        filter: "brightness(85%)",
-      },
       ":disabled": {
         opacity: 0.5,
         cursor: "not-allowed",
@@ -68,7 +65,12 @@ class Shade {
 
 class Secondary {
   constructor() {
-    return { variant: "buttons.default", color: "text", bg: "border" };
+    return {
+      variant: "buttons.default",
+      color: "text",
+      bg: "border",
+      ":hover:not(:disabled)": { bg: "hover", filter: "brightness(90%)" },
+    };
   }
 }
 
@@ -127,7 +129,8 @@ class Icon {
       color: "text",
       borderRadius: "none",
       ":hover": {
-        backgroundColor: "shade",
+        backgroundColor: "hover",
+        filter: "brightness(90%)",
       },
     };
   }
@@ -138,7 +141,7 @@ class Tool {
     return {
       variant: "buttons.default",
       color: "text",
-
+      py: 1,
       backgroundColor: "bgSecondary",
       borderRadius: "default",
       ":hover": {
