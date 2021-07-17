@@ -15,22 +15,33 @@ function ReminderBar() {
   if (!reminder) return null;
   return (
     <Flex
-      p={1}
-      bg={"primary"}
       alignItems="center"
-      mb={1}
-      px={2}
-      sx={{ cursor: "pointer" }}
-      onClick={reminder?.action}
       justifyContent="space-between"
+      sx={{
+        cursor: "pointer",
+        borderRadius: "default",
+        ":hover": { bg: "hover" },
+      }}
+      onClick={reminder?.action}
+      mx={1}
+      p={1}
     >
       <Flex alignItems="center">
-        <reminder.icon size={14} color="static" sx={{ mr: 1 }} />
-        <Text variant="body" fontSize={"body"} color="static">
-          {reminder.title}
-        </Text>
+        <reminder.icon
+          size={18}
+          color="primary"
+          sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
+        />
+        <Flex variant="columnCenter" alignItems="flex-start">
+          <Text display={["block", "none", "block"]} variant="subBody">
+            {reminder.subtitle}
+          </Text>
+          <Text variant="body" fontSize={"body"}>
+            {reminder.title}
+          </Text>
+        </Flex>
       </Flex>
-      <Icon.ArrowRight size={14} color="static" />
+      <Icon.ChevronRight size={20} color="primary" />
     </Flex>
   );
 }

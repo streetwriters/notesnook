@@ -23,11 +23,11 @@ export async function shouldAddBackupReminder() {
 
 export async function shouldAddRecoveryKeyBackupReminder() {
   const recoveryKeyBackupDate = Config.get("recoveryKeyBackupDate", 0);
-  if (!recoveryKeyBackupDate) return false;
+  if (!recoveryKeyBackupDate) return true;
   return dayjs(recoveryKeyBackupDate).add(7, "d").isBefore(dayjs());
 }
 
-export async function shouldAddSignupReminder() {
+export async function shouldAddLoginReminder() {
   const user = await db.user.getUser();
   if (!user) return true;
 }
@@ -39,22 +39,26 @@ export async function shouldAddConfirmEmailReminder() {
 
 export const Reminders = {
   backup: {
-    title: "Back up your data now!",
+    subtitle: "Create a backup to keep your notes safe",
+    title: "Back up your data",
     action: createBackup,
     icon: Icon.Backup,
   },
-  signup: {
-    title: "Sign up for cross-device syncing!",
-    action: () => hashNavigate("/signup"),
-    icon: Icon.Login,
+  login: {
+    title: "Login to sync your notes",
+    subtitle: "You are not logged in",
+    action: () => hashNavigate("/login"),
+    icon: Icon.User,
   },
   email: {
     title: "Please confirm your email",
+    subtitle: "Confirm your email to sync notes",
     action: () => hashNavigate("/email/verify"),
     icon: Icon.Email,
   },
   recoverykey: {
-    title: "Did you backup your recovery key?",
+    title: "Backup your recovery key",
+    subtitle: "Keep your recovery key safe",
     action: showRecoveryKeyDialog,
     icon: Icon.Warn,
   },
@@ -70,8 +74,8 @@ export async function resetReminders() {
       appStore.addReminder("backup", "high");
     }
   }
-  if (await shouldAddSignupReminder()) {
-    appStore.addReminder("signup", "low");
+  if (await shouldAddLoginReminder()) {
+    appStore.addReminder("login", "low");
   }
   if (await shouldAddConfirmEmailReminder()) {
     appStore.addReminder("email", "high");
