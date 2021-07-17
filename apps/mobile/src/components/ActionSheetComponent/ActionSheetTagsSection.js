@@ -53,7 +53,7 @@ const TagItem = ({tag, close}) => {
 
   const style = {
     paddingHorizontal: 0,
-    paddingHorizontal: 12,
+    paddingHorizontal: 6,
     marginVertical: 5,
   };
 
