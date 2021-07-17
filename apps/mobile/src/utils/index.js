@@ -141,7 +141,7 @@ export const GROUP = {
 export const SORT = {
   dateEdited:"Date edited",
   dateCreated:"Date created",
-  title:"Title",
+  //title:"Title",
 }
 
 export const editing = {
@@ -238,6 +238,7 @@ export function getTotalNotes(notebook) {
   if (notebook.type === 'topic') {
     return notebook.notes.length;
   }
+  if (!notebook.topics) return 0;
   return notebook.topics.reduce((sum, topic) => {
     return sum + topic.notes.length;
   }, 0);
