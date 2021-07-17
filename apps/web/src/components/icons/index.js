@@ -12,7 +12,10 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
       title={title}
       path={name}
       size={size + "px"}
-      stroke={stroke}
+      style={{
+        strokeWidth: stroke || "0px",
+        stroke: theme.colors[color] || color,
+      }}
       color={theme.colors[color] || color}
       spin={rotate}
     />
