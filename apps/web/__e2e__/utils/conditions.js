@@ -28,12 +28,15 @@ async function isToastPresent() {
   return isPresent(getTestId("toast"));
 }
 
-async function checkNotePresence(index = 0, grouped = true, note = NOTE) {
-  let noteSelector = List.new("note").atIndex(index).title();
-  if (grouped) noteSelector = noteSelector.grouped();
+async function checkNotePresence(viewId, index = 0, note = NOTE) {
+  let noteSelector = List.new("note")
+    .view(viewId)
+    .grouped()
+    .atIndex(index)
+    .title();
   noteSelector = noteSelector.build();
 
-  await page.waitForSelector(noteSelector);
+  await page.waitForSelector(noteSelector, { state: "attached" });
   await expect(page.innerText(noteSelector)).resolves.toBe(note.title);
   return noteSelector;
 }

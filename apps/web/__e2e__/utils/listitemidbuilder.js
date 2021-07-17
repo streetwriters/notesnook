@@ -4,8 +4,14 @@ class ListItemIDBuilder {
   static new(type) {
     return new ListItemIDBuilder(type);
   }
+
   constructor(type) {
     this.type = type;
+  }
+
+  view(viewId) {
+    this.viewId = viewId;
+    return this;
   }
 
   atIndex(index) {
@@ -45,9 +51,16 @@ class ListItemIDBuilder {
 
   build() {
     if (this.isGrouped) this.index++;
-    return getTestId(
+
+    const id = getTestId(
       `${this.type}-${this.index}${this.suffix ? `-${this.suffix}` : ""}`
     );
+
+    if (this.isGrouped) {
+      this.index--;
+    }
+    if (this.viewId) return `#${this.viewId} ${id}`;
+    return id;
   }
 }
 module.exports = ListItemIDBuilder;

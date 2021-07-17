@@ -48,11 +48,11 @@ async function createNoteAndCheckPresence(note = NOTE) {
   // make sure the note has saved.
   await page.waitForTimeout(1000);
 
-  return await checkNotePresence(0, false, note);
+  return await checkNotePresence("notes", undefined, note);
 }
 
 async function checkNotebookPresence(notebook) {
-  const notebookIdBuilder = List.new("notebook").atIndex(0);
+  const notebookIdBuilder = List.new("notebook").grouped().atIndex(0);
 
   await expect(
     page.textContent(notebookIdBuilder.title().build())
@@ -62,11 +62,11 @@ async function checkNotebookPresence(notebook) {
     page.textContent(notebookIdBuilder.body().build())
   ).resolves.toBe(notebook.description);
 
-  await page.click(List.new("notebook").atIndex(0).title().build());
+  await page.click(List.new("notebook").grouped().atIndex(0).title().build());
 
   for (let i = 0; i < notebook.topics.length; ++i) {
     await expect(
-      page.textContent(List.new("topic").atIndex(i).title().build())
+      page.textContent(List.new("topic").grouped().atIndex(i).title().build())
     ).resolves.toBeTruthy();
   }
 
@@ -97,15 +97,15 @@ async function deleteNotebookAndCheckAbsence(notebookSelector) {
   await navigateTo("trash");
 
   await expect(
-    isPresent(List.new("trash").atIndex(0).build())
+    isPresent(List.new("trash").grouped().atIndex(0).build())
   ).resolves.toBeTruthy();
 
   await expect(
-    page.textContent(List.new("trash").atIndex(0).title().build())
+    page.textContent(List.new("trash").grouped().atIndex(0).title().build())
   ).resolves.toBe(NOTEBOOK.title);
 
   await expect(
-    page.textContent(List.new("trash").atIndex(0).body().build())
+    page.textContent(List.new("trash").grouped().atIndex(0).body().build())
   ).resolves.toBe(NOTEBOOK.description);
 
   await navigateTo("notebooks");
@@ -118,7 +118,7 @@ test("create a note inside a notebook", async () => {
 
   await page.click(notebookSelector);
 
-  await page.click(List.new("topic").atIndex(1).build());
+  await page.click(List.new("topic").grouped().atIndex(1).build());
 
   await createNoteAndCheckPresence();
 });
@@ -161,7 +161,7 @@ test("edit topics individually", async () => {
   await page.click(notebookSelector);
 
   for (let index = 0; index < NOTEBOOK.topics.length; index++) {
-    await openContextMenu(List.new("topic").atIndex(index).build());
+    await openContextMenu(List.new("topic").grouped().atIndex(index).build());
 
     await page.click(Menu.new("menuitem").item("edit").build());
 
@@ -173,7 +173,7 @@ test("edit topics individually", async () => {
     await page.waitForTimeout(500);
 
     await expect(
-      page.textContent(List.new("topic").atIndex(index).title().build())
+      page.textContent(List.new("topic").grouped().atIndex(0).title().build())
     ).resolves.toBe(editedTopicTitle);
   }
 });
@@ -191,14 +191,14 @@ test("permanently delete a notebook", async () => {
 
   await navigateTo("trash");
 
-  await openContextMenu(List.new("trash").atIndex(0).build());
+  await openContextMenu(List.new("trash").grouped().atIndex(0).build());
 
   await clickMenuItem("delete");
 
   await confirmDialog();
 
   await expect(
-    page.$(List.new("trash").atIndex(0).build())
+    page.$(List.new("trash").grouped().atIndex(0).build())
   ).resolves.toBeFalsy();
 });
 

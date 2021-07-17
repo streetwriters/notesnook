@@ -1,4 +1,3 @@
-const { devices } = require("@playwright/test");
 const IS_CI = !!process.env.CI;
 
 module.exports = {

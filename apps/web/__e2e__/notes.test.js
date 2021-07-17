@@ -22,21 +22,21 @@ const {
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
 
-async function createNoteAndCheckPresence(note = NOTE) {
+async function createNoteAndCheckPresence(note = NOTE, viewId = "home") {
   await createNote(note, "notes");
 
   // make sure the note has saved.
   await page.waitForTimeout(1000);
 
-  let noteSelector = await checkNotePresence();
+  let noteSelector = await checkNotePresence(viewId);
 
   await page.click(noteSelector, { button: "left" });
 
   return noteSelector;
 }
 
-async function deleteNoteAndCheckAbsence() {
-  const noteSelector = await createNoteAndCheckPresence();
+async function deleteNoteAndCheckAbsence(viewId = "home") {
+  const noteSelector = await createNoteAndCheckPresence(undefined, viewId);
 
   await openContextMenu(noteSelector);
 
@@ -48,7 +48,11 @@ async function deleteNoteAndCheckAbsence() {
 
   await navigateTo("trash");
 
-  const trashItemSelector = List.new("trash").atIndex(0).title().build();
+  const trashItemSelector = List.new("trash")
+    .grouped()
+    .atIndex(0)
+    .title()
+    .build();
 
   await expect(isPresent(trashItemSelector)).resolves.toBeTruthy();
 
@@ -90,8 +94,8 @@ async function checkNoteLocked(noteSelector) {
   ).resolves.toBeTruthy();
 
   await expect(
-    page.textContent(List.new("note").grouped().atIndex(0).body().build())
-  ).resolves.toBe("");
+    isAbsent(List.new("note").grouped().atIndex(0).body().build())
+  ).resolves.toBeTruthy();
 
   await useContextMenu(noteSelector, () =>
     expect(
@@ -119,7 +123,9 @@ async function checkNoteColored(noteSelector) {
   // wait for the page to render and notes to populate
   await page.waitForTimeout(500);
 
-  const coloredNote = await page.$(List.new("note").atIndex(0).build());
+  const coloredNote = await page.$(
+    List.new("note").grouped().atIndex(0).build()
+  );
   if (!coloredNote) throw new Error("Colored note not present.");
 }
 
@@ -144,11 +150,11 @@ async function addNoteToNotebook() {
 
   await navigateTo("notebooks");
 
-  await page.click(List.new("notebook").atIndex(0).title().build());
+  await page.click(List.new("notebook").grouped().atIndex(0).title().build());
 
-  await page.click(List.new("topic").atIndex(0).title().build());
+  await page.click(List.new("topic").grouped().atIndex(0).title().build());
 
-  await checkNotePresence(0, false);
+  await checkNotePresence("notes");
 }
 
 async function exportNote(format) {
@@ -201,7 +207,7 @@ test.describe("run tests independently", () => {
 
     await navigateTo("notes");
 
-    await checkNotePresence();
+    await checkNotePresence("home");
   });
 
   test("add a note to notebook", async () => {
@@ -229,7 +235,7 @@ test.describe("run tests independently", () => {
 
     await navigateTo("favorites");
 
-    await checkNotePresence(0, false);
+    await checkNotePresence("notes");
 
     await navigateTo("notes");
   });
@@ -265,7 +271,7 @@ test.describe("run tests independently", () => {
 
     await navigateTo("favorites");
 
-    noteSelector = await checkNotePresence(0, false);
+    noteSelector = await checkNotePresence("notes");
 
     await useContextMenu(noteSelector, async () => {
       await expect(
@@ -416,18 +422,17 @@ test.describe("run tests independently", () => {
     await checkNoteColored(noteSelector);
   });
 
-  test("tag with words from properties", async () => {
+  test("add tags to note", async () => {
     await createNoteAndCheckPresence();
+    const tags = ["hello", "nevermind", "what", "no way", "gold and goldie"];
 
-    await page.click(getTestId("properties"));
+    for (let tag of tags) {
+      await page.fill(getTestId("editor-tag-input"), tag);
 
-    await page.fill(getTestId("properties-tag"), "testtag");
+      await page.press(getTestId("editor-tag-input"), "Enter");
 
-    await page.press(getTestId("properties-tag"), "Enter");
-
-    await expect(
-      isPresent(getTestId("properties-tag-testtag"))
-    ).resolves.toBeTruthy();
+      await expect(isPresent(getTestId(`tag-${tag}`))).resolves.toBeTruthy();
+    }
   });
 
   test(`export note as txt`, async () => await exportNote("txt"));

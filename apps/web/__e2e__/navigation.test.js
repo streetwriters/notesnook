@@ -15,6 +15,7 @@ const routes = [
   createRoute("notes", "Notes"),
   createRoute("notebooks", "Notebooks"),
   createRoute("favorites", "Favorites"),
+  createRoute("monographs", "Monographs"),
   createRoute("tags", "Tags"),
   createRoute("trash", "Trash"),
   createRoute("settings", "Settings"),
