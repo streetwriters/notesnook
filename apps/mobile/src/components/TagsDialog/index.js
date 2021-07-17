@@ -19,7 +19,7 @@ const TagsDialog = () => {
   const [visible, setVisible] = useState(false);
   const [note, setNote] = useState(null);
   const allTags = useTagStore(state => state.tags);
-  const [tags, setTags] = useState(allTags);
+  const [tags, setTags] = useState([]);
   const [query, setQuery] = useState(null);
   const inputRef = useRef();
   const actionSheetRef = useRef();
@@ -39,6 +39,7 @@ const TagsDialog = () => {
 
   const sortTags = () => {
     let _tags = [...allTags];
+    _tags = _tags.filter(t => t.type === 'tag');
     _tags = _tags.sort((a, b) => a.title.localeCompare(b.title));
     if (query) {
       _tags = _tags.filter(t => t.title.startsWith(query));
@@ -57,7 +58,6 @@ const TagsDialog = () => {
       }
     }
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
-
     setTags([...noteTags, ..._tags]);
   };
 
@@ -118,6 +118,12 @@ const TagsDialog = () => {
         context: 'local',
       });
     }
+
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes,
+    ]);
   };
 
   return !visible ? null : (
@@ -223,15 +229,15 @@ const TagItem = ({tag, note, setNote}) => {
       } else {
         await db.notes.note(note.id).tag(tag.title);
       }
+      useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
-    } catch (e) {
-    } finally {
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-      ]);
-    }
+    } catch (e) {}
+
+    Navigation.setRoutesToUpdate([
+      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.Favorites,
+      Navigation.routeNames.Notes,
+    ]);
   };
 
   return (

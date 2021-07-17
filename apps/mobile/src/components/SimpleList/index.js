@@ -2,7 +2,6 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, RefreshControl} from 'react-native';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
 import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
@@ -15,14 +14,6 @@ import {Footer} from './footer';
 import {Header} from './header';
 import {SectionHeader} from './section-header';
 
-const heights = {
-  note: 100,
-  notebook: 110,
-  tag: 80,
-  topic: 80,
-  header: 35,
-};
-
 let renderItems = {
   note: NoteWrapper,
   notebook: NotebookWrapper,
@@ -33,8 +24,8 @@ let renderItems = {
 
 const RenderItem = ({item, index}) => {
   const Item = renderItems[item.itemType || item.type];
-
-  return <Item item={item} index={index} />;
+  
+  return <Item item={item} tags={item.tags} index={index} />;
 };
 
 const SimpleList = ({
@@ -43,8 +34,6 @@ const SimpleList = ({
   customRefresh,
   customRefreshing,
   refreshCallback,
-  sortMenuButton,
-  jumpToDialog,
   placeholderData,
   loading,
   headerProps = {
@@ -60,9 +49,12 @@ const SimpleList = ({
 
   useEffect(() => {
     if (!loading) {
-      setTimeout(() => {
-        _setLoading(false);
-      }, 300);
+      setTimeout(
+        () => {
+          _setLoading(false);
+        },
+        listData.length === 0 ? 0 : 300,
+      );
     } else {
       _setLoading(true);
     }
@@ -74,6 +66,7 @@ const SimpleList = ({
         <SectionHeader
           item={item}
           index={index}
+          title={headerProps.heading}
           type={screen === 'Notes' ? 'home' : type}
         />
       ) : (
@@ -117,7 +110,7 @@ const SimpleList = ({
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
-        data={_loading ? listData.slice(0,9) : listData}
+        data={_loading ? listData.slice(0, 9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}
         initialNumToRender={10}
@@ -146,14 +139,16 @@ const SimpleList = ({
         }
         ListFooterComponent={<Footer />}
         ListHeaderComponent={
-          <Header
-            title={headerProps.heading}
-            paragraph={headerProps.paragraph}
-            onPress={headerProps.onPress}
-            icon={headerProps.icon}
-            type={type}
-            screen={screen}
-          />
+          <>
+            <Header
+              title={headerProps.heading}
+              paragraph={headerProps.paragraph}
+              onPress={headerProps.onPress}
+              icon={headerProps.icon}
+              type={type}
+              screen={screen}
+            />
+          </>
         }
       />
 

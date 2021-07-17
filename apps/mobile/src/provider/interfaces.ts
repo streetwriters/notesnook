@@ -73,7 +73,10 @@ export type Settings = {
     screenshotMode?: boolean,
     privacyScreen?: boolean,
     appLockMode?: string,
-    telemetry:boolean
+    telemetry:boolean,
+    notebooksListMode: "normal" | "compact",
+    notesListMode: "normal" | "compact",
+
 }
 
 type Dimensions = {

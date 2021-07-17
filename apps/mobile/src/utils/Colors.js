@@ -46,7 +46,7 @@ export var COLOR_SCHEME = {
   bg: '#ffffff',
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
-  pri: '#000000',
+  pri: '#424242',
   sec: 'white',
   light: '#ffffff',
 };
@@ -59,7 +59,7 @@ export const COLOR_SCHEME_LIGHT = {
   nav: '#f7f7f7',
   input: 'transparent',
   heading: '#212121',
-  pri: '#424242',
+  pri: '#505050',
   sec: '#ffffff',
   light: '#ffffff',
 };

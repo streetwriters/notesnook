@@ -59,17 +59,6 @@ export const Notes = ({route, navigation}) => {
       Navigation.goBack();
     }
     setNotes(groupArray(_notes, 'notes'));
-    if (params.menu) {
-      navigation.setOptions({
-        animationEnabled: true,
-        gestureEnabled: false,
-      });
-    } else {
-      navigation.setOptions({
-        animationEnabled: true,
-        gestureEnabled: Platform.OS === 'ios',
-      });
-    }
     updateSearch();
     ranAfterInteractions = false;
   };

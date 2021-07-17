@@ -28,6 +28,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   setLoading: loading => set({ loading: loading }),
   setNotes: items => {
     if (!items) {
+      
       set({
         notes: groupArray(db.notes.all, db.settings?.getGroupOptions("home")),
       });
@@ -165,6 +166,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     privacyScreen: false,
     appLockMode: 'none',
     telemetry: true,
+    notebooksListMode:"normal",
+    notesListMode:"normal"
   },
   fullscreen: false,
   deviceMode: null,
@@ -236,6 +239,8 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     });
   },
   clearSelection: () => {
+    history.selectedItemsList = [];
+    history.selectionMode = false;
     set({ selectionMode: false, selectedItemsList: [] });
   },
 }));

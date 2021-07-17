@@ -1,3 +1,4 @@
+import {groupArray} from 'notes-core/utils/grouping';
 import React, {useEffect, useState} from 'react';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
 import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
@@ -21,7 +22,12 @@ import {
 } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
-  const [topics, setTopics] = useState(route.params.notebook?.topics);
+  const [topics, setTopics] = useState(
+    groupArray(
+      route.params.notebook?.topics || [],
+      db.settings.getGroupOptions('topics'),
+    ),
+  );
   let params = route.params;
   let ranAfterInteractions = false;
 
@@ -35,19 +41,12 @@ export const Notebook = ({route, navigation}) => {
       let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
       if (notebook) {
         params.notebook = notebook;
-        setTopics(notebook.topics);
+        setTopics(
+          groupArray(notebook.topics, db.settings.getGroupOptions('topics')),
+        );
         params.title = params.notebook.title;
       }
       eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
-      if (params.menu) {
-        navigation.setOptions({
-          gestureEnabled: false,
-        });
-      } else {
-        navigation.setOptions({
-          gestureEnabled: Platform.OS === 'ios',
-        });
-      }
       updateSearch();
       ranAfterInteractions = false;
     } catch (e) {}

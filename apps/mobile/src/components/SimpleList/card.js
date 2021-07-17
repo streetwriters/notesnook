@@ -1,19 +1,17 @@
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import {
-  useMessageStore,
-  useSelectionStore
-} from '../../provider/stores';
-import { SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {useMessageStore, useSelectionStore} from '../../provider/stores';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
 export const Card = ({color}) => {
-  const [state,dispatch] = useTracked();
+  const [state, dispatch] = useTracked();
   const colors = state.colors;
-  color = color ? color : colors.accent
+  color = color ? color : colors.accent;
 
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
@@ -25,25 +23,33 @@ export const Card = ({color}) => {
       type="transparent"
       customStyle={{
         paddingVertical: 12,
-        width: '100%',
+        width: '95%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingHorizontal: 0,
-        borderRadius:0
+        borderRadius: 0,
       }}>
       <View
         style={{
           width: 40,
           backgroundColor:
-            messageBoardState.type === 'error' ? colors.red : color,
+            messageBoardState.type === 'error'
+              ? hexToRGBA(colors.red, 0.15)
+              : hexToRGBA(color,0.15),
           height: 40,
           marginLeft: 10,
           borderRadius: 100,
           alignItems: 'center',
           justifyContent: 'center',
         }}>
-        <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
+        <Icon
+          size={SIZE.lg}
+          color={
+            messageBoardState.type === 'error' ? colors.error : color
+          }
+          name={messageBoardState.icon}
+        />
       </View>
 
       <View
@@ -51,16 +57,14 @@ export const Card = ({color}) => {
           marginLeft: 10,
           maxWidth: '75%',
         }}>
-        <Paragraph color={colors.icon} size={SIZE.xs}>
+        <Paragraph color={colors.icon} size={SIZE.xs + 1}>
           {messageBoardState.message}
         </Paragraph>
         <Paragraph
           style={{
             maxWidth: '100%',
           }}
-          color={
-            messageBoardState.type === 'error' ? colors.red : color
-          }>
+          color={colors.heading}>
           {messageBoardState.actionText}
         </Paragraph>
       </View>
@@ -76,9 +80,7 @@ export const Card = ({color}) => {
         }}>
         <Icon
           name="chevron-right"
-          color={
-            messageBoardState.type === 'error' ? colors.red : color
-          }
+          color={messageBoardState.type === 'error' ? colors.red : color}
           size={SIZE.lg}
         />
       </View>

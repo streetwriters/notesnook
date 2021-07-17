@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState
+  useState,
 } from 'react';
 import {
   Appearance,
@@ -12,43 +12,44 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View
+  View,
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
-import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
+import {enabled} from 'react-native-privacy-snapshot';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
-import { Button } from '../../components/Button';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import {Button} from '../../components/Button';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
-import { Header as TopHeader } from '../../components/Header/index';
+import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
-import { PressableButton } from '../../components/PressableButton';
+import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import { Toast } from '../../components/Toast';
+import {Card} from '../../components/SimpleList/card';
+import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   useMessageStore,
   useSettingStore,
-  useUserStore
+  useUserStore,
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent
+  ToastEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -62,17 +63,17 @@ import {
   preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
-  SUBSCRIPTION_STATUS_STRINGS
+  SUBSCRIPTION_STATUS_STRINGS,
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme
+  setColorScheme,
 } from '../../utils/Colors';
-import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -81,14 +82,14 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState
+  eUpdateSearchState,
 } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { pv, SIZE } from '../../utils/SizeUtils';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -396,7 +397,9 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
         marginBottom: 5,
         marginTop: 5,
       }}>
-      <Paragraph size={SIZE.md + 1} color={collapsed ? colors.icon : colors.accent}>
+      <Paragraph
+        size={SIZE.md + 1}
+        color={collapsed ? colors.icon : colors.accent}>
         {title}
       </Paragraph>
 
@@ -635,7 +638,7 @@ const CustomButton = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingVertical: 12,
         width: '100%',
         borderRadius: 0,
         flexDirection: 'row',
@@ -744,67 +747,7 @@ const SettingsUserSection = () => {
   return (
     <>
       {messageBoardState && messageBoardState?.visible && (
-        <PressableButton
-          onPress={messageBoardState.onPress}
-          customStyle={{
-            paddingVertical: 12,
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 0,
-          }}>
-          <View
-            style={{
-              width: 40,
-              backgroundColor:
-                messageBoardState.type === 'error' ? colors.red : colors.accent,
-              height: 40,
-              marginLeft: 10,
-              borderRadius: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
-          </View>
-
-          <View
-            style={{
-              marginLeft: 10,
-              maxWidth: '75%',
-            }}>
-            <Paragraph color={colors.icon} size={SIZE.xs}>
-              {messageBoardState.message}
-            </Paragraph>
-            <Paragraph
-              style={{
-                maxWidth: '100%',
-              }}
-              color={
-                messageBoardState.type === 'error' ? colors.red : colors.accent
-              }>
-              {messageBoardState.actionText}
-            </Paragraph>
-          </View>
-
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'absolute',
-              right: 6,
-            }}>
-            <Icon
-              name="chevron-right"
-              color={
-                messageBoardState.type === 'error' ? colors.red : colors.accent
-              }
-              size={SIZE.lg}
-            />
-          </View>
-        </PressableButton>
+        <Card color={colors.accent} />
       )}
 
       {user ? (
@@ -1180,7 +1123,7 @@ const SettingsAppearanceSection = () => {
           <View
             style={{
               paddingHorizontal: 12,
-              marginTop:5
+              marginTop: 5,
             }}>
             <Paragraph
               size={SIZE.md}
@@ -1257,10 +1200,10 @@ const SettingsAppearanceSection = () => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginRight: 10,
-                  marginVertical:5,
+                  marginVertical: 5,
                   width: DDS.isLargeTablet() ? 40 : 50,
                   height: DDS.isLargeTablet() ? 40 : 50,
-                  borderRadius:100,
+                  borderRadius: 100,
                 }}>
                 {colors.accent === item ? (
                   <Icon
