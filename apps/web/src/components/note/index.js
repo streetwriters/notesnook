@@ -21,6 +21,7 @@ function Note(props) {
   const { item, index, context } = props;
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
+  const viewMode = useStore((store) => store.viewMode);
   const isOpened = selectedNote === note.id;
 
   const [shade, primary] = useMemo(() => {
@@ -40,6 +41,7 @@ function Note(props) {
     <ListItem
       selectable
       isFocused={isOpened}
+      isCompact={viewMode === "compact"}
       item={note}
       title={note.title}
       body={note.headline}

@@ -1,7 +1,7 @@
 import React from "react";
 import { Flex, Text } from "rebass";
 import ListItem from "../list-item";
-import { store } from "../../stores/notebook-store";
+import { useStore, store } from "../../stores/notebook-store";
 import { store as appStore } from "../../stores/app-store";
 import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
@@ -10,72 +10,72 @@ import { hashNavigate, navigate } from "../../navigation";
 import { getTotalNotes } from "../../common";
 import IconTag from "../icon-tag";
 
-class Notebook extends React.Component {
-  shouldComponentUpdate(nextProps) {
-    const prevItem = this.props.item;
-    const nextItem = nextProps.item;
-    return (
-      prevItem.pinned !== nextItem.pinned ||
-      prevItem.title !== nextItem.title ||
-      prevItem.description !== nextItem.description ||
-      prevItem.topics.length !== nextItem.topics.length
-    );
-  }
-  render() {
-    const { item, index } = this.props;
-    const notebook = item;
+function Notebook(props) {
+  const { item, index } = props;
+  const notebook = item;
 
-    return (
-      <ListItem
-        selectable
-        item={notebook}
-        onClick={() => {
-          navigate(`/notebooks/${notebook.id}`);
-        }}
-        title={notebook.title}
-        body={notebook.description}
-        index={index}
-        menu={{ items: menuItems, extraData: { notebook } }}
-        footer={
-          <>
-            {notebook?.topics && (
-              <Flex mb={1}>
-                {notebook?.topics.slice(0, 3).map((topic) => (
-                  <IconTag
-                    key={topic.id}
-                    text={topic.title}
-                    icon={Icon.Topic}
-                    onClick={(e) => {
-                      navigate(`/notebooks/${notebook.id}/${topic.id}`);
-                    }}
-                  />
-                ))}
-              </Flex>
-            )}
-            <Flex
-              sx={{ fontSize: "subBody", color: "fontTertiary" }}
-              alignItems="center"
-            >
-              {notebook.pinned && (
-                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
-              )}
-              {new Date(notebook.dateCreated).toLocaleDateString("en", {
-                month: "long",
-                day: "2-digit",
-                year: "numeric",
-              })}
-              <Text as="span" mx={1}>
-                •
-              </Text>
-              <Text>{getTotalNotes(notebook)} Notes</Text>
+  const viewMode = useStore((store) => store.viewMode);
+
+  return (
+    <ListItem
+      selectable
+      isCompact={viewMode === "compact"}
+      item={notebook}
+      onClick={() => {
+        navigate(`/notebooks/${notebook.id}`);
+      }}
+      title={notebook.title}
+      body={notebook.description}
+      index={index}
+      menu={{ items: menuItems, extraData: { notebook } }}
+      footer={
+        <>
+          {notebook?.topics && (
+            <Flex mb={1}>
+              {notebook?.topics.slice(0, 3).map((topic) => (
+                <IconTag
+                  key={topic.id}
+                  text={topic.title}
+                  icon={Icon.Topic}
+                  onClick={(e) => {
+                    navigate(`/notebooks/${notebook.id}/${topic.id}`);
+                  }}
+                />
+              ))}
             </Flex>
-          </>
-        }
-      />
-    );
-  }
+          )}
+          <Flex
+            sx={{ fontSize: "subBody", color: "fontTertiary" }}
+            alignItems="center"
+          >
+            {notebook.pinned && (
+              <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
+            )}
+            {new Date(notebook.dateCreated).toLocaleDateString("en", {
+              month: "long",
+              day: "2-digit",
+              year: "numeric",
+            })}
+            <Text as="span" mx={1}>
+              •
+            </Text>
+            <Text>{getTotalNotes(notebook)} Notes</Text>
+          </Flex>
+        </>
+      }
+    />
+  );
 }
-export default Notebook;
+export default React.memo(Notebook, (prev, next) => {
+  const prevItem = prev.item;
+  const nextItem = next.item;
+  return (
+    prevItem.pinned === nextItem.pinned ||
+    prevItem.title === nextItem.title ||
+    prevItem.description === nextItem.description ||
+    prevItem.topics.length === nextItem.topics.length
+  );
+});
 
 const pin = async (notebook) => {
   await store.pin(notebook);

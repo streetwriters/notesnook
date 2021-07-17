@@ -5,11 +5,18 @@ import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { groupArray } from "notes-core/utils/grouping";
+import Config from "../utils/config";
 
 class NotebookStore extends BaseStore {
   notebooks = [];
   selectedNotebookTopics = [];
   selectedNotebookId = 0;
+  viewMode = Config.get("notebooks:viewMode", "detailed");
+
+  setViewMode = (viewMode) => {
+    this.set((state) => (state.viewMode = viewMode));
+    Config.set("notebooks:viewMode", viewMode);
+  };
 
   refresh = () => {
     this.set((state) => {

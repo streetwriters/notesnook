@@ -69,6 +69,7 @@ function ListItem(props) {
       background: "background",
     },
     isFocused,
+    isCompact,
   } = props;
 
   const isSelectionMode = useSelectionStore((store) => store.isSelectionMode);
@@ -123,12 +124,11 @@ function ListItem(props) {
         openContextMenu(e, menuItems, props.menu?.extraData, false)
       }
       p={2}
+      py={isCompact ? 2 : 3}
       tabIndex={props.index}
       justifyContent="center"
       sx={{
         height: "inherit",
-        borderBottom: "1px solid",
-        borderBottomColor: "border",
         cursor: "pointer",
         position: "relative",
         borderLeft: isFocused ? "3px solid" : "none",
@@ -160,47 +160,48 @@ function ListItem(props) {
     >
       {props.header}
 
-        <Text
+      <Text
         data-test-id={`${props.item.type}-${props.index}-title`}
-          fontWeight={"bold"}
+        variant={isCompact ? "subtitle" : "title"}
+        fontWeight={"bold"}
         color={text}
         display={isSelectionMode ? "flex" : "block"}
-          sx={{
-            lineHeight: "1.4rem",
-            maxHeight: "1.4rem", // 1 lines, i hope
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-          }}
-        >
+        sx={{
+          lineHeight: "1.4rem",
+          maxHeight: "1.4rem", // 1 lines, i hope
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+        }}
+      >
         {isSelectionMode && (
           <ItemSelector
             isSelected={isSelected}
             toggleSelection={toggleSelection}
           />
         )}
-          {props.title}
-        </Text>
+        {props.title}
+      </Text>
 
-      {props.body && (
-      <Text
-        as="p"
-        variant="body"
+      {!isCompact && props.body && (
+        <Text
+          as="p"
+          variant="body"
           data-test-id={`${props.item.type}-${props.index}-body`}
-        sx={{
+          sx={{
             lineHeight: `1.2rem`,
-          overflow: "hidden",
-          textOverflow: "ellipsis",
+            overflow: "hidden",
+            textOverflow: "ellipsis",
             position: "relative",
             display: "-webkit-box",
             WebkitLineClamp: 4,
             WebkitBoxOrient: "vertical",
-        }}
-      >
-        {props.body}
-      </Text>
+          }}
+        >
+          {props.body}
+        </Text>
       )}
-      {props.footer && <Box mt={1}>{props.footer}</Box>}
+      {props.footer && <Box mt={isCompact ? 0 : 1}>{props.footer}</Box>}
     </Flex>
   );
 }

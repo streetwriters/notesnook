@@ -16,6 +16,12 @@ class NoteStore extends BaseStore {
   notes = [];
   context = undefined;
   selectedNote = 0;
+  viewMode = Config.get("notes:viewMode", "detailed");
+
+  setViewMode = (viewMode) => {
+    this.set((state) => (state.viewMode = viewMode));
+    Config.set("notes:viewMode", viewMode);
+  };
 
   init = () => {
     EV.subscribe(EVENTS.noteRemoved, (id) => {

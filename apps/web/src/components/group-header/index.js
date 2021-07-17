@@ -4,7 +4,8 @@ import { Button, Flex, Text } from "rebass";
 import Animated from "../animated";
 import { db } from "../../common/db";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
-import { useStore as useSettingsStore } from "../../stores/setting-store";
+import { useStore as useNoteStore } from "../../stores/note-store";
+import { useStore as useNotebookStore } from "../../stores/notebook-store";
 import useMobile from "../../utils/use-mobile";
 
 const groupByToTitleMap = {
@@ -49,7 +50,7 @@ function changeGroupOptions({ groupOptions, type, refresh }, { key: itemKey }) {
   if (key === "groupBy") {
     if (value === "abc") groupOptions.sortBy = "title";
     else groupOptions.sortBy = "dateEdited";
-}
+  }
   db.settings.setGroupOptions(type, groupOptions);
   refresh();
 }
@@ -76,6 +77,24 @@ function GroupHeader(props) {
   const { title, groups, onJump, index, type, refresh } = props;
   const groupOptions = useMemo(() => db.settings.getGroupOptions(type), [type]);
   const openContextMenu = useOpenContextMenu();
+  const notesViewMode = useNoteStore((store) => store.viewMode);
+  const setNotesViewMode = useNoteStore((store) => store.setViewMode);
+  const notebooksViewMode = useNotebookStore((store) => store.viewMode);
+  const setNotebooksViewMode = useNotebookStore((store) => store.setViewMode);
+
+  const [viewMode, setViewMode] = useMemo(() => {
+    if (type === "home" || type === "notes" || type === "favorites") {
+      return [notesViewMode, setNotesViewMode];
+    } else if (type === "notebooks")
+      return [notebooksViewMode, setNotebooksViewMode];
+    else return null;
+  }, [
+    type,
+    notesViewMode,
+    notebooksViewMode,
+    setNotesViewMode,
+    setNotebooksViewMode,
+  ]);
 
   if (!title) return null;
 
@@ -99,16 +118,16 @@ function GroupHeader(props) {
       mx={1}
       my={1}
       py={index > 0 ? [2, "8px"] : 1}
-        alignItems="center"
-        justifyContent="space-between"
+      alignItems="center"
+      justifyContent="space-between"
       bg="bgSecondary"
       sx={{ borderRadius: "default" }}
-      >
-        <Text variant="subtitle" color="primary">
-          {title}
-        </Text>
+    >
+      <Text variant="subtitle" color="primary">
+        {title}
+      </Text>
 
-        {index === 0 && (
+      {index === 0 && (
         <Flex mr={1}>
           <IconButton
             icon={
@@ -127,37 +146,22 @@ function GroupHeader(props) {
               });
             }}
           />
-        )}
-      </Flex>
-      <Flex
-        flexDirection="column"
-        p={menuType === "jumpto" ? 2 : 0}
-        pt={2}
-        style={{
-          display: isExpanded ? "flex" : "none",
-        }}
-        justifyContent="center"
-        sx={{
-          position: "absolute",
-          zIndex: 1,
-          bg: "bgSecondary",
-          width: "100%",
-          top: "29px",
-          borderBottom: "1px solid",
-          borderBottomColor: "border",
-          borderBottomWidth: 1,
-          boxShadow: "0px 3px 6px 0px #0000005e",
-        }}
-      >
-        <JumpToGroupMenu
-          onJump={(title) => {
-            setIsExpanded(false);
-            onJump(title);
-          }}
-          isVisible={menuType === "jumpto"}
-          groups={groups}
-        />
-      </Flex>
+          {viewMode && (
+            <IconButton
+              icon={
+                viewMode === "compact" ? Icon.DetailedView : Icon.CompactView
+              }
+              title={
+                viewMode === "compact"
+                  ? "Switch to detailed view"
+                  : "Switch to compact view"
+              }
+              onClick={(e) =>
+                setViewMode(viewMode === "compact" ? "detailed" : "compact")
+              }
+            />
+          )}
+        </Flex>
       )}
     </Animated.Flex>
   );
@@ -185,7 +189,7 @@ function IconButton(props) {
       {text && <Text variant="body">{text}</Text>}
       {props.icon && (
         <props.icon size={isMobile ? 20 : 14} sx={{ ml: text ? 1 : 0 }} />
-          )}
+      )}
     </Button>
   );
 }

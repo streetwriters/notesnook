@@ -158,3 +158,6 @@ export const Rocket = createIcon(Icons.mdiRocketLaunchOutline);
 export const Share = createIcon(Icons.mdiShareVariantOutline);
 export const Password = createIcon(Icons.mdiFormTextboxPassword);
 export const Destruct = createIcon(Icons.mdiBomb);
+
+export const CompactView = createIcon(Icons.mdiViewHeadline);
+export const DetailedView = createIcon(Icons.mdiViewSequentialOutline);
