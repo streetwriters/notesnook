@@ -1,4 +1,10 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, {
+  useRef,
+  useState,
+  useCallback,
+  useEffect,
+  useMemo,
+} from "react";
 import { Flex, Text, Button } from "rebass";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
@@ -10,6 +16,7 @@ import { showToast } from "../../utils/toast";
 
 function Unlock(props) {
   const { noteId } = props;
+  const note = useMemo(() => db.notes.note(noteId)?.data, [noteId]);
   const passwordRef = useRef();
   const [isWrong, setIsWrong] = useState(false);
   const [isUnlocking, setIsUnlocking] = useState(false);
@@ -51,7 +58,7 @@ function Unlock(props) {
     >
       <Flex justifyContent="center" alignItems="center">
         <Text variant="heading" ml={2} fontSize={48}>
-          Open note
+          {note?.title}
         </Text>
       </Flex>
       <Text variant="body" color="gray" textAlign="center">
