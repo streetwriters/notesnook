@@ -87,7 +87,7 @@ function GroupHeader(props) {
       return [notesViewMode, setNotesViewMode];
     } else if (type === "notebooks")
       return [notebooksViewMode, setNotebooksViewMode];
-    else return null;
+    else return [null, null];
   }, [
     type,
     notesViewMode,
