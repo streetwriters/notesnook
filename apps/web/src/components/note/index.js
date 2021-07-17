@@ -12,9 +12,10 @@ import { showExportDialog } from "../../common/dialog-controller";
 import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
 import { showToast } from "../../utils/toast";
-import { hashNavigate } from "../../navigation";
+import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import Vault from "../../common/vault";
+import IconTag from "../icon-tag";
 
 function Note(props) {
   const { item, index, context } = props;
@@ -28,18 +29,11 @@ function Note(props) {
     return [noteColor + "11", noteColor];
   }, [note.color]);
 
-  const notebooksText = useMemo(() => {
+  const notebook = useMemo(() => {
     if (!note.notebooks?.length) return;
     const firstNotebook = note.notebooks[0];
-    const title = db.notebooks.notebook(firstNotebook.id)?.title;
-    const remainingNotebooks = note.notebooks.length - 1;
-    let otherText = "";
-    if (remainingNotebooks) {
-      otherText = " & ";
-      otherText +=
-        remainingNotebooks === 1 ? "1 other" : `${remainingNotebooks} others`;
-    }
-    return title + otherText;
+    const notebook = db.notebooks.notebook(firstNotebook.id)?.data;
+    return notebook;
   }, [note.notebooks]);
 
   return (
@@ -71,17 +65,28 @@ function Note(props) {
         }
       }}
       header={
-        notebooksText && (
-          <Flex
-            alignSelf="flex-start"
-            justifySelf="flex-start"
-            alignContent="center"
-            justifyContent="center"
-          >
-            <Icon.Notebook size={12} color={primary} />
-            <Text variant="subBody" color={primary} fontWeight="600" ml={"3px"}>
-              {notebooksText}
-            </Text>
+        (note.tags.length || notebook) && (
+          <Flex alignSelf="flex-start" justifySelf="flex-start" mb={1}>
+            {notebook && (
+              <IconTag
+                onClick={() => {
+                  navigate(`/notebooks/${notebook.id}/`);
+                }}
+                text={notebook.title}
+                icon={Icon.Notebook}
+              />
+            )}
+            {note.tags.slice(0, 2).map((tag) => (
+              <IconTag
+                text={tag}
+                icon={Icon.Tag}
+                onClick={() => {
+                  const tagId = db.tags.tag(tag)?.id;
+                  if (!tagId) return showToast("Tag not found.");
+                  navigate(`/tags/${tagId}`);
+                }}
+              />
+            ))}
           </Flex>
         )
       }
