@@ -76,15 +76,14 @@ function Header(props) {
             {!isMobile && createButtonData && (
               <Icon.Plus
                 data-test-id={`${type}-action-button`}
-                color="primary"
-                size={24}
+                color="static"
+                size={18}
                 sx={{
+                  bg: "primary",
                   ml: 2,
-                  border: "2px solid",
-                  borderColor: "primary",
-                  borderRadius: "default",
+                  borderRadius: 100,
                   size: 28,
-                  ":hover": { bg: "shade" },
+                  ":hover": { boxShadow: "0px 0px 5px 0px var(--dimPrimary)" },
                 }}
                 title={createButtonData.title}
                 onClick={createButtonData.onClick}
