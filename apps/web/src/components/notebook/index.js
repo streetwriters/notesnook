@@ -70,9 +70,9 @@ export default React.memo(Notebook, (prev, next) => {
   const prevItem = prev.item;
   const nextItem = next.item;
   return (
-    prevItem.pinned === nextItem.pinned ||
-    prevItem.title === nextItem.title ||
-    prevItem.description === nextItem.description ||
+    prevItem.pinned === nextItem.pinned &&
+    prevItem.title === nextItem.title &&
+    prevItem.description === nextItem.description &&
     prevItem.topics.length === nextItem.topics.length
   );
 });
