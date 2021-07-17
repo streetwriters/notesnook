@@ -1,21 +1,19 @@
-import { NavigationContainer } from '@react-navigation/native';
+import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
-import { createNativeStackNavigator } from 'react-native-screens/native-stack';
+import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import { useSelectionStore, useSettingStore } from '../provider/stores';
-import {
-  eSendEvent
-} from '../services/EventManager';
+import {useSelectionStore, useSettingStore} from '../provider/stores';
+import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import SettingsService from '../services/SettingsService';
-import { history } from '../utils';
-import { rootNavigatorRef } from '../utils/Refs';
+import {history} from '../utils';
+import {rootNavigatorRef} from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import { Search } from '../views/Search';
+import {Search} from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -53,7 +51,7 @@ export const NavigatorStack = React.memo(
           },
         );
       }
-    },[settings])
+    }, [settings]);
 
     return (
       <Container root={true}>
@@ -67,29 +65,18 @@ export const NavigatorStack = React.memo(
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                stackAnimation: 'none',
+                stackAnimation: "slide_from_bottom",
+                
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
               <Stack.Screen name="Favorites" component={Favorites} />
               <Stack.Screen name="Trash" component={Trash} />
-              <Stack.Screen
-                options={screenOptionsForAnimation}
-                name="NotesPage"
-                component={Notes}
-              />
+              <Stack.Screen name="NotesPage" component={Notes} />
               <Stack.Screen name="Tags" component={Tags} />
-              <Stack.Screen
-                options={screenOptionsForAnimation}
-                name="Notebook"
-                component={Notebook}
-              />
+              <Stack.Screen name="Notebook" component={Notebook} />
               <Stack.Screen name="Settings" component={Settings} />
-              <Stack.Screen
-                options={screenOptionsForAnimation}
-                name="Search"
-                component={Search}
-              />
+              <Stack.Screen name="Search" component={Search} />
             </Stack.Navigator>
           )}
         </NavigationContainer>
