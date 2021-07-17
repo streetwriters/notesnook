@@ -1,21 +1,32 @@
 import React from "react";
-import { Flex, Button, Text } from "rebass";
+import { Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
 import useMobile from "../../utils/use-mobile";
+import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
 
 function NavigationItem(props) {
   const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
+  const isTablet = useTablet();
   const openContextMenu = useOpenContextMenu();
 
   return (
     <Button
       data-test-id={`navitem-${title.toLowerCase()}`}
       variant="icon"
-      py={2}
+      bg={props.selected ? "border" : "transparent"}
+      p={2}
+      mx={2}
+      mt={[1, 2, 1]}
+      sx={{
+        borderRadius: "default",
+        position: "relative",
+        ":first-of-type": { mt: 2 },
+        ":last-of-type": { mb: 2 },
+      }}
       label={title}
       title={title}
       onContextMenu={(event) => {
@@ -26,48 +37,46 @@ function NavigationItem(props) {
         if (isMobile) toggleSideMenu(false);
         props.onClick();
       }}
+      display="flex"
+      justifyContent={["flex-start", "center", "flex-start"]}
+      alignItems="center"
     >
-      <Flex
-        justifyContent={"flex-start"}
-        alignItems="center"
-        sx={{ position: "relative" }}
-      >
-        <Icon
-          size={15}
-          sx={{ mr: 1 }}
-          color={props.selected && !color ? "primary" : color || "icon"}
-          rotate={isLoading}
+      <Icon
+        size={isTablet ? 18 : 15}
+        //sx={{ mr: 1 }}
+        color={color || "icon"}
+        rotate={isLoading}
+        stroke={props.selected ? "1px" : "0px"}
+      />
+      {isNew && (
+        <Icons.Circle
+          size={6}
+          sx={{ position: "absolute", bottom: 0, left: "15px" }}
+          color={"primary"}
         />
-        {isNew && (
-          <Icons.Circle
-            size={6}
-            sx={{ position: "absolute", bottom: 0, left: "15px" }}
-            color={"primary"}
-          />
-        )}
-        {isShortcut && (
-          <Icons.Shortcut
-            size={8}
-            sx={{ position: "absolute", bottom: "-3px", left: "-6px" }}
-            color={props.selected && !color ? "primary" : color || "icon"}
-          />
-        )}
+      )}
+      {isShortcut && (
+        <Icons.Shortcut
+          size={8}
+          sx={{ position: "absolute", bottom: "-3px", left: "-6px" }}
+          color={color || "icon"}
+        />
+      )}
 
-        <Text
-          variant="body"
-          fontSize="subtitle"
-          sx={{
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
-            fontWeight: props.selected ? "bold" : "normal",
-          }}
-          color={props.selected ? (!!color ? color : "primary") : "text"}
-          ml={1}
-        >
-          {title}
-        </Text>
-      </Flex>
+      <Text
+        display={["block", "none", "block"]}
+        variant="body"
+        fontSize="subtitle"
+        sx={{
+          whiteSpace: "nowrap",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          fontWeight: props.selected ? "bold" : "normal",
+        }}
+        ml={1}
+      >
+        {title}
+      </Text>
     </Button>
   );
 }

@@ -55,7 +55,7 @@ const bottomRoutes = [
   },
 ];
 
-const NAVIGATION_MENU_WIDTH = "9em";
+const NAVIGATION_MENU_WIDTH = "10em";
 
 function NavigationMenu(props) {
   const { toggleNavigationContainer } = props;
