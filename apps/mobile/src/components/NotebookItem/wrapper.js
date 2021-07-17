@@ -31,7 +31,7 @@ export const NotebookWrapper = React.memo(({item, index}) => {
       id: item.id,
       type: item.type,
     };
-    Navigation.push(routeName, params, headerState);
+    Navigation.navigate(routeName, params, headerState);
   };
   return (
     <SelectionWrapper

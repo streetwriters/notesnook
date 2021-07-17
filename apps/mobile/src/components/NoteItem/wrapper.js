@@ -12,7 +12,7 @@ import { tabBarRef } from '../../utils/Refs';
 import { presentDialog } from '../Dialog/functions';
 import SelectionWrapper from '../SelectionWrapper';
 
-export const NoteWrapper = React.memo(({item, index}) => {
+export const NoteWrapper = React.memo(({item, index,tags,compactMode}) => {
   const isTrash = item.type === 'trash';
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
 
@@ -95,7 +95,16 @@ export const NoteWrapper = React.memo(({item, index}) => {
       testID={notesnook.ids.note.get(index)}
       onPress={onPress}
       item={item}>
-      <NoteItem item={item} isTrash={isTrash} />
+      <NoteItem item={item} tags={tags} isTrash={isTrash} />
     </SelectionWrapper>
   );
+},(prev,next) => {
+  if (prev.tags.length !== next.tags.length) {
+    return false;
+  }
+  if (prev.item !== next.item) {
+    return false;
+  }
+
+  return true;
 });
