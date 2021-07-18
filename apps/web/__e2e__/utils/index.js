@@ -12,6 +12,8 @@ const NOTE = {
   content: "This is " + "Test 1".repeat(10),
 };
 
+const PASSWORD = "123abc123abc";
+
 function getTestId(id) {
   return `[data-test-id="${id}"]`;
 }
@@ -19,15 +21,19 @@ function getTestId(id) {
 async function createNote(note, actionButtonId) {
   await page.click(getTestId(actionButtonId + "-action-button"));
 
+  await editNote(note.title, note.content);
+}
+
+async function editNote(title, content) {
   await page.waitForSelector(".mce-content-body");
 
-  await page.fill(getTestId("editor-title"), note.title);
+  if (title) await page.fill(getTestId("editor-title"), title);
 
   await page.waitForTimeout(100);
 
   await page.focus(".mce-content-body");
 
-  await page.type(".mce-content-body", note.content);
+  await page.type(".mce-content-body", content);
 }
 
 async function downloadFile(downloadActionSelector, encoding) {
@@ -45,7 +51,9 @@ async function downloadFile(downloadActionSelector, encoding) {
 module.exports = {
   NOTE,
   NOTEBOOK,
+  PASSWORD,
   getTestId,
   createNote,
+  editNote,
   downloadFile,
 };

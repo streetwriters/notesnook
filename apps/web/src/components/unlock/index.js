@@ -59,8 +59,13 @@ function Unlock(props) {
       mx={2}
     >
       <Flex justifyContent="center" alignItems="center">
-        <Text variant="heading" ml={2} fontSize={48}>
-          {note?.title}
+        <Text
+          data-test-id="unlock-note-title"
+          variant="heading"
+          ml={2}
+          fontSize={48}
+        >
+          {note?.title || "Open note"}
         </Text>
       </Flex>
       <Text variant="body" color="gray" textAlign="center">
@@ -68,6 +73,7 @@ function Unlock(props) {
       </Text>
       <Field
         id="vaultPassword"
+        data-test-id="unlock-note-password"
         inputRef={passwordRef}
         autoFocus
         sx={{ mt: 2, width: ["95%", "95%", "50%"] }}
@@ -98,6 +104,7 @@ function Unlock(props) {
       <Button
         mt={3}
         variant="primary"
+        data-test-id="unlock-note-submit"
         disabled={isUnlocking}
         onClick={async () => {
           await submit();

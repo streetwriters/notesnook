@@ -4,7 +4,14 @@
 /**
  * TODO: We are still not checking if toast appears on delete/restore or not.
  */ const { test, expect } = require("@playwright/test");
-const { getTestId, createNote, NOTE, downloadFile } = require("./utils");
+const {
+  getTestId,
+  createNote,
+  NOTE,
+  downloadFile,
+  PASSWORD,
+  editNote,
+} = require("./utils");
 const {
   navigateTo,
   clickMenuItem,
@@ -66,11 +73,23 @@ async function lockUnlockNote(noteSelector, type) {
 
   await clickMenuItem(type);
 
-  await page.fill(getTestId("dialog-password"), "123abc123abc");
+  await page.fill(getTestId("dialog-password"), PASSWORD);
 
   await confirmDialog();
 
   await expect(isToastPresent()).resolves.toBeTruthy();
+}
+
+async function openLockedNote(noteSelector) {
+  await page.click(noteSelector);
+
+  await expect(page.textContent(getTestId("unlock-note-title"))).resolves.toBe(
+    NOTE.title
+  );
+
+  await page.fill(getTestId("unlock-note-password"), PASSWORD);
+
+  await page.click(getTestId("unlock-note-submit"));
 }
 
 async function checkNotePinned(noteSelector, pause) {
@@ -392,7 +411,7 @@ test.describe("run tests independently", () => {
 
     await page.click(getTestId("properties-locked"));
 
-    await page.fill(getTestId("dialog-password"), "123abc123abc");
+    await page.fill(getTestId("dialog-password"), PASSWORD);
 
     await confirmDialog();
 
@@ -438,4 +457,28 @@ test.describe("run tests independently", () => {
   test(`export note as txt`, async () => await exportNote("txt"));
   test(`export note as md`, async () => await exportNote("md"));
   test(`export note as html`, async () => await exportNote("html"));
+
+  test("unlock a note for editing", async () => {
+    const content = "Edits 1 2 3 ";
+
+    const noteSelector = await createNoteAndCheckPresence();
+
+    await lockUnlockNote(noteSelector, "lock");
+
+    await checkNoteLocked(noteSelector);
+
+    await openLockedNote(noteSelector);
+
+    await editNote(null, content);
+
+    await page.waitForTimeout(1000);
+
+    await openLockedNote(noteSelector);
+
+    await page.waitForSelector(".mce-content-body");
+
+    await expect(page.textContent(".mce-content-body")).resolves.toContain(
+      `${content}${NOTE.content}`
+    );
+  });
 });
