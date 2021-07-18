@@ -3,7 +3,8 @@
 
 /**
  * TODO: We are still not checking if toast appears on delete/restore or not.
- */ const { test, expect } = require("@playwright/test");
+ */
+const { Page, test, expect } = require("@playwright/test");
 const {
   getTestId,
   createNote,
