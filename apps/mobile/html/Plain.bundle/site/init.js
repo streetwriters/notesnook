@@ -1,4 +1,3 @@
-
 attachTitleInputListeners();
 autosize();
 function reactNativeEventHandler(type, value) {
@@ -24,7 +23,7 @@ function init_tiny(size) {
     plugins: [
       'mychecklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace mycode',
-      'media imagetools table paste wordcount autoresize directionality',
+      'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
     paste_data_images: true,
@@ -92,14 +91,13 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-    imagetools_toolbar:
-      'rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
     mobile: {
       resize: false,
-      object_resizing: false,
+      object_resizing: false
     },
     image_description: false,
     image_caption: false,
@@ -114,21 +112,24 @@ function init_tiny(size) {
         icon: 'remove',
         tooltip: 'Remove image',
         onAction: function () {
-          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
         },
         onclick: function () {
-          editor.undoManager.transact(function() {tinymce.activeEditor.execCommand('Delete');});
-
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
         }
       });
       editor.ui.registry.addButton('imageopts', {
         icon: 'image-options',
         tooltip: 'Image properties',
         onAction: function () {
-          reactNativeEventHandler("imageoptions");
+          reactNativeEventHandler('imageoptions');
         },
         onclick: function () {
-          reactNativeEventHandler("imageoptions");
+          reactNativeEventHandler('imageoptions');
         }
       });
 
@@ -189,7 +190,6 @@ function init_tiny(size) {
       });
 
       editor.on('ScrollIntoView', function (e) {
-        
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
@@ -204,21 +204,21 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
-    if (event.type === 'nodechange' && !event.selectionChange) return;
-    if (isLoading) {
-      isLoading = false;
-      return;
-    }
-    if (editor.plugins.wordcount.getCount() === 0) return;
-    clearTimeout(changeTimer);
-    changeTimer = null;   
-    changeTimer = setTimeout(function () {
-      selectchange();
-      reactNativeEventHandler('tiny', editor.getContent());
-      reactNativeEventHandler('history', {
-        undo: editor.undoManager.hasUndo(),
-        redo: editor.undoManager.hasRedo()
-      });
+  if (event.type === 'nodechange' && !event.selectionChange) return;
+  if (isLoading) {
+    isLoading = false;
+    return;
+  }
+  if (editor.plugins.wordcount.getCount() === 0) return;
+  clearTimeout(changeTimer);
+  changeTimer = null;
+  changeTimer = setTimeout(function () {
+    selectchange();
+    reactNativeEventHandler('tiny', editor.getContent());
+    reactNativeEventHandler('history', {
+      undo: editor.undoManager.hasUndo(),
+      redo: editor.undoManager.hasRedo()
+    });
   }, 1);
 };
 

@@ -5,7 +5,7 @@ function reactNativeEventHandler(type, value) {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: type,
-        value: value,
+        value: value
       })
     );
   }
@@ -13,21 +13,21 @@ function reactNativeEventHandler(type, value) {
 
 let DEFAULT_FONT_SIZE = '12pt';
 let EDITOR_SETTINGS = {
-  fontSize:12,
-  directionality:'ltr'
-}
+  fontSize: 12,
+  directionality: 'ltr'
+};
 
 function loadSettings() {
   let settings = localStorage.getItem('editorSettings');
   if (settings) {
     settings = JSON.parse(settings);
     EDITOR_SETTINGS = settings;
-  } 
+  }
 }
 
 function changeDirection(rtl) {
   loadSettings();
-  EDITOR_SETTINGS.directionality = rtl? 'rtl' : "ltr";
+  EDITOR_SETTINGS.directionality = rtl ? 'rtl' : 'ltr';
   localStorage.setItem('editorSettings', JSON.stringify(EDITOR_SETTINGS));
   if (rtl) {
     tinymce.activeEditor.execCommand('mceDirectionRTL');
@@ -114,13 +114,13 @@ function init_tiny(size) {
     selector: '#tiny_textarea',
     menubar: false,
     min_height: size,
-    directionality:EDITOR_SETTINGS.directionality,
+    directionality: EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
       'mychecklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace mycode',
-      'media imagetools table paste wordcount autoresize directionality',
+      'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
     paste_data_images: true,
@@ -231,7 +231,7 @@ function init_tiny(size) {
     resize: true,
     mobile: {
       resize: false,
-      object_resizing: false,
+      object_resizing: false
     },
     image_description: false,
     image_caption: false,
@@ -254,7 +254,7 @@ function init_tiny(size) {
           editor.undoManager.transact(function () {
             tinymce.activeEditor.execCommand('Delete');
           });
-        },
+        }
       });
       editor.ui.registry.addButton('imageopts', {
         icon: 'image-options',
@@ -264,7 +264,7 @@ function init_tiny(size) {
         },
         onclick: function () {
           reactNativeEventHandler('imageoptions');
-        },
+        }
       });
 
       editor.ui.registry.addButton('imagepreview', {
@@ -293,7 +293,7 @@ function init_tiny(size) {
             xhr.send();
           }
         },
-        onclick: function () {},
+        onclick: function () {}
       });
     },
     init_instance_callback: function (edit) {
@@ -363,13 +363,13 @@ function init_tiny(size) {
         e.preventDefault();
         e.elm.scrollIntoView({
           behavior: 'smooth',
-          block: 'nearest',
+          block: 'nearest'
         });
       });
       editor.on('input', onChange);
       editor.on('keyup', onChange);
       editor.on('NodeChange', onChange);
-    },
+    }
   });
 }
 window.prevContent = '';
@@ -432,7 +432,7 @@ function selectchange() {
 
   currentFormats.current = {
     index: range.startOffset,
-    length: range.endOffset - range.startOffset,
+    length: range.endOffset - range.startOffset
   };
 
   currentFormats.fontsize = editor.selection.getNode().style.fontSize;
