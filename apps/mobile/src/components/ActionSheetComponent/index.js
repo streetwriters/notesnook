@@ -1,12 +1,12 @@
 import React, {useEffect, useState} from 'react';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import {
   Clipboard,
   Dimensions,
   Keyboard,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
@@ -18,7 +18,7 @@ import {
   useMenuStore,
   useSelectionStore,
   useTrashStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -26,7 +26,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
@@ -37,13 +37,13 @@ import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
-  eOpenTagsDialog,
+  eOpenTagsDialog
 } from '../../utils/Events';
 import {deleteItems} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -56,6 +56,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
 import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import htmlToText from 'html-to-text';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -64,7 +65,7 @@ export const ActionSheetComponent = ({
   hasColors = false,
   hasTags = false,
   rowItems = [],
-  getRef,
+  getRef
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -72,7 +73,7 @@ export const ActionSheetComponent = ({
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(item.id),
+    db.settings.isPinned(item.id)
   );
   const [note, setNote] = useState(item);
   const user = useUserStore(state => state.user);
@@ -112,9 +113,12 @@ export const ActionSheetComponent = ({
     }
   }
 
-  const onUpdate = type => {
+  const onUpdate = async type => {
     console.log('update', type);
     if (type === 'unpin') {
+      await sleep(1000);
+
+      await Notifications.get();
       checkNotifPinned();
     }
   };
@@ -125,7 +129,7 @@ export const ActionSheetComponent = ({
     return () => {
       eUnSubscribeEvent('onUpdate', onUpdate);
     };
-  }, []);
+  }, [item]);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -160,7 +164,7 @@ export const ActionSheetComponent = ({
         Navigation.routeNames.Notebooks,
         Navigation.routeNames.Notebook,
         Navigation.routeNames.Tags,
-        Navigation.routeNames.Trash,
+        Navigation.routeNames.Trash
       ]);
     }
 
@@ -185,7 +189,7 @@ export const ActionSheetComponent = ({
       on: colors.night ? true : false,
       close: false,
       nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.night,
+      id: notesnook.ids.dialogs.actionsheet.night
     },
     {
       name: 'Add to notebook',
@@ -198,7 +202,7 @@ export const ActionSheetComponent = ({
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);
         }, 300);
-      },
+      }
     },
     {
       name: 'Pin',
@@ -212,7 +216,7 @@ export const ActionSheetComponent = ({
             ToastEvent.show({
               heading: 'Cannot pin more than 3 notes',
               type: 'error',
-              context: 'local',
+              context: 'local'
             });
             return;
           }
@@ -222,7 +226,7 @@ export const ActionSheetComponent = ({
             ToastEvent.show({
               heading: 'Cannot pin more than 3 notebooks',
               type: 'error',
-              context: 'local',
+              context: 'local'
             });
             return;
           }
@@ -234,7 +238,7 @@ export const ActionSheetComponent = ({
       check: true,
       on: note.pinned,
       nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pin,
+      id: notesnook.ids.dialogs.actionsheet.pin
     },
     {
       name: 'Favorite',
@@ -251,7 +255,7 @@ export const ActionSheetComponent = ({
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notes
         ]);
         localRefresh(item.type, true);
       },
@@ -260,7 +264,7 @@ export const ActionSheetComponent = ({
       on: note.favorite,
       nopremium: true,
       id: notesnook.ids.dialogs.actionsheet.favorite,
-      color: 'orange',
+      color: 'orange'
     },
     {
       name: 'PinToNotif',
@@ -271,7 +275,7 @@ export const ActionSheetComponent = ({
       icon: 'bell',
       on: notifPinned !== null,
       func: async () => {
-        if (Platform.OS === "ios") return;
+        if (Platform.OS === 'ios') return;
         if (notifPinned !== null) {
           Notifications.remove(note.id, notifPinned.identifier);
           await sleep(1000);
@@ -281,7 +285,7 @@ export const ActionSheetComponent = ({
         }
         if (note.locked) return;
         let text = await db.notes.note(note.id).content();
-        text = toTXT(text);
+        text = htmlToText.convert(text);
         Notifications.present({
           title: note.title,
           message: note.headline,
@@ -289,12 +293,12 @@ export const ActionSheetComponent = ({
           bigText: text,
           ongoing: true,
           actions: ['UNPIN'],
-          tag: note.id,
+          tag: note.id
         });
         await sleep(1000);
         let notifs = await Notifications.get();
         checkNotifPinned();
-      },
+      }
     },
 
     {
@@ -303,7 +307,7 @@ export const ActionSheetComponent = ({
       icon: 'square-edit-outline',
       func: () => {
         close('notebook');
-      },
+      }
     },
     {
       name: 'Edit Topic',
@@ -311,7 +315,7 @@ export const ActionSheetComponent = ({
       icon: 'square-edit-outline',
       func: () => {
         close('topic');
-      },
+      }
     },
     {
       name: 'Copy',
@@ -325,20 +329,20 @@ export const ActionSheetComponent = ({
             locked: true,
             item: note,
             title: 'Copy note',
-            description: 'Unlock note to copy to clipboard.',
+            description: 'Unlock note to copy to clipboard.'
           });
         } else {
           let text = await db.notes.note(note.id).content();
-          text = toTXT(text);
+          text = htmlToText.convert(text);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
           ToastEvent.show({
             heading: 'Note copied to clipboard',
             type: 'success',
-            context: 'local',
+            context: 'local'
           });
         }
-      },
+      }
     },
     {
       name: 'Restore',
@@ -353,7 +357,7 @@ export const ActionSheetComponent = ({
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Trash,
+          Navigation.routeNames.Trash
         ]);
         type = note.type === 'trash' ? note.itemType : note.type;
 
@@ -362,9 +366,9 @@ export const ActionSheetComponent = ({
             type === 'note'
               ? 'Note restored from trash'
               : 'Notebook restored from trash',
-          type: 'success',
+          type: 'success'
         });
-      },
+      }
     },
 
     {
@@ -380,7 +384,7 @@ export const ActionSheetComponent = ({
             func: () => {
               eSendEvent(eOpenLoginDialog);
             },
-            actionText: 'Login',
+            actionText: 'Login'
           });
           return;
         }
@@ -389,7 +393,7 @@ export const ActionSheetComponent = ({
           ToastEvent.show({
             heading: 'Email not verified',
             message: 'Please verify your email first.',
-            context: 'local',
+            context: 'local'
           });
           return;
         }
@@ -397,14 +401,14 @@ export const ActionSheetComponent = ({
           ToastEvent.show({
             heading: 'Locked notes cannot be published',
             type: 'error',
-            context: 'local',
+            context: 'local'
           });
           return;
         }
         close();
         await sleep(300);
         eSendEvent(eOpenPublishNoteDialog, note);
-      },
+      }
     },
     {
       name: 'Vault',
@@ -425,7 +429,7 @@ export const ActionSheetComponent = ({
               Navigation.setRoutesToUpdate([
                 Navigation.routeNames.NotesPage,
                 Navigation.routeNames.Favorites,
-                Navigation.routeNames.Notes,
+                Navigation.routeNames.Notes
               ]);
               localRefresh(note.type);
             })
@@ -444,7 +448,7 @@ export const ActionSheetComponent = ({
             });
         }
       },
-      on: note.locked,
+      on: note.locked
     },
 
     {
@@ -460,7 +464,7 @@ export const ActionSheetComponent = ({
             if (item.type === 'topic') {
               await db.settings.pin(note.type, {
                 id: note.id,
-                notebookId: note.notebookId,
+                notebookId: note.notebookId
               });
             } else {
               await db.settings.pin(note.type, {id: note.id});
@@ -474,7 +478,7 @@ export const ActionSheetComponent = ({
       check: true,
       on: isPinnedToMenu,
       nopremium: true,
-      id: notesnook.ids.dialogs.actionsheet.pinMenu,
+      id: notesnook.ids.dialogs.actionsheet.pinMenu
     },
     {
       name: 'Edit Tag',
@@ -491,15 +495,15 @@ export const ActionSheetComponent = ({
             Navigation.setRoutesToUpdate([
               Navigation.routeNames.Notes,
               Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Tags,
+              Navigation.routeNames.Tags
             ]);
           },
           input: true,
           defaultValue: note.title,
           inputPlaceholder: 'Enter tag title',
-          positiveText: 'Save',
+          positiveText: 'Save'
         });
-      },
+      }
     },
     {
       name: 'Share',
@@ -514,7 +518,7 @@ export const ActionSheetComponent = ({
             locked: true,
             share: true,
             title: 'Share note',
-            description: 'Unlock note to share it.',
+            description: 'Unlock note to share it.'
           });
         } else {
           let text = await db.notes.note(note.id).export('txt');
@@ -522,10 +526,10 @@ export const ActionSheetComponent = ({
           Share.open({
             title: 'Share note to',
             failOnCancel: false,
-            message: m,
+            message: m
           });
         }
-      },
+      }
     },
     {
       name: 'Export',
@@ -533,7 +537,7 @@ export const ActionSheetComponent = ({
       icon: 'export',
       func: () => {
         close('export');
-      },
+      }
     },
     {
       name: 'RemoveTopic',
@@ -549,11 +553,11 @@ export const ActionSheetComponent = ({
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Notebook
         ]);
         setNote(db.notes.note(note.id).data);
         close();
-      },
+      }
     },
     {
       name: 'Delete',
@@ -575,11 +579,11 @@ export const ActionSheetComponent = ({
               Navigation.setRoutesToUpdate([
                 Navigation.routeNames.Notes,
                 Navigation.routeNames.NotesPage,
-                Navigation.routeNames.Tags,
+                Navigation.routeNames.Tags
               ]);
             },
             positiveText: 'Delete',
-            positiveType: 'errorShade',
+            positiveType: 'errorShade'
           });
           return;
         }
@@ -591,7 +595,7 @@ export const ActionSheetComponent = ({
             locked: true,
             item: note,
             title: 'Delete note',
-            description: 'Unlock note to delete it.',
+            description: 'Unlock note to delete it.'
           });
         } else {
           try {
@@ -599,7 +603,7 @@ export const ActionSheetComponent = ({
             await deleteItems(note);
           } catch (e) {}
         }
-      },
+      }
     },
     {
       name: 'PermDelete',
@@ -620,13 +624,13 @@ export const ActionSheetComponent = ({
             ToastEvent.show({
               heading: 'Permanantly deleted items',
               type: 'success',
-              context: 'local',
+              context: 'local'
             });
           },
-          positiveType: 'errorShade',
+          positiveType: 'errorShade'
         });
-      },
-    },
+      }
+    }
   ];
 
   let columnItemWidth = DDS.isTab ? (400 - 24) / rowItems.length : (w - 24) / 5;
@@ -638,7 +642,7 @@ export const ActionSheetComponent = ({
       style={{
         alignItems: 'center',
         width: columnItemWidth,
-        marginBottom: 10,
+        marginBottom: 10
       }}>
       <PressableButton
         onPress={rowItem.func}
@@ -651,7 +655,7 @@ export const ActionSheetComponent = ({
           alignItems: 'center',
           textAlign: 'center',
           textAlignVertical: 'center',
-          marginBottom: DDS.isTab ? 7 : 3.5,
+          marginBottom: DDS.isTab ? 7 : 3.5
         }}>
         <Icon
           name={rowItem.icon}
@@ -693,13 +697,13 @@ export const ActionSheetComponent = ({
         backgroundColor: colors.bg,
         paddingHorizontal: 0,
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
-        borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1,
+        borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1
       }}>
       <TouchableOpacity
         style={{
           width: '100%',
           height: '100%',
-          position: 'absolute',
+          position: 'absolute'
         }}
         onPress={() => {
           Keyboard.dismiss();
@@ -716,12 +720,12 @@ export const ActionSheetComponent = ({
             paddingHorizontal: 12,
             alignItems: 'center',
             marginTop: 5,
-            zIndex: 10,
+            zIndex: 10
           }}>
           <Heading
             style={{
               maxWidth: '90%',
-              textAlign: 'center',
+              textAlign: 'center'
             }}
             size={SIZE.md}>
             {note.type === 'tag' ? '#' : null}
@@ -734,7 +738,7 @@ export const ActionSheetComponent = ({
               style={{
                 width: '90%',
                 textAlign: 'center',
-                maxWidth: '90%',
+                maxWidth: '90%'
               }}>
               {note.type === 'notebook' && note.description
                 ? note.description
@@ -752,7 +756,7 @@ export const ActionSheetComponent = ({
             size={SIZE.xs}
             style={{
               textAlignVertical: 'center',
-              marginTop: 2.5,
+              marginTop: 2.5
             }}>
             {note.type === 'note' || (note.type === 'tag' && note.dateEdited)
               ? 'Last edited on ' + timeConverter(note.dateEdited)
@@ -783,7 +787,7 @@ export const ActionSheetComponent = ({
               width: '90%',
               maxWidth: '90%',
               flexWrap: 'wrap',
-              justifyContent: 'center',
+              justifyContent: 'center'
             }}>
             {note.type === 'notebook' &&
             note &&
@@ -805,7 +809,7 @@ export const ActionSheetComponent = ({
                         let headerState = {
                           heading: topic.title,
                           id: topic.id,
-                          type: topic.type,
+                          type: topic.type
                         };
                         Navigation.navigate(routeName, params, headerState);
                       }}
@@ -815,7 +819,7 @@ export const ActionSheetComponent = ({
                         marginRight: 5,
                         paddingHorizontal: 0,
                         paddingHorizontal: 6,
-                        marginTop: 5,
+                        marginTop: 5
                       }}
                     />
                   ))
@@ -832,7 +836,7 @@ export const ActionSheetComponent = ({
                   marginRight: 5,
                   paddingHorizontal: 0,
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: 12
                 }}
               />
             )}
@@ -850,7 +854,7 @@ export const ActionSheetComponent = ({
                   marginRight: 5,
                   paddingHorizontal: 0,
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: 12
                 }}
               />
             )}
@@ -873,7 +877,7 @@ export const ActionSheetComponent = ({
                   marginRight: 5,
                   paddingHorizontal: 0,
                   borderRadius: 100,
-                  paddingHorizontal: 12,
+                  paddingHorizontal: 12
                 }}
               />
             )}
@@ -888,7 +892,7 @@ export const ActionSheetComponent = ({
       {note.id || note.dateCreated ? (
         <FlatList
           data={rowItemsData.filter(
-            i => rowItems.indexOf(i.name) > -1 && !i.hidden,
+            i => rowItems.indexOf(i.name) > -1 && !i.hidden
           )}
           keyExtractor={item => item.title}
           numColumns={rowItems.length < 5 ? rowItems.length : 5}
@@ -896,14 +900,14 @@ export const ActionSheetComponent = ({
             marginTop: note.type !== 'note' ? 10 : 0,
             borderTopWidth: 1,
             borderColor: colors.nav,
-            paddingTop: 20,
+            paddingTop: 20
           }}
           columnWrapperStyle={{
-            justifyContent: rowItems.length < 5 ? 'space-around' : 'flex-start',
+            justifyContent: rowItems.length < 5 ? 'space-around' : 'flex-start'
           }}
           contentContainerStyle={{
             alignSelf: 'center',
-            width: rowItems.length < 5 ? '100%' : null,
+            width: rowItems.length < 5 ? '100%' : null
           }}
           renderItem={({item, index}) => _renderRowItem(item)}
         />
@@ -919,26 +923,26 @@ export const ActionSheetComponent = ({
             marginTop: 25,
             flexDirection: 'row',
             justifyContent: 'flex-start',
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}>
           <Icon name="shield-key-outline" color={colors.accent} size={40} />
 
           <View
             style={{
               flex: 1,
-              marginLeft: 5,
+              marginLeft: 5
             }}>
             <Heading
               color={colors.accent}
               style={{
-                fontSize: SIZE.md,
+                fontSize: SIZE.md
               }}>
               This note is encrypted and synced
             </Heading>
             <Paragraph
               style={{
                 flexWrap: 'wrap',
-                flexBasis: 1,
+                flexBasis: 1
               }}
               color={colors.pri}>
               No one can read it except you.
@@ -950,7 +954,7 @@ export const ActionSheetComponent = ({
       {DDS.isTab ? (
         <View
           style={{
-            height: 20,
+            height: 20
           }}
         />
       ) : null}
