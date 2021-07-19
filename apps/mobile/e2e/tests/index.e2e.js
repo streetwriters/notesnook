@@ -1,9 +1,6 @@
-const { notesnook } = require("../test.ids");
-const { sleep } = require("./utils.test");
+const detox = require("detox");
+const { LaunchApp } = require("./misc.e2e");
 
-it('App initialization', async () => {
-    device.launchApp();
-    console.log('sleeping after launch');
-    await sleep(5000);
-	await expect(element(by.id(notesnook.ids.default.root))).toBeVisible();
+it('App Launch', async () => {
+	await LaunchApp();
 });
