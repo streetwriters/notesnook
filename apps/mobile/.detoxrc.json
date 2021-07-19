@@ -16,7 +16,7 @@
       "build": "cd android && ./gradlew app:assembleDebug app:assembleAndroidTest -DtestBuildType=debug && cd ..",
       "type": "android.attached",
       "device":{
-        "avdName":"LMG710ULM3d3678f0"
+        "adbName":"LMG710ULM3d3678f0"
       }
     },
     "android.emu.release": {
