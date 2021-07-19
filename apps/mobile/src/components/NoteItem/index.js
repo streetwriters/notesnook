@@ -269,18 +269,19 @@ const NoteItem = ({item, isTrash, tags}) => {
                 style={{
                   marginRight: 10,
                 }}>
-                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
-              </Paragraph>
-              <Paragraph
-                color={colors.icon}
-                size={SIZE.xs}
-                style={{
-                  marginRight: 10,
-                }}>
                 Deleted on{' '}
                 {item && item.dateDeleted
                   ? new Date(item.dateDeleted).toISOString().slice(0, 10)
                   : null}
+              </Paragraph>
+
+              <Paragraph
+                color={colors.accent}
+                size={SIZE.xs}
+                style={{
+                  marginRight: 10,
+                }}>
+                {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
             </>
           )}
