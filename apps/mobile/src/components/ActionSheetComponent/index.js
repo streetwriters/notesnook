@@ -1,9 +1,10 @@
+import htmlToText from 'html-to-text';
 import React, {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
 import {
   Clipboard,
   Dimensions,
   Keyboard,
+  Platform,
   ScrollView,
   TouchableOpacity,
   View
@@ -31,7 +32,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import Sync from '../../services/Sync';
-import {editing, toTXT} from '../../utils';
+import {editing} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -56,7 +57,6 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ActionSheetColorsSection} from './ActionSheetColorsSection';
 import {ActionSheetTagsSection} from './ActionSheetTagsSection';
-import htmlToText from 'html-to-text';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -285,7 +285,9 @@ export const ActionSheetComponent = ({
         }
         if (note.locked) return;
         let text = await db.notes.note(note.id).content();
-        text = htmlToText.convert(text);
+        text = htmlToText.convert(text, {
+          selectors: [{selector: 'img', format: 'skip'}]
+        });
         Notifications.present({
           title: note.title,
           message: note.headline,
@@ -333,7 +335,9 @@ export const ActionSheetComponent = ({
           });
         } else {
           let text = await db.notes.note(note.id).content();
-          text = htmlToText.convert(text);
+          text = htmlToText.convert(text, {
+            selectors: [{selector: 'img', format: 'skip'}]
+          });
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
           ToastEvent.show({
