@@ -90,44 +90,50 @@ export const SectionHeader = ({item, index, type, title}) => {
           alignItems: 'center',
         }}>
         {index === 0 ? (
-          <Button
-            onPress={() => {
-              eSendEvent(eOpenSortDialog, type);
-            }}
-            title={groupBy}
-            icon={
-              groupOptions.sortDirection === 'asc'
-                ? 'sort-ascending'
-                : 'sort-descending'
-            }
-            height={25}
-            style={{
-              borderRadius: 100,
-              paddingHorizontal: 0,
-              backgroundColor: 'transparent',
-              marginRight: type === 'notes' || type === "home" || type === 'notebooks' ? 10 : 0,
-            }}
-            type="gray"
-            iconPosition="right"
-          />
-        ) : null}
-
-        {type === 'notes' || type === 'notebooks' || type === 'home' ? (
-          <ActionIcon
-            customStyle={{
-              width: 25,
-              height: 25,
-            }}
-            color={colors.icon}
-            name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
-            onPress={() => {
-              SettingsService.set(
-                type !== 'notebooks' ? 'notesListMode' : 'notebooksListMode',
-                listMode === 'normal' ? 'compact' : 'normal',
-              );
-            }}
-            size={SIZE.md}
-          />
+          <>
+            <Button
+              onPress={() => {
+                eSendEvent(eOpenSortDialog, type);
+              }}
+              title={groupBy}
+              icon={
+                groupOptions.sortDirection === 'asc'
+                  ? 'sort-ascending'
+                  : 'sort-descending'
+              }
+              height={25}
+              style={{
+                borderRadius: 100,
+                paddingHorizontal: 0,
+                backgroundColor: 'transparent',
+                marginRight:
+                  type === 'notes' || type === 'home' || type === 'notebooks'
+                    ? 10
+                    : 0,
+              }}
+              type="gray"
+              iconPosition="right"
+            />
+            {type === 'notes' || type === 'notebooks' || type === 'home' ? (
+              <ActionIcon
+                customStyle={{
+                  width: 25,
+                  height: 25,
+                }}
+                color={colors.icon}
+                name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
+                onPress={() => {
+                  SettingsService.set(
+                    type !== 'notebooks'
+                      ? 'notesListMode'
+                      : 'notebooksListMode',
+                    listMode === 'normal' ? 'compact' : 'normal',
+                  );
+                }}
+                size={SIZE.md}
+              />
+            ) : null}
+          </>
         ) : null}
       </View>
     </View>
