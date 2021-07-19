@@ -159,6 +159,8 @@ const EditorHeader = () => {
       await sleep(500);
       editing.isFocused = true;
     }
+    
+    let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
     ActionSheetEvent(note, true, true, [
       'Add to notebook',
       'Share',
@@ -170,6 +172,7 @@ const EditorHeader = () => {
       'Pin',
       'Favorite',
       'Publish',
+      ...android,
     ]);
   };
 

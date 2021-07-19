@@ -1,4 +1,5 @@
 import React from 'react';
+import {Platform} from 'react-native';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
@@ -51,6 +52,7 @@ function navigateToTag(item) {
 
 const showActionSheet = (item, isTrash) => {
   let note = isTrash ? item : db.notes.note(item?.id)?.data;
+  let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
   ActionSheetEvent(
     note ? note : item,
     isTrash ? false : true,
@@ -65,10 +67,10 @@ const showActionSheet = (item, isTrash) => {
           'Publish',
           'Pin',
           'Favorite',
-          'PinToNotif',
           'Vault',
           'Delete',
           'RemoveTopic',
+          ...android,
         ],
   );
 };
