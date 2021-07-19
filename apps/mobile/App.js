@@ -20,6 +20,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from './src/services/EventManager';
+import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
 import { Tracker } from './src/utils';
 import { db } from './src/utils/DB';
@@ -52,6 +53,7 @@ async function loadDefaultNotes() {
 const loadDatabase = async () => {
   SplashScreen.hide();
   await db.init();
+  Notifications.get();
   let requireIntro = await MMKV.getItem('introCompleted');
   useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
   loadDefaultNotes();
