@@ -25,8 +25,8 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     let rowItems =
       item.type === 'topic'
         ? ['Edit Topic', 'Add Shortcut', 'Delete']
-        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
-    rowItems = isTrash ? ['Restore', 'Remove'] : rowItems;
+        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete',];
+    rowItems = isTrash ? ['Restore', 'PermDelete'] : rowItems;
 
     ActionSheetEvent(item, false, false, rowItems, {
       notebookID: notebookID,
