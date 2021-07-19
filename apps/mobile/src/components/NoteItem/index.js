@@ -65,11 +65,11 @@ const showActionSheet = (item, isTrash) => {
           'Publish',
           'Pin',
           'Favorite',
+          'PinToNotif',
           'Vault',
           'Delete',
           'RemoveTopic',
         ],
-    isTrash ? [] : ['Pin', 'Favorite', 'Vault', 'Delete', 'RemoveTopic'],
   );
 };
 
@@ -202,7 +202,7 @@ const NoteItem = ({item, isTrash, tags}) => {
               ) : null}
 
               {item.pinned ? (
-                <Icon1
+                <Icon
                   style={{marginRight: 10}}
                   name="pin"
                   size={SIZE.sm}

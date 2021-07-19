@@ -20,8 +20,15 @@ import {
   useUserStore,
 } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, openVault, ToastEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  openVault,
+  ToastEvent,
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import Notifications from '../../services/Notifications';
 import Sync from '../../services/Sync';
 import {editing, toTXT} from '../../utils';
 import {
@@ -69,6 +76,7 @@ export const ActionSheetComponent = ({
   const [note, setNote] = useState(item);
   const user = useUserStore(state => state.user);
   const lastSynced = useUserStore(state => state.lastSynced);
+  const [notifPinned, setNotifPinned] = useState(null);
 
   const refreshing = false;
   const isPublished = db.monographs.isPublished(note.id);
@@ -81,14 +89,42 @@ export const ActionSheetComponent = ({
 
   useEffect(() => {
     if (item.id === null) return;
-
-    sleep(1000).then(() => {
-      setNote({...item});
-      if (item.type !== note) {
-        setIsPinnedToMenu(db.settings.isPinned(note.id));
-      }
-    });
+    checkNotifPinned();
+    setNote({...item});
+    if (item.type !== 'note') {
+      setIsPinnedToMenu(db.settings.isPinned(note.id));
+    }
   }, [item]);
+
+  function checkNotifPinned() {
+    let pinned = Notifications.getPinnedNotes();
+    console.log(pinned);
+    if (!pinned) {
+      setNotifPinned(null);
+      return;
+    }
+    let index = pinned.findIndex(notif => notif.tag === item.id);
+    if (index !== -1) {
+      setNotifPinned(pinned[index]);
+    } else {
+      setNotifPinned(null);
+    }
+  }
+
+  const onUpdate = type => {
+    console.log('update', type);
+    if (type === 'unpin') {
+      checkNotifPinned();
+    }
+  };
+
+  useEffect(() => {
+    eSubscribeEvent('onUpdate', onUpdate);
+
+    return () => {
+      eUnSubscribeEvent('onUpdate', onUpdate);
+    };
+  }, []);
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
@@ -225,6 +261,37 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.favorite,
       color: 'orange',
     },
+    {
+      name: 'PinToNotif',
+      title:
+        notifPinned !== null
+          ? 'Unpin from Notifications'
+          : 'Pin to Notifications',
+      icon: 'bell',
+      on: notifPinned !== null,
+      func: async () => {
+        if (notifPinned !== null) {
+          Notifications.remove(note.id, notifPinned.identifier);
+          await Notifications.get();
+          checkNotifPinned();
+          return;
+        }
+        if (note.locked) return;
+        let text = await db.notes.note(note.id).content();
+        text = toTXT(text);
+        Notifications.present({
+          title: note.title,
+          message: note.headline,
+          subtitle: note.headline,
+          bigText: text,
+          ongoing: true,
+          actions: ['UNPIN'],
+          tag: note.id,
+        });
+        await Notifications.get();
+        checkNotifPinned();
+      },
+    },
 
     {
       name: 'Edit Notebook',
@@ -271,7 +338,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'Restore',
-      title:"Restore " + note.itemType,
+      title: 'Restore ' + note.itemType,
       icon: 'delete-restore',
       func: async () => {
         close();
@@ -416,11 +483,11 @@ export const ActionSheetComponent = ({
           title: 'Edit tag',
           paragraph: 'Change the title of the tag',
           positivePress: async value => {
-            await db.tags.rename(note.id,value);
+            await db.tags.rename(note.id, value);
             Navigation.setRoutesToUpdate([
               Navigation.routeNames.Notes,
               Navigation.routeNames.NotesPage,
-              Navigation.routeNames.Tags
+              Navigation.routeNames.Tags,
             ]);
           },
           input: true,
@@ -504,7 +571,7 @@ export const ActionSheetComponent = ({
               Navigation.setRoutesToUpdate([
                 Navigation.routeNames.Notes,
                 Navigation.routeNames.NotesPage,
-                Navigation.routeNames.Tags
+                Navigation.routeNames.Tags,
               ]);
             },
             positiveText: 'Delete',
@@ -532,7 +599,7 @@ export const ActionSheetComponent = ({
     },
     {
       name: 'PermDelete',
-      title:"Delete " + note.itemType,
+      title: 'Delete ' + note.itemType,
       icon: 'delete',
       func: async () => {
         close();
@@ -595,7 +662,9 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph style={{textAlign: 'center'}}>{rowItem.title}</Paragraph>
+      <Paragraph size={SIZE.sm - 1} style={{textAlign: 'center'}}>
+        {rowItem.title}
+      </Paragraph>
     </View>
   );
 
