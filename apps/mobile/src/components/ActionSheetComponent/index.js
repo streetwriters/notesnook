@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import { Platform } from 'react-native';
 import {
   Clipboard,
   Dimensions,
@@ -270,8 +271,10 @@ export const ActionSheetComponent = ({
       icon: 'bell',
       on: notifPinned !== null,
       func: async () => {
+        if (Platform.OS === "ios") return;
         if (notifPinned !== null) {
           Notifications.remove(note.id, notifPinned.identifier);
+          await sleep(1000);
           await Notifications.get();
           checkNotifPinned();
           return;
@@ -288,7 +291,8 @@ export const ActionSheetComponent = ({
           actions: ['UNPIN'],
           tag: note.id,
         });
-        await Notifications.get();
+        await sleep(1000);
+        let notifs = await Notifications.get();
         checkNotifPinned();
       },
     },
