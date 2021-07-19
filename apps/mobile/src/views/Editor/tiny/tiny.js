@@ -83,6 +83,7 @@ const updateSavingState = value => `
 `;
 
 export const clearEditor = `
+
 tinymce.activeEditor.setContent("");
 `;
 const clearTitle = `
@@ -151,6 +152,7 @@ isLoading = false;
 const html = value => post('html', value);
 
 const focusEditor = `
+window.focus();
 tinymce.activeEditor.focus();
 `;
 

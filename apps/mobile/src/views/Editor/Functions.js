@@ -184,7 +184,10 @@ let webviewTimer = null;
 
 export const loadNote = async item => {
   editing.currentlyEditing = true;
+  editing.movedAway = false;
+  if (editing.isFocused) {
   tiny.call(EditorWebView, tiny.blur);
+  }
   if (item && item.type === 'new') {
     if (getNote()) {
       await clearEditor();

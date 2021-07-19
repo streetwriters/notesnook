@@ -87,6 +87,7 @@ export default class CustomTabs extends Component {
       editing.keyboardState = false;
       this.inputElement.current?.focus();
       this.inputElement.current?.blur();
+      console.log('hiding keyboard from custom tabs');
     }
   }
 
@@ -124,7 +125,7 @@ export default class CustomTabs extends Component {
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
 
-    if (this.scrollOffset < this.props.offsets.b - 100 || this.nextPage !== 1) {
+    if (this.scrollOffset < this.props.offsets.b - 100 && this.nextPage !== 1) {
       editing.movedAway = true;
     } else {
       editing.movedAway = false;
@@ -173,6 +174,7 @@ export default class CustomTabs extends Component {
       editing.movedAway = false;
     } else {
       this.nextPage = 0;
+      console.log('moved away here',editing.movedAway);
       editing.movedAway = true;
       this.hideKeyboardIfVisible();
     }
