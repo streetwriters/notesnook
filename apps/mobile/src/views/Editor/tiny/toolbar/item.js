@@ -107,8 +107,8 @@ const ToolbarItem = ({
 
       if (format === 'link') {
         properties.selection = data;
+        if (!data['link']) return;
         properties.pauseSelectionChange = true;
-
         eSendEvent('showTooltip', {
           data: null,
           value: data['link'],
