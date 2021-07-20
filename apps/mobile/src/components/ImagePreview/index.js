@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import ImageViewer from 'react-native-image-zoom-viewer';
-import { ActionIcon } from '../ActionIcon';
+import RNFetchBlob from 'rn-fetch-blob';
+import Storage from '../../utils/storage';
+import {ActionIcon} from '../ActionIcon';
 import BaseDialog from '../Dialog/base-dialog';
 const {
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } = require('../../services/EventManager');
 
 const ImagePreview = () => {
@@ -37,10 +39,10 @@ const ImagePreview = () => {
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: 'black',
+            backgroundColor: 'black'
           }}>
           <ImageViewer
-            enableImageZoom={false}
+            enableImageZoom={true}
             renderIndicator={() => <></>}
             enableSwipeDown
             useNativeDriver
@@ -52,11 +54,13 @@ const ImagePreview = () => {
                   width: '100%',
                   justifyContent: 'flex-end',
                   alignItems: 'center',
-                  height: 50,
-                  marginTop: 30,
+                  height: 80,
+                  marginTop: 0,
                   paddingHorizontal: 12,
                   position: 'absolute',
                   zIndex: 999,
+                  backgroundColor: 'rgba(0,0,0,0.3)',
+                  paddingTop: 30
                 }}>
                 <ActionIcon
                   name="close"
@@ -69,8 +73,8 @@ const ImagePreview = () => {
             )}
             imageUrls={[
               {
-                url: image,
-              },
+                url: image
+              }
             ]}
           />
         </View>
