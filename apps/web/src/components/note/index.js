@@ -78,17 +78,20 @@ function Note(props) {
                 icon={Icon.Notebook}
               />
             )}
-            {note.tags.slice(0, 2).map((tag) => (
-              <IconTag
-                text={tag}
-                icon={Icon.Tag}
-                onClick={() => {
-                  const tagId = db.tags.tag(tag)?.id;
-                  if (!tagId) return showToast("Tag not found.");
-                  navigate(`/tags/${tagId}`);
-                }}
-              />
-            ))}
+            {note.tags.slice(0, 2).map((tag) => {
+              const tagItem = db.tags.tag(tag);
+              if (!tagItem) return null;
+              return (
+                <IconTag
+                  text={tagItem.alias || tagItem.title}
+                  icon={Icon.Tag}
+                  onClick={() => {
+                    if (!tagItem.id) return showToast("Tag not found.");
+                    navigate(`/tags/${tagItem.id}`);
+                  }}
+                />
+              );
+            })}
           </Flex>
         )
       }
