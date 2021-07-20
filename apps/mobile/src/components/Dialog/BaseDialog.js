@@ -24,8 +24,8 @@ const BaseDialog = ({
   background = null
 }) => {
   const [state, dispatch] = useTracked();
-  
   const floating = useIsFloatingKeyboard();
+  
   return (
     <Modal
       visible={visible}
