@@ -21,7 +21,7 @@ body,
 
 * {
   font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
-    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif !important;
+    Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
 }
 
 @keyframes fadeUp {

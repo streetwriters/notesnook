@@ -11,7 +11,6 @@ import "tinymce/plugins/advlist";
 import "tinymce/plugins/autolink";
 import "tinymce/plugins/textpattern";
 import "tinymce/plugins/textcolor";
-import "tinymce/plugins/paste";
 import "tinymce/plugins/importcss";
 import "tinymce/plugins/hr";
 import "tinymce/plugins/imagetools";
@@ -24,6 +23,7 @@ import "./plugins/shortlink";
 import "./plugins/quickimage";
 import "./plugins/checklist";
 import "./plugins/collapsibleheaders";
+import "./plugins/paste";
 import "./editor.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
@@ -183,8 +183,7 @@ function TinyMCE(props) {
         toolbar: simple
           ? false
           : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
-        quickbars_selection_toolbar:
-          "bold italic underline strikethrough code h2 h3 quicklink blockquote",
+        quickbars_selection_toolbar: false,
         mobile: {
           toolbar_mode: "scrolling",
         },
@@ -203,7 +202,6 @@ function TinyMCE(props) {
               block: "nearest",
             });
           });
-          editor.on("NewBlock", (e) => {});
         },
         toolbar_persist: true,
         toolbar_sticky: false,
