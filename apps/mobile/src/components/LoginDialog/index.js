@@ -474,7 +474,7 @@ const LoginDialog = () => {
       <ScrollView
         ref={scrollViewRef}
         keyboardShouldPersistTaps="always"
-        keyboardDismissMode="none"
+        keyboardDismissMode="on-drag"
         nestedScrollEnabled
         onMomentumScrollEnd={() => {
           actionSheetRef.current.handleChildScrollEnd();
