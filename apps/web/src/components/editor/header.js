@@ -90,7 +90,7 @@ function Autosuggest({
   sx,
 }) {
   const [filtered, setFiltered] = useState([]);
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const inputRef = useRef();
   return (
     <Flex
@@ -138,8 +138,13 @@ function Autosuggest({
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {
-            onAdd(e.target.value);
+            if (selectedIndex > -1) {
+              onSelect(filtered[selectedIndex]);
+            } else {
+              onAdd(e.target.value);
+            }
             e.target.value = "";
+            setFiltered([]);
           } else if (e.target.value === "" && e.key === "Backspace") {
             onRemove();
           } else if (e.key === "Escape") {
@@ -160,7 +165,8 @@ function Autosuggest({
         }}
       />
       {filtered.length ? (
-        <Box
+        <Flex
+          flexDirection="column"
           sx={{
             position: "absolute",
             top: 25,
@@ -191,7 +197,7 @@ function Autosuggest({
               {renderSuggestion(item, selectedIndex === index)}
             </Button>
           ))}
-        </Box>
+        </Flex>
       ) : null}
     </Flex>
   );
