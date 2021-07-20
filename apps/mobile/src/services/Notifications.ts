@@ -2,8 +2,7 @@ import { useNoteStore } from './../provider/stores';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Platform } from 'react-native';
 import PushNotification, { Importance, PushNotificationDeliveredObject } from 'react-native-push-notification';
-import { useSettingStore } from '../provider/stores';
-import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './EventManager';
+import { eSendEvent } from './EventManager';
 import { db } from '../utils/DB';
 import { DDS } from './DeviceDetection';
 import { tabBarRef } from '../utils/Refs';
@@ -11,9 +10,9 @@ import { eOnLoadNote } from '../utils/Events';
 import { editing } from '../utils';
 import { MMKV } from '../utils/mmkv';
 
-
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
+let pinned = [];
 
 function loadNote(id: string, jump: boolean) {
   let note = db.notes.note(id).data;
@@ -30,20 +29,21 @@ function loadNote(id: string, jump: boolean) {
 }
 
 function init() {
+  if (Platform.OS === "ios") return;
   PushNotification.configure({
     onNotification: function (notification) {
       editing.movedAway = false;
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore
-        loadNote(notification.tag,false)
+        loadNote(notification.tag, false)
         return;
       }
 
       let unsub = useNoteStore.subscribe((loading) => {
         if (loading === false) {
           //@ts-ignore
-          loadNote(notification.tag,true);
+          loadNote(notification.tag, true);
           //@ts-ignore
         }
         unsub();
@@ -58,6 +58,7 @@ function init() {
       }
     },
     popInitialNotification: true,
+    //@ts-ignore
     requestPermissions: Platform.OS === 'ios',
   });
 
@@ -106,15 +107,13 @@ function clearAll() {
   PushNotification.clearAllNotifications();
 }
 
-let pinned = [];
-
-
 function getPinnedNotes(): PushNotificationDeliveredObject[] {
   return pinned;
 }
 
 function get(): Promise<PushNotificationDeliveredObject[]> {
   return new Promise(resolve => {
+    if (Platform.OS === "ios") resolve([]);
     PushNotification.getDeliveredNotifications(n => {
       pinned = n;
       resolve(n);
