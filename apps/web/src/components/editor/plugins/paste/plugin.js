@@ -9,8 +9,6 @@ import tinymce from "tinymce/tinymce";
  * Version: 5.8.1 (2021-05-20)
  */
 (function () {
-  "use strict";
-
   var Cell = function (initial) {
     var value = initial;
     var get = function () {
@@ -546,7 +544,7 @@ import tinymce from "tinymce/tinymce";
         content
       ) ||
       /class="OutlineElement/.test(content) ||
-      /id="?docs\-internal\-guid\-/.test(content)
+      /id="?docs-internal-guid-/.test(content)
     );
   };
   var isNumericList = function (text) {
@@ -554,8 +552,8 @@ import tinymce from "tinymce/tinymce";
     var patterns = [
       /^[IVXLMCD]+\.[ \u00a0]/,
       /^[ivxlmcd]+\.[ \u00a0]/,
-      /^[a-z]{1,2}[\.\)][ \u00a0]/,
-      /^[A-Z]{1,2}[\.\)][ \u00a0]/,
+      /^[a-z]{1,2}[.)][ \u00a0]/,
+      /^[A-Z]{1,2}[.)][ \u00a0]/,
       /^[0-9]+\.[ \u00a0]/,
       /^[\u3007\u4e00\u4e8c\u4e09\u56db\u4e94\u516d\u4e03\u516b\u4e5d]+\.[ \u00a0]/,
       /^[\u58f1\u5f10\u53c2\u56db\u4f0d\u516d\u4e03\u516b\u4e5d\u62fe]+\.[ \u00a0]/,
@@ -728,6 +726,8 @@ import tinymce from "tinymce/tinymce";
             return;
           }
           break;
+        default:
+          break;
       }
       if (name.indexOf("mso-comment") === 0) {
         node.remove();
@@ -767,7 +767,7 @@ import tinymce from "tinymce/tinymce";
       /<br class="?Apple-interchange-newline"?>/gi,
       /<b[^>]+id="?docs-internal-[^>]*>/gi,
       /<!--[\s\S]+?-->/gi,
-      /<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|img|meta|link|style|\w:\w+)(?=[\s\/>]))[^>]*>/gi,
+      /<(!|script[^>]*>.*?<\/script(?=[>\s])|\/?(\?xml(:\w+)?|img|meta|link|style|\w:\w+)(?=[\s/>]))[^>]*>/gi,
       [/<(\/?)s>/gi, "<$1strike>"],
       [/&nbsp;/gi, nbsp],
       [
@@ -948,7 +948,7 @@ import tinymce from "tinymce/tinymce";
     return true;
   };
   var isAbsoluteUrl = function (url) {
-    return /^https?:\/\/[\w\?\-\/+=.&%@~#]+$/i.test(url);
+    return /^https?:\/\/[\w?\-/+=.&%@~#]+$/i.test(url);
   };
   var isImageUrl = function (editor, url) {
     return (
@@ -1112,7 +1112,7 @@ import tinymce from "tinymce/tinymce";
     );
   };
   var parseDataUri = function (uri) {
-    var matches = /data:([^;]+);base64,([a-z0-9\+\/=]+)/i.exec(uri);
+    var matches = /data:([^;]+);base64,([a-z0-9+/=]+)/i.exec(uri);
     if (matches) {
       return {
         type: matches[1],

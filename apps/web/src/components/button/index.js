@@ -1,8 +1,6 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Flex, Text } from "rebass";
 import { useTheme } from "emotion-theming";
-import useMobile from "../../utils/use-mobile";
-import useTablet from "../../utils/use-tablet";
 
 //TODO use normal button
 const boxShadow = "1px 1px 10px 0px var(--primary)";
