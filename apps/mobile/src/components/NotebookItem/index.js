@@ -82,7 +82,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               <Button
                 title={topic.title}
                 key={topic.id}
-                height={25}
+                height={SIZE.xl}
                 textStyle={{
                   fontWeight: 'normal',
                   fontFamily: null,
