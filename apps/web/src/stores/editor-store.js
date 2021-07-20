@@ -14,28 +14,30 @@ const SESSION_STATES = {
   unlocked: "unlocked",
   opening: "opening",
 };
-const DEFAULT_SESSION = {
-  contentId: undefined,
-  notebooks: undefined,
-  state: undefined,
-  isSaving: false,
-  title: "",
-  id: "",
-  pinned: false,
-  favorite: false,
-  locked: false,
-  tags: [],
-  context: undefined,
-  color: undefined,
-  dateEdited: 0,
-  totalWords: 0,
-  content: {
-    type: "tiny",
-    data: "",
-  },
+const getDefaultSession = () => {
+  return {
+    contentId: undefined,
+    notebooks: undefined,
+    state: undefined,
+    isSaving: false,
+    title: "",
+    id: "",
+    pinned: false,
+    favorite: false,
+    locked: false,
+    tags: [],
+    context: undefined,
+    color: undefined,
+    dateEdited: 0,
+    totalWords: 0,
+    content: {
+      type: "tiny",
+      data: "",
+    },
+  };
 };
 class EditorStore extends BaseStore {
-  session = DEFAULT_SESSION;
+  session = getDefaultSession();
   arePropertiesVisible = false;
 
   init = () => {
@@ -52,7 +54,7 @@ class EditorStore extends BaseStore {
   openLockedSession = async (note) => {
     this.set((state) => {
       state.session = {
-        ...DEFAULT_SESSION,
+        ...getDefaultSession(),
         ...note,
         id: undefined, // NOTE: we give a session id only after the note is opened.
         content: note.content,
@@ -93,10 +95,11 @@ class EditorStore extends BaseStore {
     let content = await db.content.raw(note.contentId);
 
     this.set((state) => {
+      const defaultSession = getDefaultSession();
       state.session = {
-        ...DEFAULT_SESSION,
+        ...defaultSession,
         ...note,
-        content: content || DEFAULT_SESSION.content,
+        content: content || defaultSession.content,
         totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
       };
@@ -162,7 +165,7 @@ class EditorStore extends BaseStore {
     let context = noteStore.get().context;
     this.set((state) => {
       state.session = {
-        ...DEFAULT_SESSION,
+        ...getDefaultSession(),
         context,
         nonce,
         state: SESSION_STATES.new,
@@ -176,7 +179,7 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(false);
     this.set((state) => {
       state.session = {
-        ...DEFAULT_SESSION,
+        ...getDefaultSession(),
         state: SESSION_STATES.new,
       };
     });
