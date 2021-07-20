@@ -10,14 +10,14 @@ import {db} from '../../utils/DB';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import {Placeholder} from '../ListPlaceholders';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
-import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
 let refs = [];
 
@@ -33,7 +33,7 @@ export class AddNotebookDialog extends React.Component {
       count: 0,
       topicInputFocused: false,
       editTopic: false,
-      loading: false,
+      loading: false
     };
     this.title = null;
     this.description = null;
@@ -50,6 +50,7 @@ export class AddNotebookDialog extends React.Component {
     this.hiddenInput = createRef();
     this.topicInputRef = createRef();
     this.addingTopic = false;
+    this.actionSheetRef = createRef();
   }
 
   open = () => {
@@ -69,16 +70,20 @@ export class AddNotebookDialog extends React.Component {
       this.setState({
         topics: [...topicsList],
 
-        visible: true,
+        visible: true
       });
     } else {
       this.setState({
-        visible: true,
+        visible: true
       });
     }
+    sleep(100).then(r => {
+      this.actionSheetRef.current?.show();
+    });
   };
 
   close = () => {
+    this.actionSheetRef.current?.hide();
     refs = [];
     this.prevIndex = null;
     this.prevItem = null;
@@ -92,7 +97,7 @@ export class AddNotebookDialog extends React.Component {
       topics: [],
       descFocused: false,
       titleFocused: false,
-      editTopic: false,
+      editTopic: false
     });
   };
 
@@ -115,17 +120,17 @@ export class AddNotebookDialog extends React.Component {
       this.prevItem = null;
       this.currentInputValue = null;
       this.topicInputRef.current?.setNativeProps({
-        text: null,
+        text: null
       });
     }
     this.setState({
-      topics: nextTopics,
+      topics: nextTopics
     });
   };
 
   addNewNotebook = async () => {
     this.setState({
-      loading: true,
+      loading: true
     });
     let {topics} = this.state;
     let edit = this.props.toEdit;
@@ -134,10 +139,10 @@ export class AddNotebookDialog extends React.Component {
       ToastEvent.show({
         heading: 'Notebook title is required',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       this.setState({
-        loading: false,
+        loading: false
       });
       return;
     }
@@ -170,7 +175,7 @@ export class AddNotebookDialog extends React.Component {
       await db.notebooks.add({
         title: this.title,
         description: this.description,
-        id: id,
+        id: id
       });
 
       let nextTopics = toEdit.topics.map((topic, index) => {
@@ -192,17 +197,17 @@ export class AddNotebookDialog extends React.Component {
         title: this.title,
         description: this.description,
         topics: prevTopics,
-        id: id,
+        id: id
       });
     }
     useMenuStore.getState().setMenuPins();
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notebook,
-      Navigation.routeNames.NotesPage,
+      Navigation.routeNames.NotesPage
     ]);
     this.setState({
-      loading: false,
+      loading: false
     });
     this.close();
   };
@@ -218,7 +223,7 @@ export class AddNotebookDialog extends React.Component {
     if (this.prevItem === null) {
       prevTopics.push(this.currentInputValue);
       this.setState({
-        topics: prevTopics,
+        topics: prevTopics
       });
       setTimeout(() => {
         this.listRef.scrollToEnd({animated: true});
@@ -227,7 +232,7 @@ export class AddNotebookDialog extends React.Component {
     } else {
       prevTopics[this.prevIndex] = this.currentInputValue;
       this.setState({
-        topics: prevTopics,
+        topics: prevTopics
       });
       this.currentInputValue = null;
 
@@ -235,7 +240,7 @@ export class AddNotebookDialog extends React.Component {
         this.topicInputRef.current?.blur();
         Keyboard.dismiss();
         this.setState({
-          editTopic: false,
+          editTopic: false
         });
         willFocus = false;
       }
@@ -250,7 +255,7 @@ export class AddNotebookDialog extends React.Component {
       }
     }
     this.topicInputRef.current?.setNativeProps({
-      text: '',
+      text: ''
     });
     willFocus && this.topicInputRef.current?.focus();
   };
@@ -260,12 +265,20 @@ export class AddNotebookDialog extends React.Component {
     const {topics, visible, topicInputFocused} = this.state;
     if (!visible) return null;
     return (
-      <BaseDialog
-        onShow={async () => {
+      <ActionSheetWrapper
+        onOpen={async () => {
           this.topicsToDelete = [];
           await sleep(300);
           this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
         }}
+        fwdRef={this.actionSheetRef}
+        onClose={() => {
+          this.close();
+          this.setState({
+            visible: false
+          });
+        }}
+        animation="fade"
         centered={false}
         statusBarTranslucent={false}
         onRequestClose={this.close}>
@@ -275,7 +288,7 @@ export class AddNotebookDialog extends React.Component {
             width: 1,
             height: 1,
             opacity: 0,
-            position: 'absolute',
+            position: 'absolute'
           }}
           blurOnSubmit={false}
         />
@@ -285,8 +298,10 @@ export class AddNotebookDialog extends React.Component {
             styles.container,
             {
               backgroundColor: colors.bg,
-              paddingTop: 5,
-            },
+              height: null,
+              borderTopRightRadius: 10,
+              borderTopLeftRadius: 10
+            }
           ]}>
           <DialogHeader
             title={
@@ -298,6 +313,7 @@ export class AddNotebookDialog extends React.Component {
                 : 'Notebooks are the best way to organize your notes.'
             }
           />
+          <Seperator half />
 
           <Input
             fwdRef={ref => (this.titleRef = ref)}
@@ -338,8 +354,8 @@ export class AddNotebookDialog extends React.Component {
                 refs[this.prevIndex].setNativeProps({
                   text: value,
                   style: {
-                    borderBottomColor: colors.accent,
-                  },
+                    borderBottomColor: colors.accent
+                  }
                 });
               }
             }}
@@ -352,7 +368,7 @@ export class AddNotebookDialog extends React.Component {
             button={{
               icon: this.state.editTopic ? 'check' : 'plus',
               onPress: this.onSubmit,
-              color: topicInputFocused ? colors.accent : colors.icon,
+              color: topicInputFocused ? colors.accent : colors.icon
             }}
             placeholder="Add a topic"
           />
@@ -361,26 +377,6 @@ export class AddNotebookDialog extends React.Component {
             data={topics}
             ref={ref => (this.listRef = ref)}
             keyExtractor={(item, index) => item + index.toString()}
-            ListEmptyComponent={
-              <View
-                style={{
-                  height: 500,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                <Placeholder type="topics" w={150} h={150} />
-                <Heading>Topics</Heading>
-                <Paragraph
-                  textBreakStrategy="balanced"
-                  style={{
-                    textAlign: 'center',
-                    width: '80%',
-                  }}
-                  color={colors.icon}>
-                  You have not added any topics yet.
-                </Paragraph>
-              </View>
-            }
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
@@ -388,12 +384,12 @@ export class AddNotebookDialog extends React.Component {
                   this.prevIndex = index;
                   this.prevItem = item;
                   this.topicInputRef.current?.setNativeProps({
-                    text: item,
+                    text: item
                   });
                   this.topicInputRef.current?.focus();
                   this.currentInputValue = item;
                   this.setState({
-                    editTopic: true,
+                    editTopic: true
                   });
                 }}
                 onDelete={this.onDelete}
@@ -402,18 +398,21 @@ export class AddNotebookDialog extends React.Component {
               />
             )}
           />
-
-          <DialogButtons
-            negativeTitle="Cancel"
-            positiveTitle={toEdit && toEdit.dateCreated ? 'Save' : 'Add'}
-            onPressPositive={this.addNewNotebook}
-            onPressNegative={this.close}
-            loading={this.state.loading}
+          <Seperator />
+          <Button
+            width="100%"
+            height={50}
+            fontSize={SIZE.md}
+            title={
+              toEdit && toEdit.dateCreated ? 'Save changes' : 'Create notebook'
+            }
+            type="accent"
+            onPress={this.addNewNotebook}
           />
         </View>
 
         <Toast context="local" />
-      </BaseDialog>
+      </ActionSheetWrapper>
     );
   }
 }
@@ -429,7 +428,7 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         alignItems: 'center',
         backgroundColor: colors.nav,
         borderRadius: 5,
-        marginVertical: 5,
+        marginVertical: 5
       }}>
       <TouchableOpacity
         style={{
@@ -437,7 +436,7 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           backgroundColor: 'transparent',
           zIndex: 10,
           position: 'absolute',
-          height: 30,
+          height: 30
         }}
         onPress={() => {
           onPress(item, index);
@@ -449,8 +448,8 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
         style={[
           styles.topicInput,
           {
-            color: colors.pri,
-          },
+            color: colors.pri
+          }
         ]}
         defaultValue={item}
         placeholderTextColor={colors.icon}
@@ -463,7 +462,7 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           right: 0,
           alignItems: 'center',
           flexDirection: 'row',
-          justifyContent: 'flex-end',
+          justifyContent: 'flex-end'
         }}>
         <ActionIcon
           onPress={() => {
@@ -492,29 +491,28 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   container: {
     width: DDS.isTab ? 500 : '100%',
     height: DDS.isTab ? 600 : '100%',
     maxHeight: DDS.isTab ? 600 : '100%',
     borderRadius: DDS.isTab ? 5 : 0,
-    paddingHorizontal: 12,
-    paddingVertical: pv,
+    paddingHorizontal: 12
   },
   overlay: {
     width: '100%',
     height: '100%',
-    position: 'absolute',
+    position: 'absolute'
   },
   headingContainer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   headingText: {
     marginLeft: 5,
-    fontSize: SIZE.xl,
+    fontSize: SIZE.xl
   },
   input: {
     paddingRight: 12,
@@ -525,7 +523,7 @@ const styles = StyleSheet.create({
     padding: pv - 2,
     borderBottomWidth: 1,
     marginTop: 10,
-    marginBottom: 5,
+    marginBottom: 5
   },
   addBtn: {
     width: '12%',
@@ -533,21 +531,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    right: 0,
+    right: 0
   },
   buttonContainer: {
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
     width: '100%',
-    marginTop: 20,
+    marginTop: 20
   },
 
   topicContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginTop: 10,
+    marginTop: 10
   },
   topicInput: {
     padding: pv - 5,
@@ -557,7 +555,7 @@ const styles = StyleSheet.create({
     paddingRight: 40,
     paddingVertical: 10,
     width: '100%',
-    maxWidth: '100%',
+    maxWidth: '100%'
   },
   topicBtn: {
     borderRadius: 5,
@@ -566,6 +564,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     position: 'absolute',
-    right: 0,
-  },
+    right: 0
+  }
 });
