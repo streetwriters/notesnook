@@ -3,7 +3,7 @@ import TitleBox from "./title-box";
 import { useStore } from "../../stores/editor-store";
 import { Input } from "@rebass/forms";
 import * as Icon from "../icons";
-import { Box, Button, Flex, Text } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
 
@@ -125,7 +125,7 @@ function Autosuggest({
               fields.some((field) => {
                 return (
                   field
-                    .normalize("NFD")
+                    ?.normalize("NFD")
                     .replace(/[\u0300-\u036f]/g, "")
                     .toLowerCase()
                     .indexOf(value.toLowerCase()) !== -1
