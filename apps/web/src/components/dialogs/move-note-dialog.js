@@ -93,7 +93,7 @@ class MoveDialog extends React.Component {
             id="notebook-title"
             name="notebook-title"
             helpText="Add a new notebook"
-            placeholder="Press enter to add a new notebook"
+            placeholder="Enter new notebook title (press enter to confirm)"
             action={{
               onClick: async () => {
                 await this.addNotebook(this.inputRef);
@@ -125,6 +125,7 @@ class MoveDialog extends React.Component {
                     this.setState({
                       currentOpenedIndex:
                         this.state.currentOpenedIndex === index ? -1 : index,
+                      isAddingTopic: !notebook.topics.length,
                     });
                   }}
                   action={
@@ -155,7 +156,7 @@ class MoveDialog extends React.Component {
                       data-test-id="mnd-new-topic-title"
                       id="topic-title"
                       name="topic-title"
-                      placeholder="Press enter to add a topic"
+                      placeholder="Enter new topic title (press enter to confirm)"
                       action={{
                         onClick: () => {
                           this.setState({
