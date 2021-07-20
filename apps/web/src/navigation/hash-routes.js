@@ -21,7 +21,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { isMobile } from "../utils/dimensions";
 import {
   showEditTopicDialog,
-  showTopicDialog,
+  showCreateTopicDialog,
 } from "../common/dialog-controller";
 import { hashNavigate } from ".";
 import { Suspense } from "react";
@@ -44,7 +44,7 @@ const hashroutes = {
     showEditNotebookDialog(notebookId);
   },
   "/topics/create": () => {
-    showTopicDialog();
+    showCreateTopicDialog();
   },
   "/notebooks/:notebookId/topics/:topicId/edit": ({ notebookId, topicId }) => {
     showEditTopicDialog(notebookId, topicId);
