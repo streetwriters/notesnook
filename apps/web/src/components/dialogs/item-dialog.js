@@ -1,6 +1,5 @@
-import React, { useRef } from "react";
+import React from "react";
 import { Box } from "rebass";
-import { Input } from "@rebass/forms";
 import Dialog from "./dialog";
 import Field from "../field";
 

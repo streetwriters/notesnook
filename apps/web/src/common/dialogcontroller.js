@@ -489,9 +489,9 @@ export function showSignUpDialog() {
   ));
 }
 
-export function showTopicDialog() {
+export function showCreateTopicDialog() {
   return showDialog((Dialogs, perform) => (
-    <Dialogs.TopicDialog
+    <Dialogs.ItemDialog
       title={"Create topic"}
       subtitle={"You can create as many topics as you want."}
       onClose={() => {
@@ -515,7 +515,7 @@ export function showEditTopicDialog(notebookId, topicId) {
     ?.topics?.topic(topicId)?._topic;
   if (!topic) return;
   return showDialog((Dialogs, perform) => (
-    <Dialogs.TopicDialog
+    <Dialogs.ItemDialog
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       icon={Icon.Topic}
@@ -537,7 +537,7 @@ export function showCreateTagDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ItemDialog
       title={"Create tag"}
-      subtitle={"You can create multiple tags."}
+      subtitle={"You can create as many tags as you want."}
       onClose={() => {
         perform(false);
       }}
