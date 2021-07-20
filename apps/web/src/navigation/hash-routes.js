@@ -2,6 +2,8 @@ import React from "react";
 import Vault from "../common/vault";
 import {
   showBuyDialog,
+  showCreateTagDialog,
+  showEditTagDialog,
   showEmailVerificationDialog,
 } from "../common/dialog-controller";
 import {
@@ -46,6 +48,12 @@ const hashroutes = {
   },
   "/notebooks/:notebookId/topics/:topicId/edit": ({ notebookId, topicId }) => {
     showEditTopicDialog(notebookId, topicId);
+  },
+  "/tags/create": () => {
+    showCreateTagDialog();
+  },
+  "/tags/:tagId/edit": ({ tagId }) => {
+    showEditTagDialog(tagId);
   },
   "/notes/create": () => {
     closeOpenedDialog();

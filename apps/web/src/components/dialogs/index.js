@@ -10,7 +10,7 @@ import MoveDialog from "./movenotedialog";
 import PasswordDialog from "./passworddialog";
 import RecoveryKeyDialog from "./recoverykeydialog";
 import SignUpDialog from "./signupdialog";
-import TopicDialog from "./topicdialog";
+import ItemDialog from "./itemdialog";
 import SessionExpiredDialog from "./sessionexpireddialog";
 import FeatureDialog from "./feature-dialog";
 
@@ -27,7 +27,7 @@ const Dialogs = {
   PasswordDialog,
   RecoveryKeyDialog,
   SignUpDialog,
-  TopicDialog,
+  ItemDialog,
   SessionExpiredDialog,
   FeatureDialog,
 };

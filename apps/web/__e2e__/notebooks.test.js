@@ -166,7 +166,7 @@ test("edit topics individually", async () => {
     await page.click(Menu.new("menuitem").item("edit").build());
 
     const editedTopicTitle = "Topic " + index + " edit 1";
-    await page.fill(getTestId("dialog-edit-topic"), editedTopicTitle);
+    await page.fill(getTestId("item-dialog-title"), editedTopicTitle);
 
     await page.click(getTestId("dialog-yes"));
 

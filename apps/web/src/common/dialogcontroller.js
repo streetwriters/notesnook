@@ -4,6 +4,7 @@ import { hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
+import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
@@ -491,9 +492,8 @@ export function showSignUpDialog() {
 export function showTopicDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.TopicDialog
-      title={"Create a Topic"}
+      title={"Create topic"}
       subtitle={"You can create as many topics as you want."}
-      icon={Icon.Topic}
       onClose={() => {
         perform(false);
       }}
@@ -502,6 +502,7 @@ export function showTopicDialog() {
         const notebookId = notebookStore.get().selectedNotebookId;
         await db.notebooks.notebook(notebookId).topics.add(topic);
         notebookStore.setSelectedNotebook(notebookId);
+        showToast("success", "Topic created!");
         perform(true);
       }}
     />
@@ -515,17 +516,56 @@ export function showEditTopicDialog(notebookId, topicId) {
   if (!topic) return;
   return showDialog((Dialogs, perform) => (
     <Dialogs.TopicDialog
-      title={"Edit Topic"}
+      title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
       icon={Icon.Topic}
-      topic={topic}
+      item={topic}
       onClose={() => perform(false)}
       onAction={async (t) => {
         await db.notebooks
           .notebook(topic.notebookId)
           .topics.add({ ...topic, title: t });
         notebookStore.setSelectedNotebook(topic.notebookId);
-        showToast("success", "Topic edited successfully!");
+        showToast("success", "Topic edited!");
+        perform(true);
+      }}
+    />
+  ));
+}
+
+export function showCreateTagDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ItemDialog
+      title={"Create tag"}
+      subtitle={"You can create multiple tags."}
+      onClose={() => {
+        perform(false);
+      }}
+      onAction={async (title) => {
+        if (!title) return;
+        await db.tags.add(title);
+        showToast("success", "Tag created!");
+        tagStore.refresh();
+        perform(true);
+      }}
+    />
+  ));
+}
+
+export function showEditTagDialog(tagId) {
+  const tag = db.tags.tag(tagId);
+  if (!tag) return;
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ItemDialog
+      title={"Edit tag"}
+      subtitle={`You are editing #${tag.alias || tag.title}.`}
+      item={tag}
+      onClose={() => perform(false)}
+      onAction={async (title) => {
+        if (!title) return;
+        await db.tags.rename(tagId, title);
+        showToast("success", "Tag edited!");
+        tagStore.refresh();
         perform(true);
       }}
     />

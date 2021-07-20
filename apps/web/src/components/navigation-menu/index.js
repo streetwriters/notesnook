@@ -148,7 +148,7 @@ function NavigationMenu(props) {
         {pins.map((pin) => (
           <NavigationItem
             key={pin.id}
-            title={pin.title}
+            title={pin.alias || pin.title}
             menu={{
               items: [
                 {

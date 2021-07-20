@@ -52,8 +52,12 @@ export const CREATE_BUTTON_MAP = {
     onClick: () => hashNavigate("/notebooks/create"),
   },
   topics: {
-    title: "Add a topic",
+    title: "Create a topic",
     onClick: () => hashNavigate(`/topics/create`),
+  },
+  tags: {
+    title: "Create a tag",
+    onClick: () => hashNavigate(`/tags/create`),
   },
 };
 
