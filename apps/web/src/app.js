@@ -34,11 +34,12 @@ function App() {
       const width = 180;
 
       const percent = offset - (position / width) * offset;
-      if (percent >= 0) {
-        const overlay = document.getElementById("overlay");
+      const overlay = document.getElementById("overlay");
+      if (percent > 0) {
         overlay.style.opacity = `${percent}%`;
-        overlay.style.pointerEvents =
-          Math.round(percent) === offset ? "all" : "none";
+        overlay.style.pointerEvents = "all";
+      } else {
+        overlay.style.pointerEvents = "none";
       }
     },
     onChange: (e, { slide, lastSlide }) => {
