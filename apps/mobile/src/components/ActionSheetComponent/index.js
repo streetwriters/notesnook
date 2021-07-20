@@ -46,7 +46,7 @@ import {
   eOpenPublishNoteDialog,
   eOpenTagsDialog
 } from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
+import {deleteItems, openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
@@ -924,34 +924,58 @@ export const ActionSheetComponent = ({
             width: '95%',
             alignItems: 'flex-start',
             paddingHorizontal: 12,
-            marginTop: 25,
             flexDirection: 'row',
             justifyContent: 'flex-start',
-            alignSelf: 'center'
+            alignSelf: 'center',
+            backgroundColor: colors.nav,
+            borderRadius: 5
           }}>
-          <Icon name="shield-key-outline" color={colors.accent} size={40} />
+          <Icon
+            name="shield-key-outline"
+            color={colors.accent}
+            size={SIZE.sm + SIZE.xs + 2}
+          />
 
           <View
             style={{
               flex: 1,
-              marginLeft: 5
+              marginLeft: 5,
+              flexShrink: 1
             }}>
             <Heading
               color={colors.accent}
               style={{
-                fontSize: SIZE.md
+                fontSize: SIZE.sm,
+                flexWrap: 'wrap'
               }}>
-              This note is encrypted and synced
+              Encrypted and synced
             </Heading>
             <Paragraph
               style={{
-                flexWrap: 'wrap',
-                flexBasis: 1
+                flexWrap: 'wrap'
               }}
+              size={SIZE.xs}
               color={colors.pri}>
-              No one can read it except you.
+              No one can read this note except you.
             </Paragraph>
           </View>
+
+          <Button
+            onPress={async () => {
+              try {
+                close();
+                await sleep(300);
+                await openLinkInBrowser(
+                  'https://docs.notesnook.com/how-is-my-data-encrypted/',
+                  colors
+                );
+              } catch (e) {}
+            }}
+            fontSize={SIZE.sm}
+            title="Learn more"
+            height={30}
+            type="accent"
+          />
         </View>
       ) : null}
 
