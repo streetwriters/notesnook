@@ -93,7 +93,6 @@ function App() {
               sx={{
                 scrollSnapAlign: "start",
               }}
-              flexDirection="column"
             >
               <NavigationMenu
                 toggleNavigationContainer={(state) => {
