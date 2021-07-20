@@ -24,6 +24,7 @@ import "./plugins/quickimage";
 import "./plugins/checklist";
 import "./plugins/collapsibleheaders";
 import "./plugins/paste";
+import "./plugins/shortcuts";
 import "./editor.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
@@ -101,7 +102,7 @@ function useSkin() {
 }
 
 const plugins =
-  "checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize collapsibleheaders";
+  "shortcuts checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize collapsibleheaders";
 function TinyMCE(props) {
   const {
     changeInterval,

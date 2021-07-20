@@ -1,7 +1,7 @@
 import tinymce from "tinymce/tinymce";
 import hljs from "highlight.js/lib/common";
 import "highlight.js/styles/atom-one-light.css";
-import rangy from "rangy/lib/rangy-textrange";
+import { getCharacterRange, moveCaretTo, persistSelection } from "../utils";
 
 const TAB = "  ";
 const LANGUAGE_SELECT_LABEL_SELECTOR =
@@ -84,16 +84,15 @@ languagesToItems();
     var content = editor.selection.getContent({ format: "text" });
     content = content.replace(/^\n/gm, "") || "&nbsp;";
 
-    const rng = editor.selection.getRng();
     editor.undoManager.transact(function () {
       editor.execCommand(
         "mceInsertContent",
         false,
-        `<code spellcheck="false">${content}</pre>`
+        `<code spellcheck="false">${content}</code>&nbsp;`
       );
     });
-    editor.selection.setRng(rng);
-    editor.nodeChanged();
+
+    editor.nodeChanged({ selectionChange: true });
   };
 
   var register = function (editor) {
@@ -370,33 +369,8 @@ function applyHighlighting(editor, language, refresh = false, auto = false) {
   if (auto) changeSelectedLanguage(editor, language, true);
 }
 
-function getCharacterRange(node) {
-  if (!node) return;
-  const ranges = rangy.getSelection().saveCharacterRanges(node);
-  if (!ranges || !ranges.length) return;
-  const { characterRange } = ranges[0];
-  return characterRange;
-}
-
 function insertAt(str, token, index) {
   return str.substring(0, index) + token + str.substring(index);
-}
-
-function moveCaretTo(node, index, endIndex) {
-  const newCharacterRange = {
-    characterRange: {
-      start: index,
-      end: endIndex || index,
-    },
-  };
-
-  rangy.getSelection().restoreCharacterRanges(node, [newCharacterRange]);
-}
-
-function persistSelection(node, action) {
-  let saved = rangy.getSelection().saveCharacterRanges(node);
-  action();
-  rangy.getSelection().restoreCharacterRanges(node, saved);
 }
 
 function getLanguageFromClassName(className) {
