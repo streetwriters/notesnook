@@ -1,5 +1,6 @@
 import {NavigationContainer} from '@react-navigation/native';
 import * as React from 'react';
+import { Platform } from 'react-native';
 import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
 import {useSelectionStore, useSettingStore} from '../provider/stores';
@@ -65,8 +66,7 @@ export const NavigatorStack = React.memo(
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                stackAnimation: "slide_from_bottom",
-                
+                stackAnimation: "none",
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
