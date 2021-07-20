@@ -1,12 +1,12 @@
 import http from 'notes-core/utils/http';
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import Orientation from 'react-native-orientation';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import { AppRootEvents } from './AppRootEvents';
-import { RootView } from './initializer.root';
+import {AppRootEvents} from './AppRootEvents';
+import {RootView} from './initializer.root';
 import AppLoader from './src/components/AppLoader';
-import { useTracked } from './src/provider';
+import {useTracked} from './src/provider';
 import {
   initialize,
   useMessageStore,
@@ -14,7 +14,7 @@ import {
   useSettingStore,
   useUserStore
 } from './src/provider/stores';
-import { DDS } from './src/services/DeviceDetection';
+import {DDS} from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -22,19 +22,20 @@ import {
 } from './src/services/EventManager';
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
-import { Tracker } from './src/utils';
-import { db } from './src/utils/DB';
-import { eDispatchAction } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
+import {Tracker} from './src/utils';
+import {db} from './src/utils/DB';
+import {eDispatchAction} from './src/utils/Events';
+import {MMKV} from './src/utils/mmkv';
 
 let databaseHasLoaded = false;
-
 
 async function loadDefaultNotes() {
   try {
     const isCreated = await MMKV.getItem('defaultNoteCreated');
     if (isCreated) return;
-    const notes = await http.get('https://app.notesnook.com/notes/index_14.json');
+    const notes = await http.get(
+      'https://app.notesnook.com/notes/index_14.json'
+    );
     if (!notes) return;
     for (let note of notes) {
       const content = await http.get(note.mobileContent);
@@ -42,7 +43,7 @@ async function loadDefaultNotes() {
         title: note.title,
         headline: note.headline,
         localOnly: true,
-        content: {type: 'tiny', data: content},
+        content: {type: 'tiny', data: content}
       });
     }
     await MMKV.setItem('defaultNoteCreated', 'yes');
@@ -61,8 +62,8 @@ const loadDatabase = async () => {
     await MMKV.setItem(
       'askForRating',
       JSON.stringify({
-        timestamp: Date.now() + 86400000 * 2,
-      }),
+        timestamp: Date.now() + 86400000 * 2
+      })
     );
   }
 };
@@ -80,7 +81,7 @@ function checkOrientation() {
           ? 'tablet'
           : DDS.isSmallTab
           ? 'smallTablet'
-          : 'mobile',
+          : 'mobile'
       );
   });
 }

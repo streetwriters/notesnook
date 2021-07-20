@@ -10,7 +10,7 @@ import {useTracked} from '../../../../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  eSendEvent,
+  eSendEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
@@ -26,7 +26,7 @@ import {
   properties,
   TOOLBAR_ICONS,
   rgbToHex,
-  font_names,
+  font_names
 } from './constants';
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';
@@ -44,7 +44,7 @@ const ToolbarItem = ({
   groupType,
   text,
   formatValue,
-  fullname,
+  fullname
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -112,7 +112,7 @@ const ToolbarItem = ({
         eSendEvent('showTooltip', {
           data: null,
           value: data['link'],
-          type: 'link',
+          type: 'link'
         });
         return;
       }
@@ -195,7 +195,7 @@ const ToolbarItem = ({
         eSendEvent(eShowGetPremium, {
           context: 'editor',
           title: 'Get Notesnook Pro',
-          desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+          desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
         });
       }
       return;
@@ -232,7 +232,7 @@ const ToolbarItem = ({
         title: format,
         default: valueIcon,
         type: groupType,
-        pageX: event.nativeEvent.pageX,
+        pageX: event.nativeEvent.pageX
       });
       return;
     }
@@ -295,7 +295,7 @@ const ToolbarItem = ({
           justifyContent: 'center',
           alignItems: 'center',
           height: normalize(50),
-          minWidth: 60,
+          minWidth: 60
         }}>
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />
@@ -331,7 +331,7 @@ const ToolbarItem = ({
                   ? formatValue
                   : format === 'fontname' && icon !== '-apple-system' && icon
                   ? icon
-                  : null,
+                  : null
             }}
             size={text.includes('%') ? SIZE.sm : SIZE.md}>
             {currentText || text}
@@ -359,11 +359,11 @@ const ToolbarItem = ({
               position: 'absolute',
               transform: [
                 {
-                  rotateZ: '-45deg',
-                },
+                  rotateZ: '-45deg'
+                }
               ],
               top: 0,
-              right: 0,
+              right: 0
             }}
           />
         )}

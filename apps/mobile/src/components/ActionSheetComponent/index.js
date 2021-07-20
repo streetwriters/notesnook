@@ -298,7 +298,7 @@ export const ActionSheetComponent = ({
           tag: note.id
         });
         await sleep(1000);
-        let notifs = await Notifications.get();
+        await Notifications.get();
         checkNotifPinned();
       }
     },
