@@ -129,7 +129,7 @@ h6::before {
 }
 
 .mce-content-body pre {
-  counter-reset: line;
+  overflow-x: auto;
   line-height: 1.5 !important;
   padding: 15px;
   border: 1px solid var(--border);
