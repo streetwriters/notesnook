@@ -1,6 +1,5 @@
 import tinymce from "tinymce/tinymce";
 import hljs from "highlight.js/lib/common";
-import "highlight.js/styles/atom-one-light.css";
 import { getCharacterRange, moveCaretTo, persistSelection } from "../utils";
 
 const TAB = "  ";
