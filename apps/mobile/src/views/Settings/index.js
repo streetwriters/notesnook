@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import {
   Appearance,
@@ -12,7 +12,7 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
@@ -39,7 +39,7 @@ import {Actions} from '../../provider/Actions';
 import {
   useMessageStore,
   useSettingStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
@@ -49,7 +49,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -63,14 +63,14 @@ import {
   preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
-  SUBSCRIPTION_STATUS_STRINGS,
+  SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
@@ -82,7 +82,7 @@ import {
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -116,7 +116,7 @@ export const Settings = ({navigation}) => {
       data: [],
       noSearch: true,
       type: '',
-      color: null,
+      color: null
     });
 
     if (!pageIsLoaded) {
@@ -126,12 +126,12 @@ export const Settings = ({navigation}) => {
     Navigation.setHeaderState(
       'Settings',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Settings',
-        id: 'settings_navigation',
-      },
+        id: 'settings_navigation'
+      }
     );
   }, []);
 
@@ -162,7 +162,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com/tos', colors);
         } catch (e) {}
       },
-      desc: 'Read our terms of service',
+      desc: 'Read our terms of service'
     },
 
     {
@@ -172,7 +172,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com/privacy', colors);
         } catch (e) {}
       },
-      desc: 'Read our privacy policy',
+      desc: 'Read our privacy policy'
     },
     {
       name: 'Check for updates',
@@ -182,7 +182,7 @@ export const Settings = ({navigation}) => {
           ToastEvent.show({
             heading: 'No new updates',
             type: 'success',
-            message: 'You are using the latest version',
+            message: 'You are using the latest version'
           });
           return;
         }
@@ -192,7 +192,7 @@ export const Settings = ({navigation}) => {
       desc:
         version?.mobile > APP_VERSION
           ? 'New update available.'
-          : 'You are using the latest version',
+          : 'You are using the latest version'
     },
     {
       name: `Report an issue`,
@@ -201,7 +201,7 @@ export const Settings = ({navigation}) => {
           await Linking.openURL('https://github.com/streetwriters/notesnook');
         } catch (e) {}
       },
-      desc: `Facing an issue? Report it on our Github`,
+      desc: `Facing an issue? Report it on our Github`
     },
     {
       name: 'Join our Discord community',
@@ -217,7 +217,7 @@ export const Settings = ({navigation}) => {
             'Follow the development process',
             'Give suggestions and report issues.',
             'Get early access to new features',
-            'Meet other people using Notesnook',
+            'Meet other people using Notesnook'
           ],
           noProgress: true,
           icon: 'discord',
@@ -226,10 +226,10 @@ export const Settings = ({navigation}) => {
               await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
             } catch (e) {}
           },
-          actionText: 'Join Now',
+          actionText: 'Join Now'
         });
       },
-      desc: 'We are not ghosts, chat with us and share your experience.',
+      desc: 'We are not ghosts, chat with us and share your experience.'
     },
     {
       name: 'Download on desktop',
@@ -238,7 +238,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com', colors);
         } catch (e) {}
       },
-      desc: 'Notesnook app can be downloaded on all platforms',
+      desc: 'Notesnook app can be downloaded on all platforms'
     },
     {
       name: 'Documentation',
@@ -247,7 +247,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://docs.notesnook.com', colors);
         } catch (e) {}
       },
-      desc: 'Learn about every feature and how it works.',
+      desc: 'Learn about every feature and how it works.'
     },
     {
       name: 'Roadmap',
@@ -255,11 +255,11 @@ export const Settings = ({navigation}) => {
         try {
           await openLinkInBrowser(
             'https://docs.notesnook.com/roadmap/',
-            colors,
+            colors
           );
         } catch (e) {}
       },
-      desc: 'See what the future of Notesnook is going to be like.',
+      desc: 'See what the future of Notesnook is going to be like.'
     },
     {
       name: 'About Notesnook',
@@ -268,8 +268,8 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com', colors);
         } catch (e) {}
       },
-      desc: format(APP_VERSION),
-    },
+      desc: format(APP_VERSION)
+    }
   ];
 
   return (
@@ -280,18 +280,18 @@ export const Settings = ({navigation}) => {
       <View
         style={{
           height: '100%',
-          backgroundColor: colors.bg,
+          backgroundColor: colors.bg
         }}>
         <ScrollView
           onScroll={e =>
             eSendEvent(eScrollEvent, {
               y: e.nativeEvent.contentOffset.y,
-              screen: 'Settings',
+              screen: 'Settings'
             })
           }
           scrollEventThrottle={1}
           style={{
-            paddingHorizontal: 0,
+            paddingHorizontal: 0
           }}>
           <SettingsUserSection />
           <SettingsAppearanceSection />
@@ -312,7 +312,7 @@ export const Settings = ({navigation}) => {
                     await Linking.openURL(
                       Platform.OS === 'ios'
                         ? 'https://bit.ly/notesnook-ios'
-                        : 'https://bit.ly/notesnook-and',
+                        : 'https://bit.ly/notesnook-and'
                     );
                   } catch (e) {}
                 }}
@@ -325,12 +325,12 @@ export const Settings = ({navigation}) => {
                   alignItems: 'flex-start',
                   paddingHorizontal: 12,
                   marginTop: 10,
-                  borderColor: colors.accent,
+                  borderColor: colors.accent
                 }}>
                 <Heading
                   color={colors.accent}
                   style={{
-                    fontSize: SIZE.md,
+                    fontSize: SIZE.md
                   }}>
                   {`Rate us on ${
                     Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
@@ -339,7 +339,7 @@ export const Settings = ({navigation}) => {
                 <Paragraph
                   style={{
                     flexWrap: 'wrap',
-                    flexBasis: 1,
+                    flexBasis: 1
                   }}
                   color={colors.pri}>
                   It took us a year to bring Notesnook to life, the best private
@@ -363,7 +363,7 @@ export const Settings = ({navigation}) => {
 
           <View
             style={{
-              height: 400,
+              height: 400
             }}
           />
         </ScrollView>
@@ -395,13 +395,21 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
         alignSelf: 'center',
         borderRadius: 5,
         marginBottom: 5,
-        marginTop: 5,
+        marginTop: 5
       }}>
-      <Paragraph
-        size={SIZE.md + 1}
-        color={collapsed ? colors.icon : colors.accent}>
-        {title}
-      </Paragraph>
+      {collapsed ? (
+        <Paragraph
+          size={SIZE.md + 1}
+          color={collapsed ? colors.icon : colors.accent}>
+          {title}
+        </Paragraph>
+      ) : (
+        <Heading
+          size={SIZE.md + 1}
+          color={colors.accent}>
+          {title}
+        </Heading>
+      )}
 
       <Icon
         name={collapsed ? 'chevron-down' : 'chevron-up'}
@@ -433,7 +441,7 @@ const AccoutLogoutSection = () => {
                 height: '100%',
                 backgroundColor: colors.bg,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'center'
               }}>
               <Heading color={colors.pri} size={SIZE.md}>
                 Logging out
@@ -443,7 +451,7 @@ const AccoutLogoutSection = () => {
                   flexDirection: 'row',
                   height: 10,
                   width: 100,
-                  marginTop: 15,
+                  marginTop: 15
                 }}>
                 <AnimatedProgress fill={colors.accent} total={8} current={8} />
               </View>
@@ -503,7 +511,7 @@ const AccoutLogoutSection = () => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  alignSelf: 'flex-end',
+                  alignSelf: 'flex-end'
                 }}>
                 <Button
                   onPress={() => {
@@ -520,7 +528,7 @@ const AccoutLogoutSection = () => {
                       ToastEvent.show({
                         heading: 'Account Password is required',
                         type: 'error',
-                        context: 'local',
+                        context: 'local'
                       });
                       return;
                     }
@@ -531,14 +539,14 @@ const AccoutLogoutSection = () => {
                         heading: 'Failed to delete account',
                         message: e.message,
                         type: 'error',
-                        context: 'local',
+                        context: 'local'
                       });
                     }
                     close();
                   }}
                   fontSize={SIZE.md}
                   style={{
-                    marginLeft: 10,
+                    marginLeft: 10
                   }}
                   type="error"
                   title="Delete"
@@ -554,8 +562,8 @@ const AccoutLogoutSection = () => {
             name: 'Logout',
             func: async () => {
               setVisible(true);
-            },
-          },
+            }
+          }
         ].map((item, index) => (
           <PressableButton
             onPress={item.func}
@@ -569,12 +577,12 @@ const AccoutLogoutSection = () => {
               alignItems: 'flex-start',
               paddingHorizontal: 12,
               marginTop: index === 0 ? 25 : 0,
-              borderRadius: 0,
+              borderRadius: 0
             }}>
             <Heading
               color={item.name === 'Logout' ? colors.pri : colors.red}
               style={{
-                fontSize: SIZE.md,
+                fontSize: SIZE.md
               }}>
               {item.name}
             </Heading>
@@ -595,19 +603,19 @@ const AccoutLogoutSection = () => {
             alignItems: 'flex-start',
             paddingHorizontal: 12,
             marginTop: 25,
-            borderColor: colors.red,
+            borderColor: colors.red
           }}>
           <Heading
             color={colors.red}
             style={{
-              fontSize: SIZE.md,
+              fontSize: SIZE.md
             }}>
             Delete account
           </Heading>
           <Paragraph
             style={{
               flexWrap: 'wrap',
-              flexBasis: 1,
+              flexBasis: 1
             }}
             color={colors.red}>
             Your account will be deleted and all your data will be removed
@@ -626,7 +634,7 @@ const CustomButton = ({
   customComponent,
   onPress,
   maxWidth = '100%',
-  color = null,
+  color = null
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -641,17 +649,17 @@ const CustomButton = ({
         paddingVertical: 12,
         width: '100%',
         borderRadius: 0,
-        flexDirection: 'row',
+        flexDirection: 'row'
       }}>
       <View
         style={{
-          maxWidth: maxWidth,
+          maxWidth: maxWidth
         }}>
         <Paragraph
           size={SIZE.md}
           color={color || colors.pri}
           style={{
-            textAlignVertical: 'center',
+            textAlignVertical: 'center'
           }}>
           {title}
         </Paragraph>
@@ -668,7 +676,7 @@ const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
   return {
     time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
-    isHour: daysRemaining === 0,
+    isHour: daysRemaining === 0
   };
 };
 
@@ -692,7 +700,7 @@ const SettingsUserSection = () => {
       ToastEvent.show({
         heading: 'Account Password is required',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -708,7 +716,7 @@ const SettingsUserSection = () => {
           heading: 'Incorrect password',
           message: 'Please enter the correct password to save recovery key.',
           type: 'error',
-          context: 'local',
+          context: 'local'
         });
       }
     } catch (e) {
@@ -716,7 +724,7 @@ const SettingsUserSection = () => {
         heading: 'Incorrect password',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -730,14 +738,14 @@ const SettingsUserSection = () => {
         ToastEvent.show({
           heading: 'Subscribed on web',
           message: 'Open your web browser to manage your subscription.',
-          type: 'success',
+          type: 'success'
         });
         return;
       }
       Linking.openURL(
         Platform.OS === 'ios'
           ? 'https://apps.apple.com/account/subscriptions'
-          : 'https://play.google.com/store/account/subscriptions',
+          : 'https://play.google.com/store/account/subscriptions'
       );
     } else {
       eSendEvent(eOpenPremiumDialog);
@@ -756,7 +764,7 @@ const SettingsUserSection = () => {
             style={{
               paddingHorizontal: 12,
               marginTop: 15,
-              marginBottom: 15,
+              marginBottom: 15
             }}>
             <View
               style={{
@@ -767,20 +775,20 @@ const SettingsUserSection = () => {
                 borderRadius: 5,
                 paddingHorizontal: 12,
                 borderWidth: 1,
-                borderColor: colors.accent,
+                borderColor: colors.accent
               }}>
               <View
                 style={{
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 2.5,
+                  paddingBottom: 2.5
                 }}>
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    alignItems: 'center',
+                    alignItems: 'center'
                   }}>
                   <View
                     style={{
@@ -790,7 +798,7 @@ const SettingsUserSection = () => {
                       width: 20,
                       height: 20,
                       alignItems: 'center',
-                      justifyContent: 'center',
+                      justifyContent: 'center'
                     }}>
                     <Icon
                       size={SIZE.md}
@@ -803,7 +811,7 @@ const SettingsUserSection = () => {
                     color={colors.heading}
                     size={SIZE.sm}
                     style={{
-                      marginLeft: 5,
+                      marginLeft: 5
                     }}>
                     {user?.email}
                   </Paragraph>
@@ -812,7 +820,7 @@ const SettingsUserSection = () => {
                   style={{
                     borderRadius: 5,
                     padding: 5,
-                    paddingVertical: 2.5,
+                    paddingVertical: 2.5
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
                     {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
@@ -865,7 +873,7 @@ const SettingsUserSection = () => {
                         onPress={manageSubscription}
                         width="100%"
                         style={{
-                          paddingHorizontal: 0,
+                          paddingHorizontal: 0
                         }}
                         fontSize={SIZE.md}
                         title={
@@ -915,18 +923,18 @@ const SettingsUserSection = () => {
                       paragraph:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
-                      noProgress: true,
+                      noProgress: true
                     });
                   }}
                   style={{
                     alignSelf: 'flex-end',
                     marginTop: 10,
                     borderRadius: 3,
-                    zIndex: 10,
+                    zIndex: 10
                   }}
                   fontSize={11}
                   textStyle={{
-                    fontWeight: 'normal',
+                    fontWeight: 'normal'
                   }}
                   height={20}
                   type="accent"
@@ -968,7 +976,7 @@ const SettingsUserSection = () => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    alignSelf: 'flex-end',
+                    alignSelf: 'flex-end'
                   }}>
                   <Button
                     onPress={() => {
@@ -983,7 +991,7 @@ const SettingsUserSection = () => {
                     onPress={tryVerification}
                     fontSize={SIZE.md}
                     style={{
-                      marginLeft: 10,
+                      marginLeft: 10
                     }}
                     type="transparent"
                     title="Verify"
@@ -1001,21 +1009,21 @@ const SettingsUserSection = () => {
                 setVerifyUser(true);
               },
               desc:
-                'Recover your data using the recovery key if your password is lost.',
+                'Recover your data using the recovery key if your password is lost.'
             },
             {
               name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
               },
-              desc: 'Setup a new password for your account.',
+              desc: 'Setup a new password for your account.'
             },
             {
               name: 'Having problems with syncing?',
               func: async () => {
                 await Sync.run('global', true);
               },
-              desc: 'Try force sync to resolve issues with syncing.',
+              desc: 'Try force sync to resolve issues with syncing.'
             },
             {
               name: 'Subscription not activated?',
@@ -1023,35 +1031,35 @@ const SettingsUserSection = () => {
                 if (Platform.OS === 'android') return;
                 eSendEvent(eOpenProgressDialog, {
                   title: 'Loading subscriptions',
-                  paragraph: `Please wait while we fetch your subscriptions.`,
+                  paragraph: `Please wait while we fetch your subscriptions.`
                 });
                 let subscriptions = await RNIap.getPurchaseHistory();
                 subscriptions.sort(
-                  (a, b) => b.transactionDate - a.transactionDate,
+                  (a, b) => b.transactionDate - a.transactionDate
                 );
                 let currentSubscription = subscriptions[0];
                 eSendEvent(eOpenProgressDialog, {
                   title: 'Notesnook Pro',
                   paragraph: `You subscribed to Notesnook Pro on ${new Date(
-                    currentSubscription.transactionDate,
+                    currentSubscription.transactionDate
                   ).toLocaleString()}. Verify this subscription?`,
                   action: async () => {
                     eSendEvent(eOpenProgressDialog, {
                       title: 'Verifying subscription',
-                      paragraph: `Please wait while we verify your subscription.`,
+                      paragraph: `Please wait while we verify your subscription.`
                     });
                     await PremiumService.subscriptions.verify(
-                      currentSubscription,
+                      currentSubscription
                     );
                     eSendEvent(eCloseProgressDialog);
                   },
                   icon: 'information-outline',
                   actionText: 'Verify',
-                  noProgress: true,
+                  noProgress: true
                 });
               },
-              desc: 'Verify your subscription to Notesnook Pro',
-            },
+              desc: 'Verify your subscription to Notesnook Pro'
+            }
           ].map(item =>
             item.name === 'Subscription not activated?' &&
             (Platform.OS !== 'ios' || PremiumService.get()) ? null : (
@@ -1062,7 +1070,7 @@ const SettingsUserSection = () => {
                 tagline={item.desc}
                 color={item.name === 'Logout' ? colors.errorText : colors.pri}
               />
-            ),
+            )
           )}
         </>
       ) : null}
@@ -1093,17 +1101,17 @@ const SettingsAppearanceSection = () => {
       await PremiumService.verify(async () => {
         await SettingsService.set(
           'useSystemTheme',
-          SettingsService.get().useSystemTheme ? false : true,
+          SettingsService.get().useSystemTheme ? false : true
         );
         if (SettingsService.get().useSystemTheme) {
           await MMKV.setStringAsync(
             'theme',
-            JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+            JSON.stringify({night: Appearance.getColorScheme() === 'dark'})
           );
           changeColorScheme(
             Appearance.getColorScheme() === 'dark'
               ? COLOR_SCHEME_DARK
-              : COLOR_SCHEME_LIGHT,
+              : COLOR_SCHEME_LIGHT
           );
         }
       });
@@ -1123,12 +1131,12 @@ const SettingsAppearanceSection = () => {
           <View
             style={{
               paddingHorizontal: 12,
-              marginTop: 5,
+              marginTop: 5
             }}>
             <Paragraph
               size={SIZE.md}
               style={{
-                textAlignVertical: 'center',
+                textAlignVertical: 'center'
               }}>
               Accent Color
             </Paragraph>
@@ -1151,13 +1159,13 @@ const SettingsAppearanceSection = () => {
               marginTop: 10,
               marginBottom: pv + 5,
               width: '100%',
-              paddingHorizontal: 12,
+              paddingHorizontal: 12
             }}
             nestedScrollEnabled
             contentContainerStyle={{
               alignSelf: 'center',
               flexDirection: 'row',
-              flexWrap: 'wrap',
+              flexWrap: 'wrap'
             }}>
             {[
               '#FF5722',
@@ -1173,7 +1181,7 @@ const SettingsAppearanceSection = () => {
               '#9381ff',
               '#FF1744',
               '#B71C1C',
-              '#ffadad',
+              '#ffadad'
             ].map(item => (
               <PressableButton
                 key={item}
@@ -1181,7 +1189,7 @@ const SettingsAppearanceSection = () => {
                   colors.accent === item
                     ? RGB_Linear_Shade(
                         !colors.night ? -0.2 : 0.2,
-                        hexToRGBA(item, 1),
+                        hexToRGBA(item, 1)
                       )
                     : item
                 }
@@ -1203,7 +1211,7 @@ const SettingsAppearanceSection = () => {
                   marginVertical: 5,
                   width: DDS.isLargeTablet() ? 40 : 50,
                   height: DDS.isLargeTablet() ? 40 : 50,
-                  borderRadius: 100,
+                  borderRadius: 100
                 }}>
                 {colors.accent === item ? (
                   <Icon
@@ -1241,13 +1249,13 @@ const SettingsAppearanceSection = () => {
               if (!colors.night) {
                 await MMKV.setStringAsync(
                   'theme',
-                  JSON.stringify({night: true}),
+                  JSON.stringify({night: true})
                 );
                 changeColorScheme(COLOR_SCHEME_DARK);
               } else {
                 await MMKV.setStringAsync(
                   'theme',
-                  JSON.stringify({night: false}),
+                  JSON.stringify({night: false})
                 );
 
                 changeColorScheme(COLOR_SCHEME_LIGHT);
@@ -1265,13 +1273,13 @@ const SettingsAppearanceSection = () => {
                   if (!colors.night) {
                     await MMKV.setStringAsync(
                       'theme',
-                      JSON.stringify({night: true}),
+                      JSON.stringify({night: true})
                     );
                     changeColorScheme(COLOR_SCHEME_DARK);
                   } else {
                     await MMKV.setStringAsync(
                       'theme',
-                      JSON.stringify({night: false}),
+                      JSON.stringify({night: false})
                     );
 
                     changeColorScheme(COLOR_SCHEME_LIGHT);
@@ -1293,7 +1301,7 @@ const SettingsAppearanceSection = () => {
                 animationDuration={200}
                 style={{
                   borderRadius: 5,
-                  backgroundColor: colors.bg,
+                  backgroundColor: colors.bg
                 }}
                 button={
                   <TouchableOpacity
@@ -1302,7 +1310,7 @@ const SettingsAppearanceSection = () => {
                     }}
                     style={{
                       flexDirection: 'row',
-                      alignItems: 'center',
+                      alignItems: 'center'
                     }}>
                     <Paragraph>{settings.homepage}</Paragraph>
                     <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
@@ -1319,25 +1327,25 @@ const SettingsAppearanceSection = () => {
                           heading: 'Homepage set to ' + item.name,
                           message:
                             'Restart the app for changes to take effect.',
-                          type: 'success',
+                          type: 'success'
                         });
                       }}
                       style={{
                         backgroundColor:
                           settings.homepage === item.name
                             ? colors.shade
-                            : 'transparent',
+                            : 'transparent'
                       }}
                       textStyle={{
                         fontSize: SIZE.md,
                         color:
                           settings.homepage === item.name
                             ? colors.accent
-                            : colors.pri,
+                            : colors.pri
                       }}>
                       {item.name}
                     </MenuItem>
-                  ),
+                  )
                 )}
               </Menu>
             }
@@ -1358,7 +1366,7 @@ const SettingsPrivacyAndSecurity = () => {
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
     biometryEnrolled: false,
-    isBiometryAvailable: false,
+    isBiometryAvailable: false
   });
 
   const checkVaultStatus = useCallback(() => {
@@ -1370,7 +1378,7 @@ const SettingsPrivacyAndSecurity = () => {
         setVaultStatus({
           exists: r,
           biometryEnrolled: fingerprint,
-          isBiometryAvailable: available ? true : false,
+          isBiometryAvailable: available ? true : false
         });
       });
     });
@@ -1389,20 +1397,20 @@ const SettingsPrivacyAndSecurity = () => {
       title: 'None',
       value: 'none',
       desc:
-        'Disable app lock. Notes will be accessible to anyone who opens the app',
+        'Disable app lock. Notes will be accessible to anyone who opens the app'
     },
     {
       title: 'Secure Mode',
       value: 'launch',
       desc:
-        'Lock app on launch and keep it unlocked when you switch to other apps.',
+        'Lock app on launch and keep it unlocked when you switch to other apps.'
     },
     {
       title: 'Strict Mode',
       value: 'background',
       desc:
-        'Lock app on launch and also when you switch from other apps or background.',
-    },
+        'Lock app on launch and also when you switch from other apps or background.'
+    }
   ];
 
   const toggleBiometricUnlocking = () => {
@@ -1416,7 +1424,7 @@ const SettingsPrivacyAndSecurity = () => {
         : 'Enable biometery unlock',
       description: vaultStatus.biometryEnrolled
         ? 'Disable biometric unlocking for notes in vault'
-        : 'Disable biometric unlocking for notes in vault',
+        : 'Disable biometric unlocking for notes in vault'
     });
   };
 
@@ -1448,10 +1456,10 @@ const SettingsPrivacyAndSecurity = () => {
                   paddingHorizontal: 6,
                   paddingVertical: 6,
                   marginTop: 3,
-                  marginBottom: 3,
+                  marginBottom: 3
                 }}
                 style={{
-                  marginBottom: 10,
+                  marginBottom: 10
                 }}>
                 <Heading
                   color={
@@ -1583,7 +1591,7 @@ const SettingsPrivacyAndSecurity = () => {
                     changePassword: true,
                     novault: true,
                     title: 'Change vault password',
-                    description: 'Set a new password for your vault.',
+                    description: 'Set a new password for your vault.'
                   });
                 }}
               />
@@ -1598,7 +1606,7 @@ const SettingsPrivacyAndSecurity = () => {
                     novault: true,
                     title: 'Clear vault',
                     description:
-                      'Enter vault password to unlock and remove all notes from the vault.',
+                      'Enter vault password to unlock and remove all notes from the vault.'
                   });
                 }}
               />
@@ -1614,7 +1622,7 @@ const SettingsPrivacyAndSecurity = () => {
                     novault: true,
                     title: 'Delete vault',
                     description:
-                      'Enter your account password to delete your vault.',
+                      'Enter your account password to delete your vault.'
                   });
                 }}
               />
@@ -1631,7 +1639,7 @@ const SettingsPrivacyAndSecurity = () => {
                     novault: false,
                     title: 'Create vault',
                     description:
-                      'Set a password to create vault and lock notes.',
+                      'Set a password to create vault and lock notes.'
                   });
                 });
               }}
@@ -1656,14 +1664,14 @@ const SettingsBackupAndRestore = () => {
       func: async () => {
         await Backup.run();
       },
-      desc: 'Backup your data to phone storage',
+      desc: 'Backup your data to phone storage'
     },
     {
       name: 'Restore backup',
       func: () => {
         eSendEvent(eOpenRestoreDialog);
       },
-      desc: 'Restore backup from phone storage.',
+      desc: 'Restore backup from phone storage.'
     },
     {
       name: 'Import notes from other note apps',
@@ -1684,16 +1692,16 @@ const SettingsBackupAndRestore = () => {
             try {
               await openLinkInBrowser(
                 'https://docs.notesnook.com/importing/notesnook-importer/',
-                colors,
+                colors
               );
             } catch (e) {}
           },
           paragraph:
-            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.',
+            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.'
         });
       },
-      new: true,
-    },
+      new: true
+    }
   ];
 
   const toggleEncryptedBackups = async () => {
@@ -1704,7 +1712,7 @@ const SettingsBackupAndRestore = () => {
         func: () => {
           eSendEvent(eOpenLoginDialog);
         },
-        actionText: 'Login',
+        actionText: 'Login'
       });
       return;
     }
@@ -1738,17 +1746,17 @@ const SettingsBackupAndRestore = () => {
               alignItems: 'center',
               justifyContent: 'space-between',
               height: 50,
-              paddingHorizontal: 12,
+              paddingHorizontal: 12
             }}>
             <View
               style={{
-                maxWidth: '60%',
+                maxWidth: '60%'
               }}>
               <Paragraph
                 size={SIZE.md}
                 style={{
                   textAlignVertical: 'center',
-                  maxWidth: '100%',
+                  maxWidth: '100%'
                 }}>
                 Auto Backup
               </Paragraph>
@@ -1763,21 +1771,21 @@ const SettingsBackupAndRestore = () => {
                 overflow: 'hidden',
                 borderRadius: 5,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'center'
               }}>
               {[
                 {
                   title: 'Never',
-                  value: 'off',
+                  value: 'off'
                 },
                 {
                   title: 'Daily',
-                  value: 'daily',
+                  value: 'daily'
                 },
                 {
                   title: 'Weekly',
-                  value: 'weekly',
-                },
+                  value: 'weekly'
+                }
               ].map(item => (
                 <TouchableOpacity
                   activeOpacity={1}
@@ -1794,7 +1802,7 @@ const SettingsBackupAndRestore = () => {
                               message:
                                 'You must give storage access to enable auto backups.',
                               type: 'error',
-                              context: 'local',
+                              context: 'local'
                             });
                             return;
                           }
@@ -1813,7 +1821,7 @@ const SettingsBackupAndRestore = () => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: 50,
-                    height: 20,
+                    height: 20
                   }}>
                   <Paragraph
                     color={
