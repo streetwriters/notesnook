@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -31,6 +31,7 @@ import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import GroupHeader from "../components/group-header";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -100,6 +101,12 @@ const otherItems = [
 ];
 
 function Settings(props) {
+  const [groups, setGroups] = useState({
+    appearance: false,
+    backup: false,
+    privacy: false,
+    other: true,
+  });
   const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
@@ -267,261 +274,284 @@ function Settings(props) {
             </Button>
           </>
         )}
-        <Text
-          variant="subtitle"
-          color="primary"
-          py={1}
-          sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
-        >
-          Appearance
-        </Text>
-        <Tip
-          text="Accent color"
-          tip="Choose a color to use as accent color"
-          sx={{ py: 2 }}
-        />
-        <Flex
-          flexWrap="wrap"
-          justifyContent="left"
-          sx={{
-            borderRadius: "default",
+        <Header
+          title="Appearance"
+          isOpen={groups.appearance}
+          onClick={() => {
+            setGroups((g) => ({ ...g, appearance: !g.appearance }));
           }}
-        >
-          {accents.map((color) => (
-            <AccentItem
-              key={color.code}
-              code={color.code}
-              label={color.label}
+        />
+        {groups.appearance && (
+          <>
+            <Tip
+              text="Accent color"
+              tip="Choose a color to use as accent color"
+              sx={{ py: 2 }}
             />
-          ))}
-        </Flex>
-        <Toggle
-          title="Dark mode"
-          onTip="Dark mode is on"
-          offTip="Dark mode is off"
-          onToggled={toggleNightMode}
-          isToggled={theme === "dark"}
-          onlyIf={!followSystemTheme}
-        />
-        <Toggle
-          title="Follow system theme"
-          onTip="Switch app theme according to system"
-          offTip="Keep app theme independent"
-          premium="customize"
-          onToggled={toggleFollowSystemTheme}
-          isToggled={followSystemTheme}
-        />
+            <Flex
+              flexWrap="wrap"
+              justifyContent="left"
+              sx={{
+                borderRadius: "default",
+              }}
+            >
+              {accents.map((color) => (
+                <AccentItem
+                  key={color.code}
+                  code={color.code}
+                  label={color.label}
+                />
+              ))}
+            </Flex>
+            <Toggle
+              title="Dark mode"
+              onTip="Dark mode is on"
+              offTip="Dark mode is off"
+              onToggled={toggleNightMode}
+              isToggled={theme === "dark"}
+              onlyIf={!followSystemTheme}
+            />
+            <Toggle
+              title="Follow system theme"
+              onTip="Switch app theme according to system"
+              offTip="Keep app theme independent"
+              premium="customize"
+              onToggled={toggleFollowSystemTheme}
+              isToggled={followSystemTheme}
+            />
+          </>
+        )}
 
-        <Text
-          variant="subtitle"
-          color="primary"
-          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-        >
-          {"Backup & Restore"}
-        </Text>
-        <Button
-          variant="list"
-          onClick={async () => {
-            if (await verifyAccount()) await createBackup();
+        <Header
+          title="Backup & restore"
+          isOpen={groups.backup}
+          onClick={() => {
+            setGroups((g) => ({ ...g, backup: !g.backup }));
           }}
-        >
-          <Tip text="Backup data" tip="Create a backup file of all your data" />
-        </Button>
-        <input
-          type="file"
-          id="restore-backup"
-          hidden
-          accept=".nnbackup,text/plain,application/json"
         />
-        <Button
-          variant="list"
-          onClick={async () => {
-            try {
-              const backupData = JSON.stringify(await importBackup());
-              const error = await showLoadingDialog({
-                title: "Restoring backup",
-                subtitle: "We are restoring your backup. Please wait...",
-                action: async () => {
-                  await db.backup.import(backupData);
-                },
-                message: (
-                  <Text color="error">
-                    Please do NOT close your browser or shut down your PC.
-                  </Text>
-                ),
-              });
-              if (!error) {
-                await showToast("success", "Backup restored!");
-                await refreshApp();
-              } else {
-                throw new Error(error);
-              }
-            } catch (e) {
-              await showToast(
-                "error",
-                `Could not restore the backup. Error message: ${e.message || e}`
-              );
-            }
-          }}
-        >
-          <Tip text="Restore backup" tip="Restore data from a backup file" />
-        </Button>
-
-        <Toggle
-          title="Encrypt backups"
-          onTip="All backup files will be encrypted"
-          offTip="Backup files will not be encrypted"
-          onToggled={toggleEncryptBackups}
-          premium={CHECK_IDS.backupEncrypt}
-          isToggled={encryptBackups}
-        />
-
-        <OptionsItem
-          title={isDesktop() ? "Automatic backups" : "Backup reminders"}
-          tip={
-            isDesktop()
-              ? "Automatically backup my data"
-              : "Remind me to backup my data"
-          }
-          options={["Never", "Daily", "Weekly", "Monthly"]}
-          premium="backups"
-          selectedOption={backupReminderOffset}
-          onSelectionChanged={(_option, index) =>
-            setBackupReminderOffset(index)
-          }
-        />
-
-        <Text
-          variant="subtitle"
-          color="primary"
-          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-        >
-          Vault
-        </Text>
-
-        {isVaultCreated ? (
+        {groups.backup && (
           <>
             <Button
               variant="list"
-              onClick={() => hashNavigate("/vault/changePassword")}
+              onClick={async () => {
+                if (await verifyAccount()) await createBackup();
+              }}
             >
               <Tip
-                text="Change vault password"
-                tip={"Set a new password for your vault"}
+                text="Backup data"
+                tip="Create a backup file of all your data"
               />
             </Button>
+            <input
+              type="file"
+              id="restore-backup"
+              hidden
+              accept=".nnbackup,text/plain,application/json"
+            />
             <Button
               variant="list"
               onClick={async () => {
-                if (await Vault.clearVault()) {
-                  refreshNotes();
-                  showToast("success", "Vault cleared.");
+                try {
+                  const backupData = JSON.stringify(await importBackup());
+                  const error = await showLoadingDialog({
+                    title: "Restoring backup",
+                    subtitle: "We are restoring your backup. Please wait...",
+                    action: async () => {
+                      await db.backup.import(backupData);
+                    },
+                    message: (
+                      <Text color="error">
+                        Please do NOT close your browser or shut down your PC.
+                      </Text>
+                    ),
+                  });
+                  if (!error) {
+                    await showToast("success", "Backup restored!");
+                    await refreshApp();
+                  } else {
+                    throw new Error(error);
+                  }
+                } catch (e) {
+                  await showToast(
+                    "error",
+                    `Could not restore the backup. Error message: ${
+                      e.message || e
+                    }`
+                  );
                 }
               }}
             >
               <Tip
-                text="Clear vault"
-                tip="Unlock all locked notes and clear vault"
+                text="Restore backup"
+                tip="Restore data from a backup file"
               />
             </Button>
+
+            <Toggle
+              title="Encrypt backups"
+              onTip="All backup files will be encrypted"
+              offTip="Backup files will not be encrypted"
+              onToggled={toggleEncryptBackups}
+              premium={CHECK_IDS.backupEncrypt}
+              isToggled={encryptBackups}
+            />
+
+            <OptionsItem
+              title={isDesktop() ? "Automatic backups" : "Backup reminders"}
+              tip={
+                isDesktop()
+                  ? "Automatically backup my data"
+                  : "Remind me to backup my data"
+              }
+              options={["Never", "Daily", "Weekly", "Monthly"]}
+              premium="backups"
+              selectedOption={backupReminderOffset}
+              onSelectionChanged={(_option, index) =>
+                setBackupReminderOffset(index)
+              }
+            />
+          </>
+        )}
+
+        <Header
+          title="Privacy & security"
+          isOpen={groups.privacy}
+          onClick={() => {
+            setGroups((g) => ({ ...g, privacy: !g.privacy }));
+          }}
+        />
+        {groups.privacy && (
+          <>
+            {isVaultCreated ? (
+              <>
+                <Button
+                  variant="list"
+                  onClick={() => hashNavigate("/vault/changePassword")}
+                >
+                  <Tip
+                    text="Change vault password"
+                    tip={"Set a new password for your vault"}
+                  />
+                </Button>
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    if (await Vault.clearVault()) {
+                      refreshNotes();
+                      showToast("success", "Vault cleared.");
+                    }
+                  }}
+                >
+                  <Tip
+                    text="Clear vault"
+                    tip="Unlock all locked notes and clear vault"
+                  />
+                </Button>
+                <Button
+                  variant="list"
+                  onClick={async () => {
+                    if (
+                      (await Vault.deleteVault()) &&
+                      !(await db.vault.exists())
+                    ) {
+                      setIsVaultCreated(false);
+                      await refreshApp();
+                      showToast("success", "Vault deleted.");
+                    }
+                  }}
+                  sx={{ ":hover": { borderColor: "error" } }}
+                  bg="errorBg"
+                  mx={-2}
+                  px={2}
+                >
+                  <Tip
+                    color="error"
+                    text="Delete vault"
+                    tip="Delete vault (and optionally remove all locked notes)"
+                  />
+                </Button>
+              </>
+            ) : (
+              <Button
+                variant="list"
+                onClick={async () => {
+                  hashNavigate("/vault/create");
+                }}
+              >
+                <Tip
+                  text="Create vault"
+                  tip="Create a password-encrypted vault for your notes"
+                />
+              </Button>
+            )}
+            <Toggle
+              title="Enable telemetry"
+              onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
+              offTip="Do not collect any data or crash reports"
+              onToggled={() => {
+                setEnableTelemetry(!enableTelemetry);
+              }}
+              isToggled={enableTelemetry}
+            />
             <Button
               variant="list"
-              onClick={async () => {
-                if ((await Vault.deleteVault()) && !(await db.vault.exists())) {
-                  setIsVaultCreated(false);
-                  await refreshApp();
-                  showToast("success", "Vault deleted.");
-                }
+              onClick={() => {
+                const details = [
+                  "1. We send an event whenever you open the web app along with the app version. All further navigation is not recorded.",
+                  "2. We send an event when you click the CTA (Call to Action) button on an announcement or promo.",
+                  "3. We send an event when you open the checkout to buy Notesnook Pro.",
+                  "4. We send an event when you claim an offer or promo.",
+                ];
+                confirm({
+                  title: "Telemetry details",
+                  subtitle:
+                    "Read details of all the usage data we collect and send to our servers.",
+                  message: (
+                    <>
+                      {details.map((detail) => (
+                        <p>{detail}</p>
+                      ))}
+                    </>
+                  ),
+                  yesText: "Okay",
+                });
               }}
-              sx={{ ":hover": { borderColor: "error" } }}
-              bg="errorBg"
-              mx={-2}
-              px={2}
             >
               <Tip
-                color="error"
-                text="Delete vault"
-                tip="Delete vault (and optionally remove all locked notes)"
+                text="What do we collect?"
+                tip="Read details of all usage data we collect."
               />
             </Button>
           </>
-        ) : (
-          <Button
-            variant="list"
-            onClick={async () => {
-              hashNavigate("/vault/create");
-            }}
-          >
-            <Tip
-              text="Create vault"
-              tip="Create a password-encrypted vault for your notes"
-            />
-          </Button>
         )}
-        <Text
-          variant="subtitle"
-          color="primary"
-          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-        >
-          Telemetry
-        </Text>
-        <Toggle
-          title="Enable telemetry"
-          onTip="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
-          offTip="Do not collect any data or crash reports"
-          onToggled={() => {
-            setEnableTelemetry(!enableTelemetry);
-          }}
-          isToggled={enableTelemetry}
-        />
-        <Button
-          variant="list"
+        <Header
+          title="Other"
+          isOpen={groups.other}
           onClick={() => {
-            const details = [
-              "1. We send an event whenever you open the web app along with the app version. All further navigation is not recorded.",
-              "2. We send an event when you click the CTA (Call to Action) button on an announcement or promo.",
-              "3. We send an event when you open the checkout to buy Notesnook Pro.",
-              "4. We send an event when you claim an offer or promo.",
-            ];
-            confirm({
-              title: "Telemetry details",
-              subtitle:
-                "Read details of all the usage data we collect and send to our servers.",
-              message: (
-                <>
-                  {details.map((detail) => (
-                    <p>{detail}</p>
-                  ))}
-                </>
-              ),
-              yesText: "Okay",
-            });
+            setGroups((g) => ({ ...g, other: !g.other }));
           }}
-        >
-          <Tip
-            text="What do we collect?"
-            tip="Read details of all usage data we collect."
-          />
-        </Button>
-        <Text
-          variant="subtitle"
-          color="primary"
-          sx={{ py: 1, borderBottom: "1px solid", borderBottomColor: "border" }}
-        >
-          Other
-        </Text>
-        {otherItems.map((item) => (
-          <Button
-            key={item.title}
-            variant="list"
-            onClick={() => {
-              openLink(item.link, "_blank");
-            }}
-          >
-            <Tip text={item.title} tip={item.description} />
-          </Button>
-        ))}
-        <Tip sx={{ mt: 2 }} text="About" tip={`version ${version.formatted}`} />
+        />
+
+        {groups.other && (
+          <>
+            {otherItems.map((item) => (
+              <Button
+                key={item.title}
+                variant="list"
+                onClick={() => {
+                  openLink(item.link, "_blank");
+                }}
+              >
+                <Tip text={item.title} tip={item.description} />
+              </Button>
+            ))}
+            <Tip
+              sx={{ mt: 2 }}
+              text="About"
+              tip={`version ${version.formatted}`}
+            />
+          </>
+        )}
       </Flex>
     </ScrollContainer>
   );
@@ -775,6 +805,29 @@ function AccountStatusContainer(props) {
         </Text>
       </Flex>
       {children}
+    </Flex>
+  );
+}
+
+function Header(props) {
+  const { title, isOpen, onClick } = props;
+  return (
+    <Flex
+      sx={{ borderRadius: "default", cursor: "pointer" }}
+      bg="bgSecondary"
+      mt={2}
+      p={"8px"}
+      justifyContent="space-between"
+      onClick={onClick}
+    >
+      <Text
+        variant="title"
+        fontWeight="body"
+        color={isOpen ? "primary" : "text"}
+      >
+        {title}
+      </Text>
+      {isOpen ? <Icon.ChevronUp color="primary" /> : <Icon.ChevronDown />}
     </Flex>
   );
 }
