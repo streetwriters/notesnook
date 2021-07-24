@@ -23,11 +23,10 @@ const tools = [
 ];
 
 function Properties() {
-  const [notebook, setNotebook] = useState();
   const color = useStore((store) => store.session.color);
   const toggleLocked = useStore((store) => store.toggleLocked);
   const sessionId = useStore((store) => store.session.id);
-  const notebookData = useStore((store) => store.session.notebook);
+  const notebooks = useStore((store) => store.session.notebooks);
   const setSession = useStore((store) => store.setSession);
   const setColor = useStore((store) => store.setColor);
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
@@ -46,19 +45,6 @@ function Properties() {
     },
     [setSession, toggleLocked]
   );
-
-  useEffect(() => {
-    if (notebookData && notebookData.id) {
-      const notebook = db.notebooks.notebook(notebookData.id).data;
-      const topic = notebook.topics?.find((t) => t.id === notebookData.topic);
-      if (!topic) return;
-      setNotebook({
-        id: notebook.id,
-        title: notebook.title,
-        topic: { title: topic.title, id: topic.id },
-      });
-    }
-  }, [notebookData]);
 
   return (
     !isFocusMode && (
@@ -119,7 +105,7 @@ function Properties() {
             </Text>
             {sessionId ? (
               <>
-                <Flex mb={1}>
+                <Flex>
                   {tools.map((tool, _) => (
                     <Toggle
                       {...tool}
@@ -130,43 +116,6 @@ function Properties() {
                     />
                   ))}
                 </Flex>
-                <Button
-                  color="static"
-                  onClick={async () => {
-                    await showMoveNoteDialog([sessionId]);
-                  }}
-                  data-test-id="properties-add-to-nb"
-                >
-                  {notebook ? "Move to another notebook" : "Add to notebook"}
-                </Button>
-                {notebook && (
-                  <Text as="span" variant="subBody" mt={1}>
-                    In{" "}
-                    <Text
-                      as="span"
-                      color="primary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={() => {
-                        navigate(`/notebooks/${notebook.id}`);
-                      }}
-                    >
-                      {notebook.title}
-                    </Text>{" "}
-                    under{" "}
-                    <Text
-                      as="span"
-                      color="primary"
-                      sx={{ cursor: "pointer" }}
-                      onClick={() => {
-                        navigate(
-                          `/notebooks/${notebook.id}/${notebook.topic.id}`
-                        );
-                      }}
-                    >
-                      {notebook.topic.title}
-                    </Text>
-                  </Text>
-                )}
                 <Flex flexDirection="column">
                   {objectMap(COLORS, (label, code) => (
                     <Flex
@@ -194,6 +143,69 @@ function Properties() {
                     </Flex>
                   ))}
                 </Flex>
+                {notebooks?.length && (
+                  <>
+                    <Text variant="subtitle" mt={4} mb={1}>
+                      Referenced in {notebooks.length} notebook(s):
+                    </Text>
+                    {notebooks.map((ref) => {
+                      const notebook = db.notebooks.notebook(ref.id);
+                      if (!notebook) return null;
+                      const topics = ref.topics.map(
+                        (topicId) => notebook.topics.topic(topicId)._topic
+                      );
+                      return (
+                        <Flex flexDirection="column" my={1}>
+                          <Flex
+                            onClick={() => {
+                              navigate(`/notebooks/${notebook.data.id}`);
+                            }}
+                            mb={1}
+                          >
+                            <Icon.Notebook size={12} />
+                            <Text
+                              variant="body"
+                              ml={1}
+                              sx={{ cursor: "pointer" }}
+                            >
+                              {notebook.title}
+                            </Text>
+                          </Flex>
+                          {topics.map((topic) => (
+                            <Flex
+                              mb={1}
+                              ml={2}
+                              onClick={() => {
+                                navigate(
+                                  `/notebooks/${notebook.data.id}/${topic.id}`
+                                );
+                              }}
+                            >
+                              <Icon.Topic size={12} />
+                              <Text
+                                variant="body"
+                                ml={1}
+                                sx={{ cursor: "pointer" }}
+                              >
+                                {topic.title}
+                              </Text>
+                            </Flex>
+                          ))}
+                        </Flex>
+                      );
+                    })}
+                  </>
+                )}
+                <Button
+                  variant="secondary"
+                  onClick={async () => {
+                    await showMoveNoteDialog([sessionId]);
+                  }}
+                  data-test-id="properties-add-to-nb"
+                  mt={notebooks?.length ? 0 : 3}
+                >
+                  Add to notebook
+                </Button>
               </>
             ) : (
               <Text
