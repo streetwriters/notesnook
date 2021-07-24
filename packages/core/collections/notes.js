@@ -102,6 +102,7 @@ export default class Notes extends Collection {
       if (note.color) await this._db.colors.add(note.color, id);
 
       for (let tag of note.tags) {
+        if (!tag || !tag.trim()) continue;
         await this._db.tags.add(tag, id);
       }
     }
