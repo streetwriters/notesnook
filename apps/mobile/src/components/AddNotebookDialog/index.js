@@ -1,6 +1,6 @@
 import React, {createRef} from 'react';
 import {Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {FlatList, TextInput} from 'react-native-gesture-handler';
+import {FlatList, ScrollView, TextInput} from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
 import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
@@ -12,8 +12,6 @@ import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import Seperator from '../Seperator';
@@ -54,13 +52,12 @@ export class AddNotebookDialog extends React.Component {
   }
 
   open = () => {
+    console.log('opening called')
     refs = [];
     let {toEdit} = this.props;
-
     if (toEdit && toEdit.type === 'notebook') {
       let topicsList = [];
       toEdit.topics.forEach((item, index) => {
-        //if (index === 0) return;
         topicsList.push(item.title);
       });
       this.id = toEdit.id;
@@ -69,7 +66,6 @@ export class AddNotebookDialog extends React.Component {
 
       this.setState({
         topics: [...topicsList],
-
         visible: true
       });
     } else {
@@ -273,36 +269,30 @@ export class AddNotebookDialog extends React.Component {
         }}
         fwdRef={this.actionSheetRef}
         onClose={() => {
+          console.log('closing now');
           this.close();
           this.setState({
             visible: false
           });
         }}
-        animation="fade"
-        centered={false}
         statusBarTranslucent={false}
         onRequestClose={this.close}>
-        <TextInput
-          ref={this.hiddenInput}
-          style={{
-            width: 1,
-            height: 1,
-            opacity: 0,
-            position: 'absolute'
-          }}
-          blurOnSubmit={false}
-        />
-
         <View
-          style={[
-            styles.container,
-            {
-              backgroundColor: colors.bg,
-              height: null,
-              borderTopRightRadius: 10,
-              borderTopLeftRadius: 10
-            }
-          ]}>
+          style={{
+            maxHeight: DDS.isTab ? '90%' : '100%',
+            borderRadius: DDS.isTab ? 5 : 0,
+            paddingHorizontal: 12
+          }}>
+          <TextInput
+            ref={this.hiddenInput}
+            style={{
+              width: 1,
+              height: 1,
+              opacity: 0,
+              position: 'absolute'
+            }}
+            blurOnSubmit={false}
+          />
           <DialogHeader
             title={
               toEdit && toEdit.dateCreated ? 'Edit Notebook' : 'New Notebook'
@@ -492,13 +482,6 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.3)',
     justifyContent: 'center',
     alignItems: 'center'
-  },
-  container: {
-    width: DDS.isTab ? 500 : '100%',
-    height: DDS.isTab ? 600 : '100%',
-    maxHeight: DDS.isTab ? 600 : '100%',
-    borderRadius: DDS.isTab ? 5 : 0,
-    paddingHorizontal: 12
   },
   overlay: {
     width: '100%',
