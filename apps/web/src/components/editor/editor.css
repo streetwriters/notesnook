@@ -74,6 +74,7 @@ tox-tbtn tox-tbtn--select {
   outline: none;
   height: 100%;
   padding-bottom: 150px;
+  margin: 0px !important;
 }
 
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
