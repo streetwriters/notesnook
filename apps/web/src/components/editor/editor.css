@@ -73,6 +73,7 @@ tox-tbtn tox-tbtn--select {
 .mce-content-body {
   outline: none;
   height: 100%;
+  padding-bottom: 150px;
 }
 
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
@@ -129,7 +130,8 @@ h6::before {
 }
 
 .mce-content-body pre {
-  overflow-x: auto;
+  overflow: auto;
+  max-height: 600px;
   line-height: 1.5 !important;
   padding: 15px;
   border: 1px solid var(--border);
