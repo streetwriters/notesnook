@@ -43,8 +43,8 @@ const ActionSheetWrapper = ({
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
       alignSelf: 'center',
-      borderBottomRight: 0,
-      borderBottomLeft: 0
+      borderBottomRightRadius: 0,
+      borderBottomLeftRadius: 0
     };
   }, [colors.bg, gestureEnabled]);
 
