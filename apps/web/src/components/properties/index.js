@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback } from "react";
 import * as Icon from "../icons";
 import { Flex, Text, Button } from "rebass";
 import { useStore } from "../../stores/editor-store";
