@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   ScrollView,
@@ -7,39 +7,39 @@ import {
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
+import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import { useTracked } from '../../provider/index';
-import { useUserStore } from '../../provider/stores';
+import {useTracked} from '../../provider/index';
+import {useUserStore} from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
+import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import { Header } from '../SimpleList/header';
+import {Header} from '../SimpleList/header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -57,6 +57,7 @@ let confirmPassword;
 let oldPassword;
 
 function getEmail() {
+  if (!email) return null;
   return email.replace(/(.{2})(.*)(?=@)/, function (gp1, gp2, gp3) {
     for (let i = 0; i < gp3.length; i++) {
       gp2 += '*';
@@ -64,7 +65,6 @@ function getEmail() {
     return gp2;
   });
 }
-let offsetY = 0;
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -84,7 +84,6 @@ const LoginDialog = () => {
   const actionSheetRef = useRef();
   const _email = useRef();
   const _pass = useRef();
-  const _username = useRef();
   const _oPass = useRef();
   const _passConfirm = useRef();
 
@@ -177,11 +176,6 @@ const LoginDialog = () => {
   const current = MODE_DATA[mode];
 
   useEffect(() => {
-    MMKV.getItem('loginSessionHasExpired').then(r => {
-      if (r === 'expired') {
-        open(MODES.sessionExpired);
-      }
-    });
     eSubscribeEvent(eOpenLoginDialog, open);
     return () => {
       eUnSubscribeEvent(eOpenLoginDialog, open);
@@ -473,15 +467,14 @@ const LoginDialog = () => {
         onMomentumScrollEnd={() => {
           actionSheetRef.current.handleChildScrollEnd();
         }}
+        bounces={false}
+        overScrollMode="never"
+        scrollToOverflowEnabled="false"
         style={{
-          maxHeight: DDS.isTab ? '90%' : '100%',
-          width: DDS.isTab ? 500 : '100%',
           minHeight: !DDS.isTab ? '90%' : null,
-          height: MODES.sessionExpired === mode ? '100%' : null,
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
-          zIndex: 10,
-          paddingBottom: DDS.isTab ? 20 : 0
+          zIndex: 10
         }}>
         <Header
           color="transparent"
@@ -748,7 +741,7 @@ const LoginDialog = () => {
                 justifyContent: 'space-between',
                 backgroundColor: colors.bg,
                 alignSelf: 'center',
-                paddingVertical:20
+                paddingVertical: 20
               }}>
               <View
                 style={{

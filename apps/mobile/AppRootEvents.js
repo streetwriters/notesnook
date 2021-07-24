@@ -1,10 +1,10 @@
 import NetInfo from '@react-native-community/netinfo';
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect } from 'react';
-import { Appearance, AppState, Linking, Platform } from 'react-native';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect} from 'react';
+import {Appearance, AppState, Linking, Platform} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import { enabled } from 'react-native-privacy-snapshot';
+import {enabled} from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
 import {
   clearAllStores,
@@ -29,9 +29,9 @@ import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
 import SettingsService from './src/services/SettingsService';
 import Sync from './src/services/Sync';
-import { APP_VERSION, doInBackground, editing } from './src/utils';
-import { updateStatusBarColor } from './src/utils/Colors';
-import { db } from './src/utils/DB';
+import {APP_VERSION, doInBackground, editing} from './src/utils';
+import {updateStatusBarColor} from './src/utils/Colors';
+import {db} from './src/utils/DB';
 import {
   eClearEditor,
   eCloseProgressDialog,
@@ -39,10 +39,14 @@ import {
   eOpenProgressDialog,
   refreshNotesPage
 } from './src/utils/Events';
-import { MMKV } from './src/utils/mmkv';
+import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
-import { sleep } from './src/utils/TimeUtils';
-import { getNote, getWebviewInit, updateNoteInEditor } from './src/views/Editor/Functions';
+import {sleep} from './src/utils/TimeUtils';
+import {
+  getNote,
+  getWebviewInit,
+  updateNoteInEditor
+} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -55,7 +59,7 @@ async function storeAppState() {
       editing: editing.currentlyEditing,
       note: getNote(),
       movedAway: editing.movedAway,
-      timestamp: Date.now(),
+      timestamp: Date.now()
     });
     await MMKV.setItem('appState', state);
   }
@@ -128,7 +132,7 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
       eSubscribeEvent('userLoggedIn', setCurrentUser);
       removeInternetStateListener = NetInfo.addEventListener(
-        onInternetStateChanged,
+        onInternetStateChanged
       );
       return () => {
         eUnSubscribeEvent('userLoggedIn', setCurrentUser);
@@ -140,7 +144,7 @@ export const AppRootEvents = React.memo(
         EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
         EV.unsubscribe(
           EVENTS.userCheckStatus,
-          PremiumService.onUserStatusCheck,
+          PremiumService.onUserStatusCheck
         );
         EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
@@ -162,7 +166,7 @@ export const AppRootEvents = React.memo(
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Trash,
-          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Notebook
         ]);
         eSendEvent(eClearEditor);
       } catch (e) {}
@@ -230,7 +234,7 @@ export const AppRootEvents = React.memo(
       eSendEvent(eOpenProgressDialog, {
         title: 'Email confirmed!',
         paragraph: message,
-        noProgress: true,
+        noProgress: true
       });
 
       if (user?.isEmailConfirmed) {
@@ -245,10 +249,10 @@ export const AppRootEvents = React.memo(
         })
         .then(async () => {
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
-            onSuccessfulSubscription,
+            onSuccessfulSubscription
           );
           subsriptionErrorListener = RNIap.purchaseErrorListener(
-            onSubscriptionError,
+            onSubscriptionError
           );
         });
     };
@@ -264,7 +268,7 @@ export const AppRootEvents = React.memo(
           },
           icon: 'check',
           actionText: 'Continue',
-          noProgress: true,
+          noProgress: true
         });
       }
       await PremiumService.setPremiumStatus();
@@ -290,7 +294,7 @@ export const AppRootEvents = React.memo(
           ToastEvent.show({
             heading: 'Sync failed',
             message: e.message,
-            context: 'global',
+            context: 'global'
           });
         }
       } finally {
@@ -316,7 +320,7 @@ export const AppRootEvents = React.memo(
         },
         icon: 'logout',
         actionText: 'Login',
-        noProgress: true,
+        noProgress: true
       });
     };
 
@@ -352,7 +356,7 @@ export const AppRootEvents = React.memo(
           });
           if (res !== true) throw new Error(res);
 
-          if (!user.isEmailConfirmed) {
+          if (!user?.isEmailConfirmed) {
             setEmailVerifyMessage();
             return;
           }
@@ -362,7 +366,7 @@ export const AppRootEvents = React.memo(
         }
       } catch (e) {
         let user = await db.user.getUser();
-        if (user && !user.isEmailConfirmed) {
+        if (user && !user?.isEmailConfirmed) {
           setEmailVerifyMessage();
         } else if (!user) {
           setLoginMessage();
@@ -388,7 +392,7 @@ export const AppRootEvents = React.memo(
         heading: 'Failed to subscribe',
         type: 'error',
         message: error.message,
-        context: 'local',
+        context: 'local'
       });
     };
 
@@ -413,7 +417,7 @@ export const AppRootEvents = React.memo(
             }
 
             let result = await BiometricService.validateUser(
-              'Unlock to access your notes',
+              'Unlock to access your notes'
             );
             if (result) {
               showingDialog = false;
@@ -435,10 +439,10 @@ export const AppRootEvents = React.memo(
           await MMKV.removeItem('appState');
         }
         let user = await db.user.getUser();
-        if (user && !user.isEmailConfirmed) {
+        if (user && !user?.isEmailConfirmed) {
           try {
             let user = await db.user.fetchUser();
-            if (user.isEmailConfirmed) {
+            if (user?.isEmailConfirmed) {
               onEmailVerified();
             }
           } catch (e) {}
@@ -463,5 +467,5 @@ export const AppRootEvents = React.memo(
 
     return <></>;
   },
-  () => true,
+  () => true
 );

@@ -47,11 +47,6 @@ const Editor = React.memo(
     };
 
     useEffect(()=>{
-      setTimeout(async () => {
-        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
-        eSendEvent(eOpenLoginDialog, 4);
-      }, 1000);
-
       if (premiumUser) {
         tiny.call(EditorWebView,tiny.setMarkdown,true)
       }

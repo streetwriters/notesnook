@@ -6,21 +6,22 @@ import {useTracked} from '../../provider';
 import {
   useFavoriteStore,
   useNoteStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import {editing} from '../../utils';
 import {db} from '../../utils/DB';
-import {eOpenRateDialog} from '../../utils/Events';
+import {eOpenLoginDialog, eOpenRateDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
@@ -76,13 +77,18 @@ const AppLoader = ({onLoad}) => {
     Animated.timing(opacityV, {
       toValue: 0,
       duration: 100,
-      easing: Easing.out(Easing.ease),
+      easing: Easing.out(Easing.ease)
     }).start();
     setLoading(false);
     await db.notes.init();
     setNotes();
     setFavorites();
     _setLoading(false);
+    await sleep(1000);
+    if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+      eSendEvent(eOpenLoginDialog, 4);
+      return;
+    }
     let askForRating = await MMKV.getItem('askForRating');
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
@@ -112,7 +118,7 @@ const AppLoader = ({onLoad}) => {
   const onUnlockBiometrics = async () => {
     let verified = await BiometricService.validateUser(
       'Unlock to access your notes',
-      '',
+      ''
     );
     if (verified) {
       didVerifyUser = true;
@@ -141,7 +147,7 @@ const AppLoader = ({onLoad}) => {
         height: '100%',
         position: 'absolute',
         zIndex: 999,
-        borderRadius: 10,
+        borderRadius: 10
       }}>
       <Animated.View
         style={{
@@ -151,7 +157,7 @@ const AppLoader = ({onLoad}) => {
           justifyContent: 'center',
           alignItems: 'center',
           borderRadius: 10,
-          opacity: opacityV,
+          opacity: opacityV
         }}>
         {verifyUser ? (
           <SafeAreaView
@@ -159,7 +165,7 @@ const AppLoader = ({onLoad}) => {
               flex: 1,
               justifyContent: 'center',
               width: '100%',
-              paddingHorizontal: 12,
+              paddingHorizontal: 12
             }}>
             <Heading>Verify your identity</Heading>
             {user ? (
@@ -209,7 +215,7 @@ const AppLoader = ({onLoad}) => {
             style={{
               height: 10,
               flexDirection: 'row',
-              width: 100,
+              width: 100
             }}>
             <AnimatedProgress fill={colors.accent} current={4} total={4} />
           </View>
