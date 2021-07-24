@@ -1,4 +1,4 @@
-const module = {
+const hosts = {
   API_HOST:
     process.env.NODE_ENV === "production"
       ? "https://api.notesnook.com"
@@ -11,6 +11,10 @@ const module = {
     process.env.NODE_ENV === "production"
       ? "https://events.streetwriters.co"
       : "http://localhost:7264",
+  SUBSCRIPTIONS_HOST:
+    process.env.NODE_ENV === "production"
+      ? "https://subscriptions.streetwriters.co"
+      : "http://localhost:9264",
 };
 
-export default module;
+export default hosts;

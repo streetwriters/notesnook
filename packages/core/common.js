@@ -10,6 +10,8 @@ export async function sendCheckUserStatusEvent(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
+export const CLIENT_ID = "notesnook";
+
 export const CHECK_IDS = {
   noteColor: "note:color",
   noteTag: "note:tag",
