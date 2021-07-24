@@ -51,7 +51,7 @@ function NavigationItem(props) {
       {isNew && (
         <Icons.Circle
           size={6}
-          sx={{ position: "absolute", bottom: 0, left: "15px" }}
+          sx={{ position: "absolute", bottom: "8px", left: "23px" }}
           color={"primary"}
         />
       )}
