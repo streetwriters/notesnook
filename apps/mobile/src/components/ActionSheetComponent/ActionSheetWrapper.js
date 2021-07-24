@@ -28,20 +28,21 @@ const ActionSheetWrapper = ({
   const deviceMode = useSettingStore(state => state.deviceMode);
   const largeTablet = deviceMode === 'tablet';
   const smallTablet = deviceMode === 'smallTablet';
+  const dimensions = useSettingStore(state => state.dimensions);
 
   const insets = useSafeAreaInsets();
+
+  let width = dimensions.width > 600 ? 600 : 500;
+
   const style = React.useMemo(() => {
     return {
-      width: largeTablet || smallTablet ? 500 : '100%',
+      width: largeTablet || smallTablet ? width : '100%',
       backgroundColor: colors.bg,
       zIndex: 10,
       paddingTop: 10,
       paddingBottom: 0,
-      borderBottomRightRadius: largeTablet ? 10 : 1,
-      borderBottomLeftRadius: largeTablet ? 10 : 1,
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
-      marginBottom: largeTablet ? 50 : 0,
       alignSelf: 'center',
     };
   }, [colors.bg, gestureEnabled]);
@@ -72,7 +73,6 @@ const ActionSheetWrapper = ({
       drawUnderStatusBar={false}
       containerStyle={style}
       gestureEnabled={gestureEnabled}
-      extraScroll={largeTablet ? 50 : 0}
       initialOffsetFromBottom={1}
       onPositionChanged={onHasReachedTop}
       closeOnTouchBackdrop={closeOnTouchBackdrop}
