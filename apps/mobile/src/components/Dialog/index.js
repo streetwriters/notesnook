@@ -13,7 +13,7 @@ import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
 
-export const Dialog = () => {
+export const Dialog = ({context = 'global'}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
@@ -31,7 +31,7 @@ export const Dialog = () => {
     paragraphColor: colors.pri,
     input: false,
     inputPlaceholder: 'Enter some text',
-    defaultValue: '',
+    defaultValue: ''
   });
 
   useEffect(() => {
@@ -53,8 +53,10 @@ export const Dialog = () => {
   };
 
   const show = data => {
-    setDialogInfo(data);
-    setVisible(true);
+    if (data.context && data.context === context) {
+      setDialogInfo(data);
+      setVisible(true);
+    }
   };
 
   const hide = () => {
@@ -76,7 +78,7 @@ export const Dialog = () => {
     borderRadius: 5,
     backgroundColor: colors.bg,
     paddingHorizontal: ph,
-    paddingVertical: pv,
+    paddingVertical: pv
   };
 
   return (

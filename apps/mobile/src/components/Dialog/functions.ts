@@ -13,7 +13,8 @@ type DialogInfo = {
   paragraphColor: string,
   input:boolean,
   inputPlaceholder:string,
-  defaultValue:string
+  defaultValue:string,
+  context:"global" | "local"
 }
 
 export function presentDialog(data: DialogInfo): void {
