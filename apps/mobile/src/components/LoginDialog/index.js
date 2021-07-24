@@ -1,46 +1,45 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {UIManager} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   ScrollView,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider/index';
-import {useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider/index';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
+  eOpenRecoveryKeyDialog
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import {Header} from '../SimpleList/header';
+import { Header } from '../SimpleList/header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -49,7 +48,7 @@ const MODES = {
   signup: 1,
   forgotPassword: 2,
   changePassword: 3,
-  sessionExpired: 4,
+  sessionExpired: 4
 };
 
 let email = '';
@@ -104,7 +103,7 @@ const LoginDialog = () => {
       buttonAlt: 'Sign Up',
       buttonAltFunc: () => {
         setMode(MODES.signup);
-      },
+      }
     },
     {
       headerButton: 'Sign Up',
@@ -124,7 +123,7 @@ const LoginDialog = () => {
         _email.current?.blur();
         setMode(MODES.login);
         onChangeFocus();
-      },
+      }
     },
     {
       headerButton: 'Forgot Password',
@@ -143,7 +142,7 @@ const LoginDialog = () => {
       buttonAlt: 'Go back to Login',
       buttonAltFunc: () => {
         setMode(MODES.login);
-      },
+      }
     },
     {
       headerButton: 'Change Password',
@@ -157,7 +156,7 @@ const LoginDialog = () => {
       loading:
         'Please wait while we change your password and encrypt your data.',
       showLoader: true,
-      buttonAlt: null,
+      buttonAlt: null
     },
     {
       headerButton: 'Session expired',
@@ -171,8 +170,8 @@ const LoginDialog = () => {
       buttonAlt: 'Logout & delete data',
       buttonAltFunc: () => {
         setConfirm(true);
-      },
-    },
+      }
+    }
   ];
 
   const current = MODE_DATA[mode];
@@ -191,7 +190,6 @@ const LoginDialog = () => {
 
   async function open(mode) {
     setMode(mode ? mode : MODES.login);
-
     if (mode === MODES.sessionExpired) {
       let user = await db.user.getUser();
       email = user.email;
@@ -205,10 +203,6 @@ const LoginDialog = () => {
   const close = () => {
     if (loading) return;
     actionSheetRef.current?.hide();
-    _email.current?.clear();
-    _pass.current?.clear();
-    _passConfirm.current?.clear();
-    _username.current?.clear();
     confirmPassword = null;
     oldPassword = null;
     email = null;
@@ -226,7 +220,7 @@ const LoginDialog = () => {
       ToastEvent.show({
         heading: 'Email or password is invalid',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -247,7 +241,7 @@ const LoginDialog = () => {
         heading: 'Login successful',
         message: `Logged in as ${user.email}`,
         type: 'success',
-        context: 'local',
+        context: 'local'
       });
       close();
       await sleep(300);
@@ -255,7 +249,7 @@ const LoginDialog = () => {
       eSendEvent(eOpenProgressDialog, {
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
-        noProgress: false,
+        noProgress: false
       });
       await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
@@ -265,7 +259,7 @@ const LoginDialog = () => {
         heading: user ? 'Failed to sync' : 'Login failed',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -276,7 +270,7 @@ const LoginDialog = () => {
         heading: 'All fields required',
         message: 'Fill all the fields and try again',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
 
       return false;
@@ -288,7 +282,7 @@ const LoginDialog = () => {
         message:
           'Some or all information provided is invalid. Resolve all errors and try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return false;
     }
@@ -305,7 +299,7 @@ const LoginDialog = () => {
           setUserConsent(true);
           signupUser();
           ToastEvent.hide();
-        },
+        }
       });
       return false;
     }
@@ -335,7 +329,7 @@ const LoginDialog = () => {
         heading: 'Signup failed',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -345,7 +339,7 @@ const LoginDialog = () => {
       ToastEvent.show({
         heading: 'Account email is required.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -366,7 +360,7 @@ const LoginDialog = () => {
         heading: 'Recovery email not sent',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -377,7 +371,7 @@ const LoginDialog = () => {
         heading: 'All fields required',
         message: 'Fill all the fields and try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -391,7 +385,7 @@ const LoginDialog = () => {
         heading: 'Failed to change password',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
     setStatus(null);
@@ -475,7 +469,7 @@ const LoginDialog = () => {
         ref={scrollViewRef}
         keyboardShouldPersistTaps="always"
         keyboardDismissMode="on-drag"
-        nestedScrollEnabled
+        nestedScrollEnabled={mode !== MODES.sessionExpired}
         onMomentumScrollEnd={() => {
           actionSheetRef.current.handleChildScrollEnd();
         }}
@@ -487,7 +481,7 @@ const LoginDialog = () => {
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
           zIndex: 10,
-          paddingBottom: DDS.isTab ? 20 : 0,
+          paddingBottom: DDS.isTab ? 20 : 0
         }}>
         <Header
           color="transparent"
@@ -507,7 +501,7 @@ const LoginDialog = () => {
               marginTop: 10,
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: hexToRGBA(colors.red, 0.2),
+              backgroundColor: hexToRGBA(colors.red, 0.2)
             }}>
             <Icon
               size={20}
@@ -531,7 +525,7 @@ const LoginDialog = () => {
               paddingVertical: 12,
               marginTop: 10,
               flexDirection: 'row',
-              alignItems: 'center',
+              alignItems: 'center'
             }}>
             <Icon
               size={20}
@@ -553,7 +547,7 @@ const LoginDialog = () => {
           style={{
             paddingHorizontal: 12,
             paddingTop: 12,
-            width: focused ? '100%' : '99.9%',
+            width: focused ? '100%' : '99.9%'
           }}>
           {mode === MODES.changePassword ? null : (
             <Input
@@ -646,7 +640,7 @@ const LoginDialog = () => {
               }}
               style={{
                 alignSelf: 'flex-end',
-                marginTop: 2.5,
+                marginTop: 2.5
               }}>
               <Paragraph color={colors.accent}>Forgot password?</Paragraph>
             </TouchableOpacity>
@@ -686,12 +680,12 @@ const LoginDialog = () => {
                 style={{
                   flexDirection: 'row',
                   width: '100%',
-                  alignItems: 'center',
+                  alignItems: 'center'
                 }}>
                 <Paragraph
                   size={11}
                   style={{
-                    maxWidth: '90%',
+                    maxWidth: '90%'
                   }}>
                   By signing up you agree to our{' '}
                   <Paragraph
@@ -739,7 +733,7 @@ const LoginDialog = () => {
               type={MODES.sessionExpired === mode ? 'error' : 'shade'}
               fontSize={SIZE.md}
               style={{
-                marginTop: 10,
+                marginTop: 10
               }}
               height={50}
             />
@@ -749,17 +743,18 @@ const LoginDialog = () => {
             <View
               style={{
                 alignItems: 'center',
-                marginTop: 10,
                 width: '100%',
                 flexDirection: 'row',
                 justifyContent: 'space-between',
                 backgroundColor: colors.bg,
+                alignSelf: 'center',
+                paddingVertical:20
               }}>
               <View
                 style={{
-                  flexShrink: 1,
+                  flexShrink: 1
                 }}>
-                <Heading size={SIZE.md}>{status}</Heading>
+                <Heading size={SIZE.md}>{status}Logging in</Heading>
                 <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
                   {current.loading}{' '}
                   {!current.showLoader ? null : (
