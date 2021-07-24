@@ -38,6 +38,7 @@ async function setPremiumStatus() {
     if (!get()) {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
+      console.log(products);
     } else {
       await subscriptions.clear();
     }
@@ -49,12 +50,12 @@ function getProducts() {
 }
 
 function get() {
-  return true;
+  //return true;
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
 async function verify(callback, error) {
-  return callback();
+  //return callback();
   try {
     if (!premiumStatus) {
       if (error) {

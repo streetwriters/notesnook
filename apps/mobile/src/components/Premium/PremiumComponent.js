@@ -12,23 +12,25 @@ import {
   ORGANIZE_SVG,
   RICH_TEXT_SVG,
   SYNC_SVG,
-  VAULT_SVG,
+  VAULT_SVG
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {dWidth, itemSkus} from '../../utils';
 import {db} from '../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
-  eOpenProgressDialog,
+  eOpenProgressDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
+import {Dialog} from '../Dialog';
+import {presentDialog} from '../Dialog/functions';
 import {SvgToPngView} from '../ListPlaceholders';
 import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
@@ -40,68 +42,68 @@ const features = [
     description:
       'Your notes will be automatically encrypted and synced to all your devices.',
     icon: SYNC_SVG,
-    img: 'sync',
+    img: 'sync'
   },
   {
     title: 'Unlimited organization',
     description:
       'Make unlimited notebooks and tags. Assign colors to your notes for quick access.',
     icon: ORGANIZE_SVG,
-    img: 'organize',
+    img: 'organize'
   },
   {
     title: 'Secure vault',
     description:
       'Lock any note with a password and keep sensitive data under lock and key.',
     icon: VAULT_SVG,
-    img: 'vault',
+    img: 'vault'
   },
   {
     title: 'Full rich text editor',
     description:
       ' Add images, links, tables, lists and embed videos. Use markdown for fast editing.',
     icon: RICH_TEXT_SVG,
-    img: 'richtext',
+    img: 'richtext'
   },
   {
     title: 'Export notes',
     description: 'You can export your notes in PDF, Markdown and HTML formats.',
     icon: EXPORT_SVG,
-    img: 'export',
+    img: 'export'
   },
   {
     title: 'Automatic and encrypted backups',
     description:
       'Enable daily or weekly backups of your data with automatic encryption.',
     icon: BACKUP_SVG,
-    img: 'backup',
+    img: 'backup'
   },
   {
     title: 'Customize Notesnook',
     description:
       'Change app colors, turn on automatic theme switching and change default home page.',
     icon: ACCENT_SVG,
-    img: 'accent',
+    img: 'accent'
   },
   {
     title: 'Get a Pro badge on Discord',
     description:
       'Pro users get access to special channels and priority support on our Discord server ',
     icon: COMMUNITY_SVG,
-    img: 'community',
-  },
+    img: 'community'
+  }
 ];
 
 const promoCyclesMonthly = {
   1: 'first month',
   2: 'first 2 months',
-  3: 'first 3 months',
+  3: 'first 3 months'
 };
 
 const promoCyclesYearly = {
   1: 'first year',
   2: 'first 2 years',
-  3: 'first 3 years',
+  3: 'first 3 years'
 };
 
 export const PremiumComponent = ({close, promo}) => {
@@ -123,37 +125,21 @@ export const PremiumComponent = ({close, promo}) => {
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
-            p => p.productId === 'com.streetwriters.notesnook.sub.mo',
+            p => p.productId === 'com.streetwriters.notesnook.sub.mo'
           ),
           yearly: products.find(
-            p => p.productId === 'com.streetwriters.notesnook.sub.yr',
-          ),
+            p => p.productId === 'com.streetwriters.notesnook.sub.yr'
+          )
         };
         console.log(products.map(p => p.productId));
         setOffers(offers);
 
         if (promo?.promoCode) {
-          let product = products.find(p => p.productId === promo.promoCode);
-          let isMonthly = product.productId.indexOf('.mo') > -1;
-          let cycleText = isMonthly
-            ? promoCyclesMonthly[
-                product.introductoryPriceCyclesAndroid ||
-                  product.introductoryPriceNumberOfPeriodsIOS
-              ]
-            : promoCyclesYearly[
-                product.introductoryPriceCyclesAndroid ||
-                  product.introductoryPriceNumberOfPeriodsIOS
-              ];
-          setProduct({
-            type: 'promo',
-            offerType: isMonthly ? 'monthly' : 'yearly',
-            data: product,
-            cycleText: cycleText,
-          });
+          getPromo(promo.promoCode);
         } else {
           setProduct({
             type: 'monthly',
-            data: offers.monthly,
+            data: offers.monthly
           });
         }
         setProducts(products);
@@ -161,6 +147,26 @@ export const PremiumComponent = ({close, promo}) => {
     } catch (e) {
       console.log('error getting sku', e);
     }
+  };
+
+  const getPromo = productId => {
+    let product = products.find(p => p.productId === productId);
+    let isMonthly = product.productId.indexOf('.mo') > -1;
+    let cycleText = isMonthly
+      ? promoCyclesMonthly[
+          product.introductoryPriceCyclesAndroid ||
+            product.introductoryPriceNumberOfPeriodsIOS
+        ]
+      : promoCyclesYearly[
+          product.introductoryPriceCyclesAndroid ||
+            product.introductoryPriceNumberOfPeriodsIOS
+        ];
+    setProduct({
+      type: 'promo',
+      offerType: isMonthly ? 'monthly' : 'yearly',
+      data: product,
+      cycleText: cycleText
+    });
   };
 
   useEffect(() => {
@@ -186,7 +192,7 @@ export const PremiumComponent = ({close, promo}) => {
         null,
         null,
         null,
-        user.id,
+        user.id
       )
         .then(async r => {
           setBuying(false);
@@ -200,7 +206,7 @@ export const PremiumComponent = ({close, promo}) => {
             },
             icon: 'check',
             actionText: 'Continue',
-            noProgress: true,
+            noProgress: true
           });
         })
         .catch(e => {
@@ -217,14 +223,15 @@ export const PremiumComponent = ({close, promo}) => {
         backgroundColor: colors.bg,
         justifyContent: 'space-between',
         borderRadius: 10,
-        paddingTop: 10,
+        paddingTop: 10
       }}>
+      <Dialog context="local" />
       <Heading
         size={SIZE.xxxl}
         style={{
           paddingBottom: 20,
           paddingTop: 0,
-          alignSelf: 'center',
+          alignSelf: 'center'
         }}>
         Notesnook{' '}
         <Heading size={SIZE.xxxl} color={colors.accent}>
@@ -249,7 +256,7 @@ export const PremiumComponent = ({close, promo}) => {
         style={{
           padding: 5,
           borderRadius: 10,
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         {product?.type !== 'promo' ? (
           <View
@@ -257,13 +264,13 @@ export const PremiumComponent = ({close, promo}) => {
               flexDirection: 'row',
               alignItems: 'center',
               justifyContent: 'center',
-              marginBottom: 10,
+              marginBottom: 10
             }}>
             <Paragraph
               onPress={() => {
                 setProduct({
                   type: 'monthly',
-                  data: offers?.monthly,
+                  data: offers?.monthly
                 });
               }}
               style={{
@@ -271,7 +278,7 @@ export const PremiumComponent = ({close, promo}) => {
                 fontWeight: product?.type == 'monthly' ? 'bold' : 'normal',
                 paddingVertical: 15,
                 minWidth: 100,
-                textAlign: 'right',
+                textAlign: 'right'
               }}>
               Monthly
             </Paragraph>
@@ -282,7 +289,7 @@ export const PremiumComponent = ({close, promo}) => {
               onPress={() => {
                 setProduct({
                   type: 'yearly',
-                  data: offers?.yearly,
+                  data: offers?.yearly
                 });
               }}
               style={{
@@ -290,7 +297,7 @@ export const PremiumComponent = ({close, promo}) => {
                 fontWeight: product?.type == 'yearly' ? 'bold' : 'normal',
                 paddingVertical: 15,
                 minWidth: 100,
-                textAlign: 'left',
+                textAlign: 'left'
               }}>
               Yearly
             </Paragraph>
@@ -300,14 +307,14 @@ export const PremiumComponent = ({close, promo}) => {
             style={{
               paddingVertical: 15,
               alignSelf: 'center',
-              textAlign: 'center',
+              textAlign: 'center'
             }}
             size={SIZE.lg - 4}>
             {product.data.introductoryPrice}
             <Paragraph
               style={{
                 textDecorationLine: 'line-through',
-                color: colors.icon,
+                color: colors.icon
               }}
               size={SIZE.sm}>
               ({product.data.localizedPrice})
@@ -317,29 +324,77 @@ export const PremiumComponent = ({close, promo}) => {
         )}
 
         {product?.data ? (
-          <Button
-            onPress={buySubscription}
-            fontSize={SIZE.lg}
-            loading={buying}
-            title={
-              promo
-                ? promo.text
-                : user
-                ? `Subscribe for ${product?.data?.localizedPrice} / ${
-                    product.type === 'yearly' ? 'yr' : 'mo'
-                  }`
-                : 'Start Your 14 Day Free Trial'
-            }
-            type="accent"
-            height={60}
-            width="100%"
-          />
+          <>
+            <Button
+              onPress={buySubscription}
+              fontSize={SIZE.lg}
+              loading={buying}
+              title={
+                promo
+                  ? promo.text
+                  : user
+                  ? `Subscribe for ${product?.data?.localizedPrice} / ${
+                      product.type === 'yearly' ? 'yr' : 'mo'
+                    }`
+                  : 'Start Your 14 Day Free Trial'
+              }
+              type="accent"
+              height={60}
+              width="100%"
+            />
+            <Button
+              height={35}
+              style={{
+                marginTop: 10
+              }}
+              onPress={() => {
+                presentDialog({
+                  context: 'local',
+                  input: true,
+                  inputPlaceholder: 'Enter code',
+                  positiveText: 'Apply',
+                  positivePress: async value => {
+                    if (!value) return;
+                    try {
+                      let productId = await db.offers.getCode(
+                        value,
+                        Platform.OS
+                      );
+                      if (productId) {
+                        ToastEvent.show({
+                          heading: 'Discount applied!',
+                          type: 'success',
+                          context: 'local'
+                        });
+                      } else {
+                        ToastEvent.show({
+                          heading: 'Promo code invalid or expired',
+                          type: 'error',
+                          context: 'local'
+                        });
+                      }
+                    } catch (e) {
+                      ToastEvent.show({
+                        heading: 'Promo code invalid or expired',
+                        message: e.message,
+                        type: 'error',
+                        context: 'local'
+                      });
+                    }
+                  },
+                  title: 'Have a promo code?',
+                  paragraph: 'Enter your promo code to get a special discount.'
+                });
+              }}
+              title="I have a promo code"
+            />
+          </>
         ) : (
           <Paragraph
             color={colors.icon}
             style={{
               alignSelf: 'center',
-              height: 50,
+              height: 50
             }}>
             This subscription is unavailable at the moment
           </Paragraph>
@@ -352,7 +407,7 @@ export const PremiumComponent = ({close, promo}) => {
             style={{
               alignSelf: 'center',
               marginTop: 5,
-              textAlign: 'center',
+              textAlign: 'center'
             }}>
             Upon signing up, your 14 day free trial of Notesnook Pro will be
             activated automatically.{' '}
@@ -388,7 +443,7 @@ export const PremiumComponent = ({close, promo}) => {
                 style={{
                   alignSelf: 'center',
                   marginTop: 10,
-                  textAlign: 'center',
+                  textAlign: 'center'
                 }}>
                 By tapping Subscribe,
                 <Paragraph size={SIZE.xs + 1} color={colors.accent}>
@@ -409,7 +464,7 @@ export const PremiumComponent = ({close, promo}) => {
                 style={{
                   alignSelf: 'center',
                   marginTop: 10,
-                  textAlign: 'center',
+                  textAlign: 'center'
                 }}>
                 By tapping Subscribe, your payment will be charged on your
                 Google Account, and your subscription will automatically renew
@@ -426,14 +481,14 @@ export const PremiumComponent = ({close, promo}) => {
                 paddingVertical: 10,
                 marginTop: 5,
                 borderRadius: 5,
-                paddingHorizontal: 12,
+                paddingHorizontal: 12
               }}>
               <Paragraph
                 size={SIZE.xs + 1}
                 color={colors.icon}
                 style={{
                   maxWidth: '100%',
-                  textAlign: 'center',
+                  textAlign: 'center'
                 }}>
                 By subscribing, you agree to our{' '}
                 <Paragraph
@@ -483,13 +538,13 @@ const RenderItem = React.memo(
           paddingVertical: 5,
           marginBottom: 10,
           width: '100%',
-          backgroundColor: colors.bg,
+          backgroundColor: colors.bg
         }}>
         <View
           style={{
             width: '95%',
             alignItems: 'center',
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}>
           <SvgToPngView
             src={item.icon(colors.accent)}
@@ -504,7 +559,7 @@ const RenderItem = React.memo(
             style={{
               textAlign: 'center',
               alignSelf: 'center',
-              marginTop: 10,
+              marginTop: 10
             }}>
             {item.title}
           </Heading>
@@ -517,7 +572,7 @@ const RenderItem = React.memo(
               fontWeight: 'normal',
               textAlign: 'center',
               alignSelf: 'center',
-              maxWidth: '80%',
+              maxWidth: '80%'
             }}>
             {item.description}
           </Paragraph>
@@ -525,5 +580,5 @@ const RenderItem = React.memo(
       </View>
     );
   },
-  () => true,
+  () => true
 );
