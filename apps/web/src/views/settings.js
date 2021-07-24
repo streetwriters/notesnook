@@ -163,8 +163,7 @@ function Settings(props) {
           <AccountStatus user={user} />
         ) : (
           <Flex
-            bg="shade"
-            p={2}
+            p={1}
             sx={{ borderRadius: "default", cursor: "pointer" }}
             onClick={async () => {
               await showLogInDialog();
@@ -178,18 +177,18 @@ function Settings(props) {
               <Flex>
                 <Flex
                   variant="columnCenter"
-                  bg="primary"
+                  bg="shade"
                   mr={2}
                   size={35}
                   sx={{
                     borderRadius: 80,
                   }}
                 >
-                  <Icon.User size={20} color="static" />
+                  <Icon.User size={20} color="primary" />
                 </Flex>
                 <Flex variant="columnCenter" alignItems="flex-start">
                   <Text variant="subBody">You are not logged in</Text>
-                  <Text variant="body" color="primary" fontSize={"body"}>
+                  <Text variant="body" fontSize={"body"}>
                     Login to sync your notes
                   </Text>
                 </Flex>
