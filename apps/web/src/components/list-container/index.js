@@ -54,7 +54,7 @@ function ListContainer(props) {
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
               totalCount={items.length}
-              overscan={10}
+              // overscan={10}
               components={{
                 Scroller: CustomScrollbarsVirtualList,
                 Header: () =>
