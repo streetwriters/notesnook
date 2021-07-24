@@ -183,13 +183,15 @@ class Database {
 
   /**
    *
-   * @param {{AUTH_HOST: string, API_HOST: string, SSE_HOST: string}} hosts
+   * @param {{AUTH_HOST: string, API_HOST: string, SSE_HOST: string, SUBSCRIPTIONS_HOST: string}} hosts
    */
   host(hosts) {
     if (process.env.NODE_ENV !== "production") {
       Constants.AUTH_HOST = hosts.AUTH_HOST || Constants.AUTH_HOST;
       Constants.API_HOST = hosts.API_HOST || Constants.API_HOST;
       Constants.SSE_HOST = hosts.SSE_HOST || Constants.SSE_HOST;
+      Constants.SUBSCRIPTIONS_HOST =
+        hosts.SUBSCRIPTIONS_HOST || Constants.SUBSCRIPTIONS_HOST;
     }
   }
 
