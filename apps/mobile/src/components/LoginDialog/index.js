@@ -747,7 +747,7 @@ const LoginDialog = () => {
                 style={{
                   flexShrink: 1
                 }}>
-                <Heading size={SIZE.md}>{status}Logging in</Heading>
+                <Heading size={SIZE.md}>{status}</Heading>
                 <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
                   {current.loading}{' '}
                   {!current.showLoader ? null : (

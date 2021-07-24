@@ -1,17 +1,17 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {editing} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorWebView, textInput} from '../../views/Editor/Functions';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { editing } from '../../utils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView, textInput } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import {focusEditor} from '../../views/Editor/tiny/toolbar/constants';
-import {Toast} from '../Toast';
-import {GetPremium} from './GetPremium';
+import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { Toast } from '../Toast';
+import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -21,7 +21,7 @@ const ActionSheetWrapper = ({
   onOpen,
   closeOnTouchBackdrop = true,
   onHasReachedTop,
-  keyboardMode,
+  keyboardMode
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -29,7 +29,6 @@ const ActionSheetWrapper = ({
   const largeTablet = deviceMode === 'tablet';
   const smallTablet = deviceMode === 'smallTablet';
   const dimensions = useSettingStore(state => state.dimensions);
-
   const insets = useSafeAreaInsets();
 
   let width = dimensions.width > 600 ? 600 : 500;
@@ -44,6 +43,8 @@ const ActionSheetWrapper = ({
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
       alignSelf: 'center',
+      borderBottomRight: 0,
+      borderBottomLeft: 0
     };
   }, [colors.bg, gestureEnabled]);
 
