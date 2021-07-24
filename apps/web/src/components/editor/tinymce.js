@@ -209,7 +209,18 @@ function TinyMCE(props) {
         browser_spellcheck: true,
         inline: true,
         fixed_toolbar_container: "#editorToolbar",
-        autoresize_bottom_margin: 100,
+        paste_postprocess: function (_, args) {
+          const { node } = args;
+          if (node.childNodes) {
+            for (let childNode of node.childNodes) {
+              if (childNode.tagName === "PRE") {
+                childNode.className = "hljs";
+                const code = childNode.textContent || childNode.innerText;
+                childNode.innerHTML = code;
+              }
+            }
+          }
+        },
       }}
       onBeforeExecCommand={async (command) => {
         if (
