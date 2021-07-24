@@ -843,18 +843,22 @@ function Header(props) {
       sx={{ borderRadius: "default", cursor: "pointer" }}
       bg="bgSecondary"
       mt={2}
-      p={"8px"}
+      p={2}
       justifyContent="space-between"
       onClick={onClick}
     >
       <Text
-        variant="title"
+        variant="subtitle"
         fontWeight="body"
         color={isOpen ? "primary" : "text"}
       >
         {title}
       </Text>
-      {isOpen ? <Icon.ChevronUp color="primary" /> : <Icon.ChevronDown />}
+      {isOpen ? (
+        <Icon.ChevronUp size={19} color="primary" />
+      ) : (
+        <Icon.ChevronDown size={19} />
+      )}
     </Flex>
   );
 }
