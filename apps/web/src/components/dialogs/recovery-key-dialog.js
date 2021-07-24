@@ -40,7 +40,7 @@ function RecoveryKeyDialog(props) {
   }, []);
 
   return (
-    <Dialog isOpen={true} title="Backup Recovery Key">
+    <Dialog isOpen={true} title="Backup your recovery key">
       <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
           <Text

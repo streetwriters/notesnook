@@ -231,7 +231,7 @@ const menuItems = [
   },
   {
     key: "movetotrash",
-    title: () => "Move to Trash",
+    title: () => "Move to trash",
     color: "red",
     icon: Icon.Trash,
     disabled: ({ note }) => db.monographs.isPublished(note.id),
