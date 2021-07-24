@@ -10,6 +10,7 @@ import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import ToggleSwitch from 'toggle-switch-react-native';
 
 export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   const [state, dispatch] = useTracked();
@@ -25,12 +26,12 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
       Navigation.navigate(
         item.name,
         {
-          menu: true,
+          menu: true
         },
         {
           heading: item.name,
-          id: item.name.toLowerCase() + '_navigation',
-        },
+          id: item.name.toLowerCase() + '_navigation'
+        }
       );
     }
     if (item.close) {
@@ -60,7 +61,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
       onPress={_onPress}
       type={!isFocused ? 'gray' : 'grayBg'}
       customStyle={{
-        width:'100%',
+        width: '100%',
         alignSelf: 'center',
         borderRadius: 5,
         flexDirection: 'row',
@@ -68,20 +69,20 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         height: normalize(50),
-        marginBottom:5
+        marginBottom: 5
       }}>
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         <Icon
           style={{
             width: 30,
             textAlignVertical: 'center',
-            textAlign: 'left',
+            textAlign: 'left'
           }}
-          name={ item.icon}
+          name={item.icon}
           color={isFocused ? colors.accent : colors.pri}
           size={SIZE.lg - 2}
         />
@@ -90,17 +91,18 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
             {item.name}
           </Heading>
         ) : (
-          <Paragraph size={SIZE.md}>
-            {item.name}
-          </Paragraph>
+          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
         )}
       </View>
 
       {item.switch ? (
-        <Icon
-          size={SIZE.lg}
-          color={item.on ? colors.accent : colors.icon}
-          name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
+        <ToggleSwitch
+          isOn={item.on}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={_onPress}
         />
       ) : rightBtn ? (
         <Button
@@ -112,7 +114,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
           icon={rightBtn.icon}
           style={{
             borderRadius: 100,
-            paddingHorizontal: 16,
+            paddingHorizontal: 16
           }}
           onPress={rightBtn.func}
         />
