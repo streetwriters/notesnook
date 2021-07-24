@@ -18,6 +18,7 @@ import {Actions} from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
+  useSettingStore,
   useTrashStore,
   useUserStore
 } from '../../provider/stores';
@@ -79,6 +80,7 @@ export const ActionSheetComponent = ({
   const user = useUserStore(state => state.user);
   const lastSynced = useUserStore(state => state.lastSynced);
   const [notifPinned, setNotifPinned] = useState(null);
+  const dimensions = useSettingStore(state => state.dimensions);
 
   const refreshing = false;
   const isPublished = db.monographs.isPublished(note.id);
@@ -637,7 +639,9 @@ export const ActionSheetComponent = ({
     }
   ];
 
-  let columnItemWidth = DDS.isTab ? (400 - 24) / rowItems.length : (w - 24) / 5;
+  let width = dimensions.width > 600 ? 600 : 500;
+  let columnItemWidth = DDS.isTab ? (width - 24) / 5 : (w - 24) / 5;
+
   const _renderRowItem = rowItem => (
     <View
       onPress={rowItem.func}

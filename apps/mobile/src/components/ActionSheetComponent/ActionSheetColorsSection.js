@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
-import { useMenuStore } from '../../provider/stores';
+import { useMenuStore, useSettingStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -16,6 +16,7 @@ import { PressableButton } from '../PressableButton';
 export const ActionSheetColorsSection = ({item, close}) => {
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore(state => state.setColorNotes)
+  const dimensions = useSettingStore(state => state.dimensions);
   const localRefresh = () => {
     toAdd = db.notes.note(note.id);
     if (toAdd) {
@@ -31,11 +32,15 @@ export const ActionSheetColorsSection = ({item, close}) => {
     setNote({...toAdd});
   };
 
+  let width = dimensions.width > 600 ? 600 : 500;
+
   const _renderColor = (c) => {
     const color = {
       name: c,
       value: COLORS_NOTE[c],
     };
+
+
 
     return (
       <PressableButton
@@ -60,8 +65,8 @@ export const ActionSheetColorsSection = ({item, close}) => {
           eSendEvent(refreshNotesPage);
         }}
         customStyle={{
-          width: DDS.isTab ? 400 / 10 : dWidth / 9,
-          height: DDS.isTab ? 400 / 10 : dWidth / 9,
+          width: DDS.isTab ? width / 12 : dWidth / 9,
+          height: DDS.isTab ? width / 12 : dWidth / 9,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center',
