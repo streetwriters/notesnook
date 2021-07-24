@@ -31,7 +31,10 @@ function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
       py="2px"
     >
       <Icon size={11} color={styles?.icon?.color} sx={{ ...styles?.icon }} />
-      <Text variant="body" p={0} fontSize={11} ml={"2px"}>
+      <Text
+        variant="body"
+        sx={{ fontSize: 11, ml: "2px", p: 0, ...styles?.text }}
+      >
         {text}
       </Text>
     </Flex>

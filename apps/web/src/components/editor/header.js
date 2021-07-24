@@ -27,11 +27,7 @@ function Header() {
       />
 
       {id && (
-        <Flex
-          alignItems="flex-start"
-          justifyContent="flex-start"
-          flexWrap="wrap"
-        >
+        <Flex alignItems="center" flexWrap="wrap">
           {tags.map((tag) => (
             <IconTag
               testId={`tag-${tag}`}
@@ -40,10 +36,11 @@ function Header() {
               icon={Icon.Tag}
               title={`Click to remove`}
               onClick={() => setTag(tag)}
-              styles={{ container: { mb: 1 } }}
+              styles={{ container: { mb: 1 }, text: { fontSize: "body" } }}
             />
           ))}
           <Autosuggest
+            sx={{ ml: 1 }}
             getData={() => db.tags.all}
             getFields={(item) => [item.title, item.alias]}
             limit={5}
@@ -113,6 +110,7 @@ function Autosuggest({
         sx={{ width: "auto", border: "none", p: 0 }}
         placeholder="Add a tag..."
         data-test-id="editor-tag-input"
+        fontSize="body"
         onChange={(e) => {
           const { value } = e.target;
           if (!value.length) {
