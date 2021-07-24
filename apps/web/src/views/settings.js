@@ -400,7 +400,20 @@ function Settings(props) {
                 tip="Restore data from a backup file"
               />
             </Button>
-
+            <Button
+              key={"importer"}
+              variant="list"
+              onClick={() => {
+                openLink("https://importer.notesnook.com/", "_blank");
+              }}
+            >
+              <Tip
+                text={"Import from other apps"}
+                tip={
+                  "Import all your notes from other note taking apps with Notesnook Importer."
+                }
+              />
+            </Button>
             <Toggle
               title="Encrypt backups"
               onTip="All backup files will be encrypted"
