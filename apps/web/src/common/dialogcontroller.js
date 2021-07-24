@@ -14,6 +14,7 @@ import download from "../utils/download";
 import { zip } from "../utils/zip";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
+import { toTitleCase } from "../utils/string";
 
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
@@ -566,6 +567,26 @@ export function showEditTagDialog(tagId) {
         await db.tags.rename(tagId, title);
         showToast("success", "Tag edited!");
         tagStore.refresh();
+        perform(true);
+      }}
+    />
+  ));
+}
+
+export function showRenameColorDialog(colorId) {
+  const color = db.colors.tag(colorId);
+  if (!color) return;
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ItemDialog
+      title={"Rename color"}
+      subtitle={`You are renaming color ${toTitleCase(color.title)}.`}
+      item={color}
+      onClose={() => perform(false)}
+      onAction={async (title) => {
+        if (!title) return;
+        await db.colors.rename(colorId, title);
+        showToast("success", "Color renamed!");
+        appStore.refreshColors();
         perform(true);
       }}
     />

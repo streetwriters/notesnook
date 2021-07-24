@@ -12,6 +12,7 @@ import { COLORS } from "../../common";
 import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
 import { useLocation } from "wouter";
+import { showRenameColorDialog } from "../../common/dialog-controller";
 
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
@@ -135,12 +136,24 @@ function NavigationMenu(props) {
         {colors.map((color) => (
           <NavigationItem
             key={color.id}
-            title={toTitleCase(color.title)}
+            title={toTitleCase(color.alias || color.title)}
             icon={Icon.Circle}
             selected={location === `/colors/${color.id}`}
             color={COLORS[color.title]}
             onClick={() => {
               navigate(`/colors/${color.id}`);
+            }}
+            menu={{
+              items: [
+                {
+                  key: "rename",
+                  title: () => "Rename color",
+                  onClick: async ({ color }) => {
+                    await showRenameColorDialog(color.id);
+                  },
+                },
+              ],
+              extraData: { color },
             }}
           />
         ))}
