@@ -31,7 +31,6 @@ import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import GroupHeader from "../components/group-header";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -77,15 +76,20 @@ function subscriptionStatusToString(user) {
 
 const otherItems = [
   {
-    title: "Terms of Service",
+    title: "Terms of service",
     description: "Read our terms of service.",
     link: "https://notesnook.com/tos",
   },
   {
-    title: "Privacy Policy",
+    title: "Privacy policy",
     description:
       "We do not share, sell, read, or use your data. Read our privacy policy.",
     link: "https://notesnook.com/privacy",
+  },
+  {
+    title: "Report an issue",
+    description: "Facing an issue? Report it on our Github Repo.",
+    link: "https://github.com/streetwriters/notesnook/issues/new",
   },
   {
     title: "Join our Discord community",
@@ -94,9 +98,19 @@ const otherItems = [
     link: "https://discord.com/invite/zQBK97EE22",
   },
   {
-    title: "Use Notesnook on Mobile",
+    title: "Download for iOS & Android",
     description: "Notesnook is available on Android & iOS",
     link: "https://notesnook.com/",
+  },
+  {
+    title: "Documentation",
+    description: "Learn about every feature in Notesnook and how it works",
+    link: "https://docs.notesnook.com/",
+  },
+  {
+    title: "Roadmap",
+    description: "See what the future of Notesnook is going to be like!",
+    link: "https://docs.notesnook.com/roadmap",
   },
 ];
 
