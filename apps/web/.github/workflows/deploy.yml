@@ -17,11 +17,10 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      - uses: actions/checkout@v2
-
-      - uses: actions/setup-dotnet@v1
+      - name: Check out Git repository
+        uses: actions/checkout@v2 # If you're using actions/checkout@v2 you must set persist-credentials to false in most cases for the deployment to work correctly.
         with:
-          dotnet-version: 5.0.x
+          persist-credentials: false
 
       - name: Use Node.js 15.x
         uses: actions/setup-node@v2.1.5
