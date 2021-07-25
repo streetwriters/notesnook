@@ -134,12 +134,9 @@ class AppStore extends BaseStore {
         return await this.refresh();
       })
       .catch(async (err) => {
+        showToast("error", err.message);
         console.error(err);
         if (err.code === "MERGE_CONFLICT") await this.refresh();
-        else {
-          showToast("error", err.message);
-          console.error(err);
-        }
       })
       .finally(() => {
         this.set((state) => (state.isSyncing = false));
