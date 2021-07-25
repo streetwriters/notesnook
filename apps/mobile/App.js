@@ -65,6 +65,12 @@ const loadDatabase = async () => {
         timestamp: Date.now() + 86400000 * 2
       })
     );
+    await MMKV.setItem(
+      'askForBackup',
+      JSON.stringify({
+        timestamp: Date.now() + 86400000 * 3
+      })
+    );
   }
 };
 

@@ -404,9 +404,7 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
           {title}
         </Paragraph>
       ) : (
-        <Heading
-          size={SIZE.md + 1}
-          color={colors.accent}>
+        <Heading size={SIZE.md + 1} color={colors.accent}>
           {title}
         </Heading>
       )}
@@ -1651,57 +1649,78 @@ const SettingsPrivacyAndSecurity = () => {
   );
 };
 
-const SettingsBackupAndRestore = () => {
+export const SettingsBackupAndRestore = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
 
-  const [collapsed, setCollapsed] = useState(true);
+  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+
+  const optItems = isSheet
+    ? []
+    : [
+        {
+          name: 'Restore backup',
+          func: async () => {
+            if (isSheet) {
+              eSendEvent(eCloseProgressDialog);
+              await sleep(300);
+            }
+            eSendEvent(eOpenRestoreDialog);
+          },
+          desc: 'Restore backup from phone storage.'
+        },
+        {
+          name: 'Import notes from other note apps',
+          desc: 'Get all your notes in one place with Notesnook Importer.',
+          func: async () => {
+            if (isSheet) {
+              eSendEvent(eCloseProgressDialog);
+              await sleep(300);
+            }
+            eSendEvent(eOpenProgressDialog, {
+              title: 'Notesnook Importer',
+              icon: 'import',
+              noProgress: true,
+              action: async () => {
+                try {
+                  await openLinkInBrowser(
+                    'https://importer.notesnook.com',
+                    colors
+                  );
+                } catch (e) {}
+              },
+              actionText: 'Go to Notesnook Importer',
+              learnMore: 'Learn how this works',
+              learnMorePress: async () => {
+                try {
+                  await openLinkInBrowser(
+                    'https://docs.notesnook.com/importing/notesnook-importer/',
+                    colors
+                  );
+                } catch (e) {}
+              },
+              paragraph:
+                'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.'
+            });
+          },
+          new: true
+        }
+      ];
   const backupItemsList = [
     {
-      name: 'Backup data',
+      name: 'Backup now',
       func: async () => {
+        if (isSheet) {
+          eSendEvent(eCloseProgressDialog);
+          await sleep(300);
+        }
         await Backup.run();
       },
       desc: 'Backup your data to phone storage'
     },
-    {
-      name: 'Restore backup',
-      func: () => {
-        eSendEvent(eOpenRestoreDialog);
-      },
-      desc: 'Restore backup from phone storage.'
-    },
-    {
-      name: 'Import notes from other note apps',
-      desc: 'Get all your notes in one place with Notesnook Importer.',
-      func: () => {
-        eSendEvent(eOpenProgressDialog, {
-          title: 'Notesnook Importer',
-          icon: 'import',
-          noProgress: true,
-          action: async () => {
-            try {
-              await openLinkInBrowser('https://importer.notesnook.com', colors);
-            } catch (e) {}
-          },
-          actionText: 'Go to Notesnook Importer',
-          learnMore: 'Learn how this works',
-          learnMorePress: async () => {
-            try {
-              await openLinkInBrowser(
-                'https://docs.notesnook.com/importing/notesnook-importer/',
-                colors
-              );
-            } catch (e) {}
-          },
-          paragraph:
-            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.'
-        });
-      },
-      new: true
-    }
+    ...optItems
   ];
 
   const toggleEncryptedBackups = async () => {
@@ -1719,13 +1738,24 @@ const SettingsBackupAndRestore = () => {
     await SettingsService.set('encryptedBackup', !settings.encryptedBackup);
   };
 
+  const updateAskForBackup = async () => {
+    await MMKV.setItem(
+      'askForBackup',
+      JSON.stringify({
+        timestamp: Date.now() + 86400000 * 3
+      })
+    );
+  }
+
   return (
     <>
-      <SectionHeader
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        title="Backup & restore"
-      />
+      {!isSheet && (
+        <SectionHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          title="Backup & restore"
+        />
+      )}
 
       {!collapsed && (
         <>
@@ -1758,7 +1788,7 @@ const SettingsBackupAndRestore = () => {
                   textAlignVertical: 'center',
                   maxWidth: '100%'
                 }}>
-                Auto Backup
+                Automatic backups
               </Paragraph>
               <Paragraph color={colors.icon} size={SIZE.sm}>
                 Backup your data automatically.
@@ -1792,6 +1822,7 @@ const SettingsBackupAndRestore = () => {
                   onPress={async () => {
                     if (item.value === 'off') {
                       await SettingsService.set('reminder', item.value);
+                
                     } else {
                       await PremiumService.verify(async () => {
                         if (Platform.OS === 'android') {
@@ -1811,6 +1842,7 @@ const SettingsBackupAndRestore = () => {
                         //await Backup.run();
                       });
                     }
+                    updateAskForBackup();
                   }}
                   key={item.value}
                   style={{
@@ -1835,21 +1867,23 @@ const SettingsBackupAndRestore = () => {
             </View>
           </View>
 
-          <CustomButton
-            title="Backup encryption"
-            tagline="Encrypt all your backups."
-            onPress={toggleEncryptedBackups}
-            customComponent={
-              <ToggleSwitch
-                isOn={settings.encryptedBackup}
-                onColor={colors.accent}
-                offColor={colors.icon}
-                size="small"
-                animationSpeed={150}
-                onToggle={toggleEncryptedBackups}
-              />
-            }
-          />
+          {!isSheet && (
+            <CustomButton
+              title="Backup encryption"
+              tagline="Encrypt all your backups."
+              onPress={toggleEncryptedBackups}
+              customComponent={
+                <ToggleSwitch
+                  isOn={settings.encryptedBackup}
+                  onColor={colors.accent}
+                  offColor={colors.icon}
+                  size="small"
+                  animationSpeed={150}
+                  onToggle={toggleEncryptedBackups}
+                />
+              }
+            />
+          )}
         </>
       )}
     </>

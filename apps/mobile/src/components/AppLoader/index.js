@@ -6,8 +6,10 @@ import {useTracked} from '../../provider';
 import {
   useFavoriteStore,
   useNoteStore,
+  useSettingStore,
   useUserStore
 } from '../../provider/stores';
+import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
 import {DDS} from '../../services/DeviceDetection';
 import {
@@ -17,11 +19,16 @@ import {
 } from '../../services/EventManager';
 import {editing} from '../../utils';
 import {db} from '../../utils/DB';
-import {eOpenLoginDialog, eOpenRateDialog} from '../../utils/Events';
+import {
+  eOpenLoginDialog,
+  eOpenProgressDialog,
+  eOpenRateDialog
+} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import {SettingsBackupAndRestore} from '../../views/Settings';
 import {Button} from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
@@ -84,9 +91,14 @@ const AppLoader = ({onLoad}) => {
     setNotes();
     setFavorites();
     _setLoading(false);
-    await sleep(1000);
+    await sleep(2000);
     if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
       eSendEvent(eOpenLoginDialog, 4);
+      return;
+    }
+    let settingsStore = useSettingStore.getState();
+    if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
+      await Backup.checkAndRun();
       return;
     }
     let askForRating = await MMKV.getItem('askForRating');
@@ -94,6 +106,26 @@ const AppLoader = ({onLoad}) => {
       askForRating = JSON.parse(askForRating);
       if (askForRating?.timestamp < Date.now()) {
         eSendEvent(eOpenRateDialog);
+        return;
+      }
+    }
+
+    let askForBackup = await MMKV.getItem('askForBackup');
+    if (
+      (settingsStore.settings.reminder === 'off' ||
+        !settingsStore.settings.reminder)
+    ) {
+      askForBackup = JSON.parse(askForBackup);
+
+      if (askForBackup?.timestamp < Date.now()) {
+        eSendEvent(eOpenProgressDialog, {
+          title: 'Backup & restore',
+          paragraph: 'Please enable automatic backups to keep your data safe',
+          noProgress: true,
+          noIcon: true,
+          component: <SettingsBackupAndRestore isSheet={true} />
+        });
+        return;
       }
     }
   };

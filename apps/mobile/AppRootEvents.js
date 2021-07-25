@@ -182,7 +182,6 @@ export const AppRootEvents = React.memo(
               await onEmailVerified();
             }
             await setCurrentUser();
-            await Backup.checkAndRun();
             let version = await db.version();
             if (version.mobile > APP_VERSION) {
               eSendEvent('updateDialog', ver);
