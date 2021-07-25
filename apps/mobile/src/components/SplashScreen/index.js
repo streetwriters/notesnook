@@ -9,12 +9,15 @@ import {
   NOTE_SVG,
   ORGANIZE_SVG,
   PRIVACY_SVG,
-  SYNC_SVG,
+  RICH_TEXT_SVG,
+  SYNC_SVG
 } from '../../assets/images/assets';
 import {useTracked} from '../../provider';
 import {useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import {dHeight, dWidth, getElevation} from '../../utils';
+import {eOpenLoginDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
@@ -28,31 +31,39 @@ const features = [
     title: 'Notesnook',
     description: 'A safe place to write and stay organized.',
     icon: require('../../assets/images/notesnook-logo-png.png'),
-    type: 'image',
+    type: 'image'
   },
   {
-    title: 'Made to protect your privacy',
+    title: '100% end-to-end encrypted',
     description:
-      'Your data is encrypted on your device. No one but you can read your notes.',
+      'Your data is encrypted on your device. No one except you can read your notes.',
     icon: PRIVACY_SVG,
-    link: 'https://notesnook.com',
-    img: 'privacy',
+    link: 'https://docs.notesnook.com/how-is-my-data-encrypted/',
+    img: 'privacy'
   },
   {
     icon: SYNC_SVG,
-    title: 'While keeping you in sync',
+    title: 'Sync to unlimited devices',
     description:
-      'Everything is automatically synced to all your devices in a safe and secure way. Notesnook is available on all major platforms.',
+      'You can download Notesnook on your laptop/pc, tablet and mobile. Your notes are with you where ever you go.',
     link: 'https://notesnook.com',
-    img: 'sync',
+    img: 'sync'
+  },
+  {
+    icon: RICH_TEXT_SVG,
+    title: 'Write better. Faster. Smarter.',
+    description:
+      'Edit your notes the way you want. You can add images, videos, tables and so much more.',
+    link: 'https://notesnook.com',
+    img: 'sync'
   },
   {
     icon: ORGANIZE_SVG,
-    title: 'And helping you stay organized',
+    title: 'Organize to remember, not to put away',
     description:
-      'Add your notes in notebooks and topics or simply assign tags or colors to find them easily.',
+      'With notebooks, tags and colors you can find your notes easily.',
     link: 'https://notesnook.com',
-    img: 'sync',
+    img: 'sync'
   },
   {
     icon: COMMUNITY_SVG,
@@ -60,8 +71,8 @@ const features = [
     description:
       'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
     link: 'https://discord.gg/zQBK97EE22',
-    img: 'community',
-  },
+    img: 'community'
+  }
 ];
 let currentIndex = 0;
 const SplashScreen = () => {
@@ -81,12 +92,12 @@ const SplashScreen = () => {
         timing(opacity, {
           toValue: 1,
           duration: 500,
-          easing: Easing.in(Easing.ease),
+          easing: Easing.in(Easing.ease)
         }).start();
         timing(translateY, {
           toValue: 0,
           duration: 500,
-          easing: Easing.in(Easing.ease),
+          easing: Easing.in(Easing.ease)
         }).start();
       }, 15);
     }
@@ -96,7 +107,7 @@ const SplashScreen = () => {
     timing(translateY2, {
       toValue: dHeight * 2,
       duration: 500,
-      easing: Easing.in(Easing.ease),
+      easing: Easing.in(Easing.ease)
     }).start();
     await sleep(500);
     setIntroCompleted(true);
@@ -114,15 +125,15 @@ const SplashScreen = () => {
           backgroundColor: colors.bg,
           transform: [
             {
-              translateY: translateY2,
-            },
-          ],
+              translateY: translateY2
+            }
+          ]
         }}>
         <SafeAreaView
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: colors.bg,
+            backgroundColor: colors.bg
           }}>
           <Animated.View
             style={{
@@ -131,7 +142,7 @@ const SplashScreen = () => {
               justifyContent: 'center',
               alignItems: 'center',
               padding: 12,
-              opacity: opacity,
+              opacity: opacity
             }}>
             <View>
               <Carousel
@@ -148,27 +159,27 @@ const SplashScreen = () => {
                   <View
                     style={{
                       height: '100%',
-                      justifyContent: 'center',
+                      justifyContent: 'center'
                     }}>
                     <View
                       key={item.description}
                       style={{
                         paddingVertical: 5,
                         marginBottom: 10,
-                        alignSelf: 'center',
+                        alignSelf: 'center'
                       }}>
                       <View
                         style={{
                           flexWrap: 'wrap',
                           width: '100%',
-                          alignItems: 'center',
+                          alignItems: 'center'
                         }}>
                         {item.type === 'image' ? (
                           <Image
                             source={item.icon}
                             style={{
                               width: 170,
-                              height: 170,
+                              height: 170
                             }}
                           />
                         ) : item.type === 'icon' ? (
@@ -197,7 +208,7 @@ const SplashScreen = () => {
                             style={{
                               textAlign: 'center',
                               alignSelf: 'center',
-                              marginTop: 10,
+                              marginTop: 10
                             }}>
                             {item.title}
                           </Heading>
@@ -212,7 +223,7 @@ const SplashScreen = () => {
                               fontWeight: 'normal',
                               textAlign: 'center',
                               alignSelf: 'center',
-                              maxWidth: DDS.isTab ? 350 : '80%',
+                              maxWidth: DDS.isTab ? 350 : '80%'
                             }}>
                             {item.description}
                           </Paragraph>
@@ -242,35 +253,63 @@ const SplashScreen = () => {
               style={{
                 width: '100%',
                 position: 'absolute',
-                bottom: 25,
+                bottom: 25
               }}>
               <Button
                 fontSize={SIZE.md}
                 height={50}
-                width={isNext ? null : DDS.isTab ? 250 : '100%'}
+                width={DDS.isTab ? 350 : '100%'}
                 onPress={async () => {
                   if (isNext) {
                     carouselRef.current?.snapToItem(
                       currentIndex + 1,
                       true,
-                      true,
+                      true
                     );
                     currentIndex++;
-                    if (currentIndex === 4) {
+                    if (currentIndex === 5) {
                       setIsNext(false);
                     }
                   } else {
                     await hide();
                     await Storage.write('introCompleted', 'true');
+                    await sleep(300);
+                    eSendEvent(eOpenLoginDialog, 1);
                   }
                 }}
                 style={{
                   paddingHorizontal: 24,
-                  alignSelf: !isNext ? 'center' : 'flex-end',
+                  alignSelf: !isNext ? 'center' : 'flex-end'
                 }}
                 type="accent"
-                title={isNext ? 'Next' : 'Start taking notes'}
+                title={isNext ? 'Next' : 'Start your 14 day free trial'}
               />
+              <Paragraph
+                style={{
+                  alignSelf: 'center',
+                  marginTop: 5
+                }}>
+                (no credit card required)
+              </Paragraph>
+
+              {isNext ? null : (
+                <Button
+                  fontSize={SIZE.md}
+                  height={50}
+                  width={DDS.isTab ? 350 : '100%'}
+                  onPress={async () => {
+                    await hide();
+                    await Storage.write('introCompleted', 'true');
+                  }}
+                  style={{
+                    paddingHorizontal: 24,
+                    alignSelf: !isNext ? 'center' : 'flex-end',
+                    marginTop: 10
+                  }}
+                  type="inverted"
+                  title="I want to try the app first"
+                />
+              )}
             </View>
           </Animated.View>
         </SafeAreaView>
