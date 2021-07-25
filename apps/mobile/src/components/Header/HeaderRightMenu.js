@@ -1,16 +1,14 @@
-import React, {useRef} from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import Navigation from '../../services/Navigation';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import React, { useRef } from 'react';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { useSettingStore, useUserStore } from '../../provider/stores';
+import Navigation from '../../services/Navigation';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 
 export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const [state] = useTracked();
@@ -41,11 +39,12 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
-          type="shade"
+          type="accent"
           style={{
             marginLeft: 20,
-            width: 50,
-            height: 35,
+            width: 40,
+            height: 40,
+            borderRadius:100
           }}
         />
       ) : null}
