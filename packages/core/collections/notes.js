@@ -55,7 +55,7 @@ export default class Notes extends Collection {
     if (!oldNote && !noteArg.content && !noteArg.contentId) return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
-      const { type, data, conflicted, resolved } = noteArg.content;
+      const { type, data, conflicted, dateEdited, remote } = noteArg.content;
 
       let content = getContentFromData(type, data);
       if (!content) throw new Error("Invalid content type.");
@@ -75,9 +75,10 @@ export default class Notes extends Collection {
         id: note.contentId,
         type,
         data,
-        conflicted,
-        resolved,
+        remote,
         localOnly: !!note.localOnly,
+        dateEdited,
+        conflicted,
       });
     }
 
@@ -93,9 +94,8 @@ export default class Notes extends Collection {
       color: note.color,
       tags: note.tags || [],
       favorite: !!note.favorite,
-      dateCreated: note.dateCreated,
-      conflicted: !!note.conflicted,
       localOnly: !!note.localOnly,
+      conflicted: !!note.conflicted,
     };
 
     if (!oldNote || oldNote.deleted) {

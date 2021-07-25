@@ -53,10 +53,8 @@ class Merger {
     remoteItem = await this._deserialize(remoteItem);
     if (!localItem) {
       await add(remoteItem);
-    } else if (!localItem.resolved && localItem.dateEdited > this._lastSynced) {
+    } else if (localItem.dateEdited > this._lastSynced) {
       await resolve(localItem, remoteItem);
-    } else if (localItem.resolved) {
-      await add({ ...localItem, resolved: false });
     } else {
       await add(remoteItem);
     }

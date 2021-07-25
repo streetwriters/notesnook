@@ -21,12 +21,11 @@ export default class Content extends Collection {
       id,
       type: content.type,
       data: content.data || content,
-      conflicted: content.conflicted || false,
-      resolved: !!content.resolved,
       dateEdited: content.dateEdited,
       dateCreated: content.dateCreated,
       remote: content.remote,
       localOnly: !!content.localOnly,
+      conflicted: content.conflicted,
     });
     return id;
   }
