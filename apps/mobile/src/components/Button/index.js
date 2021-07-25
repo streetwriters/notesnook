@@ -16,7 +16,7 @@ export const Button = ({
   width = null,
   onPress = () => {},
   loading = false,
-  title = '',
+  title = null,
   icon,
   fontSize = SIZE.sm,
   type = 'transparent',
