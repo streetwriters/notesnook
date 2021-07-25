@@ -4,6 +4,7 @@ import { store as noteStore } from "./note-store";
 import { store as notebookStore } from "./notebook-store";
 import { store as trashStore } from "./trash-store";
 import { store as tagStore } from "./tag-store";
+import { store as editorstore } from "./editor-store";
 import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
@@ -136,7 +137,11 @@ class AppStore extends BaseStore {
       .catch(async (err) => {
         showToast("error", err.message);
         console.error(err);
-        if (err.code === "MERGE_CONFLICT") await this.refresh();
+        if (err.code === "MERGE_CONFLICT") {
+          if (editorstore.get().session.id)
+            editorstore.openSession(editorstore.get().session.id, true);
+          await this.refresh();
+        }
       })
       .finally(() => {
         this.set((state) => (state.isSyncing = false));

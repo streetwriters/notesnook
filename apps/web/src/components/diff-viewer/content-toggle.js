@@ -28,7 +28,8 @@ function ContentToggle(props) {
                 await cleanDiff(
                   document.getElementById(selectedEditor).innerHTML
                 ),
-                await cleanDiff(document.getElementById(otherEditor).innerHTML)
+                await cleanDiff(document.getElementById(otherEditor).innerHTML),
+                dateEdited
               );
             }}
             p={1}
@@ -43,17 +44,12 @@ function ContentToggle(props) {
             console.log("isOtherSelected", isOtherSelected);
             if (isOtherSelected) {
               const { selectedEditor } = editors;
-              console.log(
-                selectedEditor,
-                document.getElementById(selectedEditor).innerHTML,
-                await cleanDiff(
-                  document.getElementById(selectedEditor).innerHTML
-                )
-              );
               await resolveConflict(
                 await cleanDiff(
                   document.getElementById(selectedEditor).innerHTML
-                )
+                ),
+                null,
+                dateEdited
               );
             } else {
               onToggle();

@@ -49,17 +49,20 @@ function DiffViewer(props) {
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
-    async (note, selectedContent, otherContent) => {
-      if (!note) return;
+    async (selectedContent, otherContent, selectedContentDateEdited) => {
+      if (!conflictedNote) return;
 
       selectedContent = {
         data: selectedContent,
         type: "tiny",
-        resolved: true,
+        // HACK: we need to set remote = true so the database doesn't
+        // overwrite the dateEdited of the content.
+        remote: true,
+        dateEdited: selectedContentDateEdited,
       };
 
       await db.notes.add({
-        id: note.id,
+        id: conflictedNote.id,
         content: selectedContent,
         conflicted: false,
       });
@@ -69,17 +72,12 @@ function DiffViewer(props) {
           type: "tiny",
         };
         await db.notes.add({
-          ...note,
           content: otherContent,
-          id: undefined,
-          dateCreated: undefined,
-          dateEdited: undefined,
-          conflicted: false,
-          title: note.title + " (DUPLICATE)",
+          title: conflictedNote.title + " (COPY)",
         });
       }
       notesStore.refresh();
-      hashNavigate(`/notes/${note.id}/edit`, { replace: true });
+      hashNavigate(`/notes/${conflictedNote.id}/edit`, { replace: true });
 
       const conflictsCount = db.notes.conflicted?.length;
       if (conflictsCount) {
@@ -92,7 +90,7 @@ function DiffViewer(props) {
         await sync();
       }
     },
-    [sync]
+    [conflictedNote, sync]
   );
 
   useEffect(() => {
@@ -208,7 +206,7 @@ function DiffViewer(props) {
           >
             <ContentToggle
               label="Current note"
-              resolveConflict={(data) => resolveConflict(conflictedNote, data)}
+              resolveConflict={resolveConflict}
               dateEdited={localContent.dateEdited}
               isSelected={selectedContent === 0}
               isOtherSelected={selectedContent === 1}
@@ -262,7 +260,7 @@ function DiffViewer(props) {
                 pb: 1,
                 pt: [1, 1, 0],
               }}
-              resolveConflict={(data) => resolveConflict(conflictedNote, data)}
+              resolveConflict={resolveConflict}
               label="Incoming note"
               isSelected={selectedContent === 1}
               isOtherSelected={selectedContent === 0}
