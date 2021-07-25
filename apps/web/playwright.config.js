@@ -17,6 +17,15 @@ module.exports = {
     trace: IS_CI ? "off" : "retain-on-failure",
     screenshot: IS_CI ? "off" : "only-on-failure",
     video: IS_CI ? "off" : "retry-with-video",
+
+    viewport: {
+      width: 1280,
+      height: 720,
+    },
+    screen: {
+      width: 1280,
+      height: 720,
+    },
   },
   projects: [
     {

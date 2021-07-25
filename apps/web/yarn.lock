@@ -8610,7 +8610,7 @@ normalize-url@^3.0.0:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.8.0"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#928ed8ca7c770ec15fbf3bc7f2f398d14620ae65"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#e761e03dd9303b7d6e45d05fd434ad4c0d3bb508"
   dependencies:
     "@stablelib/blake2s" "^1.0.1"
     dayjs "^1.10.6"
