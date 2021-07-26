@@ -8,6 +8,22 @@ export function getCharacterRange(node) {
   return characterRange;
 }
 
+export function getNextCharacter(node, range) {
+  if (!range) return "";
+  return (node.textContent || node.innerText).substring(
+    range.end,
+    range.end + 1
+  );
+}
+
+export function getPreviousCharacter(node, range) {
+  if (!range) return "";
+  return (node.textContent || node.innerText).substring(
+    range.start,
+    range.start - 1
+  );
+}
+
 export function moveCaretTo(node, index, endIndex) {
   const newCharacterRange = {
     characterRange: {
