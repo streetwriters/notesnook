@@ -7,6 +7,7 @@ const WRAP_CHARS = {
   "(": { start: "(", end: ")" },
   "{": { start: "{", end: "}" },
   "|": { start: "|", end: "|" },
+  "`": { start: "`", end: "`" },
 };
 
 (function () {
@@ -23,7 +24,7 @@ const WRAP_CHARS = {
         } else if (!!WRAP_CHARS[e.key]) {
           e.preventDefault();
           const char = WRAP_CHARS[e.key];
-          editor.selection.setContent(`${char.start}${content}${char.end} `);
+          editor.selection.setContent(`${char.start}${content}${char.end}`);
         }
       } else if (!!WRAP_CHARS[e.key]) {
         e.preventDefault();
