@@ -17,6 +17,7 @@ export function isUserPremium(user) {
   return (
     subStatus === SUBSCRIPTION_STATUS.BETA ||
     subStatus === SUBSCRIPTION_STATUS.PREMIUM ||
+    subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED ||
     subStatus === SUBSCRIPTION_STATUS.TRIAL
   );
 }
