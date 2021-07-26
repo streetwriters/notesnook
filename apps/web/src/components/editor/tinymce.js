@@ -223,23 +223,15 @@ function TinyMCE(props) {
         },
       }}
       onBeforeExecCommand={async (command) => {
-        if (
-          premiumCommands.some((cmd) => {
-            let isPremium = command.command === cmd && !command?.value?.paste;
-            if (
-              command.command === "mceInsertContent" &&
-              !command?.value?.paste
-            ) {
-              isPremium =
-                command.value.startsWith(`<pre`) ||
-                command.value.startsWith(`<table`) ||
-                command.value.startsWith(`<img`) ||
-                command.value.includes("tox-checklist");
-            }
-            return isPremium;
-          }) &&
-          !isUserPremium
-        ) {
+        const isPremiumCommand = premiumCommands.some((cmd) => {
+          const { value, command: commandName } = command;
+          let isPremium = commandName === cmd && !value?.paste;
+          if (commandName === "mceInsertContent" && !value?.paste) {
+            isPremium = /^<(?:pre|table|img)|tox-checklist/gm.test(value);
+          }
+          return isPremium;
+        });
+        if (isPremiumCommand && !isUserPremium) {
           command.preventDefault();
           command.stopImmediatePropagation();
           command.stopPropagation();
