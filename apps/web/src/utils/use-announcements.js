@@ -70,10 +70,7 @@ function shouldShowAnnouncement(announcement) {
       case "verified":
         return user && user.isEmailVerified;
       case "proExpired":
-        return (
-          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
-          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED
-        );
+        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED;
       case "any":
       default:
         return true;
