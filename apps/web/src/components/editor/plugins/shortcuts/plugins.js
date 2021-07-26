@@ -6,7 +6,6 @@ const WRAP_CHARS = {
   "[": { start: "[", end: "]" },
   "(": { start: "(", end: ")" },
   "{": { start: "{", end: "}" },
-  "'": { start: "'", end: "'" },
   "|": { start: "|", end: "|" },
 };
 
