@@ -91,7 +91,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 fontSize={SIZE.xs + 1}
                 icon="book-open-outline"
                 style={{
-                  borderRadius: 100,
+                  borderRadius: 5,
                   marginRight: 5,
                   marginVertical: 5,
                   maxWidth: 120,

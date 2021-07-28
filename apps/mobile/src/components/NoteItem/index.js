@@ -101,7 +101,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 <Button
                   title={db.notebooks.notebook(_item.id)?.data.title}
                   key={_item}
-                  height={22}
+                  height={20}
                   textStyle={{
                     fontWeight: 'normal',
                     fontFamily: null,
@@ -110,7 +110,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   type="grayBg"
                   fontSize={SIZE.xs + 1}
                   style={{
-                    borderRadius: 100,
+                    borderRadius: 5,
                     marginRight: 5,
                     borderWidth: 0.5,
                     borderColor: colors.icon,
@@ -125,7 +125,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 <Button
                   title={'#' + item}
                   key={item}
-                  height={22}
+                  height={20}
                   textStyle={{
                     fontWeight: 'normal',
                     fontFamily: null,
@@ -133,7 +133,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   type="grayBg"
                   fontSize={SIZE.xs + 1}
                   style={{
-                    borderRadius: 100,
+                    borderRadius: 5,
                     marginRight: 5,
                     borderWidth: 0.5,
                     borderColor: colors.icon,
