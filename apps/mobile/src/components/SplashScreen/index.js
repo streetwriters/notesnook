@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Image, SafeAreaView, View} from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Image, SafeAreaView, View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import Carousel from 'react-native-snap-carousel';
-import {SvgXml} from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   COMMUNITY_SVG,
@@ -12,29 +12,23 @@ import {
   RICH_TEXT_SVG,
   SYNC_SVG
 } from '../../assets/images/assets';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
-import {dHeight, dWidth, getElevation} from '../../utils';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
+import { dHeight, dWidth, getElevation } from '../../utils';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const features = [
   {
-    title: 'Notesnook',
-    description: 'A safe place to write and stay organized.',
-    icon: require('../../assets/images/notesnook-logo-png.png'),
-    type: 'image'
-  },
-  {
-    title: '100% end-to-end encrypted',
+    title: '100% end-to-end encrypted notes',
     description:
       'Your data is encrypted on your device. No one except you can read your notes.',
     icon: PRIVACY_SVG,
@@ -72,11 +66,17 @@ const features = [
       'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
     link: 'https://discord.gg/zQBK97EE22',
     img: 'community'
+  },
+  {
+    title: 'Welcome to Notesnook',
+    description: 'Ready to start taking private notes?',
+    icon: require('../../assets/images/notesnook-logo-png.png'),
+    type: 'image'
   }
 ];
 let currentIndex = 0;
 const SplashScreen = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const {colors} = state;
   const carouselRef = useRef();
   const [isNext, setIsNext] = useState(true);
@@ -195,8 +195,6 @@ const SplashScreen = () => {
                                 ? item.icon(colors.accent)
                                 : NOTE_SVG(colors.accent)
                             }
-                            //img={item.img}
-                            //color={colors.accent}
                             width={250}
                             height={250}
                           />
@@ -208,7 +206,8 @@ const SplashScreen = () => {
                             style={{
                               textAlign: 'center',
                               alignSelf: 'center',
-                              marginTop: 10
+                              marginTop: 10,
+                              maxWidth: '90%'
                             }}>
                             {item.title}
                           </Heading>
@@ -272,7 +271,7 @@ const SplashScreen = () => {
                     }
                   } else {
                     await hide();
-                    await Storage.write('introCompleted', 'true');
+                    await MMKV.setItem('introCompleted', 'true');
                     await sleep(300);
                     eSendEvent(eOpenLoginDialog, 1);
                   }
@@ -284,13 +283,6 @@ const SplashScreen = () => {
                 type="accent"
                 title={isNext ? 'Next' : 'Start your 14 day free trial'}
               />
-              <Paragraph
-                style={{
-                  alignSelf: 'center',
-                  marginTop: 5
-                }}>
-                (no credit card required)
-              </Paragraph>
 
               {isNext ? null : (
                 <Button
@@ -299,14 +291,14 @@ const SplashScreen = () => {
                   width={DDS.isTab ? 350 : '100%'}
                   onPress={async () => {
                     await hide();
-                    await Storage.write('introCompleted', 'true');
+                    await MMKV.setItem('introCompleted', 'true');
                   }}
                   style={{
                     paddingHorizontal: 24,
                     alignSelf: !isNext ? 'center' : 'flex-end',
                     marginTop: 10
                   }}
-                  type="inverted"
+                  type="grayBg"
                   title="I want to try the app first"
                 />
               )}
