@@ -4,7 +4,7 @@ import {useMenuStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/DB';
@@ -16,6 +16,7 @@ import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 
 export class AddTopicDialog extends React.Component {
@@ -24,7 +25,7 @@ export class AddTopicDialog extends React.Component {
     this.state = {
       visible: false,
       titleFocused: false,
-      loading: false,
+      loading: false
     };
 
     this.title;
@@ -40,7 +41,7 @@ export class AddTopicDialog extends React.Component {
         ToastEvent.show({
           heading: 'Topic title is required',
           type: 'error',
-          context: 'local',
+          context: 'local'
         });
         this.setState({loading: false});
         return;
@@ -59,7 +60,7 @@ export class AddTopicDialog extends React.Component {
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.Notebooks,
         Navigation.routeNames.Notebook,
-        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.NotesPage
       ]);
       useMenuStore.getState().setMenuPins();
     } catch (e) {}
@@ -86,7 +87,7 @@ export class AddTopicDialog extends React.Component {
     }
 
     this.setState({
-      visible: true,
+      visible: true
     });
   };
   close = () => {
@@ -95,7 +96,7 @@ export class AddTopicDialog extends React.Component {
     this.notebook = null;
     this.toEdit = null;
     this.setState({
-      visible: false,
+      visible: false
     });
   };
 
@@ -121,7 +122,7 @@ export class AddTopicDialog extends React.Component {
                 : 'Add a new topic to ' + this.notebook.title
             }
           />
-
+          <Seperator half />
           <Input
             fwdRef={this.titleRef}
             onChangeText={value => {
