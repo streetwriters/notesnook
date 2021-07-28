@@ -13,7 +13,7 @@ import {
   eOpenProgressDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {Dialog} from '../Dialog';
@@ -214,7 +214,11 @@ export const PremiumComponent = ({close, promo, getRef}) => {
         ref={scrollViewRef}
         nestedScrollEnabled
         style={{
-          marginBottom: 10
+          borderBottomWidth: 1,
+          borderBottomColor: colors.nav,
+          paddingVertical: 10,
+          borderTopWidth: 1,
+          borderTopColor: colors.nav
         }}
         onMomentumScrollEnd={() => {
           getRef().current?.handleChildScrollEnd();
@@ -224,9 +228,8 @@ export const PremiumComponent = ({close, promo, getRef}) => {
 
       <View
         style={{
-          padding: 5,
           borderRadius: 10,
-          paddingHorizontal: 12
+          paddingHorizontal: 12,
         }}>
         {product?.type !== 'promo' ? (
           user ? (
@@ -235,7 +238,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom: 10
+                marginBottom:10
               }}>
               <Paragraph
                 onPress={() => {
@@ -312,7 +315,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                   : 'Try free for 14 days'
               }
               type="accent"
-              height={60}
+              height={normalize(60)}
               width="100%"
             />
             {user && (
@@ -382,7 +385,6 @@ export const PremiumComponent = ({close, promo, getRef}) => {
             size={SIZE.xs + 1}
             style={{
               alignSelf: 'center',
-              marginTop: 5,
               textAlign: 'center',
               marginTop: 10
             }}>
@@ -477,6 +479,9 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                         console.log('closed');
                       });
                   }}
+                  style={{
+                    textDecorationLine: 'underline'
+                  }}
                   color={colors.accent}>
                   Terms of Service{' '}
                 </Paragraph>
@@ -489,6 +494,9 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                       .then(r => {
                         console.log('closed');
                       });
+                  }}
+                  style={{
+                    textDecorationLine: 'underline'
                   }}
                   color={colors.accent}>
                   Privacy Policy.
