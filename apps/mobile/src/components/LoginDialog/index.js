@@ -471,7 +471,6 @@ const LoginDialog = () => {
         overScrollMode="never"
         scrollToOverflowEnabled="false"
         style={{
-          minHeight: !DDS.isTab ? '90%' : null,
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
           zIndex: 10
