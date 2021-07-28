@@ -94,6 +94,8 @@ export default class Notes extends Collection {
       color: note.color,
       tags: note.tags || [],
       favorite: !!note.favorite,
+      dateCreated: note.dateCreated,
+      dateEdited: note.dateEdited,
       localOnly: !!note.localOnly,
       conflicted: !!note.conflicted,
     };
