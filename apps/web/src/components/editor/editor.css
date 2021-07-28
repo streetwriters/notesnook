@@ -88,3 +88,7 @@ tox-tbtn tox-tbtn--select {
 .tox .tox-tbtn--select {
   min-width: 92px;
 }
+
+.mce-content-body hr {
+  border-color: #b1b1b1 !important;
+}
