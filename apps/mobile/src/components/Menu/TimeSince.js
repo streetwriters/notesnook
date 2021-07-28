@@ -6,7 +6,8 @@ export const TimeSince = ({time, style,updateFrequency=30000}) => {
   const [timeAgo, setTimeAgo] = useState(null);
 
   useEffect(() => {
-    let t = timeSince(time);
+    
+    let t = timeSince(time || Date.now());
     setTimeAgo(t);
     let interval = setInterval(() => {
       t = timeSince(time);
