@@ -4,6 +4,18 @@ _Maintained by Streetwriters team_
 
 All of these plugins are being used in [Notesnook](https://notesnook.com/) in production.
 
+## Installation
+
+```
+yarn add @streetwritersco/tinymce-plugins
+```
+
+### Usage
+
+```jsx
+import "@streetwritersco/tinymce-plugins/<plugin-name>";
+```
+
 ## Plugins
 
 ### Custom
