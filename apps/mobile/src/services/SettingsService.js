@@ -1,12 +1,12 @@
-import {Platform} from 'react-native';
-import {enabled} from 'react-native-privacy-snapshot';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
-import {useSettingStore} from '../provider/stores';
-import {AndroidModule, preloadImages, sortSettings} from '../utils';
-import {getColorScheme} from '../utils/ColorUtils';
-import {MMKV} from '../utils/mmkv';
-import {scale, updateSize} from '../utils/SizeUtils';
+import { Platform } from 'react-native';
+import { enabled } from 'react-native-privacy-snapshot';
+import { updateEvent } from '../components/DialogManager/recievers';
+import { Actions } from '../provider/Actions';
+import { useSettingStore } from '../provider/stores';
+import { AndroidModule, preloadImages } from '../utils';
+import { getColorScheme } from '../utils/ColorUtils';
+import { MMKV } from '../utils/mmkv';
+import { scale, updateSize } from '../utils/SizeUtils';
 
 export const defaultSettings = {
   showToolbarOnTop: false,
@@ -49,6 +49,9 @@ async function init() {
     settings = JSON.parse(settings);
     if (!settings.appLockMode) {
       settings.appLockMode = 'none';
+    }
+    if (!settings.hasOwnProperty('telemetry')) {
+      settings.telemetry = true;
     }
     if (!settings.notesListMode) {
       settings.notesListMode = 'normal';

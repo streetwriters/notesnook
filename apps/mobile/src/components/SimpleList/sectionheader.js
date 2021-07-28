@@ -5,7 +5,7 @@ import {useSettingStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
 import {SORT} from '../../utils';
@@ -22,10 +22,10 @@ export const SectionHeader = ({item, index, type, title}) => {
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
   const [groupOptions, setGroupOptions] = useState(
-    db.settings?.getGroupOptions(type),
+    db.settings?.getGroupOptions(type)
   );
   let groupBy = Object.keys(SORT).find(
-    key => SORT[key] === groupOptions.groupBy,
+    key => SORT[key] === groupOptions.groupBy
   );
 
   const color = COLORS_NOTE[title.toLowerCase()] || colors.accent;
@@ -60,7 +60,7 @@ export const SectionHeader = ({item, index, type, title}) => {
         backgroundColor: colors.nav,
         alignSelf: 'center',
         borderRadius: 5,
-        marginVertical: 5,
+        marginVertical: 5
       }}>
       <TouchableOpacity
         onPress={() => {
@@ -70,7 +70,7 @@ export const SectionHeader = ({item, index, type, title}) => {
         hitSlop={{top: 10, left: 10, right: 30, bottom: 15}}
         style={{
           height: '100%',
-          justifyContent: 'center',
+          justifyContent: 'center'
         }}>
         <Heading
           color={color}
@@ -78,7 +78,7 @@ export const SectionHeader = ({item, index, type, title}) => {
           style={{
             minWidth: 60,
             alignSelf: 'center',
-            textAlignVertical: 'center',
+            textAlignVertical: 'center'
           }}>
           {!item.title || item.title === '' ? 'Pinned' : item.title}
         </Heading>
@@ -87,7 +87,7 @@ export const SectionHeader = ({item, index, type, title}) => {
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         {index === 0 ? (
           <>
@@ -109,7 +109,7 @@ export const SectionHeader = ({item, index, type, title}) => {
                 marginRight:
                   type === 'notes' || type === 'home' || type === 'notebooks'
                     ? 10
-                    : 0,
+                    : 0
               }}
               type="gray"
               iconPosition="right"
@@ -118,7 +118,7 @@ export const SectionHeader = ({item, index, type, title}) => {
               <ActionIcon
                 customStyle={{
                   width: 25,
-                  height: 25,
+                  height: 25
                 }}
                 color={colors.icon}
                 name={listMode == 'compact' ? 'view-list' : 'view-list-outline'}
@@ -127,10 +127,10 @@ export const SectionHeader = ({item, index, type, title}) => {
                     type !== 'notebooks'
                       ? 'notesListMode'
                       : 'notebooksListMode',
-                    listMode === 'normal' ? 'compact' : 'normal',
+                    listMode === 'normal' ? 'compact' : 'normal'
                   );
                 }}
-                size={SIZE.md}
+                size={SIZE.lg - 2}
               />
             ) : null}
           </>

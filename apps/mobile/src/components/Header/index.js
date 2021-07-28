@@ -46,8 +46,8 @@ export const Header = React.memo(
             overflow: 'hidden',
             borderBottomWidth: 1,
             borderBottomColor: hide ? 'transparent' : colors.nav,
-            justifyContent: 'space-between',
-          },
+            justifyContent: 'space-between'
+          }
         ]}>
         <View style={styles.leftBtnContainer}>
           <HeaderLeftMenu headerMenuState={!isBack} currentScreen={screen} />
@@ -66,7 +66,7 @@ export const Header = React.memo(
           <>
             <View
               style={{
-                width: '80%',
+                width: '80%'
               }}>
               <SearchInput />
             </View>
@@ -91,7 +91,7 @@ export const Header = React.memo(
       </View>
     );
   },
-  (prev, next) => prev.title === next.title,
+  (prev, next) => prev.title === next.title
 );
 
 const styles = StyleSheet.create({
@@ -102,13 +102,13 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
-    width: '100%',
+    width: '100%'
   },
   leftBtnContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    flexShrink: 1,
+    flexShrink: 1
   },
   leftBtn: {
     justifyContent: 'center',
@@ -117,17 +117,17 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 100,
     marginLeft: -5,
-    marginRight: 25,
+    marginRight: 25
   },
   rightBtnContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   rightBtn: {
     justifyContent: 'center',
     alignItems: 'flex-end',
     height: 40,
     width: 40,
-    paddingRight: 0,
-  },
+    paddingRight: 0
+  }
 });

@@ -12,12 +12,12 @@ export const Title = ({heading, headerColor}) => {
       style={{
         opacity: 1,
         flexShrink: 1,
-        flexDirection: 'row',
+        flexDirection: 'row'
       }}>
       <Heading
         numberOfLines={1}
         style={{
-          flexWrap: 'wrap',
+          flexWrap: 'wrap'
         }}
         color={headerColor}>
         <Heading color={colors.accent}>

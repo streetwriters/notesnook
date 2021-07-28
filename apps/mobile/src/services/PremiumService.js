@@ -38,7 +38,6 @@ async function setPremiumStatus() {
     if (!get()) {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
-      console.log(products);
     } else {
       await subscriptions.clear();
     }

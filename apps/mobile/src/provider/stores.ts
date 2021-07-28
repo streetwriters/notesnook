@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import { history, SORT, GROUP, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
+import { history, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/DB';
 import { MMKV } from '../utils/mmkv';
 import {
