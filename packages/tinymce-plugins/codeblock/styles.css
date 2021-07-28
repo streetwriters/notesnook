@@ -1,0 +1,21 @@
+.mce-content-body pre {
+  overflow: auto;
+  max-height: 600px;
+  line-height: 1.5 !important;
+  padding: 15px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+pre,
+pre * {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
+    Menlo, monospace !important;
+  font-size: 14px !important;
+}
+
+.tox-menu.tox-collection.tox-collection--list.tox-selected-menu {
+  max-height: 190px !important;
+}

@@ -1,0 +1,27 @@
+{
+  "name": "@streetwriters/tinymce-plugins",
+  "version": "1.0.0",
+  "description": "All the custom made or modified plugins for TinyMCE used in Notesnook & other apps maintained by Streetwriters team.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "tinymce",
+    "plugins",
+    "editor"
+  ],
+  "author": {
+    "name": "Streetwriters (Private) Ltd.",
+    "email": "support@streetwriters.co",
+    "url": "https://streetwriters.co"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "tinymce": "^5"
+  },
+  "dependencies": {
+    "highlight.js": "^11.1.0",
+    "rangy": "^1.3.0"
+  }
+}

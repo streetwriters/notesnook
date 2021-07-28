@@ -1,0 +1,40 @@
+.mce-content-body h2::before,
+h3::before,
+h4::before,
+h5::before,
+h6::before {
+  font-size: 12px;
+  font-weight: normal;
+  color: var(--fontTertiary);
+  letter-spacing: 1.2px;
+  padding: 1px 3px 1px 3px;
+  margin-left: -31px;
+  margin-right: 7px;
+  cursor: row-resize;
+}
+
+.mce-content-body h2::before {
+  content: "H2";
+}
+
+.mce-content-body h3::before {
+  content: "H3";
+}
+
+.mce-content-body h4::before {
+  content: "H4";
+}
+
+.mce-content-body h5::before {
+  content: "H5";
+}
+
+.mce-content-body .c::before {
+  color: var(--static);
+  background-color: var(--primary);
+  border-radius: 5px;
+}
+
+.h {
+  display: none;
+}

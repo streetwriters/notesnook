@@ -1,0 +1,15 @@
+.mce-content-body code[data-mce-selected="inline-boundary"] {
+  background-color: rgb(27 31 35 / 5%);
+}
+
+.mce-content-body code {
+  background-color: rgb(27 31 35 / 5%);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
+    Menlo, monospace !important;
+  font-size: 14px !important;
+}
