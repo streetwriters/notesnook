@@ -38,6 +38,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
@@ -685,6 +686,7 @@ export class VaultDialog extends Component {
             paragraph={this.state.description}
             icon="shield"
           />
+          <Seperator half />
 
           {(novault ||
             changePassword ||
@@ -749,6 +751,9 @@ export class VaultDialog extends Component {
                   ? 'check-circle-outline'
                   : 'checkbox-blank-circle-outline'
               }
+              style={{
+                marginTop:10
+              }}
               width="100%"
               title={'Delete all notes'}
               type="errorShade"
@@ -757,6 +762,7 @@ export class VaultDialog extends Component {
 
           {changePassword ? (
             <>
+              <Seperator half/>
               <Input
                 ref={changePassInputRef}
                 editable={!loading}
@@ -835,11 +841,14 @@ export class VaultDialog extends Component {
 
           {this.state.isBiometryAvailable &&
           !this.state.fingerprintAccess &&
+          !this.state.clearVault &&
+          !this.state.deleteVault &&
           ((!this.state.biometricUnlock && !changePassword) || !novault) ? (
             <Button
               onPress={() => {
+                console.log(this.state.biometricUnlock)
                 this.setState({
-                  biometricUnlock: !biometricUnlock,
+                  biometricUnlock: !this.state.biometricUnlock,
                 });
               }}
               style={{
@@ -847,8 +856,8 @@ export class VaultDialog extends Component {
               }}
               icon="fingerprint"
               width="100%"
-              title="Enable biometric unlocking"
-              type="shade"
+              title="Biometric unlocking"
+              type={this.state.biometricUnlock ? "shade"  : 'grayBg'}
             />
           ) : null}
 
