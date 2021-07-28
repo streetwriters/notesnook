@@ -44,7 +44,7 @@ function register(editor) {
       var node = event.target;
       var parent = node.parentElement;
       if (
-        event.targetTouches.length > 1 ||
+        event.targetTouches.length > 0 ||
         event.targetTouches[0].clientX > 45 ||
         parent.className !== CLASS_NAMES.list ||
         node.nodeName !== "LI"
