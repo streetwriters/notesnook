@@ -55,9 +55,13 @@ const loadDatabase = async () => {
   SplashScreen.hide();
   await db.init();
   Notifications.get();
+  loadDefaultNotes();
+  await checkFirstLaunch();
+};
+
+async function checkFirstLaunch() {
   let requireIntro = await MMKV.getItem('introCompleted');
   useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
-  loadDefaultNotes();
   if (!requireIntro) {
     await MMKV.setItem(
       'askForRating',
@@ -72,7 +76,7 @@ const loadDatabase = async () => {
       })
     );
   }
-};
+}
 
 function checkOrientation() {
   Orientation.getOrientation((e, r) => {
@@ -118,10 +122,6 @@ const App = () => {
           setVerifyUser(true);
         }
         await loadDatabase();
-
-        if (!SettingsService.get().hasOwnProperty('telemetry')) {
-          await SettingsService.set('telemetry', true);
-        }
         if (SettingsService.get().telemetry) {
           Tracker.record('50bf361f-dba0-41f1-9570-93906249a6d3');
         }
