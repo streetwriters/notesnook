@@ -1,4 +1,8 @@
 import React, { useEffect } from "react";
+import "./editor.css";
+import "@streetwritersco/tinymce-plugins/codeblock/styles.css";
+import "@streetwritersco/tinymce-plugins/inlinecode/styles.css";
+import "@streetwritersco/tinymce-plugins/collapsibleheaders/styles.css";
 import "tinymce/tinymce";
 import "tinymce/icons/default";
 import "tinymce/themes/silver";
@@ -18,14 +22,14 @@ import "tinymce/plugins/noneditable";
 import "tinymce/plugins/table";
 import "tinymce/plugins/directionality";
 import "tinymce/plugins/media";
-import "./plugins/code";
-import "./plugins/shortlink";
-import "./plugins/quickimage";
-import "./plugins/checklist";
-import "./plugins/collapsibleheaders";
-import "./plugins/paste";
-import "./plugins/shortcuts";
-import "./editor.css";
+import { processPastedContent } from "@streetwritersco/tinymce-plugins/codeblock";
+import "@streetwritersco/tinymce-plugins/inlinecode";
+import "@streetwritersco/tinymce-plugins/shortlink";
+import "@streetwritersco/tinymce-plugins/quickimage";
+import "@streetwritersco/tinymce-plugins/checklist";
+import "@streetwritersco/tinymce-plugins/collapsibleheaders";
+import "@streetwritersco/tinymce-plugins/paste";
+import "@streetwritersco/tinymce-plugins/shortcuts";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -40,7 +44,7 @@ const markdownPatterns = [
   { start: "_", end: "_", format: "italic" },
   { start: "**", end: "**", format: "bold" },
   { start: "~~", end: "~~", format: "strikethrough" },
-  { start: "`", end: "`", cmd: "mceCode" },
+  { start: "`", end: "`", cmd: "mceInsertInlineCode" },
   { start: "## ", format: "h2" },
   { start: "### ", format: "h3" },
   { start: "#### ", format: "h4" },
@@ -101,8 +105,14 @@ function useSkin() {
     : [host + "/skins/notesnook-dark", host + "/skins/notesnook"];
 }
 
-const plugins =
-  "shortcuts checklist paste importcss searchreplace autolink directionality code quickimage shortlink media table hr advlist lists imagetools noneditable quickbars autoresize collapsibleheaders";
+const plugins = {
+  default:
+    "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable quickbars autoresize",
+  custom:
+    "collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
+  pro: "textpattern",
+};
+
 function TinyMCE(props) {
   const {
     changeInterval,
@@ -148,7 +158,9 @@ function TinyMCE(props) {
         statusbar: false,
         link_quicklink: true,
         width: "100%",
-        plugins: isUserPremium ? `${plugins} textpattern` : plugins,
+        plugins: isUserPremium
+          ? `${plugins.default} ${plugins.custom} ${plugins.pro}`
+          : plugins.default,
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_insert_toolbar: false,
@@ -211,15 +223,7 @@ function TinyMCE(props) {
         fixed_toolbar_container: "#editorToolbar",
         paste_postprocess: function (_, args) {
           const { node } = args;
-          if (node.childNodes) {
-            for (let childNode of node.childNodes) {
-              if (childNode.tagName === "PRE") {
-                childNode.className = "hljs";
-                const code = childNode.textContent || childNode.innerText;
-                childNode.innerHTML = code;
-              }
-            }
-          }
+          processPastedContent(node);
         },
       }}
       onBeforeExecCommand={async (command) => {
