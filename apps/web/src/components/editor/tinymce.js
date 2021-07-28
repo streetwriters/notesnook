@@ -158,9 +158,11 @@ function TinyMCE(props) {
         statusbar: false,
         link_quicklink: true,
         width: "100%",
-        plugins: isUserPremium
-          ? `${plugins.default} ${plugins.custom} ${plugins.pro}`
-          : plugins.default,
+        plugins: [
+          plugins.default,
+          plugins.custom,
+          isUserPremium ? plugins.pro : "",
+        ],
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
         quickbars_insert_toolbar: false,
