@@ -130,15 +130,15 @@ const Input = ({
   };
 
   const style = {
-    borderWidth:1,
-    borderRadius:5,
+    borderWidth: 1,
+    borderRadius: 5,
     borderColor: color,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     flexGrow: 1,
     height: 50,
-    paddingHorizontal:12,
+    paddingHorizontal: 12
   };
 
   const textStyle = {
@@ -148,7 +148,7 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height: 50,
+    height: 50
   };
 
   return (
@@ -205,6 +205,7 @@ const Input = ({
                 top={10}
                 bottom={10}
                 onPress={() => {
+                  fwdRef.current?.blur();
                   setSecureEntry(!secureEntry);
                 }}
                 style={{
