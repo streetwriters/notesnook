@@ -76,6 +76,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: 20,
+    marginTop: 10,
   },
 });
