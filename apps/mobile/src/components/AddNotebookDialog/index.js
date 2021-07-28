@@ -52,7 +52,7 @@ export class AddNotebookDialog extends React.Component {
   }
 
   open = () => {
-    console.log('opening called')
+    console.log('opening called');
     refs = [];
     let {toEdit} = this.props;
     if (toEdit && toEdit.type === 'notebook') {
@@ -366,7 +366,11 @@ export class AddNotebookDialog extends React.Component {
           <FlatList
             data={topics}
             ref={ref => (this.listRef = ref)}
+            nestedScrollEnabled
             keyExtractor={(item, index) => item + index.toString()}
+            onMomentumScrollEnd={() => {
+              this.actionSheetRef.current?.handleChildScrollEnd();
+            }}
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
