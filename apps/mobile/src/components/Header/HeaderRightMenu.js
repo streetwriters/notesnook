@@ -1,14 +1,14 @@
-import React, { useRef } from 'react';
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
+import React, {useRef} from 'react';
+import {ActivityIndicator, StyleSheet, View} from 'react-native';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useSettingStore, useUserStore } from '../../provider/stores';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {useSettingStore, useUserStore} from '../../provider/stores';
 import Navigation from '../../services/Navigation';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
 
 export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const [state] = useTracked();
@@ -23,7 +23,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
         <ActionIcon
           onPress={async () => {
             Navigation.navigate('Search', {
-              menu: false,
+              menu: false
             });
           }}
           testID={notesnook.ids.default.header.buttons.left}
@@ -41,10 +41,11 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           iconSize={SIZE.xl}
           type="accent"
           style={{
-            marginLeft: 20,
+            marginLeft: 10,
             width: 40,
             height: 40,
-            borderRadius:100
+            borderRadius: 100,
+            paddingHorizontal: 0
           }}
         />
       ) : null}
@@ -55,7 +56,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           animationDuration={200}
           style={{
             borderRadius: 5,
-            backgroundColor: colors.bg,
+            backgroundColor: colors.bg
           }}
           button={
             <ActionIcon
@@ -77,7 +78,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               }}
               textStyle={{
                 fontSize: SIZE.md,
-                color: colors.pri,
+                color: colors.pri
               }}>
               <Icon name={item.icon} size={SIZE.md} />
               {'  ' + item.title}
@@ -92,7 +93,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
 const styles = StyleSheet.create({
   rightBtnContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   rightBtn: {
     justifyContent: 'center',
@@ -100,6 +101,6 @@ const styles = StyleSheet.create({
     height: 40,
     width: 40,
     marginLeft: 10,
-    paddingRight: 0,
-  },
+    paddingRight: 0
+  }
 });
