@@ -74,7 +74,7 @@ export const execCommands = {
      
     })();`,
 
-  cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
+  cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   image: async () => {
     if (editing.isFocused) {
       tiny.call(EditorWebView, tiny.blur);
@@ -124,7 +124,7 @@ export const execCommands = {
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
   pre: `
-    tinymce.activeEditor.execCommand('CodeBlock')
+    tinymce.activeEditor.execCommand('mceInsertCodeBlock')
   `,
   tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
   tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
