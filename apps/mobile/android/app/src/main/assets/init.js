@@ -118,8 +118,8 @@ function init_tiny(size) {
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
     plugins: [
-      'mychecklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace mycode',
+      'checklist advlist autolink textpattern hr lists link noneditable image',
+      'searchreplace codeblock shortcuts inlinecode',
       'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
@@ -131,7 +131,11 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
-    .mce-content-body *::before {
+    .mce-content-body h2::before,
+    h3::before,
+    h4::before,
+    h5::before,
+    h6::before {
       font-size: 11px;
       font-weight: normal;
       letter-spacing: 1.1px;
@@ -241,6 +245,13 @@ function init_tiny(size) {
       'Sans=sans-serif;' +
       'Classic=courier new;' +
       'Mono=monospace;',
+    paste_postprocess: function (_, args) {
+      try {
+        window.processPastedContent(args.node);
+      } catch (e) {
+        console.error(e);
+      }
+    },
     setup: function (editor) {
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
