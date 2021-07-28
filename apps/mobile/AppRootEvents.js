@@ -12,7 +12,6 @@ import {
   useNoteStore,
   useUserStore
 } from './src/provider/stores';
-import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
@@ -336,14 +335,15 @@ export const AppRootEvents = React.memo(
 
     const setCurrentUser = async login => {
       try {
-        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
-          return;
         let user = await db.user.getUser();
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+          setUser(user);
+          return;
+        }
         if (user) {
           setUser(user);
           clearMessage();
           attachIAPListeners();
-
           await Sync.run();
           let res = await doInBackground(async () => {
             try {
@@ -365,7 +365,7 @@ export const AppRootEvents = React.memo(
         }
       } catch (e) {
         let user = await db.user.getUser();
-        if (user && !user?.isEmailConfirmed) {
+        if (user && !user.isEmailConfirmed) {
           setEmailVerifyMessage();
         } else if (!user) {
           setLoginMessage();
