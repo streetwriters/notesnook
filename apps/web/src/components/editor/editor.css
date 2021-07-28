@@ -84,3 +84,7 @@ tox-tbtn tox-tbtn--select {
 .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
   margin-top: 1em !important;
 }
+
+.tox .tox-tbtn--select {
+  min-width: 92px;
+}
