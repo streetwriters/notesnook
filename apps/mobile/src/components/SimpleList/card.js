@@ -9,7 +9,7 @@ import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
 export const Card = ({color}) => {
-  const [state, dispatch] = useTracked();
+  const [state,] = useTracked();
   const colors = state.colors;
   color = color ? color : colors.accent;
 
@@ -20,7 +20,7 @@ export const Card = ({color}) => {
   return !messageBoardState.visible || selectionMode || announcement ? null : (
     <PressableButton
       onPress={messageBoardState.onPress}
-      type="transparent"
+      type="gray"
       customStyle={{
         paddingVertical: 12,
         width: '95%',
@@ -28,7 +28,6 @@ export const Card = ({color}) => {
         alignItems: 'center',
         justifyContent: 'flex-start',
         paddingHorizontal: 0,
-        borderRadius: 0,
       }}>
       <View
         style={{
@@ -36,18 +35,16 @@ export const Card = ({color}) => {
           backgroundColor:
             messageBoardState.type === 'error'
               ? hexToRGBA(colors.red, 0.15)
-              : hexToRGBA(color,0.15),
+              : hexToRGBA(color, 0.15),
           height: 40,
           marginLeft: 10,
           borderRadius: 100,
           alignItems: 'center',
-          justifyContent: 'center',
+          justifyContent: 'center'
         }}>
         <Icon
           size={SIZE.lg}
-          color={
-            messageBoardState.type === 'error' ? colors.error : color
-          }
+          color={messageBoardState.type === 'error' ? colors.errorText : color}
           name={messageBoardState.icon}
         />
       </View>
@@ -55,14 +52,14 @@ export const Card = ({color}) => {
       <View
         style={{
           marginLeft: 10,
-          maxWidth: '75%',
+          maxWidth: '75%'
         }}>
         <Paragraph color={colors.icon} size={SIZE.xs + 1}>
           {messageBoardState.message}
         </Paragraph>
         <Paragraph
           style={{
-            maxWidth: '100%',
+            maxWidth: '100%'
           }}
           color={colors.heading}>
           {messageBoardState.actionText}
@@ -76,7 +73,7 @@ export const Card = ({color}) => {
           justifyContent: 'center',
           alignItems: 'center',
           position: 'absolute',
-          right: 6,
+          right: 6
         }}>
         <Icon
           name="chevron-right"
