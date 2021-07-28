@@ -118,6 +118,8 @@ function GroupHeader(props) {
       mx={1}
       my={1}
       py={index > 0 ? [2, "8px"] : 1}
+      pl={1}
+      pr={0}
       alignItems="center"
       justifyContent="space-between"
       bg="bgSecondary"
@@ -178,7 +180,7 @@ function IconButton(props) {
       display="flex"
       alignItems="center"
       title={title}
-      p={1}
+      p={"2px"}
       mr={[2, 0]}
       sx={{ ":last-of-type": { mr: 0 } }}
       onClick={(e) => {
@@ -188,7 +190,7 @@ function IconButton(props) {
     >
       {text && <Text variant="body">{text}</Text>}
       {props.icon && (
-        <props.icon size={isMobile ? 20 : 14} sx={{ ml: text ? 1 : 0 }} />
+        <props.icon size={isMobile ? 20 : 16} sx={{ ml: text ? 1 : 0 }} />
       )}
     </Button>
   );
