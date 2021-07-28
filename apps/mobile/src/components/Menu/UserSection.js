@@ -1,48 +1,43 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  Platform,
-  TouchableOpacity,
-  View
+  Platform, View
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = () => {
   const [state] = useTracked();
   const {colors} = state;
-
   const user = useUserStore(state => state.user);
   const syncing = useUserStore(state => state.syncing);
   const lastSynced = useUserStore(state => state.lastSynced);
-  const deviceMode = useSettingStore(state => state.deviceMode);
-
   const insets = useSafeAreaInsets();
+
   return (
     <View
       style={{
         width: '100%',
         alignSelf: 'center',
-        paddingBottom: Platform.OS === 'ios' ? insets.bottom / 2 : null
+        paddingBottom: Platform.OS === 'ios' ? insets.bottom / 2 : null,
+        borderTopWidth: 1,
+        borderTopColor: colors.nav
       }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
-          alignItems: 'center',
-          paddingRight: 12,
-          paddingLeft: 12
+          alignItems: 'center'
         }}>
         <PressableButton
           onPress={async () => {
@@ -57,8 +52,8 @@ export const UserSection = () => {
             flexDirection: 'row',
             justifyContent: 'flex-start',
             padding: 12,
-            borderBottomRightRadius: 0,
-            borderBottomLeftRadius: 0
+            paddingHorizontal: 20,
+            borderRadius: 0
           }}>
           <View
             style={{
