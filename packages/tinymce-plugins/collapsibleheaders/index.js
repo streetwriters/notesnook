@@ -28,8 +28,9 @@ function register(editor) {
 
   editor.on("NewBlock", function (event) {
     const { newBlock } = event;
-    const target = newBlock?.previousElementSibling;
-    if (target?.classList.contains(COLLAPSED_KEY)) {
+    if (!newBlock) return;
+    const target = newBlock.previousElementSibling;
+    if (target && target.classList.contains(COLLAPSED_KEY)) {
       target.classList.remove(COLLAPSED_KEY);
       collapseElement(target);
     }

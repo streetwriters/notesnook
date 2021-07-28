@@ -107,7 +107,8 @@ var registerHandlers = function (api, editor) {
     if (
       isCodeBlock(node) &&
       e.command === "mceInsertContent" &&
-      e.value?.paste
+      e.value &&
+      e.value.paste
     ) {
       e.value.content = e.value.content
         .replace(/<p>/gm, "")

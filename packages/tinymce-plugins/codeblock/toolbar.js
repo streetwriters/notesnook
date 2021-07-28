@@ -26,7 +26,7 @@ function addCodeBlockToolbar(editor) {
       if (node.nodeName === TAGNAME) {
         state.activeBlock = node;
         const language = parseCodeblockLanguage(node);
-        setupChangeLanguageButton(editor, language?.name);
+        setupChangeLanguageButton(editor, language && language.name);
         return true;
       } else {
         state.activeBlock = null;
@@ -53,24 +53,24 @@ function setupChangeLanguageButton(editor, text = "Auto detect") {
     onItemAction: function (_, language) {
       selectLanguage(editor, language);
     },
-    select: (language) => language?.name === text,
+    select: (language) => language && language.name === text,
     fetch: (callback) => callback(state.languages),
   });
 }
 
 function selectLanguage(editor, language) {
   applyHighlighting(editor, language);
-  setupChangeLanguageButton(editor, language?.name);
+  setupChangeLanguageButton(editor, language && language.name);
 }
 
 function changeLanguageSelectLabel(text) {
   const label = document.querySelector(LANGUAGE_SELECT_LABEL_SELECTOR);
-  if (!label || label?.textContent === text) return;
+  if (!label || label.textContent === text) return;
   label.textContent = text;
 }
 
 function parseCodeblockLanguage(node) {
-  if (node?.tagName !== TAGNAME) return;
+  if (node && node.tagName !== TAGNAME) return;
 
   const languageAliases = getLanguageFromClassName(node.className).split("-");
   if (languageAliases.length <= 1) return;
@@ -87,7 +87,7 @@ function autoDetectLanguage(node) {
 }
 
 function applyHighlighting(editor, language) {
-  if (!language || !language.aliases?.length) return;
+  if (!language || !language.aliases || !language.aliases.length) return;
 
   const node = state.activeBlock;
   const alias = language.aliases[0];

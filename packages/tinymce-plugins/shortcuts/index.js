@@ -19,7 +19,7 @@ function register(editor) {
   editor.on("keydown", function (e) {
     const content = editor.selection.getContent();
     const node = editor.selection.getNode();
-    if (node?.nodeName === "PRE") return;
+    if (node && node.nodeName === "PRE") return;
 
     if (content) {
       if (e.key === "`") {
