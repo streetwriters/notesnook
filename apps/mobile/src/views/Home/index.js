@@ -9,10 +9,12 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager, scrollRef } from '../../utils';
+import { editing, InteractionManager, scrollRef } from '../../utils';
 import { db } from '../../utils/DB';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { eClearEditor, eOnLoadNote, eScrollEvent } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import { getNote } from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
   const notes = useNoteStore(state => state.notes);
@@ -81,6 +83,11 @@ export const Home = ({navigation}) => {
 
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
+      if (getNote()) {
+       eSendEvent(eOnLoadNote, {type: 'new'});
+       editing.currentlyEditing;
+       editing.movedAway = false;
+      }
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
