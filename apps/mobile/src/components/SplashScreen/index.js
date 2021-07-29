@@ -1,45 +1,53 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Image, SafeAreaView, View } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import React, {useEffect, useRef, useState} from 'react';
+import {Image, SafeAreaView, View} from 'react-native';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import Carousel from 'react-native-snap-carousel';
-import { SvgXml } from 'react-native-svg';
+import {SvgXml} from 'react-native-svg';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   COMMUNITY_SVG,
   NOTE_SVG,
   ORGANIZE_SVG,
-  PRIVACY_SVG,
+  PRIVATE_SVG,
   RICH_TEXT_SVG,
   SYNC_SVG
 } from '../../assets/images/assets';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
-import { dHeight, dWidth, getElevation } from '../../utils';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
+import {dHeight, dWidth, getElevation} from '../../utils';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const features = [
   {
+    title: 'Welcome to Notesnook',
+    description:
+      'Did you know that the best note taking apps can secretly read all your notes? But Notesnook is different. How?',
+    icon: require('../../assets/images/notesnook-logo-png.png'),
+    type: 'image'
+  },
+  {
     title: '100% end-to-end encrypted notes',
     description:
-      'Your data is encrypted on your device. No one except you can read your notes.',
-    icon: PRIVACY_SVG,
+      'All your notes are encrypted on your device. No one except you can read your notes.',
+    icon: PRIVATE_SVG,
     link: 'https://docs.notesnook.com/how-is-my-data-encrypted/',
+    linkText: 'Learn how we encrypt your data',
     img: 'privacy'
   },
   {
     icon: SYNC_SVG,
     title: 'Sync to unlimited devices',
     description:
-      'You can download Notesnook on your laptop/pc, tablet and mobile. Your notes are with you where ever you go.',
+      'Notesnook works 100% offline and you can install it on all your mobile, tablet and PC. Your notes are always with you where ever you go.',
     link: 'https://notesnook.com',
     img: 'sync'
   },
@@ -47,7 +55,7 @@ const features = [
     icon: RICH_TEXT_SVG,
     title: 'Write better. Faster. Smarter.',
     description:
-      'Edit your notes the way you want. You can add images, videos, tables and so much more.',
+      'Edit your notes the way you want. You can add images, videos, tables and even use markdown.',
     link: 'https://notesnook.com',
     img: 'sync'
   },
@@ -65,13 +73,16 @@ const features = [
     description:
       'We are not ghosts, chat with us and share your experience. Give suggestions, report issues and meet other people using Notesnook',
     link: 'https://discord.gg/zQBK97EE22',
+    linkText: 'Join now',
     img: 'community'
   },
   {
-    title: 'Welcome to Notesnook',
+    icon: require('../../assets/images/to_the_stars.png'),
+    title: 'Get started',
     description: 'Ready to start taking private notes?',
-    icon: require('../../assets/images/notesnook-logo-png.png'),
-    type: 'image'
+    img: 'community',
+    type: 'image',
+    size: 320
   }
 ];
 let currentIndex = 0;
@@ -133,7 +144,7 @@ const SplashScreen = () => {
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: colors.bg
+            backgroundColor: colors.nav
           }}>
           <Animated.View
             style={{
@@ -141,7 +152,6 @@ const SplashScreen = () => {
               height: '100%',
               justifyContent: 'center',
               alignItems: 'center',
-              padding: 12,
               opacity: opacity
             }}>
             <View>
@@ -153,97 +163,13 @@ const SplashScreen = () => {
                 loop={false}
                 onSnapToItem={i => {
                   currentIndex = i;
+                  if (currentIndex === 6) {
+                    setIsNext(false);
+                  }
                 }}
                 maxToRenderPerBatch={10}
                 renderItem={({item, index}) => (
-                  <View
-                    style={{
-                      height: '100%',
-                      justifyContent: 'center'
-                    }}>
-                    <View
-                      key={item.description}
-                      style={{
-                        paddingVertical: 5,
-                        marginBottom: 10,
-                        alignSelf: 'center'
-                      }}>
-                      <View
-                        style={{
-                          flexWrap: 'wrap',
-                          width: '100%',
-                          alignItems: 'center'
-                        }}>
-                        {item.type === 'image' ? (
-                          <Image
-                            source={item.icon}
-                            style={{
-                              width: 170,
-                              height: 170
-                            }}
-                          />
-                        ) : item.type === 'icon' ? (
-                          <Icon
-                            color={item.color}
-                            name={item.icon}
-                            size={170}
-                          />
-                        ) : (
-                          <SvgXml
-                            xml={
-                              item.icon
-                                ? item.icon(colors.accent)
-                                : NOTE_SVG(colors.accent)
-                            }
-                            width={250}
-                            height={250}
-                          />
-                        )}
-
-                        {item.title && (
-                          <Heading
-                            size={SIZE.xl}
-                            style={{
-                              textAlign: 'center',
-                              alignSelf: 'center',
-                              marginTop: 10,
-                              maxWidth: '90%'
-                            }}>
-                            {item.title}
-                          </Heading>
-                        )}
-
-                        {item.description && (
-                          <Paragraph
-                            size={SIZE.md}
-                            color={colors.icon}
-                            textBreakStrategy="balanced"
-                            style={{
-                              fontWeight: 'normal',
-                              textAlign: 'center',
-                              alignSelf: 'center',
-                              maxWidth: DDS.isTab ? 350 : '80%'
-                            }}>
-                            {item.description}
-                          </Paragraph>
-                        )}
-
-                        {item.link && (
-                          <Button
-                            title="Learn more"
-                            fontSize={SIZE.md}
-                            onPress={() => {
-                              try {
-                                openLinkInBrowser(item.link, colors);
-                              } catch (e) {
-                                console.log(e, 'ERROR');
-                              }
-                            }}
-                          />
-                        )}
-                      </View>
-                    </View>
-                  </View>
+                  <RenderItem item={item} index={index} />
                 )}
               />
             </View>
@@ -252,8 +178,26 @@ const SplashScreen = () => {
               style={{
                 width: '100%',
                 position: 'absolute',
-                bottom: 25
+                bottom: 25,
+                paddingHorizontal: 12
               }}>
+              {isNext ? null : (
+                <Button
+                  fontSize={SIZE.md}
+                  height={40}
+                  onPress={async () => {
+                    await hide();
+                    await MMKV.setItem('introCompleted', 'true');
+                  }}
+                  style={{
+                    paddingHorizontal: 24,
+                    alignSelf: !isNext ? 'center' : 'flex-end',
+                    marginBottom: 10
+                  }}
+                  type="gray"
+                  title="I want to try the app first"
+                />
+              )}
               <Button
                 fontSize={SIZE.md}
                 height={50}
@@ -266,7 +210,7 @@ const SplashScreen = () => {
                       true
                     );
                     currentIndex++;
-                    if (currentIndex === 5) {
+                    if (currentIndex === 6) {
                       setIsNext(false);
                     }
                   } else {
@@ -281,27 +225,8 @@ const SplashScreen = () => {
                   alignSelf: !isNext ? 'center' : 'flex-end'
                 }}
                 type="accent"
-                title={isNext ? 'Next' : 'Start your 14 day free trial'}
+                title={isNext ? 'Next' : 'Sign up'}
               />
-
-              {isNext ? null : (
-                <Button
-                  fontSize={SIZE.md}
-                  height={50}
-                  width={DDS.isTab ? 350 : '100%'}
-                  onPress={async () => {
-                    await hide();
-                    await MMKV.setItem('introCompleted', 'true');
-                  }}
-                  style={{
-                    paddingHorizontal: 24,
-                    alignSelf: !isNext ? 'center' : 'flex-end',
-                    marginTop: 10
-                  }}
-                  type="grayBg"
-                  title="I want to try the app first"
-                />
-              )}
             </View>
           </Animated.View>
         </SafeAreaView>
@@ -311,3 +236,124 @@ const SplashScreen = () => {
 };
 
 export default SplashScreen;
+
+const RenderItem = ({item, index}) => {
+  const [state] = useTracked();
+  const {colors} = state;
+  const translateY = useValue(0);
+  const dimensions = useSettingStore(state => state.dimensions);
+  let itemWidth = dimensions.width > 400 ? 320 : 260;
+
+  useEffect(() => {
+    if (index === 0) return;
+    let value = 0;
+    setInterval(() => {
+      value = value === 0 ? 5 : 0;
+      timing(translateY, {
+        toValue: value,
+        duration: 2000,
+        easing: Easing.inOut(Easing.ease)
+      }).start();
+    }, 2000);
+  }, []);
+
+  return (
+    <View
+      style={{
+        justifyContent: 'center',
+        backgroundColor: colors.bg,
+        alignSelf: 'center',
+        width: '90%',
+        borderBottomRightRadius: 10,
+        borderBottomLeftRadius: 10,
+        height: '80%'
+      }}>
+      <View
+        key={item.description}
+        style={{
+          paddingVertical: 5,
+          marginBottom: 10,
+          alignSelf: 'center'
+        }}>
+        <View
+          style={{
+            flexWrap: 'wrap',
+            width: '100%',
+            alignItems: 'center'
+          }}>
+          <Animated.View
+            style={{
+              transform: [
+                {
+                  translateY: translateY
+                }
+              ]
+            }}>
+            {item.type === 'image' ? (
+              <Image
+                source={item.icon}
+                style={{
+                  width: item.size || 170,
+                  height: item.size || 170
+                }}
+              />
+            ) : item.type === 'icon' ? (
+              <Icon color={item.color} name={item.icon} size={170} />
+            ) : (
+              <SvgXml
+                xml={
+                  item.icon ? item.icon(colors.accent) : NOTE_SVG(colors.accent)
+                }
+                width={itemWidth}
+                height={itemWidth}
+              />
+            )}
+          </Animated.View>
+
+          {item.title && (
+            <Heading
+              size={SIZE.xxl}
+              textBreakStrategy="balanced"
+              style={{
+                textAlign: 'center',
+                alignSelf: 'center',
+                marginTop: 10,
+                maxWidth: '90%',
+                marginBottom: 10
+              }}>
+              {item.title}
+            </Heading>
+          )}
+
+          {item.description && (
+            <Paragraph
+              size={SIZE.md}
+              style={{
+                fontWeight: 'normal',
+                textAlign: 'center',
+                alignSelf: 'center',
+                maxWidth: DDS.isTab ? 350 : '90%',
+                lineHeight: SIZE.md + 7
+              }}>
+              {item.description}
+            </Paragraph>
+          )}
+
+          {item.link && (
+            <Button
+              title={item.linkText || 'Learn more'}
+              fontSize={SIZE.md}
+              onPress={() => {
+                try {
+                  openLinkInBrowser(item.link, colors);
+                } catch (e) {
+                  console.log(e, 'ERROR');
+                }
+              }}
+            />
+          )}
+        </View>
+      </View>
+    </View>
+  );
+};
