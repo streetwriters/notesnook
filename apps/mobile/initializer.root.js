@@ -183,6 +183,8 @@ const NativeStack = React.memo(
 
     function setDeviceMode(current, size) {
       setDeviceModeState(current);
+      let needsUpdate = current !== deviceMode;
+    
       if (fullscreen) {
         editorRef.current?.setNativeProps({
           style: {
@@ -207,14 +209,19 @@ const NativeStack = React.memo(
           },
         });
       }
+      if (!needsUpdate) {
+        console.log('reposition not needed');
+        return;
+      }
       setTimeout(() => {
         if (current === 'tablet') {
           tabBarRef.current?.goToIndex(0);
         } else {
           if (!editing.movedAway) {
-            tabBarRef.current?.goToPage(1)
+            tabBarRef.current?.goToIndex(2)
           } else {
-            tabBarRef.current?.goToPage(0)
+            console.log('index one',editing.movedAway);
+            tabBarRef.current?.goToIndex(1)
           }
         }
       }, 1);

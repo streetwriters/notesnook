@@ -77,14 +77,13 @@ export default class CustomTabs extends Component {
   };
 
   hideKeyboardIfVisible(close) {
-
     if (!close && this.nextPage === 1) return;
     if (Platform.OS === 'ios') return;
     if (editing.movedAway) return;
 
     if (
-      (editing.keyboardState) &&
-      this.scrollOffset < this.props.offsets.b - 100
+      (editing.keyboardState || editing.isFocused) &&
+      this.scrollOffset < this.props.offsets.b - 50
     ) {
       editing.keyboardState = false;
       Keyboard.dismiss();
@@ -103,6 +102,7 @@ export default class CustomTabs extends Component {
       offset = 0;
       this.nextPage = 0;
     }
+
     this.listRef.current?.scrollToOffset({
       offset: offset,
       animated: animated,
@@ -128,16 +128,11 @@ export default class CustomTabs extends Component {
       clearTimeout(this.scrollEndTimeout);
       this.scrollEndTimeout = null;
     }
+
     if (this.page === 1 && this.scrollOffset < this.props.offsets.b - 100) {
       this.nextPage = 0;
     } else {
       this.nextPage = 1;
-    }
-
-    if (this.scrollOffset < this.props.offsets.b - 100 && this.nextPage !== 1) {
-      editing.movedAway = true;
-    } else {
-      editing.currentlyEditing = true;
     }
     this.props.onScroll(this.scrollOffset);
     if (this.scrollTimeout) {
@@ -182,13 +177,14 @@ export default class CustomTabs extends Component {
     this.moved = false;
     this.responderAllowedScroll = false;
     let page = 0;
+
     if (this.scrollOffset > this.props.offsets.b - 100) {
       page = 1;
       this.nextPage = 1;
     } else {
       this.nextPage = 0;
-      editing.movedAway = true;
     }
+
     let drawerState = page === 0 && this.scrollOffset < 10;
     if (drawerState !== this.currentDrawerState) {
       this.currentDrawerState = drawerState;
@@ -201,7 +197,6 @@ export default class CustomTabs extends Component {
     );
     if (this.page !== page) {
       this.scrollEndTimeout = setTimeout(() => {
-        console.log('go to page',page, 'from page', this.page);
         this.props.onChangeTab({i: page, from: this.page});
         this.page = page;
       },50)
