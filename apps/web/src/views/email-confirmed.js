@@ -1,8 +1,10 @@
 import { useEffect } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import { trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
+import * as Icon from "../components/icons";
+import openLink from "../commands/openLink";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -13,43 +15,68 @@ function EmailConfirmed() {
   return (
     <ThemeProvider>
       <Flex
-        flexDirection="column"
         bg="background"
-        height="100%"
-        alignItems="center"
+        height={"100%"}
+        justifyContent={["start", "start", "space-evenly"]}
         overflowY="auto"
+        flexDirection={["column", "column", "row"]}
+        fontSize={[16, 16, 18]}
       >
-        <Flex flex={1} justifyContent="center" alignItems="center">
-          <Flex
-            maxWidth={["95%", "400px", "400px"]}
-            flexDirection="column"
-            sx={{
-              borderRadius: "default",
-              border: "1px solid",
-              borderTop: "none",
-              borderColor: "primary",
-            }}
+        <Flex
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          flex={1}
+          sx={{ flexShrink: 0 }}
+          py={[50, 50, 0]}
+          px={[2, 2, 0]}
+        >
+          <Icon.MailCheck
+            sx={{ bg: "shade", borderRadius: 100, p: 5 }}
+            size={72}
+            color="primary"
+          />
+          <Text
+            textAlign="center"
+            variant="heading"
+            fontWeight="heading"
+            fontSize="2.5em"
+            mt={5}
           >
-            <Text
-              variant="heading"
-              fontSize={32}
-              bg="primary"
-              textAlign="center"
-              color="static"
-              py={20}
-              sx={{
-                borderRadius: "default",
-                borderBottomLeftRadius: "0px",
-                borderBottomRightRadius: "0px",
-              }}
-            >
-              <Text variant="title" color="static" textAlign="center">
-                Notesnook
-              </Text>
-              Email confirmed
-            </Text>
-            <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
-          </Flex>
+            Huzzah!
+          </Text>
+          <Text
+            textAlign="center"
+            variant="heading"
+            fontWeight="bold"
+            fontSize="1.5em"
+            color="icon"
+            mt={2}
+          >
+            Your account has been verified.
+          </Text>
+          <Text
+            textAlign="center"
+            variant="body"
+            fontSize="1.2em"
+            color="fontTertiary"
+            mt={2}
+            sx={{ wordWrap: "break-word" }}
+            mx={[2, 2, 100]}
+          >
+            Enjoy 14 days of Notesnook Pro completely free.
+          </Text>
+        </Flex>
+        <Flex
+          flexDirection="column"
+          bg="bgSecondary"
+          justifyContent="center"
+          p={5}
+          py={[50, 50, 5]}
+          flex={1}
+          sx={{ flexGrow: 0 }}
+        >
+          <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
         </Flex>
       </Flex>
     </ThemeProvider>
@@ -57,36 +84,103 @@ function EmailConfirmed() {
 }
 export default EmailConfirmed;
 
+const social = [
+  {
+    title: "Discord",
+    hoverColor: "#7289da",
+    icon: Icon.Discord,
+    link: "https://discord.com/invite/zQBK97EE22",
+  },
+  {
+    title: "Twitter",
+    hoverColor: "#1da1f2",
+    icon: Icon.Twitter,
+    link: "https://twitter.com/notesnook",
+  },
+  {
+    title: "Reddit",
+    hoverColor: "#ff4500",
+    icon: Icon.Reddit,
+    link: "https://reddit.com/r/Notesnook",
+  },
+];
 function BlogPromoBanner(props) {
-  const { link } = props;
   return (
-    <Flex flexDirection="column" p={4}>
-      <Text variant="heading" textAlign="center">
-        Do you know why we made notesnook?
+    <Flex flexDirection="column" justifyContent="center" alignItems="center">
+      <Text variant="heading" fontSize="1.5em" textAlign="center">
+        Share Notesnook with your friends!
       </Text>
-      <Text variant="body" fontSize="title" mt={1}>
-        There are so many note taking apps out there. But none of them fix the
-        core issue with privacy.
+      <Text
+        textAlign="center"
+        variant="body"
+        fontSize="1.2em"
+        color="fontTertiary"
+        mt={2}
+        sx={{ wordWrap: "break-word" }}
+        mx={[2, 2, 100]}
+      >
+        Because where's the fun in nookin' alone?
       </Text>
-
-      <Text variant="body" fontSize="title" mt={1}>
-        Privacy has become undesirable because you have to sacrifice so much.
+      <Flex mt={5}>
+        {social.map((account) => (
+          <account.icon
+            hoverColor={account.hoverColor}
+            title={account.title}
+            onClick={() => {
+              openLink(account.link, "_blank");
+              trackEvent(account.title, "social-link");
+            }}
+            size={30}
+            sx={{ mr: 1, cursor: "pointer" }}
+          />
+        ))}
+      </Flex>
+      <Text
+        textAlign="center"
+        variant="body"
+        color="fontTertiary"
+        mt={2}
+        sx={{ wordWrap: "break-word" }}
+        mx={[2, 2, 100]}
+      >
+        Use{" "}
+        <Text as="span" fontWeight="bold" color="primary">
+          #notesnook
+        </Text>{" "}
+        and get a chance to win free promo codes.
       </Text>
-
-      <Text variant="body" fontSize="title" mt={1}>
-        In your heart, you know privacy is important. But you can't give up on
-        that awesome feature.
-      </Text>
-
-      <Text variant="body" fontSize="title" mt={1}>
-        You are forced to keep using privacy invasive apps because...the
-        alternative is not as productive.
-      </Text>
-
-      <Text variant="title" mt={1}>
-        But we are going to change that.
-      </Text>
-      <Button
+      {/* <p>
+        Listen. We want you to buy Notesnook Pro. It's as simple as that. Since
+        2019, we have been analyzing the ever increasing trend towards privacy
+        invasive apps.
+      </p>
+      <p>
+        Notion. Evernote. Google Keep. Trello. People flock to these apps to
+        solve their "problems". What they never realize is that Trello is packed
+        with 100+ trackers. What they don't realize is that Google is using
+        their "smart" notes to sell them ads. There is no end to this.
+      </p>
+      <p>
+        The result is clear. No one cares about privacy. Security &amp;
+        encryption are just buzzwords.
+      </p>
+      <p>
+        We want you to buy Notesnook Pro. Not to line our own pockets but to
+        bring a change. Instead of. We want to hear that phrase. "I bought
+        Notesnook instead of Evernote". For us, that is success.
+      </p>
+      <p>
+        There are no two ways about it. The world is moving towards a time when
+        privacy, security, freedom will be just words...memories. Call me a
+        conspiracy theorist but the evidence makes this clear. The world where
+        Big Data will govern us is not far.
+      </p>
+      <p>
+        99% of the people will shrug and move on. That's okay. But you can
+        choose not to. You can choose freedom, privacy, and security. I promise
+        it won't hurt.
+      </p> */}
+      {/* <Button
         mt={2}
         as="a"
         href={link}
@@ -100,7 +194,7 @@ function BlogPromoBanner(props) {
         }
       >
         How are we going to do that? Read on.
-      </Button>
+      </Button> */}
     </Flex>
   );
 }

@@ -1,9 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 import MDIIcon from "@mdi/react";
 import * as Icons from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import Animated from "../animated";
-//import useMobile from "../../utils/use-mobile";
 
 function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
@@ -24,6 +23,7 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
 
 function createIcon(name, rotate = false) {
   return function (props) {
+    const [isHovering, setIsHovering] = useState();
     return (
       <Animated.Flex
         id={props.id}
@@ -37,8 +37,18 @@ function createIcon(name, rotate = false) {
         sx={props.sx}
         justifyContent="center"
         alignItems="center"
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
       >
-        <Icon title={props.title} name={name} rotate={rotate} {...props} />
+        <Icon
+          title={props.title}
+          name={name}
+          rotate={rotate}
+          color={
+            props.hoverColor && isHovering ? props.hoverColor : props.color
+          }
+          {...props}
+        />
       </Animated.Flex>
     );
   };
@@ -161,3 +171,9 @@ export const Destruct = createIcon(Icons.mdiBomb);
 
 export const CompactView = createIcon(Icons.mdiViewHeadline);
 export const DetailedView = createIcon(Icons.mdiViewSequentialOutline);
+
+export const MailCheck = createIcon(Icons.mdiEmailCheckOutline);
+
+export const Discord = createIcon(Icons.mdiDiscord);
+export const Twitter = createIcon(Icons.mdiTwitter);
+export const Reddit = createIcon(Icons.mdiReddit);
