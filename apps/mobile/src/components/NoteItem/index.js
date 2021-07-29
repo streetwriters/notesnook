@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {Platform} from 'react-native';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,13 +23,13 @@ function navigateToNotebook(item) {
   let params = {
     menu: false,
     notebook: notebook,
-    title: notebook.title,
+    title: notebook.title
   };
 
   let headerState = {
     heading: notebook.title,
     id: notebook.id,
-    type: notebook.type,
+    type: notebook.type
   };
   Navigation.navigate(routeName, params, headerState);
 }
@@ -40,12 +40,12 @@ function navigateToTag(item) {
   let params = {
     ..._tag,
     type: 'tag',
-    get: 'tagged',
+    get: 'tagged'
   };
   Navigation.navigate('NotesPage', params, {
     heading: '#' + _tag.title,
     id: _tag.id,
-    type: _tag.type,
+    type: _tag.type
   });
   eSendEvent(refreshNotesPage, params);
 }
@@ -70,8 +70,8 @@ const showActionSheet = (item, isTrash) => {
           'Vault',
           'Delete',
           'RemoveTopic',
-          ...android,
-        ],
+          ...android
+        ]
   );
 };
 
@@ -86,7 +86,7 @@ const NoteItem = ({item, isTrash, tags}) => {
       <View
         style={{
           flexGrow: 1,
-          flexShrink: 1,
+          flexShrink: 1
         }}>
         {!compactMode && (
           <View
@@ -94,7 +94,7 @@ const NoteItem = ({item, isTrash, tags}) => {
               flexDirection: 'row',
               alignItems: 'center',
               zIndex: 10,
-              elevation: 10,
+              elevation: 10
             }}>
             {!isTrash &&
               item.notebooks?.slice(0, 1).map(_item => (
@@ -104,7 +104,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   height={20}
                   textStyle={{
                     fontWeight: 'normal',
-                    fontFamily: null,
+                    fontFamily: null
                   }}
                   icon="book-outline"
                   type="grayBg"
@@ -115,7 +115,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     borderWidth: 0.5,
                     borderColor: colors.icon,
                     paddingHorizontal: 6,
-                    paddingRight: 2,
+                    paddingRight: 2
                   }}
                   onPress={() => navigateToNotebook(_item)}
                 />
@@ -128,7 +128,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   height={20}
                   textStyle={{
                     fontWeight: 'normal',
-                    fontFamily: null,
+                    fontFamily: null
                   }}
                   type="grayBg"
                   fontSize={SIZE.xs + 1}
@@ -138,7 +138,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     borderWidth: 0.5,
                     borderColor: colors.icon,
                     paddingHorizontal: 6,
-                    zIndex: 10,
+                    zIndex: 10
                   }}
                   onPress={() => navigateToTag(item)}
                 />
@@ -150,7 +150,7 @@ const NoteItem = ({item, isTrash, tags}) => {
           numberOfLines={1}
           color={COLORS_NOTE[item.color] || colors.heading}
           style={{
-            flexWrap: 'wrap',
+            flexWrap: 'wrap'
           }}
           size={SIZE.md}>
           {item.title}
@@ -159,7 +159,7 @@ const NoteItem = ({item, isTrash, tags}) => {
         {item.headline && !compactMode ? (
           <Paragraph
             style={{
-              flexWrap: 'wrap',
+              flexWrap: 'wrap'
             }}
             numberOfLines={2}>
             {item.headline}
@@ -173,7 +173,7 @@ const NoteItem = ({item, isTrash, tags}) => {
             alignItems: 'center',
             width: '100%',
             marginTop: 5,
-            height: SIZE.md + 2,
+            height: SIZE.md + 2
           }}>
           {!isTrash ? (
             <>
@@ -181,7 +181,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 style={{
                   fontSize: SIZE.xs + 1,
                   color: colors.icon,
-                  marginRight: 10,
+                  marginRight: 10
                 }}
                 time={item.dateCreated}
                 updateFrequency={
@@ -198,7 +198,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     borderRadius: 100,
                     backgroundColor: COLORS_NOTE[item.color],
                     marginRight: -4.5,
-                    marginRight: 10,
+                    marginRight: 10
                   }}
                 />
               ) : null}
@@ -209,7 +209,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   name="pin"
                   size={SIZE.sm}
                   style={{
-                    marginRight: 5,
+                    marginRight: 5
                   }}
                   color={COLORS_NOTE[item.color] || colors.accent}
                 />
@@ -221,7 +221,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   name="lock"
                   size={SIZE.sm}
                   style={{
-                    marginRight: 10,
+                    marginRight: 10
                   }}
                   color={colors.icon}
                 />
@@ -233,7 +233,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   name="star"
                   size={SIZE.md}
                   style={{
-                    marginRight: 10,
+                    marginRight: 10
                   }}
                   color="orange"
                 />
@@ -245,7 +245,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     marginRight: 10,
                     flexDirection: 'row',
                     alignItems: 'center',
-                    justifyContent: 'space-between',
+                    justifyContent: 'space-between'
                   }}>
                   <Icon
                     name="alert-circle"
@@ -256,7 +256,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     size={SIZE.xs}
                     style={{
                       color: colors.red,
-                      marginLeft: 2,
+                      marginLeft: 2
                     }}>
                     CONFLICTS
                   </Heading>
@@ -269,7 +269,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.icon}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10,
+                  marginRight: 10
                 }}>
                 Deleted on{' '}
                 {item && item.dateDeleted
@@ -281,7 +281,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.accent}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10,
+                  marginRight: 10
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
@@ -299,7 +299,7 @@ const NoteItem = ({item, isTrash, tags}) => {
           height: 35,
           width: 35,
           borderRadius: 100,
-          alignItems: 'center',
+          alignItems: 'center'
         }}
       />
     </>

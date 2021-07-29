@@ -25,7 +25,7 @@ let renderItems = {
 const RenderItem = ({item, index}) => {
   const Item = renderItems[item.itemType || item.type];
   
-  return <Item item={item} tags={item.tags} index={index} />;
+  return <Item item={item} tags={item.tags ? [...item.tags] : null} index={index} />;
 };
 
 const SimpleList = ({
