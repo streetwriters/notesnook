@@ -167,7 +167,7 @@ class SortDialog extends React.Component {
                     onPress={async () => {
                       let _groupOptions = {
                         ...groupOptions,
-                        sortBy: type === 'trash' ? 'dateDeleted' : item,
+                        sortBy: this.props.type === 'trash' ? 'dateDeleted' : item,
                       };
                       await this.updateGroupOptions(_groupOptions);
                     }}
