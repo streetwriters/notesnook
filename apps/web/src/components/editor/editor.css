@@ -42,7 +42,7 @@
   color: var(--fontTertiary) !important;
 }
 
-tox-tbtn tox-tbtn--select {
+.tox-tbtn .tox-tbtn--select {
   border-radius: 5px !important;
 }
 

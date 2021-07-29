@@ -765,6 +765,11 @@ function AccountStatus(props) {
           <Button
             variant="list"
             onClick={async () => {
+              if (!user.subscription.updateURL)
+                return showToast(
+                  "error",
+                  "Failed to update. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
+                );
               await openPaddleDialog(user.subscription.updateURL);
             }}
           >
@@ -777,6 +782,11 @@ function AccountStatus(props) {
             variant="list"
             sx={{ ":hover": { borderColor: "error" } }}
             onClick={async () => {
+              if (!user.subscription.cancelURL)
+                return showToast(
+                  "error",
+                  "Failed to cancel subscription. Please reach out to us at support@streetwriters.co so we can help you resolve the issue."
+                );
               await openPaddleDialog(user.subscription.cancelURL);
             }}
           >
