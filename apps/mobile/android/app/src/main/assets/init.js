@@ -124,9 +124,6 @@ function init_tiny(size) {
     ],
     toolbar: false,
     paste_data_images: true,
-    /*   images_upload_handler: function (blobInfo, success, failure) {
-      success('data:' + blobInfo.blob().type + ';base64,' + blobInfo.base64());
-    }, */
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
@@ -161,11 +158,6 @@ function init_tiny(size) {
       
       .mce-content-body h5::before {
       content: "H5";
-      }
-      
-      .mce-content-body blockquote::before {
-      content: "QUOTE";
-      margin-left: 0px !important;
       }
   
       .h {

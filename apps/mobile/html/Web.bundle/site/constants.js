@@ -32,8 +32,8 @@ const markdownPatterns = [
   {start: '#####', format: 'h5'},
   {start: '######', format: 'h6'},
   {start: '* ', cmd: 'InsertUnorderedList'},
-  {start: '- [ ] ', cmd: 'InsertCheckList'},
-  {start: '- [x] ', cmd: 'InsertCheckList', value: 'checked'},
+  {start: '- [ ] ', cmd: 'insertCheckList'},
+  {start: '- [x] ', cmd: 'insertCheckList', value: 'checked'},
   {start: '- ', cmd: 'InsertUnorderedList'},
   {start: '> ', format: 'blockquote'},
   {
