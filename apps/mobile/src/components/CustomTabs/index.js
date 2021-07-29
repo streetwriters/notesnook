@@ -1,5 +1,6 @@
 import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
+import { Keyboard } from 'react-native';
 import {FlatList, TextInput, View} from 'react-native';
 import {DDS} from '../../services/DeviceDetection';
 import {editing} from '../../utils';
@@ -76,18 +77,17 @@ export default class CustomTabs extends Component {
   };
 
   hideKeyboardIfVisible(close) {
+
     if (!close && this.nextPage === 1) return;
     if (Platform.OS === 'ios') return;
+    if (editing.movedAway) return;
 
     if (
-      (editing.keyboardState || editing.isFocused) &&
-      this.scrollOffset < this.props.offsets.b - 50
+      (editing.keyboardState) &&
+      this.scrollOffset < this.props.offsets.b - 100
     ) {
-      editing.isFocused = false;
       editing.keyboardState = false;
-      this.inputElement.current?.focus();
-      this.inputElement.current?.blur();
-      console.log('hiding keyboard from custom tabs');
+      Keyboard.dismiss();
     }
   }
 
@@ -124,11 +124,19 @@ export default class CustomTabs extends Component {
   onScroll = event => {
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
+    if (this.page === 1 && this.scrollOffset < this.props.offsets.b - 100) {
+      this.nextPage = 0;
+    } else {
+      this.nextPage = 1;
+    }
 
     if (this.scrollOffset < this.props.offsets.b - 100 && this.nextPage !== 1) {
       editing.movedAway = true;
     } else {
-      editing.movedAway = false;
       editing.currentlyEditing = true;
     }
     this.props.onScroll(this.scrollOffset);
@@ -164,19 +172,22 @@ export default class CustomTabs extends Component {
 
   keyExtractor = (item, index) => item;
 
+  scrollEndTimeout = null;
+
   onScrollEnd = () => {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout)
+      this.scrollEndTimeout = null;
+    }
     this.moved = false;
     this.responderAllowedScroll = false;
     let page = 0;
-    if (this.scrollOffset > this.props.offsets.b - 50) {
+    if (this.scrollOffset > this.props.offsets.b - 100) {
       page = 1;
       this.nextPage = 1;
-      editing.movedAway = false;
     } else {
       this.nextPage = 0;
-      console.log('moved away here',editing.movedAway);
       editing.movedAway = true;
-      this.hideKeyboardIfVisible();
     }
     let drawerState = page === 0 && this.scrollOffset < 10;
     if (drawerState !== this.currentDrawerState) {
@@ -189,8 +200,11 @@ export default class CustomTabs extends Component {
         : false,
     );
     if (this.page !== page) {
-      this.props.onChangeTab({i: page, from: this.page});
-      this.page = page;
+      this.scrollEndTimeout = setTimeout(() => {
+        console.log('go to page',page, 'from page', this.page);
+        this.props.onChangeTab({i: page, from: this.page});
+        this.page = page;
+      },50)
     }
   };
 

@@ -212,9 +212,9 @@ const NativeStack = React.memo(
           tabBarRef.current?.goToIndex(0);
         } else {
           if (!editing.movedAway) {
-            tabBarRef.current?.goToIndex(2);
+            tabBarRef.current?.goToPage(1)
           } else {
-            tabBarRef.current?.goToIndex(1);
+            tabBarRef.current?.goToPage(0)
           }
         }
       }, 1);
