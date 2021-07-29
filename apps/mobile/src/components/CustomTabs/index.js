@@ -1,6 +1,6 @@
 import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
-import { Keyboard } from 'react-native';
+import {Keyboard} from 'react-native';
 import {FlatList, TextInput, View} from 'react-native';
 import {DDS} from '../../services/DeviceDetection';
 import {editing} from '../../utils';
@@ -91,6 +91,10 @@ export default class CustomTabs extends Component {
   }
 
   goToIndex(index, animated = true) {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
     let offset = 0;
     if (index === 1) {
       this.nextPage = 0;
@@ -105,14 +109,14 @@ export default class CustomTabs extends Component {
 
     this.listRef.current?.scrollToOffset({
       offset: offset,
-      animated: animated,
+      animated: animated
     });
   }
 
   setScrollEnabled = enabled => {
     this.scrollEnabled = enabled;
     this.listRef.current?.getNativeScrollRef().setNativeProps({
-      scrollEnabled: enabled,
+      scrollEnabled: enabled
     });
   };
 
@@ -151,6 +155,10 @@ export default class CustomTabs extends Component {
   };
 
   goToPage = page => {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
     this.nextPage = page;
     if (page === 0) {
       this.scrollOffset = this.props.offsets.a;
@@ -171,7 +179,7 @@ export default class CustomTabs extends Component {
 
   onScrollEnd = () => {
     if (this.scrollEndTimeout) {
-      clearTimeout(this.scrollEndTimeout)
+      clearTimeout(this.scrollEndTimeout);
       this.scrollEndTimeout = null;
     }
     this.moved = false;
@@ -193,13 +201,13 @@ export default class CustomTabs extends Component {
     this.props.toggleOverlay(
       Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10)
         ? true
-        : false,
+        : false
     );
     if (this.page !== page) {
       this.scrollEndTimeout = setTimeout(() => {
         this.props.onChangeTab({i: page, from: this.page});
         this.page = page;
-      },50)
+      }, 50);
     }
   };
 
@@ -220,7 +228,7 @@ export default class CustomTabs extends Component {
         onMoveShouldSetResponderCapture={this.onMoveShouldSetResponder}
         onStartShouldSetResponderCapture={this.onMoveShouldSetResponder}
         style={{
-          flex: 1,
+          flex: 1
         }}>
         <TextInput
           ref={this.inputElement}
@@ -246,7 +254,6 @@ export default class CustomTabs extends Component {
           overScrollMode="never"
           maxToRenderPerBatch={100}
           keyboardDismissMode="none"
-          disableVirtualization
           removeClippedSubviews={Platform.OS === 'android'}
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
@@ -256,10 +263,10 @@ export default class CustomTabs extends Component {
           snapToOffsets={[
             this.props.offsets.a,
             this.props.offsets.b,
-            this.props.offsets.c,
+            this.props.offsets.c
           ]}
           contentOffset={{
-            x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b,
+            x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b
           }}
           data={['drawer', 'navigation', 'editor']}
           renderItem={this.renderItem}
@@ -270,5 +277,5 @@ export default class CustomTabs extends Component {
 }
 
 CustomTabs.defaultProps = {
-  onDrawerStateChange: () => {},
+  onDrawerStateChange: () => {}
 };

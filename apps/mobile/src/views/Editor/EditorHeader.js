@@ -108,7 +108,7 @@ const EditorHeader = () => {
         await clearEditor();
         Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
       }
-    }, 50);
+    }, 300);
   };
 
   const publishNote = async () => {
