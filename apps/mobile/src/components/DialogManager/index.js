@@ -265,7 +265,7 @@ export class DialogManager extends Component {
           </ActionSheetWrapper>
         )}
 
-        <Dialog />
+        <Dialog context="global" />
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
           close={() => {

@@ -625,7 +625,9 @@ export const ActionSheetComponent = ({
           negativeText: 'Cancel',
           positivePress: async () => {
             await db.trash.delete(note.id);
-            useTrashStore.getState().setTrash();
+            Navigation.setRoutesToUpdate([
+              Navigation.routeNames.Trash
+            ]);
             useSelectionStore.getState().setSelectionMode(false);
             ToastEvent.show({
               heading: 'Permanantly deleted items',
@@ -633,7 +635,7 @@ export const ActionSheetComponent = ({
               context: 'local'
             });
           },
-          positiveType: 'errorShade'
+          positiveType: 'errorShade',
         });
       }
     }
