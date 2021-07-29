@@ -156,7 +156,7 @@ const EditorHeader = () => {
     let note = getNote() && db.notes.note(getNote().id).data;
     if (editing.isFocused) {
       tiny.call(EditorWebView, tiny.blur);
-      await sleep(500);
+      await sleep(300);
       editing.isFocused = true;
     }
     

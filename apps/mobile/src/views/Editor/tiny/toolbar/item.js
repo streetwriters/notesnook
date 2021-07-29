@@ -18,6 +18,7 @@ import {db} from '../../../../utils/DB';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
+import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import {execCommands} from './commands';
 import {
@@ -189,7 +190,11 @@ const ToolbarItem = ({
     if (premium && !PremiumService.get()) {
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
-        await sleep(500);
+        if (editing.isFocused) {
+          tiny.call(EditorWebView, tiny.blur);
+          await sleep(300);
+          editing.isFocused = true;
+        }    
         PremiumService.showVerifyEmailDialog();
       } else {
         eSendEvent(eShowGetPremium, {
@@ -201,6 +206,11 @@ const ToolbarItem = ({
       return;
     }
     if (type === 'settings') {
+      if (editing.isFocused) {
+        tiny.call(EditorWebView, tiny.blur);
+        await sleep(300);
+        editing.isFocused = true;
+      }  
       eSendEvent('openEditorSettings');
       return;
     }
