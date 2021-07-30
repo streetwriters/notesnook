@@ -17,19 +17,15 @@ function EmailConfirmed() {
       <Flex
         bg="background"
         height={"100%"}
-        justifyContent={["start", "start", "space-evenly"]}
         overflowY="auto"
-        flexDirection={["column", "column", "row"]}
-        fontSize={[16, 16, 18]}
+        flexDirection={"column"}
+        fontSize={[14, 16, 18]}
       >
         <Flex
           flexDirection="column"
           justifyContent="center"
           alignItems="center"
           flex={1}
-          sx={{ flexShrink: 0 }}
-          py={[50, 50, 0]}
-          px={[2, 2, 0]}
         >
           <Icon.MailCheck
             sx={{ bg: "shade", borderRadius: 100, p: 5 }}
@@ -62,9 +58,20 @@ function EmailConfirmed() {
             color="fontTertiary"
             mt={2}
             sx={{ wordWrap: "break-word" }}
-            mx={[2, 2, 100]}
           >
-            Enjoy 14 days of Notesnook Pro completely free.
+            ...and we have also activated your 14 day free trial of{" "}
+            <Text
+              as="a"
+              href="https://notesnook.com/pricing"
+              rel="noreferrer"
+              target="_blank"
+              color="primary"
+            >
+              Notesnook Pro
+            </Text>
+            .
+            <br />
+            Enjoy the nice-teas.
           </Text>
         </Flex>
         <Flex
@@ -72,9 +79,6 @@ function EmailConfirmed() {
           bg="bgSecondary"
           justifyContent="center"
           p={5}
-          py={[50, 50, 5]}
-          flex={1}
-          sx={{ flexGrow: 0 }}
         >
           <BlogPromoBanner link="https://blog.notesnook.com/why-another-note-taking-app/" />
         </Flex>
@@ -107,17 +111,16 @@ const social = [
 function BlogPromoBanner(props) {
   return (
     <Flex flexDirection="column" justifyContent="center" alignItems="center">
-      <Text variant="heading" fontSize="1.5em" textAlign="center">
+      <Text variant="heading" fontSize="1.2em" textAlign="center">
         Share Notesnook with your friends!
       </Text>
       <Text
         textAlign="center"
         variant="body"
-        fontSize="1.2em"
+        fontSize="1em"
         color="fontTertiary"
         mt={2}
         sx={{ wordWrap: "break-word" }}
-        mx={[2, 2, 100]}
       >
         Because where's the fun in nookin' alone?
       </Text>
@@ -141,7 +144,6 @@ function BlogPromoBanner(props) {
         color="fontTertiary"
         mt={2}
         sx={{ wordWrap: "break-word" }}
-        mx={[2, 2, 100]}
       >
         Use{" "}
         <Text as="span" fontWeight="bold" color="primary">
