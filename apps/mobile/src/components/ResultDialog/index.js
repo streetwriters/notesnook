@@ -1,16 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {SvgXml} from 'react-native-svg';
-import {WELCOME_SVG} from '../../assets/images/assets';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
-import {ph, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { WELCOME_SVG } from '../../assets/images/assets';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
+import { ph, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
-import {SvgToPngView} from '../ListPlaceholders';
+import { SvgToPngView } from '../ListPlaceholders';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -49,7 +48,7 @@ const ResultDialog = () => {
         style={{
           ...getElevation(5),
           width: DDS.isTab ? 350 : '85%',
-          maxHeight: 350,
+          maxHeight: 450,
           borderRadius: 5,
           backgroundColor: colors.bg,
           paddingHorizontal: ph,
@@ -60,18 +59,19 @@ const ResultDialog = () => {
         <SvgToPngView
           src={WELCOME_SVG(colors.accent)}
           color={colors.accent}
-          img="welcome"
-          width={170}
-          height={170}
+          width={240}
+          height={240}
         />
 
         <Heading
           size={SIZE.lg}
+          textBreakStrategy="balanced"
           style={{
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10,
             maxWidth: '80%',
+            marginBottom:10
           }}>
           {dialogData.title}
         </Heading>
@@ -81,6 +81,7 @@ const ResultDialog = () => {
             alignSelf: 'center',
             textAlign: 'center',
             maxWidth: '80%',
+            lineHeight:SIZE.sm + 5
           }}>
           {dialogData.paragraph}
         </Paragraph>
