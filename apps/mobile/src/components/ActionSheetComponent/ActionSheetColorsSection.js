@@ -19,9 +19,9 @@ export const ActionSheetColorsSection = ({item, close}) => {
   const dimensions = useSettingStore(state => state.dimensions);
   let width = dimensions.width > 600 ? 600 : 500;
 
-  const changeColor = async () => {
+  const changeColor = async (color) => {
     if (note.color === color.name) {
-      await db.notes.note(note.id).uncolor(color.name);
+      await db.notes.note(note.id).uncolor();
     } else {
       await db.notes.note(note.id).color(color.name);
     }

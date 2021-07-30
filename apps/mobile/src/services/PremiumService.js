@@ -49,12 +49,10 @@ function getProducts() {
 }
 
 function get() {
-  //return true;
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
 async function verify(callback, error) {
-  //return callback();
   try {
     if (!premiumStatus) {
       if (error) {
@@ -72,7 +70,6 @@ async function verify(callback, error) {
 const onUserStatusCheck = async type => {
   let status = get();
   let message = null;
-
   if (!status) {
     switch (type) {
       case CHECK_IDS.noteColor:
@@ -112,6 +109,7 @@ const onUserStatusCheck = async type => {
         message = null;
         break;
     }
+
     if (message) {
       eSendEvent(eShowGetPremium, message);
     }
