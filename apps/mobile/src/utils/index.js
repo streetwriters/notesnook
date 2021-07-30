@@ -17,7 +17,7 @@ import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 import * as ackeeTracker from "./ackee"
 
-export const APP_VERSION = 1450;
+export const APP_VERSION = 1500;
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co',{
   ignoreLocalhost:true
