@@ -101,6 +101,7 @@ const EditorHeader = () => {
           duration: 1500
         });
       }
+      useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
       setTimeout(async () => {
         await clearEditor(false);
