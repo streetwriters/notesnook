@@ -9,6 +9,7 @@ import {ph, pv} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import Input from '../Input';
 import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
@@ -47,7 +48,10 @@ export const Dialog = ({context = 'global'}) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
+      let result = await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
+      if (result === false) {
+        return;
+      }
     }
     hide();
   };
@@ -99,7 +103,7 @@ export const Dialog = ({context = 'global'}) => {
             paragraph={dialogInfo.paragraph}
             paragraphColor={dialogInfo.paragraphColor}
           />
-          <Seperator />
+          <Seperator half />
 
           {dialogInfo.input && (
             <Input
@@ -108,6 +112,7 @@ export const Dialog = ({context = 'global'}) => {
               onChangeText={value => {
                 setInputValue(value);
               }}
+              secureTextEntry={dialogInfo.secureTextEntry}
               defaultValue={dialogInfo.defaultValue}
               onSubmit={onPressPositive}
               returnKeyLabel="Done"
@@ -124,6 +129,7 @@ export const Dialog = ({context = 'global'}) => {
             positiveType={dialogInfo.positiveType}
           />
         </View>
+        <Toast context="local"/>
       </BaseDialog>
     )
   );

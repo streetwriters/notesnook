@@ -1727,24 +1727,31 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           inputPlaceholder: 'Enter account password',
           paragraph: 'Please enter your account password to backup data',
           positiveText: 'Verify',
+          secureTextEntry:true,
           positivePress: async value => {
             try {
-              let verified = db.user.verifyPassword(value);
+              let verified = await db.user.verifyPassword(value);
               if (verified) {
-                await Backup.run();
+                sleep(300).then(async () => {
+                  await Backup.run();
+                })
               } else {
                 ToastEvent.show({
                   heading: 'Incorrect password',
                   message: 'The account password you entered is incorrect',
-                  type: 'error'
+                  type: 'error',
+                  context: 'local'
                 });
+                return false;
               }
             } catch (e) {
               ToastEvent.show({
                 heading: 'Failed to backup data',
                 message: e.message,
-                type: 'error'
+                type: 'error',
+                context: 'local'
               });
+              return false;
             }
           }
         });
