@@ -26,6 +26,7 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
+import {presentDialog} from '../../components/Dialog/functions';
 import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
@@ -1716,7 +1717,37 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           eSendEvent(eCloseProgressDialog);
           await sleep(300);
         }
-        await Backup.run();
+        if (!user) {
+          await Backup.run();
+          return;
+        }
+        presentDialog({
+          title: "Verify it's you",
+          input: true,
+          inputPlaceholder: 'Enter account password',
+          paragraph: 'Please enter your account password to backup data',
+          positiveText: 'Verify',
+          positivePress: async value => {
+            try {
+              let verified = db.user.verifyPassword(value);
+              if (verified) {
+                await Backup.run();
+              } else {
+                ToastEvent.show({
+                  heading: 'Incorrect password',
+                  message: 'The account password you entered is incorrect',
+                  type: 'error'
+                });
+              }
+            } catch (e) {
+              ToastEvent.show({
+                heading: 'Failed to backup data',
+                message: e.message,
+                type: 'error'
+              });
+            }
+          }
+        });
       },
       desc: 'Backup your data to phone storage'
     },
@@ -1745,7 +1776,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
         timestamp: Date.now() + 86400000 * 3
       })
     );
-  }
+  };
 
   return (
     <>
@@ -1822,7 +1853,6 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
                   onPress={async () => {
                     if (item.value === 'off') {
                       await SettingsService.set('reminder', item.value);
-                
                     } else {
                       await PremiumService.verify(async () => {
                         if (Platform.OS === 'android') {
