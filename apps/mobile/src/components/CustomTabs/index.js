@@ -162,7 +162,6 @@ export default class CustomTabs extends Component {
     this.nextPage = page;
     if (page === 0) {
       this.scrollOffset = this.props.offsets.a;
-      this.hideKeyboardIfVisible();
       this.goToIndex(1);
     } else if (page === 1) {
       this.goToIndex(2);
@@ -170,7 +169,7 @@ export default class CustomTabs extends Component {
     if (this.page !== page) {
       this.props.onChangeTab({i: page, from: this.page});
       this.page = page;
-    }
+    } 
   };
 
   keyExtractor = (item, index) => item;
