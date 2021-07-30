@@ -21,7 +21,6 @@ const EditorOverlay = () => {
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
   const opacity = useValue(1);
-  const translateY = useValue(6000);
 
   const load = async _loading => {
     clearTimeout(timer);
@@ -36,6 +35,7 @@ const EditorOverlay = () => {
       clearTimeout(timer);
       clearTimeout(timerError);
       setError(false);
+      await sleep(500);
       timing(opacity, {
         toValue: 0,
         duration: 150,
