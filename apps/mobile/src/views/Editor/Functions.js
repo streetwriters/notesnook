@@ -90,6 +90,7 @@ export async function clearTimer(clear) {
           content.data?.trim().length > 0) ||
         (title && title?.trim().length > 0 && id)
       ) {
+        console.log('saving note now');
         await saveNote(true);
       }
     }
@@ -430,8 +431,8 @@ function onNoteChange() {
   }, 500);
 }
 
-export async function clearEditor() {
-  await clearTimer(true);
+export async function clearEditor(clear=true) {
+  clear && await clearTimer(true);
   try {
     tiny.call(EditorWebView, tiny.reset, true);
     clearNote();
