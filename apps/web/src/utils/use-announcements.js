@@ -6,11 +6,13 @@ import { store as userstore } from "../stores/user-store";
 import { isUserPremium } from "../hooks/use-is-user-premium";
 
 var CACHED_ANNOUNCEMENTS = [];
+var cancelled = false;
 export default function useAnnouncements() {
   const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
     (async function () {
+      cancelled = false;
       try {
         CACHED_ANNOUNCEMENTS = CACHED_ANNOUNCEMENTS.length
           ? CACHED_ANNOUNCEMENTS
@@ -18,6 +20,7 @@ export default function useAnnouncements() {
       } catch (e) {
         console.error(e);
       } finally {
+        if (cancelled) return;
         setAnnouncements(() => {
           const filtered = CACHED_ANNOUNCEMENTS.filter((announcement) =>
             shouldShowAnnouncement(announcement)
@@ -26,6 +29,9 @@ export default function useAnnouncements() {
         });
       }
     })();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const remove = useCallback((id) => {
