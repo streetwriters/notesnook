@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
-import useVersion, { getCachedVersion } from "./utils/useVersion";
 import { resetReminders } from "./common/reminders";
 import { introduceFeatures } from "./common";
 import { db } from "./common/db";
@@ -22,19 +21,6 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  // const [version] = useVersion();
-
-  // useEffect(() => {
-  //   (async function () {
-  //     const cached = getCachedVersion();
-  //     if (!cached) return;
-  //     await import("./common/dialogcontroller").then((dialogs) => {
-  //       if (cached.appUpdated) return dialogs.showAppUpdatedNotice(cached);
-  //       else if (cached.appUpdateable)
-  //         return dialogs.showAppAvailableNotice(cached);
-  //     });
-  //   })();
-  // }, [version]);
 
   useEffect(
     function initializeApp() {

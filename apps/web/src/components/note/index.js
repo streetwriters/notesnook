@@ -5,7 +5,6 @@ import TimeAgo from "timeago-react";
 import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
-import { COLORS } from "../../common";
 import { db } from "../../common/db";
 import Colors from "../menu/colors";
 import { showExportDialog } from "../../common/dialog-controller";
