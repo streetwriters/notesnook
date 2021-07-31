@@ -4,7 +4,6 @@ import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getCouponData, upgrade } from "../../common/checkout";
-import { showLogInDialog } from "../../common/dialog-controller";
 import { ReactComponent as Personalization } from "../../assets/accent.svg";
 import { ReactComponent as Backups } from "../../assets/backup.svg";
 import { ReactComponent as Export } from "../../assets/export.svg";
@@ -316,8 +315,7 @@ function BuyDialog(props) {
                   if (isLoggedIn) {
                     await upgrade(user, coupon, plan);
                   } else {
-                    await showLogInDialog();
-                    await upgrade(user, coupon);
+                    
                   }
                   props.onCancel();
                 }}
