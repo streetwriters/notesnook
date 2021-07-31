@@ -22,19 +22,19 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  const [version] = useVersion();
+  // const [version] = useVersion();
 
-  useEffect(() => {
-    (async function () {
-      const cached = getCachedVersion();
-      if (!cached) return;
-      await import("./common/dialogcontroller").then((dialogs) => {
-        if (cached.appUpdated) return dialogs.showAppUpdatedNotice(cached);
-        else if (cached.appUpdateable)
-          return dialogs.showAppAvailableNotice(cached);
-      });
-    })();
-  }, [version]);
+  // useEffect(() => {
+  //   (async function () {
+  //     const cached = getCachedVersion();
+  //     if (!cached) return;
+  //     await import("./common/dialogcontroller").then((dialogs) => {
+  //       if (cached.appUpdated) return dialogs.showAppUpdatedNotice(cached);
+  //       else if (cached.appUpdateable)
+  //         return dialogs.showAppAvailableNotice(cached);
+  //     });
+  //   })();
+  // }, [version]);
 
   useEffect(
     function initializeApp() {
@@ -72,6 +72,9 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
       }
     });
     registerKeyMap();
+    return () => {
+      EV.unsubscribeAll();
+    };
   }, []);
 
   useEffect(() => {
