@@ -23,7 +23,7 @@ function Colors(props) {
           <Icon.Circle
             size={isMobile ? 45 : 25}
             style={{ cursor: "pointer" }}
-            color={code}
+            color={label}
             strokeWidth={0}
             data-test-id={`menuitem-colors-${label}`}
           />

@@ -8,10 +8,12 @@ class LightColorSchemeFactory {
       background: "white",
       accent: "white",
       bgSecondary: "#f7f7f7",
+      bgSecondaryText: "#5E5E5E",
+      bgSecondaryPrimary: "#008234",
       border: "#e7e7e7",
       hover: "#f1f1f1",
       fontSecondary: "white",
-      fontTertiary: "#5b5b5b",
+      fontTertiary: "#757575",
       text: "#202124",
       overlay: "rgba(0, 0, 0, 0.1)",
       secondary: "white",
@@ -19,6 +21,15 @@ class LightColorSchemeFactory {
       disabled: "#9b9b9b",
       placeholder: hexToRGB("#000000", 0.6),
       ...new StaticColorSchemeFactory(accent),
+
+      // COLORS
+      red: "#D93B30",
+      orange: "#C75301",
+      yellow: "#AC660D",
+      green: "#4CAF50",
+      blue: "#197AC7",
+      purple: "#673AB7",
+      gray: "#777777",
     };
   }
 }

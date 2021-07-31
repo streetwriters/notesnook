@@ -125,7 +125,7 @@ function GroupHeader(props) {
       bg="bgSecondary"
       sx={{ borderRadius: "default" }}
     >
-      <Text variant="subtitle" color="primary">
+      <Text variant="subtitle" color="bgSecondaryPrimary">
         {title}
       </Text>
 

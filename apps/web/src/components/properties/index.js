@@ -128,7 +128,7 @@ function Properties() {
                       data-test-id={`properties-${label}`}
                     >
                       <Flex key={label} alignItems="center">
-                        <Icon.Circle size={14} color={code} />
+                        <Icon.Circle size={14} color={label} />
                         <Text ml={1} color="text" variant="body">
                           {toTitleCase(label)}
                         </Text>

@@ -139,7 +139,7 @@ function NavigationMenu(props) {
             title={toTitleCase(color.alias || color.title)}
             icon={Icon.Circle}
             selected={location === `/colors/${color.id}`}
-            color={COLORS[color.title]}
+            color={color.title}
             onClick={() => {
               navigate(`/colors/${color.id}`);
             }}

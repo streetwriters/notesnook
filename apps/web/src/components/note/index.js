@@ -24,10 +24,9 @@ function Note(props) {
   const viewMode = useStore((store) => store.viewMode);
   const isOpened = selectedNote === note.id;
 
-  const [shade, primary] = useMemo(() => {
-    if (!note.color) return ["shade", "primary"];
-    const noteColor = COLORS[note.color];
-    return [noteColor + "11", noteColor];
+  const primary = useMemo(() => {
+    if (!note.color) return "primary";
+    return note.color;
   }, [note.color]);
 
   const notebook = useMemo(() => {
@@ -48,7 +47,6 @@ function Note(props) {
       id={note.id}
       index={index}
       colors={{
-        shade,
         primary,
         text: note.color ? primary : "text",
         background: isOpened ? "bgSecondary" : "background",
@@ -98,7 +96,10 @@ function Note(props) {
       footer={
         <Flex
           alignItems="center"
-          sx={{ fontSize: "subBody", color: "fontTertiary" }}
+          sx={{
+            fontSize: "subBody",
+            color: isOpened ? "bgSecondaryText" : "fontTertiary",
+          }}
         >
           <TimeAgo
             live={false}

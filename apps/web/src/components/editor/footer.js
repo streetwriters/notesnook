@@ -11,7 +11,7 @@ function EditorFooter() {
   if (!id) return null;
   return (
     <Flex alignItems="center">
-      <Text variant="subBody">
+      <Text variant="subBody" color="bgSecondaryText">
         {totalWords + " words"}
         <TextSeperator />
         {timeConverter(dateEdited)}

@@ -44,7 +44,7 @@ function StatusBar() {
                 size={7}
                 color={user.isEmailConfirmed ? "success" : "warn"}
               />
-              <Text variant="subBody" ml={1}>
+              <Text variant="subBody" color="bgSecondaryText" ml={1}>
                 {user.email}
                 {user.isEmailConfirmed ? "" : " (not verified)"}
               </Text>
@@ -70,11 +70,11 @@ function StatusBar() {
           <Button
             variant="statusitem"
             display="flex"
-            onClick={() => {}}
+            onClick={() => navigate("/login")}
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
             <Icon.Circle size={7} color="error" />
-            <Text variant="subBody" ml={1}>
+            <Text variant="subBody" color="bgSecondaryText" ml={1}>
               Not logged in
             </Text>
           </Button>
@@ -82,7 +82,7 @@ function StatusBar() {
         {processingStatus && (
           <Flex ml={1} alignItems="center" justifyContent="center">
             <Icon.Loading size={12} />
-            <Text variant="subBody" ml={1}>
+            <Text variant="subBody" color="bgSecondaryText" ml={1}>
               {processingStatus}
             </Text>
           </Flex>
@@ -108,11 +108,13 @@ function StatusBar() {
                 updateStatus.type !== "available"
               }
               color={
-                updateStatus.type === "available" ? "primary" : "fontTertiary"
+                updateStatus.type === "available"
+                  ? "primary"
+                  : "bgSecondaryText"
               }
               size={12}
             />
-            <Text variant="subBody" ml={1}>
+            <Text variant="subBody" color="bgSecondaryText" ml={1}>
               {statusToInfoText(updateStatus)}
             </Text>
           </Button>

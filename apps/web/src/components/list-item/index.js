@@ -62,8 +62,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 
 function ListItem(props) {
   const {
-    colors: { shade, text, primary, background } = {
-      shade: "shade",
+    colors: { text, primary, background } = {
       primary: "primary",
       text: "text",
       background: "background",
@@ -119,13 +118,13 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={isSelected ? shade : background}
+      bg={isSelected ? "bgSecondary" : background}
       onContextMenu={(e) =>
         openContextMenu(e, menuItems, props.menu?.extraData, false)
       }
       p={2}
       py={isCompact ? 2 : 3}
-      tabIndex={props.index}
+      tabIndex={0}
       justifyContent="center"
       sx={{
         height: "inherit",

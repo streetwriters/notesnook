@@ -1,10 +1,11 @@
 import createStore from "../common/store";
 import BaseStore from "./index";
 import Config from "../utils/config";
+import { getDefaultAccentColor } from "../theme/accents";
 
 class ThemeStore extends BaseStore {
   theme = Config.get("theme", "light");
-  accent = Config.get("accent", "#01c352");
+  accent = Config.get("accent", getDefaultAccentColor());
   followSystemTheme = Config.get("followSystemTheme", false);
 
   setTheme = (theme) => {
