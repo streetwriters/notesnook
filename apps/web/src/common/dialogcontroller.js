@@ -330,12 +330,6 @@ async function exportToPDF(content) {
   });
 }
 
-export function showForgotPasswordDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.ForgotPasswordDialog onClose={() => perform()} />
-  ));
-}
-
 export function showLoadingDialog(dialogData) {
   const { title, message, subtitle, action } = dialogData;
   return showDialog((Dialogs, perform) => (
@@ -348,27 +342,6 @@ export function showLoadingDialog(dialogData) {
     />
   ));
 }
-
-export const showLogInDialog = (
-  title,
-  description,
-  positiveText,
-  email,
-  skipInit,
-  force
-) => {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.LoginDialog
-      title={title}
-      description={description}
-      positiveText={positiveText}
-      skipInit={skipInit}
-      force={force}
-      email={email}
-      onClose={(res) => perform(res)}
-    />
-  ));
-};
 
 export function showMoveNoteDialog(noteIds) {
   return showDialog((Dialogs, perform) => (
@@ -474,17 +447,6 @@ export function showRecoveryKeyDialog() {
       onDone={() => {
         Config.set("recoveryKeyBackupDate", Date.now());
         perform(true);
-      }}
-    />
-  ));
-}
-
-export function showSignUpDialog() {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.SignUpDialog
-      onClose={async (res) => {
-        perform(res);
-        if (res === true) await showRecoveryKeyDialog();
       }}
     />
   ));

@@ -11,8 +11,6 @@ import {
   showEditNotebookDialog,
 } from "../common/dialog-controller";
 import { closeOpenedDialog } from "../common/dialog-controller";
-import { showLogInDialog } from "../common/dialog-controller";
-import { showSignUpDialog } from "../common/dialog-controller";
 import RouteContainer from "../components/route-container";
 import DiffViewer from "../components/diff-viewer";
 import Unlock from "../components/unlock";
@@ -99,9 +97,6 @@ const hashroutes = {
     closeOpenedDialog();
     return <DiffViewer noteId={noteId} />;
   },
-  "/signup": () => {
-    showSignUpDialog();
-  },
   "/vault/changePassword": () => {
     Vault.changeVaultPassword();
   },
@@ -109,9 +104,6 @@ const hashroutes = {
     Vault.createVault().then((res) => {
       appStore.setIsVaultCreated(res);
     });
-  },
-  "/login": () => {
-    showLogInDialog();
   },
   "/buy": () => {
     showBuyDialog();
