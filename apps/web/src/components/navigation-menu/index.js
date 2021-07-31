@@ -223,7 +223,7 @@ function NavigationMenu(props) {
           <NavigationItem
             title="Login"
             icon={Icon.Login}
-            onClick={() => hashNavigate("/login")}
+            onClick={() => navigate("/login")}
           />
         )}
         {bottomRoutes.map((item) => (

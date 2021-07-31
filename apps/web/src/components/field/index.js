@@ -32,6 +32,7 @@ function Field(props) {
     label,
     type,
     sx,
+    styles = {},
     name,
     required,
     autoFocus,
@@ -52,22 +53,33 @@ function Field(props) {
   const [rules, setRules] = useState(passwordValidationRules);
 
   return (
-    <Flex sx={sx} flexDirection="column">
+    <Flex sx={{ ...sx, ...styles.container }} flexDirection="column">
       <Label
         htmlFor={id}
         sx={{
           fontSize: "subtitle",
           fontWeight: "bold",
-          color: "text",
+          color: "icon",
+          flexDirection: "column",
+          ...styles.label,
         }}
       >
-        {label}
+        {label}{" "}
+        {helpText && (
+          <Text
+            as="span"
+            sx={{
+              fontSize: "subBody",
+              fontWeight: "normal",
+              color: "fontTertiary",
+              ...styles.label,
+            }}
+          >
+            {helpText}
+          </Text>
+        )}
       </Label>
-      {helpText && (
-        <Label htmlFor={id} sx={{ fontSize: "subBody", color: "gray" }}>
-          {helpText}
-        </Label>
-      )}
+
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
           data-test-id={props["data-test-id"]}
@@ -82,6 +94,7 @@ function Field(props) {
           autoComplete={autoComplete}
           type={type || "text"}
           sx={{
+            ...styles.input,
             ":disabled": {
               bg: "bgSecondary",
             },

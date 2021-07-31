@@ -5,7 +5,7 @@ import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
 import dayjs from "dayjs";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
-import { hashNavigate } from "../navigation";
+import { hashNavigate, navigate } from "../navigation";
 import { isDesktop } from "../utils/platform";
 import saveFile from "../commands/save-file";
 import { PATHS } from "@notesnook/desktop/paths";
@@ -47,7 +47,7 @@ export const Reminders = {
   login: {
     title: "Login to sync your notes",
     subtitle: "You are not logged in",
-    action: () => hashNavigate("/login"),
+    action: () => navigate("/login"),
     icon: Icon.User,
   },
   email: {

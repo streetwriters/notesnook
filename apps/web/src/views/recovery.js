@@ -297,7 +297,7 @@ function FinalStep() {
     <Step heading="Account recovered!">
       <Button
         variant="secondary"
-        onClick={() => (window.location.href = "/#/login")}
+        onClick={() => (window.location.href = "/login")}
       >
         Login using new password
       </Button>

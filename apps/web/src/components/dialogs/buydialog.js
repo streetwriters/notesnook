@@ -13,6 +13,7 @@ import { ReactComponent as Sync } from "../../assets/sync.svg";
 import { ReactComponent as Vault } from "../../assets/vault.svg";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { trackEvent } from "../../utils/analytics";
+import { navigate } from "../../navigation";
 
 const premiumDetails = [
   {
@@ -315,7 +316,7 @@ function BuyDialog(props) {
                   if (isLoggedIn) {
                     await upgrade(user, coupon, plan);
                   } else {
-                    
+                    navigate(`/login`, { redirect: `/#/buy/${coupon}` });
                   }
                   props.onCancel();
                 }}

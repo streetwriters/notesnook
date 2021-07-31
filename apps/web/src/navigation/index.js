@@ -66,6 +66,12 @@ export function getQueryString() {
   return window.location.search;
 }
 
+export function getQueryParams() {
+  const params = parseQuery(getQueryString());
+  if (Object.keys(params).length <= 0) return;
+  return params;
+}
+
 export function getCurrentPath() {
   return window.location.pathname || "/";
 }
