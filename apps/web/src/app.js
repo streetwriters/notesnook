@@ -7,15 +7,16 @@ import StatusBar from "./components/statusbar";
 import Animated from "./components/animated";
 import NavigationMenu from "./components/navigationmenu";
 import GlobalMenuWrapper from "./components/globalmenuwrapper";
-import { getCurrentPath, NavigationEvents } from "./navigation";
+import { NavigationEvents } from "./navigation";
 import rootroutes from "./navigation/rootroutes";
 import { useStore } from "./stores/app-store";
 import { Suspense } from "react";
 import useMobile from "./utils/use-mobile";
 import useTablet from "./utils/use-tablet";
 import HashRouter from "./components/hashrouter";
-import ThemeTransition from "./components/themeprovider/themetransition";
 import useSlider from "./hooks/use-slider";
+import useRoutes from "./utils/use-routes";
+import { clearRouteCache } from "./components/cachedrouter";
 
 const AppEffects = React.lazy(() => import("./app-effects"));
 const CachedRouter = React.lazy(() => import("./components/cached-router"));
@@ -55,6 +56,9 @@ function App() {
       setIsAppLoaded(true);
     }
     NavigationEvents.subscribe("onNavigate", onNavigate);
+    return () => {
+      NavigationEvents.unsubscribe("onNavigate", onNavigate);
+    };
   }, []);
 
   return (
@@ -173,15 +177,9 @@ function App() {
 }
 
 function Root() {
-  const path = getCurrentPath();
-  switch (path) {
-    case "/account/verified":
-      return rootroutes["/account/verified"]();
-    case "/account/recovery":
-      return rootroutes["/account/recovery"]();
-    default:
-      return <App />;
-  }
+  const route = useRoutes(rootroutes);
+  if (route) clearRouteCache();
+  return route?.component || <App />;
 }
 
 export default Root;

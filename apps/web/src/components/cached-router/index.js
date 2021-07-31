@@ -6,7 +6,7 @@ import RouteContainer from "../route-container";
 import ThemeProvider from "../theme-provider";
 import routes from "../../navigation/routes";
 
-const cache = {};
+var cache = {};
 function CachedRouter() {
   const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
   useEffect(() => {
@@ -57,4 +57,9 @@ function CachedRouter() {
     />
   );
 }
+
+export function clearRouteCache() {
+  cache = {};
+}
+
 export default CachedRouter;
