@@ -166,7 +166,6 @@ function App() {
             </Flex>
           </Flex>
           <StatusBar />
-          <ThemeTransition />
         </Flex>
       </ThemeProvider>
     </MotionConfig>
