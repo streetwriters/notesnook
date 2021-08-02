@@ -5,6 +5,7 @@ import "./index.css";
 import * as serviceWorker from "./serviceWorkerRegistration";
 import "./utils/overrides";
 import { loadTrackerScript } from "./utils/analytics";
+import Config from "./utils/config";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -13,7 +14,11 @@ if (process.env.NODE_ENV === "production") {
 
 initializeDatabase().then(async (db) => {
   const isLoggedIn = !!(await db.user.getUser());
-  if (!isLoggedIn && window.location.pathname === "/")
+  if (
+    !isLoggedIn &&
+    window.location.pathname === "/" &&
+    !Config.get("skipInitiation", false)
+  )
     window.location.replace("/signup");
 
   import("react-dom").then(({ render }) => {

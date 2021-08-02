@@ -6,6 +6,7 @@ import Field from "../components/field";
 import { getQueryParams, navigate, useQueryParams } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
+import Config from "../utils/config";
 
 const features = [
   {
@@ -187,7 +188,10 @@ function Auth(props) {
           alignItems="center"
           sx={{ position: "absolute", top: 3, right: 30, cursor: "pointer" }}
           title="Go to app"
-          onClick={() => navigate("/")}
+          onClick={() => {
+            Config.set("skipInitiation", true);
+            navigate("/");
+          }}
         >
           <Icon.ArrowRight size={16} />
           <Text variant="body" ml={1}>
