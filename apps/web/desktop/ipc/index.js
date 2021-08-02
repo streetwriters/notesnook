@@ -1,4 +1,4 @@
-const { ipcMain, BrowserWindow } = require("electron");
+const { ipcMain } = require("electron");
 const { getAction } = require("./actions");
 
 ipcMain.on("fromRenderer", async (event, args) => {

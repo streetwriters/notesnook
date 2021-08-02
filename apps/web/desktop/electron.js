@@ -5,7 +5,6 @@ const { isDevelopment } = require("./utils");
 const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
 require("./ipc/index.js");
-
 try {
   require("electron-reloader")(module);
 } catch (_) {}
@@ -29,17 +28,14 @@ async function createWindow() {
     },
   });
 
-  mainWindow.on("show", () => {
-    console.log("SHOWIGN!");
-  });
-
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
 
   mainWindow.maximize();
 
-  // await loadURL(mainWindow);
-  mainWindow.loadURL(isDevelopment() ? process.env.ELECTRON_START_URL : URL);
+  await mainWindow.loadURL(
+    isDevelopment() ? process.env.ELECTRON_START_URL : URL
+  );
 
   mainWindow.on("closed", () => {
     mainWindow = null;

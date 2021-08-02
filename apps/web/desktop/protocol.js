@@ -47,12 +47,13 @@ function registerProtocol() {
           ...request,
           body: !!request.uploadData ? request.uploadData[0].bytes : null,
           headers: { ...request.headers, origin: `${PROTOCOL}://${HOSTNAME}/` },
+          redirect: "manual",
         });
         callback({
-          data: response.body,
-          headers: response.headers,
-          mimeType: response.headers.get("Content-Type"),
           statusCode: response.status,
+          data: response.body,
+          headers: Object.fromEntries(response.headers.entries()),
+          mimeType: response.headers.get("Content-Type"),
         });
       }
     },
