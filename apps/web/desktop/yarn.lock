@@ -803,6 +803,11 @@ electron-builder@^22.11.7:
     update-notifier "^5.1.0"
     yargs "^17.0.1"
 
+electron-data-storage@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/electron-data-storage/-/electron-data-storage-1.0.7.tgz#983322d44f9af0bb6f5c9cb66eccc291e14ff486"
+  integrity sha512-dTT1l2DlEk2DqUVgOpaftJLMjRt0AkOGHR9tA2VUUFfs6ORRL+O0JJR93zjQngZCA9U9g/N0VBbsINdZDiVQGg==
+
 electron-is-dev@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/electron-is-dev/-/electron-is-dev-1.2.0.tgz#2e5cea0a1b3ccf1c86f577cee77363ef55deb05e"

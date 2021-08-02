@@ -8,6 +8,7 @@
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
+    "electron-data-storage": "^1.0.7",
     "electron-serve": "^1.1.0",
     "electron-updater": "^4.3.8",
     "node-fetch": "^2.6.1"

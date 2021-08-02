@@ -4,6 +4,7 @@ const os = require("os");
 const { isDevelopment } = require("./utils");
 const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
+const { getTheme, getBackgroundColor } = require("./theme");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -13,6 +14,7 @@ let mainWindow;
 
 async function createWindow() {
   mainWindow = new BrowserWindow({
+    backgroundColor: getBackgroundColor(),
     autoHideMenuBar: true,
     icon: path.join(
       __dirname,

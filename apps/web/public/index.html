@@ -69,11 +69,34 @@
     <meta name="twitter:card" content="summary_large_image" />
     <title>Notesnook - Your private note taking space</title>
 
+    <script>
+      const theme = JSON.parse(
+        window.localStorage.getItem("theme") || '"light"'
+      );
+      const root = document.querySelector("html");
+      root.setAttribute("data-theme", theme);
+    </script>
     <style>
+      html[data-theme="dark"] {
+        --bg: #1b1b1b;
+        --fg: #fff;
+        --three-bars-bg: #494949;
+        --gradient-stop-color: #111111;
+        --n-letter-color: #e1e1e1;
+      }
+
+      html[data-theme="light"] {
+        --bg: #fff;
+        --three-bars-bg: #bebebe;
+        --gradient-stop-color: #fff9f9;
+        --n-letter-color: #000;
+      }
+
       #splash svg {
         transform: scale(1);
         animation: pulse 2s infinite;
       }
+
       @keyframes pulse {
         0% {
           transform: scale(0.95);
@@ -87,15 +110,6 @@
           transform: scale(0.95);
         }
       }
-      code.key {
-        display: inline-block;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        padding: 0.1em 0.5em;
-        margin: 0 0.2em;
-        box-shadow: 0 1px 0px rgba(0, 0, 0, 0.2), 0 0 0 2px #fff inset;
-        background-color: #f7f7f7;
-      }
     </style>
     <link rel="stylesheet" href="/fonts.css" />
   </head>
@@ -107,7 +121,7 @@
     <div
       id="splash"
       style="
-        background-color: #f0f0f0;
+        background-color: var(--bg);
         height: 100%;
         width: 100%;
         position: absolute;
@@ -134,7 +148,11 @@
           />
           <linearGradient id="a">
             <stop offset="0" />
-            <stop offset="1" stop-color="#fff9f9" stop-opacity="0" />
+            <stop
+              offset="1"
+              stop-color="var(--gradient-stop-color)"
+              stop-opacity="0"
+            />
           </linearGradient>
           <linearGradient
             id="c"
@@ -155,33 +173,25 @@
             stroke-width="1.2"
             d="M160 205V-35m0 240L18 249m142-44l154 41"
           />
-          <path d="M84 109l35 54V98l21-7v91l-27 9-35-54v65l-21 6v-91z" />
+          <path
+            fill="var(--n-letter-color)"
+            d="M84 109l35 54V98l21-7v91l-27 9-35-54v65l-21 6v-91z"
+          />
           <rect
             width="86.1"
             height="12.6"
             x="185"
             y="97"
-            fill="#bebebe"
+            fill="var(--three-bars-bg)"
             ry="2.3"
             transform="skewY(15) scale(.9669 1)"
           />
           <path
-            fill="#bebebe"
+            fill="var(--three-bars-bg)"
             d="M181 169l99 26 2 3v8c0 1-1 2-2 1l-99-26-2-3v-7c0-2 1-2 2-2zm0-47l99 27 2 2v8l-2 2-99-27c-1 0-2-1-2-3v-7l2-2z"
           />
         </g>
       </svg>
-      <p align="center" style="font-size: 14px; margin-top: 25px">
-        Taking too long?
-        <br />
-        <span
-          >Reload the app by pressing <code class="key">Shift</code> +
-          <code class="key">F5</code></span
-        >
-        <br />
-        <br />
-        <em>If it still takes too long, please reload your browser.</em>
-      </p>
     </div>
     <div id="dialogContainer"></div>
     <!--
