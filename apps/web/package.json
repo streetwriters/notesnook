@@ -73,6 +73,7 @@
   },
   "scripts": {
     "start": "env-cmd -e all,dev,web react-scripts start",
+    "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "build": "env-cmd -e all,web react-scripts build",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
