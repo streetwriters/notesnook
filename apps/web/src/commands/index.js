@@ -4,6 +4,8 @@ import { isDesktop } from "../utils/platform";
 export const ElectronEventManager = new EventManager();
 
 export function invokeCommand(type, payload = {}) {
+  if (!isDesktop()) return;
+
   window.api.send("fromRenderer", {
     type,
     ...payload,
