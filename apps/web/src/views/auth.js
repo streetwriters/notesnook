@@ -61,10 +61,7 @@ const authTypes = {
       text: "Create account",
       loadingText: "Creating account...",
     },
-    secondaryAction: {
-      text: "I want to try the app first",
-      onClick: () => navigate("/"),
-    },
+
     agreementText: (
       <>
         By pressing "Create account" button, you agree to our{" "}
@@ -184,6 +181,19 @@ function Auth(props) {
         overflowY="auto"
         flexDirection={"row"}
       >
+        <Button
+          variant="secondary"
+          display="flex"
+          alignItems="center"
+          sx={{ position: "absolute", top: 3, right: 30, cursor: "pointer" }}
+          title="Go to app"
+          onClick={() => navigate("/")}
+        >
+          <Icon.ArrowRight size={16} />
+          <Text variant="body" ml={1}>
+            Go to app
+          </Text>
+        </Button>
         <Box
           flexDirection="column"
           justifyContent="center"
@@ -197,24 +207,15 @@ function Auth(props) {
             justifyContent="center"
             alignItems="start"
           >
-            <Flex
-              mt={4}
-              alignItems="center"
-              sx={{ cursor: "pointer" }}
-              title="Go back to app"
-              onClick={() => navigate("/")}
+            <Text
+              color="static"
+              variant="title"
+              fontWeight="heading"
+              ml={1}
+              fontSize={20}
             >
-              <Icon.ArrowLeft size={22} color="static" />
-              <Text
-                color="static"
-                variant="title"
-                fontWeight="heading"
-                ml={1}
-                fontSize={20}
-              >
-                Notesnook
-              </Text>
-            </Flex>
+              Notesnook
+            </Text>
 
             <Flex mt={100} flexDirection="column" height={250}>
               <Text

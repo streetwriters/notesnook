@@ -23,7 +23,6 @@ async function configureAutoUpdater() {
   autoUpdater.addListener("update-not-available", (info) => {
     sendMessageToRenderer(EVENTS.updateNotAvailable, info);
   });
-  await autoUpdater.checkForUpdates();
 }
 
 module.exports = { configureAutoUpdater };

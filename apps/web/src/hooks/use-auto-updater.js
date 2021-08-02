@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { ElectronEventManager } from "../commands";
 import { EVENTS } from "@notesnook/desktop/events";
 import { isDesktop } from "../utils/platform";
+import checkForUpdate from "../commands/check-for-update";
 
 export default function useAutoUpdater() {
   const [status, setStatus] = useState();
@@ -42,25 +43,13 @@ export default function useAutoUpdater() {
       updateDownloadProgress
     );
 
-    if (isDesktop()) checkingForUpdate();
+    if (isDesktop()) {
+      checkingForUpdate();
+      checkForUpdate();
+    }
+
     return () => {
-      ElectronEventManager.unsubscribe(
-        EVENTS.checkingForUpdate,
-        checkingForUpdate
-      );
-      ElectronEventManager.unsubscribe(
-        EVENTS.updateNotAvailable,
-        updateNotAvailable
-      );
-      ElectronEventManager.unsubscribe(EVENTS.updateAvailable, updateAvailable);
-      ElectronEventManager.unsubscribe(
-        EVENTS.updateDownloadCompleted,
-        updateDownloadCompleted
-      );
-      ElectronEventManager.unsubscribe(
-        EVENTS.updateDownloadProgress,
-        updateDownloadProgress
-      );
+      ElectronEventManager.unsubscribeAll();
     };
   }, []);
 
