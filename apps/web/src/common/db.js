@@ -38,6 +38,8 @@ function initializeDatabase() {
         loadDefaultNotes(db);
       } catch (e) {}
     }
+
+    return db;
   });
 }
 

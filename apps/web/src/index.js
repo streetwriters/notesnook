@@ -11,7 +11,11 @@ if (process.env.NODE_ENV === "production") {
   console.log = () => {};
 }
 
-initializeDatabase().then(() => {
+initializeDatabase().then(async (db) => {
+  const isLoggedIn = !!(await db.user.getUser());
+  if (!isLoggedIn && !window.location.pathname.startsWith("/signup"))
+    window.location.replace("/signup");
+
   import("react-dom").then(({ render }) => {
     import("./App").then(({ default: App }) => {
       render(<App />, document.getElementById("root"), async () => {
