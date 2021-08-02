@@ -13,7 +13,7 @@ if (process.env.NODE_ENV === "production") {
 
 initializeDatabase().then(async (db) => {
   const isLoggedIn = !!(await db.user.getUser());
-  if (!isLoggedIn && !window.location.pathname.startsWith("/signup"))
+  if (!isLoggedIn && window.location.pathname === "/")
     window.location.replace("/signup");
 
   import("react-dom").then(({ render }) => {
