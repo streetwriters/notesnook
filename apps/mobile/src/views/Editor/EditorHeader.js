@@ -44,6 +44,7 @@ import {
   getNote,
   isNotedEdited,
   loadNote,
+  presentResolveConflictDialog,
   setColors,
   textInput
 } from './Functions';

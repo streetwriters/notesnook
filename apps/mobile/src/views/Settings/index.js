@@ -1170,17 +1170,15 @@ const SettingsAppearanceSection = () => {
               '#FF5722',
               '#FFA000',
               '#1B5E20',
-              '#00c853',
+              '#008837',
               '#757575',
               '#0560ff',
               '#009688',
               '#2196F3',
               '#880E4F',
               '#9C27B0',
-              '#9381ff',
               '#FF1744',
-              '#B71C1C',
-              '#ffadad'
+              '#B71C1C'
             ].map(item => (
               <PressableButton
                 key={item}
@@ -1727,14 +1725,14 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           inputPlaceholder: 'Enter account password',
           paragraph: 'Please enter your account password to backup data',
           positiveText: 'Verify',
-          secureTextEntry:true,
+          secureTextEntry: true,
           positivePress: async value => {
             try {
               let verified = await db.user.verifyPassword(value);
               if (verified) {
                 sleep(300).then(async () => {
                   await Backup.run();
-                })
+                });
               } else {
                 ToastEvent.show({
                   heading: 'Incorrect password',

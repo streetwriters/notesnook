@@ -121,6 +121,9 @@ function attachMessageListener() {
     let value = message.value;
 
     switch (type) {
+      case 'inject':
+        tinymce.activeEditor.setContent(value);
+        break;
       case 'html':
         isLoading = true;
         tinymce.activeEditor.mode.set('readonly');

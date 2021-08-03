@@ -4,8 +4,8 @@ import {Platform, StatusBar} from 'react-native';
 import {AndroidModule} from '.';
 
 export const ACCENT = {
-  color: '#00c853',
-  shade: '#00c85312',
+  color: '#0088373',
+  shade: '#00883712',
 };
 
 export const COLORS_NOTE = {

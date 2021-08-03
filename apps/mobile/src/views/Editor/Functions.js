@@ -6,7 +6,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -17,7 +17,7 @@ import {db} from '../../utils/DB';
 import {
   eOnLoadNote,
   eShowGetPremium,
-  eShowMergeDialog,
+  eShowMergeDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -38,7 +38,7 @@ let note = null;
 let id = null;
 let content = {
   data: '',
-  type: 'tiny',
+  type: 'tiny'
 };
 let title = '';
 let saveCounter = 0;
@@ -125,7 +125,7 @@ export const textInput = createRef();
 export function post(type, value = null) {
   let message = {
     type,
-    value,
+    value
   };
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
@@ -175,7 +175,7 @@ function clearNote() {
   id = null;
   content = {
     data: '',
-    type: 'tiny',
+    type: 'tiny'
   };
 }
 
@@ -187,7 +187,7 @@ export const loadNote = async item => {
   editing.currentlyEditing = true;
   editing.movedAway = false;
   if (editing.isFocused) {
-  tiny.call(EditorWebView, tiny.blur);
+    tiny.call(EditorWebView, tiny.blur);
   }
   if (item && item.type === 'new') {
     if (getNote()) {
@@ -210,7 +210,7 @@ export const loadNote = async item => {
         EditorWebView,
         EDITOR_SETTINGS.directionality === 'rtl'
           ? `tinymce.activeEditor.execCommand('mceDirectionRTL');`
-          : `tinymce.activeEditor.execCommand('mceDirectionLTR');`,
+          : `tinymce.activeEditor.execCommand('mceDirectionLTR');`
       );
     }
     if (!webviewInit) {
@@ -286,7 +286,7 @@ export const _onMessage = async evt => {
         noteEdited = true;
         content = {
           type: message.type,
-          data: message.value,
+          data: message.value
         };
         onNoteChange();
       }
@@ -296,7 +296,7 @@ export const _onMessage = async evt => {
         noteEdited = true;
         title = message.value;
         eSendEvent('editorScroll', {
-          title: message.value,
+          title: message.value
         });
         onNoteChange();
       }
@@ -317,7 +317,7 @@ export const _onMessage = async evt => {
         eSendEvent(eShowGetPremium, {
           context: 'editor',
           title: 'Get Notesnook Pro',
-          desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+          desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
         });
       }
       break;
@@ -368,54 +368,54 @@ function showImageOptionsTooltip() {
       {
         format: 'imagepreview',
         type: 'format',
-        fullname: 'Image preview',
+        fullname: 'Image preview'
       },
       {
         format: 'imageResize25',
         text: '25%',
         type: 'format',
         showTitle: false,
-        fullname: 'Resize to 25%',
+        fullname: 'Resize to 25%'
       },
       {
         format: 'imageResize50',
         text: '50%',
         type: 'format',
         showTitle: false,
-        fullname: 'Resize to 25%',
+        fullname: 'Resize to 25%'
       },
       {
         format: 'imageResize100',
         text: '100%',
         type: 'format',
         showTitle: false,
-        fullname: 'Resize to 25%',
+        fullname: 'Resize to 25%'
       },
       {
         format: 'imagefloatleft',
         type: 'format',
-        fullname: 'Remove image',
+        fullname: 'Remove image'
       },
       {
         format: 'imagefloatright',
         type: 'format',
-        fullname: 'Image preview',
+        fullname: 'Image preview'
       },
       {
         format: 'imagefloatnone',
         type: 'format',
-        fullname: 'Image preview',
+        fullname: 'Image preview'
       },
       {
         format: 'removeimage',
         type: 'format',
-        fullname: 'Remove image',
-      },
+        fullname: 'Remove image'
+      }
     ],
     title: 'imageoptions',
     default: null,
     type: 'imageoptions',
-    pageX: 0,
+    pageX: 0
   });
 }
 
@@ -431,15 +431,15 @@ function onNoteChange() {
   }, 500);
 }
 
-export async function clearEditor(clear=true) {
-  clear && await clearTimer(true);
+export async function clearEditor(clear = true) {
+  clear && (await clearTimer(true));
   try {
     tiny.call(EditorWebView, tiny.reset, true);
     clearNote();
     editing.focusType = null;
     eSendEvent('historyEvent', {
       undo: 0,
-      redo: 0,
+      redo: 0
     });
     saveCounter = 0;
     useEditorStore.getState().setCurrentlyEditingNote(null);
@@ -470,28 +470,28 @@ async function addToCollection(id) {
       await db.notes.move(
         {
           topic: editing.actionAfterFirstSave.id,
-          id: editing.actionAfterFirstSave.notebook,
+          id: editing.actionAfterFirstSave.notebook
         },
-        id,
+        id
       );
       editing.actionAfterFirstSave = {
-        type: null,
+        type: null
       };
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.Notebooks,
         Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Notebook,
+        Navigation.routeNames.Notebook
       ]);
       break;
     }
     case 'tag': {
       await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
       editing.actionAfterFirstSave = {
-        type: null,
+        type: null
       };
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.Tags,
-        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.NotesPage
       ]);
       break;
     }
@@ -499,7 +499,7 @@ async function addToCollection(id) {
       await db.notes.note(id).color(editing.actionAfterFirstSave.id);
 
       editing.actionAfterFirstSave = {
-        type: null,
+        type: null
       };
       Navigation.setRoutesToUpdate([Navigation.routeNames.NotesPage]);
       useMenuStore.getState().setColorNotes();
@@ -535,9 +535,9 @@ export async function saveNote(preventUpdate) {
       title,
       content: {
         data: content.data,
-        type: content.type,
+        type: content.type
       },
-      id: id,
+      id: id
     };
 
     if (!locked) {
@@ -547,7 +547,7 @@ export async function saveNote(preventUpdate) {
           Navigation.routeNames.Notes,
           Navigation.routeNames.Favorites,
           Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Notebook
         ]);
       }
 
@@ -565,7 +565,7 @@ export async function saveNote(preventUpdate) {
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notes
       ]);
       let n = db.notes.note(id)?.data?.dateEdited;
       tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
@@ -616,14 +616,14 @@ async function restoreEditorState() {
   editing.isRestoringState = false;
 }
 
-const presentResolveConflictDialog = _note => {
+export const presentResolveConflictDialog = _note => {
   presentDialog({
     title: 'Changes not saved',
     paragraph: 'Please resolve conflicts to save changes',
     positiveText: 'Resolve',
     positivePress: () => {
       eSendEvent(eShowMergeDialog, _note);
-    },
+    }
   });
 };
 
@@ -636,11 +636,13 @@ export async function updateNoteInEditor() {
   }
   tiny.call(EditorWebView, tiny.isLoading);
   await setNote(_note);
-  await loadNoteInEditor();
+  post('title', title);
+  post('inject', content.data);
+  tiny.call(EditorWebView, tiny.notLoading);
   console.log('updated note in editor');
 }
 
-const loadNoteInEditor = async () => {
+const loadNoteInEditor = async (keepHistory = true) => {
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
@@ -657,7 +659,7 @@ const loadNoteInEditor = async () => {
         value: true,
       }),
     );
-    `,
+    `
       );
     } else {
       post('html', content.data);
@@ -666,11 +668,13 @@ const loadNoteInEditor = async () => {
     setColors();
     tiny.call(
       EditorWebView,
-      tiny.updateDateEdited(timeConverter(note.dateEdited)),
+      tiny.updateDateEdited(timeConverter(note.dateEdited))
     );
     tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
   } else {
     await restoreEditorState();
   }
-  tiny.call(EditorWebView, tiny.clearHistory);
+  if (keepHistory) {
+    tiny.call(EditorWebView, tiny.clearHistory);
+  }
 };

@@ -204,6 +204,7 @@ export const AppRootEvents = React.memo(
     const onSyncComplete = async () => {
       initialize();
       setLastSynced(await db.lastSynced());
+      console.log('sync complete')
       if (getNote()) {
         await updateNoteInEditor();
       }

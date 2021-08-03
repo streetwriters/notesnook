@@ -114,7 +114,7 @@ const onUserStatusCheck = async type => {
       eSendEvent(eShowGetPremium, message);
     }
   }
-  return {type, result: status};
+  return {type, result: true};
 };
 
 const showVerifyEmailDialog = () => {
