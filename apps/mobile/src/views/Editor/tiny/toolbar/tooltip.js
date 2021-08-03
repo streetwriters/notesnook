@@ -1,20 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
-import { TouchableOpacity } from 'react-native-gesture-handler';
-import Animated, { Easing, timing } from 'react-native-reanimated';
-import { useTracked } from '../../../../provider';
-import { DDS } from '../../../../services/DeviceDetection';
+import React, {useEffect, useState} from 'react';
+import {ScrollView, View} from 'react-native';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import Animated, {Easing, timing} from 'react-native-reanimated';
+import {PressableButton} from '../../../../components/PressableButton';
+import Heading from '../../../../components/Typography/Heading';
+import Paragraph from '../../../../components/Typography/Paragraph';
+import {useTracked} from '../../../../provider';
+import {DDS} from '../../../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../../../services/EventManager';
-import { editing } from '../../../../utils';
-import { normalize } from '../../../../utils/SizeUtils';
-import { sleep } from '../../../../utils/TimeUtils';
+import {editing} from '../../../../utils';
+import {normalize, SIZE} from '../../../../utils/SizeUtils';
+import {sleep} from '../../../../utils/TimeUtils';
 import ColorGroup from './colorgroup';
-import { execCommands } from './commands';
-import { formatSelection, properties } from './constants';
+import {execCommands} from './commands';
+import {formatSelection, properties} from './constants';
 import ToolbarItem from './item';
 import ToolbarLinkInput from './linkinput';
 
@@ -25,7 +28,7 @@ function animate(val, time = 200) {
   timing(translateValue, {
     toValue: val,
     duration: time,
-    easing: Easing.in(Easing.ease),
+    easing: Easing.in(Easing.ease)
   }).start(async () => {
     await sleep(time);
     animating = false;
@@ -39,7 +42,7 @@ const Tooltip = () => {
     data: [],
     title: null,
     default: null,
-    type: null,
+    type: null
   });
   const floating = group?.type === 'table' || DDS.isTab;
 
@@ -50,7 +53,7 @@ const Tooltip = () => {
     };
   }, []);
 
-  const show = async (data) => {
+  const show = async data => {
     properties.userBlur = true;
     if (!data) {
       editing.tooltip = null;
@@ -73,7 +76,7 @@ const Tooltip = () => {
     setGroup(data);
     await sleep(5);
     animate(0, time);
-    if (editing.tooltip !== "link") {
+    if (editing.tooltip !== 'link') {
       properties.pauseSelectionChange = false;
     }
   };
@@ -84,8 +87,8 @@ const Tooltip = () => {
       padding: floating ? 5 : 0,
       position: 'absolute',
       bottom: 50,
-      width: group?.type === 'table' ? 35 * 5 + 15 : floating ? '50%' : '100%',
-      minHeight: normalize(50) ,
+      width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '50%' : '100%',
+      minHeight: normalize(50),
       backgroundColor: colors.nav,
       alignSelf: 'center',
       flexDirection: 'row',
@@ -96,13 +99,13 @@ const Tooltip = () => {
       paddingHorizontal: 6,
       transform: [
         {
-          translateY: translateValue,
-        },
-      ],
+          translateY: translateValue
+        }
+      ]
     };
   }, [floating, colors.accent, colors.bg, group?.type]);
 
-  let ParentElement = (props) => (
+  let ParentElement = props => (
     <Animated.View style={style}>
       {group && /^(link|table|ul|align)$/.test(group.type) ? (
         <View
@@ -113,7 +116,7 @@ const Tooltip = () => {
             width: '100%',
             backgroundColor: colors.bg,
             marginVertical: 5,
-            borderRadius: 5,
+            borderRadius: 5
           }}
           children={props.children}></View>
       ) : (
@@ -123,7 +126,7 @@ const Tooltip = () => {
             backgroundColor: colors.bg,
             marginVertical: 5,
             borderRadius: 5,
-            paddingHorizontal: 0,
+            paddingHorizontal: 0
           }}
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -134,13 +137,21 @@ const Tooltip = () => {
             justifyContent: 'space-around',
             alignItems: 'center',
             flexDirection: 'row',
-            minWidth: '100%',
+            minWidth: '100%'
           }}
           children={props.children}
         />
       )}
     </Animated.View>
   );
+
+  function getRowColumns(index) {
+    let columnCount = 5;
+    let rowNumber = Math.floor(index / columnCount);
+    let columnNumber = index - rowNumber * columnCount;
+
+    return `${rowNumber  + 1} x ${columnNumber + 1}`;
+  }
 
   return (
     <ParentElement>
@@ -156,61 +167,76 @@ const Tooltip = () => {
       )}
 
       {!group?.data && group?.type === 'table' && (
-        <View
-          style={{
-            width: '100%',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-          }}>
-          {[
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7,
-            8,
-            9,
-            10,
-            11,
-            12,
-            13,
-            14,
-            15,
-            16,
-            17,
-            18,
-            19,
-            20,
-            21,
-            22,
-            23,
-            24,
-            25,
-          ].map((item, index) => (
-            <TouchableOpacity
-              key={item.toString()}
-              onPress={() => {
-                let columnCount = 5;
-                let rowNumber = Math.floor(index / columnCount);
-                let columnNumber = index - rowNumber * columnCount;
-                formatSelection(
-                  execCommands.table(rowNumber + 1, columnNumber + 1),
-                );
-                console.log('hiding tooltip')
-                eSendEvent('showTooltip');
-              }}
-              style={{
-                width: 25,
-                height: 25,
-                borderWidth: 1,
-                borderColor: colors.icon,
-                marginHorizontal: 5,
-                marginVertical: 5,
-              }}
-            />
-          ))}
+        <View>
+          <Heading
+            size={SIZE.sm}
+            style={{
+              alignSelf: 'center',
+              marginBottom: 5
+            }}>
+            Select rows x columns
+          </Heading>
+          <View
+            style={{
+              width: '100%',
+              flexDirection: 'row',
+              flexWrap: 'wrap',
+              zIndex: 10
+            }}>
+            {[
+              1,
+              2,
+              3,
+              4,
+              5,
+              6,
+              7,
+              8,
+              9,
+              10,
+              11,
+              12,
+              13,
+              14,
+              15,
+              16,
+              17,
+              18,
+              19,
+              20,
+              21,
+              22,
+              23,
+              24,
+              25
+            ].map((item, index) => (
+              <PressableButton
+                key={item.toString()}
+                onPress={() => {
+                  let columnCount = 5;
+                  let rowNumber = Math.floor(index / columnCount);
+                  let columnNumber = index - rowNumber * columnCount;
+                  formatSelection(
+                    execCommands.table(rowNumber + 1, columnNumber + 1)
+                  );
+                  eSendEvent('showTooltip');
+                }}
+                type="gray"
+                customStyle={{
+                  width: 35,
+                  height: 25,
+                  borderWidth: 1,
+                  borderColor: colors.icon,
+                  marginHorizontal: 5,
+                  marginVertical: 5,
+                  borderRadius: 2.5
+                }}>
+                <Paragraph size={SIZE.xs} color={colors.icon}>
+                  {getRowColumns(index)}
+                </Paragraph>
+              </PressableButton>
+            ))}
+          </View>
         </View>
       )}
 
@@ -221,7 +247,7 @@ const Tooltip = () => {
       {group &&
         group.data &&
         /^(hilitecolor|forecolor|)$/.test(group.type) === false &&
-        group.data.map((item) =>
+        group.data.map(item =>
           /^(video|link|)$/.test(group.type) ? (
             <ToolbarLinkInput
               key={item.formatValue || item.format}
@@ -250,7 +276,7 @@ const Tooltip = () => {
               text={item.text}
               fullname={item.fullname}
             />
-          ),
+          )
         )}
     </ParentElement>
   );

@@ -62,6 +62,7 @@ export const execCommands = {
   table: (r, c) =>
     `(function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
+      
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
