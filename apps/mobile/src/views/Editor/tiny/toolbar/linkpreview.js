@@ -1,19 +1,14 @@
 import { getLinkPreview } from 'link-preview-js';
 import React, { useEffect, useState } from 'react';
-import { Platform } from 'react-native';
-import { Image, ScrollView, View,TouchableOpacity } from 'react-native';
+import { Image, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { ActionIcon } from '../../../../components/ActionIcon';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
 import { useTracked } from '../../../../provider';
-import { editing } from '../../../../utils';
 import { openLinkInBrowser } from '../../../../utils/functions';
 import { SIZE } from '../../../../utils/SizeUtils';
-import { sleep } from '../../../../utils/TimeUtils';
-import { EditorWebView, textInput } from '../../Functions';
-import tiny from '../tiny';
-import { focusEditor, INPUT_MODE, properties, reFocusEditor } from './constants';
+import { INPUT_MODE, properties, reFocusEditor } from './constants';
 
 let prevLink = {};
 let prevHeight = 50;

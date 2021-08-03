@@ -18,7 +18,7 @@ import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
-import tiny from '../tiny';
+import tiny, { safeKeyboardDismiss } from '../tiny';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -190,7 +190,8 @@ const ToolbarItem = ({
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         if (editing.isFocused) {
-          Keyboard.dismiss();
+          
+          safeKeyboardDismiss();
           await sleep(300);
           editing.isFocused = true;
         }
@@ -206,7 +207,8 @@ const ToolbarItem = ({
     }
     if (type === 'settings') {
       if (editing.isFocused) {
-        Keyboard.dismiss();
+        
+      safeKeyboardDismiss();
         await sleep(300);
         editing.isFocused = true;
       }

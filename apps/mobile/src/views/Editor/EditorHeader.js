@@ -44,10 +44,11 @@ import {
   getNote,
   isNotedEdited,
   loadNote,
-  setColors
+  setColors,
+  textInput
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
-import tiny from './tiny/tiny';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
@@ -142,10 +143,10 @@ const EditorHeader = () => {
       });
       return;
     }
-
+    console.log(editing.isFocused)
     if (editing.isFocused) {
-      tiny.call(EditorWebView, tiny.blur);
-      await sleep(500);
+      safeKeyboardDismiss();
+      await sleep(300);
       editing.isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
@@ -154,7 +155,7 @@ const EditorHeader = () => {
   const showActionsheet = async () => {
     let note = getNote() && db.notes.note(getNote().id).data;
     if (editing.isFocused) {
-      Keyboard.dismiss();
+      safeKeyboardDismiss();
       await sleep(500);
       editing.isFocused = true;
     }

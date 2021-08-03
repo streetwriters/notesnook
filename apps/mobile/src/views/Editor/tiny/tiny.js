@@ -1,6 +1,6 @@
 import {Platform} from 'react-native';
 import {editing} from '../../../utils';
-import {EditorWebView, getWebviewInit, post} from '../Functions';
+import {EditorWebView, getWebviewInit, post, textInput} from '../Functions';
 
 const reset = `
 isLoading = true;
@@ -164,6 +164,11 @@ function call(webview, func, noqueue) {
       webview.current?.injectJavaScript(func);
     }, 1000);
   }
+}
+
+export function safeKeyboardDismiss() {
+  textInput.current?.focus();
+  textInput.current?.blur();
 }
 
 const undo = `
