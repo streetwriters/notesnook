@@ -77,7 +77,7 @@ const ActionSheetWrapper = ({
       }
       onOpen={_onOpen}
       keyboardShouldPersistTaps="always"
-      premium={
+      ExtraOverlayComponent={
         <>
           <Toast context="local" />
           <GetPremium
