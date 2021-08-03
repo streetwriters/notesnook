@@ -1,6 +1,6 @@
 import React, {createRef} from 'react';
-import {Keyboard, StyleSheet, TouchableOpacity, View} from 'react-native';
-import {FlatList, ScrollView, TextInput} from 'react-native-gesture-handler';
+import {Keyboard, StyleSheet, TouchableOpacity, View,TextInput} from 'react-native';
+import {FlatList, ScrollView, } from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
 import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
