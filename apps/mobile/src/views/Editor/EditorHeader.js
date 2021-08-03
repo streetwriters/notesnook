@@ -154,8 +154,8 @@ const EditorHeader = () => {
   const showActionsheet = async () => {
     let note = getNote() && db.notes.note(getNote().id).data;
     if (editing.isFocused) {
-      tiny.call(EditorWebView, tiny.blur);
-      await sleep(300);
+      Keyboard.dismiss();
+      await sleep(500);
       editing.isFocused = true;
     }
 

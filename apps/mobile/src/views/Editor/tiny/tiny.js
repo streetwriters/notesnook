@@ -19,10 +19,10 @@ window.blur();
 
 const removeMarkdown = `
  tinymce.activeEditor.plugins.textpattern.setPatterns("")
-`
+`;
 const setMarkdown = `
  tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
-`
+`;
 
 const keyboardStateChanged = `(function() {
   let node = tinymce.activeEditor.selection.getNode();
@@ -152,8 +152,7 @@ isLoading = false;
 const html = value => post('html', value);
 
 const focusEditor = `
-window.focus();
-tinymce.activeEditor.focus();
+ tinymce.activeEditor.focus();
 `;
 
 function call(webview, func, noqueue) {
@@ -186,7 +185,7 @@ const onKeyboardShow = () => {
   if (!editing.movedAway) {
     editing.isFocused = true;
     if (Platform.OS === 'ios') {
-      if (editing.focusType === "title") return;
+      if (editing.focusType === 'title') return;
       call(EditorWebView, keyboardStateChanged);
     }
   }

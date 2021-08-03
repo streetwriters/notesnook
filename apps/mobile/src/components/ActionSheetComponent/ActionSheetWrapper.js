@@ -9,7 +9,7 @@ import { hexToRGBA } from '../../utils/ColorUtils';
 import { sleep } from '../../utils/TimeUtils';
 import { EditorWebView, textInput } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import { focusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { focusEditor, reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
 import { Toast } from '../Toast';
 import { GetPremium } from './GetPremium';
 
@@ -53,16 +53,7 @@ const ActionSheetWrapper = ({
   };
 
   const _onClose = async () => {
-    if (editing.isFocused === true) {
-      textInput.current?.focus();
-      await sleep(10);
-      if (editing.focusType == 'editor') {
-        focusEditor();
-      } else {
-        Platform.OS === 'android' && EditorWebView.current.requestFocus();
-        tiny.call(EditorWebView, tiny.focusTitle);
-      }
-    }
+    await reFocusEditor();
     if (onClose) {
       onClose();
     }

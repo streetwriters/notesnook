@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
-import {View,TouchableOpacity} from 'react-native';
+import {View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableButton} from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
@@ -17,7 +17,7 @@ import {db} from '../../../../utils/DB';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
-import { EditorWebView } from '../../Functions';
+import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 import {execCommands} from './commands';
 import {
@@ -190,10 +190,10 @@ const ToolbarItem = ({
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         if (editing.isFocused) {
-          tiny.call(EditorWebView, tiny.blur);
+          Keyboard.dismiss();
           await sleep(300);
           editing.isFocused = true;
-        }    
+        }
         PremiumService.showVerifyEmailDialog();
       } else {
         eSendEvent(eShowGetPremium, {
@@ -206,10 +206,10 @@ const ToolbarItem = ({
     }
     if (type === 'settings') {
       if (editing.isFocused) {
-        tiny.call(EditorWebView, tiny.blur);
+        Keyboard.dismiss();
         await sleep(300);
         editing.isFocused = true;
-      }  
+      }
       eSendEvent('openEditorSettings');
       return;
     }
