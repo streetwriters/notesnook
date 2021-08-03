@@ -345,6 +345,11 @@ export const AppRootEvents = React.memo(
           clearMessage();
           attachIAPListeners();
           await Sync.run();
+          if (!user.isEmailConfirmed) {
+            setEmailVerifyMessage();
+            return;
+          }
+         
           let res = await doInBackground(async () => {
             try {
               user = await db.user.fetchUser();
@@ -354,11 +359,6 @@ export const AppRootEvents = React.memo(
             }
           });
           if (res !== true) throw new Error(res);
-
-          if (!user?.isEmailConfirmed) {
-            setEmailVerifyMessage();
-            return;
-          }
           setUser(user);
         } else {
           setLoginMessage();
@@ -438,7 +438,7 @@ export const AppRootEvents = React.memo(
           await MMKV.removeItem('appState');
         }
         let user = await db.user.getUser();
-        if (user && !user?.isEmailConfirmed) {
+        if (user && !user.isEmailConfirmed) {
           try {
             let user = await db.user.fetchUser();
             if (user?.isEmailConfirmed) {
