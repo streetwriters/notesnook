@@ -120,7 +120,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             autoCorrect={false}
             returnKeyLabel="Done"
             returnKeyType="done"
-            onSubmit={onSubmit}
+            onSubmitEditing={() => onSubmit(inputValue)}
             onChangeText={onChangeText}
             defaultValue={value}
             blurOnSubmit={false}
