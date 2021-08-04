@@ -1359,7 +1359,7 @@ const SettingsPrivacyAndSecurity = () => {
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
   const [appLockVisible, setAppLockVisible] = useState(false);
-
+  const user = useUserStore(state => state.user);
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
     biometryEnrolled: false,
@@ -1371,7 +1371,7 @@ const SettingsPrivacyAndSecurity = () => {
       db.vault.exists().then(async r => {
         let available = await BiometricService.isBiometryAvailable();
         let fingerprint = await BiometricService.hasInternetCredentials();
-
+        console.log(available);
         setVaultStatus({
           exists: r,
           biometryEnrolled: fingerprint,
@@ -1379,7 +1379,7 @@ const SettingsPrivacyAndSecurity = () => {
         });
       });
     });
-  });
+  }, [collapsed]);
 
   useEffect(() => {
     checkVaultStatus();
@@ -1387,7 +1387,7 @@ const SettingsPrivacyAndSecurity = () => {
     return () => {
       eUnSubscribeEvent('vaultUpdated', () => checkVaultStatus());
     };
-  }, []);
+  }, [collapsed]);
 
   const modes = [
     {
@@ -1545,7 +1545,7 @@ const SettingsPrivacyAndSecurity = () => {
             }
           />
 
-          {vaultStatus.isBiometryAvailable && (
+          {user || vaultStatus.isBiometryAvailable ? (
             <CustomButton
               key="appLock"
               title="App lock"
@@ -1555,7 +1555,7 @@ const SettingsPrivacyAndSecurity = () => {
               }}
               maxWidth="90%"
             />
-          )}
+          ) : null}
 
           {vaultStatus.exists ? (
             <>

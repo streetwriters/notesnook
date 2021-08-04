@@ -15,7 +15,8 @@ import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import {editing} from '../../utils';
 import {db} from '../../utils/DB';
@@ -112,8 +113,8 @@ const AppLoader = ({onLoad}) => {
 
     let askForBackup = await MMKV.getItem('askForBackup');
     if (
-      (settingsStore.settings.reminder === 'off' ||
-        !settingsStore.settings.reminder)
+      settingsStore.settings.reminder === 'off' ||
+      !settingsStore.settings.reminder
     ) {
       askForBackup = JSON.parse(askForBackup);
 
@@ -148,6 +149,13 @@ const AppLoader = ({onLoad}) => {
   }, [verifyUser]);
 
   const onUnlockBiometrics = async () => {
+    if (!(await BiometricService.isBiometryAvailable())) {
+      ToastEvent.show({
+        heading: 'Biometrics unavailable',
+        message: 'Try unlocking the app with your account password'
+      });
+      return;
+    }
     let verified = await BiometricService.validateUser(
       'Unlock to access your notes',
       ''
@@ -206,6 +214,7 @@ const AppLoader = ({onLoad}) => {
                   To keep your notes secure, please enter password of the
                   account you are logged in to.
                 </Paragraph>
+                <Seperator half />
                 <Input
                   secureTextEntry
                   placeholder="Enter account password"

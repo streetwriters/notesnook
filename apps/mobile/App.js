@@ -122,6 +122,7 @@ const App = () => {
           setVerifyUser(true);
         }
         await loadDatabase();
+        useUserStore.getState().setUser(await db.user.getUser());
         if (SettingsService.get().telemetry) {
           Tracker.record('50bf361f-dba0-41f1-9570-93906249a6d3');
         }

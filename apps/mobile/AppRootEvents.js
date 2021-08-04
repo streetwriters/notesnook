@@ -337,6 +337,7 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async login => {
       try {
         let user = await db.user.getUser();
+        console.log(user,'called user set current');
         if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
           setUser(user);
           return;
