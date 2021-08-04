@@ -122,10 +122,7 @@ function attachMessageListener() {
 
     switch (type) {
       case 'inject':
-        current_selection_range = tinymce.activeEditor.selection.getRng().cloneRange();
         tinymce.activeEditor.setContent(value);
-        alert(current_selection_range.startOffset);
-        tinymce.activeEditor.selection.setRng(current_selection_range);
         break;
       case 'html':
         isLoading = true;
