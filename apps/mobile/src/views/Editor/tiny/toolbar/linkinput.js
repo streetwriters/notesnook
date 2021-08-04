@@ -12,7 +12,7 @@ import {
   focusEditor,
   formatSelection,
   INPUT_MODE,
-  properties,
+  properties
 } from './constants';
 import LinkPreview from './linkpreview';
 
@@ -22,7 +22,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [mode, setMode] = useState(
-    value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING,
+    value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING
   );
 
   const inputRef = useRef();
@@ -75,6 +75,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     } else {
       formatSelection(execCommands[format](inputValue));
     }
+
     editing.tooltip = null;
     setMode(INPUT_MODE.NO_EDIT);
     focusEditor(format, false);
@@ -93,11 +94,12 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     <View
       style={{
         flexDirection: 'row',
-        paddingHorizontal: 12,
         maxWidth: '100%',
         width: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexShrink: 1,
+        paddingHorizontal:12
       }}>
       {mode === INPUT_MODE.NO_EDIT ? (
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
@@ -110,8 +112,9 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               height: normalize(50),
               color: colors.pri,
               zIndex: 10,
+              flexWrap: 'wrap',
               flexGrow: 1,
-              maxWidth:'85%'
+              fontSize: SIZE.sm
             }}
             autoCapitalize="none"
             autoCorrect={false}
@@ -131,7 +134,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               onPress={onSubmit}
               height={normalize(40)}
               fontSize={SIZE.md}
-              style={{marginLeft: 10, paddingHorizontal: 12}}
+              style={{marginLeft: 10, paddingHorizontal: 15}}
             />
           )}
         </>
