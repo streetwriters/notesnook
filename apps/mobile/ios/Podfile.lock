@@ -236,7 +236,7 @@ PODS:
     - React-jsi (= 0.64.2)
     - React-perflogger (= 0.64.2)
   - React-jsinspector (0.64.2)
-  - react-native-background-actions (2.6.0):
+  - react-native-background-actions (2.6.2):
     - React-Core
   - react-native-begin-background-task (0.1.0):
     - React
@@ -650,7 +650,7 @@ SPEC CHECKSUMS:
   React-jsi: 67747b9722f6dab2ffe15b011bcf6b3f2c3f1427
   React-jsiexecutor: 80c46bd381fd06e418e0d4f53672dc1d1945c4c3
   React-jsinspector: cc614ec18a9ca96fd275100c16d74d62ee11f0ae
-  react-native-background-actions: 38b3f9e94c92349acf27873c952793e09a92cbb1
+  react-native-background-actions: 5acd5851ac2d3bb8b1c39fcc9332abe45977fd04
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
   react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
