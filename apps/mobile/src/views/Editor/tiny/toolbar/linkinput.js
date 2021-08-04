@@ -99,7 +99,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
         justifyContent: 'space-between',
         alignItems: 'center',
         flexShrink: 1,
-        paddingHorizontal:12
+        paddingHorizontal: 12
       }}>
       {mode === INPUT_MODE.NO_EDIT ? (
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
@@ -113,8 +113,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               color: colors.pri,
               zIndex: 10,
               flexWrap: 'wrap',
-              flexGrow: 1,
-              fontSize: SIZE.sm
+              fontSize: SIZE.sm,
+              flexShrink: 1
             }}
             autoCapitalize="none"
             autoCorrect={false}
@@ -134,7 +134,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               onPress={onSubmit}
               height={normalize(40)}
               fontSize={SIZE.md}
-              style={{marginLeft: 10, paddingHorizontal: 15}}
+              style={{paddingHorizontal: 15}}
             />
           )}
         </>
