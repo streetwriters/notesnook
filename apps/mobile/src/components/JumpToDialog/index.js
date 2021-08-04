@@ -19,6 +19,7 @@ import {
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
 let timeout = null;
@@ -154,14 +155,14 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                 borderRadius: 100,
                 height: 25,
               }}>
-              <Heading
+              <Paragraph
                 size={SIZE.sm}
                 color={colors.accent}
                 style={{
                   textAlign: 'center',
                 }}>
                 Top
-              </Heading>
+              </Paragraph>
             </PressableButton>
             {notes
               .filter(i => i.type === 'header')
@@ -179,7 +180,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                       borderRadius: 100,
                       height: 25,
                     }}>
-                    <Heading
+                    <Paragraph
                       size={SIZE.sm}
                       color={
                         currentIndex === index ? colors.light : colors.accent
@@ -188,7 +189,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                         textAlign: 'center',
                       }}>
                       {item.title}
-                    </Heading>
+                    </Paragraph>
                   </PressableButton>
                 ) : null;
               })}

@@ -1,6 +1,7 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 
 export const Title = ({heading, headerColor}) => {

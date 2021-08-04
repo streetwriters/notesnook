@@ -38,34 +38,35 @@ export const Header = React.memo(
           padding: 0,
           width: '100%',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         {messageCard && (
           <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
         )}
+        
       </View>
     ) : (
       <View
         style={{
-          width: '100%',
+          width: '100%'
         }}>
         <View
           style={{
-            minHeight:height || 195,
+            minHeight: height || 195,
             padding: 12,
             width: '100%',
             zIndex: 10,
             justifyContent: 'flex-end',
             backgroundColor: COLORS_NOTE[title.toLowerCase()]
               ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
-              : color || colors.shade,
+              : color || colors.shade
           }}>
           <View
             style={{
               right: 0,
               paddingRight: 12,
               bottom: 0,
-              position: 'absolute',
+              position: 'absolute'
             }}>
             <Placeholder
               color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
@@ -77,7 +78,7 @@ export const Header = React.memo(
 
           <View
             style={{
-              marginTop: 15,
+              marginTop: 15
             }}>
             <Heading
               style={{marginBottom: paragraph ? 0 : 0}}
@@ -96,10 +97,10 @@ export const Header = React.memo(
                 icon={icon}
                 style={{
                   alignSelf: 'flex-start',
-                  paddingLeft: 0,
+                  paddingLeft: 0
                 }}
                 textStyle={{
-                  fontWeight: 'normal',
+                  fontWeight: 'normal'
                 }}
                 iconSize={SIZE.sm}
                 fontSize={SIZE.sm}
@@ -110,5 +111,5 @@ export const Header = React.memo(
         </View>
       </View>
     );
-  },
+  }
 );

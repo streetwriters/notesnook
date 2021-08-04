@@ -1,6 +1,6 @@
 import { Appearance } from "react-native";
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from "../services/EventManager";
-import { COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme } from "./Colors";
+import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme } from "./Colors";
 import { eThemeUpdated } from "./Events";
 import { MMKV } from "./MMKV";
 
@@ -69,8 +69,8 @@ export async function getColorScheme(useSystemTheme) {
 
 
     if (!accentColor ) {
-        await MMKV.setItem('accentColor', '#00c853');
-        setAccentColor('#00c853');
+        await MMKV.setItem('accentColor', ACCENT.color);
+        setAccentColor(ACCENT.color);
     } else {
         setAccentColor(accentColor);
     }

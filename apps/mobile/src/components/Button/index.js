@@ -6,6 +6,7 @@ import {BUTTON_TYPES, showTooltip} from '../../utils';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 /**
  *
@@ -82,7 +83,7 @@ export const Button = ({
       ): null}
 
       {!title ? null : (
-        <Heading
+        <Paragraph
           color={textColor}
           size={fontSize}
           numberOfLines={1}
@@ -94,7 +95,7 @@ export const Button = ({
             textStyle,
           ]}>
           {title}
-        </Heading>
+        </Paragraph>
       )}
 
       {icon && !loading && iconPosition === 'right' ? (
