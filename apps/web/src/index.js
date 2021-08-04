@@ -15,6 +15,7 @@ if (process.env.NODE_ENV === "production") {
 initializeDatabase().then(async (db) => {
   const isLoggedIn = !!(await db.user.getUser());
   if (
+    !process.env.REACT_APP_CI &&
     !isLoggedIn &&
     window.location.pathname === "/" &&
     !Config.get("skipInitiation", false)

@@ -1926,6 +1926,7 @@
 "@notesnook/desktop@./desktop/":
   version "1.4.1"
   dependencies:
+    electron-data-storage "^1.0.7"
     electron-serve "^1.1.0"
     electron-updater "^4.3.8"
     node-fetch "^2.6.1"
@@ -5087,6 +5088,11 @@ ejs@^3.1.5:
   integrity sha512-9lt9Zse4hPucPkoP7FHDF0LQAlGyF9JVpnClFLFH3aSSbxmyoqINRpp/9wePWJTUl4KOQwRL72Iw3InHPDkoGw==
   dependencies:
     jake "^10.6.1"
+
+electron-data-storage@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/electron-data-storage/-/electron-data-storage-1.0.7.tgz#983322d44f9af0bb6f5c9cb66eccc291e14ff486"
+  integrity sha512-dTT1l2DlEk2DqUVgOpaftJLMjRt0AkOGHR9tA2VUUFfs6ORRL+O0JJR93zjQngZCA9U9g/N0VBbsINdZDiVQGg==
 
 electron-serve@^1.1.0:
   version "1.1.0"
