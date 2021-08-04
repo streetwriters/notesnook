@@ -11,6 +11,7 @@ export const properties = {
   pauseSelectionChange: false,
   inputMode: 1,
   userBlur: false,
+  linkAdded:false
 };
 
 export const toolbarRef = createRef();
@@ -23,7 +24,8 @@ export async function focusEditor(format,kill=true) {
   kill && eSendEvent("showTooltip");
   Platform.OS === "android" && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
-    tiny.call(EditorWebView, tiny.blur + ' ' + tiny.focusEditor);
+    textInput.current?.focus();
+    tiny.call(EditorWebView, tiny.focusEditor);
   } else {
     console.log('focus editor');
     EditorWebView.current?.requestFocus();

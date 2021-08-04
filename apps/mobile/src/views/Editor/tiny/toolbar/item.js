@@ -9,7 +9,8 @@ import {useTracked} from '../../../../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  eSendEvent
+  eSendEvent,
+  ToastEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
@@ -18,7 +19,7 @@ import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
-import tiny, { safeKeyboardDismiss } from '../tiny';
+import tiny, {safeKeyboardDismiss} from '../tiny';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -108,6 +109,7 @@ const ToolbarItem = ({
       if (format === 'link') {
         properties.selection = data;
         if (!data['link']) return;
+
         properties.pauseSelectionChange = true;
         eSendEvent('showTooltip', {
           data: null,
@@ -190,7 +192,6 @@ const ToolbarItem = ({
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         if (editing.isFocused) {
-          
           safeKeyboardDismiss();
           await sleep(300);
           editing.isFocused = true;
@@ -207,8 +208,7 @@ const ToolbarItem = ({
     }
     if (type === 'settings') {
       if (editing.isFocused) {
-        
-      safeKeyboardDismiss();
+        safeKeyboardDismiss();
         await sleep(300);
         editing.isFocused = true;
       }
@@ -228,6 +228,11 @@ const ToolbarItem = ({
       (format === 'link' && properties.selection.current?.length === 0) ||
       !properties.selection
     ) {
+      ToastEvent.show({
+        heading: 'No selection',
+        message: 'Select some text before adding a link.',
+        type: 'error'
+      });
       return;
     }
 

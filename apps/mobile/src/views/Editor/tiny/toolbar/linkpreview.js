@@ -19,7 +19,9 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   const [height, setHeight] = useState(prevHeight);
 
   useEffect(() => {
+    console.log('previewing', value);
     if (value && prevLink.value !== value) {
+     
       getLinkPreview(value)
         .then((r) => {
           if (r.contentType?.includes('text/html')) {
@@ -36,7 +38,7 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         })
         .catch((e) => console.log);
     }
-  }, []);
+  }, [value]);
 
   const renderImage = (imageLink, faviconLink) => {
     return imageLink ? (
