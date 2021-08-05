@@ -708,6 +708,11 @@ detect-node@^2.0.4:
   resolved "https://registry.yarnpkg.com/detect-node/-/detect-node-2.1.0.tgz#c9c70775a49c3d03bc2c06d9a73be550f978f8b1"
   integrity sha512-T0NIuQpnTvFDATNuHN5roPwSBG83rFsuO+MXXH9/3N1eFbn4wcPjttvjMLEPWJ0RGUYgQE7cGgS3tNxbqCGM7g==
 
+diary@^0.1.6:
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/diary/-/diary-0.1.6.tgz#112e564a8d507bf15887ccbbeea9bff540e46cb5"
+  integrity sha512-5xoYu+2Lbv4mQ5rnAFMYJrX9zpsT8sS2U5ihzDpCwUzgHvN3jwov077wGvIxxAL+zt5S/6A3OWUYls2pMcPixg==
+
 dir-compare@^2.4.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/dir-compare/-/dir-compare-2.4.0.tgz#785c41dc5f645b34343a4eafc50b79bac7f11631"
