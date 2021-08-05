@@ -23,7 +23,7 @@ function registerProtocol() {
     PROTOCOL,
     async (request, callback) => {
       const url = new URL(request.url);
-      if (url.hostname === HOSTNAME) {
+      if (shouldInterceptRequest(url)) {
         logger.info("Intercepting request:", request);
 
         const loadIndex = !path.extname(url.pathname);
@@ -79,6 +79,12 @@ function registerProtocol() {
       protocolInterceptionResult ? "successful" : "failed"
     }.`
   );
+}
+
+const bypassedRoutes = ["/notes/index_v14.json", "/notes/welcome-web"];
+function shouldInterceptRequest(url) {
+  let shouldIntercept = url.hostname === HOSTNAME;
+  return shouldIntercept && !bypassedRoutes.includes(url.pathname);
 }
 
 module.exports = { registerProtocol, URL: `${PROTOCOL}://${HOSTNAME}/` };
