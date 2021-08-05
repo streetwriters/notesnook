@@ -1,6 +1,6 @@
 const { autoUpdater } = require("electron-updater");
 const { EVENTS } = require("./events");
-const { sendMessageToRenderer } = require("./ipc");
+const { sendMessageToRenderer } = require("./ipc/utils");
 
 async function configureAutoUpdater() {
   autoUpdater.autoDownload = false;

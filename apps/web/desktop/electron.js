@@ -32,6 +32,7 @@ async function createWindow() {
       preload: __dirname + "/preload.js",
     },
   });
+  global.win = mainWindow;
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
@@ -49,8 +50,6 @@ async function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
   });
-
-  global.win = mainWindow;
 }
 
 app.commandLine.appendSwitch("lang", "en-US");

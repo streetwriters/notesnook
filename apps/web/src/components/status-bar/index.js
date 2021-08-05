@@ -128,7 +128,7 @@ function StatusBar() {
 export default StatusBar;
 
 function statusToInfoText(status) {
-  const { type, version, progress } = status;
+  const { type, version, progress = 0 } = status;
   return type === "checking"
     ? "Checking for updates..."
     : type === "updated"

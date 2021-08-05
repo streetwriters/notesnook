@@ -1,7 +1,7 @@
 const { CancellationToken } = require("builder-util-runtime");
 const { autoUpdater } = require("electron-updater");
-const { sendMessageToRenderer } = require("..");
 const { EVENTS } = require("../../events");
+const { sendMessageToRenderer } = require("../utils");
 
 module.exports = () => {
   sendMessageToRenderer(EVENTS.updateDownloadProgress, { progress: 0 });
