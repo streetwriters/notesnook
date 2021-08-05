@@ -12,15 +12,24 @@ if (process.env.NODE_ENV === "production") {
   console.log = () => {};
 }
 
-initializeDatabase().then(async (db) => {
+const HOMEPAGE_ROUTE = { 1: "/notebooks", 2: "/favorites", 3: "/tags" };
+
+async function checkRedirects(db) {
   const isLoggedIn = !!(await db.user.getUser());
-  if (
-    !process.env.REACT_APP_CI &&
-    !isLoggedIn &&
-    window.location.pathname === "/" &&
-    !Config.get("skipInitiation", false)
-  )
-    window.location.replace("/signup");
+  if (window.location.pathname === "/") {
+    const skipInitiation = Config.get("skipInitiation", false);
+    const homepage = Config.get("homepage", 0);
+    if (!process.env.REACT_APP_CI && !isLoggedIn && !skipInitiation)
+      window.location.replace("/signup");
+    else if (homepage) {
+      const route = HOMEPAGE_ROUTE[homepage];
+      window.location.replace(route);
+    }
+  }
+}
+
+initializeDatabase().then(async (db) => {
+  await checkRedirects(db);
 
   import("react-dom").then(({ render }) => {
     import("./App").then(({ default: App }) => {

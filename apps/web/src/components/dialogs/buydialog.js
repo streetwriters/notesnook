@@ -123,7 +123,6 @@ function BuyDialog(props) {
         setIsLoading(true);
         setError();
         const data = await getCouponData(coupon, plan);
-        console.log(data);
         setPrices({
           ...data.paddlejs.vendor,
           withoutDiscount: data.total[0],

@@ -31,6 +31,9 @@ import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import { Slider } from "@rebass/forms";
+import useZoomFactor from "../hooks/use-zoom-factor";
+import debounce from "just-debounce";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -131,6 +134,7 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
+  const [zoomFactor, setZoomFactor] = useZoomFactor();
   const [, version] = useVersion();
 
   const toggleFollowSystemTheme = useThemeStore(
@@ -146,6 +150,7 @@ function Settings(props) {
     "backupReminderOffset",
     0
   );
+  const [homepage, setHomepage] = usePersistentState("homepage", 0);
   const [enableTelemetry, setEnableTelemetry] = usePersistentState(
     "telemetry",
     true
@@ -332,6 +337,32 @@ function Settings(props) {
               onToggled={toggleFollowSystemTheme}
               isToggled={followSystemTheme}
             />
+            <OptionsItem
+              title={"Homepage"}
+              tip={"Default screen to open on app startup."}
+              options={["Notes", "Notebooks", "Favorites", "Tags"]}
+              premium
+              selectedOption={homepage}
+              onSelectionChanged={(_option, index) => setHomepage(index)}
+            />
+            {isDesktop && (
+              <>
+                <Tip
+                  sx={{ pt: 2 }}
+                  text="Zoom factor"
+                  tip={`Zoom in or out the app content. (${zoomFactor})`}
+                />
+                <Slider
+                  min={0.5}
+                  max={2.0}
+                  defaultValue={zoomFactor}
+                  step={0.1}
+                  onChange={debounce((e) => {
+                    setZoomFactor(e.target.valueAsNumber);
+                  }, 500)}
+                />
+              </>
+            )}
           </>
         )}
 

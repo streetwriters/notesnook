@@ -1,12 +1,8 @@
-const { setTheme, getBackgroundColor } = require("../../theme");
+const { setTheme, getBackgroundColor } = require("../../config/theme");
 
-module.exports = {
-  type: "changeAppTheme",
-  action: async (args) => {
-    console.log("args", args);
-    if (!global.win) return;
-    const { theme } = args;
-    await setTheme(theme);
-    global.win.setBackgroundColor(getBackgroundColor());
-  },
+module.exports = async (args) => {
+  if (!global.win) return;
+  const { theme } = args;
+  await setTheme(theme);
+  global.win.setBackgroundColor(getBackgroundColor());
 };

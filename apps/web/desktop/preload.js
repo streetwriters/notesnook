@@ -1,4 +1,5 @@
-const { contextBridge, ipcRenderer } = require("electron");
+const { contextBridge } = require("electron");
+const { ipcRenderer } = require("electron-better-ipc");
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -18,5 +19,13 @@ contextBridge.exposeInMainWorld("api", {
         func(args);
       });
     }
+  },
+});
+
+// Expose protected methods that allow the renderer process to use
+// the ipcRenderer without exposing the entire object
+contextBridge.exposeInMainWorld("config", {
+  zoomFactor: () => {
+    return ipcRenderer.callMain("fromRenderer", { type: "getZoomFactor" });
   },
 });

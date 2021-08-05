@@ -26,6 +26,7 @@
     "highlight.js": "^11.1.0",
     "hotkeys-js": "^3.8.3",
     "immer": "^8.0.1",
+    "just-debounce": "^1.1.0",
     "localforage": "^1.7.3",
     "localforage-getitems": "https://github.com/thecodrr/localForage-getItems.git",
     "notes-core": "npm:@streetwriters/notesnook-core@latest",

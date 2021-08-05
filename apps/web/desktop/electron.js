@@ -4,7 +4,8 @@ const os = require("os");
 const { isDevelopment } = require("./utils");
 const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
-const { getTheme, getBackgroundColor } = require("./theme");
+const { getBackgroundColor } = require("./config/theme");
+const getZoomFactor = require("./ipc/calls/getZoomFactor");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -21,11 +22,12 @@ async function createWindow() {
       os.platform() === "win32" ? "app.ico" : "favicon-72x72.png"
     ),
     webPreferences: {
+      zoomFactor: getZoomFactor(),
       devTools: true, // isDev,
       nodeIntegration: false, //true,
       enableRemoteModule: false,
       contextIsolation: true,
-      sandbox: true,
+      // sandbox: true,
       preload: __dirname + "/preload.js",
     },
   });
