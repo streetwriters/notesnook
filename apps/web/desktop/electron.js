@@ -6,6 +6,7 @@ const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
 const { getBackgroundColor } = require("./config/theme");
 const getZoomFactor = require("./ipc/calls/getZoomFactor");
+const { logger } = require("./logger");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -37,9 +38,13 @@ async function createWindow() {
 
   mainWindow.maximize();
 
-  await mainWindow.loadURL(
-    isDevelopment() ? process.env.ELECTRON_START_URL : URL
-  );
+  try {
+    await mainWindow.loadURL(
+      isDevelopment() ? process.env.ELECTRON_START_URL : URL
+    );
+  } catch (e) {
+    logger.error(e);
+  }
 
   mainWindow.on("closed", () => {
     mainWindow = null;
@@ -50,6 +55,8 @@ async function createWindow() {
 
 app.commandLine.appendSwitch("lang", "en-US");
 app.on("ready", async () => {
+  logger.info("App ready. Opening window.");
+
   registerProtocol();
   await createWindow();
   configureAutoUpdater();

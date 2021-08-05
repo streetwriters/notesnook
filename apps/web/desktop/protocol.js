@@ -3,6 +3,7 @@ const { isDevelopment, getPath } = require("./utils");
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch").default;
+const { logger } = require("./logger");
 
 const FILE_NOT_FOUND = -6;
 const BASE_PATH = isDevelopment() ? "../public" : "";
@@ -18,20 +19,24 @@ const extensionToMimeType = {
 };
 
 function registerProtocol() {
-  protocol.interceptStreamProtocol(
+  const protocolInterceptionResult = protocol.interceptStreamProtocol(
     PROTOCOL,
     async (request, callback) => {
       const url = new URL(request.url);
       if (url.hostname === HOSTNAME) {
+        logger.info("Intercepting request:", request);
+
+        const loadIndex = !path.extname(url.pathname);
         const absoluteFilePath = path.normalize(
           `${__dirname}${
-            url.pathname === "/"
+            loadIndex
               ? `${BASE_PATH}/index.html`
               : `${BASE_PATH}/${url.pathname}`
           }`
         );
         const filePath = getPath(absoluteFilePath);
         if (!filePath) {
+          logger.error("Local asset file not found at", filePath);
           callback({ error: FILE_NOT_FOUND });
           return;
         }
@@ -43,12 +48,22 @@ function registerProtocol() {
           mimeType: extensionToMimeType[fileExtension],
         });
       } else {
-        const response = await fetch(request.url, {
-          ...request,
-          body: !!request.uploadData ? request.uploadData[0].bytes : null,
-          headers: { ...request.headers, origin: `${PROTOCOL}://${HOSTNAME}/` },
-          redirect: "manual",
-        });
+        var response;
+        try {
+          response = await fetch(request.url, {
+            ...request,
+            body: !!request.uploadData ? request.uploadData[0].bytes : null,
+            headers: {
+              ...request.headers,
+              origin: `${PROTOCOL}://${HOSTNAME}/`,
+            },
+            redirect: "manual",
+          });
+        } catch (e) {
+          logger.error(`Error sending request to `, request.url, "Error: ", e);
+          callback({ statusCode: 400 });
+          return;
+        }
         callback({
           statusCode: response.status,
           data: response.body,
@@ -56,10 +71,13 @@ function registerProtocol() {
           mimeType: response.headers.get("Content-Type"),
         });
       }
-    },
-    (err) => {
-      if (err) console.error("Failed to register protocol");
     }
+  );
+
+  logger.info(
+    `${PROTOCOL} protocol inteception ${
+      protocolInterceptionResult ? "successful" : "failed"
+    }.`
   );
 }
 

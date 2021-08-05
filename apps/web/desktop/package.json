@@ -16,7 +16,7 @@
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
-    "@types/node-fetch": "^2.5.10",
+    "@types/node-fetch": "^2.5.12",
     "electron": "^12.0.0",
     "electron-builder": "^22.11.7",
     "electron-builder-notarize": "^1.2.0",
@@ -43,6 +43,9 @@
       "!*.chunk.js.LICENSE.txt",
       "build/",
       "!node_modules",
+      "node_modules/electron-data-storage",
+      "node_modules/electron-better-ipc",
+      "node_modules/diary",
       "node_modules/node-fetch",
       "node_modules/electron-updater",
       "node_modules/lazy-val",

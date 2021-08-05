@@ -2,6 +2,7 @@ const { app } = require("electron");
 const { diary, enable, defaultReporter } = require("diary");
 const fs = require("fs");
 const path = require("path");
+const { isDevelopment } = require("./utils");
 
 enable("native");
 
@@ -12,7 +13,7 @@ const logFileStream = fs.createWriteStream(LOG_FILE_PATH, {
 });
 
 const native = diary("native", (e) => {
-  defaultReporter(e);
+  if (isDevelopment()) defaultReporter(e);
   logFileReporter(e);
 });
 
