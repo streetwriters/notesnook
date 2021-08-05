@@ -1924,7 +1924,7 @@
     fastq "^1.6.0"
 
 "@notesnook/desktop@./desktop/":
-  version "1.4.1"
+  version "1.5.0"
   dependencies:
     diary "^0.1.6"
     electron-better-ipc "^2.0.1"
@@ -8638,7 +8638,7 @@ normalize-url@^3.0.0:
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.8.0"
-  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#f3cc6b5dacac443966bccace43a7f98f13e367be"
+  resolved "git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git#d784c9774e435c0966ec8693cfaf854343e56458"
   dependencies:
     "@stablelib/blake2s" "^1.0.1"
     dayjs "^1.10.6"
