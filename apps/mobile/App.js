@@ -103,7 +103,7 @@ const loadMainApp = () => {
     initialize();
   }
 };
-
+checkOrientation();
 const App = () => {
   const [, dispatch] = useTracked();
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
@@ -113,7 +113,6 @@ const App = () => {
     useMessageStore.getState().setAnnouncement();
     (async () => {
       try {
-        checkOrientation();
         await SettingsService.init();
         if (
           SettingsService.get().appLockMode &&
