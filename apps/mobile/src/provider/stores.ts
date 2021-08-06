@@ -170,7 +170,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notesListMode:"normal"
   },
   fullscreen: false,
-  deviceMode: null,
+  deviceMode: "mobile",
   dimensions: { width, height },
   appLoading: true,
   isIntroCompleted: false,
