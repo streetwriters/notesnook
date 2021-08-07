@@ -11,25 +11,24 @@ jobs:
     - uses: actions/checkout@v2
       with:
         persist-credentials: false
-        
+
     - uses: joschi/setup-jdk@v2
       with:
         java-version: '8'
     - name: Use Node.js v14
-      uses: actions/setup-node@v1
+      uses: actions/setup-node@v2.1.5
       with:
         node-version: 14.x
-    
-    
+        
+    - name: Install node_modules
+      run: |
+        yarn
 
     - name: Download Android Emulator Image
       run: |
         echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
         echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name emu --device "Nexus 5X" -k 'system-images;android-29;google_apis;x86'
         $ANDROID_HOME/emulator/emulator -list-avds
-    - name: Install node_modules
-      run: |
-        yarn
 
     - name: Build for detox
       run: |
