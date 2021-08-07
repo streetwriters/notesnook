@@ -1,0 +1,26 @@
+diff --git a/node_modules/react-native-orientation/android/build.gradle b/node_modules/react-native-orientation/android/build.gradle
+index e09fb27..b5af68d 100644
+--- a/node_modules/react-native-orientation/android/build.gradle
++++ b/node_modules/react-native-orientation/android/build.gradle
+@@ -1,16 +1,16 @@
+ apply plugin: 'com.android.library'
+ 
+ android {
+-    compileSdkVersion 23
+-    buildToolsVersion "23.0.1"
++    compileSdkVersion 29
++    buildToolsVersion "29.0.3"
+ 
+     defaultConfig {
+-        minSdkVersion 16
+-        targetSdkVersion 22
++        minSdkVersion 21
++        targetSdkVersion 29
+         versionCode 1
+         versionName "1.0"
+         ndk {
+-            abiFilters "armeabi-v7a", "x86"
++            abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
+         }
+     }
+ }
