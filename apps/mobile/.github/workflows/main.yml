@@ -17,14 +17,14 @@ jobs:
       with:
         java-version: 'openjdk8'
         architecture: 'x64'
-        
+
     - name: Use Node.js v14
       uses: actions/setup-node@v2.1.5
       with:
         node-version: 14.x
         
     - name: Install node_modules
-      run: yarn
+      run: yarn install --frozen-lockfile
 
     - name: Download Android Emulator Image
       run: |
