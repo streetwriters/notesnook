@@ -1,4 +1,5 @@
 import React from 'react';
+import { Platform } from 'react-native';
 import { Text } from 'react-native';
 import { useTracked } from '../../provider';
 import { SIZE } from '../../utils/SizeUtils';
@@ -27,7 +28,8 @@ const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
         {
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          fontWeight: 'bold',
+          fontFamily:Platform.OS === "android"  ? "Roboto-Medium" : null,
+          fontWeight:Platform.OS === "ios" ? "600" : null
         },
         style,
       ]}></Text>

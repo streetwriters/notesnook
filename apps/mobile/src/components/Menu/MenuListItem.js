@@ -10,25 +10,28 @@ import {Button} from '../Button';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import ToggleSwitch from 'toggle-switch-react-native';
 
 export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [headerTextState, setHeaderTextState] = useState(null);
+  let isFocused =
+    headerTextState?.id === item.name.toLowerCase() + '_navigation';
 
-  const _onPress = (event) => {
+  const _onPress = event => {
     if (item.func) {
       item.func();
     } else {
       Navigation.navigate(
         item.name,
         {
-          menu: true,
+          menu: true
         },
         {
           heading: item.name,
-          id: item.name.toLowerCase() + '_navigation',
-        },
+          id: item.name.toLowerCase() + '_navigation'
+        }
       );
     }
     if (item.close) {
@@ -36,7 +39,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
     }
   };
 
-  const onHeaderStateChange = (event) => {
+  const onHeaderStateChange = event => {
     if (event.id === item.name.toLowerCase() + '_navigation') {
       setHeaderTextState(event);
     } else {
@@ -56,50 +59,50 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
       testID={testID}
       key={item.name + index}
       onPress={_onPress}
-      type="transparent"
+      type={!isFocused ? 'gray' : 'grayBg'}
       customStyle={{
         width: '100%',
         alignSelf: 'center',
-        borderRadius: 0,
+        borderRadius: 5,
         flexDirection: 'row',
         paddingHorizontal: 8,
         justifyContent: 'space-between',
         alignItems: 'center',
         height: normalize(50),
+        marginBottom: 5
       }}>
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         <Icon
           style={{
             width: 30,
             textAlignVertical: 'center',
-            textAlign: 'left',
+            textAlign: 'left'
           }}
           name={item.icon}
-          color={
-            headerTextState?.id === item.name.toLowerCase() + '_navigation'
-              ? colors.accent
-              : colors.pri
-          }
+          color={isFocused ? colors.accent : colors.pri}
           size={SIZE.lg - 2}
         />
-        {headerTextState?.id === item.name.toLowerCase() + '_navigation' ? (
-          <Heading color={colors.accent} size={SIZE.md}>
+        {isFocused ? (
+          <Heading color={colors.heading} size={SIZE.md}>
             {item.name}
           </Heading>
         ) : (
-          <Paragraph color={colors.heading} size={SIZE.md}>{item.name}</Paragraph>
+          <Paragraph size={SIZE.md}>{item.name}</Paragraph>
         )}
       </View>
 
       {item.switch ? (
-        <Icon
-          size={SIZE.lg}
-          color={item.on ? colors.accent : colors.icon}
-          name={item.on ? 'toggle-switch' : 'toggle-switch-off'}
+        <ToggleSwitch
+          isOn={item.on}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={_onPress}
         />
       ) : rightBtn ? (
         <Button
@@ -111,28 +114,11 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
           icon={rightBtn.icon}
           style={{
             borderRadius: 100,
-            paddingHorizontal: 16,
+            paddingHorizontal: 16
           }}
           onPress={rightBtn.func}
         />
-      ) : (
-        <View
-          style={{
-            backgroundColor:
-              headerTextState?.id === item.name.toLowerCase() + '_navigation'
-                ? colors.accent
-                : 'transparent',
-            width: 7,
-            height: 7,
-            borderRadius: 100,
-            ...getElevation(
-              headerTextState?.id === item.name.toLowerCase() + '_navigation'
-                ? 1
-                : 0,
-            ),
-          }}
-        />
-      )}
+      ) : null}
     </PressableButton>
   );
 };

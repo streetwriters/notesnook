@@ -15,6 +15,13 @@ import { refreshNotesPage } from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
+import * as ackeeTracker from "./ackee"
+
+export const APP_VERSION = 1510;
+
+export const Tracker = ackeeTracker.create('https://sa.streetwriters.co',{
+  ignoreLocalhost:true
+});
 
 const imgNames = [
   'favorites',
@@ -93,7 +100,7 @@ export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time),
 };
 
-export const APP_VERSION = 1400;
+
 
 export async function setSetting(settings, name, value) {
   let s = {...settings};
@@ -123,13 +130,19 @@ export const sortSettings = {
   sortOrder: 'desc',
 };
 
-export const SORT = {
-  default: null,
+export const GROUP = {
+  default: "default",
   alphabetical: 'abc',
   year: 'year',
   week: 'week',
   month: 'month',
 };
+
+export const SORT = {
+  dateEdited:"Date edited",
+  dateCreated:"Date created",
+  //title:"Title",
+}
 
 export const editing = {
   currentlyEditing: false,
@@ -225,6 +238,7 @@ export function getTotalNotes(notebook) {
   if (notebook.type === 'topic') {
     return notebook.notes.length;
   }
+  if (!notebook.topics) return 0;
   return notebook.topics.reduce((sum, topic) => {
     return sum + topic.notes.length;
   }, 0);
@@ -236,6 +250,7 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.yr.15',
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
+  'com.streetwriters.notesnook.sub.yr.ofr',
 ];
 
 export const MenuItemsList = [

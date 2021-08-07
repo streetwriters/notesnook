@@ -6,14 +6,14 @@ function attachTitleInputListeners() {
   infoBar = '.info-bar';
   document.addEventListener(
     'DOMContentLoaded',
-    function() {
+    function () {
       autosize();
-      document.body.onscroll = function(event) {
+      document.body.onscroll = function (event) {
         if (scrollTimer) {
           clearTimeout(scrollTimer);
           scrollTimer = null;
         }
-        scrollTimer = setTimeout(function() {
+        scrollTimer = setTimeout(function () {
           window.ReactNativeWebView.postMessage(
             JSON.stringify({
               visible: event.target.documentElement.scrollTop,
@@ -115,17 +115,20 @@ function attachMessageListener() {
   if (isSafari) {
     listenerHandler = window;
   }
-  listenerHandler.addEventListener('message', function(data) {
+  listenerHandler.addEventListener('message', function (data) {
     let message = JSON.parse(data.data);
     let type = message.type;
     let value = message.value;
 
     switch (type) {
+      case 'inject':
+        tinymce.activeEditor.setContent(value);
+        break;
       case 'html':
         isLoading = true;
         tinymce.activeEditor.mode.set('readonly');
         tinymce.activeEditor.setContent(value);
-        setTimeout(function() {
+        setTimeout(function () {
           document.activeElement.blur();
           window.blur();
           tinymce.activeEditor.mode.set('design');
@@ -139,12 +142,12 @@ function attachMessageListener() {
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
         break;
       case 'theme':
-      pageTheme.colors = JSON.parse(value);
-      setTheme();   
-      break;  
+        pageTheme.colors = JSON.parse(value);
+        setTheme();
+        break;
       case 'title':
         document.getElementById('titleInput').value = value;
-        setTimeout(function() {
+        setTimeout(function () {
           autosize();
         }, 100);
         break;

@@ -62,6 +62,7 @@ export const execCommands = {
   table: (r, c) =>
     `(function() {
       let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
+      
       if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
         let rng = tinymce.activeEditor.selection.getRng()
         tinymce.activeEditor.execCommand("mceInsertNewLine")
@@ -74,7 +75,7 @@ export const execCommands = {
      
     })();`,
 
-  cl: `tinymce.activeEditor.execCommand('InsertCheckList')`,
+  cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   image: async () => {
     if (editing.isFocused) {
       tiny.call(EditorWebView, tiny.blur);
@@ -124,7 +125,7 @@ export const execCommands = {
   },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
   pre: `
-    tinymce.activeEditor.execCommand('CodeBlock')
+    tinymce.activeEditor.execCommand('mceInsertCodeBlock')
   `,
   tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
   tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
@@ -233,7 +234,7 @@ export const execCommands = {
     }  
   })();
   `,
-  imagefloatleft:`(function () {
+  imagefloatleft: `(function () {
 let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -253,7 +254,7 @@ let node = tinymce.activeEditor.selection.getNode();
   })();
   
   `,
-  imagefloatright:`(function () {
+  imagefloatright: `(function () {
 let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -273,9 +274,8 @@ let node = tinymce.activeEditor.selection.getNode();
   }
   })()
   
-  `
-  ,
-  imagefloatnone:`(function () {
+  `,
+  imagefloatnone: `(function () {
   let node = tinymce.activeEditor.selection.getNode();
   if (node.tagName === 'IMG') {
    
@@ -294,8 +294,11 @@ let node = tinymce.activeEditor.selection.getNode();
   }
   })()
   
-  `
-
+  `,
+  'line-break': `
+  tinymce.activeEditor.undoManager.transact(function() {
+    tinymce.activeEditor.execCommand('InsertLineBreak');
+  });`,
 };
 
 const handleImageResponse = response => {

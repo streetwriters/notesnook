@@ -38,6 +38,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
+import Seperator from '../Seperator';
 import {Toast} from '../Toast';
 import Paragraph from '../Typography/Paragraph';
 
@@ -70,6 +71,9 @@ export class VaultDialog extends Component {
       revokeFingerprintAccess: false,
       title: 'Unlock Note',
       description: null,
+      clearVault: false,
+      deleteVault: false,
+      deleteAll: false,
     };
     this.password = null;
     this.confirmPassword = null;
@@ -159,6 +163,8 @@ export class VaultDialog extends Component {
       revokeFingerprintAccess: data.revokeFingerprintAccess,
       title: data.title,
       description: data.description,
+      clearVault: data.clearVault,
+      deleteVault: data.deleteVault,
     });
 
     if (
@@ -166,7 +172,9 @@ export class VaultDialog extends Component {
       data.novault &&
       !data.fingerprintAccess &&
       !data.revokeFingerprintAccess &&
-      !data.changePassword
+      !data.changePassword &&
+      !data.clearVault &&
+      !data.deleteVault
     ) {
       await this._onPressFingerprintAuth(data.title, data.description);
     } else {
@@ -283,7 +291,7 @@ export class VaultDialog extends Component {
           if (e.message === db.vault.ERRORS.wrongPassword) {
             ToastEvent.show({
               heading: 'Incorrect password',
-              message:"Please enter the correct password and try again",
+              message: 'Please enter the correct password and try again',
               type: 'error',
               context: 'local',
             });
@@ -293,7 +301,7 @@ export class VaultDialog extends Component {
       if (!this.password || this.password.trim() === 0) {
         ToastEvent.show({
           heading: 'Incorrect password',
-          message:"Please enter the correct password and try again",
+          message: 'Please enter the correct password and try again',
           type: 'error',
           context: 'local',
         });
@@ -319,14 +327,69 @@ export class VaultDialog extends Component {
         });
     } else if (this.state.fingerprintAccess) {
       this._enrollFingerprint(this.password);
+    } else if (this.state.clearVault) {
+      await this.clearVault();
+    } else if (this.state.deleteVault) {
+      await this.deleteVault();
     }
+  };
+
+  deleteVault = async () => {
+    this.setState({
+      loading: true,
+    });
+    try {
+      let verified = await db.user.verifyPassword(this.password);
+      if (verified) {
+        await db.vault.delete(this.state.deleteAll);
+        eSendEvent('vaultUpdated');
+        this.setState({
+          loading: false,
+        });
+        this.close();
+      } else {
+        ToastEvent.show({
+          heading: 'Account password incorrect',
+          message: 'Please enter correct password for your account.',
+          type: 'error',
+          context: 'local',
+        });
+      }
+    } catch (e) {}
+    this.setState({
+      loading: false,
+    });
+  };
+
+  clearVault = async () => {
+    this.setState({
+      loading: true,
+    });
+    try {
+      await db.vault.clear(this.password);
+      this.setState({
+        loading: false,
+      });
+      this.close();
+      eSendEvent('vaultUpdated');
+    } catch (e) {
+      ToastEvent.show({
+        heading: 'Vault password incorrect',
+        message: 'Please enter correct password to clear vault.',
+        type: 'error',
+        context: 'local',
+      });
+    }
+    this.setState({
+      loading: false,
+    });
   };
 
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show({
         message: 'Incorrect password',
-        message:"Please enter the correct password and try again",
+        message: 'Please enter the correct password and try again',
         type: 'error',
         context: 'local',
       });
@@ -353,7 +416,7 @@ export class VaultDialog extends Component {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show({
         heading: 'Incorrect password',
-        message:"Please enter the correct password and try again",
+        message: 'Please enter the correct password and try again',
         type: 'error',
         context: 'local',
       });
@@ -595,6 +658,8 @@ export class VaultDialog extends Component {
       changePassword,
       copyNote,
       loading,
+      deleteVault,
+      clearVault,
     } = this.state;
 
     if (!visible) return null;
@@ -621,8 +686,12 @@ export class VaultDialog extends Component {
             paragraph={this.state.description}
             icon="shield"
           />
+          <Seperator half />
 
-          {(novault || changePassword) &&
+          {(novault ||
+            changePassword ||
+            this.state.clearVault ||
+            this.state.deleteVault) &&
           !this.state.revokeFingerprintAccess ? (
             <>
               <Input
@@ -670,8 +739,30 @@ export class VaultDialog extends Component {
             </>
           ) : null}
 
+          {this.state.deleteVault && (
+            <Button
+              onPress={() =>
+                this.setState({
+                  deleteAll: !this.state.deleteAll,
+                })
+              }
+              icon={
+                this.state.deleteAll
+                  ? 'check-circle-outline'
+                  : 'checkbox-blank-circle-outline'
+              }
+              style={{
+                marginTop:10
+              }}
+              width="100%"
+              title={'Delete all notes'}
+              type="errorShade"
+            />
+          )}
+
           {changePassword ? (
             <>
+              <Seperator half/>
               <Input
                 ref={changePassInputRef}
                 editable={!loading}
@@ -750,11 +841,14 @@ export class VaultDialog extends Component {
 
           {this.state.isBiometryAvailable &&
           !this.state.fingerprintAccess &&
+          !this.state.clearVault &&
+          !this.state.deleteVault &&
           ((!this.state.biometricUnlock && !changePassword) || !novault) ? (
             <Button
               onPress={() => {
+                console.log(this.state.biometricUnlock)
                 this.setState({
-                  biometricUnlock: !biometricUnlock,
+                  biometricUnlock: !this.state.biometricUnlock,
                 });
               }}
               style={{
@@ -762,8 +856,8 @@ export class VaultDialog extends Component {
               }}
               icon="fingerprint"
               width="100%"
-              title="Enable biometric unlocking"
-              type="shade"
+              title="Biometric unlocking"
+              type={this.state.biometricUnlock ? "shade"  : 'grayBg'}
             />
           ) : null}
 
@@ -771,8 +865,15 @@ export class VaultDialog extends Component {
             onPressNegative={this.close}
             onPressPositive={this.onPress}
             loading={loading}
+            positiveType={
+              deleteVault || clearVault ? 'errorShade' : 'transparent'
+            }
             positiveTitle={
-              fingerprintAccess
+              deleteVault
+                ? 'Delete'
+                : clearVault
+                ? 'Clear'
+                : fingerprintAccess
                 ? 'Enable'
                 : this.state.revokeFingerprintAccess
                 ? 'Revoke'

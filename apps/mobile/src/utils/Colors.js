@@ -4,14 +4,14 @@ import {Platform, StatusBar} from 'react-native';
 import {AndroidModule} from '.';
 
 export const ACCENT = {
-  color: '#00c853',
-  shade: '#00c85312',
+  color: '#008837',
+  shade: '#00883712',
 };
 
 export const COLORS_NOTE = {
   red: '#f44336',
   orange: '#FF9800',
-  yellow: '#FFD600',
+  yellow: '#F9D71C',
   green: '#4CAF50',
   blue: '#2196F3',
   purple: '#673AB7',
@@ -46,7 +46,7 @@ export var COLOR_SCHEME = {
   bg: '#ffffff',
   navbg: '#f7f7f7',
   nav: '#f7f7f7',
-  pri: '#000000',
+  pri: '#424242',
   sec: 'white',
   light: '#ffffff',
 };
@@ -59,7 +59,7 @@ export const COLOR_SCHEME_LIGHT = {
   nav: '#f7f7f7',
   input: 'transparent',
   heading: '#212121',
-  pri: '#424242',
+  pri: '#505050',
   sec: '#ffffff',
   light: '#ffffff',
 };

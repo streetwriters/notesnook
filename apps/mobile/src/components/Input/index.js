@@ -1,14 +1,13 @@
 import React, {useState} from 'react';
-import {TouchableOpacity} from 'react-native';
+import {TouchableOpacity,TextInput} from 'react-native';
 import {View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider/index';
 import {
   ERRORS_LIST,
   validateEmail,
   validatePass,
-  validateUsername,
+  validateUsername
 } from '../../services/Validation';
 import {getElevation} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
@@ -41,7 +40,7 @@ const Input = ({
   returnKeyType,
   returnKeyLabel,
   autoCompleteType,
-  onFocusInput,
+  onFocusInput
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -50,7 +49,7 @@ const Input = ({
   const [secureEntry, setSecureEntry] = useState(true);
   const [showError, setShowError] = useState(false);
   const [errorList, setErrorList] = useState({
-    SHORT_PASS: true,
+    SHORT_PASS: true
     //  NO_ABC: true,
     //  NO_CAPS_ABC: true,
     //  NO_NUM: true,
@@ -73,7 +72,7 @@ const Input = ({
         NO_ABC: true,
         NO_CAPS_ABC: true,
         NO_NUM: true,
-        SPECIAL: true,
+        SPECIAL: true
       });
       return;
     }
@@ -92,7 +91,6 @@ const Input = ({
         isError = value === customValidator();
         break;
     }
-    //console.log('isError', isError, error);
 
     if (validationType === 'password') {
       let hasError = false;
@@ -131,14 +129,15 @@ const Input = ({
   };
 
   const style = {
-    borderBottomWidth: 1,
+    borderWidth: 1,
+    borderRadius: 5,
     borderColor: color,
-    paddingHorizontal: 0,
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     flexGrow: 1,
     height: 50,
+    paddingHorizontal: 12
   };
 
   const textStyle = {
@@ -148,7 +147,7 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height: 35,
+    height: 50
   };
 
   return (
@@ -159,7 +158,7 @@ const Input = ({
           height: height,
           marginBottom: marginBottom,
           flexGrow: 1,
-          maxHeight: height,
+          maxHeight: height
         }}>
         <TouchableOpacity
           disabled={!loading}
@@ -196,7 +195,7 @@ const Input = ({
               flexDirection: 'row',
               justifyContent: 'center',
               height: 35,
-              alignItems: 'center',
+              alignItems: 'center'
             }}>
             {secureTextEntry && (
               <ActionIcon
@@ -205,11 +204,12 @@ const Input = ({
                 top={10}
                 bottom={10}
                 onPress={() => {
+                  fwdRef.current?.blur();
                   setSecureEntry(!secureEntry);
                 }}
                 style={{
                   width: 25,
-                  marginLeft: 5,
+                  marginLeft: 5
                 }}
                 color={secureEntry ? colors.icon : colors.accent}
               />
@@ -218,14 +218,10 @@ const Input = ({
             {button && (
               <ActionIcon
                 name={button.icon}
-                size={20}
+                size={SIZE.xl}
                 top={10}
                 bottom={10}
                 onPress={button.onPress}
-                style={{
-                  width: 25,
-                  marginLeft: 5,
-                }}
                 color={button.color}
               />
             )}
@@ -241,7 +237,7 @@ const Input = ({
                 size={20}
                 style={{
                   width: 25,
-                  marginLeft: 5,
+                  marginLeft: 5
                 }}
                 color={colors.errorText}
               />
@@ -257,13 +253,13 @@ const Input = ({
                 paddingHorizontal: 5,
                 borderRadius: 2.5,
                 ...getElevation(2),
-                top: 0,
+                top: 0
               }}>
               <Paragraph
                 size={SIZE.xs}
                 style={{
                   textAlign: 'right',
-                  textAlignVertical: 'bottom',
+                  textAlignVertical: 'bottom'
                 }}>
                 <Icon
                   name="alert-circle-outline"
@@ -280,15 +276,16 @@ const Input = ({
       {validationType === 'password' && focus && (
         <View
           style={{
-            paddingTop: 5,
+            paddingTop: 5
           }}>
           {Object.keys(errorList).filter(k => errorList[k] === true).length !==
           0 ? (
             Object.keys(ERRORS_LIST).map(error => (
               <View
+                key={ERRORS_LIST[error]}
                 style={{
                   flexDirection: 'row',
-                  alignItems: 'center',
+                  alignItems: 'center'
                 }}>
                 <Icon
                   name={errorList[error] ? 'close' : 'check'}

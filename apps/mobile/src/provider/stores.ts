@@ -2,7 +2,7 @@ import { Platform } from 'react-native';
 import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import { history, SORT, sortSettings, SUBSCRIPTION_STATUS } from '../utils';
+import { history, SUBSCRIPTION_STATUS } from '../utils';
 import { db } from '../utils/DB';
 import { MMKV } from '../utils/mmkv';
 import {
@@ -20,7 +20,7 @@ import {
   UserStore,
   Announcement,
 } from './interfaces';
-
+import { groupArray } from "notes-core/utils/grouping"
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -28,8 +28,9 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   setLoading: loading => set({ loading: loading }),
   setNotes: items => {
     if (!items) {
+      
       set({
-        notes: db.notes.group(SORT[sortSettings.sort], sortSettings.sortOrder),
+        notes: groupArray(db.notes.all, db.settings?.getGroupOptions("home")),
       });
       return;
     }
@@ -51,7 +52,7 @@ export const useNotebookStore = create<NotebookStore>((set, get) => ({
   setNotebooks: items => {
     if (!items) {
       set({
-        notebooks: db.notebooks.all,
+        notebooks: groupArray(db.notebooks.all, db.settings?.getGroupOptions("notebooks")),
       });
       return;
     }
@@ -73,7 +74,7 @@ export const useFavoriteStore = create<FavoriteStore>((set, get) => ({
   setFavorites: items => {
     if (!items) {
       set({
-        favorites: db.notes.favorites,
+        favorites: groupArray(db.notes.favorites, db.settings?.getGroupOptions("favorites")),
       });
       return;
     }
@@ -95,7 +96,7 @@ export const useTagStore = create<TagStore>((set, get) => ({
   setTags: items => {
     if (!items) {
       set({
-        tags: db.tags.all,
+        tags: groupArray(db.tags.all, db.settings?.getGroupOptions("tags")),
       });
       return;
     }
@@ -117,7 +118,7 @@ export const useTrashStore = create<TrashStore>((set, get) => ({
   setTrash: items => {
     if (!items) {
       set({
-        trash: db.trash.all,
+        trash: groupArray(db.trash.all, db.settings?.getGroupOptions("trash")),
       });
       return;
     }
@@ -164,16 +165,22 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     screenshotMode: true,
     privacyScreen: false,
     appLockMode: 'none',
+    telemetry: true,
+    notebooksListMode:"normal",
+    notesListMode:"normal"
   },
   fullscreen: false,
-  deviceMode: null,
+  deviceMode: "mobile",
   dimensions: { width, height },
+  appLoading: true,
+  isIntroCompleted: false,
   setSettings: settings => set({ settings }),
   setFullscreen: fullscreen => set({ fullscreen }),
   setDeviceMode: mode => set({ deviceMode: mode }),
   setDimensions: dimensions => set({ dimensions: dimensions }),
-  appLoading:true,
-  setAppLoading:(appLoading) => set({appLoading})
+  setAppLoading: (appLoading) => set({ appLoading }),
+  setIntroCompleted: (isIntroCompleted) => set({ isIntroCompleted })
+
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -210,7 +217,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       history.selectedItemsList = [];
       history.selectionMode = false;
     }
-    set({ selectionMode: mode,selectedItemsList:mode? get().selectedItemsList : [] })
+    set({ selectionMode: mode, selectedItemsList: mode ? get().selectedItemsList : [] })
   },
   setSelectedItem: item => {
     let selectedItems = get().selectedItemsList;
@@ -222,7 +229,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     }
     selectedItems = [...new Set(selectedItems)];
     history.selectedItemsList = selectedItems;
- 
+
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
 
@@ -232,9 +239,12 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     });
   },
   clearSelection: () => {
+    history.selectedItemsList = [];
+    history.selectionMode = false;
     set({ selectionMode: false, selectedItemsList: [] });
   },
 }));
+
 
 export const useMessageStore = create<MessageStore>((set, get) => ({
   message: {
@@ -310,10 +320,10 @@ async function shouldShowAnnouncement(announcement) {
   let removed = await MMKV.getStringAsync(announcement.id) ===
     "removed"
   if (removed) return false;
-  console.log(announcement);
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1
   );
+
   if (!show) return false;
 
   const subStatus = PremiumService.getUser()?.subscription?.type;

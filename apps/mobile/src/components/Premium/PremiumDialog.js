@@ -38,7 +38,7 @@ class PremiumDialog extends React.Component {
   render() {
     return !this.state.visible ? null : (
       <ActionSheetWrapper onClose={this.onClose} fwdRef={this.actionSheetRef}>
-        <PremiumComponent  promo={this.state.promo} close={this.close} />
+        <PremiumComponent getRef={() => this.actionSheetRef}  promo={this.state.promo} close={this.close} />
       </ActionSheetWrapper>
     );
   }

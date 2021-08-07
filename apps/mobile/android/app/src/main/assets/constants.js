@@ -32,8 +32,8 @@ const markdownPatterns = [
   {start: '#####', format: 'h5'},
   {start: '######', format: 'h6'},
   {start: '* ', cmd: 'InsertUnorderedList'},
-  {start: '- [ ] ', cmd: 'InsertCheckList'},
-  {start: '- [x] ', cmd: 'InsertCheckList', value: 'checked'},
+  {start: '- [ ] ', cmd: 'insertCheckList'},
+  {start: '- [x] ', cmd: 'insertCheckList', value: 'checked'},
   {start: '- ', cmd: 'InsertUnorderedList'},
   {start: '> ', format: 'blockquote'},
   {
@@ -119,7 +119,7 @@ function setTheme() {
   } else {
     light();
   }
-
+  addStyle();
   let css = document.createElement('style');
   css.type = 'text/css';
 
@@ -275,13 +275,13 @@ var minifyImg = function (
   resolve,
   imageArguments = 0.7
 ) {
-  fetch(dataUrl).then(function(res) {
-    res.blob().then(function(blob) {
+  fetch(dataUrl).then(function (res) {
+    res.blob().then(function (blob) {
       new Compressor(blob, {
         quality: imageArguments,
         width: newWidth,
         mimeType: imageType,
-        success: function(result) {
+        success: function (result) {
           let fileReader = new FileReader();
           fileReader.onloadend = function () {
             resolve(fileReader.result);
@@ -289,27 +289,27 @@ var minifyImg = function (
           };
           fileReader.readAsDataURL(result);
         },
-        error: function(err) {
+        error: function (err) {
           console.log(err.message);
         }
       });
-    })
+    });
   });
 };
 
 function loadImage() {
   let fileInput = document.querySelector('#image-input');
-  let listener = function() {
+  let listener = function () {
     if (fileInput.files != null && fileInput.files[0] != null) {
       let reader = new FileReader();
       console.log(reader.readyState, 'READY STATE');
-      let load = function(e) {
+      let load = function (e) {
         console.log(e, 'loaded error');
         minifyImg(
           reader.result,
           1024,
           'image/jpeg',
-          function(r) {
+          function (r) {
             var content = `<img style="max-width:100% !important;" src="${r}">`;
             editor.insertContent(content);
           },
@@ -318,14 +318,14 @@ function loadImage() {
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);
       };
-      let error = function() {
+      let error = function () {
         console.log('error');
         reader.onload = null;
         fileInput.removeEventListener('change', listener);
         reader.removeEventListener('load', load);
         reader.removeEventListener('error', error);
       };
-      reader.onabort = function() {
+      reader.onabort = function () {
         console.log('abort');
       };
       reader.addEventListener('load', load);

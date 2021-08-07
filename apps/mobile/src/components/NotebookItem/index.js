@@ -3,10 +3,12 @@ import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
-import {getTotalNotes, history} from '../../utils';
+import {getElevation, getTotalNotes, history} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -14,20 +16,19 @@ import Paragraph from '../Typography/Paragraph';
 export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const [state] = useTracked();
   const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const compactMode = settings.notebooksListMode === 'compact';
+
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
-    let rowItems = isTrash
-      ? ['Restore', 'Remove']
-      : [item.type == 'topic' ? 'Edit Topic' : 'Edit Notebook'];
+    let rowItems =
+      item.type === 'topic'
+        ? ['Edit Topic', 'Add Shortcut', 'Delete']
+        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete',];
+    rowItems = isTrash ? ['Restore', 'PermDelete'] : rowItems;
 
-    let columnItems = isTrash
-      ? []
-      : item.type === 'topic'
-      ? ['Add Shortcut to Menu', 'Delete']
-      : ['Pin', 'Add Shortcut to Menu','Delete'];
-
-    ActionSheetEvent(item, false, false, rowItems, columnItems, {
+    ActionSheetEvent(item, false, false, rowItems, {
       notebookID: notebookID,
     });
   };
@@ -48,65 +49,58 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     <>
       <View
         style={{
-          width: '90%',
-          maxWidth: '90%',
-          minHeight: 50,
-          justifyContent: 'center',
+          flexGrow: 1,
+          flexShrink: 1,
         }}>
         <Heading
           size={SIZE.md}
           numberOfLines={1}
           style={{
-            maxWidth: '100%',
+            flexWrap: 'wrap',
           }}>
           {item.title}
         </Heading>
-        {isTopic || !item.description ? null : (
+        {isTopic || !item.description || compactMode ? null : (
           <Paragraph
             size={SIZE.sm}
             numberOfLines={2}
             style={{
-              maxWidth: '100%',
+              flexWrap: 'wrap',
             }}>
             {item.description}
           </Paragraph>
         )}
 
-        {isTopic ? null : (
+        {isTopic || compactMode  ? null : (
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              width: '80%',
-              maxWidth: '80%',
               flexWrap: 'wrap',
-              paddingVertical: 0,
             }}>
             {topics.map(topic => (
-              <TouchableOpacity
-                activeOpacity={0.8}
-                onPress={() => navigateToTopic(topic)}
+              <Button
+                title={topic.title}
                 key={topic.id}
+                height={SIZE.xl}
+                textStyle={{
+                  fontWeight: 'normal',
+                  fontFamily: null,
+                }}
+                type="grayBg"
+                fontSize={SIZE.xs + 1}
+                icon="book-open-outline"
                 style={{
-                  borderRadius: 2.5,
-                  backgroundColor: colors.accent,
-                  paddingHorizontal: 5,
-                  paddingVertical: 2,
+                  borderRadius: 5,
                   marginRight: 5,
-                  marginVertical: 2.5,
-                  maxWidth: 100,
-                }}>
-                <Paragraph
-                  size={SIZE.xs}
-                  numberOfLines={1}
-                  lineBreakMode="tail"
-                  color="white"
-                  style={{
-                    maxWidth: '100%',
-                  }}>
-                  {topic.title}
-                </Paragraph>
-              </TouchableOpacity>
+                  marginVertical: 5,
+                  maxWidth: 120,
+                  borderWidth: 0.5,
+                  borderColor: colors.icon,
+                  paddingHorizontal: 6,
+                }}
+                onPress={() => navigateToTopic(topic)}
+              />
             ))}
           </View>
         )}
@@ -116,8 +110,8 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignItems: 'center',
-            marginTop: 2.5,
-            minHeight: SIZE.md + 2,
+            marginTop: 5,
+            height: SIZE.md + 2,
           }}>
           {isTrash ? (
             <>

@@ -11,21 +11,27 @@
       }
     },
     "android.emu.debug": {
+      "binaryPath": "android/app/build/outputs/apk/debug/app-debug.apk",
+      "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
+      "type": "android.emulator",
+      "name": "emu"
+    },
+    "android.dev.debug": {
       "binaryPath": "android/app/build/outputs/apk/debug/app-arm64-v8a-debug.apk",
       "testBinaryPath": "android/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk",
       "build": "cd android && ./gradlew app:assembleDebug app:assembleAndroidTest -DtestBuildType=debug && cd ..",
       "type": "android.attached",
-      "device":{
-        "avdName":"LMG710ULM3d3678f0"
+      "device": {
+        "adbName": "LMG710ULM3d3678f0"
       }
     },
-    "android.emu.release": {
+    "android.dev.release": {
       "binaryPath": "android/app/build/outputs/apk/release/app-arm64-v8a-release.apk",
       "build": "cd android ; ./gradlew assembleRelease assembleAndroidTest -DtestBuildType=release ; cd -",
       "type": "android.emulator",
-      "device":{
-        "avdName":"LMG710ULM3d3678f0"
+      "device": {
+        "avdName": "LMG710ULM3d3678f0"
       }
-  }
+    }
   }
 }

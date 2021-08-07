@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { Clipboard, View } from 'react-native';
 import Animated, { useValue } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
-import { useMenuStore, useNotebookStore, useSelectionStore } from '../../provider/stores';
+import {
+  useMenuStore,
+  useNotebookStore,
+  useSelectionStore
+} from '../../provider/stores';
 import { openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { dWidth, getElevation, toTXT } from '../../utils';
@@ -10,8 +14,7 @@ import { db } from '../../utils/DB';
 import { deleteItems } from '../../utils/functions';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
-import { simpleDialogEvent } from '../DialogManager/recievers';
-import { TEMPLATE_PERMANANT_DELETE } from '../DialogManager/Templates';
+import { presentDialog } from '../Dialog/functions';
 
 export const ActionStrip = ({note, setActionStrip}) => {
   const [state, dispatch] = useTracked();
@@ -21,7 +24,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
-  
+
   const [isPinnedToMenu, setIsPinnedToMenu] = useState(false);
   const [width, setWidth] = useState(dWidth - 16);
   const opacity = useValue(0);
@@ -124,7 +127,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
             });
           }
           setIsPinnedToMenu(db.settings.isPinned(note.id));
-          setMenuPins()
+          setMenuPins();
 
           setActionStrip(false);
         } catch (e) {}
@@ -188,7 +191,23 @@ export const ActionStrip = ({note, setActionStrip}) => {
       icon: 'delete',
       visible: note.type === 'trash',
       onPress: () => {
-        simpleDialogEvent(TEMPLATE_PERMANANT_DELETE);
+        presentDialog({
+          title: `Permanent delete`,
+          paragraph: `Are you sure you want to delete this ${note.itemType} permanantly from trash?`,
+          positiveText: 'Delete',
+          negativeText: 'Cancel',
+          positivePress: async () => {
+            await db.trash.delete(note.id);
+            useTrashStore.getState().setTrash();
+            useSelectionStore.getState().setSelectionMode(false);
+            ToastEvent.show({
+              heading: 'Permanantly deleted items',
+              type: 'success',
+              context: 'local',
+            });
+          },
+          positiveType: 'errorShade',
+        });
         setActionStrip(false);
       },
     },

@@ -89,6 +89,7 @@ export const Menu = React.memo(
             style={{
               height: '100%',
               width: '100%',
+              paddingHorizontal:12
             }}
             showsVerticalScrollIndicator={false}
             data={[0]}
@@ -108,7 +109,11 @@ export const Menu = React.memo(
               </>
             )}
           />
-
+          <View
+          style={{
+            paddingHorizontal:12
+          }}
+          >
           {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 2).map(
             (item, index) => (
               <MenuListItem
@@ -125,6 +130,8 @@ export const Menu = React.memo(
               />
             ),
           )}
+          </View>
+         
 
           <View
             style={{

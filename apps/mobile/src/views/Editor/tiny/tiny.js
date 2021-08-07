@@ -1,6 +1,6 @@
 import {Platform} from 'react-native';
 import {editing} from '../../../utils';
-import {EditorWebView, getWebviewInit, post} from '../Functions';
+import {EditorWebView, getWebviewInit, post, textInput} from '../Functions';
 
 const reset = `
 isLoading = true;
@@ -19,10 +19,10 @@ window.blur();
 
 const removeMarkdown = `
  tinymce.activeEditor.plugins.textpattern.setPatterns("")
-`
+`;
 const setMarkdown = `
  tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
-`
+`;
 
 const keyboardStateChanged = `(function() {
   let node = tinymce.activeEditor.selection.getNode();
@@ -83,6 +83,7 @@ const updateSavingState = value => `
 `;
 
 export const clearEditor = `
+
 tinymce.activeEditor.setContent("");
 `;
 const clearTitle = `
@@ -151,7 +152,7 @@ isLoading = false;
 const html = value => post('html', value);
 
 const focusEditor = `
-tinymce.activeEditor.focus();
+ tinymce.activeEditor.focus();
 `;
 
 function call(webview, func, noqueue) {
@@ -160,10 +161,14 @@ function call(webview, func, noqueue) {
   } else {
     if (noqueue) return;
     setTimeout(() => {
-      console.log('run after delay');
       webview.current?.injectJavaScript(func);
     }, 1000);
   }
+}
+
+export function safeKeyboardDismiss() {
+  textInput.current?.focus();
+  textInput.current?.blur();
 }
 
 const undo = `
@@ -185,7 +190,7 @@ const onKeyboardShow = () => {
   if (!editing.movedAway) {
     editing.isFocused = true;
     if (Platform.OS === 'ios') {
-      if (editing.focusType === "title") return;
+      if (editing.focusType === 'title') return;
       call(EditorWebView, keyboardStateChanged);
     }
   }

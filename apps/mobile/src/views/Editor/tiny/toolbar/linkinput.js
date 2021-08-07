@@ -12,7 +12,7 @@ import {
   focusEditor,
   formatSelection,
   INPUT_MODE,
-  properties,
+  properties
 } from './constants';
 import LinkPreview from './linkpreview';
 
@@ -22,7 +22,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [mode, setMode] = useState(
-    value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING,
+    value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING
   );
 
   const inputRef = useRef();
@@ -60,11 +60,11 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     }
   }, [mode]);
 
-  const onChangeText = (value) => {
+  const onChangeText = value => {
     inputValue = value;
   };
 
-  const onSubmit = (value) => {
+  const onSubmit = value => {
     if (value === 'clear') {
       inputValue = null;
     }
@@ -75,9 +75,10 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     } else {
       formatSelection(execCommands[format](inputValue));
     }
+
     editing.tooltip = null;
     setMode(INPUT_MODE.NO_EDIT);
-    focusEditor(format);
+    focusEditor(format, false);
     properties.userBlur = false;
   };
 
@@ -93,11 +94,12 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     <View
       style={{
         flexDirection: 'row',
-        paddingHorizontal: 12,
         maxWidth: '100%',
         width: '100%',
         justifyContent: 'space-between',
         alignItems: 'center',
+        flexShrink: 1,
+        paddingHorizontal: 12
       }}>
       {mode === INPUT_MODE.NO_EDIT ? (
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
@@ -110,18 +112,21 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               height: normalize(50),
               color: colors.pri,
               zIndex: 10,
-              flexGrow: 1,
+              flexWrap: 'wrap',
+              fontSize: SIZE.sm,
+              flexShrink: 1,
+              minWidth:'80%'
             }}
             autoCapitalize="none"
             autoCorrect={false}
             returnKeyLabel="Done"
             returnKeyType="done"
-            onSubmit={onSubmit}
+            onSubmitEditing={() => onSubmit(inputValue)}
             onChangeText={onChangeText}
             defaultValue={value}
             blurOnSubmit={false}
             placeholder="Enter link"
-            placeholderTextColor={colors.nav}
+            placeholderTextColor={colors.icon}
           />
 
           {mode === INPUT_MODE.EDITING && (
@@ -130,7 +135,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               onPress={onSubmit}
               height={normalize(40)}
               fontSize={SIZE.md}
-              style={{marginLeft: 10, paddingHorizontal: 12}}
+              style={{paddingHorizontal: 15}}
             />
           )}
         </>

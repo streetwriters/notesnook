@@ -120,7 +120,7 @@ const PinItem = ({item, index, onPress}) => {
   }, []);
 
   const icons = {
-    topic: 'format-title',
+    topic: 'book-open-outline',
     notebook: 'book-outline',
     tag: 'pound',
   };
@@ -141,6 +141,7 @@ const PinItem = ({item, index, onPress}) => {
             type="error"
             onPress={async () => {
               await db.settings.unpin(item.id);
+              setVisible(false);
               setMenuPins();
             }}
             fontSize={SIZE.md}
@@ -153,20 +154,22 @@ const PinItem = ({item, index, onPress}) => {
         </ActionSheetWrapper>
       )}
       <PressableButton
-        type="transparent"
+        type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}
         onLongPress={() => {
-          setVisible(true);
+          setVisible(!visible);
           fwdRef.current?.show();
         }}
         onPress={() => onPress(item)}
         customStyle={{
+          width: '100%',
+          alignSelf: 'center',
+          borderRadius: 5,
           flexDirection: 'row',
+          paddingHorizontal: 8,
           justifyContent: 'space-between',
           alignItems: 'center',
-          width: '100%',
-          borderRadius: 0,
-          paddingHorizontal: 10,
-          minHeight: normalize(50),
+          height: normalize(50),
+          marginBottom: 5,
         }}>
         <View
           style={{
@@ -184,7 +187,7 @@ const PinItem = ({item, index, onPress}) => {
             <Icon
               style={{
                 position: 'absolute',
-                bottom: -5,
+                bottom: -6,
                 left: -6,
               }}
               color={color}
@@ -203,33 +206,17 @@ const PinItem = ({item, index, onPress}) => {
                 style={{
                   flexWrap: 'wrap',
                 }}
-                color={colors.accent}
+                color={colors.heading}
                 size={SIZE.md}>
                 {item.title}
               </Heading>
             ) : (
-              <Paragraph
-                numberOfLines={1}
-                color={colors.heading}
-                size={SIZE.md}>
+              <Paragraph numberOfLines={1} color={colors.pri} size={SIZE.md}>
                 {item.title}
               </Paragraph>
             )}
           </View>
         </View>
-
-        <View
-          style={{
-            backgroundColor:
-              headerTextState?.id === item.id ? colors.accent : 'transparent',
-            width: 7,
-            height: 7,
-            borderRadius: 100,
-            ...getElevation(
-              headerTextState?.id === item.id + '_navigation' ? 1 : 0,
-            ),
-          }}
-        />
       </PressableButton>
     </>
   );

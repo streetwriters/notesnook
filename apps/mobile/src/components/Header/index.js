@@ -4,9 +4,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import SearchService from '../../services/SearchService';
-import {dWidth} from '../../utils';
 import {eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {SearchInput} from '../SearchInput';
 import {HeaderLeftMenu} from './HeaderLeftMenu';
@@ -14,7 +12,7 @@ import {HeaderRightMenu} from './HeaderRightMenu';
 import {Title} from './title';
 
 export const Header = React.memo(
-  ({root, title, screen, isBack, color, action}) => {
+  ({root, title, screen, isBack, color, action, rightButtons}) => {
     const [state] = useTracked();
     const {colors} = state;
     const insets = useSafeAreaInsets();
@@ -46,14 +44,13 @@ export const Header = React.memo(
             overflow: 'hidden',
             borderBottomWidth: 1,
             borderBottomColor: hide ? 'transparent' : colors.nav,
-            justifyContent: 'center',
-          },
+            justifyContent: 'space-between',
+          }
         ]}>
         <View style={styles.leftBtnContainer}>
           <HeaderLeftMenu headerMenuState={!isBack} currentScreen={screen} />
 
-          {(Platform.OS === 'android' || Platform.isPad) &&
-          screen !== 'Search' ? (
+          {screen !== 'Search' ? (
             <Title
               headerColor={color}
               heading={title}
@@ -62,78 +59,54 @@ export const Header = React.memo(
             />
           ) : null}
         </View>
-        {Platform.OS !== 'android' && !Platform.isPad && screen !== 'Search' ? (
-          <Title
-            headerColor={color}
-            heading={title}
-            screen={screen}
-            root={root}
-          />
-        ) : null}
 
         {screen === 'Search' ? (
           <>
             <View
               style={{
-                width: '80%',
+                width: '80%'
               }}>
               <SearchInput />
             </View>
-            <View style={[styles.rightBtnContainer, {right: 6}]}>
+            <View style={[styles.rightBtnContainer]}>
               <ActionIcon
                 onPress={() => {
                   SearchService.search();
                 }}
                 name="magnify"
-                size={SIZE.xxxl}
                 color={colors.pri}
                 style={styles.rightBtn}
               />
             </View>
           </>
         ) : (
-          <HeaderRightMenu action={action} currentScreen={screen} />
+          <HeaderRightMenu
+            rightButtons={rightButtons}
+            action={action}
+            currentScreen={screen}
+          />
         )}
       </View>
     );
   },
-  (prev, next) => prev.title === next.title,
+  (prev, next) => prev.title === next.title
 );
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     zIndex: 11,
-    height: 50,
+    minHeight: 50,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 12,
-    width: '100%',
-  },
-  loadingContainer: {
-    alignSelf: 'center',
-    alignItems: 'center',
-    justifyContent: 'center',
-    zIndex: 999,
-    left: dWidth / 2 - 20,
-    top: -20,
-    width: 40,
-    height: 40,
-    position: 'absolute',
-  },
-  loadingInnerContainer: {
-    width: 40,
-    height: 20,
-    position: 'absolute',
-    zIndex: 10,
-    top: 0,
+    width: '100%'
   },
   leftBtnContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-start',
     alignItems: 'center',
-    position: 'absolute',
-    left: 12,
+    flexShrink: 1
   },
   leftBtn: {
     justifyContent: 'center',
@@ -142,19 +115,17 @@ const styles = StyleSheet.create({
     width: 40,
     borderRadius: 100,
     marginLeft: -5,
-    marginRight: 25,
+    marginRight: 25
   },
   rightBtnContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
-    position: 'absolute',
-    right: 12,
+    alignItems: 'center'
   },
   rightBtn: {
     justifyContent: 'center',
     alignItems: 'flex-end',
     height: 40,
-    width: 50,
-    paddingRight: 0,
-  },
+    width: 40,
+    paddingRight: 0
+  }
 });

@@ -20,11 +20,12 @@ const BaseDialog = ({
   statusBarTranslucent = true,
   transparent,
   centered = true,
+  bottom = false,
   background = null
 }) => {
   const [state, dispatch] = useTracked();
-  
   const floating = useIsFloatingKeyboard();
+  
   return (
     <Modal
       visible={visible}
@@ -52,7 +53,7 @@ const BaseDialog = ({
           style={[
             styles.backdrop,
             {
-              justifyContent: centered ? 'center' : 'flex-start',
+              justifyContent: centered ? 'center' : bottom ? 'flex-end' : 'flex-start',
             },
           ]}>
           <TouchableOpacity

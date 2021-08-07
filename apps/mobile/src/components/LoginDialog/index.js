@@ -1,42 +1,45 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, ScrollView, Text, TouchableOpacity, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React, {useEffect, useRef, useState} from 'react';
+import {
+  ActivityIndicator,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { Button } from '../../components/Button';
+import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import { Toast } from '../../components/Toast';
-import { useTracked } from '../../provider/index';
-import { useUserStore } from '../../provider/stores';
+import {useTracked} from '../../provider/index';
+import {useUserStore} from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
+import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import { getElevation } from '../../utils';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/DB';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {sleep} from '../../utils/TimeUtils';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import { Header } from '../SimpleList/header';
+import {Header} from '../SimpleList/header';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -45,16 +48,16 @@ const MODES = {
   signup: 1,
   forgotPassword: 2,
   changePassword: 3,
-  sessionExpired: 4,
+  sessionExpired: 4
 };
 
 let email = '';
-let username;
 let password = '';
 let confirmPassword;
 let oldPassword;
 
 function getEmail() {
+  if (!email) return null;
   return email.replace(/(.{2})(.*)(?=@)/, function (gp1, gp2, gp3) {
     for (let i = 0; i < gp3.length; i++) {
       gp2 += '*';
@@ -62,7 +65,6 @@ function getEmail() {
     return gp2;
   });
 }
-
 const LoginDialog = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
@@ -78,11 +80,10 @@ const LoginDialog = () => {
   const [error, setError] = useState(false);
   const [focused, setFocused] = useState(false);
   const [confirm, setConfirm] = useState(false);
-  const insets = useSafeAreaInsets();
-
+  const scrollViewRef = useRef();
+  const actionSheetRef = useRef();
   const _email = useRef();
   const _pass = useRef();
-  const _username = useRef();
   const _oPass = useRef();
   const _passConfirm = useRef();
 
@@ -101,7 +102,7 @@ const LoginDialog = () => {
       buttonAlt: 'Sign Up',
       buttonAltFunc: () => {
         setMode(MODES.signup);
-      },
+      }
     },
     {
       headerButton: 'Sign Up',
@@ -121,7 +122,7 @@ const LoginDialog = () => {
         _email.current?.blur();
         setMode(MODES.login);
         onChangeFocus();
-      },
+      }
     },
     {
       headerButton: 'Forgot Password',
@@ -140,7 +141,7 @@ const LoginDialog = () => {
       buttonAlt: 'Go back to Login',
       buttonAltFunc: () => {
         setMode(MODES.login);
-      },
+      }
     },
     {
       headerButton: 'Change Password',
@@ -154,7 +155,7 @@ const LoginDialog = () => {
       loading:
         'Please wait while we change your password and encrypt your data.',
       showLoader: true,
-      buttonAlt: null,
+      buttonAlt: null
     },
     {
       headerButton: 'Session expired',
@@ -168,18 +169,13 @@ const LoginDialog = () => {
       buttonAlt: 'Logout & delete data',
       buttonAltFunc: () => {
         setConfirm(true);
-      },
-    },
+      }
+    }
   ];
 
   const current = MODE_DATA[mode];
 
   useEffect(() => {
-    MMKV.getItem('loginSessionHasExpired').then(r => {
-      if (r === 'expired') {
-        open(MODES.sessionExpired);
-      }
-    });
     eSubscribeEvent(eOpenLoginDialog, open);
     return () => {
       eUnSubscribeEvent(eOpenLoginDialog, open);
@@ -194,25 +190,23 @@ const LoginDialog = () => {
     }
     setStatus(null);
     setVisible(true);
+    await sleep(10);
+    actionSheetRef.current?.show();
   }
 
   const close = () => {
     if (loading) return;
-    _email.current?.clear();
-    _pass.current?.clear();
-    _passConfirm.current?.clear();
-    _username.current?.clear();
-
-    // email = null;
-    //  password = null;
+    actionSheetRef.current?.hide();
     confirmPassword = null;
     oldPassword = null;
-    setVisible(false);
+    email = null;
+    password = null;
     setUserConsent(false);
     setError(false);
     setLoading(false);
     setStatus(null);
     setMode(MODES.login);
+    setVisible(false);
   };
 
   const loginUser = async () => {
@@ -220,7 +214,7 @@ const LoginDialog = () => {
       ToastEvent.show({
         heading: 'Email or password is invalid',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -241,7 +235,7 @@ const LoginDialog = () => {
         heading: 'Login successful',
         message: `Logged in as ${user.email}`,
         type: 'success',
-        context: 'local',
+        context: 'local'
       });
       close();
       await sleep(300);
@@ -249,7 +243,7 @@ const LoginDialog = () => {
       eSendEvent(eOpenProgressDialog, {
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
-        noProgress: false,
+        noProgress: false
       });
       await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
@@ -259,7 +253,7 @@ const LoginDialog = () => {
         heading: user ? 'Failed to sync' : 'Login failed',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -270,7 +264,7 @@ const LoginDialog = () => {
         heading: 'All fields required',
         message: 'Fill all the fields and try again',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
 
       return false;
@@ -282,7 +276,7 @@ const LoginDialog = () => {
         message:
           'Some or all information provided is invalid. Resolve all errors and try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return false;
     }
@@ -299,7 +293,7 @@ const LoginDialog = () => {
           setUserConsent(true);
           signupUser();
           ToastEvent.hide();
-        },
+        }
       });
       return false;
     }
@@ -329,7 +323,7 @@ const LoginDialog = () => {
         heading: 'Signup failed',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -339,7 +333,7 @@ const LoginDialog = () => {
       ToastEvent.show({
         heading: 'Account email is required.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -360,7 +354,7 @@ const LoginDialog = () => {
         heading: 'Recovery email not sent',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -371,7 +365,7 @@ const LoginDialog = () => {
         heading: 'All fields required',
         message: 'Fill all the fields and try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -385,7 +379,7 @@ const LoginDialog = () => {
         heading: 'Failed to change password',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
     setStatus(null);
@@ -396,17 +390,21 @@ const LoginDialog = () => {
     setFocused(!focused);
     setTimeout(() => {
       _email.current?.focus();
-      //setFocused(!focused);
     }, 50);
   };
 
   return !visible ? null : (
-    <BaseDialog
+    <ActionSheetWrapper
+      fwdRef={actionSheetRef}
       animation={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={false}
+      gestureEnabled={MODES.sessionExpired !== mode}
+      closeOnTouchBackdrop={MODES.sessionExpired !== mode}
       onRequestClose={MODES.sessionExpired !== mode && close}
+      keyboardMode="position"
       visible={true}
-      onShow={() => {
+      onClose={close}
+      onOpen={() => {
         setTimeout(() => {
           if (MODES.sessionExpired === mode) {
             _pass.current?.focus();
@@ -457,117 +455,34 @@ const LoginDialog = () => {
             if (!current.showLoader) {
               setStatus(null);
             }
-          }}>
-          <View
-            style={{
-              alignItems: 'center',
-              position: 'absolute',
-              bottom: 0,
-              paddingHorizontal: 12,
-              paddingTop: 10,
-              paddingBottom: 20,
-              width: '100%',
-              flexDirection: 'row',
-              justifyContent: 'space-between',
-            }}>
-            <View
-              style={{
-                maxWidth: '80%',
-              }}>
-              <Heading size={SIZE.md}>{status}</Heading>
-              <Paragraph style={{maxWidth: '100%'}} color={colors.icon}>
-                {current.loading}
-                {!current.showLoader ? null : (
-                  <Paragraph color={colors.errorText}>
-                    {'\n'}
-                    Do not close the app.
-                  </Paragraph>
-                )}
-              </Paragraph>
-            </View>
-
-            {!current.showLoader ? (
-              <Button
-                title="Ok"
-                width={50}
-                onPress={() => {
-                  setStatus(null);
-                }}
-                type="accent"
-              />
-            ) : (
-              <ActivityIndicator size={SIZE.xxxl} color={colors.accent} />
-            )}
-          </View>
-        </BaseDialog>
+          }}
+        />
       ) : null}
 
       <ScrollView
+        ref={scrollViewRef}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="on-drag"
+        nestedScrollEnabled={mode !== MODES.sessionExpired}
+        onMomentumScrollEnd={() => {
+          actionSheetRef.current.handleChildScrollEnd();
+        }}
+        bounces={false}
+        overScrollMode="never"
+        scrollToOverflowEnabled="false"
         style={{
-          maxHeight: DDS.isTab ? '90%' : '100%',
-          minHeight: '50%',
-          height: DDS.isTab ? null : '100%',
-          width: DDS.isTab ? 500 : '100%',
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
-          zIndex: 10,
-          ...getElevation(DDS.isTab ? 5 : 0),
-          paddingBottom: DDS.isTab ? 20 : 0,
+          zIndex: 10
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-            height: 50,
-          }}>
-          {DDS.isTab && MODES.sessionExpired !== mode ? (
-            <ActionIcon
-              name="close"
-              size={SIZE.xxxl}
-              onPress={() => {
-                if (MODES.sessionExpired === mode) return;
-                close();
-              }}
-              customStyle={{
-                width: 40,
-                height: 40,
-                marginLeft: -5,
-              }}
-              color={colors.heading}
-            />
-          ) : (
-            MODES.sessionExpired !== mode && (
-              <ActionIcon
-                name="arrow-left"
-                size={SIZE.xxxl}
-                onPress={() => {
-                  if (MODES.sessionExpired === mode) return;
-                  close();
-                }}
-                customStyle={{
-                  width: 40,
-                  height: 40,
-                  marginLeft: -5,
-                }}
-                color={colors.heading}
-              />
-            )
-          )}
-
-          <View />
-        </View>
-
         <Header
           color="transparent"
           type="login"
+          height={150}
           noAnnouncement={true}
           shouldShow
           title={current.headerButton}
           messageCard={false}
-          onPress={mode !== MODES.changePassword && current.headerButtonFunc}
-          paragraph={mode !== MODES.changePassword && current.headerParagraph}
         />
         {mode === MODES.sessionExpired && (
           <View
@@ -578,7 +493,7 @@ const LoginDialog = () => {
               marginTop: 10,
               flexDirection: 'row',
               alignItems: 'center',
-              backgroundColor: hexToRGBA(colors.red, 0.2),
+              backgroundColor: hexToRGBA(colors.red, 0.2)
             }}>
             <Icon
               size={20}
@@ -602,7 +517,7 @@ const LoginDialog = () => {
               paddingVertical: 12,
               marginTop: 10,
               flexDirection: 'row',
-              alignItems: 'center',
+              alignItems: 'center'
             }}>
             <Icon
               size={20}
@@ -624,7 +539,7 @@ const LoginDialog = () => {
           style={{
             paddingHorizontal: 12,
             paddingTop: 12,
-            width: focused ? '100%' : '99.9%',
+            width: focused ? '100%' : '99.9%'
           }}>
           {mode === MODES.changePassword ? null : (
             <Input
@@ -717,7 +632,7 @@ const LoginDialog = () => {
               }}
               style={{
                 alignSelf: 'flex-end',
-                marginTop: 2.5,
+                marginTop: 2.5
               }}>
               <Paragraph color={colors.accent}>Forgot password?</Paragraph>
             </TouchableOpacity>
@@ -757,12 +672,12 @@ const LoginDialog = () => {
                 style={{
                   flexDirection: 'row',
                   width: '100%',
-                  alignItems: 'center',
+                  alignItems: 'center'
                 }}>
                 <Paragraph
                   size={11}
                   style={{
-                    maxWidth: '90%',
+                    maxWidth: '90%'
                   }}>
                   By signing up you agree to our{' '}
                   <Paragraph
@@ -770,9 +685,7 @@ const LoginDialog = () => {
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/tos', colors)
                         .catch(e => {})
-                        .then(r => {
-                          console.log('closed');
-                        });
+                        .then(r => {});
                     }}
                     color={colors.accent}>
                     terms of service{' '}
@@ -783,9 +696,7 @@ const LoginDialog = () => {
                     onPress={() => {
                       openLinkInBrowser('https://notesnook.com/privacy', colors)
                         .catch(e => {})
-                        .then(r => {
-                          console.log('closed');
-                        });
+                        .then(r => {});
                     }}
                     color={colors.accent}>
                     privacy policy.
@@ -814,20 +725,55 @@ const LoginDialog = () => {
               type={MODES.sessionExpired === mode ? 'error' : 'shade'}
               fontSize={SIZE.md}
               style={{
-                marginTop: 10,
+                marginTop: 10
               }}
               height={50}
             />
           )}
+
+          {status && (
+            <View
+              style={{
+                alignItems: 'center',
+                width: '100%',
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                backgroundColor: colors.bg,
+                alignSelf: 'center',
+                paddingVertical: 20
+              }}>
+              <View
+                style={{
+                  flexShrink: 1
+                }}>
+                <Heading size={SIZE.md}>{status}</Heading>
+                <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
+                  {current.loading}{' '}
+                  {!current.showLoader ? null : (
+                    <Paragraph color={colors.errorText}>
+                      Do not close the app.
+                    </Paragraph>
+                  )}
+                </Paragraph>
+              </View>
+
+              {!current.showLoader ? (
+                <Button
+                  title="Ok"
+                  width={50}
+                  onPress={() => {
+                    setStatus(null);
+                  }}
+                  type="accent"
+                />
+              ) : (
+                <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
+              )}
+            </View>
+          )}
         </View>
-        <View
-        style={{
-          height:50
-        }}
-        />
       </ScrollView>
-      <Toast context="local" />
-    </BaseDialog>
+    </ActionSheetWrapper>
   );
 };
 

@@ -4,7 +4,11 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
-import {useNoteStore, useSettingStore} from '../../provider/stores';
+import {
+  useMessageStore,
+  useNoteStore,
+  useSettingStore,
+} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
@@ -15,16 +19,14 @@ import {
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
+import Paragraph from '../Typography/Paragraph';
 
 const offsets = [];
 let timeout = null;
-const JumpToDialog = ({scrollRef}) => {
+const JumpToDialog = ({scrollRef, data, type, screen}) => {
   const [state] = useTracked();
   const {colors} = state;
-
-  const notes = useNoteStore(state => state.notes);
-  const settings = useSettingStore(state => state.settings);
-
+  const notes = data;
   const [visible, setVisible] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(null);
 
@@ -33,9 +35,12 @@ const JumpToDialog = ({scrollRef}) => {
     let ind = notes.findIndex(
       i => i.title === item.title && i.type === 'header',
     );
+    let messageState = useMessageStore.getState().message;
+    let msgOffset = messageState?.visible ? 60 : 10;
     ind = ind + 1;
     ind = ind - (index + 1);
-    offset = offset + ind * 100 + 200;
+    offset = offset + ind * 100 + msgOffset;
+    console.log(scrollRef.current?.scrollToOffset);
     scrollRef.current?.scrollToOffset({
       offset: offset,
       animated: true,
@@ -66,7 +71,8 @@ const JumpToDialog = ({scrollRef}) => {
     }, 200);
   };
 
-  const open = () => {
+  const open = _type => {
+    if (_type !== type) return;
     setVisible(true);
   };
 
@@ -86,9 +92,11 @@ const JumpToDialog = ({scrollRef}) => {
         let ind = notes.findIndex(
           i => i.title === item.title && i.type === 'header',
         );
+        let messageState = useMessageStore.getState().message;
+        let msgOffset = messageState?.visible ? 60 : 10;
         ind = ind + 1;
         ind = ind - (index + 1);
-        offset = offset + ind * 100 + 190;
+        offset = offset + ind * 100 + msgOffset;
         offsets.push(offset);
       });
   };
@@ -117,8 +125,7 @@ const JumpToDialog = ({scrollRef}) => {
           style={{
             alignSelf: 'center',
           }}>
-          {settings.sort.slice(0, 1).toUpperCase() +
-            settings.sort.slice(1, settings.sort.length)}
+          Jump to
         </Heading>
         <Seperator />
         <ScrollView
@@ -142,21 +149,20 @@ const JumpToDialog = ({scrollRef}) => {
               type="shade"
               customStyle={{
                 minWidth: '20%',
-                maxWidth: '46%',
                 width: null,
-                paddingHorizontal: 10,
+                paddingHorizontal: 12,
                 margin: 5,
                 borderRadius: 100,
-                height: 22,
+                height: 25,
               }}>
-              <Heading
+              <Paragraph
                 size={SIZE.sm}
                 color={colors.accent}
                 style={{
                   textAlign: 'center',
                 }}>
                 Top
-              </Heading>
+              </Paragraph>
             </PressableButton>
             {notes
               .filter(i => i.type === 'header')
@@ -168,14 +174,13 @@ const JumpToDialog = ({scrollRef}) => {
                     type={currentIndex === index ? 'accent' : 'shade'}
                     customStyle={{
                       minWidth: '20%',
-                      maxWidth: '46%',
                       width: null,
-                      paddingHorizontal: 0,
+                      paddingHorizontal: 12,
                       margin: 5,
                       borderRadius: 100,
-                      height: 22,
+                      height: 25,
                     }}>
-                    <Heading
+                    <Paragraph
                       size={SIZE.sm}
                       color={
                         currentIndex === index ? colors.light : colors.accent
@@ -184,7 +189,7 @@ const JumpToDialog = ({scrollRef}) => {
                         textAlign: 'center',
                       }}>
                       {item.title}
-                    </Heading>
+                    </Paragraph>
                   </PressableButton>
                 ) : null;
               })}

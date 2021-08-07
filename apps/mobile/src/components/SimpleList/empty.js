@@ -3,8 +3,9 @@ import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {SIZE} from '../../utils/SizeUtils';
+import {normalize, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
+import {Placeholder} from '../ListPlaceholders';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -14,6 +15,8 @@ export const Empty = ({
   placeholderData,
   absolute,
   headerProps,
+  type,
+  screen,
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -37,6 +40,14 @@ export const Empty = ({
           justifyContent: 'center',
           alignItems: 'center',
         }}>
+        <Placeholder
+          color={
+            COLORS_NOTE[headerProps.heading.toLowerCase()] || colors.accent
+          }
+          w={normalize(150)}
+          h={normalize(150)}
+          type={screen === 'Favorites' ? 'favorites' : type}
+        />
         <Heading>{placeholderData.heading}</Heading>
         <Paragraph
           textBreakStrategy="balanced"

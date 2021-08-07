@@ -6,10 +6,11 @@ import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import Share from 'react-native-share';
 import {Platform} from 'react-native';
-import { sanitizeFilename } from '../utils/filename';
+import {sanitizeFilename} from '../utils/filename';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
+
 let RNFetchBlob;
 async function run() {
   if (Platform.OS === 'android') {
@@ -19,7 +20,7 @@ async function run() {
         heading: 'Cannot backup data',
         message: 'You must provide phone storage access to backup data.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -29,14 +30,14 @@ async function run() {
   eSendEvent(eOpenProgressDialog, {
     title: 'Backing up your data',
     paragraph:
-      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
   });
   let backup;
   let error;
   try {
     backup = await db.backup.export(
       'mobile',
-      SettingsService.get().encryptedBackup,
+      SettingsService.get().encryptedBackup
     );
   } catch (e) {
     error = true;
@@ -45,7 +46,7 @@ async function run() {
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now();
-      backupName = sanitizeFilename(backupName,{replacement:"_"});
+      backupName = sanitizeFilename(backupName, {replacement: '_'});
       backupName = backupName + '.nnbackup';
       let path = await storage.checkAndCreateDir('/backups/');
       await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
@@ -56,7 +57,7 @@ async function run() {
         heading: 'Backup successful',
         message: 'Your backup is stored in Notesnook folder on your phone.',
         type: 'success',
-        context: 'local',
+        context: 'local'
       });
 
       eSendEvent(eOpenProgressDialog, {
@@ -74,13 +75,20 @@ async function run() {
                   Platform.OS === 'ios'
                     ? path + backupName
                     : 'file:/' + path + backupName,
-                title: 'Save Backup to Cloud',
-              }).catch((e) => console.log);
+                title: 'Save Backup to Cloud'
+              }).catch(e => console.log);
             },
-            actionText: 'Share Backup File',
-          },
-        ],
+            actionText: 'Share Backup File'
+          }
+        ]
       });
+      console.log('updated ask for backup date');
+      await MMKV.setItem(
+        'askForBackup',
+        JSON.stringify({
+          timestamp: Date.now() + 86400000 * 3
+        })
+      );
 
       return path + backupName;
     } catch (e) {
@@ -92,7 +100,7 @@ async function run() {
     ToastEvent.show({
       heading: 'Backup failed',
       type: 'error',
-      context: 'local',
+      context: 'local'
     });
 
     return null;
@@ -138,5 +146,5 @@ const checkAndRun = async () => {
 export default {
   checkBackupRequired,
   run,
-  checkAndRun,
+  checkAndRun
 };

@@ -1,7 +1,9 @@
 import { createRef } from 'react';
 import {Platform} from 'react-native';
 import { eSendEvent } from '../../../../services/EventManager';
-import {EditorWebView} from '../../Functions';
+import { editing } from '../../../../utils';
+import { sleep } from '../../../../utils/TimeUtils';
+import {EditorWebView, textInput} from '../../Functions';
 import tiny from '../tiny';
 
 export const properties = {
@@ -9,6 +11,7 @@ export const properties = {
   pauseSelectionChange: false,
   inputMode: 1,
   userBlur: false,
+  linkAdded:false
 };
 
 export const toolbarRef = createRef();
@@ -17,14 +20,30 @@ export function formatSelection(command) {
   EditorWebView.current?.injectJavaScript(command);
 }
 
-export function focusEditor(format) {
-  eSendEvent("showTooltip");
-  Platform.OS === 'android' && EditorWebView.current.requestFocus();
+export async function focusEditor(format,kill=true) {
+  kill && eSendEvent("showTooltip");
+  Platform.OS === "android" && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
-    tiny.call(EditorWebView, tiny.blur + ' ' + tiny.focusEditor);
-  } else {
-
+    textInput.current?.focus();
     tiny.call(EditorWebView, tiny.focusEditor);
+  } else {
+    console.log('focus editor');
+    EditorWebView.current?.requestFocus();
+    tiny.call(EditorWebView, tiny.focusEditor);
+  }
+}
+
+export async function reFocusEditor() {
+  if (editing.isFocused === true) {
+    await sleep(300);
+    textInput.current?.focus();
+    await sleep(300);
+    if (editing.focusType == 'editor') {
+      focusEditor(null,false);
+    } else {
+      Platform.OS === 'android' && EditorWebView.current?.requestFocus();
+      tiny.call(EditorWebView, tiny.focusTitle);
+    }
   }
 }
 
@@ -182,4 +201,5 @@ export const TOOLBAR_ICONS = {
   imagefloatleft:"format-float-left",
   imagefloatright:"format-float-right",
   imagefloatnone:"format-float-none",
+  "line-break":"keyboard-return"
 };

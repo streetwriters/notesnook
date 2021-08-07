@@ -1,0 +1,21 @@
+diff --git a/node_modules/toggle-switch-react-native/ToggleSwitch.js b/node_modules/toggle-switch-react-native/ToggleSwitch.js
+index 7ddf25f..04b04e4 100644
+--- a/node_modules/toggle-switch-react-native/ToggleSwitch.js
++++ b/node_modules/toggle-switch-react-native/ToggleSwitch.js
+@@ -25,11 +25,11 @@ export default class ToggleSwitch extends React.Component {
+     switch (size) {
+       case "small":
+         return {
+-          width: 40,
+-          padding: 10,
+-          circleWidth: 15,
+-          circleHeight: 15,
+-          translateX: 22,
++          width: 30,
++          padding: 8,
++          circleWidth: 11,
++          circleHeight: 11,
++          translateX: 18.5,
+         };
+       case "large":
+         return {

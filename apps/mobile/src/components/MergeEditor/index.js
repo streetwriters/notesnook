@@ -1,40 +1,41 @@
+import KeepAwake from '@sayem314/react-native-keep-awake';
 import React, {createRef, useEffect, useState} from 'react';
-import {Modal, SafeAreaView, TouchableOpacity, View, Text} from 'react-native';
+import {Modal, SafeAreaView, Text, TouchableOpacity, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  sendNoteEditedEvent,
 } from '../../services/EventManager';
-import {dHeight, doInBackground} from '../../utils';
+import Navigation from '../../services/Navigation';
+import Sync from '../../services/Sync';
+import {dHeight} from '../../utils';
 import {db} from '../../utils/DB';
+import diff from '../../utils/differ';
 import {
   eApplyChanges,
   eShowMergeDialog,
   refreshNotesPage,
 } from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {normalize, SIZE} from '../../utils/SizeUtils';
+import {timeConverter} from '../../utils/TimeUtils';
+import {
+  getNote,
+  sourceUri,
+  updateNoteInEditor,
+} from '../../views/Editor/Functions';
 import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Paragraph from '../Typography/Paragraph';
-import KeepAwake from '@sayem314/react-native-keep-awake';
-import {timeConverter} from '../../utils/TimeUtils';
-import tiny from '../../views/Editor/tiny/tiny';
-import diff from '../../utils/differ';
-import {openLinkInBrowser} from '../../utils/functions';
-import Sync from '../../services/Sync';
-import Navigation from '../../services/Navigation';
 
 const {Value, timing} = Animated;
 
@@ -107,9 +108,9 @@ const MergeEditor = () => {
   const insets = useSafeAreaInsets();
 
   const onPrimaryWebViewLoad = () => {
-   // console.log('on load called')
+    // console.log('on load called')
     //return;
-   // console.log("on load called")
+    // console.log("on load called")
     // let htmlDiff = {
     //   before: primaryData.data,
     // };
@@ -117,43 +118,43 @@ const MergeEditor = () => {
     // console.log('before entering')
     // if (secondaryData.data) {
     //   console.log("getting diff");
-    //   htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data); 
+    //   htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
     //   console.log("diff generated");
     // }
-   // console.log('posting message')
+    // console.log('posting message')
     postMessage(primaryWebView, 'htmldiff', primaryData?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage(primaryWebView, "theme" , JSON.stringify(theme));
+    postMessage(primaryWebView, 'theme', JSON.stringify(theme));
   };
 
   const onSecondaryWebViewLoad = () => {
-   // console.log('onload2')
+    // console.log('onload2')
     //return;
-  //  let htmlDiff = {
-  //    before: primaryData.data,
-  //  };
-  //  if (secondaryData.data) {
-  //  htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
-  //  }
-   postMessage(secondaryWebView, 'htmldiff', secondaryData?.data);
+    //  let htmlDiff = {
+    //    before: primaryData.data,
+    //  };
+    //  if (secondaryData.data) {
+    //  htmlDiff = diff.diff_dual_pane(primaryData.data, secondaryData.data);
+    //  }
+    postMessage(secondaryWebView, 'htmldiff', secondaryData?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage(secondaryWebView, "theme" , JSON.stringify(theme));
+    postMessage(secondaryWebView, 'theme', JSON.stringify(theme));
   };
 
   function postMessage(webview, type, value = null) {
     let message = {
-      type:type,
+      type: type,
       value,
     };
     webview.current?.postMessage(JSON.stringify(message));
   }
 
-  const _onShouldStartLoadWithRequest = (request) => {
+  const _onShouldStartLoadWithRequest = request => {
     if (request.url.includes('http')) {
       openLinkInBrowser(request.url, colors)
-        .catch((e) =>
+        .catch(e =>
           ToastEvent.show({
             title: 'Failed to open link',
             message: e.message,
@@ -161,7 +162,7 @@ const MergeEditor = () => {
             context: 'local',
           }),
         )
-        .then((r) => {
+        .then(r => {
           console.log('closed');
         });
 
@@ -171,7 +172,7 @@ const MergeEditor = () => {
     }
   };
 
-  const onMessageFromPrimaryWebView = (evt) => {
+  const onMessageFromPrimaryWebView = evt => {
     if (evt.nativeEvent.data !== '') {
       let data = JSON.parse(evt.nativeEvent.data);
 
@@ -184,7 +185,7 @@ const MergeEditor = () => {
     }
   };
 
-  const onMessageFromSecondaryWebView = (evt) => {
+  const onMessageFromSecondaryWebView = evt => {
     if (evt.nativeEvent.data === '') {
       let data = JSON.parse(evt.nativeEvent.data);
       if (data.type === 'tiny') {
@@ -205,6 +206,7 @@ const MergeEditor = () => {
             : primaryData.data,
           resolved: true,
           type: primaryData.type,
+          dateEdited:primaryData.dateEdited
         },
         id: note.id,
         conflicted: false,
@@ -217,6 +219,7 @@ const MergeEditor = () => {
             : secondaryData.data,
           type: secondaryData.type,
           resolved: true,
+          dateEdited:secondaryData.dateEdited
         },
         id: note.id,
         conflicted: false,
@@ -230,6 +233,7 @@ const MergeEditor = () => {
             ? diff.clean(primaryData.data)
             : primaryData.data,
           type: primaryData.type,
+
         },
         id: null,
       });
@@ -250,20 +254,23 @@ const MergeEditor = () => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Notes,
     ]);
+    if (getNote()?.id === note.id) {
+      updateNoteInEditor();
+    }
     close();
     await Sync.run();
   };
 
-  const show = async (item) => {
+  const show = async item => {
     note = item;
     console.log('getting raw data');
     let noteData = await db.content.raw(note.contentId);
     console.log('got raw data');
-   switch (noteData.type) {
-     case 'tiny':
-       primaryData = noteData;
-       secondaryData = noteData.conflicted;
-   }
+    switch (noteData.type) {
+      case 'tiny':
+        primaryData = noteData;
+        secondaryData = noteData.conflicted;
+    }
     setVisible(true);
     console.log('display');
     firstWebViewHeight.setValue(dHeight / 2 - (50 + insets.top / 2));
@@ -346,23 +353,13 @@ const MergeEditor = () => {
     openEditorAnimation(firstWebViewHeight, secondWebViewHeight, true, insets);
   };
 
-  const params = 'platform=' + Platform.OS;
-  const sourceUri =
-    (Platform.OS === 'android' ? 'file:///android_asset/' : '') +
-    'Web.bundle/loader.html';
-  const injectedJS = `if (!window.location.search) {
-         var link = document.getElementById('progress-bar');
-          link.href = './site/plaineditor.html?${params}';
-          link.click();  
-    }`;
-
   return !visible ? null : (
     <Modal
       statusBarTranslucent
       transparent={false}
       animationType="slide"
-      onRequestClose={()=> {
-        close()
+      onRequestClose={() => {
+        close();
       }}
       visible={true}>
       <SafeAreaView
@@ -528,7 +525,6 @@ const MergeEditor = () => {
                 height: '100%',
                 backgroundColor: 'transparent',
               }}
-              injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
               cacheMode="LOAD_DEFAULT"
               domStorageEnabled={true}
@@ -543,14 +539,9 @@ const MergeEditor = () => {
               javaScriptEnabled={true}
               cacheEnabled={true}
               onMessage={onMessageFromPrimaryWebView}
-              source={
-                Platform.OS === 'ios'
-                  ? {uri: sourceUri}
-                  : {
-                      uri: 'file:///android_asset/plaineditor.html',
-                      baseUrl: 'file:///android_asset/',
-                    }
-              }
+              source={{
+                uri: sourceUri + 'plaineditor.html',
+              }}
             />
           </Animated.View>
 
@@ -674,7 +665,6 @@ const MergeEditor = () => {
                 height: '100%',
                 backgroundColor: 'transparent',
               }}
-              injectedJavaScript={Platform.OS === 'ios' ? injectedJS : null}
               onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
               cacheMode="LOAD_DEFAULT"
               domStorageEnabled={true}
@@ -689,14 +679,9 @@ const MergeEditor = () => {
               javaScriptEnabled={true}
               cacheEnabled={true}
               onMessage={onMessageFromSecondaryWebView}
-              source={
-                Platform.OS === 'ios'
-                  ? {uri: sourceUri}
-                  : {
-                      uri: 'file:///android_asset/plaineditor.html',
-                      baseUrl: 'file:///android_asset/',
-                    }
-              }
+              source={{
+                uri: sourceUri + 'plaineditor.html',
+              }}
             />
           </Animated.View>
         </View>

@@ -1,39 +1,29 @@
-import React, {Component, createRef} from 'react';
+import React, { Component, createRef } from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  openVault,
+  openVault
 } from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
+import { getCurrentColors } from '../../utils/Colors';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
-  eCloseLoginDialog,
-  eCloseMoveNoteDialog,
-  eClosePremiumDialog,
-  eCloseSimpleDialog,
-  eOnLoadNote,
+  eCloseLoginDialog, eClosePremiumDialog, eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenExportDialog,
-  eOpenLoginDialog,
-  eOpenMoveNoteDialog,
-  eOpenPremiumDialog,
-  eOpenSimpleDialog,
-  eShowGetPremium,
-  eThemeUpdated,
+  eOpenLoginDialog, eOpenPremiumDialog, eShowGetPremium,
+  eThemeUpdated
 } from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorSettings} from '../../views/Editor/EditorSettings';
-import {ActionSheetComponent} from '../ActionSheetComponent';
+import { EditorSettings } from '../../views/Editor/EditorSettings';
+import { ActionSheetComponent } from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {Dialog} from '../Dialog';
+import { AddNotebookDialog } from '../AddNotebookDialog';
+import { AddTopicDialog } from '../AddTopicDialog';
+import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import ImagePreview from '../ImagePreview';
-import JumpToDialog from '../JumpToDialog';
 import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
@@ -47,9 +37,9 @@ import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
-import {UpdateDialog} from '../UpdateDialog';
-import {VaultDialog} from '../VaultDialog';
-import {TEMPLATE_DELETE, TEMPLATE_PERMANANT_DELETE} from './Templates';
+import TagsDialog from '../TagsDialog';
+import { UpdateDialog } from '../UpdateDialog';
+import { VaultDialog } from '../VaultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -101,15 +91,6 @@ export class DialogManager extends Component {
     this.actionSheet.current?.setModalVisible(false);
   };
 
-  _showMoveNote = () => {
-    ///this.moveNoteDialog.open();
-  };
-
-  _hideMoveNote = () => {
-    //eSendEvent(eCloseMoveNoteDialog)
-    // this.moveNoteDialog.close();
-  };
-
   loadNote = i => {
     if (i && i.type === 'new') {
       this.setState({
@@ -147,17 +128,8 @@ export class DialogManager extends Component {
     eSubscribeEvent(eOpenActionSheet, this._showActionSheet);
     eSubscribeEvent(eCloseActionSheet, this._hideActionSheet);
 
-    eSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
-    eSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
-
-    eSubscribeEvent(eOpenMoveNoteDialog, this._showMoveNote);
-    eSubscribeEvent(eCloseMoveNoteDialog, this._hideMoveNote);
-
     eSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
-
-    eSubscribeEvent(eOpenLoginDialog, this.showLoginDialog);
-    eSubscribeEvent(eCloseLoginDialog, this.hideLoginDialog);
 
     eSubscribeEvent(eOpenPremiumDialog, this.showPremiumDialog);
     eSubscribeEvent(eClosePremiumDialog, this.hidePremiumDialog);
@@ -169,12 +141,6 @@ export class DialogManager extends Component {
 
     eUnSubscribeEvent(eOpenActionSheet, this._showActionSheet);
     eUnSubscribeEvent(eCloseActionSheet, this._hideActionSheet);
-
-    eUnSubscribeEvent(eOpenSimpleDialog, this._showSimpleDialog);
-    eUnSubscribeEvent(eCloseSimpleDialog, this._hideSimpleDialog);
-
-    eUnSubscribeEvent(eOpenMoveNoteDialog, this._showMoveNote);
-    eUnSubscribeEvent(eCloseMoveNoteDialog, this._hideMoveNote);
 
     eUnSubscribeEvent(eOpenAddNotebookDialog, this.showAddNotebook);
     eUnSubscribeEvent(eCloseAddNotebookDialog, this.hideAddNotebook);
@@ -194,14 +160,6 @@ export class DialogManager extends Component {
     this.premiumDialog.close();
   };
 
-  showLoginDialog = () => {
-    //this.loginDialog.open();
-  };
-
-  hideLoginDialog = () => {
-    //this.loginDialog.close();
-  };
-
   showAddNotebook = data => {
     this.setState(
       {
@@ -216,42 +174,9 @@ export class DialogManager extends Component {
     this.addNotebooksDialog.close();
   };
 
-  _showSimpleDialog = data => {
-    this.setState(
-      {
-        simpleDialog: data,
-      },
-      () => {
-        this.simpleDialog?.show();
-      },
-    );
-  };
-  _hideSimpleDialog = data => {
-    this.simpleDialog?.hide();
-  };
-
   onActionSheetHide = () => {
     if (this.show) {
       switch (this.show) {
-        case 'delete': {
-          if (this.state.item.locked) {
-            openVault({
-              item: this.state.item,
-              novault: true,
-              locked: true,
-              deleteNote: true,
-              title: 'Delete note',
-              description: 'Unlock to delete note.',
-            });
-          } else {
-            this._showSimpleDialog(TEMPLATE_DELETE(this.state.item.type));
-          }
-          break;
-        }
-        case 'permanant_delete': {
-          this._showSimpleDialog(TEMPLATE_PERMANANT_DELETE);
-          break;
-        }
         case 'novault': {
           openVault({
             item: this.state.item,
@@ -288,10 +213,6 @@ export class DialogManager extends Component {
         }
         case 'topic': {
           this.showAddTopic();
-          break;
-        }
-        case 'movenote': {
-          // this._showMoveNote();
           break;
         }
         case 'premium': {
@@ -344,12 +265,7 @@ export class DialogManager extends Component {
           </ActionSheetWrapper>
         )}
 
-        <Dialog
-          ref={ref => (this.simpleDialog = ref)}
-          item={item}
-          colors={colors}
-          template={simpleDialog}
-        />
+        <Dialog context="global" />
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
           close={() => {
@@ -379,13 +295,13 @@ export class DialogManager extends Component {
         <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
-        <SortDialog colors={colors} />
 
         <UpdateDialog />
         <RateDialog />
-        <ImagePreview/>
-        <EditorSettings/>
-        <PublishNoteDialog/>
+        <ImagePreview />
+        <EditorSettings />
+        <PublishNoteDialog />
+        <TagsDialog/>
       </>
     );
   }

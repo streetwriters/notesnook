@@ -10,20 +10,19 @@ import {
   clearAllStores,
   initialize,
   useNoteStore,
-  useUserStore,
+  useUserStore
 } from './src/provider/stores';
-import Backup from './src/services/Backup';
 import BiometricService from './src/services/BiometricService';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from './src/services/EventManager';
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage,
+  setLoginMessage
 } from './src/services/Message';
 import Navigation from './src/services/Navigation';
 import PremiumService from './src/services/PremiumService';
@@ -37,12 +36,16 @@ import {
   eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenProgressDialog,
-  refreshNotesPage,
+  refreshNotesPage
 } from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
-import {getNote, getWebviewInit} from './src/views/Editor/Functions';
+import {
+  getNote,
+  getWebviewInit,
+  updateNoteInEditor
+} from './src/views/Editor/Functions';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -50,11 +53,12 @@ let subsriptionErrorListener;
 let isUserReady = false;
 async function storeAppState() {
   if (editing.currentlyEditing) {
+    if (getNote()?.locked) return;
     let state = JSON.stringify({
       editing: editing.currentlyEditing,
       note: getNote(),
       movedAway: editing.movedAway,
-      timestamp: Date.now(),
+      timestamp: Date.now()
     });
     await MMKV.setItem('appState', state);
   }
@@ -127,7 +131,7 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
       eSubscribeEvent('userLoggedIn', setCurrentUser);
       removeInternetStateListener = NetInfo.addEventListener(
-        onInternetStateChanged,
+        onInternetStateChanged
       );
       return () => {
         eUnSubscribeEvent('userLoggedIn', setCurrentUser);
@@ -139,7 +143,7 @@ export const AppRootEvents = React.memo(
         EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
         EV.unsubscribe(
           EVENTS.userCheckStatus,
-          PremiumService.onUserStatusCheck,
+          PremiumService.onUserStatusCheck
         );
         EV.unsubscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
 
@@ -161,7 +165,7 @@ export const AppRootEvents = React.memo(
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Trash,
-          Navigation.routeNames.Notebook,
+          Navigation.routeNames.Notebook
         ]);
         eSendEvent(eClearEditor);
       } catch (e) {}
@@ -177,7 +181,6 @@ export const AppRootEvents = React.memo(
               await onEmailVerified();
             }
             await setCurrentUser();
-            await Backup.checkAndRun();
             let version = await db.version();
             if (version.mobile > APP_VERSION) {
               eSendEvent('updateDialog', ver);
@@ -201,6 +204,10 @@ export const AppRootEvents = React.memo(
     const onSyncComplete = async () => {
       initialize();
       setLastSynced(await db.lastSynced());
+      console.log('sync complete')
+      if (getNote()) {
+        await updateNoteInEditor();
+      }
     };
 
     const onUrlRecieved = async res => {
@@ -226,7 +233,7 @@ export const AppRootEvents = React.memo(
       eSendEvent(eOpenProgressDialog, {
         title: 'Email confirmed!',
         paragraph: message,
-        noProgress: true,
+        noProgress: true
       });
 
       if (user?.isEmailConfirmed) {
@@ -241,17 +248,17 @@ export const AppRootEvents = React.memo(
         })
         .then(async () => {
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
-            onSuccessfulSubscription,
+            onSuccessfulSubscription
           );
           subsriptionErrorListener = RNIap.purchaseErrorListener(
-            onSubscriptionError,
+            onSubscriptionError
           );
         });
     };
 
     const onAccountStatusChange = async userStatus => {
-      console.log('account status', userStatus, PremiumService.get());
       if (!PremiumService.get() && userStatus.type === 5) {
+        PremiumService.subscriptions.clear();
         eSendEvent(eOpenProgressDialog, {
           title: 'Notesnook Pro',
           paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
@@ -260,7 +267,7 @@ export const AppRootEvents = React.memo(
           },
           icon: 'check',
           actionText: 'Continue',
-          noProgress: true,
+          noProgress: true
         });
       }
       await PremiumService.setPremiumStatus();
@@ -286,7 +293,7 @@ export const AppRootEvents = React.memo(
           ToastEvent.show({
             heading: 'Sync failed',
             message: e.message,
-            context: 'global',
+            context: 'global'
           });
         }
       } finally {
@@ -312,7 +319,7 @@ export const AppRootEvents = React.memo(
         },
         icon: 'logout',
         actionText: 'Login',
-        noProgress: true,
+        noProgress: true
       });
     };
 
@@ -329,15 +336,22 @@ export const AppRootEvents = React.memo(
 
     const setCurrentUser = async login => {
       try {
-        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired')
-          return;
         let user = await db.user.getUser();
+        console.log(user,'called user set current');
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+          setUser(user);
+          return;
+        }
         if (user) {
           setUser(user);
           clearMessage();
           attachIAPListeners();
-
           await Sync.run();
+          if (!user.isEmailConfirmed) {
+            setEmailVerifyMessage();
+            return;
+          }
+         
           let res = await doInBackground(async () => {
             try {
               user = await db.user.fetchUser();
@@ -347,11 +361,6 @@ export const AppRootEvents = React.memo(
             }
           });
           if (res !== true) throw new Error(res);
-
-          if (!user.isEmailConfirmed) {
-            setEmailVerifyMessage();
-            return;
-          }
           setUser(user);
         } else {
           setLoginMessage();
@@ -375,11 +384,8 @@ export const AppRootEvents = React.memo(
     };
 
     const onSuccessfulSubscription = async subscription => {
-      const receipt = subscription.transactionReceipt;
-      if (prevTransactionId === subscription.transactionId) {
-        return;
-      }
-      await processReceipt(receipt);
+      await PremiumService.subscriptions.set(subscription);
+      await PremiumService.subscriptions.verify(subscription);
     };
 
     const onSubscriptionError = async error => {
@@ -387,48 +393,8 @@ export const AppRootEvents = React.memo(
         heading: 'Failed to subscribe',
         type: 'error',
         message: error.message,
-        context: 'local',
+        context: 'local'
       });
-
-      if (Platform.OS === 'ios') {
-        await RNIap.clearTransactionIOS();
-      }
-    };
-
-    const processReceipt = async receipt => {
-      if (receipt) {
-        if (Platform.OS === 'ios') {
-          let user = await db.user.getUser();
-          if (!user) return;
-          fetch('https://payments.streetwriters.co/apple/verify', {
-            method: 'POST',
-            body: JSON.stringify({
-              receipt_data: receipt,
-              user_id: user.id,
-            }),
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          })
-            .then(async r => {
-              let text = await r.text();
-              console.log(r.ok, text);
-              if (!r.ok) {
-                if (text === 'Receipt already expired.') {
-                  console.log('RNIap.clearTransactionIOS');
-                  await RNIap.clearTransactionIOS();
-                }
-                return;
-              }
-              console.log('Success', 'RNIap.finishTransactionIOS');
-              await RNIap.finishTransactionIOS(prevTransactionId);
-              await RNIap.clearTransactionIOS();
-            })
-            .catch(e => {
-              console.log(e, 'ERROR');
-            });
-        }
-      }
     };
 
     const onAppStateChanged = async state => {
@@ -452,7 +418,7 @@ export const AppRootEvents = React.memo(
             }
 
             let result = await BiometricService.validateUser(
-              'Unlock to access your notes',
+              'Unlock to access your notes'
             );
             if (result) {
               showingDialog = false;
@@ -477,7 +443,7 @@ export const AppRootEvents = React.memo(
         if (user && !user.isEmailConfirmed) {
           try {
             let user = await db.user.fetchUser();
-            if (user.isEmailConfirmed) {
+            if (user?.isEmailConfirmed) {
               onEmailVerified();
             }
           } catch (e) {}
@@ -502,5 +468,5 @@ export const AppRootEvents = React.memo(
 
     return <></>;
   },
-  () => true,
+  () => true
 );

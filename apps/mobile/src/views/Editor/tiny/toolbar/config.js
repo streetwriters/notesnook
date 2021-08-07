@@ -29,6 +29,11 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Strikethrough',
     },
     {
+      format: 'line-break',
+      type: 'format',
+      fullname: 'Line break',
+    },
+    {
       format: 'align',
       type: 'tooltip',
       valueIcon: 'alignleft',
@@ -159,7 +164,6 @@ export const TOOLBAR_CONFIG = [
           format: 'ol',
           formatValue: style,
           fullname: style,
-          premium: true,
         };
       }),
     },
@@ -173,7 +177,6 @@ export const TOOLBAR_CONFIG = [
           format: 'ul',
           formatValue: style === 'default' ? 'disc' : style,
           fullname: style,
-          premium: true,
         };
       }),
     },
@@ -194,7 +197,6 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'hilitecolor',
           formatValue: item,
-          premium: true,
           fullname: item,
         };
       }),
@@ -209,7 +211,6 @@ export const TOOLBAR_CONFIG = [
           format: 'forecolor',
           formatValue: item,
           fullname: item,
-          premium: true,
         };
       }),
     },
@@ -246,26 +247,22 @@ export const TOOLBAR_CONFIG = [
       format: 'outdent',
       type: 'format',
       fullname: 'Outdent',
-      premium: true,
     },
     {
       format: 'indent',
       type: 'format',
-      premium: true,
       fullname: 'Indent',
     },
 
     {
       format: 'superscript',
       type: 'format',
-      premium: true,
       fullname: 'Superscript',
     },
     {
       format: 'subscript',
       type: 'format',
       fullname: 'Subscript',
-      premium: true,
     },
   ],
   [
@@ -362,10 +359,10 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Search & Replace',
     },
-   /*   {
+    {
       format: 'settings',
       type: 'settings',
       fullname: 'Editor Settings',
-    },   */
+    },
   ],
 ];

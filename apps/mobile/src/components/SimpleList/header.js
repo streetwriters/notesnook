@@ -1,15 +1,13 @@
 import React from 'react';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
-import {useMessageStore, useSettingStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import {useMessageStore} from '../../provider/stores';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import {Placeholder} from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 import {Announcement} from './announcement';
 import {Card} from './card';
 
@@ -24,56 +22,51 @@ export const Header = React.memo(
     shouldShow = false,
     icon,
     screen,
-    noAnnouncement
+    noAnnouncement,
+    height
   }) => {
     const [state] = useTracked();
     const {colors} = state;
-    const announcements = useMessageStore(state => state.announcements)
-    const deviceMode = useSettingStore(state => state.deviceMode)
-
+    const announcements = useMessageStore(state => state.announcements);
 
     return announcements.length > 0 && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
-    ) : type === 'search' ? null : deviceMode !== "mobile" && !shouldShow ? (
+    ) : type === 'search' ? null : !shouldShow ? (
       <View
         style={{
           marginBottom: 5,
           padding: 0,
           width: '100%',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         {messageCard && (
           <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
         )}
+        
       </View>
     ) : (
       <View
         style={{
-          width: '100%',
+          width: '100%'
         }}>
-        {messageCard && (
-          <Card color={COLORS_NOTE[title.toLowerCase()] || colors.accent} />
-        )}
         <View
           style={{
-            minHeight: 195,
+            minHeight: height || 195,
             padding: 12,
             width: '100%',
             zIndex: 10,
             justifyContent: 'flex-end',
             backgroundColor: COLORS_NOTE[title.toLowerCase()]
               ? hexToRGBA(COLORS_NOTE[title.toLowerCase()], 0.15)
-              : color || colors.shade,
+              : color || colors.shade
           }}>
           <View
             style={{
               right: 0,
               paddingRight: 12,
-              opacity: 0.5,
               bottom: 0,
-              paddingHorizontal: 12,
-              position: 'absolute',
+              position: 'absolute'
             }}>
             <Placeholder
               color={COLORS_NOTE[title.toLowerCase()] || colors.accent}
@@ -85,7 +78,7 @@ export const Header = React.memo(
 
           <View
             style={{
-              marginTop: 15,
+              marginTop: 15
             }}>
             <Heading
               style={{marginBottom: paragraph ? 0 : 0}}
@@ -104,10 +97,10 @@ export const Header = React.memo(
                 icon={icon}
                 style={{
                   alignSelf: 'flex-start',
-                  paddingLeft: 0,
+                  paddingLeft: 0
                 }}
                 textStyle={{
-                  fontWeight: 'normal',
+                  fontWeight: 'normal'
                 }}
                 iconSize={SIZE.sm}
                 fontSize={SIZE.sm}
@@ -118,5 +111,5 @@ export const Header = React.memo(
         </View>
       </View>
     );
-  },
+  }
 );

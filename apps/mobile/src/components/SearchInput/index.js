@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, TextInput, View } from 'react-native';
-import { useTracked } from '../../provider';
+import React, {useEffect, useState} from 'react';
+import {Platform, TextInput, View} from 'react-native';
+import {useTracked} from '../../provider';
 import SearchService from '../../services/SearchService';
-import { inputRef } from '../../utils/Refs';
-import { SIZE } from '../../utils/SizeUtils';
+import {inputRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
 
-export const SearchInput = (props) => {
+export const SearchInput = props => {
   const [state] = useTracked();
   const {colors} = state;
   const [searchState, setSearchState] = useState('Search all notes');
@@ -22,7 +22,7 @@ export const SearchInput = (props) => {
     };
   }, []);
 
-  const onChangeText = async (value) => {
+  const onChangeText = async value => {
     SearchService.setTerm(value);
   };
 
@@ -42,8 +42,7 @@ export const SearchInput = (props) => {
       <TextInput
         ref={inputRef}
         style={{
-          //fontFamily: "sans-serif",
-          fontWeight:'bold',
+          fontWeight: 'bold',
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,

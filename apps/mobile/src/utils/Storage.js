@@ -8,7 +8,9 @@ import * as Keychain from 'react-native-keychain';
 
 let RNFetchBlob;
 async function read(key) {
+  if (!key) return null;
   let data = await MMKV.getItem(key);
+
   if (!data) return null;
   try {
     return JSON.parse(data);
@@ -178,36 +180,10 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  console.log(password,email,'calling');
   let result =  await Sodium.hashPassword(password, email);
-  console.log(result,'result');
   return result
 }
-/* 
-function compress(data) {
-  return urlEncode(base64.fromByteArray(pako.gzip(data)));
-}
 
-function decompress(data) {
-  console.log(data);
-  return pako.ungzip(base64.toByteArray(urlDecode(data)),{
-    to:"string"
-  });
-}
-
-
-
-var urlEncode = function(encoded) {
-  return encoded.replace('+', '-').replace('/', '_').replace(/=+$/, '');
-};
-
-var urlDecode = function(encoded) {
-  encoded = encoded.replace('-', '+').replace('_', '/');
-  while (encoded.length % 4)
-    encoded += '=';
-  return encoded;
-};
- */
 export default {
   read,
   write,

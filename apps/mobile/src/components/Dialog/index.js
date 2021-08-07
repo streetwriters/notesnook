@@ -1,132 +1,136 @@
-import React, { Component } from 'react';
-import { View } from 'react-native';
-import { useSelectionStore, useTrashStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { ToastEvent } from '../../services/EventManager';
-import { getElevation, history } from '../../utils';
-import { db } from '../../utils/DB';
-import { deleteItems } from '../../utils/functions';
-import { ph, pv } from '../../utils/SizeUtils';
-import { dialogActions } from '../DialogManager/DialogActions';
+import React, {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eCloseSimpleDialog, eOpenSimpleDialog} from '../../utils/Events';
+import {ph, pv} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import Input from '../Input';
 import Seperator from '../Seperator';
+import { Toast } from '../Toast';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
 
-export class Dialog extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      visible: false,
-      selecteItemsLength: 0,
+export const Dialog = ({context = 'global'}) => {
+  const [state] = useTracked();
+  const colors = state.colors;
+  const [visible, setVisible] = useState(false);
+  const [inputValue, setInputValue] = useState(null);
+  const inputRef = useRef();
+  const [dialogInfo, setDialogInfo] = useState({
+    title: '',
+    paragraph: '',
+    positiveText: 'Done',
+    negativeText: 'Cancel',
+    positivePress: () => {},
+    onClose: () => {},
+    positiveType: 'transparent',
+    icon: null,
+    paragraphColor: colors.pri,
+    input: false,
+    inputPlaceholder: 'Enter some text',
+    defaultValue: ''
+  });
+
+  useEffect(() => {
+    eSubscribeEvent(eOpenSimpleDialog, show);
+    eSubscribeEvent(eCloseSimpleDialog, hide);
+
+    return () => {
+      eUnSubscribeEvent(eOpenSimpleDialog, show);
+      eUnSubscribeEvent(eCloseSimpleDialog, hide);
     };
-  }
+  }, []);
 
-  _onPress = async () => {
-    let {template, item} = this.props;
-    switch (template.action) {
-      case dialogActions.ACTION_DELETE:
-        deleteItems();
-        this.hide();  
-        break;
-      case dialogActions.ACTION_PERMANANT_DELETE: {
-        if (item.dateCreated && history.selectedItemsList.length === 0) {
-          history.selectedItemsList = [];
-          history.selectedItemsList.push(item);
-        }
-        let ids = [];
-        history.selectedItemsList.forEach((item) => ids.push(item.id));
-        await db.trash.delete(...ids);
-        useTrashStore.getState().setTrash();
-        useSelectionStore.getState().clearSelection();
-        ToastEvent.show({
-          heading: 'Permanantly deleted items',
-          type: 'success',
-          context: 'local',
-        });
-        this.hide();
-        break;
-      }
-      case dialogActions.ACTION_EMPTY_TRASH: {
-        await db.trash.clear();
-        useTrashStore.getState().setTrash();
-        useSelectionStore.getState().clearSelection();
-        ToastEvent.show({
-          heading: 'Trash cleared',
-          message:"All notes and notebooks in the trash have been removed permanantly.",
-          type: 'success',
-          context: 'local',
-        });
-        this.hide();
-        break;
+  const onPressPositive = async () => {
+    if (dialogInfo.positivePress) {
+      inputRef.current?.blur();
+      let result = await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
+      if (result === false) {
+        return;
       }
     }
+    hide();
   };
 
-  _onClose = () => {
-    let {template, item} = this.props;
-    if (dialogActions.ACTION_TRASH === template.action) {
-      // delete item forever.
-      db.trash.delete(item.id);
+  const show = data => {
+    if (data.context && data.context !== context) return;
+    setDialogInfo(data);
+    setVisible(true);
+  };
+
+  const hide = () => {
+    setVisible(false);
+  };
+
+  const onNegativePress = async () => {
+    if (dialogInfo.onClose) {
+      await dialogInfo.onClose();
     }
-    this.setState({
-      visible: false,
-    });
+
+    hide();
   };
 
-  show = () => {
-    this.setState({
-      visible: true,
-      selectedItemsLength: history.selectedItemsList.length,
-    });
-  };
-  hide = () => {
-    this.setState({
-      visible: false,
-    });
+  const style = {
+    ...getElevation(5),
+    width: DDS.isTab ? 400 : '85%',
+    maxHeight: 450,
+    borderRadius: 5,
+    backgroundColor: colors.bg,
+    paddingHorizontal: ph,
+    paddingVertical: pv
   };
 
-  render() {
-    const {template, colors} = this.props;
-    const {title, paragraph, positiveText, negativeText, icon} = template;
-    const {visible} = this.state;
-
-    if (!visible) return null;
-    return (
-      <BaseDialog visible={true} onRequestClose={this.hide}>
-        <View
-          style={{
-            ...getElevation(5),
-            width: DDS.isTab ? 350 : '85%',
-            maxHeight: 350,
-            borderRadius: 5,
-            backgroundColor: colors.bg,
-            paddingHorizontal: ph,
-            paddingVertical: pv,
-          }}>
+  return (
+    visible && (
+      <BaseDialog
+        statusBarTranslucent={false}
+        onShow={async () => {
+          if (dialogInfo.input) {
+            await sleep(100);
+            inputRef.current?.focus();
+          }
+        }}
+        visible={true}
+        onRequestClose={hide}>
+        <View style={style}>
           <DialogHeader
-            title={title}
-            icon={icon}
-            paragraph={
-              this.state.selectedItemsLength > 0
-                ? 'Delete ' +
-                  this.state.selectedItemsLength +
-                  ' selected items?'
-                : paragraph
-            }
+            title={dialogInfo.title}
+            icon={dialogInfo.icon}
+            paragraph={dialogInfo.paragraph}
+            paragraphColor={dialogInfo.paragraphColor}
           />
-          <Seperator />
+          <Seperator half />
 
-          {template.noButtons ? null : (
-            <DialogButtons
-              onPressNegative={this._onClose}
-              onPressPositive={this._onPress}
-              positiveTitle={positiveText}
-              negativeTitle={negativeText}
+          {dialogInfo.input && (
+            <Input
+              fwdRef={inputRef}
+              autoCapitalize="none"
+              onChangeText={value => {
+                setInputValue(value);
+              }}
+              secureTextEntry={dialogInfo.secureTextEntry}
+              defaultValue={dialogInfo.defaultValue}
+              onSubmit={onPressPositive}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+              placeholder={dialogInfo.inputPlaceholder}
             />
           )}
+
+          <DialogButtons
+            onPressNegative={onNegativePress}
+            onPressPositive={onPressPositive}
+            positiveTitle={dialogInfo.positiveText}
+            negativeTitle={dialogInfo.negativeText}
+            positiveType={dialogInfo.positiveType}
+          />
         </View>
+        <Toast context="local"/>
       </BaseDialog>
-    );
-  }
-}
+    )
+  );
+};

@@ -1,132 +1,114 @@
 import React from 'react';
 import {
   ActivityIndicator,
-  Platform,
-  TouchableOpacity,
-  View,
+  Platform, View
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {TimeSince} from './TimeSince';
+import { TimeSince } from './TimeSince';
 
 export const UserSection = () => {
   const [state] = useTracked();
   const {colors} = state;
-
   const user = useUserStore(state => state.user);
   const syncing = useUserStore(state => state.syncing);
   const lastSynced = useUserStore(state => state.lastSynced);
-  const deviceMode = useSettingStore(state => state.deviceMode);
-
   const insets = useSafeAreaInsets();
+
   return (
     <View
       style={{
         width: '100%',
         alignSelf: 'center',
-        backgroundColor: colors.nav,
         paddingBottom: Platform.OS === 'ios' ? insets.bottom / 2 : null,
+        borderTopWidth: 1,
+        borderTopColor: colors.nav
       }}>
       <View
         style={{
-          flexDirection: deviceMode !== 'mobile' ? 'column' : 'row',
+          flexDirection: 'row',
           justifyContent: 'space-between',
-          alignItems: deviceMode !== 'mobile' ? 'flex-start' : 'center',
-          paddingRight: 8,
-          paddingLeft: 8,
+          alignItems: 'center'
         }}>
-        <TouchableOpacity
-          activeOpacity={0.8}
-          onPress={() => {
+        <PressableButton
+          onPress={async () => {
             if (user) {
-              ToastEvent.show({
-                heading: 'Logged in as ' + user?.email,
-                type: 'success',
-                context: 'global',
-              });
+              await Sync.run();
             } else {
               eSendEvent(eOpenLoginDialog);
             }
           }}
-          style={{
+          type="gray"
+          customStyle={{
             flexDirection: 'row',
-            alignItems: 'center',
-            paddingVertical: deviceMode !== 'mobile' ? 5 : 10,
-            paddingTop: 10,
+            justifyContent: 'flex-start',
+            padding: 12,
+            paddingHorizontal: 20,
+            borderRadius: 0
           }}>
-          <Icon
+          <View
             style={{
-              marginRight: 5,
-            }}
-            name="checkbox-blank-circle"
-            size={10}
-            color={!user ? colors.red : colors.green}
-          />
-
-          <View>
-            <Heading size={SIZE.sm} color={colors.heading}>
-              {!user ? 'Not logged in' : 'Logged in'}
-            </Heading>
-
-            {!user && (
-              <Paragraph
-                style={{
-                  maxWidth: deviceMode !== 'mobile' ? '96%' : '100%',
-                }}
-                color={colors.icon}>
-                Login to encrypt and sync your notes.
-              </Paragraph>
-            )}
-          </View>
-        </TouchableOpacity>
-
-        {user && (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={async () => await Sync.run()}
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              paddingVertical: deviceMode !== 'mobile' ? 0 : 10,
-              paddingBottom: 10,
-              justifyContent: 'space-between',
-              width: deviceMode !== 'mobile' ? '100%' : null,
+              flexShrink: 1,
+              flexGrow: 1
             }}>
-            <Paragraph
+            <Heading
               style={{
-                marginRight: 5,
+                flexWrap: 'wrap'
               }}
-              size={SIZE.sm}
-              color={syncing ? colors.accent : colors.icon}>
-              {syncing ? 'Syncing' : 'Synced '}
-
-              {!syncing ? (
+              size={SIZE.xs}
+              color={colors.icon}>
+              {!user ? (
+                'You are not logged in'
+              ) : !syncing ? (
                 lastSynced && lastSynced !== 'Never' ? (
-                  <TimeSince
-                    style={{fontSize: SIZE.sm, color: colors.icon}}
-                    time={lastSynced}
-                  />
+                  <>
+                    Last synced{' '}
+                    <TimeSince
+                      style={{fontSize: SIZE.xs, color: colors.icon}}
+                      time={lastSynced}
+                    />
+                  </>
                 ) : (
                   'never'
                 )
-              ) : null}
+              ) : (
+                'Syncing your notes'
+              )}{' '}
+              <Icon
+                name="checkbox-blank-circle"
+                size={9}
+                color={!user ? colors.red : colors.green}
+              />
+            </Heading>
+
+            <Paragraph
+              style={{
+                flexWrap: 'wrap'
+              }}
+              color={colors.heading}>
+              {!user
+                ? 'Login to sync your notes.'
+                : 'Tap here to sync your notes.'}
             </Paragraph>
-            {syncing ? (
-              <ActivityIndicator size={SIZE.md} color={colors.accent} />
+          </View>
+
+          {user ? (
+            syncing ? (
+              <ActivityIndicator size={SIZE.lg} color={colors.accent} />
             ) : (
-              <Icon color={colors.accent} name="sync" size={SIZE.md} />
-            )}
-          </TouchableOpacity>
-        )}
+              <Icon color={colors.accent} name="sync" size={SIZE.lg} />
+            )
+          ) : null}
+        </PressableButton>
       </View>
     </View>
   );

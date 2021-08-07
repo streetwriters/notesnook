@@ -1,75 +1,86 @@
 import React from 'react';
-import { TouchableOpacity, View } from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useMessageStore, useSelectionStore, useSettingStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { getElevation } from '../../utils';
-import { SIZE } from '../../utils/SizeUtils';
+import {useTracked} from '../../provider';
+import {useMessageStore, useSelectionStore} from '../../provider/stores';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({color}) => {;
+export const Card = ({color}) => {
+  const [state,] = useTracked();
+  const colors = state.colors;
+  color = color ? color : colors.accent;
+
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const messageBoardState = useMessageStore(state => state.message);
   const announcement = useMessageStore(state => state.announcement);
-  const deviceMode = useSettingStore(state => state.settings)
 
   return !messageBoardState.visible || selectionMode || announcement ? null : (
-    <TouchableOpacity
-      activeOpacity={0.8}
+    <PressableButton
       onPress={messageBoardState.onPress}
-      testID={notesnook.ids.default.loginToSync}
-      style={{
+      type="gray"
+      customStyle={{
+        paddingVertical: 12,
+        width: '95%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        position: deviceMode !== "mobile" || announcement ? 'relative' : 'absolute',
-        right: 0,
-        top: 0,
-        zIndex: 100,
-        backgroundColor: messageBoardState.type === 'error' ? 'red' : color,
-        width: '100%',
+        paddingHorizontal: 0,
       }}>
       <View
         style={{
-          flexDirection: 'row',
+          width: 40,
+          backgroundColor:
+            messageBoardState.type === 'error'
+              ? hexToRGBA(colors.red, 0.15)
+              : hexToRGBA(color, 0.15),
+          height: 40,
+          marginLeft: 10,
+          borderRadius: 100,
           alignItems: 'center',
-          paddingHorizontal: 12,
-          paddingVertical: 5,
-          width: '100%',
+          justifyContent: 'center'
         }}>
-        <View
-          style={{
-            borderRadius: 100,
-            backgroundColor: 'white',
-            marginRight: 5,
-            height: 20,
-            width: 20,
-            justifyContent: 'center',
-            alignItems: 'center',
-            ...getElevation(5),
-          }}>
-          <Icon
-            name={messageBoardState.icon}
-            size={SIZE.sm}
-            color={messageBoardState.type === 'error' ? 'red' : color}
-          />
-        </View>
-
-        <Paragraph size={SIZE.sm} color="white">
-          {messageBoardState.actionText}
-        </Paragraph>
-
         <Icon
-          name="arrow-right"
-          size={SIZE.md}
-          color="white"
-          style={{
-            position: 'absolute',
-            right: 12,
-          }}
+          size={SIZE.lg}
+          color={messageBoardState.type === 'error' ? colors.errorText : color}
+          name={messageBoardState.icon}
         />
       </View>
-    </TouchableOpacity>
+
+      <View
+        style={{
+          marginLeft: 10,
+          maxWidth: '75%'
+        }}>
+        <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+          {messageBoardState.message}
+        </Paragraph>
+        <Paragraph
+          style={{
+            maxWidth: '100%'
+          }}
+          color={colors.heading}>
+          {messageBoardState.actionText}
+        </Paragraph>
+      </View>
+
+      <View
+        style={{
+          width: 40,
+          height: 40,
+          justifyContent: 'center',
+          alignItems: 'center',
+          position: 'absolute',
+          right: 6
+        }}>
+        <Icon
+          name="chevron-right"
+          color={messageBoardState.type === 'error' ? colors.red : color}
+          size={SIZE.lg}
+        />
+      </View>
+    </PressableButton>
   );
 };

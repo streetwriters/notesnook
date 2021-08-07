@@ -4,7 +4,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useState,
+  useState
 } from 'react';
 import {
   Appearance,
@@ -12,23 +12,26 @@ import {
   Platform,
   ScrollView,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
+import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import ToggleSwitch from 'toggle-switch-react-native';
 import {Button} from '../../components/Button';
 import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
+import {presentDialog} from '../../components/Dialog/functions';
 import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
-import {Header} from '../../components/SimpleList/header';
+import {Card} from '../../components/SimpleList/card';
 import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
@@ -37,7 +40,7 @@ import {Actions} from '../../provider/Actions';
 import {
   useMessageStore,
   useSettingStore,
-  useUserStore,
+  useUserStore
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
@@ -47,7 +50,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -60,32 +63,34 @@ import {
   MenuItemsList,
   preloadImages,
   SUBSCRIPTION_PROVIDER,
-  SUBSCRIPTION_STATUS_STRINGS,
+  SUBSCRIPTION_STATUS,
+  SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
-  setColorScheme,
+  setColorScheme
 } from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {db} from '../../utils/DB';
 import {
+  eCloseProgressDialog,
   eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenProgressDialog,
   eOpenRecoveryKeyDialog,
   eOpenRestoreDialog,
   eScrollEvent,
-  eUpdateSearchState,
+  eUpdateSearchState
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 
 let menuRef = createRef();
 
@@ -101,6 +106,8 @@ export const Settings = ({navigation}) => {
   const {colors} = state;
   const [version, setVersion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [collapsed, setCollapsed] = useState(false);
+
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
@@ -110,7 +117,7 @@ export const Settings = ({navigation}) => {
       data: [],
       noSearch: true,
       type: '',
-      color: null,
+      color: null
     });
 
     if (!pageIsLoaded) {
@@ -120,12 +127,12 @@ export const Settings = ({navigation}) => {
     Navigation.setHeaderState(
       'Settings',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Settings',
-        id: 'settings_navigation',
-      },
+        id: 'settings_navigation'
+      }
     );
   }, []);
 
@@ -156,7 +163,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com/tos', colors);
         } catch (e) {}
       },
-      desc: 'Read our terms of service',
+      desc: 'Read our terms of service'
     },
 
     {
@@ -166,7 +173,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com/privacy', colors);
         } catch (e) {}
       },
-      desc: 'Read our privacy policy',
+      desc: 'Read our privacy policy'
     },
     {
       name: 'Check for updates',
@@ -176,7 +183,7 @@ export const Settings = ({navigation}) => {
           ToastEvent.show({
             heading: 'No new updates',
             type: 'success',
-            message: 'You are using the latest version',
+            message: 'You are using the latest version'
           });
           return;
         }
@@ -186,7 +193,7 @@ export const Settings = ({navigation}) => {
       desc:
         version?.mobile > APP_VERSION
           ? 'New update available.'
-          : 'You are using the latest version',
+          : 'You are using the latest version'
     },
     {
       name: `Report an issue`,
@@ -195,7 +202,7 @@ export const Settings = ({navigation}) => {
           await Linking.openURL('https://github.com/streetwriters/notesnook');
         } catch (e) {}
       },
-      desc: `Facing an issue? Report it on our Github`,
+      desc: `Facing an issue? Report it on our Github`
     },
     {
       name: 'Join our Discord community',
@@ -211,7 +218,7 @@ export const Settings = ({navigation}) => {
             'Follow the development process',
             'Give suggestions and report issues.',
             'Get early access to new features',
-            'Meet other people using Notesnook',
+            'Meet other people using Notesnook'
           ],
           noProgress: true,
           icon: 'discord',
@@ -220,10 +227,10 @@ export const Settings = ({navigation}) => {
               await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
             } catch (e) {}
           },
-          actionText: 'Join Now',
+          actionText: 'Join Now'
         });
       },
-      desc: 'We are not ghosts, chat with us and share your experience.',
+      desc: 'We are not ghosts, chat with us and share your experience.'
     },
     {
       name: 'Download on desktop',
@@ -232,7 +239,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com', colors);
         } catch (e) {}
       },
-      desc: 'Notesnook app can be downloaded on all platforms',
+      desc: 'Notesnook app can be downloaded on all platforms'
     },
     {
       name: 'Documentation',
@@ -241,7 +248,7 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://docs.notesnook.com', colors);
         } catch (e) {}
       },
-      desc: 'Learn about every feature and how it works.',
+      desc: 'Learn about every feature and how it works.'
     },
     {
       name: 'Roadmap',
@@ -249,11 +256,11 @@ export const Settings = ({navigation}) => {
         try {
           await openLinkInBrowser(
             'https://docs.notesnook.com/roadmap/',
-            colors,
+            colors
           );
         } catch (e) {}
       },
-      desc: 'See what the future of Notesnook is going to be like.',
+      desc: 'See what the future of Notesnook is going to be like.'
     },
     {
       name: 'About Notesnook',
@@ -262,8 +269,8 @@ export const Settings = ({navigation}) => {
           await openLinkInBrowser('https://notesnook.com', colors);
         } catch (e) {}
       },
-      desc: format(APP_VERSION),
-    },
+      desc: format(APP_VERSION)
+    }
   ];
 
   return (
@@ -274,89 +281,90 @@ export const Settings = ({navigation}) => {
       <View
         style={{
           height: '100%',
-          backgroundColor: colors.bg,
+          backgroundColor: colors.bg
         }}>
         <ScrollView
           onScroll={e =>
             eSendEvent(eScrollEvent, {
               y: e.nativeEvent.contentOffset.y,
-              screen: 'Settings',
+              screen: 'Settings'
             })
           }
           scrollEventThrottle={1}
           style={{
-            paddingHorizontal: 0,
+            paddingHorizontal: 0
           }}>
-          {!DDS.isTab && (
-            <Header noAnnouncement={true} title="Settings" type="settings" messageCard={false} />
-          )}
-
           <SettingsUserSection />
           <SettingsAppearanceSection />
+          <SettingsPrivacyAndSecurity />
+          <SettingsBackupAndRestore />
 
-          {!loading && (
+          <SectionHeader
+            collapsed={collapsed}
+            setCollapsed={setCollapsed}
+            title="Other"
+          />
+
+          {!collapsed && (
             <>
-              <SettingsPrivacyAndSecurity />
-              <SettingsBackupAndRestore />
+              <PressableButton
+                onPress={async () => {
+                  try {
+                    await Linking.openURL(
+                      Platform.OS === 'ios'
+                        ? 'https://bit.ly/notesnook-ios'
+                        : 'https://bit.ly/notesnook-and'
+                    );
+                  } catch (e) {}
+                }}
+                type="shade"
+                customStyle={{
+                  borderWidth: 1,
+                  borderRadius: 5,
+                  paddingVertical: 10,
+                  width: '95%',
+                  alignItems: 'flex-start',
+                  paddingHorizontal: 12,
+                  marginTop: 10,
+                  borderColor: colors.accent
+                }}>
+                <Heading
+                  color={colors.accent}
+                  style={{
+                    fontSize: SIZE.md
+                  }}>
+                  {`Rate us on ${
+                    Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
+                  }`}
+                </Heading>
+                <Paragraph
+                  style={{
+                    flexWrap: 'wrap',
+                    flexBasis: 1
+                  }}
+                  color={colors.pri}>
+                  It took us a year to bring Notesnook to life, the best private
+                  note taking app. It will take you a moment to rate it to let
+                  us know what you think!
+                </Paragraph>
+              </PressableButton>
+
+              {otherItems.map(item => (
+                <CustomButton
+                  key={item.name}
+                  title={item.name}
+                  tagline={item.desc}
+                  onPress={item.func}
+                />
+              ))}
             </>
           )}
-
-          <SectionHeader title="Other" />
-
-          <PressableButton
-            onPress={async () => {
-              try {
-                await Linking.openURL(
-                  Platform.OS === 'ios'
-                    ? 'https://bit.ly/notesnook-ios'
-                    : 'https://bit.ly/notesnook-and',
-                );
-              } catch (e) {}
-            }}
-            type="shade"
-            customStyle={{
-              borderWidth: 1,
-              borderRadius: 5,
-              paddingVertical: 10,
-              width: '95%',
-              alignItems: 'flex-start',
-              paddingHorizontal: 12,
-              marginTop: 10,
-              borderColor: colors.accent,
-            }}>
-            <Heading
-              color={colors.accent}
-              style={{
-                fontSize: SIZE.md,
-              }}>
-              {`Rate us on ${Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}`}
-            </Heading>
-            <Paragraph
-              style={{
-                flexWrap: 'wrap',
-                flexBasis: 1,
-              }}
-              color={colors.pri}>
-              It took us a year to bring Notesnook to life, the best private
-              note taking app. It will take you a moment to rate it to let us
-              know what you think!
-            </Paragraph>
-          </PressableButton>
-
-          {otherItems.map(item => (
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              tagline={item.desc}
-              onPress={item.func}
-            />
-          ))}
 
           <AccoutLogoutSection />
 
           <View
             style={{
-              height: 400,
+              height: 400
             }}
           />
         </ScrollView>
@@ -367,22 +375,47 @@ export const Settings = ({navigation}) => {
 
 export default Settings;
 
-const SectionHeader = ({title}) => {
+const SectionHeader = ({title, collapsed, setCollapsed}) => {
   const [state] = useTracked();
   const {colors} = state;
 
   return (
-    <View
+    <TouchableOpacity
+      activeOpacity={0.9}
+      onPress={() => {
+        setCollapsed(!collapsed);
+      }}
       style={{
-        height: 30,
+        height: 50,
         backgroundColor: colors.nav,
         paddingHorizontal: 12,
-        justifyContent: 'center',
+        justifyContent: 'space-between',
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: '95%',
+        alignSelf: 'center',
+        borderRadius: 5,
+        marginBottom: 5,
+        marginTop: 5
       }}>
-      <Heading size={SIZE.sm} color={colors.accent}>
-        {title}
-      </Heading>
-    </View>
+      {collapsed ? (
+        <Paragraph
+          size={SIZE.md + 1}
+          color={collapsed ? colors.icon : colors.accent}>
+          {title}
+        </Paragraph>
+      ) : (
+        <Heading size={SIZE.md + 1} color={colors.accent}>
+          {title}
+        </Heading>
+      )}
+
+      <Icon
+        name={collapsed ? 'chevron-down' : 'chevron-up'}
+        color={collapsed ? colors.icon : colors.accent}
+        size={SIZE.lg}
+      />
+    </TouchableOpacity>
   );
 };
 
@@ -407,7 +440,7 @@ const AccoutLogoutSection = () => {
                 height: '100%',
                 backgroundColor: colors.bg,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'center'
               }}>
               <Heading color={colors.pri} size={SIZE.md}>
                 Logging out
@@ -417,7 +450,7 @@ const AccoutLogoutSection = () => {
                   flexDirection: 'row',
                   height: 10,
                   width: 100,
-                  marginTop: 15,
+                  marginTop: 15
                 }}>
                 <AnimatedProgress fill={colors.accent} total={8} current={8} />
               </View>
@@ -477,7 +510,7 @@ const AccoutLogoutSection = () => {
                 style={{
                   flexDirection: 'row',
                   alignItems: 'center',
-                  alignSelf: 'flex-end',
+                  alignSelf: 'flex-end'
                 }}>
                 <Button
                   onPress={() => {
@@ -494,7 +527,7 @@ const AccoutLogoutSection = () => {
                       ToastEvent.show({
                         heading: 'Account Password is required',
                         type: 'error',
-                        context: 'local',
+                        context: 'local'
                       });
                       return;
                     }
@@ -505,14 +538,14 @@ const AccoutLogoutSection = () => {
                         heading: 'Failed to delete account',
                         message: e.message,
                         type: 'error',
-                        context: 'local',
+                        context: 'local'
                       });
                     }
                     close();
                   }}
                   fontSize={SIZE.md}
                   style={{
-                    marginLeft: 10,
+                    marginLeft: 10
                   }}
                   type="error"
                   title="Delete"
@@ -528,8 +561,8 @@ const AccoutLogoutSection = () => {
             name: 'Logout',
             func: async () => {
               setVisible(true);
-            },
-          },
+            }
+          }
         ].map((item, index) => (
           <PressableButton
             onPress={item.func}
@@ -543,12 +576,12 @@ const AccoutLogoutSection = () => {
               alignItems: 'flex-start',
               paddingHorizontal: 12,
               marginTop: index === 0 ? 25 : 0,
-              borderRadius: 0,
+              borderRadius: 0
             }}>
             <Heading
               color={item.name === 'Logout' ? colors.pri : colors.red}
               style={{
-                fontSize: SIZE.md,
+                fontSize: SIZE.md
               }}>
               {item.name}
             </Heading>
@@ -569,19 +602,19 @@ const AccoutLogoutSection = () => {
             alignItems: 'flex-start',
             paddingHorizontal: 12,
             marginTop: 25,
-            borderColor: colors.red,
+            borderColor: colors.red
           }}>
           <Heading
             color={colors.red}
             style={{
-              fontSize: SIZE.md,
+              fontSize: SIZE.md
             }}>
             Delete account
           </Heading>
           <Paragraph
             style={{
               flexWrap: 'wrap',
-              flexBasis: 1,
+              flexBasis: 1
             }}
             color={colors.red}>
             Your account will be deleted and all your data will be removed
@@ -600,7 +633,7 @@ const CustomButton = ({
   customComponent,
   onPress,
   maxWidth = '100%',
-  color = null,
+  color = null
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -612,20 +645,20 @@ const CustomButton = ({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 12,
-        paddingVertical: 6,
+        paddingVertical: 12,
         width: '100%',
         borderRadius: 0,
-        flexDirection: 'row',
+        flexDirection: 'row'
       }}>
       <View
         style={{
-          maxWidth: maxWidth,
+          maxWidth: maxWidth
         }}>
         <Paragraph
           size={SIZE.md}
           color={color || colors.pri}
           style={{
-            textAlignVertical: 'center',
+            textAlignVertical: 'center'
           }}>
           {title}
         </Paragraph>
@@ -642,7 +675,7 @@ const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
   return {
     time: dayjs(t2).diff(dayjs(), daysRemaining === 0 ? 'hours' : 'days'),
-    isHour: daysRemaining === 0,
+    isHour: daysRemaining === 0
   };
 };
 
@@ -660,12 +693,13 @@ const SettingsUserSection = () => {
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
   const input = useRef();
+
   const tryVerification = async () => {
     if (!passwordVerifyValue) {
       ToastEvent.show({
         heading: 'Account Password is required',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
@@ -681,7 +715,7 @@ const SettingsUserSection = () => {
           heading: 'Incorrect password',
           message: 'Please enter the correct password to save recovery key.',
           type: 'error',
-          context: 'local',
+          context: 'local'
         });
       }
     } catch (e) {
@@ -689,75 +723,38 @@ const SettingsUserSection = () => {
         heading: 'Incorrect password',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
+    }
+  };
+
+  const manageSubscription = () => {
+    if (
+      user.subscription.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+      Platform.OS === 'android'
+    ) {
+      if (user.subscription.provider === 3) {
+        ToastEvent.show({
+          heading: 'Subscribed on web',
+          message: 'Open your web browser to manage your subscription.',
+          type: 'success'
+        });
+        return;
+      }
+      Linking.openURL(
+        Platform.OS === 'ios'
+          ? 'https://apps.apple.com/account/subscriptions'
+          : 'https://play.google.com/store/account/subscriptions'
+      );
+    } else {
+      eSendEvent(eOpenPremiumDialog);
     }
   };
 
   return (
     <>
       {messageBoardState && messageBoardState?.visible && (
-        <PressableButton
-          onPress={messageBoardState.onPress}
-          customStyle={{
-            paddingVertical: 12,
-            width: '100%',
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            paddingHorizontal: 0,
-          }}>
-          <View
-            style={{
-              width: 40,
-              backgroundColor:
-                messageBoardState.type === 'error' ? colors.red : colors.accent,
-              height: 40,
-              marginLeft: 10,
-              borderRadius: 100,
-              alignItems: 'center',
-              justifyContent: 'center',
-            }}>
-            <Icon size={SIZE.lg} color="white" name={messageBoardState.icon} />
-          </View>
-
-          <View
-            style={{
-              marginLeft: 10,
-              maxWidth: '75%',
-            }}>
-            <Paragraph color={colors.icon} size={SIZE.xs}>
-              {messageBoardState.message}
-            </Paragraph>
-            <Paragraph
-              style={{
-                maxWidth: '100%',
-              }}
-              color={
-                messageBoardState.type === 'error' ? colors.red : colors.accent
-              }>
-              {messageBoardState.actionText}
-            </Paragraph>
-          </View>
-
-          <View
-            style={{
-              width: 40,
-              height: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-              position: 'absolute',
-              right: 6,
-            }}>
-            <Icon
-              name="chevron-right"
-              color={
-                messageBoardState.type === 'error' ? colors.red : colors.accent
-              }
-              size={SIZE.lg}
-            />
-          </View>
-        </PressableButton>
+        <Card color={colors.accent} />
       )}
 
       {user ? (
@@ -766,7 +763,7 @@ const SettingsUserSection = () => {
             style={{
               paddingHorizontal: 12,
               marginTop: 15,
-              marginBottom: 15,
+              marginBottom: 15
             }}>
             <View
               style={{
@@ -777,20 +774,20 @@ const SettingsUserSection = () => {
                 borderRadius: 5,
                 paddingHorizontal: 12,
                 borderWidth: 1,
-                borderColor: colors.accent,
+                borderColor: colors.accent
               }}>
               <View
                 style={{
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 2.5,
+                  paddingBottom: 2.5
                 }}>
                 <View
                   style={{
                     flexDirection: 'row',
                     justifyContent: 'center',
-                    alignItems: 'center',
+                    alignItems: 'center'
                   }}>
                   <View
                     style={{
@@ -800,7 +797,7 @@ const SettingsUserSection = () => {
                       width: 20,
                       height: 20,
                       alignItems: 'center',
-                      justifyContent: 'center',
+                      justifyContent: 'center'
                     }}>
                     <Icon
                       size={SIZE.md}
@@ -813,7 +810,7 @@ const SettingsUserSection = () => {
                     color={colors.heading}
                     size={SIZE.sm}
                     style={{
-                      marginLeft: 5,
+                      marginLeft: 5
                     }}>
                     {user?.email}
                   </Paragraph>
@@ -822,7 +819,7 @@ const SettingsUserSection = () => {
                   style={{
                     borderRadius: 5,
                     padding: 5,
-                    paddingVertical: 2.5,
+                    paddingVertical: 2.5
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
                     {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
@@ -830,11 +827,7 @@ const SettingsUserSection = () => {
                 </View>
               </View>
               <View>
-                {user.subscription.type === 1 ||
-                user.subscription.type === 2 ||
-                user.subscription.type === 5 ||
-                user.subscription.type === 6 ||
-                user.subscription.type === 7 ? (
+                {user.subscription.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
                     <Seperator />
                     <Paragraph
@@ -871,21 +864,28 @@ const SettingsUserSection = () => {
                 ) : null}
 
                 {user.isEmailConfirmed &&
-                  user.subscription.type !== 5 &&
-                  user.subscription.type !== 2 && (
+                  user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+                  user.subscription.type !== SUBSCRIPTION_STATUS.BETA && (
                     <>
                       <Seperator />
                       <Button
-                        onPress={() => {
-                          eSendEvent(eOpenPremiumDialog);
-                        }}
+                        onPress={manageSubscription}
                         width="100%"
                         style={{
-                          paddingHorizontal: 0,
+                          paddingHorizontal: 0
                         }}
                         fontSize={SIZE.md}
                         title={
-                          user.subscription.type === 6
+                          user.subscription.provider === 3 &&
+                          user.subscription.type ===
+                            SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+                            ? 'Manage subscription from desktop app'
+                            : user.subscription.type ===
+                                SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+                              Platform.OS === 'android'
+                            ? `Resubscribe from Google Playstore`
+                            : user.subscription.type ===
+                              SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
                                 PremiumService.getProducts().length > 0
                                   ? PremiumService.getProducts()[0]
@@ -907,9 +907,8 @@ const SettingsUserSection = () => {
               </View>
 
               {user?.subscription?.provider &&
-              user.subscription.type !== 6 &&
-              user.subscription.type !== 7 &&
-              user.subscription.type !== 0 &&
+              user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
+              user.subscription.type !== SUBSCRIPTION_STATUS.BASIC &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
                 <Button
                   title={
@@ -923,18 +922,18 @@ const SettingsUserSection = () => {
                       paragraph:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
-                      noProgress: true,
+                      noProgress: true
                     });
                   }}
                   style={{
                     alignSelf: 'flex-end',
                     marginTop: 10,
                     borderRadius: 3,
-                    zIndex: 10,
+                    zIndex: 10
                   }}
                   fontSize={11}
                   textStyle={{
-                    fontWeight: 'normal',
+                    fontWeight: 'normal'
                   }}
                   height={20}
                   type="accent"
@@ -959,7 +958,7 @@ const SettingsUserSection = () => {
               <DialogContainer>
                 <DialogHeader
                   title="Verify it's you"
-                  paragraph="To save your account recovery key, enter your account password"
+                  paragraph="Enter your account password to save your data recovery key."
                 />
 
                 <Input
@@ -976,7 +975,7 @@ const SettingsUserSection = () => {
                   style={{
                     flexDirection: 'row',
                     alignItems: 'center',
-                    alignSelf: 'flex-end',
+                    alignSelf: 'flex-end'
                   }}>
                   <Button
                     onPress={() => {
@@ -991,7 +990,7 @@ const SettingsUserSection = () => {
                     onPress={tryVerification}
                     fontSize={SIZE.md}
                     style={{
-                      marginLeft: 10,
+                      marginLeft: 10
                     }}
                     type="transparent"
                     title="Verify"
@@ -1009,31 +1008,69 @@ const SettingsUserSection = () => {
                 setVerifyUser(true);
               },
               desc:
-                'Recover your data using the recovery key if your password is lost.',
+                'Recover your data using the recovery key if your password is lost.'
             },
             {
               name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
               },
-              desc: 'Setup a new password for your account.',
+              desc: 'Setup a new password for your account.'
             },
             {
               name: 'Having problems with syncing?',
               func: async () => {
                 await Sync.run('global', true);
               },
-              desc: 'Try force sync to resolve issues with syncing.',
+              desc: 'Try force sync to resolve issues with syncing.'
             },
-          ].map(item => (
-            <CustomButton
-              key={item.name}
-              title={item.name}
-              onPress={item.func}
-              tagline={item.desc}
-              color={item.name === 'Logout' ? colors.errorText : colors.pri}
-            />
-          ))}
+            {
+              name: 'Subscription not activated?',
+              func: async () => {
+                if (Platform.OS === 'android') return;
+                eSendEvent(eOpenProgressDialog, {
+                  title: 'Loading subscriptions',
+                  paragraph: `Please wait while we fetch your subscriptions.`
+                });
+                let subscriptions = await RNIap.getPurchaseHistory();
+                subscriptions.sort(
+                  (a, b) => b.transactionDate - a.transactionDate
+                );
+                let currentSubscription = subscriptions[0];
+                eSendEvent(eOpenProgressDialog, {
+                  title: 'Notesnook Pro',
+                  paragraph: `You subscribed to Notesnook Pro on ${new Date(
+                    currentSubscription.transactionDate
+                  ).toLocaleString()}. Verify this subscription?`,
+                  action: async () => {
+                    eSendEvent(eOpenProgressDialog, {
+                      title: 'Verifying subscription',
+                      paragraph: `Please wait while we verify your subscription.`
+                    });
+                    await PremiumService.subscriptions.verify(
+                      currentSubscription
+                    );
+                    eSendEvent(eCloseProgressDialog);
+                  },
+                  icon: 'information-outline',
+                  actionText: 'Verify',
+                  noProgress: true
+                });
+              },
+              desc: 'Verify your subscription to Notesnook Pro'
+            }
+          ].map(item =>
+            item.name === 'Subscription not activated?' &&
+            (Platform.OS !== 'ios' || PremiumService.get()) ? null : (
+              <CustomButton
+                key={item.name}
+                title={item.name}
+                onPress={item.func}
+                tagline={item.desc}
+                color={item.name === 'Logout' ? colors.errorText : colors.pri}
+              />
+            )
+          )}
         </>
       ) : null}
     </>
@@ -1044,7 +1081,7 @@ const SettingsAppearanceSection = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
-
+  const [collapsed, setCollapsed] = useState(true);
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});
@@ -1063,17 +1100,17 @@ const SettingsAppearanceSection = () => {
       await PremiumService.verify(async () => {
         await SettingsService.set(
           'useSystemTheme',
-          SettingsService.get().useSystemTheme ? false : true,
+          SettingsService.get().useSystemTheme ? false : true
         );
         if (SettingsService.get().useSystemTheme) {
           await MMKV.setStringAsync(
             'theme',
-            JSON.stringify({night: Appearance.getColorScheme() === 'dark'}),
+            JSON.stringify({night: Appearance.getColorScheme() === 'dark'})
           );
           changeColorScheme(
             Appearance.getColorScheme() === 'dark'
               ? COLOR_SCHEME_DARK
-              : COLOR_SCHEME_LIGHT,
+              : COLOR_SCHEME_LIGHT
           );
         }
       });
@@ -1082,203 +1119,236 @@ const SettingsAppearanceSection = () => {
 
   return (
     <>
-      <SectionHeader title="Appearance" />
+      <SectionHeader
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        title="Appearance"
+      />
 
-      <View
-        style={{
-          paddingHorizontal: 12,
-        }}>
-        <Paragraph
-          size={SIZE.md}
-          style={{
-            textAlignVertical: 'center',
-          }}>
-          Accent Color
-        </Paragraph>
-        <Paragraph size={SIZE.sm} color={colors.icon}>
-          Change the accent color of the app.
-        </Paragraph>
-      </View>
-      <ScrollView
-        horizontal={true}
-        showsHorizontalScrollIndicator={false}
-        onMoveShouldSetResponderCapture={() => {
-          tabBarRef.current?.setScrollEnabled(false);
-        }}
-        onMomentumScrollEnd={() => {
-          tabBarRef.current?.setScrollEnabled(true);
-        }}
-        style={{
-          borderRadius: 5,
-          padding: 5,
-          marginTop: 10,
-          marginBottom: pv + 5,
-          width: '100%',
-          paddingHorizontal: 12,
-        }}
-        nestedScrollEnabled
-        contentContainerStyle={{
-          alignSelf: 'center',
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-        }}>
-        {[
-          '#FF5722',
-          '#FFA000',
-          '#1B5E20',
-          '#01c352',
-          '#757575',
-          '#0560ff',
-          '#009688',
-          '#2196F3',
-          '#880E4F',
-          '#9C27B0',
-          '#9381ff',
-          '#FF1744',
-          '#B71C1C',
-          '#ffadad',
-        ].map(item => (
-          <PressableButton
-            key={item}
-            customColor={
-              colors.accent === item
-                ? RGB_Linear_Shade(
-                    !colors.night ? -0.2 : 0.2,
-                    hexToRGBA(item, 1),
-                  )
-                : item
-            }
-            customSelectedColor={item}
-            alpha={!colors.night ? -0.1 : 0.1}
-            opacity={1}
-            onPress={async () => {
-              await PremiumService.verify(async () => {
-                changeAccentColor(item);
-                preloadImages(item);
-                await MMKV.setStringAsync('accentColor', item);
-              });
-            }}
-            customStyle={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginVertical: 5,
-              marginHorizontal: 5,
-              width: DDS.isLargeTablet() ? 40 : 50,
-              height: DDS.isLargeTablet() ? 40 : 50,
-              borderRadius: 100,
+      {collapsed ? null : (
+        <>
+          <View
+            style={{
+              paddingHorizontal: 12,
+              marginTop: 5
             }}>
-            {colors.accent === item ? (
-              <Icon
-                size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
-                color="white"
-                name="check"
-              />
-            ) : null}
-          </PressableButton>
-        ))}
-        <View style={{width: 50}} />
-      </ScrollView>
-
-      <CustomButton
-        title="System Theme"
-        tagline="Automatically switch to dark mode when the system theme changes."
-        onPress={switchTheme}
-        maxWidth="90%"
-        customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.useSystemTheme ? colors.accent : colors.icon}
-            name={
-              settings.useSystemTheme ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        }
-      />
-
-      <CustomButton
-        title="Dark Mode"
-        tagline="Switch on dark mode at night to protect your eyes."
-        onPress={async () => {
-          if (!colors.night) {
-            await MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-            changeColorScheme(COLOR_SCHEME_DARK);
-          } else {
-            await MMKV.setStringAsync('theme', JSON.stringify({night: false}));
-
-            changeColorScheme(COLOR_SCHEME_LIGHT);
-          }
-        }}
-        maxWidth="90%"
-        customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={colors.night ? colors.accent : colors.icon}
-            name={colors.night ? 'toggle-switch' : 'toggle-switch-off'}
-          />
-        }
-      />
-
-      <CustomButton
-        title="Homepage"
-        tagline={'Default screen to open on app startup '}
-        onPress={async () => {
-          await PremiumService.verify(menuRef.current?.show);
-        }}
-        customComponent={
-          <Menu
-            ref={menuRef}
-            animationDuration={200}
+            <Paragraph
+              size={SIZE.md}
+              style={{
+                textAlignVertical: 'center'
+              }}>
+              Accent Color
+            </Paragraph>
+            <Paragraph size={SIZE.sm} color={colors.icon}>
+              Change the accent color of the app.
+            </Paragraph>
+          </View>
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            onMoveShouldSetResponderCapture={() => {
+              tabBarRef.current?.setScrollEnabled(false);
+            }}
+            onMomentumScrollEnd={() => {
+              tabBarRef.current?.setScrollEnabled(true);
+            }}
             style={{
               borderRadius: 5,
-              backgroundColor: colors.bg,
+              padding: 5,
+              marginTop: 10,
+              marginBottom: pv + 5,
+              width: '100%',
+              paddingHorizontal: 12
             }}
-            button={
-              <TouchableOpacity
+            nestedScrollEnabled
+            contentContainerStyle={{
+              alignSelf: 'center',
+              flexDirection: 'row',
+              flexWrap: 'wrap'
+            }}>
+            {[
+              '#FF5722',
+              '#FFA000',
+              '#1B5E20',
+              '#008837',
+              '#757575',
+              '#0560ff',
+              '#009688',
+              '#2196F3',
+              '#880E4F',
+              '#9C27B0',
+              '#FF1744',
+              '#B71C1C'
+            ].map(item => (
+              <PressableButton
+                key={item}
+                customColor={
+                  colors.accent === item
+                    ? RGB_Linear_Shade(
+                        !colors.night ? -0.2 : 0.2,
+                        hexToRGBA(item, 1)
+                      )
+                    : item
+                }
+                customSelectedColor={item}
+                alpha={!colors.night ? -0.1 : 0.1}
+                opacity={1}
                 onPress={async () => {
-                  await PremiumService.verify(menuRef.current?.show);
+                  await PremiumService.verify(async () => {
+                    changeAccentColor(item);
+                    preloadImages(item);
+                    await MMKV.setStringAsync('accentColor', item);
+                  });
                 }}
-                style={{
+                customStyle={{
                   flexDirection: 'row',
+                  justifyContent: 'center',
                   alignItems: 'center',
+                  marginRight: 10,
+                  marginVertical: 5,
+                  width: DDS.isLargeTablet() ? 40 : 50,
+                  height: DDS.isLargeTablet() ? 40 : 50,
+                  borderRadius: 100
                 }}>
-                <Paragraph>{settings.homepage}</Paragraph>
-                <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
-              </TouchableOpacity>
-            }>
-            {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
-              (item, index) => (
-                <MenuItem
-                  key={item.name}
-                  onPress={async () => {
-                    menuRef.current?.hide();
-                    await SettingsService.set('homepage', item.name);
-                    ToastEvent.show({
-                      heading: 'Homepage set to ' + item.name,
-                      message: 'Restart the app for changes to take effect.',
-                      type: 'success',
-                    });
-                  }}
-                  style={{
-                    backgroundColor:
-                      settings.homepage === item.name
-                        ? colors.shade
-                        : 'transparent',
-                  }}
-                  textStyle={{
-                    fontSize: SIZE.md,
-                    color:
-                      settings.homepage === item.name
-                        ? colors.accent
-                        : colors.pri,
-                  }}>
-                  {item.name}
-                </MenuItem>
-              ),
-            )}
-          </Menu>
-        }
-      />
+                {colors.accent === item ? (
+                  <Icon
+                    size={DDS.isLargeTablet() ? SIZE.lg : SIZE.xxl}
+                    color="white"
+                    name="check"
+                  />
+                ) : null}
+              </PressableButton>
+            ))}
+            <View style={{width: 50}} />
+          </ScrollView>
+
+          <CustomButton
+            title="System Theme"
+            tagline="Automatically switch to dark mode when the system theme changes."
+            onPress={switchTheme}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.useSystemTheme}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={switchTheme}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Dark Mode"
+            tagline="Switch on dark mode at night to protect your eyes."
+            onPress={async () => {
+              if (!colors.night) {
+                await MMKV.setStringAsync(
+                  'theme',
+                  JSON.stringify({night: true})
+                );
+                changeColorScheme(COLOR_SCHEME_DARK);
+              } else {
+                await MMKV.setStringAsync(
+                  'theme',
+                  JSON.stringify({night: false})
+                );
+
+                changeColorScheme(COLOR_SCHEME_LIGHT);
+              }
+            }}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={colors.night}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={async isOn => {
+                  if (!colors.night) {
+                    await MMKV.setStringAsync(
+                      'theme',
+                      JSON.stringify({night: true})
+                    );
+                    changeColorScheme(COLOR_SCHEME_DARK);
+                  } else {
+                    await MMKV.setStringAsync(
+                      'theme',
+                      JSON.stringify({night: false})
+                    );
+
+                    changeColorScheme(COLOR_SCHEME_LIGHT);
+                  }
+                }}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Homepage"
+            tagline={'Default screen to open on app startup '}
+            onPress={async () => {
+              await PremiumService.verify(menuRef.current?.show);
+            }}
+            customComponent={
+              <Menu
+                ref={menuRef}
+                animationDuration={200}
+                style={{
+                  borderRadius: 5,
+                  backgroundColor: colors.bg
+                }}
+                button={
+                  <TouchableOpacity
+                    onPress={async () => {
+                      await PremiumService.verify(menuRef.current?.show);
+                    }}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center'
+                    }}>
+                    <Paragraph>{settings.homepage}</Paragraph>
+                    <Icon color={colors.icon} name="menu-down" size={SIZE.md} />
+                  </TouchableOpacity>
+                }>
+                {MenuItemsList.slice(0, MenuItemsList.length - 1).map(
+                  (item, index) => (
+                    <MenuItem
+                      key={item.name}
+                      onPress={async () => {
+                        menuRef.current?.hide();
+                        await SettingsService.set('homepage', item.name);
+                        ToastEvent.show({
+                          heading: 'Homepage set to ' + item.name,
+                          message:
+                            'Restart the app for changes to take effect.',
+                          type: 'success'
+                        });
+                      }}
+                      style={{
+                        backgroundColor:
+                          settings.homepage === item.name
+                            ? colors.shade
+                            : 'transparent'
+                      }}
+                      textStyle={{
+                        fontSize: SIZE.md,
+                        color:
+                          settings.homepage === item.name
+                            ? colors.accent
+                            : colors.pri
+                      }}>
+                      {item.name}
+                    </MenuItem>
+                  )
+                )}
+              </Menu>
+            }
+          />
+        </>
+      )}
     </>
   );
 };
@@ -1287,13 +1357,13 @@ const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
-
+  const [collapsed, setCollapsed] = useState(true);
   const [appLockVisible, setAppLockVisible] = useState(false);
-
+  const user = useUserStore(state => state.user);
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
     biometryEnrolled: false,
-    isBiometryAvailable: false,
+    isBiometryAvailable: false
   });
 
   const checkVaultStatus = useCallback(() => {
@@ -1301,15 +1371,15 @@ const SettingsPrivacyAndSecurity = () => {
       db.vault.exists().then(async r => {
         let available = await BiometricService.isBiometryAvailable();
         let fingerprint = await BiometricService.hasInternetCredentials();
-
+        console.log(available);
         setVaultStatus({
           exists: r,
           biometryEnrolled: fingerprint,
-          isBiometryAvailable: available ? true : false,
+          isBiometryAvailable: available ? true : false
         });
       });
     });
-  });
+  }, [collapsed]);
 
   useEffect(() => {
     checkVaultStatus();
@@ -1317,28 +1387,43 @@ const SettingsPrivacyAndSecurity = () => {
     return () => {
       eUnSubscribeEvent('vaultUpdated', () => checkVaultStatus());
     };
-  }, []);
+  }, [collapsed]);
 
   const modes = [
     {
       title: 'None',
       value: 'none',
       desc:
-        'Disable app lock. Notes will be accessible to anyone who opens the app',
+        'Disable app lock. Notes will be accessible to anyone who opens the app'
     },
     {
       title: 'Secure Mode',
       value: 'launch',
       desc:
-        'Lock app on launch and keep it unlocked when you switch to other apps.',
+        'Lock app on launch and keep it unlocked when you switch to other apps.'
     },
     {
       title: 'Strict Mode',
       value: 'background',
       desc:
-        'Lock app on launch and also when you switch from other apps or background.',
-    },
+        'Lock app on launch and also when you switch from other apps or background.'
+    }
   ];
+
+  const toggleBiometricUnlocking = () => {
+    openVault({
+      item: {},
+      fingerprintAccess: !vaultStatus.biometryEnrolled,
+      revokeFingerprintAccess: vaultStatus.biometryEnrolled,
+      novault: true,
+      title: vaultStatus.biometryEnrolled
+        ? 'Revoke biometric unlocking'
+        : 'Enable biometery unlock',
+      description: vaultStatus.biometryEnrolled
+        ? 'Disable biometric unlocking for notes in vault'
+        : 'Disable biometric unlocking for notes in vault'
+    });
+  };
 
   return (
     <>
@@ -1368,10 +1453,10 @@ const SettingsPrivacyAndSecurity = () => {
                   paddingHorizontal: 6,
                   paddingVertical: 6,
                   marginTop: 3,
-                  marginBottom: 3,
+                  marginBottom: 3
                 }}
                 style={{
-                  marginBottom: 10,
+                  marginBottom: 10
                 }}>
                 <Heading
                   color={
@@ -1402,303 +1487,440 @@ const SettingsPrivacyAndSecurity = () => {
         </BaseDialog>
       )}
 
-      <SectionHeader title="Privacy & Security" />
-      <CustomButton
-        key="privacyMode"
-        title="Privacy mode"
-        tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
-        onPress={() => {
-          Platform.OS === 'android'
-            ? AndroidModule.setSecureMode(!settings.privacyScreen)
-            : enabled(true);
-
-          SettingsService.set('privacyScreen', !settings.privacyScreen);
-        }}
-        maxWidth="90%"
-        customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.privacyScreen ? colors.accent : colors.icon}
-            name={
-              settings.privacyScreen ? 'toggle-switch' : 'toggle-switch-off'
+      <SectionHeader
+        collapsed={collapsed}
+        setCollapsed={setCollapsed}
+        title="Privacy & Security"
+      />
+      {collapsed ? null : (
+        <>
+          <CustomButton
+            key="telemetry"
+            title="Enable telemetry"
+            tagline="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
+            onPress={() => {
+              SettingsService.set('telemetry', !settings.telemetry);
+            }}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.telemetry}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={isOn => {
+                  SettingsService.set('telemetry', isOn);
+                }}
+              />
             }
           />
-        }
-      />
 
-      {vaultStatus.isBiometryAvailable && (
-        <CustomButton
-          key="appLock"
-          title="App lock"
-          tagline="Require biometrics to access your notes."
-          onPress={() => {
-            setAppLockVisible(true);
-          }}
-          maxWidth="90%"
-        />
-      )}
+          <CustomButton
+            key="privacyMode"
+            title="Privacy mode"
+            tagline="Hide app contents when you switch to other apps. This will also disable screenshot taking in the app."
+            onPress={() => {
+              Platform.OS === 'android'
+                ? AndroidModule.setSecureMode(!settings.privacyScreen)
+                : enabled(true);
 
-      {vaultStatus.exists ? (
-        <>
-          {vaultStatus.isBiometryAvailable ? (
+              SettingsService.set('privacyScreen', !settings.privacyScreen);
+            }}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.privacyScreen}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={isOn => {
+                  Platform.OS === 'android'
+                    ? AndroidModule.setSecureMode(isOn)
+                    : enabled(true);
+                  SettingsService.set('privacyScreen', isOn);
+                }}
+              />
+            }
+          />
+
+          {user || vaultStatus.isBiometryAvailable ? (
             <CustomButton
-              key="fingerprintVaultUnlock"
-              title="Vault biometrics unlock"
-              tagline="Access notes in vault using biometrics"
+              key="appLock"
+              title="App lock"
+              tagline="Require biometrics to access your notes."
               onPress={() => {
-                openVault({
-                  item: {},
-                  fingerprintAccess: !vaultStatus.biometryEnrolled,
-                  revokeFingerprintAccess: vaultStatus.biometryEnrolled,
-                  novault: true,
-                  title: vaultStatus.biometryEnrolled
-                    ? 'Revoke biometric unlocking'
-                    : 'Enable biometery unlock',
-                  description: vaultStatus.biometryEnrolled
-                    ? 'Disable biometric unlocking for notes in vault'
-                    : 'Disable biometric unlocking for notes in vault',
-                });
+                setAppLockVisible(true);
               }}
               maxWidth="90%"
-              customComponent={
-                <Icon
-                  size={SIZE.xl}
-                  color={
-                    vaultStatus.biometryEnrolled ? colors.accent : colors.icon
-                  }
-                  name={
-                    vaultStatus.biometryEnrolled
-                      ? 'toggle-switch'
-                      : 'toggle-switch-off'
-                  }
-                />
-              }
             />
           ) : null}
-          <CustomButton
-            key="changeVaultPassword"
-            title="Change vault password"
-            tagline="Setup a new password for the vault"
-            onPress={() => {
-              openVault({
-                item: {},
-                changePassword: true,
-                novault: true,
-                title: 'Change vault password',
-                description: 'Set a new password for your vault.',
-              });
-            }}
-          />
+
+          {vaultStatus.exists ? (
+            <>
+              {vaultStatus.isBiometryAvailable ? (
+                <CustomButton
+                  key="fingerprintVaultUnlock"
+                  title="Vault biometrics unlock"
+                  tagline="Access notes in vault using biometrics"
+                  onPress={toggleBiometricUnlocking}
+                  maxWidth="90%"
+                  customComponent={
+                    <ToggleSwitch
+                      isOn={vaultStatus.biometryEnrolled}
+                      onColor={colors.accent}
+                      offColor={colors.icon}
+                      size="small"
+                      animationSpeed={150}
+                      onToggle={toggleBiometricUnlocking}
+                    />
+                  }
+                />
+              ) : null}
+              <CustomButton
+                key="changeVaultPassword"
+                title="Change vault password"
+                tagline="Setup a new password for the vault"
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    changePassword: true,
+                    novault: true,
+                    title: 'Change vault password',
+                    description: 'Set a new password for your vault.'
+                  });
+                }}
+              />
+              <CustomButton
+                key="clearVault"
+                title="Clear vault"
+                tagline="Unlock all locked notes and clear vault."
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    clearVault: true,
+                    novault: true,
+                    title: 'Clear vault',
+                    description:
+                      'Enter vault password to unlock and remove all notes from the vault.'
+                  });
+                }}
+              />
+
+              <CustomButton
+                key="deleteVault"
+                title="Delete vault"
+                tagline="Delete vault (and optionally remove all notes)."
+                onPress={() => {
+                  openVault({
+                    item: {},
+                    deleteVault: true,
+                    novault: true,
+                    title: 'Delete vault',
+                    description:
+                      'Enter your account password to delete your vault.'
+                  });
+                }}
+              />
+            </>
+          ) : (
+            <CustomButton
+              key="createVault"
+              title="Create vault"
+              tagline="Secure your notes by adding the to the vault."
+              onPress={() => {
+                PremiumService.verify(() => {
+                  openVault({
+                    item: {},
+                    novault: false,
+                    title: 'Create vault',
+                    description:
+                      'Set a password to create vault and lock notes.'
+                  });
+                });
+              }}
+            />
+          )}
         </>
-      ) : (
-        <CustomButton
-          key="createVault"
-          title="Create vault"
-          tagline="Secure your notes by adding the to the vault."
-          onPress={() => {
-            PremiumService.verify(() => {
-              openVault({
-                item: {},
-                novault: false,
-                title: 'Create vault',
-                description: 'Set a password to create vault and lock notes.',
-              });
-            });
-          }}
-        />
       )}
     </>
   );
 };
 
-const SettingsBackupAndRestore = () => {
+export const SettingsBackupAndRestore = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
 
+  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+
+  const optItems = isSheet
+    ? []
+    : [
+        {
+          name: 'Restore backup',
+          func: async () => {
+            if (isSheet) {
+              eSendEvent(eCloseProgressDialog);
+              await sleep(300);
+            }
+            eSendEvent(eOpenRestoreDialog);
+          },
+          desc: 'Restore backup from phone storage.'
+        },
+        {
+          name: 'Import notes from other note apps',
+          desc: 'Get all your notes in one place with Notesnook Importer.',
+          func: async () => {
+            if (isSheet) {
+              eSendEvent(eCloseProgressDialog);
+              await sleep(300);
+            }
+            eSendEvent(eOpenProgressDialog, {
+              title: 'Notesnook Importer',
+              icon: 'import',
+              noProgress: true,
+              action: async () => {
+                try {
+                  await openLinkInBrowser(
+                    'https://importer.notesnook.com',
+                    colors
+                  );
+                } catch (e) {}
+              },
+              actionText: 'Go to Notesnook Importer',
+              learnMore: 'Learn how this works',
+              learnMorePress: async () => {
+                try {
+                  await openLinkInBrowser(
+                    'https://docs.notesnook.com/importing/notesnook-importer/',
+                    colors
+                  );
+                } catch (e) {}
+              },
+              paragraph:
+                'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.'
+            });
+          },
+          new: true
+        }
+      ];
   const backupItemsList = [
     {
-      name: 'Backup data',
+      name: 'Backup now',
       func: async () => {
-        await Backup.run();
-      },
-      desc: 'Backup your data to phone storage',
-    },
-    {
-      name: 'Restore backup',
-      func: () => {
-        eSendEvent(eOpenRestoreDialog);
-      },
-      desc: 'Restore backup from phone storage.',
-    },
-    {
-      name: 'Import notes from other note apps',
-      desc: 'Get all your notes in one place with Notesnook Importer.',
-      func: () => {
-        eSendEvent(eOpenProgressDialog, {
-          title: 'Notesnook Importer',
-          icon: 'import',
-          noProgress: true,
-          action: async () => {
+        if (isSheet) {
+          eSendEvent(eCloseProgressDialog);
+          await sleep(300);
+        }
+        if (!user) {
+          await Backup.run();
+          return;
+        }
+        presentDialog({
+          title: "Verify it's you",
+          input: true,
+          inputPlaceholder: 'Enter account password',
+          paragraph: 'Please enter your account password to backup data',
+          positiveText: 'Verify',
+          secureTextEntry: true,
+          positivePress: async value => {
             try {
-              await openLinkInBrowser('https://importer.notenook.com', colors);
-            } catch (e) {}
-          },
-          actionText: 'Go to Notesnook Importer',
-          learnMore: 'Learn how this works',
-          learnMorePress: async () => {
-            try {
-              await openLinkInBrowser(
-                'https://docs.notesnook.com/importing/notesnook-importer/',
-                colors,
-              );
-            } catch (e) {}
-          },
-          paragraph:
-            'Now you can import your notes from all the popular note taking apps. Go to https://importer.notesnook.com to import your notes.',
+              let verified = await db.user.verifyPassword(value);
+              if (verified) {
+                sleep(300).then(async () => {
+                  await Backup.run();
+                });
+              } else {
+                ToastEvent.show({
+                  heading: 'Incorrect password',
+                  message: 'The account password you entered is incorrect',
+                  type: 'error',
+                  context: 'local'
+                });
+                return false;
+              }
+            } catch (e) {
+              ToastEvent.show({
+                heading: 'Failed to backup data',
+                message: e.message,
+                type: 'error',
+                context: 'local'
+              });
+              return false;
+            }
+          }
         });
       },
-      new: true,
+      desc: 'Backup your data to phone storage'
     },
+    ...optItems
   ];
+
+  const toggleEncryptedBackups = async () => {
+    if (!user) {
+      ToastEvent.show({
+        heading: 'Login required to enable encryption',
+        type: 'error',
+        func: () => {
+          eSendEvent(eOpenLoginDialog);
+        },
+        actionText: 'Login'
+      });
+      return;
+    }
+    await SettingsService.set('encryptedBackup', !settings.encryptedBackup);
+  };
+
+  const updateAskForBackup = async () => {
+    await MMKV.setItem(
+      'askForBackup',
+      JSON.stringify({
+        timestamp: Date.now() + 86400000 * 3
+      })
+    );
+  };
 
   return (
     <>
-      <SectionHeader title="Backup & restore" />
-
-      {backupItemsList.map(item => (
-        <CustomButton
-          key={item.name}
-          title={item.name}
-          tagline={item.desc}
-          onPress={item.func}
+      {!isSheet && (
+        <SectionHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          title="Backup & restore"
         />
-      ))}
+      )}
 
-      <View
-        style={{
-          width: '100%',
-          marginHorizontal: 0,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          height: 50,
-          paddingHorizontal: 12,
-        }}>
-        <View
-          style={{
-            maxWidth: '60%',
-          }}>
-          <Paragraph
-            size={SIZE.md}
+      {!collapsed && (
+        <>
+          {backupItemsList.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+            />
+          ))}
+
+          <View
             style={{
-              textAlignVertical: 'center',
-              maxWidth: '100%',
+              width: '100%',
+              marginHorizontal: 0,
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              height: 50,
+              paddingHorizontal: 12
             }}>
-            Auto Backup
-          </Paragraph>
-          <Paragraph color={colors.icon} size={SIZE.sm}>
-            Backup your data automatically.
-          </Paragraph>
-        </View>
-
-        <View
-          style={{
-            flexDirection: 'row',
-            overflow: 'hidden',
-            borderRadius: 5,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
-          {[
-            {
-              title: 'Never',
-              value: 'off',
-            },
-            {
-              title: 'Daily',
-              value: 'daily',
-            },
-            {
-              title: 'Weekly',
-              value: 'weekly',
-            },
-          ].map(item => (
-            <TouchableOpacity
-              activeOpacity={1}
-              onPress={async () => {
-                if (item.value === 'off') {
-                  await SettingsService.set('reminder', item.value);
-                } else {
-                  await PremiumService.verify(async () => {
-                    if (Platform.OS === 'android') {
-                      let granted = await Storage.requestPermission();
-                      if (!granted) {
-                        ToastEvent.show({
-                          heading: 'Could not enable auto backups',
-                          message:
-                            'You must give storage access to enable auto backups.',
-                          type: 'error',
-                          context: 'local',
-                        });
-                        return;
-                      }
-                    }
-                    await SettingsService.set('reminder', item.value);
-                    //await Backup.run();
-                  });
-                }
-              }}
-              key={item.value}
+            <View
               style={{
-                backgroundColor:
-                  settings.reminder === item.value ? colors.accent : colors.nav,
-                justifyContent: 'center',
-                alignItems: 'center',
-                width: 50,
-                height: 20,
+                maxWidth: '60%'
               }}>
               <Paragraph
-                color={settings.reminder === item.value ? 'white' : colors.icon}
-                size={SIZE.xs}>
-                {item.title}
+                size={SIZE.md}
+                style={{
+                  textAlignVertical: 'center',
+                  maxWidth: '100%'
+                }}>
+                Automatic backups
               </Paragraph>
-            </TouchableOpacity>
-          ))}
-        </View>
-      </View>
+              <Paragraph color={colors.icon} size={SIZE.sm}>
+                Backup your data automatically.
+              </Paragraph>
+            </View>
 
-      <CustomButton
-        title="Backup encryption"
-        tagline="Encrypt all your backups."
-        onPress={async () => {
-          if (!user) {
-            ToastEvent.show({
-              heading: 'Login required to enable encryption',
-              type: 'error',
-              func: () => {
-                eSendEvent(eOpenLoginDialog);
-              },
-              actionText: 'Login',
-            });
-            return;
-          }
-          await SettingsService.set(
-            'encryptedBackup',
-            !settings.encryptedBackup,
-          );
-        }}
-        customComponent={
-          <Icon
-            size={SIZE.xl}
-            color={settings.encryptedBackup ? colors.accent : colors.icon}
-            name={
-              settings.encryptedBackup ? 'toggle-switch' : 'toggle-switch-off'
-            }
-          />
-        }
-      />
+            <View
+              style={{
+                flexDirection: 'row',
+                overflow: 'hidden',
+                borderRadius: 5,
+                justifyContent: 'center',
+                alignItems: 'center'
+              }}>
+              {[
+                {
+                  title: 'Never',
+                  value: 'off'
+                },
+                {
+                  title: 'Daily',
+                  value: 'daily'
+                },
+                {
+                  title: 'Weekly',
+                  value: 'weekly'
+                }
+              ].map(item => (
+                <TouchableOpacity
+                  activeOpacity={1}
+                  onPress={async () => {
+                    if (item.value === 'off') {
+                      await SettingsService.set('reminder', item.value);
+                    } else {
+                      await PremiumService.verify(async () => {
+                        if (Platform.OS === 'android') {
+                          let granted = await Storage.requestPermission();
+                          if (!granted) {
+                            ToastEvent.show({
+                              heading: 'Could not enable auto backups',
+                              message:
+                                'You must give storage access to enable auto backups.',
+                              type: 'error',
+                              context: 'local'
+                            });
+                            return;
+                          }
+                        }
+                        await SettingsService.set('reminder', item.value);
+                        //await Backup.run();
+                      });
+                    }
+                    updateAskForBackup();
+                  }}
+                  key={item.value}
+                  style={{
+                    backgroundColor:
+                      settings.reminder === item.value
+                        ? colors.accent
+                        : colors.nav,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    width: 50,
+                    height: 20
+                  }}>
+                  <Paragraph
+                    color={
+                      settings.reminder === item.value ? 'white' : colors.icon
+                    }
+                    size={SIZE.xs}>
+                    {item.title}
+                  </Paragraph>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </View>
+
+          {!isSheet && (
+            <CustomButton
+              title="Backup encryption"
+              tagline="Encrypt all your backups."
+              onPress={toggleEncryptedBackups}
+              customComponent={
+                <ToggleSwitch
+                  isOn={settings.encryptedBackup}
+                  onColor={colors.accent}
+                  offColor={colors.icon}
+                  size="small"
+                  animationSpeed={150}
+                  onToggle={toggleEncryptedBackups}
+                />
+              }
+            />
+          )}
+        </>
+      )}
     </>
   );
 };

@@ -2,28 +2,17 @@ import React, {useEffect, useRef, useState} from 'react';
 import {FlatList, RefreshControl} from 'react-native';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
-import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import {COLORS_NOTE} from '../../utils/Colors';
 import {eScrollEvent} from '../../utils/Events';
-import useAnnouncement from '../../utils/useAnnouncement';
 import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
+import SortDialog from '../SortDialog';
 import TagItem from '../TagItem';
-import {Announcement} from './announcement';
 import {Empty} from './empty';
 import {Footer} from './footer';
 import {Header} from './header';
 import {SectionHeader} from './section-header';
-
-const heights = {
-  note: 100,
-  notebook: 110,
-  tag: 80,
-  topic: 80,
-  header: 35,
-};
 
 let renderItems = {
   note: NoteWrapper,
@@ -33,11 +22,11 @@ let renderItems = {
   section: SectionHeader,
 };
 
-const RenderItem = ({item,index}) => {
-  const Item = renderItems[item.itemType || item.type]
-
-  return <Item item={item} index={index} />
-}
+const RenderItem = ({item, index}) => {
+  const Item = renderItems[item.itemType || item.type];
+  
+  return <Item item={item} tags={item.tags ? [...item.tags] : null} index={index} />;
+};
 
 const SimpleList = ({
   listData,
@@ -45,8 +34,6 @@ const SimpleList = ({
   customRefresh,
   customRefreshing,
   refreshCallback,
-  sortMenuButton,
-  jumpToDialog,
   placeholderData,
   loading,
   headerProps = {
@@ -56,40 +43,22 @@ const SimpleList = ({
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-
-  const [dataProvider, setDataProvider] = useState([]);
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
   const refreshing = false;
 
   useEffect(() => {
     if (!loading) {
-      setDataProvider(
-        dataProvider.length < 2 &&
-          listData.length >= 1 &&
-          SettingsService.get().homepage !== screen
-          ? listData.slice(0, 1)
-          : listData,
-      );
-
-      if (
-        !listData ||
-        listData.length === 0 ||
-        SettingsService.get().homepage === screen
-      ) {
-        setTimeout(() => {
+      setTimeout(
+        () => {
           _setLoading(false);
-        }, 1);
-        return;
-      }
-      setTimeout(() => {
-        setDataProvider(listData);
-        _setLoading(false);
-      }, 150);
+        },
+        listData.length === 0 ? 0 : 300,
+      );
     } else {
-      setDataProvider([]);
+      _setLoading(true);
     }
-  }, [loading, listData]);
+  }, [loading]);
 
   const renderItem = React.useCallback(
     ({item, index}) =>
@@ -97,9 +66,8 @@ const SimpleList = ({
         <SectionHeader
           item={item}
           index={index}
-          headerProps={headerProps}
-          jumpToDialog={jumpToDialog}
-          sortMenuButton={sortMenuButton}
+          title={headerProps.heading}
+          type={screen === 'Notes' ? 'home' : type}
         />
       ) : (
         <RenderItem item={item} index={index} />
@@ -142,7 +110,7 @@ const SimpleList = ({
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
-        data={dataProvider}
+        data={_loading ? listData.slice(0, 9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}
         initialNumToRender={10}
@@ -165,22 +133,36 @@ const SimpleList = ({
             loading={loading || _loading}
             placeholderData={placeholderData}
             headerProps={headerProps}
-          />
-        }
-        ListFooterComponent={<Footer />}
-        ListHeaderComponent={
-          <Header
-            title={headerProps.heading}
-            paragraph={headerProps.paragraph}
-            onPress={headerProps.onPress}
-            icon={headerProps.icon}
             type={type}
             screen={screen}
           />
         }
+        ListFooterComponent={<Footer />}
+        ListHeaderComponent={
+          <>
+            <Header
+              title={headerProps.heading}
+              paragraph={headerProps.paragraph}
+              onPress={headerProps.onPress}
+              icon={headerProps.icon}
+              type={type}
+              screen={screen}
+            />
+          </>
+        }
       />
 
-      <JumpToDialog scrollRef={scrollRef} />
+      <SortDialog
+        screen={screen}
+        type={screen === 'Notes' ? 'home' : type}
+        colors={colors}
+      />
+      <JumpToDialog
+        screen={screen}
+        data={listData}
+        type={screen === 'Notes' ? 'home' : type}
+        scrollRef={scrollRef}
+      />
     </>
   );
 };

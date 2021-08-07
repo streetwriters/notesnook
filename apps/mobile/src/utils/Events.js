@@ -127,3 +127,6 @@ export const eCloseRateDialog = '565';
 
 export const eOpenPublishNoteDialog = '566';
 export const eClosePublishNoteDialog = '567';
+
+export const eOpenTagsDialog = '568';
+export const eCloseTagsDialog = '569';

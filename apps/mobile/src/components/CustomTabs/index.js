@@ -1,7 +1,8 @@
 import React, {Component, createRef} from 'react';
 import {Platform} from 'react-native';
+import {Keyboard} from 'react-native';
 import {FlatList, TextInput, View} from 'react-native';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {editing} from '../../utils';
 
 export default class CustomTabs extends Component {
@@ -39,11 +40,14 @@ export default class CustomTabs extends Component {
       this.setScrollEnabled(false);
       this.responderAllowedScroll = true;
       return;
-    }  
+    }
 
     if (cOffset > pOffset - 50 || DDS.isSmallTab) {
-      if ((!DDS.isSmallTab && x > 50 || y > heightCheck) || (DDS.isSmallTab && x > this.props.widths.b)) {
-
+      if (
+        (!DDS.isSmallTab && x > 50) ||
+        y > heightCheck ||
+        (DDS.isSmallTab && x > this.props.widths.b)
+      ) {
         this.responderAllowedScroll = false;
         this.setScrollEnabled(false);
         return;
@@ -75,19 +79,22 @@ export default class CustomTabs extends Component {
   hideKeyboardIfVisible(close) {
     if (!close && this.nextPage === 1) return;
     if (Platform.OS === 'ios') return;
+    if (editing.movedAway) return;
 
     if (
       (editing.keyboardState || editing.isFocused) &&
       this.scrollOffset < this.props.offsets.b - 50
     ) {
-      editing.isFocused = false;
       editing.keyboardState = false;
-      this.inputElement.current?.focus();
-      this.inputElement.current?.blur();
+      Keyboard.dismiss();
     }
   }
 
   goToIndex(index, animated = true) {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
     let offset = 0;
     if (index === 1) {
       this.nextPage = 0;
@@ -102,14 +109,14 @@ export default class CustomTabs extends Component {
 
     this.listRef.current?.scrollToOffset({
       offset: offset,
-      animated: animated,
+      animated: animated
     });
   }
 
   setScrollEnabled = enabled => {
     this.scrollEnabled = enabled;
     this.listRef.current?.getNativeScrollRef().setNativeProps({
-      scrollEnabled: enabled,
+      scrollEnabled: enabled
     });
   };
 
@@ -121,6 +128,16 @@ export default class CustomTabs extends Component {
   onScroll = event => {
     this.moved = true;
     this.scrollOffset = event.nativeEvent.contentOffset.x;
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
+
+    if (this.page === 1 && this.scrollOffset < this.props.offsets.b - 100) {
+      this.nextPage = 0;
+    } else {
+      this.nextPage = 1;
+    }
     this.props.onScroll(this.scrollOffset);
     if (this.scrollTimeout) {
       clearTimeout(this.scrollTimeout);
@@ -138,10 +155,13 @@ export default class CustomTabs extends Component {
   };
 
   goToPage = page => {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
     this.nextPage = page;
     if (page === 0) {
       this.scrollOffset = this.props.offsets.a;
-      this.hideKeyboardIfVisible();
       this.goToIndex(1);
     } else if (page === 1) {
       this.goToIndex(2);
@@ -149,21 +169,29 @@ export default class CustomTabs extends Component {
     if (this.page !== page) {
       this.props.onChangeTab({i: page, from: this.page});
       this.page = page;
-    }
+    } 
   };
 
   keyExtractor = (item, index) => item;
 
-  onScrollEnd = event => {
+  scrollEndTimeout = null;
+
+  onScrollEnd = () => {
+    if (this.scrollEndTimeout) {
+      clearTimeout(this.scrollEndTimeout);
+      this.scrollEndTimeout = null;
+    }
     this.moved = false;
     this.responderAllowedScroll = false;
     let page = 0;
-    if (this.scrollOffset > this.props.offsets.b - 50) {
+
+    if (this.scrollOffset > this.props.offsets.b - 100) {
       page = 1;
+      this.nextPage = 1;
     } else {
       this.nextPage = 0;
-      this.hideKeyboardIfVisible();
     }
+
     let drawerState = page === 0 && this.scrollOffset < 10;
     if (drawerState !== this.currentDrawerState) {
       this.currentDrawerState = drawerState;
@@ -172,22 +200,23 @@ export default class CustomTabs extends Component {
     this.props.toggleOverlay(
       Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10)
         ? true
-        : false,
+        : false
     );
     if (this.page !== page) {
-      this.props.onChangeTab({i: page, from: this.page});
-      this.page = page;
+      this.scrollEndTimeout = setTimeout(() => {
+        this.props.onChangeTab({i: page, from: this.page});
+        this.page = page;
+      }, 50);
     }
   };
 
   onListTouchEnd = event => {
     if (this.lastOffset < 30 && event) {
       let width = this.props.dimensions.width;
-      let px = event.nativeEvent.pageX
+      let px = event.nativeEvent.pageX;
       if (px > width * 0.75 || (DDS.isSmallTab && px > this.props.widths.a)) {
         this.goToIndex(1);
       }
-
     }
   };
 
@@ -198,7 +227,7 @@ export default class CustomTabs extends Component {
         onMoveShouldSetResponderCapture={this.onMoveShouldSetResponder}
         onStartShouldSetResponderCapture={this.onMoveShouldSetResponder}
         style={{
-          flex: 1,
+          flex: 1
         }}>
         <TextInput
           ref={this.inputElement}
@@ -219,12 +248,12 @@ export default class CustomTabs extends Component {
           alwaysBounceHorizontal={false}
           scrollToOverflowEnabled={false}
           scrollsToTop={false}
-          scrollEventThrottle={1}
+          scrollEventThrottle={2}
           directionalLockEnabled
           overScrollMode="never"
           maxToRenderPerBatch={100}
-          removeClippedSubviews={false}
           keyboardDismissMode="none"
+          removeClippedSubviews={Platform.OS === 'android'}
           keyboardShouldPersistTaps="always"
           showsHorizontalScrollIndicator={false}
           disableIntervalMomentum={true}
@@ -233,10 +262,10 @@ export default class CustomTabs extends Component {
           snapToOffsets={[
             this.props.offsets.a,
             this.props.offsets.b,
-            this.props.offsets.c,
+            this.props.offsets.c
           ]}
           contentOffset={{
-            x: this.props.offsets.a,
+            x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b
           }}
           data={['drawer', 'navigation', 'editor']}
           renderItem={this.renderItem}
@@ -247,5 +276,5 @@ export default class CustomTabs extends Component {
 }
 
 CustomTabs.defaultProps = {
-  onDrawerStateChange: () => {},
+  onDrawerStateChange: () => {}
 };

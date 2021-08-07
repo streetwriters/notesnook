@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useWindowDimensions} from 'react-native';
 import {useTracked} from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {history} from '../../utils';
 import {PressableButton} from '../PressableButton';
@@ -14,13 +15,14 @@ const SelectionWrapper = ({
   background,
   onLongPress,
   onPress,
-  height,
   testID,
 }) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [actionStrip, setActionStrip] = useState(false);
-  const {fontScale} = useWindowDimensions();
+  const settings = useSettingStore(state => state.settings);
+  const listMode = item.type === "notebook" ? settings.notebooksListMode : settings.notesListMode
+  const compactMode = (item.type === 'notebook' || item.type === 'note') && listMode === "compact"
 
   const _onLongPress = () => {
     if (history.selectedItemsList.length > 0) return;
@@ -64,8 +66,7 @@ const SelectionWrapper = ({
         borderRadius: 0,
         overflow: 'hidden',
         paddingHorizontal: 12,
-        marginTop: 0,
-        height: height * fontScale,
+        paddingVertical:compactMode ? 8 : 12,
       }}>
       {actionStrip && (
         <ActionStrip note={item} setActionStrip={setActionStrip} />

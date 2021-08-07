@@ -1,32 +1,29 @@
-import React, {useEffect} from 'react';
-import {BackHandler} from 'react-native';
-import {View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import React, { useEffect } from 'react';
+import { BackHandler, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
 import { useSelectionStore } from '../../provider/stores';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
-  eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
-  refreshNotesPage,
+  eOpenMoveNoteDialog, refreshNotesPage
 } from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {TEMPLATE_DELETE} from '../DialogManager/Templates';
+import { deleteItems } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { presentDialog } from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 
 export const SelectionHeader = React.memo(({screen, type, extras}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  
+
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setSelectionMode = useSelectionStore(state => state.setSelectionMode);
-  const clearSelection = useSelectionStore(state => state.clearSelection)
+  const clearSelection = useSelectionStore(state => state.clearSelection);
 
   const insets = useSafeAreaInsets();
 
@@ -116,12 +113,11 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             marginRight: 25,
           }}
           onPress={() => {
-            setSelectionMode(!selectionMode)
+            setSelectionMode(!selectionMode);
             clearSelection();
           }}
           color={colors.light}
           name="close"
-          size={SIZE.xxxl}
         />
 
         {Platform.OS === 'android' ? (
@@ -213,7 +209,21 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
               marginLeft: 10,
             }}
             onPress={async () => {
-              eSendEvent(eOpenSimpleDialog, TEMPLATE_DELETE('item'));
+              presentDialog({
+                title: `Delete ${
+                  selectedItemsList.length > 1 ? 'items' : 'item'
+                }`,
+                paragraph: `Are you sure you want to delete ${
+                  selectedItemsList.length > 1 ? 'these items?' : 'this item?'
+                }`,
+                positiveText: 'Delete',
+                negativeText: 'Cancel',
+                positivePress: () => {
+                  deleteItems();
+                },
+                positiveType:"errorShade"
+              });
+
               return;
             }}
             color={colors.light}

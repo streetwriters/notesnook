@@ -1,29 +1,32 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {createRef, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
+import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ActionSheetWrapper from '../../components/ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
-import Heading from '../../components/Typography/Heading';
+import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Seperator from '../../components/Seperator';
-import SettingsService from '../../services/SettingsService';
-import { useSettingStore } from '../../provider/stores';
+import {EditorWebView} from './Functions';
+import tiny from './tiny/tiny';
+import ToggleSwitch from 'toggle-switch-react-native';
 
 export const EditorSettings = () => {
-  const [state,dispatch] = useTracked();
+  const [state, dispatch] = useTracked();
   const {colors} = state;
-  
-  const settings = useSettingStore(state => state.settings);
-  
+  const [settings, setSettings] = useState({
+    fontSize: 10,
+    directionality: 'ltr',
+  });
   const [visible, setVisible] = useState(false);
   const [savePreset, setSavePreset] = useState(false);
   const actionSheetRef = useRef();
@@ -38,14 +41,111 @@ export const EditorSettings = () => {
     setVisible(false);
   };
 
+  const onSettingsRecieved = settings => {
+    setSettings(settings);
+  };
+
   useEffect(() => {
+    eSubscribeEvent('editorSettingsEvent', onSettingsRecieved);
     eSubscribeEvent('openEditorSettings', open);
     eSubscribeEvent('closeEditorSettings', close);
     return () => {
+      eUnSubscribeEvent('editorSettingsEvent', onSettingsRecieved);
       eUnSubscribeEvent('openEditorSettings', open);
       eUnSubscribeEvent('closeEditorSettings', close);
     };
   }, []);
+
+  const SettingsButton = ({
+    title,
+    description,
+    enabled,
+    type,
+    items,
+    dropdownItemPress,
+    dropDownTitle,
+    style,
+    stub,
+    onPress,
+  }) => (
+    <PressableButton
+      onPress={onPress}
+      customStyle={{
+        flexDirection: 'row',
+        width: '100%',
+        height: 50,
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        borderRadius: 0,
+        paddingHorizontal: 12,
+      }}>
+      <View
+        style={{
+          flexGrow: 1,
+        }}>
+        <Paragraph size={SIZE.md}>{title}</Paragraph>
+        {description && (
+          <Paragraph color={colors.icon} size={SIZE.sm}>
+            {description}
+          </Paragraph>
+        )}
+      </View>
+      {type === 'dropdown' ? (
+        <DropDownMenu
+          onPress={dropdownItemPress}
+          style={style}
+          stub={stub}
+          title={dropDownTitle}
+          items={items}
+        />
+      ) : (
+        <ToggleSwitch
+          isOn={enabled}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={onPress}
+        />
+      )}
+    </PressableButton>
+  );
+
+  let settingsItems = [
+    {
+      title: 'Font size',
+      id: 'fontSize',
+      type: 'dropdown',
+      items: [10, 12, 14, 16, 18],
+      stub: 'pt',
+      dropDownTitle: settings.fontSize + 'pt',
+      style: {
+        width: 70,
+      },
+      dropdownItemPress: item => {
+        tiny.call(
+          EditorWebView,
+          `
+        changeFontSize(${item})
+        `,
+        );
+      },
+    },
+    {
+      title: 'RTL Direction',
+      id: 'rtlDirection',
+      type: 'boolean',
+      enabled: settings.directionality === 'rtl',
+      onPress: () => {
+        tiny.call(
+          EditorWebView,
+          `
+          changeDirection(${settings.directionality === 'rtl' ? false : true})
+        `,
+        );
+      },
+    },
+  ];
 
   let presets = [
     {
@@ -59,52 +159,6 @@ export const EditorSettings = () => {
     },
   ];
 
-  const SettingsButton = ({title, description, enabled, id}) => (
-    <PressableButton
-      onPress={() => {
-        let editorSettings = settings.editorSettings;
-        if (!editorSettings) {
-          editorSettings = {};
-        }
-        editorSettings[id] = !enabled;
-        SettingsService.set('editorSettings', {...editorSettings});
-        
-      }}
-      customStyle={{
-        flexDirection: 'row',
-        width: '100%',
-        height: 40,
-        alignItems: 'center',
-        justifyContent: 'space-between',
-      }}>
-      <View
-        style={{
-          width: '90%',
-        }}>
-        <Paragraph size={SIZE.md}>{title}</Paragraph>
-        <Paragraph color={colors.icon} size={SIZE.sm}>
-          {description}
-        </Paragraph>
-      </View>
-      <Icon
-        color={enabled ? colors.accent : colors.icon}
-        size={SIZE.lg}
-        name={
-          !enabled ? 'checkbox-blank-circle-outline' : 'check-circle-outline'
-        }
-      />
-    </PressableButton>
-  );
-
-  let settingsItems = [
-    {
-      title: 'Disable gestures',
-      description:
-        'Disable swipe left to exit editor & swipe down with two fingers to start new note.',
-      id: 'disableGestures',
-    },
-  ];
-
   return (
     visible && (
       <ActionSheetWrapper
@@ -112,10 +166,7 @@ export const EditorSettings = () => {
         onClose={() => {
           setVisible(false);
         }}>
-        <View
-          style={{
-            paddingHorizontal: 12,
-          }}>
+        <View>
           {savePreset && (
             <BaseDialog
               onRequestClose={() => {
@@ -137,29 +188,81 @@ export const EditorSettings = () => {
             </BaseDialog>
           )}
 
-          <DialogHeader
-            title="Editor settings"
-            paragraph="Modify editor settings based on personal preference."
-            button={{
-              title: 'Save as Preset',
-              onPress: () => {
-                setSavePreset(true);
-              },
-            }}
-          />
+          <View
+            style={{
+              paddingHorizontal: 12,
+            }}>
+            <DialogHeader
+              title="Editor settings"
+              paragraph="Modify editor settings based on personal preference."
+             /*  button={{
+                title: 'Save as Preset',
+                onPress: () => {
+                  setSavePreset(true);
+                },
+              }} */
+            />
+          </View>
+
           <Seperator />
           {settingsItems.map(item => (
-            <SettingsButton
-              title={item.title}
-              description={item.description}
-              enabled={
-                settings?.editorSettings && settings?.editorSettings[item.id]
-              }
-              id={item.id}
-            />
+            <SettingsButton {...item} />
           ))}
         </View>
       </ActionSheetWrapper>
     )
+  );
+};
+
+const DropDownMenu = ({items, onPress, style, title, stub}) => {
+  const [state, dispatch] = useTracked();
+  const {colors} = state;
+  const menuRef = useRef();
+
+  return (
+    <Menu
+      ref={menuRef}
+      animationDuration={200}
+      style={[
+        {
+          borderRadius: 5,
+        },
+        style,
+      ]}
+      button={
+        <Button
+          title={title}
+          iconPosition="right"
+          icon="chevron-down"
+          iconSize={SIZE.lg}
+          style={{
+            paddingRight: 0,
+          }}
+          onPress={() => {
+            menuRef.current?.show();
+          }}
+          textStyle={{
+            fontWeight: 'normal',
+          }}
+          width={null}
+          fontSize={SIZE.sm}
+        />
+      }>
+      {items.map((item, index) => (
+        <MenuItem
+          key={item.toString()}
+          onPress={() => {
+            onPress(item);
+            menuRef.current?.hide();
+          }}
+          textStyle={{
+            fontSize: SIZE.md,
+            color: colors.pri,
+          }}>
+          <Icon name={item.icon} size={SIZE.md} />
+          {item + stub}
+        </MenuItem>
+      ))}
+    </Menu>
   );
 };

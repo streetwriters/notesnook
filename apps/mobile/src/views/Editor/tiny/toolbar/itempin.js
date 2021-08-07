@@ -1,12 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { useTracked } from '../../../../provider';
 import {
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../../../services/EventManager';
-import {useTracked} from '../../../../provider';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
-import {sleep} from '../../../../utils/TimeUtils';
+import { sleep } from '../../../../utils/TimeUtils';
 
 const ToolbarItemPin = ({format, color}) => {
   const [state] = useTracked();
@@ -28,13 +27,12 @@ const ToolbarItemPin = ({format, color}) => {
       toValue: val,
       duration: time,
       easing: Easing.in(Easing.ease),
-    }).start(async () => {
-      await sleep(time);
-      animating = false;
-    });
+    }).start();
+    await sleep(time);
+    animating = false;
   }
 
-  const show = async (data) => {
+  const show = async data => {
     if (data?.title === format) {
       setVisible(true);
       await sleep(5);
@@ -45,7 +43,7 @@ const ToolbarItemPin = ({format, color}) => {
       setVisible(false);
     }
   };
-  
+
   return (
     visible && (
       <Animated.View

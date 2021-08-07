@@ -19,7 +19,7 @@ const ProgressDialog = () => {
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Loading',
-    paragraph: 'Loading tagline',
+    paragraph: 'Loading tagline'
   });
   const actionSheetRef = useRef();
   useEffect(() => {
@@ -57,7 +57,7 @@ const ProgressDialog = () => {
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom: 10,
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         {!dialogData?.noProgress ? (
           <ActivityIndicator size={50} color={colors.accent} />
@@ -83,10 +83,13 @@ const ProgressDialog = () => {
           </Paragraph>
         )}
       </View>
+
+      {dialogData.component}
+
       {dialogData?.learnMore ? (
         <Paragraph
           style={{
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}
           onPress={dialogData.learnMorePress}
           color={colors.icon}>
@@ -97,7 +100,7 @@ const ProgressDialog = () => {
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom: 12,
+          marginBottom: 12
         }}>
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
@@ -110,7 +113,7 @@ const ProgressDialog = () => {
               width="100%"
               style={{
                 justifyContent: 'flex-start',
-                backgroundColor: 'transparent',
+                backgroundColor: 'transparent'
               }}
             />
           ))}
@@ -118,7 +121,7 @@ const ProgressDialog = () => {
 
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         {dialogData?.action ? (
           <Button
@@ -143,7 +146,7 @@ const ProgressDialog = () => {
               type="accent"
               height={50}
               style={{
-                marginBottom: 10,
+                marginBottom: 10
               }}
               width="100%"
               fontSize={SIZE.md}

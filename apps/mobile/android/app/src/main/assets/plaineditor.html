@@ -9,6 +9,30 @@
 	<link id="dark_sheet" disabled rel="stylesheet" href="./dist/skins/notesnook-dark/content.min.css">
 	<link id="light_sheet" disabled rel="stylesheet" href="./dist/skins/notesnook/content.min.css">
 	<style>
+		.img_float_left {
+			float: left;
+		}
+
+		.img_float_right {
+			float: right;
+		}
+
+		.img_float_none {
+			float: none;
+		}
+
+		.img_size_one {
+			width: 100%;
+		}
+
+		.img_size_two {
+			width: 50%;
+		}
+
+		.img_size_three {
+			width: 25%;
+		}
+
 		span.diff-del {
 			background-color: #FDB0C0;
 		}
@@ -51,8 +75,9 @@
 		td {
 			min-width: 20vw !important;
 		}
+
 		.htmldiff_div {
-			padding:12px !important;
+			padding: 12px !important;
 			overflow-x: hidden;
 			overflow-y: scroll;
 		}
@@ -60,9 +85,7 @@
 </head>
 
 <body>
-	<div
-	class="htmldiff_div"
-	>
+	<div class="htmldiff_div">
 
 	</div>
 	<script src="./listeners.js"></script>

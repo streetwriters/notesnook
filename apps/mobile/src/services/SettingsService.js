@@ -3,11 +3,10 @@ import { enabled } from 'react-native-privacy-snapshot';
 import { updateEvent } from '../components/DialogManager/recievers';
 import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
-import { AndroidModule, preloadImages, sortSettings } from '../utils';
+import { AndroidModule, preloadImages } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
-import Navigation from './Navigation';
 
 export const defaultSettings = {
   showToolbarOnTop: false,
@@ -22,10 +21,13 @@ export const defaultSettings = {
   sortOrder: 'desc',
   screenshotMode: true,
   privacyScreen: false,
-  appLockMode: 'none', 
-}
+  appLockMode: 'none',
+  telemetry: true,
+  notebooksListMode: 'normal',
+  notesListMode: 'normal'
+};
 
-let settings = {...defaultSettings}
+let settings = {...defaultSettings};
 
 let appLoaded = false;
 
@@ -41,30 +43,28 @@ async function init() {
   scale.fontScale = 1;
   settings = await MMKV.getItem('appSettings');
   if (!settings) {
-    settings = defaultSettings
+    settings = defaultSettings;
     await MMKV.setItem('appSettings', JSON.stringify(settings));
   } else {
     settings = JSON.parse(settings);
     if (!settings.appLockMode) {
-      settings.appLockMode = "none";
+      settings.appLockMode = 'none';
+    }
+    if (!settings.hasOwnProperty('telemetry')) {
+      settings.telemetry = true;
+    }
+    if (!settings.notesListMode) {
+      settings.notesListMode = 'normal';
+    }
+    if (!settings.notebooksListMode) {
+      settings.notebooksListMode = 'normal';
     }
   }
-
-  Navigation.setHeaderState(
-    settings.homepage,
-    {
-      menu: true,
-    },
-    {
-      heading: settings.homepage,
-      id: settings.homepage.toLowerCase() + '_navigation',
-    },
-  );
 
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
   }
-  if (settings.privacyScreen || settings.appLockMode === "background") {
+  if (settings.privacyScreen || settings.appLockMode === 'background') {
     if (Platform.OS === 'android') {
       AndroidModule.setSecureMode(true);
     } else {
@@ -77,8 +77,7 @@ async function init() {
       enabled(false);
     }
   }
-  sortSettings.sort = settings.sort;
-  sortSettings.sortOrder = settings.sortOrder;
+
   updateSize();
   useSettingStore.getState().setSettings({...settings});
   setTheme();
@@ -88,7 +87,7 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    preloadImages(newColors.accent)
+    preloadImages(newColors.accent);
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };
@@ -110,5 +109,5 @@ export default {
   set,
   get,
   setAppLoaded,
-  getApploaded,
+  getApploaded
 };

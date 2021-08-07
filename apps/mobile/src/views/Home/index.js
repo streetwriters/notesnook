@@ -4,25 +4,23 @@ import { ContainerTopSection } from '../../components/Container/ContainerTopSect
 import { Header } from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
 import { useNoteStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { InteractionManager, scrollRef } from '../../utils';
+import { editing, InteractionManager, scrollRef } from '../../utils';
 import { db } from '../../utils/DB';
-import { eOnLoadNote, eScrollEvent } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
+import { eClearEditor, eOnLoadNote, eScrollEvent } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
-import Storage from '../../utils/storage';
+import { sleep } from '../../utils/TimeUtils';
+import { getNote } from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
   const notes = useNoteStore(state => state.notes);
   const setNotes = useNoteStore(state => state.setNotes);
   const loading = useNoteStore(state => state.loading);
-  
+
   let ranAfterInteractions = false;
 
   const onFocus = useCallback(() => {
@@ -51,7 +49,7 @@ export const Home = ({navigation}) => {
 
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notes', () => {
-        setNotes()
+        setNotes();
       });
     });
     ranAfterInteractions = false;
@@ -85,7 +83,11 @@ export const Home = ({navigation}) => {
 
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+      if (getNote()) {
+       eSendEvent(eOnLoadNote, {type: 'new'});
+       editing.currentlyEditing;
+       editing.movedAway = false;
+      }
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});

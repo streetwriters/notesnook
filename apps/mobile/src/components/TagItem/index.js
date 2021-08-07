@@ -1,6 +1,6 @@
 import React from 'react';
 import {useWindowDimensions, View} from 'react-native';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
@@ -20,7 +20,7 @@ const TagItem = ({item, index}) => {
       {
         ...item,
         type: 'tag',
-        get:'tagged'
+        get: 'tagged',
       },
       {
         heading: '#' + item.title,
@@ -39,7 +39,7 @@ const TagItem = ({item, index}) => {
       opacity={1}
       customStyle={{
         paddingHorizontal: 12,
-        height: 80  * fontScale,
+        height: 80 * fontScale,
         flexDirection: 'row',
         alignItems: 'center',
         borderBottomWidth: 1.5,
@@ -48,10 +48,9 @@ const TagItem = ({item, index}) => {
         justifyContent: 'space-between',
       }}>
       <View
-      style={{
-        maxWidth:"92%"
-      }}
-      >
+        style={{
+          maxWidth: '92%',
+        }}>
         <Heading size={SIZE.md}>
           <Heading
             size={SIZE.md}
@@ -81,9 +80,8 @@ const TagItem = ({item, index}) => {
         name="dots-horizontal"
         size={SIZE.xl}
         onPress={() => {
-          let rowItems = [];
-          let columnItems = ['Add Shortcut to Menu', 'Remove Shortcut from Menu'];
-          ActionSheetEvent(item, false, false, rowItems, columnItems);
+          let rowItems = ['Add Shortcut', 'Delete', 'Edit Tag'];
+          ActionSheetEvent(item, false, false, rowItems);
         }}
         testID={notesnook.ids.tag.menu}
         customStyle={{

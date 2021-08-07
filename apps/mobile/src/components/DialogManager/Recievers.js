@@ -4,13 +4,11 @@ import {
   eCloseAddNotebookDialog,
   eCloseAddTopicDialog,
   eCloseMoveNoteDialog,
-  eCloseSimpleDialog,
+  eDispatchAction,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
   eOpenMoveNoteDialog,
-  eOpenSimpleDialog,
-  eDispatchAction,
 } from '../../utils/Events';
 
 export const ActionSheetEvent = (
@@ -34,14 +32,6 @@ export const ActionSheetHideEvent = () => {
   eSendEvent(eCloseActionSheet);
 };
 
-export const simpleDialogEvent = data => {
-  eSendEvent(eOpenSimpleDialog, data);
-};
-
-export const simpleDialogHideEvent = () => {
-  eSendEvent(eCloseSimpleDialog);
-};
-
 export const moveNoteEvent = () => {
   eSendEvent(eOpenMoveNoteDialog);
 };
@@ -63,6 +53,5 @@ export const HideAddTopicEvent = notebook => {
 };
 
 export const updateEvent = data => {
-  
   eSendEvent(eDispatchAction, data);
 };

@@ -1,3 +1,4 @@
+import {groupArray} from 'notes-core/utils/grouping';
 import React, {useCallback, useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
@@ -57,18 +58,7 @@ export const Notes = ({route, navigation}) => {
     ) {
       Navigation.goBack();
     }
-    setNotes(_notes);
-    if (params.menu) {
-      navigation.setOptions({
-        animationEnabled: true,
-        gestureEnabled: false,
-      });
-    } else {
-      navigation.setOptions({
-        animationEnabled: true,
-        gestureEnabled: Platform.OS === 'ios',
-      });
-    }
+    setNotes(groupArray(_notes, 'notes'));
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -221,7 +211,7 @@ export const Notes = ({route, navigation}) => {
         ? 'Learn about monographs'
         : 'Add your first Note',
     action: _onPressBottomButton,
-    buttonIcon: 'information-outline',
+    buttonIcon: params.get === 'monographs' ? 'information-outline' : null,
     loading:
       params.get === 'monographs'
         ? 'Loading published notes'
@@ -229,6 +219,20 @@ export const Notes = ({route, navigation}) => {
   };
 
   const isFocused = () => navigation.isFocused();
+
+  const headerRightButtons = [
+    {
+      icon: 'pencil',
+      title: 'Edit topic',
+      func: () => {
+        if (route.params.type !== 'topic') return;
+        eSendEvent(eOpenAddTopicDialog, {
+          notebookId: route.params.notebookId,
+          toEdit: route.params,
+        });
+      },
+    },
+  ];
 
   return (
     <>
@@ -246,6 +250,9 @@ export const Notes = ({route, navigation}) => {
           isBack={!params.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
+          rightButtons={
+            route.params.type !== 'topic' ? null : headerRightButtons
+          }
         />
       </ContainerTopSection>
       <SimpleList

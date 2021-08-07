@@ -4,13 +4,15 @@ import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {editing, getElevation, showContext, showTooltip, TOOLTIP_POSITIONS} from '../../utils';
+import {useSettingStore} from '../../provider/stores';
+import {
+  editing,
+  getElevation,
+  showTooltip,
+  TOOLTIP_POSITIONS,
+} from '../../utils';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
-import RNTooltips from 'react-native-tooltips';
-import { useSettingStore } from '../../provider/stores';
 
 const translateY = new Animated.Value(0);
 export const ContainerBottomButton = ({
@@ -20,7 +22,7 @@ export const ContainerBottomButton = ({
   shouldShow = false,
 }) => {
   const insets = useSafeAreaInsets();
-  const deviceMode = useSettingStore(state => state.deviceMode)
+  const deviceMode = useSettingStore(state => state.deviceMode);
 
   function animate(translate) {
     Animated.timing(translateY, {
@@ -31,16 +33,14 @@ export const ContainerBottomButton = ({
   }
 
   const onKeyboardHide = async () => {
-    console.log('called hide')
     editing.keyboardState = false;
-    if (DDS.isTab) return;
+    if (deviceMode !== 'mobile') return;
     animate(0);
   };
 
   const onKeyboardShow = async () => {
-    console.log('called show');
     editing.keyboardState = true;
-    if (DDS.isTab) return;
+    if (deviceMode !== 'mobile') return;
     animate(150);
   };
 
@@ -51,16 +51,18 @@ export const ContainerBottomButton = ({
       Keyboard.removeListener('keyboardDidShow', onKeyboardShow);
       Keyboard.removeListener('keyboardDidHide', onKeyboardHide);
     };
-  }, []);
+  }, [deviceMode]);
 
-  return deviceMode !== "mobile" && !shouldShow ? null : (
+  return deviceMode !== 'mobile' && !shouldShow ? null : (
     <Animated.View
       style={{
         position: 'absolute',
         right: 12,
         bottom:
           Platform.OS === 'ios' && insets.bottom !== 0
-            ? Platform.isPad ? insets.bottom - 12 : insets.bottom - 24
+            ? Platform.isPad
+              ? insets.bottom - 12
+              : insets.bottom - 24
             : insets.bottom + 12,
         zIndex: 10,
         transform: [
@@ -70,7 +72,7 @@ export const ContainerBottomButton = ({
           {
             translateX: translateY,
           },
-        ], 
+        ],
       }}>
       <PressableButton
         testID={notesnook.ids.default.addBtn}
@@ -81,8 +83,8 @@ export const ContainerBottomButton = ({
           ...getElevation(5),
           borderRadius: 100,
         }}
-        onLongPress={(event) => {
-          showTooltip(event,title,TOOLTIP_POSITIONS.LEFT)
+        onLongPress={event => {
+          showTooltip(event, title, TOOLTIP_POSITIONS.LEFT);
         }}
         onPress={onPress}>
         <View

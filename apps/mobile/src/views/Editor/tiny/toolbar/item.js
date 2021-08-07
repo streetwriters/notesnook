@@ -1,7 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Platform} from 'react-native';
-import {View} from 'react-native';
-import {TouchableOpacity} from 'react-native-gesture-handler';
+import {View, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {PressableButton} from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
@@ -11,6 +10,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   eSendEvent,
+  ToastEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
@@ -18,7 +18,8 @@ import {db} from '../../../../utils/DB';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
-import tiny from '../tiny';
+import {EditorWebView} from '../../Functions';
+import tiny, {safeKeyboardDismiss} from '../tiny';
 import {execCommands} from './commands';
 import {
   focusEditor,
@@ -26,7 +27,7 @@ import {
   properties,
   TOOLBAR_ICONS,
   rgbToHex,
-  font_names,
+  font_names
 } from './constants';
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';
@@ -44,7 +45,7 @@ const ToolbarItem = ({
   groupType,
   text,
   formatValue,
-  fullname,
+  fullname
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -107,12 +108,13 @@ const ToolbarItem = ({
 
       if (format === 'link') {
         properties.selection = data;
-        properties.pauseSelectionChange = true;
+        if (!data['link']) return;
 
+        properties.pauseSelectionChange = true;
         eSendEvent('showTooltip', {
           data: null,
           value: data['link'],
-          type: 'link',
+          type: 'link'
         });
         return;
       }
@@ -189,18 +191,27 @@ const ToolbarItem = ({
     if (premium && !PremiumService.get()) {
       let user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
-        await sleep(500);
+        if (editing.isFocused) {
+          safeKeyboardDismiss();
+          await sleep(300);
+          editing.isFocused = true;
+        }
         PremiumService.showVerifyEmailDialog();
       } else {
         eSendEvent(eShowGetPremium, {
           context: 'editor',
           title: 'Get Notesnook Pro',
-          desc: 'Enjoy Full Rich Text Editor with Markdown Support!',
+          desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
         });
       }
       return;
     }
     if (type === 'settings') {
+      if (editing.isFocused) {
+        safeKeyboardDismiss();
+        await sleep(300);
+        editing.isFocused = true;
+      }
       eSendEvent('openEditorSettings');
       return;
     }
@@ -217,6 +228,11 @@ const ToolbarItem = ({
       (format === 'link' && properties.selection.current?.length === 0) ||
       !properties.selection
     ) {
+      ToastEvent.show({
+        heading: 'No selection',
+        message: 'Select some text before adding a link.',
+        type: 'error'
+      });
       return;
     }
 
@@ -232,7 +248,7 @@ const ToolbarItem = ({
         title: format,
         default: valueIcon,
         type: groupType,
-        pageX: event.nativeEvent.pageX,
+        pageX: event.nativeEvent.pageX
       });
       return;
     }
@@ -295,7 +311,7 @@ const ToolbarItem = ({
           justifyContent: 'center',
           alignItems: 'center',
           height: normalize(50),
-          minWidth: 60,
+          minWidth: 60
         }}>
         {type === 'tooltip' && (
           <ToolbarItemPin format={format} color={selected && color} />
@@ -331,7 +347,7 @@ const ToolbarItem = ({
                   ? formatValue
                   : format === 'fontname' && icon !== '-apple-system' && icon
                   ? icon
-                  : null,
+                  : null
             }}
             size={text.includes('%') ? SIZE.sm : SIZE.md}>
             {currentText || text}
@@ -359,11 +375,11 @@ const ToolbarItem = ({
               position: 'absolute',
               transform: [
                 {
-                  rotateZ: '-45deg',
-                },
+                  rotateZ: '-45deg'
+                }
               ],
               top: 0,
-              right: 0,
+              right: 0
             }}
           />
         )}

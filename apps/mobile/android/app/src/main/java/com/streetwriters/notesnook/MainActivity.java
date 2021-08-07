@@ -14,7 +14,12 @@ public class MainActivity extends ReactActivity {
     protected void onCreate(Bundle savedInstanceState) {
     SplashScreen.show(this);
     super.onCreate(null);
-    startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+    try {
+      startService(new Intent(getBaseContext(), OnClearFromRecentService.class));
+    } catch (Exception e) {
+
+    }
+
   }
 
 
