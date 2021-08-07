@@ -9,6 +9,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+      with:
+        persist-credentials: false
+        
     - uses: joschi/setup-jdk@v2
       with:
         java-version: '8'
@@ -26,8 +29,8 @@ jobs:
         $ANDROID_HOME/emulator/emulator -list-avds
     - name: Install node_modules
       run: |
-        yarn add git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git
-    
+        yarn
+
     - name: Build for detox
       run: |
         yarn build-detox-android
