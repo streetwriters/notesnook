@@ -18,7 +18,7 @@ jobs:
         node-version: 15.x
         
     - name: Install node_modules
-      run: yarn
+      run: yarn install --concurrency 2 --frozen-lockfile --cache-folder .yarncache
 
     - name: Download Android Emulator Image
       run: |
