@@ -12,9 +12,12 @@ jobs:
       with:
         persist-credentials: false
 
-    - uses: joschi/setup-jdk@v2
+    - name: Use specific Java version for sdkmanager to work
+      uses: joschi/setup-jdk@v1
       with:
-        java-version: '8'
+        java-version: 'openjdk8'
+        architecture: 'x64'
+        
     - name: Use Node.js v14
       uses: actions/setup-node@v2.1.5
       with:
