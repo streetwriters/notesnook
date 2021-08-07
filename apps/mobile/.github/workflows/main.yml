@@ -21,7 +21,7 @@ jobs:
         $ANDROID_HOME/emulator/emulator -list-avds
     - name: Install node_modules
       run: |
-        yarn install --frozen-lockfile
+        yarn
     
     - name: Build for detox
       run: |
