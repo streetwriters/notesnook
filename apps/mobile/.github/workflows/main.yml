@@ -20,6 +20,12 @@ jobs:
     - name: Install node_modules
       run: yarn install --concurrency 2 --frozen-lockfile --cache-folder .yarncache
 
+    - name: Use specific Java version for the builds
+      uses: joschi/setup-jdk@v2
+      with:
+        java-version: 'openjdk8'
+        architecture: 'x64'
+
     - name: Download Android Emulator Image
       run: |
         echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
