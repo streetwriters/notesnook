@@ -9,16 +9,16 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - uses: joschi/setup-jdk@v2
+      with:
+        java-version: '8'
     - name: Use Node.js v14
       uses: actions/setup-node@v1
       with:
         node-version: 14.x
     
-    - name: "Install JDK"
-    - uses: joschi/setup-jdk@v2
-      with:
-        java-version: '8'
-             
+    
+
     - name: Download Android Emulator Image
       run: |
         echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
