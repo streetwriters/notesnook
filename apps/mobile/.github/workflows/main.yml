@@ -12,37 +12,10 @@ jobs:
       with:
         persist-credentials: false
 
-    - name: Use specific Java version for sdkmanager to work
-      uses: joschi/setup-jdk@v2
-      with:
-        java-version: 'openjdk8'
-        architecture: 'x64'
-
     - name: Use Node.js v15
       uses: actions/setup-node@v2.1.5
       with:
         node-version: 15.x
         
     - name: Install node_modules
-      run: yarn install --frozen-lockfile
-
-    - name: Download Android Emulator Image
-      run: |
-        echo "y" | $ANDROID_HOME/tools/bin/sdkmanager --install "system-images;android-29;google_apis;x86"
-        echo "no" | $ANDROID_HOME/tools/bin/avdmanager create avd --force --name emu --device "Nexus 5X" -k 'system-images;android-29;google_apis;x86'
-        $ANDROID_HOME/emulator/emulator -list-avds
-
-    - name: Build for detox
-      run: |
-        yarn build-detox-android
-    - name: Android Emulator
-      timeout-minutes: 10
-      continue-on-error: true
-      run: |
-        echo "Starting emulator"
-        nohup $ANDROID_HOME/emulator/emulator -avd emu -no-audio -no-snapshot -no-window &
-        $ANDROID_HOME/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed | tr -d '\r') ]]; do sleep 1; done; input keyevent 82'
-        $ANDROID_HOME/platform-tools/adb devices
-        echo "Emulator started"
-    - name: Android Detox
-      run: yarn start & yarn test-detox-android
+      run: yarn
