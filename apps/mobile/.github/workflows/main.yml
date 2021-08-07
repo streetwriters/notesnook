@@ -21,7 +21,7 @@ jobs:
         $ANDROID_HOME/emulator/emulator -list-avds
     - name: Install node_modules
       run: |
-        yarn
+        yarn add git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git
     
     - name: Build for detox
       run: |
