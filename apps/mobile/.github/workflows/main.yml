@@ -8,19 +8,11 @@ jobs:
     timeout-minutes: 15
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v1
-      with:
-        fetch-depth: 1
-
-    - name: Node
+    - uses: actions/checkout@v2
+    - name: Use Node.js v14
       uses: actions/setup-node@v1
-
-    - name: Use specific Java version for sdkmanager to work
-      uses: joschi/setup-jdk@v1
       with:
-        java-version: 'openjdk8'
-        architecture: 'x64'
+        node-version: 14.x
 
     - name: Download Android Emulator Image
       run: |
