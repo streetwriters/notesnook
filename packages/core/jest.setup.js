@@ -1,7 +1,8 @@
 var nodeCrypto = require("crypto");
 var jsdom = require("jsdom");
+var dotenv = require("dotenv");
 
-process.env.NODE_ENV = "testing";
+dotenv.config();
 
 const dom = new jsdom.JSDOM("", {});
 global.window = dom.window;

@@ -1,10 +1,10 @@
 class EventManager {
   constructor() {
-    this._registry = {};
+    this._registry = new Map();
   }
 
   unsubscribeAll() {
-    this._registry = {};
+    this._registry.clear();
   }
 
   subscribeMulti(names, handler) {
@@ -13,24 +13,19 @@ class EventManager {
     });
   }
 
-  subscribe(name, handler) {
+  subscribe(name, handler, once = false) {
     if (!name || !handler) throw new Error("name and handler are required.");
-    if (!this._registry[name]) this._registry[name] = [];
-    this._registry[name].push(handler);
+    this._registry.set(handler, { name, once });
   }
 
-  unsubscribe(name, handler) {
-    if (!this._registry[name]) return;
-    const index = this._registry[name].indexOf(handler);
-    if (index <= -1) return;
-    this._registry[name].splice(index, 1);
+  unsubscribe(_name, handler) {
+    this._registry.delete(handler);
   }
 
   publish(name, ...args) {
-    if (!this._registry[name]) return;
-    const handlers = this._registry[name];
-    handlers.forEach((handler) => {
-      handler(...args);
+    this._registry.forEach((props, handler) => {
+      if (props.name === name) handler(...args);
+      if (props.once) this._registry.delete(handler);
     });
   }
 
@@ -38,7 +33,7 @@ class EventManager {
     if (!this._registry[name]) return true;
     const handlers = this._registry[name];
     if (handlers.length <= 0) return true;
-    return await Promise.all(handlers.map((handler) => handler(...args)));
+    return await Promise.all(handlers.map((h) => h.handler(...args)));
   }
 }
 export default EventManager;

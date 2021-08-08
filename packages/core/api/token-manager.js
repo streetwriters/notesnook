@@ -1,6 +1,7 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
-import { EV, EVENTS, sendSessionExpiredEvent } from "../common";
+import { EV, EVENTS } from "../common";
+import EventManager from "../utils/event-manager";
 
 const ENDPOINTS = {
   token: "/connect/token",
@@ -9,9 +10,12 @@ const ENDPOINTS = {
   logout: "/account/logout",
 };
 
-var RETRIES = 0;
-var RETRIES_LIMIT = 1;
-const FIVE_MINUTES = 60 * 5;
+var isRefreshingToken = false;
+const TokenEventManager = new EventManager();
+const TOKEN_EVENTS = {
+  tokenRefreshed: "tokenRefreshed",
+};
+
 class TokenManager {
   /**
    *
@@ -33,8 +37,7 @@ class TokenManager {
 
   _isTokenExpired(token) {
     const { t, expires_in } = token;
-    const marginedExpiryMs = expires_in - FIVE_MINUTES;
-    const expiryMs = t + marginedExpiryMs * 1000;
+    const expiryMs = t + expires_in * 1000;
     return Date.now() >= expiryMs;
   }
 
@@ -46,10 +49,6 @@ class TokenManager {
     } catch (e) {
       console.error("Error getting access token:", e);
       if (e.message === "invalid_grant" || e.message === "invalid_client") {
-        if (++RETRIES <= RETRIES_LIMIT) {
-          return await this.getAccessToken(true);
-        }
-        RETRIES = 0;
         EV.publish(EVENTS.userSessionExpired);
       }
       return null;
@@ -58,16 +57,50 @@ class TokenManager {
 
   async _refreshToken(token) {
     const { refresh_token, scope } = token;
-
     if (!refresh_token || !scope) return;
-    return await this.saveToken(
-      await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-        refresh_token,
-        grant_type: "refresh_token",
-        scope: scope,
-        client_id: "notesnook",
-      })
-    );
+
+    if (isRefreshingToken) {
+      return new Promise((resolve, reject) => {
+        TokenEventManager.subscribe(
+          TOKEN_EVENTS.tokenRefreshed,
+          onTokenRefreshed,
+          true
+        );
+
+        function onTokenRefreshed({ success, error }) {
+          clearTimeout(timeout);
+          if (success) return resolve();
+          else return reject(error);
+        }
+
+        const timeout = setTimeout(() => {
+          TokenEventManager.unsubscribe(null, onTokenRefreshed);
+          reject("Timeout while refreshing token.");
+        }, 15000);
+      });
+    }
+
+    isRefreshingToken = true;
+    try {
+      await this.saveToken(
+        await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
+          refresh_token,
+          grant_type: "refresh_token",
+          scope: scope,
+          client_id: "notesnook",
+        })
+      );
+      TokenEventManager.publish(TOKEN_EVENTS.tokenRefreshed, { success: true });
+    } catch (e) {
+      TokenEventManager.publish(TOKEN_EVENTS.tokenRefreshed, {
+        success: false,
+        error: e,
+      });
+      console.error("Failed to refresh token:", e);
+      throw e;
+    } finally {
+      isRefreshingToken = false;
+    }
   }
 
   async revokeToken() {

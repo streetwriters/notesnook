@@ -14,6 +14,7 @@
     "babel-plugin-syntax-object-rest-spread": "^6.13.0",
     "babel-polyfill": "^6.26.0",
     "babel-preset-env": "^1.7.0",
+    "dotenv": "^10.0.0",
     "jest": "^24.9.0",
     "jest-fetch-mock": "^3.0.3",
     "jsdom": "^16.5.3"
