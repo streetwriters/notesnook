@@ -25,7 +25,7 @@ PODS:
   - MMKV (1.2.7):
     - MMKVCore (~> 1.2.7)
   - MMKVCore (1.2.7)
-  - Permission-PhotoLibrary (3.0.0):
+  - Permission-PhotoLibrary (3.0.5):
     - RNPermissions
   - pop (1.0.12)
   - RCT-Folly (2020.01.13.00):
@@ -240,7 +240,7 @@ PODS:
     - React-Core
   - react-native-begin-background-task (0.1.0):
     - React
-  - react-native-document-picker (4.1.1):
+  - react-native-document-picker (4.3.0):
     - React-Core
   - react-native-fingerprint-scanner (5.0.0):
     - React-Core
@@ -248,24 +248,24 @@ PODS:
     - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
-  - react-native-image-picker (3.2.1):
+  - react-native-image-picker (3.8.1):
     - React-Core
   - react-native-keep-awake (1.0.4):
     - React
   - react-native-mmkv-storage (0.3.7):
     - MMKV (= 1.2.7)
     - React
-  - react-native-netinfo (5.9.9):
+  - react-native-netinfo (5.9.10):
     - React-Core
   - react-native-orientation (3.1.3):
     - React
-  - react-native-safe-area-context (3.1.9):
+  - react-native-safe-area-context (3.3.0):
     - React-Core
   - react-native-sodium (0.3.6):
     - React
   - react-native-splash-screen (3.2.0):
     - React
-  - react-native-webview (11.6.4):
+  - react-native-webview (11.6.6):
     - React-Core
   - React-perflogger (0.64.2)
   - React-RCTActionSheet (0.64.2):
@@ -335,17 +335,17 @@ PODS:
     - React-Core
   - rn-fetch-blob (0.12.0):
     - React-Core
-  - RNCCheckbox (0.5.6):
+  - RNCCheckbox (0.5.8):
     - React-Core
   - RNCMaskedView (0.1.11):
     - React
   - RNCPushNotificationIOS (1.8.0):
     - React-Core
-  - RNDeviceInfo (8.0.0):
+  - RNDeviceInfo (8.1.7):
     - React-Core
   - RNExitApp (1.1.0):
     - React
-  - RNFastImage (8.3.4):
+  - RNFastImage (8.3.7):
     - React-Core
     - SDWebImage (~> 5.8)
     - SDWebImageWebPCoder (~> 0.6.1)
@@ -355,24 +355,24 @@ PODS:
     - React-Core
   - RNIap (5.2.14):
     - React-Core
-  - RNInAppBrowser (3.5.1):
+  - RNInAppBrowser (3.6.3):
     - React-Core
   - RNKeychain (4.0.5):
     - React
-  - RNPermissions (3.0.0):
+  - RNPermissions (3.0.5):
     - React-Core
   - RNPrivacySnapshot (1.0.0):
     - React-Core
   - RNReanimated (1.13.3):
     - React-Core
-  - RNScreens (3.3.0):
+  - RNScreens (3.5.0):
     - React-Core
     - React-RCTImage
   - RNSecureRandom (1.0.0):
     - React
   - RNShare (3.8.5):
     - React-Core
-  - RNSVG (12.1.0):
+  - RNSVG (12.1.1):
     - React
   - RNTooltips (1.0.3):
     - pop (~> 1.0)
@@ -637,7 +637,7 @@ SPEC CHECKSUMS:
   libwebp: e90b9c01d99205d03b6bb8f2c8c415e5a4ef66f0
   MMKV: 22e5136f7d00197bc0fc9694b7f71519f0d1ca12
   MMKVCore: 607b7b05f2c2140056b5d338e45f2c14bf3f4232
-  Permission-PhotoLibrary: cb9cdc1e3744e26ab404297a8e289d50c8ee27e8
+  Permission-PhotoLibrary: 0748c1a490fad126dfe36dbea8234dedfe59cc27
   pop: d582054913807fd11fd50bfe6a539d91c7e1a55a
   RCT-Folly: ec7a233ccc97cc556cf7237f0db1ff65b986f27c
   RCTRequired: 6d3e854f0e7260a648badd0d44fc364bc9da9728
@@ -652,19 +652,19 @@ SPEC CHECKSUMS:
   React-jsinspector: cc614ec18a9ca96fd275100c16d74d62ee11f0ae
   react-native-background-actions: 5acd5851ac2d3bb8b1c39fcc9332abe45977fd04
   react-native-begin-background-task: 3b889e07458afc5822a7277cf9cbc7cd077e39ee
-  react-native-document-picker: c9cbeb5445188a805ab19fa4061115d38fe1ea63
+  react-native-document-picker: 20f652c2402d3ddc81f396d8167c3bd978add4a2
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 237bffb1c7e05fb142092681531810a29ba53015
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
-  react-native-image-picker: 64d12e81f3d9dad0af107fe6536b295d51932ec0
+  react-native-image-picker: 31971f6184e7c1dcb4fc1f122e1ba2c3fb11ef1e
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
   react-native-mmkv-storage: 6d9ce7bbbef45fcdde623dd13bf3617ea87c2a52
-  react-native-netinfo: 0212ce8604e88edf686f1481b925b17a42a52449
+  react-native-netinfo: 30fb89fa913c342be82a887b56e96be6d71201dd
   react-native-orientation: f1caf84d65f1a4fd4511a18f2b924e634ad7a628
-  react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
+  react-native-safe-area-context: 61c8c484a3a9e7d1fda19f7b1794b35bbfd2262a
   react-native-sodium: c7587732667e1cdb7d0d77c2aa2e98420aad2036
   react-native-splash-screen: 200d11d188e2e78cea3ad319964f6142b6384865
-  react-native-webview: 1a19adb5578cdf7f005b7961dcc50c1c6b70f41b
+  react-native-webview: e6eddf2722f5e7220eae7229b516efabb1ed0acd
   React-perflogger: 25373e382fed75ce768a443822f07098a15ab737
   React-RCTActionSheet: af7796ba49ffe4ca92e7277a5d992d37203f7da5
   React-RCTAnimation: 6a2e76ab50c6f25b428d81b76a5a45351c4d77aa
@@ -679,24 +679,24 @@ SPEC CHECKSUMS:
   ReactCommon: 149906e01aa51142707a10665185db879898e966
   rn-extensions-share: 3f0ecce20dfbca1f0358deb4ebfb9ee121a6d92a
   rn-fetch-blob: f065bb7ab7fb48dd002629f8bdcb0336602d3cba
-  RNCCheckbox: 80ee60cd2e67b46986e8e244db520655372deab4
+  RNCCheckbox: 6bd119c26c6eb8264a29d59ff66cb70a14de3349
   RNCMaskedView: 0e1bc4bfa8365eba5fbbb71e07fbdc0555249489
   RNCPushNotificationIOS: 61a7c72bd1ebad3568025957d001e0f0e7b32191
-  RNDeviceInfo: 87d2d175c760f6bcf58acd036f887e8b2392802c
+  RNDeviceInfo: ace1442cd0f7d01292a39a3b587666177eaf8cb0
   RNExitApp: c4e052df2568b43bec8a37c7cd61194d4cfee2c3
-  RNFastImage: d4870d58f5936111c56218dbd7fcfc18e65b58ff
+  RNFastImage: a7384db75df352500261e8e8f1ac2026def26102
   RNFileViewer: 83cc066ad795b1f986791d03b56fe0ee14b6a69f
   RNGestureHandler: 9b7e605a741412e20e13c512738a31bd1611759b
   RNIap: f00befe6581a5953191108cb97d9b3872473337b
-  RNInAppBrowser: 48b95ba7a4eaff5cc223bca338d3e319561dbd1b
+  RNInAppBrowser: 3ff3a3b8f458aaf25aaee879d057352862edf357
   RNKeychain: 840f8e6f13be0576202aefcdffd26a4f54bfe7b5
-  RNPermissions: 99dd8d4a30ff13509b949ca63cd1f69edc461775
+  RNPermissions: 7043bacbf928eae25808275cfe73799b8f618911
   RNPrivacySnapshot: 8eaf571478a353f2e5184f5c803164f22428b023
   RNReanimated: 514a11da3a2bcc6c3dfd9de32b38e2b9bf101926
-  RNScreens: bf59f17fbf001f1025243eeed5f19419d3c11ef2
+  RNScreens: 01ab149b5dd5c27f5ff26741b1d2bdf2cee1af35
   RNSecureRandom: 0dcee021fdb3d50cd5cee5db0ebf583c42f5af0e
   RNShare: 7e22ba3bf66294ff7c122a1f2da8a8ec642091a0
-  RNSVG: ce9d996113475209013317e48b05c21ee988d42e
+  RNSVG: 551acb6562324b1d52a4e0758f7ca0ec234e278f
   RNTooltips: 47a992eb7b12f624e5a8a40f0990fbef49dcb83e
   RNVectorIcons: 31cebfcf94e8cf8686eb5303ae0357da64d7a5a4
   SDWebImage: 7acbb57630ac7db4a495547fb73916ff3e432f6b
