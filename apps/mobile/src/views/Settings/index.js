@@ -91,7 +91,8 @@ import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-
+import {Button as MButton} from '../../components/Button/index';
+import Share from 'react-native-share';
 let menuRef = createRef();
 
 const format = ver => {
@@ -297,6 +298,38 @@ export const Settings = ({navigation}) => {
           <SettingsUserSection />
           <SettingsAppearanceSection />
           <SettingsPrivacyAndSecurity />
+
+          <View
+            style={{
+              alignItems: 'center',
+              width: '95%',
+              borderRadius: 5,
+              backgroundColor: colors.nav,
+              alignSelf: 'center',
+              padding: 12,
+              marginVertical:6
+            }}>
+            <Heading size={18}>Invite code: XZA8G</Heading>
+            <Paragraph
+              style={{
+                textAlign: 'center'
+              }}>
+              Invite your friends to Notesnook and on every sign up, you will get 7 days of
+              Notesnook Pro for free.
+            </Paragraph>
+            <Seperator />
+            <MButton
+            fontSize={SIZE.md}
+            onPress={() => {
+              Share.open({
+                title:"Download Notesnook",
+                message:"Download Notesnook",
+                failOnCancel:false
+              })
+            }}
+            height={40} width="100%" title="Invite a friend" type="accent" />
+          </View>
+
           <SettingsBackupAndRestore />
 
           <SectionHeader
@@ -1007,8 +1040,7 @@ const SettingsUserSection = () => {
               func: async () => {
                 setVerifyUser(true);
               },
-              desc:
-                'Recover your data using the recovery key if your password is lost.'
+              desc: 'Recover your data using the recovery key if your password is lost.'
             },
             {
               name: 'Change password',
@@ -1393,20 +1425,17 @@ const SettingsPrivacyAndSecurity = () => {
     {
       title: 'None',
       value: 'none',
-      desc:
-        'Disable app lock. Notes will be accessible to anyone who opens the app'
+      desc: 'Disable app lock. Notes will be accessible to anyone who opens the app'
     },
     {
       title: 'Secure Mode',
       value: 'launch',
-      desc:
-        'Lock app on launch and keep it unlocked when you switch to other apps.'
+      desc: 'Lock app on launch and keep it unlocked when you switch to other apps.'
     },
     {
       title: 'Strict Mode',
       value: 'background',
-      desc:
-        'Lock app on launch and also when you switch from other apps or background.'
+      desc: 'Lock app on launch and also when you switch from other apps or background.'
     }
   ];
 
