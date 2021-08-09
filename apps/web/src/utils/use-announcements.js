@@ -21,12 +21,12 @@ export default function useAnnouncements() {
         console.error(e);
       } finally {
         if (cancelled) return;
-        setAnnouncements(() => {
-          const filtered = CACHED_ANNOUNCEMENTS.filter((announcement) =>
-            shouldShowAnnouncement(announcement)
-          );
-          return filtered;
-        });
+        let announcements = [];
+        for (let announcement of CACHED_ANNOUNCEMENTS) {
+          if (await shouldShowAnnouncement(announcement))
+            announcements.push(announcement);
+        }
+        setAnnouncements(announcements);
       }
     })();
     return () => {
@@ -49,7 +49,7 @@ export default function useAnnouncements() {
 
 export const allowedPlatforms = ["all", process.env.REACT_APP_PLATFORM];
 
-function shouldShowAnnouncement(announcement) {
+async function shouldShowAnnouncement(announcement) {
   if (Config.get(announcement.id) === "removed") return false;
 
   let show = announcement.platforms.some(
@@ -57,7 +57,7 @@ function shouldShowAnnouncement(announcement) {
   );
   if (!show) return false;
 
-  const user = userstore.get().user;
+  const user = await db.user.getUser();
   const subStatus = user?.subscription?.type;
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
