@@ -332,12 +332,14 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                     positiveText: 'Apply',
                     positivePress: async value => {
                       if (!value) return;
+                      console.log(value);
                       try {
                         let productId = await db.offers.getCode(
                           value,
                           Platform.OS
                         );
                         if (productId) {
+                          getPromo(productId)
                           ToastEvent.show({
                             heading: 'Discount applied!',
                             type: 'success',
