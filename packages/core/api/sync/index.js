@@ -42,6 +42,7 @@ export default class Sync {
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
     this._tokenManager = new TokenManager(this._db);
+    this._isSyncing = false;
   }
 
   async _fetch(lastSynced, token) {
@@ -52,6 +53,7 @@ export default class Sync {
   }
 
   async _performChecks() {
+    if (this._isSyncing) throw new Error("Sync already running.");
     let lastSynced = (await this._db.context.read("lastSynced")) || 0;
     let token = await this._tokenManager.getAccessToken();
     if (!token) throw new Error("You need to login to sync.");
@@ -65,28 +67,35 @@ export default class Sync {
 
   async start(full, force) {
     if (force) await this._db.context.write("lastSynced", 0);
-
     let { lastSynced, token } = await this._performChecks();
 
-    if (full) var serverResponse = await this._fetch(lastSynced, token);
+    try {
+      this._isSyncing = true;
 
-    // we prepare local data before merging so we always have correct data
-    const data = await this._collector.collect(lastSynced);
+      if (full) var serverResponse = await this._fetch(lastSynced, token);
 
-    if (full) {
-      // merge the server response
-      await this._merger.merge(serverResponse, lastSynced);
-    }
+      // we prepare local data before merging so we always have correct data
+      const data = await this._collector.collect(lastSynced);
 
-    // check for conflicts and throw
-    await this._db.conflicts.check();
+      if (full) {
+        // merge the server response
+        await this._merger.merge(serverResponse, lastSynced);
+      }
 
-    // send the data back to server
-    lastSynced = await this._send(data, token);
+      // check for conflicts and throw
+      await this._db.conflicts.check();
 
-    // update our lastSynced time
-    if (lastSynced) {
-      await this._db.context.write("lastSynced", lastSynced);
+      // send the data back to server
+      lastSynced = await this._send(data, token);
+
+      // update our lastSynced time
+      if (lastSynced) {
+        await this._db.context.write("lastSynced", lastSynced);
+      }
+    } catch (e) {
+      throw e;
+    } finally {
+      this._isSyncing = false;
     }
   }
 
