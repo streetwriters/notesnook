@@ -206,7 +206,7 @@ const MergeEditor = () => {
             : primaryData.data,
           resolved: true,
           type: primaryData.type,
-          dateEdited:primaryData.dateEdited
+          dateEdited:secondaryData.dateEdited + 1
         },
         id: note.id,
         conflicted: false,
