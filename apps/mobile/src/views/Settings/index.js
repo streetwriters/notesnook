@@ -299,7 +299,8 @@ export const Settings = ({navigation}) => {
           <SettingsAppearanceSection />
           <SettingsPrivacyAndSecurity />
 
-          <View
+          {/**
+          * <View
             style={{
               alignItems: 'center',
               width: '95%',
@@ -329,6 +330,7 @@ export const Settings = ({navigation}) => {
             }}
             height={40} width="100%" title="Invite a friend" type="accent" />
           </View>
+          */}
 
           <SettingsBackupAndRestore />
 
@@ -340,47 +342,44 @@ export const Settings = ({navigation}) => {
 
           {!collapsed && (
             <>
-              <PressableButton
-                onPress={async () => {
-                  try {
-                    await Linking.openURL(
-                      Platform.OS === 'ios'
-                        ? 'https://bit.ly/notesnook-ios'
-                        : 'https://bit.ly/notesnook-and'
-                    );
-                  } catch (e) {}
-                }}
-                type="shade"
-                customStyle={{
-                  borderWidth: 1,
+              <View
+                style={{
                   borderRadius: 5,
                   paddingVertical: 10,
                   width: '95%',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                   paddingHorizontal: 12,
                   marginTop: 10,
-                  borderColor: colors.accent
+                  backgroundColor: colors.nav,
+                  alignSelf: 'center'
                 }}>
-                <Heading
-                  color={colors.accent}
-                  style={{
-                    fontSize: SIZE.md
-                  }}>
-                  {`Rate us on ${
-                    Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
-                  }`}
-                </Heading>
                 <Paragraph
                   style={{
                     flexWrap: 'wrap',
-                    flexBasis: 1
+                    flexBasis: 1,
+                    textAlign: 'center'
                   }}
                   color={colors.pri}>
-                  It took us a year to bring Notesnook to life, the best private
-                  note taking app. It will take you a moment to rate it to let
-                  us know what you think!
+                  It took us a year to bring Notesnook to you. Help us make it better by rating it on {Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}
                 </Paragraph>
-              </PressableButton>
+                <Seperator />
+                <MButton
+                  type="accent"
+                  width="100%"
+                  title={`Rate us on ${
+                    Platform.OS === 'ios' ? 'Appstore' : 'Playstore'
+                  }`}
+                  onPress={async () => {
+                    try {
+                      await Linking.openURL(
+                        Platform.OS === 'ios'
+                          ? 'https://bit.ly/notesnook-ios'
+                          : 'https://bit.ly/notesnook-and'
+                      );
+                    } catch (e) {}
+                  }}
+                />
+              </View>
 
               {otherItems.map(item => (
                 <CustomButton
@@ -993,7 +992,7 @@ const SettingsUserSection = () => {
                   title="Verify it's you"
                   paragraph="Enter your account password to save your data recovery key."
                 />
-
+                <Seperator half />
                 <Input
                   fwdRef={input}
                   placeholder="Enter account password"
@@ -1752,7 +1751,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           title: "Verify it's you",
           input: true,
           inputPlaceholder: 'Enter account password',
-          paragraph: 'Please enter your account password to backup data',
+          paragraph: 'Please enter your account password to backup your data',
           positiveText: 'Verify',
           secureTextEntry: true,
           positivePress: async value => {
