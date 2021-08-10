@@ -1,5 +1,5 @@
 import Config from "../utils/config";
-import { createBackup } from "./index";
+import { createBackup, verifyAccount } from "./index";
 import { db } from "./db";
 import { store as appStore } from "../stores/app-store";
 import * as Icon from "../components/icons";
@@ -41,7 +41,9 @@ export const Reminders = {
   backup: {
     subtitle: "Create a backup to keep your notes safe",
     title: "Back up your data",
-    action: createBackup,
+    action: async () => {
+      if (await verifyAccount()) await createBackup();
+    },
     icon: Icon.Backup,
   },
   login: {
@@ -59,7 +61,9 @@ export const Reminders = {
   recoverykey: {
     title: "Backup your recovery key",
     subtitle: "Keep your recovery key safe",
-    action: showRecoveryKeyDialog,
+    action: async () => {
+      if (await verifyAccount()) await showRecoveryKeyDialog();
+    },
     icon: Icon.Warn,
   },
 };
