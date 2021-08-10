@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from 'react';
+import {Appearance} from 'react-native';
 import {SafeAreaView, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
@@ -19,6 +20,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import {editing} from '../../utils';
+import {COLOR_SCHEME_DARK} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {
   eOpenLoginDialog,
@@ -182,7 +184,10 @@ const AppLoader = ({onLoad}) => {
   return loading ? (
     <Animated.View
       style={{
-        backgroundColor: colors.bg,
+        backgroundColor:
+          Appearance.getColorScheme() === 'dark'
+            ? COLOR_SCHEME_DARK.bg
+            : colors.bg,
         width: '100%',
         height: '100%',
         position: 'absolute',
@@ -191,7 +196,10 @@ const AppLoader = ({onLoad}) => {
       }}>
       <Animated.View
         style={{
-          backgroundColor: colors.bg,
+          backgroundColor:
+            Appearance.getColorScheme() === 'dark'
+              ? COLOR_SCHEME_DARK.bg
+              : colors.bg,
           width: '100%',
           height: '100%',
           justifyContent: 'center',

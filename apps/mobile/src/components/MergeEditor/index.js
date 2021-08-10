@@ -204,9 +204,10 @@ const MergeEditor = () => {
           data: primaryData.data
             ? diff.clean(primaryData.data)
             : primaryData.data,
-          resolved: true,
           type: primaryData.type,
-          dateEdited:secondaryData.dateEdited + 1
+          dateEdited:primary.dateEdited,
+          remote:true,
+          dateResolved:secondaryData.dateEdited
         },
         id: note.id,
         conflicted: false,
@@ -218,8 +219,9 @@ const MergeEditor = () => {
             ? diff.clean(secondaryData.data)
             : secondaryData.data,
           type: secondaryData.type,
-          resolved: true,
-          dateEdited:secondaryData.dateEdited
+          remote:true,
+          dateEdited:secondaryData.dateEdited,
+          dateResolved:secondaryData.dateEdited
         },
         id: note.id,
         conflicted: false,
