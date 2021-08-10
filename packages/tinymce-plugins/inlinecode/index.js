@@ -7,7 +7,7 @@ function register(editor) {
     icon: "sourcecode",
     tooltip: "Inline code",
     onAction: function () {
-      return addInlineCode(editor);
+      return toggleInlineCode(editor);
     },
     onSetup: function (api) {
       var nodeChangeHandler = function (e) {
@@ -28,23 +28,15 @@ function register(editor) {
   });
 
   editor.addCommand("mceInsertInlineCode", function () {
-    addInlineCode(editor);
+    toggleInlineCode(editor);
   });
 }
 
-function addInlineCode(editor) {
-  var content = editor.selection.getContent({ format: "text" });
-  content = content.replace(/^\n/gm, "") || "&nbsp;";
-
-  editor.undoManager.transact(function () {
-    editor.execCommand(
-      "mceInsertContent",
-      false,
-      `<code spellcheck="false">${content}</code>`
-    );
+function toggleInlineCode(editor) {
+  editor.undoManager.transact(() => {
+    editor.focus();
+    editor.execCommand("mceToggleFormat", false, "code");
   });
-
-  editor.nodeChanged({ selectionChange: true });
 }
 
 (function init() {
