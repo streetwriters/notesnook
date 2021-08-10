@@ -141,6 +141,7 @@ const ProgressDialog = () => {
           dialogData?.actionsArray.map(item => (
             <Button
               onPress={item.action}
+              key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
               type="accent"
