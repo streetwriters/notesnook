@@ -2082,10 +2082,10 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
 
-"@streetwritersco/tinymce-plugins@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@streetwritersco/tinymce-plugins/-/tinymce-plugins-1.0.0.tgz#05a5889a9cdad79b9ff01fc3f6d28febcebf2912"
-  integrity sha512-CBRQSF+6N2hIXb9mPnerkTb5Zr1qdQGzhNDcMT1l4ugUyvB2Yeb6dBy+tBgdeoJ3046jODDjPxUmQmSoGo3BGw==
+"@streetwritersco/tinymce-plugins@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@streetwritersco/tinymce-plugins/-/tinymce-plugins-1.0.2.tgz#a5f2724a85702d3cad924a128f83441c45b3dd64"
+  integrity sha512-Is0yl+2I+B5e2feBg5z1c+e+QPG7OF1/287qPU1ZIV3+ryUAbL4XDzJfIlLH6PAAp0wyu/Z+LtVpxfX/0epNTQ==
   dependencies:
     highlight.js "^11.1.0"
     rangy "^1.3.0"
@@ -8635,19 +8635,6 @@ normalize-url@^3.0.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-3.3.0.tgz"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
-
-notes-core@../notesnook-core/:
-  version "6.8.2"
-  dependencies:
-    "@stablelib/blake2s" "^1.0.1"
-    dayjs "^1.10.6"
-    fast-sort "^2.0.1"
-    lean-he "^2.1.2"
-    no-internet "^1.5.2"
-    qclone "^1.0.4"
-    quill-delta-to-html "^0.12.0"
-    showdown "https://github.com/thecodrr/showdown"
-    spark-md5 "^3.0.1"
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.8.2"

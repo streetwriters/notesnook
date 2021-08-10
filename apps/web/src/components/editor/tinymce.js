@@ -167,6 +167,7 @@ function TinyMCE(props) {
         contextmenu: false,
         quickbars_insert_toolbar: false,
         skin_url: newSkin,
+        inline_boundaries_selector: "a[href]",
         // content_css: "",
         content_style: `
         pre.codeblock {
