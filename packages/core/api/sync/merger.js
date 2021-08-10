@@ -47,14 +47,17 @@ class Merger {
     }
   }
 
-  async _mergeItemWithConflicts(remoteItem, get, add, resolve) {
+  async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
     let localItem = await get(remoteItem.id);
 
     remoteItem = await this._deserialize(remoteItem);
     if (!localItem) {
       await add(remoteItem);
-    } else if (localItem.dateEdited > this._lastSynced) {
-      await resolve(localItem, remoteItem);
+    } else if (
+      localItem.dateResolved !== remoteItem.dateEdited &&
+      localItem.dateEdited > this._lastSynced
+    ) {
+      await markAsConflicted(localItem, remoteItem);
     } else {
       await add(remoteItem);
     }

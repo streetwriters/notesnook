@@ -26,6 +26,7 @@ export default class Content extends Collection {
       remote: content.remote,
       localOnly: !!content.localOnly,
       conflicted: content.conflicted,
+      dateResolved: content.dateResolved,
     });
     return id;
   }
