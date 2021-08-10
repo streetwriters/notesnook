@@ -10,8 +10,6 @@ function ContentToggle(props) {
     sx,
     label,
     dateEdited,
-    editors,
-    cleanDiff,
     resolveConflict,
   } = props;
 
@@ -22,16 +20,7 @@ function ContentToggle(props) {
           <Button
             variant="primary"
             mr={2}
-            onClick={async () => {
-              const { selectedEditor, otherEditor } = editors;
-              await resolveConflict(
-                await cleanDiff(
-                  document.getElementById(selectedEditor).innerHTML
-                ),
-                await cleanDiff(document.getElementById(otherEditor).innerHTML),
-                dateEdited
-              );
-            }}
+            onClick={() => resolveConflict({ saveCopy: true })}
             p={1}
             px={2}
           >
@@ -40,17 +29,9 @@ function ContentToggle(props) {
         )}
         <Button
           variant="primary"
-          onClick={async () => {
-            console.log("isOtherSelected", isOtherSelected);
+          onClick={() => {
             if (isOtherSelected) {
-              const { selectedEditor } = editors;
-              await resolveConflict(
-                await cleanDiff(
-                  document.getElementById(selectedEditor).innerHTML
-                ),
-                null,
-                dateEdited
-              );
+              resolveConflict({ saveCopy: false });
             } else {
               onToggle();
             }

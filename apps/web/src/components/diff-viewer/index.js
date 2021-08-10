@@ -49,33 +49,39 @@ function DiffViewer(props) {
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
-    async (selectedContent, otherContent, selectedContentDateEdited) => {
+    async ({ toKeep, toCopy, toKeepDateEdited, dateResolved }) => {
       if (!conflictedNote) return;
 
-      selectedContent = {
-        data: selectedContent,
+      toKeep = await differ.clean(toKeep);
+      if (toCopy) toCopy = await differ.clean(toCopy);
+
+      const toKeepContent = {
+        data: toKeep,
         type: "tiny",
         // HACK: we need to set remote = true so the database doesn't
         // overwrite the dateEdited of the content.
         remote: true,
-        dateEdited: selectedContentDateEdited,
+        dateEdited: toKeepDateEdited,
+        dateResolved,
       };
 
       await db.notes.add({
         id: conflictedNote.id,
-        content: selectedContent,
+        content: toKeepContent,
         conflicted: false,
       });
-      if (otherContent) {
-        otherContent = {
-          data: otherContent,
+
+      if (toCopy) {
+        const toCopyContent = {
+          data: toCopy,
           type: "tiny",
         };
         await db.notes.add({
-          content: otherContent,
+          content: toCopyContent,
           title: conflictedNote.title + " (COPY)",
         });
       }
+
       notesStore.refresh();
       hashNavigate(`/notes/${conflictedNote.id}/edit`, { replace: true });
 
@@ -105,7 +111,11 @@ function DiffViewer(props) {
       note = note.data;
 
       const content = await db.content.raw(note.contentId);
-      if (!content.conflicted) return resolveConflict(note, content.data);
+      if (!content.conflicted)
+        return resolveConflict({
+          toKeep: content.data,
+          dateEdited: content.dateEdited,
+        });
 
       setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
@@ -206,15 +216,17 @@ function DiffViewer(props) {
           >
             <ContentToggle
               label="Current note"
-              resolveConflict={resolveConflict}
               dateEdited={localContent.dateEdited}
               isSelected={selectedContent === 0}
               isOtherSelected={selectedContent === 1}
               onToggle={() => setSelectedContent((s) => (s === 0 ? -1 : 0))}
-              cleanDiff={async (html) => await differ.clean(html)}
-              editors={{
-                selectedEditor: "diffViewAfter",
-                otherEditor: "diffViewBefore",
+              resolveConflict={({ saveCopy }) => {
+                resolveConflict({
+                  toKeep: htmlDiff.after,
+                  toCopy: saveCopy ? htmlDiff.before : null,
+                  toKeepDateEdited: localContent.dateEdited,
+                  dateResolved: remoteContent.dateEdited,
+                });
               }}
               sx={{
                 borderStyle: "solid",
@@ -250,6 +262,19 @@ function DiffViewer(props) {
             width={["100%", "100%", "50%"]}
           >
             <ContentToggle
+              resolveConflict={({ saveCopy }) => {
+                resolveConflict({
+                  toKeep: htmlDiff.before,
+                  toCopy: saveCopy ? htmlDiff.after : null,
+                  toKeepDateEdited: remoteContent.dateEdited,
+                  dateResolved: remoteContent.dateEdited,
+                });
+              }}
+              label="Incoming note"
+              isSelected={selectedContent === 1}
+              isOtherSelected={selectedContent === 0}
+              dateEdited={remoteContent.dateEdited}
+              onToggle={() => setSelectedContent((s) => (s === 1 ? -1 : 1))}
               sx={{
                 alignItems: "flex-end",
                 borderStyle: "solid",
@@ -259,17 +284,6 @@ function DiffViewer(props) {
                 px: 2,
                 pb: 1,
                 pt: [1, 1, 0],
-              }}
-              resolveConflict={resolveConflict}
-              label="Incoming note"
-              isSelected={selectedContent === 1}
-              isOtherSelected={selectedContent === 0}
-              dateEdited={remoteContent.dateEdited}
-              onToggle={() => setSelectedContent((s) => (s === 1 ? -1 : 1))}
-              cleanDiff={async (html) => await differ.clean(html)}
-              editors={{
-                selectedEditor: "diffViewBefore",
-                otherEditor: "diffViewAfter",
               }}
             />
             <ScrollSyncPane>
