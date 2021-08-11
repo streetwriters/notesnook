@@ -49,7 +49,7 @@ import {
   textInput
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
@@ -144,7 +144,7 @@ const EditorHeader = () => {
       });
       return;
     }
-    console.log(editing.isFocused)
+    console.log(editing.isFocused);
     if (editing.isFocused) {
       safeKeyboardDismiss();
       await sleep(300);
@@ -155,12 +155,11 @@ const EditorHeader = () => {
 
   const showActionsheet = async () => {
     let note = getNote() && db.notes.note(getNote().id).data;
-    if (editing.isFocused) {
+    if (editing.isFocused || editing.keyboardState) {
       safeKeyboardDismiss();
-      await sleep(500);
       editing.isFocused = true;
     }
-
+    await sleep(500);
     let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
     ActionSheetEvent(note, true, true, [
       'Add to notebook',

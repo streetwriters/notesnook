@@ -7,7 +7,7 @@ import {
 } from '../../../../utils/Events';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
-import tiny from '../tiny';
+import tiny, { safeKeyboardDismiss } from '../tiny';
 import {formatSelection} from './constants';
 
 export const execCommands = {
@@ -78,8 +78,8 @@ export const execCommands = {
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   image: async () => {
     if (editing.isFocused) {
-      tiny.call(EditorWebView, tiny.blur);
-      await sleep(300);
+      safeKeyboardDismiss()
+      await sleep(500);
       editing.isFocused = true;
     }
     eSendEvent(eOpenProgressDialog, {
@@ -89,7 +89,7 @@ export const execCommands = {
         {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
-            await sleep(300);
+            await sleep(500);
             launchCamera(
               {
                 includeBase64: true,

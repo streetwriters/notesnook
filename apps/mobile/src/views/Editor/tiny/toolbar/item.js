@@ -193,7 +193,7 @@ const ToolbarItem = ({
       if (user && !user.isEmailConfirmed) {
         if (editing.isFocused) {
           safeKeyboardDismiss();
-          await sleep(300);
+          await sleep(500);
           editing.isFocused = true;
         }
         PremiumService.showVerifyEmailDialog();
@@ -209,7 +209,7 @@ const ToolbarItem = ({
     if (type === 'settings') {
       if (editing.isFocused) {
         safeKeyboardDismiss();
-        await sleep(300);
+        await sleep(500);
         editing.isFocused = true;
       }
       eSendEvent('openEditorSettings');
