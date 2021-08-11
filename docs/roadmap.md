@@ -10,7 +10,7 @@ We are constantly working on Notesnook to make it the best private notes app.
 
 Need a new feature in Notesnook? Chat with us on [Discord](https://discord.com/invite/5davZnhw3V) and let's discuss.
 
-## `Q2 2021`
+## `Q2 2021` - Released
 
 We are really exciting about what is coming to Notesnook by the end of Q2 2021.
 
