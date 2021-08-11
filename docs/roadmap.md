@@ -18,7 +18,7 @@ We are really exciting about what is coming to Notesnook by the end of Q2 2021.
 - [x] **[Importing Notes](https://importer.notesnook.com)** from files such as markdown, html, txt, docx and other note apps such as Evernote & Google Keep.
 - [x] **Improve note tagging system:** Edit tag and add/remove multiple notes in a tag
 - [x] **[Note Publishing](https://monograph.notesnook.com)** on a public url that is viewable by anyone with a shareable link. The note can be encrypted if required before publishing so only people with the password can view it.
-- [x] **Extend sorting** same as in notes to all collections such as Favorties, Tags, Notebooks, Topics etc. [WIP]
+- [x] **Extend sorting** same as in notes to all collections such as Favorties, Tags, Notebooks, Topics etc.
 - [x] **Unified promo code system on all platforms**
 - [x] Publish blog
 
