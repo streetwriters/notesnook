@@ -1,8 +1,8 @@
-import { createRef } from 'react';
+import {createRef} from 'react';
 import {Platform} from 'react-native';
-import { eSendEvent } from '../../../../services/EventManager';
-import { editing } from '../../../../utils';
-import { sleep } from '../../../../utils/TimeUtils';
+import {eSendEvent} from '../../../../services/EventManager';
+import {editing} from '../../../../utils';
+import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView, textInput} from '../../Functions';
 import tiny from '../tiny';
 
@@ -11,7 +11,7 @@ export const properties = {
   pauseSelectionChange: false,
   inputMode: 1,
   userBlur: false,
-  linkAdded:false
+  linkAdded: false
 };
 
 export const toolbarRef = createRef();
@@ -20,26 +20,28 @@ export function formatSelection(command) {
   EditorWebView.current?.injectJavaScript(command);
 }
 
-export async function focusEditor(format,kill=true) {
-  kill && eSendEvent("showTooltip");
-  Platform.OS === "android" && EditorWebView.current.requestFocus();
+export async function focusEditor(format, kill = true) {
+  kill && eSendEvent('showTooltip');
+  Platform.OS === 'android' && EditorWebView.current.requestFocus();
   if (format === 'link' || format === 'video') {
     textInput.current?.focus();
     tiny.call(EditorWebView, tiny.focusEditor);
   } else {
     console.log('focus editor');
-    EditorWebView.current?.requestFocus();
+    Platform.OS === 'android' && EditorWebView.current?.requestFocus();
     tiny.call(EditorWebView, tiny.focusEditor);
   }
 }
 
 export async function reFocusEditor() {
   if (editing.isFocused === true) {
-    await sleep(300);
-    textInput.current?.focus();
+    if (Platform.OS === 'android') {
+      await sleep(300);
+      textInput.current?.focus();
+    }
     await sleep(300);
     if (editing.focusType == 'editor') {
-      focusEditor(null,false);
+      focusEditor(null, false);
     } else {
       Platform.OS === 'android' && EditorWebView.current?.requestFocus();
       tiny.call(EditorWebView, tiny.focusTitle);
@@ -72,7 +74,7 @@ export function rgbToHex(color) {
 
 export const INPUT_MODE = {
   EDITING: 1,
-  NO_EDIT: 2,
+  NO_EDIT: 2
 };
 
 export const font_names = Platform.select({
@@ -82,15 +84,15 @@ export const font_names = Platform.select({
     {name: 'Serif', value: 'serif'},
     {name: 'Sans', value: 'sans-serif'},
     {name: 'Mono', value: 'courier'},
-    {name: 'Classic', value: 'courier new'},
+    {name: 'Classic', value: 'courier new'}
   ],
   ios: [
     {name: 'System Font', value: ''},
     {name: 'Sans', value: '-apple-system'},
     {name: 'Times New Roman', value: 'times new roman'},
     {name: 'Mono', value: 'courier'},
-    {name: 'Classic', value: 'courier new'},
-  ],
+    {name: 'Classic', value: 'courier new'}
+  ]
 });
 
 export const editor_colors = [
@@ -128,7 +130,7 @@ export const editor_colors = [
   '#666600',
   '#003700',
   '#002966',
-  '#3d1466',
+  '#3d1466'
 ];
 
 export const editor_font_size = [
@@ -138,7 +140,7 @@ export const editor_font_size = [
   '14pt',
   '18pt',
   '24pt',
-  '36pt',
+  '36pt'
 ];
 
 export const unorderedListStyles = ['default', 'circle', 'square'];
@@ -149,7 +151,7 @@ export const orderedListStyles = [
   'lower-greek',
   'lower-roman',
   'upper-alpha',
-  'upper-roman',
+  'upper-roman'
 ];
 
 export const TOOLBAR_ICONS = {
@@ -187,19 +189,19 @@ export const TOOLBAR_ICONS = {
   removeformat: 'format-clear',
   horizontal: 'border-horizontal',
   table: 'table-plus',
-  settings:'cog-outline',
-  magnify:"magnify",
-  tableprops:"table-settings",
-  tabledelete:"table-remove",
-  tablesplitcell:"table-split-cell",
-  tablemergecell:"table-merge-cells",
-  tablerowprops:"table-row",
-  tablecolumnprops:"table-column",
-  tableconfig:"table-cog",
-  imagepreview:"fullscreen",
-  removeimage:"delete",
-  imagefloatleft:"format-float-left",
-  imagefloatright:"format-float-right",
-  imagefloatnone:"format-float-none",
-  "line-break":"keyboard-return"
+  settings: 'cog-outline',
+  magnify: 'magnify',
+  tableprops: 'table-settings',
+  tabledelete: 'table-remove',
+  tablesplitcell: 'table-split-cell',
+  tablemergecell: 'table-merge-cells',
+  tablerowprops: 'table-row',
+  tablecolumnprops: 'table-column',
+  tableconfig: 'table-cog',
+  imagepreview: 'fullscreen',
+  removeimage: 'delete',
+  imagefloatleft: 'format-float-left',
+  imagefloatright: 'format-float-right',
+  imagefloatnone: 'format-float-none',
+  'line-break': 'keyboard-return'
 };

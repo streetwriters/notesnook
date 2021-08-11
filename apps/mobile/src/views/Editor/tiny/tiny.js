@@ -167,8 +167,13 @@ function call(webview, func, noqueue) {
 }
 
 export function safeKeyboardDismiss() {
-  textInput.current?.focus();
-  textInput.current?.blur();
+  if (Platform.OS === "android") {
+    textInput.current?.focus();
+    textInput.current?.blur();
+  } else {
+    call(EditorWebView,blur);
+  }
+
 }
 
 const undo = `

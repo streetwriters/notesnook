@@ -108,7 +108,7 @@ const Editor = React.memo(
             }}
             javaScriptEnabled={true}
             focusable={true}
-            keyboardDisplayRequiresUserAction={false}
+            keyboardDisplayRequiresUserAction={true}
             onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
             cacheMode="LOAD_DEFAULT"
             cacheEnabled={true}
