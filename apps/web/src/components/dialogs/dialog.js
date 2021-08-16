@@ -41,6 +41,7 @@ function Dialog(props) {
           backgroundColor: undefined,
           padding: 0,
           overflowY: "hidden",
+          border: 0,
           zIndex: 0,
         },
         overlay: {

@@ -16,7 +16,7 @@ class DarkColorSchemeFactory {
       fontSecondary: "#000",
       fontTertiary: "#A1A1A1",
       text: "#d3d3d3",
-      overlay: "rgba(255, 255, 255, 0.5)",
+      overlay: "rgba(53, 53, 53, 0.5)",
       secondary: "black",
       icon: "#dbdbdb",
       disabled: "#5b5b5b",
