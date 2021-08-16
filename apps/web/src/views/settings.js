@@ -41,6 +41,7 @@ function importBackup() {
     importFileElem.click();
     importFileElem.onchange = function () {
       const file = importFileElem.files[0];
+      if (!file) return reject("No file selected.");
       if (!file.name.endsWith(".nnbackup")) {
         return reject(
           "The given file does not have .nnbackup extension. Only files with .nnbackup extension are supported."
@@ -416,6 +417,7 @@ function Settings(props) {
                     throw new Error(error);
                   }
                 } catch (e) {
+                  console.error(e);
                   await showToast(
                     "error",
                     `Could not restore the backup. Error message: ${
