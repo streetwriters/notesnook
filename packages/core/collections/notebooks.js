@@ -142,5 +142,6 @@ export default class Notebooks extends Collection {
         }
       }
     }
+    await this._collection.updateItem(notebook);
   }
 }
