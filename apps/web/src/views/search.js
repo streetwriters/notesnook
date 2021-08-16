@@ -7,6 +7,8 @@ import ProgressBar from "../components/progress-bar";
 import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "rebass";
 import { showToast } from "../utils/toast";
+import { store as notebookstore } from "../stores/notebook-store";
+import { navigate } from "../navigation";
 
 async function typeToItems(type, context) {
   switch (type) {
@@ -18,7 +20,7 @@ async function typeToItems(type, context) {
     case "notebooks":
       return ["notebooks", db.notebooks.all];
     case "topics":
-      const { notebookId } = context;
+      const notebookId = notebookstore.get().selectedNotebookId;
       if (!notebookId) return ["topics", []];
       const topics = db.notebooks.notebook(notebookId).topics.all;
       return ["topics", topics];
@@ -62,8 +64,10 @@ function Search({ type }) {
       case "notebooks":
         return "all notebooks";
       case "topics":
-        const notebook = db.notebooks.notebook(context.notebookId);
-        return `${notebook.title} topics`;
+        const notebookId = notebookstore.get().selectedNotebookId;
+        if (!notebookId) return "";
+        const notebook = db.notebooks.notebook(notebookId);
+        return `topics in ${notebook.title} notebook`;
       case "tags":
         return "all tags";
       case "trash":
@@ -72,6 +76,9 @@ function Search({ type }) {
         return "";
     }
   }, [type, context]);
+
+  if (!title) return navigate("/");
+
   return (
     <>
       <Text variant="subtitle" mx={2}>
