@@ -141,7 +141,7 @@ export default class Notebooks extends Collection {
           if (!!this._db.notes.note(noteId)) topic.notes.push(noteId);
         }
       }
+      await this._collection.updateItem(notebook);
     }
-    await this._collection.updateItem(notebook);
   }
 }
