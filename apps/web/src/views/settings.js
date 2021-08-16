@@ -346,7 +346,7 @@ function Settings(props) {
               selectedOption={homepage}
               onSelectionChanged={(_option, index) => setHomepage(index)}
             />
-            {isDesktop && (
+            {isDesktop() && (
               <>
                 <Tip
                   sx={{ pt: 2 }}
