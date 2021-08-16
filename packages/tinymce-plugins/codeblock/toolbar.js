@@ -70,7 +70,7 @@ function changeLanguageSelectLabel(text) {
 }
 
 function parseCodeblockLanguage(node) {
-  if (node && node.tagName !== TAGNAME) return;
+  if (!node || node.tagName !== TAGNAME) return;
 
   const languageAliases = getLanguageFromClassName(node.className).split("-");
   if (languageAliases.length <= 1) return;
