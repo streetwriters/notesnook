@@ -1,4 +1,5 @@
 const { addPluginToPluginManager } = require("../utils");
+const Compressor = require("compressorjs");
 
 function register(editor) {
   editor.ui.registry.addButton("image", {

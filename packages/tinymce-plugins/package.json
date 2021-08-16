@@ -22,6 +22,7 @@
     "tinymce": "^5"
   },
   "dependencies": {
+    "compressorjs": "^1.0.7",
     "highlight.js": "^11.1.0",
     "rangy": "^1.3.0"
   }
