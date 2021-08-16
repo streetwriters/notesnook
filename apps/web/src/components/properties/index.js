@@ -151,9 +151,13 @@ function Properties() {
                     {notebooks.map((ref) => {
                       const notebook = db.notebooks.notebook(ref.id);
                       if (!notebook) return null;
-                      const topics = ref.topics.map(
-                        (topicId) => notebook.topics.topic(topicId)._topic
-                      );
+                      const topics = ref.topics.reduce((topics, topicId) => {
+                        const topic = notebook.topics.topic(topicId);
+                        if (!!topic && !!topic._topic)
+                          topics.push(topic._topic);
+                        return topics;
+                      }, []);
+
                       return (
                         <Flex flexDirection="column" my={1}>
                           <Flex
