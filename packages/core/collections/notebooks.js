@@ -4,6 +4,7 @@ import sort from "fast-sort";
 import getId from "../utils/id";
 import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
 import { qclone } from "qclone";
+import setManipulator from "../utils/set";
 
 export default class Notebooks extends Collection {
   async merge(remoteNotebook) {
@@ -35,10 +36,12 @@ export default class Notebooks extends Collection {
         // This case will be automatically handled as the new notebook is our source of truth.
 
         // CASE 3: if topic exists in both notebooks:
-        //      if oldTopic.dateEdited > newTopic.dateEdited: we keep oldTopic.
+        //      if oldTopic.dateEdited > newTopic.dateEdited: we keep oldTopic
+        //      and merge the notes of both topics.
         else if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
           remoteNotebook.topics[newTopicIndex] = {
             ...oldTopic,
+            notes: setManipulator.union(oldTopic.notes, newTopic.notes),
             dateEdited: Date.now(),
           };
         }
