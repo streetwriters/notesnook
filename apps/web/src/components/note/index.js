@@ -75,7 +75,7 @@ function Note(props) {
                 icon={Icon.Notebook}
               />
             )}
-            {note.tags.slice(0, 2).map((tag) => {
+            {note.tags?.slice(0, 2).map((tag) => {
               const tagItem = db.tags.tag(tag);
               if (!tagItem) return null;
               return (
