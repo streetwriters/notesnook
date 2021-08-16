@@ -114,6 +114,9 @@ export default class Backup {
         "This backup was made from a newer version of Notesnook. Cannot migrate."
       );
 
+    // we have to reindex to make sure we handle all the items
+    // properly.
+    reindex(data);
     const collections = [
       {
         index: data["notebooks"],
@@ -138,7 +141,9 @@ export default class Backup {
       },
     ];
 
-    await this._migrator.migrate(collections, (id) => data[id], version);
+    if (await this._migrator.migrate(collections, (id) => data[id], version)) {
+      this._db.notebooks.cleanup();
+    }
   }
 
   _validate(backup) {
@@ -173,4 +178,24 @@ function filterData(data) {
 
   skippedKeys.forEach((key) => delete data[key]);
   return data;
+}
+
+function reindex(data) {
+  for (let key in data) {
+    const item = data[key];
+    switch (item.type) {
+      case "notebook":
+        if (!data["notebooks"]) data["notebooks"] = [];
+        data["notebooks"].push(item.id);
+        break;
+      case "note":
+        if (!data["notes"]) data["notes"] = [];
+        data["notes"].push(item.id);
+        break;
+      case "content":
+        if (!data["content"]) data["content"] = [];
+        data["content"].push(item.id);
+        break;
+    }
+  }
 }
