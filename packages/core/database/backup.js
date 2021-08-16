@@ -142,7 +142,7 @@ export default class Backup {
     ];
 
     if (await this._migrator.migrate(collections, (id) => data[id], version)) {
-      this._db.notebooks.cleanup();
+      await this._db.notebooks.cleanup();
     }
   }
 

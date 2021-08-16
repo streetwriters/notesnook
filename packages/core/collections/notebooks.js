@@ -131,7 +131,8 @@ export default class Notebooks extends Collection {
     }
   }
 
-  cleanup() {
+  async cleanup() {
+    await this._db.notes.init();
     for (let notebook of this.all) {
       for (let topic of notebook.topics) {
         const clonedIds = topic.notes.slice();
