@@ -260,7 +260,7 @@ export const Notes = ({route, navigation}) => {
         />
       </ContainerTopSection>
       <SimpleList
-        listData={notes}
+        listData={notes || []}
         type="notes"
         screen="NotesPage"
         refreshCallback={_refreshCallback}
