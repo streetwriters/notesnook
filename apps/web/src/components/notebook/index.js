@@ -51,6 +51,12 @@ function Notebook(props) {
             {notebook.pinned && (
               <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
             )}
+            <Text variant="subBody" color="primary">
+              Notebook
+            </Text>
+            <Text as="span" mx={1}>
+              •
+            </Text>
             {new Date(notebook.dateCreated).toLocaleDateString("en", {
               month: "long",
               day: "2-digit",
