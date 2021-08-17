@@ -29,7 +29,7 @@ const RenderItem = ({item, index}) => {
   const Item = renderItems[item.itemType || item.type];
 
   return (
-    <Item item={item} tags={item.tags ? [...item.tags] : null} index={index} />
+    <Item item={item} tags={item.tags ? [...item.tags] : []} index={index} />
   );
 };
 
@@ -108,6 +108,8 @@ const SimpleList = ({
   };
 
   const _keyExtractor = item => item.id || item.title;
+
+  
 
   return (
     <>
