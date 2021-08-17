@@ -49,12 +49,10 @@ function getProducts() {
 }
 
 function get() {
-  return true;
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
 async function verify(callback, error) {
-  return callback();
   try {
     if (!premiumStatus) {
       if (error) {
