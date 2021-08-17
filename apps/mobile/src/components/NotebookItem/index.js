@@ -94,6 +94,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 textStyle={{
                   marginRight: 0
                 }}
+                iconSize={SIZE.sm}
                 style={{
                   borderRadius: 5,
                   maxWidth: 120,

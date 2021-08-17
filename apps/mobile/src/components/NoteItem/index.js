@@ -102,20 +102,21 @@ const NoteItem = ({item, isTrash, tags}) => {
                   title={db.notebooks.notebook(_item.id)?.data.title}
                   key={_item}
                   height={20}
-                  textStyle={{
-                    fontWeight: 'normal',
-                    fontFamily: null
-                  }}
                   icon="book-outline"
                   type="grayBg"
                   fontSize={SIZE.xs + 1}
+                  iconSize={SIZE.sm}
+                  textStyle={{
+                    marginRight: 0,
+                    fontWeight: 'normal',
+                    fontFamily: null
+                  }}
                   style={{
                     borderRadius: 5,
                     marginRight: 5,
                     borderWidth: 0.5,
                     borderColor: colors.icon,
                     paddingHorizontal: 6,
-                    paddingRight: 2
                   }}
                   onPress={() => navigateToNotebook(_item)}
                 />
@@ -127,6 +128,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   key={item}
                   height={20}
                   textStyle={{
+                    marginRight: 0,
                     fontWeight: 'normal',
                     fontFamily: null
                   }}
