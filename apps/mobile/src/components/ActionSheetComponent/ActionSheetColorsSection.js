@@ -20,7 +20,6 @@ export const ActionSheetColorsSection = ({item, close}) => {
   let width = dimensions.width > 600 ? 600 : 500;
 
   const changeColor = async (color) => {
-    console.log(note);
     if (note.color === color.name) {
       await db.notes.note(note.id).uncolor();
     } else {
