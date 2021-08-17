@@ -882,3 +882,7 @@ hue-6-2: #e6c07b
 .hljs-link {
   text-decoration: underline;
 }
+
+.mce-content-body hr {
+  border-color: #b1b1b1 !important;
+}
