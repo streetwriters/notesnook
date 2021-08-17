@@ -2011,7 +2011,7 @@
     fastq "^1.6.0"
 
 "@notesnook/desktop@./desktop/":
-  version "1.5.2"
+  version "1.5.3"
   dependencies:
     diary "^0.1.6"
     electron-better-ipc "^2.0.1"
@@ -8723,19 +8723,6 @@ normalize-url@^3.0.0:
   version "3.3.0"
   resolved "https://registry.npmjs.org/normalize-url/-/normalize-url-3.3.0.tgz"
   integrity sha512-U+JJi7duF1o+u2pynbp2zXDW2/PADgC30f0GsHZtRh+HOcXHnw137TrNlyxxRvWW5fjKd3bcLHPxofWuCjaeZg==
-
-notes-core@../notesnook-core/:
-  version "6.8.3"
-  dependencies:
-    "@stablelib/blake2s" "^1.0.1"
-    dayjs "^1.10.6"
-    fast-sort "^2.0.1"
-    lean-he "^2.1.2"
-    no-internet "^1.5.2"
-    qclone "^1.0.4"
-    quill-delta-to-html "^0.12.0"
-    showdown "https://github.com/thecodrr/showdown"
-    spark-md5 "^3.0.1"
 
 "notes-core@git+https://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:x-oauth-basic@github.com/streetwriters/notesnook-core.git":
   version "6.8.3"
