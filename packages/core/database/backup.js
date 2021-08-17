@@ -183,6 +183,10 @@ function filterData(data) {
 function reindex(data) {
   for (let key in data) {
     const item = data[key];
+    if (!item) {
+      delete data[key];
+      continue;
+    }
     switch (item.type) {
       case "notebook":
         if (!data["notebooks"]) data["notebooks"] = [];
