@@ -64,7 +64,7 @@ function Note(props) {
         }
       }}
       header={
-        (note.tags.length || notebook) && (
+        (note.tags?.length || notebook) && (
           <Flex alignSelf="flex-start" justifySelf="flex-start" mb={1}>
             {notebook && (
               <IconTag

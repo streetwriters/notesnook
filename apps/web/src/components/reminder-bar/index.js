@@ -7,6 +7,8 @@ import * as Icon from "../icons";
 function ReminderBar() {
   const reminders = useAppStore((store) => store.reminders);
   const reminder = useMemo(() => {
+    if (!reminders) return null;
+
     const copy = reminders.slice();
     const reminder = copy.sort((a, b) => a.priority - b.priority)[0];
     if (!reminder) return;

@@ -22,8 +22,8 @@ const NotesProfile = createProfile(
       index={index}
       pinnable={!context}
       item={item}
-      tags={item.tags.slice()}
-      notebooks={item.notebooks?.slice()}
+      tags={item.tags?.slice() || []}
+      notebooks={item.notebooks?.slice() || []}
       context={context}
     />
   ),
