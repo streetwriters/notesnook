@@ -193,16 +193,21 @@ export default class Notes extends Collection {
       let item = this.note(id);
       if (!item) continue;
       const itemData = qclone(item.data);
+
       if (item.notebooks) {
         for (let notebook of item.notebooks) {
-          for (let topic of notebook.topics) {
-            await this._db.notebooks
-              .notebook(notebook.id)
-              .topics.topic(topic)
-              .delete(id);
+          const notebookRef = this._db.notebooks.notebook(notebook.id);
+          if (!notebookRef) continue;
+
+          for (let topicId of notebook.topics) {
+            const topic = notebookRef.topics.topic(topicId);
+            if (!topic) continue;
+
+            await topic.delete(id);
           }
         }
       }
+
       for (let tag of item.tags) {
         await this._db.tags.untag(tag, id);
       }
