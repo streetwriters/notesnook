@@ -20,6 +20,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
   const compactMode = settings.notebooksListMode === 'compact';
 
   const topics = item.topics?.slice(0, 3) || [];
+
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
     let rowItems =
@@ -85,19 +86,21 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 height={SIZE.xl}
                 textStyle={{
                   fontWeight: 'normal',
-                  fontFamily: null
+                  fontFamily: null,
                 }}
                 type="grayBg"
                 fontSize={SIZE.xs + 1}
-                icon="book-open-outline"
+                icon="bookmark-outline"
+                textStyle={{
+                  marginRight: 0
+                }}
                 style={{
                   borderRadius: 5,
-                  marginRight: 5,
-                  marginVertical: 5,
                   maxWidth: 120,
                   borderWidth: 0.5,
                   borderColor: colors.icon,
-                  paddingHorizontal: 6
+                  paddingHorizontal: 6,
+                  marginVertical:5
                 }}
                 onPress={() => navigateToTopic(topic)}
               />
@@ -113,6 +116,15 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             marginTop: 5,
             height: SIZE.md + 2
           }}>
+          <Paragraph
+            color={colors.accent}
+            size={SIZE.xs}
+            style={{
+              marginRight: 10
+            }}>
+            {isTopic ? 'Topic' : 'Notebook'}
+          </Paragraph>
+
           {isTrash ? (
             <>
               <Paragraph
@@ -145,7 +157,6 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               {new Date(item.dateCreated).toDateString().substring(4)}
             </Paragraph>
           )}
-
           <Paragraph
             color={colors.icon}
             size={SIZE.xs}
