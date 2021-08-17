@@ -203,5 +203,6 @@ export const TOOLBAR_ICONS = {
   imagefloatleft: 'format-float-left',
   imagefloatright: 'format-float-right',
   imagefloatnone: 'format-float-none',
-  'line-break': 'keyboard-return'
+  'line-break': 'keyboard-return',
+  code:"code-tags"
 };

@@ -3,7 +3,7 @@ import {
   font_names,
   orderedListStyles,
   unorderedListStyles,
-  editor_colors,
+  editor_colors
 } from './constants';
 
 export const TOOLBAR_CONFIG = [
@@ -11,27 +11,27 @@ export const TOOLBAR_CONFIG = [
     {
       format: 'bold',
       type: 'format',
-      fullname: 'Bold',
+      fullname: 'Bold'
     },
     {
       format: 'italic',
       type: 'format',
-      fullname: 'Italic',
+      fullname: 'Italic'
     },
     {
       format: 'underline',
       type: 'format',
-      fullname: 'Underline',
+      fullname: 'Underline'
     },
     {
       format: 'strikethrough',
       type: 'format',
-      fullname: 'Strikethrough',
+      fullname: 'Strikethrough'
     },
     {
       format: 'line-break',
       type: 'format',
-      fullname: 'Line break',
+      fullname: 'Line break'
     },
     {
       format: 'align',
@@ -43,28 +43,28 @@ export const TOOLBAR_CONFIG = [
           format: 'alignleft',
           type: 'formatLine',
           premium: true,
-          fullname: 'Align Left',
+          fullname: 'Align Left'
         },
         {
           format: 'aligncenter',
           type: 'formatLine',
           premium: true,
-          fullname: 'Align Center',
+          fullname: 'Align Center'
         },
         {
           format: 'alignright',
           type: 'formatLine',
           premium: true,
-          fullname: 'Align Right',
+          fullname: 'Align Right'
         },
         {
           format: 'alignjustify',
           type: 'formatLine',
           premium: true,
-          fullname: 'Justify',
-        },
-      ],
-    },
+          fullname: 'Justify'
+        }
+      ]
+    }
   ],
   [
     {
@@ -77,9 +77,9 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'fontsize',
           formatValue: item,
-          fullname: item,
+          fullname: item
         };
-      }),
+      })
     },
     {
       format: 'fontname',
@@ -92,15 +92,15 @@ export const TOOLBAR_CONFIG = [
           format: 'fontname',
           formatValue: item.value,
           fullname: item.value,
-          text: item.name,
+          text: item.name
         };
-      }),
+      })
     },
     {
       format: 'h2',
       type: 'format',
       showTitle: false,
-      fullname: 'Heading 2',
+      fullname: 'Heading 2'
     },
     {
       format: 'header',
@@ -114,45 +114,45 @@ export const TOOLBAR_CONFIG = [
           text: 'Paragraph',
           type: 'format',
           showTitle: false,
-          fullname: 'Paragraph',
+          fullname: 'Paragraph'
         },
         {
           format: 'h2',
           text: 'Heading 2',
           type: 'format',
           showTitle: false,
-          fullname: 'Heading 2',
+          fullname: 'Heading 2'
         },
         {
           format: 'h3',
           text: 'Heading 3',
           type: 'format',
           showTitle: false,
-          fullname: 'Heading 3',
+          fullname: 'Heading 3'
         },
         {
           format: 'h4',
           text: 'Heading 4',
           type: 'format',
           showTitle: false,
-          fullname: 'Heading 4',
+          fullname: 'Heading 4'
         },
         {
           format: 'h5',
           text: 'Heading 5',
           type: 'format',
           showTitle: false,
-          fullname: 'Heading 5',
+          fullname: 'Heading 5'
         },
         {
           format: 'h6',
           text: 'Heading 6',
           type: 'format',
           showTitle: false,
-          fullname: 'Heading 6',
-        },
-      ],
-    },
+          fullname: 'Heading 6'
+        }
+      ]
+    }
   ],
   [
     {
@@ -163,9 +163,9 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'ol',
           formatValue: style,
-          fullname: style,
+          fullname: style
         };
-      }),
+      })
     },
 
     {
@@ -176,16 +176,16 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'ul',
           formatValue: style === 'default' ? 'disc' : style,
-          fullname: style,
+          fullname: style
         };
-      }),
+      })
     },
     {
       format: 'cl',
       type: 'format',
       fullname: 'Checklist',
-      premium: true,
-    },
+      premium: true
+    }
   ],
   [
     {
@@ -197,9 +197,9 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'hilitecolor',
           formatValue: item,
-          fullname: item,
+          fullname: item
         };
-      }),
+      })
     },
     {
       format: 'forecolor',
@@ -210,17 +210,17 @@ export const TOOLBAR_CONFIG = [
         return {
           format: 'forecolor',
           formatValue: item,
-          fullname: item,
+          fullname: item
         };
-      }),
-    },
+      })
+    }
   ],
 
   [
     {
       format: 'blockquote',
       type: 'format',
-      fullname: 'Quote',
+      fullname: 'Quote'
     },
     {
       format: 'link',
@@ -231,39 +231,44 @@ export const TOOLBAR_CONFIG = [
         {
           format: 'link',
           type: 'format',
-          fullname: 'Link',
-        },
-      ],
+          fullname: 'Link'
+        }
+      ]
     },
     {
       format: 'pre',
       type: 'format',
       fullname: 'Code Block',
-      premium: true,
+      premium: true
     },
+    {
+      format: 'code',
+      type: 'format',
+      fullname: 'Inline Code'
+    }
   ],
   [
     {
       format: 'outdent',
       type: 'format',
-      fullname: 'Outdent',
+      fullname: 'Outdent'
     },
     {
       format: 'indent',
       type: 'format',
-      fullname: 'Indent',
+      fullname: 'Indent'
     },
 
     {
       format: 'superscript',
       type: 'format',
-      fullname: 'Superscript',
+      fullname: 'Superscript'
     },
     {
       format: 'subscript',
       type: 'format',
-      fullname: 'Subscript',
-    },
+      fullname: 'Subscript'
+    }
   ],
   [
     {
@@ -271,7 +276,7 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       fullname: 'Table',
       groupType: 'table',
-      premium: true,
+      premium: true
     },
     {
       format: 'tableconfig',
@@ -283,86 +288,86 @@ export const TOOLBAR_CONFIG = [
           format: 'tableprops',
           type: 'format',
           fullname: 'Table Settings',
-          premium: true,
+          premium: true
         },
         {
           format: 'tablerowprops',
           type: 'format',
           fullname: 'Table Row Settings',
-          premium: true,
+          premium: true
         },
         {
           format: 'tablesplitcell',
           type: 'format',
           fullname: 'Table Split Cell',
-          premium: true,
+          premium: true
         },
         {
           format: 'tablemergecell',
           type: 'format',
           fullname: 'Table Merge Cell',
-          premium: true,
-        },
+          premium: true
+        }
       ],
-      premium: true,
+      premium: true
     },
 
     {
       format: 'tabledelete',
       type: 'format',
       fullname: 'Remove Table',
-      premium: true,
-    },
+      premium: true
+    }
   ],
   [
     {
       format: 'image',
       type: 'format',
       fullname: 'Image',
-      premium: true,
+      premium: true
     },
     {
       format: 'video',
       type: 'format',
       groupType: 'video',
       fullname: 'Video',
-      premium: true,
-    },
+      premium: true
+    }
   ],
 
   [
     {
       format: 'ltr',
       type: 'format',
-      fullname: 'Text Direction LTR',
+      fullname: 'Text Direction LTR'
     },
     {
       format: 'rtl',
       type: 'format',
-      fullname: 'Text Direction RTL',
-    },
+      fullname: 'Text Direction RTL'
+    }
   ],
   [
     {
       format: 'horizontal',
       type: 'format',
-      fullname: 'Horizontal Rule',
+      fullname: 'Horizontal Rule'
     },
 
     {
       format: 'removeformat',
       type: 'format',
-      fullname: 'Remove Formatting',
+      fullname: 'Remove Formatting'
     },
     {
       format: 'magnify',
       type: 'format',
-      fullname: 'Search & Replace',
+      fullname: 'Search & Replace'
     },
     {
       format: 'settings',
       type: 'settings',
-      fullname: 'Editor Settings',
-    },
-  ],
+      fullname: 'Editor Settings'
+    }
+  ]
 ];

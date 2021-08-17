@@ -3,11 +3,11 @@ import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {
   eCloseProgressDialog,
-  eOpenProgressDialog,
+  eOpenProgressDialog
 } from '../../../../utils/Events';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
-import tiny, { safeKeyboardDismiss } from '../tiny';
+import tiny, {safeKeyboardDismiss} from '../tiny';
 import {formatSelection} from './constants';
 
 export const execCommands = {
@@ -78,7 +78,7 @@ export const execCommands = {
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   image: async () => {
     if (editing.isFocused) {
-      safeKeyboardDismiss()
+      safeKeyboardDismiss();
       await sleep(500);
       editing.isFocused = true;
     }
@@ -94,13 +94,13 @@ export const execCommands = {
               {
                 includeBase64: true,
                 maxWidth: 1024,
-                mediaType: 'photo',
+                mediaType: 'photo'
               },
-              handleImageResponse,
+              handleImageResponse
             );
           },
           actionText: 'Take photo',
-          icon: 'camera',
+          icon: 'camera'
         },
         {
           action: async () => {
@@ -110,15 +110,15 @@ export const execCommands = {
               {
                 includeBase64: true,
                 maxWidth: 1024,
-                mediaType: 'photo',
+                mediaType: 'photo'
               },
-              handleImageResponse,
+              handleImageResponse
             );
           },
           actionText: 'Select from gallery',
-          icon: 'image-multiple',
-        },
-      ],
+          icon: 'image-multiple'
+        }
+      ]
     });
 
     return;
@@ -299,6 +299,9 @@ let node = tinymce.activeEditor.selection.getNode();
   tinymce.activeEditor.undoManager.transact(function() {
     tinymce.activeEditor.execCommand('InsertLineBreak');
   });`,
+  code: `tinymce.activeEditor.undoManager.transact(function() {
+    tinymce.activeEditor.execCommand('mceInsertInlineCode');
+});`
 };
 
 const handleImageResponse = response => {
