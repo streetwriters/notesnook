@@ -96,8 +96,8 @@ const NoteItem = ({item, isTrash, tags}) => {
               zIndex: 10,
               elevation: 10
             }}>
-            {!isTrash &&
-              item.notebooks?.slice(0, 1).map(_item => (
+            {!isTrash && item.notebooks ? 
+              item.notebooks?.slice(0, 1)?.map(_item => (
                 <Button
                   title={db.notebooks.notebook(_item.id)?.data.title}
                   key={_item}
@@ -119,9 +119,9 @@ const NoteItem = ({item, isTrash, tags}) => {
                   }}
                   onPress={() => navigateToNotebook(_item)}
                 />
-              ))}
-            {!isTrash &&
-              tags?.slice(0, 2).map(item => (
+              )) : null}
+            {!isTrash && tags ? 
+              tags.slice(0, 2)?.map(item => (
                 <Button
                   title={'#' + item}
                   key={item}
@@ -142,7 +142,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   }}
                   onPress={() => navigateToTag(item)}
                 />
-              ))}
+              )) : null}
           </View>
         )}
 

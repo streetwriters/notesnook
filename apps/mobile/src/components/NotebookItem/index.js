@@ -3,7 +3,7 @@ import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
-import { useSettingStore } from '../../provider/stores';
+import {useSettingStore} from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import {getElevation, getTotalNotes, history} from '../../utils';
 import {SIZE} from '../../utils/SizeUtils';
@@ -25,11 +25,11 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     let rowItems =
       item.type === 'topic'
         ? ['Edit Topic', 'Add Shortcut', 'Delete']
-        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete',];
+        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
     rowItems = isTrash ? ['Restore', 'PermDelete'] : rowItems;
 
     ActionSheetEvent(item, false, false, rowItems, {
-      notebookID: notebookID,
+      notebookID: notebookID
     });
   };
 
@@ -40,7 +40,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     let headerState = {
       heading: topic.title,
       id: topic.id,
-      type: topic.type,
+      type: topic.type
     };
     Navigation.navigate(routeName, params, headerState);
   };
@@ -50,13 +50,13 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
       <View
         style={{
           flexGrow: 1,
-          flexShrink: 1,
+          flexShrink: 1
         }}>
         <Heading
           size={SIZE.md}
           numberOfLines={1}
           style={{
-            flexWrap: 'wrap',
+            flexWrap: 'wrap'
           }}>
           {item.title}
         </Heading>
@@ -65,18 +65,18 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             size={SIZE.sm}
             numberOfLines={2}
             style={{
-              flexWrap: 'wrap',
+              flexWrap: 'wrap'
             }}>
             {item.description}
           </Paragraph>
         )}
 
-        {isTopic || compactMode  ? null : (
+        {isTopic || compactMode ? null : (
           <View
             style={{
               flexDirection: 'row',
               alignItems: 'center',
-              flexWrap: 'wrap',
+              flexWrap: 'wrap'
             }}>
             {topics.map(topic => (
               <Button
@@ -85,7 +85,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 height={SIZE.xl}
                 textStyle={{
                   fontWeight: 'normal',
-                  fontFamily: null,
+                  fontFamily: null
                 }}
                 type="grayBg"
                 fontSize={SIZE.xs + 1}
@@ -97,7 +97,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                   maxWidth: 120,
                   borderWidth: 0.5,
                   borderColor: colors.icon,
-                  paddingHorizontal: 6,
+                  paddingHorizontal: 6
                 }}
                 onPress={() => navigateToTopic(topic)}
               />
@@ -111,7 +111,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             justifyContent: 'flex-start',
             alignItems: 'center',
             marginTop: 5,
-            height: SIZE.md + 2,
+            height: SIZE.md + 2
           }}>
           {isTrash ? (
             <>
@@ -120,7 +120,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: 'center',
-                  marginRight: 10,
+                  marginRight: 10
                 }}>
                 {'Deleted on ' +
                   new Date(item.dateDeleted).toISOString().slice(0, 10)}
@@ -130,7 +130,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 size={SIZE.xs}
                 style={{
                   textAlignVertical: 'center',
-                  marginRight: 10,
+                  marginRight: 10
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
@@ -140,7 +140,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               color={colors.icon}
               size={SIZE.xs}
               style={{
-                marginRight: 10,
+                marginRight: 10
               }}>
               {new Date(item.dateCreated).toDateString().substring(4)}
             </Paragraph>
@@ -150,7 +150,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             color={colors.icon}
             size={SIZE.xs}
             style={{
-              marginRight: 10,
+              marginRight: 10
             }}>
             {item && totalNotes > 1
               ? totalNotes + ' notes'
@@ -166,7 +166,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               size={SIZE.sm}
               style={{
                 marginRight: 10,
-                marginTop: 2,
+                marginTop: 2
               }}
               color={colors.accent}
             />
@@ -184,7 +184,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
           height: 35,
           width: 35,
           borderRadius: 100,
-          alignItems: 'center',
+          alignItems: 'center'
         }}
       />
     </>

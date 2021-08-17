@@ -12,7 +12,7 @@ import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
@@ -22,7 +22,7 @@ import {
   eOnLoadNote,
   eOpenAddTopicDialog,
   eScrollEvent,
-  refreshNotesPage,
+  refreshNotesPage
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
@@ -49,8 +49,12 @@ export const Notes = ({route, navigation}) => {
     } else if (params.get === 'monographs') {
       _notes = db.monographs.all;
     } else {
-      _notes = db.notebooks.notebook(params.notebookId)?.topics.topic(params.id)
-        ?.all;
+      _notes = db.notebooks
+        .notebook(params.notebookId)
+        ?.topics.topic(params.id)?.all;
+    }
+    if (!_notes) {
+      _notes = [];
     }
     if (
       (params.type === 'tag' || params.type === 'color') &&
@@ -69,7 +73,7 @@ export const Notes = ({route, navigation}) => {
       ranAfterInteractions = false;
       eUnSubscribeEvent(refreshNotesPage, init);
       editing.actionAfterFirstSave = {
-        type: null,
+        type: null
       };
     };
   }, []);
@@ -79,7 +83,7 @@ export const Notes = ({route, navigation}) => {
     editing.actionAfterFirstSave = {
       type: params.type,
       id: params.id,
-      notebook: params.notebookId,
+      notebook: params.notebookId
     };
   };
 
@@ -98,7 +102,7 @@ export const Notes = ({route, navigation}) => {
           ? '#' + params.title
           : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
       id: params.id,
-      type: params.type,
+      type: params.type
     });
   };
 
@@ -109,14 +113,14 @@ export const Notes = ({route, navigation}) => {
         params.type === 'tag'
           ? '#' + params.title
           : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-      type: 'in',
+      type: 'in'
     });
   };
 
   const onBlur = useCallback(() => {
     setNotes([]);
     editing.actionAfterFirstSave = {
-      type: null,
+      type: null
     };
   }, []);
 
@@ -129,10 +133,10 @@ export const Notes = ({route, navigation}) => {
           params.type === 'tag'
             ? '#' + params.title
             : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
-        type: 'hide',
+        type: 'hide'
       });
       editing.actionAfterFirstSave = {
-        type: null,
+        type: null
       };
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
@@ -157,7 +161,7 @@ export const Notes = ({route, navigation}) => {
       title:
         params.type === 'tag'
           ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
     });
   };
 
@@ -166,7 +170,7 @@ export const Notes = ({route, navigation}) => {
       try {
         await openLinkInBrowser(
           'https://docs.notesnook.com/monographs/',
-          colors.accent,
+          colors.accent
         );
       } catch (e) {}
       return;
@@ -190,10 +194,10 @@ export const Notes = ({route, navigation}) => {
       if (route.params.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
         notebookId: route.params.notebookId,
-        toEdit: route.params,
+        toEdit: route.params
       });
     },
-    icon: 'pencil',
+    icon: 'pencil'
   };
 
   const _refreshCallback = () => {
@@ -215,7 +219,7 @@ export const Notes = ({route, navigation}) => {
     loading:
       params.get === 'monographs'
         ? 'Loading published notes'
-        : 'Loading your notes.',
+        : 'Loading your notes.'
   };
 
   const isFocused = () => navigation.isFocused();
@@ -228,10 +232,10 @@ export const Notes = ({route, navigation}) => {
         if (route.params.type !== 'topic') return;
         eSendEvent(eOpenAddTopicDialog, {
           notebookId: route.params.notebookId,
-          toEdit: route.params,
+          toEdit: route.params
         });
-      },
-    },
+      }
+    }
   ];
 
   return (
@@ -240,7 +244,7 @@ export const Notes = ({route, navigation}) => {
         type={params.type}
         extras={{
           topic: params.id,
-          notebook: params.notebookId,
+          notebook: params.notebookId
         }}
         screen="NotesPage"
       />

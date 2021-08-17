@@ -1,14 +1,17 @@
 import React, {useEffect, useRef, useState} from 'react';
+import {View} from 'react-native';
 import {FlatList, RefreshControl} from 'react-native';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {eScrollEvent} from '../../utils/Events';
+import {ActionIcon} from '../ActionIcon';
 import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
 import SortDialog from '../SortDialog';
 import TagItem from '../TagItem';
+import Paragraph from '../Typography/Paragraph';
 import {Empty} from './empty';
 import {Footer} from './footer';
 import {Header} from './header';
@@ -19,13 +22,15 @@ let renderItems = {
   notebook: NotebookWrapper,
   topic: NotebookWrapper,
   tag: TagItem,
-  section: SectionHeader,
+  section: SectionHeader
 };
 
 const RenderItem = ({item, index}) => {
   const Item = renderItems[item.itemType || item.type];
-  
-  return <Item item={item} tags={item.tags ? [...item.tags] : null} index={index} />;
+
+  return (
+    <Item item={item} tags={item.tags ? [...item.tags] : null} index={index} />
+  );
 };
 
 const SimpleList = ({
@@ -37,9 +42,9 @@ const SimpleList = ({
   placeholderData,
   loading,
   headerProps = {
-    heading: 'Home',
+    heading: 'Home'
   },
-  screen,
+  screen
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -53,7 +58,7 @@ const SimpleList = ({
         () => {
           _setLoading(false);
         },
-        listData.length === 0 ? 0 : 300,
+        listData.length === 0 ? 0 : 300
       );
     } else {
       _setLoading(true);
@@ -72,7 +77,7 @@ const SimpleList = ({
       ) : (
         <RenderItem item={item} index={index} />
       ),
-    [],
+    []
   );
 
   const _onRefresh = async () => {
@@ -88,10 +93,10 @@ const SimpleList = ({
       let y = event.nativeEvent.contentOffset.y;
       eSendEvent(eScrollEvent, {
         y,
-        screen,
+        screen
       });
     },
-    [screen],
+    [screen]
   );
 
   let styles = {
@@ -99,7 +104,7 @@ const SimpleList = ({
     backgroundColor: colors.bg,
     width: '100%',
     minHeight: 1,
-    minWidth: 1,
+    minWidth: 1
   };
 
   const _keyExtractor = item => item.id || item.title;
@@ -119,7 +124,7 @@ const SimpleList = ({
           <RefreshControl
             style={{
               opacity: 0,
-              elevation: 0,
+              elevation: 0
             }}
             tintColor={colors.accent}
             colors={[colors.accent]}
