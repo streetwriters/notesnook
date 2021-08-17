@@ -20,12 +20,13 @@ export const ActionSheetColorsSection = ({item, close}) => {
   let width = dimensions.width > 600 ? 600 : 500;
 
   const changeColor = async (color) => {
+    console.log(note);
     if (note.color === color.name) {
       await db.notes.note(note.id).uncolor();
     } else {
       await db.notes.note(note.id).color(color.name);
     }
-    let _note = db.notes.note(note.id);
+    let _note = db.notes.note(note.id).data;
     setNote({..._note});
     setColorNotes();
     Navigation.setRoutesToUpdate([
