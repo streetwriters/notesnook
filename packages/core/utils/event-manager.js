@@ -30,10 +30,14 @@ class EventManager {
   }
 
   async publishWithResult(name, ...args) {
-    if (!this._registry[name]) return true;
-    const handlers = this._registry[name];
+    const handlers = [];
+    this._registry.forEach((props, handler) => {
+      if (props.name === name) handlers.push(handler);
+      if (props.once) this._registry.delete(handler);
+    });
+
     if (handlers.length <= 0) return true;
-    return await Promise.all(handlers.map((h) => h.handler(...args)));
+    return await Promise.all(handlers.map((handler) => handler(...args)));
   }
 }
 export default EventManager;
