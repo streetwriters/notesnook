@@ -43,6 +43,7 @@ const PublishNoteDialog = () => {
     note &&
     `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
   const isPublished = note && db?.monographs.isPublished(note?.id);
+  const pwdInput = useRef();
 
   useEffect(() => {
     eSubscribeEvent(eOpenPublishNoteDialog, open);
@@ -299,6 +300,7 @@ const PublishNoteDialog = () => {
               {isLocked ? (
                 <>
                   <Input
+                    fwdRef={pwdInput}
                     onChangeText={value => (passwordValue = value)}
                     blurOnSubmit
                     secureTextEntry

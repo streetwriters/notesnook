@@ -93,7 +93,6 @@ import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
 import {Button as MButton} from '../../components/Button/index';
 import Share from 'react-native-share';
-let menuRef = createRef();
 
 const format = ver => {
   let parts = ver.toString().split('');
@@ -460,6 +459,7 @@ const AccoutLogoutSection = () => {
   const [visible, setVisible] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [loading, setLoading] = useState(false);
+  const pwdInput = useRef();
 
   return (
     user && (
@@ -532,6 +532,7 @@ const AccoutLogoutSection = () => {
 
               <Input
                 placeholder="Enter account password"
+                fwdRef={pwdInput}
                 onChangeText={v => {
                   passwordValue = v;
                 }}
@@ -1113,6 +1114,7 @@ const SettingsAppearanceSection = () => {
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
+  const menuRef = useRef();
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
     dispatch({type: Actions.THEME, colors: newColors});

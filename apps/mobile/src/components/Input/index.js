@@ -204,7 +204,7 @@ const Input = ({
                 top={10}
                 bottom={10}
                 onPress={() => {
-                  fwdRef.current?.blur();
+                  fwdRef?.current?.blur();
                   setSecureEntry(!secureEntry);
                 }}
                 style={{

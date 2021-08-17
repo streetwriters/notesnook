@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Appearance} from 'react-native';
 import {SafeAreaView, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
@@ -52,6 +52,7 @@ const AppLoader = ({onLoad}) => {
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
+  const pwdInput = useRef();
 
   const load = async value => {
     if (verifyUser) return;
@@ -224,6 +225,7 @@ const AppLoader = ({onLoad}) => {
                 </Paragraph>
                 <Seperator half />
                 <Input
+                  fwdRef={pwdInput}
                   secureTextEntry
                   placeholder="Enter account password"
                   onChangeText={v => (passwordValue = v)}
