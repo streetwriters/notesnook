@@ -129,7 +129,8 @@ export function getTotalNotes(notebook) {
   }, 0);
 }
 
-export function verifyAccount() {
+export async function verifyAccount() {
+  if (!(await db.user.getUser())) return true;
   return showPasswordDialog("verify_account", ({ password }) => {
     return db.user.verifyPassword(password);
   });
