@@ -231,6 +231,7 @@ function init_tiny(size) {
     },
     image_description: false,
     image_caption: false,
+    media_dimensions:false,
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
@@ -259,6 +260,31 @@ function init_tiny(size) {
           });
         }
       });
+
+      editor.ui.registry.addButton('deletevideo', {
+        icon: 'remove',
+        tooltip: 'Remove iframe',
+        onAction: function () {
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
+        },
+        onclick: function () {
+          editor.undoManager.transact(function () {
+            tinymce.activeEditor.execCommand('Delete');
+          });
+        }
+      });
+
+      editor.ui.registry.addContextToolbar('iframecontrols', {
+        predicate: function (node) {
+          return node.getAttribute("data-mce-object") === "iframe"
+        },
+        items: 'deletevideo',
+        position: 'node',
+        scope: 'node'
+      });
+
       editor.ui.registry.addButton('imageopts', {
         icon: 'image-options',
         tooltip: 'Image properties',
