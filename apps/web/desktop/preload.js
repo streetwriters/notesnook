@@ -29,3 +29,14 @@ contextBridge.exposeInMainWorld("config", {
     return ipcRenderer.callMain("fromRenderer", { type: "getZoomFactor" });
   },
 });
+
+contextBridge.exposeInMainWorld("native", {
+  selectDirectory: ({ title, buttonLabel, defaultPath }) => {
+    return ipcRenderer.callMain("fromRenderer", {
+      type: "selectDirectory",
+      title,
+      buttonLabel,
+      defaultPath,
+    });
+  },
+});

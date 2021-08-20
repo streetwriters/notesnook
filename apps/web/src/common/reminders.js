@@ -73,7 +73,11 @@ export async function resetReminders() {
   if (await shouldAddBackupReminder()) {
     if (isDesktop()) {
       const { data, filename, ext } = await createBackup(false);
-      saveFile(`${PATHS.backupsDirectory}/${filename}.${ext}`, data);
+      const directory = Config.get(
+        "backupStorageLocation",
+        PATHS.backupsDirectory
+      );
+      saveFile(`${directory}/${filename}.${ext}`, data);
     } else {
       appStore.addReminder("backup", "high");
     }

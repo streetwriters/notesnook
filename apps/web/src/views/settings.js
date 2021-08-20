@@ -34,6 +34,7 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 import { Slider } from "@rebass/forms";
 import useZoomFactor from "../hooks/use-zoom-factor";
 import debounce from "just-debounce";
+import { PATHS } from "@notesnook/desktop/paths";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -152,6 +153,10 @@ function Settings(props) {
     0
   );
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
+  const [backupStorageLocation, setBackupStorageLocation] = usePersistentState(
+    "backupStorageLocation",
+    PATHS.backupsDirectory
+  );
   const [enableTelemetry, setEnableTelemetry] = usePersistentState(
     "telemetry",
     true
@@ -469,6 +474,26 @@ function Settings(props) {
                 setBackupReminderOffset(index)
               }
             />
+            {isDesktop() && !!backupReminderOffset ? (
+              <Button
+                key={"backupLocation"}
+                variant="list"
+                onClick={async () => {
+                  const location = await window.native.selectDirectory({
+                    title: "Select where Notesnook should save backups",
+                    defaultPath:
+                      backupStorageLocation || PATHS.backupsDirectory,
+                  });
+                  if (!location) return;
+                  setBackupStorageLocation(location);
+                }}
+              >
+                <Tip
+                  text={"Change backups storage location"}
+                  tip={backupStorageLocation}
+                />
+              </Button>
+            ) : null}
           </>
         )}
 

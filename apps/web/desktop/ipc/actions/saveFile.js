@@ -1,23 +1,14 @@
-const { app } = require("electron");
 const fs = require("fs");
 const path = require("path");
 const { logger } = require("../../logger");
+const { resolvePath } = require("../utils");
 
 module.exports = (args) => {
   try {
     const { data, filePath } = args;
     if (!data || !filePath) return;
 
-    const resolvedPath = path.join(
-      ...filePath.split("/").map((segment) => {
-        let resolved = segment;
-        try {
-          resolved = app.getPath(resolved);
-        } finally {
-          return resolved;
-        }
-      })
-    );
+    const resolvedPath = resolvePath(filePath);
 
     logger.info("Saving file to", resolvedPath);
 

@@ -1,7 +1,9 @@
 const getZoomFactor = require("./getZoomFactor");
+const selectDirectory = require("./selectDirectory");
 
 const calls = {
   getZoomFactor,
+  selectDirectory,
 };
 
 module.exports.getCall = function getAction(callName) {
