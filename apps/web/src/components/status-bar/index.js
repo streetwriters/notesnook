@@ -9,6 +9,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import useAutoUpdater from "../../hooks/use-auto-updater";
 import downloadUpdate from "../../commands/download-update";
 import installUpdate from "../../commands/install-update";
+import checkForUpdate from "../../commands/check-for-update";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -97,6 +98,8 @@ function StatusBar() {
                 downloadUpdate();
               } else if (updateStatus.type === "completed") {
                 installUpdate();
+              } else {
+                checkForUpdate();
               }
             }}
             sx={{ alignItems: "center", justifyContent: "center" }}
