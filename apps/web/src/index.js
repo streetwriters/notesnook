@@ -6,6 +6,7 @@ import * as serviceWorker from "./serviceWorkerRegistration";
 import "./utils/overrides";
 import { loadTrackerScript } from "./utils/analytics";
 import Config from "./utils/config";
+import { isTesting } from "./utils/platform";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -19,7 +20,7 @@ async function checkRedirects(db) {
   if (window.location.pathname === "/") {
     const skipInitiation = Config.get("skipInitiation", false);
     const homepage = Config.get("homepage", 0);
-    if (!process.env.REACT_APP_CI && !isLoggedIn && !skipInitiation)
+    if (!isTesting() && !isLoggedIn && !skipInitiation)
       window.location.replace("/signup");
     else if (homepage) {
       const route = HOMEPAGE_ROUTE[homepage];

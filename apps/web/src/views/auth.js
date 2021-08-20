@@ -303,6 +303,7 @@ function Auth(props) {
               styles={{
                 container: { mt: 50 },
               }}
+              data-test-id="email"
               id="email"
               required
               name="email"
@@ -315,6 +316,7 @@ function Auth(props) {
                 styles={{
                   container: { mt: 2 },
                 }}
+                data-test-id="password"
                 id="password"
                 required
                 name="password"
@@ -336,6 +338,7 @@ function Auth(props) {
               </Button>
             )}
             <Button
+              data-test-id="submitButton"
               display="flex"
               type="submit"
               mt={4}

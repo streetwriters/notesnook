@@ -4,6 +4,7 @@ import Config from "../utils/config";
 import http from "notes-core/utils/http";
 import { EV, EVENTS } from "notes-core/common";
 import { getCurrentHash, hashNavigate } from "../navigation";
+import { isTesting } from "../utils/platform";
 
 /**
  * @type {import("notes-core/api").default}
@@ -12,27 +13,29 @@ var db;
 async function initializeDatabase() {
   const { default: Database } = await import("notes-core/api");
   db = new Database(StorageInterface, EventSource);
-  // db.host({
-  //   API_HOST: "https://api.notesnook.com",
-  //   AUTH_HOST: "https://auth.streetwriters.co",
-  //   SSE_HOST: "https://events.streetwriters.co",
-  // });
 
   // db.host({
   //   API_HOST: "http://localhost:5264",
   //   AUTH_HOST: "http://localhost:8264",
   //   SSE_HOST: "http://localhost:7264",
   // });
-
-  db.host({
-    API_HOST: "http://192.168.10.23:5264",
-    AUTH_HOST: "http://192.168.10.23:8264",
-    SSE_HOST: "http://192.168.10.23:7264",
-  });
+  if (isTesting()) {
+    db.host({
+      API_HOST: "https://api.notesnook.com",
+      AUTH_HOST: "https://auth.streetwriters.co",
+      SSE_HOST: "https://events.streetwriters.co",
+    });
+  } else {
+    db.host({
+      API_HOST: "http://192.168.10.23:5264",
+      AUTH_HOST: "http://192.168.10.23:8264",
+      SSE_HOST: "http://192.168.10.23:7264",
+    });
+  }
 
   await db.init();
 
-  if (!isAppHydrated() && !process.env.REACT_APP_CI) {
+  if (!isAppHydrated() && !isTesting()) {
     try {
       loadDefaultNotes(db);
     } catch (e) {}

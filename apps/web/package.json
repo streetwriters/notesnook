@@ -57,6 +57,7 @@
     "@types/quill": "^2.0.5",
     "babel-eslint": "^10.1.0",
     "chalk": "^4.1.0",
+    "dotenv": "^10.0.0",
     "env-cmd": "^10.1.0",
     "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
