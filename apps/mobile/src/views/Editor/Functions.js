@@ -158,6 +158,7 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
+    
     if (!data) {
       content.data = '';
       content.type = 'tiny';
@@ -267,6 +268,7 @@ const checkStatus = async noreset => {
     }, 1000);
   });
 };
+let lastEditTime = 0;
 
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
@@ -284,6 +286,7 @@ export const _onMessage = async evt => {
     case 'tiny':
       if (message.value !== content.data) {
         noteEdited = true;
+        lastEditTime = Date.now();
         content = {
           type: message.type,
           data: message.value
@@ -294,6 +297,8 @@ export const _onMessage = async evt => {
     case 'title':
       if (message.value !== title) {
         noteEdited = true;
+
+        lastEditTime = Date.now();
         title = message.value;
         eSendEvent('editorScroll', {
           title: message.value
@@ -628,18 +633,26 @@ export const presentResolveConflictDialog = _note => {
 };
 
 export async function updateNoteInEditor() {
-  console.log('updating note in editor');
+
+  console.log('trying to update.');
   let _note = db.notes.note(id).data;
   if (_note.conflicted) {
     presentResolveConflictDialog(_note);
     return;
   }
+  let data = await db.content.raw(note.contentId);
+  if (lastEditTime > _note.dateEdited) return;
+  if (data.data === content.data) return;
+  if (content.data.indexOf(data.data) !== -1) return;
+  if (note.dateEdited === _note.dateEdited) return;
+
   tiny.call(EditorWebView, tiny.isLoading);
   await setNote(_note);
   post('title', title);
   post('inject', content.data);
   tiny.call(EditorWebView, tiny.notLoading);
-  console.log('updated note in editor');
+
+  console.log('update content in editor complete');
 }
 
 const loadNoteInEditor = async (keepHistory = true) => {
