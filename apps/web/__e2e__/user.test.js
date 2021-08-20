@@ -22,7 +22,7 @@ const USER = {
   password: process.env.USER_PASSWORD,
 };
 
-test("login user", async () => {
+async function loginUser() {
   await page.click(getTestId("navitem-login"));
 
   await page.fill(getTestId("email"), USER.email);
@@ -34,4 +34,8 @@ test("login user", async () => {
   await page.waitForNavigation();
 
   expect(await isAbsent(getTestId("navitem-login"))).toBe(true);
+}
+
+test("login user", async () => {
+  await loginUser();
 });

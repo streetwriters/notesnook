@@ -26,3 +26,6 @@ jobs:
       - run: yarn playwright install-deps
       - run: yarn playwright install
       - run: yarn test
+        env:
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
