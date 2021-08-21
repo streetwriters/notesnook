@@ -26,6 +26,8 @@ import "@streetwritersco/tinymce-plugins/<plugin-name>";
 4. Shortcuts (for auto enclosing brackets, quotes, etc.)
 5. Quickimage (for directly embedding local file images)
 6. Collapsible Headers
+7. Keyboard quirks
+   - These includes various workarounds for quirks with keyboard input
 
 ### Overrides
 
