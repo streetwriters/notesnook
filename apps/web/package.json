@@ -11,7 +11,7 @@
     "@mdi/react": "^1.4.0",
     "@notesnook/desktop": "./desktop/",
     "@rebass/forms": "^4.0.6",
-    "@streetwritersco/tinymce-plugins": "^1.0.3",
+    "@streetwritersco/tinymce-plugins": "^1.1.0",
     "@tinymce/tinymce-react": "^3.12.6",
     "clipboard": "^2.0.6",
     "cogo-toast": "^4.2.3",

@@ -30,11 +30,11 @@ import "@streetwritersco/tinymce-plugins/checklist";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
+import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
-import { KeyboardEventManager } from "../../utils/keyboard";
 import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 
@@ -109,7 +109,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable quickbars autoresize",
   custom:
-    "collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
+    "keyboardquirks collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
   pro: "textpattern",
 };
 
@@ -130,6 +130,8 @@ function TinyMCE(props) {
   const isUserPremium = useIsUserPremium();
   const tinymceRef = editorRef;
   useEffect(() => {
+    if (!tinymceRef.current.editor.dom) return;
+
     tinymceRef.current.editor.dom.styleSheetLoader.unload(
       `${oldSkin}/content.inline.min.css`
     );
@@ -258,16 +260,10 @@ function TinyMCE(props) {
         }
       }}
       onKeyDown={(e) => {
-        e.getModifierState = undefined;
-        KeyboardEventManager.publish("keydown", e);
         if (e.ctrlKey && e.key === "s") {
           e.preventDefault();
           onSave();
         }
-      }}
-      onKeyUp={(e) => {
-        e.getModifierState = undefined;
-        KeyboardEventManager.publish("keyup", e);
       }}
       onEditorChange={(content, editor) => {
         if (onWordCountChanged) {
