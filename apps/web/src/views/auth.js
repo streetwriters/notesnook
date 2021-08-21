@@ -57,6 +57,7 @@ const authTypes = {
       },
     },
     labels: { email: "Your email", password: "Set password" },
+    confirmPassword: true,
     autoComplete: { password: "new-password" },
     primaryAction: {
       text: "Create account",
@@ -88,6 +89,11 @@ const authTypes = {
       </>
     ),
     onSubmit: async (form, onError) => {
+      console.log(form);
+      if (form.password !== form.confirmPassword) {
+        onError("Passwords do not match.");
+        return;
+      }
       return await userstore
         .signup(form)
         .then(async () => navigate(form.redirect || "/"))
@@ -279,7 +285,14 @@ function Auth(props) {
               const form = new FormData(e.target);
               const obj = Object.fromEntries(form.entries());
               obj.redirect = redirect;
-              await data.onSubmit(obj, setError, setSuccess);
+              await data.onSubmit(
+                obj,
+                (error) => {
+                  setIsSubmitting(false);
+                  setError(error);
+                },
+                setSuccess
+              );
               setIsSubmitting(false);
             }}
           >
@@ -322,6 +335,21 @@ function Auth(props) {
                 name="password"
                 autoComplete={data.autoComplete?.password}
                 label={data.labels.password}
+                type="password"
+              />
+            )}
+
+            {data.confirmPassword && (
+              <Field
+                styles={{
+                  container: { mt: 2 },
+                }}
+                data-test-id="confirm-password"
+                id="confirmPassword"
+                required
+                name="confirmPassword"
+                autoComplete="confirm-password"
+                label="Confirm your password"
                 type="password"
               />
             )}
