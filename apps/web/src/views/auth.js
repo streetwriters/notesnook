@@ -48,6 +48,7 @@ const features = [
 var interval = null;
 const authTypes = {
   signup: {
+    resetOnNavigate: true,
     title: "Create an account",
     subtitle: {
       text: "Already have an account?",
@@ -101,6 +102,7 @@ const authTypes = {
     },
   },
   login: {
+    resetOnNavigate: true,
     title: "Welcome back!",
     subtitle: {
       text: "Don't have an account?",
@@ -124,6 +126,7 @@ const authTypes = {
     },
   },
   recover: {
+    resetOnNavigate: false,
     title: "Recover your account",
     subtitle: {
       text: "Remember your password?",
@@ -179,6 +182,15 @@ function Auth(props) {
       setSuccess();
     }
   }, [isSubmitting]);
+
+  useEffect(() => {
+    setError();
+    setSuccess();
+    if (authTypes[type].resetOnNavigate) {
+      const form = document.getElementById("authForm");
+      form.reset();
+    }
+  }, [type]);
 
   return (
     <ThemeProvider>
@@ -275,6 +287,7 @@ function Auth(props) {
         <Flex justifyContent="center" flex={1} flexShrink={0}>
           <Flex
             as="form"
+            id="authForm"
             flexDirection="column"
             justifyContent="center"
             alignItems="stretch"
