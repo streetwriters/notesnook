@@ -1,0 +1,15 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`convert evernote note enex file: text-file 1`] = `
+Array [
+  Object {
+    "content": Object {
+      "data": "<p>Hello world</p>",
+      "type": "text",
+    },
+    "dateCreated": 0,
+    "dateEdited": 0,
+    "title": "world",
+  },
+]
+`;

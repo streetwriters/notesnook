@@ -1,0 +1,29 @@
+{
+  "name": "notesnook-importer",
+  "version": "1.0.0",
+  "private": "true",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "start": "index.js"
+  },
+  "dependencies": {
+    "dayjs": "^1.10.6",
+    "jsdom": "^17.0.0",
+    "showdown": "https://github.com/thecodrr/showdown",
+    "uzip": "^0.20201231.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.15.0",
+    "@babel/preset-env": "^7.15.0",
+    "@types/jest": "^27.0.1",
+    "@types/node": "^12.12.67",
+    "babel-jest": "^27.0.6",
+    "jest": "^27.0.6"
+  },
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": "14.x"
+  }
+}

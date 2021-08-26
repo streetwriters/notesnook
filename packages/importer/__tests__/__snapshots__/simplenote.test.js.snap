@@ -1,0 +1,51 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`convert simplenote backup zip file: simplenote-backup 1`] = `
+Array [
+  Object {
+    "content": Object {
+      "data": "<ol>
+<li>We Create</li>
+<li>We Contribute</li>
+<li>We Blog</li>
+<li>We Help</li>
+<li>We Love Coding</li>
+<li>Work with us</li>
+<li>Our Team</li>
+<li>What we can do</li>
+<li>Careers</li>
+<li>Blog Page</li>
+</ol>",
+      "type": "html",
+    },
+    "dateCreated": "2019-09-25T19:12:04.794Z",
+    "dateEdited": undefined,
+    "pinned": true,
+    "title": "KEYWORDS LIST OF MINT PLAYER",
+  },
+  Object {
+    "content": Object {
+      "data": "<ol>
+<li>We Create</li>
+<li>We Contribute</li>
+<li>We Blog</li>
+<li>We Help</li>
+<li>We Love Coding</li>
+<li>Work with us</li>
+<li>Our Team</li>
+<li>What we can do</li>
+<li>Careers</li>
+<li>Blog Page</li>
+</ol>",
+      "type": "html",
+    },
+    "dateCreated": "2019-09-21T17:43:30.648Z",
+    "dateEdited": undefined,
+    "tags": Array [
+      "cow",
+      "hello",
+    ],
+    "title": "List of Pages",
+  },
+]
+`;
