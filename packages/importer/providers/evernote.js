@@ -45,16 +45,7 @@ function convert(files) {
   return notes;
 }
 
-/**
- *
- * @param {string} fileName
- * @returns file name without extension
- */
-function getName(fileName) {
-  let parts = fileName.split(".");
-  let ext = parts.pop();
-  return fileName.replace(`.${ext}`, "");
-}
+
 
 /**
  *
@@ -65,7 +56,7 @@ function getName(fileName) {
 function isNotebook(notes, fileName) {
   if (notes.length > 1) return true;
   let note = notes[0];
-  if (note.querySelector("title").textContent !== getName(fileName)) {
+  if (note.querySelector("title").textContent !== extension.getName(fileName)) {
     return true;
   }
 
