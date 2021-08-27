@@ -69,7 +69,7 @@ function isNotebook(notes, fileName) {
  * @returns the created notebook using file name
  */
 function getNotebooks(fileName) {
-  return [{ notebook: getName(fileName), topic: "All notes" }];
+  return [{ notebook: extension.getName(fileName), topic: "All notes" }];
 }
 
 /**
