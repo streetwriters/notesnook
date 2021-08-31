@@ -70,12 +70,14 @@ export default class Sync {
     let { lastSynced, token } = await this._performChecks();
 
     try {
+      const now = Date.now();
       this._isSyncing = true;
 
       if (full) var serverResponse = await this._fetch(lastSynced, token);
 
       // we prepare local data before merging so we always have correct data
       const data = await this._collector.collect(lastSynced);
+      data.lastSynced = now;
 
       if (full) {
         // merge the server response
@@ -141,21 +143,5 @@ export default class Sync {
     );
 
     return response.lastSynced;
-  }
-
-  async cleanup() {
-    try {
-      let token = await this._tokenManager.getAccessToken();
-      if (!token) return;
-      const contentIds = await this._db.content.cleanup();
-      if (contentIds.length <= 0) return;
-      await http.post.json(
-        `${Constants.API_HOST}/sync/delete`,
-        { collection: "content", ids: contentIds },
-        token
-      );
-    } catch (e) {
-      console.error(e);
-    }
   }
 }
