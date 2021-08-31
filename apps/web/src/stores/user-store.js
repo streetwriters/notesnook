@@ -50,6 +50,13 @@ class UserStore extends BaseStore {
 
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
+      EV.remove(
+        EVENTS.userSubscriptionUpdated,
+        EVENTS.userEmailConfirmed,
+        EVENTS.databaseSyncRequested,
+        EVENTS.userLoggedOut
+      );
+
       this.set((state) => {
         state.user = user;
         state.isLoggedIn = true;
@@ -63,6 +70,7 @@ class UserStore extends BaseStore {
       });
 
       EV.subscribe(EVENTS.databaseSyncRequested, async () => {
+        console.log("Sync requested.");
         await appStore.sync(false);
       });
 
