@@ -39,5 +39,11 @@ class EventManager {
     if (handlers.length <= 0) return true;
     return await Promise.all(handlers.map((handler) => handler(...args)));
   }
+
+  remove(...names) {
+    this._registry.forEach((props, handler) => {
+      if (names.includes(props.name)) this._registry.delete(handler);
+    });
+  }
 }
 export default EventManager;

@@ -36,6 +36,7 @@ export const EVENTS = {
   databaseUpdated: "db:updated",
   appRefreshRequested: "app:refreshRequested",
   noteRemoved: "note:removed",
+  tokenRefreshed: "token:refreshed",
 };
 
 export const CURRENT_DATABASE_VERSION = 5.2;

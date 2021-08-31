@@ -1,7 +1,6 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import { EV, EVENTS } from "../common";
-import EventManager from "../utils/event-manager";
 
 const ENDPOINTS = {
   token: "/connect/token",
@@ -11,11 +10,6 @@ const ENDPOINTS = {
 };
 
 var isRefreshingToken = false;
-const TokenEventManager = new EventManager();
-const TOKEN_EVENTS = {
-  tokenRefreshed: "tokenRefreshed",
-};
-
 class TokenManager {
   /**
    *
@@ -61,11 +55,7 @@ class TokenManager {
 
     if (isRefreshingToken) {
       return new Promise((resolve, reject) => {
-        TokenEventManager.subscribe(
-          TOKEN_EVENTS.tokenRefreshed,
-          onTokenRefreshed,
-          true
-        );
+        EV.subscribe(EVENTS.tokenRefreshed, onTokenRefreshed, true);
 
         function onTokenRefreshed({ success, error }) {
           clearTimeout(timeout);
@@ -74,7 +64,7 @@ class TokenManager {
         }
 
         const timeout = setTimeout(() => {
-          TokenEventManager.unsubscribe(null, onTokenRefreshed);
+          EV.unsubscribe(EVENTS.tokenRefreshed, onTokenRefreshed);
           reject("Timeout while refreshing token.");
         }, 15000);
       });
@@ -90,9 +80,9 @@ class TokenManager {
           client_id: "notesnook",
         })
       );
-      TokenEventManager.publish(TOKEN_EVENTS.tokenRefreshed, { success: true });
+      EV.publish(EVENTS.tokenRefreshed, { success: true });
     } catch (e) {
-      TokenEventManager.publish(TOKEN_EVENTS.tokenRefreshed, {
+      EV.publish(EVENTS.tokenRefreshed, {
         success: false,
         error: e,
       });

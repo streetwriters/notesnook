@@ -47,7 +47,7 @@ class Database {
 
   async init() {
     EV.subscribeMulti(
-      [EVENTS.userLoggedIn, EVENTS.userFetched],
+      [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
       this.connectSSE.bind(this)
     );
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -100,7 +100,9 @@ class Database {
     this.monographs.init();
   }
 
-  async connectSSE() {
+  async connectSSE(args) {
+    if (!!args.error) return;
+
     this.monographs.init();
 
     if (!NNEventSource) return;
@@ -115,7 +117,6 @@ class Database {
     });
 
     this.evtSource.onopen = async () => {
-      await this.syncer.cleanup();
       console.log("SSE: opened channel successfully!");
     };
 
