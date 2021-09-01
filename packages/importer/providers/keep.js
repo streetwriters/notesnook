@@ -19,6 +19,22 @@ const colors = {
 };
 
 /**
+ * 
+ * @param {object} keepNote A google keep note object
+ * @returns parsed html list from json.
+ */
+function makeListHtml(keepNote) {
+  let content = '<ul class="tox-checklist">';
+  for (item of keepNote.listContent) {
+    content += `<li class="${
+      item.isChecked ? "tox-checklist--checked" : ""
+    }" >${item.text}</li>`;
+  }
+  content += "</ul>";
+  return content;
+}
+
+/**
  *
  * @param  {Array<{data:string | Buffer,createdAt:number,modifiedAt:number,fileName:string}>} files
  * @returns array of notes
@@ -34,7 +50,7 @@ function convert(files) {
       let imageKeys = items.filter(
         (i) => i.endsWith("png") || i.endsWith("jpg") || i.endsWith("jpeg")
       );
-	  
+
       for (let key of noteKeys) {
         let keepNote = JSON.parse(Buffer.from(unzip[key].buffer).toString());
         let note = templates.note();
@@ -62,14 +78,7 @@ function convert(files) {
           note.tags = keepNote.labels.map((label) => label.name);
         }
         if (keepNote.listContent) {
-          let content = '<ul class="tox-checklist">';
-          for (item of keepNote.listContent) {
-            content += `<li class="${
-              item.isChecked ? "tox-checklist--checked" : ""
-            }" >${item.text}</li>`;
-          }
-          content += "</ul>";
-          note.content.data = content;
+          note.content.data = makeListHtml(keepNote);
         }
         if (keepNote.color && keepNote.color !== "DEFAULT") {
           note.color = colors[keepNote.color.toLowerCase()];
