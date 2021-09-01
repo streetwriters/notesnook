@@ -73,7 +73,7 @@ function androidGboardEnterKeyBug(editor) {
     if (e.inputType === "insertCompositionText") {
       if (e.data?.endsWith("\n") && inputState.isKeyUnidentified) {
         inputState.isKeyUnidentified = null;
-        inputState.moveSelectionToNextNode = true;
+        inputState.forceMoveSelectionToNextNode = true;
       }
     } else {
       inputState.isKeyUnidentified = null;
@@ -162,6 +162,13 @@ function androidBackspaceKeyQuirk(editor) {
         container: range.startContainer,
         offset: range.startOffset,
       };
+
+      // Weird behavior: tinymce removes 1 (and only 1) trailing whitespace.
+      // It doesn't matter if there are more than 1. So we need to account for that.
+      if (range.startContainer.textContent.endsWith(" ")) {
+        inputState.selection.offset -= 1;
+      }
+
       inputState.forcePreserveSelection = true;
     } else {
       inputState.selection = {};
