@@ -54,7 +54,7 @@ function get() {
 
 async function verify(callback, error) {
   try {
-    if (!premiumStatus) {
+    if (!get()) {
       if (error) {
         error();
         return;

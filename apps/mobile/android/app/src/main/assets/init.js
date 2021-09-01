@@ -119,7 +119,7 @@ function init_tiny(size) {
     content_css: 'dist/skins/notesnook',
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace codeblock shortcuts inlinecode',
+      'searchreplace codeblock shortcuts inlinecode keyboardquirks',
       'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,

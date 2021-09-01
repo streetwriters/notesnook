@@ -158,7 +158,7 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
-    
+
     if (!data) {
       content.data = '';
       content.type = 'tiny';
@@ -190,6 +190,7 @@ export const loadNote = async item => {
   if (editing.isFocused) {
     tiny.call(EditorWebView, tiny.blur);
   }
+
   if (item && item.type === 'new') {
     if (getNote()) {
       await clearEditor();
@@ -223,9 +224,12 @@ export const loadNote = async item => {
     if (id === item.id && !item.forced) {
       return;
     }
-
     eSendEvent('loadingNote', item);
-    clearTimer();
+    if (getNote()) {
+      await clearEditor();
+    }
+    clearNote();
+    noteEdited = false;
     await setNote(item);
     webviewInit = false;
     editing.isFocused = false;
@@ -633,7 +637,6 @@ export const presentResolveConflictDialog = _note => {
 };
 
 export async function updateNoteInEditor() {
-
   console.log('trying to update.');
   let _note = db.notes.note(id).data;
   if (_note.conflicted) {
