@@ -2169,10 +2169,10 @@
   resolved "https://registry.yarnpkg.com/@stablelib/wipe/-/wipe-1.0.1.tgz#d21401f1d59ade56a62e139462a97f104ed19a36"
   integrity sha512-WfqfX/eXGiAd3RJe4VU2snh/ZPwtSjLG4ynQ/vYzvghTh7dHFcI1wl+nrkWG6lGhukOxOsUHfv8dUXr58D0ayg==
 
-"@streetwritersco/tinymce-plugins@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@streetwritersco/tinymce-plugins/-/tinymce-plugins-1.1.1.tgz#9c66cca00158a3931453113985cadd95a11a831e"
-  integrity sha512-QEtMIfJgK6TQTSD3ugguR1lEx/0s8/CK/L5wFjGWEvpx2z7zJcGhDjH1hFuhbVjAGQB2G8YCFMFY0t3e9sVsDA==
+"@streetwritersco/tinymce-plugins@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@streetwritersco/tinymce-plugins/-/tinymce-plugins-1.1.2.tgz#f54ebf48aa160dee63914e5981ea43de6a721912"
+  integrity sha512-mbB+X9O93vDAcKmal5Uw4/n6gN5Uqe3GwzPcqoIfWDii2Nb15lHwTJYWbTVqmLZH6GyxM3+VXg4ZQLL8SK5/yg==
   dependencies:
     compressorjs "^1.0.7"
     highlight.js "^11.1.0"
