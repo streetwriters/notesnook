@@ -71,7 +71,7 @@ function androidGboardEnterKeyBug(editor) {
   const inputState = {};
   editor.on("beforeinput", (e) => {
     if (e.inputType === "insertCompositionText") {
-      if (e.data?.endsWith("\n") && inputState.isKeyUnidentified) {
+      if (e.data && e.data.endsWith("\n") && inputState.isKeyUnidentified) {
         inputState.isKeyUnidentified = null;
         inputState.forceMoveSelectionToNextNode = true;
       }
@@ -91,7 +91,9 @@ function androidGboardEnterKeyBug(editor) {
       e.preventDefault();
 
       const range = editor.selection.getRng();
-      const sibling = range.startContainer.parentElement?.nextElementSibling;
+      const sibling = range.startContainer.parentElement
+        ? range.startContainer.parentElement.nextElementSibling
+        : null;
       if (!sibling) return;
       editor.selection.setCursorLocation(sibling, 0);
     }
