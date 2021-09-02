@@ -101,7 +101,7 @@ class Database {
   }
 
   async connectSSE(args) {
-    if (!!args.error) return;
+    if (args && !!args.error) return;
 
     this.monographs.init();
 
