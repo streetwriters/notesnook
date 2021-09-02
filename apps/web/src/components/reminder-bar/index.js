@@ -1,11 +1,12 @@
 import React, { useMemo } from "react";
-import { Flex, Text } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
 import * as Icon from "../icons";
 
 function ReminderBar() {
   const reminders = useAppStore((store) => store.reminders);
+  const dismissReminders = useAppStore((store) => store.dismissReminders);
   const reminder = useMemo(() => {
     if (!reminders) return null;
 
@@ -14,21 +15,21 @@ function ReminderBar() {
     if (!reminder) return;
     return Reminders[reminder.type];
   }, [reminders]);
+
   if (!reminder) return null;
   return (
     <Flex
       alignItems="center"
-      justifyContent="space-between"
       sx={{
         cursor: "pointer",
         borderRadius: "default",
         ":hover": { bg: "hover" },
       }}
+      p={1}
       onClick={reminder?.action}
       mx={1}
-      p={1}
     >
-      <Flex alignItems="center">
+      <Flex alignItems="center" flex={1}>
         <reminder.icon
           size={18}
           color="primary"
@@ -43,7 +44,22 @@ function ReminderBar() {
           </Text>
         </Flex>
       </Flex>
-      <Icon.ChevronRight size={20} color="primary" />
+      <Button
+        onClick={(e) => {
+          e.stopPropagation();
+          dismissReminders(reminder);
+        }}
+        sx={{
+          borderRadius: 50,
+          p: 1,
+          mr: 1,
+          bg: "transparent",
+          ":hover": { backgroundColor: "shade" },
+        }}
+        variant="tool"
+      >
+        <Icon.Dismiss size={20} color="primary" />
+      </Button>
     </Flex>
   );
 }

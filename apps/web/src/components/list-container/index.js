@@ -66,16 +66,6 @@ function ListContainer(props) {
                   ) : (
                     <ReminderBar />
                   ),
-                Footer: () => (
-                  <Text
-                    textAlign="center"
-                    color="fontTertiary"
-                    variant="body"
-                    py={2}
-                  >
-                    — End reached —
-                  </Text>
-                ),
               }}
               itemContent={(index, item) => {
                 if (!item) return null;

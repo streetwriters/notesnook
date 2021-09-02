@@ -77,13 +77,25 @@ class AppStore extends BaseStore {
    * @param {string} detail
    * @param {"high"|"medium"|"low"} priority
    */
-  addReminder = (type, priority) => {
-    this.set((state) =>
-      state.reminders.push({
-        type,
-        priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1,
-      })
-    );
+  setReminders = (...reminders) => {
+    this.set((state) => {
+      state.reminders = [];
+      for (let reminder of reminders) {
+        const { priority, type } = reminder;
+        state.reminders.push({
+          type,
+          priority: priority === "high" ? 1 : priority === "medium" ? 2 : 1,
+        });
+      }
+    });
+  };
+
+  dismissReminders = (...reminders) => {
+    this.set((state) => {
+      for (let reminder of reminders) {
+        state.reminders.splice(state.reminders.indexOf(reminder), 1);
+      }
+    });
   };
 
   pinItemToMenu = async (item) => {

@@ -69,7 +69,8 @@ export const Reminders = {
 };
 
 export async function resetReminders() {
-  appStore.set((state) => (state.reminders = []));
+  const reminders = [];
+
   if (await shouldAddBackupReminder()) {
     if (isDesktop()) {
       const { data, filename, ext } = await createBackup(false);
@@ -79,16 +80,17 @@ export async function resetReminders() {
       );
       saveFile(`${directory}/${filename}.${ext}`, data);
     } else {
-      appStore.addReminder("backup", "high");
+      reminders.push({ type: "backup", priority: "high" });
     }
   }
   if (await shouldAddLoginReminder()) {
-    appStore.addReminder("login", "low");
+    reminders.push({ type: "login", priority: "low" });
   }
   if (await shouldAddConfirmEmailReminder()) {
-    appStore.addReminder("email", "high");
+    reminders.push({ type: "email", priority: "high" });
   }
   if (await shouldAddRecoveryKeyBackupReminder()) {
-    appStore.addReminder("recoverykey", "high");
+    reminders.push({ type: "recoverykey", priority: "high" });
   }
+  appStore.get().setReminders(...reminders);
 }

@@ -177,3 +177,5 @@ export const MailCheck = createIcon(Icons.mdiEmailCheckOutline);
 export const Discord = createIcon(Icons.mdiDiscord);
 export const Twitter = createIcon(Icons.mdiTwitter);
 export const Reddit = createIcon(Icons.mdiReddit);
+
+export const Dismiss = createIcon(Icons.mdiClose);

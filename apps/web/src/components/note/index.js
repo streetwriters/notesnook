@@ -80,6 +80,7 @@ function Note(props) {
               if (!tagItem) return null;
               return (
                 <IconTag
+                  key={tagItem.id}
                   text={tagItem.alias || tagItem.title}
                   icon={Icon.Tag}
                   onClick={() => {
