@@ -53,8 +53,7 @@ class UserStore extends BaseStore {
       EV.remove(
         EVENTS.userSubscriptionUpdated,
         EVENTS.userEmailConfirmed,
-        EVENTS.databaseSyncRequested,
-        EVENTS.userLoggedOut
+        EVENTS.databaseSyncRequested
       );
 
       this.set((state) => {
