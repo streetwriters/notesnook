@@ -7,6 +7,7 @@ import {useTracked} from '../../provider';
 import {useSettingStore, useUserStore} from '../../provider/stores';
 import Navigation from '../../services/Navigation';
 import {SIZE} from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 
@@ -72,8 +73,9 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           {rightButtons.map((item, index) => (
             <MenuItem
               key={item.title}
-              onPress={() => {
+              onPress={async () => {
                 menuRef.current?.hide();
+                await sleep(300);
                 item.func();
               }}
               textStyle={{
