@@ -91,9 +91,20 @@ function androidGboardEnterKeyBug(editor) {
       e.preventDefault();
 
       const range = editor.selection.getRng();
-      const sibling = range.startContainer.parentElement
-        ? range.startContainer.parentElement.nextElementSibling
-        : null;
+
+      let sibling;
+      let parentElement = range.startContainer.parentElement;
+
+      if (parentElement) {
+        sibling = parentElement.nextElementSibling;
+
+        if (!sibling) {
+          let grandParentElement = parentElement.parentElement;
+          if (grandParentElement && grandParentElement.nodeName !== "BODY") {
+            sibling = grandParentElement.nextElementSibling;
+          }
+        }
+      }
       if (!sibling) return;
       editor.selection.setCursorLocation(sibling, 0);
     }
@@ -152,7 +163,7 @@ function androidBackspaceKeyQuirk(editor) {
   const inputState = {
     previousSelection: {},
     selection: {},
-    forcePreserveSelection: false,
+    forcePreserveSelection: false
   };
 
   editor.on("beforeinput", (e) => {
@@ -162,7 +173,7 @@ function androidBackspaceKeyQuirk(editor) {
       const range = editor.selection.getRng();
       inputState.selection = {
         container: range.startContainer,
-        offset: range.startOffset,
+        offset: range.startOffset
       };
 
       // Weird behavior: tinymce removes 1 (and only 1) trailing whitespace.
@@ -182,7 +193,7 @@ function androidBackspaceKeyQuirk(editor) {
     const range = editor.selection.getRng();
     inputState.previousSelection = {
       offset: range.startOffset,
-      container: range.startContainer,
+      container: range.startContainer
     };
   });
 
