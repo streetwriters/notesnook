@@ -371,6 +371,7 @@ export class AddNotebookDialog extends React.Component {
             onMomentumScrollEnd={() => {
               this.actionSheetRef.current?.handleChildScrollEnd();
             }}
+            ListFooterComponent={<View style={{height:50}} />}
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
