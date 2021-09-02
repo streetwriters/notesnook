@@ -250,9 +250,7 @@ export class DialogManager extends Component {
               getRef={() => this.actionSheet}
               hasColors={actionSheetData.colors}
               hasTags={actionSheetData.colors}
-              overlayColor={
-                colors.night ? 'rgba(225,225,225,0.1)' : 'rgba(0,0,0,0.3)'
-              }
+              overlayColor='rgba(0,0,0,0.3)'
               rowItems={actionSheetData.rowItems}
               columnItems={actionSheetData.columnItems}
               close={value => {

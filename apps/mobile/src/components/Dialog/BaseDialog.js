@@ -43,8 +43,6 @@ const BaseDialog = ({
         style={{
           backgroundColor:background? background : transparent
             ? 'transparent'
-            : state.colors.night
-            ? 'rgba(255,255,255,0.15)'
             : 'rgba(0,0,0,0.3)',
         }}>
         <KeyboardAvoidingView
