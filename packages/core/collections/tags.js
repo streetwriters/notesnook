@@ -19,18 +19,18 @@ export default class Tags extends Collection {
       title: tagId,
     };
 
-    let id = tag.id || makeId(tag.title);
+    let id = tag.id || makeId(tag.title.toLowerCase());
     let notes = tag.noteIds || [];
 
     tag = {
       type: "tag",
-      alias: tag.title,
       id,
       title: tag.title,
       noteIds: setManipulator.union(notes, noteIds),
     };
 
     await this._collection.addItem(tag);
+    await this._db.settings.setAlias(tag.id, tag.title);
     return tag;
   }
 
@@ -40,8 +40,17 @@ export default class Tags extends Collection {
       console.error(`No tag found. Tag id:`, tagId);
       return;
     }
-    tag.alias = newName;
-    await this._collection.updateItem(tag);
+    await this._db.settings.setAlias(tagId, newName);
+  }
+
+  alias(tagId) {
+    let tag = this.tag(tagId);
+    if (!tag) {
+      console.error(`No tag found. Tag id:`, tagId);
+      return;
+    }
+    const alias = this._db.settings.getAlias(tagId);
+    return alias || tag.alias || tag.title;
   }
 
   get raw() {

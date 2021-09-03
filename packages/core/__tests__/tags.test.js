@@ -76,7 +76,7 @@ describe.each([
       let tag = db[collection].tag(value);
       await db[collection].rename(tag.id, value + "-new");
       tag = db[collection].tag(tag.id);
-      expect(tag.alias).toBe(value + "-new");
+      expect(db[collection].alias(tag.id)).toBe(value + "-new");
     }));
 
   test(`remove a ${action}`, () =>

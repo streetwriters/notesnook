@@ -37,6 +37,7 @@ class Settings {
         ...item.groupOptions,
         ...this._settings.groupOptions,
       };
+      this._settings.aliases = {};
     } else {
       this._initSettings(item);
     }
@@ -66,6 +67,15 @@ class Settings {
         sortDirection: "desc",
       }
     );
+  }
+
+  async setAlias(id, name) {
+    this._settings.aliases[id] = name;
+    await this._saveSettings();
+  }
+
+  getAlias(id) {
+    return this._settings.aliases[id];
   }
 
   async pin(type, data) {
@@ -120,6 +130,7 @@ class Settings {
       id: id(),
       pins: [],
       groupOptions: {},
+      aliases: {},
       dateEdited: 0,
       dateCreated: 0,
       ...(settings || {}),
