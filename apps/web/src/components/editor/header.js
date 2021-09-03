@@ -42,7 +42,7 @@ function Header() {
           <Autosuggest
             sx={{ ml: 1 }}
             getData={() => db.tags.all}
-            getFields={(item) => [item.title, item.alias]}
+            getFields={(item) => [db.tags.alias(item.id)]}
             limit={5}
             onAdd={(value) => setTag(value)}
             onSelect={(item) => setTag(item.title)}
@@ -63,7 +63,7 @@ function Header() {
               >
                 <Icon.Tag size={14} />
                 <Text variant="title" fontWeight="body">
-                  {item.alias || item.title}
+                  {db.tags.alias(item.id)}
                 </Text>
               </Flex>
             )}

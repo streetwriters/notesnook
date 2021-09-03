@@ -7,7 +7,6 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import Animated from "../animated";
 import NavigationItem from "./navigation-item";
 import { navigate } from "../../navigation";
-import { toTitleCase } from "../../utils/string";
 import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
 import { useLocation } from "wouter";
@@ -135,10 +134,10 @@ function NavigationMenu(props) {
         {colors.map((color) => (
           <NavigationItem
             key={color.id}
-            title={toTitleCase(color.alias || color.title)}
+            title={db.colors.alias(color.id)}
             icon={Icon.Circle}
             selected={location === `/colors/${color.id}`}
-            color={color.title}
+            color={color.title.toLowerCase()}
             onClick={() => {
               navigate(`/colors/${color.id}`);
             }}
@@ -160,7 +159,7 @@ function NavigationMenu(props) {
         {pins.map((pin) => (
           <NavigationItem
             key={pin.id}
-            title={pin.alias || pin.title}
+            title={pin.type === "tag" ? db.tags.alias(pin.id) : pin.title}
             menu={{
               items: [
                 {

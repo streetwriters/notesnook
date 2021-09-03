@@ -4,11 +4,9 @@ import { Flex, Text, Button } from "rebass";
 import { useStore } from "../../stores/editor-store";
 import { COLORS } from "../../common";
 import { db } from "../../common/db";
-import { objectMap } from "../../utils/object";
 import { useStore as useAppStore } from "../../stores/app-store";
 import Animated from "../animated";
 import Toggle from "./toggle";
-import { toTitleCase } from "../../utils/string";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { navigate } from "../../navigation";
 
@@ -117,7 +115,7 @@ function Properties() {
                   ))}
                 </Flex>
                 <Flex flexDirection="column">
-                  {objectMap(COLORS, (label, code) => (
+                  {COLORS.map((label) => (
                     <Flex
                       key={label}
                       justifyContent="space-between"
@@ -128,12 +126,12 @@ function Properties() {
                       data-test-id={`properties-${label}`}
                     >
                       <Flex key={label} alignItems="center">
-                        <Icon.Circle size={14} color={label} />
+                        <Icon.Circle size={14} color={label.toLowerCase()} />
                         <Text ml={1} color="text" variant="body">
-                          {toTitleCase(label)}
+                          {label}
                         </Text>
                       </Flex>
-                      {color === label && (
+                      {label.toLowerCase() === color?.toLowerCase() && (
                         <Icon.Checkmark
                           color="primary"
                           size={20}

@@ -1,6 +1,5 @@
 import React from "react";
 import { db } from "../common/db";
-import { toTitleCase } from "../utils/string";
 import Home from "../views/home";
 import Notebooks from "../views/notebooks";
 import Notes from "../views/notes.js";
@@ -147,7 +146,7 @@ const routes = {
     return {
       key: "notes",
       type: "notes",
-      title: toTitleCase(title),
+      title: title,
       component: <Notes />,
       buttons: {
         search: {

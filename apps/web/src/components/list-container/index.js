@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Flex, Text } from "rebass";
+import { Flex } from "rebass";
 import Button from "../button";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";

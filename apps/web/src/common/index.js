@@ -14,15 +14,15 @@ import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
 import { isTesting } from "../utils/platform";
 
-export const COLORS = {
-  red: "#f44336",
-  orange: "#FF9800",
-  yellow: "#FFD600",
-  green: "#4CAF50",
-  blue: "#2196F3",
-  purple: "#673AB7",
-  gray: "#9E9E9E",
-};
+export const COLORS = [
+  "Red",
+  "Orange",
+  "Yellow",
+  "Green",
+  "Blue",
+  "Purple",
+  "Gray",
+];
 
 export const SUBSCRIPTION_STATUS = {
   BASIC: 0,

@@ -25,7 +25,7 @@ function Note(props) {
 
   const primary = useMemo(() => {
     if (!note.color) return "primary";
-    return note.color;
+    return note.color.toLowerCase();
   }, [note.color]);
 
   const notebook = useMemo(() => {
@@ -81,7 +81,7 @@ function Note(props) {
               return (
                 <IconTag
                   key={tagItem.id}
-                  text={tagItem.alias || tagItem.title}
+                  text={db.tags.alias(tagItem.id)}
                   icon={Icon.Tag}
                   onClick={() => {
                     if (!tagItem.id) return showToast("Tag not found.");

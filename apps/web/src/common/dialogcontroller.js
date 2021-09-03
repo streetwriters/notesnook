@@ -14,7 +14,6 @@ import download from "../utils/download";
 import { zip } from "../utils/zip";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
-import { toTitleCase } from "../utils/string";
 
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
@@ -521,7 +520,8 @@ export function showEditTagDialog(tagId) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ItemDialog
       title={"Edit tag"}
-      subtitle={`You are editing #${tag.alias || tag.title}.`}
+      subtitle={`You are editing #${db.tags.alias(tag.id)}.`}
+      defaultValue={db.tags.alias(tag.id)}
       item={tag}
       onClose={() => perform(false)}
       onAction={async (title) => {
@@ -541,8 +541,9 @@ export function showRenameColorDialog(colorId) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ItemDialog
       title={"Rename color"}
-      subtitle={`You are renaming color ${toTitleCase(color.title)}.`}
+      subtitle={`You are renaming color ${db.colors.alias(color.id)}.`}
       item={color}
+      defaultValue={db.colors.alias(color.id)}
       onClose={() => perform(false)}
       onAction={async (title) => {
         if (!title) return;
