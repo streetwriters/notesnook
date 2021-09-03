@@ -58,7 +58,7 @@ function NavigationItem(props) {
       {isShortcut && (
         <Icons.Shortcut
           size={8}
-          sx={{ position: "absolute", bottom: "-3px", left: "-6px" }}
+          sx={{ position: "absolute", bottom: "8px", left: "6px" }}
           color={color || "icon"}
         />
       )}
