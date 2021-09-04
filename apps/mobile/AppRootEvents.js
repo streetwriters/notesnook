@@ -204,7 +204,6 @@ export const AppRootEvents = React.memo(
     const onSyncComplete = async () => {
       initialize();
       setLastSynced(await db.lastSynced());
-      console.log('sync complete')
       if (getNote()) {
         await updateNoteInEditor();
       }
@@ -250,9 +249,8 @@ export const AppRootEvents = React.memo(
           subsriptionSuccessListener = RNIap.purchaseUpdatedListener(
             onSuccessfulSubscription
           );
-          subsriptionErrorListener = RNIap.purchaseErrorListener(
-            onSubscriptionError
-          );
+          subsriptionErrorListener =
+            RNIap.purchaseErrorListener(onSubscriptionError);
         });
     };
 
@@ -304,9 +302,11 @@ export const AppRootEvents = React.memo(
     const onLogout = async reason => {
       setUser(null);
       clearAllStores();
+
       SettingsService.init();
       setSyncing(false);
       setLoginMessage();
+      console.log('called logout');
       await PremiumService.setPremiumStatus();
       await MMKV.setItem('introCompleted', 'true');
       eSendEvent(eOpenProgressDialog, {
@@ -321,6 +321,10 @@ export const AppRootEvents = React.memo(
         actionText: 'Login',
         noProgress: true
       });
+      // Workaround to clear app on logout
+      setTimeout(() => {
+        initialize();
+      }, 1000);
     };
 
     unsubIAP = () => {
@@ -337,7 +341,7 @@ export const AppRootEvents = React.memo(
     const setCurrentUser = async login => {
       try {
         let user = await db.user.getUser();
-        console.log(user,'called user set current');
+        console.log(user, 'called user set current');
         if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
           setUser(user);
           return;
@@ -351,7 +355,7 @@ export const AppRootEvents = React.memo(
             setEmailVerifyMessage();
             return;
           }
-         
+
           let res = await doInBackground(async () => {
             try {
               user = await db.user.fetchUser();
