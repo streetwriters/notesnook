@@ -8,7 +8,7 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
-import { confirm, showTrackingDetailsDialog } from "../common/dialog-controller";
+import { showTrackingDetailsDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
