@@ -43,10 +43,8 @@ function NavigationItem(props) {
     >
       <Icon
         size={isTablet ? 18 : 15}
-        //sx={{ mr: 1 }}
-        color={color || "icon"}
+        color={props.selected ? "primary" : color || "icon"}
         rotate={isLoading}
-        stroke={props.selected ? "1px" : "0px"}
       />
       {isNew && (
         <Icons.Circle
