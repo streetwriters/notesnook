@@ -38,6 +38,7 @@ const ColorItem = ({item, index}) => {
   const {colors} = state;
   const setColorNotes = useMenuStore(state => state.setColorNotes);
   const [headerTextState, setHeaderTextState] = useState(null);
+  const alias = db.colors.alias(item.title);
 
   const onHeaderStateChange = event => {
     if (event?.id === item.id) {
@@ -62,7 +63,7 @@ const ColorItem = ({item, index}) => {
       get: 'colored'
     };
     Navigation.navigate('NotesPage', params, {
-      heading: item.title.slice(0, 1).toUpperCase() + item.title.slice(1),
+      heading: alias.slice(0, 1).toUpperCase() + alias.slice(1),
       id: item.id,
       type: 'color'
     });
@@ -75,7 +76,7 @@ const ColorItem = ({item, index}) => {
       title: 'Rename color',
       input: true,
       inputPlaceholder: 'Enter name for this color',
-      defaultValue: db.settings.getAlias(item.id) || item.title,
+      defaultValue: alias,
       paragraph: 'You are renaming the color ' + item.title,
       positivePress: async value => {
         if (!value || value.trim().length === 0) return;
@@ -132,13 +133,11 @@ const ColorItem = ({item, index}) => {
         </View>
         {headerTextState?.id === item.id ? (
           <Heading color={colors.heading} size={SIZE.md}>
-            {db.settings.getAlias(item.id) ||
-              item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+            {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
           </Heading>
         ) : (
           <Paragraph color={colors.pri} size={SIZE.md}>
-            {db.settings.getAlias(item.id) ||
-              item.title.slice(0, 1).toUpperCase() + item.title.slice(1)}
+            {alias.slice(0, 1).toUpperCase() + alias.slice(1)}
           </Paragraph>
         )}
       </View>

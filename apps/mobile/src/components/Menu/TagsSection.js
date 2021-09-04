@@ -1,22 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {useMenuStore, useNoteStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useMenuStore, useNoteStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getElevation} from '../../utils';
-import {db} from '../../utils/DB';
-import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/DB';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
+import { normalize, SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
+import { Button } from '../Button';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -38,13 +36,13 @@ export const TagsSection = () => {
       params = {
         notebook: item,
         title: item.title,
-        menu: true,
+        menu: true
       };
 
       Navigation.navigate('Notebook', params, {
         heading: item.title,
         id: item.id,
-        type: item.type,
+        type: item.type
       });
       eSendEvent(eOnNewTopicAdded, params);
     } else if (item.type === 'tag') {
@@ -52,12 +50,12 @@ export const TagsSection = () => {
         ...item,
         type: 'tag',
         menu: true,
-        get: 'tagged',
+        get: 'tagged'
       };
       Navigation.navigate('NotesPage', params, {
-        heading: '#' + item.title,
+        heading: '#' + db.tags.alias(item.title),
         id: item.id,
-        type: item.type,
+        type: item.type
       });
       eSendEvent(refreshNotesPage, params);
     } else {
@@ -65,7 +63,7 @@ export const TagsSection = () => {
       Navigation.navigate('NotesPage', params, {
         heading: item.title,
         id: item.id,
-        type: item.type,
+        type: item.type
       });
       eSendEvent(refreshNotesPage, params);
     }
@@ -75,15 +73,15 @@ export const TagsSection = () => {
   return (
     <View
       style={{
-        flexGrow: 1,
+        flexGrow: 1
       }}>
       <FlatList
         data={menuPins}
         style={{
-          flexGrow: 1,
+          flexGrow: 1
         }}
         contentContainerStyle={{
-          flexGrow: 1,
+          flexGrow: 1
         }}
         keyExtractor={(item, index) => item.id}
         renderItem={({item, index}) => (
@@ -97,13 +95,13 @@ export const TagsSection = () => {
 const PinItem = ({item, index, onPress}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
   const setMenuPins = useMenuStore(state => state.setMenuPins);
-
+  const alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
   const [visible, setVisible] = useState(false);
   const [headerTextState, setHeaderTextState] = useState(null);
   const color = headerTextState?.id === item.id ? colors.accent : colors.pri;
   const fwdRef = useRef();
+
   const onHeaderStateChange = event => {
     if (event?.id === item.id) {
       setHeaderTextState(event);
@@ -122,7 +120,7 @@ const PinItem = ({item, index, onPress}) => {
   const icons = {
     topic: 'book-open-outline',
     notebook: 'book-outline',
-    tag: 'pound',
+    tag: 'pound'
   };
 
   return (
@@ -148,7 +146,7 @@ const PinItem = ({item, index, onPress}) => {
             width="95%"
             height={50}
             customStyle={{
-              marginBottom: 30,
+              marginBottom: 30
             }}
           />
         </ActionSheetWrapper>
@@ -169,26 +167,26 @@ const PinItem = ({item, index, onPress}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           height: normalize(50),
-          marginBottom: 5,
+          marginBottom: 5
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
-            flex: 1,
+            flex: 1
           }}>
           <View
             style={{
               width: 30,
-              justifyContent: 'center',
+              justifyContent: 'center'
             }}>
             <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />
             <Icon
               style={{
                 position: 'absolute',
                 bottom: -6,
-                left: -6,
+                left: -6
               }}
               color={color}
               size={SIZE.xs}
@@ -199,20 +197,20 @@ const PinItem = ({item, index, onPress}) => {
             style={{
               alignItems: 'flex-start',
               flexGrow: 1,
-              flex: 1,
+              flex: 1
             }}>
             {headerTextState?.id === item.id ? (
               <Heading
                 style={{
-                  flexWrap: 'wrap',
+                  flexWrap: 'wrap'
                 }}
                 color={colors.heading}
                 size={SIZE.md}>
-                {item.title}
+                {alias}
               </Heading>
             ) : (
               <Paragraph numberOfLines={1} color={colors.pri} size={SIZE.md}>
-                {item.title}
+                {alias}
               </Paragraph>
             )}
           </View>

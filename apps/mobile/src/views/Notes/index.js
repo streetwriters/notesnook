@@ -32,9 +32,10 @@ export const Notes = ({route, navigation}) => {
   const colors = state.colors;
   const [notes, setNotes] = useState([]);
   const loading = useNoteStore(state => state.loading);
-
   let params = route.params ? route.params : null;
+  const alias = param.type === "tag" ? db.tags.alias(params.title) : db.colors.alias(params.title)
   let ranAfterInteractions = false;
+
 
   const runAfterInteractions = (time = 300) => {
     InteractionManager.runAfterInteractions(() => {
@@ -99,8 +100,8 @@ export const Notes = ({route, navigation}) => {
     Navigation.setHeaderState('NotesPage', params, {
       heading:
         params.type === 'tag'
-          ? '#' + params.title
-          : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+          ? '#' + alias 
+          : alias.slice(0, 1).toUpperCase() + alias.slice(1),
       id: params.id,
       type: params.type
     });
@@ -111,8 +112,8 @@ export const Notes = ({route, navigation}) => {
     eSendEvent(eScrollEvent, {
       name:
         params.type === 'tag'
-          ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+          ? '#' + alias
+          : alias.slice(0, 1).toUpperCase() + alias.slice(1),
       type: 'in'
     });
   };
@@ -131,8 +132,8 @@ export const Notes = ({route, navigation}) => {
       eSendEvent(eScrollEvent, {
         name:
           params.type === 'tag'
-            ? '#' + params.title
-            : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+            ? '#' + alias
+            : alias.slice(0, 1).toUpperCase() + alias.slice(1),
         type: 'hide'
       });
       editing.actionAfterFirstSave = {
@@ -152,7 +153,7 @@ export const Notes = ({route, navigation}) => {
   const updateSearch = () => {
     SearchService.update({
       placeholder: `Search in ${
-        params.type === 'tag' ? '#' + params.title : params.title
+        params.type === 'tag' ? '#' + alias : alias
       }`,
       data: notes,
       noSearch: false,
@@ -186,8 +187,8 @@ export const Notes = ({route, navigation}) => {
   const headerProps = {
     heading:
       params.type === 'tag'
-        ? '#' + params.title
-        : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        ? '#' + alias
+        : alias.slice(0, 1).toUpperCase() + alias.slice(1),
     color: params.type === 'color' ? params.title.toLowerCase() : null,
     paragraph: route.params.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
@@ -250,7 +251,7 @@ export const Notes = ({route, navigation}) => {
       />
       <ContainerTopSection>
         <Header
-          title={db.settings.getAlias(params.id) || headerProps.heading}
+          title={headerProps.heading}
           isBack={!params.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
