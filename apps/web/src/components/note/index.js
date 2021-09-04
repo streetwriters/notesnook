@@ -168,7 +168,6 @@ const menuItems = [
   },
   {
     key: "publish",
-    isNew: true,
     disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
     disableReason: "You cannot publish a locked note.",
     icon: Icon.Publish,

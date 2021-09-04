@@ -39,7 +39,6 @@ const routes = [
     title: "Monographs",
     path: "/monographs",
     icon: Icon.Monographs,
-    isNew: true,
   },
   { title: "Trash", path: "/trash", icon: Icon.Trash },
 ];

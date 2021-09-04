@@ -64,7 +64,7 @@ export const CREATE_BUTTON_MAP = {
 export async function introduceFeatures() {
   const hash = getCurrentHash().replace("#", "");
   if (!!hash || isTesting()) return;
-  const features = ["monographs"];
+  const features = [];
   for (let feature of features) {
     if (!Config.get(`feature:${feature}`)) {
       await showFeatureDialog(feature);

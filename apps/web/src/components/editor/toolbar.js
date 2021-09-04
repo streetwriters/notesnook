@@ -117,7 +117,6 @@ function Toolbar(props) {
         title: "Publish",
         icon: Icon.Publish,
         enabled: !isLocked,
-        new: true,
         onClick: () => showPublishView(store.get().session.id, "top"),
       },
       {
