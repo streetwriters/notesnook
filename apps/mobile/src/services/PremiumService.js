@@ -6,7 +6,7 @@ import {db} from '../utils/DB';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
-  eShowGetPremium,
+  eShowGetPremium
 } from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
 import {eSendEvent, ToastEvent} from './EventManager';
@@ -35,12 +35,11 @@ async function setPremiumStatus() {
     premiumStatus = 0;
   } finally {
     useMessageStore.getState().setAnnouncement();
-    if (!get()) {
-      await RNIap.initConnection();
-      products = await RNIap.getSubscriptions(itemSkus);
-    } else {
+    if (get()) {
       await subscriptions.clear();
     }
+    await RNIap.initConnection();
+    products = await RNIap.getSubscriptions(itemSkus);
   }
 }
 
@@ -49,6 +48,7 @@ function getProducts() {
 }
 
 function get() {
+  return true;
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 
@@ -76,22 +76,21 @@ const onUserStatusCheck = async type => {
         message = {
           context: 'sheet',
           title: 'Get Notesnook Pro',
-          desc: 'To assign colors to a note get Notesnook Pro today.',
+          desc: 'To assign colors to a note get Notesnook Pro today.'
         };
         break;
       case CHECK_IDS.noteExport:
         message = {
           context: 'export',
           title: 'Export in PDF, MD & HTML',
-          desc:
-            'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!',
+          desc: 'Get Notesnook Pro to export your notes in PDF, Markdown and HTML formats!'
         };
         break;
       case CHECK_IDS.noteTag:
         message = {
           context: 'sheet',
           title: 'Get Notesnook Pro',
-          desc: 'To create more tags for your notes become a Pro user today.',
+          desc: 'To create more tags for your notes become a Pro user today.'
         };
         break;
       case CHECK_IDS.notebookAdd:
@@ -101,8 +100,7 @@ const onUserStatusCheck = async type => {
         message = {
           context: 'sheet',
           title: 'Add Notes to Vault',
-          desc:
-            'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.',
+          desc: 'With Notesnook Pro you can add notes to your vault and do so much more! Get it now.'
         };
         break;
       case CHECK_IDS.databaseSync:
@@ -133,7 +131,7 @@ const showVerifyEmailDialog = () => {
           ToastEvent.show({
             heading: 'Please wait before requesting another email',
             type: 'error',
-            context: 'local',
+            context: 'local'
           });
           console.log('error');
           return;
@@ -146,19 +144,19 @@ const showVerifyEmailDialog = () => {
           message:
             'We have sent you an email confirmation link. Please check your email inbox to verify your account. If you cannot find the email, check your spam folder.',
           type: 'success',
-          context: 'local',
+          context: 'local'
         });
       } catch (e) {
         ToastEvent.show({
           heading: 'Could not send email',
           message: e.message,
           type: 'error',
-          context: 'local',
+          context: 'local'
         });
       }
     },
     actionText: 'Resend Confirmation Link',
-    noProgress: true,
+    noProgress: true
   });
 };
 
@@ -176,7 +174,7 @@ const subscriptions = {
       _subscriptions = [];
     }
     let index = _subscriptions.findIndex(
-      s => s.transactionId === transactionId,
+      s => s.transactionId === transactionId
     );
     if (index === -1) {
       _subscriptions.unshift(subscription);
@@ -193,7 +191,7 @@ const subscriptions = {
       _subscriptions = [];
     }
     let index = _subscriptions.findIndex(
-      s => s.transactionId === transactionId,
+      s => s.transactionId === transactionId
     );
     if (index !== -1) {
       _subscriptions.splice(index);
@@ -204,7 +202,7 @@ const subscriptions = {
     console.log(
       'verifying: ',
       subscription.transactionId,
-      new Date(subscription.transactionDate).toLocaleString(),
+      new Date(subscription.transactionDate).toLocaleString()
     );
 
     if (subscription.transactionReceipt) {
@@ -215,16 +213,16 @@ const subscriptions = {
           method: 'POST',
           body: JSON.stringify({
             receipt_data: subscription.transactionReceipt,
-            user_id: user.id,
+            user_id: user.id
           }),
           headers: {
-            'Content-Type': 'application/json',
-          },
+            'Content-Type': 'application/json'
+          }
         };
         try {
           let result = await fetch(
             'https://payments.streetwriters.co/apple/verify',
-            requestData,
+            requestData
           );
           let text = await result.text();
           if (!result.ok) {
@@ -255,7 +253,7 @@ const subscriptions = {
       await subscriptions.remove(subscription.transactionId);
       console.log('clearing subscriptions');
     }
-  },
+  }
 };
 
 export default {
@@ -266,5 +264,5 @@ export default {
   showVerifyEmailDialog,
   getProducts,
   getUser,
-  subscriptions,
+  subscriptions
 };

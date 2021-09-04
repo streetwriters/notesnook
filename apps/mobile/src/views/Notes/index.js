@@ -100,7 +100,7 @@ export const Notes = ({route, navigation}) => {
       heading:
         params.type === 'tag'
           ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+          : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
       id: params.id,
       type: params.type
     });
@@ -161,7 +161,7 @@ export const Notes = ({route, navigation}) => {
       title:
         params.type === 'tag'
           ? '#' + params.title
-          : params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
+          : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
     });
   };
 
@@ -187,7 +187,7 @@ export const Notes = ({route, navigation}) => {
     heading:
       params.type === 'tag'
         ? '#' + params.title
-        : params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
+        : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1),
     color: params.type === 'color' ? params.title.toLowerCase() : null,
     paragraph: route.params.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
@@ -250,7 +250,7 @@ export const Notes = ({route, navigation}) => {
       />
       <ContainerTopSection>
         <Header
-          title={headerProps.heading}
+          title={db.settings.getAlias(params.id) || headerProps.heading}
           isBack={!params.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
