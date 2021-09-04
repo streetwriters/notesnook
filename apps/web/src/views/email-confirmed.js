@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
-import { trackEvent } from "../utils/analytics";
+import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import * as Icon from "../components/icons";
 import openLink from "../commands/openLink";
@@ -131,7 +131,7 @@ function BlogPromoBanner(props) {
             title={account.title}
             onClick={() => {
               openLink(account.link, "_blank");
-              trackEvent(account.title, "social-link");
+              trackEvent(ANALYTICS_EVENTS.socialLink, account.title);
             }}
             size={30}
             sx={{ mr: 1, cursor: "pointer" }}

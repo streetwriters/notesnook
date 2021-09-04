@@ -12,7 +12,7 @@ import { ReactComponent as RichText } from "../../assets/richtext.svg";
 import { ReactComponent as Sync } from "../../assets/sync.svg";
 import { ReactComponent as Vault } from "../../assets/vault.svg";
 import getSymbolFromCurrency from "currency-symbol-map";
-import { trackEvent } from "../../utils/analytics";
+import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import { navigate } from "../../navigation";
 
 const premiumDetails = [
@@ -137,7 +137,7 @@ function BuyDialog(props) {
   }, [coupon, plan]);
 
   useEffect(() => {
-    trackEvent("Buy dialog opened.", "buy");
+    trackEvent(ANALYTICS_EVENTS.purchaseInitiated, "Buy dialog opened.");
   }, []);
 
   return (
@@ -311,7 +311,6 @@ function BuyDialog(props) {
                 fontSize="title"
                 fontWeight="bold"
                 onClick={async () => {
-                  trackEvent("Subscribe button clicked.", "buy");
                   if (isLoggedIn) {
                     await upgrade(user, coupon, plan);
                   } else {

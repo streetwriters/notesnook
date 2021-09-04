@@ -1,4 +1,4 @@
-import { trackEvent } from "../utils/analytics";
+import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 
 const isDev = false; // process.env.NODE_ENV === "development";
 
@@ -35,9 +35,9 @@ async function upgrade(user, coupon, plan) {
   if (!Paddle) return;
 
   if (coupon) {
-    trackEvent(`[${coupon}] redeemed!`, "offers");
+    trackEvent(ANALYTICS_EVENTS.offerClaimed, `[${coupon}] redeemed!`);
   } else {
-    trackEvent(`Checkout requested`, "checkout");
+    trackEvent(ANALYTICS_EVENTS.checkoutStarted, `Checkout requested`);
   }
 
   Paddle.Checkout.open({

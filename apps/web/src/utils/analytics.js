@@ -20,10 +20,40 @@ export function loadTrackerScript() {
   firstScriptElement.parentNode.insertBefore(script, firstScriptElement);
 }
 
-export function trackEvent(eventName, eventType) {
+export const ANALYTICS_EVENTS = {
+  checkoutStarted: {
+    name: "checkout:started",
+    description: "Sent when you start Paddle checkout.",
+  },
+  offerClaimed: {
+    name: "offer:claimed",
+    description:
+      "Sent when you start Paddle checkout with a coupon code applied.",
+  },
+  announcementDismissed: {
+    name: "announcement:dismissed",
+    description: "Sent when you dismiss an announcement.",
+  },
+  purchaseInitiated: {
+    name: "purchase:initiated",
+    description:
+      "Sent whenever the Premium dialog is shown to you. This can be voluntary or via accessing a premium feature.",
+  },
+  socialLink: {
+    name: "link:social",
+    description:
+      "Sent whenever you open Notesnook social media link from the email verified screen.",
+  },
+  announcementCta: {
+    name: "announcement:cta",
+    description: "Sent whenever you an announcement CTA is invoked.",
+  },
+};
+
+export function trackEvent(event, eventMessage) {
   if (Config.get("telemetry") === "false") return;
   if (window.umami) {
-    window.umami.trackEvent(eventName, eventType);
+    window.umami.trackEvent(eventMessage, event.name);
   }
 }
 

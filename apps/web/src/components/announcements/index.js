@@ -2,7 +2,7 @@ import React, { useMemo } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { showBuyDialog } from "../../common/dialog-controller";
-import { trackEvent } from "../../utils/analytics";
+import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import { allowedPlatforms } from "../../utils/use-announcements";
 
 function Announcements({ announcements, removeAnnouncement }) {
@@ -36,7 +36,10 @@ function Announcements({ announcements, removeAnnouncement }) {
             ":hover": { opacity: 0.7 },
           }}
           onClick={() => {
-            trackEvent(announcement.title, "dismissed");
+            trackEvent(
+              ANALYTICS_EVENTS.announcementDismissed,
+              announcement.title
+            );
             removeAnnouncement && removeAnnouncement(announcement.id);
           }}
         >
@@ -82,7 +85,7 @@ function Announcements({ announcements, removeAnnouncement }) {
               }}
               fontWeight="bold"
               onClick={async () => {
-                trackEvent(action.data, action.type);
+                trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
                 switch (action.type) {
                   case "link":
                     const url = new URL(action.data);

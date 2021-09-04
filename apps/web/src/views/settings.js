@@ -8,7 +8,7 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
-import { confirm } from "../common/dialog-controller";
+import { confirm, showTrackingDetailsDialog } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
@@ -577,30 +577,7 @@ function Settings(props) {
               }}
               isToggled={enableTelemetry}
             />
-            <Button
-              variant="list"
-              onClick={() => {
-                const details = [
-                  "1. We send an event whenever you open the web app along with the app version. All further navigation is not recorded.",
-                  "2. We send an event when you click the CTA (Call to Action) button on an announcement or promo.",
-                  "3. We send an event when you open the checkout to buy Notesnook Pro.",
-                  "4. We send an event when you claim an offer or promo.",
-                ];
-                confirm({
-                  title: "Telemetry details",
-                  subtitle:
-                    "Read details of all the usage data we collect and send to our servers.",
-                  message: (
-                    <>
-                      {details.map((detail) => (
-                        <p>{detail}</p>
-                      ))}
-                    </>
-                  ),
-                  yesText: "Okay",
-                });
-              }}
-            >
+            <Button variant="list" onClick={showTrackingDetailsDialog}>
               <Tip
                 text="What do we collect?"
                 tip="Read details of all usage data we collect."

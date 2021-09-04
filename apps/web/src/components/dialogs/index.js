@@ -10,9 +10,11 @@ import RecoveryKeyDialog from "./recoverykeydialog";
 import ItemDialog from "./itemdialog";
 import SessionExpiredDialog from "./sessionexpireddialog";
 import FeatureDialog from "./feature-dialog";
+import TrackingDetailsDialog from "./trackingdetailsdialog";
 
 const Dialogs = {
   AddNotebookDialog,
+  TrackingDetailsDialog,
   BuyDialog,
   Confirm,
   EmailVerificationDialog,

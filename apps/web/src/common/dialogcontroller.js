@@ -573,3 +573,9 @@ export function showFeatureDialog(featureName) {
     />
   ));
 }
+
+export function showTrackingDetailsDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.TrackingDetailsDialog onClose={(res) => perform(res)} />
+  ));
+}
