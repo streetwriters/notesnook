@@ -15,6 +15,8 @@ export async function shouldAddBackupReminder() {
   if (!backupReminderOffset) return false;
 
   const lastBackupTime = await db.backup.lastBackupTime();
+  if (!lastBackupTime) return true;
+
   const offsetToDays =
     backupReminderOffset === 1 ? 1 : backupReminderOffset === 2 ? 7 : 30;
 
