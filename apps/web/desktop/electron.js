@@ -28,7 +28,7 @@ async function createWindow() {
       nodeIntegration: false, //true,
       enableRemoteModule: false,
       contextIsolation: true,
-      // sandbox: true,
+      nativeWindowOpen: true,
       preload: __dirname + "/preload.js",
     },
   });
@@ -40,9 +40,7 @@ async function createWindow() {
   mainWindow.maximize();
 
   try {
-    await mainWindow.loadURL(
-      isDevelopment() ? process.env.ELECTRON_START_URL : URL
-    );
+    await mainWindow.loadURL(isDevelopment() ? "http://localhost:3000" : URL);
   } catch (e) {
     logger.error(e);
   }
