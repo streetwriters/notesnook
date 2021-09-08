@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Keyboard, TouchableOpacity, View} from 'react-native';
+import {Keyboard, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -23,30 +23,29 @@ export const Toast = ({context = 'global'}) => {
   const [data, setData] = useState({});
   const [toastStyle, setToastStyle] = useState({
     backgroundColor: colors.errorBg,
-    color: colors.errorText,
+    color: colors.errorText
   });
   const insets = useSafeAreaInsets();
 
   let toastTranslate = useValue(-dHeight);
   let toastOpacity = useValue(0);
 
-  const showToastFunc = async (data) => {
+  const showToastFunc = async data => {
     if (data.context !== context) return;
-    if (toastMessages.findIndex((m) => m.message === data.message) >= 0) {
-      console.log('returning from here')
+    if (toastMessages.findIndex(m => m.message === data.message) >= 0) {
+      console.log('returning from here');
       return;
     }
     toastMessages.push(data);
     if (toastMessages?.length > 1) return;
-    console.log(data);
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
-        color: colors.successText,
+        color: colors.successText
       });
     } else {
       setToastStyle({
-        color: colors.errorText,
+        color: colors.errorText
       });
     }
     toastTranslate.setValue(-dHeight);
@@ -55,7 +54,7 @@ export const Toast = ({context = 'global'}) => {
     timing(toastOpacity, {
       toValue: 1,
       duration: 150,
-      easing: Easing.ease,
+      easing: Easing.ease
     }).start();
 
     setTimeout(() => {
@@ -63,37 +62,40 @@ export const Toast = ({context = 'global'}) => {
     }, data.duration);
   };
 
-  const showNext = (data) => {
+  const showNext = data => {
+    if (!data) {
+      hideToastFunc() 
+      return;
+    }
     setData(data);
     if (data.type === 'success') {
       setToastStyle({
-        color: colors.successText,
+        color: colors.successText
       });
     } else {
       setToastStyle({
-        color: colors.errorText,
+        color: colors.errorText
       });
     }
     setTimeout(() => {
       hideToastFunc();
-    }, toastMessages[0].duration);
+    }, data?.duration);
   };
 
-  const hideToastFunc = (data) => {
-    if (toastMessages.length > 1) {
-      toastMessages.shift();
-
+  const hideToastFunc = () => {
+    let msg = toastMessages.shift();
+    if (msg) {
       timing(toastOpacity, {
         toValue: 0,
         duration: 100,
-        easing: Easing.in(Easing.ease),
+        easing: Easing.in(Easing.ease)
       }).start(() => {
-        showNext(toastMessages[0]);
+        showNext(msg);
         setTimeout(() => {
           timing(toastOpacity, {
             toValue: 1,
             duration: 150,
-            easing: Easing.in(Easing.ease),
+            easing: Easing.in(Easing.ease)
           }).start();
         }, 300);
       });
@@ -101,7 +103,7 @@ export const Toast = ({context = 'global'}) => {
       timing(toastOpacity, {
         toValue: 0,
         duration: 150,
-        easing: Easing.inOut(Easing.ease),
+        easing: Easing.inOut(Easing.ease)
       }).start(async () => {
         await sleep(100);
         toastTranslate.setValue(-dHeight);
@@ -152,9 +154,9 @@ export const Toast = ({context = 'global'}) => {
         elevation: 15,
         transform: [
           {
-            translateY: toastTranslate,
-          },
-        ],
+            translateY: toastTranslate
+          }
+        ]
       }}>
       <Animated.View
         activeOpacity={0.8}
@@ -174,14 +176,14 @@ export const Toast = ({context = 'global'}) => {
           justifyContent: 'space-between',
           flexDirection: 'row',
           alignItems: 'center',
-          width: '95%',
+          width: '95%'
         }}>
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
-            flex: 1,
+            flex: 1
           }}>
           <View
             style={{
@@ -189,7 +191,7 @@ export const Toast = ({context = 'global'}) => {
               borderRadius: 100,
               justifyContent: 'center',
               alignItems: 'center',
-              marginRight: 10,
+              marginRight: 10
             }}>
             <Icon
               name={data.type === 'success' ? 'check' : 'close'}
@@ -201,7 +203,7 @@ export const Toast = ({context = 'global'}) => {
           <View
             style={{
               flexGrow: 1,
-              paddingRight: 25,
+              paddingRight: 25
             }}>
             {data?.heading ? (
               <Heading
@@ -219,7 +221,7 @@ export const Toast = ({context = 'global'}) => {
                 color={colors.pri}
                 style={{
                   maxWidth: '100%',
-                  paddingRight: 10,
+                  paddingRight: 10
                 }}
                 onPress={() => {
                   hideToastFunc();
