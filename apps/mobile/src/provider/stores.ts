@@ -28,7 +28,7 @@ export const useNoteStore = create<NoteStore>((set, get) => ({
   setLoading: loading => set({ loading: loading }),
   setNotes: items => {
     if (!items) {
-      
+
       set({
         notes: groupArray(db.notes.all, db.settings?.getGroupOptions("home")),
       });
@@ -166,8 +166,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     privacyScreen: false,
     appLockMode: 'none',
     telemetry: true,
-    notebooksListMode:"normal",
-    notesListMode:"normal"
+    notebooksListMode: "normal",
+    notesListMode: "normal"
   },
   fullscreen: false,
   deviceMode: "mobile",
@@ -186,7 +186,17 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
 export const useMenuStore = create<MenuStore>((set, get) => ({
   menuPins: [],
   colorNotes: [],
-  setMenuPins: () => set({ menuPins: db.settings.pins }),
+  setMenuPins: () => {
+    try {
+      set({ menuPins: db.settings.pins })
+    } catch (e) {
+      setTimeout(() => {
+        try {
+          set({ menuPins: db.settings.pins })
+        } catch (e) {}
+      }, 1000)
+    }
+  },
   setColorNotes: () => set({ colorNotes: db.colors.all }),
   clearAll: () => set({ menuPins: [], colorNotes: [] })
 }));
