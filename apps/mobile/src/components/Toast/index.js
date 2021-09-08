@@ -31,6 +31,7 @@ export const Toast = ({context = 'global'}) => {
   let toastOpacity = useValue(0);
 
   const showToastFunc = async data => {
+    if (!data) return;
     if (data.context !== context) return;
     if (toastMessages.findIndex(m => m.message === data.message) >= 0) {
       console.log('returning from here');
@@ -165,7 +166,7 @@ export const Toast = ({context = 'global'}) => {
           ...toastStyle,
           maxWidth: '95%',
           backgroundColor: colors.nav,
-          minWidth: data.func ? '95%' : '50%',
+          minWidth: data?.func ? '95%' : '50%',
           alignSelf: 'center',
           borderRadius: 5,
           opacity: toastOpacity,
@@ -194,9 +195,9 @@ export const Toast = ({context = 'global'}) => {
               marginRight: 10
             }}>
             <Icon
-              name={data.type === 'success' ? 'check' : 'close'}
+              name={data?.type === 'success' ? 'check' : 'close'}
               size={SIZE.lg}
-              color={data.type === 'error' ? colors.errorText : colors.accent}
+              color={data?.type === 'error' ? colors.errorText : colors.accent}
             />
           </View>
 
