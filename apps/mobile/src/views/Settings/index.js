@@ -359,7 +359,9 @@ export const Settings = ({navigation}) => {
                     textAlign: 'center'
                   }}
                   color={colors.pri}>
-                  It took us a year to bring Notesnook to you. Help us make it better by rating it on {Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}
+                  It took us a year to bring Notesnook to you. Help us make it
+                  better by rating it on{' '}
+                  {Platform.OS === 'ios' ? 'Appstore' : 'Playstore'}
                 </Paragraph>
                 <Seperator />
                 <MButton
@@ -920,16 +922,10 @@ const SettingsUserSection = () => {
                             : user.subscription.type ===
                               SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
-                                PremiumService.getProducts().length > 0
-                                  ? PremiumService.getProducts()[0]
-                                      .localizedPrice
-                                  : '$4.49'
+                                PremiumService.getMontlySub().localizedPrice
                               } / mo)`
                             : `Subscribe to Notesnook Pro (${
-                                PremiumService.getProducts().length > 0
-                                  ? PremiumService.getProducts()[0]
-                                      .localizedPrice
-                                  : '$4.49'
+                                PremiumService.getMontlySub().localizedPrice
                               } / mo)`
                         }
                         height={50}

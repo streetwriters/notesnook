@@ -43,6 +43,20 @@ async function setPremiumStatus() {
   }
 }
 
+function getMontlySub() {
+  let _product = {
+    localizedPrice: '$4.49'
+  };
+  if (
+    products.find(p => p.productId === 'com.streetwriters.notesnook.sub.mo')
+  ) {
+    _product = products.find(
+      p => p.productId === 'com.streetwriters.notesnook.sub.mo'
+    );
+  }
+  return _product;
+}
+
 function getProducts() {
   return products;
 }
@@ -263,5 +277,6 @@ export default {
   showVerifyEmailDialog,
   getProducts,
   getUser,
-  subscriptions
+  subscriptions,
+  getMontlySub
 };
