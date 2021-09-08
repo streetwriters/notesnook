@@ -31,7 +31,8 @@ import {
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenPublishNoteDialog
+  eOpenPublishNoteDialog,
+  eOpenLoginDialog
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
