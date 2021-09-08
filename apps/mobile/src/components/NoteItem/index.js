@@ -18,7 +18,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 function navigateToNotebook(item) {
-  let notebook = db.notebooks.notebook(item.id).data;
+  let notebook = item;
   let routeName = 'Notebook';
   let params = {
     menu: false,
@@ -96,55 +96,62 @@ const NoteItem = ({item, isTrash, tags}) => {
               zIndex: 10,
               elevation: 10
             }}>
-            {!isTrash && item.notebooks ? 
-              item.notebooks?.slice(0, 1)?.map(_item => (
-                <Button
-                  title={db.notebooks.notebook(_item.id)?.data.title}
-                  key={_item}
-                  height={20}
-                  icon="book-outline"
-                  type="grayBg"
-                  fontSize={SIZE.xs + 1}
-                  iconSize={SIZE.sm}
-                  textStyle={{
-                    marginRight: 0,
-                    fontWeight: 'normal',
-                    fontFamily: null
-                  }}
-                  style={{
-                    borderRadius: 5,
-                    marginRight: 5,
-                    borderWidth: 0.5,
-                    borderColor: colors.icon,
-                    paddingHorizontal: 6,
-                  }}
-                  onPress={() => navigateToNotebook(_item)}
-                />
-              )) : null}
-            {!isTrash && tags ? 
-              tags.slice(0, 2)?.map(item => (
-                <Button
-                  title={'#' + db.tags.alias(item)}
-                  key={item}
-                  height={20}
-                  textStyle={{
-                    marginRight: 0,
-                    fontWeight: 'normal',
-                    fontFamily: null
-                  }}
-                  type="grayBg"
-                  fontSize={SIZE.xs + 1}
-                  style={{
-                    borderRadius: 5,
-                    marginRight: 5,
-                    borderWidth: 0.5,
-                    borderColor: colors.icon,
-                    paddingHorizontal: 6,
-                    zIndex: 10
-                  }}
-                  onPress={() => navigateToTag(item)}
-                />
-              )) : null}
+            {!isTrash && item.notebooks
+              ? item.notebooks?.slice(0, 1)?.map(_item => {
+                  let notebook = db.notebooks.notebook(_item.id);
+                  notebook = notebook?.data;
+
+                  return notebook ? (
+                    <Button
+                      title={notebook.title}
+                      key={_item}
+                      height={20}
+                      icon="book-outline"
+                      type="grayBg"
+                      fontSize={SIZE.xs + 1}
+                      iconSize={SIZE.sm}
+                      textStyle={{
+                        marginRight: 0,
+                        fontWeight: 'normal',
+                        fontFamily: null
+                      }}
+                      style={{
+                        borderRadius: 5,
+                        marginRight: 5,
+                        borderWidth: 0.5,
+                        borderColor: colors.icon,
+                        paddingHorizontal: 6
+                      }}
+                      onPress={() => navigateToNotebook(notebook)}
+                    />
+                  ) : null;
+                })
+              : null}
+            {!isTrash && tags
+              ? tags.slice(0, 2)?.map(item => (
+                  <Button
+                    title={'#' + db.tags.alias(item)}
+                    key={item}
+                    height={20}
+                    textStyle={{
+                      marginRight: 0,
+                      fontWeight: 'normal',
+                      fontFamily: null
+                    }}
+                    type="grayBg"
+                    fontSize={SIZE.xs + 1}
+                    style={{
+                      borderRadius: 5,
+                      marginRight: 5,
+                      borderWidth: 0.5,
+                      borderColor: colors.icon,
+                      paddingHorizontal: 6,
+                      zIndex: 10
+                    }}
+                    onPress={() => navigateToTag(item)}
+                  />
+                ))
+              : null}
           </View>
         )}
 
