@@ -120,8 +120,9 @@ const routes = {
   "/tags/:tagId": ({ tagId }) => {
     const tag = db.tags.tag(tagId);
     if (!tag) return false;
-    const { title, id } = tag;
+    const { id } = tag;
     notestore.setContext({ type: "tag", value: id });
+    const title = db.tags.alias(id);
     return {
       key: "notes",
       type: "notes",
@@ -141,7 +142,8 @@ const routes = {
   "/colors/:colorId": ({ colorId }) => {
     const color = db.colors.tag(colorId);
     if (!color) return navigate("/");
-    const { title, id } = color;
+    const { id } = color;
+    const title = db.colors.alias(id);
     notestore.setContext({ type: "color", value: id });
     return {
       key: "notes",

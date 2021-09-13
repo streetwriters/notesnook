@@ -3,12 +3,15 @@ import ListItem from "../list-item";
 import { hashNavigate, navigate } from "../../navigation";
 import { Text } from "rebass";
 import { store as appStore } from "../../stores/app-store";
+import { store as tagStore } from "../../stores/tag-store";
+import { store as editorStore } from "../../stores/editor-store";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
+import { showToast } from "../../utils/toast";
 
 const menuItems = [
   {
-    title: () => "Edit",
+    title: () => "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {
       hashNavigate(`/tags/${tag.id}/edit`);
@@ -20,16 +23,29 @@ const menuItems = [
     icon: Icon.Shortcut,
     onClick: ({ tag }) => appStore.pinItemToMenu(tag),
   },
+  {
+    color: "error",
+    title: () => "Delete",
+    icon: Icon.DeleteForver,
+    onClick: async ({ tag }) => {
+      if (tag.noteIds.includes(editorStore.get().session.id))
+        editorStore.clearSession();
+
+      await db.tags.remove(tag.id);
+      showToast("success", "Tag deleted!");
+      tagStore.refresh();
+    },
+  },
 ];
 
 function Tag({ item, index }) {
-  const { id, title, alias, noteIds } = item;
+  const { id, noteIds } = item;
   return (
     <ListItem
       item={item}
       selectable={false}
       index={index}
-      title={<TagNode title={alias || title} />}
+      title={<TagNode title={db.tags.alias(id)} />}
       footer={
         <Text mt={1} variant="subBody">
           {noteIds.length} notes

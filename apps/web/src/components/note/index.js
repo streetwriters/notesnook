@@ -17,7 +17,7 @@ import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
 
 function Note(props) {
-  const { item, index, context } = props;
+  const { tags, item, index, context } = props;
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
   const viewMode = useStore((store) => store.viewMode);
@@ -64,7 +64,7 @@ function Note(props) {
         }
       }}
       header={
-        (note.tags?.length || notebook) && (
+        (tags?.length || notebook) && (
           <Flex alignSelf="flex-start" justifySelf="flex-start" mb={1}>
             {notebook && (
               <IconTag
@@ -75,7 +75,7 @@ function Note(props) {
                 icon={Icon.Notebook}
               />
             )}
-            {note.tags?.slice(0, 2).map((tag) => {
+            {tags?.slice(0, 2).map((tag) => {
               const tagItem = db.tags.tag(tag);
               if (!tagItem) return null;
               return (
@@ -150,8 +150,9 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
-    prevProps.notebooks?.length === nextProps.notebooks?.length &&
-    prevProps.tags.length === nextProps.tags.length
+    JSON.stringify(prevProps.notebooks) ===
+      JSON.stringify(nextProps.notebooks) &&
+    JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
   );
 });
 
