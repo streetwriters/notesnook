@@ -81,6 +81,8 @@ export const ActionSheetComponent = ({
   const lastSynced = useUserStore(state => state.lastSynced);
   const [notifPinned, setNotifPinned] = useState(null);
   const dimensions = useSettingStore(state => state.dimensions);
+  const alias = note.type === "tag" ? db.tags.alias(note.id) : note.type === "color" ? db.colors.alias(note.id) : note.title
+
 
   const refreshing = false;
   const isPublished = db.monographs.isPublished(note.id);
@@ -107,6 +109,7 @@ export const ActionSheetComponent = ({
       setNotifPinned(null);
       return;
     }
+    
     let index = pinned.findIndex(notif => notif.tag === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
@@ -475,15 +478,15 @@ export const ActionSheetComponent = ({
       id: notesnook.ids.dialogs.actionsheet.pinMenu
     },
     {
-      name: 'Edit Tag',
-      title: 'Edit tag',
+      name: 'Rename Tag',
+      title: 'Rename tag',
       icon: 'square-edit-outline',
       func: async () => {
         close();
         await sleep(300);
         presentDialog({
-          title: 'Edit tag',
-          paragraph: 'Change the title of the tag',
+          title: 'Rename tag',
+          paragraph: 'Change the title of the tag ' + alias,
           positivePress: async value => {
             await db.tags.rename(note.id, value);
             Navigation.setRoutesToUpdate([
@@ -493,8 +496,8 @@ export const ActionSheetComponent = ({
             ]);
           },
           input: true,
-          defaultValue: note.title,
-          inputPlaceholder: 'Enter tag title',
+          defaultValue: alias,
+          inputPlaceholder: 'Enter title of tag',
           positiveText: 'Save'
         });
       }
@@ -725,7 +728,7 @@ export const ActionSheetComponent = ({
             }}
             size={SIZE.md}>
             {note.type === 'tag' ? '#' : null}
-            {note?.title.replace('\n', '')}
+            {alias}
           </Heading>
 
           {note.headline || note.description ? (

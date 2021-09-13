@@ -4,6 +4,7 @@ import {notesnook} from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
+import { db } from '../../utils/DB';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
@@ -59,7 +60,7 @@ const TagItem = ({item, index}) => {
             }}>
             #
           </Heading>
-          {item.title}
+          {db.tags.alias(item.id)}
         </Heading>
         <Paragraph
           color={colors.icon}
@@ -80,7 +81,7 @@ const TagItem = ({item, index}) => {
         name="dots-horizontal"
         size={SIZE.xl}
         onPress={() => {
-          let rowItems = ['Add Shortcut', 'Delete', 'Edit Tag'];
+          let rowItems = ['Add Shortcut', 'Delete', 'Rename Tag'];
           ActionSheetEvent(item, false, false, rowItems);
         }}
         testID={notesnook.ids.tag.menu}
