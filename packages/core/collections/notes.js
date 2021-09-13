@@ -194,8 +194,8 @@ export default class Notes extends Collection {
       if (!item) continue;
       const itemData = qclone(item.data);
 
-      if (item.notebooks) {
-        for (let notebook of item.notebooks) {
+      if (itemData.notebooks) {
+        for (let notebook of itemData.notebooks) {
           const notebookRef = this._db.notebooks.notebook(notebook.id);
           if (!notebookRef) continue;
 
@@ -208,11 +208,12 @@ export default class Notes extends Collection {
         }
       }
 
-      for (let tag of item.tags) {
+      for (let tag of itemData.tags) {
         await this._db.tags.untag(tag, id);
       }
-      if (item.data.color) {
-        await this._db.colors.remove(item.data.color, id);
+
+      if (itemData.color) {
+        await this._db.colors.untag(itemData.color, id);
       }
       // await this._collection.removeItem(id);
       if (moveToTrash) await this._db.trash.add(itemData);

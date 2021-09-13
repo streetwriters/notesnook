@@ -261,3 +261,18 @@ test("export note to txt", () =>
     const txt = await db.notes.note(id).export("txt");
     expect(txt.includes("Hello")).toBeTruthy();
   }));
+
+test("deleting a colored note should remove it from that color", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.notes.note(id).color("Yellow");
+    let color = db.colors.tag("Yellow");
+
+    expect(color).toBeTruthy();
+    expect(color.noteIds.indexOf(id)).toBeGreaterThan(-1);
+
+    await db.notes.delete(id);
+
+    color = db.colors.tag("Yellow");
+    expect(color).toBeFalsy();
+    // TODO expect(color.noteIds.indexOf(id)).toBe(-1);
+  }));
