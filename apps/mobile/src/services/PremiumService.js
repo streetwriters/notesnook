@@ -27,7 +27,7 @@ async function setPremiumStatus() {
       premiumStatus = 0;
       userstore.setPremium(get());
     } else {
-      premiumStatus = user.subscription.type;
+      premiumStatus = user.subscription?.type || 0;
       userstore.setPremium(get());
       userstore.setUser(user);
     }
