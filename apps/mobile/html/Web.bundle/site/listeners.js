@@ -126,6 +126,7 @@ function attachMessageListener() {
         break;
       case 'html':
         isLoading = true;
+        globalThis.isClearingNoteData = false;
         tinymce.activeEditor.mode.set('readonly');
         tinymce.activeEditor.setContent(value);
         setTimeout(function () {

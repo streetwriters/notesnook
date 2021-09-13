@@ -231,7 +231,7 @@ function init_tiny(size) {
     },
     image_description: false,
     image_caption: false,
-    media_dimensions:false,
+    media_dimensions: false,
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
@@ -278,7 +278,7 @@ function init_tiny(size) {
 
       editor.ui.registry.addContextToolbar('iframecontrols', {
         predicate: function (node) {
-          return node.getAttribute("data-mce-object") === "iframe"
+          return node.getAttribute('data-mce-object') === 'iframe';
         },
         items: 'deletevideo',
         position: 'node',
@@ -343,6 +343,10 @@ function init_tiny(size) {
       });
 
       editor.on('SetContent', function (event) {
+        if (globalThis.isClearingNoteData) {
+          globalThis.isClearingNoteData = false;
+          return;
+        }
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }

@@ -90,7 +90,6 @@ export async function clearTimer(clear) {
           content.data?.trim().length > 0) ||
         (title && title?.trim().length > 0 && id)
       ) {
-        console.log('saving note now');
         await saveNote(true);
       }
     }
@@ -192,13 +191,9 @@ export const loadNote = async item => {
   }
 
   if (item && item.type === 'new') {
-    if (getNote()) {
-      await clearEditor();
-    }
+    await clearEditor(true, true, true);
     clearNote();
-
     noteEdited = false;
-    id = null;
     if (Platform.OS === 'android') {
       await sleep(100);
       textInput.current?.focus();
@@ -226,9 +221,8 @@ export const loadNote = async item => {
     }
     eSendEvent('loadingNote', item);
     if (getNote()) {
-      await clearEditor();
+      await clearEditor(true, false);
     }
-    clearNote();
     noteEdited = false;
     await setNote(item);
     webviewInit = false;
@@ -240,9 +234,7 @@ export const loadNote = async item => {
         eSendEvent('webviewreset');
       }
     }, 1);
-    InteractionManager.runAfterInteractions(async () => {
-      useEditorStore.getState().setCurrentlyEditingNote(item.id);
-    }, 50);
+    useEditorStore.getState().setCurrentlyEditingNote(item.id);
   }
 };
 
@@ -265,6 +257,7 @@ const checkStatus = async noreset => {
     webviewTimer = setTimeout(() => {
       if (!webviewOK && !noreset) {
         webviewInit = false;
+
         EditorWebView = createRef();
         eSendEvent('webviewreset');
         resolve(false);
@@ -440,20 +433,36 @@ function onNoteChange() {
   }, 500);
 }
 
-export async function clearEditor(clear = true) {
+let cTimeout = null;
+export async function clearEditor(
+  clear = true,
+  reset = true,
+  immediate = false
+) {
   clear && (await clearTimer(true));
-  try {
-    tiny.call(EditorWebView, tiny.reset, true);
-    clearNote();
-    editing.focusType = null;
-    eSendEvent('historyEvent', {
-      undo: 0,
-      redo: 0
-    });
-    saveCounter = 0;
-    useEditorStore.getState().setCurrentlyEditingNote(null);
-  } catch (e) {
-    console.log(e);
+  clearNote();
+  if (cTimeout) {
+    clearTimeout(cTimeout);
+    cTimeout = null;
+  }
+  let func = () => {
+    try {
+      reset && tiny.call(EditorWebView, tiny.reset, true);
+      editing.focusType = null;
+      eSendEvent('historyEvent', {
+        undo: 0,
+        redo: 0
+      });
+      saveCounter = 0;
+      useEditorStore.getState().setCurrentlyEditingNote(null);
+    } catch (e) {
+      console.log(e);
+    }
+  };
+  if (immediate) {
+    return func();
+  } else {
+    cTimeout = setTimeout(func, 500);
   }
 }
 
@@ -637,7 +646,6 @@ export const presentResolveConflictDialog = _note => {
 };
 
 export async function updateNoteInEditor() {
-  console.log('trying to update.');
   let _note = db.notes.note(id).data;
   if (_note.conflicted) {
     presentResolveConflictDialog(_note);
@@ -654,8 +662,6 @@ export async function updateNoteInEditor() {
   post('title', title);
   post('inject', content.data);
   tiny.call(EditorWebView, tiny.notLoading);
-
-  console.log('update content in editor complete');
 }
 
 const loadNoteInEditor = async (keepHistory = true) => {
@@ -664,11 +670,11 @@ const loadNoteInEditor = async (keepHistory = true) => {
   if (note?.id) {
     post('title', title);
     intent = false;
-
     if (!content || !content.data || content?.data?.length === 0) {
       tiny.call(
         EditorWebView,
         `
+    globalThis.isClearingNoteData = false;
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: 'noteLoaded',

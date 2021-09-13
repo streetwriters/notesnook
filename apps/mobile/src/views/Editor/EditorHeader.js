@@ -106,9 +106,7 @@ const EditorHeader = () => {
       }
       useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
-      setTimeout(async () => {
-        await clearEditor(false);
-      }, 500);
+      await clearEditor(false,true,false);
       Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
     }
   };

@@ -7,6 +7,7 @@ isLoading = true;
 document.getElementById("titleInput").value = '';
 autosize();
 window.prevContent = "";
+globalThis.isClearingNoteData = true;
 tinymce.activeEditor.setContent('');
 tinymce.activeEditor.undoManager.clear();
 info = document.querySelector(infoBar);
@@ -32,7 +33,6 @@ const keyboardStateChanged = `(function() {
 const blur = `
     document.activeElement.blur();
 	  window.blur();
-
 `;
 
 const pre = `(function() {
