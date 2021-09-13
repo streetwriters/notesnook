@@ -31,15 +31,6 @@ function ListContainer(props) {
       setSelectedItems(items.filter((item) => item.type !== "header"));
   }, [shouldSelectAll, type, setSelectedItems, items]);
 
-  useEffect(() => {
-    if (props.static) return;
-    // whenever there is a change in items array we have to reset the size cache
-    // so it can be recalculated.
-    if (listRef.current) {
-      listRef.current.resetAfterIndex(0, true);
-    }
-  }, [props.items, listRef, props.static]);
-
   return (
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
@@ -50,6 +41,7 @@ function ListContainer(props) {
         <>
           <Flex variant="columnFill" data-test-id="note-list">
             <Virtuoso
+              ref={listRef}
               data={items}
               computeItemKey={(index) => items[index].id || items[index].title}
               defaultItemHeight={profile.estimatedItemHeight}
