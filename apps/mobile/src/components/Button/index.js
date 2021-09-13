@@ -1,10 +1,10 @@
 import React from 'react';
-import { ActivityIndicator } from 'react-native';
+import {ActivityIndicator} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { BUTTON_TYPES, showTooltip } from '../../utils';
-import { ph, SIZE } from '../../utils/SizeUtils';
-import { PressableButton } from '../PressableButton';
+import {useTracked} from '../../provider';
+import {BUTTON_TYPES, showTooltip} from '../../utils';
+import {ph, SIZE} from '../../utils/SizeUtils';
+import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
 /**
@@ -29,16 +29,19 @@ export const Button = ({
   tooltipText,
   textStyle,
   iconPosition = 'left',
-  hitSlop
+  hitSlop,
+  buttonType = {}
 }) => {
   const [state] = useTracked();
   const {colors} = state;
-  const textColor =
-    colors[
-      type === 'accent'
-        ? BUTTON_TYPES[type](accentColor, accentText).text
-        : BUTTON_TYPES[type].text
-    ];
+
+  const textColor = buttonType.text
+    ? buttonType.text
+    : colors[
+        type === 'accent'
+          ? BUTTON_TYPES[type](accentColor, accentText).text
+          : BUTTON_TYPES[type].text
+      ];
 
   return (
     <PressableButton
@@ -58,6 +61,10 @@ export const Button = ({
       type={type}
       accentColor={accentColor}
       accentText={accentText}
+      customColor={buttonType.color}
+      customSelectedColor={buttonType.selected}
+      customOpacity={buttonType.opacity}
+      customAlpha={buttonType.alpha}
       customStyle={{
         height: height,
         width: width || null,
@@ -67,19 +74,19 @@ export const Button = ({
         justifyContent: 'center',
         alignItems: 'center',
         flexDirection: 'row',
-        ...style,
+        ...style
       }}>
       {loading && <ActivityIndicator color={textColor} />}
       {icon && !loading && iconPosition === 'left' ? (
         <Icon
           name={icon}
           style={{
-            marginRight: 0,
+            marginRight: 0
           }}
-          color={textColor}
+          color={buttonType.text || textColor}
           size={iconSize}
         />
-      ): null}
+      ) : null}
 
       {!title ? null : (
         <Paragraph
@@ -88,10 +95,10 @@ export const Button = ({
           numberOfLines={1}
           style={[
             {
-              marginLeft: icon || loading && iconPosition === "left" ? 5 : 0,
-              marginRight: icon || loading && iconPosition === "right" ? 5 : 0,
+              marginLeft: icon || (loading && iconPosition === 'left') ? 5 : 0,
+              marginRight: icon || (loading && iconPosition === 'right') ? 5 : 0
             },
-            textStyle,
+            textStyle
           ]}>
           {title}
         </Paragraph>
@@ -101,7 +108,7 @@ export const Button = ({
         <Icon
           name={icon}
           style={{
-            marginLeft: 0,
+            marginLeft: 0
           }}
           color={textColor}
           size={iconSize}
