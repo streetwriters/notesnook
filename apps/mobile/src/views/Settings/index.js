@@ -1,11 +1,5 @@
 import dayjs from 'dayjs';
-import React, {
-  createRef,
-  useCallback,
-  useEffect,
-  useRef,
-  useState
-} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
 import {
   Appearance,
   Linking,
@@ -21,6 +15,7 @@ import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import ToggleSwitch from 'toggle-switch-react-native';
 import {Button} from '../../components/Button';
+import {Button as MButton} from '../../components/Button/index';
 import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
@@ -91,8 +86,6 @@ import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import {Button as MButton} from '../../components/Button/index';
-import Share from 'react-native-share';
 
 const format = ver => {
   let parts = ver.toString().split('');
@@ -298,39 +291,6 @@ export const Settings = ({navigation}) => {
           <SettingsAppearanceSection />
           <SettingsPrivacyAndSecurity />
 
-          {/**
-          * <View
-            style={{
-              alignItems: 'center',
-              width: '95%',
-              borderRadius: 5,
-              backgroundColor: colors.nav,
-              alignSelf: 'center',
-              padding: 12,
-              marginVertical:6
-            }}>
-            <Heading size={18}>Invite code: XZA8G</Heading>
-            <Paragraph
-              style={{
-                textAlign: 'center'
-              }}>
-              Invite your friends to Notesnook and on every sign up, you will get 7 days of
-              Notesnook Pro for free.
-            </Paragraph>
-            <Seperator />
-            <MButton
-            fontSize={SIZE.md}
-            onPress={() => {
-              Share.open({
-                title:"Download Notesnook",
-                message:"Download Notesnook",
-                failOnCancel:false
-              })
-            }}
-            height={40} width="100%" title="Invite a friend" type="accent" />
-          </View>
-          */}
-
           <SettingsBackupAndRestore />
 
           <SectionHeader
@@ -456,15 +416,13 @@ let passwordValue = null;
 const AccoutLogoutSection = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-
   const user = useUserStore(state => state.user);
   const [visible, setVisible] = useState(false);
   const [deleteAccount, setDeleteAccount] = useState(false);
   const [loading, setLoading] = useState(false);
   const pwdInput = useRef();
 
-  return (
-    user && (
+  return !user ? null : (
       <>
         {loading && (
           <BaseDialog visible={true}>
@@ -659,7 +617,6 @@ const AccoutLogoutSection = () => {
         </PressableButton>
       </>
     )
-  );
 };
 
 const CustomButton = ({
@@ -765,10 +722,10 @@ const SettingsUserSection = () => {
 
   const manageSubscription = () => {
     if (
-      user.subscription.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
+      user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
       Platform.OS === 'android'
     ) {
-      if (user.subscription.provider === 3) {
+      if (user.subscription?.provider === 3) {
         ToastEvent.show({
           heading: 'Subscribed on web',
           message: 'Open your web browser to manage your subscription.',
@@ -857,12 +814,12 @@ const SettingsUserSection = () => {
                     paddingVertical: 2.5
                   }}>
                   <Heading color={colors.accent} size={SIZE.sm}>
-                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription.type]}
+                    {SUBSCRIPTION_STATUS_STRINGS[user.subscription?.type]}
                   </Heading>
                 </View>
               </View>
               <View>
-                {user.subscription.type !== SUBSCRIPTION_STATUS.BASIC ? (
+                {user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC ? (
                   <View>
                     <Seperator />
                     <Paragraph
@@ -870,7 +827,7 @@ const SettingsUserSection = () => {
                       color={
                         (subscriptionDaysLeft.time > 5 &&
                           !subscriptionDaysLeft.isHour) ||
-                        user.subscription.type !== 6
+                        user.subscription?.type !== 6
                           ? colors.accent
                           : colors.red
                       }>
@@ -881,17 +838,17 @@ const SettingsUserSection = () => {
                           } remaining`}
                     </Paragraph>
                     <Paragraph color={colors.pri}>
-                      {user.subscription.type === 2
+                      {user.subscription?.type === 2
                         ? 'You signed up on ' + startDate
-                        : user.subscription.type === 1
+                        : user.subscription?.type === 1
                         ? 'Your trial period started on ' + startDate
-                        : user.subscription.type === 6
+                        : user.subscription?.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
                           : 'Your account will be downgraded to Basic in 3 days'
-                        : user.subscription.type === 7
+                        : user.subscription?.type === 7
                         ? `Your subscription will end on ${expiryDate}.`
-                        : user.subscription.type === 5
+                        : user.subscription?.type === 5
                         ? `Your subscription will auto renew on ${expiryDate}.`
                         : null}
                     </Paragraph>
@@ -899,8 +856,8 @@ const SettingsUserSection = () => {
                 ) : null}
 
                 {user.isEmailConfirmed &&
-                  user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM &&
-                  user.subscription.type !== SUBSCRIPTION_STATUS.BETA && (
+                  user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+                  user.subscription?.type !== SUBSCRIPTION_STATUS.BETA && (
                     <>
                       <Seperator />
                       <Button
@@ -911,15 +868,15 @@ const SettingsUserSection = () => {
                         }}
                         fontSize={SIZE.md}
                         title={
-                          user.subscription.provider === 3 &&
-                          user.subscription.type ===
+                          user.subscription?.provider === 3 &&
+                          user.subscription?.type ===
                             SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
                             ? 'Manage subscription from desktop app'
-                            : user.subscription.type ===
+                            : user.subscription?.type ===
                                 SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
                               Platform.OS === 'android'
                             ? `Resubscribe from Google Playstore`
-                            : user.subscription.type ===
+                            : user.subscription?.type ===
                               SUBSCRIPTION_STATUS.PREMIUM_EXPIRED
                             ? `Resubscribe to Notesnook Pro (${
                                 PremiumService.getMontlySub().localizedPrice
@@ -936,8 +893,8 @@ const SettingsUserSection = () => {
               </View>
 
               {user?.subscription?.provider &&
-              user.subscription.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
-              user.subscription.type !== SUBSCRIPTION_STATUS.BASIC &&
+              user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM_EXPIRED &&
+              user.subscription?.type !== SUBSCRIPTION_STATUS.BASIC &&
               SUBSCRIPTION_PROVIDER[user?.subscription?.provider] ? (
                 <Button
                   title={
@@ -1733,6 +1690,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           new: true
         }
       ];
+      
   const backupItemsList = [
     {
       name: 'Backup now',

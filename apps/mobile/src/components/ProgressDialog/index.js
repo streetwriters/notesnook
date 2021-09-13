@@ -71,7 +71,7 @@ const ProgressDialog = () => {
 
         {dialogData?.title && <Heading> {dialogData?.title}</Heading>}
 
-        {dialogData?.paragraph && (
+        {dialogData?.paragraph ? (
           <Paragraph style={{textAlign: 'center'}}>
             {dialogData?.paragraph}
             {!dialogData?.noProgress ? (
@@ -81,7 +81,7 @@ const ProgressDialog = () => {
               </Paragraph>
             ) : null}
           </Paragraph>
-        )}
+        ) : null} 
       </View>
 
       {dialogData.component}

@@ -318,7 +318,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
               height={normalize(60)}
               width="100%"
             />
-            {user && (
+            {user ? (
               <Button
                 height={35}
                 style={{
@@ -368,7 +368,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                 }}
                 title="I have a promo code"
               />
-            )}
+            ) : null}
           </>
         ) : (
           <Paragraph

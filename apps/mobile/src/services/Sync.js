@@ -9,11 +9,6 @@ import {eSendEvent, ToastEvent} from './EventManager';
 const run = async (context = 'global', forced) => {
   let userstore = useUserStore.getState();
   if (userstore.syncing) {
-    ToastEvent.show({
-      heading: 'Sync running already',
-      message:"Please wait a few moments",
-      type: 'success'
-    });
     return;
   }
   userstore.setSyncing(true);

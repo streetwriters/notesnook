@@ -835,7 +835,7 @@ export const ActionSheetComponent = ({
                   ))
               : null}
 
-            {note.type === 'note' && isPublished && (
+            {note.type === 'note' && isPublished ? (
               <Button
                 title="Published"
                 type="shade"
@@ -849,7 +849,7 @@ export const ActionSheetComponent = ({
                   paddingHorizontal: 12
                 }}
               />
-            )}
+            ) : null}
             {note.type !== 'note' || refreshing ? null : (
               <Button
                 onPress={async () => await Sync.run('local')}

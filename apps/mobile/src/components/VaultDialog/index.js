@@ -833,11 +833,11 @@ export class VaultDialog extends Component {
 
           {this.state.biometricUnlock &&
             !this.state.isBiometryEnrolled &&
-            novault && (
+            novault ? (
               <Paragraph>
                 Unlock with password once to enable biometric access.
               </Paragraph>
-            )}
+            ) : null}
 
           {this.state.isBiometryAvailable &&
           !this.state.fingerprintAccess &&

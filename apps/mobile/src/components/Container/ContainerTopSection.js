@@ -8,7 +8,7 @@ export const ContainerTopSection = ({children}) => {
   const {colors} = state;
   const selectionMode = useSelectionStore(state => state.selectionMode);
 
-  return !selectionMode && (
+  return !selectionMode ? (
     <View
       style={{
         backgroundColor: colors.bg,
@@ -17,5 +17,5 @@ export const ContainerTopSection = ({children}) => {
       }}>
       {children}
     </View>
-  );
+  ) : null
 };

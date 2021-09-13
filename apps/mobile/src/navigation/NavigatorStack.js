@@ -60,7 +60,7 @@ export const NavigatorStack = React.memo(
           onStateChange={onStateChange}
           independent={true}
           ref={rootNavigatorRef}>
-          {render && (
+          {render ? (
             <Stack.Navigator
               initialRouteName={settings.homepage}
               screenOptions={{
@@ -78,7 +78,7 @@ export const NavigatorStack = React.memo(
               <Stack.Screen name="Settings" component={Settings} />
               <Stack.Screen name="Search" component={Search} />
             </Stack.Navigator>
-          )}
+          ) : null}
         </NavigationContainer>
       </Container>
     );
