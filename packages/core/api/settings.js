@@ -10,6 +10,7 @@ class Settings {
    */
   constructor(db) {
     this._db = db;
+    this._initSettings();
   }
 
   async init() {
@@ -18,7 +19,6 @@ class Settings {
     await this._saveSettings();
 
     EV.subscribe(EVENTS.userLoggedOut, () => {
-      this._settings = undefined;
       this._initSettings();
     });
   }
