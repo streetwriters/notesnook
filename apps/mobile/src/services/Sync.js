@@ -1,5 +1,5 @@
 import NetInfo from '@react-native-community/netinfo';
-import { initialize } from '../provider/stores';
+import { initialize, useUserStore } from '../provider/stores';
 import { doInBackground } from '../utils';
 import { db } from '../utils/DB';
 import { eOpenLoginDialog } from '../utils/Events';
@@ -7,6 +7,7 @@ import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
 import { eSendEvent, ToastEvent } from './EventManager';
 
 const run = async (context = 'global', forced) => {
+  const userstore = useUserStore.getState();
   userstore.setSyncing(true);
   try {
     let res = await doInBackground(async () => {
