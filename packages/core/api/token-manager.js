@@ -45,7 +45,7 @@ class TokenManager {
       if (e.message === "invalid_grant" || e.message === "invalid_client") {
         EV.publish(EVENTS.userSessionExpired);
       }
-      return null;
+      throw e;
     }
   }
 

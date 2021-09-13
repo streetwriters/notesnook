@@ -53,10 +53,8 @@ export default class Sync {
   }
 
   async _performChecks() {
-    if (this._isSyncing) throw new Error("Sync already running.");
     let lastSynced = (await this._db.context.read("lastSynced")) || 0;
     let token = await this._tokenManager.getAccessToken();
-    if (!token) throw new Error("You need to login to sync.");
 
     // update the conflicts status and if find any, throw
     await this._db.conflicts.recalculate();
@@ -66,6 +64,8 @@ export default class Sync {
   }
 
   async start(full, force) {
+    if (this._isSyncing) return false;
+
     if (force) await this._db.context.write("lastSynced", 0);
     let { lastSynced, token } = await this._performChecks();
 
@@ -94,6 +94,8 @@ export default class Sync {
       if (lastSynced) {
         await this._db.context.write("lastSynced", lastSynced);
       }
+
+      return true;
     } catch (e) {
       throw e;
     } finally {
