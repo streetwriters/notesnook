@@ -1,8 +1,8 @@
-import React from "react";
+import { useEffect } from "react";
 import ListContainer from "../components/list-container";
 import { useStore as useNotesStore } from "../stores/note-store";
 import NotesPlaceholder from "../components/placeholders/notesplacholder";
-import { hashNavigate } from "../navigation";
+import { hashNavigate, navigate } from "../navigation";
 import FavoritesPlaceholder from "../components/placeholders/favorites-placeholder";
 import { groupArray } from "notes-core/utils/grouping";
 import { db } from "../common/db";
@@ -11,6 +11,13 @@ function Notes() {
   const context = useNotesStore((store) => store.context);
   const refreshContext = useNotesStore((store) => store.refreshContext);
   const type = context?.type === "favorite" ? "favorites" : "notes";
+
+  useEffect(() => {
+    if (!context || (context.type === "color" && context.notes.length <= 0)) {
+      navigate("/", true);
+    }
+  }, [context]);
+
   if (!context) return null;
   return (
     <ListContainer

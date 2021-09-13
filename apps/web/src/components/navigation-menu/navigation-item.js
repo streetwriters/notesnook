@@ -43,7 +43,7 @@ function NavigationItem(props) {
     >
       <Icon
         size={isTablet ? 18 : 15}
-        color={props.selected ? "primary" : color || "icon"}
+        color={color || (props.selected ? "primary" : "icon")}
         rotate={isLoading}
       />
       {isNew && (
