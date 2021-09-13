@@ -25,7 +25,7 @@ jobs:
       - run: npm ci
       - run: npm exec playwright install-deps
       - run: npm exec playwright install
-      - run: npm exec test
+      - run: npm run test
         env:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}
