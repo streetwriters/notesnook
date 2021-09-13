@@ -17,7 +17,7 @@ import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 
-export const SectionHeader = ({item, index, type, title}) => {
+export const SectionHeader = ({item, index, type, title,color}) => {
   const [state] = useTracked();
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
@@ -28,7 +28,6 @@ export const SectionHeader = ({item, index, type, title}) => {
     key => SORT[key] === groupOptions.groupBy
   );
 
-  const color = COLORS_NOTE[title.toLowerCase()] || colors.accent;
   const settings = useSettingStore(state => state.settings);
   const listMode =
     type === 'notebooks' ? settings.notebooksListMode : settings.notesListMode;
@@ -73,7 +72,7 @@ export const SectionHeader = ({item, index, type, title}) => {
           justifyContent: 'center'
         }}>
         <Heading
-          color={color}
+          color={COLORS_NOTE[color] || colors.accent  }
           size={SIZE.sm}
           style={{
             minWidth: 60,

@@ -68,6 +68,7 @@ const SimpleList = ({
         <SectionHeader
           item={item}
           index={index}
+          color={headerProps.color}
           title={headerProps.heading}
           type={screen === 'Notes' ? 'home' : type}
         />
@@ -149,6 +150,7 @@ const SimpleList = ({
               paragraph={headerProps.paragraph}
               onPress={headerProps.onPress}
               icon={headerProps.icon}
+              color={headerProps.color}
               type={type}
               screen={screen}
             />

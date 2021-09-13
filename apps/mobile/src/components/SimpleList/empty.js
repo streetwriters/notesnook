@@ -42,7 +42,7 @@ export const Empty = ({
         }}>
         <Placeholder
           color={
-            COLORS_NOTE[headerProps.heading.toLowerCase()] || colors.accent
+            COLORS_NOTE[headerProps.color] || colors.accent
           }
           w={normalize(150)}
           h={normalize(150)}
@@ -68,17 +68,15 @@ export const Empty = ({
             fontSize={SIZE.md}
             accentColor="bg"
             accentText={
-              COLORS_NOTE[headerProps?.heading?.toLowerCase()]
-                ? headerProps.heading?.toLowerCase()
+              COLORS_NOTE[headerProps.color]
+                ? headerProps.color
                 : 'accent'
             }
           />
         ) : loading ? (
           <ActivityIndicator
             color={
-              COLORS_NOTE[headerProps?.heading?.toLowerCase()]
-                ? COLORS_NOTE[headerProps?.heading?.toLowerCase()]
-                : colors.accent
+              COLORS_NOTE[headerProps.color] || colors.accent
             }
           />
         ) : null}

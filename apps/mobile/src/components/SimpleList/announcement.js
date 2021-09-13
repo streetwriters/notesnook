@@ -7,6 +7,7 @@ import {
   useSelectionStore
 } from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
+import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {eOpenPremiumDialog, eOpenProgressDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
@@ -16,7 +17,7 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Announcement = () => {
+export const Announcement = ({color}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const announcements = useMessageStore(state => state.announcements);
@@ -64,9 +65,17 @@ export const Announcement = () => {
             <Button
               title={'Announcement'}
               fontSize={12}
-              type="shade"
               height={null}
               icon="bullhorn"
+              style={{
+                backgroundColor: color
+                  ? RGB_Linear_Shade(
+                      colors.night ? 0.04 : -0.04,
+                      hexToRGBA(color, 0.12)
+                    )
+                  : colors.shade
+              }}
+              buttonType={{text: color || colors.accent}}
               style={{
                 paddingVertical: 4
               }}
@@ -126,6 +135,30 @@ export const Announcement = () => {
                     type={index === 0 ? 'accent' : 'shade'}
                     title={item.title}
                     fontSize={SIZE.md}
+                    buttonType={{
+                      color: color
+                        ? index === 0
+                          ? RGB_Linear_Shade(
+                              colors.night ? 0.04 : -0.04,
+                              hexToRGBA(color, 0.12)
+                            )
+                          : color
+                        : index === 0
+                        ? colors.accent
+                        : colors.shade,
+                      text:
+                        index !== 0
+                          ? color
+                            ? color
+                            : colors.accent
+                          : colors.light,
+                      selected: color
+                        ? color
+                        : index === 0
+                        ? colors.accent
+                        : colors.shade,
+                      opacity: 0.12
+                    }}
                     onPress={async () => {
                       if (item.type === 'link') {
                         try {
