@@ -33,7 +33,7 @@ export const Notes = ({route, navigation}) => {
   const [notes, setNotes] = useState([]);
   const loading = useNoteStore(state => state.loading);
   let params = route.params ? route.params : null;
-  const alias = params.type === "tag" ? db.tags.alias(params.title) : params.type === "color" ? db.colors.alias(params.title) : params.title
+  const alias = params.type === "tag" ? db.tags.alias(params.id) : params.type === "color" ? db.colors.alias(params.id) : params.title
 
   let ranAfterInteractions = false;
 

@@ -38,7 +38,7 @@ const ColorItem = ({item, index}) => {
   const {colors} = state;
   const setColorNotes = useMenuStore(state => state.setColorNotes);
   const [headerTextState, setHeaderTextState] = useState(null);
-  const alias = db.colors.alias(item.title);
+  const alias = db.colors.alias(item.id);
 
   const onHeaderStateChange = event => {
     if (event?.id === item.id) {

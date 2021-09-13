@@ -53,7 +53,7 @@ export const TagsSection = () => {
         get: 'tagged'
       };
       Navigation.navigate('NotesPage', params, {
-        heading: '#' + db.tags.alias(item.title),
+        heading: '#' + db.tags.alias(item.id),
         id: item.id,
         type: item.type
       });
