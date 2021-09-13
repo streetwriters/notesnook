@@ -14,12 +14,10 @@ import {Button} from '../Button';
 export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const syncing = useUserStore(state => state.syncing);
   const deviceMode = useSettingStore(state => state.deviceMode);
   const menuRef = useRef();
   return (
     <View style={styles.rightBtnContainer}>
-      {syncing && <ActivityIndicator size={SIZE.xl} color={colors.accent} />}
       {currentScreen !== 'Settings' && (
         <ActionIcon
           onPress={async () => {
