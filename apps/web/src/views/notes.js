@@ -13,7 +13,7 @@ function Notes() {
   const type = context?.type === "favorite" ? "favorites" : "notes";
 
   useEffect(() => {
-    if (!context || (context.type === "color" && context.notes.length <= 0)) {
+    if (context?.type === "color" && context?.notes?.length <= 0) {
       navigate("/", true);
     }
   }, [context]);
