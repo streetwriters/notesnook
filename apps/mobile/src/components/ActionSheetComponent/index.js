@@ -213,27 +213,15 @@ export const ActionSheetComponent = ({
       func: async () => {
         if (!note.id) return;
         close();
-        if (note.type === 'note') {
-          if (db.notes.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show({
-              heading: 'Cannot pin more than 3 notes',
-              type: 'error',
-              context: 'local'
-            });
-            return;
-          }
-          await db.notes.note(note.id).pin();
-        } else {
-          if (db.notebooks.pinned.length === 3 && !note.pinned) {
-            ToastEvent.show({
-              heading: 'Cannot pin more than 3 notebooks',
-              type: 'error',
-              context: 'local'
-            });
-            return;
-          }
-          await db.notebooks.notebook(note.id).pin();
+        let type = note.type;
+        if (db[`${type}s`].pinned.length === 3 && !note.pinned) {
+          ToastEvent.show({
+            heading: `Cannot pin more than 3 ${type}s`,
+            type: 'error',
+          });
+          return;
         }
+        await db[`${type}s`][type](note.id).pin();
         localRefresh(item.type);
       },
       close: false,
@@ -625,9 +613,7 @@ export const ActionSheetComponent = ({
           negativeText: 'Cancel',
           positivePress: async () => {
             await db.trash.delete(note.id);
-            Navigation.setRoutesToUpdate([
-              Navigation.routeNames.Trash
-            ]);
+            Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
             useSelectionStore.getState().setSelectionMode(false);
             ToastEvent.show({
               heading: 'Permanantly deleted items',
@@ -635,7 +621,7 @@ export const ActionSheetComponent = ({
               context: 'local'
             });
           },
-          positiveType: 'errorShade',
+          positiveType: 'errorShade'
         });
       }
     }
