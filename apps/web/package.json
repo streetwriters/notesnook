@@ -80,7 +80,7 @@
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",
-    "test": "yarn zx ./scripts/run-tests.mjs",
+    "test": "npm exec playwright test",
     "test:debug": "env-cmd -e dev,debug,silent jest -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",

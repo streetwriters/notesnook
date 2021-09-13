@@ -1,6 +1,6 @@
 const { Page, test, expect } = require("@playwright/test");
 const { getTestId } = require("./utils");
-const { isAbsent } = require("./utils/conditions");
+const { isAbsent, isPresent } = require("./utils/conditions");
 const dotenv = require("dotenv");
 const path = require("path");
 
@@ -11,10 +11,10 @@ dotenv.config({ path: path.join(__dirname, ".env.local") });
  */
 var page = null;
 global.page = null;
-test.beforeEach(async ({ page: _page }) => {
+test.beforeEach(async ({ page: _page, baseURL }) => {
   global.page = _page;
   page = _page;
-  await page.goto("http://localhost:3000/");
+  await page.goto(baseURL);
 });
 
 const USER = {
@@ -31,11 +31,13 @@ async function loginUser() {
 
   await page.click(getTestId("submitButton"));
 
-  await page.waitForNavigation();
+  await page.waitForSelector(getTestId("navitem-sync"));
 
-  expect(await isAbsent(getTestId("navitem-login"))).toBe(true);
+  expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
 }
 
-test("login user", async () => {
+test("login user", async ({}, info) => {
+  info.setTimeout(0);
+
   await loginUser();
 });

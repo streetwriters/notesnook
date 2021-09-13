@@ -3,8 +3,8 @@
 const { test, expect } = require("@playwright/test");
 const { getTestId } = require("./utils");
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("http://localhost:3000");
+test.beforeEach(async ({ page, baseURL }) => {
+  await page.goto(baseURL);
 });
 
 function createRoute(key, header) {
