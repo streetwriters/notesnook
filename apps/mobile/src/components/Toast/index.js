@@ -31,6 +31,7 @@ export const Toast = ({context = 'global'}) => {
   let toastOpacity = useValue(0);
 
   const showToastFunc = async data => {
+    console.log('toast show',data.message);
     if (!data) return;
     if (data.context !== context) return;
     if (toastMessages.findIndex(m => m.message === data.message) >= 0) {
@@ -84,7 +85,7 @@ export const Toast = ({context = 'global'}) => {
   };
 
   const hideToastFunc = () => {
-    let msg = toastMessages.shift();
+    let msg = toastMessages.length > 1 ? toastMessages.shift() : null;
     if (msg) {
       timing(toastOpacity, {
         toValue: 0,
