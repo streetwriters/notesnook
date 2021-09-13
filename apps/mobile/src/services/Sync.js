@@ -1,29 +1,24 @@
 import NetInfo from '@react-native-community/netinfo';
-import {initialize, useUserStore} from '../provider/stores';
-import {doInBackground} from '../utils';
-import {db} from '../utils/DB';
-import {eOpenLoginDialog} from '../utils/Events';
-import {getNote, updateNoteInEditor} from '../views/Editor/Functions';
-import {eSendEvent, ToastEvent} from './EventManager';
+import { initialize } from '../provider/stores';
+import { doInBackground } from '../utils';
+import { db } from '../utils/DB';
+import { eOpenLoginDialog } from '../utils/Events';
+import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
+import { eSendEvent, ToastEvent } from './EventManager';
 
 const run = async (context = 'global', forced) => {
-  let userstore = useUserStore.getState();
-  if (userstore.syncing) {
-    return;
-  }
   userstore.setSyncing(true);
   try {
     let res = await doInBackground(async () => {
       try {
-        await db.sync(true, forced);
-        return true;
+        return await db.sync(true, forced);
       } catch (e) {
         return e.message;
       }
     });
 
-    if (res !== true) throw new Error(res);
-
+    if (!res) return;
+    if (typeof res === "string") throw new Error(res);
     ToastEvent.show({
       heading: 'Sync complete',
       type: 'success',
@@ -31,7 +26,7 @@ const run = async (context = 'global', forced) => {
       context: context
     });
   } catch (e) {
-    console.log(e);
+    if (e.message === "Sync already running") return;
     if (e.message === 'You need to login to sync.') {
       ToastEvent.show({
         heading: 'Enable sync',
