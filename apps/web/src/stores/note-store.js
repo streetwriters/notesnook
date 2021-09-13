@@ -7,7 +7,6 @@ import Vault from "../common/vault";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import Config from "../utils/config";
-import { showToast } from "../utils/toast";
 import { qclone } from "qclone";
 import { hashNavigate } from "../navigation";
 import { groupArray } from "notes-core/utils/grouping";
@@ -81,11 +80,9 @@ class NoteStore extends BaseStore {
   };
 
   pin = async (id) => {
-    // TODO (hack) we probably shouldn't do this here.
     const note = db.notes.note(id);
     if (!note.data.pinned && db.notes.pinned.length >= 3) {
-      await showToast("error", "You cannot pin more than 3 notes.");
-      return;
+      throw new Error("You cannot pin more than 3 notes.");
     }
     if (!this._syncEditor(note.id, "pinned", !note.data.pinned)) {
       await note.pin();

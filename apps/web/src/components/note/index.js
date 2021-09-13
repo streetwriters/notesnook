@@ -155,9 +155,13 @@ export default React.memo(Note, function (prevProps, nextProps) {
   );
 });
 
-const pin = async (note) => {
-  await store.pin(note.id);
-  if (note.pinned) await showUnpinnedToast(note.id, "note");
+const pin = (note) => {
+  return store
+    .pin(note.id)
+    .then(async () => {
+      if (note.pinned) await showUnpinnedToast(note.id, "note");
+    })
+    .catch((error) => showToast("error", error.message));
 };
 
 const menuItems = [

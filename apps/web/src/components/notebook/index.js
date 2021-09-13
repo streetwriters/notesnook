@@ -9,6 +9,7 @@ import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
 import { getTotalNotes } from "../../common";
 import IconTag from "../icon-tag";
+import { showToast } from "../../utils/toast";
 
 function Notebook(props) {
   const { item, index } = props;
@@ -83,9 +84,13 @@ export default React.memo(Notebook, (prev, next) => {
   );
 });
 
-const pin = async (notebook) => {
-  await store.pin(notebook);
-  if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
+const pin = (notebook) => {
+  return store
+    .pin(notebook.id)
+    .then(() => {
+      if (notebook.pinned) showUnpinnedToast(notebook.id, "notebook");
+    })
+    .catch((error) => showToast("error", error.message));
 };
 
 const menuItems = [

@@ -10,7 +10,6 @@ import {
   showSessionExpiredDialog,
 } from "../common/dialog-controller";
 import { Text } from "rebass";
-import { showToast } from "../utils/toast";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
@@ -64,7 +63,6 @@ class UserStore extends BaseStore {
         this.set((state) => (state.user.subscription = subscription));
       });
       EV.subscribe(EVENTS.userEmailConfirmed, async () => {
-        showToast("success", "Email confirmed successfully!");
         window.location.reload();
       });
 

@@ -3,7 +3,6 @@ import createStore from "../common/store";
 import { store as appStore } from "./app-store";
 import { store as noteStore } from "./note-store";
 import BaseStore from "./index";
-import { showToast } from "../utils/toast";
 import { groupArray } from "notes-core/utils/grouping";
 import Config from "../utils/config";
 
@@ -36,11 +35,11 @@ class NotebookStore extends BaseStore {
   };
 
   pin = async (notebookId) => {
-    // TODO (hack) We probably shouldn't do this here.
-    if (db.notebooks.pinned.length >= 3) {
-      return await showToast("error", "You cannot pin more than 3 notebooks.");
+    const notebook = db.notebooks.notebook(notebookId);
+    if (!notebook._notebook.pinned && db.notebooks.pinned.length >= 3) {
+      throw new Error("You cannot pin more than 3 notebooks.");
     }
-    await db.notebooks.notebook(notebookId).pin();
+    await notebook.pin();
     this.refresh();
   };
 
