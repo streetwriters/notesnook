@@ -101,7 +101,8 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                   borderWidth: 0.5,
                   borderColor: colors.icon,
                   paddingHorizontal: 6,
-                  marginVertical:5
+                  marginVertical:5,
+                  marginRight:5
                 }}
                 onPress={() => navigateToTopic(topic)}
               />
