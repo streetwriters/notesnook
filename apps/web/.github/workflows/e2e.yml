@@ -22,10 +22,10 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - run: yarn
-      - run: yarn playwright install-deps
-      - run: yarn playwright install
-      - run: yarn test
+      - run: npm ci
+      - run: npm exec playwright install-deps
+      - run: npm exec playwright install
+      - run: npm exec test
         env:
           USER_EMAIL: ${{ secrets.USER_EMAIL }}
           USER_PASSWORD: ${{ secrets.USER_PASSWORD }}

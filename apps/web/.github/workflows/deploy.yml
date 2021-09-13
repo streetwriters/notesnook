@@ -22,12 +22,12 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Use Node.js 15.x
+      - name: Use Node.js 16.x
         uses: actions/setup-node@v2.1.5
         with:
-          node-version: 15.x
-      - run: yarn install
-      - run: yarn build
+          node-version: 16.x
+      - run: npm ci
+      - run: npm run build
 
       - uses: easingthemes/ssh-deploy@main
         env:
