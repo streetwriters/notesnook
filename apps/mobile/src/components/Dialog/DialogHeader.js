@@ -31,7 +31,7 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
             }}>
             <Heading size={SIZE.xl}>{title}</Heading>
 
-            {button && (
+            {button ? (
               <Button
                 onPress={button.onPress}
                 style={{
@@ -42,7 +42,7 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
                 type="accent"
                 height={25}
               />
-            )}
+            ) : null}
           </View>
 
           {paragraph ? (

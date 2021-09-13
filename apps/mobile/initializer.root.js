@@ -313,7 +313,7 @@ const NativeStack = React.memo(
           height: '100%',
           width: fullscreen ? 0 : widths[deviceMode].b
         }}>
-        {deviceMode === 'mobile' && (
+        {deviceMode === 'mobile' ? (
           <Animated.View
             style={{
               position: 'absolute',
@@ -330,7 +330,7 @@ const NativeStack = React.memo(
             }}
             ref={overlayRef}
           />
-        )}
+        ) : null}
 
         <NavigatorStack />
       </View>,
@@ -346,7 +346,7 @@ const NativeStack = React.memo(
           height: '100%',
           backgroundColor: colors.bg
         }}>
-        {deviceMode && (
+        {deviceMode ? (
           <CustomTabs
             ref={tabBarRef}
             dimensions={dimensions}
@@ -363,7 +363,7 @@ const NativeStack = React.memo(
             onScroll={onScroll}
             onChangeTab={onChangeTab}
           />
-        )}
+        ) : null}
       </View>
     );
   },
