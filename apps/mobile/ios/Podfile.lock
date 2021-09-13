@@ -248,8 +248,6 @@ PODS:
     - React-Core
   - react-native-html-to-pdf-lite (0.9.1):
     - React
-  - react-native-image-picker (3.8.1):
-    - React-Core
   - react-native-keep-awake (1.0.4):
     - React
   - react-native-mmkv-storage (0.3.7):
@@ -422,7 +420,6 @@ DEPENDENCIES:
   - react-native-fingerprint-scanner (from `../node_modules/react-native-fingerprint-scanner`)
   - react-native-get-random-values (from `../node_modules/react-native-get-random-values`)
   - react-native-html-to-pdf-lite (from `../node_modules/react-native-html-to-pdf-lite`)
-  - react-native-image-picker (from `../node_modules/react-native-image-picker`)
   - "react-native-keep-awake (from `../node_modules/@sayem314/react-native-keep-awake`)"
   - react-native-mmkv-storage (from `../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec`)
   - "react-native-netinfo (from `../node_modules/@react-native-community/netinfo`)"
@@ -527,8 +524,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-get-random-values"
   react-native-html-to-pdf-lite:
     :path: "../node_modules/react-native-html-to-pdf-lite"
-  react-native-image-picker:
-    :path: "../node_modules/react-native-image-picker"
   react-native-keep-awake:
     :path: "../node_modules/@sayem314/react-native-keep-awake"
   react-native-mmkv-storage:
@@ -656,7 +651,6 @@ SPEC CHECKSUMS:
   react-native-fingerprint-scanner: be63e626b31fb951780a5fac5328b065a61a3d6e
   react-native-get-random-values: 237bffb1c7e05fb142092681531810a29ba53015
   react-native-html-to-pdf-lite: 21bfb169bf4cbcd7bec9f736975ee1b3f5292d4a
-  react-native-image-picker: 31971f6184e7c1dcb4fc1f122e1ba2c3fb11ef1e
   react-native-keep-awake: e63964d58c890de02bfb6519dedb7d90b5c782de
   react-native-mmkv-storage: 6d9ce7bbbef45fcdde623dd13bf3617ea87c2a52
   react-native-netinfo: 30fb89fa913c342be82a887b56e96be6d71201dd
