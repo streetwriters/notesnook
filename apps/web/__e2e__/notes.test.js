@@ -130,7 +130,7 @@ async function checkNoteColored(noteSelector) {
   await openContextMenu(noteSelector);
 
   await expect(
-    isPresent(Menu.new("menuitem").colorCheck("red").build())
+    isPresent(Menu.new("menuitem").colorCheck("Red").build())
   ).resolves.toBeTruthy();
 
   await closeContextMenu(noteSelector);
@@ -307,12 +307,12 @@ test.describe("run tests independently", () => {
 
     await openContextMenu(noteSelector);
 
-    await page.click(Menu.new("menuitem").color("red").build());
+    await page.click(Menu.new("menuitem").color("Red").build());
 
     await page.click(getTestId("properties"));
 
     await expect(
-      isPresent(getTestId("properties-red-check"))
+      isPresent(getTestId("properties-Red-check"))
     ).resolves.toBeTruthy();
 
     await page.click(getTestId("properties-close"));
@@ -437,7 +437,7 @@ test.describe("run tests independently", () => {
 
     await page.click(getTestId("properties"));
 
-    await page.click(getTestId("properties-red"));
+    await page.click(getTestId("properties-Red"));
 
     await checkNoteColored(noteSelector);
   });
