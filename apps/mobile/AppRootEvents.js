@@ -185,9 +185,7 @@ export const AppRootEvents = React.memo(
             if (version.mobile > APP_VERSION) {
               eSendEvent('updateDialog', ver);
             }
-          } catch (e) {
-            console.log(e);
-          }
+          } catch (e) {}
         })();
       }
       return () => {
@@ -306,7 +304,6 @@ export const AppRootEvents = React.memo(
       SettingsService.init();
       setSyncing(false);
       setLoginMessage();
-      console.log('called logout');
       await PremiumService.setPremiumStatus();
       await MMKV.setItem('introCompleted', 'true');
       eSendEvent(eOpenProgressDialog, {
@@ -321,7 +318,7 @@ export const AppRootEvents = React.memo(
         actionText: 'Login',
         noProgress: true
       });
-      // Workaround to clear app on logout
+
       setTimeout(() => {
         initialize();
       }, 1000);

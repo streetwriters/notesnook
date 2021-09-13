@@ -1,14 +1,13 @@
-import {groupArray} from 'notes-core/utils/grouping';
-import React, {useCallback, useEffect, useState} from 'react';
-import {Platform} from 'react-native';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
+import { groupArray } from 'notes-core/utils/grouping';
+import React, { useCallback, useEffect, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {useNoteStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
+import { useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -16,16 +15,16 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {editing, InteractionManager} from '../../utils';
-import {db} from '../../utils/DB';
+import { editing, InteractionManager } from '../../utils';
+import { db } from '../../utils/DB';
 import {
   eOnLoadNote,
   eOpenAddTopicDialog,
   eScrollEvent,
   refreshNotesPage
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {tabBarRef} from '../../utils/Refs';
+import { openLinkInBrowser } from '../../utils/functions';
+import { tabBarRef } from '../../utils/Refs';
 
 export const Notes = ({route, navigation}) => {
   const [state] = useTracked();

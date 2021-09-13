@@ -1,15 +1,15 @@
-import React, {useRef} from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
+import React, { useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
+import Menu, { MenuItem } from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import Navigation from '../../services/Navigation';
-import {SIZE} from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 
 export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const [state] = useTracked();

@@ -395,10 +395,10 @@ export const BUTTON_TYPES = {
     text: 'red',
     selected: 'red',
     opacity: 0.12
-  }
+  },
 };
-let he;
 
+let he;
 export function toTXT(html) {
   let text = html.replace(/<br[^>]*>/gi, '\n').replace(/<[^>]+>/g, '');
   if (!he) {
