@@ -8,7 +8,7 @@ import {
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import {SORT} from '../../utils';
+import {GROUP, SORT} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/DB';
 import {eOpenJumpToDialog, eOpenSortDialog} from '../../utils/Events';
@@ -24,8 +24,8 @@ export const SectionHeader = ({item, index, type, title,color}) => {
   const [groupOptions, setGroupOptions] = useState(
     db.settings?.getGroupOptions(type)
   );
-  let groupBy = Object.keys(SORT).find(
-    key => SORT[key] === groupOptions.groupBy
+  let groupBy = Object.keys(GROUP).find(
+    key => GROUP[key] === groupOptions.groupBy
   );
 
   const settings = useSettingStore(state => state.settings);
@@ -37,6 +37,7 @@ export const SectionHeader = ({item, index, type, title,color}) => {
     : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
   const onUpdate = () => {
+    console.log(groupOptions);
     setGroupOptions({...db.settings?.getGroupOptions(type)});
   };
 

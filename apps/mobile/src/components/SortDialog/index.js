@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
@@ -24,7 +24,7 @@ class SortDialog extends React.Component {
     super(props);
     this.state = {
       groupOptions: null,
-      visible: false,
+      visible: false
     };
     this.actionSheet = createRef();
   }
@@ -34,12 +34,12 @@ class SortDialog extends React.Component {
     this.setState(
       {
         visible: true,
-        groupOptions: db.settings.getGroupOptions(this.props.type),
+        groupOptions: db.settings.getGroupOptions(this.props.type)
       },
       async () => {
-        console.log(this.state.groupOptions)
+        console.log(this.state.groupOptions);
         this.actionSheet.current?.setModalVisible(true);
-      },
+      }
     );
   }
 
@@ -47,7 +47,7 @@ class SortDialog extends React.Component {
     this.actionSheet.current?.setModalVisible(false);
     await sleep(100);
     this.setState({
-      visible: false,
+      visible: false
     });
   }
 
@@ -64,7 +64,7 @@ class SortDialog extends React.Component {
   updateGroupOptions = async _groupOptions => {
     await db.settings.setGroupOptions(this.props.type, _groupOptions);
     this.setState({
-      groupOptions: _groupOptions,
+      groupOptions: _groupOptions
     });
     Navigation.setRoutesToUpdate([this.props.screen]);
     eSendEvent('groupOptionsUpdate');
@@ -84,104 +84,107 @@ class SortDialog extends React.Component {
             backgroundColor: colors.bg,
             justifyContent: 'space-between',
             borderRadius: 10,
-            paddingTop: 10,
+            paddingTop: 10
           }}>
           <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingHorizontal:12
-              }}>
-              <Heading
-                size={SIZE.xl}
-                style={{
-                  alignSelf: 'center',
-                }}>
-                Sort & Group
-              </Heading>
-
-              <Button
-                title={
-                  groupOptions.sortDirection === 'asc'
-                    ? 'Ascending'
-                    : 'Descending'
-                }
-                icon={
-                  groupOptions.sortDirection === 'asc'
-                    ? 'sort-ascending'
-                    : 'sort-descending'
-                }
-                height={25}
-                iconPosition="right"
-                type="grayBg"
-                style={{
-                  borderRadius: 100,
-                }}
-                onPress={async () => {
-                  let _groupOptions = {
-                    ...groupOptions,
-                    sortDirection:
-                      groupOptions.sortDirection === 'asc' ? 'desc' : 'asc',
-                  };
-                  await this.updateGroupOptions(_groupOptions);
-                }}
-              />
-            </View>
-
-            <Seperator />
-            <View
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-around',
-                borderBottomWidth: 1,
-                borderBottomColor: colors.nav,
-                marginBottom: 12,
-                paddingHorizontal:12
-              }}>
-              {this.state.groupOptions.groupBy === 'abc' ? (
-                <Paragraph color={colors.icon}>
-                  No sort options available.
-                </Paragraph>
-              ) : (
-                Object.keys(SORT).map((item, index) => (
-                  <Button
-                    key={item}
-                    type={groupOptions.sortBy === item ? 'transparent' : 'gray'}
-                    title={SORT[item]}
-                    height={40}
-                    iconPosition="left"
-                    icon={
-                      groupOptions.sortBy === item
-                        ? 'check-circle-outline'
-                        : 'checkbox-blank-circle-outline'
-                    }
-                    textStyle={{
-                      fontWeight: 'normal',
-                      color:colors.pri
-                    }}
-                    fontSize={SIZE.sm}
-                    style={{
-                      backgroundColor: 'transparent',
-                    }}
-                    onPress={async () => {
-                      let _groupOptions = {
-                        ...groupOptions,
-                        sortBy: this.props.type === 'trash' ? 'dateDeleted' : item,
-                      };
-                      await this.updateGroupOptions(_groupOptions);
-                    }}
-                    iconSize={SIZE.lg}
-                  />
-                ))
-              )}
-            </View>
-            <View
             style={{
-              paddingHorizontal:12
-            }}
-            >
-               {Object.keys(GROUP).map((item, index) => (
+              flexDirection: 'row',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingHorizontal: 12
+            }}>
+            <Heading
+              size={SIZE.xl}
+              style={{
+                alignSelf: 'center'
+              }}>
+              Sort & Group
+            </Heading>
+
+            <Button
+              title={
+                groupOptions.sortDirection === 'asc'
+                  ? groupOptions.groupBy === 'abc'
+                    ? 'Z - A'
+                    : 'Oldest - Newest'
+                  : groupOptions.groupBy === 'abc'
+                  ? 'A - Z'
+                  : 'Newest - Oldest'
+              }
+              icon={
+                groupOptions.sortDirection === 'asc'
+                  ? 'sort-ascending'
+                  : 'sort-descending'
+              }
+              height={25}
+              iconPosition="right"
+              type="grayBg"
+              style={{
+                borderRadius: 100
+              }}
+              onPress={async () => {
+                let _groupOptions = {
+                  ...groupOptions,
+                  sortDirection:
+                    groupOptions.sortDirection === 'asc' ? 'desc' : 'asc'
+                };
+                await this.updateGroupOptions(_groupOptions);
+              }}
+            />
+          </View>
+
+          <Seperator />
+          <View
+            style={{
+              flexDirection: 'row',
+              justifyContent: 'space-around',
+              borderBottomWidth: 1,
+              borderBottomColor: colors.nav,
+              marginBottom: 12,
+              paddingHorizontal: 12
+            }}>
+            {this.state.groupOptions.groupBy === 'abc' ? (
+              <Paragraph color={colors.icon}>
+                No sort options available.
+              </Paragraph>
+            ) : (
+              Object.keys(SORT).map((item, index) => (
+                <Button
+                  key={item}
+                  type={groupOptions.sortBy === item ? 'transparent' : 'gray'}
+                  title={SORT[item]}
+                  height={40}
+                  iconPosition="left"
+                  icon={
+                    groupOptions.sortBy === item
+                      ? 'check-circle-outline'
+                      : 'checkbox-blank-circle-outline'
+                  }
+                  textStyle={{
+                    fontWeight: 'normal',
+                    color: colors.pri
+                  }}
+                  fontSize={SIZE.sm}
+                  style={{
+                    backgroundColor: 'transparent'
+                  }}
+                  onPress={async () => {
+                    let _groupOptions = {
+                      ...groupOptions,
+                      sortBy: this.props.type === 'trash' ? 'dateDeleted' : item
+                    };
+                    await this.updateGroupOptions(_groupOptions);
+                  }}
+                  iconSize={SIZE.lg}
+                />
+              ))
+            )}
+          </View>
+          <View
+            style={{
+              paddingHorizontal: 12
+            }}>
+            {Object.keys(GROUP).map((item, index) => (
               <PressableButton
                 key={item}
                 testID={'btn-' + item}
@@ -189,8 +192,11 @@ class SortDialog extends React.Component {
                 onPress={async () => {
                   let _groupOptions = {
                     ...groupOptions,
-                    groupBy: GROUP[item],
+                    groupBy: GROUP[item]
                   };
+                  if (item === "alphabetical") {
+                    _groupOptions.sortBy = "title"
+                  }
 
                   this.updateGroupOptions(_groupOptions);
                 }}
@@ -202,12 +208,13 @@ class SortDialog extends React.Component {
                   alignItems: 'center',
                   borderRadius: 5,
                   paddingHorizontal: 12,
-                  marginBottom: 10,
+                  marginBottom: 10
                 }}>
                 <Paragraph
                   size={SIZE.sm}
                   style={{
-                    fontWeight:groupOptions.groupBy === GROUP[item] ? "bold" : "normal"
+                    fontWeight:
+                      groupOptions.groupBy === GROUP[item] ? 'bold' : 'normal'
                   }}
                   color={
                     groupOptions.groupBy === GROUP[item]
@@ -221,10 +228,8 @@ class SortDialog extends React.Component {
                 ) : null}
               </PressableButton>
             ))}
-            </View>
-           
-
           </View>
+        </View>
       </ActionSheetWrapper>
     );
   }
