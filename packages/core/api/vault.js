@@ -207,7 +207,10 @@ export default class Vault {
       note = this._db.notes.note(id).data;
       if (note.locked) return;
       contentId = note.contentId;
-      let content = await this._db.content.raw(contentId);
+      let content = await this._db.content.raw(contentId, false);
+      // TODO:
+      // 1. extract and empty out all attachments from note contents
+      // 2. encrypt them with vault password
       data = content.data;
       type = content.type;
     }

@@ -97,6 +97,7 @@ export default class Sync {
 
       return true;
     } catch (e) {
+      this._isSyncing = false;
       throw e;
     } finally {
       this._isSyncing = false;

@@ -1,5 +1,7 @@
 import Collection from "./collection";
 import getId from "../utils/id";
+import { getContentFromData } from "../content-types";
+import { diff, hasItem } from "../utils/array";
 
 export default class Content extends Collection {
   async add(content) {
@@ -37,10 +39,10 @@ export default class Content extends Collection {
     return content.data;
   }
 
-  async raw(id) {
+  async raw(id, withAttachments = true) {
     const content = await this._collection.getItem(id);
     if (!content) return;
-    return content;
+    return withAttachments ? await this.insertAttachments(content) : content;
   }
 
   remove(id) {
@@ -56,22 +58,37 @@ export default class Content extends Collection {
     return this._collection.getItems(this._collection.indexer.indices);
   }
 
-  async cleanup() {
-    const indices = this._collection.indexer.indices;
-    await this._db.notes.init();
-    const notes = this._db.notes._collection.getRaw();
-    if (!notes.length && indices.length > 0) return [];
-    let ids = [];
-    for (let contentId of indices) {
-      const noteIndex = notes.findIndex((note) => note.contentId === contentId);
-      const isOrphaned = noteIndex === -1;
-      if (isOrphaned) {
-        ids.push(contentId);
-        await this._collection.deleteItem(contentId);
-      } else if (notes[noteIndex].localOnly) {
-        ids.push(contentId);
-      }
+  async insertAttachments(contentItem) {
+    const content = getContentFromData(contentItem.type, contentItem.data);
+    contentItem.data = await content.insertAttachments((hash) => {
+      return this._db.attachments.get(hash);
+    });
+    return contentItem;
+  }
+
+  async extractAttachments(contents) {
+    const allAttachments = this._db.attachments.all;
+    for (let contentItem of contents) {
+      const content = getContentFromData(contentItem.type, contentItem.data);
+      const { data, attachments } = await content.extractAttachments(
+        (data, type) => this._db.attachments.save(data, type)
+      );
+
+      await diff(allAttachments, attachments, async (attachment, action) => {
+        if (hasItem(attachment.noteIds, contentItem.noteId)) return;
+
+        if (action === "delete") {
+          await this._db.attachments.delete(
+            attachment.hash,
+            contentItem.noteId
+          );
+        } else if (action === "insert") {
+          await this._db.attachments.add(attachment, contentItem.noteId);
+        }
+      });
+
+      contentItem.data = data;
     }
-    return ids;
+    return contents;
   }
 }

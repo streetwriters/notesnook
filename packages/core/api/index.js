@@ -19,6 +19,7 @@ import UserManager from "./user-manager";
 import http from "../utils/http";
 import Monographs from "./monographs";
 import Offers from "./offers";
+import Attachments from "../collections/attachments";
 
 /**
  * @type {EventSource}
@@ -30,8 +31,9 @@ class Database {
    * @param {any} context
    * @param {EventSource} eventsource
    */
-  constructor(context, eventsource) {
+  constructor(context, eventsource, fs) {
     this.context = new Storage(context);
+    this.fs = fs;
     NNEventSource = eventsource;
     this._syncTimeout = 0;
   }
@@ -86,6 +88,8 @@ class Database {
     this.colors = await Tags.new(this, "colors");
     /** @type {Content} */
     this.content = await Content.new(this, "content", false);
+    /** @type {Attachments} */
+    this.attachments = await Attachments.new(this, "attachments");
 
     this.trash = new Trash(this);
 
