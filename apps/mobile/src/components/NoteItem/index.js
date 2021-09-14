@@ -130,7 +130,7 @@ const NoteItem = ({item, isTrash, tags}) => {
             {!isTrash && tags
               ? tags.slice(0, 2)?.map(item => (
                   <Button
-                    title={'#' + db.tags.alias(item.id)}
+                    title={'#' + db.tags.alias(item)}
                     key={item}
                     height={20}
                     textStyle={{
