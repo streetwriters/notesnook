@@ -503,7 +503,7 @@ async function addToCollection(id) {
       break;
     }
     case 'tag': {
-      await db.notes.note(note.id).tag(editing.actionAfterFirstSave.id);
+      await db.notes.note(id).tag(editing.actionAfterFirstSave.id);
       editing.actionAfterFirstSave = {
         type: null
       };
@@ -589,7 +589,9 @@ export async function saveNote(preventUpdate) {
       tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
     }
-  } catch (e) {}
+  } catch (e) {
+    console.log('note save error', e);
+  }
   isSaving = false;
 }
 
