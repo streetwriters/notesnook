@@ -16,6 +16,7 @@ import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
 import {db} from '../../../../utils/DB';
 import {eShowGetPremium} from '../../../../utils/Events';
+import {MMKV} from '../../../../utils/mmkv';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
@@ -55,6 +56,7 @@ const ToolbarItem = ({
   const [currentText, setCurrentText] = useState(null);
 
   useEffect(() => {
+    if (/^(dhilitecolor|dforecolor)$/.test(format)) return;
     eSubscribeEvent('onSelectionChange', onSelectionChange);
     return () => {
       eUnSubscribeEvent('onSelectionChange', onSelectionChange);
@@ -62,8 +64,29 @@ const ToolbarItem = ({
   }, [selected]);
 
   useEffect(() => {
+    if (/^(dhilitecolor|dforecolor)$/.test(format)) return;
     onSelectionChange(properties.selection, true);
   }, []);
+
+  useEffect(() => {
+    if (/^(dhilitecolor|dforecolor)$/.test(format)) {
+      onColorChange();
+      eSubscribeEvent('onColorChange', onColorChange);
+    }
+    return () => {
+      eUnSubscribeEvent('onColorChange', onColorChange);
+    };
+  }, []);
+
+  const onColorChange = async () => {
+    console.log('color change');
+    if (/^(dhilitecolor|dforecolor)$/.test(format)) {
+      let _color = await MMKV.getItem(format);
+      let defColor =
+        format === 'dhilitecolor' ? colors.accent + '60' : colors.accent;
+      setColor(_color || defColor);
+    }
+  };
 
   const checkForChanges = data => {
     properties.selection = data;
@@ -272,6 +295,10 @@ const ToolbarItem = ({
       }
     }
 
+    if (/^(dhilitecolor|dforecolor)$/.test(format)) {
+      value = color;
+    }
+
     if (format === 'pre') {
       if (selected) {
         formatSelection(tiny.pre);
@@ -293,13 +320,10 @@ const ToolbarItem = ({
     focusEditor(format);
     editing.tooltip = null;
   };
-
   return (
     <View>
       <PressableButton
-        type={selected ? 'shade' : 'transparent'}
-        customColor={selected && color}
-        customSelectedColor={selected && color}
+        type={selected && !color ? 'shade' : 'transparent'}
         customOpacity={0.12}
         onLongPress={event => {
           showTooltip(event, fullname, TOOLTIP_POSITIONS.TOP);
@@ -307,81 +331,96 @@ const ToolbarItem = ({
         onPress={e => onPress(e)}
         customStyle={{
           borderRadius: 0,
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
           height: normalize(50),
-          minWidth: 60
+          minWidth: /^(dhilitecolor|dforecolor)$/.test(format) ? 30 : 60
         }}>
-        {type === 'tooltip' && (
-          <ToolbarItemPin format={format} color={selected && color} />
-        )}
-
-        {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format) ? (
-          <Heading
-            size={SIZE.md + 2}
-            color={selected ? colors.accent : colors.pri}>
-            {format.slice(0, 1).toUpperCase() + format.slice(1)}
-          </Heading>
-        ) : /^(ol|ul|cl)$/.test(format) ? (
-          <ToolbarListFormat
-            format={format}
-            selected={selected}
-            formatValue={formatValue || icon || 'default'}
-          />
-        ) : format === 'fontsize' ? (
-          <Paragraph
-            size={SIZE.md}
-            color={selected ? colors.accent : colors.pri}>
-            {formatValue || currentText || '12pt'}
-          </Paragraph>
-        ) : text && groupFormat !== 'header' ? (
-          <Paragraph
-            color={selected ? colors.accent : colors.pri}
+        {/^(dhilitecolor|dforecolor)$/.test(format) ? (
+          <View
             style={{
-              paddingHorizontal: 12,
-              fontFamily:
-                format === 'fontname' &&
-                formatValue &&
-                formatValue !== '-apple-system'
-                  ? formatValue
-                  : format === 'fontname' && icon !== '-apple-system' && icon
-                  ? icon
-                  : null
+              backgroundColor: color,
+              height: 30,
+              width: 30,
+              marginLeft: 10,
+              borderRadius: 2.5
             }}
-            size={text.includes('%') ? SIZE.sm : SIZE.md}>
-            {currentText || text}
-          </Paragraph>
+          />
         ) : (
-          <Icon
-            name={
-              valueIcon
-                ? TOOLBAR_ICONS[icon || valueIcon]
-                : TOOLBAR_ICONS[format === '' ? groupDefault : format]
-            }
-            size={SIZE.xl}
-            allowFontScaling={false}
-            color={selected ? (color ? color : colors.accent) : colors.pri}
-          />
-        )}
+          <>
+            {type === 'tooltip' && (
+              <ToolbarItemPin format={format} color={selected && color} />
+            )}
 
-        {type === 'tooltip' && (
-          <Icon
-            name="menu-right"
-            size={SIZE.sm}
-            allowFontScaling={false}
-            color={colors.icon}
-            style={{
-              position: 'absolute',
-              transform: [
-                {
-                  rotateZ: '-45deg'
+            {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format) ? (
+              <Heading
+                size={SIZE.md + 2}
+                color={selected ? colors.accent : colors.pri}>
+                {format.slice(0, 1).toUpperCase() + format.slice(1)}
+              </Heading>
+            ) : /^(ol|ul|cl)$/.test(format) ? (
+              <ToolbarListFormat
+                format={format}
+                selected={selected}
+                formatValue={formatValue || icon || 'default'}
+              />
+            ) : format === 'fontsize' ? (
+              <Paragraph
+                size={SIZE.md}
+                color={selected ? colors.accent : colors.pri}>
+                {formatValue || currentText || '12pt'}
+              </Paragraph>
+            ) : text && groupFormat !== 'header' ? (
+              <Paragraph
+                color={selected ? colors.accent : colors.pri}
+                style={{
+                  paddingHorizontal: 12,
+                  fontFamily:
+                    format === 'fontname' &&
+                    formatValue &&
+                    formatValue !== '-apple-system'
+                      ? formatValue
+                      : format === 'fontname' &&
+                        icon !== '-apple-system' &&
+                        icon
+                      ? icon
+                      : null
+                }}
+                size={text.includes('%') ? SIZE.sm : SIZE.md}>
+                {currentText || text}
+              </Paragraph>
+            ) : (
+              <Icon
+                name={
+                  valueIcon
+                    ? TOOLBAR_ICONS[icon || valueIcon]
+                    : TOOLBAR_ICONS[format === '' ? groupDefault : format]
                 }
-              ],
-              top: 0,
-              right: 0
-            }}
-          />
+                size={SIZE.xl}
+                allowFontScaling={false}
+                color={selected ? (color ? color : colors.accent) : colors.pri}
+              />
+            )}
+
+            {type === 'tooltip' && (
+              <Icon
+                name="menu-right"
+                size={SIZE.sm}
+                allowFontScaling={false}
+                color={colors.icon}
+                style={{
+                  position: 'absolute',
+                  transform: [
+                    {
+                      rotateZ: '-45deg'
+                    }
+                  ],
+                  top: 0,
+                  right: 0
+                }}
+              />
+            )}
+          </>
         )}
       </PressableButton>
     </View>

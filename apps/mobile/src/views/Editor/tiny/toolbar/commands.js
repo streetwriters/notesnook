@@ -25,6 +25,10 @@ export const execCommands = {
     `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
   hilitecolor: color =>
     `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
+  dforecolor: color =>
+    `tinymce.activeEditor.execCommand('ForeColor',false, '${color}');`,
+  dhilitecolor: color =>
+    `tinymce.activeEditor.execCommand('HiliteColor',false, '${color}');`,
 
   fontname: fontname =>
     `tinymce.activeEditor.execCommand('FontName',false, '${fontname}');`,

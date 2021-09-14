@@ -189,6 +189,11 @@ export const TOOLBAR_CONFIG = [
   ],
   [
     {
+      format: 'dhilitecolor',
+      type: 'format',
+      fullname: 'Default Highlight Color'
+    },
+    {
       format: 'hilitecolor',
       type: 'tooltip',
       fullname: 'Text Highlight Color',
@@ -200,6 +205,11 @@ export const TOOLBAR_CONFIG = [
           fullname: item
         };
       })
+    },
+    {
+      format: 'dforecolor',
+      type: 'format',
+      fullname: 'Default Text Color'
     },
     {
       format: 'forecolor',
