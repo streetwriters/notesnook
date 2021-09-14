@@ -24,10 +24,24 @@ export default class NNCrypto {
    * @param {string} plainData - the plaintext data
    * @param {boolean}
    */
-  encrypt = async (passwordOrKey, plainData) => {
+  encrypt = async (passwordOrKey, plainData, type = "plain") => {
     await this._initialize();
     return global.ncrypto.encrypt.call(this, passwordOrKey, {
-      type: "plain",
+      type,
+      data: plainData,
+    });
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {string} plainData - the plaintext data
+   * @param {string} type
+   */
+  encryptBinary = async (passwordOrKey, plainData, type = "plain") => {
+    await this._initialize();
+    return global.ncrypto.encryptBinary.call(this, passwordOrKey, {
+      type,
       data: plainData,
     });
   };

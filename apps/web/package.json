@@ -9,9 +9,9 @@
   "dependencies": {
     "@mdi/js": "^5.9.55",
     "@mdi/react": "^1.4.0",
-    "@notesnook/desktop": "./desktop/",
+    "@notesnook/desktop": "file:./desktop/",
     "@rebass/forms": "^4.0.6",
-    "@streetwritersco/tinymce-plugins": "^1.1.2",
+    "@streetwritersco/tinymce-plugins": "file:../notesnook/packages/tinymce-plugins",
     "@tinymce/tinymce-react": "^3.12.6",
     "clipboard": "^2.0.6",
     "cogo-toast": "^4.2.3",
@@ -48,6 +48,7 @@
     "tinymce": "5.8.1",
     "uzip": "^0.20201231.0",
     "wouter": "^2.7.3",
+    "xxhash-wasm": "^0.4.2",
     "zustand": "^3.3.1"
   },
   "devDependencies": {

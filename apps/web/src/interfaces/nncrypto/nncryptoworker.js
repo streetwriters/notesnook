@@ -65,11 +65,49 @@ export default class NNCryptoWorker {
    * @param {string} data - the plaintext data
    * @param {boolean} compress
    */
-  encrypt = (passwordOrKey, data) => {
-    return this._communicate("encrypt", {
-      passwordOrKey,
-      data: { type: "plain", data },
-    });
+  encrypt = (passwordOrKey, data, type = "plain") => {
+    const payload = { type, data };
+    const transferables = type === "buffer" ? [payload.data] : [];
+    return this._communicate(
+      "encrypt",
+      {
+        passwordOrKey,
+        data: payload,
+      },
+      transferables
+    );
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {string} data - the plaintext data
+   * @param {string} type
+   */
+  encryptBinary = (passwordOrKey, data, type = "plain") => {
+    const payload = { type, data };
+    const transferables = type === "buffer" ? [payload.data] : [];
+    return this._communicate(
+      "encryptBinary",
+      {
+        passwordOrKey,
+        data: payload,
+      },
+      transferables
+    );
+  };
+
+  /**
+   *
+   * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+   * @param {{alg: string, salt: string, iv: string, cipher: Uint8Array}} cipherData - the cipher data
+   */
+  decryptBinary = (passwordOrKey, cipherData, outputType = "text") => {
+    cipherData.output = outputType;
+    cipherData.inputType = "uint8array";
+    return this._communicate("decrypt", { passwordOrKey, cipher: cipherData }, [
+      cipherData.cipher,
+    ]);
   };
 
   /**
@@ -77,8 +115,9 @@ export default class NNCryptoWorker {
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
    * @param {{alg: string, salt: string, iv: string, cipher: string}} cipherData - the cipher data
    */
-  decrypt = (passwordOrKey, cipherData) => {
-    cipherData.output = "text";
+  decrypt = (passwordOrKey, cipherData, outputType = "text") => {
+    cipherData.output = outputType;
+    cipherData.inputType = "base64";
     return this._communicate("decrypt", { passwordOrKey, cipher: cipherData });
   };
 

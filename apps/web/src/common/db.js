@@ -1,4 +1,5 @@
 import StorageInterface from "../interfaces/storage";
+import FS from "../interfaces/fs";
 import EventSource from "eventsource";
 import Config from "../utils/config";
 import http from "notes-core/utils/http";
@@ -12,13 +13,8 @@ import { isTesting } from "../utils/platform";
 var db;
 async function initializeDatabase() {
   const { default: Database } = await import("notes-core/api");
-  db = new Database(StorageInterface, EventSource);
+  db = new Database(StorageInterface, EventSource, FS);
 
-  // db.host({
-  //   API_HOST: "http://localhost:5264",
-  //   AUTH_HOST: "http://localhost:8264",
-  //   SSE_HOST: "http://localhost:7264",
-  // });
   if (isTesting()) {
     db.host({
       API_HOST: "https://api.notesnook.com",
@@ -27,9 +23,9 @@ async function initializeDatabase() {
     });
   } else {
     db.host({
-      API_HOST: "http://192.168.10.23:5264",
-      AUTH_HOST: "http://192.168.10.23:8264",
-      SSE_HOST: "http://192.168.10.23:7264",
+      API_HOST: "http://localhost:5264",
+      AUTH_HOST: "http://localhost:8264",
+      SSE_HOST: "http://localhost:7264",
     });
   }
 

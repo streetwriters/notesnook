@@ -25,12 +25,13 @@ import "tinymce/plugins/media";
 import { processPastedContent } from "@streetwritersco/tinymce-plugins/codeblock";
 import "@streetwritersco/tinymce-plugins/inlinecode";
 import "@streetwritersco/tinymce-plugins/shortlink";
-import "@streetwritersco/tinymce-plugins/quickimage";
 import "@streetwritersco/tinymce-plugins/checklist";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
+import "./plugins/attachmentpicker";
+import "./plugins/icons";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -109,7 +110,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable quickbars autoresize",
   custom:
-    "keyboardquirks collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
+    "icons keyboardquirks collapsibleheaders shortlink attachmentpicker paste codeblock inlinecode shortcuts checklist",
   pro: "textpattern",
 };
 
@@ -200,7 +201,7 @@ function TinyMCE(props) {
 `,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image attachment media link table | ltr rtl | searchreplace`,
         quickbars_selection_toolbar: false,
         mobile: {
           toolbar_mode: "scrolling",

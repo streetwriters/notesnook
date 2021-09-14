@@ -12,8 +12,19 @@ function onMessage(ev) {
     switch (type) {
       case "encrypt": {
         const { passwordOrKey, data: _data } = data;
-        const cipher = encrypt.call(context, passwordOrKey, _data);
+        const cipher = encrypt.call(context, passwordOrKey, _data, "base64");
         sendMessage("encrypt", cipher, messageId);
+        break;
+      }
+      case "encryptBinary": {
+        const { passwordOrKey, data: _data } = data;
+        const cipher = encrypt.call(
+          context,
+          passwordOrKey,
+          _data,
+          "uint8array"
+        );
+        sendMessage("encryptBinary", cipher, messageId, [cipher.cipher.buffer]);
         break;
       }
       case "decrypt": {
@@ -125,7 +136,7 @@ const _getKey = (passwordOrKey) => {
  * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
  * @param {{type: "plain" | "uint8array", data: string | Uint8Array}} plainData - the plaintext data
  */
-const encrypt = (passwordOrKey, plainData) => {
+const encrypt = (passwordOrKey, plainData, outputType) => {
   const { sodium } = this;
 
   if (plainData.type === "plain") {
@@ -149,7 +160,7 @@ const encrypt = (passwordOrKey, plainData) => {
     undefined,
     nonce,
     key,
-    "base64"
+    outputType
   );
   const iv = sodium.to_base64(nonce);
   sodium.memzero(nonce);
@@ -171,14 +182,20 @@ const encrypt = (passwordOrKey, plainData) => {
  * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
  * @param {{salt: string, iv: string, cipher: string}} cipher - the cipher data
  */
-const decrypt = (passwordOrKey, { iv, cipher, salt, output }) => {
+const decrypt = (passwordOrKey, { iv, cipher, salt, output, inputType }) => {
   const { sodium } = this;
 
   const { key } = _getKey({ salt, ...passwordOrKey });
+  const input =
+    inputType === "uint8array"
+      ? input
+      : inputType === "base64"
+      ? sodium.from_base64(cipher)
+      : sodium.decode(cipher);
 
   const data = sodium.crypto_aead_xchacha20poly1305_ietf_decrypt(
     undefined,
-    sodium.from_base64(cipher),
+    input,
     undefined,
     sodium.from_base64(iv),
     key,
