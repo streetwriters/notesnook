@@ -181,23 +181,6 @@ const SplashScreen = () => {
                 bottom: 25,
                 paddingHorizontal: 12
               }}>
-              {isNext ? null : (
-                <Button
-                  fontSize={SIZE.md}
-                  height={40}
-                  onPress={async () => {
-                    await hide();
-                    await MMKV.setItem('introCompleted', 'true');
-                  }}
-                  style={{
-                    paddingHorizontal: 24,
-                    alignSelf: !isNext ? 'center' : 'flex-end',
-                    marginBottom: 10
-                  }}
-                  type="gray"
-                  title="I want to try the app first"
-                />
-              )}
               <Button
                 fontSize={SIZE.md}
                 height={50}
@@ -227,6 +210,30 @@ const SplashScreen = () => {
                 type="accent"
                 title={isNext ? 'Next' : 'Sign up'}
               />
+
+              {isNext ? null : (
+                <Button
+                  fontSize={SIZE.md}
+                  height={50}
+                  width="100%"
+                  onPress={async () => {
+                    await hide();
+                    await MMKV.setItem('introCompleted', 'true');
+                  }}
+                  style={{
+                    paddingHorizontal: 24,
+                    alignSelf: !isNext ? 'center' : 'flex-end',
+                    marginTop: 10
+                  }}
+                  type="grayBg"
+                  buttonType={{
+                    color: '#808080',
+                    selected: '#808080',
+                    opacity: 0.15,
+                  }}
+                  title="I want to try the app first"
+                />
+              )}
             </View>
           </Animated.View>
         </SafeAreaView>
