@@ -118,7 +118,7 @@ const PinItem = ({item, index, onPress}) => {
   }, []);
 
   const icons = {
-    topic: 'book-open-outline',
+    topic: 'bookmark',
     notebook: 'book-outline',
     tag: 'pound'
   };
