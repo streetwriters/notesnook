@@ -49,7 +49,8 @@ class Database {
   async init() {
     EV.subscribeMulti(
       [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
-      this.connectSSE.bind(this)
+      this.connectSSE,
+      this
     );
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();

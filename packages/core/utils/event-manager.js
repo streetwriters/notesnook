@@ -7,9 +7,9 @@ class EventManager {
     this._registry.clear();
   }
 
-  subscribeMulti(names, handler) {
+  subscribeMulti(names, handler, thisArg) {
     names.forEach((name) => {
-      this.subscribe(name, handler);
+      this.subscribe(name, handler.bind(thisArg));
     });
   }
 
