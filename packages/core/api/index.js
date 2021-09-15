@@ -19,6 +19,7 @@ import UserManager from "./user-manager";
 import http from "../utils/http";
 import Monographs from "./monographs";
 import Offers from "./offers";
+import Debug from "./debug";
 
 /**
  * @type {EventSource}
@@ -74,6 +75,7 @@ class Database {
     this.outbox = new Outbox(this);
     this.monographs = new Monographs(this);
     this.offers = new Offers();
+    this.debug = new Debug();
 
     // collections
     /** @type {Notes} */
