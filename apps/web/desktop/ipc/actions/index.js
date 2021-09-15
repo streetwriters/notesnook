@@ -2,7 +2,7 @@ const changeAppTheme = require("./changeAppTheme");
 const checkForUpdate = require("./checkForUpdate");
 const downloadUpdate = require("./downloadUpdate");
 const installUpdate = require("./installUpdate");
-const openLink = require("./openLink");
+const open = require("./open");
 const saveFile = require("./saveFile");
 const setZoomFactor = require("./setZoomFactor");
 
@@ -11,7 +11,7 @@ const actions = {
   checkForUpdate,
   downloadUpdate,
   installUpdate,
-  openLink,
+  open,
   saveFile,
   setZoomFactor,
 };

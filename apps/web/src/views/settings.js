@@ -27,7 +27,6 @@ import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
 import Tip from "../components/tip";
 import Toggle from "../components/toggle";
-import openLink from "../commands/openLink";
 import { isDesktop } from "../utils/platform";
 import Vault from "../common/vault";
 import { isUserPremium } from "../hooks/use-is-user-premium";
@@ -35,6 +34,7 @@ import { Slider } from "@rebass/forms";
 import useZoomFactor from "../hooks/use-zoom-factor";
 import debounce from "just-debounce";
 import { PATHS } from "@notesnook/desktop/paths";
+import { openPath } from "../commands/open";
 
 function importBackup() {
   return new Promise((resolve, reject) => {
@@ -124,6 +124,7 @@ function Settings(props) {
     appearance: false,
     backup: false,
     privacy: false,
+    developer: false,
     other: true,
   });
   const isSystemThemeDark = useSystemTheme();
@@ -152,6 +153,7 @@ function Settings(props) {
     "backupReminderOffset",
     0
   );
+  const [debugMode, setDebugMode] = usePersistentState("debugMode", false);
   const [homepage, setHomepage] = usePersistentState("homepage", 0);
   const [backupStorageLocation, setBackupStorageLocation] = usePersistentState(
     "backupStorageLocation",
@@ -441,7 +443,7 @@ function Settings(props) {
               key={"importer"}
               variant="list"
               onClick={() => {
-                openLink("https://importer.notesnook.com/", "_blank");
+                window.open("https://importer.notesnook.com/", "_blank");
               }}
             >
               <Tip
@@ -585,6 +587,39 @@ function Settings(props) {
             </Button>
           </>
         )}
+
+        <Header
+          title="Developer options"
+          isOpen={groups.developer}
+          onClick={() => {
+            setGroups((g) => ({ ...g, developer: !g.developer }));
+          }}
+        />
+        {groups.developer && (
+          <>
+            <Toggle
+              title="Debug mode"
+              onTip="Show debug options on items"
+              offTip="Hide debug options from items"
+              onToggled={() => setDebugMode(!debugMode)}
+              isToggled={debugMode}
+            />
+            {isDesktop() && (
+              <Button
+                variant="list"
+                onClick={() => {
+                  openPath(PATHS.logsDirectory);
+                }}
+              >
+                <Tip
+                  text="Open logs directory"
+                  tip="Show the directory where log files are stored."
+                />
+              </Button>
+            )}
+          </>
+        )}
+
         <Header
           title="Other"
           isOpen={groups.other}
@@ -600,7 +635,7 @@ function Settings(props) {
                 key={item.title}
                 variant="list"
                 onClick={() => {
-                  openLink(item.link, "_blank");
+                  window.open(item.link, "_blank");
                 }}
               >
                 <Tip text={item.title} tip={item.description} />

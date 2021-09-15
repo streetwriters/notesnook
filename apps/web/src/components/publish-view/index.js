@@ -5,7 +5,7 @@ import * as Icon from "../icons";
 import Toggle from "../toggle";
 import Field from "../field";
 import { db } from "../../common/db";
-import ClipboardJS from "clipboard";
+import * as clipboard from "clipboard-polyfill/text";
 import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
 
@@ -21,20 +21,6 @@ function PublishView(props) {
   useEffect(() => {
     setPublishId(db.monographs.monograph(noteId));
   }, [noteId]);
-
-  useEffect(() => {
-    var clipboard = new ClipboardJS(".copyPublishLink");
-    clipboard.on("success", function (e) {
-      e.clearSelection();
-    });
-    clipboard.on("error", function () {
-      console.error("Error while copying text.");
-    });
-
-    return () => {
-      clipboard?.destroy();
-    };
-  }, []);
 
   return (
     <Flex
@@ -91,9 +77,13 @@ function PublishView(props) {
           <Button
             variant="anchor"
             className="copyPublishLink"
-            data-clipboard-text={`https://monograph.notesnook.com/${publishId}`}
+            onClick={() => {
+              clipboard.writeText(
+                `https://monograph.notesnook.com/${publishId}`
+              );
+            }}
           >
-            <Icon.Copy size={20} color="primary" onClick={() => {}} />
+            <Icon.Copy size={20} color="primary" />
           </Button>
         </Flex>
       )}

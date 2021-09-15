@@ -7,6 +7,9 @@ import {
 } from "../../stores/selection-store";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
 import { SELECTION_OPTIONS_MAP } from "../../common";
+import Config from "../../utils/config";
+import { db } from "../../common/db";
+import * as clipboard from "clipboard-polyfill/text";
 
 function selectMenuItem(isSelected, toggleSelection) {
   return {
@@ -23,6 +26,29 @@ function selectMenuItem(isSelected, toggleSelection) {
       }
     },
   };
+}
+
+function debugMenuItems(type) {
+  if (!type) return [];
+  return [
+    {
+      key: "copy-data",
+      title: () => "Copy data",
+      icon: Icon.Copy,
+      onClick: async ({ [type]: item }) => {
+        if (type === "note" && item.contentId) {
+          item.additionalData = {
+            content: db.debug.strip(await db.content.raw(item.contentId)),
+          };
+        }
+        item.additionalData = {
+          ...item.additionalData,
+          lastSynced: await db.lastSynced(),
+        };
+        await clipboard.writeText(db.debug.strip(item));
+      },
+    },
+  ];
 }
 
 const ItemSelector = ({ isSelected, toggleSelection }) => {
@@ -103,9 +129,12 @@ function ListItem(props) {
     }
     if (props.selectable)
       items = [selectMenuItem(isSelected, toggleSelection), ...items];
+    if (Config.get("debugMode", false))
+      items = [...items, ...debugMenuItems(props.item.type)];
     return items;
   }, [
     props.menu?.items,
+    props.item.type,
     isSelected,
     isSelectionMode,
     toggleSelection,
