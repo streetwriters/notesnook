@@ -108,7 +108,7 @@ export const CHECK_STATUS = `(function() {
         });
         window.ReactNativeWebView.postMessage(msg)
 
-       },100)
+       },1)
 })();`;
 
 export function getNote() {
@@ -221,8 +221,9 @@ export const loadNote = async item => {
     }
     eSendEvent('loadingNote', item);
     if (getNote()) {
-      await clearEditor(true, false);
+      await clearEditor(true, false,true);
     }
+    console.log('cleared editor')
     noteEdited = false;
     await setNote(item);
     webviewInit = false;
@@ -249,6 +250,7 @@ const checkStatus = async noreset => {
       clearTimeout(webviewTimer);
       webviewTimer = null;
       resolve(true);
+      console.log('webview is running fine')
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
     eSubscribeEvent('webviewOk', onWebviewOk);
@@ -460,6 +462,7 @@ export async function clearEditor(
     }
   };
   if (immediate) {
+    console.log('clearing');
     return func();
   } else {
     cTimeout = setTimeout(func, 500);

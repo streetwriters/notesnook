@@ -35,7 +35,6 @@ const EditorOverlay = () => {
       clearTimeout(timer);
       clearTimeout(timerError);
       setError(false);
-      await sleep(500);
       timing(opacity, {
         toValue: 0,
         duration: 150,
