@@ -1,14 +1,13 @@
-import {launchCamera, launchImageLibrary} from 'react-native-sodium';
-import {eSendEvent} from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
+import { launchCamera, launchImageLibrary } from 'react-native-sodium';
+import { eSendEvent } from '../../../../services/EventManager';
+import { editing } from '../../../../utils';
 import {
   eCloseProgressDialog,
   eOpenProgressDialog
 } from '../../../../utils/Events';
-import {sleep} from '../../../../utils/TimeUtils';
-import {EditorWebView} from '../../Functions';
-import tiny, {safeKeyboardDismiss} from '../tiny';
-import {formatSelection} from './constants';
+import { sleep } from '../../../../utils/TimeUtils';
+import { safeKeyboardDismiss } from '../tiny';
+import { formatSelection } from './constants';
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -308,12 +307,15 @@ let node = tinymce.activeEditor.selection.getNode();
 });`
 };
 
-const handleImageResponse = response => {
+const handleImageResponse = (response) => {
   if (response.didCancel || response.errorMessage) {
     return;
   }
+  // For not support only single image picker
+  let image = response.assets[0];
 
-  let b64 = `data:${response.type};base64, ` + response.base64;
+  let b64 = `data:${image.type};base64, ` + image.base64;
+
   formatSelection(`
   (function() {
     let pTag = "";
