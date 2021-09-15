@@ -87,7 +87,7 @@ export async function clearTimer(clear) {
       if (!id) return;
       if (
         (content?.data &&
-          typeof content.data == 'string' &&
+          typeof content.data === 'string' &&
           content.data?.trim().length > 0) ||
         (title && title?.trim().length > 0)
       ) {
@@ -279,7 +279,6 @@ let lastEditTime = 0;
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
-  
 
   try {
     message = JSON.parse(message);
@@ -293,13 +292,13 @@ export const _onMessage = async evt => {
     case 'tiny':
       if (message.value !== content.data) {
         noteEdited = true;
-        
+
         lastEditTime = Date.now();
         content = {
           type: message.type,
           data: message.value
         };
-        console.log("NOTE_CONTENT_CHANGE",id);
+        console.log('NOTE_CONTENT_CHANGE', id);
         onNoteChange();
       }
       break;
@@ -312,7 +311,7 @@ export const _onMessage = async evt => {
         eSendEvent('editorScroll', {
           title: message.value
         });
-        console.log("NOTE_TITLE_CHANGE",id);
+        console.log('NOTE_TITLE_CHANGE', id);
         onNoteChange();
       }
       break;
@@ -439,7 +438,7 @@ function showImageOptionsTooltip() {
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
-  console.log("NOTE_CHANGE_CALLED",noteEdited,id);
+  console.log('NOTE_CHANGE_CALLED', noteEdited, id);
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
@@ -551,7 +550,7 @@ export async function saveNote(preventUpdate) {
   if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
-  console.log("NOTE_SAVE_CALLED",id,noteEdited);
+  console.log('NOTE_SAVE_CALLED', id, noteEdited);
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
