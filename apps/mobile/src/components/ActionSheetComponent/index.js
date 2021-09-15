@@ -1,7 +1,7 @@
+import Clipboard from "@react-native-clipboard/clipboard";
 import htmlToText from 'html-to-text';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
-  Clipboard,
   Dimensions,
   Keyboard,
   Platform,
@@ -9,20 +9,18 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
-  useSettingStore,
-  useTrashStore,
-  useUserStore
+  useSettingStore, useUserStore
 } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -33,7 +31,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import Sync from '../../services/Sync';
-import {editing} from '../../utils';
+import { editing } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -41,23 +39,23 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import { db } from '../../utils/DB';
 import {
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
   eOpenTagsDialog
 } from '../../utils/Events';
-import {deleteItems, openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
-import {Button} from '../Button';
-import {presentDialog} from '../Dialog/functions';
-import {PressableButton} from '../PressableButton';
+import { deleteItems, openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
+import { Button } from '../Button';
+import { presentDialog } from '../Dialog/functions';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ActionSheetColorsSection} from './ActionSheetColorsSection';
-import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import { ActionSheetColorsSection } from './ActionSheetColorsSection';
+import { ActionSheetTagsSection } from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
 export const ActionSheetComponent = ({
@@ -81,8 +79,13 @@ export const ActionSheetComponent = ({
   const lastSynced = useUserStore(state => state.lastSynced);
   const [notifPinned, setNotifPinned] = useState(null);
   const dimensions = useSettingStore(state => state.dimensions);
-  const alias = note.type === "tag" ? db.tags.alias(note.id) : note.type === "color" ? db.colors.alias(note.id) : note.title
-
+  const settings = useSettingStore(state => state.settings);
+  const alias =
+    note.type === 'tag'
+      ? db.tags.alias(note.id)
+      : note.type === 'color'
+      ? db.colors.alias(note.id)
+      : note.title;
 
   const refreshing = false;
   const isPublished = db.monographs.isPublished(note.id);
@@ -109,7 +112,7 @@ export const ActionSheetComponent = ({
       setNotifPinned(null);
       return;
     }
-    
+
     let index = pinned.findIndex(notif => notif.tag === item.id);
     if (index !== -1) {
       setNotifPinned(pinned[index]);
@@ -220,7 +223,7 @@ export const ActionSheetComponent = ({
         if (db[`${type}s`].pinned.length === 3 && !note.pinned) {
           ToastEvent.show({
             heading: `Cannot pin more than 3 ${type}s`,
-            type: 'error',
+            type: 'error'
           });
           return;
         }
@@ -970,6 +973,45 @@ export const ActionSheetComponent = ({
             title="Learn more"
             height={30}
             type="accent"
+          />
+        </View>
+      ) : null}
+
+      {settings.devMode ? (
+        <View
+          style={{
+            width: '100%',
+            paddingHorizontal: 12,
+            marginTop: 10
+          }}>
+          <Button
+            onPress={async () => {
+              let additionalData = {}
+              if (note.type === "note") {
+                let content = await db.content.raw(note.contentId);
+                content = db.debug.strip(content);
+                additionalData.content = content;
+              }
+              additionalData.lastSynced = await db.lastSynced();
+              
+              let _note = {...note};
+              _note.additionalData = additionalData;
+              Clipboard.setString(db.debug.strip(_note));
+              ToastEvent.show({
+                heading:"Debug data copied!",
+                type:'success',
+                context:'local'
+              })
+              
+            }}
+            fontSize={SIZE.sm}
+            title="Copy data"
+            icon="clipboard"
+            height={30}
+            type="warn"
+            style={{
+              alignSelf: 'flex-end'
+            }}
           />
         </View>
       ) : null}

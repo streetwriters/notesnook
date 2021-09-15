@@ -158,7 +158,6 @@ export const Settings = ({navigation}) => {
       },
       desc: 'Read our terms of service'
     },
-
     {
       name: 'Privacy policy',
       func: async () => {
@@ -293,6 +292,8 @@ export const Settings = ({navigation}) => {
 
           <SettingsBackupAndRestore />
 
+          <SettingsDeveloperOptions />
+
           <SectionHeader
             collapsed={collapsed}
             setCollapsed={setCollapsed}
@@ -423,200 +424,200 @@ const AccoutLogoutSection = () => {
   const pwdInput = useRef();
 
   return !user ? null : (
-      <>
-        {loading && (
-          <BaseDialog visible={true}>
+    <>
+      {loading && (
+        <BaseDialog visible={true}>
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: colors.bg,
+              justifyContent: 'center',
+              alignItems: 'center'
+            }}>
+            <Heading color={colors.pri} size={SIZE.md}>
+              Logging out
+            </Heading>
             <View
               style={{
-                width: '100%',
-                height: '100%',
-                backgroundColor: colors.bg,
-                justifyContent: 'center',
-                alignItems: 'center'
+                flexDirection: 'row',
+                height: 10,
+                width: 100,
+                marginTop: 15
               }}>
-              <Heading color={colors.pri} size={SIZE.md}>
-                Logging out
-              </Heading>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  height: 10,
-                  width: 100,
-                  marginTop: 15
-                }}>
-                <AnimatedProgress fill={colors.accent} total={8} current={8} />
-              </View>
+              <AnimatedProgress fill={colors.accent} total={8} current={8} />
             </View>
-          </BaseDialog>
-        )}
+          </View>
+        </BaseDialog>
+      )}
 
-        {visible && (
-          <BaseDialog visible={true}>
-            <DialogContainer>
-              <DialogHeader
-                title="Logout"
-                paragraph="Clear all your data and reset the app."
-              />
-              <DialogButtons
-                positiveTitle="Logout"
-                negativeTitle="Cancel"
-                onPressNegative={() => setVisible(false)}
-                onPressPositive={async () => {
-                  setVisible(false);
-                  setLoading(true);
-                  await sleep(10);
-                  await db.user.logout();
-                  await BiometricService.resetCredentials();
-                  await Storage.write('introCompleted', 'true');
-                  setLoading(false);
-                }}
-              />
-            </DialogContainer>
-          </BaseDialog>
-        )}
+      {visible && (
+        <BaseDialog visible={true}>
+          <DialogContainer>
+            <DialogHeader
+              title="Logout"
+              paragraph="Clear all your data and reset the app."
+            />
+            <DialogButtons
+              positiveTitle="Logout"
+              negativeTitle="Cancel"
+              onPressNegative={() => setVisible(false)}
+              onPressPositive={async () => {
+                setVisible(false);
+                setLoading(true);
+                await sleep(10);
+                await db.user.logout();
+                await BiometricService.resetCredentials();
+                await Storage.write('introCompleted', 'true');
+                setLoading(false);
+              }}
+            />
+          </DialogContainer>
+        </BaseDialog>
+      )}
 
-        {deleteAccount && (
-          <BaseDialog
-            onRequestClose={() => {
-              setDeleteAccount(false);
-              passwordValue = null;
-            }}
-            visible={true}>
-            <DialogContainer>
-              <DialogHeader
-                title="Delete account"
-                paragraph="Your account will be deleted and all your data will be removed
-                permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE."
-                paragraphColor={colors.red}
-              />
-
-              <Input
-                placeholder="Enter account password"
-                fwdRef={pwdInput}
-                onChangeText={v => {
-                  passwordValue = v;
-                }}
-                secureTextEntry={true}
-              />
-
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  alignSelf: 'flex-end'
-                }}>
-                <Button
-                  onPress={() => {
-                    setDeleteAccount(false);
-                    passwordValue = null;
-                  }}
-                  fontSize={SIZE.md}
-                  type="gray"
-                  title="Cancel"
-                />
-                <Button
-                  onPress={async () => {
-                    if (!passwordValue) {
-                      ToastEvent.show({
-                        heading: 'Account Password is required',
-                        type: 'error',
-                        context: 'local'
-                      });
-                      return;
-                    }
-                    try {
-                      await db.user.deleteUser(passwordValue);
-                    } catch (e) {
-                      ToastEvent.show({
-                        heading: 'Failed to delete account',
-                        message: e.message,
-                        type: 'error',
-                        context: 'local'
-                      });
-                    }
-                    close();
-                  }}
-                  fontSize={SIZE.md}
-                  style={{
-                    marginLeft: 10
-                  }}
-                  type="error"
-                  title="Delete"
-                />
-              </View>
-            </DialogContainer>
-            <Toast context="local" />
-          </BaseDialog>
-        )}
-
-        {[
-          {
-            name: 'Logout',
-            func: async () => {
-              setVisible(true);
-            }
-          }
-        ].map((item, index) => (
-          <PressableButton
-            onPress={item.func}
-            key={item.name}
-            type="gray"
-            customStyle={{
-              height: 50,
-              borderTopWidth: index === 0 ? 1 : 0,
-              borderTopColor: colors.nav,
-              width: '100%',
-              alignItems: 'flex-start',
-              paddingHorizontal: 12,
-              marginTop: index === 0 ? 25 : 0,
-              borderRadius: 0
-            }}>
-            <Heading
-              color={item.name === 'Logout' ? colors.pri : colors.red}
-              style={{
-                fontSize: SIZE.md
-              }}>
-              {item.name}
-            </Heading>
-          </PressableButton>
-        ))}
-
-        <PressableButton
-          onPress={() => {
-            setDeleteAccount(true);
+      {deleteAccount && (
+        <BaseDialog
+          onRequestClose={() => {
+            setDeleteAccount(false);
             passwordValue = null;
           }}
-          type="error"
+          visible={true}>
+          <DialogContainer>
+            <DialogHeader
+              title="Delete account"
+              paragraph="Your account will be deleted and all your data will be removed
+                permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE."
+              paragraphColor={colors.red}
+            />
+
+            <Input
+              placeholder="Enter account password"
+              fwdRef={pwdInput}
+              onChangeText={v => {
+                passwordValue = v;
+              }}
+              secureTextEntry={true}
+            />
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                alignSelf: 'flex-end'
+              }}>
+              <Button
+                onPress={() => {
+                  setDeleteAccount(false);
+                  passwordValue = null;
+                }}
+                fontSize={SIZE.md}
+                type="gray"
+                title="Cancel"
+              />
+              <Button
+                onPress={async () => {
+                  if (!passwordValue) {
+                    ToastEvent.show({
+                      heading: 'Account Password is required',
+                      type: 'error',
+                      context: 'local'
+                    });
+                    return;
+                  }
+                  try {
+                    await db.user.deleteUser(passwordValue);
+                  } catch (e) {
+                    ToastEvent.show({
+                      heading: 'Failed to delete account',
+                      message: e.message,
+                      type: 'error',
+                      context: 'local'
+                    });
+                  }
+                  close();
+                }}
+                fontSize={SIZE.md}
+                style={{
+                  marginLeft: 10
+                }}
+                type="error"
+                title="Delete"
+              />
+            </View>
+          </DialogContainer>
+          <Toast context="local" />
+        </BaseDialog>
+      )}
+
+      {[
+        {
+          name: 'Logout',
+          func: async () => {
+            setVisible(true);
+          }
+        }
+      ].map((item, index) => (
+        <PressableButton
+          onPress={item.func}
+          key={item.name}
+          type="gray"
           customStyle={{
-            borderWidth: 1,
-            borderRadius: 5,
-            paddingVertical: 10,
-            width: '95%',
+            height: 50,
+            borderTopWidth: index === 0 ? 1 : 0,
+            borderTopColor: colors.nav,
+            width: '100%',
             alignItems: 'flex-start',
             paddingHorizontal: 12,
-            marginTop: 25,
-            borderColor: colors.red
+            marginTop: index === 0 ? 25 : 0,
+            borderRadius: 0
           }}>
           <Heading
-            color={colors.red}
+            color={item.name === 'Logout' ? colors.pri : colors.red}
             style={{
               fontSize: SIZE.md
             }}>
-            Delete account
+            {item.name}
           </Heading>
-          <Paragraph
-            style={{
-              flexWrap: 'wrap',
-              flexBasis: 1
-            }}
-            color={colors.red}>
-            Your account will be deleted and all your data will be removed
-            permanantly. Make sure you have saved backup of your notes. This
-            action is IRREVERSIBLE.
-          </Paragraph>
         </PressableButton>
-      </>
-    )
+      ))}
+
+      <PressableButton
+        onPress={() => {
+          setDeleteAccount(true);
+          passwordValue = null;
+        }}
+        type="error"
+        customStyle={{
+          borderWidth: 1,
+          borderRadius: 5,
+          paddingVertical: 10,
+          width: '95%',
+          alignItems: 'flex-start',
+          paddingHorizontal: 12,
+          marginTop: 25,
+          borderColor: colors.red
+        }}>
+        <Heading
+          color={colors.red}
+          style={{
+            fontSize: SIZE.md
+          }}>
+          Delete account
+        </Heading>
+        <Paragraph
+          style={{
+            flexWrap: 'wrap',
+            flexBasis: 1
+          }}
+          color={colors.red}>
+          Your account will be deleted and all your data will be removed
+          permanantly. Make sure you have saved backup of your notes. This
+          action is IRREVERSIBLE.
+        </Paragraph>
+      </PressableButton>
+    </>
+  );
 };
 
 const CustomButton = ({
@@ -1631,6 +1632,62 @@ const SettingsPrivacyAndSecurity = () => {
   );
 };
 
+export const SettingsDeveloperOptions = ({isSheet}) => {
+  const [state] = useTracked();
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+
+  const toggleDevMode = () => {
+    SettingsService.set("devMode",!settings.devMode);
+  }
+
+
+  const devModeList = [
+    {
+      name: 'Enable developer mode',
+      func: toggleDevMode,
+      desc: 'Backup your data to phone storage',
+      customComponent: (
+        <ToggleSwitch
+          isOn={settings.devMode}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={toggleDevMode}
+        />
+      )
+    }
+  ];
+
+  return (
+    <>
+      {!isSheet && (
+        <SectionHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          title="Developer Options"
+        />
+      )}
+
+      {!collapsed && (
+        <>
+          {devModeList.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+              customComponent={item.customComponent}
+            />
+          ))}
+        </>
+      )}
+    </>
+  );
+};
+
 export const SettingsBackupAndRestore = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -1690,7 +1747,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           new: true
         }
       ];
-      
+
   const backupItemsList = [
     {
       name: 'Backup now',

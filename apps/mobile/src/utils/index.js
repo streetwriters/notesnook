@@ -396,6 +396,12 @@ export const BUTTON_TYPES = {
     selected: 'red',
     opacity: 0.12
   },
+  warn:{
+    primary: 'warningBg',
+    text: 'warningText',
+    selected: 'warningBg',
+    opacity: 0.12
+  }
 };
 
 let he;

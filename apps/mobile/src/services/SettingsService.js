@@ -24,7 +24,8 @@ export const defaultSettings = {
   appLockMode: 'none',
   telemetry: true,
   notebooksListMode: 'normal',
-  notesListMode: 'normal'
+  notesListMode: 'normal',
+  devMode:false
 };
 
 let settings = {...defaultSettings};

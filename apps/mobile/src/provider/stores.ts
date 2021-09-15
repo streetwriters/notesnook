@@ -167,7 +167,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     appLockMode: 'none',
     telemetry: true,
     notebooksListMode: "normal",
-    notesListMode: "normal"
+    notesListMode: "normal",
+    devMode:false,
   },
   fullscreen: false,
   deviceMode: "mobile",
