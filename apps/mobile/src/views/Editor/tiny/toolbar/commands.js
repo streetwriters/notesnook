@@ -308,7 +308,7 @@ let node = tinymce.activeEditor.selection.getNode();
 };
 
 const handleImageResponse = (response) => {
-  if (response.didCancel || response.errorMessage) {
+  if (response.didCancel || response.errorMessage || !response.assets || response.assets?.length === 0) {
     return;
   }
   // For not support only single image picker
