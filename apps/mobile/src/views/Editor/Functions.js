@@ -126,6 +126,7 @@ export function post(type, value = null) {
     type,
     value
   };
+  console.log("EDITOR_WEBVIEW_NULL", EditorWebView.current ? false : true)
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
@@ -182,8 +183,9 @@ function clearNote() {
 let currentEditingTimer = null;
 
 let webviewTimer = null;
-
+let requestedReload = false;
 export const loadNote = async item => {
+  console.log(".....OPEN NOTE.....")
   editing.currentlyEditing = true;
   editing.movedAway = false;
   if (editing.isFocused) {
@@ -191,7 +193,9 @@ export const loadNote = async item => {
   }
 
   if (item && item.type === 'new') {
-    await clearEditor(true, true, true);
+    if (getNote()) {
+      await clearEditor(true, true, true);
+    }
     clearNote();
     noteEdited = false;
     if (Platform.OS === 'android') {
@@ -230,6 +234,8 @@ export const loadNote = async item => {
     editing.isFocused = false;
     setTimeout(async () => {
       if (await checkStatus(true)) {
+        requestedReload = true;
+        console.log("RELOADING EDITOR NOW",note.title);
         EditorWebView.current?.reload();
       } else {
         eSendEvent('webviewreset');
@@ -259,7 +265,7 @@ const checkStatus = async noreset => {
     webviewTimer = setTimeout(() => {
       if (!webviewOK && !noreset) {
         webviewInit = false;
-
+        console.log("WEBVIEW TIMER RUN NOW")
         EditorWebView = createRef();
         eSendEvent('webviewreset');
         resolve(false);
@@ -326,6 +332,8 @@ export const _onMessage = async evt => {
       }
       break;
     case 'status':
+      if (!requestedReload) return;
+      requestedReload = false;
       setColors(COLOR_SCHEME);
       webviewInit = true;
       webviewOK = true;
@@ -447,7 +455,7 @@ export async function clearEditor(
     clearTimeout(cTimeout);
     cTimeout = null;
   }
-  let func = () => {
+  let func = async () => {
     try {
       reset && tiny.call(EditorWebView, tiny.reset, true);
       editing.focusType = null;
@@ -458,12 +466,12 @@ export async function clearEditor(
       saveCounter = 0;
       useEditorStore.getState().setCurrentlyEditingNote(null);
     } catch (e) {
-      console.log(e);
+      console.log('reset error', e);
     }
   };
   if (immediate) {
     console.log('clearing');
-    return func();
+    return await func();
   } else {
     cTimeout = setTimeout(func, 500);
   }
@@ -675,6 +683,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
   if (note?.id) {
     post('title', title);
     intent = false;
+    console.log('loading in editor',title?.length,content?.data?.length);
     if (!content || !content.data || content?.data?.length === 0) {
       tiny.call(
         EditorWebView,

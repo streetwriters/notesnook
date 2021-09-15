@@ -261,6 +261,12 @@ function init_tiny(size) {
         }
       });
 
+      editor.on('init', function(e) {
+        setTimeout(() => {
+          reactNativeEventHandler('status', true);
+        },300)
+      });
+
       editor.ui.registry.addButton('deletevideo', {
         icon: 'remove',
         tooltip: 'Remove iframe',
@@ -328,7 +334,6 @@ function init_tiny(size) {
     init_instance_callback: function (edit) {
       editor = edit;
       setTheme();
-      reactNativeEventHandler('status', true);
 
       editor.on('SelectionChange', function (e) {
         selectchange();
