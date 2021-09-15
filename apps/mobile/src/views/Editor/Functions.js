@@ -84,11 +84,12 @@ export async function clearTimer(clear) {
     clearTimeout(timer);
     timer = null;
     if (clear) {
+      if (!id) return;
       if (
         (content?.data &&
           typeof content.data == 'string' &&
           content.data?.trim().length > 0) ||
-        (title && title?.trim().length > 0 && id)
+        (title && title?.trim().length > 0)
       ) {
         await saveNote(true);
       }
@@ -126,7 +127,7 @@ export function post(type, value = null) {
     type,
     value
   };
-  console.log("EDITOR_WEBVIEW_NULL", EditorWebView.current ? false : true)
+  console.log('EDITOR_WEBVIEW_NULL', EditorWebView.current ? false : true);
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
@@ -185,7 +186,7 @@ let currentEditingTimer = null;
 let webviewTimer = null;
 let requestedReload = false;
 export const loadNote = async item => {
-  console.log(".....OPEN NOTE.....")
+  console.log('.....OPEN NOTE.....');
   editing.currentlyEditing = true;
   editing.movedAway = false;
   if (editing.isFocused) {
@@ -225,9 +226,9 @@ export const loadNote = async item => {
     }
     eSendEvent('loadingNote', item);
     if (getNote()) {
-      await clearEditor(true, false,true);
+      await clearEditor(true, false, true);
     }
-    console.log('cleared editor')
+    console.log('cleared editor');
     noteEdited = false;
     await setNote(item);
     webviewInit = false;
@@ -235,7 +236,7 @@ export const loadNote = async item => {
     setTimeout(async () => {
       if (await checkStatus(true)) {
         requestedReload = true;
-        console.log("RELOADING EDITOR NOW",note.title);
+        console.log('RELOADING EDITOR NOW', note.title);
         EditorWebView.current?.reload();
       } else {
         eSendEvent('webviewreset');
@@ -256,7 +257,7 @@ const checkStatus = async noreset => {
       clearTimeout(webviewTimer);
       webviewTimer = null;
       resolve(true);
-      console.log('webview is running fine')
+      console.log('webview is running fine');
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
     eSubscribeEvent('webviewOk', onWebviewOk);
@@ -265,7 +266,7 @@ const checkStatus = async noreset => {
     webviewTimer = setTimeout(() => {
       if (!webviewOK && !noreset) {
         webviewInit = false;
-        console.log("WEBVIEW TIMER RUN NOW")
+        console.log('WEBVIEW TIMER RUN NOW');
         EditorWebView = createRef();
         eSendEvent('webviewreset');
         resolve(false);
@@ -278,6 +279,7 @@ let lastEditTime = 0;
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
+  
 
   try {
     message = JSON.parse(message);
@@ -291,11 +293,13 @@ export const _onMessage = async evt => {
     case 'tiny':
       if (message.value !== content.data) {
         noteEdited = true;
+        
         lastEditTime = Date.now();
         content = {
           type: message.type,
           data: message.value
         };
+        console.log("NOTE_CONTENT_CHANGE",id);
         onNoteChange();
       }
       break;
@@ -308,6 +312,7 @@ export const _onMessage = async evt => {
         eSendEvent('editorScroll', {
           title: message.value
         });
+        console.log("NOTE_TITLE_CHANGE",id);
         onNoteChange();
       }
       break;
@@ -434,7 +439,7 @@ function showImageOptionsTooltip() {
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
-
+  console.log("NOTE_CHANGE_CALLED",noteEdited,id);
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
@@ -449,6 +454,7 @@ export async function clearEditor(
   reset = true,
   immediate = false
 ) {
+  tiny.call(EditorWebView, tiny.isLoading);
   clear && (await clearTimer(true));
   clearNote();
   if (cTimeout) {
@@ -545,6 +551,7 @@ export async function saveNote(preventUpdate) {
   if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
+  console.log("NOTE_SAVE_CALLED",id,noteEdited);
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
@@ -683,7 +690,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
   if (note?.id) {
     post('title', title);
     intent = false;
-    console.log('loading in editor',title?.length,content?.data?.length);
+    console.log('loading in editor', title?.length, content?.data?.length);
     if (!content || !content.data || content?.data?.length === 0) {
       tiny.call(
         EditorWebView,
