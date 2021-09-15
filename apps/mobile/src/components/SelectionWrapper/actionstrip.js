@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Clipboard, View } from 'react-native';
+import {View } from 'react-native';
+import Clipboard from "@react-native-clipboard/clipboard"
 import Animated, { useValue } from 'react-native-reanimated';
 import { useTracked } from '../../provider';
 import {

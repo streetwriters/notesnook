@@ -4,8 +4,8 @@ import {
   InteractionManager,
   TouchableOpacity,
   View,
-  Clipboard,
 } from 'react-native';
+import Clipboard from "@react-native-clipboard/clipboard"
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';

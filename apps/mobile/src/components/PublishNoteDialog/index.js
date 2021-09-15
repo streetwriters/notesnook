@@ -1,11 +1,11 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
-  Clipboard,
   TouchableOpacity,
   View,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import Clipboard from "@react-native-clipboard/clipboard"
 import {useTracked} from '../../provider';
 import {
   eSubscribeEvent,

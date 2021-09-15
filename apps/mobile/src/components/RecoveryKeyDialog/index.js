@@ -1,8 +1,9 @@
 import React, {createRef} from 'react';
-import {Clipboard, Platform, View} from 'react-native';
+import {Platform, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
 import {LOGO_BASE64} from '../../assets/images/assets';
+import Clipboard from "@react-native-clipboard/clipboard"
 import {
   eSendEvent,
   eSubscribeEvent,
