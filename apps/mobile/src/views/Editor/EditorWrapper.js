@@ -98,10 +98,6 @@ export const EditorWrapper = ({width,dimensions}) => {
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
 
-  useEffect(() => {
-console.log("RERENDERING EDITOR")
-
-  })
 
   return (
     <View

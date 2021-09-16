@@ -34,6 +34,7 @@ import {
   eOpenPublishNoteDialog,
   eOpenLoginDialog
 } from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
 import {EditorTitle} from './EditorTitle';
@@ -99,14 +100,14 @@ const EditorHeader = () => {
       });
       if (checkNote() && isNotedEdited()) {
         ToastEvent.show({
-          heading: 'Note Saved',
+          heading: 'Note is saved',
           type: 'success',
           duration: 1500
         });
       }
       useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
-      await clearEditor(false,true,false);
+      await clearEditor(false, true, false);
       Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
     }
   };

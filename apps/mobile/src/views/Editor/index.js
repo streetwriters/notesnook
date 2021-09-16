@@ -70,12 +70,6 @@ const Editor = React.memo(
     }, []);
 
 
-    useEffect(() => {
-      console.log("RERENDERING MAIN EDITOR")
-      
-        })
-
-
     return resetting ? null : (
       <>
         <TextInput

@@ -215,6 +215,7 @@ export const loadNote = async item => {
           : `tinymce.activeEditor.execCommand('mceDirectionLTR');`
       );
     }
+
     if (!webviewInit) {
       EditorWebView.current?.reload();
     }
@@ -336,7 +337,7 @@ export const _onMessage = async evt => {
       }
       break;
     case 'status':
-      if (!requestedReload) return;
+      if (!requestedReload && getNote()) return;
       requestedReload = false;
       setColors(COLOR_SCHEME);
       webviewInit = true;
