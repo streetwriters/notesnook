@@ -1,5 +1,6 @@
 import {CHECK_IDS} from 'notes-core/common';
 import * as RNIap from 'react-native-iap';
+import InAppBrowser from 'react-native-inappbrowser-reborn';
 import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
 import {db} from '../utils/DB';
@@ -42,6 +43,7 @@ async function setPremiumStatus() {
     products = await RNIap.getSubscriptions(itemSkus);
   }
 }
+
 
 function getMontlySub() {
   let _product = {

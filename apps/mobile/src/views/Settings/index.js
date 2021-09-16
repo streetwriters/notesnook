@@ -1645,9 +1645,9 @@ export const SettingsDeveloperOptions = ({isSheet}) => {
 
   const devModeList = [
     {
-      name: 'Enable developer mode',
+      name: 'Enable debug mode',
       func: toggleDevMode,
-      desc: 'Backup your data to phone storage',
+      desc: 'Show debug options on items',
       customComponent: (
         <ToggleSwitch
           isOn={settings.devMode}

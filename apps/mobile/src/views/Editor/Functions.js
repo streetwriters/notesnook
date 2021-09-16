@@ -109,7 +109,7 @@ export const CHECK_STATUS = `(function() {
         });
         window.ReactNativeWebView.postMessage(msg)
 
-       },1)
+       },${Platform.OS === "ios" ? "300" : "1"})
 })();`;
 
 export function getNote() {
@@ -197,6 +197,7 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, true, true);
     }
+      disableSaving = false;
     clearNote();
     noteEdited = false;
     if (Platform.OS === 'android') {
@@ -229,6 +230,7 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, false, true);
     }
+    disableSaving = false;
     console.log('cleared editor');
     noteEdited = false;
     await setNote(item);
@@ -449,6 +451,7 @@ function onNoteChange() {
 }
 
 let cTimeout = null;
+let disableSaving = false;
 export async function clearEditor(
   clear = true,
   reset = true,
@@ -456,6 +459,7 @@ export async function clearEditor(
 ) {
   tiny.call(EditorWebView, tiny.isLoading);
   clear && (await clearTimer(true));
+  disableSaving = true;
   clearNote();
   if (cTimeout) {
     clearTimeout(cTimeout);
@@ -546,12 +550,17 @@ async function addToCollection(id) {
   }
 }
 let isSaving = false;
-
+console.log('loaded now')
 export async function saveNote(preventUpdate) {
+  if (disableSaving) {
+    console.log('saving is disabled');
+    return;
+  }
+
+  console.log('NOTE_SAVE_CALLED', id, noteEdited);
   if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
-  console.log('NOTE_SAVE_CALLED', id, noteEdited);
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
