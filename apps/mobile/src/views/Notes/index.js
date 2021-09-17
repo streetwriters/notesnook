@@ -161,8 +161,8 @@ export const Notes = ({route, navigation}) => {
       color: params.type === 'color' ? params.title : null,
       title:
         params.type === 'tag'
-          ? '#' + params.title
-          : db.settings.getAlias(params.id) || params.title.slice(0, 1).toUpperCase() + params.title.slice(1)
+          ? '#' + alias
+          : alias.slice(0, 1).toUpperCase() + alias.slice(1)
     });
   };
 
