@@ -66,6 +66,11 @@ export default class Content extends Collection {
     return contentItem;
   }
 
+  /**
+   *
+   * @param {Array} contents
+   * @returns {Promise<Array>}
+   */
   async extractAttachments(contents) {
     const allAttachments = this._db.attachments.all;
     for (let contentItem of contents) {
