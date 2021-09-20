@@ -1,6 +1,7 @@
 import NNCrypto from "./nncrypto/index";
 import localforage from "localforage";
 import xxhash from "xxhash-wasm";
+import axios from "axios";
 
 const crypto = new NNCrypto();
 const fs = localforage.createInstance({
@@ -48,12 +49,13 @@ async function writeEncrypted(filename, { data, type, key }) {
 async function hashBuffer(data) {
   const hasher = await xxhash();
   return {
-    hash: Buffer.from(hasher.h64Raw(data)).toString("base64"),
+    hash: Buffer.from(hasher.h64Raw(data)).toString("hex"),
     type: "xxh64",
   };
 }
 
 async function readEncrypted(filename, key, cipherData) {
+  console.log("Reading encrypted file", filename);
   const readAsBuffer = localforage.supports(localforage.INDEXEDDB);
   cipherData.cipher = await fs.getItem(filename);
   if (!cipherData.cipher)
@@ -64,5 +66,55 @@ async function readEncrypted(filename, key, cipherData) {
     : await crypto.decrypt(key, cipherData, cipherData.outputType);
 }
 
-const FS = { writeEncrypted, readEncrypted };
+async function uploadFile(filename, requestOptions) {
+  console.log("Request to upload file", filename, requestOptions);
+  const { url } = requestOptions;
+
+  let cipher = await fs.getItem(filename);
+  if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
+
+  const readAsBuffer = localforage.supports(localforage.INDEXEDDB);
+  if (!readAsBuffer)
+    cipher = Uint8Array.from(window.atob(cipher), (c) => c.charCodeAt(0));
+
+  const response = await axios.request({
+    url: url,
+    method: "PUT",
+    headers: {
+      "Content-Type": "",
+    },
+    data: new Blob([cipher.buffer]),
+    onUploadProgress: (ev) => {
+      console.log("Uploading file", filename, ev);
+    },
+  });
+
+  console.log("File uploaded:", filename, response);
+  return isSuccessStatusCode(response.status);
+}
+
+async function downloadFile(filename, requestOptions) {
+  const { url, headers } = requestOptions;
+  console.log("Request to download file", filename, url, headers);
+  if (await fs.hasItem(filename)) return true;
+
+  const response = await axios.get(url, {
+    headers: headers,
+    responseType: "blob",
+    onDownloadProgress: (ev) => {
+      console.log("Downloading file", filename, ev);
+    },
+  });
+  console.log("File downloaded", filename, url, response);
+  if (!isSuccessStatusCode(response.status)) return false;
+  const blob = new Blob([response.data]);
+  await fs.setItem(filename, new Uint8Array(await blob.arrayBuffer()));
+  return true;
+}
+
+const FS = { writeEncrypted, readEncrypted, uploadFile, downloadFile };
 export default FS;
+
+function isSuccessStatusCode(statusCode) {
+  return statusCode >= 200 && statusCode <= 299;
+}

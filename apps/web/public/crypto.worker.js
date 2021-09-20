@@ -188,7 +188,7 @@ const decrypt = (passwordOrKey, { iv, cipher, salt, output, inputType }) => {
   const { key } = _getKey({ salt, ...passwordOrKey });
   const input =
     inputType === "uint8array"
-      ? input
+      ? cipher
       : inputType === "base64"
       ? sodium.from_base64(cipher)
       : sodium.decode(cipher);
@@ -199,10 +199,12 @@ const decrypt = (passwordOrKey, { iv, cipher, salt, output, inputType }) => {
     undefined,
     sodium.from_base64(iv),
     key,
-    output
+    output !== "base64" ? output : "uint8array"
   );
   sodium.memzero(key);
-  return data;
+  return output === "base64"
+    ? sodium.to_base64(data, sodium.base64_variants.ORIGINAL)
+    : data;
 };
 
 if (self.document) {

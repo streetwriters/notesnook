@@ -81,12 +81,12 @@ export default class NNCryptoWorker {
   /**
    *
    * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
-   * @param {string} data - the plaintext data
+   * @param {string|Uint8Array} data - the plaintext data
    * @param {string} type
    */
   encryptBinary = (passwordOrKey, data, type = "plain") => {
     const payload = { type, data };
-    const transferables = type === "buffer" ? [payload.data] : [];
+    const transferables = type === "buffer" ? [payload.data.buffer] : [];
     return this._communicate(
       "encryptBinary",
       {
@@ -106,7 +106,7 @@ export default class NNCryptoWorker {
     cipherData.output = outputType;
     cipherData.inputType = "uint8array";
     return this._communicate("decrypt", { passwordOrKey, cipher: cipherData }, [
-      cipherData.cipher,
+      cipherData.cipher.buffer,
     ]);
   };
 

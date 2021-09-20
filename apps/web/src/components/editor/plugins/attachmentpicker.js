@@ -47,7 +47,7 @@ async function pickFile() {
   const key = await getEncryptionKey();
   const buffer = await selectedFile.arrayBuffer();
   const output = await fs.writeEncrypted(null, {
-    data: buffer,
+    data: new Uint8Array(buffer),
     type: "buffer",
     key,
   });
@@ -59,7 +59,7 @@ async function pickFile() {
   });
 
   return {
-    hash: selectedFile.hash,
+    hash: output.hash,
     filename: selectedFile.name,
     type: selectedFile.type,
     size: selectedFile.size,
@@ -74,7 +74,7 @@ async function pickImage() {
   const key = await getEncryptionKey();
 
   const output = await fs.writeEncrypted(null, {
-    data: buffer,
+    data: new Uint8Array(buffer),
     type: "buffer",
     key,
   });
@@ -86,7 +86,7 @@ async function pickImage() {
   });
 
   return {
-    hash: selectedImage.hash,
+    hash: output.hash,
     filename: selectedImage.name,
     type: selectedImage.type,
     size: output.length,
