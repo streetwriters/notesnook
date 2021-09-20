@@ -33,8 +33,10 @@ export default class Attachments extends Collection {
    * @returns
    */
   add(attachment, noteId) {
-    if (!attachment || !noteId)
+    if (!attachment)
       return console.error("attachment or noteId cannot be null");
+
+    if (attachment.remote) return this._collection.addItem(attachment);
 
     if (!attachment.hash) throw new Error("Please provide attachment hash.");
 
@@ -68,6 +70,7 @@ export default class Attachments extends Collection {
       dateUploaded: undefined,
       dateDeleted: undefined,
     };
+    console.log("adding attachmentitem", attachmentItem);
     return this._collection.addItem(attachmentItem);
   }
 
@@ -83,15 +86,31 @@ export default class Attachments extends Collection {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
     await this._initEncryptionKey();
-    const data = await this._db.fs.readEncrypted(attachment.hash, this.key, {
-      iv: attachment.iv,
-      salt: attachment.salt,
-      length: attachment.length,
-      alg: attachment.alg,
-      outputType: "base64",
-    });
+    const data = await this._db.fs.readEncrypted(
+      attachment.metadata.hash,
+      this.key,
+      {
+        iv: attachment.iv,
+        salt: attachment.salt,
+        length: attachment.length,
+        alg: attachment.alg,
+        outputType: "base64",
+      }
+    );
     attachment.data = data;
     return attachment;
+  }
+
+  async attachment(id) {
+    return this.all.find((a) => a.id === id);
+  }
+
+  markAsUploaded(id) {
+    const attachment = this.all.find((a) => a.id === id);
+    console.log("mark as uploaded", id, attachment);
+    if (!attachment) return;
+    attachment.dateUploaded = Date.now();
+    return this._collection.updateItem(attachment);
   }
 
   async save(data, type) {
@@ -100,7 +119,15 @@ export default class Attachments extends Collection {
   }
 
   get pending() {
-    return this.all.filter((attachment) => !attachment.dateUploaded);
+    return this.all.filter(
+      (attachment) => attachment.dateUploaded <= 0 || !attachment.dateUploaded
+    );
+  }
+
+  get media() {
+    return this.all.filter((attachment) =>
+      attachment.metadata.type.startsWith("image/")
+    );
   }
 
   get all() {

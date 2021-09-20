@@ -73,15 +73,18 @@ export default class Sync {
       const now = Date.now();
       this._isSyncing = true;
 
-      if (full) var serverResponse = await this._fetch(lastSynced, token);
+      await this._uploadAttachments(token);
 
       // we prepare local data before merging so we always have correct data
       const data = await this._collector.collect(lastSynced);
       data.lastSynced = now;
 
       if (full) {
+        var serverResponse = await this._fetch(lastSynced, token);
         // merge the server response
         await this._merger.merge(serverResponse, lastSynced);
+
+        await this._downloadAttachments(token);
       }
 
       // check for conflicts and throw
@@ -146,5 +149,42 @@ export default class Sync {
     );
 
     return response.lastSynced;
+  }
+
+  async _uploadAttachments(token) {
+    const attachments = this._db.attachments.pending;
+    console.log("Uploading attachments", attachments);
+    for (let attachment of attachments) {
+      const { hash } = attachment.metadata;
+      const url = await this._getPresignedURL(hash, token, "PUT");
+      const uploadResult = await this._db.fs.uploadFile(hash, { url });
+      if (!uploadResult) throw new Error("Failed to upload file.");
+      await this._db.attachments.markAsUploaded(attachment.id);
+    }
+  }
+
+  async _downloadAttachments(token) {
+    const attachments = this._db.attachments.media;
+    console.log("Downloading attachments", attachments);
+    for (let attachment of attachments) {
+      const { hash } = attachment.metadata;
+      const url = `${Constants.API_HOST}/s3?name=${hash}`;
+      const downloadResult = await this._db.fs.downloadFile(hash, {
+        url,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!downloadResult) throw new Error("Failed to download file.");
+    }
+  }
+
+  async _getPresignedURL(filename, token, verb) {
+    const response = await fetch(`${Constants.API_HOST}/s3?name=${filename}`, {
+      method: verb,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (response.ok) return await response.text();
+    throw new Error("Couldn't get presigned url.");
   }
 }

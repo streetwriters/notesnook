@@ -76,8 +76,16 @@ class Merger {
   async merge(serverResponse, lastSynced) {
     if (!serverResponse) return false;
     this._lastSynced = lastSynced;
-    const { notes, synced, notebooks, content, trash, vaultKey, settings } =
-      serverResponse;
+    const {
+      notes,
+      synced,
+      notebooks,
+      content,
+      trash,
+      vaultKey,
+      settings,
+      attachments,
+    } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
     this.key = await this._db.user.getEncryptionKey();
@@ -85,6 +93,12 @@ class Merger {
     if (vaultKey) {
       await this._db.vault._setKey(await this._deserialize(vaultKey, false));
     }
+
+    await this._mergeArray(
+      attachments,
+      (id) => this._db.attachments.attachment(id),
+      (item) => this._db.attachments.add(item)
+    );
 
     await this._mergeArray(
       settings,
