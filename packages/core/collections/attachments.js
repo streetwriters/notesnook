@@ -74,7 +74,7 @@ export default class Attachments extends Collection {
     return this._collection.addItem(attachmentItem);
   }
 
-  delete(hash, noteId) {
+  async delete(hash, noteId) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
     if (!attachment.noteIds.length) {
