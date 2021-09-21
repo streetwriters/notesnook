@@ -1,7 +1,7 @@
 import Collection from "./collection";
 import id from "../utils/id";
-import SparkMD5 from "spark-md5";
 import { deleteItem } from "../utils/array";
+import hosts from "../utils/constants";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -77,8 +77,15 @@ export default class Attachments extends Collection {
   delete(hash, noteId) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
-    if (!attachment.noteIds.length) attachment.dateDeleted = Date.now();
-
+    if (!attachment.noteIds.length) {
+      attachment.dateDeleted = Date.now();
+      const token = await this._db.user.tokenManager.getToken();
+      const result = await this.fs.deleteFile(attachment.metadata.hash, {
+        url: `${hosts.API_HOST}/s3?name=${attachment.metadata.hash}`,
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!result) return;
+    }
     return this._collection.updateItem(attachment);
   }
 
