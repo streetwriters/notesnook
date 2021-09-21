@@ -1,6 +1,7 @@
 import NNCrypto from "./nncrypto/index";
 import localforage from "localforage";
 import xxhash from "xxhash-wasm";
+import { xxhash3 } from "hash-wasm";
 import axios from "axios";
 
 const crypto = new NNCrypto();
@@ -47,10 +48,9 @@ async function writeEncrypted(filename, { data, type, key }) {
 }
 
 async function hashBuffer(data) {
-  const hasher = await xxhash();
   return {
-    hash: Buffer.from(hasher.h64Raw(data)).toString("hex"),
-    type: "xxh64",
+    hash: xxhash3(data),
+    type: "xxh3",
   };
 }
 
@@ -112,7 +112,26 @@ async function downloadFile(filename, requestOptions) {
   return true;
 }
 
-const FS = { writeEncrypted, readEncrypted, uploadFile, downloadFile };
+async function deleteFile(filename, requestOptions) {
+  const { url, headers } = requestOptions;
+  console.log("Request to delete file", filename, url, headers);
+  if (!(await fs.hasItem(filename))) return true;
+
+  const response = await axios.delete(url, {
+    headers: headers,
+  });
+  const result = isSuccessStatusCode(response.status);
+  // if (result) await fs.removeItem(filename);
+  return result;
+}
+
+const FS = {
+  writeEncrypted,
+  readEncrypted,
+  uploadFile,
+  downloadFile,
+  deleteFile,
+};
 export default FS;
 
 function isSuccessStatusCode(statusCode) {
