@@ -61,10 +61,11 @@ class Tiny {
     doc.innerHTML = this.data;
     const attachmentElements = doc.querySelectorAll("img");
 
-    for (let attachment of attachmentElements) {
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
       switch (attachment.tagName) {
         case "IMG": {
-          const hash = attachment.dataset["hash"];
+          const hash = getDatasetAttribute(attachment, "hash");
 
           const attachmentItem = await get(hash);
           if (!attachmentItem) continue;
@@ -91,37 +92,39 @@ class Tiny {
     const attachmentElements = doc.querySelectorAll("img,.attachment");
 
     const attachments = [];
-    for (let attachment of attachmentElements) {
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
       switch (attachment.tagName) {
         case "IMG": {
-          if (!attachment.dataset.hash) {
+          if (!getDatasetAttribute(attachment, "hash")) {
             const src = attachment.getAttribute("src");
             if (!src) continue;
 
             const { data, mime } = dataurl.toObject(src);
             if (!data) continue;
 
-            const type = attachment.dataset.mime || mime || "image/jpeg";
+            const type =
+              getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
             const metadata = await store(data, "base64");
-            attachment.dataset.hash = metadata.hash;
+            setDatasetAttribute("hash", metadata.hash);
 
             attachments.push({
               type,
-              filename: attachment.dataset.filename,
+              filename: getDatasetAttribute(attachment, "filename"),
               ...metadata,
             });
           } else {
             attachments.push({
-              hash: attachment.dataset.hash,
+              hash: getDatasetAttribute(attachment, "hash"),
             });
           }
           attachment.removeAttribute("src");
           break;
         }
         default: {
-          if (!attachment.dataset.hash) return;
+          if (!getDatasetAttribute(attachment, "hash")) return;
           attachments.push({
-            hash: attachment.dataset.hash,
+            hash: getDatasetAttribute(attachment, "hash"),
           });
           break;
         }
@@ -131,6 +134,14 @@ class Tiny {
   }
 }
 export default Tiny;
+
+function getDatasetAttribute(element, attribute) {
+  return element.getAttribute(`data-${attribute}`);
+}
+
+function setDatasetAttribute(element, attribute, value) {
+  return element.setAttribute(`data-${attribute}`, value);
+}
 
 function getHeadlineFromText(text) {
   for (var i = 0; i < text.length; ++i) {
