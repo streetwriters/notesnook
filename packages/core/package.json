@@ -26,7 +26,6 @@
     "@stablelib/blake2s": "^1.0.1",
     "dayjs": "^1.10.6",
     "fast-sort": "^2.0.1",
-    "lean-he": "^2.1.2",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",
     "quill-delta-to-html": "^0.12.0",
