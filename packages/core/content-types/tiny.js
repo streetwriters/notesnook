@@ -1,6 +1,4 @@
 import showdown from "showdown";
-import decode from "lean-he/decode";
-import SparkMD5 from "spark-md5";
 import dataurl from "../utils/dataurl";
 
 var converter = new showdown.Converter();
@@ -18,14 +16,11 @@ class Tiny {
   }
 
   toTXT() {
-    if ("DOMParser" in window || "DOMParser" in global) {
-      let doc = new DOMParser().parseFromString(this.data, "text/html");
-      return doc.body.textContent.trim();
-    } else {
-      return decode(
-        this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
-      ).trim();
-    }
+    if (!("HTMLParser" in global)) return "";
+
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
+    return doc.body.textContent.trim();
   }
 
   toMD() {
@@ -60,9 +55,10 @@ class Tiny {
   }
 
   async insertAttachments(get) {
-    if (!("DOMParser" in window || "DOMParser" in global)) return;
+    if (!("HTMLParser" in global)) return;
 
-    let doc = new DOMParser().parseFromString(this.data, "text/html");
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
     const attachmentElements = doc.querySelectorAll("img");
 
     for (let attachment of attachmentElements) {
@@ -88,9 +84,10 @@ class Tiny {
   }
 
   async extractAttachments(store) {
-    if (!("DOMParser" in window || "DOMParser" in global)) return;
+    if (!("HTMLParser" in global)) return;
 
-    let doc = new DOMParser().parseFromString(this.data, "text/html");
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
     const attachmentElements = doc.querySelectorAll("img,.attachment");
 
     const attachments = [];
