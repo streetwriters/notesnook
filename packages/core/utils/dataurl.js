@@ -1,8 +1,10 @@
-const REGEX = /^data:(?<mime>image\/.+);base64,(?<data>.+)/;
+const REGEX = /^data:(image\/.+);base64,(.+)/;
 
 function toObject(dataurl) {
-  const { groups } = REGEX.exec(dataurl);
-  return groups || {};
+  const regexResult = REGEX.exec(dataurl);
+  if (regexResult.length < 3) return {};
+  const [_, mime, data] = regexResult;
+  return { mime, data };
 }
 
 function fromObject({ type, data }) {
