@@ -20,7 +20,7 @@ class Tiny {
 
     let doc = HTMLParser.createElement("div");
     doc.innerHTML = this.data;
-    return doc.body.textContent.trim();
+    return doc.textContent.trim();
   }
 
   toMD() {
