@@ -81,7 +81,7 @@ class Tiny {
         }
       }
     }
-    return doc.body.innerHTML;
+    return doc.innerHTML;
   }
 
   async extractAttachments(store) {
@@ -130,7 +130,7 @@ class Tiny {
         }
       }
     }
-    return { data: doc.body.innerHTML, attachments };
+    return { data: doc.innerHTML, attachments };
   }
 }
 export default Tiny;
