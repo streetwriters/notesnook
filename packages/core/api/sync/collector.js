@@ -31,7 +31,7 @@ class Collector {
   }
 
   _serialize(item) {
-    if (!item) return;
+    if (!item) return null;
     return this._db.context.encrypt(this.key, JSON.stringify(item));
   }
 
