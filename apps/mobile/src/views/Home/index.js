@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
+import RNFetchBlob from 'rn-fetch-blob';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header/index';

@@ -107,6 +107,7 @@ const ProgressDialog = () => {
             <Button
               title={v}
               type="gray"
+              key={v}
               textStyle={{fontWeight: 'normal'}}
               fontSize={SIZE.sm}
               icon="check"
@@ -126,6 +127,7 @@ const ProgressDialog = () => {
         {dialogData?.action ? (
           <Button
             onPress={dialogData.action}
+            key={dialogData.actionText}
             title={dialogData.actionText}
             accentColor={dialogData.iconColor || 'accent'}
             accentText="light"

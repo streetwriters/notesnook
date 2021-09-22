@@ -4,6 +4,9 @@ import {AppRegistry} from 'react-native';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
 import Notifications from './src/services/Notifications';
+import jsdom from 'jsdom-jscore-rn';
+global.HTMLParser = jsdom.html();
+
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
 

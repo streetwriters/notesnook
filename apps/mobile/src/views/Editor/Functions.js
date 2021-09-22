@@ -109,7 +109,7 @@ export const CHECK_STATUS = `(function() {
         });
         window.ReactNativeWebView.postMessage(msg)
 
-       },${Platform.OS === "ios" ? "300" : "1"})
+       },${Platform.OS === 'ios' ? '300' : '1'})
 })();`;
 
 export function getNote() {
@@ -127,7 +127,6 @@ export function post(type, value = null) {
     type,
     value
   };
-  console.log('EDITOR_WEBVIEW_NULL', EditorWebView.current ? false : true);
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
@@ -197,9 +196,10 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, true, true);
     }
-      disableSaving = false;
+    disableSaving = false;
     clearNote();
     noteEdited = false;
+    isFirstLoad = false;
     if (Platform.OS === 'android') {
       await sleep(100);
       textInput.current?.focus();
@@ -230,8 +230,8 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, false, true);
     }
+    isFirstLoad = true;
     disableSaving = false;
-    console.log('cleared editor');
     noteEdited = false;
     await setNote(item);
     webviewInit = false;
@@ -239,7 +239,6 @@ export const loadNote = async item => {
     setTimeout(async () => {
       if (await checkStatus(true)) {
         requestedReload = true;
-        console.log('RELOADING EDITOR NOW', note.title);
         EditorWebView.current?.reload();
       } else {
         eSendEvent('webviewreset');
@@ -260,7 +259,6 @@ const checkStatus = async noreset => {
       clearTimeout(webviewTimer);
       webviewTimer = null;
       resolve(true);
-      console.log('webview is running fine');
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
     eSubscribeEvent('webviewOk', onWebviewOk);
@@ -269,7 +267,6 @@ const checkStatus = async noreset => {
     webviewTimer = setTimeout(() => {
       if (!webviewOK && !noreset) {
         webviewInit = false;
-        console.log('WEBVIEW TIMER RUN NOW');
         EditorWebView = createRef();
         eSendEvent('webviewreset');
         resolve(false);
@@ -295,13 +292,11 @@ export const _onMessage = async evt => {
     case 'tiny':
       if (message.value !== content.data) {
         noteEdited = true;
-
         lastEditTime = Date.now();
         content = {
           type: message.type,
           data: message.value
         };
-        console.log('NOTE_CONTENT_CHANGE', id);
         onNoteChange();
       }
       break;
@@ -314,7 +309,6 @@ export const _onMessage = async evt => {
         eSendEvent('editorScroll', {
           title: message.value
         });
-        console.log('NOTE_TITLE_CHANGE', id);
         onNoteChange();
       }
       break;
@@ -324,6 +318,7 @@ export const _onMessage = async evt => {
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
       eSendEvent('loadingNote');
+
       break;
     case 'premium':
       let user = await db.user.getUser();
@@ -438,10 +433,16 @@ function showImageOptionsTooltip() {
   });
 }
 
+let isFirstLoad = true;
+
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
-  console.log('NOTE_CHANGE_CALLED', noteEdited, id);
+  if (isFirstLoad) {
+    isFirstLoad = false;
+    noteEdited = false;
+    return;
+  }
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
@@ -459,6 +460,7 @@ export async function clearEditor(
 ) {
   tiny.call(EditorWebView, tiny.isLoading);
   clear && (await clearTimer(true));
+  isFirstLoad = true;
   disableSaving = true;
   clearNote();
   if (cTimeout) {
@@ -480,7 +482,6 @@ export async function clearEditor(
     }
   };
   if (immediate) {
-    console.log('clearing');
     return await func();
   } else {
     cTimeout = setTimeout(func, 500);
@@ -550,14 +551,11 @@ async function addToCollection(id) {
   }
 }
 let isSaving = false;
-console.log('loaded now')
 export async function saveNote(preventUpdate) {
   if (disableSaving) {
-    console.log('saving is disabled');
     return;
   }
 
-  console.log('NOTE_SAVE_CALLED', id, noteEdited);
   if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
@@ -699,7 +697,6 @@ const loadNoteInEditor = async (keepHistory = true) => {
   if (note?.id) {
     post('title', title);
     intent = false;
-    console.log('loading in editor', title?.length, content?.data?.length);
     if (!content || !content.data || content?.data?.length === 0) {
       tiny.call(
         EditorWebView,

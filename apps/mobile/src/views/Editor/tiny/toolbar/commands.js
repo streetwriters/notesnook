@@ -1,11 +1,13 @@
 import { launchCamera, launchImageLibrary } from 'react-native-sodium';
 import { eSendEvent } from '../../../../services/EventManager';
 import { editing } from '../../../../utils';
+import { db } from '../../../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenProgressDialog
 } from '../../../../utils/Events';
 import { sleep } from '../../../../utils/TimeUtils';
+import { getNote } from '../../Functions';
 import { safeKeyboardDismiss } from '../tiny';
 import { formatSelection } from './constants';
 
@@ -93,11 +95,14 @@ export const execCommands = {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
             await sleep(500);
+            let key = await db.user.getEncryptionKey();
             launchCamera(
               {
                 includeBase64: true,
                 maxWidth: 1024,
-                mediaType: 'photo'
+                mediaType: 'photo',
+                encryptToFile:true,
+                ...key
               },
               handleImageResponse
             );
@@ -109,11 +114,14 @@ export const execCommands = {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
             await sleep(300);
+            let key = await db.user.getEncryptionKey();
             launchImageLibrary(
               {
                 includeBase64: true,
                 maxWidth: 1024,
-                mediaType: 'photo'
+                mediaType: 'photo',
+                encryptToFile:true,
+                ...key
               },
               handleImageResponse
             );
@@ -307,7 +315,7 @@ let node = tinymce.activeEditor.selection.getNode();
 });`
 };
 
-const handleImageResponse = (response) => {
+const handleImageResponse = async (response) => {
   if (response.didCancel || response.errorMessage || !response.assets || response.assets?.length === 0) {
     return;
   }
@@ -315,6 +323,17 @@ const handleImageResponse = (response) => {
   let image = response.assets[0];
 
   let b64 = `data:${image.type};base64, ` + image.base64;
+
+  await db.attachments.add({
+    iv:image.encryptionInfo.iv,
+    salt:image.encryptionInfo.salt,
+    length:image.encryptionInfo.length,
+    alg:`xcha-argon2i13`,
+    hash:image.encryptionInfo.hash,
+    hashType:image.encryptionInfo.hashType,
+    type:image.type,
+    filename:image.fileName
+  },getNote()?.id);
 
   formatSelection(`
   (function() {
@@ -329,7 +348,7 @@ const handleImageResponse = (response) => {
   1024,
   'image/jpeg',
   function(r) {
-    var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
+    var content = "<img data-hash='${image.encryptionInfo.hash}' style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
     editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
   },
   0.6
