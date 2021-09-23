@@ -39,11 +39,14 @@ async function setPremiumStatus() {
     if (get()) {
       await subscriptions.clear();
     }
-    await RNIap.initConnection();
-    products = await RNIap.getSubscriptions(itemSkus);
+    try {
+      await RNIap.initConnection();
+      products = await RNIap.getSubscriptions(itemSkus);
+    } catch (e) {
+      console.log('subscriptions: ',e)
+    }
   }
 }
-
 
 function getMontlySub() {
   let _product = {
