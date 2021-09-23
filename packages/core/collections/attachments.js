@@ -122,7 +122,11 @@ export default class Attachments extends Collection {
 
   async save(data, type) {
     await this._initEncryptionKey();
-    await this._db.fs.writeEncrypted(null, { data, type, key: this.key });
+    return await this._db.fs.writeEncrypted(null, {
+      data,
+      type,
+      key: this.key,
+    });
   }
 
   get pending() {

@@ -153,7 +153,7 @@ export default class Sync {
 
   async _uploadAttachments(token) {
     const attachments = this._db.attachments.pending;
-    console.log("Uploading attachments", attachments);
+    console.log("Uploading attachments", this._db.attachments.pending);
     for (let attachment of attachments) {
       const { hash } = attachment.metadata;
       const url = await this._getPresignedURL(hash, token, "PUT");
