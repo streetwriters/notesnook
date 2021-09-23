@@ -7,26 +7,31 @@ let placeholder = `data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wCEAAcHBw
 
 async function readEncrypted(filename, key, cipherData) {
   console.log('read encrypted file: ', filename);
-
-  let path = `${cacheDir}/${filename}`;
-  let exists = await RNFetchBlob.fs.exists(path);
-  if (!exists) {
+  try {
+    let path = `${cacheDir}/${filename}`;
+    let exists = await RNFetchBlob.fs.exists(path);
+    if (!exists) {
+      return placeholder;
+    }
+    let output = await Sodium.decryptFile(
+      key,
+      {
+        ...cipherData,
+        hash: filename
+      },
+      true
+    );
+    console.log('output length: ', output?.length);
+    return output;
+  } catch (e) {
     return placeholder;
+    console.log('read encrypted file error: ', e.stack, e);
   }
-  let output = await Sodium.decryptFile(
-    key,
-    {
-      ...cipherData,
-      hash: filename
-    },
-    true
-  );
-  console.log('output length: ', output?.length);
-  return output;
 }
 
 async function writeEncrypted(filename, {data, type, key}) {
   console.log('file input: ', {data, type, key});
+  
   let output = await Sodium.encryptFile(key, {
     data,
     type
@@ -40,16 +45,21 @@ async function writeEncrypted(filename, {data, type, key}) {
 }
 
 async function uploadFile(filename, {url, headers}) {
-  console.log('uploading file: ', filename);
+  console.log('uploading file: ', filename,headers);
+  
   try {
     let response = await RNFetchBlob.fetch(
       'PUT',
       url,
-      headers,
+      {
+        "content-type":""
+      },
       RNFetchBlob.wrap(`${cacheDir}/${filename}`)
     ).uploadProgress((sent, total) => {
       console.log('uploading: ', sent, total);
     });
+    
+    console.log(response.info().status)
     let status = response.info().status;
     return status >= 200 && status < 300;
   } catch (e) {
