@@ -1,6 +1,5 @@
 import NNCrypto from "./nncrypto/index";
 import localforage from "localforage";
-import xxhash from "xxhash-wasm";
 import { xxhash3 } from "hash-wasm";
 import axios from "axios";
 
@@ -49,7 +48,7 @@ async function writeEncrypted(filename, { data, type, key }) {
 
 async function hashBuffer(data) {
   return {
-    hash: xxhash3(data),
+    hash: await xxhash3(data),
     type: "xxh3",
   };
 }
