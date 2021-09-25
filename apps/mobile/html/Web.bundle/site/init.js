@@ -108,6 +108,13 @@ function collapseElement(target) {
   }
 }
 
+function onUndoChange() {
+  reactNativeEventHandler('history', {
+    undo: editor.undoManager.hasUndo(),
+    redo: editor.undoManager.hasRedo()
+  });
+}
+
 function init_tiny(size) {
   loadFontSize();
   tinymce.init({
@@ -245,7 +252,8 @@ function init_tiny(size) {
         console.error(e);
       }
     },
-    setup: function (editor) {
+    setup: function (_editor) {
+      editor = _editor
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
         tooltip: 'Remove image',
@@ -261,10 +269,10 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('init', function(e) {
+      editor.on('init', function (e) {
         setTimeout(() => {
           reactNativeEventHandler('status', true);
-        },300)
+        }, 300);
       });
 
       editor.ui.registry.addButton('deletevideo', {
@@ -331,17 +339,20 @@ function init_tiny(size) {
         onclick: function () {}
       });
     },
-    init_instance_callback: function (edit) {
-      editor = edit;
+    init_instance_callback: function (_editor) {
+      editor = _editor;
       setTheme();
 
       editor.on('SelectionChange', function (e) {
         selectchange();
-        reactNativeEventHandler('history', {
-          undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo()
-        });
       });
+
+      editor.on('ClearUndos', onUndoChange);
+      editor.on('Undo', onUndoChange);
+      editor.on('Redo', onUndoChange);
+      editor.on('TypingUndos', onUndoChange);
+      editor.on('BeforeAddUndo', onUndoChange);
+      editor.on('AddUndo', onUndoChange);
 
       editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
