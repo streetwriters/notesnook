@@ -17,7 +17,9 @@ function StatusBar() {
   const lastSynced = useAppStore((state) => state.lastSynced);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
   const isSyncing = useAppStore((state) => state.isSyncing);
-  const processingStatus = useAppStore((state) => state.processingStatus);
+  const processingStatuses = useAppStore((state) =>
+    Object.values(state.processingStatuses)
+  );
   const updateStatus = useAutoUpdater();
 
   return (
@@ -80,14 +82,14 @@ function StatusBar() {
             </Text>
           </Button>
         )}
-        {processingStatus && (
+        {processingStatuses?.map(({ status, progress }) => (
           <Flex ml={1} alignItems="center" justifyContent="center">
             <Icon.Loading size={12} />
             <Text variant="subBody" color="bgSecondaryText" ml={1}>
-              {processingStatus}
+              {progress ? `${progress}% ${status}` : status}
             </Text>
           </Flex>
-        )}
+        ))}
 
         {updateStatus && (
           <Button

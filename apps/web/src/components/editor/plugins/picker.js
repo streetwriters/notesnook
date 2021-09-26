@@ -14,30 +14,22 @@ function register(editor) {
     tooltip: "Insert image",
     onAction: () => insertImage(editor),
   });
-
-  editor.addCommand("InsertImage", function () {
-    insertImage(editor);
-  });
 }
 
 async function insertImage(editor) {
   const image = await pickImage();
   if (!image) return;
-
-  var content = `<img class="attachment" data-mime="${image.type}" data-hash="${image.hash}" data-filename="${image.filename}" src="${image.dataurl}" data-size="${image.size}"/>`;
-  editor.insertContent(content);
+  editor.execCommand("mceAttachImage", image);
 }
 
 async function insertFile(editor) {
   const file = await pickFile();
   if (!file) return;
-
-  var content = `<span class="attachment" data-mime="${file.type}" data-filename="${file.filename}" data-hash="${file.hash}" data-size="${file.size}"/>`;
-  editor.insertContent(content);
+  editor.execCommand("mceAttachFile", file);
 }
 
 (function init() {
-  global.tinymce.PluginManager.add("attachmentpicker", register);
+  global.tinymce.PluginManager.add("picker", register);
 })();
 
 async function pickFile() {
@@ -89,7 +81,7 @@ async function pickImage() {
     hash: output.hash,
     filename: selectedImage.name,
     type: selectedImage.type,
-    size: output.length,
+    size: selectedImage.length,
     dataurl,
   };
 }
@@ -97,7 +89,7 @@ async function pickImage() {
 async function getEncryptionKey() {
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
-  return key;
+  return key; // { password: "helloworld" };
 }
 
 /**
@@ -128,7 +120,8 @@ function compressImage(file, type) {
     new Compressor(file, {
       quality: 0.8,
       mimeType: file.type,
-      width: 1920,
+      maxWidth: 2000,
+      maxHeight: 2000,
       /**
        *
        * @param {Blob} result

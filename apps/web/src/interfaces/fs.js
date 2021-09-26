@@ -2,7 +2,9 @@ import NNCrypto from "./nncrypto/index";
 import localforage from "localforage";
 import { xxhash3 } from "hash-wasm";
 import axios from "axios";
+import { AppEventManager, AppEvents } from "../common";
 
+const PLACEHOLDER = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzUuNDcgMTM1LjQ3Ij48ZyBmaWxsPSJncmF5Ij48cGF0aCBkPSJNNjUuNjMgNjUuODZhNC40OCA0LjQ4IDAgMSAwLS4wMS04Ljk2IDQuNDggNC40OCAwIDAgMCAwIDguOTZ6bTAtNi4zM2ExLjg1IDEuODUgMCAxIDEgMCAzLjcgMS44NSAxLjg1IDAgMCAxIDAtMy43em0wIDAiLz48cGF0aCBkPSJNODguNDkgNDguNTNINDYuOThjLS45IDAtMS42NC43My0xLjY0IDEuNjRWODUuM2MwIC45Ljc0IDEuNjQgMS42NCAxLjY0aDQxLjVjLjkxIDAgMS42NC0uNzQgMS42NC0xLjY0VjUwLjE3YzAtLjktLjczLTEuNjQtMS42My0xLjY0Wm0tLjk5IDIuNjJ2MjAuNzdsLTguMjUtOC4yNWExLjM4IDEuMzggMCAwIDAtMS45NSAwTDY1LjYzIDc1LjM0bC03LjQ2LTcuNDZhMS4zNyAxLjM3IDAgMCAwLTEuOTUgMGwtOC4yNSA4LjI1VjUxLjE1Wk00Ny45NyA4NC4zMXYtNC40N2w5LjIyLTkuMjIgNy40NiA3LjQ1YTEuMzcgMS4zNyAwIDAgMCAxLjk1IDBMNzguMjcgNjYuNGw5LjIzIDkuMjN2OC42OHptMCAwIi8+PC9nPjwvc3ZnPg==`;
 const crypto = new NNCrypto();
 const fs = localforage.createInstance({
   storeName: "notesnook-fs",
@@ -57,8 +59,10 @@ async function readEncrypted(filename, key, cipherData) {
   console.log("Reading encrypted file", filename);
   const readAsBuffer = localforage.supports(localforage.INDEXEDDB);
   cipherData.cipher = await fs.getItem(filename);
-  if (!cipherData.cipher)
-    throw new Error(`File not found. Filename: ${filename}`);
+  if (!cipherData.cipher) {
+    console.error(`File not found. Filename: ${filename}`);
+    return PLACEHOLDER;
+  }
 
   return readAsBuffer
     ? await crypto.decryptBinary(key, cipherData, cipherData.outputType)
@@ -85,6 +89,12 @@ async function uploadFile(filename, requestOptions) {
     data: new Blob([cipher.buffer]),
     onUploadProgress: (ev) => {
       console.log("Uploading file", filename, ev);
+      AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
+        type: "upload",
+        hash: filename,
+        total: ev.total,
+        loaded: ev.loaded,
+      });
     },
   });
 
@@ -102,6 +112,12 @@ async function downloadFile(filename, requestOptions) {
     responseType: "blob",
     onDownloadProgress: (ev) => {
       console.log("Downloading file", filename, ev);
+      AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
+        type: "download",
+        hash: filename,
+        total: ev.total,
+        loaded: ev.loaded,
+      });
     },
   });
   console.log("File downloaded", filename, url, response);
@@ -124,12 +140,17 @@ async function deleteFile(filename, requestOptions) {
   return result;
 }
 
+function exists(filename) {
+  return fs.hasItem(filename);
+}
+
 const FS = {
   writeEncrypted,
   readEncrypted,
   uploadFile,
   downloadFile,
   deleteFile,
+  exists,
 };
 export default FS;
 

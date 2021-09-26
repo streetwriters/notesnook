@@ -26,16 +26,16 @@ async function initializeDatabase() {
       SSE_HOST: "https://events.streetwriters.co",
     });
   } else {
-    // db.host({
-    //   API_HOST: "http://localhost:5264",
-    //   AUTH_HOST: "http://localhost:8264",
-    //   SSE_HOST: "http://localhost:7264",
-    // });
     db.host({
-      API_HOST: "http://192.168.10.29:5264",
-      AUTH_HOST: "http://192.168.10.29:8264",
-      SSE_HOST: "http://192.168.10.29:7264",
+      API_HOST: "http://localhost:5264",
+      AUTH_HOST: "http://localhost:8264",
+      SSE_HOST: "http://localhost:7264",
     });
+    // db.host({
+    //   API_HOST: "http://192.168.10.29:5264",
+    //   AUTH_HOST: "http://192.168.10.29:8264",
+    //   SSE_HOST: "http://192.168.10.29:7264",
+    // });
   }
 
   await db.init();
