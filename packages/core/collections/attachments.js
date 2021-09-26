@@ -1,7 +1,9 @@
 import Collection from "./collection";
 import id from "../utils/id";
-import { deleteItem } from "../utils/array";
+import { deleteItem, hasItem } from "../utils/array";
 import hosts from "../utils/constants";
+import { EV, EVENTS } from "../common";
+import dataurl from "../utils/dataurl";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -9,12 +11,13 @@ export default class Attachments extends Collection {
     this.key = null;
   }
 
-  async _initEncryptionKey() {
+  async _getEncryptionKey() {
     if (!this.key) this.key = await this._db.user.getEncryptionKey();
     if (!this.key)
       throw new Error(
         "Failed to get user encryption key. Cannot cache attachments."
       );
+    return this.key;
   }
 
   /**
@@ -78,13 +81,9 @@ export default class Attachments extends Collection {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
     if (!attachment.noteIds.length) {
+      const isDeleted = await this._db.fs.deleteFile(attachment.metadata.hash);
+      if (!isDeleted) return;
       attachment.dateDeleted = Date.now();
-      const token = await this._db.user.tokenManager.getToken();
-      const result = await this.fs.deleteFile(attachment.metadata.hash, {
-        url: `${hosts.API_HOST}/s3?name=${attachment.metadata.hash}`,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!result) return;
     }
     return this._collection.updateItem(attachment);
   }
@@ -92,10 +91,10 @@ export default class Attachments extends Collection {
   async get(hash) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
-    await this._initEncryptionKey();
+
     const data = await this._db.fs.readEncrypted(
       attachment.metadata.hash,
-      this.key,
+      await this._getEncryptionKey(),
       {
         iv: attachment.iv,
         salt: attachment.salt,
@@ -104,8 +103,7 @@ export default class Attachments extends Collection {
         outputType: "base64",
       }
     );
-    attachment.data = data;
-    return attachment;
+    return { data, ...attachment };
   }
 
   async attachment(id) {
@@ -121,11 +119,49 @@ export default class Attachments extends Collection {
   }
 
   async save(data, type) {
-    await this._initEncryptionKey();
-    return await this._db.fs.writeEncrypted(null, {
+    return await this._db.fs.writeEncrypted(
+      null,
       data,
       type,
-      key: this.key,
+      await this._getEncryptionKey()
+    );
+  }
+
+  async download(noteId) {
+    const attachments = this.media.filter((attachment) =>
+      hasItem(attachment.noteIds, noteId)
+    );
+    console.log("Downloading attachments", attachments);
+    for (let i = 0; i < attachments.length; i++) {
+      EV.publish(EVENTS.attachmentsLoading, {
+        type: "download",
+        total: attachments.length,
+        current: i,
+      });
+
+      const { hash } = attachments[i].metadata;
+
+      const attachmentExists = await this._db.fs.exists(hash);
+      if (attachmentExists) continue;
+
+      const isDownloaded = await this._db.fs.downloadFile(hash);
+      if (!isDownloaded) continue;
+
+      const attachment = await this.get(hash);
+      if (!attachment) continue;
+
+      EV.publish(EVENTS.mediaAttachmentDownloaded, {
+        hash,
+        src: dataurl.fromObject({
+          type: attachment.metadata.type,
+          data: attachment.data,
+        }),
+      });
+    }
+    EV.publish(EVENTS.attachmentsLoading, {
+      type: "download",
+      total: attachments.length,
+      current: attachments.length,
     });
   }
 

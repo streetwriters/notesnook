@@ -37,6 +37,8 @@ export const EVENTS = {
   appRefreshRequested: "app:refreshRequested",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
+  attachmentsLoading: "attachments:loading",
+  mediaAttachmentDownloaded: "attachments:mediaDownloaded",
 };
 
 export const CURRENT_DATABASE_VERSION = 5.2;

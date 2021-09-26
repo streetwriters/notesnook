@@ -13,14 +13,14 @@ var isRefreshingToken = false;
 class TokenManager {
   /**
    *
-   * @param {import("./index").default} db
+   * @param {import("../database/storage").default} storage
    */
-  constructor(db) {
-    this._db = db;
+  constructor(storage) {
+    this._storage = storage;
   }
 
   async getToken(renew = true, forceRenew = false) {
-    let token = await this._db.context.read("token");
+    let token = await this._storage.read("token");
     if (!token) return;
     if (forceRenew || (renew && this._isTokenExpired(token))) {
       await this._refreshToken(token);
@@ -107,7 +107,7 @@ class TokenManager {
 
   saveToken(tokenResponse) {
     let token = { ...tokenResponse, t: Date.now() };
-    return this._db.context.write("token", token);
+    return this._storage.write("token", token);
   }
 
   async getAccessTokenFromAuthorizationCode(userId, authCode) {

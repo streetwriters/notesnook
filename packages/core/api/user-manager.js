@@ -22,11 +22,11 @@ const ENDPOINTS = {
 class UserManager {
   /**
    *
-   * @param {import("./index").default} db
+   * @param {import("../database/storage").default} storage
    */
-  constructor(db) {
-    this._db = db;
-    this.tokenManager = new TokenManager(db);
+  constructor(storage) {
+    this._storage = storage;
+    this.tokenManager = new TokenManager(storage);
   }
 
   async init() {
@@ -36,7 +36,7 @@ class UserManager {
   }
 
   async signup(email, password) {
-    const hashedPassword = await this._db.context.hash(password, email);
+    const hashedPassword = await this._storage.hash(password, email);
     await http.post(`${constants.API_HOST}${ENDPOINTS.signup}`, {
       email,
       password: hashedPassword,
@@ -48,7 +48,7 @@ class UserManager {
 
   async login(email, password, hashedPassword) {
     if (!hashedPassword) {
-      hashedPassword = await this._db.context.hash(password, email);
+      hashedPassword = await this._storage.hash(password, email);
     }
 
     await this.tokenManager.saveToken(
@@ -63,7 +63,7 @@ class UserManager {
 
     const user = await this.fetchUser();
     setUserPersonalizationBytes(user.salt);
-    await this._db.context.deriveCryptoKey(`_uk_@${user.email}`, {
+    await this._storage.deriveCryptoKey(`_uk_@${user.email}`, {
       password,
       salt: user.salt,
     });
@@ -83,7 +83,7 @@ class UserManager {
     } catch (e) {
       console.error(e);
     } finally {
-      await this._db.context.clear();
+      await this._storage.clear();
       EV.publish(EVENTS.userLoggedOut, reason);
       EV.publish(EVENTS.appRefreshRequested);
     }
@@ -91,11 +91,11 @@ class UserManager {
 
   setUser(user) {
     if (!user) return;
-    return this._db.context.write("user", user);
+    return this._storage.write("user", user);
   }
 
   getUser() {
-    return this._db.context.read("user");
+    return this._storage.read("user");
   }
 
   async deleteUser(password) {
@@ -104,7 +104,7 @@ class UserManager {
     const user = await this.getUser();
     await http.post(
       `${constants.API_HOST}${ENDPOINTS.deleteUser}`,
-      { password: await this._db.context.hash(password, user.email) },
+      { password: await this._storage.hash(password, user.email) },
       token
     );
     await this.logout(false, "Account deleted.");
@@ -155,7 +155,7 @@ class UserManager {
   async getEncryptionKey() {
     const user = await this.getUser();
     if (!user) return;
-    const key = await this._db.context.getCryptoKey(`_uk_@${user.email}`);
+    const key = await this._storage.getCryptoKey(`_uk_@${user.email}`);
     return { key, salt: user.salt };
   }
 
@@ -181,8 +181,8 @@ class UserManager {
       const user = await this.getUser();
       if (!user) return false;
       const key = await this.getEncryptionKey();
-      const cipher = await this._db.context.encrypt(key, "notesnook");
-      const plainText = await this._db.context.decrypt({ password }, cipher);
+      const cipher = await this._storage.encrypt(key, "notesnook");
+      const plainText = await this._storage.decrypt({ password }, cipher);
       return plainText === "notesnook";
     } catch (e) {
       return false;
@@ -197,12 +197,12 @@ class UserManager {
     const { email, salt } = await this.getUser();
     var hashedData = {};
     if (data.old_password)
-      hashedData.old_password = await this._db.context.hash(
+      hashedData.old_password = await this._storage.hash(
         data.old_password,
         email
       );
     if (data.new_password)
-      hashedData.new_password = await this._db.context.hash(
+      hashedData.new_password = await this._storage.hash(
         data.new_password,
         email
       );
@@ -215,20 +215,21 @@ class UserManager {
       },
       token
     );
-    await this._db.outbox.add(
-      type,
-      { newPassword: data.new_password },
-      async () => {
-        await this._db.sync(true);
+    // TODO
+    // await this._db.outbox.add(
+    //   type,
+    //   { newPassword: data.new_password },
+    //   async () => {
+    //     await this._db.sync(true);
 
-        await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
-          password: data.new_password,
-          salt,
-        });
+    //     await this._storage.deriveCryptoKey(`_uk_@${email}`, {
+    //       password: data.new_password,
+    //       salt,
+    //     });
 
-        await this._db.sync(false, true);
-      }
-    );
+    //     await this._db.sync(false, true);
+    //   }
+    // );
     return true;
   }
 }

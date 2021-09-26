@@ -30,8 +30,8 @@ class Collection {
    */
   constructor(db, name, cached) {
     this._db = db;
-    if (cached) this._collection = new CachedCollection(this._db.context, name);
-    else this._collection = new IndexedCollection(this._db.context, name);
+    if (cached) this._collection = new CachedCollection(this._db.storage, name);
+    else this._collection = new IndexedCollection(this._db.storage, name);
   }
 }
 export default Collection;

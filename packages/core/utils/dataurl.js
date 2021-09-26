@@ -8,7 +8,7 @@ function toObject(dataurl) {
 }
 
 function fromObject({ type, data }) {
-  //const { groups } = REGEX.exec(dataurl);
+  if (REGEX.test(data)) return data;
   return `data:${type};base64,${data}`;
 }
 

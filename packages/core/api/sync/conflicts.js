@@ -9,12 +9,12 @@ class Conflicts {
 
   async recalculate() {
     if (this._db.notes.conflicted.length <= 0) {
-      await this._db.context.write("hasConflicts", false);
+      await this._db.storage.write("hasConflicts", false);
     }
   }
 
   async check() {
-    let hasConflicts = await this._db.context.read("hasConflicts");
+    let hasConflicts = await this._db.storage.read("hasConflicts");
     if (hasConflicts) {
       const mergeConflictError = new Error(
         "Merge conflicts detected. Please resolve all conflicts to continue syncing."

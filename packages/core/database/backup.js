@@ -20,7 +20,7 @@ export default class Backup {
   }
 
   lastBackupTime() {
-    return this._db.context.read("lastBackupTime");
+    return this._db.storage.read("lastBackupTime");
   }
 
   /**
@@ -35,22 +35,22 @@ export default class Backup {
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");
 
-    let keys = await this._db.context.getAllKeys();
+    let keys = await this._db.storage.getAllKeys();
     let data = filterData(
-      Object.fromEntries(await this._db.context.readMulti(keys))
+      Object.fromEntries(await this._db.storage.readMulti(keys))
     );
 
     let hash = {};
 
     if (encrypt) {
       const key = await this._db.user.getEncryptionKey();
-      data = await this._db.context.encrypt(key, JSON.stringify(data));
+      data = await this._db.storage.encrypt(key, JSON.stringify(data));
     } else {
       hash = { hash: SparkMD5.hash(JSON.stringify(data)), hash_type: "md5" };
     }
 
     // save backup time
-    await this._db.context.write("lastBackupTime", Date.now());
+    await this._db.storage.write("lastBackupTime", Date.now());
     return JSON.stringify({
       version: CURRENT_DATABASE_VERSION,
       type,
@@ -77,7 +77,7 @@ export default class Backup {
     //check if we have encrypted data
     if (db.salt && db.iv) {
       if (!key) key = await this._db.user.getEncryptionKey();
-      backup.data = JSON.parse(await this._db.context.decrypt(key, db));
+      backup.data = JSON.parse(await this._db.storage.decrypt(key, db));
     } else if (!this._verify(backup))
       throw new Error("Backup file has been tempered, aborting...");
 

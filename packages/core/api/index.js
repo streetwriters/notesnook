@@ -1,5 +1,6 @@
 import Notes from "../collections/notes";
 import Storage from "../database/storage";
+import FileStorage from "../database/fs";
 import Notebooks from "../collections/notebooks";
 import Trash from "../collections/trash";
 import Tags from "../collections/tags";
@@ -28,12 +29,12 @@ var NNEventSource;
 class Database {
   /**
    *
-   * @param {any} context
+   * @param {any} storage
    * @param {EventSource} eventsource
    */
-  constructor(context, eventsource, fs) {
-    this.context = new Storage(context);
-    this.fs = fs;
+  constructor(storage, eventsource, fs) {
+    this.storage = new Storage(storage);
+    this.fs = new FileStorage(fs, storage);
     NNEventSource = eventsource;
     this._syncTimeout = 0;
   }
@@ -62,10 +63,10 @@ class Database {
     });
     EV.subscribe(EVENTS.databaseUpdated, this._onDBWrite.bind(this));
 
-    this.session = new Session(this.context);
+    this.session = new Session(this.storage);
     await this._validate();
 
-    this.user = new UserManager(this);
+    this.user = new UserManager(this.storage);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
@@ -152,7 +153,7 @@ class Database {
           await this.user.logout(true, "Password Changed");
           break;
         case "emailConfirmed":
-          const token = await this.context.read("token");
+          const token = await this.storage.read("token");
           await this.user.tokenManager._refreshToken(token);
           await this.user.fetchUser(true);
           EV.publish(EVENTS.userEmailConfirmed);
@@ -166,7 +167,7 @@ class Database {
   }
 
   async lastSynced() {
-    return this.context.read("lastSynced");
+    return this.storage.read("lastSynced");
   }
 
   async _onDBWrite(item) {

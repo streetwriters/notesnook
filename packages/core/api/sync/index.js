@@ -41,7 +41,7 @@ export default class Sync {
     this._db = db;
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
-    this._tokenManager = new TokenManager(this._db);
+    this._tokenManager = new TokenManager(this._db.storage);
     this._isSyncing = false;
   }
 
@@ -53,7 +53,7 @@ export default class Sync {
   }
 
   async _performChecks() {
-    let lastSynced = (await this._db.context.read("lastSynced")) || 0;
+    let lastSynced = (await this._db.storage.read("lastSynced")) || 0;
     let token = await this._tokenManager.getAccessToken();
 
     // update the conflicts status and if find any, throw
@@ -66,7 +66,7 @@ export default class Sync {
   async start(full, force) {
     if (this._isSyncing) return false;
 
-    if (force) await this._db.context.write("lastSynced", 0);
+    if (force) await this._db.storage.write("lastSynced", 0);
     let { lastSynced, token } = await this._performChecks();
 
     try {
@@ -84,7 +84,7 @@ export default class Sync {
         // merge the server response
         await this._merger.merge(serverResponse, lastSynced);
 
-        await this._downloadAttachments(token);
+        // await this._downloadAttachments(token);
       }
 
       // check for conflicts and throw
@@ -95,7 +95,7 @@ export default class Sync {
 
       // update our lastSynced time
       if (lastSynced) {
-        await this._db.context.write("lastSynced", lastSynced);
+        await this._db.storage.write("lastSynced", lastSynced);
       }
 
       return true;
@@ -123,7 +123,7 @@ export default class Sync {
 
     // update our lastSynced time
     if (lastSynced) {
-      await this._db.context.write("lastSynced", lastSynced);
+      await this._db.storage.write("lastSynced", lastSynced);
     }
 
     EV.publish(EVENTS.appRefreshRequested);
@@ -137,7 +137,7 @@ export default class Sync {
     // last edited (but unsynced) time resulting in edited notes
     // not getting synced.
     // if (serverResponse.lastSynced) {
-    //   await this._db.context.write("lastSynced", serverResponse.lastSynced);
+    //   await this._db.storage.write("lastSynced", serverResponse.lastSynced);
     // }
   }
 
@@ -154,37 +154,24 @@ export default class Sync {
   async _uploadAttachments(token) {
     const attachments = this._db.attachments.pending;
     console.log("Uploading attachments", this._db.attachments.pending);
-    for (let attachment of attachments) {
+    for (var i = 0; i < attachments.length; ++i) {
+      const attachment = attachments[i];
+      EV.publish(EVENTS.attachmentsLoading, {
+        type: "upload",
+        total: attachments.length,
+        current: i,
+      });
       const { hash } = attachment.metadata;
-      const url = await this._getPresignedURL(hash, token, "PUT");
-      const uploadResult = await this._db.fs.uploadFile(hash, { url });
-      if (!uploadResult) throw new Error("Failed to upload file.");
+
+      const isUploaded = await this._db.fs.uploadFile(hash);
+      if (!isUploaded) throw new Error("Failed to upload file.");
+
       await this._db.attachments.markAsUploaded(attachment.id);
     }
-  }
-
-  async _downloadAttachments(token) {
-    const attachments = this._db.attachments.media;
-    console.log("Downloading attachments", attachments);
-    for (let attachment of attachments) {
-      const { hash } = attachment.metadata;
-      const url = `${Constants.API_HOST}/s3?name=${hash}`;
-      const downloadResult = await this._db.fs.downloadFile(hash, {
-        url,
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      if (!downloadResult) throw new Error("Failed to download file.");
-    }
-  }
-
-  async _getPresignedURL(filename, token, verb) {
-    const response = await fetch(`${Constants.API_HOST}/s3?name=${filename}`, {
-      method: verb,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    EV.publish(EVENTS.attachmentsLoading, {
+      type: "upload",
+      total: attachments.length,
+      current: attachments.length,
     });
-    if (response.ok) return await response.text();
-    throw new Error("Couldn't get presigned url.");
   }
 }

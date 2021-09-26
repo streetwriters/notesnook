@@ -13,8 +13,8 @@ class Migrations {
 
   async init() {
     this.dbVersion =
-      (await this._db.context.read("v")) || CURRENT_DATABASE_VERSION;
-    this._db.context.write("v", this.dbVersion);
+      (await this._db.storage.read("v")) || CURRENT_DATABASE_VERSION;
+    this._db.storage.write("v", this.dbVersion);
   }
 
   async migrate() {
@@ -55,7 +55,7 @@ class Migrations {
       },
     ];
     await this._migrator.migrate(collections, (item) => item, this.dbVersion);
-    await this._db.context.write("v", CURRENT_DATABASE_VERSION);
+    await this._db.storage.write("v", CURRENT_DATABASE_VERSION);
 
     EV.publish(EVENTS.databaseMigrated, {
       prev: this.dbVersion,

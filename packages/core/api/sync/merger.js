@@ -25,7 +25,7 @@ class Merger {
 
   async _deserialize(item, migrate = true) {
     const deserialized = JSON.parse(
-      await this._db.context.decrypt(this.key, item)
+      await this._db.storage.decrypt(this.key, item)
     );
     deserialized.remote = true;
     if (!migrate) return deserialized;
@@ -147,7 +147,7 @@ class Merger {
           // otherwise we trigger the conflicts
           await this._db.content.add({ ...local, conflicted: remote });
           await this._db.notes.add({ id: local.noteId, conflicted: true });
-          await this._db.context.write("hasConflicts", true);
+          await this._db.storage.write("hasConflicts", true);
         }
       }
     );

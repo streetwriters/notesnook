@@ -32,7 +32,7 @@ class Collector {
 
   _serialize(item) {
     if (!item) return null;
-    return this._db.context.encrypt(this.key, JSON.stringify(item));
+    return this._db.storage.encrypt(this.key, JSON.stringify(item));
   }
 
   _encrypt(array) {
