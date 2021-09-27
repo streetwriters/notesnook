@@ -1,5 +1,6 @@
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
+import {useAttachmentStore} from '../provider/stores';
 
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 
@@ -31,7 +32,7 @@ async function readEncrypted(filename, key, cipherData) {
 
 async function writeEncrypted(filename, {data, type, key}) {
   console.log('file input: ', {data, type, key});
-  
+
   let output = await Sodium.encryptFile(key, {
     data,
     type
@@ -44,47 +45,84 @@ async function writeEncrypted(filename, {data, type, key}) {
   };
 }
 
-async function uploadFile(filename, {url, headers}) {
-  console.log('uploading file: ', filename,headers);
-  
+async function uploadFile(filename, {url, headers}, cancelToken) {
+  console.log('uploading file: ', filename, headers);
+
   try {
-    let response = await RNFetchBlob.fetch(
+    let request = RNFetchBlob.fetch(
       'PUT',
       url,
       {
-        "content-type":""
+        'content-type': ''
       },
       RNFetchBlob.wrap(`${cacheDir}/${filename}`)
     ).uploadProgress((sent, total) => {
+      useAttachmentStore
+        .getState()
+        .setProgress(sent, total, filename, 0, 'upload');
       console.log('uploading: ', sent, total);
     });
-    
-    console.log(response.info().status)
+    cancelToken.cancel = request.cancel;
+    let response = await request;
+
+    console.log(response.info().status);
     let status = response.info().status;
+    useAttachmentStore
+      .getState()
+      .setProgress(
+        sent,
+        total,
+        filename,
+        0,
+        'upload',
+        status >= 200 && status < 300
+      );
     return status >= 200 && status < 300;
   } catch (e) {
+    useAttachmentStore
+      .getState()
+      .setProgress(0, total, filename, 0, 'upload', false);
     console.log('upload file: ', e, url, headers);
     return false;
   }
 }
 
-async function downloadFile(filename, {url, headers}) {
+async function downloadFile(filename, {url, headers}, cancelToken) {
   console.log('downloading file: ', filename, url);
   try {
     let path = `${cacheDir}/${filename}`;
-    let exists = await RNFetchBlob.fs.exists(`${cacheDir}/${filename}`);
+    let exists = await RNFetchBlob.fs.exists(path);
     console.log(exists);
     if (exists) return true;
-    let response = await RNFetchBlob.config({
+    let request = RNFetchBlob.config({
       path: path
     })
       .fetch('GET', url, headers)
       .progress((recieved, total) => {
+        useAttachmentStore
+          .getState()
+          .setProgress(0, total, filename, recieved, 'download');
         console.log('downloading: ', recieved, total);
       });
+    cancelToken.cancel = request.cancel;
+    let response = await request;
     let status = response.info().status;
+    useAttachmentStore
+      .getState()
+      .setProgress(
+        0,
+        total,
+        filename,
+        recieved,
+        'download',
+        status >= 200 && status < 300
+      );
+
     return status >= 200 && status < 300;
   } catch (e) {
+    useAttachmentStore
+      .getState()
+      .setProgress(0, total, filename, 0, 'download', false);
     console.log('download file error: ', e, url, headers);
     return false;
   }
@@ -103,10 +141,28 @@ async function deleteFile(filename, {url, headers}) {
   }
 }
 
+async function exists(filename) {
+  let exists = await RNFetchBlob.fs.exists(`${cacheDir}/${filename}`);
+  return exists;
+}
+
+function cancelable(operation) {
+  const cancelToken = {
+    cancel: () => {}
+  };
+  return (filename, {url, headers}) => {
+    return {
+      execute: () => operation(filename, {url, headers}, cancelToken),
+      cancel: () => cancelToken.cancel()
+    };
+  };
+}
+
 export default {
   readEncrypted,
   writeEncrypted,
-  uploadFile,
-  downloadFile,
-  deleteFile
+  uploadFile: cancelable(uploadFile),
+  downloadFile: cancelable(downloadFile),
+  deleteFile,
+  exists
 };
