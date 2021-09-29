@@ -1,11 +1,70 @@
 const { addPluginToPluginManager } = require("../utils");
 
+const ZERO_WIDTH_NOBREAK_SPACE = 65279;
 /**
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
   androidBackspaceKeyQuirk(editor);
-  androidGboardEnterKeyBug(editor);
+  androidGboardEnterKeyQuirk(editor);
+  androidSwiftKeyFormattingQuirk(editor);
+}
+
+/**
+ * => Detected & tested on:
+ * Google Chrome Android with SwiftKey Keyboard
+ *
+ * => Quirk details:
+ * On Android, when caret is at the end of the first word
+ * of a new line, pressing a non alphanumeric character (e.g. space)
+ * key removes the formatting of the word and moves the caret
+ * back by one position.
+ *
+ * => Example of the bug (| = caret, _ = bold):
+ *  -> Before pressing space:
+ *      1) Some text
+ *      2) Some text on second _line_|
+ *  -> After pressing space:
+ *      1) Some text
+ *      2) Some text on second lin| e
+ *
+ * => Reason why this happens:
+ * I haven't been able to figure out why this happens. I was able to reproduce
+ * this same bug in other apps like Canva as well.
+ *
+ * However, this bug is specific to SwiftKey Keyboard. Gboard has no such issue.
+ *
+ * => How the fix works:
+ * The fix is hacky, obviously. I found out that if we remove the ZERO_WIDTH_SPACE
+ * character TinyMCE puts when you start typing with a format turned on, the issue
+ * no longer occurs.
+ *
+ * To make that happen, we listen to SelectionChange event and watch for any tag with
+ * ZERO_WIDTH_SPACE in the beginning. We can't remove the ZERO_WIDTH_SPACE immediately
+ * because that would move the selection to the previous line. Instead we wait until
+ * the user inputs the first character.
+ *
+ * As soon as the first character is inserted, we remove the ZERO_WIDTH_SPACE and move
+ * selection forward by one character.
+ *
+ * => Interesting information:
+ * I could not detect this bug in Prosemirror. No idea why.
+ */
+function androidSwiftKeyFormattingQuirk(editor) {
+  if (!global.tinymce.Env.os.isAndroid()) return;
+
+  editor.on("SelectionChange", () => {
+    const node = editor.selection.getNode();
+    if (
+      node.textContent.length > 1 &&
+      node.textContent.charCodeAt(0) === ZERO_WIDTH_NOBREAK_SPACE
+    ) {
+      const rng = editor.selection.getRng();
+      node.textContent = node.textContent.substring(1);
+      rng.setStart(node, rng.startOffset + 1);
+      editor.selection.setRng(rng);
+    }
+  });
 }
 
 /**
@@ -65,7 +124,7 @@ function register(editor) {
  * custom eventing system in place? Or maybe they provide a fix for this
  * bug built in.
  */
-function androidGboardEnterKeyBug(editor) {
+function androidGboardEnterKeyQuirk(editor) {
   if (!global.tinymce.Env.os.isAndroid()) return;
 
   const inputState = {};
@@ -95,17 +154,15 @@ function androidGboardEnterKeyBug(editor) {
       let sibling;
       let parentElement = range.startContainer.parentElement;
 
-      if (parentElement) {
-        sibling = parentElement.nextElementSibling;
-
-        if (!sibling) {
-          let grandParentElement = parentElement.parentElement;
-          if (grandParentElement && grandParentElement.nodeName !== "BODY") {
-            sibling = grandParentElement.nextElementSibling;
-          }
-        }
+      while (
+        parentElement.parentElement &&
+        !parentElement.parentElement.classList.contains("mce-content-body")
+      ) {
+        parentElement = parentElement.parentElement;
       }
+      sibling = parentElement.nextElementSibling;
       if (!sibling) return;
+      sibling.innerHTML = "<br>";
       editor.selection.setCursorLocation(sibling, 0);
     }
   });
@@ -163,7 +220,7 @@ function androidBackspaceKeyQuirk(editor) {
   const inputState = {
     previousSelection: {},
     selection: {},
-    forcePreserveSelection: false
+    forcePreserveSelection: false,
   };
 
   editor.on("beforeinput", (e) => {
@@ -173,7 +230,7 @@ function androidBackspaceKeyQuirk(editor) {
       const range = editor.selection.getRng();
       inputState.selection = {
         container: range.startContainer,
-        offset: range.startOffset
+        offset: range.startOffset,
       };
 
       // Weird behavior: tinymce removes 1 (and only 1) trailing whitespace.
@@ -193,7 +250,7 @@ function androidBackspaceKeyQuirk(editor) {
     const range = editor.selection.getRng();
     inputState.previousSelection = {
       offset: range.startOffset,
-      container: range.startContainer
+      container: range.startContainer,
     };
   });
 
