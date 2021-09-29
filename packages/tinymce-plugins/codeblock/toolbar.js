@@ -1,6 +1,6 @@
 const { persistSelection } = require("../utils");
 const { TAGNAME, state } = require("./utils");
-const hljs = require("highlight.js").default;
+const hljs = require("highlight.js");
 
 const LANGUAGE_SELECT_LABEL_SELECTOR =
   ".tox-pop__dialog span.tox-tbtn__select-label";
