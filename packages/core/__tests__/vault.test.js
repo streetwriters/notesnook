@@ -48,7 +48,7 @@ test("lock a note", () =>
 
     expect(note.headline).toBe("");
 
-    const content = await db.content.raw(note.data.contentId);
+    const content = await db.content.raw(note.data.contentId, false);
     expect(content.noteId).toBeDefined();
     expect(content.data.iv).toBeDefined();
     expect(content.data.cipher).toBeDefined();

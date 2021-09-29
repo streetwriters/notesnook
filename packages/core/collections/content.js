@@ -42,7 +42,7 @@ export default class Content extends Collection {
     return content.data;
   }
 
-  async raw(id, withAttachments = true) {
+  async raw(id, withAttachments = false) {
     const content = await this._collection.getItem(id);
     if (!content) return;
     return withAttachments ? await this.insertAttachments(content) : content;
