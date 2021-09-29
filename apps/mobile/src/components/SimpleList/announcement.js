@@ -132,20 +132,20 @@ export const Announcement = ({color}) => {
                 <>
                   <Button
                     key={item.title}
-                    type={index === 0 ? 'accent' : 'shade'}
                     title={item.title}
                     fontSize={SIZE.md}
                     buttonType={{
-                      color: color
-                        ? index === 0
+                      color:
+                        index === 0
+                          ? color
+                            ? color
+                            : colors.accent
+                          : color
                           ? RGB_Linear_Shade(
                               colors.night ? 0.04 : -0.04,
                               hexToRGBA(color, 0.12)
                             )
-                          : color
-                        : index === 0
-                        ? colors.accent
-                        : colors.shade,
+                          : colors.shade,
                       text:
                         index !== 0
                           ? color
@@ -157,9 +157,11 @@ export const Announcement = ({color}) => {
                         : index === 0
                         ? colors.accent
                         : colors.shade,
-                      opacity: 0.12
+                      opacity: 1
                     }}
                     onPress={async () => {
+                      console.log(index);
+                      return;
                       if (item.type === 'link') {
                         try {
                           await openLinkInBrowser(item.data, state.colors);
