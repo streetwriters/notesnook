@@ -7,6 +7,7 @@ const { configureAutoUpdater } = require("./autoupdate");
 const { getBackgroundColor, getTheme, setTheme } = require("./config/theme");
 const getZoomFactor = require("./ipc/calls/getZoomFactor");
 const { logger } = require("./logger");
+const { setupMenu } = require("./menu");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -36,6 +37,7 @@ async function createWindow() {
   });
   global.win = mainWindow;
   setTheme(getTheme());
+  setupMenu(mainWindow);
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
