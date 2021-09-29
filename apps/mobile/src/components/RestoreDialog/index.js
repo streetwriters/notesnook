@@ -1,21 +1,21 @@
-import React, { createRef, useEffect, useState } from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import React, {createRef, useEffect, useState} from 'react';
+import {ActivityIndicator, Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import { FlatList } from 'react-native-gesture-handler';
-import { useTracked } from '../../provider';
-import { initialize } from '../../provider/stores';
+import {FlatList} from 'react-native-gesture-handler';
+import {useTracked} from '../../provider';
+import {initialize} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import {db} from '../../utils/DB';
+import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
@@ -53,7 +53,7 @@ const RestoreDialog = () => {
       heading: 'Restoring Backup',
       message: 'Your backup data is being restored. please wait.',
       type: 'error',
-      context: 'local',
+      context: 'local'
     });
   };
 
@@ -78,6 +78,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [files, setFiles] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     checkBackups();
@@ -94,7 +95,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           heading: 'Cannot restore backup',
           message: 'You must provide phone storage access to restore backups.',
           type: 'error',
-          context: 'local',
+          context: 'local'
         });
         return;
       }
@@ -110,7 +111,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         heading: 'Restore successful',
         message: 'Your backup data has been restored successfully.',
         type: 'success',
-        context: 'global',
+        context: 'global'
       });
       close();
     } catch (e) {
@@ -119,7 +120,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         heading: 'Restore failed',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
   };
@@ -133,7 +134,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           message:
             'You must provide phone storage access to check for backups.',
           type: 'success',
-          context: 'local',
+          context: 'local'
         });
         return;
       }
@@ -149,6 +150,9 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       });
 
       setFiles(files);
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     } catch (e) {}
   };
 
@@ -162,7 +166,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             paddingHorizontal: 8,
             paddingRight: 8,
             alignItems: 'center',
-            paddingTop: restoring ? 8 : 0,
+            paddingTop: restoring ? 8 : 0
           }}>
           <DialogHeader
             title="Backups"
@@ -179,7 +183,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                     fetch(r.uri).then(async r => {
                       try {
                         let backup = await r.json();
-                       
+
                         await db.backup.import(JSON.stringify(backup));
                         setRestoring(false);
                         initialize();
@@ -189,7 +193,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                           message:
                             'Your backup data has been restored successfully.',
                           type: 'success',
-                          context: 'global',
+                          context: 'global'
                         });
                         actionSheetRef.current?.hide();
                       } catch (e) {
@@ -199,13 +203,13 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                           message:
                             'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
                           type: 'error',
-                          context: 'local',
+                          context: 'local'
                         });
                       }
                     });
                   })
                   .catch(console.log);
-              },
+              }
             }}
           />
         </View>
@@ -223,20 +227,31 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           }}
           ListEmptyComponent={
             !restoring ? (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 100,
-                }}>
-                <Paragraph color={colors.icon}>No backups found.</Paragraph>
-              </View>
+              loading ? (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 100
+                  }}>
+                  <ActivityIndicator color={colors.accent} size={SIZE.lg} />
+                </View>
+              ) : (
+                <View
+                  style={{
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    height: 100
+                  }}>
+                  <Paragraph color={colors.icon}>No backups found.</Paragraph>
+                </View>
+              )
             ) : (
               <View
                 style={{
                   justifyContent: 'center',
                   alignItems: 'center',
-                  height: 200,
+                  height: 200
                 }}>
                 <ActivityIndicator color={colors.accent} />
                 <Paragraph color={colors.icon}>
@@ -247,9 +262,9 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           }
           keyExtractor={item => item.filename}
           style={{
-            paddingHorizontal: 12,
+            paddingHorizontal: 12
           }}
-          data={restoring ? [] : files}
+          data={restoring || loading ? [] : files}
           renderItem={({item, index}) => [
             <View
               style={{
@@ -260,11 +275,11 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                 borderRadius: 0,
                 flexDirection: 'row',
                 borderBottomWidth: 0.5,
-                borderBottomColor: colors.nav,
+                borderBottomColor: colors.nav
               }}>
               <View
                 style={{
-                  maxWidth: '75%',
+                  maxWidth: '75%'
                 }}>
                 <Paragraph
                   size={SIZE.sm}
@@ -281,13 +296,13 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                 height={30}
                 onPress={() => restore(item, index)}
               />
-            </View>,
+            </View>
           ]}
           ListFooterComponent={
-            restoring ? null : (
+            restoring || loading ? null : (
               <View
                 style={{
-                  height: 150,
+                  height: 150
                 }}
               />
             )
