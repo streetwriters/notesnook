@@ -30,7 +30,7 @@ function register(editor) {
       e.key = "Backspace";
     } else if (e.inputType.includes("insert")) {
       e.key = e.data;
-      if (e.data.endsWith("\n")) {
+      if (e.data && e.data.endsWith("\n")) {
         e.code = "Enter";
         e.key = "Enter";
       }
