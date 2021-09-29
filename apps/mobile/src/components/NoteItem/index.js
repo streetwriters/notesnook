@@ -34,6 +34,8 @@ function navigateToNotebook(item) {
   Navigation.navigate(routeName, params, headerState);
 }
 
+
+
 function navigateToTag(item) {
   let tags = db.tags.all;
   let _tag = tags.find(t => t.title === item);
@@ -157,7 +159,7 @@ const NoteItem = ({item, isTrash, tags}) => {
 
         <Heading
           numberOfLines={1}
-          color={COLORS_NOTE[item.color] || colors.heading}
+          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
           style={{
             flexWrap: 'wrap'
           }}
@@ -205,7 +207,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     width: SIZE.xs,
                     height: SIZE.xs,
                     borderRadius: 100,
-                    backgroundColor: COLORS_NOTE[item.color],
+                    backgroundColor: COLORS_NOTE[item.color.toLowerCase()],
                     marginRight: -4.5,
                     marginRight: 10
                   }}
@@ -220,7 +222,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                   style={{
                     marginRight: 5
                   }}
-                  color={COLORS_NOTE[item.color] || colors.accent}
+                  color={COLORS_NOTE[item.color?.toLowerCase()] || colors.accent}
                 />
               ) : null}
 
@@ -238,7 +240,6 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.favorite ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="star"
                   size={SIZE.md}
                   style={{

@@ -21,6 +21,7 @@ import {
   Announcement,
 } from './interfaces';
 import { groupArray } from "notes-core/utils/grouping"
+import { post } from '../views/Editor/Functions';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -148,6 +149,31 @@ export const useUserStore = create<UserStore>((set, get) => ({
   setVerifyUser: (verified) => set({ verifyUser: verified })
 }));
 
+interface AttachmentStore {
+  progress?: {
+    [name: string]: {
+      sent: number,
+      total: number,
+      hash: string,
+      recieved: number,
+      type: "upload" | "download",
+      success: boolean
+    }
+  },
+  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download", success) => void
+}
+
+export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
+  progress: {},
+  setProgress: (sent, total, hash, recieved, type, success) => {
+    let _p = get().progress;
+    _p[hash] = { sent, total, hash, recieved, type, success };
+    post("fetchprogress", _p[hash]);
+    set({ progress: { ..._p } });
+  },
+
+}));
+
 let { width, height } = Dimensions.get('window');
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
@@ -168,7 +194,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     telemetry: true,
     notebooksListMode: "normal",
     notesListMode: "normal",
-    devMode:false,
+    devMode: false,
   },
   fullscreen: false,
   deviceMode: "mobile",
@@ -194,7 +220,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
       setTimeout(() => {
         try {
           set({ menuPins: db.settings.pins })
-        } catch (e) {}
+        } catch (e) { }
       }, 1000)
     }
   },

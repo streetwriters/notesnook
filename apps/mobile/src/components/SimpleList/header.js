@@ -41,7 +41,7 @@ export const Header = React.memo(
           alignItems: 'center'
         }}>
         {messageCard && (
-          <Card color={COLORS_NOTE[color] || colors.accent} />
+          <Card color={COLORS_NOTE[color?.toLowerCase()] || colors.accent} />
         )}
         
       </View>
@@ -57,8 +57,8 @@ export const Header = React.memo(
             width: '100%',
             zIndex: 10,
             justifyContent: 'flex-end',
-            backgroundColor: COLORS_NOTE[color]
-              ? hexToRGBA(COLORS_NOTE[color], 0.15)
+            backgroundColor: COLORS_NOTE[color?.toLowerCase()]
+              ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15)
               : color || colors.shade
           }}>
           <View
@@ -69,7 +69,7 @@ export const Header = React.memo(
               position: 'absolute'
             }}>
             <Placeholder
-              color={COLORS_NOTE[color] || colors.accent}
+              color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
               w={normalize(150)}
               h={normalize(150)}
               type={screen === 'Favorites' ? 'favorites' : type}

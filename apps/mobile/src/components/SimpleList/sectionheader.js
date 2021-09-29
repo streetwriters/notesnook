@@ -73,7 +73,7 @@ export const SectionHeader = ({item, index, type, title,color}) => {
           justifyContent: 'center'
         }}>
         <Heading
-          color={COLORS_NOTE[color] || colors.accent  }
+          color={COLORS_NOTE[color?.toLowerCase()] || colors.accent  }
           size={SIZE.sm}
           style={{
             minWidth: 60,
