@@ -9,29 +9,32 @@ export default function useAutoUpdater() {
   const [status, setStatus] = useState();
 
   useEffect(() => {
-    function checkingForUpdate() {
-      setStatus({ type: "checking" });
-
+    function changeStatus(status) {
       clearTimeout(checkingForUpdateTimeout);
+      setStatus(status);
+    }
+
+    function checkingForUpdate() {
+      changeStatus({ type: "checking" });
       checkingForUpdateTimeout = setTimeout(() => {
-        setStatus({ type: "updated" });
+        changeStatus({ type: "updated" });
       }, 10000);
     }
 
     function updateAvailable(info) {
-      setStatus({ type: "available", version: info.version });
+      changeStatus({ type: "available", version: info.version });
     }
 
     function updateNotAvailable(info) {
-      setStatus({ type: "updated" });
+      changeStatus({ type: "updated" });
     }
 
     function updateDownloadCompleted(info) {
-      setStatus({ type: "completed", version: info.version });
+      changeStatus({ type: "completed", version: info.version });
     }
 
     function updateDownloadProgress(progressInfo) {
-      setStatus({ type: "downloading", progress: progressInfo.percent });
+      changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 
     ElectronEventManager.subscribe(EVENTS.checkingForUpdate, checkingForUpdate);
