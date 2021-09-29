@@ -81,7 +81,7 @@ async function pickImage() {
     hash: output.hash,
     filename: selectedImage.name,
     type: selectedImage.type,
-    size: selectedImage.length,
+    size: selectedImage.size,
     dataurl,
   };
 }

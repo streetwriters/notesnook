@@ -71,7 +71,7 @@ async function readEncrypted(filename, key, cipherData) {
 
 async function uploadFile(filename, requestOptions) {
   console.log("Request to upload file", filename, requestOptions);
-  const { url } = requestOptions;
+  const { url, cancellationToken } = requestOptions;
 
   let cipher = await fs.getItem(filename);
   if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
@@ -86,6 +86,7 @@ async function uploadFile(filename, requestOptions) {
     headers: {
       "Content-Type": "",
     },
+    cancelToken: cancellationToken,
     data: new Blob([cipher.buffer]),
     onUploadProgress: (ev) => {
       console.log("Uploading file", filename, ev);
@@ -103,13 +104,14 @@ async function uploadFile(filename, requestOptions) {
 }
 
 async function downloadFile(filename, requestOptions) {
-  const { url, headers } = requestOptions;
+  const { url, headers, cancellationToken } = requestOptions;
   console.log("Request to download file", filename, url, headers);
   if (await fs.hasItem(filename)) return true;
 
   const response = await axios.get(url, {
     headers: headers,
     responseType: "blob",
+    cancelToken: cancellationToken,
     onDownloadProgress: (ev) => {
       console.log("Downloading file", filename, ev);
       AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
@@ -128,15 +130,16 @@ async function downloadFile(filename, requestOptions) {
 }
 
 async function deleteFile(filename, requestOptions) {
-  const { url, headers } = requestOptions;
+  const { url, headers, cancellationToken } = requestOptions;
   console.log("Request to delete file", filename, url, headers);
   if (!(await fs.hasItem(filename))) return true;
 
   const response = await axios.delete(url, {
+    cancelToken: cancellationToken,
     headers: headers,
   });
   const result = isSuccessStatusCode(response.status);
-  // if (result) await fs.removeItem(filename);
+  if (result) await fs.removeItem(filename);
   return result;
 }
 
@@ -147,8 +150,8 @@ function exists(filename) {
 const FS = {
   writeEncrypted,
   readEncrypted,
-  uploadFile,
-  downloadFile,
+  uploadFile: cancellable(uploadFile),
+  downloadFile: cancellable(downloadFile),
   deleteFile,
   exists,
 };
@@ -156,4 +159,15 @@ export default FS;
 
 function isSuccessStatusCode(statusCode) {
   return statusCode >= 200 && statusCode <= 299;
+}
+
+function cancellable(operation) {
+  const source = axios.CancelToken.source();
+  return function (filename, requestOptions) {
+    requestOptions.cancellationToken = source.token;
+    return {
+      execute: () => operation(filename, requestOptions),
+      cancel: (message) => source.cancel(message),
+    };
+  };
 }

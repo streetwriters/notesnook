@@ -159,7 +159,7 @@ span.attachment em::before {
 img {
   border-radius: 5px;
   max-width: 100% !important;
-  height: auto !important;
+  /* height: auto !important; */
   background-color: var(--bgSecondary);
 }
 

@@ -235,6 +235,7 @@ function TinyMCE(props) {
         invalid_styles: {
           span: "--progress",
         },
+        extended_valid_elements: `img[*|src=placeholder.svg]`,
       }}
       onBeforeExecCommand={async (command) => {
         const isPremiumCommand = premiumCommands.some((cmd) => {

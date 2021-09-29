@@ -92,7 +92,7 @@ class EditorStore extends BaseStore {
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
-    let content = await db.content.raw(note.contentId);
+    let content = await db.content.raw(note.contentId, false);
 
     this.set((state) => {
       const defaultSession = getDefaultSession();
