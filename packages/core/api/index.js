@@ -53,6 +53,9 @@ class Database {
       [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
       this.connectSSE.bind(this)
     );
+    EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
+      await this.fs.cancel(attachment.metadata.hash);
+    });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();
       clearTimeout(this._syncTimeout);

@@ -5,21 +5,36 @@ export default class FileStorage {
   constructor(fs, storage) {
     this.fs = fs;
     this.tokenManager = new TokenManager(storage);
+    this._queue = [];
   }
 
-  async downloadFile(hash) {
+  async downloadFile(groupId, hash) {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
     const token = await this.tokenManager.getAccessToken();
-    return await this.fs.downloadFile(hash, {
+    const { execute, cancel } = this.fs.downloadFile(hash, {
       url,
       headers: { Authorization: `Bearer ${token}` },
     });
+    this._queue.push({ groupId, hash, cancel, type: "download" });
+    return await execute();
   }
 
-  async uploadFile(hash) {
+  async uploadFile(groupId, hash) {
     const token = await this.tokenManager.getAccessToken();
     const url = await this._getPresignedURL(hash, token, "PUT");
-    return await this.fs.uploadFile(hash, { url });
+    const { execute, cancel } = this.fs.uploadFile(hash, { url });
+    this._queue.push({ groupId, hash, cancel, type: "upload" });
+    return await execute();
+  }
+
+  async cancel(groupId, type = undefined) {
+    await Promise.all(
+      this._queue
+        .filter(
+          (item) => item.groupId === groupId && (!type || item.type === type)
+        )
+        .map(async (op) => await op.cancel())
+    );
   }
 
   readEncrypted(filename, encryptionKey, cipherData) {
@@ -27,7 +42,7 @@ export default class FileStorage {
   }
 
   writeEncrypted(filename, data, type, encryptionKey) {
-    return this._db.fs.writeEncrypted(filename, {
+    return this.fs.writeEncrypted(filename, {
       data,
       type,
       key: encryptionKey,

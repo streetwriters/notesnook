@@ -189,7 +189,7 @@ export default class Vault {
 
   /** @private */
   async _decryptContent(contentId, password) {
-    let encryptedContent = await this._db.content.raw(contentId);
+    let encryptedContent = await this._db.content.raw(contentId, false);
 
     let decryptedContent = await this._storage.decrypt(
       { password },
@@ -215,12 +215,15 @@ export default class Vault {
       data = content.data;
       type = content.type;
     } else {
-      const [content] = await this._db.content.extractAttachments([
-        { data, type, noteId: id },
-      ]);
+      const content = await this._db.content.extractAttachments({
+        data,
+        type,
+        noteId: id,
+      });
       data = content.data;
       type = content.type;
     }
+    console.log("encrypting data:", data);
 
     await this._encryptContent(contentId, data, type, password);
 

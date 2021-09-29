@@ -38,6 +38,7 @@ export const EVENTS = {
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
   attachmentsLoading: "attachments:loading",
+  attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
 };
 

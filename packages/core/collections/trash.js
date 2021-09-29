@@ -19,11 +19,11 @@ export default class Trash {
   }
 
   async cleanup() {
-    this.all.forEach(async (item) => {
-      if (dayjs(item.dateDeleted).add(7, "days").isBefore(dayjs())) {
-        await this.delete(item.id);
-      }
-    });
+    const now = dayjs().unix();
+    for (const item of this.all) {
+      if (dayjs(item.dateDeleted).add(7, "days").unix() < now) continue;
+      await this.delete(item.id);
+    }
   }
 
   get all() {

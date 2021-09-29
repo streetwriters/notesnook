@@ -4,6 +4,7 @@ import { deleteItem, hasItem } from "../utils/array";
 import hosts from "../utils/constants";
 import { EV, EVENTS } from "../common";
 import dataurl from "../utils/dataurl";
+import dayjs from "dayjs";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
@@ -50,6 +51,7 @@ export default class Attachments extends Collection {
       if (oldAttachment.noteIds.includes(noteId)) return;
 
       oldAttachment.noteIds.push(noteId);
+      oldAttachment.dateDeleted = undefined;
       return this._collection.updateItem(oldAttachment);
     }
 
@@ -81,11 +83,10 @@ export default class Attachments extends Collection {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment || !deleteItem(attachment.noteIds, noteId)) return;
     if (!attachment.noteIds.length) {
-      const isDeleted = await this._db.fs.deleteFile(attachment.metadata.hash);
-      if (!isDeleted) return;
       attachment.dateDeleted = Date.now();
+      EV.publish(EVENTS.attachmentDeleted, attachment);
     }
-    return this._collection.updateItem(attachment);
+    return await this._collection.updateItem(attachment);
   }
 
   async get(hash) {
@@ -141,10 +142,7 @@ export default class Attachments extends Collection {
 
       const { hash } = attachments[i].metadata;
 
-      const attachmentExists = await this._db.fs.exists(hash);
-      if (attachmentExists) continue;
-
-      const isDownloaded = await this._db.fs.downloadFile(hash);
+      const isDownloaded = await this._db.fs.downloadFile(noteId, hash);
       if (!isDownloaded) continue;
 
       const attachment = await this.get(hash);
@@ -163,6 +161,22 @@ export default class Attachments extends Collection {
       total: attachments.length,
       current: attachments.length,
     });
+  }
+
+  get deleted() {
+    return this.all.filter((attachment) => attachment.dateDeleted > 0);
+  }
+
+  async cleanup() {
+    const now = dayjs().unix();
+    for (const attachment of this.deleted) {
+      if (dayjs(attachment.dateDeleted).add(7, "days").unix() < now) continue;
+
+      const isDeleted = await this._db.fs.deleteFile(attachment.metadata.hash);
+      if (!isDeleted) continue;
+
+      await this._collection.removeItem(attachment.id);
+    }
   }
 
   get pending() {

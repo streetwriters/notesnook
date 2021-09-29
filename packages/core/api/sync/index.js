@@ -73,7 +73,7 @@ export default class Sync {
       const now = Date.now();
       this._isSyncing = true;
 
-      await this._uploadAttachments(token);
+      await this._uploadAttachments();
 
       // we prepare local data before merging so we always have correct data
       const data = await this._collector.collect(lastSynced);
@@ -151,7 +151,7 @@ export default class Sync {
     return response.lastSynced;
   }
 
-  async _uploadAttachments(token) {
+  async _uploadAttachments() {
     const attachments = this._db.attachments.pending;
     console.log("Uploading attachments", this._db.attachments.pending);
     for (var i = 0; i < attachments.length; ++i) {
@@ -163,7 +163,7 @@ export default class Sync {
       });
       const { hash } = attachment.metadata;
 
-      const isUploaded = await this._db.fs.uploadFile(hash);
+      const isUploaded = await this._db.fs.uploadFile(hash, hash);
       if (!isUploaded) throw new Error("Failed to upload file.");
 
       await this._db.attachments.markAsUploaded(attachment.id);
