@@ -220,21 +220,22 @@ function setTheme() {
     .tox .tox-toolbar__primary {
       background: none !important;
       border-bottom: 1px solid ${pageTheme.colors.nav} !important;
-    }
-
-  
-	  `;
+    }`;
+    
 
   let node2 = `
-  .mce-content-body audio[data-mce-selected], 
-  .mce-content-body embed[data-mce-selected], 
-  .mce-content-body img[data-mce-selected], 
-  .mce-content-body object[data-mce-selected], 
-  .mce-content-body table[data-mce-selected], 
-  .mce-content-body video[data-mce-selected] {
+  .mce-content-body table[data-mce-selected], {
     outline: 3px solid ${pageTheme.colors.shade} !important;
 }
 
+.mce-content-body audio[data-mce-selected], 
+  .mce-content-body embed[data-mce-selected], 
+  .mce-content-body img[data-mce-selected], 
+  .mce-content-body object[data-mce-selected], 
+  .mce-content-body video[data-mce-selected] {
+    outline: 3px solid ${pageTheme.colors.shade} !important;
+    border-radius:5px;
+}
 
 .mce-content-body div.mce-resizehandle {
   background-color: ${pageTheme.colors.accent} !important;
@@ -248,14 +249,6 @@ function setTheme() {
   z-index: 10000;
   opacity:0.5;
 }`;
-
-  /*
-
-#mceResizeHandlese {
-  height: 40px !important;
-  width: 40px !important;
-  border-radius:100px !important;
-} */
 
   let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
     'head'

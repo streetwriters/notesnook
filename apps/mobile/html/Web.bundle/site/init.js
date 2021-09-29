@@ -126,7 +126,7 @@ function init_tiny(size) {
     content_css: 'dist/skins/notesnook',
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace codeblock shortcuts inlinecode keyboardquirks',
+      'searchreplace codeblock inlinecode keyboardquirks',
       'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
@@ -135,6 +135,9 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
+    body: {
+      font-family:"Open Sans";
+    }
     .mce-content-body h2::before,
     h3::before,
     h4::before,
@@ -200,6 +203,7 @@ function init_tiny(size) {
     img {
       max-width:100% !important;
       height:auto !important;
+      border-radius:5px !important;
     }
     .tox .tox-edit-area__iframe {
       background-color:transparent !important;
@@ -223,6 +227,15 @@ function init_tiny(size) {
     td {
       min-width:10vw !important;
     }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong {
+      font-weight:600 !important;
+    }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
@@ -242,7 +255,7 @@ function init_tiny(size) {
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
-      'Sans=sans-serif;' +
+      'Open Sans=open sans;' +
       'Classic=courier new;' +
       'Mono=monospace;',
     paste_postprocess: function (_, args) {
@@ -434,10 +447,6 @@ const onChange = function (event) {
   changeTimer = setTimeout(function () {
     selectchange();
     reactNativeEventHandler('tiny', editor.getContent());
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo()
-    });
   }, 1);
 };
 

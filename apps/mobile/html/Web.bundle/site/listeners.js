@@ -121,6 +121,9 @@ function attachMessageListener() {
     let value = message.value;
 
     switch (type) {
+      case 'fetchprogress':
+      
+        break;
       case 'inject':
         tinymce.activeEditor.setContent(value);
         break;

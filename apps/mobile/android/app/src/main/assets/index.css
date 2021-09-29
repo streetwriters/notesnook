@@ -1,5 +1,6 @@
 body {
   margin: 0px !important;
+  font-family:"Open Sans";
 }
 
 .app-main {
@@ -7,8 +8,7 @@ body {
 }
 
 #formBox textarea {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
+  font-family: "Open Sans";
   font-weight: 600 !important;
   background-color: transparent;
   border: none;
@@ -48,9 +48,8 @@ body {
 }
 
 #textCopy {
+  font-family: "Open Sans";
   visibility: hidden;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   font-weight: 600 !important;
   font-size: 32px;
   padding-top: 4px;
@@ -62,12 +61,11 @@ body {
 }
 
 .info-bar {
+  font-family: "Open Sans";
   color: gray;
   font-size: 11px;
   height: 15px;
   display: flex;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', sans-serif;
   padding-left: 4px !important;
   justify-content: space-between;
 }
@@ -81,6 +79,7 @@ body {
   outline: none;
 }
 #infowords {
+  font-family: "Open Sans";
   margin-right: 5px;
   margin-left: 0px;
   border-radius: 5;
@@ -88,6 +87,7 @@ body {
 }
 
 #infodate {
+  font-family: "Open Sans";
   margin-right: 5px;
   margin-left: 5px;
   margin-top: 0;
@@ -95,6 +95,7 @@ body {
 }
 
 #infosaved {
+  font-family: "Open Sans";
   margin-right: 5px;
   margin-left: 5px;
   border-radius: 5;

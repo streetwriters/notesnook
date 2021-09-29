@@ -108,6 +108,13 @@ function collapseElement(target) {
   }
 }
 
+function onUndoChange() {
+  reactNativeEventHandler('history', {
+    undo: editor.undoManager.hasUndo(),
+    redo: editor.undoManager.hasRedo()
+  });
+}
+
 function init_tiny(size) {
   loadFontSize();
   tinymce.init({
@@ -119,7 +126,7 @@ function init_tiny(size) {
     content_css: 'dist/skins/notesnook',
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace codeblock shortcuts inlinecode keyboardquirks',
+      'searchreplace codeblock inlinecode keyboardquirks',
       'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
@@ -128,6 +135,9 @@ function init_tiny(size) {
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
     content_style: `
+    body: {
+      font-family:"Open Sans";
+    }
     .mce-content-body h2::before,
     h3::before,
     h4::before,
@@ -193,6 +203,7 @@ function init_tiny(size) {
     img {
       max-width:100% !important;
       height:auto !important;
+      border-radius:5px !important;
     }
     .tox .tox-edit-area__iframe {
       background-color:transparent !important;
@@ -216,6 +227,15 @@ function init_tiny(size) {
     td {
       min-width:10vw !important;
     }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong {
+      font-weight:600 !important;
+    }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
@@ -235,7 +255,7 @@ function init_tiny(size) {
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
-      'Sans=sans-serif;' +
+      'Open Sans=open sans;' +
       'Classic=courier new;' +
       'Mono=monospace;',
     paste_postprocess: function (_, args) {
@@ -245,7 +265,8 @@ function init_tiny(size) {
         console.error(e);
       }
     },
-    setup: function (editor) {
+    setup: function (_editor) {
+      editor = _editor
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
         tooltip: 'Remove image',
@@ -261,10 +282,10 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('init', function(e) {
+      editor.on('init', function (e) {
         setTimeout(() => {
           reactNativeEventHandler('status', true);
-        },300)
+        }, 300);
       });
 
       editor.ui.registry.addButton('deletevideo', {
@@ -331,17 +352,20 @@ function init_tiny(size) {
         onclick: function () {}
       });
     },
-    init_instance_callback: function (edit) {
-      editor = edit;
+    init_instance_callback: function (_editor) {
+      editor = _editor;
       setTheme();
 
       editor.on('SelectionChange', function (e) {
         selectchange();
-        reactNativeEventHandler('history', {
-          undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo()
-        });
       });
+
+      editor.on('ClearUndos', onUndoChange);
+      editor.on('Undo', onUndoChange);
+      editor.on('Redo', onUndoChange);
+      editor.on('TypingUndos', onUndoChange);
+      editor.on('BeforeAddUndo', onUndoChange);
+      editor.on('AddUndo', onUndoChange);
 
       editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
@@ -423,10 +447,6 @@ const onChange = function (event) {
   changeTimer = setTimeout(function () {
     selectchange();
     reactNativeEventHandler('tiny', editor.getContent());
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo()
-    });
   }, 1);
 };
 
