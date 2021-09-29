@@ -4,7 +4,7 @@ const os = require("os");
 const { isDevelopment } = require("./utils");
 const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
-const { getBackgroundColor } = require("./config/theme");
+const { getBackgroundColor, getTheme, setTheme } = require("./config/theme");
 const getZoomFactor = require("./ipc/calls/getZoomFactor");
 const { logger } = require("./logger");
 require("./ipc/index.js");
@@ -17,6 +17,7 @@ let mainWindow;
 async function createWindow() {
   mainWindow = new BrowserWindow({
     backgroundColor: getBackgroundColor(),
+    darkTheme: getTheme() === "dark",
     autoHideMenuBar: true,
     icon: path.join(
       __dirname,
@@ -34,6 +35,7 @@ async function createWindow() {
     },
   });
   global.win = mainWindow;
+  setTheme(getTheme());
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
