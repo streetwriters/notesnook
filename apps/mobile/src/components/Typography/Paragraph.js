@@ -28,6 +28,7 @@ const Paragraph = ({color, size = SIZE.sm, style, ...restProps}) => {
           fontSize: size || SIZE.sm,
           color: color || colors.pri,
           fontWeight: '400',
+          fontFamily:"OpenSans-Regular"
         },
         style,
       ]}>
