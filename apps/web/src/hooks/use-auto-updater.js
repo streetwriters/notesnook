@@ -4,12 +4,18 @@ import { EVENTS } from "@notesnook/desktop/events";
 import { isDesktop } from "../utils/platform";
 import checkForUpdate from "../commands/check-for-update";
 
+var checkingForUpdateTimeout = 0;
 export default function useAutoUpdater() {
   const [status, setStatus] = useState();
 
   useEffect(() => {
     function checkingForUpdate() {
       setStatus({ type: "checking" });
+
+      clearTimeout(checkingForUpdateTimeout);
+      checkingForUpdateTimeout = setTimeout(() => {
+        setStatus({ type: "updated" });
+      }, 10000);
     }
 
     function updateAvailable(info) {
