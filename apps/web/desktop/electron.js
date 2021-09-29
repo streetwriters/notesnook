@@ -29,6 +29,7 @@ async function createWindow() {
       enableRemoteModule: false,
       contextIsolation: true,
       nativeWindowOpen: true,
+      spellcheck: false,
       preload: __dirname + "/preload.js",
     },
   });
