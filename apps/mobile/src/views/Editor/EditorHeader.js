@@ -278,7 +278,7 @@ const EditorHeader = () => {
               left={50}
               testID={notesnook.ids.default.header.buttons.back}
               name="arrow-left"
-              color={colors.heading}
+              color={colors.pri}
               onPress={_onBackPress}
               bottom={5}
               customStyle={{
@@ -297,7 +297,7 @@ const EditorHeader = () => {
             {currentlyEditingNote && (
               <ActionIcon
                 name="cloud-upload-outline"
-                color={colors.accent}
+                color={colors.pri}
                 customStyle={{
                   marginLeft: 10,
                   borderRadius: 5
@@ -310,7 +310,7 @@ const EditorHeader = () => {
             {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
-                color={colors.heading}
+                color={colors.pri}
                 customStyle={{
                   marginLeft: 10
                 }}
@@ -325,7 +325,7 @@ const EditorHeader = () => {
 
             <ActionIcon
               name="dots-horizontal"
-              color={colors.heading}
+              color={colors.pri}
               customStyle={{
                 marginLeft: 10
               }}
