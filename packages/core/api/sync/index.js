@@ -25,7 +25,7 @@
  * Syncing should pause until all the conflicts have been resolved
  * And then it should continue.
  */
-import { EV, EVENTS } from "../../common";
+import { EV, EVENTS, sendAttachmentsProgressEvent } from "../../common";
 import Constants from "../../utils/constants";
 import http from "../../utils/http";
 import TokenManager from "../token-manager";
@@ -155,12 +155,9 @@ export default class Sync {
     const attachments = this._db.attachments.pending;
     console.log("Uploading attachments", this._db.attachments.pending);
     for (var i = 0; i < attachments.length; ++i) {
+      sendAttachmentsProgressEvent("upload", attachments.length, i);
+
       const attachment = attachments[i];
-      EV.publish(EVENTS.attachmentsLoading, {
-        type: "upload",
-        total: attachments.length,
-        current: i,
-      });
       const { hash } = attachment.metadata;
 
       const isUploaded = await this._db.fs.uploadFile(hash, hash);
@@ -168,10 +165,6 @@ export default class Sync {
 
       await this._db.attachments.markAsUploaded(attachment.id);
     }
-    EV.publish(EVENTS.attachmentsLoading, {
-      type: "upload",
-      total: attachments.length,
-      current: attachments.length,
-    });
+    sendAttachmentsProgressEvent("upload", attachments.length);
   }
 }
