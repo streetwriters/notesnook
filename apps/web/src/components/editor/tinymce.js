@@ -29,9 +29,10 @@ import "@streetwritersco/tinymce-plugins/collapsibleheaders";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
+import "@streetwritersco/tinymce-plugins/attachmentshandler";
 import "./plugins/picker";
-import "./plugins/attachments";
 import "./plugins/icons";
+import "./plugins/attachmentshandler.css";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -112,7 +113,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "icons keyboardquirks collapsibleheaders shortlink attachments picker paste codeblock inlinecode shortcuts checklist",
+    "icons keyboardquirks collapsibleheaders shortlink attachmentshandler picker paste codeblock inlinecode shortcuts checklist",
   pro: "textpattern",
 };
 
@@ -162,9 +163,9 @@ function TinyMCE(props) {
 
     const mediaAttachmentDownloadedEvent = EV.subscribe(
       EVENTS.mediaAttachmentDownloaded,
-      (arg) => {
-        console.log("downloaded attachment", arg);
-        tinymceRef.current.editor.execCommand("mceReplaceImage", arg);
+      (image) => {
+        const { hash, src } = image;
+        tinymceRef.current.editor.execCommand("mceReplaceImage", { hash, src });
       }
     );
     return () => {
@@ -236,6 +237,9 @@ function TinyMCE(props) {
           span: "--progress",
         },
         extended_valid_elements: `img[*|src=placeholder.svg]`,
+        attachmenthandler_download_attachment: (hash) => {
+          console.log(hash);
+        },
       }}
       onBeforeExecCommand={async (command) => {
         const isPremiumCommand = premiumCommands.some((cmd) => {
