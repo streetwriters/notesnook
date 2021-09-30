@@ -1,15 +1,18 @@
-import { launchCamera, launchImageLibrary } from 'react-native-sodium';
-import { eSendEvent } from '../../../../services/EventManager';
-import { editing } from '../../../../utils';
-import { db } from '../../../../utils/DB';
+import {launchCamera, launchImageLibrary} from 'react-native-sodium';
+import {eSendEvent} from '../../../../services/EventManager';
+import {editing} from '../../../../utils';
+import {db} from '../../../../utils/DB';
 import {
   eCloseProgressDialog,
   eOpenProgressDialog
 } from '../../../../utils/Events';
-import { sleep } from '../../../../utils/TimeUtils';
-import { getNote } from '../../Functions';
-import { safeKeyboardDismiss } from '../tiny';
-import { formatSelection } from './constants';
+import {sleep} from '../../../../utils/TimeUtils';
+import {getNote} from '../../Functions';
+import {safeKeyboardDismiss} from '../tiny';
+import {formatSelection} from './constants';
+import * as ScopedStorage from 'react-native-scoped-storage';
+import Sodium from 'react-native-sodium';
+import DocumentPicker from 'react-native-document-picker';
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -81,6 +84,25 @@ export const execCommands = {
     })();`,
 
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
+  filepicker: async () => {
+    let key = await db.user.getEncryptionKey();
+    if (!key) return;
+    let file = await DocumentPicker.pick();
+    let encryptionInfo = await Sodium.encryptFile(key, {uri: file.uri});
+    await db.attachments.add(
+      {
+        iv: encryptionInfo.iv,
+        salt: encryptionInfo.salt,
+        length: encryptionInfo.length,
+        alg: `xcha-argon2i13`,
+        hash: encryptionInfo.hash,
+        hashType: encryptionInfo.hashType,
+        type: file.type,
+        filename: file.name
+      },
+      getNote()?.id
+    );
+  },
   image: async () => {
     if (editing.isFocused) {
       safeKeyboardDismiss();
@@ -99,9 +121,11 @@ export const execCommands = {
             launchCamera(
               {
                 includeBase64: true,
-                maxWidth: 1024,
+                maxWidth: 2000,
+                maxHeight: 2000,
+                quality: 0.8,
                 mediaType: 'photo',
-                encryptToFile:true,
+                encryptToFile: true,
                 ...key
               },
               handleImageResponse
@@ -118,9 +142,11 @@ export const execCommands = {
             launchImageLibrary(
               {
                 includeBase64: true,
-                maxWidth: 1024,
+                maxWidth: 2000,
+                maxHeight: 2000,
+                quality: 0.8,
                 mediaType: 'photo',
-                encryptToFile:true,
+                encryptToFile: true,
                 ...key
               },
               handleImageResponse
@@ -315,25 +341,33 @@ let node = tinymce.activeEditor.selection.getNode();
 });`
 };
 
-const handleImageResponse = async (response) => {
-  if (response.didCancel || response.errorMessage || !response.assets || response.assets?.length === 0) {
+const handleImageResponse = async response => {
+  if (
+    response.didCancel ||
+    response.errorMessage ||
+    !response.assets ||
+    response.assets?.length === 0
+  ) {
     return;
   }
-  // For not support only single image picker
+  
   let image = response.assets[0];
 
   let b64 = `data:${image.type};base64, ` + image.base64;
 
-  await db.attachments.add({
-    iv:image.encryptionInfo.iv,
-    salt:image.encryptionInfo.salt,
-    length:image.encryptionInfo.length,
-    alg:`xcha-argon2i13`,
-    hash:image.encryptionInfo.hash,
-    hashType:image.encryptionInfo.hashType,
-    type:image.type,
-    filename:image.fileName
-  },getNote()?.id);
+  await db.attachments.add(
+    {
+      iv: image.encryptionInfo.iv,
+      salt: image.encryptionInfo.salt,
+      length: image.encryptionInfo.length,
+      alg: `xcha-argon2i13`,
+      hash: image.encryptionInfo.hash,
+      hashType: image.encryptionInfo.hashType,
+      type: image.type,
+      filename: image.fileName
+    },
+    getNote()?.id
+  );
 
   formatSelection(`
   (function() {
@@ -342,18 +376,8 @@ const handleImageResponse = async (response) => {
     if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
       pTag = "<p></p>"
     }
-    
-  minifyImg(
-  "${b64}",
-  1024,
-  'image/jpeg',
-  function(r) {
-    var content = "<img data-hash='${image.encryptionInfo.hash}' style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
+    var content = "<img data-hash='${image.encryptionInfo.hash}' style=" + "max-width:100% !important;" + "src=" + "${b64}" + ">" + pTag;
     editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
-  },
-  0.6
-  );
-  
   })();
 `);
 };

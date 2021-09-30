@@ -70,7 +70,7 @@ export function setColors(colors) {
   let theme = {...appColors, factor: normalize(1)};
 
   if (note && note.color && !DDS.isLargeTablet()) {
-    theme.shade = hexToRGBA(COLORS_NOTE[note.color], 0.15);
+    theme.shade = hexToRGBA(COLORS_NOTE[note.color?.toLowerCase()], 0.15);
   }
   tiny.call(EditorWebView, tiny.updateTheme(JSON.stringify(theme)));
 }

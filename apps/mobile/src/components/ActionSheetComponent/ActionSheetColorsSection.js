@@ -39,7 +39,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
   const _renderColor = c => {
     const color = {
       name: c,
-      value: COLORS_NOTE[c]
+      value: COLORS_NOTE[c?.toLowerCase()]
     };
 
     return (
@@ -56,7 +56,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-        {note.color === color.name ? (
+        {note.color?.toLowerCase() === color.name ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>
