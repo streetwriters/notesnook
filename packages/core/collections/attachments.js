@@ -89,7 +89,13 @@ export default class Attachments extends Collection {
     return await this._collection.updateItem(attachment);
   }
 
-  async get(hash) {
+  get(noteId) {
+    return this.file.filter((attachment) =>
+      hasItem(attachment.noteIds, noteId)
+    );
+  }
+
+  async read(hash) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
 
@@ -180,6 +186,12 @@ export default class Attachments extends Collection {
   get media() {
     return this.all.filter((attachment) =>
       attachment.metadata.type.startsWith("image/")
+    );
+  }
+
+  get file() {
+    return this.all.filter(
+      (attachment) => !attachment.metadata.type.startsWith("image/")
     );
   }
 

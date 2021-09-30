@@ -64,7 +64,7 @@ export default class Content extends Collection {
   async insertAttachments(contentItem) {
     const content = getContentFromData(contentItem.type, contentItem.data);
     contentItem.data = await content.insertAttachments((hash) => {
-      return this._db.attachments.get(hash);
+      return this._db.attachments.read(hash);
     });
     return contentItem;
   }
