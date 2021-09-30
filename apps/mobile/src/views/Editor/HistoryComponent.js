@@ -10,10 +10,10 @@ const HistoryComponent = () => {
   const {colors} = state;
   const [historyState, setHistoryState] = useState({
     undo: false,
-    redo: false,
+    redo: false
   });
 
-  const onHistoryChange = (data) => {
+  const onHistoryChange = data => {
     setHistoryState(data);
   };
 
@@ -28,11 +28,11 @@ const HistoryComponent = () => {
   return (
     <>
       <ActionIcon
-        name="undo"
+        name="undo-variant"
         disabled={!historyState.undo}
-        color={colors.heading}
+        color={colors.pri}
         customStyle={{
-          marginLeft: 10,
+          marginLeft: 10
         }}
         onPress={() => {
           if (!historyState.undo) return;
@@ -40,12 +40,9 @@ const HistoryComponent = () => {
         }}
       />
       <ActionIcon
-        name="redo"
+        name="redo-variant"
         disabled={!historyState.redo}
-        color={colors.heading}
-        customStyle={{
-          marginLeft: 10,
-        }}
+        color={colors.pri}
         onPress={() => {
           if (!historyState.redo) return;
           tiny.call(EditorWebView, tiny.redo);

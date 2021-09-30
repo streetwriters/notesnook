@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Linking, Platform, View } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
+import React, {useEffect, useRef, useState} from 'react';
+import {Linking, Platform, View} from 'react-native';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -44,8 +44,8 @@ const RateDialog = () => {
         await MMKV.setItem(
           'askForRating',
           JSON.stringify({
-            timestamp: Date.now() + 86400000 * 2,
-          }),
+            timestamp: Date.now() + 86400000 * 2
+          })
         );
         setVisible(false);
       }}>
@@ -53,13 +53,12 @@ const RateDialog = () => {
         style={{
           width: '100%',
           alignSelf: 'center',
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         <Heading>Do you enjoy using Notesnook?</Heading>
         <Paragraph size={SIZE.md}>
-          It took us a year to bring Notesnook to life. How has been your
-          experience using it. It will take you a moment to rate it. Please let
-          us know what you think!
+          It took us a year to bring Notesnook to life. Share your experience
+          and suggestions to help us improve it.
         </Paragraph>
 
         <Seperator half />
@@ -68,7 +67,7 @@ const RateDialog = () => {
             await Linking.openURL(
               Platform.OS === 'ios'
                 ? 'https://bit.ly/notesnook-ios'
-                : 'https://bit.ly/notesnook-and',
+                : 'https://bit.ly/notesnook-and'
             );
 
             await MMKV.setItem('askForRating', 'completed');
@@ -87,7 +86,7 @@ const RateDialog = () => {
             flexDirection: 'row',
             paddingTop: 12,
             width: '100%',
-            alignSelf: 'center',
+            alignSelf: 'center'
           }}>
           <Button
             onPress={async () => {
@@ -105,8 +104,8 @@ const RateDialog = () => {
               await MMKV.setItem(
                 'askForRating',
                 JSON.stringify({
-                  timestamp: Date.now() + 86400000 * 2,
-                }),
+                  timestamp: Date.now() + 86400000 * 2
+                })
               );
               setVisible(false);
             }}

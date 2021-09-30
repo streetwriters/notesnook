@@ -115,7 +115,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               flexWrap: 'wrap',
               fontSize: SIZE.sm,
               flexShrink: 1,
-              minWidth:'80%'
+              minWidth:'80%',
+              fontFamily:"OpenSans-Regular"
             }}
             autoCapitalize="none"
             autoCorrect={false}

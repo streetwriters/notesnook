@@ -377,14 +377,9 @@ const ToolbarItem = ({
                   paddingHorizontal: 12,
                   fontFamily:
                     format === 'fontname' &&
-                    formatValue &&
-                    formatValue !== '-apple-system'
-                      ? formatValue
-                      : format === 'fontname' &&
-                        icon !== '-apple-system' &&
-                        icon
-                      ? icon
-                      : null
+                    formatValue
+                      ? formatValue === 'open sans' ? "OpenSans-Regular" : formatValue
+                      : 'OpenSans-Regular'
                 }}
                 size={text.includes('%') ? SIZE.sm : SIZE.md}>
                 {currentText || text}
