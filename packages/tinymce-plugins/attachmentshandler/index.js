@@ -1,4 +1,8 @@
+const { addPluginToPluginManager } = require("../utils");
+
 function register(editor) {
+  setupUI(editor);
+
   editor.addCommand("mceAttachImage", function (image) {
     insertImage(editor, image);
   });
@@ -31,6 +35,41 @@ function register(editor) {
   });
 }
 
+function setupUI(editor) {
+  editor.ui.registry.addIcon(
+    "download",
+    `<svg height="24" width="24"><path d="M13,5V11H14.17L12,13.17L9.83,11H11V5H13M15,3H9V9H5L12,16L19,9H15V3M19,18H5V20H19V18Z" /></svg>`
+  );
+
+  editor.ui.registry.addButton("download", {
+    icon: "download",
+    tooltip: "Download attachment",
+    onAction: () => {
+      const node = editor.selection.getNode();
+      if (!node || !editor.settings.attachmenthandler_download_attachment)
+        return;
+      const hash = node.getAttribute("data-hash");
+      editor.settings.attachmenthandler_download_attachment(hash);
+    },
+  });
+
+  editor.ui.registry.addButton("delete", {
+    icon: "close",
+    tooltip: "Remove attachment",
+    onAction: () => {
+      editor.execCommand("Delete");
+    },
+  });
+
+  editor.ui.registry.addContextToolbar("attachment-selection", {
+    predicate: function (node) {
+      return node.nodeName !== "IMG" && node.classList.contains("attachment");
+    },
+    items: "download delete",
+    position: "node",
+  });
+}
+
 async function insertImage(editor, image) {
   var content = `
     <img class="attachment"
@@ -40,7 +79,8 @@ async function insertImage(editor, image) {
         data-filename="${image.filename}"
         src="${image.dataurl}"
         data-size="${image.size}"
-        style="float: left;"/>`;
+        style="float: left;"/>
+    <p><br></p>`;
   editor.insertContent(content);
 }
 
