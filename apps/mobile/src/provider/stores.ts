@@ -21,7 +21,8 @@ import {
   Announcement,
 } from './interfaces';
 import { groupArray } from "notes-core/utils/grouping"
-import { post } from '../views/Editor/Functions';
+import { EditorWebView, post } from '../views/Editor/Functions';
+import tiny from '../views/Editor/tiny/tiny';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -167,8 +168,19 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
   setProgress: (sent, total, hash, recieved, type, success) => {
     let _p = get().progress;
-    _p[hash] = { sent, total, hash, recieved, type, success };
-    post("fetchprogress", _p[hash]);
+    if (typeof success !== "boolean") {
+      _p[hash] = { sent, total, hash, recieved, type, success };
+    } else {
+      _p[hash] = null;
+    }
+    
+    let progress = { total, hash, loaded: type === "download" ? recieved : sent };
+    tiny.call(EditorWebView, `
+    (function() {
+      let progress = ${JSON.stringify(progress)}
+      tinymce.activeEditor.execCommand("mceUpdateAttachmentProgress",progress);
+    })()`);
+    console.log(_p);
     set({ progress: { ..._p } });
   },
 
