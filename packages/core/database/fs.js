@@ -16,7 +16,9 @@ export default class FileStorage {
       headers: { Authorization: `Bearer ${token}` },
     });
     this._queue.push({ groupId, hash, cancel, type: "download" });
-    return await execute();
+    const result = await execute();
+    this._deleteOp(groupId, "download");
+    return result;
   }
 
   async uploadFile(groupId, hash) {
@@ -24,18 +26,25 @@ export default class FileStorage {
     const url = await this._getPresignedURL(hash, token, "PUT");
     const { execute, cancel } = this.fs.uploadFile(hash, { url });
     this._queue.push({ groupId, hash, cancel, type: "upload" });
-    return await execute();
+    const result = await execute();
+    this._deleteOp(groupId, "upload");
+    return result;
   }
 
   async cancel(groupId, type = undefined) {
     console.trace("Cancelling", groupId, type);
-    await Promise.all(
-      this._queue
-        .filter(
-          (item) => item.groupId === groupId && (!type || item.type === type)
-        )
-        .map(async (op) => await op.cancel("Operation canceled."))
+    const [op] = this._deleteOp(groupId, type);
+    if (!op) return;
+    await op.cancel("Operation canceled.");
+    console.log("Cancellation done:", groupId, this._queue);
+  }
+
+  _deleteOp(groupId, type = undefined) {
+    const opIndex = this._queue.findIndex(
+      (item) => item.groupId === groupId && (!type || item.type === type)
     );
+    if (opIndex < 0) return [];
+    return this._queue.splice(opIndex, 1);
   }
 
   readEncrypted(filename, encryptionKey, cipherData) {
