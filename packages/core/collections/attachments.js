@@ -48,7 +48,7 @@ export default class Attachments extends Collection {
       (a) => a.metadata.hash === attachment.hash
     );
     if (oldAttachment) {
-      if (oldAttachment.noteIds.includes(noteId)) return;
+      if (!noteId || oldAttachment.noteIds.includes(noteId)) return;
 
       oldAttachment.noteIds.push(noteId);
       oldAttachment.dateDeleted = undefined;
