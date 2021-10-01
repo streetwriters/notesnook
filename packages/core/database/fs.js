@@ -28,12 +28,13 @@ export default class FileStorage {
   }
 
   async cancel(groupId, type = undefined) {
+    console.trace("Cancelling", groupId, type);
     await Promise.all(
       this._queue
         .filter(
           (item) => item.groupId === groupId && (!type || item.type === type)
         )
-        .map(async (op) => await op.cancel())
+        .map(async (op) => await op.cancel("Operation canceled."))
     );
   }
 

@@ -153,18 +153,23 @@ export default class Sync {
 
   async _uploadAttachments() {
     const attachments = this._db.attachments.pending;
-    console.log("Uploading attachments", this._db.attachments.pending);
-    for (var i = 0; i < attachments.length; ++i) {
-      sendAttachmentsProgressEvent("upload", attachments.length, i);
+    try {
+      console.log("Uploading attachments", this._db.attachments.pending);
+      for (var i = 0; i < attachments.length; ++i) {
+        sendAttachmentsProgressEvent("upload", attachments.length, i);
 
-      const attachment = attachments[i];
-      const { hash } = attachment.metadata;
+        const attachment = attachments[i];
+        const { hash } = attachment.metadata;
 
-      const isUploaded = await this._db.fs.uploadFile(hash, hash);
-      if (!isUploaded) throw new Error("Failed to upload file.");
+        const isUploaded = await this._db.fs.uploadFile(hash, hash);
+        if (!isUploaded) throw new Error("Failed to upload file.");
 
-      await this._db.attachments.markAsUploaded(attachment.id);
+        await this._db.attachments.markAsUploaded(attachment.id);
+      }
+    } catch (e) {
+      throw new Error("Failed to upload attachments. Error: " + e.message);
+    } finally {
+      sendAttachmentsProgressEvent("upload", attachments.length);
     }
-    sendAttachmentsProgressEvent("upload", attachments.length);
   }
 }
