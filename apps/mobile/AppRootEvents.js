@@ -42,10 +42,12 @@ import {MMKV} from './src/utils/mmkv';
 import Storage from './src/utils/storage';
 import {sleep} from './src/utils/TimeUtils';
 import {
+  EditorWebView,
   getNote,
   getWebviewInit,
   updateNoteInEditor
 } from './src/views/Editor/Functions';
+import tiny from './src/views/Editor/tiny/tiny';
 
 let prevTransactionId = null;
 let subsriptionSuccessListener;
@@ -118,6 +120,23 @@ export const AppRootEvents = React.memo(
     const setUser = useUserStore(state => state.setUser);
     const setSyncing = useUserStore(state => state.setSyncing);
 
+    const onMediaDownloaded = ({hash,src}) => {
+      console.log('on media download: ',hash,src)
+      tiny.call(
+        EditorWebView,
+        `
+        (function(){
+          let image = JSON.parse("${JSON.stringify({hash,src})}");
+          tinymce.activeEditor.execCommand("mceReplaceImage",image);
+        })();
+        `
+      );
+    }
+
+    const onLoadingAttachment = (data) => {
+      console.log('on attachment loading',data);
+    }
+
     useEffect(() => {
       Appearance.addChangeListener(SettingsService.setTheme);
       Linking.addEventListener('url', onUrlRecieved);
@@ -129,6 +148,9 @@ export const AppRootEvents = React.memo(
       EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
       EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
       EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
+      EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+      EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
+      
       eSubscribeEvent('userLoggedIn', setCurrentUser);
       removeInternetStateListener = NetInfo.addEventListener(
         onInternetStateChanged
@@ -141,6 +163,8 @@ export const AppRootEvents = React.memo(
         EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
         EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
         EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
+        EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
+        EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
         EV.unsubscribe(
           EVENTS.userCheckStatus,
           PremiumService.onUserStatusCheck
