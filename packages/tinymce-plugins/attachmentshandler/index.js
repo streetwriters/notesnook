@@ -13,14 +13,14 @@ function register(editor) {
 
   editor.addCommand("mceReplaceImage", function (image) {
     const { hash, src } = image;
-    const element = document.querySelector(`img[data-hash="${hash}"]`);
+    const element = editor.dom.doc.querySelector(`img[data-hash="${hash}"]`);
     if (!element || !src || !hash) return;
     element.setAttribute("src", src);
   });
 
   editor.addCommand("mceUpdateAttachmentProgress", function (progressState) {
     const { hash, total, loaded } = progressState;
-    const element = document.querySelector(
+    const element = editor.dom.doc.querySelector(
       `span.attachment[data-hash="${hash}"]`
     );
     if (!element || !total || !loaded) return;
