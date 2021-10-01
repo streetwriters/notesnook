@@ -54,6 +54,7 @@ class Database {
       this.connectSSE.bind(this)
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
+      console.log("deleted:", attachment);
       await this.fs.cancel(attachment.metadata.hash);
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {

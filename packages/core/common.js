@@ -14,7 +14,7 @@ export async function sendAttachmentsProgressEvent(type, total, current) {
   EV.publish(EVENTS.attachmentsLoading, {
     type,
     total,
-    current: current || total,
+    current: current === undefined ? total : current,
   });
 }
 
