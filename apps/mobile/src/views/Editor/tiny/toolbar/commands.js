@@ -1,4 +1,5 @@
-import {launchCamera, launchImageLibrary} from 'react-native-sodium';
+import DocumentPicker from 'react-native-document-picker';
+import Sodium, {launchCamera, launchImageLibrary} from 'react-native-sodium';
 import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {db} from '../../../../utils/DB';
@@ -7,12 +8,8 @@ import {
   eOpenProgressDialog
 } from '../../../../utils/Events';
 import {sleep} from '../../../../utils/TimeUtils';
-import {getNote} from '../../Functions';
-import {safeKeyboardDismiss} from '../tiny';
-import {formatSelection} from './constants';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import Sodium from 'react-native-sodium';
-import DocumentPicker from 'react-native-document-picker';
+import {EditorWebView, getNote} from '../../Functions';
+import tiny, {safeKeyboardDismiss} from '../tiny';
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -85,22 +82,45 @@ export const execCommands = {
 
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   filepicker: async () => {
-    let key = await db.user.getEncryptionKey();
+    let key = {password: 'helloworld'}; // await db.user.getEncryptionKey();
+
     if (!key) return;
     let file = await DocumentPicker.pick();
-    let encryptionInfo = await Sodium.encryptFile(key, {uri: file.uri});
-    await db.attachments.add(
-      {
-        iv: encryptionInfo.iv,
-        salt: encryptionInfo.salt,
-        length: encryptionInfo.length,
-        alg: `xcha-argon2i13`,
-        hash: encryptionInfo.hash,
-        hashType: encryptionInfo.hashType,
-        type: file.type,
-        filename: file.name
-      },
-      getNote()?.id
+    let encryptionInfo = await Sodium.encryptFile(key, {
+      uri: file.uri,
+      type: 'url'
+    });
+
+    let attachment = {
+      iv: encryptionInfo.iv,
+      salt: encryptionInfo.salt,
+      length: encryptionInfo.length,
+      alg: `xcha-argon2i13`,
+      hash: encryptionInfo.hash,
+      hashType: encryptionInfo.hashType,
+      type: file.type,
+      filename: file.name,
+      size: encryptionInfo.length
+    };
+    try {
+      await db.attachments.add(attachment, getNote()?.id);
+    } catch (e) {
+      console.log('attachment error: ', e);
+      return;
+    }
+    console.log('adding to editor')
+
+    tiny.call(
+      EditorWebView,
+      `
+    (function() {
+      let file = ${JSON.stringify(attachment)}
+      tinymce.activeEditor.execCommand('mceAttachFile',file);
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    })();
+    `
     );
   },
   image: async () => {
@@ -117,7 +137,7 @@ export const execCommands = {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
             await sleep(500);
-            let key = await db.user.getEncryptionKey();
+            let key = {password: 'helloworld'};
             launchCamera(
               {
                 includeBase64: true,
@@ -138,7 +158,7 @@ export const execCommands = {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
             await sleep(300);
-            let key = await db.user.getEncryptionKey();
+            let key = {password: 'helloworld'};
             launchImageLibrary(
               {
                 includeBase64: true,
@@ -350,34 +370,31 @@ const handleImageResponse = async response => {
   ) {
     return;
   }
-  
+
   let image = response.assets[0];
-
   let b64 = `data:${image.type};base64, ` + image.base64;
-
-  await db.attachments.add(
-    {
-      iv: image.encryptionInfo.iv,
-      salt: image.encryptionInfo.salt,
-      length: image.encryptionInfo.length,
-      alg: `xcha-argon2i13`,
-      hash: image.encryptionInfo.hash,
-      hashType: image.encryptionInfo.hashType,
-      type: image.type,
-      filename: image.fileName
-    },
-    getNote()?.id
+  let imageinfo = {
+    iv: image.encryptionInfo.iv,
+    salt: image.encryptionInfo.salt,
+    length: image.encryptionInfo.length,
+    alg: `xcha-argon2i13`,
+    hash: image.encryptionInfo.hash,
+    hashType: image.encryptionInfo.hashType,
+    type: image.type,
+    filename: image.fileName
+  };
+  await db.attachments.add(imageinfo, getNote()?.id);
+  imageinfo.dataurl = b64;
+  tiny.call(
+    EditorWebView,
+    `
+    (function(){
+      let image = ${JSON.stringify(imageinfo)}
+      tinymce.activeEditor.execCommand('mceAttachImage',image);
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    })();
+    `
   );
-
-  formatSelection(`
-  (function() {
-    let pTag = "";
-    let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
-    if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
-      pTag = "<p></p>"
-    }
-    var content = "<img data-hash='${image.encryptionInfo.hash}' style=" + "max-width:100% !important;" + "src=" + "${b64}" + ">" + pTag;
-    editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
-  })();
-`);
 };

@@ -41,6 +41,7 @@ import {
 } from '../../utils/Colors';
 import { db } from '../../utils/DB';
 import {
+  eOpenAttachmentsDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
   eOpenTagsDialog
@@ -532,6 +533,16 @@ export const ActionSheetComponent = ({
       }
     },
     {
+      name: 'Attachments',
+      title: 'Attachments',
+      icon: 'attachment',
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAttachmentsDialog,note);
+      }
+    },
+    {
       name: 'Export',
       title: 'Export',
       icon: 'export',
@@ -672,7 +683,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.sm - 1} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.sm - 1.5} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>

@@ -276,6 +276,11 @@ const ToolbarItem = ({
       return;
     }
 
+    if (format === 'filepicker') {
+      await execCommands.filepicker();
+      return;
+    }
+
     if (format === 'image') {
       await execCommands.image();
       return;

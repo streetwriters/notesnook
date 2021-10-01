@@ -69,6 +69,7 @@ const showActionSheet = (item, isTrash) => {
           'Publish',
           'Pin',
           'Favorite',
+          'Attachments',
           'Vault',
           'Delete',
           'RemoveTopic',
