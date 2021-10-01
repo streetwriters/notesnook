@@ -248,7 +248,52 @@ function setTheme() {
   width: 30px !important;
   z-index: 10000;
   opacity:0.5;
-}`;
+}
+
+span.attachment {
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+  user-select: none;
+  display: inline;
+  align-items: center;
+  background-color: ${pageTheme.colors.nav};
+  padding: 0px 5px 0px 22px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  font-size: 0.85rem;
+  cursor: pointer !important;
+  word-break: break-all;
+}
+
+span.attachment:not([data-progress])::after {
+  content: attr(data-size);
+  color: ${pageTheme.colors.icon};
+  margin-left: 5px;
+  font-size: 0.7rem;
+}
+
+span.attachment[data-progress]::after {
+  content: attr(data-progress);
+  color:${pageTheme.colors.icon};
+  margin-left: 5px;
+  font-size: 0.7rem;
+}
+
+span.attachment em::before {
+  content: "";
+  position: absolute;
+  width: 15px;
+  height: 15px;
+  left: 5px;
+  top: 1.5px;
+  background-color: ${pageTheme.colors.pri};
+  -webkit-mask-size: 15px 15px;
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' width='24'%3E%3Cpath d='M7.5,18A5.5,5.5 0 0,1 2,12.5A5.5,5.5 0 0,1 7.5,7H18A4,4 0 0,1 22,11A4,4 0 0,1 18,15H9.5A2.5,2.5 0 0,1 7,12.5A2.5,2.5 0 0,1 9.5,10H17V11.5H9.5A1,1 0 0,0 8.5,12.5A1,1 0 0,0 9.5,13.5H18A2.5,2.5 0 0,0 20.5,11A2.5,2.5 0 0,0 18,8.5H7.5A4,4 0 0,0 3.5,12.5A4,4 0 0,0 7.5,16.5H17V18H7.5Z'%3E%3C/path%3E%3C/svg%3E");
+  mask-size: 15px 15px;
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' width='24'%3E%3Cpath d='M7.5,18A5.5,5.5 0 0,1 2,12.5A5.5,5.5 0 0,1 7.5,7H18A4,4 0 0,1 22,11A4,4 0 0,1 18,15H9.5A2.5,2.5 0 0,1 7,12.5A2.5,2.5 0 0,1 9.5,10H17V11.5H9.5A1,1 0 0,0 8.5,12.5A1,1 0 0,0 9.5,13.5H18A2.5,2.5 0 0,0 20.5,11A2.5,2.5 0 0,0 18,8.5H7.5A4,4 0 0,0 3.5,12.5A4,4 0 0,0 7.5,16.5H17V18H7.5Z'%3E%3C/path%3E%3C/svg%3E");
+}
+`;
 
   let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
     'head'

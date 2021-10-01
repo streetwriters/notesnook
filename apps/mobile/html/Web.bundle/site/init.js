@@ -126,7 +126,7 @@ function init_tiny(size) {
     content_css: 'dist/skins/notesnook',
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace codeblock inlinecode keyboardquirks',
+      'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
       'media imagetools table paste wordcount autoresize directionality'
     ],
     toolbar: false,
@@ -134,6 +134,10 @@ function init_tiny(size) {
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
+    extended_valid_elements:`img[*|src=placeholder.svg]`,
+    invalid_styles:{
+      span:`--progress`
+    },
     content_style: `
     body: {
       font-family:"Open Sans";
