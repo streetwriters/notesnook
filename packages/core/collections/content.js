@@ -2,7 +2,6 @@ import Collection from "./collection";
 import getId from "../utils/id";
 import { getContentFromData } from "../content-types";
 import { hasItem } from "../utils/array";
-import { diffArrays } from "diff";
 
 export default class Content extends Collection {
   async add(content) {
@@ -84,22 +83,29 @@ export default class Content extends Collection {
       (data, type) => this._db.attachments.save(data, type)
     );
 
-    const diff = diffArrays(allAttachments, attachments, {
-      comparator: (left, right) => left.hash === right.metadata.hash,
+    const noteAttachments = allAttachments.filter((attachment) =>
+      hasItem(attachment.noteIds, contentItem.noteId)
+    );
+
+    const toDelete = noteAttachments.filter((attachment) => {
+      return attachments.every((a) => a.hash !== attachment.metadata.hash);
     });
 
-    for (const change of diff) {
-      for (let attachment of change.value) {
-        const exists = hasItem(attachment.noteIds, contentItem.noteId);
-        if (change.removed && exists) {
-          await this._db.attachments.delete(
-            attachment.metadata.hash,
-            contentItem.noteId
-          );
-        } else if ((!change.removed || change.added) && !exists) {
-          await this._db.attachments.add(attachment, contentItem.noteId);
-        }
-      }
+    const toAdd = attachments.filter((a) => {
+      return noteAttachments.every(
+        (attachment) => a.hash !== attachment.metadata.hash
+      );
+    });
+
+    for (let attachment of toDelete) {
+      await this._db.attachments.delete(
+        attachment.metadata.hash,
+        contentItem.noteId
+      );
+    }
+
+    for (let attachment of toAdd) {
+      await this._db.attachments.add(attachment, contentItem.noteId);
     }
 
     contentItem.data = data;

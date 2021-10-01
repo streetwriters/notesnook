@@ -25,7 +25,6 @@
   "dependencies": {
     "@stablelib/blake2s": "^1.0.1",
     "dayjs": "^1.10.6",
-    "diff": "^5.0.0",
     "fast-sort": "^2.0.1",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",
