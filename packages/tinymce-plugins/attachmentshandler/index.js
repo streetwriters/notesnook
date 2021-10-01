@@ -18,7 +18,12 @@ function register(editor) {
     element.setAttribute("src", src);
   });
 
-  editor.addCommand("mceUpdateAttachmentProgress", function (progressState) {
+  /**
+   * NOTE: we have to extend the editor interface directly
+   * because calling execCommand forces the editor to steal
+   * the focus. There is currently no way around that.
+   */
+  editor._updateAttachmentProgress = function (progressState) {
     const { hash, total, loaded } = progressState;
     const element = editor.dom.doc.querySelector(
       `span.attachment[data-hash="${hash}"]`
@@ -32,7 +37,7 @@ function register(editor) {
       element.setAttribute("data-progress", `${percent}%`);
       element.style.setProperty("--progress", `${percent}%`);
     }
-  });
+  };
 }
 
 function setupUI(editor) {
