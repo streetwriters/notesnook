@@ -712,6 +712,9 @@ const loadNoteInEditor = async (keepHistory = true) => {
       );
     } else {
       post('html', content.data);
+      if (id) {
+        db.attachments.download(id);
+      }
     }
 
     setColors();
