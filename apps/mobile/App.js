@@ -3,8 +3,8 @@ import React, {useEffect} from 'react';
 import Orientation from 'react-native-orientation';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 import SplashScreen from 'react-native-splash-screen';
-import {AppRootEvents} from './AppRootEvents';
-import {RootView} from './initializer.root';
+import {useAppEvents} from './src/utils/use-app-events';
+import {RootView} from './src/navigation/RootView';
 import AppLoader from './src/components/AppLoader';
 import {useTracked} from './src/provider';
 import {
@@ -107,6 +107,7 @@ checkOrientation();
 const App = () => {
   const [, dispatch] = useTracked();
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
+  const appEvents = useAppEvents();
 
   useEffect(() => {
     databaseHasLoaded = false;
@@ -147,7 +148,6 @@ const App = () => {
   return (
     <SafeAreaProvider>
       <RootView />
-      <AppRootEvents />
       <AppLoader onLoad={loadMainApp} />
     </SafeAreaProvider>
   );

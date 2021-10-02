@@ -6,7 +6,6 @@ import {enableScreens} from 'react-native-screens';
 import Notifications from './src/services/Notifications';
 import jsdom from 'jsdom-jscore-rn';
 global.HTMLParser = jsdom.html();
-
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
 
@@ -26,6 +25,6 @@ const AppProvider = () => {
 
 AppRegistry.registerComponent(appName, () => AppProvider);
 AppRegistry.registerComponent('NotesnookShare', () => {
-  NotesnookShare = require('./NotesnookShare').default;
+  NotesnookShare = require('./share/index').default;
   return NotesnookShare;
 });

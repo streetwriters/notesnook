@@ -19,11 +19,11 @@ import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
 import sanitize from 'sanitize-html';
 import validator from 'validator';
-import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
-import {db} from './src/utils/DB';
-import {SIZE} from './src/utils/SizeUtils';
-import Storage from './src/utils/storage';
-import {sleep} from './src/utils/TimeUtils';
+import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../src/utils/Colors';
+import {db} from '../src/utils/DB';
+import {SIZE} from '../src/utils/SizeUtils';
+import Storage from '../src/utils/storage';
+import {sleep} from '../src/utils/TimeUtils';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);

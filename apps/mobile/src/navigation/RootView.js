@@ -5,35 +5,35 @@ import {
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import Animated, {useValue} from 'react-native-reanimated';
-import {notesnook} from './e2e/test.ids';
-import ContextMenu from './src/components/ContextMenu';
-import CustomTabs from './src/components/CustomTabs';
-import {DialogManager} from './src/components/DialogManager';
-import {DummyText} from './src/components/DummyText';
-import {Menu} from './src/components/Menu';
-import {Toast} from './src/components/Toast';
-import {NavigatorStack} from './src/navigation/NavigatorStack';
-import {useTracked} from './src/provider';
-import {useSettingStore} from './src/provider/stores';
-import {DDS} from './src/services/DeviceDetection';
+import {notesnook} from '../../e2e/test.ids';
+import ContextMenu from '../components/ContextMenu';
+import CustomTabs from '../components/CustomTabs';
+import {DialogManager} from '../components/DialogManager';
+import {DummyText} from '../components/DummyText';
+import {Menu} from '../components/Menu';
+import {Toast} from '../components/Toast';
+import {NavigatorStack} from './NavigatorStack';
+import {useTracked} from '../provider';
+import {useSettingStore} from '../provider/stores';
+import {DDS} from '../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
-} from './src/services/EventManager';
-import {editing, setWidthHeight} from './src/utils';
-import {updateStatusBarColor} from './src/utils/Colors';
+} from '../services/EventManager';
+import {editing, setWidthHeight} from '../utils';
+import {updateStatusBarColor} from '../utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
-} from './src/utils/Events';
-import {editorRef, tabBarRef} from './src/utils/Refs';
-import {sleep} from './src/utils/TimeUtils';
-import {EditorWrapper} from './src/views/Editor/EditorWrapper';
-import {EditorWebView, getNote} from './src/views/Editor/Functions';
-import tiny from './src/views/Editor/tiny/tiny';
+} from '../utils/Events';
+import {editorRef, tabBarRef} from '../utils/Refs';
+import {sleep} from '../utils/TimeUtils';
+import {EditorWrapper} from '../views/Editor/EditorWrapper';
+import {EditorWebView, getNote} from '../views/Editor/Functions';
+import tiny from '../views/Editor/tiny/tiny';
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
