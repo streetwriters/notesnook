@@ -3,7 +3,7 @@ import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Platform } from 'react-native';
 import PushNotification, { Importance, PushNotificationDeliveredObject } from 'react-native-push-notification';
 import { eSendEvent } from './EventManager';
-import { db } from '../utils/DB';
+import { db } from '../utils/database';
 import { DDS } from './DeviceDetection';
 import { tabBarRef } from '../utils/Refs';
 import { eOnLoadNote } from '../utils/Events';

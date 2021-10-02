@@ -4,7 +4,7 @@ import {notesnook} from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';

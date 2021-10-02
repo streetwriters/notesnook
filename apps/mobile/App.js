@@ -23,7 +23,7 @@ import {
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
 import {Tracker} from './src/utils';
-import {db} from './src/utils/DB';
+import {db} from './src/utils/database';
 import {eDispatchAction} from './src/utils/Events';
 import {MMKV} from './src/utils/mmkv';
 

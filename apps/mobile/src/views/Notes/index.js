@@ -16,7 +16,7 @@ import {
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import {
   eOnLoadNote,
   eOpenAddTopicDialog,

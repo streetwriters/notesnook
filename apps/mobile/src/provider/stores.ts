@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
 import { history, SUBSCRIPTION_STATUS } from '../utils';
-import { db } from '../utils/DB';
+import { db } from '../utils/database';
 import { MMKV } from '../utils/mmkv';
 import {
   MenuStore,

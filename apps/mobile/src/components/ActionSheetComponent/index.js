@@ -39,7 +39,7 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import {
   eOpenAttachmentsDialog,
   eOpenMoveNoteDialog,

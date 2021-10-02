@@ -2,7 +2,7 @@ import {useCallback, useEffect, useState} from 'react';
 import {Platform} from 'react-native';
 import {SUBSCRIPTION_STATUS} from '.';
 import PremiumService from '../services/PremiumService';
-import {db} from './DB';
+import {db} from './database';
 import {MMKV} from './mmkv';
 
 var CACHED_ANNOUNCEMENT;

@@ -6,7 +6,7 @@ import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,

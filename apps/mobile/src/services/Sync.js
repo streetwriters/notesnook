@@ -1,7 +1,7 @@
 import NetInfo from '@react-native-community/netinfo';
 import { initialize, useUserStore } from '../provider/stores';
 import { doInBackground } from '../utils';
-import { db } from '../utils/DB';
+import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
 import { ToastEvent } from './EventManager';
 

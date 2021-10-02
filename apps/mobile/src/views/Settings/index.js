@@ -69,7 +69,7 @@ import {
   setColorScheme
 } from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,

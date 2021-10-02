@@ -7,7 +7,7 @@ import {useSettingStore} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';

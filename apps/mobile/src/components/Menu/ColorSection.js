@@ -9,7 +9,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {presentDialog} from '../Dialog/functions';

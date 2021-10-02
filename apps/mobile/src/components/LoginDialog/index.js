@@ -22,7 +22,7 @@ import {
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,

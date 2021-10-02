@@ -13,7 +13,7 @@ import {
   ToastEvent,
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eClosePublishNoteDialog,
   eOpenPublishNoteDialog,

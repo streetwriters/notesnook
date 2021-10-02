@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
 import { normalize, SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';

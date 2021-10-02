@@ -10,7 +10,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent,
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
 import {sanitizeFilename} from '../../utils/filename';
 import {SIZE} from '../../utils/SizeUtils';

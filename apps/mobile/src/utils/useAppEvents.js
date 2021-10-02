@@ -30,7 +30,7 @@ import SettingsService from '../services/SettingsService';
 import Sync from '../services/Sync';
 import {APP_VERSION, doInBackground, editing} from '.';
 import {updateStatusBarColor} from './Colors';
-import {db} from './DB';
+import {db} from './database';
 import {
   eClearEditor,
   eCloseProgressDialog,

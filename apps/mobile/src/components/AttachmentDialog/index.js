@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eCloseAttachmentDialog,
   eCloseTagsDialog,

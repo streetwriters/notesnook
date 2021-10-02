@@ -15,7 +15,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import diff from '../../utils/differ';
 import {
   eApplyChanges,

@@ -13,7 +13,7 @@ import PremiumService from '../../services/PremiumService';
 import {editing, InteractionManager} from '../../utils';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eOnLoadNote,
   eShowGetPremium,

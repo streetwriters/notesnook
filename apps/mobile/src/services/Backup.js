@@ -1,6 +1,6 @@
 const {MMKV} = require('../utils/MMKV');
 import storage from '../utils/storage';
-import {db} from '../utils/DB';
+import {db} from '../utils/database';
 import {eSendEvent, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';

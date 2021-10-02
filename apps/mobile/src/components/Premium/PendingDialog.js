@@ -1,7 +1,7 @@
 import React, { createRef } from 'react';
 import { View } from 'react-native';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eClosePendingDialog, eOpenPendingDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';

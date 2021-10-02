@@ -6,7 +6,7 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { history } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eOnLoadNote, eShowMergeDialog } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { presentDialog } from '../Dialog/functions';

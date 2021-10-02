@@ -6,7 +6,7 @@ import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';

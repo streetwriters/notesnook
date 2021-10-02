@@ -11,7 +11,7 @@ import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eClearEditor, eOnLoadNote, eScrollEvent } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { sleep } from '../../utils/TimeUtils';

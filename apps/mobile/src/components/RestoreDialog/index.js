@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';

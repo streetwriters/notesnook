@@ -10,7 +10,7 @@ import {
 import SettingsService from '../../services/SettingsService';
 import {GROUP, SORT} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eOpenJumpToDialog, eOpenSortDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';

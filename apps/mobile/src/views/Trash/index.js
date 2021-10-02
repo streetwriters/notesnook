@@ -11,7 +11,7 @@ import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {

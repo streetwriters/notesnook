@@ -21,7 +21,7 @@ import {
 } from '../../services/EventManager';
 import {editing} from '../../utils';
 import {COLOR_SCHEME_DARK} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,

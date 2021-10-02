@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';

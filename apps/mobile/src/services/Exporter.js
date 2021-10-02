@@ -1,5 +1,5 @@
 import {Platform} from 'react-native';
-import {db} from '../utils/DB';
+import {db} from '../utils/database';
 import {ToastEvent} from './EventManager';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import Storage from '../utils/storage';

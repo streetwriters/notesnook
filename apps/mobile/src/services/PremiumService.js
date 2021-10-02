@@ -3,7 +3,7 @@ import * as RNIap from 'react-native-iap';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
-import {db} from '../utils/DB';
+import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,

@@ -14,7 +14,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getTotalNotes} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';

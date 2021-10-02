@@ -2,7 +2,7 @@ import DocumentPicker from 'react-native-document-picker';
 import Sodium, {launchCamera, launchImageLibrary} from 'react-native-sodium';
 import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
-import {db} from '../../../../utils/DB';
+import {db} from '../../../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenProgressDialog

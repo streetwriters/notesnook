@@ -20,7 +20,7 @@ import ShareExtension from 'rn-extensions-share';
 import sanitize from 'sanitize-html';
 import validator from 'validator';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../src/utils/Colors';
-import {db} from '../src/utils/DB';
+import {db} from '../src/utils/database';
 import {SIZE} from '../src/utils/SizeUtils';
 import Storage from '../src/utils/storage';
 import {sleep} from '../src/utils/TimeUtils';

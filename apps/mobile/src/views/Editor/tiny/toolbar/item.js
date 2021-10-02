@@ -14,7 +14,7 @@ import {
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
-import {db} from '../../../../utils/DB';
+import {db} from '../../../../utils/database';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {MMKV} from '../../../../utils/mmkv';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
