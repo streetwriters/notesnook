@@ -95,6 +95,11 @@ export default class Attachments extends Collection {
     );
   }
 
+  exists(hash) {
+    const attachment = this.all.find((a) => a.metadata.hash === hash);
+    return !!attachment;
+  }
+
   async read(hash) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
