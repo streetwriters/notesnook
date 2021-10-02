@@ -147,7 +147,7 @@ export default class Attachments extends Collection {
       const isDownloaded = await this._db.fs.downloadFile(noteId, hash);
       if (!isDownloaded) continue;
 
-      const attachment = await this.get(hash);
+      const attachment = await this.read(hash);
       if (!attachment) continue;
 
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
