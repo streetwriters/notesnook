@@ -13,9 +13,13 @@ function register(editor) {
 
   editor.addCommand("mceReplaceImage", function (image) {
     const { hash, src } = image;
-    const element = editor.dom.doc.querySelector(`img[data-hash="${hash}"]`);
-    if (!element || !src || !hash) return;
-    element.setAttribute("src", src);
+    const elements = editor.dom.doc.querySelectorAll(
+      `img[data-hash="${hash}"]`
+    );
+    if (!elements || !elements.length || !src) return;
+    for (let element of elements) {
+      element.setAttribute("src", src);
+    }
   });
 
   /**
@@ -25,17 +29,19 @@ function register(editor) {
    */
   editor._updateAttachmentProgress = function (progressState) {
     const { hash, total, loaded } = progressState;
-    const element = editor.dom.doc.querySelector(
+    const elements = editor.dom.doc.querySelectorAll(
       `span.attachment[data-hash="${hash}"]`
     );
-    if (!element || !total || !loaded) return;
-    if (total === loaded) {
-      element.removeAttribute("data-progress");
-      element.style.removeProperty("--progress");
-    } else {
-      const percent = Math.round((loaded / total) * 100);
-      element.setAttribute("data-progress", `${percent}%`);
-      element.style.setProperty("--progress", `${percent}%`);
+    if (!elements || !elements.length || !total || !loaded) return;
+    for (let element of elements) {
+      if (total === loaded) {
+        element.removeAttribute("data-progress");
+        element.style.removeProperty("--progress");
+      } else {
+        const percent = Math.round((loaded / total) * 100);
+        element.setAttribute("data-progress", `${percent}%`);
+        element.style.setProperty("--progress", `${percent}%`);
+      }
     }
   };
 }
