@@ -170,7 +170,7 @@ function Editor({ noteId, nonce }) {
           </Suspense>
         </Animated.Flex>
       </Flex>
-      <Properties />
+      <Properties noteId={noteId} />
     </Flex>
   );
 }

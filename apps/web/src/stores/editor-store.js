@@ -30,6 +30,7 @@ const getDefaultSession = () => {
     color: undefined,
     dateEdited: 0,
     totalWords: 0,
+    attachments: [],
     content: {
       type: "tiny",
       data: "",
@@ -102,6 +103,7 @@ class EditorStore extends BaseStore {
         content: content || defaultSession.content,
         totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
+        attachments: db.attachments.get(note.id) || [],
       };
     });
     appStore.setIsEditorOpen(true);
@@ -146,6 +148,7 @@ class EditorStore extends BaseStore {
           state.session.title = note.title;
           state.session.isSaving = false;
           state.session.notebooks = note.notebooks;
+          state.session.attachments = db.attachments.get(note.id) || [];
         });
 
         noteStore.refresh();

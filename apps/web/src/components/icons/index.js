@@ -58,7 +58,7 @@ export const Plus = createIcon(Icons.mdiPlus);
 export const Note = createIcon(Icons.mdiHomeVariantOutline);
 export const Minus = createIcon(Icons.mdiMinus);
 export const Notebook = createIcon(Icons.mdiBookOutline);
-export const Notebook2 = createIcon(Icons.mdiBookOutline);
+export const Notebook2 = createIcon(Icons.mdiNotebookOutline);
 export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
 export const ArrowRight = createIcon(Icons.mdiArrowRight);
 export const ArrowDown = createIcon(Icons.mdiArrowDown);
@@ -128,8 +128,8 @@ export const Error = createIcon(Icons.mdiAlertCircle);
 export const Warn = createIcon(Icons.mdiAlert);
 export const Info = createIcon(Icons.mdiInformation);
 
-export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOff);
-export const ToggleChecked = createIcon(Icons.mdiToggleSwitch);
+export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOffOutline);
+export const ToggleChecked = createIcon(Icons.mdiToggleSwitchOutline);
 
 export const Backup = createIcon(Icons.mdiBackupRestore);
 export const Buy = createIcon(Icons.mdiCurrencyUsdCircleOutline);
@@ -179,3 +179,6 @@ export const Twitter = createIcon(Icons.mdiTwitter);
 export const Reddit = createIcon(Icons.mdiReddit);
 
 export const Dismiss = createIcon(Icons.mdiClose);
+
+export const File = createIcon(Icons.mdiFileOutline);
+export const Download = createIcon(Icons.mdiArrowDown);
