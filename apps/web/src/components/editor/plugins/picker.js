@@ -33,25 +33,33 @@ async function insertFile(editor) {
 })();
 
 async function pickFile() {
+  const key = await getEncryptionKey();
+
   const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
   if (!selectedFile) return;
 
-  const key = await getEncryptionKey();
   const buffer = await selectedFile.arrayBuffer();
-  const output = await fs.writeEncrypted(null, {
-    data: new Uint8Array(buffer),
-    type: "buffer",
-    key,
-  });
+  const { hash, type: hashType } = await fs.hashBuffer(buffer);
+
+  const output = db.attachments.exists(hash)
+    ? {}
+    : await fs.writeEncrypted(null, {
+        data: new Uint8Array(buffer),
+        type: "buffer",
+        key,
+        hash,
+      });
 
   await db.attachments.add({
     ...output,
+    hash,
+    hashType,
     filename: selectedFile.name,
     type: selectedFile.type,
   });
 
   return {
-    hash: output.hash,
+    hash,
     filename: selectedFile.name,
     type: selectedFile.type,
     size: selectedFile.size,
@@ -59,26 +67,33 @@ async function pickFile() {
 }
 
 async function pickImage() {
+  const key = await getEncryptionKey();
+
   const selectedImage = await showFilePicker({ acceptedFileTypes: "image/*" });
   if (!selectedImage) return;
 
   const { dataurl, buffer } = await compressImage(selectedImage, "buffer");
-  const key = await getEncryptionKey();
+  const { hash, type: hashType } = await fs.hashBuffer(buffer);
 
-  const output = await fs.writeEncrypted(null, {
-    data: new Uint8Array(buffer),
-    type: "buffer",
-    key,
-  });
+  const output = db.attachments.exists(hash)
+    ? {}
+    : await fs.writeEncrypted(null, {
+        data: new Uint8Array(buffer),
+        type: "buffer",
+        key,
+        hash,
+      });
 
   await db.attachments.add({
     ...output,
+    hash,
+    hashType,
     filename: selectedImage.name,
     type: selectedImage.type,
   });
 
   return {
-    hash: output.hash,
+    hash,
     filename: selectedImage.name,
     type: selectedImage.type,
     size: selectedImage.size,
@@ -87,6 +102,7 @@ async function pickImage() {
 }
 
 async function getEncryptionKey() {
+  return { password: "helloworld" };
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
   return key; // { password: "helloworld" };

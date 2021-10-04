@@ -24,14 +24,12 @@ fs.hasItem = async function (key) {
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncrypted(filename, { data, type, key }) {
-  const saveAsBuffer = localforage.supports(localforage.INDEXEDDB);
-
-  if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
-  const { hash, type: hashType } = await hashBuffer(data);
+async function writeEncrypted(filename, { data, type, key, hash }) {
   if (!filename) filename = hash;
+  if (await fs.hasItem(filename)) return {};
 
-  if (await fs.hasItem(filename)) return { hash, hashType };
+  const saveAsBuffer = localforage.supports(localforage.INDEXEDDB);
+  if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
 
   const output = saveAsBuffer
     ? await crypto.encryptBinary(key, data, "buffer")
@@ -39,8 +37,6 @@ async function writeEncrypted(filename, { data, type, key }) {
 
   await fs.setItem(filename, output.cipher);
   return {
-    hash,
-    hashType,
     iv: output.iv,
     length: output.length,
     salt: output.salt,
@@ -48,6 +44,11 @@ async function writeEncrypted(filename, { data, type, key }) {
   };
 }
 
+/**
+ *
+ * @param {import("hash-wasm/dist/lib/util").IDataType} data
+ * @returns
+ */
 async function hashBuffer(data) {
   return {
     hash: await xxhash3(data),
@@ -154,6 +155,7 @@ const FS = {
   downloadFile: cancellable(downloadFile),
   deleteFile,
   exists,
+  hashBuffer,
 };
 export default FS;
 
@@ -162,8 +164,8 @@ function isSuccessStatusCode(statusCode) {
 }
 
 function cancellable(operation) {
-  const source = axios.CancelToken.source();
   return function (filename, requestOptions) {
+    const source = axios.CancelToken.source();
     requestOptions.cancellationToken = source.token;
     return {
       execute: () => operation(filename, requestOptions),
