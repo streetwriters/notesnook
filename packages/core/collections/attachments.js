@@ -119,7 +119,9 @@ export default class Attachments extends Collection {
   }
 
   attachment(hashOrId) {
-    return this.all.find((a) => a.id === hashOrId || a.hash === hashOrId);
+    return this.all.find(
+      (a) => a.id === hashOrId || a.metadata.hash === hashOrId
+    );
   }
 
   markAsUploaded(id) {
