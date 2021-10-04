@@ -67,8 +67,8 @@ const routes = {
     return {
       key: "notes",
       type: "notes",
-      title: notebook.title,
-      subtitle: topic.title,
+      title: topic.title,
+      subtitle: notebook.title,
       component: <Notes />,
       buttons: {
         back: {
