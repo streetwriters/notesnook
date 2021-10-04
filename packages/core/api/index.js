@@ -191,6 +191,7 @@ class Database {
   }
 
   sync(full = true, force = false) {
+    clearTimeout(this._syncTimeout);
     return this.syncer.start(full, force);
   }
 
