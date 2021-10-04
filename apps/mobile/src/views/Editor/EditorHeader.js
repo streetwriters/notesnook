@@ -241,6 +241,7 @@ const EditorHeader = () => {
   };
 
   const _onHardwareBackPress = async () => {
+    db.fs.cancel(getNote()?.id);
     if (editing.currentlyEditing) {
       await _onBackPress();
       return true;
