@@ -118,8 +118,8 @@ export default class Attachments extends Collection {
     return { data, ...attachment };
   }
 
-  async attachment(id) {
-    return this.all.find((a) => a.id === id);
+  attachment(hashOrId) {
+    return this.all.find((a) => a.id === hashOrId || a.hash === hashOrId);
   }
 
   markAsUploaded(id) {
