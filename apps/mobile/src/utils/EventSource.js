@@ -8,6 +8,8 @@ export default class EventSource {
     this.url = url;
     this.options = options;
     this.connect();
+    this.open;
+    this.message;
   }
 
   connect() {
@@ -17,14 +19,16 @@ export default class EventSource {
 
   close() {
     NativeEventSource.close();
+    this.open?.remove();
+    this.message?.remove();
   }
 
   registerEvents() {
-    EventEmitter.addListener('open', () => {
+    this.open = EventEmitter.addListener('open', () => {
       this.onopen();
     });
 
-    EventEmitter.addListener("message", (ev) => {
+   this.message = EventEmitter.addListener("message", (ev) => {
       const {message} = ev;
       const eventData = {data: message};
       this.onmessage(eventData);
