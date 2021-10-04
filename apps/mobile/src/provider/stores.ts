@@ -161,29 +161,28 @@ interface AttachmentStore {
       success: boolean
     }
   },
+  remove:(hash:string) => void
   setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download", success) => void
 }
 
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
+  remove:(hash) => {
+    let _p = get().progress;
+    _p[hash] = null
+    set({ progress: { ..._p } });
+  },
   setProgress: (sent, total, hash, recieved, type, success) => {
     let _p = get().progress;
-    if (typeof success !== "boolean") {
-      _p[hash] = { sent, total, hash, recieved, type, success };
-    } else {
-      _p[hash] = null;
-    }
-    
+    _p[hash] = { sent, total, hash, recieved, type, success };
     let progress = { total, hash, loaded: type === "download" ? recieved : sent };
     tiny.call(EditorWebView, `
     (function() {
       let progress = ${JSON.stringify(progress)}
       tinymce.activeEditor.execCommand("mceUpdateAttachmentProgress",progress);
     })()`);
-    console.log(_p);
     set({ progress: { ..._p } });
   },
-
 }));
 
 let { width, height } = Dimensions.get('window');
