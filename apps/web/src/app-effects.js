@@ -87,7 +87,9 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
           type === "download"
             ? "downloadingAttachments"
             : "uploadingAttachments";
-        const { status } = store.get().processingStatuses[key];
+        const processingStatus = store.get().processingStatuses[key];
+        if (!processingStatus) return;
+        const { status } = processingStatus;
         const percent = Math.round((loaded / total) * 100);
 
         if (loaded === total) setProcessingStatus(key, status, 100);
