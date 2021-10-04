@@ -91,8 +91,9 @@ async function insertImage(editor, image) {
         src="${image.dataurl}"
         data-size="${image.size}"
         style="float: left;"/>
-    <p><br></p>`;
+    `;
   editor.insertContent(content);
+  editor.execCommand("mceInsertNewLine");
 }
 
 async function insertFile(editor, file) {
