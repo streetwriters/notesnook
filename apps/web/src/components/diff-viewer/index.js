@@ -110,12 +110,15 @@ function DiffViewer(props) {
       notesStore.setSelectedNote(noteId);
       note = note.data;
 
-      const content = await db.content.raw(note.contentId);
+      const content = await db.content.raw(note.contentId, true);
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
           dateEdited: content.dateEdited,
         });
+      content.conflicted = await db.content.insertAttachments(
+        content.conflicted
+      );
 
       setConflictedNote(note);
       setLocalContent({ ...content, conflicted: false });
