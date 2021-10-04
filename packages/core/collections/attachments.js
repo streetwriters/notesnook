@@ -57,6 +57,19 @@ export default class Attachments extends Collection {
 
     const { iv, salt, length, alg, hash, hashType, filename, type } =
       attachment;
+
+    if (
+      !iv ||
+      !salt ||
+      !length ||
+      !alg ||
+      !hash ||
+      !hashType ||
+      !filename ||
+      !type
+    )
+      throw new Error("Could not add attachment: all properties are required.");
+
     const attachmentItem = {
       id: id(),
       noteIds: noteId ? [noteId] : [],
