@@ -154,10 +154,8 @@ function TinyMCE(props) {
     const event = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       (progressState) => {
-        tinymceRef.current.editor.execCommand(
-          "mceUpdateAttachmentProgress",
-          progressState
-        );
+        if (!tinymceRef.current.editor._updateAttachmentProgress) return;
+        tinymceRef.current.editor._updateAttachmentProgress(progressState);
       }
     );
 
@@ -180,6 +178,7 @@ function TinyMCE(props) {
       onFocus={onFocus}
       onInit={(args, editor) => {
         editor.serializer.addTempAttr("data-progress");
+        clearTimeout(editor.changeTimeout);
         onInit(args, editor);
       }}
       initialValue={initialValue}
@@ -237,8 +236,8 @@ function TinyMCE(props) {
           span: "--progress",
         },
         extended_valid_elements: `img[*|src=placeholder.svg]`,
-        attachmenthandler_download_attachment: (hash) => {
-          console.log(hash);
+        attachmenthandler_download_attachment: async (hash) => {
+          console.error("Not implemented.");
         },
       }}
       onBeforeExecCommand={async (command) => {
