@@ -21,6 +21,7 @@ import http from "../utils/http";
 import Monographs from "./monographs";
 import Offers from "./offers";
 import Attachments from "../collections/attachments";
+import Debug from "./debug";
 
 /**
  * @type {EventSource}
@@ -51,7 +52,8 @@ class Database {
   async init() {
     EV.subscribeMulti(
       [EVENTS.userLoggedIn, EVENTS.userFetched, EVENTS.tokenRefreshed],
-      this.connectSSE.bind(this)
+      this.connectSSE,
+      this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
       console.log("deleted:", attachment);
@@ -81,6 +83,7 @@ class Database {
     this.outbox = new Outbox(this);
     this.monographs = new Monographs(this);
     this.offers = new Offers();
+    this.debug = new Debug();
 
     // collections
     /** @type {Notes} */
