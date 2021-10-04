@@ -82,37 +82,17 @@ export const execCommands = {
 
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   filepicker: async () => {
-    let key = {password: 'helloworld'}; // await db.user.getEncryptionKey();
-
-    if (!key) return;
-    let file = await DocumentPicker.pick();
-    let encryptionInfo = await Sodium.encryptFile(key, {
-      uri: file.uri,
-      type: 'url'
-    });
-
-    let attachment = {
-      iv: encryptionInfo.iv,
-      salt: encryptionInfo.salt,
-      length: encryptionInfo.length,
-      alg: `xcha-argon2i13`,
-      hash: encryptionInfo.hash,
-      hashType: encryptionInfo.hashType,
-      type: file.type,
-      filename: file.name,
-      size: encryptionInfo.length
-    };
     try {
-      await db.attachments.add(attachment, getNote()?.id);
-    } catch (e) {
-      console.log('attachment error: ', e);
-      return;
-    }
-    console.log('adding to editor')
-
-    tiny.call(
-      EditorWebView,
-      `
+      let file = await DocumentPicker.pick();
+      let hash = await Sodium.hashFile({
+        uri: file.uri,
+        type: 'url'
+      });
+      let result = await attachFile(file.uri, hash, file.type, file.name);
+      if (!result) return;
+      tiny.call(
+        EditorWebView,
+        `
     (function() {
       let file = ${JSON.stringify(attachment)}
       tinymce.activeEditor.execCommand('mceAttachFile',file);
@@ -121,7 +101,10 @@ export const execCommands = {
       },100)
     })();
     `
-    );
+      );
+    } catch (e) {
+      console.log('filepicker: ', e);
+    }
   },
   image: async () => {
     if (editing.isFocused) {
@@ -136,8 +119,7 @@ export const execCommands = {
         {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
-            await sleep(500);
-            let key = {password: 'helloworld'};
+            await sleep(400);
             launchCamera(
               {
                 includeBase64: true,
@@ -145,7 +127,7 @@ export const execCommands = {
                 maxHeight: 2000,
                 quality: 0.8,
                 mediaType: 'photo',
-                encryptToFile: true,
+                encryptToFile: false,
                 ...key
               },
               handleImageResponse
@@ -157,8 +139,7 @@ export const execCommands = {
         {
           action: async () => {
             eSendEvent(eCloseProgressDialog);
-            await sleep(300);
-            let key = {password: 'helloworld'};
+            await sleep(400);
             launchImageLibrary(
               {
                 includeBase64: true,
@@ -166,7 +147,7 @@ export const execCommands = {
                 maxHeight: 2000,
                 quality: 0.8,
                 mediaType: 'photo',
-                encryptToFile: true,
+                encryptToFile: false,
                 ...key
               },
               handleImageResponse
@@ -373,23 +354,21 @@ const handleImageResponse = async response => {
 
   let image = response.assets[0];
   let b64 = `data:${image.type};base64, ` + image.base64;
-  let imageinfo = {
-    iv: image.encryptionInfo.iv,
-    salt: image.encryptionInfo.salt,
-    length: image.encryptionInfo.length,
-    alg: `xcha-argon2i13`,
-    hash: image.encryptionInfo.hash,
-    hashType: image.encryptionInfo.hashType,
-    type: image.type,
-    filename: image.fileName
-  };
-  await db.attachments.add(imageinfo, getNote()?.id);
-  imageinfo.dataurl = b64;
+  let hash = await Sodium.hashFile({
+    uri: image.uri,
+    type: 'url'
+  });
+  console.log('hash: ',hash);
   tiny.call(
     EditorWebView,
     `
     (function(){
-      let image = ${JSON.stringify(imageinfo)}
+      let image = ${JSON.stringify({
+        hash: hash,
+        type: image.type,
+        filename: image.fileName,
+        dataurl: b64
+      })}
       tinymce.activeEditor.execCommand('mceAttachImage',image);
       setTimeout(function() {
         tinymce.activeEditor.nodeChanged({selectionChange:true})
@@ -397,4 +376,31 @@ const handleImageResponse = async response => {
     })();
     `
   );
+  attachFile(image.uri, hash, image.type, image.fileName);
 };
+
+async function attachFile(uri, hash, type, filename) {
+  try {
+    let exists = db.attachments.exists(hash);
+    let encryptionInfo;
+    if (!exists) {
+      let key = await db.user.getEncryptionKey();
+      encryptionInfo = await Sodium.encryptFile(key, {
+        uri: uri,
+        type: 'url',
+        hash: hash
+      });
+      encryptionInfo.type = type;
+      encryptionInfo.filename = filename;
+      encryptionInfo.alg = `xcha-argon2i13`;
+      encryptionInfo.size = encryptionInfo.length;
+    } else {
+      encryptionInfo = {hash: hash};
+    }
+    await db.attachments.add(encryptionInfo, getNote()?.id);
+    return true;
+  } catch (e) {
+    console.log('attach file error: ', uri, hash, type, filename);
+    return false;
+  }
+}
