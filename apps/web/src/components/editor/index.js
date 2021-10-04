@@ -63,6 +63,7 @@ function Editor({ noteId, nonce }) {
       } = editorstore.get().session;
       const editor = editorRef.current?.editor;
       if (!editor) return;
+      clearTimeout(editor.changeTimeout);
       async function setContents() {
         // NOTE: workaround to not fire onEditorChange event on content load
         editor.isLoading = true;
@@ -158,7 +159,7 @@ function Editor({ noteId, nonce }) {
                       };
                     });
                   }}
-                  changeInterval={500}
+                  changeInterval={100}
                   onWordCountChanged={updateWordCount}
                   onInit={async () => {
                     await startSession(noteId);
