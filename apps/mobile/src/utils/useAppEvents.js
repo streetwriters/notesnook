@@ -64,12 +64,12 @@ export const useAppEvents = () => {
   });
 
   const onMediaDownloaded = ({hash, src}) => {
-    console.log('on media download: ', hash, src);
+    console.log('on media download: ', hash);
     tiny.call(
       EditorWebView,
       `
         (function(){
-          let image = JSON.parse("${JSON.stringify({hash, src})}");
+          let image = ${JSON.stringify({hash, src})};
           tinymce.activeEditor.execCommand("mceReplaceImage",image);
         })();
         `

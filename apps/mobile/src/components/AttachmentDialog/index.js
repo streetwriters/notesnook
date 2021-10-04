@@ -133,20 +133,9 @@ function formatBytes(bytes, decimals = 2) {
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
-let icons = {
-  image: 'image',
-  file: 'file',
-  pdf: 'file-pdf-box',
-  video: 'file-video-outline',
-  audio: 'file-music-outline'
-};
-
-function getIcon(type) {
-  let types = type.split('/');
-  let icon = Object.keys(icons).find(
-    i => i.includes(types[0]) || i.includes(types[1])
-  );
-  return icons[icon] || 'file';
+function getFileExtension(filename) {
+  var ext = /^.+\.([^.]+)$/.exec(filename);
+  return ext == null ? '' : ext[1];
 }
 
 const Attachment = ({attachment, note, setNote}) => {
@@ -154,66 +143,70 @@ const Attachment = ({attachment, note, setNote}) => {
   const colors = state.colors;
   const progress = useAttachmentStore(state => state.progress);
   const setProgress = useAttachmentStore(state => state.setProgress);
+  const [currentProgress, setCurrentProgress] = useState(null);
 
-
-  const onPress = async attachment => {
-    if (getProgress()) {
+  const onPress = async () => {
+    if (currentProgress) {
       db.fs.cancel(attachment.metadata.hash, 'download');
-      setProgress(0, 0, attachment.metadata.hash, 0, 'download', false);
+      useAttachmentStore.getState().remove(attachment.metadata.hash);
       return;
     }
 
     let folder = {};
     if (Platform.OS === 'android') {
-      let uris = await ScopedStorage.getPersistedUriPermissions();
-      if (uris.length === 0) {
-        folder = await ScopedStorage.openDocumentTree();
-      } else {
-        folder = {
-          uri: uris[0]
-        };
-      }
+      folder = await ScopedStorage.openDocumentTree(false);
+      if (!folder) return;
     } else {
       folder.uri = await Storage.checkAndCreateDir('/Downloads/');
     }
 
     try {
+      setCurrentProgress({
+        value: 0,
+        percent: '0%'
+      });
       await db.fs.downloadFile(
         attachment.metadata.hash,
         attachment.metadata.hash
       );
-      db.attachments;
       let key = await db.user.getEncryptionKey();
-      await Sodium.decryptFile(key, {
+      let info = {
         iv: attachment.iv,
         salt: attachment.salt,
         length: attachment.length,
         alg: attachment.alg,
-        hash: attachment.hash,
-        hashType: attachment.hashType,
+        hash: attachment.metadata.hash,
+        hashType: attachment.metadata.hashType,
         mime: attachment.metadata.type,
         fileName: attachment.metadata.filename,
         uri: folder.uri
+      };
+      await Sodium.decryptFile(key, info, false);
+      ToastEvent.show({
+        heading: 'Download successful',
+        message: attachment.metadata.filename + 'downloaded',
+        type: 'success',
+        context: 'local'
       });
     } catch (e) {
-      setProgress(0, 0, attachment.metadata.hash, 0, 'download', false);
+      console.log('download attachment error: ', e);
+      useAttachmentStore.getState().remove(attachment.metadata.hash);
     }
   };
-
-  const getProgress = attachment => {
+  useEffect(() => {
     let prog = progress[attachment.metadata.hash];
     if (prog && prog.type === 'download') {
       prog = prog.recieved / prog.total;
       prog = (prog * 100).toFixed(0);
-
-      return {
+      console.log('progress: ', prog);
+      setCurrentProgress({
         value: prog,
         percent: prog + '%'
-      };
+      });
     } else {
-      return null;
+      setCurrentProgress(null);
     }
-  };
+  }, [progress]);
 
   return (
     <View
@@ -233,11 +226,25 @@ const Attachment = ({attachment, note, setNote}) => {
           flexDirection: 'row',
           alignItems: 'center'
         }}>
-        <Icon
-          name={getIcon(attachment.metadata.type)}
-          size={SIZE.lg}
-          color={colors.pri}
-        />
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginLeft: -5
+          }}>
+          <Icon name="file" size={SIZE.xxxl} color={colors.icon} />
+
+          <Paragraph
+            adjustsFontSizeToFit
+            size={6}
+            color={colors.light}
+            style={{
+              position: 'absolute'
+            }}>
+            {getFileExtension(attachment.metadata.filename).toUpperCase()}
+          </Paragraph>
+        </View>
+
         <View
           style={{
             flexShrink: 1,
@@ -261,7 +268,7 @@ const Attachment = ({attachment, note, setNote}) => {
         </View>
       </View>
 
-      {getProgress(attachment) ? (
+      {currentProgress ? (
         <View
           style={{
             justifyContent: 'center',
@@ -269,7 +276,7 @@ const Attachment = ({attachment, note, setNote}) => {
           }}>
           <Progress.Circle
             size={SIZE.xxl}
-            progress={getProgress(attachment).value / 100}
+            progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
             showsText
             textStyle={{
               fontSize: 9
