@@ -54,7 +54,7 @@ class Tiny {
     return tokens.some((token) => lowercase.indexOf(token) > -1);
   }
 
-  async insertAttachments(get) {
+  async insertMedia(getData) {
     if (!("HTMLParser" in global)) return;
 
     let doc = HTMLParser.createElement("div");
@@ -67,16 +67,12 @@ class Tiny {
         case "IMG": {
           const hash = getDatasetAttribute(attachment, "hash");
 
-          const attachmentItem = await get(hash);
-          if (!attachmentItem) continue;
-
-          attachment.setAttribute(
-            "src",
-            dataurl.fromObject({
-              data: attachmentItem.data,
-              type: attachmentItem.metadata.type,
-            })
-          );
+          const src = await getData(hash, {
+            total: attachmentElements.length,
+            current: i,
+          });
+          if (!src) continue;
+          attachment.setAttribute("src", src);
           break;
         }
       }

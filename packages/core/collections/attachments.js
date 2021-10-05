@@ -102,8 +102,20 @@ export default class Attachments extends Collection {
     return await this._collection.updateItem(attachment);
   }
 
-  get(noteId) {
-    return this.file.filter((attachment) =>
+  /**
+   * Get specified type of attachments of a note
+   * @param {string} noteId
+   * @param {"files"|"images"|"all"} type
+   * @returns
+   */
+  ofNote(noteId, type) {
+    let attachments = [];
+
+    if (type === "files") attachments = this.files;
+    else if (type === "images") attachments = this.images;
+    else if (type === "all") attachments = this.all;
+
+    return attachments.filter((attachment) =>
       hasItem(attachment.noteIds, noteId)
     );
   }
@@ -113,6 +125,10 @@ export default class Attachments extends Collection {
     return !!attachment;
   }
 
+  /**
+   * @param {string} hash
+   * @returns {Promise<string>} dataurl formatted string
+   */
   async read(hash) {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
@@ -128,7 +144,7 @@ export default class Attachments extends Collection {
         outputType: "base64",
       }
     );
-    return { data, ...attachment };
+    return dataurl.fromObject({ type: attachment.metadata.type, data });
   }
 
   attachment(hashOrId) {
@@ -154,35 +170,40 @@ export default class Attachments extends Collection {
     );
   }
 
-  async download(noteId) {
-    const attachments = this.media.filter((attachment) =>
+  async downloadImages(noteId) {
+    const attachments = this.images.filter((attachment) =>
       hasItem(attachment.noteIds, noteId)
     );
     console.log("Downloading attachments", attachments);
     for (let i = 0; i < attachments.length; i++) {
-      sendAttachmentsProgressEvent("download", attachments.length, i);
-
       const { hash } = attachments[i].metadata;
+      await this._downloadMedia(hash, {
+        total: attachments.length,
+        current: i,
+        groupId: noteId,
+      });
+    }
+  }
 
-      const isDownloaded = await this._db.fs.downloadFile(noteId, hash);
-      if (!isDownloaded) continue;
+  async _downloadMedia(hash, { total, current, groupId }) {
+    sendAttachmentsProgressEvent("download", total, current);
+    try {
+      const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
+      if (!isDownloaded) return;
 
-      const attachment = await this.read(hash);
-      if (!attachment) continue;
+      const src = await this.read(hash);
+      if (!src) return;
 
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
         hash,
-        src: dataurl.fromObject({
-          type: attachment.metadata.type,
-          data: attachment.data,
-        }),
+        src,
       });
-    }
-    sendAttachmentsProgressEvent("download", attachments.length);
-  }
 
-  get deleted() {
-    return this.all.filter((attachment) => attachment.dateDeleted > 0);
+      return src;
+    } finally {
+      if (1 + current === total)
+        sendAttachmentsProgressEvent("download", total);
+    }
   }
 
   async cleanup() {
@@ -205,13 +226,17 @@ export default class Attachments extends Collection {
     );
   }
 
-  get media() {
+  get deleted() {
+    return this.all.filter((attachment) => attachment.dateDeleted > 0);
+  }
+
+  get images() {
     return this.all.filter((attachment) =>
       attachment.metadata.type.startsWith("image/")
     );
   }
 
-  get file() {
+  get files() {
     return this.all.filter(
       (attachment) => !attachment.metadata.type.startsWith("image/")
     );

@@ -83,8 +83,6 @@ export default class Sync {
         var serverResponse = await this._fetch(lastSynced, token);
         // merge the server response
         await this._merger.merge(serverResponse, lastSynced);
-
-        // await this._downloadAttachments(token);
       }
 
       // check for conflicts and throw

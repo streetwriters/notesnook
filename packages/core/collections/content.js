@@ -41,10 +41,10 @@ export default class Content extends Collection {
     return content.data;
   }
 
-  async raw(id, withAttachments = false) {
+  async raw(id) {
     const content = await this._collection.getItem(id);
     if (!content) return;
-    return withAttachments ? await this.insertAttachments(content) : content;
+    return content;
   }
 
   remove(id) {
@@ -60,11 +60,29 @@ export default class Content extends Collection {
     return this._collection.getItems(this._collection.indexer.indices);
   }
 
-  async insertAttachments(contentItem) {
+  insertMedia(contentItem) {
+    return this._insert(contentItem, this._db.attachments.read);
+  }
+
+  insertPlaceholders(contentItem, placeholder) {
+    return this._insert(contentItem, () => placeholder);
+  }
+
+  async downloadMedia(groupId, contentItem) {
     const content = getContentFromData(contentItem.type, contentItem.data);
-    contentItem.data = await content.insertAttachments((hash) => {
-      return this._db.attachments.read(hash);
+    contentItem.data = await content.insertMedia((hash, { total, current }) => {
+      return this._db.attachments._downloadMedia(hash, {
+        total,
+        current,
+        groupId,
+      });
     });
+    return contentItem;
+  }
+
+  async _insert(contentItem, getData) {
+    const content = getContentFromData(contentItem.type, contentItem.data);
+    contentItem.data = await content.insertMedia(getData);
     return contentItem;
   }
 
