@@ -59,6 +59,8 @@ const AppLoader = ({onLoad}) => {
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);
+
+  const _loading = useNoteStore(state => state.loading);
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
@@ -71,6 +73,45 @@ const AppLoader = ({onLoad}) => {
       opacityV.setValue(1);
       return;
     }
+    await restoreEditorState();
+    if (value === 'show') {
+      opacityV.setValue(0);
+      setLoading(false);
+      return;
+    }
+    Animated.timing(opacityV, {
+      toValue: 0,
+      duration: 100,
+      easing: Easing.out(Easing.ease)
+    }).start();
+    setLoading(false);
+    await db.notes.init();
+    setNotes();
+    setFavorites();
+    _setLoading(false);
+  };
+
+  useEffect(() => {
+    if (!_loading) {
+      (async () => {
+        await sleep(500);
+        if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+          eSendEvent(eOpenLoginDialog, 4);
+          return;
+        }
+        let settingsStore = useSettingStore.getState();
+        if (await checkAppUpdates()) return;
+        if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
+          await Backup.checkAndRun();
+          return;
+        }
+        if (await checkForRateAppRequest()) return;
+        await checkNeedsBackup();
+      })();
+    }
+  }, [_loading]);
+
+  const restoreEditorState = async () => {
     let appState = await MMKV.getItem('appState');
     if (appState) {
       appState = JSON.parse(appState);
@@ -89,29 +130,21 @@ const AppLoader = ({onLoad}) => {
         eSendEvent('loadingNote', appState.note);
       }
     }
+  };
 
-    if (value === 'show') {
-      opacityV.setValue(0);
-      setLoading(false);
-      return;
+  const checkForRateAppRequest = async () => {
+    let askForRating = await MMKV.getItem('askForRating');
+    if (askForRating !== 'never' || askForRating !== 'completed') {
+      askForRating = JSON.parse(askForRating);
+      if (askForRating?.timestamp < Date.now()) {
+        eSendEvent(eOpenRateDialog);
+        return true;
+      }
     }
-    Animated.timing(opacityV, {
-      toValue: 0,
-      duration: 100,
-      easing: Easing.out(Easing.ease)
-    }).start();
-    setLoading(false);
-    await db.notes.init();
-    setNotes();
-    setFavorites();
-    _setLoading(false);
-    await sleep(2000);
-    if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
-      eSendEvent(eOpenLoginDialog, 4);
-      return;
-    }
-    let settingsStore = useSettingStore.getState();
-    
+    return false;
+  };
+
+  const checkAppUpdates = async () => {
     if (Platform.OS === 'android') {
       try {
         let needsUpdate = await inAppUpdates.checkNeedsUpdate();
@@ -123,32 +156,23 @@ const AppLoader = ({onLoad}) => {
             };
           }
           inAppUpdates.startUpdate(updateOptions);
-          return;
+          return true;
         }
-      } catch (e) {}
-    }
-
-    if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
-      await Backup.checkAndRun();
-      return;
-    }
-
-    let askForRating = await MMKV.getItem('askForRating');
-    if (askForRating !== 'never' || askForRating !== 'completed') {
-      askForRating = JSON.parse(askForRating);
-      if (askForRating?.timestamp < Date.now()) {
-        eSendEvent(eOpenRateDialog);
-        return;
+      } catch (e) {
+        return false;
       }
     }
+    return false;
+  };
 
+  const checkNeedsBackup = async () => {
+    let settingsStore = useSettingStore.getState();
     let askForBackup = await MMKV.getItem('askForBackup');
     if (
       settingsStore.settings.reminder === 'off' ||
       !settingsStore.settings.reminder
     ) {
       askForBackup = JSON.parse(askForBackup);
-
       if (askForBackup?.timestamp < Date.now()) {
         eSendEvent(eOpenProgressDialog, {
           title: 'Backup & restore',
@@ -157,9 +181,11 @@ const AppLoader = ({onLoad}) => {
           noIcon: true,
           component: <SettingsBackupAndRestore isSheet={true} />
         });
-        return;
+
+        return true;
       }
     }
+    return false;
   };
 
   useEffect(() => {
