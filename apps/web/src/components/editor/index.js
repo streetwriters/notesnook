@@ -72,7 +72,7 @@ function Editor({ noteId, nonce }) {
         editor.undoManager.reset();
         editor.setDirty(false);
 
-        await db.attachments.download(id);
+        if (id) await db.attachments.downloadImages(id);
       }
 
       if (!isMobile) editor.focus();
