@@ -1,4 +1,4 @@
-import React, {useEffect, useRef} from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   BackHandler,
   InteractionManager,
@@ -6,17 +6,17 @@ import {
   Platform,
   View
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
-import {ActionSheetEvent} from '../../components/DialogManager/recievers';
-import {useTracked} from '../../provider';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
+import { ActionSheetEvent } from '../../components/DialogManager/recievers';
+import { useTracked } from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -24,35 +24,24 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
-import {db} from '../../utils/database';
+import { editing } from '../../utils';
+import { db } from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor,
-  eOpenPublishNoteDialog,
-  eOpenLoginDialog
+  eOpenFullscreenEditor, eOpenLoginDialog, eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorTitle} from './EditorTitle';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorTitle } from './EditorTitle';
 import {
-  checkNote,
   clearEditor,
-  clearTimer,
-  EditorWebView,
-  getNote,
-  isNotedEdited,
-  loadNote,
-  presentResolveConflictDialog,
-  setColors,
-  textInput
+  clearTimer, getNote, loadNote, setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
-import tiny, {safeKeyboardDismiss} from './tiny/tiny';
-import {toolbarRef} from './tiny/toolbar/constants';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { toolbarRef } from './tiny/toolbar/constants';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -98,13 +87,6 @@ const EditorHeader = () => {
         undo: 0,
         redo: 0
       });
-      if (checkNote() && isNotedEdited()) {
-        ToastEvent.show({
-          heading: 'Note is saved',
-          type: 'success',
-          duration: 1500
-        });
-      }
       useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
       await clearEditor(false, true, false);
@@ -169,6 +151,7 @@ const EditorHeader = () => {
       'Copy',
       'Dark Mode',
       'Add to Vault',
+      "Attachments",
       'Pin',
       'Favorite',
       'Publish',
