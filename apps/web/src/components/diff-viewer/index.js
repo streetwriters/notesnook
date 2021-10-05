@@ -13,6 +13,7 @@ import { showToast } from "../../utils/toast";
 import "./diff.css";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
 import { injectCssSrc, removeCss } from "../../utils/css";
+import { EV, EVENTS } from "notes-core/common";
 
 const differ = new HTMLDiffer();
 var conflicts = undefined;
@@ -46,6 +47,7 @@ function DiffViewer(props) {
   const [conflictedNote, setConflictedNote] = useState();
   const [remoteContent, setRemoteContent] = useState();
   const [localContent, setLocalContent] = useState();
+  const [isDownloadingImages, setIsDownloadingImages] = useState(false);
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
@@ -110,14 +112,19 @@ function DiffViewer(props) {
       notesStore.setSelectedNote(noteId);
       note = note.data;
 
-      const content = await db.content.raw(note.contentId, true);
+      const content = await db.content.insertPlaceholders(
+        await db.content.raw(note.contentId),
+        "placeholder.svg"
+      );
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
           dateEdited: content.dateEdited,
         });
-      content.conflicted = await db.content.insertAttachments(
-        content.conflicted
+
+      content.conflicted = await db.content.insertPlaceholders(
+        content.conflicted,
+        "placeholder.svg"
       );
 
       setConflictedNote(note);
@@ -126,7 +133,7 @@ function DiffViewer(props) {
 
       differ
         .generate(content.data, content.conflicted.data)
-        .then(({ before, after }) => {
+        .then(async ({ before, after }) => {
           setHtmlDiff({ before, after });
           conflicts = undefined;
           currentConflict = undefined;
@@ -159,7 +166,13 @@ function DiffViewer(props) {
 
   if (!conflictedNote || !localContent || !remoteContent) return null;
   return (
-    <Flex width="100%" flex="1 1 auto" flexDirection="column" overflow="hidden">
+    <Flex
+      className="diffviewer"
+      width="100%"
+      flex="1 1 auto"
+      flexDirection="column"
+      overflow="hidden"
+    >
       <Text
         mt={2}
         variant="heading"
@@ -187,6 +200,49 @@ function DiffViewer(props) {
           <Icon.ArrowLeft size={18} />
           <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
             Prev conflict
+          </Text>
+        </Button>
+        <Button
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          variant="tool"
+          onClick={async () => {
+            setIsDownloadingImages(true);
+            const event = EV.subscribe(
+              EVENTS.mediaAttachmentDownloaded,
+              ({ hash, src }) => {
+                const elements = document.querySelectorAll(
+                  `.diffviewer img[data-hash=${hash}]`
+                );
+                if (!elements || !elements.length) return;
+                for (let element of elements) element.setAttribute("src", src);
+              }
+            );
+            try {
+              await db.content.downloadMedia(noteId, {
+                data: htmlDiff.before,
+                type: localContent.type,
+              });
+              await db.content.downloadMedia(noteId, {
+                data: htmlDiff.after,
+                type: remoteContent.type,
+              });
+            } finally {
+              setIsDownloadingImages(false);
+              event.unsubscribe();
+            }
+          }}
+          disabled={isDownloadingImages}
+          mr={2}
+        >
+          {isDownloadingImages ? (
+            <Icon.Loading size={18} />
+          ) : (
+            <Icon.Download size={18} />
+          )}
+          <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
+            {isDownloadingImages ? "Downloading..." : "Download images"}
           </Text>
         </Button>
         <Button
