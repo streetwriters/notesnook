@@ -319,7 +319,12 @@ const ToolbarItem = ({
     } else if (value || value === '') {
       formatSelection(execCommands[format](value));
     } else {
-      formatSelection(execCommands[format]);
+      if (typeof execCommands[format] === "function") {
+        formatSelection(execCommands[format]());
+      } else {
+        formatSelection(execCommands[format]);
+      }
+      
     }
 
     focusEditor(format);
