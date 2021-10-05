@@ -1,6 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Platform, ScrollView, Text, View} from 'react-native';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
+import * as Progress from 'react-native-progress';
+import * as ScopedStorage from 'react-native-scoped-storage';
+import Sodium from 'react-native-sodium';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {useAttachmentStore} from '../../provider/stores';
@@ -12,24 +15,15 @@ import {
 import {db} from '../../utils/database';
 import {
   eCloseAttachmentDialog,
-  eCloseTagsDialog,
-  eOpenAttachmentsDialog,
-  eOpenTagsDialog
+  eOpenAttachmentsDialog
 } from '../../utils/Events';
+import filesystem from '../../utils/filesystem';
 import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import Storage from '../../utils/storage';
 import {ActionIcon} from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
-import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import * as Progress from 'react-native-progress';
-import filesystem from '../../utils/filesystem';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import RNFetchBlob from 'rn-fetch-blob';
-import Sodium from 'react-native-sodium';
-import Storage from '../../utils/storage';
 
 export const AttachmentDialog = () => {
   const [state] = useTracked();
@@ -142,7 +136,6 @@ const Attachment = ({attachment, note, setNote}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const progress = useAttachmentStore(state => state.progress);
-  const setProgress = useAttachmentStore(state => state.setProgress);
   const [currentProgress, setCurrentProgress] = useState(null);
 
   const onPress = async () => {
@@ -151,57 +144,22 @@ const Attachment = ({attachment, note, setNote}) => {
       useAttachmentStore.getState().remove(attachment.metadata.hash);
       return;
     }
-
-    let folder = {};
-    if (Platform.OS === 'android') {
-      folder = await ScopedStorage.openDocumentTree(false);
-      if (!folder) return;
-    } else {
-      folder.uri = await Storage.checkAndCreateDir('/Downloads/');
-    }
-
-    try {
-      setCurrentProgress({
-        value: 0,
-        percent: '0%'
-      });
-      await db.fs.downloadFile(
-        attachment.metadata.hash,
-        attachment.metadata.hash
-      );
-      let key = await db.user.getEncryptionKey();
-      let info = {
-        iv: attachment.iv,
-        salt: attachment.salt,
-        length: attachment.length,
-        alg: attachment.alg,
-        hash: attachment.metadata.hash,
-        hashType: attachment.metadata.hashType,
-        mime: attachment.metadata.type,
-        fileName: attachment.metadata.filename,
-        uri: folder.uri
-      };
-      await Sodium.decryptFile(key, info, false);
-      ToastEvent.show({
-        heading: 'Download successful',
-        message: attachment.metadata.filename + 'downloaded',
-        type: 'success',
-        context: 'local'
-      });
-    } catch (e) {
-      console.log('download attachment error: ', e);
-      useAttachmentStore.getState().remove(attachment.metadata.hash);
-    }
+    filesystem.downloadAttachment(attachment.metadata.hash);
   };
+
   useEffect(() => {
     let prog = progress[attachment.metadata.hash];
-    if (prog && prog.type === 'download') {
-      prog = prog.recieved / prog.total;
+    if (prog) {
+      let type = prog.type;
+      let loaded = prog.type === 'download' ? prog.recieved : prog.sent;
+      prog = loaded / prog.total;
       prog = (prog * 100).toFixed(0);
       console.log('progress: ', prog);
+      console.log(prog);
       setCurrentProgress({
         value: prog,
-        percent: prog + '%'
+        percent: prog + '%',
+        type: type
       });
     } else {
       setCurrentProgress(null);
@@ -263,30 +221,38 @@ const Attachment = ({attachment, note, setNote}) => {
           </Paragraph>
 
           <Paragraph color={colors.icon} size={SIZE.xs}>
-            {formatBytes(attachment.length)} ({attachment.metadata.type})
+            {formatBytes(attachment.length)}{' '}
+            {currentProgress?.type ? '(' + currentProgress.type + 'ing - tap to cancel)' : ''}
           </Paragraph>
         </View>
       </View>
 
       {currentProgress ? (
-        <View
+        <TouchableOpacity
+          activeOpacity={0.9}
+          onPress={() => {
+            db.fs.cancel(attachment.metadata.hash);
+            setCurrentProgress(null);
+          }}
           style={{
             justifyContent: 'center',
-            marginLeft: 5
+            marginLeft: 5,
+            marginTop:5,
+            marginRight:-5
           }}>
           <Progress.Circle
             size={SIZE.xxl}
             progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
             showsText
             textStyle={{
-              fontSize: 9
+              fontSize: 10
             }}
             color={colors.accent}
             formatText={progress => (progress * 100).toFixed(0)}
             borderWidth={0}
             thickness={2}
           />
-        </View>
+        </TouchableOpacity>
       ) : (
         <ActionIcon
           onPress={() => onPress(attachment)}

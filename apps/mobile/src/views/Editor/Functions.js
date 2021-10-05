@@ -19,6 +19,7 @@ import {
   eShowGetPremium,
   eShowMergeDialog
 } from '../../utils/Events';
+import filesystem from '../../utils/filesystem';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
@@ -31,6 +32,7 @@ export const editorTitleInput = createRef();
 export const sourceUri =
   Platform.OS === 'android' ? 'file:///android_asset/' : 'Web.bundle/site/';
 
+let lastEditTime = 0;
 let EDITOR_SETTINGS = null;
 let webviewOK = true;
 let noteEdited = false;
@@ -153,6 +155,7 @@ async function setNote(item) {
   title = note.title;
   id = note.id;
   noteEdited = false;
+  lastEditTime = item.dateEdited;
   if (note.locked) {
     content.data = note.content.data;
     content.type = note.content.type;
@@ -188,6 +191,7 @@ export const loadNote = async item => {
   console.log('.....OPEN NOTE.....');
   editing.currentlyEditing = true;
   editing.movedAway = false;
+
   if (editing.isFocused) {
     tiny.call(EditorWebView, tiny.blur);
   }
@@ -197,6 +201,7 @@ export const loadNote = async item => {
       await clearEditor(true, true, true);
     }
     disableSaving = false;
+    lastEditTime = 0;
     clearNote();
     noteEdited = false;
     isFirstLoad = false;
@@ -274,7 +279,6 @@ const checkStatus = async noreset => {
     }, 1000);
   });
 };
-let lastEditTime = 0;
 
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
@@ -303,7 +307,6 @@ export const _onMessage = async evt => {
     case 'title':
       if (message.value !== title) {
         noteEdited = true;
-
         lastEditTime = Date.now();
         title = message.value;
         eSendEvent('editorScroll', {
@@ -314,6 +317,9 @@ export const _onMessage = async evt => {
       break;
     case 'scroll':
       eSendEvent('editorScroll', message);
+      break;
+    case 'attachment_download':
+      filesystem.downloadAttachment(message.value);
       break;
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
@@ -611,6 +617,7 @@ export async function saveNote(preventUpdate) {
         Navigation.routeNames.Notes
       ]);
       let n = db.notes.note(id)?.data?.dateEdited;
+      lastEditTime = n + 10;
       tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
     }
@@ -678,16 +685,28 @@ export async function updateNoteInEditor() {
     presentResolveConflictDialog(_note);
     return;
   }
-  let data = await db.content.raw(note.contentId);
+  let data = await db.content.raw(_note.contentId);
   if (lastEditTime > _note.dateEdited) return;
   if (data.data === content.data) return;
   if (content.data.indexOf(data.data) !== -1) return;
   if (note.dateEdited === _note.dateEdited) return;
 
+  console.log('injecting note in editor', lastEditTime, _note.dateEdited);
+  title = note.title;
+  content.data = data.data;
+  note = _note;
+  lastEditTime = _note.dateEdited + 10;
   tiny.call(EditorWebView, tiny.isLoading);
   await setNote(_note);
+  tiny.call(EditorWebView, tiny.isLoading);
   post('title', title);
   post('inject', content.data);
+  setTimeout(() => {
+    tiny.call(EditorWebView, tiny.notLoading);
+  }, 50);
+  if (id) {
+    db.attachments.download(id);
+  }
   tiny.call(EditorWebView, tiny.notLoading);
 }
 

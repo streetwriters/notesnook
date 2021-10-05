@@ -124,6 +124,9 @@ function init_tiny(size) {
     directionality: EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
+    attachmenthandler_download_attachment:(hash) => {
+      reactNativeEventHandler('attachment_download',hash);
+    },
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
@@ -177,24 +180,6 @@ function init_tiny(size) {
       .h {
         display: none;
       }
-    .img_float_left {
-      float:left;
-    }
-    .img_float_right {
-      float:right;
-    }
-    .img_float_none {
-      float:none;
-    }
-    .img_size_one {
-      width:100%;
-    }
-    .img_size_two {
-      width:50%;
-    }
-    .img_size_three {
-      width:25%;
-    }
     span.diff-del {
       background-color: #FDB0C0;  
     }

@@ -158,11 +158,10 @@ interface AttachmentStore {
       hash: string,
       recieved: number,
       type: "upload" | "download",
-      success: boolean
     }
   },
   remove:(hash:string) => void
-  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download", success) => void
+  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download") => void
 }
 
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
@@ -170,11 +169,20 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   remove:(hash) => {
     let _p = get().progress;
     _p[hash] = null
+    tiny.call(EditorWebView, `
+    (function() {
+      let progress = ${JSON.stringify({
+        loaded:1,
+        total:1,
+        hash
+      })}
+      tinymce.activeEditor.execCommand("mceUpdateAttachmentProgress",progress);
+    })()`);
     set({ progress: { ..._p } });
   },
-  setProgress: (sent, total, hash, recieved, type, success) => {
+  setProgress: (sent, total, hash, recieved, type) => {
     let _p = get().progress;
-    _p[hash] = { sent, total, hash, recieved, type, success };
+    _p[hash] = { sent, total, hash, recieved, type };
     let progress = { total, hash, loaded: type === "download" ? recieved : sent };
     tiny.call(EditorWebView, `
     (function() {
