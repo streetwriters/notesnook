@@ -411,7 +411,7 @@ const LoginDialog = () => {
             return;
           }
           _email.current?.focus();
-        }, 150);
+        },500);
       }}
       background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
@@ -744,7 +744,8 @@ const LoginDialog = () => {
               }}>
               <View
                 style={{
-                  flexShrink: 1
+                  flexShrink: 1,
+                  paddingRight:5
                 }}>
                 <Heading size={SIZE.md}>{status}</Heading>
                 <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
