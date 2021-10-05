@@ -109,13 +109,6 @@ export const Notes = ({route, navigation}) => {
 
   const onFocus = () => {
     init();
-    eSendEvent(eScrollEvent, {
-      name:
-        params.type === 'tag'
-          ? '#' + alias
-          : alias.slice(0, 1).toUpperCase() + alias.slice(1),
-      type: 'in'
-    });
   };
 
   const onBlur = useCallback(() => {
@@ -129,13 +122,6 @@ export const Notes = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     navigation.addListener('blur', onBlur);
     return () => {
-      eSendEvent(eScrollEvent, {
-        name:
-          params.type === 'tag'
-            ? '#' + alias
-            : alias.slice(0, 1).toUpperCase() + alias.slice(1),
-        type: 'hide'
-      });
       editing.actionAfterFirstSave = {
         type: null
       };

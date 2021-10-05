@@ -1,8 +1,8 @@
-import {groupArray} from 'notes-core/utils/grouping';
-import React, {useEffect, useState} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
+import { groupArray } from 'notes-core/utils/grouping';
+import React, { useEffect, useRef, useState } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {
@@ -12,13 +12,12 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {db} from '../../utils/database';
+import { InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
 import {
   eOnNewTopicAdded,
   eOpenAddNotebookDialog,
-  eOpenAddTopicDialog,
-  eScrollEvent
+  eOpenAddTopicDialog
 } from '../../utils/Events';
 
 export const Notebook = ({route, navigation}) => {
@@ -28,34 +27,21 @@ export const Notebook = ({route, navigation}) => {
       db.settings.getGroupOptions('topics')
     )
   );
-  let params = route.params;
-  let ranAfterInteractions = false;
+  const params = useRef(route.params);
 
-  const runAfterInteractions = (time = 300) => {
-    InteractionManager.runAfterInteractions(() => {
-      Navigation.routeNeedsUpdate('Notebook', () => {
-        onLoad();
-      });
-    }, time);
+  const onLoad = data => {
+    if (data) params.current = data;
     try {
-      let notebook = db.notebooks.notebook(params?.notebook?.id)?.data;
+      let notebook = db.notebooks.notebook(params?.current?.notebook?.id)?.data;
       if (notebook) {
-        params.notebook = notebook;
+        params.current.notebook = notebook;
         setTopics(
           groupArray(notebook.topics, db.settings.getGroupOptions('topics'))
         );
-        params.title = params.notebook.title;
+        params.current.title = params.current.notebook.title;
       }
-      eSendEvent(eScrollEvent, {name: params.title, type: 'in'});
       updateSearch();
-      ranAfterInteractions = false;
     } catch (e) {}
-  };
-  const onLoad = data => {
-    if (data) {
-      params = data;
-    }
-    runAfterInteractions(data ? 300 : 1);
   };
 
   useEffect(() => {
@@ -66,13 +52,12 @@ export const Notebook = ({route, navigation}) => {
   }, []);
 
   const onFocus = async () => {
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions();
-    }
+    InteractionManager.runAfterInteractions(() => {
+      Navigation.routeNeedsUpdate(Navigation.routeNames.Notebook, onLoad);
+    }, 150);
     Navigation.setHeaderState('Notebook', params, {
-      heading: params.title,
-      id: params.notebook.id,
+      heading: params.current.title,
+      id: params.current.notebook.id,
       type: 'notebook'
     });
   };
@@ -80,8 +65,6 @@ export const Notebook = ({route, navigation}) => {
   useEffect(() => {
     navigation.addListener('focus', onFocus);
     return () => {
-      ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: params.title, type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);
@@ -94,15 +77,15 @@ export const Notebook = ({route, navigation}) => {
 
   const updateSearch = () => {
     SearchService.update({
-      placeholder: `Search in "${params.title}"`,
+      placeholder: `Search in "${params.current.title}"`,
       data: topics,
       type: 'topics',
-      title: params.title
+      title: params.current.title
     });
   };
 
   const _onPressBottomButton = () => {
-    let n = params.notebook;
+    let n = params.current.notebook;
     eSendEvent(eOpenAddTopicDialog, {notebookId: n.id});
   };
 
@@ -111,15 +94,16 @@ export const Notebook = ({route, navigation}) => {
       <SelectionHeader screen="Notebook" />
       <ContainerTopSection>
         <Header
-          title={params.title}
-          isBack={!params.menu}
+          title={params.current.title}
+          isBack={!params.current.menu}
           screen="Notebook"
           action={_onPressBottomButton}
           rightButtons={[
             {
               icon: 'pencil',
               title: 'Edit notebook',
-              func: () => eSendEvent(eOpenAddNotebookDialog, params.notebook)
+              func: () =>
+                eSendEvent(eOpenAddNotebookDialog, params.current.notebook)
             }
           ]}
         />
@@ -132,16 +116,16 @@ export const Notebook = ({route, navigation}) => {
         }}
         screen="Notebook"
         headerProps={{
-          heading: params.title,
+          heading: params.current.title,
           paragraph: 'Edit notebook',
           onPress: () => {
-            eSendEvent(eOpenAddNotebookDialog, params.notebook);
+            eSendEvent(eOpenAddNotebookDialog, params.current.notebook);
           },
           icon: 'pencil'
         }}
         focused={() => navigation.isFocused()}
         placeholderData={{
-          heading: params.notebook.title,
+          heading: params.current.notebook.title,
           paragraph: 'You have not added any topics yet.',
           button: 'Add a topic',
           action: _onPressBottomButton,

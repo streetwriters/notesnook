@@ -26,8 +26,6 @@ export const Trash = ({route, navigation}) => {
         setTrash();
       });
     });
-
-    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -62,7 +60,6 @@ export const Trash = ({route, navigation}) => {
     return () => {
       pageIsLoaded = false;
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);

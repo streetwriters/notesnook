@@ -62,12 +62,13 @@ const ColorItem = ({item, index}) => {
       menu: true,
       get: 'colored'
     };
+
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate('NotesPage', params, {
       heading: alias.slice(0, 1).toUpperCase() + alias.slice(1),
       id: item.id,
       type: 'color'
     });
-    eSendEvent(refreshNotesPage, params);
     Navigation.closeDrawer();
   };
 

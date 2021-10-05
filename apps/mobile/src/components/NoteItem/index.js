@@ -1,19 +1,18 @@
-import React, {useEffect} from 'react';
-import {Platform} from 'react-native';
-import {View} from 'react-native';
+import React from 'react';
+import { Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {ActionSheetEvent} from '../DialogManager/recievers';
-import {TimeSince} from '../Menu/TimeSince';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { ActionSheetEvent } from '../DialogManager/recievers';
+import { TimeSince } from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -31,10 +30,9 @@ function navigateToNotebook(item) {
     id: notebook.id,
     type: notebook.type
   };
+  eSendEvent(eOnNewTopicAdded, params);
   Navigation.navigate(routeName, params, headerState);
 }
-
-
 
 function navigateToTag(item) {
   let tags = db.tags.all;
@@ -44,12 +42,13 @@ function navigateToTag(item) {
     type: 'tag',
     get: 'tagged'
   };
+
+  eSendEvent(refreshNotesPage, params);
   Navigation.navigate('NotesPage', params, {
     heading: '#' + _tag.title,
     id: _tag.id,
     type: _tag.type
   });
-  eSendEvent(refreshNotesPage, params);
 }
 
 const showActionSheet = (item, isTrash) => {
@@ -223,7 +222,9 @@ const NoteItem = ({item, isTrash, tags}) => {
                   style={{
                     marginRight: 5
                   }}
-                  color={COLORS_NOTE[item.color?.toLowerCase()] || colors.accent}
+                  color={
+                    COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
+                  }
                 />
               ) : null}
 

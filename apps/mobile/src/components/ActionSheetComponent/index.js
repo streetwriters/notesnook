@@ -44,7 +44,8 @@ import {
   eOpenAttachmentsDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
-  eOpenTagsDialog
+  eOpenTagsDialog,
+  refreshNotesPage
 } from '../../utils/Events';
 import { deleteItems, openLinkInBrowser } from '../../utils/functions';
 import { MMKV } from '../../utils/mmkv';
@@ -823,7 +824,8 @@ export const ActionSheetComponent = ({
                           heading: topic.title,
                           id: topic.id,
                           type: topic.type
-                        };
+                        }; 
+                        eSendEvent(refreshNotesPage, params);
                         Navigation.navigate(routeName, params, headerState);
                       }}
                       icon="book-open-outline"

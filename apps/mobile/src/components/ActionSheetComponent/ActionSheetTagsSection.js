@@ -41,12 +41,13 @@ const TagItem = ({tag, close}) => {
       type: 'tag',
       get: 'tagged',
     };
+
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate('NotesPage', params, {
       heading: '#' + _tag.title,
       id: _tag.id,
       type: _tag.type,
     });
-    eSendEvent(refreshNotesPage, params);
     await sleep(300);
     close();
   };

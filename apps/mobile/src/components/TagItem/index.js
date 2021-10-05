@@ -3,8 +3,10 @@ import {useWindowDimensions, View} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/database';
+import {db} from '../../utils/database';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
@@ -16,18 +18,19 @@ const TagItem = ({item, index}) => {
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
   const onPress = () => {
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate(
       'NotesPage',
       {
         ...item,
         type: 'tag',
-        get: 'tagged',
+        get: 'tagged'
       },
       {
         heading: '#' + item.title,
         id: item.id,
-        type: item.type,
-      },
+        type: item.type
+      }
     );
   };
 
@@ -46,17 +49,17 @@ const TagItem = ({item, index}) => {
         borderBottomWidth: 1.5,
         borderBottomColor: colors.nav,
         width: '100%',
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
       }}>
       <View
         style={{
-          maxWidth: '92%',
+          maxWidth: '92%'
         }}>
         <Heading size={SIZE.md}>
           <Heading
             size={SIZE.md}
             style={{
-              color: colors.accent,
+              color: colors.accent
             }}>
             #
           </Heading>
@@ -66,7 +69,7 @@ const TagItem = ({item, index}) => {
           color={colors.icon}
           size={SIZE.xs}
           style={{
-            marginTop: 5,
+            marginTop: 5
           }}>
           {item && item.noteIds.length && item.noteIds.length > 1
             ? item.noteIds.length + ' notes'
@@ -90,7 +93,7 @@ const TagItem = ({item, index}) => {
           height: 35,
           width: 35,
           borderRadius: 100,
-          alignItems: 'center',
+          alignItems: 'center'
         }}
       />
     </PressableButton>

@@ -292,12 +292,13 @@ export const MenuItemsList = [
         title: 'Monographs',
         id: 'monographs_navigation'
       });
+
+      eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
         heading: 'Monographs',
         id: 'monographs_navigation',
         type: 'notes'
       });
-      eSendEvent(refreshNotesPage, params);
     }
   },
   {

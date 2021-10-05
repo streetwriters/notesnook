@@ -104,7 +104,6 @@ export const Settings = ({navigation}) => {
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
       data: [],
@@ -143,7 +142,6 @@ export const Settings = ({navigation}) => {
 
     return () => {
       pageIsLoaded = false;
-      eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);

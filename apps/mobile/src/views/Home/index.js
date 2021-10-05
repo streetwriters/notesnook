@@ -46,7 +46,6 @@ export const Home = ({navigation}) => {
 
   const runAfterInteractions = () => {
     updateSearch();
-    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
 
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notes', () => {
@@ -61,7 +60,6 @@ export const Home = ({navigation}) => {
     navigation.addListener('blur', onBlur);
     return () => {
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };

@@ -43,7 +43,6 @@ export const Folders = ({route, navigation}) => {
         setNotebooks()
       });
     });
-    eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -54,7 +53,6 @@ export const Folders = ({route, navigation}) => {
       ranAfterInteractions = false;
       pageIsLoaded = false;
       navigation.removeListener('focus', onFocus);
-      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
     };
   }, []);
 
