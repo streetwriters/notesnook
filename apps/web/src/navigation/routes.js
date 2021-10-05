@@ -12,6 +12,7 @@ import Trash from "../views/trash";
 import { store as notestore } from "../stores/note-store";
 import { store as nbstore } from "../stores/notebook-store";
 import Monographs from "../views/monographs";
+import { showToast } from "../utils/toast";
 
 const routes = {
   "/": () => ({
@@ -44,6 +45,11 @@ const routes = {
       key: "topics",
       type: "topics",
       title: notebook.title,
+      isEditable: true,
+      onChange: (title) => {
+        db.notebooks.add({ id: notebookId, title });
+        showToast("success", "Notebook title updated!");
+      },
       component: <Topics />,
       buttons: {
         back: {
@@ -67,8 +73,13 @@ const routes = {
     return {
       key: "notes",
       type: "notes",
-      title: notebook.title,
-      subtitle: topic.title,
+      title: topic.title,
+      subtitle: notebook.title,
+      isEditable: true,
+      onChange: (title) => {
+        db.notebooks.notebook(notebookId).topics.add({ ...topic, title });
+        showToast("success", "Topic title updated!");
+      },
       component: <Notes />,
       buttons: {
         back: {
