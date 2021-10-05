@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Appearance} from 'react-native';
+import {Appearance, Platform} from 'react-native';
 import {SafeAreaView, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
@@ -38,6 +38,16 @@ import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import SpInAppUpdates, {
+  NeedsUpdateResponse,
+  IAUUpdateKind,
+  StartUpdateOptions
+} from 'sp-react-native-in-app-updates';
+import DeviceInfo from 'react-native-device-info';
+
+const inAppUpdates = new SpInAppUpdates(
+  false // isDebug
+);
 
 let passwordValue = null;
 let didVerifyUser = false;
@@ -101,10 +111,28 @@ const AppLoader = ({onLoad}) => {
       return;
     }
     let settingsStore = useSettingStore.getState();
+    
+    if (Platform.OS === 'android') {
+      try {
+        let needsUpdate = await inAppUpdates.checkNeedsUpdate();
+        if (needsUpdate.shouldUpdate) {
+          let updateOptions = {};
+          if (Platform.OS === 'android') {
+            updateOptions = {
+              updateType: IAUUpdateKind.IMMEDIATE
+            };
+          }
+          inAppUpdates.startUpdate(updateOptions);
+          return;
+        }
+      } catch (e) {}
+    }
+
     if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
       await Backup.checkAndRun();
       return;
     }
+
     let askForRating = await MMKV.getItem('askForRating');
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
