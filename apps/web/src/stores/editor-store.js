@@ -103,7 +103,7 @@ class EditorStore extends BaseStore {
         content: content || defaultSession.content,
         totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
-        attachments: db.attachments.get(note.id) || [],
+        attachments: db.attachments.ofNote(note.id, "files") || [],
       };
     });
     appStore.setIsEditorOpen(true);
@@ -148,7 +148,8 @@ class EditorStore extends BaseStore {
           state.session.title = note.title;
           state.session.isSaving = false;
           state.session.notebooks = note.notebooks;
-          state.session.attachments = db.attachments.get(note.id) || [];
+          state.session.attachments =
+            db.attachments.ofNote(note.id, "files") || [];
         });
 
         noteStore.refresh();
