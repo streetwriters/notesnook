@@ -39,7 +39,7 @@ async function pickFile() {
   if (!selectedFile) return;
 
   const buffer = await selectedFile.arrayBuffer();
-  const { hash, type: hashType } = await fs.hashBuffer(buffer);
+  const { hash, type: hashType } = await fs.hashBuffer(Buffer.from(buffer));
 
   const output = db.attachments.exists(hash)
     ? {}
@@ -73,7 +73,7 @@ async function pickImage() {
   if (!selectedImage) return;
 
   const { dataurl, buffer } = await compressImage(selectedImage, "buffer");
-  const { hash, type: hashType } = await fs.hashBuffer(buffer);
+  const { hash, type: hashType } = await fs.hashBuffer(Buffer.from(buffer));
 
   const output = db.attachments.exists(hash)
     ? {}
@@ -130,6 +130,7 @@ function showFilePicker({ acceptedFileTypes }) {
  *
  * @param {File} file
  * @param {"base64"|"buffer"} type
+ * @returns {{ dataurl: string, buffer: ArrayBuffer }}
  */
 function compressImage(file, type) {
   return new Promise((resolve, reject) => {
