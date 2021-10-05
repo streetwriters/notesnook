@@ -182,3 +182,4 @@ export const Dismiss = createIcon(Icons.mdiClose);
 
 export const File = createIcon(Icons.mdiFileOutline);
 export const Download = createIcon(Icons.mdiArrowDown);
+export const ImageDownload = createIcon(Icons.mdiImage);

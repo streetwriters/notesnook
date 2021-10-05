@@ -239,10 +239,10 @@ function DiffViewer(props) {
           {isDownloadingImages ? (
             <Icon.Loading size={18} />
           ) : (
-            <Icon.Download size={18} />
+            <Icon.ImageDownload size={18} />
           )}
           <Text display={["none", "block", "block"]} fontSize="body" ml={1}>
-            {isDownloadingImages ? "Downloading..." : "Download images"}
+            {isDownloadingImages ? "Downloading..." : "Load images"}
           </Text>
         </Button>
         <Button
