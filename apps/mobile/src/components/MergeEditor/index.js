@@ -38,10 +38,6 @@ import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Paragraph from '../Typography/Paragraph';
 
-const {Value, timing} = Animated;
-
-const firstWebViewHeight = new Value(dHeight * 0.5 - 50);
-const secondWebViewHeight = new Value(dHeight * 0.5 - 50);
 const primaryWebView = createRef();
 const secondaryWebView = createRef();
 let note = null;
