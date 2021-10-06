@@ -705,7 +705,7 @@ export async function updateNoteInEditor() {
     tiny.call(EditorWebView, tiny.notLoading);
   }, 50);
   if (id) {
-    db.attachments.download(id);
+    db.attachments.downloadImages(id);
   }
   tiny.call(EditorWebView, tiny.notLoading);
 }
@@ -732,7 +732,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
     } else {
       post('html', content.data);
       if (id) {
-        db.attachments.download(id);
+        db.attachments.downloadImages(id);
       }
     }
 
