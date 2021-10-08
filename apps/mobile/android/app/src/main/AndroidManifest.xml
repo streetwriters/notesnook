@@ -24,6 +24,15 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
+        <receiver android:name=".NoteWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/note_widget_info" />
+        </receiver>
 
         <activity
             android:name=".MainActivity"
@@ -34,9 +43,9 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter android:label="Notesnook">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -45,14 +54,10 @@
 
                 <data
                     android:host="app.notesnook.com"
-                    android:scheme="https"></data>
-
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
-
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
         <activity
             android:name=".ShareActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
@@ -62,21 +67,22 @@
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
             </intent-filter>
-
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
             </intent-filter>
-
-
         </activity>
 
         <service
-            android:name="com.streetwriters.notesnook.OnClearFromRecentService"
+            android:name=".OnClearFromRecentService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />

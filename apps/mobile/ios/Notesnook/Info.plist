@@ -91,6 +91,8 @@
 		<string>OpenSans-Regular.ttf</string>
 		<string>MaterialCommunityIcons.ttf</string>
 	</array>
+	<key>UIApplicationIsOpaque</key>
+	<false/>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>

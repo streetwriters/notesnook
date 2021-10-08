@@ -13,6 +13,8 @@ let Provider;
 let App;
 let NotesnookShare;
 Notifications.init()
+let QuickNoteIOS;
+
 const AppProvider = () => {
   Provider = require('./src/provider').Provider;
   App = require('./App').default;
@@ -24,7 +26,14 @@ const AppProvider = () => {
 };
 
 AppRegistry.registerComponent(appName, () => AppProvider);
+
 AppRegistry.registerComponent('NotesnookShare', () => {
   NotesnookShare = require('./share/index').default;
   return NotesnookShare;
-});
+})
+
+AppRegistry.registerComponent('QuickNoteIOS', () => {
+  QuickNoteIOS = require("./QuickNoteIOS").default
+  return QuickNoteIOS;
+})
+
