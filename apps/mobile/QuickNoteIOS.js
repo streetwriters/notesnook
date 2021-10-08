@@ -1,23 +1,18 @@
-import React, {Component, createRef} from 'react';
-import {SafeAreaView} from 'react-native';
+import React, { Component, createRef } from 'react';
 import {
   ActivityIndicator,
   Appearance,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Text,
+  KeyboardAvoidingView, Platform, SafeAreaView, Text,
   TouchableOpacity,
-  View,
+  View
 } from 'react-native';
-import {ScrollView, TextInput} from 'react-native-gesture-handler';
+import { TextInput } from 'react-native-gesture-handler';
 import SplashScreen from 'react-native-splash-screen';
-import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
-import {db} from './src/utils/DB';
-import {SIZE} from './src/utils/SizeUtils';
-import Storage from './src/utils/storage';
-import {sleep} from './src/utils/TimeUtils';
 import ShareExtension from 'rn-extensions-share';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from './src/utils/Colors';
+import { db } from './src/utils/database';
+import Storage from './src/utils/storage';
+import { sleep } from './src/utils/TimeUtils';
 
 let validator;
 let linkPreview;
