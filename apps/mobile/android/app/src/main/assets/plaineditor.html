@@ -6,6 +6,7 @@
 	<meta charset="utf-8" />
 	<title>Note Diff Preview</title>
 	<link rel="stylesheet" href="./index.css">
+	<link rel="stylesheet" href="./fonts.css">
 	<link id="dark_sheet" disabled rel="stylesheet" href="./dist/skins/notesnook-dark/content.min.css">
 	<link id="light_sheet" disabled rel="stylesheet" href="./dist/skins/notesnook/content.min.css">
 	<style>
@@ -80,17 +81,41 @@
 			padding: 12px !important;
 			overflow-x: hidden;
 			overflow-y: scroll;
+			min-height: 150px;
+			font-family: "Open Sans";
+		}
+
+		[contenteditable] {
+			outline: 0px solid transparent;
+		}
+
+		[contenteditable=true]:empty:before {
+			content: attr(placeholder);
+			pointer-events: none;
+			display: block;
+			color: gray;
+			/* For Firefox */
 		}
 	</style>
 </head>
 
 <body>
-	<div class="htmldiff_div">
+	<div placeholder="Write something..." contenteditable="true" class="htmldiff_div">
 
 	</div>
 	<script src="./listeners.js"></script>
 	<script src="./constants.js"></script>
 	<script>
+		function reactNativeEventHandler(type, value) {
+			if (window.ReactNativeWebView) {
+				window.ReactNativeWebView.postMessage(
+					JSON.stringify({
+						type: type,
+						value: value
+					})
+				);
+			}
+		}
 		attachMessageListener()
 	</script>
 </body>

@@ -6,6 +6,7 @@
     android:padding="@dimen/widget_margin"
     android:theme="@style/ThemeOverlay.Notesnook.AppWidgetContainer">
 
+
     <LinearLayout
         android:layout_width="match_parent"
         android:id="@+id/widget_button"
@@ -14,7 +15,7 @@
         android:layout_centerVertical="true"
         android:background="@drawable/layout_bg"
         android:paddingHorizontal="10dp"
-
+        android:elevation="5dp"
         android:orientation="horizontal">
 
         <LinearLayout
