@@ -1,20 +1,22 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
-import { getLinkPreview } from 'link-preview-js';
-import React, { useEffect, useRef, useState } from 'react';
+import {getLinkPreview} from 'link-preview-js';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   Appearance,
+  FlatList,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
   Text,
+  TextInput,
   TouchableOpacity,
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
@@ -24,11 +26,11 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../src/services/EventManager';
-import { getElevation } from '../src/utils';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/Colors';
-import { db } from '../src/utils/database';
+import {getElevation} from '../src/utils';
+import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../src/utils/Colors';
+import {db} from '../src/utils/database';
 import Storage from '../src/utils/storage';
-import { sleep } from '../src/utils/TimeUtils';
+import {sleep} from '../src/utils/TimeUtils';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -37,7 +39,7 @@ async function sanitizeHtml(site) {
     let html = await fetch(site);
     html = await html.text();
     let siteHtml = html.replace(
-      /(?:<(script|button|input|textarea|style|link)(?:\s[^>]*)?>)\s*((?:(?!<\1)[\s\S])*)\s*(?:<\/\1>)/g,
+      /(?:<(script|button|input|textarea|style|link|head)(?:\s[^>]*)?>)\s*((?:(?!<\1)[\s\S])*)\s*(?:<\/\1>)/g,
       ''
     );
     return absolutify(siteHtml, site);
@@ -68,12 +70,15 @@ async function absolutifyImgs(html, site) {
   for (var i = 0; i < images.length; i++) {
     let img = images[i];
     let url = getBaseUrl(site);
-    if (!img.src.startsWith('http')) {
+    if (img.src.startsWith('/')) {
       if (img.src.startsWith('//')) {
         img.src = img.src.replace('//', 'https://');
       } else {
         img.src = url + img.src;
       }
+    }
+    if (img.src.startsWith('data:')) {
+      img.src = '';
     }
   }
   return parser.body.innerHTML;
@@ -87,7 +92,6 @@ let defaultNote = {
     data: null
   }
 };
-
 
 const modes = {
   1: {
@@ -113,7 +117,7 @@ const NotesnookShare = () => {
       ? COLOR_SCHEME_DARK
       : COLOR_SCHEME_LIGHT
   );
-  const [note, setNote] = useState(defaultNote);
+  const [note, setNote] = useState({...defaultNote});
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [loading, setLoading] = useState(false);
   const [floating, setFloating] = useState(false);
@@ -130,6 +134,9 @@ const NotesnookShare = () => {
   };
   const prevAnimation = useRef(null);
   const [mode, setMode] = useState(1);
+  const [appendNote, setAppendNote] = useState(false);
+  const keyboardHeight = useRef(0);
+  const [notes, setNotes] = useState([]);
 
   const animate = (opacityV, translateV) => {
     prevAnimation.current = translateV;
@@ -148,11 +155,11 @@ const NotesnookShare = () => {
 
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
-    //translate.setValue(-150);
+    keyboardHeight.current = kHeight;
   };
 
   const onKeyboardDidHide = () => {
-    translate.setValue(0);
+    keyboardHeight.current = 0;
   };
 
   useEffect(() => {
@@ -193,16 +200,17 @@ const NotesnookShare = () => {
 
   const loadData = async () => {
     try {
+      defaultNote.content.data = null;
+      setNote({...defaultNote});
       const data = await ShareExtension.data();
       if (!data || data.length === 0) {
         setRawData({
           value: ''
         });
-        setNote({...defaultNote});
         setLoadingIntent(false);
         return;
       }
-      let note = defaultNote;
+      let note = {...defaultNote};
       for (item of data) {
         if (item.type === 'text') {
           setRawData(item);
@@ -220,6 +228,10 @@ const NotesnookShare = () => {
 
   useEffect(() => {
     loadData();
+    db.init().then(async () => {
+      await db.notes.init();
+      setNotes(db.notes.all);
+    });
     sleep(50).then(() => {
       animate(1, 0);
     });
@@ -228,13 +240,14 @@ const NotesnookShare = () => {
   const close = async () => {
     animate(0, 1000);
     await sleep(300);
-    setNote(defaultNote);
+    setNote({...defaultNote});
     setLoadingIntent(true);
     ShareExtension.close();
   };
 
   const onLoad = () => {
-    postMessage(webviewRef, 'htmldiff', note.content?.data);
+    postMessage(webviewRef, 'htmldiff', note.content?.data || '');
+
     let theme = {...colors};
     theme.factor = 1;
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
@@ -276,7 +289,7 @@ const NotesnookShare = () => {
     close();
   };
 
-  const sourceUri = 'Plain.bundle/site/plaineditor.html';
+  const sourceUri = 'Web.bundle/site/plaineditor.html';
 
   const onShouldStartLoadWithRequest = request => {
     if (request.url.includes('/site/plaineditor.html')) {
@@ -312,8 +325,38 @@ const NotesnookShare = () => {
   };
 
   useEffect(() => {
+    console.log('data', note.content?.data);
     onLoad();
   }, [note]);
+
+  const renderItem = ({item, index}) => (
+    <TouchableOpacity
+      activeOpacity={0.9}
+      style={{
+        height: 50,
+        paddingHorizontal: 12
+      }}>
+      <Text
+        numberOfLines={1}
+        style={{
+          color: colors.pri,
+          fontFamily: 'OpenSans-SemiBold',
+          fontSize: 15
+        }}>
+        {item.title}
+      </Text>
+
+      <Text
+        numberOfLines={1}
+        style={{
+          color: colors.icon,
+          fontSize: 12,
+          fontFamily: 'OpenSans-Regular'
+        }}>
+        {item.headline}
+      </Text>
+    </TouchableOpacity>
+  );
 
   return (
     <AnimatedSAV
@@ -342,6 +385,46 @@ const NotesnookShare = () => {
         />
       </TouchableOpacity>
 
+      <View
+        style={{
+          position: 'absolute',
+          top: 20,
+          backgroundColor: colors.bg,
+          borderRadius: 10,
+          width: '95%',
+          minHeight: 50,
+          alignSelf: 'center',
+          zIndex: 999,
+          ...getElevation(5)
+        }}>
+        <View
+          style={{
+            flexShrink: 1,
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            paddingHorizontal: 12,
+            marginBottom: 10
+          }}>
+          <TextInput
+            placeholder="Search for a note"
+            style={{
+              fontSize: 15,
+              fontFamily: 'OpenSans-Regular',
+              width: '85%'
+            }}
+          />
+          <Icon name="magnify" size={25} />
+        </View>
+        <FlatList
+          data={notes}
+          style={{
+            maxHeight: height - keyboardHeight.current
+          }}
+          renderItem={renderItem}
+        />
+      </View>
+
       <AnimatedKAV
         enabled={!floating && Platform.OS === 'ios'}
         onLayout={event => {
@@ -364,6 +447,55 @@ const NotesnookShare = () => {
             maxHeight: '100%',
             paddingHorizontal: 12
           }}>
+          <View
+            style={{
+              width: '100%',
+              height: 30,
+              borderRadius: 10,
+              flexDirection: 'row',
+              alignItems: 'center'
+            }}>
+            <Button
+              color={appendNote ? colors.nav : colors.accent}
+              onPress={onPress}
+              icon="plus"
+              iconSize={18}
+              iconColor={!appendNote ? colors.light : colors.icon}
+              title="New note"
+              textStyle={{
+                fontSize: 12,
+                color: !appendNote ? colors.light : colors.icon,
+                marginLeft: 5
+              }}
+              style={{
+                marginRight: 15,
+                height: 30,
+                borderRadius: 100,
+                paddingHorizontal: 12
+              }}
+            />
+
+            <Button
+              color={!appendNote ? colors.nav : colors.accent}
+              onPress={onPress}
+              icon="text-short"
+              iconSize={18}
+              iconColor={appendNote ? colors.light : colors.icon}
+              title="Append to..."
+              textStyle={{
+                fontSize: 12,
+                color: appendNote ? colors.light : colors.icon,
+                marginLeft: 5
+              }}
+              style={{
+                marginRight: 15,
+                height: 30,
+                borderRadius: 100,
+                paddingHorizontal: 12
+              }}
+            />
+          </View>
+
           <View
             style={{
               width: '100%'
