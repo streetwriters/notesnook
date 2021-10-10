@@ -38,28 +38,23 @@ async function pickFile() {
   const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
   if (!selectedFile) return;
 
-  const buffer = await selectedFile.arrayBuffer();
-  const { hash, type: hashType } = await fs.hashBuffer(Buffer.from(buffer));
+  const generator = fs.writeEncryptedFile(selectedFile, key);
 
-  const output = db.attachments.exists(hash)
-    ? {}
-    : await fs.writeEncrypted(null, {
-        data: new Uint8Array(buffer),
-        type: "buffer",
-        key,
-        hash,
-      });
-
+  let { value: output } = await generator.next();
+  if (!db.attachments.exists(output.hash)) {
+    const { value } = await generator.next();
+    output = value;
+  }
+  console.log(output);
   await db.attachments.add({
     ...output,
-    hash,
-    hashType,
+    salt: "sda",
     filename: selectedFile.name,
     type: selectedFile.type,
   });
 
   return {
-    hash,
+    hash: output.hash,
     filename: selectedFile.name,
     type: selectedFile.type,
     size: selectedFile.size,

@@ -1,9 +1,11 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
-import NNCrypto from "./nncrypto";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import "worker-loader!nncryptoworker/dist/src/worker.js";
+import NNCrypto from "./nncrypto.stub";
 
-const crypto = new NNCrypto();
+const crypto = new NNCrypto("/static/js/bundle.worker.js");
 extendPrototype(localforage);
 
 localforage.config({
@@ -40,7 +42,7 @@ async function deriveCryptoKey(name, data) {
   const { password, salt } = data;
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
-  const keyData = await crypto.deriveKey(password, salt, true);
+  const keyData = await crypto.exportKey(password, salt);
 
   if (localforage.supports(localforage.INDEXEDDB) && window?.crypto?.subtle) {
     const pbkdfKey = await derivePBKDF2Key(password);
@@ -73,7 +75,7 @@ const Storage = {
   getAllKeys,
   deriveCryptoKey,
   getCryptoKey,
-  hash: crypto.hashPassword,
+  hash: crypto.hash,
   encrypt: crypto.encrypt,
   decrypt: crypto.decrypt,
 };
@@ -81,6 +83,7 @@ export default Storage;
 
 let enc = new TextEncoder();
 let dec = new TextDecoder();
+
 async function derivePBKDF2Key(password) {
   const key = await window.crypto.subtle.importKey(
     "raw",

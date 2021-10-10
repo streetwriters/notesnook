@@ -18,13 +18,15 @@ function onMessage(ev) {
       }
       case "encryptBinary": {
         const { passwordOrKey, data: _data } = data;
-        const cipher = encrypt.call(
-          context,
-          passwordOrKey,
-          _data,
-          "uint8array"
-        );
+        const cipher = encryptStream.call(context, passwordOrKey, _data);
         sendMessage("encryptBinary", cipher, messageId, [cipher.cipher.buffer]);
+        break;
+      }
+      case "decryptBinary": {
+        const { passwordOrKey, cipher } = data;
+        const output = decryptStream.call(context, passwordOrKey, cipher);
+        const transferables = cipher.output === "base64" ? [] : [output.buffer];
+        sendMessage("decryptBinary", output, messageId, transferables);
         break;
       }
       case "decrypt": {
@@ -166,15 +168,123 @@ const encrypt = (passwordOrKey, plainData, outputType) => {
   sodium.memzero(nonce);
   sodium.memzero(key);
   return {
-    alg: getAlgorithm(
-      sodium.base64_variants.URLSAFE_NO_PADDING,
-      plainData.compress ? 1 : 0 // TODO: Crude but works (change this to a more exact boolean flag)
-    ),
+    alg: getAlgorithm(sodium.base64_variants.URLSAFE_NO_PADDING),
     cipher,
     iv,
     salt,
     length: plainData.data.length,
   };
+};
+
+/**
+ *
+ * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+ * @param {{type: "plain" | "uint8array", data: string | Uint8Array}} plainData - the plaintext data
+ */
+const encryptStream = (passwordOrKey, plainData) => {
+  const { sodium } = this;
+
+  if (plainData.type === "plain") {
+    plainData.data = enc.encode(plainData.data);
+  } else if (plainData.type === "base64") {
+    plainData.data = sodium.from_base64(
+      plainData.data,
+      sodium.base64_variants.ORIGINAL
+    );
+  }
+
+  const { key, salt } = _getKey(passwordOrKey);
+
+  let res = sodium.crypto_secretstream_xchacha20poly1305_init_push(key);
+
+  const BLOCK_SIZE = 8 * 1024; // 8 KB
+  const ENCRYPTED_BLOCK_SIZE =
+    BLOCK_SIZE + sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+
+  let dataLength = plainData.data.byteLength;
+  const REMAINDER = BLOCK_SIZE - (dataLength % BLOCK_SIZE);
+  const TOTAL_BLOCKS = (dataLength + REMAINDER) / BLOCK_SIZE;
+
+  const ENCRYPTED_SIZE =
+    dataLength +
+    TOTAL_BLOCKS * sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+
+  let buffer = new Uint8Array(ENCRYPTED_SIZE);
+
+  for (let i = 0; i < TOTAL_BLOCKS; ++i) {
+    const start = i * BLOCK_SIZE;
+    const isFinalBlock = start + BLOCK_SIZE >= dataLength;
+    const end = isFinalBlock
+      ? start + (dataLength - start)
+      : start + BLOCK_SIZE;
+
+    const block = plainData.data.slice(start, end);
+    let encryptedBlock = sodium.crypto_secretstream_xchacha20poly1305_push(
+      res.state,
+      block,
+      null,
+      isFinalBlock
+        ? sodium.crypto_secretstream_xchacha20poly1305_TAG_FINAL
+        : sodium.crypto_secretstream_xchacha20poly1305_TAG_MESSAGE
+    );
+    buffer.set(encryptedBlock, i * ENCRYPTED_BLOCK_SIZE);
+  }
+
+  const iv = sodium.to_base64(res.header);
+  return {
+    alg: getAlgorithm("nil"),
+    cipher: buffer,
+    iv,
+    salt,
+    length: dataLength,
+  };
+};
+
+/**
+ *
+ * @param {{password: string}|{key:string, salt: string}} passwordOrKey - password or derived key
+ * @param {{salt: string, iv: string, cipher: Uint8Array}} cipher - the cipher data
+ */
+const decryptStream = (passwordOrKey, { iv, cipher, salt, output }) => {
+  const { sodium } = this;
+  const ABYTES = sodium.crypto_secretstream_xchacha20poly1305_ABYTES;
+
+  const { key } = _getKey({ salt, ...passwordOrKey });
+  const header = sodium.from_base64(iv);
+
+  const BLOCK_SIZE = 8 * 1024 + ABYTES;
+  const DECRYPTED_BLOCK_SIZE = BLOCK_SIZE - ABYTES;
+
+  let dataLength = cipher.byteLength;
+  const REMAINDER = BLOCK_SIZE - (dataLength % BLOCK_SIZE);
+  const TOTAL_BLOCKS = (dataLength + REMAINDER) / BLOCK_SIZE;
+
+  const DECRYPTED_SIZE = dataLength - TOTAL_BLOCKS * ABYTES;
+
+  let buffer = new Uint8Array(DECRYPTED_SIZE);
+
+  let state = sodium.crypto_secretstream_xchacha20poly1305_init_pull(
+    header,
+    key
+  );
+  for (let i = 0; i < TOTAL_BLOCKS; ++i) {
+    const start = i * BLOCK_SIZE;
+    const isFinalBlock = start + BLOCK_SIZE >= dataLength;
+    const end = isFinalBlock
+      ? start + (dataLength - start)
+      : start + BLOCK_SIZE;
+
+    const block = cipher.slice(start, end);
+    let { message } = sodium.crypto_secretstream_xchacha20poly1305_pull(
+      state,
+      block
+    );
+    buffer.set(message, i * DECRYPTED_BLOCK_SIZE);
+  }
+
+  return output === "base64"
+    ? sodium.to_base64(buffer, sodium.base64_variants.ORIGINAL)
+    : buffer;
 };
 
 /**
