@@ -30,7 +30,8 @@ export default class Tags extends Collection {
     };
 
     await this._collection.addItem(tag);
-    await this._db.settings.setAlias(tag.id, tag.title);
+    if (!this._db.settings.getAlias(tag.id))
+      await this._db.settings.setAlias(tag.id, tag.title);
     return tag;
   }
 
