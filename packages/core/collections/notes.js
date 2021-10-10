@@ -19,11 +19,11 @@ export default class Notes extends Collection {
     let oldNote = this._collection.getItem(id);
 
     if (noteArg.remote || noteArg.migrated) {
-      const { color, tags, notebooks } = noteArg;
+      const { color, tags } = noteArg;
 
       if (oldNote) {
         if (!!oldNote.color && oldNote.color !== color) {
-          await this._db.colors.remove(oldNote.color, id);
+          await this._db.colors.untag(oldNote.color, id);
         }
         if (!!oldNote.tags) {
           for (let tag of oldNote.tags) {
