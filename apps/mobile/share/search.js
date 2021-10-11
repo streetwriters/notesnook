@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
   FlatList,
+  Platform,
   Text,
   TextInput,
   TouchableOpacity,
@@ -87,7 +88,7 @@ export const Search = ({close, getKeyboardHeight}) => {
     <View
       style={{
         position: 'absolute',
-        top: 20,
+        top:Platform.OS === "android" ?  20 : 0,
         backgroundColor: colors.bg,
         borderRadius: 10,
         width: '95%',
@@ -103,7 +104,8 @@ export const Search = ({close, getKeyboardHeight}) => {
           justifyContent: 'space-between',
           alignItems: 'center',
           paddingHorizontal: 12,
-          marginBottom: 10
+          marginBottom: 10,
+          height:50
         }}>
         <TextInput
           ref={inputRef}

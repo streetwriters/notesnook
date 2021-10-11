@@ -44,6 +44,12 @@
 		<key>NSExtensionPointIdentifier</key>
 		<string>com.apple.share-services</string>
 	</dict>
+	<key>UIAppFonts</key>
+	<array>
+		<string>OpenSans-SemiBold.ttf</string>
+		<string>OpenSans-Regular.ttf</string>
+		<string>MaterialCommunityIcons.ttf</string>
+	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

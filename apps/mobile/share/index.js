@@ -1,18 +1,25 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
-import { getLinkPreview } from 'link-preview-js';
-import React, { useEffect, useRef, useState } from 'react';
+import {getLinkPreview} from 'link-preview-js';
+import React, {useEffect, useRef, useState} from 'react';
 import {
   ActivityIndicator,
-  Alert, Keyboard,
+  Alert,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  Text, TouchableOpacity,
+  Text,
+  TouchableOpacity,
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import Animated, {
+  color,
+  Easing,
+  timing,
+  useValue
+} from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
@@ -22,12 +29,12 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../src/services/EventManager';
-import { getElevation } from '../src/utils';
-import { db } from '../src/utils/database';
+import {getElevation} from '../src/utils';
+import {db} from '../src/utils/database';
 import Storage from '../src/utils/storage';
-import { sleep } from '../src/utils/TimeUtils';
-import { Search } from './search';
-import { useShareStore } from './store';
+import {sleep} from '../src/utils/TimeUtils';
+import {Search} from './search';
+import {useShareStore} from './store';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -108,7 +115,7 @@ const modes = {
   }
 };
 
-const NotesnookShare = () => {
+const NotesnookShare = ({quicknote = false}) => {
   const colors = useShareStore(state => state.colors);
   const appendNote = useShareStore(state => state.appendNote);
   const [note, setNote] = useState({...defaultNote});
@@ -233,7 +240,11 @@ const NotesnookShare = () => {
     await sleep(300);
     setNote({...defaultNote});
     setLoadingIntent(true);
-    ShareExtension.close();
+    if (quicknote) {
+      ShareExtension.openURL('ShareMedia://MainApp');
+    } else {
+      ShareExtension.close();
+    }
   };
 
   const onLoad = () => {
@@ -368,32 +379,61 @@ const NotesnookShare = () => {
       style={{
         width: width > 500 ? 500 : width,
         height: height,
-        justifyContent: 'flex-end',
+        justifyContent: quicknote ? 'center' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1
       }}>
-      <TouchableOpacity
-        activeOpacity={1}
-        onPress={() => {
-          if (showSearch) {
-            setShowSearch(false);
-            animate(1, 0);
-          } else {
-            close();
-          }
-        }}
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute'
-        }}>
-        <View
+      {quicknote ? (
+        <Button
+          type="action"
+          icon="close"
+          color={colors.transGray}
+          iconColor={colors.pri}
+          onPress={() => {
+            if (showSearch) {
+              console.log('hide search');
+              setShowSearch(false);
+              animate(1, 0);
+            } else {
+              close();
+            }
+          }}
+          style={{
+            position: 'absolute',
+            right: 12,
+            top: 12,
+            width: 50,
+            height: 50
+          }}
+          iconSize={25}
+        />
+      ) : (
+        <TouchableOpacity
+          activeOpacity={1}
+          onPress={() => {
+            if (showSearch) {
+              console.log('hide search');
+              setShowSearch(false);
+              animate(1, 0);
+            } else {
+              close();
+            }
+          }}
           style={{
             width: '100%',
             height: '100%',
-            backgroundColor: 'rgba(0,0,0,0)'
-          }}
-        />
-      </TouchableOpacity>
+            position: 'absolute'
+          }}>
+          <View
+            style={{
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'white',
+              opacity: 0.01
+            }}
+          />
+          <View />
+        </TouchableOpacity>
+      )}
 
       {showSearch && (
         <Search
@@ -447,7 +487,8 @@ const NotesnookShare = () => {
               textColor={!appendNote ? colors.light : colors.icon}
               type="rounded"
               style={{
-                paddingHorizontal: 12
+                paddingHorizontal: 12,
+                ...getElevation(1)
               }}
             />
 
@@ -460,13 +501,14 @@ const NotesnookShare = () => {
               icon="text-short"
               iconSize={18}
               iconColor={appendNote ? colors.light : colors.icon}
-              title={`Append to ${
-                appendNote ? appendNote.title.slice(0, 15) : 'note'
+              title={`${
+                appendNote ? appendNote.title.slice(0, 15) : 'Append to note'
               }`}
               textColor={appendNote ? colors.light : colors.icon}
               type="rounded"
               style={{
-                paddingHorizontal: 12
+                paddingHorizontal: 12,
+                ...getElevation(1)
               }}
             />
           </View>
@@ -505,7 +547,8 @@ const NotesnookShare = () => {
                 style={{
                   width: '100%',
                   height: height * 0.25,
-                  paddingBottom: 15
+                  paddingBottom: 15,
+                  borderRadius: 10
                 }}>
                 <WebView
                   onLoad={onLoad}
@@ -513,7 +556,7 @@ const NotesnookShare = () => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    backgroundColor: 'transparent'
+                    borderRadius: 10
                   }}
                   cacheMode="LOAD_DEFAULT"
                   domStorageEnabled={true}
@@ -602,7 +645,7 @@ const NotesnookShare = () => {
           </View>
           <View
             style={{
-              height: 40
+              height: Platform.OS === 'ios' ? 60 : 40
             }}
           />
         </View>
@@ -619,7 +662,7 @@ const Button = ({
   style,
   textStyle,
   icon,
-  iconSize = 1,
+  iconSize = 22,
   type = 'button',
   iconColor = 'gray',
   textColor = 'white'

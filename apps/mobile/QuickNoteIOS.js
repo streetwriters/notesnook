@@ -1,18 +1,22 @@
-import React, { Component, createRef } from 'react';
+import React, {Component, createRef} from 'react';
 import {
   ActivityIndicator,
   Appearance,
-  KeyboardAvoidingView, Platform, SafeAreaView, Text,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  Text,
   TouchableOpacity,
   View
 } from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import {TextInput} from 'react-native-gesture-handler';
 import SplashScreen from 'react-native-splash-screen';
 import ShareExtension from 'rn-extensions-share';
-import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from './src/utils/Colors';
-import { db } from './src/utils/database';
+import NotesnookShare from './share';
+import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from './src/utils/Colors';
+import {db} from './src/utils/database';
 import Storage from './src/utils/storage';
-import { sleep } from './src/utils/TimeUtils';
+import {sleep} from './src/utils/TimeUtils';
 
 let validator;
 let linkPreview;
@@ -29,7 +33,7 @@ export default class QuickNoteIOS extends Component {
         Appearance.getColorScheme() === 'dark'
           ? COLOR_SCHEME_DARK
           : COLOR_SCHEME_LIGHT,
-      height: 0,
+      height: 0
     };
     this.initialText = '';
     this.textInputRef = createRef();
@@ -38,20 +42,20 @@ export default class QuickNoteIOS extends Component {
 
   componentDidMount() {
     SplashScreen.hide();
-	sleep(300).then(r => {
-		this.textInputRef.current?.focus()
-	})
+    sleep(300).then(r => {
+      this.textInputRef.current?.focus();
+    });
   }
 
   close = () => {
-	ShareExtension.openURL('ShareMedia://MainApp');
+    ShareExtension.openURL('ShareMedia://MainApp');
   };
 
   onPress = async () => {
     this.titleInputRef.current?.blur();
     this.textInputRef.current?.blur();
     this.setState({
-      loading: true,
+      loading: true
     });
 
     let tag = `<p>${this.state.text}</p>`;
@@ -61,9 +65,9 @@ export default class QuickNoteIOS extends Component {
         title: this.state.title,
         content: {
           type: 'tiny',
-          data: tag,
+          data: tag
         },
-        id: null,
+        id: null
       });
     };
     if (db && db.notes) {
@@ -80,7 +84,7 @@ export default class QuickNoteIOS extends Component {
   saveBtn = () => (
     <View
       style={{
-        paddingHorizontal: 12,
+        paddingHorizontal: 12
       }}>
       <TouchableOpacity
         onPress={this.onPress}
@@ -92,7 +96,7 @@ export default class QuickNoteIOS extends Component {
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
-          flexDirection: 'row',
+          flexDirection: 'row'
         }}>
         {this.state.loading && (
           <ActivityIndicator color={this.state.colors.light} />
@@ -103,7 +107,7 @@ export default class QuickNoteIOS extends Component {
             fontSize: 18,
             fontWeight: 'bold',
             color: this.state.colors.light,
-            marginLeft: this.state.loading ? 10 : 0,
+            marginLeft: this.state.loading ? 10 : 0
           }}>
           Save Note
         </Text>
@@ -118,101 +122,9 @@ export default class QuickNoteIOS extends Component {
           width: '100%',
           height: '100%',
           justifyContent: 'flex-start',
-          backgroundColor: this.state.colors.bg,
+          backgroundColor: this.state.colors.nav
         }}>
-     
-
-        <KeyboardAvoidingView
-          enabled={Platform.OS === 'ios'}
-          style={{
-            paddingVertical: 25,
-            backgroundColor: this.state.colors.bg,
-            borderTopRightRadius: 10,
-            borderTopLeftRadius: 10,
-          }}
-          behavior="padding">
-          <View
-            style={{
-              maxHeight: '100%',
-            }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                borderBottomWidth: 1,
-                borderBottomColor: this.state.colors.nav,
-                paddingHorizontal: 12,
-                justifyContent: 'space-between',
-              }}>
-              <TextInput
-                ref={this.titleInputRef}
-                style={{
-                  fontSize: 25,
-                  fontWeight: 'bold',
-                  color: this.state.colors.pri,
-                  flexGrow: 1,
-                  maxWidth: '85%',
-                }}
-                placeholderTextColor={this.state.colors.icon}
-                value={this.state.title}
-                onChangeText={(v) => this.setState({title: v})}
-                onSubmitEditing={() => {
-                  this.textInputRef.current?.focus();
-                }}
-                blurOnSubmit={false}
-                placeholder="Note title"
-              />
-
-              <TouchableOpacity
-                onPress={this.close}
-                activeOpacity={0.8}
-                style={{
-                  width: 60,
-                  height: 40,
-                  borderRadius: 5,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                }}>
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: 'bold',
-                    color: this.state.colors.accent,
-                    marginLeft: this.state.loading ? 10 : 0,
-                  }}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            <TextInput
-              ref={this.textInputRef}
-              style={{
-                fontSize: 15,
-                color: this.state.colors.pri,
-                marginBottom: 10,
-                width: '100%',
-                maxHeight: '70%',
-                paddingVertical: 10,
-                paddingHorizontal: 12,
-                minHeight: 150,
-              }}
-              placeholderTextColor={this.state.colors.icon}
-              onChangeText={(v) => this.setState({text: v})}
-              multiline={true}
-              value={this.state.text}
-              blurOnSubmit={false}
-              placeholder="Type your note here"
-            />
-            {this.saveBtn()}
-            <View
-              style={{
-                height: 25,
-              }}
-            />
-          </View>
-        </KeyboardAvoidingView>
+        <NotesnookShare quicknote={true} />
       </SafeAreaView>
     );
   }

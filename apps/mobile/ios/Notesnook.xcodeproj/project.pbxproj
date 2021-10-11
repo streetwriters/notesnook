@@ -21,6 +21,7 @@
 		6510627627042895009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
 		6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */; };
 		6515C42F2580AA3000E83E39 /* StoreKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6515C42E2580AA2F00E83E39 /* StoreKit.framework */; };
+		654B3C47271417CE00B5081A /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
 		655FD77A253AD31C001D807D /* Web.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 655FD779253AD31C001D807D /* Web.bundle */; };
 		656BFBC22696AC320063D1DD /* Plain.bundle in Resources */ = {isa = PBXBuildFile; fileRef = 656BFBC12696AC320063D1DD /* Plain.bundle */; };
 		659BE46725E11A5100E05671 /* notesnook-text.png in Resources */ = {isa = PBXBuildFile; fileRef = 659BE46625E11A5100E05671 /* notesnook-text.png */; };
@@ -113,7 +114,7 @@
 		6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = NotesnookDebug.entitlements; path = Notesnook/NotesnookDebug.entitlements; sourceTree = "<group>"; };
 		6552012E27019F6E00A43C51 /* OpenSans-SemiBold.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-SemiBold.ttf"; path = "../android/app/src/main/assets/fonts/OpenSans-SemiBold.ttf"; sourceTree = "<group>"; };
 		6552012F27019F7700A43C51 /* OpenSans-Regular.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "OpenSans-Regular.ttf"; path = "../android/app/src/main/assets/fonts/OpenSans-Regular.ttf"; sourceTree = "<group>"; };
-		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Web.bundle; path = ../html/Web.bundle; sourceTree = "<group>"; };
+		655FD779253AD31C001D807D /* Web.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; path = Web.bundle; sourceTree = "<group>"; };
 		656BFBC12696AC320063D1DD /* Plain.bundle */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.plug-in"; name = Plain.bundle; path = ../../html/Plain.bundle; sourceTree = "<group>"; };
 		659BE46625E11A5100E05671 /* notesnook-text.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "notesnook-text.png"; path = "Notesnook/Images.xcassets/notesnook-text.png"; sourceTree = "<group>"; };
 		65A7F34F255689AD00699170 /* Notesnook.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = Notesnook.entitlements; path = Notesnook/Notesnook.entitlements; sourceTree = "<group>"; };
@@ -222,10 +223,10 @@
 		13B07FAE1A68108700A75B9A /* Notesnook */ = {
 			isa = PBXGroup;
 			children = (
+				655FD779253AD31C001D807D /* Web.bundle */,
 				659BE46625E11A5100E05671 /* notesnook-text.png */,
 				6529D2B0257B4A2900B49BC3 /* NotesnookDebug.entitlements */,
 				65A7F34F255689AD00699170 /* Notesnook.entitlements */,
-				655FD779253AD31C001D807D /* Web.bundle */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -574,6 +575,7 @@
 			files = (
 				6510627727042896009661C3 /* OpenSans-SemiBold.ttf in Resources */,
 				656BFBC22696AC320063D1DD /* Plain.bundle in Resources */,
+				654B3C47271417CE00B5081A /* Web.bundle in Resources */,
 				6510627527042893009661C3 /* OpenSans-Regular.ttf in Resources */,
 				65B5014725A672B200E2D264 /* MainInterface.storyboard in Resources */,
 			);
@@ -1130,7 +1132,7 @@
 			baseConfigurationReference = 19E7EB248446C3FE09F6E622 /* Pods-Notesnook.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Notesnook/NotesnookDebug.entitlements;
@@ -1231,7 +1233,7 @@
 			baseConfigurationReference = 77124A1C1FB538ED63FDEF82 /* Pods-Notesnook.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
-				APPLICATION_EXTENSION_API_ONLY = YES;
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Notesnook/Notesnook.entitlements;
@@ -1451,6 +1453,7 @@
 		65AA858525E6DDEF00772A01 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_ANALYZER_NONNULL = YES;
@@ -1488,6 +1491,7 @@
 		65AA858625E6DDEF00772A01 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				APPLICATION_EXTENSION_API_ONLY = NO;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
 				CLANG_ANALYZER_NONNULL = YES;
