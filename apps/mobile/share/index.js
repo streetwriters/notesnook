@@ -1,22 +1,18 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
-import {getLinkPreview} from 'link-preview-js';
-import React, {useEffect, useRef, useState} from 'react';
+import { getLinkPreview } from 'link-preview-js';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Appearance,
-  FlatList,
-  Keyboard,
+  Alert, Keyboard,
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
-  Text,
-  TextInput,
-  TouchableOpacity,
+  Text, TouchableOpacity,
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
@@ -26,11 +22,12 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../src/services/EventManager';
-import {getElevation} from '../src/utils';
-import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../src/utils/Colors';
-import {db} from '../src/utils/database';
+import { getElevation } from '../src/utils';
+import { db } from '../src/utils/database';
 import Storage from '../src/utils/storage';
-import {sleep} from '../src/utils/TimeUtils';
+import { sleep } from '../src/utils/TimeUtils';
+import { Search } from './search';
+import { useShareStore } from './store';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -112,11 +109,8 @@ const modes = {
 };
 
 const NotesnookShare = () => {
-  const [colors, setColors] = useState(
-    Appearance.getColorScheme() === 'dark'
-      ? COLOR_SCHEME_DARK
-      : COLOR_SCHEME_LIGHT
-  );
+  const colors = useShareStore(state => state.colors);
+  const appendNote = useShareStore(state => state.appendNote);
   const [note, setNote] = useState({...defaultNote});
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -125,6 +119,9 @@ const NotesnookShare = () => {
     type: null,
     value: null
   });
+  const [mode, setMode] = useState(1);
+  const keyboardHeight = useRef(0);
+
   const {width, height} = useWindowDimensions();
   const webviewRef = useRef();
   const opacity = useValue(0);
@@ -133,10 +130,7 @@ const NotesnookShare = () => {
     top: Platform.OS === 'ios' ? 30 : 0
   };
   const prevAnimation = useRef(null);
-  const [mode, setMode] = useState(1);
-  const [appendNote, setAppendNote] = useState(false);
-  const keyboardHeight = useRef(0);
-  const [notes, setNotes] = useState([]);
+  const [showSearch, setShowSearch] = useState(false);
 
   const animate = (opacityV, translateV) => {
     prevAnimation.current = translateV;
@@ -228,10 +222,7 @@ const NotesnookShare = () => {
 
   useEffect(() => {
     loadData();
-    db.init().then(async () => {
-      await db.notes.init();
-      setNotes(db.notes.all);
-    });
+    useShareStore.getState().restoreAppendNote();
     sleep(50).then(() => {
       animate(1, 0);
     });
@@ -247,7 +238,6 @@ const NotesnookShare = () => {
 
   const onLoad = () => {
     postMessage(webviewRef, 'htmldiff', note.content?.data || '');
-
     let theme = {...colors};
     theme.factor = 1;
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
@@ -267,26 +257,33 @@ const NotesnookShare = () => {
       return;
     }
     setLoading(true);
-    let add = async () => {
-      let _note = {
-        ...note,
-        content: {
-          data: content,
-          type: 'tiny'
-        }
-      };
-      await db.notes.add(_note);
-    };
-    if (db && db.notes) {
-      await add();
-    } else {
-      await db.init();
-      await add();
+    await db.init();
+    await db.notes.init();
+
+    if (appendNote && !db.notes.note(appendNote.id)) {
+      useShareStore.getState().setAppendNote(null);
+      Alert.alert('The note you are trying to append to has been deleted.');
+      return;
     }
+
+    let _note;
+    if (appendNote && db.notes.note(appendNote.id)) {
+      let raw = await db.content.raw(appendNote.contentId);
+      _note = {
+        content: {
+          data: raw.data + '\n' + content,
+          type: 'tiny'
+        },
+        id: appendNote.id
+      };
+    } else {
+      _note = {...note};
+      _note.content.data = content;
+    }
+    await db.notes.add(_note);
     await Storage.write('notesAddedFromIntent', 'added');
-    setLoading(false);
-    await sleep(300);
     close();
+    setLoading(false);
   };
 
   const sourceUri = 'Web.bundle/site/plaineditor.html';
@@ -325,38 +322,46 @@ const NotesnookShare = () => {
   };
 
   useEffect(() => {
-    console.log('data', note.content?.data);
     onLoad();
   }, [note]);
 
-  const renderItem = ({item, index}) => (
-    <TouchableOpacity
-      activeOpacity={0.9}
-      style={{
-        height: 50,
-        paddingHorizontal: 12
-      }}>
-      <Text
-        numberOfLines={1}
-        style={{
-          color: colors.pri,
-          fontFamily: 'OpenSans-SemiBold',
-          fontSize: 15
-        }}>
-        {item.title}
-      </Text>
+  const changeMode = async () => {
+    let _mode = modes[mode];
+    if (_mode.type === 'text' && validator.isURL(rawData.value)) {
+      let html = await sanitizeHtml(rawData.value);
+      html = await absolutifyImgs(html, rawData.value);
 
-      <Text
-        numberOfLines={1}
-        style={{
-          color: colors.icon,
-          fontSize: 12,
-          fontFamily: 'OpenSans-Regular'
-        }}>
-        {item.headline}
-      </Text>
-    </TouchableOpacity>
-  );
+      setNote(note => {
+        note.content.data = html;
+        return {...note};
+      });
+      setMode(2);
+      return;
+    }
+
+    if (_mode.type === 'clip') {
+      let html = validator.isURL(rawData.value)
+        ? makeHtmlFromUrl(rawData.value)
+        : makeHtmlFromPlainText(rawData.value);
+      setNote(note => {
+        note.content.data = html;
+        return {...note};
+      });
+      setMode(1);
+      return;
+    }
+  };
+
+  const onPaste = async () => {
+    let text = await Clipboard.getString();
+    if (text) {
+      let content = await getContent();
+      setNote(note => {
+        note.content.data = content + '\n' + makeHtmlFromPlainText(text);
+        return {...note};
+      });
+    }
+  };
 
   return (
     <AnimatedSAV
@@ -369,7 +374,12 @@ const NotesnookShare = () => {
       <TouchableOpacity
         activeOpacity={1}
         onPress={() => {
-          close();
+          if (showSearch) {
+            setShowSearch(false);
+            animate(1, 0);
+          } else {
+            close();
+          }
         }}
         style={{
           width: '100%',
@@ -385,45 +395,15 @@ const NotesnookShare = () => {
         />
       </TouchableOpacity>
 
-      <View
-        style={{
-          position: 'absolute',
-          top: 20,
-          backgroundColor: colors.bg,
-          borderRadius: 10,
-          width: '95%',
-          minHeight: 50,
-          alignSelf: 'center',
-          zIndex: 999,
-          ...getElevation(5)
-        }}>
-        <View
-          style={{
-            flexShrink: 1,
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            paddingHorizontal: 12,
-            marginBottom: 10
-          }}>
-          <TextInput
-            placeholder="Search for a note"
-            style={{
-              fontSize: 15,
-              fontFamily: 'OpenSans-Regular',
-              width: '85%'
-            }}
-          />
-          <Icon name="magnify" size={25} />
-        </View>
-        <FlatList
-          data={notes}
-          style={{
-            maxHeight: height - keyboardHeight.current
+      {showSearch && (
+        <Search
+          getKeyboardHeight={() => keyboardHeight.current}
+          close={() => {
+            setShowSearch(false);
+            animate(1, 0);
           }}
-          renderItem={renderItem}
         />
-      </View>
+      )}
 
       <AnimatedKAV
         enabled={!floating && Platform.OS === 'ios'}
@@ -457,40 +437,35 @@ const NotesnookShare = () => {
             }}>
             <Button
               color={appendNote ? colors.nav : colors.accent}
-              onPress={onPress}
+              onPress={() => {
+                useShareStore.getState().setAppendNote(null);
+              }}
               icon="plus"
               iconSize={18}
               iconColor={!appendNote ? colors.light : colors.icon}
-              title="New note"
-              textStyle={{
-                fontSize: 12,
-                color: !appendNote ? colors.light : colors.icon,
-                marginLeft: 5
-              }}
+              title="Create new note"
+              textColor={!appendNote ? colors.light : colors.icon}
+              type="rounded"
               style={{
-                marginRight: 15,
-                height: 30,
-                borderRadius: 100,
                 paddingHorizontal: 12
               }}
             />
 
             <Button
               color={!appendNote ? colors.nav : colors.accent}
-              onPress={onPress}
+              onPress={() => {
+                setShowSearch(true);
+                animate(1, 1000);
+              }}
               icon="text-short"
               iconSize={18}
               iconColor={appendNote ? colors.light : colors.icon}
-              title="Append to..."
-              textStyle={{
-                fontSize: 12,
-                color: appendNote ? colors.light : colors.icon,
-                marginLeft: 5
-              }}
+              title={`Append to ${
+                appendNote ? appendNote.title.slice(0, 15) : 'note'
+              }`}
+              textColor={appendNote ? colors.light : colors.icon}
+              type="rounded"
               style={{
-                marginRight: 15,
-                height: 30,
-                borderRadius: 100,
                 paddingHorizontal: 12
               }}
             />
@@ -508,6 +483,7 @@ const NotesnookShare = () => {
               iconSize={25}
               type="action"
               loading={loading}
+              iconColor={colors.light}
               style={{
                 position: 'absolute',
                 zIndex: 999,
@@ -566,6 +542,28 @@ const NotesnookShare = () => {
                 />
               </View>
 
+              {appendNote ? (
+                <Text
+                  style={{
+                    fontSize: 11,
+                    color: colors.gray,
+                    fontFamily: 'OpenSans-Regular',
+                    paddingHorizontal: 12,
+                    marginBottom: 10,
+                    flexWrap: 'wrap'
+                  }}>
+                  This shared note will be appended to{' '}
+                  <Text
+                    style={{
+                      color: colors.accent,
+                      fontFamily: 'OpenSans-SemiBold'
+                    }}>
+                    "{appendNote.title}"
+                  </Text>{' '}
+                  . Click on "Create new note" to add to a new note instead.
+                </Text>
+              ) : null}
+
               <View
                 style={{
                   flexDirection: 'row',
@@ -577,50 +575,13 @@ const NotesnookShare = () => {
                   color={colors.shade}
                   onPress={onPress}
                   icon={modes[mode].icon}
-                  onPress={async () => {
-                    let _mode = modes[mode];
-                    if (
-                      _mode.type === 'text' &&
-                      validator.isURL(rawData.value)
-                    ) {
-                      let html = await sanitizeHtml(rawData.value);
-                      html = await absolutifyImgs(html, rawData.value);
-
-                      setNote(note => {
-                        note.content.data = html;
-                        return {...note};
-                      });
-                      setMode(2);
-                      return;
-                    }
-
-                    if (_mode.type === 'clip') {
-                      let html = validator.isURL(rawData.value)
-                        ? makeHtmlFromUrl(rawData.value)
-                        : makeHtmlFromPlainText(rawData.value);
-                      setNote(note => {
-                        note.content.data = html;
-                        return {...note};
-                      });
-                      setMode(1);
-                      return;
-                    }
-                  }}
+                  onPress={changeMode}
                   title={modes[mode].title}
                   iconSize={18}
                   iconColor={colors.accent}
-                  textStyle={{
-                    fontSize: 12,
-                    color: colors.accent,
-                    marginLeft: 5
-                  }}
-                  style={{
-                    marginRight: 10,
-                    height: 30,
-                    borderRadius: 100,
-                    paddingHorizontal: 12,
-                    marginTop: -2.5
-                  }}
+                  textColor={colors.accent}
+                  type="rounded"
+                  style={{paddingHorizontal: 12}}
                 />
 
                 {Clipboard.hasString() ? (
@@ -628,32 +589,12 @@ const NotesnookShare = () => {
                     color={colors.nav}
                     onPress={onPress}
                     icon="clipboard"
-                    onPress={async () => {
-                      let text = await Clipboard.getString();
-                      if (text) {
-                        let content = await getContent();
-                        setNote(note => {
-                          note.content.data =
-                            content + '\n' + makeHtmlFromPlainText(text);
-                          return {...note};
-                        });
-                      }
-                    }}
+                    onPress={onPaste}
                     iconSize={18}
                     iconColor={colors.icon}
+                    textColor={colors.icon}
                     title="Paste"
-                    textStyle={{
-                      fontSize: 12,
-                      color: colors.icon,
-                      marginLeft: 5
-                    }}
-                    style={{
-                      marginRight: 15,
-                      height: 30,
-                      borderRadius: 100,
-                      paddingHorizontal: 6,
-                      marginTop: -2.5
-                    }}
+                    type="rounded"
                   />
                 ) : null}
               </View>
@@ -680,26 +621,45 @@ const Button = ({
   icon,
   iconSize = 1,
   type = 'button',
-  iconColor
+  iconColor = 'gray',
+  textColor = 'white'
 }) => {
   const types = {
     action: {
-      width: 60,
-      height: 60,
-      borderRadius: 100,
-      minWidth: 0,
-      paddingHorizontal: 0
+      style: {
+        width: 60,
+        height: 60,
+        borderRadius: 100,
+        minWidth: 0,
+        paddingHorizontal: 0
+      },
+      textStyle: {}
     },
     button: {
-      backgroundColor: color,
-      height: 50,
-      borderRadius: 5,
-      justifyContent: 'center',
-      alignItems: 'center',
-      flexDirection: 'row',
-      marginBottom: 10,
-      minWidth: 80,
-      paddingHorizontal: 20
+      style: {
+        height: 50,
+        borderRadius: 5,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        marginBottom: 10,
+        minWidth: 80,
+        paddingHorizontal: 20
+      },
+      textStyle: {}
+    },
+    rounded: {
+      style: {
+        marginRight: 15,
+        height: 30,
+        borderRadius: 100,
+        paddingHorizontal: 6,
+        marginTop: -2.5
+      },
+      textStyle: {
+        fontSize: 12,
+        marginLeft: 5
+      }
     }
   };
 
@@ -719,10 +679,10 @@ const Button = ({
           minWidth: 80,
           paddingHorizontal: 20
         },
-        types[type],
+        types[type].style,
         style
       ]}>
-      {loading && <ActivityIndicator color="white" />}
+      {loading && <ActivityIndicator color={iconColor} />}
 
       {icon && !loading && (
         <Icon name={icon} size={iconSize} color={iconColor || 'white'} />
@@ -735,10 +695,11 @@ const Button = ({
               fontSize: 18,
               fontFamily: Platform.OS === 'android' ? 'Roboto-Medium' : null,
               fontWeight: Platform.OS === 'ios' ? '600' : null,
-              color: 'white',
+              color: textColor,
               marginLeft: loading ? 10 : 0
             },
-            textStyle
+            textStyle,
+            types[type].textStyle
           ]}>
           {title}
         </Text>
