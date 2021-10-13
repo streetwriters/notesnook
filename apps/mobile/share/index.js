@@ -382,11 +382,10 @@ const NotesnookShare = ({quicknote = false}) => {
         justifyContent: quicknote ? 'center' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1
       }}>
-      {quicknote ? (
+      {quicknote && !showSearch ? (
         <Button
           type="action"
           icon="close"
-          color={colors.transGray}
           iconColor={colors.pri}
           onPress={() => {
             if (showSearch) {
@@ -399,8 +398,8 @@ const NotesnookShare = ({quicknote = false}) => {
           }}
           style={{
             position: 'absolute',
-            right: 12,
-            top: 12,
+            left: 12,
+            top: 6,
             width: 50,
             height: 50
           }}
@@ -457,7 +456,8 @@ const NotesnookShare = ({quicknote = false}) => {
           marginBottom: insets.top,
           transform: [
             {
-              translateY: Platform.OS !== 'ios' ? translate : 0
+              translateY:
+                Platform.OS !== 'ios' ? translate : showSearch ? 1000 : 0
             }
           ]
         }}
@@ -517,23 +517,25 @@ const NotesnookShare = ({quicknote = false}) => {
             style={{
               width: '100%'
             }}>
-            <Button
-              color={colors.accent}
-              onPress={onPress}
-              loading={loading || loadingIntent}
-              icon="check"
-              iconSize={25}
-              type="action"
-              loading={loading}
-              iconColor={colors.light}
-              style={{
-                position: 'absolute',
-                zIndex: 999,
-                ...getElevation(10),
-                right: 24,
-                bottom: -35
-              }}
-            />
+            {!quicknote && (
+              <Button
+                color={colors.accent}
+                onPress={onPress}
+                loading={loading || loadingIntent}
+                icon="check"
+                iconSize={25}
+                type="action"
+                loading={loading}
+                iconColor={colors.light}
+                style={{
+                  position: 'absolute',
+                  zIndex: 999,
+                  ...getElevation(10),
+                  right: 24,
+                  bottom: -35
+                }}
+              />
+            )}
 
             <View
               style={{
@@ -616,7 +618,6 @@ const NotesnookShare = ({quicknote = false}) => {
                 }}>
                 <Button
                   color={colors.shade}
-                  onPress={onPress}
                   icon={modes[mode].icon}
                   onPress={changeMode}
                   title={modes[mode].title}
@@ -630,7 +631,6 @@ const NotesnookShare = ({quicknote = false}) => {
                 {Clipboard.hasString() ? (
                   <Button
                     color={colors.nav}
-                    onPress={onPress}
                     icon="clipboard"
                     onPress={onPaste}
                     iconSize={18}
@@ -643,6 +643,25 @@ const NotesnookShare = ({quicknote = false}) => {
               </View>
             </View>
           </View>
+
+          {quicknote && (
+            <Button
+              color={colors.accent}
+              onPress={onPress}
+              iconSize={18}
+              iconColor={colors.light}
+              textColor={colors.light}
+              title="Save note"
+              textStyle={{
+                marginLeft: 5,
+                fontFamily: 'OpenSans-SemiBold'
+              }}
+              style={{
+                marginTop: 10
+              }}
+            />
+          )}
+
           <View
             style={{
               height: Platform.OS === 'ios' ? 60 : 40
@@ -736,8 +755,7 @@ const Button = ({
           style={[
             {
               fontSize: 18,
-              fontFamily: Platform.OS === 'android' ? 'Roboto-Medium' : null,
-              fontWeight: Platform.OS === 'ios' ? '600' : null,
+              fontFamily: 'OpenSans-Regular',
               color: textColor,
               marginLeft: loading ? 10 : 0
             },
