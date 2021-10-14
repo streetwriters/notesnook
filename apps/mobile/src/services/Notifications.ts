@@ -1,7 +1,10 @@
 import { useNoteStore } from './../provider/stores';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import { Platform } from 'react-native';
-import PushNotification, { Importance, PushNotificationDeliveredObject } from 'react-native-push-notification';
+import PushNotification, {
+  Importance,
+  PushNotificationDeliveredObject
+} from 'react-native-push-notification';
 import { eSendEvent } from './EventManager';
 import { db } from '../utils/database';
 import { DDS } from './DeviceDetection';
@@ -29,63 +32,119 @@ function loadNote(id: string, jump: boolean) {
 }
 
 function init() {
-  if (Platform.OS === "ios") return;
+  if (Platform.OS === 'ios') return;
   PushNotification.configure({
     onNotification: function (notification) {
       editing.movedAway = false;
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore
-        loadNote(notification.tag, false)
+        loadNote(notification.tag, false);
         return;
       }
 
-      let unsub = useNoteStore.subscribe((loading) => {
-        if (loading === false) {
-          //@ts-ignore
-          loadNote(notification.tag, true);
-          //@ts-ignore
-        }
-        unsub();
-      }, state => state.loading);
-
+      let unsub = useNoteStore.subscribe(
+        loading => {
+          if (loading === false) {
+            //@ts-ignore
+            loadNote(notification.tag, true);
+          }
+          unsub();
+        },
+        state => state.loading
+      );
     },
-    onAction: function (notification) {
-      console.log("ACTION: ", notification.id);
-      if (notification.action === 'UNPIN') {
-        //@ts-ignore
-        remove(notification.tag, notification.id);
+    onAction: async function (notification) {
+      console.log('ACTION: ', notification.action);
+      switch (notification.action) {
+        case "UNPIN":
+        case "Hide":
+          //@ts-ignore
+          remove(notification.tag, notification.id);
+          break
+        case "ReplyInput":
+          console.log("texto", notification);
+          //@ts-ignore/////
+          pinQuickNote(notification.id);
+          break
       }
     },
     popInitialNotification: true,
     //@ts-ignore
-    requestPermissions: Platform.OS === 'ios',
+    requestPermissions: Platform.OS === 'ios'
   });
 
   PushNotification.createChannel(
     {
-      channelId: CHANNEL_ID, // (required)
-      channelName: 'Notesnook', // (required)
-      playSound: false, // (optional) default: true
-      soundName: 'default', // (optional) See `soundName` parameter of `localNotification` function
-      importance: Importance.HIGH, // (optional) default: Importance.HIGH. Int value of the Android notification importance
-      vibrate: true, // (optional) default: true. Creates the default vibration pattern if true.
+      channelId: CHANNEL_ID,
+      channelName: 'Notesnook',
+      playSound: false,
+      soundName: 'default',
+      importance: Importance.HIGH,
+      vibrate: true
     },
-    created => console.log(`createChannel returned '${created}'`), // (optional) callback returns whether the channel was created, false means it already existed.
+    created => console.log(`createChannel returned '${created}'`)
   );
 }
 
 function remove(tag: string, id: string) {
   console.log(tag, id);
-  PushNotification.clearLocalNotification(tag || NOTIFICATION_TAG, parseInt(id));
+  PushNotification.clearLocalNotification(
+    tag || NOTIFICATION_TAG,
+    parseInt(id)
+  );
   get().then(() => {
-    eSendEvent("onUpdate", "unpin");
+    eSendEvent('onUpdate', 'unpin');
   });
 }
 
-function present({ title, message, subtitle, bigText, actions = [], ongoing, tag }: { title: string, message: string, subtitle: string, bigText: string, actions: Array<string>, ongoing: boolean, tag: string }) {
+function pinQuickNote(id: string) {
 
+  present({
+    title: 'Quick note',
+    message: 'Tap on "Add Note" to take a note here',
+    ongoing: true,
+    actions: ['ReplyInput', 'Hide'],
+    tag: 'notesnook_note_input',
+    reply_button_text: 'Take note',
+    reply_placeholder_text: 'Write something...',
+    id: parseInt(id)
+  });
+}
+
+async function unpinQuickNote() {
+  let all = await get();
+  let quicknote = all.find(n => n.tag === "notesnook_note_input")
+  if (quicknote) {
+    remove(quicknote.tag, quicknote.identifier)
+  }
+}
+
+function present({
+  title,
+  message,
+  subtitle,
+  bigText,
+  actions = [],
+  ongoing,
+  tag,
+  reply_placeholder_text,
+  reply_button_text,
+  id
+}: {
+  title?: string;
+  message: string;
+  subtitle?: string;
+  bigText?: string;
+  actions?: Array<string>;
+  ongoing?: boolean;
+  tag?: string;
+  reply_placeholder_text?: string;
+  reply_button_text?: string;
+  id?: number
+}) {
   PushNotification.localNotification({
+    id: id,
     channelId: CHANNEL_ID,
     tag: tag || NOTIFICATION_TAG,
     ongoing: ongoing,
@@ -98,7 +157,10 @@ function present({ title, message, subtitle, bigText, actions = [], ongoing, tag
     message: message,
     invokeApp: false,
     autoCancel: false,
-    smallIcon: "ic_stat_name"
+    smallIcon: 'ic_stat_name',
+    //@ts-ignore
+    reply_placeholder_text,
+    reply_button_text
   });
 }
 
@@ -113,7 +175,7 @@ function getPinnedNotes(): PushNotificationDeliveredObject[] {
 
 function get(): Promise<PushNotificationDeliveredObject[]> {
   return new Promise(resolve => {
-    if (Platform.OS === "ios") resolve([]);
+    if (Platform.OS === 'ios') resolve([]);
     PushNotification.getDeliveredNotifications(n => {
       pinned = n;
       resolve(n);
@@ -127,5 +189,6 @@ export default {
   clearAll,
   remove,
   get,
-  getPinnedNotes
+  getPinnedNotes,
+  pinQuickNote, unpinQuickNote
 };

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect } from 'react';
-import RNFetchBlob from 'rn-fetch-blob';
 import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Header } from '../../components/Header/index';
@@ -9,12 +8,12 @@ import { useNoteStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import Notifications from '../../services/Notifications';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager, scrollRef } from '../../utils';
 import { db } from '../../utils/database';
-import { eClearEditor, eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
 import { getNote } from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
@@ -81,6 +80,10 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
+   
+    Notifications.pinQuickNote();
+
+    return;
     if (!DDS.isTab) {
       if (getNote()) {
        eSendEvent(eOnLoadNote, {type: 'new'});
