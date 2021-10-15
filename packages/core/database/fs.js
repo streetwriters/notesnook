@@ -23,8 +23,11 @@ export default class FileStorage {
 
   async uploadFile(groupId, hash) {
     const token = await this.tokenManager.getAccessToken();
-    const url = await this._getPresignedURL(hash, token, "PUT");
-    const { execute, cancel } = this.fs.uploadFile(hash, { url });
+    const url = `${hosts.API_HOST}/s3?name=${hash}`;
+    const { execute, cancel } = this.fs.uploadFile(hash, {
+      url,
+      headers: { Authorization: `Bearer ${token}` },
+    });
     this._queue.push({ groupId, hash, cancel, type: "upload" });
     const result = await execute();
     this._deleteOp(groupId, "upload");
@@ -75,16 +78,5 @@ export default class FileStorage {
    */
   exists(filename) {
     return this.fs.exists(filename);
-  }
-
-  async _getPresignedURL(filename, token, verb) {
-    const response = await fetch(`${hosts.API_HOST}/s3?name=${filename}`, {
-      method: verb,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (response.ok) return await response.text();
-    throw new Error("Couldn't get presigned url.");
   }
 }
