@@ -1,46 +1,32 @@
+import "web-streams-polyfill/dist/ponyfill";
 import localforage from "localforage";
-import { createXXHash3, xxhash3 } from "hash-wasm";
+import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import "worker-loader!nncryptoworker/dist/src/worker.js";
 import { StreamableFS } from "streamablefs";
 import NNCrypto from "./nncrypto.stub";
+import hosts from "notes-core/utils/constants";
+import StreamSaver from "streamsaver";
+StreamSaver.mitm = "/downloader.html";
 
-const PLACEHOLDER = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAxMzUuNDcgMTM1LjQ3Ij48ZyBmaWxsPSJncmF5Ij48cGF0aCBkPSJNNjUuNjMgNjUuODZhNC40OCA0LjQ4IDAgMSAwLS4wMS04Ljk2IDQuNDggNC40OCAwIDAgMCAwIDguOTZ6bTAtNi4zM2ExLjg1IDEuODUgMCAxIDEgMCAzLjcgMS44NSAxLjg1IDAgMCAxIDAtMy43em0wIDAiLz48cGF0aCBkPSJNODguNDkgNDguNTNINDYuOThjLS45IDAtMS42NC43My0xLjY0IDEuNjRWODUuM2MwIC45Ljc0IDEuNjQgMS42NCAxLjY0aDQxLjVjLjkxIDAgMS42NC0uNzQgMS42NC0xLjY0VjUwLjE3YzAtLjktLjczLTEuNjQtMS42My0xLjY0Wm0tLjk5IDIuNjJ2MjAuNzdsLTguMjUtOC4yNWExLjM4IDEuMzggMCAwIDAtMS45NSAwTDY1LjYzIDc1LjM0bC03LjQ2LTcuNDZhMS4zNyAxLjM3IDAgMCAwLTEuOTUgMGwtOC4yNSA4LjI1VjUxLjE1Wk00Ny45NyA4NC4zMXYtNC40N2w5LjIyLTkuMjIgNy40NiA3LjQ1YTEuMzcgMS4zNyAwIDAgMCAxLjk1IDBMNzguMjcgNjYuNGw5LjIzIDkuMjN2OC42OHptMCAwIi8+PC9nPjwvc3ZnPg==`;
+const ABYTES = 17;
+const CHUNK_SIZE = 5 * 1024 * 1024;
+const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
 const crypto = new NNCrypto("/static/js/bundle.worker.js");
 const streamablefs = new StreamableFS("streamable-fs");
-const fs = localforage.createInstance({
-  storeName: "notesnook-fs",
-  name: "NotesnookFS",
-  driver: [localforage.INDEXEDDB, localforage.WEBSQL, localforage.LOCALSTORAGE],
-});
-
-fs.hasItem = async function (key) {
-  const keys = await fs.keys();
-  return keys.includes(key);
-};
 
 /**
- * We perform 4 steps here:
- * 1. We convert base64 to Uint8Array (if we get base64, that is)
- * 2. We hash the Uint8Array.
- * 3. We encrypt the Uint8Array
- * 4. We save the encrypted Uint8Array
  * @param {File} file
+ * @param {import("nncrypto/dist/src/types").SerializedKey} key
+ * @param {string} hash
  */
-async function* writeEncryptedFile(file, key) {
+async function writeEncryptedFile(file, key, hash) {
   if (!localforage.supports(localforage.INDEXEDDB))
     throw new Error("This browser does not support IndexedDB.");
 
-  const reader = file.stream().getReader();
-  const { hash, type: hashType } = await hashStream(reader);
-  reader.releaseLock();
-
-  yield { hash, hashType };
-
   let offset = 0;
-  let CHUNK_SIZE = 5 * 1024 * 1024;
 
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
 
@@ -66,8 +52,6 @@ async function* writeEncryptedFile(file, key) {
   );
 
   return {
-    hash,
-    hashType,
     iv: iv,
     length: file.size,
     salt: key.salt,
@@ -83,30 +67,13 @@ async function* writeEncryptedFile(file, key) {
  * 4. We save the encrypted Uint8Array
  */
 async function writeEncrypted(filename, { data, type, key, hash }) {
-  const saveAsBuffer = localforage.supports(localforage.INDEXEDDB);
   if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
 
   if (!hash) hash = await hashBuffer(data);
   if (!filename) filename = hash;
 
-  if (await fs.hasItem(filename)) return {};
-
-  const output = await crypto.encrypt(
-    key,
-    {
-      data,
-      format: "uint8array",
-    },
-    saveAsBuffer ? "uint8array" : "base64"
-  );
-
-  await fs.setItem(filename, output.cipher);
-  return {
-    iv: output.iv,
-    length: output.length,
-    salt: output.salt,
-    alg: output.alg,
-  };
+  const blob = new Blob([data], { type });
+  return await writeEncryptedFile(blob, key, hash);
 }
 
 /**
@@ -116,8 +83,8 @@ async function writeEncrypted(filename, { data, type, key, hash }) {
  */
 async function hashBuffer(data) {
   return {
-    hash: await xxhash3(data),
-    type: "xxh3",
+    hash: await xxhash64(data),
+    type: "xxh64",
   };
 }
 
@@ -127,7 +94,7 @@ async function hashBuffer(data) {
  * @returns
  */
 async function hashStream(reader) {
-  const hasher = await createXXHash3();
+  const hasher = await createXXHash64();
   hasher.init();
 
   while (true) {
@@ -136,100 +103,211 @@ async function hashStream(reader) {
     hasher.update(value);
   }
 
-  return { type: "xxh3", hash: hasher.digest("hex") };
+  return { type: "xxh64", hash: hasher.digest("hex") };
 }
 
 async function readEncrypted(filename, key, cipherData) {
   console.log("Reading encrypted file", filename);
-
-  const readAsBuffer = localforage.supports(localforage.INDEXEDDB);
-  cipherData.cipher = await fs.getItem(filename);
-  cipherData.format = readAsBuffer ? "uint8array" : "base64";
-
-  if (!cipherData.cipher) {
+  const fileHandle = await streamablefs.readFile(filename);
+  if (!fileHandle) {
     console.error(`File not found. Filename: ${filename}`);
     return null;
   }
 
-  return await crypto.decrypt(key, cipherData, cipherData.outputType);
+  const reader = fileHandle.getReader();
+  const plainText = new Uint8Array(
+    fileHandle.file.size + fileHandle.file.chunks * ABYTES
+  );
+
+  let offset = 0;
+  await crypto.decryptStream(
+    key,
+    cipherData.iv,
+    {
+      read: async () => {
+        const { value } = await reader.read();
+        return value;
+      },
+      write: async (chunk) => {
+        if (!chunk) return;
+
+        plainText.set(chunk, offset);
+        offset += chunk.length;
+      },
+    },
+    filename
+  );
+
+  return cipherData.outputType === "base64"
+    ? Buffer.from(plainText).toString("base64")
+    : plainText;
 }
 
 async function uploadFile(filename, requestOptions) {
   console.log("Request to upload file", filename, requestOptions);
-  const { url, cancellationToken } = requestOptions;
 
-  let cipher = await fs.getItem(filename);
-  if (!cipher) throw new Error(`File not found. Filename: ${filename}`);
+  const fileHandle = await streamablefs.readFile(filename);
+  if (!fileHandle)
+    throw new Error(`File stream not found. Filename: ${filename}`);
 
-  const readAsBuffer = localforage.supports(localforage.INDEXEDDB);
-  if (!readAsBuffer)
-    cipher = Uint8Array.from(window.atob(cipher), (c) => c.charCodeAt(0));
+  let {
+    uploadedChunks = [],
+    uploadedBytes = 0,
+    uploaded = false,
+    uploadId = "",
+  } = fileHandle.file.additionalData || {};
 
-  const response = await axios.request({
-    url: url,
-    method: "PUT",
-    headers: {
-      "Content-Type": "",
-    },
-    cancelToken: cancellationToken,
-    data: new Blob([cipher.buffer]),
-    onUploadProgress: (ev) => {
-      console.log("Uploading file", filename, ev);
-      AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
+  if (uploaded) return true;
+
+  const { headers, cancellationToken } = requestOptions;
+
+  const initiateMultiPartUpload = await axios.get(
+    `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${fileHandle.file.chunks}&uploadId=${uploadId}`,
+    {
+      headers,
+      cancelToken: cancellationToken,
+    }
+  );
+  if (!isSuccessStatusCode(initiateMultiPartUpload.status))
+    throw new Error("Could not initiate multi-part upload.");
+
+  uploadId = initiateMultiPartUpload.data.uploadId;
+  const { parts } = initiateMultiPartUpload.data;
+
+  await fileHandle.addAdditionalData("uploadId", uploadId);
+
+  function onUploadProgress(ev) {
+    reportProgress(
+      {
+        total: fileHandle.file.size,
+        loaded: uploadedBytes + ev.loaded,
+      },
+      {
         type: "upload",
         hash: filename,
-        total: ev.total,
-        loaded: ev.loaded,
-      });
-    },
-  });
+      }
+    );
+  }
 
-  console.log("File uploaded:", filename, response);
-  return isSuccessStatusCode(response.status);
+  for (let i = uploadedChunks.length; i < parts.length; ++i) {
+    const url = parts[i];
+    const chunk = await fileHandle.readChunk(i);
+    if (!chunk) throw new Error(`Chunk at offset ${i} not found.`);
+
+    const response = await axios.request({
+      url,
+      method: "PUT",
+      headers: { "Content-Type": "" },
+      cancelToken: cancellationToken,
+      data: new Blob([chunk.buffer]),
+      onUploadProgress,
+    });
+    if (!isSuccessStatusCode(response.status) || !response.headers.etag)
+      throw new Error(`Failed to upload chunk at offset ${i}.`);
+
+    uploadedBytes += chunk.length;
+    uploadedChunks.push({
+      PartNumber: i + 1,
+      ETag: JSON.parse(response.headers.etag),
+    });
+    await fileHandle.addAdditionalData("uploadedChunks", uploadedChunks);
+    await fileHandle.addAdditionalData("uploadedBytes", uploadedBytes);
+  }
+
+  const completeMultiPartUpload = await axios.post(
+    `${hosts.API_HOST}/s3/multipart`,
+    {
+      Key: filename,
+      UploadId: uploadId,
+      PartETags: uploadedChunks,
+    },
+    {
+      headers,
+      cancelToken: cancellationToken,
+    }
+  );
+  if (!isSuccessStatusCode(completeMultiPartUpload.status))
+    throw new Error("Could not complete multi-part upload.");
+
+  await fileHandle.addAdditionalData("uploaded", true);
+
+  return true;
+}
+
+function reportProgress(ev, { type, hash }) {
+  AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
+    type,
+    hash,
+    total: ev.total,
+    loaded: ev.loaded,
+  });
 }
 
 async function downloadFile(filename, requestOptions) {
   const { url, headers, cancellationToken } = requestOptions;
   console.log("Request to download file", filename, url, headers);
-  if (await fs.hasItem(filename)) return true;
+  if (await streamablefs.exists(filename)) return true;
 
   const response = await axios.get(url, {
     headers: headers,
-    responseType: "blob",
+    responseType: "arraybuffer",
     cancelToken: cancellationToken,
-    onDownloadProgress: (ev) => {
-      console.log("Downloading file", filename, ev);
-      AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
-        type: "download",
-        hash: filename,
-        total: ev.total,
-        loaded: ev.loaded,
-      });
-    },
+    onDownloadProgress: (ev) =>
+      reportProgress(ev, { type: "download", hash: filename }),
   });
+
   console.log("File downloaded", filename, url, response);
   if (!isSuccessStatusCode(response.status)) return false;
-  const blob = new Blob([response.data]);
-  await fs.setItem(filename, new Uint8Array(await blob.arrayBuffer()));
+
+  const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
+  distributor.fill(new Uint8Array(response.data));
+  distributor.close();
+
+  const fileHandle = await streamablefs.createFile(
+    filename,
+    response.data.byteLength,
+    "application/octet-stream"
+  );
+
+  for (let chunk of distributor.chunks) {
+    fileHandle.write(chunk.data);
+  }
+
   return true;
 }
 
-async function deleteFile(filename, requestOptions) {
-  const { url, headers, cancellationToken } = requestOptions;
-  console.log("Request to delete file", filename, url, headers);
-  if (!(await fs.hasItem(filename))) return true;
-
-  const response = await axios.delete(url, {
-    cancelToken: cancellationToken,
-    headers: headers,
-  });
-  const result = isSuccessStatusCode(response.status);
-  if (result) await fs.removeItem(filename);
-  return result;
+function exists(filename) {
+  return streamablefs.exists(filename);
 }
 
-function exists(filename) {
-  return fs.hasItem(filename);
+async function saveFile(filename, { key, iv, name, size }) {
+  const fileHandle = await streamablefs.readFile(filename);
+  if (!fileHandle) return false;
+
+  const writerStream = StreamSaver.createWriteStream(name, {
+    size,
+  });
+
+  const reader = fileHandle.getReader();
+  const writer = writerStream.getWriter();
+  await writer.ready;
+
+  await crypto.decryptStream(
+    key,
+    iv,
+    {
+      read: async () => {
+        const { value } = await reader.read();
+        return value;
+      },
+      write: async (chunk) => {
+        await writer.ready;
+        if (!chunk) writer.close();
+        else await writer.write(chunk);
+      },
+    },
+    filename
+  );
 }
 
 const FS = {
@@ -237,7 +315,7 @@ const FS = {
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
-  deleteFile,
+  saveFile,
   exists,
   hashBuffer,
   hashStream,
@@ -255,7 +333,90 @@ function cancellable(operation) {
     requestOptions.cancellationToken = source.token;
     return {
       execute: () => operation(filename, requestOptions),
-      cancel: (message) => source.cancel(message),
+      cancel: (message) => {
+        source.cancel(message);
+      },
     };
   };
+}
+
+class ChunkDistributor {
+  /**
+   * @typedef {{length: number, data: Uint8Array, final: boolean}} Chunk
+   */
+
+  constructor(chunkSize) {
+    this.chunkSize = chunkSize;
+    this.chunks = [];
+    this.filledCount = 0;
+    this.done = false;
+  }
+
+  /**
+   * @returns {Chunk}
+   */
+  get lastChunk() {
+    return this.chunks[this.chunks.length - 1];
+  }
+
+  /**
+   * @returns {boolean}
+   */
+  get isLastChunkFilled() {
+    return this.lastChunk.length === this.chunkSize;
+  }
+
+  /**
+   * @returns {Chunk}
+   */
+  get firstChunk() {
+    const chunk = this.chunks.shift();
+    if (chunk.data.length === this.chunkSize) this.filledCount--;
+    return chunk;
+  }
+
+  close() {
+    this.lastChunk.data = this.lastChunk.data.slice(0, this.lastChunk.length);
+    this.lastChunk.final = true;
+    this.done = true;
+  }
+
+  /**
+   * @param {Uint8Array} data
+   */
+  fill(data) {
+    if (this.done || !data || !data.length) return;
+
+    const dataLength = data.length;
+    const totalBlocks = Math.ceil(dataLength / this.chunkSize);
+
+    for (let i = 0; i < totalBlocks; ++i) {
+      const start = i * this.chunkSize;
+
+      if (this.lastChunk && !this.isLastChunkFilled) {
+        const needed = this.chunkSize - this.lastChunk.length;
+        const end = Math.min(start + needed, dataLength);
+        const chunk = data.slice(start, end);
+
+        this.lastChunk.data.set(chunk, this.lastChunk.length);
+        this.lastChunk.length += chunk.length;
+
+        if (this.lastChunk.length === this.chunkSize) this.filledCount++;
+
+        if (end !== dataLength) {
+          this.fill(data.slice(end));
+          break;
+        }
+      } else {
+        const end = Math.min(start + this.chunkSize, dataLength);
+        let chunk = data.slice(start, end);
+
+        const buffer = new Uint8Array(this.chunkSize);
+        buffer.set(chunk, 0);
+
+        this.chunks.push({ data: buffer, final: false, length: chunk.length });
+        if (chunk.length === this.chunkSize) this.filledCount++;
+      }
+    }
+  }
 }

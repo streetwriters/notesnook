@@ -9,7 +9,7 @@ import Animated from "../animated";
 import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
-import FileSaver from "file-saver";
+import FS from "../../interfaces/fs";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -286,28 +286,13 @@ function Properties({ noteId }) {
                             attachment.metadata.hash,
                             attachment.metadata.hash
                           );
-                          const data = await db.fs.readEncrypted(
-                            attachment.metadata.hash,
-                            await db.user.getEncryptionKey(),
-                            {
-                              iv: attachment.iv,
-                              salt: attachment.salt,
-                              length: attachment.length,
-                              alg: attachment.alg,
-                              outputType: "uint8array",
-                            }
-                          );
-                          // download(
-                          //   attachment.metadata.filename,
-                          //   data,
-                          //   attachment.metadata.type
-                          // );
-                          FileSaver.saveAs(
-                            new Blob([data], {
-                              type: attachment.metadata.type,
-                            }),
-                            attachment.metadata.filename
-                          );
+
+                          await FS.saveFile(attachment.metadata.hash, {
+                            key: await db.user.getEncryptionKey(),
+                            iv: attachment.iv,
+                            name: attachment.metadata.filename,
+                            size: attachment.length,
+                          });
                         }}
                       >
                         <Icon.Download size={16} />

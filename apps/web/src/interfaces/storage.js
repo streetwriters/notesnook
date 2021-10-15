@@ -66,6 +66,7 @@ async function getCryptoKey(name) {
   }
 }
 
+const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 const Storage = {
   read,
   readMulti,
@@ -75,9 +76,14 @@ const Storage = {
   getAllKeys,
   deriveCryptoKey,
   getCryptoKey,
-  hash: crypto.hash,
-  encrypt: crypto.encrypt,
-  decrypt: crypto.decrypt,
+  hash: (password, email) => crypto.hash(password, `${APP_SALT}${email}`),
+  encrypt: (key, plainText) =>
+    crypto.encrypt(key, { format: "text", data: plainText }, "base64"),
+  decrypt: async (key, cipherData) => {
+    cipherData.format = "base64";
+    const result = await crypto.decrypt(key, cipherData);
+    return result.data;
+  },
 };
 export default Storage;
 

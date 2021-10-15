@@ -38,23 +38,26 @@ async function pickFile() {
   const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
   if (!selectedFile) return;
 
-  const generator = fs.writeEncryptedFile(selectedFile, key);
+  const reader = selectedFile.stream().getReader();
+  const { hash, type: hashType } = await fs.hashStream(reader);
+  reader.releaseLock();
 
-  let { value: output } = await generator.next();
-  if (!db.attachments.exists(output.hash)) {
-    const { value } = await generator.next();
-    output = value;
+  let output = {};
+  if (!db.attachments.exists(hash)) {
+    output = await fs.writeEncryptedFile(selectedFile, key, hash);
   }
-  console.log(output);
+
   await db.attachments.add({
     ...output,
-    salt: "sda",
+    hash,
+    hashType,
+    salt: key.salt,
     filename: selectedFile.name,
     type: selectedFile.type,
   });
 
   return {
-    hash: output.hash,
+    hash: hash,
     filename: selectedFile.name,
     type: selectedFile.type,
     size: selectedFile.size,
@@ -67,17 +70,16 @@ async function pickImage() {
   const selectedImage = await showFilePicker({ acceptedFileTypes: "image/*" });
   if (!selectedImage) return;
 
-  const { dataurl, buffer } = await compressImage(selectedImage, "buffer");
-  const { hash, type: hashType } = await fs.hashBuffer(Buffer.from(buffer));
+  const { dataurl, blob } = await compressImage(selectedImage, "buffer");
 
-  const output = db.attachments.exists(hash)
-    ? {}
-    : await fs.writeEncrypted(null, {
-        data: new Uint8Array(buffer),
-        type: "buffer",
-        key,
-        hash,
-      });
+  const reader = blob.stream().getReader();
+  const { hash, type: hashType } = await fs.hashStream(reader);
+  reader.releaseLock();
+
+  var output = {};
+  if (!db.attachments.exists(hash)) {
+    output = await fs.writeEncryptedFile(blob, key, hash);
+  }
 
   await db.attachments.add({
     ...output,
@@ -97,7 +99,7 @@ async function pickImage() {
 }
 
 async function getEncryptionKey() {
-  return { password: "helloworld" };
+  // return { password: "helloworld" };
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
   return key; // { password: "helloworld" };
@@ -125,7 +127,7 @@ function showFilePicker({ acceptedFileTypes }) {
  *
  * @param {File} file
  * @param {"base64"|"buffer"} type
- * @returns {{ dataurl: string, buffer: ArrayBuffer }}
+ * @returns {Promise<Blob>}
  */
 function compressImage(file, type) {
   return new Promise((resolve, reject) => {
@@ -141,7 +143,10 @@ function compressImage(file, type) {
       async success(result) {
         const buffer = await result.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
-        resolve({ dataurl: `data:${file.type};base64,${base64}`, buffer });
+        resolve({
+          dataurl: `data:${file.type};base64,${base64}`,
+          blob: result,
+        });
       },
       error(err) {
         reject(err);
