@@ -86,16 +86,26 @@ export class NNCrypto implements INNCrypto {
       const { data, final } = chunk;
       await stream.write(decryptionStream.read(data));
 
-      if (!final) break;
+      if (final) break;
     }
   }
 
   async encryptStream(
     key: SerializedKey,
     stream: IStreamable,
-    _filename?: string
+    _streamId?: string
   ): Promise<string> {
     await this.init();
     return await this.createEncryptionStream(key, stream);
+  }
+
+  async decryptStream(
+    key: SerializedKey,
+    iv: string,
+    stream: IStreamable,
+    _streamId?: string
+  ): Promise<void> {
+    await this.init();
+    await this.createDecryptionStream(iv, key, stream);
   }
 }

@@ -34,6 +34,13 @@ export interface INNCrypto {
   encryptStream(
     key: SerializedKey,
     stream: IStreamable,
-    filename?: string
+    streamId?: string
   ): Promise<string>;
+
+  decryptStream(
+    key: SerializedKey,
+    iv: string,
+    stream: IStreamable,
+    streamId?: string
+  ): Promise<void>;
 }

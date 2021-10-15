@@ -82,9 +82,37 @@ export class NNCryptoWorker implements INNCrypto {
     if (!this.workermodule) throw new Error("Worker module is not ready.");
     if (!this.worker) throw new Error("Worker is not ready.");
 
+    const eventListener = await this.createWorkerStream(streamId, stream);
+    this.worker.addEventListener("message", eventListener);
+    const iv = await this.workermodule.createEncryptionStream(streamId, key);
+    this.worker.removeEventListener("message", eventListener);
+    return iv;
+  }
+
+  async decryptStream(
+    key: SerializedKey,
+    iv: string,
+    stream: IStreamable,
+    streamId?: string
+  ): Promise<void> {
+    if (!streamId) throw new Error("streamId is required.");
+    await this.init();
+    if (!this.workermodule) throw new Error("Worker module is not ready.");
+    if (!this.worker) throw new Error("Worker is not ready.");
+
+    const eventListener = await this.createWorkerStream(streamId, stream);
+    this.worker.addEventListener("message", eventListener);
+    await this.workermodule.createDecryptionStream(streamId, iv, key);
+    this.worker.removeEventListener("message", eventListener);
+  }
+
+  private async createWorkerStream(
+    streamId: string,
+    stream: IStreamable
+  ): Promise<EventListenerObject> {
     const readEventType = `${streamId}:read`;
     const writeEventType = `${streamId}:write`;
-    const eventListener = {
+    return {
       handleEvent: async (ev: MessageEvent) => {
         const { type } = ev.data;
         if (type === readEventType) {
@@ -97,18 +125,5 @@ export class NNCryptoWorker implements INNCrypto {
         }
       },
     };
-    this.worker.addEventListener("message", eventListener);
-    const iv = await this.workermodule.createEncryptionStream(streamId, key);
-    this.worker.removeEventListener("message", eventListener);
-    return iv;
   }
-
-  // async createDecryptionStream(
-  //   iv: string,
-  //   key: SerializedKey,
-  //   stream: IStreamable
-  // ) {
-  //   await this.init();
-  //   if (!this.workermodule) throw new Error("Worker module is not ready.");
-  // }
 }
