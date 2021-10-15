@@ -37,4 +37,21 @@ export default class FileHandle extends ReadableStream {
   private getChunkKey(offset: number): string {
     return `${this.file.filename}-chunk-${offset}`;
   }
+
+  async readChunk(offset: number): Promise<Uint8Array | null> {
+    const array = await this.storage.getItem<Uint8Array>(
+      this.getChunkKey(offset)
+    );
+    return array;
+  }
+
+  async toBlob() {
+    let blobParts: BlobPart[] = [];
+    for (let i = 0; i < this.file.chunks; ++i) {
+      const array = await this.readChunk(i);
+      if (!array) continue;
+      blobParts.push(array.buffer);
+    }
+    return new Blob(blobParts, { type: this.file.type });
+  }
 }
