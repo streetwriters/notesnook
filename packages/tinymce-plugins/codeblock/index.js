@@ -171,12 +171,7 @@ var registerHandlers = function (api, editor) {
         moveCaretTo(node, characterRange.start, endIndex);
       } else {
         // TODO: handle line deindent
-        node.textContent = insertAt(text, TAB, characterRange.start);
-        moveCaretTo(
-          node,
-          characterRange.start + TAB.length,
-          characterRange.end + TAB.length
-        );
+        editor.insertContent(TAB);
       }
     } else {
       editor.insertContent(TAB);
