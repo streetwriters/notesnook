@@ -35,7 +35,14 @@ function register(editor) {
 function toggleInlineCode(editor) {
   editor.undoManager.transact(() => {
     editor.focus();
-    editor.execCommand("mceToggleFormat", false, "code");
+    const range = editor.selection.getRng();
+    const node = editor.selection.getNode();
+
+    if (node.tagName !== TAGNAME && range.startOffset === range.endOffset) {
+      editor.selection.setContent("<code>&#xFEFF;</code>");
+    } else {
+      editor.execCommand("mceToggleFormat", false, "code");
+    }
   });
 }
 
