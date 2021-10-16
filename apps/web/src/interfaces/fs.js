@@ -4,7 +4,7 @@ import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common";
 // eslint-disable-next-line import/no-webpack-loader-syntax
-import "worker-loader!nncryptoworker/dist/src/worker.js";
+import "worker-loader?filename=static/workers/nncrypto.worker.js!nncryptoworker/dist/src/worker.js";
 import { StreamableFS } from "streamablefs";
 import NNCrypto from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
@@ -13,9 +13,9 @@ import { sendAttachmentsProgressEvent } from "notes-core/common";
 StreamSaver.mitm = "/downloader.html";
 
 const ABYTES = 17;
-const CHUNK_SIZE = 5 * 1024 * 1024;
+const CHUNK_SIZE = 512 * 1024;
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
-const crypto = new NNCrypto("/static/js/bundle.worker.js");
+const crypto = new NNCrypto("/static/workers/nncrypto.worker.js");
 const streamablefs = new StreamableFS("streamable-fs");
 
 /**

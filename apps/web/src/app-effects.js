@@ -80,7 +80,6 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
     const progressEvent = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ type, total, loaded }) => {
-        console.log(type, total, loaded);
         const [key] = getProcessingStatusFromType(type);
         if (!key) return;
 
