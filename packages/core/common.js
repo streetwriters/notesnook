@@ -10,7 +10,7 @@ export async function sendCheckUserStatusEvent(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
-export async function sendAttachmentsProgressEvent(type, total, current) {
+export function sendAttachmentsProgressEvent(type, total, current) {
   EV.publish(EVENTS.attachmentsLoading, {
     type,
     total,
