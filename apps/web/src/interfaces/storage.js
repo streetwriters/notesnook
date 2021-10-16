@@ -42,7 +42,7 @@ async function deriveCryptoKey(name, data) {
 
   const keyData = await crypto.deriveKey(password, salt, true);
 
-  if (localforage.supports(localforage.INDEXEDDB) && window?.crypto?.subtle) {
+  if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await derivePBKDF2Key(password);
     await write(name, pbkdfKey);
     const cipheredKey = await aesEncrypt(pbkdfKey, keyData);
@@ -53,7 +53,7 @@ async function deriveCryptoKey(name, data) {
 }
 
 async function getCryptoKey(name) {
-  if (localforage.supports(localforage.INDEXEDDB) && window?.crypto?.subtle) {
+  if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await read(name);
     const cipheredKey = await read(`${name}@_k`);
     if (typeof cipheredKey === "string") return cipheredKey;
@@ -62,6 +62,10 @@ async function getCryptoKey(name) {
   } else {
     return await read(`${name}@_k`);
   }
+}
+
+function isIndexedDBSupported() {
+  return localforage.driver() === "asyncStorage";
 }
 
 const Storage = {
