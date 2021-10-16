@@ -725,14 +725,12 @@ function AccountStatus(props) {
     isProCancelled,
     isProExpired,
     remainingDays,
-    remainingHours,
   } = useMemo(() => {
     const type = user?.subscription?.type;
     const expiry = user?.subscription?.expiry;
     if (!type || !expiry) return { isBasic: true };
     return {
       remainingDays: dayjs(expiry).diff(dayjs(), "day"),
-      remainingHours: dayjs(expiry).diff(dayjs(), "hours"),
       isTrial: type === SUBSCRIPTION_STATUS.TRIAL,
       isBasic: type === SUBSCRIPTION_STATUS.BASIC,
       isBeta: type === SUBSCRIPTION_STATUS.BETA,
@@ -754,7 +752,7 @@ function AccountStatus(props) {
       : isBeta
       ? `Your were enrolled in our beta program on ${startDate}`
       : isTrial
-      ? `Your trial period started on ${startDate}`
+      ? `Your free trial period will end on ${expiryDate}`
       : null;
   }, [isPro, isProExpired, isProCancelled, isBeta, isTrial, user]);
 
@@ -799,10 +797,10 @@ function AccountStatus(props) {
         fontSize={26}
         mt={2}
       >
-        {remainingDays === 0
-          ? `${remainingHours} hours remaining`
-          : remainingDays > 0
-          ? `${remainingDays} days remaining`
+        {remainingDays > 0 && isPro
+          ? `You are subscribed to the Pro plan.`
+          : remainingDays > 0 && isTrial
+          ? "Your free trial is ongoing."
           : isBeta
           ? "Your beta subscription has ended."
           : isTrial
