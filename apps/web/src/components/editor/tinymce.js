@@ -31,6 +31,7 @@ import "@streetwritersco/tinymce-plugins/collapsibleheaders";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
+import "@streetwritersco/tinymce-plugins/blockescape";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -109,7 +110,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable quickbars autoresize",
   custom:
-    "keyboardquirks collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
+    "blockescape keyboardquirks collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
   pro: "textpattern",
 };
 
