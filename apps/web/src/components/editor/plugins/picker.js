@@ -1,5 +1,6 @@
 import Compressor from "compressorjs";
 import { db } from "../../../common/db";
+import { showLoadingDialog } from "../../../common/dialog-controller";
 import fs from "../../../interfaces/fs";
 
 function register(editor) {
@@ -38,30 +39,39 @@ async function pickFile() {
   const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
   if (!selectedFile) return;
 
-  const reader = selectedFile.stream().getReader();
-  const { hash, type: hashType } = await fs.hashStream(reader);
-  reader.releaseLock();
+  const result = await showLoadingDialog({
+    title: `${selectedFile.name}`,
+    subtitle: "Please wait while we encrypt & attach your file.",
+    action: async () => {
+      const reader = selectedFile.stream().getReader();
+      const { hash, type: hashType } = await fs.hashStream(reader);
+      reader.releaseLock();
 
-  let output = {};
-  if (!db.attachments.exists(hash)) {
-    output = await fs.writeEncryptedFile(selectedFile, key, hash);
-  }
+      let output = {};
+      if (!db.attachments.exists(hash)) {
+        output = await fs.writeEncryptedFile(selectedFile, key, hash);
+      }
 
-  await db.attachments.add({
-    ...output,
-    hash,
-    hashType,
-    salt: key.salt,
-    filename: selectedFile.name,
-    type: selectedFile.type,
+      await db.attachments.add({
+        ...output,
+        hash,
+        hashType,
+        salt: "helloworld",
+        filename: selectedFile.name,
+        type: selectedFile.type,
+      });
+
+      return {
+        hash: hash,
+        filename: selectedFile.name,
+        type: selectedFile.type,
+        size: selectedFile.size,
+      };
+    },
   });
 
-  return {
-    hash: hash,
-    filename: selectedFile.name,
-    type: selectedFile.type,
-    size: selectedFile.size,
-  };
+  if (!result.hash) throw new Error("Could not add attachment.");
+  return result;
 }
 
 async function pickImage() {
@@ -99,7 +109,7 @@ async function pickImage() {
 }
 
 async function getEncryptionKey() {
-  // return { password: "helloworld" };
+  return { password: "helloworld" };
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
   return key; // { password: "helloworld" };

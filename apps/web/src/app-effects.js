@@ -65,10 +65,7 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
     const attachmentsLoadingEvent = EV.subscribe(
       EVENTS.attachmentsLoading,
       ({ type, total, current }) => {
-        const [key, status] =
-          type === "download"
-            ? ["downloadingAttachments", `Downloading`]
-            : ["uploadingAttachments", `Uploading`];
+        const [key, status] = getProcessingStatusFromType(type);
 
         if (current === total) setProcessingStatus(key);
         else
@@ -83,12 +80,11 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
     const progressEvent = AppEventManager.subscribe(
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ type, total, loaded }) => {
-        const key =
-          type === "download"
-            ? "downloadingAttachments"
-            : "uploadingAttachments";
+        console.log(type, total, loaded);
+        const [key] = getProcessingStatusFromType(type);
+        if (!key) return;
+
         const processingStatus = store.get().processingStatuses[key];
-        if (!processingStatus) return;
         const { status } = processingStatus;
         const percent = Math.round((loaded / total) * 100);
 
@@ -138,3 +134,16 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
   return <React.Fragment />;
 }
 export default AppEffects;
+
+function getProcessingStatusFromType(type) {
+  switch (type) {
+    case "download":
+      return ["downloadingAttachments", "Downloading"];
+    case "upload":
+      return ["uploadingAttachments", "Uploading"];
+    case "encrypt":
+      return ["encryptingAttachments", "Encrypting"];
+    default:
+      return undefined;
+  }
+}

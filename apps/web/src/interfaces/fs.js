@@ -9,6 +9,7 @@ import { StreamableFS } from "streamablefs";
 import NNCrypto from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
 import StreamSaver from "streamsaver";
+import { sendAttachmentsProgressEvent } from "notes-core/common";
 StreamSaver.mitm = "/downloader.html";
 
 const ABYTES = 17;
@@ -26,9 +27,13 @@ async function writeEncryptedFile(file, key, hash) {
   if (!localforage.supports(localforage.INDEXEDDB))
     throw new Error("This browser does not support IndexedDB.");
 
-  let offset = 0;
+  if (await streamablefs.exists(hash)) await streamablefs.deleteFile(hash);
 
+  let offset = 0;
+  let encrypted = 0;
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
+
+  sendAttachmentsProgressEvent("encrypt", 1, 0);
 
   const iv = await crypto.encryptStream(
     key,
@@ -46,10 +51,19 @@ async function writeEncryptedFile(file, key, hash) {
           data: chunk,
         };
       },
-      write: (chunk) => fileHandle.write(chunk),
+      write: (chunk) => {
+        encrypted += chunk.length - ABYTES;
+        reportProgress(
+          { total: file.size, loaded: encrypted },
+          { type: "encrypt", hash }
+        );
+        return fileHandle.write(chunk);
+      },
     },
     file.name
   );
+
+  sendAttachmentsProgressEvent("encrypt", 1);
 
   return {
     iv: iv,
@@ -115,9 +129,8 @@ async function readEncrypted(filename, key, cipherData) {
   }
 
   const reader = fileHandle.getReader();
-  const plainText = new Uint8Array(
-    fileHandle.file.size + fileHandle.file.chunks * ABYTES
-  );
+  const ENCRYPTED_SIZE = fileHandle.file.size + fileHandle.file.chunks * ABYTES;
+  const plainText = new Uint8Array(ENCRYPTED_SIZE);
 
   let offset = 0;
   await crypto.decryptStream(
@@ -334,6 +347,7 @@ function cancellable(operation) {
     return {
       execute: () => operation(filename, requestOptions),
       cancel: (message) => {
+        console.log("Canceled", message);
         source.cancel(message);
       },
     };
