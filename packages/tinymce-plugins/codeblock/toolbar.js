@@ -72,7 +72,7 @@ function changeLanguageSelectLabel(text) {
 function parseCodeblockLanguage(node) {
   if (!node || node.tagName !== TAGNAME) return;
 
-  const languageAliases = getLanguageFromClassName(node.className).split("-");
+  const languageAliases = getLanguageFromClassList(node).split("-");
   if (languageAliases.length <= 1) return;
   return hljs.getLanguage(languageAliases[1]);
 }
@@ -93,26 +93,33 @@ function applyHighlighting(editor, language) {
   const alias = language.aliases[0];
 
   persistSelection(node, () => {
-    node.innerHTML = hljs.highlight(node.innerText, {
+    const code = hljs.highlight(node.innerText, {
       language: alias,
-    }).value;
+    });
+    node.innerHTML = code.value.replace(/\n/gm, "<br>");
     editor.save();
   });
 
-  changeCodeblockClassName(node, ` language-${alias} `);
+  changeCodeblockClassName(node, `language-${alias}`);
 }
 
 function changeCodeblockClassName(node, className) {
-  node.className = node.className.replace(
-    getLanguageFromClassName(node.className),
-    className
-  );
+  const language = getLanguageFromClassList(node);
+  if (!!language)
+    node.classList.replace(getLanguageFromClassList(node), className);
+  else node.classList.add(className);
 }
 
-function getLanguageFromClassName(className) {
-  const classes = className.split(" ");
-  const languageKey = classes.find((c) => c.startsWith("lang"));
-  return languageKey || "";
+/**
+ *
+ * @param {Element} node
+ */
+function getLanguageFromClassList(node) {
+  for (let className of node.classList.values()) {
+    if (className.startsWith("language") || className.startsWith("lang"))
+      return className;
+  }
+  return "";
 }
 
 function refreshHighlighting(editor) {

@@ -2,11 +2,13 @@ const {
   addPluginToPluginManager,
   getCharacterRange,
   moveCaretTo,
+  getCurrentLine,
 } = require("../utils");
 const { createCodeBlock, isCodeBlock, TAGNAME, state } = require("./utils");
 const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
 
-const TAB = "  ";
+const TAB = `&nbsp;&nbsp;`;
+const TAB_LENGTH = 2;
 const EMPTY_LINE = "<p><br></p>";
 
 /**
@@ -44,6 +46,7 @@ var toggleCodeBlock = function (editor, api, type) {
   } else {
     var content = editor.selection.getContent({ format: "text" }); //.replace(/^\n/gm, "");
     if (type === "shortcut") content = "<br>";
+    if (!content) content = "<br>";
     insertCodeBlock(editor, content);
   }
 };
@@ -81,6 +84,12 @@ function blurCodeBlock(editor, block) {
 }
 
 var isCreatingCodeBlock = false;
+/**
+ *
+ * @param {*} api
+ * @param {import("tinymce").Editor} editor
+ * @returns
+ */
 var registerHandlers = function (api, editor) {
   function onNodeChanged(event) {
     api.setActive(event.element.tagName === TAGNAME);
@@ -128,12 +137,33 @@ var registerHandlers = function (api, editor) {
   // we have to handle all the logic manually.
   function onKeyDown(e) {
     const node = state.activeBlock;
-    if (!node || e.code !== "Tab") return;
+    if (!node) return;
 
+    if (e.code === "Tab") {
+      e.preventDefault();
+      handleTab(e, node);
+    } else if (e.ctrlKey && e.code === "KeyA") {
+      e.preventDefault();
+      handleCtrlA(node);
+    } else if (e.code === "Enter") {
+      handleEnter(node);
+    }
+  }
+
+  function handleEnter(node) {
+    const currentLine = getCurrentLine(node);
+    const indent =
+      (currentLine.length - currentLine.trimStart().length) / TAB_LENGTH;
+    editor.insertContent(TAB.repeat(indent));
+  }
+
+  function handleCtrlA(node) {
+    editor.selection.select(node, true);
+  }
+
+  function handleTab(e, node) {
     const characterRange = getCharacterRange(node);
     if (!characterRange) return;
-
-    e.preventDefault();
 
     // Shift + Tab = Deindent on all major platforms
     const isDeindent = e.shiftKey;
@@ -171,7 +201,7 @@ var registerHandlers = function (api, editor) {
         moveCaretTo(node, characterRange.start, endIndex);
       } else {
         // TODO: handle line deindent
-        editor.insertContent(TAB);
+        editor.selection.setContent(TAB);
       }
     } else {
       editor.insertContent(TAB);

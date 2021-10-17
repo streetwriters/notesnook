@@ -35,6 +35,23 @@ function moveCaretTo(node, index, endIndex) {
   rangy.getSelection().restoreCharacterRanges(node, [newCharacterRange]);
 }
 
+function getCurrentLine(node) {
+  const characterRange = getCharacterRange(node);
+  const lines = node.innerText.split("\n");
+
+  let currentLine = "";
+  let prevLength = 0;
+  for (let line of lines) {
+    let length = prevLength + line.length + 1;
+    if (characterRange.start === length) {
+      currentLine = line;
+      break;
+    }
+    prevLength += line.length + 1;
+  }
+  return currentLine;
+}
+
 function persistSelection(node, action) {
   let saved = rangy.getSelection().saveCharacterRanges(node);
   action();
@@ -52,6 +69,7 @@ function addPluginToPluginManager(name, register) {
 }
 
 module.exports = {
+  getCurrentLine,
   getCharacterRange,
   moveCaretTo,
   persistSelection,
