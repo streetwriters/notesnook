@@ -1,7 +1,14 @@
 import NetInfo from '@react-native-community/netinfo';
 import {EV, EVENTS} from 'notes-core/common';
 import React, {useEffect, useRef} from 'react';
-import {Appearance, AppState, Linking, Platform} from 'react-native';
+import {
+  Appearance,
+  AppState,
+  Linking,
+  NativeEventEmitter,
+  NativeModules,
+  Platform
+} from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
@@ -9,6 +16,7 @@ import SplashScreen from 'react-native-splash-screen';
 import {
   clearAllStores,
   initialize,
+  useAttachmentStore,
   useNoteStore,
   useUserStore
 } from '../provider/stores';
@@ -49,6 +57,8 @@ import {
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 
+const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
+
 export const useAppEvents = () => {
   const loading = useNoteStore(state => state.loading);
   const setLastSynced = useUserStore(state => state.setLastSynced);
@@ -77,7 +87,14 @@ export const useAppEvents = () => {
   };
 
   const onLoadingAttachment = data => {
-    console.log('on attachment loading', data);
+    useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
+  };
+
+  const onSodiumProgress = ({total, progress}) => {
+    console.log('encryption progress: ', (progress / total).toFixed(2));
+    useAttachmentStore
+      .getState()
+      .setEncryptionProgress((progress / total).toFixed(2));
   };
 
   useEffect(() => {
@@ -94,11 +111,17 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
 
+    let ubsubsodium = SodiumEventEmitter.addListener(
+      'onSodiumProgress',
+      onSodiumProgress
+    );
+
     eSubscribeEvent('userLoggedIn', setCurrentUser);
     refValues.current.removeInternetStateListener = NetInfo.addEventListener(
       onInternetStateChanged
     );
     return () => {
+      ubsubsodium?.remove();
       eUnSubscribeEvent('userLoggedIn', setCurrentUser);
       EV.unsubscribe(EVENTS.userSessionExpired, onSessionExpired);
       EV.unsubscribe(EVENTS.appRefreshRequested, onSyncComplete);
