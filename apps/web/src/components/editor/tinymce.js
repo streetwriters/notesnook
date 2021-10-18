@@ -114,7 +114,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "icons blockescape keyboardquirks collapsibleheaders attachmentshandler shortlink quickimage paste codeblock inlinecode checklist",
+    "icons picker blockescape keyboardquirks collapsibleheaders attachmentshandler shortlink paste codeblock inlinecode checklist",
   pro: "textpattern",
 };
 
