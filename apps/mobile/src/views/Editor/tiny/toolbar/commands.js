@@ -1,5 +1,8 @@
+import React from 'react';
+import {Platform} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Sodium, {launchCamera, launchImageLibrary} from 'react-native-sodium';
+import {Attachment} from '../../../../components/AttachmentDialog';
 import {eSendEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {db} from '../../../../utils/database';
@@ -84,21 +87,45 @@ export const execCommands = {
   filepicker: async () => {
     try {
       let file = await DocumentPicker.pick();
+      let uri =
+        Platform.OS === 'ios' ? file.uri.replace('file:///', '/') : file.uri;
+
+      eSendEvent(eOpenProgressDialog, {
+        title: 'Attaching file',
+        paragraph: 'Please wait while we encrypt file for upload',
+        nowarn: true,
+        icon: 'shield-lock',
+        component: (
+          <Attachment
+            attachment={{
+              metadata: {
+                filename: file.name
+              },
+              length: file.size
+            }}
+            encryption
+          />
+        )
+      });
+
       let hash = await Sodium.hashFile({
-        uri: file.uri,
+        uri: uri,
         type: 'url'
       });
-      let result = await attachFile(file.uri, hash, file.type, file.name);
+      let result = await attachFile(uri, hash, file.type, file.name);
+      setTimeout(() => {
+        eSendEvent(eCloseProgressDialog);
+      }, 1000);
       if (!result) return;
       tiny.call(
         EditorWebView,
         `
     (function() {
       let file = ${JSON.stringify({
-        hash:hash,
-        filename:file.name,
-        type:file.type,
-        size:file.size
+        hash: hash,
+        filename: file.name,
+        type: file.type,
+        size: file.size
       })}
       tinymce.activeEditor.execCommand('mceAttachFile',file);
       setTimeout(function() {
