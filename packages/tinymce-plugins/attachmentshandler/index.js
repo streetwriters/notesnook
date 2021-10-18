@@ -11,14 +11,15 @@ function register(editor) {
     insertFile(editor, file);
   });
 
-  editor.addCommand("mceReplaceImage", function (image) {
+  editor.addCommand("mceReplaceImage", async function (image) {
     const { hash, src } = image;
     const elements = editor.dom.doc.querySelectorAll(
       `img[data-hash="${hash}"]`
     );
     if (!elements || !elements.length || !src) return;
     for (let element of elements) {
-      element.setAttribute("src", src);
+      const blob = await (await fetch(src)).blob();
+      element.src = URL.createObjectURL(blob);
     }
   });
 
