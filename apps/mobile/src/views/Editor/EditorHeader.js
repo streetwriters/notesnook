@@ -1,22 +1,24 @@
-import React, { useEffect, useRef } from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
+  ActivityIndicator,
   BackHandler,
   InteractionManager,
   Keyboard,
   Platform,
   View
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
 import {
+  useAttachmentStore,
   useEditorStore,
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -24,25 +26,32 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing } from '../../utils';
-import { db } from '../../utils/database';
+import {editing} from '../../utils';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
-  eOpenFullscreenEditor, eOpenLoginDialog, eOpenPublishNoteDialog
+  eOpenFullscreenEditor,
+  eOpenLoginDialog,
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
-  clearTimer, getNote, loadNote, setColors
+  clearTimer,
+  getNote,
+  loadNote,
+  setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
-import { toolbarRef } from './tiny/toolbar/constants';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
+import {toolbarRef} from './tiny/toolbar/constants';
 
+import * as Progress from 'react-native-progress';
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -53,9 +62,11 @@ const EditorHeader = () => {
   const fullscreen = useSettingStore(state => state.fullscreen);
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
+  const loading = useAttachmentStore(state => state.loading);
   const handleBack = useRef();
 
   useEffect(() => {
+    console.log(loading);
     setColors(colors);
   }, [colors]);
 
@@ -151,7 +162,7 @@ const EditorHeader = () => {
       'Copy',
       'Dark Mode',
       'Add to Vault',
-      "Attachments",
+      'Attachments',
       'Pin',
       'Favorite',
       'Publish',
@@ -317,6 +328,27 @@ const EditorHeader = () => {
               right={50}
               onPress={showActionsheet}
             />
+
+            {loading ? (
+              <View
+                style={{
+                  justifyContent: 'center',
+                  marginLeft: 10
+                }}>
+                <Progress.Circle
+                  size={SIZE.xxl}
+                  progress={1}
+                  showsText
+                  textStyle={{
+                    fontSize: 8
+                  }}
+                  color={colors.accent}
+                  formatText={progress => (progress * 100).toFixed(0)}
+                  borderWidth={0}
+                  thickness={2}
+                />
+              </View>
+            ) : null}
           </>
         </View>
       </View>
