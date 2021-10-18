@@ -45,6 +45,16 @@ export default class FileHandle extends ReadableStream {
     return array;
   }
 
+  async readChunks(from: number, length: number): Promise<Blob> {
+    let blobParts: BlobPart[] = [];
+    for (let i = from; i < from + length; ++i) {
+      const array = await this.readChunk(i);
+      if (!array) continue;
+      blobParts.push(array.buffer);
+    }
+    return new Blob(blobParts, { type: this.file.type });
+  }
+
   async toBlob() {
     let blobParts: BlobPart[] = [];
     for (let i = 0; i < this.file.chunks; ++i) {
