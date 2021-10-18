@@ -4,15 +4,15 @@ class Session {
    * @param {import("../database/storage").default} context
    */
   constructor(context) {
-    this._context = context;
+    this._storage = context;
   }
 
   get() {
-    return this._context.read("t");
+    return this._storage.read("t");
   }
 
   set() {
-    return this._context.write("t", Date.now());
+    return this._storage.write("t", Date.now());
   }
 
   async valid() {

@@ -86,8 +86,12 @@ export default class Note {
     }
   }
 
-  content() {
-    return this._db.content.get(this._note.contentId);
+  async content(withAttachments = false) {
+    const content = await this._db.content.raw(
+      this._note.contentId,
+      withAttachments
+    );
+    return content.data;
   }
 
   async color(color) {

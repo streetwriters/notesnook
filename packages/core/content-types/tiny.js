@@ -1,5 +1,5 @@
 import showdown from "showdown";
-import decode from "lean-he/decode";
+import dataurl from "../utils/dataurl";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
@@ -16,14 +16,11 @@ class Tiny {
   }
 
   toTXT() {
-    if ("DOMParser" in window || "DOMParser" in global) {
-      let doc = new DOMParser().parseFromString(this.data, "text/html");
-      return doc.body.textContent.trim();
-    } else {
-      return decode(
-        this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, "")
-      ).trim();
-    }
+    if (!("HTMLParser" in global)) return "";
+
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
+    return doc.textContent.trim();
   }
 
   toMD() {
@@ -56,8 +53,91 @@ class Tiny {
     const lowercase = this.toTXT().toLowerCase();
     return tokens.some((token) => lowercase.indexOf(token) > -1);
   }
+
+  async insertMedia(getData) {
+    if (!("HTMLParser" in global)) return;
+
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
+    const attachmentElements = doc.querySelectorAll("img");
+
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
+      switch (attachment.tagName) {
+        case "IMG": {
+          const hash = getDatasetAttribute(attachment, "hash");
+
+          const src = await getData(hash, {
+            total: attachmentElements.length,
+            current: i,
+          });
+          if (!src) continue;
+          attachment.setAttribute("src", src);
+          break;
+        }
+      }
+    }
+    return doc.innerHTML;
+  }
+
+  async extractAttachments(store) {
+    if (!("HTMLParser" in global)) return;
+
+    let doc = HTMLParser.createElement("div");
+    doc.innerHTML = this.data;
+    const attachmentElements = doc.querySelectorAll("img,.attachment");
+
+    const attachments = [];
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
+      switch (attachment.tagName) {
+        case "IMG": {
+          if (!getDatasetAttribute(attachment, "hash")) {
+            const src = attachment.getAttribute("src");
+            if (!src) continue;
+
+            const { data, mime } = dataurl.toObject(src);
+            if (!data) continue;
+
+            const type =
+              getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
+            const metadata = await store(data, "base64");
+            setDatasetAttribute(attachment, "hash", metadata.hash);
+
+            attachments.push({
+              type,
+              filename: getDatasetAttribute(attachment, "filename"),
+              ...metadata,
+            });
+          } else {
+            attachments.push({
+              hash: getDatasetAttribute(attachment, "hash"),
+            });
+          }
+          attachment.removeAttribute("src");
+          break;
+        }
+        default: {
+          if (!getDatasetAttribute(attachment, "hash")) return;
+          attachments.push({
+            hash: getDatasetAttribute(attachment, "hash"),
+          });
+          break;
+        }
+      }
+    }
+    return { data: doc.innerHTML, attachments };
+  }
 }
 export default Tiny;
+
+function getDatasetAttribute(element, attribute) {
+  return element.getAttribute(`data-${attribute}`);
+}
+
+function setDatasetAttribute(element, attribute, value) {
+  return element.setAttribute(`data-${attribute}`, value);
+}
 
 function getHeadlineFromText(text) {
   for (var i = 0; i < text.length; ++i) {

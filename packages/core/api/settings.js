@@ -14,7 +14,7 @@ class Settings {
   }
 
   async init() {
-    var settings = await this._db.context.read("settings");
+    var settings = await this._db.storage.read("settings");
     this._initSettings(settings);
     await this._saveSettings();
 
@@ -138,7 +138,7 @@ class Settings {
   }
 
   async _saveSettings() {
-    await this._db.context.write("settings", this._settings);
+    await this._db.storage.write("settings", this._settings);
   }
 }
 export default Settings;

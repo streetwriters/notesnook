@@ -25,7 +25,7 @@
  * Syncing should pause until all the conflicts have been resolved
  * And then it should continue.
  */
-import { EV, EVENTS } from "../../common";
+import { EV, EVENTS, sendAttachmentsProgressEvent } from "../../common";
 import Constants from "../../utils/constants";
 import http from "../../utils/http";
 import TokenManager from "../token-manager";
@@ -41,7 +41,7 @@ export default class Sync {
     this._db = db;
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
-    this._tokenManager = new TokenManager(this._db);
+    this._tokenManager = new TokenManager(this._db.storage);
     this._isSyncing = false;
   }
 
@@ -53,7 +53,7 @@ export default class Sync {
   }
 
   async _performChecks() {
-    let lastSynced = (await this._db.context.read("lastSynced")) || 0;
+    let lastSynced = (await this._db.storage.read("lastSynced")) || 0;
     let token = await this._tokenManager.getAccessToken();
 
     // update the conflicts status and if find any, throw
@@ -66,20 +66,21 @@ export default class Sync {
   async start(full, force) {
     if (this._isSyncing) return false;
 
-    if (force) await this._db.context.write("lastSynced", 0);
+    if (force) await this._db.storage.write("lastSynced", 0);
     let { lastSynced, token } = await this._performChecks();
 
     try {
       const now = Date.now();
       this._isSyncing = true;
 
-      if (full) var serverResponse = await this._fetch(lastSynced, token);
+      await this._uploadAttachments();
 
       // we prepare local data before merging so we always have correct data
       const data = await this._collector.collect(lastSynced);
       data.lastSynced = now;
 
       if (full) {
+        var serverResponse = await this._fetch(lastSynced, token);
         // merge the server response
         await this._merger.merge(serverResponse, lastSynced);
       }
@@ -92,11 +93,12 @@ export default class Sync {
 
       // update our lastSynced time
       if (lastSynced) {
-        await this._db.context.write("lastSynced", lastSynced);
+        await this._db.storage.write("lastSynced", lastSynced);
       }
 
       return true;
     } catch (e) {
+      this._isSyncing = false;
       throw e;
     } finally {
       this._isSyncing = false;
@@ -119,7 +121,7 @@ export default class Sync {
 
     // update our lastSynced time
     if (lastSynced) {
-      await this._db.context.write("lastSynced", lastSynced);
+      await this._db.storage.write("lastSynced", lastSynced);
     }
 
     EV.publish(EVENTS.appRefreshRequested);
@@ -133,7 +135,7 @@ export default class Sync {
     // last edited (but unsynced) time resulting in edited notes
     // not getting synced.
     // if (serverResponse.lastSynced) {
-    //   await this._db.context.write("lastSynced", serverResponse.lastSynced);
+    //   await this._db.storage.write("lastSynced", serverResponse.lastSynced);
     // }
   }
 
@@ -145,5 +147,27 @@ export default class Sync {
     );
 
     return response.lastSynced;
+  }
+
+  async _uploadAttachments() {
+    const attachments = this._db.attachments.pending;
+    try {
+      console.log("Uploading attachments", this._db.attachments.pending);
+      for (var i = 0; i < attachments.length; ++i) {
+        sendAttachmentsProgressEvent("upload", attachments.length, i);
+
+        const attachment = attachments[i];
+        const { hash } = attachment.metadata;
+
+        const isUploaded = await this._db.fs.uploadFile(hash, hash);
+        if (!isUploaded) throw new Error("Failed to upload file.");
+
+        await this._db.attachments.markAsUploaded(attachment.id);
+      }
+    } catch (e) {
+      throw new Error("Failed to upload attachments. Error: " + e.message);
+    } finally {
+      sendAttachmentsProgressEvent("upload", attachments.length);
+    }
   }
 }

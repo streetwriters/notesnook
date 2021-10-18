@@ -25,7 +25,7 @@ class Merger {
 
   async _deserialize(item, migrate = true) {
     const deserialized = JSON.parse(
-      await this._db.context.decrypt(this.key, item)
+      await this._db.storage.decrypt(this.key, item)
     );
     deserialized.remote = true;
     if (!migrate) return deserialized;
@@ -76,8 +76,16 @@ class Merger {
   async merge(serverResponse, lastSynced) {
     if (!serverResponse) return false;
     this._lastSynced = lastSynced;
-    const { notes, synced, notebooks, content, trash, vaultKey, settings } =
-      serverResponse;
+    const {
+      notes,
+      synced,
+      notebooks,
+      content,
+      trash,
+      vaultKey,
+      settings,
+      attachments,
+    } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
     this.key = await this._db.user.getEncryptionKey();
@@ -85,6 +93,12 @@ class Merger {
     if (vaultKey) {
       await this._db.vault._setKey(await this._deserialize(vaultKey, false));
     }
+
+    await this._mergeArray(
+      attachments,
+      (id) => this._db.attachments.attachment(id),
+      (item) => this._db.attachments.add(item)
+    );
 
     await this._mergeArray(
       settings,
@@ -106,7 +120,7 @@ class Merger {
 
     await this._mergeArrayWithConflicts(
       content,
-      (id) => this._db.content.raw(id),
+      (id) => this._db.content.raw(id, false),
       (item) => this._db.content.add(item),
       async (local, remote) => {
         let note = this._db.notes.note(local.noteId);
@@ -133,7 +147,7 @@ class Merger {
           // otherwise we trigger the conflicts
           await this._db.content.add({ ...local, conflicted: remote });
           await this._db.notes.add({ id: local.noteId, conflicted: true });
-          await this._db.context.write("hasConflicts", true);
+          await this._db.storage.write("hasConflicts", true);
         }
       }
     );

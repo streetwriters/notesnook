@@ -10,6 +10,14 @@ export async function sendCheckUserStatusEvent(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
+export function sendAttachmentsProgressEvent(type, total, current) {
+  EV.publish(EVENTS.attachmentsLoading, {
+    type,
+    total,
+    current: current === undefined ? total : current,
+  });
+}
+
 export const CLIENT_ID = "notesnook";
 
 export const CHECK_IDS = {
@@ -37,6 +45,9 @@ export const EVENTS = {
   appRefreshRequested: "app:refreshRequested",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
+  attachmentsLoading: "attachments:loading",
+  attachmentDeleted: "attachment:deleted",
+  mediaAttachmentDownloaded: "attachments:mediaDownloaded",
 };
 
 export const CURRENT_DATABASE_VERSION = 5.2;

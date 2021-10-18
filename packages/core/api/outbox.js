@@ -9,7 +9,7 @@ class Outbox {
   }
 
   async init() {
-    this.outbox = (await this._db.context.read("outbox")) || {};
+    this.outbox = (await this._db.storage.read("outbox")) || {};
 
     for (var id in this.outbox) {
       const data = this.outbox[id];
@@ -18,7 +18,7 @@ class Outbox {
         case "change_password":
           const key = await this._db.user.getEncryptionKey();
           const { email } = await this._db.user.getUser();
-          await this._db.context.deriveCryptoKey(`_uk_@${email}`, {
+          await this._db.storage.deriveCryptoKey(`_uk_@${email}`, {
             password: data.newPassword,
             salt: key.salt,
           });
@@ -31,14 +31,14 @@ class Outbox {
 
   async add(id, data, action) {
     this.outbox[id] = data;
-    await this._db.context.write("outbox", this.outbox);
+    await this._db.storage.write("outbox", this.outbox);
     await action();
     await this.delete(id);
   }
 
   delete(id) {
     delete this.outbox[id];
-    return this._db.context.write("outbox", this.outbox);
+    return this._db.storage.write("outbox", this.outbox);
   }
 }
 export default Outbox;

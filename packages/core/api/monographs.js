@@ -13,17 +13,17 @@ class Monographs {
 
   async deinit() {
     this.monographs = [];
-    await this._db.context.write("monographs", this.monographs);
+    await this._db.storage.write("monographs", this.monographs);
   }
 
   async init() {
     const user = await this._db.user.getUser();
     const token = await this._db.user.tokenManager.getAccessToken();
     if (!user || !token || !user.isEmailConfirmed) return;
-    let monographs = await this._db.context.read("monographs", true);
+    let monographs = await this._db.storage.read("monographs", true);
     try {
       monographs = await http.get(`${Constants.API_HOST}/monographs`, token);
-      await this._db.context.write("monographs", monographs);
+      await this._db.storage.write("monographs", monographs);
     } catch (e) {
       console.error(e);
     }
@@ -77,7 +77,7 @@ class Monographs {
     };
 
     if (opts.password) {
-      monograph.encryptedContent = await this._db.context.encrypt(
+      monograph.encryptedContent = await this._db.storage.encrypt(
         { password: opts.password },
         JSON.stringify({ type: content.type, data: content.data })
       );

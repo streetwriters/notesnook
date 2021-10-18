@@ -27,7 +27,7 @@ export default class Vault {
    */
   constructor(db) {
     this._db = db;
-    this._context = db.context;
+    this._storage = db.storage;
     this._key = "svvaads1212#2123";
     this._vaultPassword = null;
     this.ERRORS = {
@@ -48,13 +48,13 @@ export default class Vault {
   async create(password) {
     if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
 
-    const vaultKey = await this._context.read("vaultKey");
+    const vaultKey = await this._storage.read("vaultKey");
     if (!vaultKey || !vaultKey.cipher || !vaultKey.iv) {
-      const encryptedData = await this._context.encrypt(
+      const encryptedData = await this._storage.encrypt(
         { password },
         this._key
       );
-      await this._context.write("vaultKey", encryptedData);
+      await this._storage.write("vaultKey", encryptedData);
       this._password = password;
     }
     return true;
@@ -67,10 +67,10 @@ export default class Vault {
    * @returns {Promise<Boolean>}
    */
   async unlock(password) {
-    const vaultKey = await this._context.read("vaultKey");
+    const vaultKey = await this._storage.read("vaultKey");
     if (!(await this.exists(vaultKey))) throw new Error(this.ERRORS.noVault);
     try {
-      await this._context.decrypt({ password }, vaultKey);
+      await this._storage.decrypt({ password }, vaultKey);
     } catch (e) {
       throw new Error(this.ERRORS.wrongPassword);
     }
@@ -84,7 +84,7 @@ export default class Vault {
       for (var note of lockedNotes) {
         await this._unlockNote(note, oldPassword, true);
       }
-      await this._context.remove("vaultKey");
+      await this._storage.remove("vaultKey");
       await this.create(newPassword);
       for (var note of lockedNotes) {
         await this._lockNote(note, newPassword);
@@ -106,7 +106,7 @@ export default class Vault {
         ...this._db.notes.locked.map((note) => note.id)
       );
     }
-    await this._context.remove("vaultKey");
+    await this._storage.remove("vaultKey");
     this._password = null;
   }
 
@@ -155,7 +155,7 @@ export default class Vault {
   }
 
   async exists(vaultKey) {
-    if (!vaultKey) vaultKey = await this._context.read("vaultKey");
+    if (!vaultKey) vaultKey = await this._storage.read("vaultKey");
     return vaultKey && vaultKey.cipher && vaultKey.iv;
   }
 
@@ -179,7 +179,7 @@ export default class Vault {
 
   /** @private */
   async _encryptContent(contentId, content, type, password) {
-    let encryptedContent = await this._context.encrypt(
+    let encryptedContent = await this._storage.encrypt(
       { password },
       JSON.stringify(content)
     );
@@ -189,9 +189,9 @@ export default class Vault {
 
   /** @private */
   async _decryptContent(contentId, password) {
-    let encryptedContent = await this._db.content.raw(contentId);
+    let encryptedContent = await this._db.content.raw(contentId, false);
 
-    let decryptedContent = await this._context.decrypt(
+    let decryptedContent = await this._storage.decrypt(
       { password },
       encryptedContent.data
     );
@@ -203,11 +203,23 @@ export default class Vault {
   async _lockNote(note, password) {
     let { id, content: { type, data } = {}, contentId } = note;
 
+    // Case: when note is being newly locked
     if (!data || !type || !contentId) {
       note = this._db.notes.note(id).data;
       if (note.locked) return;
       contentId = note.contentId;
-      let content = await this._db.content.raw(contentId);
+      let content = await this._db.content.raw(contentId, false);
+      // NOTE:
+      // At this point, the note already has all the attachments extracted
+      // so we should just encrypt it as normal.
+      data = content.data;
+      type = content.type;
+    } else {
+      const content = await this._db.content.extractAttachments({
+        data,
+        type,
+        noteId: id,
+      });
       data = content.data;
       type = content.type;
     }
@@ -247,12 +259,12 @@ export default class Vault {
 
   /** @inner */
   async _getKey() {
-    if (await this.exists()) return await this._context.read("vaultKey");
+    if (await this.exists()) return await this._storage.read("vaultKey");
   }
 
   /** @inner */
   async _setKey(vaultKey) {
     if (!vaultKey) return;
-    await this._context.write("vaultKey", vaultKey);
+    await this._storage.write("vaultKey", vaultKey);
   }
 }

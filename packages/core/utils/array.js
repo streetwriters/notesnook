@@ -20,10 +20,12 @@ export function deleteItems(array, ...items) {
 }
 
 export function findById(array, id) {
+  if (!array) return false;
   return array.find((item) => item.id === id);
 }
 
 export function hasItem(array, item) {
+  if (!array) return false;
   return array.indexOf(item) > -1;
 }
 

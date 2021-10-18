@@ -1,5 +1,6 @@
 import Notes from "../collections/notes";
 import Storage from "../database/storage";
+import FileStorage from "../database/fs";
 import Notebooks from "../collections/notebooks";
 import Trash from "../collections/trash";
 import Tags from "../collections/tags";
@@ -19,6 +20,7 @@ import UserManager from "./user-manager";
 import http from "../utils/http";
 import Monographs from "./monographs";
 import Offers from "./offers";
+import Attachments from "../collections/attachments";
 import Debug from "./debug";
 
 /**
@@ -28,11 +30,12 @@ var NNEventSource;
 class Database {
   /**
    *
-   * @param {any} context
+   * @param {any} storage
    * @param {EventSource} eventsource
    */
-  constructor(context, eventsource) {
-    this.context = new Storage(context);
+  constructor(storage, eventsource, fs) {
+    this.storage = new Storage(storage);
+    this.fs = new FileStorage(fs, storage);
     NNEventSource = eventsource;
     this._syncTimeout = 0;
   }
@@ -52,6 +55,10 @@ class Database {
       this.connectSSE,
       this
     );
+    EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
+      console.log("deleted:", attachment);
+      await this.fs.cancel(attachment.metadata.hash);
+    });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();
       clearTimeout(this._syncTimeout);
@@ -62,10 +69,10 @@ class Database {
     });
     EV.subscribe(EVENTS.databaseUpdated, this._onDBWrite.bind(this));
 
-    this.session = new Session(this.context);
+    this.session = new Session(this.storage);
     await this._validate();
 
-    this.user = new UserManager(this);
+    this.user = new UserManager(this.storage);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
@@ -89,6 +96,8 @@ class Database {
     this.colors = await Tags.new(this, "colors");
     /** @type {Content} */
     this.content = await Content.new(this, "content", false);
+    /** @type {Attachments} */
+    this.attachments = await Attachments.new(this, "attachments");
 
     this.trash = new Trash(this);
 
@@ -151,7 +160,7 @@ class Database {
           await this.user.logout(true, "Password Changed");
           break;
         case "emailConfirmed":
-          const token = await this.context.read("token");
+          const token = await this.storage.read("token");
           await this.user.tokenManager._refreshToken(token);
           await this.user.fetchUser(true);
           EV.publish(EVENTS.userEmailConfirmed);
@@ -165,7 +174,7 @@ class Database {
   }
 
   async lastSynced() {
-    return this.context.read("lastSynced");
+    return this.storage.read("lastSynced");
   }
 
   async _onDBWrite(item) {
@@ -182,6 +191,7 @@ class Database {
   }
 
   sync(full = true, force = false) {
+    clearTimeout(this._syncTimeout);
     return this.syncer.start(full, force);
   }
 
