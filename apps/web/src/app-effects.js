@@ -84,6 +84,7 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
         if (!key) return;
 
         const processingStatus = store.get().processingStatuses[key];
+        if (!processingStatus) return;
         const { status } = processingStatus;
         const percent = Math.round((loaded / total) * 100);
 
