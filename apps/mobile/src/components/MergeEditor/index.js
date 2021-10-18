@@ -1,5 +1,5 @@
 import KeepAwake from '@sayem314/react-native-keep-awake';
-import {EVENTS} from 'notes-core/common';
+import {EV, EVENTS} from 'notes-core/common';
 import React, {createRef, useEffect, useState} from 'react';
 import {Modal, SafeAreaView, Text, View} from 'react-native';
 import Animated from 'react-native-reanimated';
@@ -45,6 +45,7 @@ let primaryData = null;
 let secondaryData = null;
 
 function onMediaLoaded({hash, src}) {
+  console.log('on media download complete');
   let inject = `
   (function(){
     const elements = document.querySelectorAll("img[data-hash=${hash}]");
@@ -134,7 +135,7 @@ const MergeEditor = () => {
         type: content.type,
         dateEdited: content.dateEdited,
         remote: true,
-        dateResolved: content.dateEdited
+        dateResolved: secondaryData.dateEdited
       },
       id: note.id,
       conflicted: false
@@ -164,7 +165,7 @@ const MergeEditor = () => {
   const show = async item => {
     note = item;
     let content = await db.content.raw(note.contentId);
-    switch (noteData.type) {
+    switch (content.type) {
       case 'tiny':
         primaryData = content;
         secondaryData = content.conflicted;
@@ -218,8 +219,10 @@ const MergeEditor = () => {
   };
 
   const close = () => {
-    db.fs.cancel(primaryData.noteId);
-    eUnSubscribeEvent(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
+
+    db.fs.cancel(primaryData?.noteId);
+
+    EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
     setVisible(false);
     setPrimary(true);
     setSecondary(true);
@@ -237,10 +240,10 @@ const MergeEditor = () => {
   const onLoadImages = async () => {
     try {
       setLoadingAttachments(true);
-      eSubscribeEvent(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
+      EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
       await db.content.downloadMedia(primaryData.data.noteId, primaryData);
       await db.content.downloadMedia(primaryData.data.noteId, secondaryData);
-      eUnSubscribeEvent(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
+      EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
       setLoadingAttachments(false);
     } catch (e) {
       setLoadingAttachments(false);
