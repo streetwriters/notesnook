@@ -15,6 +15,7 @@ async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
+    console.log(cipherData);
     let output = await Sodium.decryptFile(
       key,
       {
@@ -26,6 +27,8 @@ async function readEncrypted(filename, key, cipherData) {
     console.log('output length: ', output?.length);
     return output;
   } catch (e) {
+    console.log(e);
+    console.log('error')
     return false;
   }
 }
@@ -48,14 +51,20 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
   console.log('uploading file: ', filename, headers);
 
   try {
+    let res = await fetch(url,{
+      method:"PUT",
+      headers
+    });
+    const uploadUrl =await  res.text();
+    console.log(uploadUrl);
     let request = RNFetchBlob.config({
-      IOSBackgroundTask: true
+      IOSBackgroundTask: true,
     })
       .fetch(
         'PUT',
-        url,
+        uploadUrl,
         {
-          'content-type': ''
+          'content-type': '',
         },
         RNFetchBlob.wrap(`${cacheDir}/${filename}`)
       )
