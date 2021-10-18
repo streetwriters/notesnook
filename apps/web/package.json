@@ -68,7 +68,6 @@
     "chalk": "^4.1.0",
     "dotenv": "^10.0.0",
     "env-cmd": "^10.1.0",
-    "eslint": "^7.20.0",
     "eslint-config-react-app": "^6.0.0",
     "eslint-plugin-import": "^2.20.2",
     "eslint-plugin-jest-playwright": "^0.2.1",
