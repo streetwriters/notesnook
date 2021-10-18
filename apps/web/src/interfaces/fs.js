@@ -15,6 +15,9 @@ StreamSaver.mitm = "/downloader.html";
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
+const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
+  (5 * 1024 * 1024) / ENCRYPTED_CHUNK_SIZE
+);
 const crypto = new NNCrypto("/static/workers/nncrypto.worker.js");
 const streamablefs = new StreamableFS("streamable-fs");
 
@@ -131,7 +134,6 @@ async function readEncrypted(filename, key, cipherData) {
   const reader = fileHandle.getReader();
   const ENCRYPTED_SIZE = fileHandle.file.size + fileHandle.file.chunks * ABYTES;
   const plainText = new Uint8Array(ENCRYPTED_SIZE);
-
   let offset = 0;
   await crypto.decryptStream(
     key,
@@ -162,6 +164,9 @@ async function uploadFile(filename, requestOptions) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle)
     throw new Error(`File stream not found. Filename: ${filename}`);
+  const TOTAL_PARTS = Math.ceil(
+    fileHandle.file.chunks / UPLOAD_PART_REQUIRED_CHUNKS
+  );
 
   let {
     uploadedChunks = [],
@@ -175,7 +180,7 @@ async function uploadFile(filename, requestOptions) {
   const { headers, cancellationToken } = requestOptions;
 
   const initiateMultiPartUpload = await axios.get(
-    `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${fileHandle.file.chunks}&uploadId=${uploadId}`,
+    `${hosts.API_HOST}/s3/multipart?name=${filename}&parts=${TOTAL_PARTS}&uploadId=${uploadId}`,
     {
       headers,
       cancelToken: cancellationToken,
@@ -192,7 +197,7 @@ async function uploadFile(filename, requestOptions) {
   function onUploadProgress(ev) {
     reportProgress(
       {
-        total: fileHandle.file.size,
+        total: fileHandle.file.size + ABYTES,
         loaded: uploadedBytes + ev.loaded,
       },
       {
@@ -202,23 +207,21 @@ async function uploadFile(filename, requestOptions) {
     );
   }
 
-  for (let i = uploadedChunks.length; i < parts.length; ++i) {
+  for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
+    const blob = await fileHandle.readChunks(i, UPLOAD_PART_REQUIRED_CHUNKS);
     const url = parts[i];
-    const chunk = await fileHandle.readChunk(i);
-    if (!chunk) throw new Error(`Chunk at offset ${i} not found.`);
-
     const response = await axios.request({
       url,
       method: "PUT",
       headers: { "Content-Type": "" },
       cancelToken: cancellationToken,
-      data: new Blob([chunk.buffer]),
+      data: blob,
       onUploadProgress,
     });
     if (!isSuccessStatusCode(response.status) || !response.headers.etag)
-      throw new Error(`Failed to upload chunk at offset ${i}.`);
+      throw new Error(`Failed to upload part at offset ${i}.`);
 
-    uploadedBytes += chunk.length;
+    uploadedBytes += blob.size;
     uploadedChunks.push({
       PartNumber: i + 1,
       ETag: JSON.parse(response.headers.etag),
@@ -271,7 +274,6 @@ async function downloadFile(filename, requestOptions) {
 
   console.log("File downloaded", filename, url, response);
   if (!isSuccessStatusCode(response.status)) return false;
-
   const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
   distributor.fill(new Uint8Array(response.data));
   distributor.close();
@@ -283,7 +285,7 @@ async function downloadFile(filename, requestOptions) {
   );
 
   for (let chunk of distributor.chunks) {
-    fileHandle.write(chunk.data);
+    await fileHandle.write(chunk.data);
   }
 
   return true;
