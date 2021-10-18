@@ -213,7 +213,7 @@ function DiffViewer(props) {
               EVENTS.mediaAttachmentDownloaded,
               ({ hash, src }) => {
                 const elements = document.querySelectorAll(
-                  `.diffviewer img[data-hash=${hash}]`
+                  `.diffviewer img[data-hash="${hash}"]`
                 );
                 if (!elements || !elements.length) return;
                 for (let element of elements) element.setAttribute("src", src);
