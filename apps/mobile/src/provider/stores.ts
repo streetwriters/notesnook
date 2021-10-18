@@ -160,22 +160,26 @@ interface AttachmentStore {
       type: "upload" | "download",
     }
   },
-  remove:(hash:string) => void
-  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download") => void
+  encryptionProgress: number,
+  setEncryptionProgress: (encryptionProgress) => void
+  remove: (hash: string) => void
+  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download") => void,
+  loading:{total:number,current:number},
+  setLoading:(data:{total:number,current:number}) => void
 }
 
 export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
-  remove:(hash) => {
+  remove: (hash) => {
     let _p = get().progress;
     _p[hash] = null
     tiny.call(EditorWebView, `
     (function() {
       let progress = ${JSON.stringify({
-        loaded:1,
-        total:1,
-        hash
-      })}
+      loaded: 1,
+      total: 1,
+      hash
+    })}
       tinymce.activeEditor.execCommand("mceUpdateAttachmentProgress",progress);
     })()`);
     set({ progress: { ..._p } });
@@ -191,6 +195,10 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     })()`);
     set({ progress: { ..._p } });
   },
+  encryptionProgress: null,
+  setEncryptionProgress: (encryptionProgress) => set({ encryptionProgress: encryptionProgress }),
+  loading:{total:0,current:0},
+  setLoading:(data) => set({loading:data})
 }));
 
 let { width, height } = Dimensions.get('window');

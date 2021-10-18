@@ -59,7 +59,7 @@ const ProgressDialog = () => {
           marginBottom: 10,
           paddingHorizontal: 12
         }}>
-        {!dialogData?.noProgress ? (
+        {!dialogData?.noProgress && !dialogData.component ? (
           <ActivityIndicator size={50} color={colors.accent} />
         ) : dialogData?.noIcon ? null : (
           <Icon
@@ -74,7 +74,7 @@ const ProgressDialog = () => {
         {dialogData?.paragraph ? (
           <Paragraph style={{textAlign: 'center'}}>
             {dialogData?.paragraph}
-            {!dialogData?.noProgress ? (
+            {!dialogData?.noProgress && !dialogData?.nowarn ? (
               <Paragraph color={colors.errorText}>
                 {' '}
                 Do not close the app.

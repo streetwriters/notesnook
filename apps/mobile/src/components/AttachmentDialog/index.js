@@ -1,26 +1,22 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Platform, TouchableOpacity, View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { useEffect, useRef, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import * as Progress from 'react-native-progress';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import Sodium from 'react-native-sodium';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useAttachmentStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useAttachmentStore } from '../../provider/stores';
 import {
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
+  eUnSubscribeEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
   eCloseAttachmentDialog,
   eOpenAttachmentsDialog
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
-import {SIZE} from '../../utils/SizeUtils';
-import Storage from '../../utils/storage';
-import {ActionIcon} from '../ActionIcon';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
 import Paragraph from '../Typography/Paragraph';
@@ -45,7 +41,7 @@ export const AttachmentDialog = () => {
   const open = item => {
     setNote(item);
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id)
+    let _attachments = db.attachments.ofNote(item.id,"files");
     setAttachments(_attachments);
   };
 
@@ -132,11 +128,14 @@ function getFileExtension(filename) {
   return ext == null ? '' : ext[1];
 }
 
-const Attachment = ({attachment, note, setNote}) => {
+export const Attachment = ({attachment,encryption}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const progress = useAttachmentStore(state => state.progress);
-  const [currentProgress, setCurrentProgress] = useState(null);
+  const [currentProgress, setCurrentProgress] = useState(encryption ? {
+    type:"encrypt"
+  }: null);
+  const encryptionProgress = encryption ? useAttachmentStore(state => state.encryptionProgress) : null
 
   const onPress = async () => {
     if (currentProgress) {
@@ -227,10 +226,11 @@ const Attachment = ({attachment, note, setNote}) => {
         </View>
       </View>
 
-      {currentProgress ? (
+      {currentProgress || encryptionProgress ? (
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
+            if (encryption) return;
             db.fs.cancel(attachment.metadata.hash);
             setCurrentProgress(null);
           }}
@@ -242,7 +242,7 @@ const Attachment = ({attachment, note, setNote}) => {
           }}>
           <Progress.Circle
             size={SIZE.xxl}
-            progress={currentProgress?.value ? currentProgress?.value / 100 : 0}
+            progress={encryptionProgress ? encryptionProgress : currentProgress?.value ? currentProgress?.value / 100 : 0}
             showsText
             textStyle={{
               fontSize: 10
@@ -255,7 +255,7 @@ const Attachment = ({attachment, note, setNote}) => {
         </TouchableOpacity>
       ) : (
         <ActionIcon
-          onPress={() => onPress(attachment)}
+          onPress={() => !encryption && onPress(attachment)}
           name="download"
           size={SIZE.lg}
           color={colors.pri}
