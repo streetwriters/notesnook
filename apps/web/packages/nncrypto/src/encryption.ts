@@ -10,6 +10,7 @@ import {
   from_base64,
   base64_variants,
   StateAddress,
+  from_string,
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
 import {
@@ -28,10 +29,16 @@ export default class Encryption {
   ): Cipher {
     const encryptionKey = KeyUtils.transform(key);
 
-    let data: Uint8Array | string = plaintext.data;
+    let data: Uint8Array | null = null;
     if (typeof plaintext.data === "string" && plaintext.format === "base64") {
       data = from_base64(plaintext.data, base64_variants.ORIGINAL);
+    } else if (typeof plaintext.data === "string") {
+      data = from_string(plaintext.data);
+    } else if (plaintext.data instanceof Uint8Array) {
+      data = plaintext.data;
     }
+
+    if (!data) throw new Error("Data cannot be null.");
 
     const nonce = randombytes_buf(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 
