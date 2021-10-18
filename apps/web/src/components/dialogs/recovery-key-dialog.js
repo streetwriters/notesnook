@@ -4,7 +4,7 @@ import Dialog from "./dialog";
 import { db } from "../../common/db";
 import Logo from "../../assets/notesnook-logo.png";
 import download from "../../utils/download";
-import ClipboardJS from "clipboard";
+import * as clipboard from "clipboard-polyfill/text";
 import { Suspense } from "react";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
@@ -20,23 +20,6 @@ function RecoveryKeyDialog(props) {
       setEmail(email);
       setKey(key);
     })();
-  }, []);
-
-  useEffect(() => {
-    var clipboard = new ClipboardJS(".copyKey");
-    clipboard.on("success", function (e) {
-      setCopyText("Copied!");
-      setTimeout(() => {
-        setCopyText("Copy to clipboard");
-      }, 2000);
-      e.clearSelection();
-    });
-    clipboard.on("error", function () {
-      console.error("Error while copying text.");
-    });
-    return () => {
-      clipboard?.destroy();
-    };
   }, []);
 
   return (
@@ -78,13 +61,21 @@ function RecoveryKeyDialog(props) {
 
             <Flex flexDirection="column">
               <Button
-                data-clipboard-text={key}
                 mt={1}
                 className="copyKey"
                 fontSize="body"
                 onClick={async () => {
-                  // await copyToClipboard(key);
-                  // setCopyText("Copied!");
+                  clipboard
+                    .writeText(key)
+                    .then(() => {
+                      setCopyText("Copied!");
+                      setTimeout(() => {
+                        setCopyText("Copy to clipboard");
+                      }, 2000);
+                    })
+                    .catch((e) => {
+                      console.error("Error while copying text.", e);
+                    });
                 }}
               >
                 {copyText}

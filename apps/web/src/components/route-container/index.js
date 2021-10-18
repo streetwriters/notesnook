@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { useStore } from "../../stores/app-store";
@@ -6,12 +6,29 @@ import { useStore as useSelectionStore } from "../../stores/selection-store";
 import { CREATE_BUTTON_MAP, SELECTION_OPTIONS_MAP } from "../../common";
 import useMobile from "../../utils/use-mobile";
 import { navigate } from "../../navigation";
+import { Input } from "@rebass/forms";
 
 function RouteContainer(props) {
-  const { id, type, title, subtitle, buttons, component } = props;
+  const {
+    id,
+    type,
+    title,
+    isEditable,
+    onChange,
+    subtitle,
+    buttons,
+    component,
+  } = props;
   return (
     <>
-      <Header type={type} title={title} subtitle={subtitle} buttons={buttons} />
+      <Header
+        type={type}
+        title={title}
+        subtitle={subtitle}
+        buttons={buttons}
+        isEditable={isEditable}
+        onChange={onChange}
+      />
       {component || <Flex id={id} flexDirection="column" flex={1} />}
     </>
   );
@@ -20,7 +37,7 @@ function RouteContainer(props) {
 export default RouteContainer;
 
 function Header(props) {
-  const { title, subtitle, buttons, type } = props;
+  const { title, subtitle, onChange, buttons, type, isEditable } = props;
   const createButtonData = CREATE_BUTTON_MAP[type];
   const toggleSideMenu = useStore((store) => store.toggleSideMenu);
   const isMobile = useMobile();
@@ -58,13 +75,15 @@ function Header(props) {
               size={30}
             />
           )}
-          <Text variant="heading" data-test-id="routeHeader" color={"text"}>
-            {title}
-          </Text>
+          <RouteTitle
+            title={title}
+            isEditable={isEditable}
+            onChange={onChange}
+          />
         </Flex>
         <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
         {!isSelectionMode && (
-          <Flex>
+          <Flex flexShrink={0}>
             {buttons?.search && (
               <Icon.Search
                 size={24}
@@ -107,9 +126,7 @@ function Header(props) {
       {isSelectionMode && (
         <Flex
           mb={2}
-          sx={{
-            cursor: "pointer",
-          }}
+          notebook
           alignItems="center"
           onClick={() => {
             if (shouldSelectAll) toggleSelectionMode(false);
@@ -144,5 +161,56 @@ function SelectionOptions(props) {
         />
       ))}
     </Flex>
+  );
+}
+
+function RouteTitle({ title, isEditable, onChange }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const ref = useRef();
+  useEffect(() => {
+    ref.current.value = title;
+  }, [title]);
+
+  return (
+    <Input
+      ref={ref}
+      variant="heading"
+      data-test-id="routeHeader"
+      color={"text"}
+      title={title}
+      sx={{
+        overflow: "hidden",
+        textOverflow: isEditing ? "initial" : "ellipsis",
+        whiteSpace: "nowrap",
+
+        p: 0,
+        m: 0,
+        fontWeight: "bold",
+        fontFamily: "heading",
+        fontSize: "heading",
+        border: "none",
+        bg: isEditing ? "bgSecondary" : "transparent",
+
+        ":focus-visible": { outline: "none" },
+      }}
+      onDoubleClick={(e) => {
+        setIsEditing(isEditable && true);
+        e.target.focus();
+      }}
+      onKeyUp={(e) => {
+        if (e.key === "Escape") {
+          e.target.value = title;
+          setIsEditing(false);
+        } else if (e.key === "Enter") {
+          if (onChange) onChange(e.target.value);
+          setIsEditing(false);
+        }
+      }}
+      onBlur={(e) => {
+        if (onChange) onChange(e.target.value);
+        setIsEditing(false);
+      }}
+      readOnly={!isEditing}
+    />
   );
 }

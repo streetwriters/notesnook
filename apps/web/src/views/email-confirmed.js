@@ -4,7 +4,6 @@ import ThemeProvider from "../components/theme-provider";
 import { ANALYTICS_EVENTS, trackEvent } from "../utils/analytics";
 import { useQueryParams } from "../navigation";
 import * as Icon from "../components/icons";
-import openLink from "../commands/openLink";
 
 function EmailConfirmed() {
   const [{ userId }] = useQueryParams();
@@ -130,7 +129,7 @@ function BlogPromoBanner(props) {
             hoverColor={account.hoverColor}
             title={account.title}
             onClick={() => {
-              openLink(account.link, "_blank");
+              window.open(account.link, "_blank");
               trackEvent(ANALYTICS_EVENTS.socialLink, account.title);
             }}
             size={30}

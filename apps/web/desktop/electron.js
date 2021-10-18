@@ -4,9 +4,10 @@ const os = require("os");
 const { isDevelopment } = require("./utils");
 const { registerProtocol, URL } = require("./protocol");
 const { configureAutoUpdater } = require("./autoupdate");
-const { getBackgroundColor } = require("./config/theme");
+const { getBackgroundColor, getTheme, setTheme } = require("./config/theme");
 const getZoomFactor = require("./ipc/calls/getZoomFactor");
 const { logger } = require("./logger");
+const { setupMenu } = require("./menu");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -17,6 +18,7 @@ let mainWindow;
 async function createWindow() {
   mainWindow = new BrowserWindow({
     backgroundColor: getBackgroundColor(),
+    darkTheme: getTheme() === "dark",
     autoHideMenuBar: true,
     icon: path.join(
       __dirname,
@@ -29,10 +31,13 @@ async function createWindow() {
       enableRemoteModule: false,
       contextIsolation: true,
       nativeWindowOpen: true,
+      spellcheck: false,
       preload: __dirname + "/preload.js",
     },
   });
   global.win = mainWindow;
+  setTheme(getTheme());
+  setupMenu(mainWindow);
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });

@@ -33,6 +33,7 @@ import "@streetwritersco/tinymce-plugins/attachmentshandler";
 import "./plugins/picker";
 import "./plugins/icons";
 import "./plugins/attachmentshandler.css";
+import "@streetwritersco/tinymce-plugins/blockescape";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { useStore as useThemeStore } from "../../stores/theme-store";
@@ -113,7 +114,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "icons keyboardquirks collapsibleheaders shortlink attachmentshandler picker paste codeblock inlinecode shortcuts checklist",
+    "icons blockescape keyboardquirks collapsibleheaders attachmentshandler shortlink quickimage paste codeblock inlinecode checklist",
   pro: "textpattern",
 };
 

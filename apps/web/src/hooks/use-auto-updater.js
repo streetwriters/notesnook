@@ -4,28 +4,37 @@ import { EVENTS } from "@notesnook/desktop/events";
 import { isDesktop } from "../utils/platform";
 import checkForUpdate from "../commands/check-for-update";
 
+var checkingForUpdateTimeout = 0;
 export default function useAutoUpdater() {
   const [status, setStatus] = useState();
 
   useEffect(() => {
+    function changeStatus(status) {
+      clearTimeout(checkingForUpdateTimeout);
+      setStatus(status);
+    }
+
     function checkingForUpdate() {
-      setStatus({ type: "checking" });
+      changeStatus({ type: "checking" });
+      checkingForUpdateTimeout = setTimeout(() => {
+        changeStatus({ type: "updated" });
+      }, 10000);
     }
 
     function updateAvailable(info) {
-      setStatus({ type: "available", version: info.version });
+      changeStatus({ type: "available", version: info.version });
     }
 
     function updateNotAvailable(info) {
-      setStatus({ type: "updated" });
+      changeStatus({ type: "updated" });
     }
 
     function updateDownloadCompleted(info) {
-      setStatus({ type: "completed", version: info.version });
+      changeStatus({ type: "completed", version: info.version });
     }
 
     function updateDownloadProgress(progressInfo) {
-      setStatus({ type: "downloading", progress: progressInfo.percent });
+      changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 
     ElectronEventManager.subscribe(EVENTS.checkingForUpdate, checkingForUpdate);

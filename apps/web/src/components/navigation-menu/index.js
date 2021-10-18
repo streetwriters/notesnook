@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Box, Flex } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import * as Icon from "../icons";
@@ -68,6 +68,14 @@ function NavigationMenu(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const isMobile = useMobile();
 
+  const _navigate = useCallback(
+    (path) => {
+      toggleNavigationContainer(true);
+      navigate(path);
+    },
+    [toggleNavigationContainer]
+  );
+
   return (
     <Animated.Flex
       id="navigationmenu"
@@ -125,8 +133,7 @@ function NavigationMenu(props) {
             onClick={() => {
               if (!isMobile && location === item.path)
                 return toggleNavigationContainer();
-              toggleNavigationContainer(true);
-              navigate(item.path);
+              _navigate(item.path);
             }}
           />
         ))}
@@ -138,7 +145,7 @@ function NavigationMenu(props) {
             selected={location === `/colors/${color.id}`}
             color={color.title.toLowerCase()}
             onClick={() => {
-              navigate(`/colors/${color.id}`);
+              _navigate(`/colors/${color.id}`);
             }}
             menu={{
               items: [
@@ -183,11 +190,11 @@ function NavigationMenu(props) {
             selected={shouldSelectNavItem(location, pin)}
             onClick={() => {
               if (pin.type === "notebook") {
-                navigate(`/notebooks/${pin.id}`);
+                _navigate(`/notebooks/${pin.id}`);
               } else if (pin.type === "topic") {
-                navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
+                _navigate(`/notebooks/${pin.notebookId}/${pin.id}`);
               } else if (pin.type === "tag") {
-                navigate(`/tags/${pin.id}`);
+                _navigate(`/tags/${pin.id}`);
               }
             }}
           />
@@ -229,7 +236,7 @@ function NavigationMenu(props) {
             title={item.title}
             icon={item.icon}
             onClick={() => {
-              navigate(item.path);
+              _navigate(item.path);
             }}
             selected={location.startsWith(item.path)}
           />

@@ -54,6 +54,8 @@ function CachedRouter() {
       title={RouteResult?.title}
       subtitle={RouteResult?.subtitle}
       buttons={RouteResult?.buttons}
+      isEditable={RouteResult?.isEditable}
+      onChange={RouteResult?.onChange}
     />
   );
 }

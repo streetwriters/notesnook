@@ -4,11 +4,11 @@ import config from "./config";
 
 var APP_VERSION = {
   formatted: format(
-    1540,
+    1550,
     process.env.REACT_APP_GIT_HASH,
     process.env.REACT_APP_PLATFORM
   ),
-  numerical: 1540,
+  numerical: 1550,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
