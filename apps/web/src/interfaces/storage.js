@@ -1,9 +1,11 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
-import NNCrypto from "./nncrypto";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import "worker-loader!nncryptoworker/dist/src/worker.js";
+import NNCrypto from "./nncrypto.stub";
 
-const crypto = new NNCrypto();
+const crypto = new NNCrypto("/static/js/bundle.worker.js");
 extendPrototype(localforage);
 
 localforage.config({
@@ -40,7 +42,7 @@ async function deriveCryptoKey(name, data) {
   const { password, salt } = data;
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
-  const keyData = await crypto.deriveKey(password, salt, true);
+  const keyData = await crypto.exportKey(password, salt);
 
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await derivePBKDF2Key(password);
@@ -68,6 +70,7 @@ function isIndexedDBSupported() {
   return localforage.driver() === "asyncStorage";
 }
 
+const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 const Storage = {
   read,
   readMulti,
@@ -77,14 +80,20 @@ const Storage = {
   getAllKeys,
   deriveCryptoKey,
   getCryptoKey,
-  hash: crypto.hashPassword,
-  encrypt: crypto.encrypt,
-  decrypt: crypto.decrypt,
+  hash: (password, email) => crypto.hash(password, `${APP_SALT}${email}`),
+  encrypt: (key, plainText) =>
+    crypto.encrypt(key, { format: "text", data: plainText }, "base64"),
+  decrypt: async (key, cipherData) => {
+    cipherData.format = "base64";
+    const result = await crypto.decrypt(key, cipherData);
+    return result.data;
+  },
 };
 export default Storage;
 
 let enc = new TextEncoder();
 let dec = new TextDecoder();
+
 async function derivePBKDF2Key(password) {
   const key = await window.crypto.subtle.importKey(
     "raw",

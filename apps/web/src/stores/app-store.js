@@ -16,7 +16,7 @@ class AppStore extends BaseStore {
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
-  processingStatus = undefined;
+  processingStatuses = {};
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
@@ -66,8 +66,11 @@ class AppStore extends BaseStore {
     this.set((state) => (state.isVaultCreated = toggleState));
   };
 
-  setProcessingStatus = (status) => {
-    this.set((state) => (state.processingStatus = status));
+  setProcessingStatus = (key, status, progress) => {
+    this.set((state) => {
+      if (!status) delete state.processingStatuses[key];
+      else state.processingStatuses[key] = { status, progress };
+    });
   };
 
   /**

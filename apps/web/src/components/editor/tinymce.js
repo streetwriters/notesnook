@@ -8,7 +8,6 @@ import "tinymce/icons/default";
 import "tinymce/themes/silver";
 import "tinymce/plugins/table";
 import "tinymce/plugins/autoresize";
-import "tinymce/plugins/quickbars";
 import "tinymce/plugins/searchreplace";
 import "tinymce/plugins/lists";
 import "tinymce/plugins/advlist";
@@ -25,12 +24,15 @@ import "tinymce/plugins/media";
 import { processPastedContent } from "@streetwritersco/tinymce-plugins/codeblock";
 import "@streetwritersco/tinymce-plugins/inlinecode";
 import "@streetwritersco/tinymce-plugins/shortlink";
-import "@streetwritersco/tinymce-plugins/quickimage";
 import "@streetwritersco/tinymce-plugins/checklist";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
+import "@streetwritersco/tinymce-plugins/attachmentshandler";
+import "./plugins/picker";
+import "./plugins/icons";
+import "./plugins/attachmentshandler.css";
 import "@streetwritersco/tinymce-plugins/blockescape";
 import { Editor } from "@tinymce/tinymce-react";
 import { showBuyDialog } from "../../common/dialog-controller";
@@ -38,6 +40,8 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
 import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
+import { AppEventManager, AppEvents } from "../../common";
+import { EV, EVENTS } from "notes-core/common";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -108,9 +112,9 @@ function useSkin() {
 
 const plugins = {
   default:
-    "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable quickbars autoresize",
+    "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "blockescape keyboardquirks collapsibleheaders shortlink quickimage paste codeblock inlinecode shortcuts checklist",
+    "icons blockescape keyboardquirks collapsibleheaders attachmentshandler shortlink quickimage paste codeblock inlinecode checklist",
   pro: "textpattern",
 };
 
@@ -147,11 +151,37 @@ function TinyMCE(props) {
     );
   }, [tinymceRef, newSkin, oldSkin]);
 
+  useEffect(() => {
+    const event = AppEventManager.subscribe(
+      AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+      (progressState) => {
+        if (!tinymceRef.current.editor._updateAttachmentProgress) return;
+        tinymceRef.current.editor._updateAttachmentProgress(progressState);
+      }
+    );
+
+    const mediaAttachmentDownloadedEvent = EV.subscribe(
+      EVENTS.mediaAttachmentDownloaded,
+      (image) => {
+        const { hash, src } = image;
+        tinymceRef.current.editor.execCommand("mceReplaceImage", { hash, src });
+      }
+    );
+    return () => {
+      event.unsubscribe();
+      mediaAttachmentDownloadedEvent.unsubscribe();
+    };
+  }, [tinymceRef]);
+
   return (
     <Editor
       ref={tinymceRef}
       onFocus={onFocus}
-      onInit={onInit}
+      onInit={(args, editor) => {
+        editor.serializer.addTempAttr("data-progress");
+        clearTimeout(editor.changeTimeout);
+        onInit(args, editor);
+      }}
       initialValue={initialValue}
       init={{
         //experimental
@@ -168,40 +198,11 @@ function TinyMCE(props) {
         ],
         toolbar_mode: isTablet() ? "scrolling" : "sliding",
         contextmenu: false,
-        quickbars_insert_toolbar: false,
         skin_url: newSkin,
         inline_boundaries_selector: "a[href]",
-        // content_css: "",
-        content_style: `
-        pre.codeblock {
-          overflow-x: auto;
-        }
-
-        img {
-          max-width:100% !important;
-          height:auto !important;
-        }
-        
-        iframe {
-          max-width:100% !important;
-        }
-
-        table {
-          display: block !important;
-          overflow-x: auto !important;
-          white-space: nowrap  !important;
-          max-width:100% !important;
-          width:100% !important;
-          height:auto !important;
-        }
-        
-        td {
-          min-width:20vw !important;
-        }
-`,
         toolbar: simple
           ? false
-          : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image media link table | ltr rtl | searchreplace`,
+          : `bold italic underline strikethrough inlinecode | blockquote codeblock | fontsizeselect formatselect | alignleft aligncenter alignright alignjustify | outdent indent subscript superscript |  numlist bullist checklist | forecolor backcolor removeformat | hr | image attachment media link table | ltr rtl | searchreplace`,
         quickbars_selection_toolbar: false,
         mobile: {
           toolbar_mode: "scrolling",
@@ -212,7 +213,8 @@ function TinyMCE(props) {
         placeholder: placeholder || "Start writing your note here...",
         target_list: false,
         link_title: false,
-        imagetools_toolbar: "rotateleft rotateright | flipv fliph",
+        imagetools_toolbar:
+          "rotateleft rotateright | flipv fliph | alignleft aligncenter alignright",
         setup: (editor) => {
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();
@@ -230,6 +232,13 @@ function TinyMCE(props) {
         paste_postprocess: function (_, args) {
           const { node } = args;
           processPastedContent(node);
+        },
+        invalid_styles: {
+          span: "--progress",
+        },
+        extended_valid_elements: `img[*|src=placeholder.svg]`,
+        attachmenthandler_download_attachment: async (hash) => {
+          console.error("Not implemented.");
         },
       }}
       onBeforeExecCommand={async (command) => {

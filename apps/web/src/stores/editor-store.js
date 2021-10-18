@@ -30,6 +30,7 @@ const getDefaultSession = () => {
     color: undefined,
     dateEdited: 0,
     totalWords: 0,
+    attachments: [],
     content: {
       type: "tiny",
       data: "",
@@ -92,7 +93,7 @@ class EditorStore extends BaseStore {
     if (note.conflicted)
       return hashNavigate(`/notes/${noteId}/conflict`, { replace: true });
 
-    let content = await db.content.raw(note.contentId);
+    let content = await db.content.raw(note.contentId, false);
 
     this.set((state) => {
       const defaultSession = getDefaultSession();
@@ -102,6 +103,7 @@ class EditorStore extends BaseStore {
         content: content || defaultSession.content,
         totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
+        attachments: db.attachments.ofNote(note.id, "files") || [],
       };
     });
     appStore.setIsEditorOpen(true);
@@ -146,6 +148,8 @@ class EditorStore extends BaseStore {
           state.session.title = note.title;
           state.session.isSaving = false;
           state.session.notebooks = note.notebooks;
+          state.session.attachments =
+            db.attachments.ofNote(note.id, "files") || [];
         });
 
         noteStore.refresh();

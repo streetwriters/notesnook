@@ -1,24 +1,37 @@
 import React from "react";
 import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
+import ReactToggle from "react-toggle";
+import "react-toggle/style.css";
+import { Label } from "@rebass/forms";
+import "./toggle.css";
 
 function Toggle(props) {
-  const { icons, label, onToggle, toggleKey } = props;
+  const { icon: ToggleIcon, label, onToggle, toggleKey } = props;
   const isOn = useStore((store) => store.session[toggleKey]);
   return (
     <Flex
-      variant="columnCenter"
-      width="33%"
+      alignItems="center"
+      justifyContent="space-between"
       py={2}
-      mr={1}
-      sx={{ borderRadius: "default", cursor: "pointer" }}
+      px={2}
+      sx={{
+        borderBottom: "1px solid var(--border)",
+        cursor: "pointer",
+      }}
       onClick={() => onToggle(!isOn)}
       data-test-id={props.testId}
     >
-      {isOn ? <icons.on color="primary" /> : <icons.off />}
-      <Text mt={1} variant="body" color={isOn ? "primary" : "text"}>
+      <Text
+        display="flex"
+        alignItems="center"
+        variant="body"
+        color={isOn ? "primary" : "text"}
+      >
+        <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
+      <ReactToggle size={20} defaultChecked={isOn} icons={false} />
     </Flex>
   );
 }

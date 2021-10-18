@@ -23,7 +23,7 @@ function createOption(key, title, icon, onClick) {
     onClick: async () => {
       await onClick.call(this, selectionStore.get());
       selectionStore.toggleSelectionMode(false);
-      appStore.setProcessingStatus();
+      appStore.setProcessingStatus(key);
     },
   };
 }
@@ -47,7 +47,7 @@ const DeleteOption = createOption(
     const statusText = `${
       item.dateDeleted ? `Permanently deleting` : `Deleting`
     } ${state.selectedItems.length} items...`;
-    appStore.setProcessingStatus(statusText);
+    appStore.setProcessingStatus("deleteOption", statusText);
 
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {
@@ -87,6 +87,7 @@ const UnfavoriteOption = createOption(
   Icon.Star,
   function (state) {
     appStore.setProcessingStatus(
+      "unfavoriteOption",
       `Unfavoriting ${state.selectedItems.length} notes...`
     );
 
@@ -105,6 +106,7 @@ const AddToNotebookOption = createOption(
   Icon.AddToNotebook,
   async function (state) {
     appStore.setProcessingStatus(
+      "atnOption",
       `Adding ${state.selectedItems.length} notes to notebooks...`
     );
 
@@ -120,6 +122,7 @@ const ExportOption = createOption(
   Icon.Export,
   async function (state) {
     appStore.setProcessingStatus(
+      "exportOption",
       `Exporting ${state.selectedItems.length} notes...`
     );
 
@@ -136,6 +139,7 @@ const RestoreOption = createOption(
   Icon.Restore,
   async function (state) {
     appStore.setProcessingStatus(
+      "restoreOption",
       `Restoring ${state.selectedItems.length} items...`
     );
 

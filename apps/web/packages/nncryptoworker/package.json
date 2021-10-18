@@ -1,0 +1,20 @@
+{
+  "name": "nncryptoworker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc --declaration --outDir ./dist"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "nncrypto": "file:../nncrypto",
+    "streamablefs": "file:../streamablefs",
+    "threads": "^1.7.0"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.3"
+  }
+}

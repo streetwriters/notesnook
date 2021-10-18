@@ -13,6 +13,7 @@ import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
 import EditorLoading from "./loading";
+import { db } from "../../common/db";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
@@ -57,17 +58,21 @@ function Editor({ noteId, nonce }) {
     if (sessionState === SESSION_STATES.new) {
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       const {
+        id,
         content: { data },
       } = editorstore.get().session;
       const editor = editorRef.current?.editor;
       if (!editor) return;
-      function setContents() {
+      clearTimeout(editor.changeTimeout);
+      async function setContents() {
         // NOTE: workaround to not fire onEditorChange event on content load
         editor.isLoading = true;
         editor.setContent(data, { format: "html" });
 
         editor.undoManager.reset();
         editor.setDirty(false);
+
+        if (id) await db.attachments.downloadImages(id);
       }
 
       if (!isMobile) editor.focus();
@@ -154,7 +159,7 @@ function Editor({ noteId, nonce }) {
                       };
                     });
                   }}
-                  changeInterval={500}
+                  changeInterval={100}
                   onWordCountChanged={updateWordCount}
                   onInit={async () => {
                     await startSession(noteId);
@@ -165,7 +170,7 @@ function Editor({ noteId, nonce }) {
           </Suspense>
         </Animated.Flex>
       </Flex>
-      <Properties />
+      <Properties noteId={noteId} />
     </Flex>
   );
 }
