@@ -108,7 +108,7 @@ async function insertFile(editor, file) {
           data-hash="${file.hash}"
           data-size="${formatBytes(file.size, 1)}">
           <em>&nbsp;</em>
-          ${file.filename}
+          <span class="filename">${file.filename}</span>
       </span>`;
   editor.insertContent(content);
 }
