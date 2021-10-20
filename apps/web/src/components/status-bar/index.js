@@ -82,8 +82,8 @@ function StatusBar() {
             </Text>
           </Button>
         )}
-        {processingStatuses?.map(({ status, progress }) => (
-          <Flex ml={1} alignItems="center" justifyContent="center">
+        {processingStatuses?.map(({ key, status, progress }) => (
+          <Flex key={key} ml={1} alignItems="center" justifyContent="center">
             <Icon.Loading size={12} />
             <Text variant="subBody" color="bgSecondaryText" ml={1}>
               {progress ? `${progress}% ${status}` : status}

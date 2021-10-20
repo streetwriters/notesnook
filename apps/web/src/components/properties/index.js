@@ -160,6 +160,7 @@ function Properties({ noteId }) {
 
               return (
                 <Flex
+                  key={notebook.id}
                   py={2}
                   px={2}
                   sx={{
@@ -213,8 +214,8 @@ function Properties({ noteId }) {
                 attachmentsStatus[attachment.metadata.hash];
               return (
                 <Flex
-                  //py={2}
-                  py={0}
+                  key={attachment.id}
+                  py={1}
                   px={2}
                   sx={{
                     borderBottom: "1px solid var(--border)",
@@ -249,7 +250,7 @@ function Properties({ noteId }) {
                         }}
                       />
                     )}
-                    <Flex>
+                    <Flex mt={1}>
                       {attachmentStatus ? (
                         <Text variant="subBody">
                           {formatBytes(attachmentStatus.loaded, 1)} of{" "}

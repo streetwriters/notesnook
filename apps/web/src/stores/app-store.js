@@ -69,7 +69,7 @@ class AppStore extends BaseStore {
   setProcessingStatus = (key, status, progress) => {
     this.set((state) => {
       if (!status) delete state.processingStatuses[key];
-      else state.processingStatuses[key] = { status, progress };
+      else state.processingStatuses[key] = { key, status, progress };
     });
   };
 

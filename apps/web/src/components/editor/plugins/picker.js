@@ -127,7 +127,6 @@ async function pickImage() {
 }
 
 async function getEncryptionKey() {
-  return { password: "helloworld" };
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
   return key; // { password: "helloworld" };
