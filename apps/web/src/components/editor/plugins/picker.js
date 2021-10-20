@@ -1,7 +1,9 @@
 import Compressor from "compressorjs";
+import { AppEventManager, AppEvents } from "../../../common";
 import { db } from "../../../common/db";
-import { showLoadingDialog } from "../../../common/dialog-controller";
+import { showProgressDialog } from "../../../common/dialog-controller";
 import fs from "../../../interfaces/fs";
+import { formatBytes } from "../../../utils/filename";
 
 function register(editor) {
   editor.ui.registry.addButton("attachment", {
@@ -39,9 +41,25 @@ async function pickFile() {
   const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
   if (!selectedFile) return;
 
-  const result = await showLoadingDialog({
-    title: `${selectedFile.name}`,
-    subtitle: "Please wait while we encrypt & attach your file.",
+  const result = await showProgressDialog({
+    title: `Encrypting attachment`,
+    subtitle: "Please wait while we encrypt this attachment for upload.",
+    message: selectedFile.name,
+    total: formatBytes(selectedFile.size, 0),
+    setProgress: (set) => {
+      const event = AppEventManager.subscribe(
+        AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+        ({ type, total, loaded }) => {
+          if (type !== "encrypt") return;
+
+          const percent = Math.round((loaded / total) * 100);
+          set({ loaded: formatBytes(loaded, 0), progress: percent });
+        }
+      );
+      return () => {
+        event.unsubscribe();
+      };
+    },
     action: async () => {
       const reader = selectedFile.stream().getReader();
       const { hash, type: hashType } = await fs.hashStream(reader);
@@ -109,6 +127,7 @@ async function pickImage() {
 }
 
 async function getEncryptionKey() {
+  return { password: "helloworld" };
   const key = await db.user.getEncryptionKey();
   if (!key) throw new Error("No encryption key found. Are you logged in?");
   return key; // { password: "helloworld" };

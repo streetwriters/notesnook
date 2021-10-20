@@ -10,6 +10,7 @@ import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
 import FS from "../../interfaces/fs";
+import { formatBytes, truncateFilename } from "../../utils/filename";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -236,7 +237,7 @@ function Properties({ noteId }) {
                         overflow: "hidden",
                       }}
                     >
-                      {formatFilename(attachment.metadata.filename)}
+                      {truncateFilename(attachment.metadata.filename)}
                     </Text>
                     {attachmentStatus && (
                       <Box
@@ -342,28 +343,4 @@ function Card({ title, children }) {
       {children}
     </Flex>
   );
-}
-
-function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return "0B";
-
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["B", "K", "M", "G", "T", "P", "E", "Z", "Y"];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + sizes[i];
-}
-
-function formatFilename(filename) {
-  const MAX_LENGTH = 38;
-  if (filename.length > MAX_LENGTH) {
-    return (
-      filename.substr(0, MAX_LENGTH / 2) +
-      "..." +
-      filename.substr(filename.lastIndexOf(".") - 4)
-    );
-  }
-  return filename;
 }

@@ -342,6 +342,21 @@ export function showLoadingDialog(dialogData) {
   ));
 }
 
+export function showProgressDialog(dialogData) {
+  const { title, message, subtitle, total, setProgress, action } = dialogData;
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ProgressDialog
+      title={title}
+      subtitle={subtitle}
+      message={message}
+      total={total}
+      setProgress={setProgress}
+      action={action}
+      onDone={(e) => perform(e)}
+    />
+  ));
+}
+
 export function showMoveNoteDialog(noteIds) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.MoveDialog

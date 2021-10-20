@@ -4,6 +4,7 @@ import Confirm from "./confirm";
 import EmailVerificationDialog from "./emailverificationdialog";
 import ExportDialog from "./exportdialog";
 import LoadingDialog from "./loadingdialog";
+import ProgressDialog from "./progressdialog";
 import MoveDialog from "./movenotedialog";
 import PasswordDialog from "./passworddialog";
 import RecoveryKeyDialog from "./recoverykeydialog";
@@ -26,5 +27,6 @@ const Dialogs = {
   ItemDialog,
   SessionExpiredDialog,
   FeatureDialog,
+  ProgressDialog,
 };
 export default Dialogs;
