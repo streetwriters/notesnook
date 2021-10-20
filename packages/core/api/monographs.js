@@ -66,7 +66,10 @@ class Monographs {
     const note = this._db.notes.note(noteId);
     if (!note) throw new Error("No such note found.");
 
-    const content = await this._db.content.raw(note.data.contentId);
+    const content = await this._db.content.downloadMedia(
+      `monograph-${noteId}`,
+      await this._db.content.raw(note.data.contentId)
+    );
     if (!content) throw new Error("This note has no content.");
 
     const monograph = {
