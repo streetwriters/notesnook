@@ -1,9 +1,10 @@
 import React from 'react';
-import {Platform} from 'react-native';
+import {Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
 import Sodium, {launchCamera, launchImageLibrary} from 'react-native-sodium';
+import RNFetchBlob from 'rn-fetch-blob';
 import {Attachment} from '../../../../components/AttachmentDialog';
-import {eSendEvent} from '../../../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {db} from '../../../../utils/database';
 import {
@@ -86,25 +87,51 @@ export const execCommands = {
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
   filepicker: async () => {
     try {
-      let file = await DocumentPicker.pick();
+      let options = {
+        mode: 'import',
+        
+      };
+      if (Platform.OS == "ios") {
+        options.copyTo = 'cachesDirectory';
+      }
+
+      let file = await DocumentPicker.pick(options);
+
+      if (file.copyError) {
+        ToastEvent.show({
+          heading: 'Failed to open file',
+          message: file.copyError,
+          type: 'error',
+          context: 'global'
+        });
+        return;
+      }
+
       let uri =
-        Platform.OS === 'ios' ? file.uri.replace('file:///', '/') : file.uri;
+        Platform.OS === 'ios'
+          ? file.fileCopyUri.replace('file:///', '/')
+          : file.uri;
 
       eSendEvent(eOpenProgressDialog, {
-        title: 'Attaching file',
+        title: 'Encrypting attachment',
         paragraph: 'Please wait while we encrypt file for upload',
         nowarn: true,
-        icon: 'shield-lock',
+        icon: 'attachment',
         component: (
-          <Attachment
-            attachment={{
-              metadata: {
-                filename: file.name
-              },
-              length: file.size
-            }}
-            encryption
-          />
+          <View
+            style={{
+              paddingHorizontal: 12
+            }}>
+            <Attachment
+              attachment={{
+                metadata: {
+                  filename: file.name
+                },
+                length: file.size
+              }}
+              encryption
+            />
+          </View>
         )
       });
 
@@ -113,6 +140,10 @@ export const execCommands = {
         type: 'url'
       });
       let result = await attachFile(uri, hash, file.type, file.name);
+      console.log('attach file: ',result);
+      if (Platform.OS === 'ios') {
+        await RNFetchBlob.fs.unlink(uri);
+      }
       setTimeout(() => {
         eSendEvent(eCloseProgressDialog);
       }, 1000);
