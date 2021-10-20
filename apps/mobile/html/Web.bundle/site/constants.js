@@ -278,6 +278,7 @@ span.attachment:not([data-progress])::after {
   color: ${pageTheme.colors.icon};
   margin-left: 5px;
   font-size: 0.7rem;
+  white-space: nowrap;
 }
 
 span.attachment[data-progress]::after {
@@ -285,6 +286,7 @@ span.attachment[data-progress]::after {
   color:${pageTheme.colors.icon};
   margin-left: 5px;
   font-size: 0.7rem;
+  white-space: nowrap;
 }
 
 span.attachment::before {
