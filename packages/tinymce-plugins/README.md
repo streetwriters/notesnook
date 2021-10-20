@@ -28,6 +28,8 @@ import "@streetwritersco/tinymce-plugins/<plugin-name>";
 6. Collapsible Headers
 7. Keyboard quirks
    - These includes various workarounds for quirks with keyboard input
+8. Blockescape (for easily escaping from blockquote and other block elements)
+9. Attachments handler (used internally by [Notesnook](https://app.notesnook.com/) for attachments)
 
 ### Overrides
 
