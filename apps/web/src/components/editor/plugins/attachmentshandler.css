@@ -11,6 +11,13 @@ span.attachment {
   border: 1px solid var(--border);
   font-size: 0.85rem;
   cursor: pointer !important;
+  max-width: 250px;
+}
+
+span.attachment .filename {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 span.attachment::before {
