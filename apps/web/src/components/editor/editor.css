@@ -148,3 +148,17 @@ td {
   color: var(--fontSecondary);
   background: var(--primary);
 }
+
+.mce-content-body code[data-mce-selected="inline-boundary"] {
+  background-color: var(--bgSecondary);
+}
+
+.mce-content-body code {
+  background-color: var(--bgSecondary);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  padding: 3px 5px 0px 5px;
+  font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
+    Menlo, monospace !important;
+  font-size: 10pt !important;
+}

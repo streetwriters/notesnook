@@ -103,6 +103,7 @@ export class NNCryptoWorker implements INNCrypto {
     const eventListener = await this.createWorkerStream(streamId, stream);
     this.worker.addEventListener("message", eventListener);
     await this.workermodule.createDecryptionStream(streamId, iv, key);
+    await stream.write(undefined);
     this.worker.removeEventListener("message", eventListener);
   }
 

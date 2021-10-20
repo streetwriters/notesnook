@@ -1,7 +1,6 @@
 import React, { useEffect } from "react";
 import "./editor.css";
 import "@streetwritersco/tinymce-plugins/codeblock/styles.css";
-import "@streetwritersco/tinymce-plugins/inlinecode/styles.css";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders/styles.css";
 import "tinymce/tinymce";
 import "tinymce/icons/default";
@@ -42,6 +41,8 @@ import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { AppEventManager, AppEvents } from "../../common";
 import { EV, EVENTS } from "notes-core/common";
+import { db } from "../../common/db";
+import FS from "../../interfaces/fs";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -238,7 +239,15 @@ function TinyMCE(props) {
         },
         extended_valid_elements: `img[*|src=placeholder.svg]`,
         attachmenthandler_download_attachment: async (hash) => {
-          console.error("Not implemented.");
+          const attachment = db.attachments.attachment(hash);
+          if (!attachment) return;
+          await db.fs.downloadFile(hash, hash);
+          await FS.saveFile(hash, {
+            key: await db.user.getEncryptionKey(),
+            iv: attachment.iv,
+            name: attachment.metadata.filename,
+            size: attachment.length,
+          });
         },
       }}
       onBeforeExecCommand={async (command) => {

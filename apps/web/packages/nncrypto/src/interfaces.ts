@@ -9,7 +9,7 @@ import {
 
 export interface IStreamable {
   read(): Promise<Chunk | undefined>;
-  write(chunk: Uint8Array): Promise<void>;
+  write(chunk: Uint8Array | undefined): Promise<void>;
 }
 
 export interface INNCrypto {
