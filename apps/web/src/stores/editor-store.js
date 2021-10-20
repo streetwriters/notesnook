@@ -72,6 +72,7 @@ class EditorStore extends BaseStore {
 
     const session = this.get().session;
 
+    if (session.id) await db.fs.cancel(session.id);
     if (session.id === noteId && !force) return;
 
     if (session.state === SESSION_STATES.unlocked) {
@@ -165,8 +166,11 @@ class EditorStore extends BaseStore {
       });
   };
 
-  newSession = (nonce) => {
+  newSession = async (nonce) => {
     let context = noteStore.get().context;
+    const session = this.get().session;
+    if (session.id) await db.fs.cancel(session.id);
+
     this.set((state) => {
       state.session = {
         ...getDefaultSession(),
@@ -179,7 +183,10 @@ class EditorStore extends BaseStore {
     appStore.setIsEditorOpen(true);
   };
 
-  clearSession = (shouldNavigate = true) => {
+  clearSession = async (shouldNavigate = true) => {
+    const session = this.get().session;
+    if (session.id) await db.fs.cancel(session.id);
+
     appStore.setIsEditorOpen(false);
     this.set((state) => {
       state.session = {
