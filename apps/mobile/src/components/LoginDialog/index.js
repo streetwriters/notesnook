@@ -21,6 +21,7 @@ import {
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import {dHeight} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
 import {
@@ -341,13 +342,20 @@ const LoginDialog = () => {
       let lastRecoveryEmailTime = await MMKV.getItem('lastRecoveryEmailTime');
       if (
         lastRecoveryEmailTime &&
-        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 10
+        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
       ) {
         throw new Error('Please wait before requesting another email');
       }
       !nostatus && setStatus('Password Recovery Email Sent!');
       await db.user.recoverAccount(email);
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
+      ToastEvent.show({
+        heading: `Check your email to reset password`,
+        message: `Recovery email has been sent to ${email}`,
+        type: 'success',
+        context: 'local',
+        duration: 7000
+      });
     } catch (e) {
       setStatus(null);
       ToastEvent.show({
@@ -373,6 +381,11 @@ const LoginDialog = () => {
     setStatus('Setting new Password');
     try {
       await db.user.changePassword(oldPassword, password);
+      ToastEvent.show({
+        heading: `Account password updated`,
+        type: 'success',
+        context: 'local'
+      });
     } catch (e) {
       setStatus(null);
       ToastEvent.show({
@@ -411,7 +424,7 @@ const LoginDialog = () => {
             return;
           }
           _email.current?.focus();
-        },500);
+        }, 300);
       }}
       background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
@@ -473,7 +486,8 @@ const LoginDialog = () => {
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
-          zIndex: 10
+          zIndex: 10,
+          minHeight: DDS.isTab ? '50%' : '85%'
         }}>
         <Header
           color="transparent"
@@ -709,11 +723,12 @@ const LoginDialog = () => {
           {mode !== MODES.signup ? null : <Seperator />}
 
           <Button
-            title={current.button}
+            title={loading ? '' : current.button}
             onPress={current.buttonFunc}
             width="100%"
             type="accent"
             fontSize={SIZE.md}
+            loading={loading}
             height={50}
           />
 
@@ -729,48 +744,6 @@ const LoginDialog = () => {
               }}
               height={50}
             />
-          )}
-
-          {status && (
-            <View
-              style={{
-                alignItems: 'center',
-                width: '100%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: colors.bg,
-                alignSelf: 'center',
-                paddingVertical: 20
-              }}>
-              <View
-                style={{
-                  flexShrink: 1,
-                  paddingRight:5
-                }}>
-                <Heading size={SIZE.md}>{status}</Heading>
-                <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
-                  {current.loading}{' '}
-                  {!current.showLoader ? null : (
-                    <Paragraph color={colors.errorText}>
-                      Do not close the app.
-                    </Paragraph>
-                  )}
-                </Paragraph>
-              </View>
-
-              {!current.showLoader ? (
-                <Button
-                  title="Ok"
-                  width={50}
-                  onPress={() => {
-                    setStatus(null);
-                  }}
-                  type="accent"
-                />
-              ) : (
-                <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
-              )}
-            </View>
           )}
         </View>
       </ScrollView>
