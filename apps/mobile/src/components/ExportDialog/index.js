@@ -1,23 +1,19 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {ToastEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { ToastEvent } from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
-import {getElevation} from '../../utils';
-import {ph, pv, SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { getElevation } from '../../utils';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {GetPremium} from '../ActionSheetComponent/GetPremium';
-import {Button} from '../Button';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -242,7 +238,7 @@ const ExportDialog = () => {
                   }}
                   onPress={async () => {
                     Share.open({
-                      url: 'file:/' + result.filePath
+                      url:Platform.OS === "ios" ?  'file:/' + result.filePath : result.filePath
                     }).catch(console.log);
                   }}
                   height={50}
@@ -257,7 +253,7 @@ const ExportDialog = () => {
                 }}
                 color={colors.icon}
                 size={SIZE.xs}>
-                {'Note exported as ' + result.filePath.split('/').pop()}
+                {'Note exported as ' + result.fileName}
               </Paragraph>
             )}
             {exporting && !complete && (
