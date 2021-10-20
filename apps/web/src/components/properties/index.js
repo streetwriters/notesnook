@@ -53,12 +53,17 @@ function Properties({ noteId }) {
       AppEvents.UPDATE_ATTACHMENT_PROGRESS,
       ({ hash, type, total, loaded }) => {
         if (!attachments.find((a) => a.metadata.hash === hash)) return;
+        const percent = Math.round((loaded / total) * 100);
         setAttachmentsStatus((status) => {
           const copy = { ...status };
-          copy[hash] = {
-            type,
-            progress: Math.round((loaded / total) * 100),
-          };
+          copy[hash] =
+            percent >= 100
+              ? null
+              : {
+                  type,
+                  loaded,
+                  progress: percent,
+                };
           return copy;
         });
       }
@@ -213,20 +218,18 @@ function Properties({ noteId }) {
                   sx={{
                     borderBottom: "1px solid var(--border)",
                     ":last-of-type": { borderBottom: "none" },
-                    ":hover .attachment-actions": {
-                      display: "flex",
-                    },
-                    ":hover .attachment-size": {
-                      display: "none",
+                    ":hover .attachment-download-btn": {
+                      opacity: 1,
                     },
                   }}
                   title={attachment.metadata.filename}
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <Flex flexDirection="column">
+                  <Flex flexDirection="column" flex={1}>
                     <Text
                       variant="body"
+                      fontSize="subtitle"
                       sx={{
                         whiteSpace: "nowrap",
                         textOverflow: "ellipsis",
@@ -245,24 +248,28 @@ function Properties({ noteId }) {
                         }}
                       />
                     )}
+                    <Flex>
+                      {attachmentStatus ? (
+                        <Text variant="subBody">
+                          {formatBytes(attachmentStatus.loaded, 1)} of{" "}
+                          {formatBytes(attachment.length, 1)} (
+                          {attachmentStatus.type}ing)
+                        </Text>
+                      ) : (
+                        <Text variant="subBody">
+                          {formatBytes(attachment.length, 1)}
+                        </Text>
+                      )}
+                    </Flex>
                   </Flex>
-                  <Text
-                    className="attachment-size"
-                    variant="subBody"
-                    flexShrink={0}
-                    p={1}
-                    m={1}
-                  >
-                    {formatBytes(attachment.length, 1)}
-                  </Text>
-                  <Box display="none" className="attachment-actions">
+
+                  <Box>
                     {attachmentStatus ? (
                       <Button
                         title="Cancel download"
                         variant="tool"
                         p={1}
                         m={1}
-                        bg="transparent"
                         sx={{ ":hover": { bg: "hover" } }}
                         onClick={async () => {
                           await db.fs.cancel(
@@ -275,24 +282,26 @@ function Properties({ noteId }) {
                       </Button>
                     ) : (
                       <Button
+                        className="attachment-download-btn"
                         title="Download attachment"
                         variant="tool"
                         p={1}
                         m={1}
-                        bg="transparent"
-                        sx={{ ":hover": { bg: "hover" } }}
+                        sx={{ ":hover": { bg: "hover" }, opacity: 0 }}
                         onClick={async () => {
-                          await db.fs.downloadFile(
-                            attachment.metadata.hash,
-                            attachment.metadata.hash
-                          );
-
-                          await FS.saveFile(attachment.metadata.hash, {
-                            key: await db.user.getEncryptionKey(),
-                            iv: attachment.iv,
-                            name: attachment.metadata.filename,
-                            size: attachment.length,
-                          });
+                          if (
+                            await db.fs.downloadFile(
+                              attachment.metadata.hash,
+                              attachment.metadata.hash
+                            )
+                          ) {
+                            await FS.saveFile(attachment.metadata.hash, {
+                              key: await db.user.getEncryptionKey(),
+                              iv: attachment.iv,
+                              name: attachment.metadata.filename,
+                              size: attachment.length,
+                            });
+                          }
                         }}
                       >
                         <Icon.Download size={16} />
@@ -348,12 +357,12 @@ function formatBytes(bytes, decimals = 2) {
 }
 
 function formatFilename(filename) {
-  const MAX_LENGTH = 28;
+  const MAX_LENGTH = 38;
   if (filename.length > MAX_LENGTH) {
     return (
       filename.substr(0, MAX_LENGTH / 2) +
       "..." +
-      filename.substr(-(MAX_LENGTH / 3))
+      filename.substr(filename.lastIndexOf(".") - 4)
     );
   }
   return filename;

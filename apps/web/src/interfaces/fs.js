@@ -254,8 +254,8 @@ function reportProgress(ev, { type, hash }) {
   AppEventManager.publish(AppEvents.UPDATE_ATTACHMENT_PROGRESS, {
     type,
     hash,
-    total: ev.total,
-    loaded: ev.loaded,
+    total: ev?.total || 1,
+    loaded: ev?.loaded || 1,
   });
 }
 
@@ -264,31 +264,37 @@ async function downloadFile(filename, requestOptions) {
   console.log("Request to download file", filename, url, headers);
   if (await streamablefs.exists(filename)) return true;
 
-  const response = await axios.get(url, {
-    headers: headers,
-    responseType: "arraybuffer",
-    cancelToken: cancellationToken,
-    onDownloadProgress: (ev) =>
-      reportProgress(ev, { type: "download", hash: filename }),
-  });
+  try {
+    const response = await axios.get(url, {
+      headers: process.env.NODE_ENV === "production" ? headers : null,
+      responseType: "arraybuffer",
+      cancelToken: cancellationToken,
+      onDownloadProgress: (ev) =>
+        reportProgress(ev, { type: "download", hash: filename }),
+    });
 
-  console.log("File downloaded", filename, url, response);
-  if (!isSuccessStatusCode(response.status)) return false;
-  const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
-  distributor.fill(new Uint8Array(response.data));
-  distributor.close();
+    console.log("File downloaded", filename, url, response);
+    if (!isSuccessStatusCode(response.status)) return false;
+    const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
+    distributor.fill(new Uint8Array(response.data));
+    distributor.close();
 
-  const fileHandle = await streamablefs.createFile(
-    filename,
-    response.data.byteLength,
-    "application/octet-stream"
-  );
+    const fileHandle = await streamablefs.createFile(
+      filename,
+      response.data.byteLength,
+      "application/octet-stream"
+    );
 
-  for (let chunk of distributor.chunks) {
-    await fileHandle.write(chunk.data);
+    for (let chunk of distributor.chunks) {
+      await fileHandle.write(chunk.data);
+    }
+
+    return true;
+  } catch (e) {
+    console.error(e);
+    reportProgress(undefined, { type: "download", hash: filename });
+    return false;
   }
-
-  return true;
 }
 
 function exists(filename) {
@@ -323,6 +329,7 @@ async function saveFile(filename, { key, iv, name, size }) {
     },
     filename
   );
+  await streamablefs.deleteFile(filename);
 }
 
 const FS = {
