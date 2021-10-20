@@ -468,6 +468,7 @@ export async function clearEditor(
   clear && (await clearTimer(true));
   isFirstLoad = true;
   disableSaving = true;
+  db.fs.cancel(getNote()?.id);
   clearNote();
   if (cTimeout) {
     clearTimeout(cTimeout);
@@ -680,6 +681,7 @@ export const presentResolveConflictDialog = _note => {
 };
 
 export async function updateNoteInEditor() {
+  return;
   let _note = db.notes.note(id).data;
   if (_note.conflicted) {
     presentResolveConflictDialog(_note);

@@ -75,6 +75,7 @@ const EditorHeader = () => {
       eSendEvent(eCloseFullscreenEditor);
       return;
     }
+    
     if (deviceMode === 'mobile') {
       editing.movedAway = true;
     }
@@ -235,7 +236,7 @@ const EditorHeader = () => {
   };
 
   const _onHardwareBackPress = async () => {
-    db.fs.cancel(getNote()?.id);
+    
     if (editing.currentlyEditing) {
       await _onBackPress();
       return true;
@@ -266,6 +267,7 @@ const EditorHeader = () => {
           {deviceMode !== 'mobile' && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
+                
                 await _onBackPress();
                 Navigation.popToTop();
               }}
