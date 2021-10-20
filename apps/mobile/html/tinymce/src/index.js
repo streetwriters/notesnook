@@ -22,7 +22,7 @@ import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/inlinecode"
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import "@streetwritersco/tinymce-plugins/attachmentshandler";
-
+import "@streetwritersco/tinymce-plugins/blockescape";
 
 require.context(
   "file-loader?name=[path][name].[ext]&context=node_modules/tinymce!tinymce/skins",

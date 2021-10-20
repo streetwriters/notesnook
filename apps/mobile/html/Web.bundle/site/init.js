@@ -130,7 +130,7 @@ function init_tiny(size) {
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
-      'media imagetools table paste wordcount autoresize directionality'
+      'media imagetools table paste wordcount autoresize directionality blockescape'
     ],
     toolbar: false,
     paste_data_images: true,
