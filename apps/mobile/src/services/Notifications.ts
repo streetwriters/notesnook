@@ -34,11 +34,15 @@ function loadNote(id: string, jump: boolean) {
 function init() {
   if (Platform.OS === 'ios') return;
   PushNotification.configure({
-    onNotification: function (notification) {
+    onNotification: async function (notification) {
       editing.movedAway = false;
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore
+        await db.init(); 
+        //@ts-ignore
+        await db.notes.init();
+         //@ts-ignore
         loadNote(notification.tag, false);
         return;
       }
@@ -64,6 +68,14 @@ function init() {
           break
         case "ReplyInput":
           console.log("texto", notification);
+          await db.init();
+          await db.notes.add({
+            content:{
+              type:'tiny',
+              //@ts-ignore
+              data:`<p>${notification.reply_text} </p>`
+            }
+          })
           //@ts-ignore/////
           pinQuickNote(notification.id);
           break
