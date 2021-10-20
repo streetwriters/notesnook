@@ -18,7 +18,11 @@ function register(editor) {
     );
     if (!elements || !elements.length || !src) return;
     for (let element of elements) {
-      const blob = await (await fetch(src)).blob();
+      const blob = dataUriToBlob(src);
+      if (!blob) {
+        console.error("Could not convert data uri to blob.");
+        continue;
+      }
       element.src = URL.createObjectURL(blob);
     }
   });
@@ -35,11 +39,11 @@ function register(editor) {
     );
     if (!elements || !elements.length || !total || !loaded) return;
     for (let element of elements) {
-      if (total === loaded) {
+      const percent = Math.round((loaded / total) * 100);
+      if (percent >= 100) {
         element.removeAttribute("data-progress");
         element.style.removeProperty("--progress");
       } else {
-        const percent = Math.round((loaded / total) * 100);
         element.setAttribute("data-progress", `${percent}%`);
         element.style.setProperty("--progress", `${percent}%`);
       }
@@ -128,3 +132,35 @@ function formatBytes(bytes, decimals = 2) {
 (function init() {
   addPluginToPluginManager("attachmentshandler", register);
 })();
+
+function dataUriToBlob(uri) {
+  const data = uri.split(",");
+
+  const matches = /data:([^;]+)/.exec(data[0]);
+  if (!matches) {
+    return null;
+  }
+
+  const mimetype = matches[1];
+  const base64 = data[1];
+
+  // al gore rhythm via http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
+  const sliceSize = 1024;
+  const byteCharacters = atob(base64);
+  const bytesLength = byteCharacters.length;
+  const slicesCount = Math.ceil(bytesLength / sliceSize);
+  const byteArrays = new Array(slicesCount);
+
+  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
+    const begin = sliceIndex * sliceSize;
+    const end = Math.min(begin + sliceSize, bytesLength);
+
+    const bytes = new Array(end - begin);
+    // tslint:disable-next-line:one-variable-per-declaration
+    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
+      bytes[i] = byteCharacters[offset].charCodeAt(0);
+    }
+    byteArrays[sliceIndex] = new Uint8Array(bytes);
+  }
+  return new Blob(byteArrays, { type: mimetype });
+}
