@@ -226,7 +226,7 @@ export const Attachment = ({attachment,encryption}) => {
         </View>
       </View>
 
-      {currentProgress || encryptionProgress ? (
+      {currentProgress || encryptionProgress || encryption ? (
         <TouchableOpacity
           activeOpacity={0.9}
           onPress={() => {
