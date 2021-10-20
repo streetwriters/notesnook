@@ -39,9 +39,10 @@ function toggleInlineCode(editor) {
     const node = editor.selection.getNode();
 
     if (node.tagName !== TAGNAME && range.startOffset === range.endOffset) {
-      editor.selection.setContent("<code>&#xFEFF;</code>");
+      editor.selection.setContent(`<code spellcheck="false">&#xFEFF;</code>`);
     } else {
-      editor.execCommand("mceToggleFormat", false, "code");
+      const content = editor.selection.getContent();
+      editor.selection.setContent(`<code spellcheck="false">${content}</code>`);
     }
   });
 }
