@@ -195,6 +195,7 @@ export default class Attachments extends Collection {
       if (!src) return;
 
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
+        groupId,
         hash,
         src,
       });
