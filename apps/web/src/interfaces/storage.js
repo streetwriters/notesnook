@@ -1,11 +1,9 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import "worker-loader!nncryptoworker/dist/src/worker.js";
-import NNCrypto from "./nncrypto.stub";
+import NNCrypto, { WORKER_PATH } from "./nncrypto.stub";
 
-const crypto = new NNCrypto("/static/js/bundle.worker.js");
+const crypto = new NNCrypto(WORKER_PATH);
 extendPrototype(localforage);
 
 localforage.config({

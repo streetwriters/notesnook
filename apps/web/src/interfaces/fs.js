@@ -3,10 +3,8 @@ import localforage from "localforage";
 import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common";
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import "worker-loader?filename=static/workers/nncrypto.worker.js!nncryptoworker/dist/src/worker.js";
 import { StreamableFS } from "streamablefs";
-import NNCrypto from "./nncrypto.stub";
+import NNCrypto, { WORKER_PATH } from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
 import { saveAs } from "file-saver";
@@ -17,7 +15,7 @@ const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
 const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
   (5 * 1024 * 1024) / ENCRYPTED_CHUNK_SIZE
 );
-const crypto = new NNCrypto("/static/workers/nncrypto.worker.js");
+const crypto = new NNCrypto(WORKER_PATH);
 const streamablefs = new StreamableFS("streamable-fs");
 
 /**
