@@ -155,6 +155,7 @@ export const ExitFullscreen = createIcon(Icons.mdiFullscreenExit);
 
 export const Announcement = createIcon(Icons.mdiBullhorn);
 export const Publish = createIcon(Icons.mdiCloudUploadOutline);
+export const Published = createIcon(Icons.mdiCloudCheckOutline);
 
 export const Copy = createIcon(Icons.mdiContentCopy);
 

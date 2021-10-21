@@ -8,6 +8,7 @@ import { db } from "../../common/db";
 import * as clipboard from "clipboard-polyfill/text";
 import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
+import { EV, EVENTS } from "notes-core/common";
 
 function PublishView(props) {
   const { noteId, position, onClose } = props;
@@ -15,11 +16,27 @@ function PublishView(props) {
   const [isPasswordProtected, setIsPasswordProtected] = useState(false);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  const [processingStatus, setProcessingStatus] = useState();
 
   const noteTitle = useMemo(() => db.notes.note(noteId)?.title, [noteId]);
 
   useEffect(() => {
     setPublishId(db.monographs.monograph(noteId));
+  }, [noteId]);
+
+  useEffect(() => {
+    const attachmentsLoadingEvent = EV.subscribe(
+      EVENTS.attachmentsLoading,
+      ({ type, groupId, total, current }) => {
+        if (!groupId || !groupId.includes(noteId) || type !== "download")
+          return;
+        if (current === total) setProcessingStatus();
+        else setProcessingStatus({ total, current });
+      }
+    );
+    return () => {
+      attachmentsLoadingEvent.unsubscribe();
+    };
   }, [noteId]);
 
   return (
@@ -37,14 +54,10 @@ function PublishView(props) {
       p={2}
       flexDirection="column"
     >
-      <Text variant="body" fontWeight="bold" color="primary">
+      <Text variant="body" fontSize="title" fontWeight="bold" color="primary">
         {noteTitle}
       </Text>
-      <Text variant="title">Publish note</Text>
-      <Text variant="body" color="fontTertiary">
-        This note will be published to a public URL.
-      </Text>
-      {publishId && (
+      {publishId ? (
         <Flex
           mt={1}
           bg="shade"
@@ -58,7 +71,7 @@ function PublishView(props) {
         >
           <Flex flexDirection="column" mr={2} overflow="hidden">
             <Text variant="body" fontWeight="bold">
-              This note is published.
+              This note is published at:
             </Text>
             <Text
               variant="subBody"
@@ -86,6 +99,13 @@ function PublishView(props) {
             <Icon.Copy size={20} color="primary" />
           </Button>
         </Flex>
+      ) : (
+        <>
+          <Text variant="title">Publish note</Text>
+          <Text variant="body" color="fontTertiary">
+            This note will be published to a public URL.
+          </Text>
+        </>
       )}
       <Toggle
         title="Self destruct?"
@@ -103,6 +123,7 @@ function PublishView(props) {
       />
       {isPasswordProtected && (
         <Field
+          autoFocus
           id="publishPassword"
           label="Password"
           helpText="Enter password to encrypt this note"
@@ -110,7 +131,13 @@ function PublishView(props) {
           sx={{ my: 1 }}
         />
       )}
-      <Flex alignItems="center" justifyContent="space-evenly" mt={2}>
+      {processingStatus && (
+        <Text variant="subBody" mt={2}>
+          Downloading images ({processingStatus.current}/
+          {processingStatus.total})
+        </Text>
+      )}
+      <Flex alignItems="center" justifyContent="space-evenly" mt={1}>
         <Button
           flex={1}
           mr={2}

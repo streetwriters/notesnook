@@ -8,9 +8,11 @@ import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
 import Animated from "../animated";
 import { showPublishView } from "../publish-view";
+import { db } from "../../common/db";
 
 function Toolbar(props) {
   const sessionState = useStore((store) => store.session.state);
+  const sessionId = useStore((store) => store.session.id);
   const isLocked = useStore((store) => store.session.locked);
   const [undoable, setUndoable] = useState(false);
   const [redoable, setRedoable] = useState(false);
@@ -24,6 +26,11 @@ function Toolbar(props) {
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const [isTitleVisible, setIsTitleVisible] = useState(false);
+
+  const isNotePublished = useMemo(
+    () => sessionId && db.monographs.isPublished(sessionId),
+    [sessionId]
+  );
 
   useEffect(() => {
     const editorScroll = document.querySelector(".editorScroll");
@@ -114,8 +121,8 @@ function Toolbar(props) {
         onClick: () => tinymce.activeEditor.execCommand("Redo"),
       },
       {
-        title: "Publish",
-        icon: Icon.Publish,
+        title: isNotePublished ? "Published" : "Publish",
+        icon: isNotePublished ? Icon.Published : Icon.Publish,
         enabled: !isLocked,
         onClick: () => showPublishView(store.get().session.id, "top"),
       },
@@ -137,6 +144,7 @@ function Toolbar(props) {
       isLocked,
       theme,
       toggleNightMode,
+      isNotePublished,
     ]
   );
 
