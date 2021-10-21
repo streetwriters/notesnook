@@ -1,6 +1,5 @@
 import StorageInterface from "../interfaces/storage";
 import FS from "../interfaces/fs";
-import EventSource from "eventsource";
 import Config from "../utils/config";
 import http from "notes-core/utils/http";
 import { EV, EVENTS } from "notes-core/common";

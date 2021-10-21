@@ -3,8 +3,10 @@ import "./editor.css";
 import "@streetwritersco/tinymce-plugins/codeblock/styles.css";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders/styles.css";
 import "tinymce/tinymce";
-import "tinymce/icons/default";
-import "tinymce/themes/silver";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import "file-loader?name=static/js/icons/default/icons.js&esModule=false!tinymce/icons/default/icons.min.js";
+// eslint-disable-next-line import/no-webpack-loader-syntax
+import "file-loader?name=static/js/themes/silver/theme.js&esModule=false!tinymce/themes/silver/theme.min.js";
 import "tinymce/plugins/table";
 import "tinymce/plugins/autoresize";
 import "tinymce/plugins/searchreplace";
