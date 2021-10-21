@@ -1,7 +1,7 @@
 const TAGNAME = "PRE";
 const state = {
   activeBlock: null,
-  languages: [{ type: "choiceitem", text: "Auto detect", value: "autodetect" }],
+  languages: [],
 };
 function createCodeBlock(content) {
   const pre = document.createElement(TAGNAME);
