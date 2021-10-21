@@ -1,10 +1,14 @@
+import React from 'react';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useAttachmentStore} from '../provider/stores';
-import {ToastEvent} from '../services/EventManager';
+import {eSendEvent, ToastEvent} from '../services/EventManager';
 import {db} from './database';
 import Storage from './storage';
 import * as ScopedStorage from 'react-native-scoped-storage';
+import {eOpenProgressDialog} from './Events';
+import {ShareComponent} from '../components/ExportDialog/share';
+import {Platform} from 'react-native';
 
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 
@@ -28,7 +32,7 @@ async function readEncrypted(filename, key, cipherData) {
     return output;
   } catch (e) {
     console.log(e);
-    console.log('error')
+    console.log('error');
     return false;
   }
 }
@@ -51,20 +55,20 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
   console.log('uploading file: ', filename, headers);
 
   try {
-    let res = await fetch(url,{
-      method:"PUT",
+    let res = await fetch(url, {
+      method: 'PUT',
       headers
     });
-    const uploadUrl =await  res.text();
+    const uploadUrl = await res.text();
     console.log(uploadUrl);
     let request = RNFetchBlob.config({
-      IOSBackgroundTask: true,
+      IOSBackgroundTask: true
     })
       .fetch(
         'PUT',
         uploadUrl,
         {
-          'content-type': '',
+          'content-type': ''
         },
         RNFetchBlob.wrap(`${cacheDir}/${filename}`)
       )
@@ -97,7 +101,7 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
       path: path,
       IOSBackgroundTask: true
     })
-      .fetch('GET', url, headers)
+      .fetch('GET', url, __DEV__ ? null : headers)
       .progress((recieved, total) => {
         useAttachmentStore
           .getState()
@@ -148,7 +152,7 @@ function cancelable(operation) {
   };
 }
 
-async function downloadAttachment(hash) {
+async function downloadAttachment(hash, global = true) {
   let attachment = db.attachments.attachment(hash);
   if (!attachment) {
     console.log('attachment not found');
@@ -159,7 +163,7 @@ async function downloadAttachment(hash) {
     folder = await ScopedStorage.openDocumentTree(false);
     if (!folder) return;
   } else {
-    folder.uri = await Storage.checkAndCreateDir('/Downloads/');
+    folder.uri = await Storage.checkAndCreateDir('/downloads/');
   }
 
   try {
@@ -183,12 +187,40 @@ async function downloadAttachment(hash) {
       fileName: attachment.metadata.filename,
       uri: folder.uri
     };
-    await Sodium.decryptFile(key, info, false);
+    let fileUri = await Sodium.decryptFile(key, info, false);
     ToastEvent.show({
       heading: 'Download successful',
       message: attachment.metadata.filename + ' downloaded',
-      type: 'success',
+      type: 'success'
     });
+    RNFetchBlob.fs.unlink(
+      RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`
+    );
+
+    if (Platform.OS === 'ios') {
+      fileUri = file.uri + '/' + attachment.hash.filename;
+    } 
+    console.log('saved file uri: ',fileUri)
+
+    eSendEvent(eOpenProgressDialog, {
+      title: `File downloaded`,
+      paragraph: `${attachment.metadata.filename} is saved to ${
+        Platform.OS === 'android'
+          ? 'the selected path'
+          : 'File Manager/Notesnook/downloads'
+      }`,
+      noProgress: true,
+      icon:"download",
+      context: global ? null : attachment.metadata.hash,
+      component: (
+        <ShareComponent
+          uri={fileUri}
+          name={attachment.metadata.filename}
+          padding={12}
+        />
+      )
+    });
+    return fileUri;
   } catch (e) {
     console.log('download attachment error: ', e);
     useAttachmentStore.getState().remove(attachment.metadata.hash);

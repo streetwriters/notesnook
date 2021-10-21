@@ -1,19 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
-import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const ProgressDialog = () => {
+const ProgressDialog = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
@@ -32,6 +30,9 @@ const ProgressDialog = () => {
   }, []);
 
   const open = async data => {
+    if ((data.context && !context) || (data.context && data.context !== context)) {
+      return;
+    }
     setDialogData(data);
     setVisible(true);
     await sleep(1);
@@ -81,7 +82,7 @@ const ProgressDialog = () => {
               </Paragraph>
             ) : null}
           </Paragraph>
-        ) : null} 
+        ) : null}
       </View>
 
       {dialogData.component}

@@ -319,7 +319,7 @@ export const _onMessage = async evt => {
       eSendEvent('editorScroll', message);
       break;
     case 'attachment_download':
-      filesystem.downloadAttachment(message.value);
+      filesystem.downloadAttachment(message.value,true);
       break;
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);

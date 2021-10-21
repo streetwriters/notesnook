@@ -1,26 +1,35 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, View } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import React, {useEffect, useRef, useState} from 'react';
+import {Platform, TouchableOpacity, View} from 'react-native';
+import {FlatList} from 'react-native-gesture-handler';
 import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useAttachmentStore } from '../../provider/stores';
+import {useTracked} from '../../provider';
+import {useAttachmentStore} from '../../provider/stores';
 import {
+  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import { db } from '../../utils/database';
+import {db} from '../../utils/database';
 import {
   eCloseAttachmentDialog,
-  eOpenAttachmentsDialog
+  eOpenAttachmentsDialog,
+  eOpenProgressDialog
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
+import {presentDialog} from '../Dialog/functions';
 import Paragraph from '../Typography/Paragraph';
-
+import FileViewer from 'react-native-file-viewer';
+import {ToastEvent} from '../../services/EventManager';
+import RNFetchBlob from 'rn-fetch-blob';
+import {Button} from '../Button';
+import Share from 'react-native-share';
+import ProgressDialog from '../ProgressDialog';
+import {ShareComponent} from '../ExportDialog/share';
 export const AttachmentDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -41,7 +50,7 @@ export const AttachmentDialog = () => {
   const open = item => {
     setNote(item);
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id,"files");
+    let _attachments = db.attachments.ofNote(item.id, 'files');
     setAttachments(_attachments);
   };
 
@@ -128,14 +137,20 @@ function getFileExtension(filename) {
   return ext == null ? '' : ext[1];
 }
 
-export const Attachment = ({attachment,encryption}) => {
+export const Attachment = ({attachment, encryption}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const progress = useAttachmentStore(state => state.progress);
-  const [currentProgress, setCurrentProgress] = useState(encryption ? {
-    type:"encrypt"
-  }: null);
-  const encryptionProgress = encryption ? useAttachmentStore(state => state.encryptionProgress) : null
+  const [currentProgress, setCurrentProgress] = useState(
+    encryption
+      ? {
+          type: 'encrypt'
+        }
+      : null
+  );
+  const encryptionProgress = encryption
+    ? useAttachmentStore(state => state.encryptionProgress)
+    : null;
 
   const onPress = async () => {
     if (currentProgress) {
@@ -143,7 +158,7 @@ export const Attachment = ({attachment,encryption}) => {
       useAttachmentStore.getState().remove(attachment.metadata.hash);
       return;
     }
-    filesystem.downloadAttachment(attachment.metadata.hash);
+    filesystem.downloadAttachment(attachment.metadata.hash,false);
   };
 
   useEffect(() => {
@@ -177,6 +192,7 @@ export const Attachment = ({attachment,encryption}) => {
         backgroundColor: colors.nav
       }}
       type="grayBg">
+      <ProgressDialog context={attachment.metadata.hash} />
       <View
         style={{
           flexShrink: 1,
@@ -221,7 +237,9 @@ export const Attachment = ({attachment,encryption}) => {
 
           <Paragraph color={colors.icon} size={SIZE.xs}>
             {formatBytes(attachment.length)}{' '}
-            {currentProgress?.type ? '(' + currentProgress.type + 'ing - tap to cancel)' : ''}
+            {currentProgress?.type
+              ? '(' + currentProgress.type + 'ing - tap to cancel)'
+              : ''}
           </Paragraph>
         </View>
       </View>
@@ -237,12 +255,18 @@ export const Attachment = ({attachment,encryption}) => {
           style={{
             justifyContent: 'center',
             marginLeft: 5,
-            marginTop:5,
-            marginRight:-5
+            marginTop: 5,
+            marginRight: -5
           }}>
           <Progress.Circle
             size={SIZE.xxl}
-            progress={encryptionProgress ? encryptionProgress : currentProgress?.value ? currentProgress?.value / 100 : 0}
+            progress={
+              encryptionProgress
+                ? encryptionProgress
+                : currentProgress?.value
+                ? currentProgress?.value / 100
+                : 0
+            }
             showsText
             textStyle={{
               fontSize: 10
