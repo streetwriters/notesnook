@@ -1,9 +1,7 @@
-import React from "react";
 import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
 import ReactToggle from "react-toggle";
 import "react-toggle/style.css";
-import { Label } from "@rebass/forms";
 import "./toggle.css";
 
 function Toggle(props) {
