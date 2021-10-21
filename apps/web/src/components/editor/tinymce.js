@@ -164,7 +164,8 @@ function TinyMCE(props) {
     const mediaAttachmentDownloadedEvent = EV.subscribe(
       EVENTS.mediaAttachmentDownloaded,
       (image) => {
-        const { hash, src } = image;
+        const { groupId, hash, src } = image;
+        if (groupId?.startsWith("monograph")) return;
         tinymceRef.current.editor.execCommand("mceReplaceImage", { hash, src });
       }
     );
