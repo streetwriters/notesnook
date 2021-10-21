@@ -1,9 +1,8 @@
 import localforage from "localforage";
 import { extendPrototype } from "localforage-getitems";
 import sort from "fast-sort";
-import NNCrypto, { WORKER_PATH } from "./nncrypto.stub";
+import { getNNCrypto } from "./nncrypto.stub";
 
-const crypto = new NNCrypto(WORKER_PATH);
 extendPrototype(localforage);
 
 localforage.config({
@@ -40,6 +39,7 @@ async function deriveCryptoKey(name, data) {
   const { password, salt } = data;
   if (!password) throw new Error("Invalid data provided to deriveCryptoKey.");
 
+  const crypto = await getNNCrypto();
   const keyData = await crypto.exportKey(password, salt);
 
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
@@ -78,10 +78,20 @@ const Storage = {
   getAllKeys,
   deriveCryptoKey,
   getCryptoKey,
-  hash: (password, email) => crypto.hash(password, `${APP_SALT}${email}`),
-  encrypt: (key, plainText) =>
-    crypto.encrypt(key, { format: "text", data: plainText }, "base64"),
-  decrypt: async (key, cipherData) => {
+  hash: async function (password, email) {
+    const crypto = await getNNCrypto();
+    return await crypto.hash(password, `${APP_SALT}${email}`);
+  },
+  encrypt: async function (key, plainText) {
+    const crypto = await getNNCrypto();
+    return await crypto.encrypt(
+      key,
+      { format: "text", data: plainText },
+      "base64"
+    );
+  },
+  decrypt: async function (key, cipherData) {
+    const crypto = await getNNCrypto();
     cipherData.format = "base64";
     const result = await crypto.decrypt(key, cipherData);
     return result.data;

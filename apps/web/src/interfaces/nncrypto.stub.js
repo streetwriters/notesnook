@@ -1,9 +1,24 @@
-// eslint-disable-next-line import/no-webpack-loader-syntax
-import "worker-loader?filename=static/workers/nncrypto.worker.js!nncryptoworker/dist/src/worker.js";
-import { NNCrypto } from "nncrypto";
-import { NNCryptoWorker } from "nncryptoworker";
+const WORKER_PATH = "/static/workers/nncrypto.worker.js";
 
-export default "Worker" in window || "Worker" in global
-  ? NNCryptoWorker
-  : NNCrypto;
-export const WORKER_PATH = "/static/workers/nncrypto.worker.js";
+async function loadNNCrypto() {
+  const hasWorker = "Worker" in window || "Worker" in global;
+  if (hasWorker) {
+    // eslint-disable-next-line import/no-webpack-loader-syntax
+    await import(
+      "worker-loader?filename=static/workers/nncrypto.worker.js!nncryptoworker/dist/src/worker.js"
+    );
+
+    const { NNCryptoWorker } = await import("nncryptoworker");
+    return NNCryptoWorker;
+  } else {
+    const { NNCrypto } = await import("nncrypto");
+    return NNCrypto;
+  }
+}
+
+var instance = null;
+export async function getNNCrypto() {
+  if (instance) return instance;
+  const NNCrypto = await loadNNCrypto();
+  return (instance = new NNCrypto(WORKER_PATH));
+}

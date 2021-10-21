@@ -1,0 +1,22 @@
+diff --git a/node_modules/react-scripts/config/webpack.config.js b/node_modules/react-scripts/config/webpack.config.js
+index 26c2a65..3d24d33 100644
+--- a/node_modules/react-scripts/config/webpack.config.js
++++ b/node_modules/react-scripts/config/webpack.config.js
+@@ -781,16 +781,7 @@ module.exports = function (webpackEnv) {
+     ].filter(Boolean),
+     // Some libraries import Node modules but don't use them in the browser.
+     // Tell webpack to provide empty mocks for them so importing them works.
+-    node: {
+-      module: 'empty',
+-      dgram: 'empty',
+-      dns: 'mock',
+-      fs: 'empty',
+-      http2: 'empty',
+-      net: 'empty',
+-      tls: 'empty',
+-      child_process: 'empty',
+-    },
++    node: false,
+     // Turn off performance processing because we utilize
+     // our own hints via the FileSizeReporter
+     performance: false,

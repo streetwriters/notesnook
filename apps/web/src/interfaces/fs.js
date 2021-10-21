@@ -4,7 +4,7 @@ import { xxhash64, createXXHash64 } from "hash-wasm";
 import axios from "axios";
 import { AppEventManager, AppEvents } from "../common";
 import { StreamableFS } from "streamablefs";
-import NNCrypto, { WORKER_PATH } from "./nncrypto.stub";
+import { getNNCrypto } from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
 import { saveAs } from "file-saver";
@@ -15,7 +15,6 @@ const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
 const UPLOAD_PART_REQUIRED_CHUNKS = Math.ceil(
   (5 * 1024 * 1024) / ENCRYPTED_CHUNK_SIZE
 );
-const crypto = new NNCrypto(WORKER_PATH);
 const streamablefs = new StreamableFS("streamable-fs");
 
 /**
@@ -24,6 +23,8 @@ const streamablefs = new StreamableFS("streamable-fs");
  * @param {string} hash
  */
 async function writeEncryptedFile(file, key, hash) {
+  const crypto = await getNNCrypto();
+
   if (!localforage.supports(localforage.INDEXEDDB))
     throw new Error("This browser does not support IndexedDB.");
 
@@ -132,6 +133,8 @@ async function readEncrypted(filename, key, cipherData) {
   const ENCRYPTED_SIZE = fileHandle.file.size + fileHandle.file.chunks * ABYTES;
   const plainText = new Uint8Array(ENCRYPTED_SIZE);
   let offset = 0;
+
+  const crypto = await getNNCrypto();
   await crypto.decryptStream(
     key,
     cipherData.iv,
@@ -305,6 +308,7 @@ async function saveFile(filename, { key, iv, name, type }) {
   const blobParts = [];
   const reader = fileHandle.getReader();
 
+  const crypto = await getNNCrypto();
   await crypto.decryptStream(
     key,
     iv,

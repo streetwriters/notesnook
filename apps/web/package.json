@@ -54,7 +54,6 @@
     "tinymce": "5.8.1",
     "uzip": "^0.20201231.0",
     "web-streams-polyfill": "^3.1.1",
-    "worker-loader": "^3.0.8",
     "wouter": "^2.7.3",
     "zustand": "^3.3.1"
   },
@@ -75,10 +74,10 @@
     "eslint-plugin-react": "^7.22.0",
     "eslint-plugin-react-hooks": "^4.2.0",
     "find-process": "^1.4.4",
-    "progress-bar-webpack-plugin": "^2.1.0",
+    "patch-package": "^6.4.7",
     "source-map-explorer": "^2.5.2",
     "typescript": "^4.1.5",
-    "webpack-bundle-analyzer": "^4.4.0",
+    "worker-loader": "^3.0.8",
     "zx": "^2.0.0"
   },
   "scripts": {
@@ -92,7 +91,8 @@
     "test:debug": "env-cmd -e dev,debug,silent jest -c jest.e2e.config.js",
     "eject": "react-scripts eject",
     "update": "npm i @streetwriters/editor@latest @streetwriters/notesnook-core@latest @streetwriters/theme@latest",
-    "analyze": "source-map-explorer 'build/static/js/*.js'"
+    "analyze": "source-map-explorer 'build/static/js/*.js'",
+    "postinstall": "patch-package"
   },
   "eslintConfig": {
     "extends": "react-app"
