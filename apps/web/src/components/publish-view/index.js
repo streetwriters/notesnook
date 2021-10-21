@@ -60,7 +60,6 @@ function PublishView(props) {
       {publishId ? (
         <Flex
           mt={1}
-          bg="shade"
           p={1}
           sx={{
             border: "1px solid",
@@ -101,7 +100,6 @@ function PublishView(props) {
         </Flex>
       ) : (
         <>
-          <Text variant="title">Publish note</Text>
           <Text variant="body" color="fontTertiary">
             This note will be published to a public URL.
           </Text>
