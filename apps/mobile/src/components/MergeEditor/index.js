@@ -422,7 +422,7 @@ const MergeEditor = () => {
               javaScriptEnabled={true}
               cacheEnabled={true}
               source={{
-                uri: sourceUri + 'plaineditor.html'
+                uri: sourceUri + 'plaineditor.html?nocontenteditable=true'
               }}
             />
           </Animated.View>
@@ -554,7 +554,7 @@ const MergeEditor = () => {
               javaScriptEnabled={true}
               cacheEnabled={true}
               source={{
-                uri: sourceUri + 'plaineditor.html'
+                uri: sourceUri + 'plaineditor.html?nocontenteditable=true'
               }}
             />
           </Animated.View>
