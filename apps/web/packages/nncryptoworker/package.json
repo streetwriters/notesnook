@@ -10,9 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "comlink": "^4.3.1",
     "nncrypto": "file:../nncrypto",
-    "streamablefs": "file:../streamablefs",
-    "threads": "^1.7.0"
+    "streamablefs": "file:../streamablefs"
   },
   "devDependencies": {
     "typescript": "^4.4.3"

@@ -1,6 +1,6 @@
 import { NNCrypto } from "nncrypto";
 import { SerializedKey } from "nncrypto/dist/src/types";
-import { expose } from "threads/worker";
+import { expose } from "comlink";
 import WorkerStream from "./workerstream";
 
 const crypto = new NNCrypto();

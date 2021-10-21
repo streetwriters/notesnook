@@ -6,9 +6,9 @@ import {
   EncryptionKey,
 } from "nncrypto/dist/src/types";
 import { Chunk } from "streamablefs/dist/src/types";
-import { spawn, Worker } from "threads";
 import { NNCryptoWorkerModule } from "./src/worker";
 import { INNCrypto, IStreamable } from "nncrypto/dist/src/interfaces";
+import { wrap } from "comlink";
 
 export class NNCryptoWorker implements INNCrypto {
   private worker?: Worker;
@@ -25,7 +25,8 @@ export class NNCryptoWorker implements INNCrypto {
     if (this.isReady) return;
 
     this.worker = new Worker(this.path);
-    this.workermodule = await spawn<NNCryptoWorkerModule>(this.worker);
+    this.workermodule = wrap<NNCryptoWorkerModule>(this.worker);
+    // this.workermodule = await spawn<NNCryptoWorkerModule>(this.worker);
     this.isReady = true;
   }
 
