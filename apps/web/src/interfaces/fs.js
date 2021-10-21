@@ -8,9 +8,8 @@ import "worker-loader?filename=static/workers/nncrypto.worker.js!nncryptoworker/
 import { StreamableFS } from "streamablefs";
 import NNCrypto from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
-import StreamSaver from "streamsaver";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
-StreamSaver.mitm = "/downloader.html";
+import { saveAs } from "file-saver";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -301,17 +300,12 @@ function exists(filename) {
   return streamablefs.exists(filename);
 }
 
-async function saveFile(filename, { key, iv, name, size }) {
+async function saveFile(filename, { key, iv, name, type }) {
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) return false;
 
-  const writerStream = StreamSaver.createWriteStream(name, {
-    size,
-  });
-
+  const blobParts = [];
   const reader = fileHandle.getReader();
-  const writer = writerStream.getWriter();
-  await writer.ready;
 
   await crypto.decryptStream(
     key,
@@ -322,13 +316,13 @@ async function saveFile(filename, { key, iv, name, size }) {
         return value;
       },
       write: async (chunk) => {
-        await writer.ready;
-        if (!chunk) writer.close();
-        else await writer.write(chunk);
+        if (!chunk) return;
+        else blobParts.push(chunk);
       },
     },
     filename
   );
+  saveAs(new Blob(blobParts, { type }), name);
   await streamablefs.deleteFile(filename);
 }
 

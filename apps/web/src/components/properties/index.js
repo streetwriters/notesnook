@@ -301,7 +301,7 @@ function Properties({ noteId }) {
                               key: await db.user.getEncryptionKey(),
                               iv: attachment.iv,
                               name: attachment.metadata.filename,
-                              size: attachment.length,
+                              type: attachment.metadata.type,
                             });
                           }
                         }}
