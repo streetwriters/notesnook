@@ -1,3 +1,5 @@
+import "./diff.css";
+import "../editor/plugins/attachmentshandler.css";
 import { useState, useEffect, useCallback } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import * as Icon from "../icons";
@@ -10,7 +12,6 @@ import { useStore as useEditorStore } from "../../stores/editor-store";
 import { hashNavigate } from "../../navigation";
 import HTMLDiffer from "./differ";
 import { showToast } from "../../utils/toast";
-import "./diff.css";
 import { ScrollSync, ScrollSyncPane } from "react-scroll-sync";
 import { injectCssSrc, removeCss } from "../../utils/css";
 import { EV, EVENTS } from "notes-core/common";
