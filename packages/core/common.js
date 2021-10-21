@@ -10,9 +10,10 @@ export async function sendCheckUserStatusEvent(type) {
   return results.some((r) => r.type === type && r.result === true);
 }
 
-export function sendAttachmentsProgressEvent(type, total, current) {
+export function sendAttachmentsProgressEvent(type, groupId, total, current) {
   EV.publish(EVENTS.attachmentsLoading, {
     type,
+    groupId,
     total,
     current: current === undefined ? total : current,
   });

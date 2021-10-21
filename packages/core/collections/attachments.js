@@ -186,7 +186,7 @@ export default class Attachments extends Collection {
   }
 
   async _downloadMedia(hash, { total, current, groupId }) {
-    sendAttachmentsProgressEvent("download", total, current);
+    sendAttachmentsProgressEvent("download", groupId, total, current);
     try {
       const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
       if (!isDownloaded) return;
@@ -202,7 +202,7 @@ export default class Attachments extends Collection {
       return src;
     } finally {
       if (1 + current === total)
-        sendAttachmentsProgressEvent("download", total);
+        sendAttachmentsProgressEvent("download", groupId, total);
     }
   }
 

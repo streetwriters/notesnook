@@ -154,10 +154,9 @@ export default class Sync {
     try {
       console.log("Uploading attachments", this._db.attachments.pending);
       for (var i = 0; i < attachments.length; ++i) {
-        sendAttachmentsProgressEvent("upload", attachments.length, i);
-
         const attachment = attachments[i];
         const { hash } = attachment.metadata;
+        sendAttachmentsProgressEvent("upload", hash, attachments.length, i);
 
         const isUploaded = await this._db.fs.uploadFile(hash, hash);
         if (!isUploaded) throw new Error("Failed to upload file.");
@@ -167,7 +166,7 @@ export default class Sync {
     } catch (e) {
       throw new Error("Failed to upload attachments. Error: " + e.message);
     } finally {
-      sendAttachmentsProgressEvent("upload", attachments.length);
+      sendAttachmentsProgressEvent("upload", null, attachments.length);
     }
   }
 }
