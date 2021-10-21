@@ -50,7 +50,7 @@ const ActionSheetWrapper = ({
   };
 
   const _onClose = async () => {
-    await reFocusEditor();
+    //await reFocusEditor();
     if (onClose) {
       onClose();
     }
