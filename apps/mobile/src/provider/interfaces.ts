@@ -76,7 +76,8 @@ export type Settings = {
     telemetry:boolean,
     notebooksListMode: "normal" | "compact",
     notesListMode: "normal" | "compact",
-    devMode:boolean
+    devMode:boolean,
+    notifNotes:boolean
 
 }
 

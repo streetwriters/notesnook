@@ -12,6 +12,7 @@ import { tabBarRef } from '../utils/Refs';
 import { eOnLoadNote } from '../utils/Events';
 import { editing } from '../utils';
 import { MMKV } from '../utils/mmkv';
+import SettingsService from './SettingsService';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
@@ -39,10 +40,10 @@ function init() {
       MMKV.removeItem('appState');
       if (useNoteStore?.getState()?.loading === false) {
         //@ts-ignore
-        await db.init(); 
+        await db.init();
         //@ts-ignore
         await db.notes.init();
-         //@ts-ignore
+        //@ts-ignore
         loadNote(notification.tag, false);
         return;
       }
@@ -62,20 +63,24 @@ function init() {
       console.log('ACTION: ', notification.action);
       switch (notification.action) {
         case "UNPIN":
-        case "Hide":
           //@ts-ignore
           remove(notification.tag, notification.id);
+        case "Hide":
+          unpinQuickNote();
           break
         case "ReplyInput":
           console.log("texto", notification);
           await db.init();
           await db.notes.add({
-            content:{
-              type:'tiny',
+            content: {
+              type: 'tiny',
               //@ts-ignore
-              data:`<p>${notification.reply_text} </p>`
+              data: `<p>${notification.reply_text} </p>`
             }
           })
+          //@ts-ignore
+          await db.notes.init();
+          useNoteStore.getState().setNotes();
           //@ts-ignore/////
           pinQuickNote(notification.id);
           break
@@ -100,7 +105,6 @@ function init() {
 }
 
 function remove(tag: string, id: string) {
-  console.log(tag, id);
   PushNotification.clearLocalNotification(
     tag || NOTIFICATION_TAG,
     parseInt(id)
@@ -110,26 +114,23 @@ function remove(tag: string, id: string) {
   });
 }
 
-function pinQuickNote(id: string) {
-
+function pinQuickNote(launch) {
   present({
     title: 'Quick note',
-    message: 'Tap on "Add Note" to take a note here',
+    message: 'Tap on "Take note" to add a note.',
     ongoing: true,
     actions: ['ReplyInput', 'Hide'],
     tag: 'notesnook_note_input',
     reply_button_text: 'Take note',
     reply_placeholder_text: 'Write something...',
-    id: parseInt(id)
+    id: 256266
   });
+
 }
 
 async function unpinQuickNote() {
-  let all = await get();
-  let quicknote = all.find(n => n.tag === "notesnook_note_input")
-  if (quicknote) {
-    remove(quicknote.tag, quicknote.identifier)
-  }
+  remove("notesnook_note_input", 256266 + "");
+  SettingsService.set("notifNotes", false);
 }
 
 function present({

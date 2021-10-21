@@ -48,6 +48,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import Notifications from '../../services/Notifications';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
@@ -285,7 +286,11 @@ export const Settings = ({navigation}) => {
             paddingHorizontal: 0
           }}>
           <SettingsUserSection />
+
           <SettingsAppearanceSection />
+
+          {Platform.OS === 'android' && <SettingsGeneralOptions />}
+
           <SettingsPrivacyAndSecurity />
 
           <SettingsBackupAndRestore />
@@ -643,17 +648,23 @@ const CustomButton = ({
       }}>
       <View
         style={{
-          maxWidth: maxWidth
+          flexShrink: 1
         }}>
         <Paragraph
           size={SIZE.md}
           color={color || colors.pri}
           style={{
-            textAlignVertical: 'center'
+            textAlignVertical: 'center',
+            flexWrap: 'wrap'
           }}>
           {title}
         </Paragraph>
-        <Paragraph size={SIZE.sm} color={colors.icon}>
+        <Paragraph
+          style={{
+            flexWrap: 'wrap'
+          }}
+          size={SIZE.sm}
+          color={colors.icon}>
           {tagline}
         </Paragraph>
       </View>
@@ -1630,6 +1641,65 @@ const SettingsPrivacyAndSecurity = () => {
   );
 };
 
+export const SettingsGeneralOptions = ({isSheet}) => {
+  const [state] = useTracked();
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+  const toggleNotifNotes = () => {
+    if (settings.notifNotes) {
+      Notifications.unpinQuickNote();
+    } else {
+      Notifications.pinQuickNote();
+    }
+    SettingsService.set('notifNotes', !settings.notifNotes);
+  };
+
+  const generalList = [
+    {
+      name: 'Notes in notifications',
+      func: toggleNotifNotes,
+      desc: 'Add quick notes from notifications without opening the app.',
+      customComponent: (
+        <ToggleSwitch
+          isOn={settings.notifNotes}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={toggleNotifNotes}
+        />
+      )
+    }
+  ];
+
+  return (
+    <>
+      {!isSheet && (
+        <SectionHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          title="General"
+        />
+      )}
+
+      {!collapsed && (
+        <>
+          {generalList.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+              customComponent={item.customComponent}
+            />
+          ))}
+        </>
+      )}
+    </>
+  );
+};
+
 export const SettingsDeveloperOptions = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -1637,9 +1707,8 @@ export const SettingsDeveloperOptions = ({isSheet}) => {
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
 
   const toggleDevMode = () => {
-    SettingsService.set("devMode",!settings.devMode);
-  }
-
+    SettingsService.set('devMode', !settings.devMode);
+  };
 
   const devModeList = [
     {

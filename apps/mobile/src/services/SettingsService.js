@@ -7,6 +7,7 @@ import { AndroidModule, preloadImages } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
+import Notifications from './Notifications';
 
 export const defaultSettings = {
   showToolbarOnTop: false,
@@ -25,7 +26,8 @@ export const defaultSettings = {
   telemetry: true,
   notebooksListMode: 'normal',
   notesListMode: 'normal',
-  devMode:false
+  devMode:false,
+  notifNotes:false
 };
 
 let settings = {...defaultSettings};
@@ -60,6 +62,9 @@ async function init() {
     if (!settings.notebooksListMode) {
       settings.notebooksListMode = 'normal';
     }
+  }
+  if (settings.notifNotes) {
+    Notifications.pinQuickNote(true);
   }
 
   if (settings.fontScale) {
