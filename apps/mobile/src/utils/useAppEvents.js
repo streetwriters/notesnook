@@ -73,8 +73,8 @@ export const useAppEvents = () => {
     removeInternetStateListener: null
   });
 
-  const onMediaDownloaded = ({hash, src}) => {
-    console.log('on media download: ', hash);
+  const onMediaDownloaded = ({hash,groupId, src}) => {
+    if (groupId?.startsWith("monograph")) return;
     tiny.call(
       EditorWebView,
       `
