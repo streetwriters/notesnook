@@ -17,11 +17,11 @@ function PasswordDialog(props) {
       setIsLoading(true);
       setError(false);
       try {
-        console.log(data);
         if (await props.validate(data)) {
           props.onDone();
         } else {
           setError("Wrong password.");
+          setIsLoading(false);
         }
       } catch (e) {
         setError(e.message);

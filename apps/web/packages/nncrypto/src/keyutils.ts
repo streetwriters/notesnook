@@ -9,10 +9,8 @@ import {
 } from "libsodium-wrappers";
 import { EncryptionKey, SerializedKey } from "./types";
 
-type KeyCipherData = { iv: Uint8Array; cipher: Uint8Array };
-
 export default class KeyUtils {
-  static deriveKey(password: string, salt: string): EncryptionKey {
+  static deriveKey(password: string, salt?: string): EncryptionKey {
     let saltBytes: Uint8Array;
     if (!salt) saltBytes = randombytes_buf(crypto_pwhash_SALTBYTES);
     else {
@@ -51,7 +49,7 @@ export default class KeyUtils {
     if ("password" in input && !!input.password) {
       const { password, salt } = input;
       return this.deriveKey(password, salt);
-    } else if ("key" in input && !!input.key) {
+    } else if ("key" in input && !!input.salt && !!input.key) {
       return { key: from_base64(input.key), salt: input.salt };
     }
     throw new Error("Invalid input.");

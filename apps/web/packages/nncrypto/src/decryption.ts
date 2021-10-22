@@ -23,6 +23,8 @@ export default class Decryption {
     cipherData: Cipher,
     outputFormat: OutputFormat = "text"
   ): Plaintext {
+    if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
+
     const encryptionKey = KeyUtils.transform(key);
     let input: Uint8Array = cipherData.cipher as Uint8Array;
     if (

@@ -19,7 +19,7 @@ export type Plaintext = {
 export type SerializedKey = {
   password?: string;
   key?: string;
-  salt: string;
+  salt?: string;
 };
 
 export type EncryptionKey = {
