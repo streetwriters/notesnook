@@ -181,11 +181,6 @@ function TinyMCE(props) {
     <Editor
       ref={tinymceRef}
       onFocus={onFocus}
-      onInit={(args, editor) => {
-        editor.serializer.addTempAttr("data-progress");
-        clearTimeout(editor.changeTimeout);
-        onInit(args, editor);
-      }}
       initialValue={initialValue}
       init={{
         //experimental
@@ -219,6 +214,11 @@ function TinyMCE(props) {
         link_title: false,
         imagetools_toolbar:
           "rotateleft rotateright | flipv fliph | alignleft aligncenter alignright",
+        init_instance_callback: (editor) => {
+          editor.serializer.addTempAttr("data-progress");
+          clearTimeout(editor.changeTimeout);
+          onInit(editor);
+        },
         setup: (editor) => {
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();

@@ -54,36 +54,46 @@ function Editor({ noteId, nonce }) {
     })();
   }, [startSession, noteId, nonce]);
 
+  const setContent = useCallback(() => {
+    const {
+      id,
+      content: { data },
+    } = editorstore.get().session;
+    const editor = editorRef.current?.editor;
+    if (!editor) return;
+
+    clearTimeout(editor.changeTimeout);
+    async function setContents() {
+      if (!editor.initialized) return;
+
+      // NOTE: workaround to not fire onEditorChange event on content load
+      editor.isLoading = true;
+      editor.setContent(data, { format: "html" });
+
+      editor.undoManager.reset();
+      editor.setDirty(false);
+
+      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
+      if (id) await db.attachments.downloadImages(id);
+    }
+
+    if (!isMobile) editor.focus();
+
+    setContents();
+  }, [isMobile]);
+
   useEffect(() => {
     if (sessionState === SESSION_STATES.new) {
-      editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
-      const {
-        id,
-        content: { data },
-      } = editorstore.get().session;
-      const editor = editorRef.current?.editor;
-      if (!editor) return;
-      clearTimeout(editor.changeTimeout);
-      async function setContents() {
-        // NOTE: workaround to not fire onEditorChange event on content load
-        editor.isLoading = true;
-        editor.setContent(data, { format: "html" });
-
-        editor.undoManager.reset();
-        editor.setDirty(false);
-
-        if (id) await db.attachments.downloadImages(id);
-      }
-
-      if (!isMobile) editor.focus();
-
-      setContents();
-      editor.on("init", setContents);
-      return () => {
-        editor.off("init", setContents);
-      };
+      setContent();
     }
-  }, [editorRef, isMobile, contentType, sessionState, sessionNonce]);
+  }, [
+    editorRef,
+    isMobile,
+    contentType,
+    sessionState,
+    sessionNonce,
+    setContent,
+  ]);
 
   return (
     <Flex
@@ -163,6 +173,7 @@ function Editor({ noteId, nonce }) {
                   onWordCountChanged={updateWordCount}
                   onInit={async () => {
                     await startSession(noteId);
+                    setContent();
                   }}
                 />
               </>
