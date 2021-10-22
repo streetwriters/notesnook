@@ -4,7 +4,7 @@ module.exports = {
   webServer: {
     command: "npm run debug",
     port: 3000,
-    timeout: 120 * 1000,
+    timeout: 60 * 1000,
     reuseExistingServer: false, //!IS_CI,
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file

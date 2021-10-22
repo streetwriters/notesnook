@@ -422,16 +422,6 @@ test.describe("run tests independently", () => {
     await checkNoteLocked(noteSelector);
   });
 
-  test("add a note to notebook from properties", async () => {
-    await createNoteAndCheckPresence();
-
-    await page.click(getTestId("properties"));
-
-    await page.click(getTestId("properties-add-to-nb"));
-
-    await addNoteToNotebook();
-  });
-
   test("assign a color to note from properties", async () => {
     const noteSelector = await createNoteAndCheckPresence();
 

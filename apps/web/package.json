@@ -57,7 +57,7 @@
     "zustand": "^3.3.1"
   },
   "devDependencies": {
-    "@playwright/test": "^1.14.0",
+    "@playwright/test": "^1.16.0",
     "@types/hookrouter": "^2.2.5",
     "@types/node-fetch": "^2.5.10",
     "@types/quill": "^2.0.5",

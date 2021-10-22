@@ -27,7 +27,7 @@ for (let route of routes) {
       state: "visible",
     });
     await page.click(getTestId(route.buttonId));
-    await expect(page.textContent(getTestId("routeHeader"))).resolves.toBe(
+    await expect(page.inputValue(getTestId("routeHeader"))).resolves.toBe(
       route.header
     );
     await page.waitForTimeout(300);
