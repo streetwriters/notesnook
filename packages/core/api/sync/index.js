@@ -152,7 +152,6 @@ export default class Sync {
   async _uploadAttachments() {
     const attachments = this._db.attachments.pending;
     try {
-      console.log("Uploading attachments", this._db.attachments.pending);
       for (var i = 0; i < attachments.length; ++i) {
         const attachment = attachments[i];
         const { hash } = attachment.metadata;

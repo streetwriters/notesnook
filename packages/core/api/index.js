@@ -56,7 +56,6 @@ class Database {
       this
     );
     EV.subscribe(EVENTS.attachmentDeleted, async (attachment) => {
-      console.log("deleted:", attachment);
       await this.fs.cancel(attachment.metadata.hash);
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
@@ -140,7 +139,7 @@ class Database {
       try {
         var { type, data } = JSON.parse(event.data);
         data = JSON.parse(data);
-        console.log(type, data);
+        // console.log(type, data);
       } catch (e) {
         console.log("SSE: Unsupported message. Message = ", event.data);
         return;

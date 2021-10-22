@@ -135,7 +135,6 @@ test("editing one topic should not update dateEdited of all", () =>
 
     const newTopics = topics.all.filter((t) => t.title !== "Hello22");
 
-    //console.log(newTopics, oldTopics);
     expect(
       newTopics.every(
         (t) =>

@@ -88,7 +88,6 @@ export default class Attachments extends Collection {
       dateUploaded: undefined,
       dateDeleted: undefined,
     };
-    console.log("adding attachmentitem", attachmentItem);
     return this._collection.addItem(attachmentItem);
   }
 
@@ -155,7 +154,6 @@ export default class Attachments extends Collection {
 
   markAsUploaded(id) {
     const attachment = this.all.find((a) => a.id === id);
-    console.log("mark as uploaded", id, attachment);
     if (!attachment) return;
     attachment.dateUploaded = Date.now();
     return this._collection.updateItem(attachment);
@@ -174,38 +172,36 @@ export default class Attachments extends Collection {
     const attachments = this.images.filter((attachment) =>
       hasItem(attachment.noteIds, noteId)
     );
-    console.log("Downloading attachments", attachments);
-    for (let i = 0; i < attachments.length; i++) {
-      const { hash } = attachments[i].metadata;
-      await this._downloadMedia(hash, {
-        total: attachments.length,
-        current: i,
-        groupId: noteId,
-      });
+    try {
+      for (let i = 0; i < attachments.length; i++) {
+        const { hash } = attachments[i].metadata;
+        await this._downloadMedia(hash, {
+          total: attachments.length,
+          current: i,
+          groupId: noteId,
+        });
+      }
+    } finally {
+      sendAttachmentsProgressEvent("download", noteId, attachments.length);
     }
   }
 
   async _downloadMedia(hash, { total, current, groupId }, notify = true) {
     sendAttachmentsProgressEvent("download", groupId, total, current);
-    try {
-      const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
-      if (!isDownloaded) return;
+    const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
+    if (!isDownloaded) return;
 
-      const src = await this.read(hash);
-      if (!src) return;
+    const src = await this.read(hash);
+    if (!src) return;
 
-      if (notify)
-        EV.publish(EVENTS.mediaAttachmentDownloaded, {
-          groupId,
-          hash,
-          src,
-        });
+    if (notify)
+      EV.publish(EVENTS.mediaAttachmentDownloaded, {
+        groupId,
+        hash,
+        src,
+      });
 
-      return src;
-    } finally {
-      if (1 + current === total)
-        sendAttachmentsProgressEvent("download", groupId, total);
-    }
+    return src;
   }
 
   async cleanup() {

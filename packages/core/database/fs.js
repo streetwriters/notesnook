@@ -35,11 +35,9 @@ export default class FileStorage {
   }
 
   async cancel(groupId, type = undefined) {
-    console.trace("Cancelling", groupId, type);
     const [op] = this._deleteOp(groupId, type);
     if (!op) return;
     await op.cancel("Operation canceled.");
-    console.log("Cancellation done:", groupId, this._queue);
   }
 
   _deleteOp(groupId, type = undefined) {

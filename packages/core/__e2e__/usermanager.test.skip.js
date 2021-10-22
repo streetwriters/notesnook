@@ -28,7 +28,6 @@ test.skip("login user and check for token", async () => {
     usermanager.login(user.email, user.password)
   ).resolves.not.toThrow();
 
-  console.log(await usermanager.tokenManager.getToken());
   await expect(usermanager.tokenManager.getToken()).resolves.toBeDefined();
 }, 30000);
 
@@ -39,7 +38,6 @@ test.skip("login user and get user data", async () => {
   await usermanager.login(user.email, user.password);
 
   const userData = await usermanager.getUser();
-  console.log(userData);
   expect(userData.email).toBe(process.env.EMAIL);
 }, 30000);
 
