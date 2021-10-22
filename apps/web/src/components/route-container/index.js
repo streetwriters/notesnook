@@ -128,6 +128,7 @@ function Header(props) {
           mb={2}
           notebook
           alignItems="center"
+          sx={{ cursor: "pointer" }}
           onClick={() => {
             if (shouldSelectAll) toggleSelectionMode(false);
             else selectAll();
@@ -150,7 +151,7 @@ function SelectionOptions(props) {
 
   if (!isSelectionMode || !options) return null;
   return (
-    <Flex>
+    <Flex flexShrink={0}>
       {options.map((option) => (
         <option.icon
           title={option.title}

@@ -10,8 +10,6 @@ import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
-import download from "../utils/download";
-import { zip } from "../utils/zip";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
 
@@ -258,75 +256,15 @@ export function showEmailVerificationDialog() {
 export function showExportDialog(noteIds) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ExportDialog
+      noteIds={noteIds}
       title={
         noteIds.length > 1 ? `Export ${noteIds.length} notes` : "Export note"
       }
       icon={Icon.Export}
       onClose={() => perform(false)}
-      exportNote={async (format) => {
-        if (format === "pdf") {
-          if (noteIds.length > 1)
-            showToast("error", "Multiple notes cannot be exported as PDF.");
-          const note = db.notes.note(noteIds[0]);
-          let result = await exportToPDF(await note.export("html"));
-          perform(result);
-          return;
-        }
-
-        var files = [];
-        for (var noteId of noteIds) {
-          const note = db.notes.note(noteId);
-          const content = await note.export(format);
-          if (!content) continue;
-          files.push({ filename: note.title, content });
-        }
-        if (!files.length) return perform(false);
-        if (files.length === 1) {
-          download(files[0].filename, files[0].content, format);
-        } else {
-          const zipped = await zip(files, format);
-          download("notes", zipped, "zip");
-        }
-        perform(true);
-      }}
+      onDone={() => perform(true)}
     />
   ));
-}
-
-async function exportToPDF(content) {
-  if (!content) return false;
-  return new Promise((resolve) => {
-    return import("print-js").then(async ({ default: printjs }) => {
-      printjs({
-        printable: content,
-        type: "raw-html",
-        onPrintDialogClose: () => {
-          resolve();
-        },
-      });
-      return true;
-      // TODO
-      // const doc = new jsPDF("p", "px", "letter");
-      // const div = document.createElement("div");
-      // const { width, height } = doc.internal.pageSize;
-      // div.innerHTML = content;
-      // div.style.width = width - 80 + "px";
-      // div.style.height = height - 80 + "px";
-      // div.style.position = "absolute";
-      // div.style.top = 0;
-      // div.style.left = 0;
-      // div.style.margin = "40px";
-      // div.style.fontSize = "11px";
-      // document.body.appendChild(div);
-
-      // await doc.html(div, {
-      //   callback: async (doc) => {
-      //     div.remove();
-      //     resolve(doc.output());
-      //   },
-      // });
-    });
-  });
 }
 
 export function showLoadingDialog(dialogData) {
