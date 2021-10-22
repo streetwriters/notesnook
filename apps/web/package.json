@@ -84,6 +84,7 @@
     "start": "env-cmd -e all,dev,web react-scripts start",
     "start:desktop": "env-cmd -e all,desktop react-scripts start",
     "build": "env-cmd -e all,web react-scripts build",
+    "build:profile": "env-cmd -e all,web react-scripts build --profile",
     "build:desktop": "env-cmd -e all,desktop react-scripts build",
     "deploy": "./scripts/deploy.sh",
     "debug": "env-cmd -e all,dev,web,silent react-scripts start",

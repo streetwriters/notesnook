@@ -5,7 +5,7 @@ import { getAppVersion } from "./useVersion";
 export function loadTrackerScript() {
   if (Config.get("telemetry") === "false") return;
   var script = document.createElement("script");
-  script.src = "https://analytics.streetwriters.co/umami.js";
+  script.src = "/an.js";
   script.async = true;
   script.dataset.websiteId = "f16c07d9-c77b-4781-bfbd-f58e95640002";
 
