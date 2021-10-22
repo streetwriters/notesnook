@@ -185,7 +185,7 @@ export default class Attachments extends Collection {
     }
   }
 
-  async _downloadMedia(hash, { total, current, groupId }) {
+  async _downloadMedia(hash, { total, current, groupId }, notify = true) {
     sendAttachmentsProgressEvent("download", groupId, total, current);
     try {
       const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
@@ -194,11 +194,12 @@ export default class Attachments extends Collection {
       const src = await this.read(hash);
       if (!src) return;
 
-      EV.publish(EVENTS.mediaAttachmentDownloaded, {
-        groupId,
-        hash,
-        src,
-      });
+      if (notify)
+        EV.publish(EVENTS.mediaAttachmentDownloaded, {
+          groupId,
+          hash,
+          src,
+        });
 
       return src;
     } finally {

@@ -68,14 +68,18 @@ export default class Content extends Collection {
     return this._insert(contentItem, () => placeholder);
   }
 
-  async downloadMedia(groupId, contentItem) {
+  async downloadMedia(groupId, contentItem, notify = true) {
     const content = getContentFromData(contentItem.type, contentItem.data);
     contentItem.data = await content.insertMedia((hash, { total, current }) => {
-      return this._db.attachments._downloadMedia(hash, {
-        total,
-        current,
-        groupId,
-      });
+      return this._db.attachments._downloadMedia(
+        hash,
+        {
+          total,
+          current,
+          groupId,
+        },
+        notify
+      );
     });
     return contentItem;
   }

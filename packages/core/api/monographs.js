@@ -68,7 +68,8 @@ class Monographs {
 
     const content = await this._db.content.downloadMedia(
       `monograph-${noteId}`,
-      await this._db.content.raw(note.data.contentId)
+      await this._db.content.raw(note.data.contentId),
+      false
     );
     if (!content) throw new Error("This note has no content.");
 

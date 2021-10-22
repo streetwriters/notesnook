@@ -58,6 +58,9 @@ export default class Note {
    * @param {string?} rawContent - Use this raw content instead of generating itself
    */
   async export(to = "html", rawContent) {
+    if (to !== "txt" && !(await sendCheckUserStatusEvent(CHECK_IDS.noteExport)))
+      return false;
+
     const templateData = {
       metadata: this.data,
       title: this.title,
@@ -65,11 +68,14 @@ export default class Note {
       headline: this.headline,
       createdOn: this.data.dateCreated,
     };
-    const { data, type } = await this._db.content.raw(this._note.contentId);
+    const contentItem = await this._db.content.raw(this._note.contentId);
+    if (!contentItem) return false;
+    const { data, type } = await this._db.content.downloadMedia(
+      `export-${this.id}`,
+      contentItem,
+      false
+    );
     let content = getContentFromData(type, data);
-
-    if (to !== "txt" && !(await sendCheckUserStatusEvent(CHECK_IDS.noteExport)))
-      return;
 
     switch (to) {
       case "html":
@@ -86,11 +92,8 @@ export default class Note {
     }
   }
 
-  async content(withAttachments = false) {
-    const content = await this._db.content.raw(
-      this._note.contentId,
-      withAttachments
-    );
+  async content() {
+    const content = await this._db.content.raw(this._note.contentId);
     return content.data;
   }
 
