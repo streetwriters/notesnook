@@ -6,6 +6,8 @@ const LANGUAGE_SELECT_LABEL_SELECTOR =
   ".tox-pop__dialog span.tox-tbtn__select-label";
 
 function maplanguagesToMenuItems() {
+  if (state.languages.length === languages.length) return;
+
   languages.forEach((language) => {
     state.languages.push({
       type: "choiceitem",
@@ -13,7 +15,6 @@ function maplanguagesToMenuItems() {
       value: language,
     });
   });
-  console.log("Mapped.", state.languages);
 }
 
 function addCodeBlockToolbar(editor) {
