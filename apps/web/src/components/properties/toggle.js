@@ -20,16 +20,11 @@ function Toggle(props) {
       onClick={() => onToggle(!isOn)}
       data-test-id={props.testId}
     >
-      <Text
-        display="flex"
-        alignItems="center"
-        variant="body"
-        color={isOn ? "primary" : "text"}
-      >
+      <Text display="flex" alignItems="center" variant="body" color="text">
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
-      <ReactToggle size={20} defaultChecked={isOn} icons={false} />
+      <ReactToggle size={20} checked={isOn} icons={false} />
     </Flex>
   );
 }

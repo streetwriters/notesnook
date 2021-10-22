@@ -80,7 +80,6 @@ function Properties({ noteId }) {
       <Animated.Flex
         animate={{
           x: arePropertiesVisible ? 0 : 800,
-          display: arePropertiesVisible ? "flex" : "none",
         }}
         transition={{
           duration: 0.3,
@@ -90,6 +89,7 @@ function Properties({ noteId }) {
         }}
         initial={false}
         sx={{
+          display: "flex",
           position: "absolute",
           right: 0,
           zIndex: 3,
@@ -104,7 +104,17 @@ function Properties({ noteId }) {
         bg="background"
         // px={2}
       >
-        <Card title="Properties">
+        <Card
+          title="Properties"
+          button={
+            <Icon.ArrowLeft
+              data-test-id="properties-close"
+              onClick={() => toggleProperties(false)}
+              size={18}
+              sx={{ mr: 1 }}
+            />
+          }
+        >
           {tools.map((tool, _) => (
             <Toggle
               {...tool}
@@ -321,26 +331,20 @@ function Properties({ noteId }) {
 }
 export default React.memo(Properties);
 
-function Card({ title, children }) {
+function Card({ title, button, children }) {
   return (
     <Flex
       flexDirection="column"
-      //mx={1}
-      //mt={2}
       sx={{
-        //border: "1px solid var(--border)",
         borderRadius: "default",
       }}
     >
-      <Text
-        variant="subtitle"
-        fontSize="subtitle"
-        mx={2}
-        my={2}
-        color="fontTertiary"
-      >
-        {title}
-      </Text>
+      <Flex mx={2} my={2} alignItems="center">
+        {button}
+        <Text variant="subtitle" fontSize="subtitle" color="fontTertiary">
+          {title}
+        </Text>
+      </Flex>
       {children}
     </Flex>
   );
