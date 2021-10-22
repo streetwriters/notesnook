@@ -7,24 +7,45 @@ import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import Share from 'react-native-share';
 import {Platform} from 'react-native';
 import {sanitizeFilename} from '../utils/filename';
+import * as ScopedStorage from 'react-native-scoped-storage';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
-let RNFetchBlob;
-async function run() {
+async function getDirectoryAndroid() {
+  let folder = await ScopedStorage.openDocumentTree(true);
+  if (!folder) return null;
+  let subfolder;
+  if (folder.name !== 'Notesnook backups') {
+    subfolder = await ScopedStorage.createDirectory(
+      folder.uri,
+      'Notesnook backups'
+    );
+  } else {
+    subfolder = folder;
+  }
+  MMKV.setItem('backupStorageDir', JSON.stringify(subfolder));
+  return subfolder;
+}
+
+async function checkBackupDirExists() {
+  if (Platform.OS === 'ios') return true;
+  let dir;
   if (Platform.OS === 'android') {
-    let granted = await storage.requestPermission();
-    if (!granted) {
-      ToastEvent.show({
-        heading: 'Cannot backup data',
-        message: 'You must provide phone storage access to backup data.',
-        type: 'error',
-        context: 'local'
-      });
-      return;
+    dir = await MMKV.getItem('backupStorageDir');
+    if (dir) {
+      dir = JSON.parse(dir);
+    } else {
+      dir = await getDirectoryAndroid();
     }
   }
+  return dir;
+}
+
+let RNFetchBlob;
+async function run() {
+  let androidBackupDirectory = await checkBackupDirExists();
+  if (!androidBackupDirectory) return;
 
   RNFetchBlob = require('rn-fetch-blob').default;
   eSendEvent(eOpenProgressDialog, {
@@ -48,16 +69,35 @@ async function run() {
       let backupName = 'notesnook_backup_' + Date.now();
       backupName = sanitizeFilename(backupName, {replacement: '_'});
       backupName = backupName + '.nnbackup';
-      let path = await storage.checkAndCreateDir('/backups/');
-      await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
-
+      let path;
+      let backupFilePath;
+      if (Platform.OS === 'ios') {
+        path = await storage.checkAndCreateDir('/backups/');
+        await RNFetchBlob.fs.writeFile(path + backupName, backup, 'utf8');
+        backupFilePath = path + backupName;
+      } else {
+        backupFilePath = await ScopedStorage.writeFile(
+          androidBackupDirectory.uri,
+          backupName,
+          'nnbackup/json',
+          backup,
+          'utf8',
+          false
+        );
+      }
       await MMKV.setItem('backupDate', JSON.stringify(Date.now()));
+      await MMKV.setItem(
+        'askForBackup',
+        JSON.stringify({
+          timestamp: Date.now() + 86400000 * 3
+        })
+      );
 
       ToastEvent.show({
         heading: 'Backup successful',
         message: 'Your backup is stored in Notesnook folder on your phone.',
         type: 'success',
-        context: 'local'
+        context: 'global'
       });
 
       eSendEvent(eOpenProgressDialog, {
@@ -66,33 +106,22 @@ async function run() {
         paragraph:
           'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
         noProgress: true,
-        actionText: 'Share Backup File',
+        actionText: 'Share backup',
         actionsArray: [
           {
             action: () => {
               Share.open({
-                url:
-                  Platform.OS === 'ios'
-                    ? path + backupName
-                    : 'file:/' + path + backupName,
-                title: 'Save Backup to Cloud'
+                url: backupFilePath
               }).catch(e => console.log);
             },
-            actionText: 'Share Backup File'
+            actionText: 'Share'
           }
         ]
       });
-      console.log('updated ask for backup date');
-      await MMKV.setItem(
-        'askForBackup',
-        JSON.stringify({
-          timestamp: Date.now() + 86400000 * 3
-        })
-      );
-
-      return path + backupName;
+      console.log(backupFilePath);
+      return backupFilePath;
     } catch (e) {
-      console.log('backup error', e);
+      console.log('backup error: ', e);
       eSendEvent(eCloseProgressDialog);
     }
   } else {
@@ -146,5 +175,7 @@ const checkAndRun = async () => {
 export default {
   checkBackupRequired,
   run,
-  checkAndRun
+  checkAndRun,
+  getDirectoryAndroid,
+  checkBackupDirExists
 };

@@ -11,6 +11,7 @@ import {
 } from '../../services/EventManager';
 import {db} from '../../utils/database';
 import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
@@ -19,6 +20,7 @@ import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
+import * as ScopedStorage from 'react-native-scoped-storage';
 
 const actionSheetRef = createRef();
 let RNFetchBlob;
@@ -79,6 +81,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
   const {colors} = state;
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
 
   useEffect(() => {
     checkBackups();
@@ -126,34 +129,112 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
   };
 
   const checkBackups = async () => {
-    if (Platform.OS === 'android') {
-      let granted = await storage.requestPermission();
-      if (!granted) {
-        ToastEvent.show({
-          heading: 'Backup check failed',
-          message:
-            'You must provide phone storage access to check for backups.',
-          type: 'success',
-          context: 'local'
-        });
-        return;
-      }
-    }
-    RNFetchBlob = require('rn-fetch-blob').default;
     try {
-      let path = await storage.checkAndCreateDir('/backups/');
-      let files = await RNFetchBlob.fs.lstat(path);
+      let files = [];
+      if (Platform.OS === 'android') {
+        let backupDirectory = await MMKV.getItem('backupStorageDir');
+        if (backupDirectory) {
+          backupDirectory = JSON.parse(backupDirectory);
+          setBackupDirectoryAndroid(backupDirectory);
+          files = await ScopedStorage.listFiles(backupDirectory.uri);
+        } else {
+          setLoading(false);
+          return;
+        }
+      } else {
+        RNFetchBlob = require('rn-fetch-blob').default;
+        let path = await storage.checkAndCreateDir('/backups/');
+        files = await RNFetchBlob.fs.lstat(path);
+      }
       files = files.sort(function (a, b) {
         timeA = a.lastModified;
         timeB = b.lastModified;
         return timeB - timeA;
       });
-
       setFiles(files);
       setTimeout(() => {
         setLoading(false);
       }, 1000);
-    } catch (e) {}
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+    }
+  };
+
+  const renderItem = ({item, index}) => (
+    <View
+      style={{
+        minHeight: 50,
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        borderRadius: 0,
+        flexDirection: 'row',
+        borderBottomWidth: 0.5,
+        borderBottomColor: colors.nav
+      }}>
+      <View
+        style={{
+          maxWidth: '75%'
+        }}>
+        <Paragraph size={SIZE.sm} style={{width: '100%', maxWidth: '100%'}}>
+          {timeConverter(item?.lastModified * 1)}
+        </Paragraph>
+        <Paragraph size={SIZE.xs}>
+          {(item.filename || item.name).replace('.nnbackup', '')}
+        </Paragraph>
+      </View>
+      <Button
+        title="Restore"
+        height={30}
+        type="accent"
+        style={{
+          borderRadius: 100,
+          paddingHorizontal: 12
+        }}
+        fontSize={SIZE.sm - 1}
+        onPress={() => restore(item, index)}
+      />
+    </View>
+  );
+
+  const button = {
+    title: 'Restore from files',
+    onPress: () => {
+      if (restoring) {
+        return;
+      }
+      DocumentPicker.pick()
+        .then(r => {
+          setRestoring(true);
+          fetch(r.uri).then(async r => {
+            try {
+              let backup = await r.json();
+              await db.backup.import(JSON.stringify(backup));
+              setRestoring(false);
+              initialize();
+
+              ToastEvent.show({
+                heading: 'Restore successful',
+                message: 'Your backup data has been restored successfully.',
+                type: 'success',
+                context: 'global'
+              });
+              actionSheetRef.current?.hide();
+            } catch (e) {
+              setRestoring(false);
+              ToastEvent.show({
+                heading: 'Restore failed',
+                message:
+                  'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
+                type: 'error',
+                context: 'local'
+              });
+            }
+          });
+        })
+        .catch(console.log);
+    }
   };
 
   return (
@@ -170,59 +251,18 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           }}>
           <DialogHeader
             title="Backups"
-            paragraph="All the backups are stored in 'Phone Storage/Notesnook/Backups'."
-            button={{
-              title: 'Open File Manager',
-              onPress: () => {
-                if (restoring) {
-                  return;
-                }
-                DocumentPicker.pick()
-                  .then(r => {
-                    setRestoring(true);
-                    fetch(r.uri).then(async r => {
-                      try {
-                        let backup = await r.json();
-
-                        await db.backup.import(JSON.stringify(backup));
-                        setRestoring(false);
-                        initialize();
-
-                        ToastEvent.show({
-                          heading: 'Restore successful',
-                          message:
-                            'Your backup data has been restored successfully.',
-                          type: 'success',
-                          context: 'global'
-                        });
-                        actionSheetRef.current?.hide();
-                      } catch (e) {
-                        setRestoring(false);
-                        ToastEvent.show({
-                          heading: 'Restore failed',
-                          message:
-                            'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
-                          type: 'error',
-                          context: 'local'
-                        });
-                      }
-                    });
-                  })
-                  .catch(console.log);
-              }
-            }}
+            paragraph={`All the backups are stored in ${
+              Platform.OS === 'ios'
+                ? 'File Manager/Notesnook/Backups'
+                : 'selected backups folder.'
+            }`}
+            button={button}
           />
         </View>
         <Seperator half />
         <FlatList
           nestedScrollEnabled
-          onScrollEndDrag={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
           onMomentumScrollEnd={() => {
-            actionSheetRef.current?.handleChildScrollEnd();
-          }}
-          onScrollAnimationEnd={() => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}
           ListEmptyComponent={
@@ -243,7 +283,56 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                     alignItems: 'center',
                     height: 100
                   }}>
-                  <Paragraph color={colors.icon}>No backups found.</Paragraph>
+                  {Platform.OS === 'android' && !backupDirectoryAndroid ? (
+                    <>
+                      <Button
+                        title="Select backups folder"
+                        icon="folder"
+                        onPress={async () => {
+                          let folder = await ScopedStorage.openDocumentTree(
+                            true
+                          );
+                          let subfolder;
+                          if (folder.name !== 'Notesnook backups') {
+                            subfolder = await ScopedStorage.createDirectory(
+                              folder.uri,
+                              'Notesnook backups'
+                            );
+                          } else {
+                            subfolder = folder;
+                          }
+                          console.log(subfolder, folder);
+                          MMKV.setItem(
+                            'backupStorageDir',
+                            JSON.stringify(subfolder)
+                          );
+                          setBackupDirectoryAndroid(subfolder);
+                          setLoading(true);
+                          checkBackups();
+                        }}
+                        style={{
+                          marginTop: 10,
+                          paddingHorizontal: 12
+                        }}
+                        height={30}
+                        width={null}
+                      />
+
+                      <Paragraph
+                        style={{
+                          textAlign: 'center',
+                          marginTop: 5
+                        }}
+                        size={SIZE.xs}
+                        textBreakStrategy="balanced"
+                        color={colors.icon}>
+                        Select the folder that includes your backup files to
+                        list them here.
+                      </Paragraph>
+                    </>
+                  ) : (
+                    <Paragraph color={colors.icon}>No backups found</Paragraph>
+                  )}
                 </View>
               )
             ) : (
@@ -260,49 +349,17 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
               </View>
             )
           }
-          keyExtractor={item => item.filename}
+          keyExtractor={item => item.name || item.filename}
           style={{
             paddingHorizontal: 12
           }}
           data={restoring || loading ? [] : files}
-          renderItem={({item, index}) => [
-            <View
-              style={{
-                minHeight: 50,
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                width: '100%',
-                borderRadius: 0,
-                flexDirection: 'row',
-                borderBottomWidth: 0.5,
-                borderBottomColor: colors.nav
-              }}>
-              <View
-                style={{
-                  maxWidth: '75%'
-                }}>
-                <Paragraph
-                  size={SIZE.sm}
-                  style={{width: '100%', maxWidth: '100%'}}>
-                  {timeConverter(item?.lastModified * 1)}
-                </Paragraph>
-                <Paragraph size={SIZE.xs}>
-                  {item.filename.replace('.nnbackup', '')}
-                </Paragraph>
-              </View>
-              <Button
-                title="Restore"
-                width={80}
-                height={30}
-                onPress={() => restore(item, index)}
-              />
-            </View>
-          ]}
+          renderItem={renderItem}
           ListFooterComponent={
-            restoring || loading ? null : (
+            restoring || loading || files.length === 0 ? null : (
               <View
                 style={{
-                  height: 150
+                  height: 50
                 }}
               />
             )

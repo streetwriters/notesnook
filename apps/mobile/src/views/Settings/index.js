@@ -1969,21 +1969,14 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
                     } else {
                       await PremiumService.verify(async () => {
                         if (Platform.OS === 'android') {
-                          let granted = await Storage.requestPermission();
+                          let granted = await Backup.checkBackupDirExists();
                           if (!granted) {
-                            ToastEvent.show({
-                              heading: 'Could not enable auto backups',
-                              message:
-                                'You must give storage access to enable auto backups.',
-                              type: 'error',
-                              context: 'local'
-                            });
+                            console.log('returning');
                             return;
                           }
                         }
                         await SettingsService.set('reminder', item.value);
-                        //await Backup.run();
-                      });
+                     });
                     }
                     updateAskForBackup();
                   }}

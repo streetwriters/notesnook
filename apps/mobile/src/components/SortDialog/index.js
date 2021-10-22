@@ -117,7 +117,8 @@ class SortDialog extends React.Component {
                   : 'sort-descending'
               }
               height={25}
-              iconPosition="right"
+              iconPosition="left"
+              fontSize={SIZE.sm - 1}
               type="grayBg"
               style={{
                 borderRadius: 100
