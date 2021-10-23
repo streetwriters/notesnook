@@ -8,6 +8,7 @@ import Share from 'react-native-share';
 import {Platform} from 'react-native';
 import {sanitizeFilename} from '../utils/filename';
 import * as ScopedStorage from 'react-native-scoped-storage';
+import {presentDialog} from '../components/Dialog/functions';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -30,15 +31,30 @@ async function getDirectoryAndroid() {
 
 async function checkBackupDirExists() {
   if (Platform.OS === 'ios') return true;
-  let dir;
-  if (Platform.OS === 'android') {
-    dir = await MMKV.getItem('backupStorageDir');
-    if (dir) {
-      dir = JSON.parse(dir);
-    } else {
-      dir = await getDirectoryAndroid();
-    }
+  let dir = await MMKV.getItem('backupStorageDir');
+  if (dir) {
+    dir = JSON.parse(dir);
+    let allDirs = await ScopedStorage.getPersistedUriPermissions();
+    let exists = allDirs.findIndex(d => {
+      return d === dir.uri || dir.uri.includes(d);
+    });
+    exists = exists !== -1;
+    dir = exists ? dir : null;
   }
+  if (!dir) {
+    dir = await new Promise(resolve => {
+      presentDialog({
+        title: 'Select backup folder',
+        paragraph:
+          'Please select the folder where you would like to store backup files.',
+        positivePress: async () => {
+          resolve(await getDirectoryAndroid());
+        },
+        positiveText: 'Open file manager'
+      });
+    });
+  }
+
   return dir;
 }
 

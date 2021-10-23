@@ -91,22 +91,15 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     if (restoring) {
       return;
     }
-    if (Platform.OS === 'android') {
-      let granted = storage.requestPermission();
-      if (!granted) {
-        ToastEvent.show({
-          heading: 'Cannot restore backup',
-          message: 'You must provide phone storage access to restore backups.',
-          type: 'error',
-          context: 'local'
-        });
-        return;
-      }
-    }
     try {
       setRestoring(true);
       let prefix = Platform.OS === 'ios' ? '' : 'file:/';
-      let backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
+      let backup;
+      if (Platform.OS === 'android') {
+        backup = await ScopedStorage.readFile(item.uri, 'utf8');
+      } else {
+        backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
+      }
       await db.backup.import(backup);
       setRestoring(false);
       initialize();
