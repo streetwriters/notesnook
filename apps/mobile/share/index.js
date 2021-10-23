@@ -20,6 +20,7 @@ import Animated, {
   timing,
   useValue
 } from 'react-native-reanimated';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
@@ -31,6 +32,7 @@ import {
 } from '../src/services/EventManager';
 import {getElevation} from '../src/utils';
 import {db} from '../src/utils/database';
+import {SIZE} from '../src/utils/SizeUtils';
 import Storage from '../src/utils/storage';
 import {sleep} from '../src/utils/TimeUtils';
 import {Search} from './search';
@@ -133,9 +135,7 @@ const NotesnookShare = ({quicknote = false}) => {
   const webviewRef = useRef();
   const opacity = useValue(0);
   const translate = useValue(1000);
-  const insets = {
-    top: Platform.OS === 'ios' ? 30 : 0
-  };
+  const insets = useSafeAreaInsets();
   const prevAnimation = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -379,32 +379,65 @@ const NotesnookShare = ({quicknote = false}) => {
       style={{
         width: width > 500 ? 500 : width,
         height: height,
-        justifyContent: quicknote ? 'center' : 'flex-end',
+        justifyContent: quicknote ? 'flex-start' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1
       }}>
       {quicknote && !showSearch ? (
-        <Button
-          type="action"
-          icon="close"
-          iconColor={colors.pri}
-          onPress={() => {
-            if (showSearch) {
-              console.log('hide search');
-              setShowSearch(false);
-              animate(1, 0);
-            } else {
-              close();
-            }
-          }}
+        <View
           style={{
-            position: 'absolute',
-            left: 12,
-            top: 6,
-            width: 50,
-            height: 50
-          }}
-          iconSize={25}
-        />
+            width: '100%',
+            backgroundColor: colors.bg,
+            height: 50 + insets.top,
+            paddingTop: insets.top,
+            ...getElevation(1),
+            marginTop: -insets.top,
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between'
+          }}>
+          <Button
+            type="action"
+            icon="close"
+            iconColor={colors.pri}
+            onPress={() => {
+              if (showSearch) {
+                console.log('hide search');
+                setShowSearch(false);
+                animate(1, 0);
+              } else {
+                close();
+              }
+            }}
+            style={{
+              width: 50,
+              height: 50,
+              marginBottom: 0
+            }}
+            iconSize={25}
+          />
+
+          <Text
+            style={{
+              color: colors.pri,
+              fontSize: SIZE.md,
+              fontFamily:"OpenSans-Regular"
+            }}>
+            Quick note
+          </Text>
+
+          <Button
+            type="action"
+            icon="check"
+            iconColor={colors.accent}
+            onPress={onPress}
+            style={{
+              width: 50,
+              height: 50,
+              marginBottom: 0
+            }}
+            iconSize={25}
+          />
+        </View>
       ) : (
         <TouchableOpacity
           activeOpacity={1}
@@ -436,6 +469,7 @@ const NotesnookShare = ({quicknote = false}) => {
 
       {showSearch && (
         <Search
+          quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
           close={() => {
             setShowSearch(false);
@@ -542,7 +576,7 @@ const NotesnookShare = ({quicknote = false}) => {
                 marginTop: 10,
                 minHeight: 100,
                 borderRadius: 10,
-                ...getElevation(5),
+                ...getElevation(quicknote ? 1 : 5),
                 backgroundColor: colors.bg
               }}>
               <View
@@ -644,27 +678,9 @@ const NotesnookShare = ({quicknote = false}) => {
             </View>
           </View>
 
-          {quicknote && (
-            <Button
-              color={colors.accent}
-              onPress={onPress}
-              iconSize={18}
-              iconColor={colors.light}
-              textColor={colors.light}
-              title="Save note"
-              textStyle={{
-                marginLeft: 5,
-                fontFamily: 'OpenSans-SemiBold'
-              }}
-              style={{
-                marginTop: 10
-              }}
-            />
-          )}
-
           <View
             style={{
-              height: Platform.OS === 'ios' ? 60 : 40
+              height: Platform.OS === 'ios' ? 100 : 40
             }}
           />
         </View>
@@ -684,7 +700,8 @@ const Button = ({
   iconSize = 22,
   type = 'button',
   iconColor = 'gray',
-  textColor = 'white'
+  textColor = 'white',
+  fontSize = 18
 }) => {
   const types = {
     action: {
@@ -754,7 +771,7 @@ const Button = ({
         <Text
           style={[
             {
-              fontSize: 18,
+              fontSize: fontSize || 18,
               fontFamily: 'OpenSans-Regular',
               color: textColor,
               marginLeft: loading ? 10 : 0

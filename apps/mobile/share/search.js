@@ -9,12 +9,13 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {getElevation} from '../src/utils';
 import {db} from '../src/utils/database';
 import {useShareStore} from './store';
 
-export const Search = ({close, getKeyboardHeight}) => {
+export const Search = ({close, getKeyboardHeight, quicknote}) => {
   const colors = useShareStore(state => state.colors);
   const setAppendNote = useShareStore(state => state.setAppendNote);
   const [results, setResults] = useState([]);
@@ -24,6 +25,7 @@ export const Search = ({close, getKeyboardHeight}) => {
   const notes = useRef(null);
   const timer = useRef(null);
   const inputRef = useRef();
+  const insets = useSafeAreaInsets();
 
   const onSelectItem = async item => {
     setAppendNote(item);
@@ -84,18 +86,26 @@ export const Search = ({close, getKeyboardHeight}) => {
     </TouchableOpacity>
   );
 
+  let extra = quicknote
+    ? {
+        marginTop: -insets.top,
+        paddingTop: insets.top
+      }
+    : {};
   return (
     <View
       style={{
         position: 'absolute',
-        top:Platform.OS === "android" ?  20 : 0,
+        top: Platform.OS === 'android' ? 20 : 0,
         backgroundColor: colors.bg,
-        borderRadius: 10,
-        width: '95%',
+        borderRadius: quicknote ? 0 : 10,
+        width: quicknote ? '100%' : '95%',
         minHeight: 50,
         alignSelf: 'center',
+        overflow:"hidden",
         zIndex: 999,
-        ...getElevation(5)
+        ...getElevation(quicknote ? 1 : 5),
+        ...extra
       }}>
       <View
         style={{
@@ -105,7 +115,7 @@ export const Search = ({close, getKeyboardHeight}) => {
           alignItems: 'center',
           paddingHorizontal: 12,
           marginBottom: 10,
-          height:50
+          height: 50
         }}>
         <TextInput
           ref={inputRef}
@@ -138,8 +148,8 @@ export const Search = ({close, getKeyboardHeight}) => {
         style={{
           maxHeight: height - getKeyboardHeight()
         }}
-		keyboardShouldPersistTaps="always"
-		keyboardDismissMode="none"
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="none"
         keyExtractor={item => item.id}
         renderItem={renderItem}
         ListEmptyComponent={
@@ -152,7 +162,8 @@ export const Search = ({close, getKeyboardHeight}) => {
             }}>
             <Text
               style={{
-                fontFamily: 'OpenSans-Regular'
+                fontFamily: 'OpenSans-Regular',
+                color: colors.icon
               }}>
               Search for a note to append to it.
             </Text>
