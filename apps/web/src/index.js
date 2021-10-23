@@ -1,46 +1,46 @@
-import "./commands";
-import React from "react";
-import { initializeDatabase } from "./common/db";
-import "./index.css";
+import { render } from "react-dom";
+import { getCurrentPath } from "./navigation";
 import * as serviceWorker from "./serviceWorkerRegistration";
-import { loadTrackerScript } from "./utils/analytics";
-import Config from "./utils/config";
-import { isTesting } from "./utils/platform";
+if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
-if (process.env.NODE_ENV === "production") {
-  loadTrackerScript();
-  console.log = () => {};
+const ROUTES = {
+  "/account/recovery": {
+    component: () => import("./views/recovery"),
+    props: {},
+  },
+  "/account/verified": {
+    component: () => import("./views/email-confirmed"),
+    props: {},
+  },
+  "/signup": {
+    component: () => import("./views/auth"),
+    props: { type: "signup" },
+  },
+  "/login": {
+    component: () => import("./views/auth"),
+    props: { type: "login" },
+  },
+  "/recover": {
+    component: () => import("./views/auth"),
+    props: { type: "recover" },
+  },
+  default: { component: () => import("./app"), props: {} },
+};
+
+function getRoute() {
+  const path = getCurrentPath();
+  return ROUTES[path] || ROUTES.default;
 }
 
-const HOMEPAGE_ROUTE = { 1: "/notebooks", 2: "/favorites", 3: "/tags" };
-
-async function checkRedirects(db) {
-  const isLoggedIn = !!(await db.user.getUser());
-  if (window.location.pathname === "/") {
-    const skipInitiation = Config.get("skipInitiation", false);
-    const homepage = Config.get("homepage", 0);
-    if (!isTesting() && !isLoggedIn && !skipInitiation)
-      window.location.replace("/signup");
-    else if (homepage) {
-      const route = HOMEPAGE_ROUTE[homepage];
-      window.location.replace(route);
+const route = getRoute();
+route.component().then(({ default: Component }) => {
+  render(
+    <Component {...route.props} />,
+    document.getElementById("root"),
+    () => {
+      document.getElementById("splash").remove();
     }
-  }
-}
-
-initializeDatabase().then(async (db) => {
-  await checkRedirects(db);
-
-  import("react-dom").then(({ render }) => {
-    import("./App").then(({ default: App }) => {
-      render(<App />, document.getElementById("root"), async () => {
-        document.getElementById("splash").remove();
-        import("react-modal").then(({ default: Modal }) => {
-          Modal.setAppElement("#root");
-        });
-      });
-    });
-  });
+  );
 });
 
 // If you want your app to work offline and load faster, you can change

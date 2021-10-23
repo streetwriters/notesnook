@@ -10,6 +10,7 @@ import { useCallback } from "react";
 import { showRecoveryKeyDialog } from "../common/dialog-controller";
 import { createBackup } from "../common";
 import Logo from "../assets/logo.svg";
+import useDatabase from "../hooks/use-database";
 
 function navigate(path) {
   window.location.href = path;
@@ -42,7 +43,9 @@ function useRecovery() {
 }
 
 function useAuthenticateUser({ code, userId, performAction }) {
+  const [isAppLoaded] = useDatabase();
   useEffect(() => {
+    if (!isAppLoaded) return;
     performAction({
       message: "Authenticating. Please wait...",
       error: "Failed to authenticate. Please try again.",
@@ -63,7 +66,7 @@ function useAuthenticateUser({ code, userId, performAction }) {
       }
       await db.user.fetchUser(true);
     }
-  }, [code, userId, performAction]);
+  }, [code, userId, performAction, isAppLoaded]);
 }
 
 const steps = [RecoveryKeyStep, BackupDataStep, NewPasswordStep, FinalStep];

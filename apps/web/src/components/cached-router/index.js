@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import ReactDOM from "react-dom";
-import { NavigationEvents } from "../../navigation";
+import { getHomeRoute, NavigationEvents } from "../../navigation";
 import useRoutes from "../../utils/use-routes";
 import RouteContainer from "../route-container";
 import ThemeProvider from "../theme-provider";
@@ -8,10 +8,12 @@ import routes from "../../navigation/routes";
 
 var cache = {};
 function CachedRouter() {
-  const RouteResult = useRoutes(routes, { fallbackRoute: "/" });
+  const [RouteResult, location] = useRoutes(routes, {
+    fallbackRoute: getHomeRoute(),
+  });
   useEffect(() => {
     if (!RouteResult) return;
-    NavigationEvents.publish("onNavigate", RouteResult);
+    NavigationEvents.publish("onNavigate", RouteResult, location);
     window.currentViewType = RouteResult.type;
     window.currentViewKey = RouteResult.key;
 
@@ -45,7 +47,7 @@ function CachedRouter() {
         route
       );
     }
-  }, [RouteResult]);
+  }, [RouteResult, location]);
 
   return (
     <RouteContainer

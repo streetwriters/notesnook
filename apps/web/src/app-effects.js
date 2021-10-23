@@ -8,16 +8,21 @@ import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
+import { loadTrackerScript } from "./utils/analytics";
+import Modal from "react-modal";
 
-function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
+Modal.setAppElement("#root");
+if (process.env.NODE_ENV === "production") {
+  loadTrackerScript();
+  console.log = () => {};
+}
+
+export default function AppEffects({ setShow }) {
   const refreshColors = useStore((store) => store.refreshColors);
   const refreshMenuPins = useStore((store) => store.refreshMenuPins);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const setProcessingStatus = useStore((store) => store.setProcessingStatus);
   const isFocusMode = useStore((store) => store.isFocusMode);
-  const isEditorOpen = useStore((store) => store.isEditorOpen);
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
-  const isSideMenuOpen = useStore((store) => store.isSideMenuOpen);
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
@@ -115,25 +120,8 @@ function AppEffects({ isMobile, isTablet, setShow, slideToIndex }) {
     };
   }, []);
 
-  useEffect(() => {
-    if (!isMobile) return;
-    slideToIndex(isSideMenuOpen ? 0 : 1);
-  }, [isMobile, slideToIndex, isSideMenuOpen]);
-
-  useEffect(() => {
-    if (!isMobile) return;
-    slideToIndex(isEditorOpen ? 2 : 1);
-  }, [isMobile, slideToIndex, isEditorOpen]);
-
-  useEffect(() => {
-    toggleSideMenu(!isMobile);
-    if (!isMobile && !isTablet && !isFocusMode) setShow(true);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isMobile, isTablet, isFocusMode, toggleSideMenu]);
-
   return <React.Fragment />;
 }
-export default AppEffects;
 
 function getProcessingStatusFromType(type) {
   switch (type) {

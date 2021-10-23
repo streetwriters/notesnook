@@ -6,7 +6,7 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import { useStore as useThemeStore } from "../../stores/theme-store";
 import { useStore, store } from "../../stores/editor-store";
 import { showToast } from "../../utils/toast";
-import Animated from "../animated";
+import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
 
@@ -163,7 +163,7 @@ function Toolbar(props) {
             clearSession();
           }}
         />
-        <Animated.Input
+        <AnimatedInput
           ml={[2, 2, 0]}
           initial={{
             opacity: isTitleVisible ? 1 : 0,

@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
-import * as Icon from "../components/icons";
+import { CheckCircle, Loading, ArrowRight, Error } from "../components/icons";
 import Field from "../components/field";
 import { getQueryParams, navigate, useQueryParams } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
+import useDatabase from "../hooks/use-database";
+import Loader from "../components/loader";
 
 const features = [
   {
@@ -90,7 +92,6 @@ const authTypes = {
       </>
     ),
     onSubmit: async (form, onError) => {
-      console.log(form);
       if (form.password !== form.confirmPassword) {
         onError("Passwords do not match.");
         return;
@@ -162,6 +163,7 @@ function Auth(props) {
   const [error, setError] = useState();
   const [success, setSuccess] = useState();
   const [featureIndex, setFeatureIndex] = useState(0);
+  const [isAppLoaded] = useDatabase();
 
   const data = authTypes[type];
   const feature = features[featureIndex];
@@ -188,7 +190,7 @@ function Auth(props) {
     setSuccess();
     if (authTypes[type].resetOnNavigate) {
       const form = document.getElementById("authForm");
-      form.reset();
+      form?.reset();
     }
   }, [type]);
 
@@ -211,7 +213,7 @@ function Auth(props) {
             navigate("/");
           }}
         >
-          <Icon.ArrowRight size={16} />
+          <ArrowRight size={16} />
           <Text variant="body" ml={1}>
             Go to app
           </Text>
@@ -262,7 +264,7 @@ function Auth(props) {
                   mt={4}
                   alignItems="center"
                 >
-                  <Icon.ArrowRight size={18} color="static" />
+                  <ArrowRight size={18} color="static" />
                   <Text variant="title" ml={1} color="static">
                     {feature.linkText}
                   </Text>
@@ -285,151 +287,171 @@ function Auth(props) {
           </Flex>
         </Box>
         <Flex justifyContent="center" flex={1} flexShrink={0}>
-          <Flex
-            as="form"
-            id="authForm"
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="stretch"
-            width={["95%", "55%", "35%"]}
-            onSubmit={async (e) => {
-              e.preventDefault();
-              setIsSubmitting(true);
-              const form = new FormData(e.target);
-              const obj = Object.fromEntries(form.entries());
-              obj.redirect = redirect;
-              await data.onSubmit(
-                obj,
-                (error) => {
-                  setIsSubmitting(false);
-                  setError(error);
-                },
-                setSuccess
-              );
-              setIsSubmitting(false);
-            }}
-          >
-            <Text variant="heading" textAlign="center" fontWeight="heading">
-              {data.title}
-            </Text>
-            <Text variant="body" mt={1} textAlign="center" color="fontTertiary">
-              {data.subtitle.text}{" "}
-              {data.subtitle.action && (
-                <Text
-                  sx={{ ":hover": { color: "dimPrimary" }, cursor: "pointer" }}
-                  as="b"
-                  color="primary"
-                  onClick={data.subtitle.action.onClick}
-                >
-                  {data.subtitle.action.text}
-                </Text>
-              )}
-            </Text>
-            <Field
-              styles={{
-                container: { mt: 50 },
-              }}
-              data-test-id="email"
-              id="email"
-              required
-              name="email"
-              autoComplete="email"
-              label={data.labels.email}
-              helpText={data.helpTexts?.email}
-            />
-            {data.labels.password && (
-              <Field
-                styles={{
-                  container: { mt: 2 },
-                }}
-                data-test-id="password"
-                id="password"
-                required
-                name="password"
-                autoComplete={data.autoComplete?.password}
-                label={data.labels.password}
-                type="password"
-              />
-            )}
-
-            {data.confirmPassword && (
-              <Field
-                styles={{
-                  container: { mt: 2 },
-                }}
-                data-test-id="confirm-password"
-                id="confirmPassword"
-                required
-                name="confirmPassword"
-                autoComplete="confirm-password"
-                label="Confirm your password"
-                type="password"
-              />
-            )}
-
-            {data.supportsPasswordRecovery && (
-              <Button
-                type="button"
-                alignSelf="start"
-                mt={2}
-                variant="anchor"
-                onClick={() => navigate("/recover", getQueryParams())}
-              >
-                Forgot password?
-              </Button>
-            )}
-            <Button
-              data-test-id="submitButton"
-              display="flex"
-              type="submit"
-              mt={4}
-              variant="primary"
-              disabled={isSubmitting}
-              sx={{ borderRadius: "default" }}
+          {isAppLoaded ? (
+            <Flex
+              as="form"
+              id="authForm"
+              flexDirection="column"
               justifyContent="center"
-              alignItems="center"
+              alignItems="stretch"
+              width={["95%", "55%", "35%"]}
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsSubmitting(true);
+                const form = new FormData(e.target);
+                const obj = Object.fromEntries(form.entries());
+                obj.redirect = redirect;
+                await data.onSubmit(
+                  obj,
+                  (error) => {
+                    setIsSubmitting(false);
+                    setError(error);
+                  },
+                  setSuccess
+                );
+                setIsSubmitting(false);
+              }}
             >
-              {isSubmitting ? (
-                <>
-                  <Icon.Loading color="static" size={16} sx={{ mr: 1 }} />{" "}
-                  {data.primaryAction.loadingText}
-                </>
-              ) : (
-                data.primaryAction.text
-              )}
-            </Button>
-            {data.secondaryAction && (
-              <Button
-                type="button"
-                variant="secondary"
-                mt={1}
-                onClick={data.secondaryAction.onClick}
-              >
-                {data.secondaryAction.text}
-              </Button>
-            )}
-            {error && (
-              <Flex bg="errorBg" p={1} mt={2} sx={{ borderRadius: "default" }}>
-                <Icon.Error size={15} color="error" />
-                <Text variant="error" ml={1}>
-                  {error}
-                </Text>
-              </Flex>
-            )}
-            {success && (
-              <Flex bg="shade" p={1} mt={2} sx={{ borderRadius: "default" }}>
-                <Icon.CheckCircle size={15} color="primary" />
-                <Text variant="error" color="primary" ml={1}>
-                  {success}
-                </Text>
-              </Flex>
-            )}
-            {data.agreementText && (
-              <Text mt={2} variant="subBody">
-                {data.agreementText}
+              <Text variant="heading" textAlign="center" fontWeight="heading">
+                {data.title}
               </Text>
-            )}
-          </Flex>
+              <Text
+                variant="body"
+                mt={1}
+                textAlign="center"
+                color="fontTertiary"
+              >
+                {data.subtitle.text}{" "}
+                {data.subtitle.action && (
+                  <Text
+                    sx={{
+                      ":hover": { color: "dimPrimary" },
+                      cursor: "pointer",
+                    }}
+                    as="b"
+                    color="primary"
+                    onClick={data.subtitle.action.onClick}
+                  >
+                    {data.subtitle.action.text}
+                  </Text>
+                )}
+              </Text>
+              <Field
+                styles={{
+                  container: { mt: 50 },
+                }}
+                data-test-id="email"
+                id="email"
+                required
+                name="email"
+                autoComplete="email"
+                label={data.labels.email}
+                helpText={data.helpTexts?.email}
+              />
+              {data.labels.password && (
+                <Field
+                  styles={{
+                    container: { mt: 2 },
+                  }}
+                  data-test-id="password"
+                  id="password"
+                  required
+                  name="password"
+                  autoComplete={data.autoComplete?.password}
+                  label={data.labels.password}
+                  type="password"
+                />
+              )}
+
+              {data.confirmPassword && (
+                <Field
+                  styles={{
+                    container: { mt: 2 },
+                  }}
+                  data-test-id="confirm-password"
+                  id="confirmPassword"
+                  required
+                  name="confirmPassword"
+                  autoComplete="confirm-password"
+                  label="Confirm your password"
+                  type="password"
+                />
+              )}
+
+              {data.supportsPasswordRecovery && (
+                <Button
+                  type="button"
+                  alignSelf="start"
+                  mt={2}
+                  variant="anchor"
+                  onClick={() => navigate("/recover", getQueryParams())}
+                >
+                  Forgot password?
+                </Button>
+              )}
+              <Button
+                data-test-id="submitButton"
+                display="flex"
+                type="submit"
+                mt={4}
+                variant="primary"
+                disabled={isSubmitting}
+                sx={{ borderRadius: "default" }}
+                justifyContent="center"
+                alignItems="center"
+              >
+                {isSubmitting ? (
+                  <>
+                    <Loading color="static" size={16} sx={{ mr: 1 }} />{" "}
+                    {data.primaryAction.loadingText}
+                  </>
+                ) : (
+                  data.primaryAction.text
+                )}
+              </Button>
+              {data.secondaryAction && (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  mt={1}
+                  onClick={data.secondaryAction.onClick}
+                >
+                  {data.secondaryAction.text}
+                </Button>
+              )}
+              {error && (
+                <Flex
+                  bg="errorBg"
+                  p={1}
+                  mt={2}
+                  sx={{ borderRadius: "default" }}
+                >
+                  <Error size={15} color="error" />
+                  <Text variant="error" ml={1}>
+                    {error}
+                  </Text>
+                </Flex>
+              )}
+              {success && (
+                <Flex bg="shade" p={1} mt={2} sx={{ borderRadius: "default" }}>
+                  <CheckCircle size={15} color="primary" />
+                  <Text variant="error" color="primary" ml={1}>
+                    {success}
+                  </Text>
+                </Flex>
+              )}
+              {data.agreementText && (
+                <Text mt={2} variant="subBody">
+                  {data.agreementText}
+                </Text>
+              )}
+            </Flex>
+          ) : (
+            <Loader
+              title="Did you know?"
+              text="Your password never leaves your device. Ever."
+            />
+          )}
         </Flex>
       </Flex>
     </ThemeProvider>

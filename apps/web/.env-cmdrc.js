@@ -7,8 +7,8 @@ const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 module.exports = {
   all: {
     UV_THREADPOOL_SIZE: IS_CI ? NUM_CPUS : 2,
-    GENERATE_SOURCEMAP: false,
-    INLINE_RUNTIME_CHUNK: false,
+    // GENERATE_SOURCEMAP: false,
+    // INLINE_RUNTIME_CHUNK: false,
     DISABLE_ESLINT_PLUGIN: true,
     REACT_APP_GIT_HASH: gitHash,
   },

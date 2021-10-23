@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
-import * as Icon from "../icons";
+import { Circle, Sync, Loading, Update } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "timeago-react";
@@ -43,7 +43,7 @@ function StatusBar() {
               display="flex"
               sx={{ alignItems: "center", justifyContent: "center" }}
             >
-              <Icon.Circle
+              <Circle
                 size={7}
                 color={user.isEmailConfirmed ? "success" : "warn"}
               />
@@ -58,7 +58,7 @@ function StatusBar() {
               onClick={sync}
               sx={{ alignItems: "center", justifyContent: "center" }}
             >
-              <Icon.Sync size={10} rotate={isSyncing} />
+              <Sync size={10} rotate={isSyncing} />
               <Text variant="subBody" ml={1}>
                 {"Synced "}
                 {lastSynced ? (
@@ -76,7 +76,7 @@ function StatusBar() {
             onClick={() => navigate("/login")}
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
-            <Icon.Circle size={7} color="error" />
+            <Circle size={7} color="error" />
             <Text variant="subBody" color="bgSecondaryText" ml={1}>
               Not logged in
             </Text>
@@ -84,7 +84,7 @@ function StatusBar() {
         )}
         {processingStatuses?.map(({ key, status, progress }) => (
           <Flex key={key} ml={1} alignItems="center" justifyContent="center">
-            <Icon.Loading size={12} />
+            <Loading size={12} />
             <Text variant="subBody" color="bgSecondaryText" ml={1}>
               {progress ? `${progress}% ${status}` : status}
             </Text>
@@ -106,7 +106,7 @@ function StatusBar() {
             }}
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
-            <Icon.Update
+            <Update
               rotate={
                 updateStatus.type !== "updated" &&
                 updateStatus.type !== "completed" &&

@@ -67,7 +67,6 @@ class UserStore extends BaseStore {
       });
 
       EV.subscribe(EVENTS.databaseSyncRequested, async () => {
-        console.log("Sync requested.");
         await appStore.sync(false);
       });
 

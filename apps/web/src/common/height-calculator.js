@@ -1,6 +1,6 @@
 const SINGLE_LINE_HEIGHT = 1.4;
 const DEFAULT_FONT_SIZE = document.getElementById("p").clientHeight - 1;
-console.log("HEIGHT", DEFAULT_FONT_SIZE);
+
 const MAX_HEIGHTS = {
   note: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,
   notebook: SINGLE_LINE_HEIGHT * 7 * DEFAULT_FONT_SIZE,

@@ -1,16 +1,32 @@
-import React, { useCallback } from "react";
+import { useCallback } from "react";
 import { Box, Flex } from "rebass";
-import { useStore as useAppStore } from "../../stores/app-store";
-import * as Icon from "../icons";
-import { useStore as useUserStore } from "../../stores/user-store";
-import { useStore as useThemeStore } from "../../stores/theme-store";
-import Animated from "../animated";
+import {
+  Note,
+  Notebook,
+  StarOutline,
+  Monographs,
+  Tag,
+  Trash,
+  Settings,
+  Notebook2,
+  Tag2,
+  Topic,
+  DarkMode,
+  LightMode,
+  Sync,
+  Login,
+  Circle,
+} from "../icons";
+import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
 import { navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
-import { useLocation } from "wouter";
 import { showRenameColorDialog } from "../../common/dialog-controller";
+import { useStore as useAppStore } from "../../stores/app-store";
+import { useStore as useUserStore } from "../../stores/user-store";
+import { useStore as useThemeStore } from "../../stores/theme-store";
+import useLocation from "../../hooks/use-location";
 
 function shouldSelectNavItem(route, pin) {
   if (pin.type === "notebook") {
@@ -23,31 +39,31 @@ function shouldSelectNavItem(route, pin) {
 }
 
 const routes = [
-  { title: "Notes", path: "/", icon: Icon.Note },
+  { title: "Notes", path: "/notes", icon: Note },
   {
     title: "Notebooks",
     path: "/notebooks",
-    icon: Icon.Notebook,
+    icon: Notebook,
   },
   {
     title: "Favorites",
     path: "/favorites",
-    icon: Icon.StarOutline,
+    icon: StarOutline,
   },
-  { title: "Tags", path: "/tags", icon: Icon.Tag },
+  { title: "Tags", path: "/tags", icon: Tag },
   {
     title: "Monographs",
     path: "/monographs",
-    icon: Icon.Monographs,
+    icon: Monographs,
   },
-  { title: "Trash", path: "/trash", icon: Icon.Trash },
+  { title: "Trash", path: "/trash", icon: Trash },
 ];
 
 const bottomRoutes = [
   {
     title: "Settings",
     path: "/settings",
-    icon: Icon.Settings,
+    icon: Settings,
   },
 ];
 
@@ -77,7 +93,7 @@ function NavigationMenu(props) {
   );
 
   return (
-    <Animated.Flex
+    <AnimatedFlex
       id="navigationmenu"
       flexDirection="column"
       justifyContent="space-between"
@@ -141,7 +157,7 @@ function NavigationMenu(props) {
           <NavigationItem
             key={color.id}
             title={db.colors.alias(color.id)}
-            icon={Icon.Circle}
+            icon={Circle}
             selected={location === `/colors/${color.id}`}
             color={color.title.toLowerCase()}
             onClick={() => {
@@ -181,10 +197,10 @@ function NavigationMenu(props) {
             }}
             icon={
               pin.type === "notebook"
-                ? Icon.Notebook2
+                ? Notebook2
                 : pin.type === "tag"
-                ? Icon.Tag2
-                : Icon.Topic
+                ? Tag2
+                : Topic
             }
             isShortcut
             selected={shouldSelectNavItem(location, pin)}
@@ -204,13 +220,13 @@ function NavigationMenu(props) {
         {theme === "light" ? (
           <NavigationItem
             title="Dark mode"
-            icon={Icon.DarkMode}
+            icon={DarkMode}
             onClick={toggleNightMode}
           />
         ) : (
           <NavigationItem
             title="Light mode"
-            icon={Icon.LightMode}
+            icon={LightMode}
             onClick={toggleNightMode}
           />
         )}
@@ -219,14 +235,14 @@ function NavigationMenu(props) {
             <NavigationItem
               title="Sync"
               isLoading={isSyncing}
-              icon={Icon.Sync}
+              icon={Sync}
               onClick={sync}
             />
           </>
         ) : (
           <NavigationItem
             title="Login"
-            icon={Icon.Login}
+            icon={Login}
             onClick={() => navigate("/login")}
           />
         )}
@@ -242,7 +258,7 @@ function NavigationMenu(props) {
           />
         ))}
       </Flex>
-    </Animated.Flex>
+    </AnimatedFlex>
   );
 }
 export default NavigationMenu;

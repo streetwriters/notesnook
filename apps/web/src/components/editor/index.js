@@ -7,7 +7,7 @@ import {
   store as editorstore,
 } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
-import Animated from "../animated";
+import { AnimatedFlex } from "../animated";
 import Header from "./header";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
@@ -126,7 +126,7 @@ function Editor({ noteId, nonce }) {
             alignItems: "center",
           }}
         />
-        <Animated.Flex
+        <AnimatedFlex
           variant="columnFill"
           className="editor"
           sx={{
@@ -179,7 +179,7 @@ function Editor({ noteId, nonce }) {
               </>
             ) : null}
           </Suspense>
-        </Animated.Flex>
+        </AnimatedFlex>
       </Flex>
       <Properties noteId={noteId} />
     </Flex>

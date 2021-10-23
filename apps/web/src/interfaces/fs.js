@@ -122,7 +122,6 @@ async function hashStream(reader) {
 }
 
 async function readEncrypted(filename, key, cipherData) {
-  console.log("Reading encrypted file", filename);
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) {
     console.error(`File not found. Filename: ${filename}`);
@@ -159,8 +158,6 @@ async function readEncrypted(filename, key, cipherData) {
 }
 
 async function uploadFile(filename, requestOptions) {
-  console.log("Request to upload file", filename, requestOptions);
-
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle)
     throw new Error(`File stream not found. Filename: ${filename}`);
@@ -261,7 +258,6 @@ function reportProgress(ev, { type, hash }) {
 
 async function downloadFile(filename, requestOptions) {
   const { url, headers, cancellationToken } = requestOptions;
-  console.log("Request to download file", filename, url, headers);
   if (await streamablefs.exists(filename)) return true;
 
   try {
@@ -273,7 +269,6 @@ async function downloadFile(filename, requestOptions) {
         reportProgress(ev, { type: "download", hash: filename }),
     });
 
-    console.log("File downloaded", filename, url, response);
     if (!isSuccessStatusCode(response.status)) return false;
     const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
     distributor.fill(new Uint8Array(response.data));
@@ -352,7 +347,6 @@ function cancellable(operation) {
     return {
       execute: () => operation(filename, requestOptions),
       cancel: (message) => {
-        console.log("Canceled", message);
         source.cancel(message);
       },
     };

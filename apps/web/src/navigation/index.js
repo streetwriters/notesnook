@@ -1,6 +1,6 @@
 import { useState } from "react";
 import EventManager from "notes-core/utils/eventmanager";
-// import { useCallback } from "react";
+import Config from "../utils/config";
 
 export function navigate(url, replaceOrQuery, replace) {
   if (typeof url !== "string") {
@@ -81,3 +81,13 @@ export function getCurrentHash() {
 }
 
 export const NavigationEvents = new EventManager();
+
+const HOMEPAGE_ROUTE = {
+  0: "/notes",
+  1: "/notebooks",
+  2: "/favorites",
+  3: "/tags",
+};
+export function getHomeRoute() {
+  return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
+}

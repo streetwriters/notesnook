@@ -203,9 +203,10 @@ test.describe("run tests independently", () => {
    * @type {Page}
    */
   global.page = null;
-  test.beforeEach(async ({ page: _page }) => {
+  test.beforeEach(async ({ page: _page, baseURL }) => {
     global.page = _page;
-    await page.goto("http://localhost:3000/");
+    await page.goto(baseURL);
+    await page.waitForSelector(getTestId("routeHeader"));
   });
 
   test("create a note", async () => {

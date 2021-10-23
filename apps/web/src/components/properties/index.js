@@ -5,7 +5,7 @@ import { useStore } from "../../stores/editor-store";
 import { AppEventManager, AppEvents, COLORS } from "../../common";
 import { db } from "../../common/db";
 import { useStore as useAppStore } from "../../stores/app-store";
-import Animated from "../animated";
+import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
@@ -77,7 +77,7 @@ function Properties({ noteId }) {
   if (isFocusMode || !sessionId) return null;
   return (
     <>
-      <Animated.Flex
+      <AnimatedFlex
         animate={{
           x: arePropertiesVisible ? 0 : 800,
         }}
@@ -325,7 +325,7 @@ function Properties({ noteId }) {
             })}
           </Card>
         )}
-      </Animated.Flex>
+      </AnimatedFlex>
     </>
   );
 }

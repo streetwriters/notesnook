@@ -1,7 +1,7 @@
 import * as Icon from "../icons";
 import React, { useMemo } from "react";
 import { Button, Flex, Text } from "rebass";
-import Animated from "../animated";
+import { AnimatedFlex } from "../animated";
 import { db } from "../../common/db";
 import { useOpenContextMenu } from "../../utils/useContextMenu";
 import { useStore as useNoteStore } from "../../stores/note-store";
@@ -99,7 +99,7 @@ function GroupHeader(props) {
   if (!title) return null;
 
   return (
-    <Animated.Flex
+    <AnimatedFlex
       transition={{ duration: 0.3, repeatType: "reverse", repeat: 3 }}
       onClick={(e) => {
         if (groups.length <= 0) return;
@@ -165,7 +165,7 @@ function GroupHeader(props) {
           )}
         </Flex>
       )}
-    </Animated.Flex>
+    </AnimatedFlex>
   );
 }
 export default GroupHeader;

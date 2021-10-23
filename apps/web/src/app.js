@@ -1,81 +1,48 @@
-import React, { useState, useEffect } from "react";
-import "./app.css";
-import { Box, Flex } from "rebass";
-import { MotionConfig, AnimationFeature, GesturesFeature } from "framer-motion";
+import React, { useState, Suspense } from "react";
+import { Box, Flex, Text } from "rebass";
 import ThemeProvider from "./components/theme-provider";
-import StatusBar from "./components/statusbar";
-import Animated from "./components/animated";
-import NavigationMenu from "./components/navigationmenu";
-import GlobalMenuWrapper from "./components/globalmenuwrapper";
-import { NavigationEvents } from "./navigation";
-import rootroutes from "./navigation/rootroutes";
-import { useStore } from "./stores/app-store";
-import { Suspense } from "react";
+import { AnimatedFlex } from "./components/animated";
+import NavigationMenuPlaceholder from "./components/navigationmenu/index.lite";
+import StatusBarPlaceholder from "./components/statusbar/index.lite";
 import useMobile from "./utils/use-mobile";
 import useTablet from "./utils/use-tablet";
-import HashRouter from "./components/hashrouter";
-import useSlider from "./hooks/use-slider";
-import useRoutes from "./utils/use-routes";
-import { clearRouteCache } from "./components/cachedrouter";
+import { Loading } from "./components/icons";
+import { LazyMotion, domAnimation } from "framer-motion";
+import useDatabase from "./hooks/use-database";
+import Loader from "./components/loader";
 
+const GlobalMenuWrapper = React.lazy(() =>
+  import("./components/global-menu-wrapper")
+);
 const AppEffects = React.lazy(() => import("./app-effects"));
+const MobileAppEffects = React.lazy(() => import("./app-effects.mobile"));
 const CachedRouter = React.lazy(() => import("./components/cached-router"));
+const HashRouter = React.lazy(() => import("./components/hash-router"));
+const NavigationMenu = React.lazy(() => import("./components/navigation-menu"));
+const StatusBar = React.lazy(() => import("./components/status-bar"));
 
 function App() {
   const [show, setShow] = useState(true);
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const [isAppLoaded, setIsAppLoaded] = useState(false);
-  const toggleSideMenu = useStore((store) => store.toggleSideMenu);
-  const setIsEditorOpen = useStore((store) => store.setIsEditorOpen);
-  const [sliderRef, slideToIndex] = useSlider({
-    onSliding: (e, { lastSlide, position, lastPosition }) => {
-      if (!isMobile) return;
-      const offset = 70;
-      const width = 180;
-
-      const percent = offset - (position / width) * offset;
-      const overlay = document.getElementById("overlay");
-      if (percent > 0) {
-        overlay.style.opacity = `${percent}%`;
-        overlay.style.pointerEvents = "all";
-      } else {
-        overlay.style.pointerEvents = "none";
-      }
-    },
-    onChange: (e, { slide, lastSlide }) => {
-      if (!lastSlide || !isMobile) return;
-      toggleSideMenu(slide?.index === 0 ? true : false);
-      setIsEditorOpen(slide?.index === 2 ? true : false);
-    },
-  });
-
-  useEffect(() => {
-    function onNavigate() {
-      NavigationEvents.unsubscribe("onNavigate", onNavigate);
-      setIsAppLoaded(true);
-    }
-    NavigationEvents.subscribe("onNavigate", onNavigate);
-    return () => {
-      NavigationEvents.unsubscribe("onNavigate", onNavigate);
-    };
-  }, []);
+  const [isAppLoaded] = useDatabase();
 
   return (
-    <MotionConfig features={[AnimationFeature, GesturesFeature]}>
+    <LazyMotion features={domAnimation} strict>
       <ThemeProvider>
         {isAppLoaded && (
           <Suspense fallback={<div style={{ display: "none" }} />}>
-            <AppEffects
-              slideToIndex={slideToIndex}
-              setShow={setShow}
-              isMobile={isMobile}
-              isTablet={isTablet}
-            />
+            <GlobalMenuWrapper />
+            <AppEffects setShow={setShow} />
+            {isMobile && (
+              <MobileAppEffects
+                sliderId="slider"
+                overlayId="overlay"
+                setShow={setShow}
+              />
+            )}
           </Suspense>
         )}
-
-        <GlobalMenuWrapper />
         <Flex
           flexDirection="column"
           id="app"
@@ -84,7 +51,7 @@ function App() {
           sx={{ overflow: "hidden" }}
         >
           <Flex
-            ref={sliderRef}
+            id="slider"
             variant="rowFill"
             overflowX={["auto", "hidden"]}
             sx={{
@@ -99,13 +66,18 @@ function App() {
                 scrollSnapAlign: "start",
               }}
             >
-              <NavigationMenu
-                toggleNavigationContainer={(state) => {
-                  if (!isMobile) setShow(state || !show);
+              <SuspenseLoader
+                condition={isAppLoaded}
+                component={NavigationMenu}
+                props={{
+                  toggleNavigationContainer: (state) => {
+                    if (!isMobile) setShow(state || !show);
+                  },
                 }}
+                fallback={<NavigationMenuPlaceholder />}
               />
             </Flex>
-            <Animated.Flex
+            <AnimatedFlex
               className="listMenu"
               variant="columnFill"
               initial={{
@@ -134,9 +106,16 @@ function App() {
               }}
               flexShrink={0}
             >
-              <Suspense fallback={<div />}>
-                <CachedRouter />
-              </Suspense>
+              <SuspenseLoader
+                condition={isAppLoaded}
+                component={CachedRouter}
+                fallback={
+                  <Loader
+                    title="Did you know?"
+                    text="All your notes are encrypted on your device."
+                  />
+                }
+              />
               {isMobile && (
                 <Box
                   id="overlay"
@@ -152,12 +131,9 @@ function App() {
                     pointerEvents: "none",
                   }}
                   bg="black"
-                  onClick={() => {
-                    toggleSideMenu(false);
-                  }}
                 />
               )}
-            </Animated.Flex>
+            </AnimatedFlex>
             <Flex
               width={["100vw", "100%"]}
               flexShrink={[0, 1]}
@@ -166,20 +142,37 @@ function App() {
               }}
               flexDirection="column"
             >
-              <HashRouter />
+              <SuspenseLoader
+                fallback={
+                  <Loader
+                    title="Fun fact"
+                    text="Notesnook was released in January 2021 by a team of only 3 people."
+                  />
+                }
+                component={HashRouter}
+                condition={isAppLoaded}
+              />
             </Flex>
           </Flex>
-          <StatusBar />
+          <SuspenseLoader
+            fallback={<StatusBarPlaceholder />}
+            component={StatusBar}
+            condition={isAppLoaded}
+          />
         </Flex>
       </ThemeProvider>
-    </MotionConfig>
+    </LazyMotion>
   );
 }
 
-function Root() {
-  const route = useRoutes(rootroutes);
-  if (route) clearRouteCache();
-  return route?.component || <App />;
-}
+export default App;
 
-export default Root;
+function SuspenseLoader({ condition, props, component: Component, fallback }) {
+  if (!condition) return fallback;
+
+  return (
+    <Suspense fallback={fallback}>
+      <Component {...props} />
+    </Suspense>
+  );
+}

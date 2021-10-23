@@ -1,8 +1,101 @@
 import React, { useState } from "react";
 import MDIIcon from "@mdi/react";
-import * as Icons from "@mdi/js";
+import {
+  mdiPlus,
+  mdiHomeVariantOutline,
+  mdiMinus,
+  mdiBookOutline,
+  mdiNotebookOutline,
+  mdiArrowLeft,
+  mdiArrowRight,
+  mdiArrowDown,
+  mdiBookPlusMultipleOutline,
+  mdiBookmarkOutline,
+  mdiAlert,
+  mdiShieldOutline,
+  mdiLockOpenOutline,
+  mdiLockOutline,
+  mdiStar,
+  mdiStarOutline,
+  mdiCircle,
+  mdiCircleOutline,
+  mdiUpdate,
+  mdiCheck,
+  mdiClose,
+  mdiDotsVertical,
+  mdiTrashCanOutline,
+  mdiBookRemoveOutline,
+  mdiMagnify,
+  mdiMenu,
+  mdiLoginVariant,
+  mdiEmailAlertOutline,
+  mdiAccountOutline,
+  mdiLogoutVariant,
+  mdiSunglasses,
+  mdiGlasses,
+  mdiCogOutline,
+  mdiHomeOutline,
+  mdiRecycle,
+  mdiSync,
+  mdiLoading,
+  mdiExportVariant,
+  mdiArrowExpandDown,
+  mdiArrowTopRightThick,
+  mdiChevronLeft,
+  mdiChevronRight,
+  mdiPound,
+  mdiPinOutline,
+  mdiPin,
+  mdiWeatherNight,
+  mdiWeatherSunny,
+  mdiThemeLightDark,
+  mdiCheckCircle,
+  mdiLanguageMarkdownOutline,
+  mdiFilePdfOutline,
+  mdiLanguageHtml5,
+  mdiFormatTitle,
+  mdiAlertCircle,
+  mdiInformation,
+  mdiToggleSwitchOffOutline,
+  mdiToggleSwitchOutline,
+  mdiBackupRestore,
+  mdiCurrencyUsdCircleOutline,
+  mdiPencil,
+  mdiUndoVariant,
+  mdiRedoVariant,
+  mdiTune,
+  mdiChevronDown,
+  mdiChevronUp,
+  mdiSortAscending,
+  mdiSortDescending,
+  mdiEye,
+  mdiEyeOff,
+  mdiFullscreen,
+  mdiFullscreenExit,
+  mdiBullhorn,
+  mdiCloudUploadOutline,
+  mdiCloudCheckOutline,
+  mdiContentCopy,
+  mdiCheckboxMultipleMarkedCircleOutline,
+  mdiBookEditOutline,
+  mdiDeleteForeverOutline,
+  mdiTextBoxMultipleOutline,
+  mdiRocketLaunchOutline,
+  mdiShareVariantOutline,
+  mdiFormTextboxPassword,
+  mdiBomb,
+  mdiViewHeadline,
+  mdiViewSequentialOutline,
+  mdiEmailCheckOutline,
+  mdiDiscord,
+  mdiTwitter,
+  mdiReddit,
+  mdiFileOutline,
+  mdiImage,
+  mdiNoteOutline,
+} from "@mdi/js";
 import { useTheme } from "emotion-theming";
-import Animated from "../animated";
+import { AnimatedFlex } from "../animated";
 
 function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
   const theme = useTheme();
@@ -25,7 +118,7 @@ function createIcon(name, rotate = false) {
   return function (props) {
     const [isHovering, setIsHovering] = useState();
     return (
-      <Animated.Flex
+      <AnimatedFlex
         id={props.id}
         title={props.title}
         variant={props.variant}
@@ -49,138 +142,109 @@ function createIcon(name, rotate = false) {
           }
           {...props}
         />
-      </Animated.Flex>
+      </AnimatedFlex>
     );
   };
 }
 
-export const Plus = createIcon(Icons.mdiPlus);
-export const Note = createIcon(Icons.mdiHomeVariantOutline);
-export const Minus = createIcon(Icons.mdiMinus);
-export const Notebook = createIcon(Icons.mdiBookOutline);
-export const Notebook2 = createIcon(Icons.mdiNotebookOutline);
-export const ArrowLeft = createIcon(Icons.mdiArrowLeft);
-export const ArrowRight = createIcon(Icons.mdiArrowRight);
-export const ArrowDown = createIcon(Icons.mdiArrowDown);
-export const Move = createIcon(Icons.mdiBookPlusMultipleOutline);
-export const Topic = createIcon(Icons.mdiBookmarkOutline);
-export const Alert = createIcon(Icons.mdiAlert);
-export const Vault = createIcon(Icons.mdiShieldOutline);
-export const Unlock = createIcon(Icons.mdiLockOpenOutline);
-export const Lock = createIcon(Icons.mdiLockOutline);
-export const Star = createIcon(Icons.mdiStar);
-export const StarOutline = createIcon(Icons.mdiStarOutline);
-export const Circle = createIcon(Icons.mdiCircle);
-export const CircleEmpty = createIcon(Icons.mdiCircleOutline);
-export const Update = createIcon(Icons.mdiUpdate);
-export const Check = createIcon(Icons.mdiCheck);
-export const Cross = createIcon(Icons.mdiClose);
-export const MoreVertical = createIcon(Icons.mdiDotsVertical);
-export const Trash = createIcon(Icons.mdiTrashCanOutline);
-export const TopicRemove = createIcon(Icons.mdiBookRemoveOutline);
-export const Search = createIcon(Icons.mdiMagnify);
-export const Menu = createIcon(Icons.mdiMenu);
-export const Login = createIcon(Icons.mdiLoginVariant);
-export const Email = createIcon(Icons.mdiEmailAlertOutline);
-export const Signup = createIcon(Icons.mdiAccountOutline);
-export const Logout = createIcon(Icons.mdiLogoutVariant);
-export const FocusMode = createIcon(Icons.mdiSunglasses);
-export const NormalMode = createIcon(Icons.mdiGlasses);
-export const Settings = createIcon(Icons.mdiCogOutline);
-export const Home = createIcon(Icons.mdiHomeOutline);
-export const Restore = createIcon(Icons.mdiRecycle);
-export const Sync = createIcon(Icons.mdiSync);
-export const Loading = createIcon(Icons.mdiLoading, true);
-export const Export = createIcon(Icons.mdiExportVariant);
-export const AddToNotebook = createIcon(Icons.mdiBookPlusMultipleOutline);
-export const Expand = createIcon(Icons.mdiArrowExpandDown);
-export const Shortcut = createIcon(Icons.mdiArrowTopRightThick);
-
-/** Properties Icons */
-export const ChevronLeft = createIcon(Icons.mdiChevronLeft);
-export const ChevronRight = createIcon(Icons.mdiChevronRight);
-export const Close = createIcon(Icons.mdiClose);
-export const Tag = createIcon(Icons.mdiPound);
-export const Tag2 = createIcon(Icons.mdiPound);
-export const Pin = createIcon(Icons.mdiPinOutline);
-export const PinFilled = createIcon(Icons.mdiPin);
-
-/** Settings Icons */
-export const User = createIcon(Icons.mdiAccountOutline);
-export const DarkMode = createIcon(Icons.mdiWeatherNight);
-export const LightMode = createIcon(Icons.mdiWeatherSunny);
-export const Theme = createIcon(Icons.mdiThemeLightDark);
-export const Checkmark = createIcon(Icons.mdiCheck);
-export const CheckCircle = createIcon(Icons.mdiCheckCircle);
-
-export const Properties = createIcon(Icons.mdiDotsVertical);
-
-// FORMATS
-
-export const Markdown = createIcon(Icons.mdiLanguageMarkdownOutline);
-export const PDF = createIcon(Icons.mdiFilePdfOutline);
-export const HTML = createIcon(Icons.mdiLanguageHtml5);
-export const Text = createIcon(Icons.mdiFormatTitle);
-
-// TOAST
-export const Success = createIcon(Icons.mdiCheckCircle);
-export const Error = createIcon(Icons.mdiAlertCircle);
-export const Warn = createIcon(Icons.mdiAlert);
-export const Info = createIcon(Icons.mdiInformation);
-
-export const ToggleUnchecked = createIcon(Icons.mdiToggleSwitchOffOutline);
-export const ToggleChecked = createIcon(Icons.mdiToggleSwitchOutline);
-
-export const Backup = createIcon(Icons.mdiBackupRestore);
-export const Buy = createIcon(Icons.mdiCurrencyUsdCircleOutline);
-
-export const Edit = createIcon(Icons.mdiPencil);
-
-export const Undo = createIcon(Icons.mdiUndoVariant);
-export const Redo = createIcon(Icons.mdiRedoVariant);
-
-export const Filter = createIcon(Icons.mdiTune);
-
-export const ChevronDown = createIcon(Icons.mdiChevronDown);
-export const ChevronUp = createIcon(Icons.mdiChevronUp);
-
-export const SortAsc = createIcon(Icons.mdiSortAscending);
-export const SortDesc = createIcon(Icons.mdiSortDescending);
-
-export const PasswordInvisible = createIcon(Icons.mdiEye);
-export const PasswordVisible = createIcon(Icons.mdiEyeOff);
-
-export const Fullscreen = createIcon(Icons.mdiFullscreen);
-export const ExitFullscreen = createIcon(Icons.mdiFullscreenExit);
-
-export const Announcement = createIcon(Icons.mdiBullhorn);
-export const Publish = createIcon(Icons.mdiCloudUploadOutline);
-export const Published = createIcon(Icons.mdiCloudCheckOutline);
-
-export const Copy = createIcon(Icons.mdiContentCopy);
-
-export const Select = createIcon(Icons.mdiCheckboxMultipleMarkedCircleOutline);
-export const NotebookEdit = createIcon(Icons.mdiBookEditOutline);
-export const DeleteForver = createIcon(Icons.mdiDeleteForeverOutline);
-
-export const Monographs = createIcon(Icons.mdiTextBoxMultipleOutline);
-
-export const Rocket = createIcon(Icons.mdiRocketLaunchOutline);
-export const Share = createIcon(Icons.mdiShareVariantOutline);
-export const Password = createIcon(Icons.mdiFormTextboxPassword);
-export const Destruct = createIcon(Icons.mdiBomb);
-
-export const CompactView = createIcon(Icons.mdiViewHeadline);
-export const DetailedView = createIcon(Icons.mdiViewSequentialOutline);
-
-export const MailCheck = createIcon(Icons.mdiEmailCheckOutline);
-
-export const Discord = createIcon(Icons.mdiDiscord);
-export const Twitter = createIcon(Icons.mdiTwitter);
-export const Reddit = createIcon(Icons.mdiReddit);
-
-export const Dismiss = createIcon(Icons.mdiClose);
-
-export const File = createIcon(Icons.mdiFileOutline);
-export const Download = createIcon(Icons.mdiArrowDown);
-export const ImageDownload = createIcon(Icons.mdiImage);
+export const Plus = createIcon(mdiPlus);
+export const Note = createIcon(mdiNoteOutline);
+export const Minus = createIcon(mdiMinus);
+export const Notebook = createIcon(mdiBookOutline);
+export const Notebook2 = createIcon(mdiNotebookOutline);
+export const ArrowLeft = createIcon(mdiArrowLeft);
+export const ArrowRight = createIcon(mdiArrowRight);
+export const ArrowDown = createIcon(mdiArrowDown);
+export const Move = createIcon(mdiBookPlusMultipleOutline);
+export const Topic = createIcon(mdiBookmarkOutline);
+export const Alert = createIcon(mdiAlert);
+export const Vault = createIcon(mdiShieldOutline);
+export const Unlock = createIcon(mdiLockOpenOutline);
+export const Lock = createIcon(mdiLockOutline);
+export const Star = createIcon(mdiStar);
+export const StarOutline = createIcon(mdiStarOutline);
+export const Circle = createIcon(mdiCircle);
+export const CircleEmpty = createIcon(mdiCircleOutline);
+export const Update = createIcon(mdiUpdate);
+export const Check = createIcon(mdiCheck);
+export const Cross = createIcon(mdiClose);
+export const MoreVertical = createIcon(mdiDotsVertical);
+export const Trash = createIcon(mdiTrashCanOutline);
+export const TopicRemove = createIcon(mdiBookRemoveOutline);
+export const Search = createIcon(mdiMagnify);
+export const Menu = createIcon(mdiMenu);
+export const Login = createIcon(mdiLoginVariant);
+export const Email = createIcon(mdiEmailAlertOutline);
+export const Signup = createIcon(mdiAccountOutline);
+export const Logout = createIcon(mdiLogoutVariant);
+export const FocusMode = createIcon(mdiSunglasses);
+export const NormalMode = createIcon(mdiGlasses);
+export const Settings = createIcon(mdiCogOutline);
+export const Home = createIcon(mdiHomeOutline);
+export const Restore = createIcon(mdiRecycle);
+export const Sync = createIcon(mdiSync);
+export const Loading = createIcon(mdiLoading, true);
+export const Export = createIcon(mdiExportVariant);
+export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);
+export const Expand = createIcon(mdiArrowExpandDown);
+export const Shortcut = createIcon(mdiArrowTopRightThick);
+export const ChevronLeft = createIcon(mdiChevronLeft);
+export const ChevronRight = createIcon(mdiChevronRight);
+export const Close = createIcon(mdiClose);
+export const Tag = createIcon(mdiPound);
+export const Tag2 = createIcon(mdiPound);
+export const Pin = createIcon(mdiPinOutline);
+export const PinFilled = createIcon(mdiPin);
+export const User = createIcon(mdiAccountOutline);
+export const DarkMode = createIcon(mdiWeatherNight);
+export const LightMode = createIcon(mdiWeatherSunny);
+export const Theme = createIcon(mdiThemeLightDark);
+export const Checkmark = createIcon(mdiCheck);
+export const CheckCircle = createIcon(mdiCheckCircle);
+export const Properties = createIcon(mdiDotsVertical);
+export const Markdown = createIcon(mdiLanguageMarkdownOutline);
+export const PDF = createIcon(mdiFilePdfOutline);
+export const HTML = createIcon(mdiLanguageHtml5);
+export const Text = createIcon(mdiFormatTitle);
+export const Success = createIcon(mdiCheckCircle);
+export const Error = createIcon(mdiAlertCircle);
+export const Warn = createIcon(mdiAlert);
+export const Info = createIcon(mdiInformation);
+export const ToggleUnchecked = createIcon(mdiToggleSwitchOffOutline);
+export const ToggleChecked = createIcon(mdiToggleSwitchOutline);
+export const Backup = createIcon(mdiBackupRestore);
+export const Buy = createIcon(mdiCurrencyUsdCircleOutline);
+export const Edit = createIcon(mdiPencil);
+export const Undo = createIcon(mdiUndoVariant);
+export const Redo = createIcon(mdiRedoVariant);
+export const Filter = createIcon(mdiTune);
+export const ChevronDown = createIcon(mdiChevronDown);
+export const ChevronUp = createIcon(mdiChevronUp);
+export const SortAsc = createIcon(mdiSortAscending);
+export const SortDesc = createIcon(mdiSortDescending);
+export const PasswordInvisible = createIcon(mdiEye);
+export const PasswordVisible = createIcon(mdiEyeOff);
+export const Fullscreen = createIcon(mdiFullscreen);
+export const ExitFullscreen = createIcon(mdiFullscreenExit);
+export const Announcement = createIcon(mdiBullhorn);
+export const Publish = createIcon(mdiCloudUploadOutline);
+export const Published = createIcon(mdiCloudCheckOutline);
+export const Copy = createIcon(mdiContentCopy);
+export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
+export const NotebookEdit = createIcon(mdiBookEditOutline);
+export const DeleteForver = createIcon(mdiDeleteForeverOutline);
+export const Monographs = createIcon(mdiTextBoxMultipleOutline);
+export const Rocket = createIcon(mdiRocketLaunchOutline);
+export const Share = createIcon(mdiShareVariantOutline);
+export const Password = createIcon(mdiFormTextboxPassword);
+export const Destruct = createIcon(mdiBomb);
+export const CompactView = createIcon(mdiViewHeadline);
+export const DetailedView = createIcon(mdiViewSequentialOutline);
+export const MailCheck = createIcon(mdiEmailCheckOutline);
+export const Discord = createIcon(mdiDiscord);
+export const Twitter = createIcon(mdiTwitter);
+export const Reddit = createIcon(mdiReddit);
+export const Dismiss = createIcon(mdiClose);
+export const File = createIcon(mdiFileOutline);
+export const Download = createIcon(mdiArrowDown);
+export const ImageDownload = createIcon(mdiImage);

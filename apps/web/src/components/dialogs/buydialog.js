@@ -4,13 +4,6 @@ import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { getCouponData, upgrade } from "../../common/checkout";
-import { ReactComponent as Personalization } from "../../assets/accent.svg";
-import { ReactComponent as Backups } from "../../assets/backup.svg";
-import { ReactComponent as Export } from "../../assets/export.svg";
-import { ReactComponent as Organize } from "../../assets/organize.svg";
-import { ReactComponent as RichText } from "../../assets/richtext.svg";
-import { ReactComponent as Sync } from "../../assets/sync.svg";
-import { ReactComponent as Vault } from "../../assets/vault.svg";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import { navigate } from "../../navigation";
@@ -19,77 +12,41 @@ const premiumDetails = [
   {
     title: "Unlimited attachments",
     description: "Your notes will be automatically synced to all your devices.",
-    illustration: {
-      icon: Sync,
-      width: "40%",
-    },
   },
   {
     title: "Unlimited storage",
     description: "Your notes will be automatically synced to all your devices.",
-    illustration: {
-      icon: Sync,
-      width: "40%",
-    },
   },
   {
     title: "Unlimited notebooks & tags",
     description:
       "Make unlimited notebooks and tags, and assign colors to your notes for quick access.",
-    illustration: {
-      icon: Organize,
-      width: "40%",
-    },
   },
   {
     title: "Automatic syncing",
     description: "Your notes will be automatically synced to all your devices.",
-    illustration: {
-      icon: Sync,
-      width: "40%",
-    },
   },
   {
     title: "Secure vault for notes",
     description:
       "Lock any note with a password and keep sensitive data under lock and key.",
-    illustration: {
-      icon: Vault,
-      width: "35%",
-    },
   },
   {
     title: "Full rich text editor + markdown support",
     description:
       "Add images, links, tables and lists to your notes, and use markdown for fast editing.",
-    illustration: {
-      icon: RichText,
-      width: "50%",
-    },
   },
   {
     title: "Multi-format exports",
     description: "Export your notes in PDF, Markdown, or HTML formats.",
-    illustration: {
-      icon: Export,
-      width: "25%",
-    },
   },
   {
     title: "Automatic encrypted backups",
     description: "Enable daily or weekly backups with automatic encryption.",
-    illustration: {
-      icon: Backups,
-      width: "25%",
-    },
   },
   {
     title: "Customize Notesnook",
     description: "Change app colors and turn on automatic theme switching.",
-    illustration: {
-      icon: Personalization,
-      width: "50%",
-    },
   },
   {
     title: (
@@ -100,10 +57,6 @@ const premiumDetails = [
     ),
     description:
       "Pro users get access to special channels and priority support on our Discord server.",
-    illustration: {
-      icon: Personalization,
-      width: "50%",
-    },
   },
 ];
 

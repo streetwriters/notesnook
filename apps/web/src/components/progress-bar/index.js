@@ -1,7 +1,7 @@
 import { useAnimation } from "framer-motion";
 import React, { useEffect } from "react";
 import { Flex } from "rebass";
-import Animated from "../animated";
+import { AnimatedBox } from "../animated";
 
 function ProgressBar(props) {
   const { width, progress, duration = 1, onLoadingEnd, sx } = props;
@@ -12,7 +12,7 @@ function ProgressBar(props) {
 
   return (
     <Flex overflow="hidden" width={width} sx={sx}>
-      <Animated.Box
+      <AnimatedBox
         height={5}
         initial={{ width: "0%" }}
         animate={animation}

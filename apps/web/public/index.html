@@ -17,7 +17,7 @@
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="%PUBLIC_URL%/favicon-32x32.png"
+      href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAMAAABEpIrGAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAHUUExURUxpcf////////////////////////////////////////////////////////////////////////////////////39/f39/f////////////////////////////////z8/O3s7P7+/vTz8wAAAPz7++/v7/Py8u/u7vDv7+7t7dfX1/79/ezr66Kiovv6+vf29vX09OTj4w0NDfv7++Ti4vr6+vT09Ovq6vn5+f39/fb19dnX1/b29tvb29/f3xMTE/j4+Pn4+O7s7MnJyerq6uno6M/Pz8jIyN3d3dnZ2d7e3kZGRvj39/38/Pf39+zs7PDw8OPi4ubl5cvLy+rp6czMzPLy8vPz887Ozujo6MrKyuDf3+fn59PT0+bm5uXl5c3NzfX19evr6wsLC+/t7ePj4/Ty8u3r6/Lx8eXk5OPh4dDQ0Nza2tjX19vZ2fHw8Nva2tLR0djW1tbW1tra2tLS0uHh4evp6eLi4tXV1djY2L+/vysrK7q6utHR0aGhoa6urrm5uQICAigoKCEhIZCQkFxcXBgYGFRUVBISEm1tbQ4ODklJSbu7uyAgID09PZqamkVFRXh4eLGxsTg4OOTk5FFRUQEBAQoKCnx8fBcXF7/+rP8AAAAfdFJOUwBOqO2h6KT9Mtyr5+w3Str+6TTZOjXb31M24O8BOd0PapSsAAABxElEQVQ4y2NgYOBgYWWXxwLYBdmEGICAjx9Z1NJJVQfB42QE6hdG0RaoaaCqhKSCl4EF1VxNVAXyTAzcaArUUBXwMLBjKDBBViDAII+uwBZFgTy6AjU1awIKNKz1aa0g1VBfB58CDS08CuIb40AKzLAqsJKXN2tXacChwKS+rTtB3tJHRU9ewxmbFZ6tKiqTrSAKdIO1LDEUaPeoqMzsUwAp0NIt8Uj0ijJXQFVgnDJVZcK0XrACXcXY0sjoHM8AfyUkBbOn9KvMmgRSYFEW4hUVqJagHeaShqTAwX7ijJQusAkW5VXRHu6eruFqaigKkqarqAAVKFbYxWiYq1XGedijuMHBWz6xo7m2Rl7RwtvdJaw6NjzCFl2BVVNdshJQgbqBsqtdpIu7nasjXIFXS2cyRL2CW6i6JTCgFCLitUPs4QrM7cDmKZi7FRYVm6o5QeLbDGICLNEqJAVk59rk2djY5Me4FThawQOKFSzrrxmaZWpqBAamQUGmwRaakNTNzMAm7+ekrKmlqOjsrIgAGcAA1ci0NVPiYhAV8zVURgbp6nBg7isuwsDAKKfkp4AEVOHASklKApS9JZmY5bECaS5ZGQYA3vqpy6NoYh0AAABXelRYdFJhdyBwcm9maWxlIHR5cGUgaXB0YwAAeJzj8gwIcVYoKMpPy8xJ5VIAAyMLLmMLEyMTS5MUAxMgRIA0w2QDI7NUIMvY1MjEzMQcxAfLgEigSi4A6hcRdPJCNZUAAAAASUVORK5CYII="
     />
     <link
       rel="icon"
@@ -25,7 +25,11 @@
       sizes="16x16"
       href="%PUBLIC_URL%/favicon-16x16.png"
     />
-    <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" />
+    <link
+      rel="manifest"
+      href='data:application/manifest+json,{"name":"Notesnook - Your private note taking space","short_name":"Notesnook","icons":[{"src":"favicon.ico","sizes":"64x64 32x32 24x24 16x16","type":"image/x-icon"},{"src":"/android-chrome-192x192.png","sizes":"192x192","type":"image/png"},{"src":"/android-chrome-512x512.png","sizes":"512x512","type":"image/png"}],"start_url":".","theme_color":"rgb(255,255,255)","background_color":"rgb(255,255,255)","display":"standalone"}'
+    />
+    <!-- <link rel="manifest" href="%PUBLIC_URL%/site.webmanifest" /> -->
     <link
       rel="mask-icon"
       href="%PUBLIC_URL%/safari-pinned-tab.svg"
@@ -110,8 +114,73 @@
           transform: scale(0.95);
         }
       }
+
+      html,
+      body {
+        font-size: 16px;
+      }
+
+      @media only screen and (max-width: 480px) {
+        html,
+        body {
+          font-size: 18px;
+          background-color: var(--background);
+        }
+      }
+
+      :root,
+      body,
+      #root {
+        margin: 0 !important;
+        height: 100%;
+        overflow: hidden;
+      }
+
+      * {
+        font-family: "Open Sans", -apple-system, BlinkMacSystemFont, "Segoe UI",
+          Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      }
+
+      @keyframes fadeUp {
+        0% {
+          transform: translateY(500px);
+          opacity: 0;
+        }
+        80% {
+          transform: translateY(0px);
+          opacity: 0.7;
+        }
+        100% {
+          opacity: 1;
+        }
+      }
+
+      /* svg {
+  width: 1.5rem;
+} */
+
+      .ReactModal__Overlay {
+        opacity: 0;
+        transition: opacity 200ms ease-in-out;
+      }
+
+      .ReactModal__Overlay--after-open {
+        opacity: 1;
+      }
+
+      .ReactModal__Overlay--before-close {
+        opacity: 0;
+      }
+
+      .slide {
+        background-color: transparent !important;
+      }
+
+      .carousel.carousel-slider {
+        display: flex;
+        flex-direction: row;
+      }
     </style>
-    <link rel="stylesheet" href="/fonts.css" />
   </head>
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>

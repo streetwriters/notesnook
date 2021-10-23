@@ -4,7 +4,7 @@ import React, { useEffect, useMemo } from "react";
 import { Flex, Box, Text, Button } from "rebass";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import useMobile from "../../utils/use-mobile";
-import Animated from "../animated";
+import { AnimatedFlex } from "../animated";
 
 function Menu(props) {
   const { menuItems, data, closeMenu, id, style, sx, state } = props;
@@ -193,7 +193,7 @@ function MobileMenuContainer({ style, id, state, title, children }) {
       overflow="hidden"
       sx={{ position: "relative" }}
     >
-      <Animated.Flex
+      <AnimatedFlex
         width="100%"
         bg="background"
         sx={{
@@ -221,7 +221,7 @@ function MobileMenuContainer({ style, id, state, title, children }) {
           </Text>
           {children}
         </Flex>
-      </Animated.Flex>
+      </AnimatedFlex>
     </Flex>
   );
 }

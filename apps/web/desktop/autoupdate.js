@@ -14,7 +14,6 @@ async function configureAutoUpdater() {
     sendMessageToRenderer(EVENTS.updateAvailable, info);
   });
   autoUpdater.addListener("download-progress", (progress) => {
-    console.log("Downloading", progress);
     sendMessageToRenderer(EVENTS.updateDownloadProgress, progress);
   });
   autoUpdater.addListener("update-downloaded", (info) => {

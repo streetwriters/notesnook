@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, Flex, Text } from "rebass";
+import { Button, Flex, Image, Text } from "rebass";
 import { useStore } from "../../stores/theme-store";
 import { changeSvgTheme } from "../../utils/css";
 
@@ -8,7 +8,7 @@ function Placeholder(props) {
   useEffect(() => {
     changeSvgTheme(accent);
   }, [accent]);
-  const { image: Image, text, callToAction } = props;
+  const { image: PlaceholderImage, text, callToAction } = props;
 
   return (
     <>
@@ -17,7 +17,7 @@ function Placeholder(props) {
         alignSelf="stretch"
         sx={{ position: "relative" }}
       >
-        <Image width={"100%"} height={"100px"} />
+        <Image src={PlaceholderImage} width={"100%"} height={"100px"} />
         <Text
           variant="body"
           mt={2}

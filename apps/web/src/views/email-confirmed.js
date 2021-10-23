@@ -1,3 +1,4 @@
+import "../app.css";
 import { useEffect } from "react";
 import { Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";

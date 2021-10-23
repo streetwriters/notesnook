@@ -15,7 +15,7 @@ import Monographs from "../views/monographs";
 import { showToast } from "../utils/toast";
 
 const routes = {
-  "/": () => ({
+  "/notes": () => ({
     key: "home",
     type: "notes",
     title: "Notes",

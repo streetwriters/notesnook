@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactComponent as Monographs } from "../../assets/monographs.svg";
+import Monographs from "../../assets/monographs.svg";
 import Placeholder from "./index";
 
 function MonographsPlaceholder() {

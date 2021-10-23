@@ -5,6 +5,7 @@ const { getTestId } = require("./utils");
 
 test.beforeEach(async ({ page, baseURL }) => {
   await page.goto(baseURL);
+  await page.waitForSelector(getTestId("routeHeader"));
 });
 
 function createRoute(key, header) {

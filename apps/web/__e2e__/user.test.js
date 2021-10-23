@@ -15,6 +15,7 @@ test.beforeEach(async ({ page: _page, baseURL }) => {
   global.page = _page;
   page = _page;
   await page.goto(baseURL);
+  await page.waitForSelector(getTestId("routeHeader"));
 });
 
 const USER = {

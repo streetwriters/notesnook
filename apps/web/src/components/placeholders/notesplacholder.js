@@ -1,5 +1,5 @@
 import React from "react";
-import { ReactComponent as Note } from "../../assets/note.svg";
+import Note from "../../assets/note.svg";
 import Placeholder from "./index";
 import * as Icon from "../icons";
 import { hashNavigate } from "../../navigation";
