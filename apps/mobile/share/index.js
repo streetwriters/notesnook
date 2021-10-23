@@ -380,7 +380,8 @@ const NotesnookShare = ({quicknote = false}) => {
         width: width > 500 ? 500 : width,
         height: height,
         justifyContent: quicknote ? 'flex-start' : 'flex-end',
-        opacity: Platform.OS !== 'ios' ? opacity : 1
+        opacity: Platform.OS !== 'ios' ? opacity : 1,
+        alignSelf:'center'
       }}>
       {quicknote && !showSearch ? (
         <View
