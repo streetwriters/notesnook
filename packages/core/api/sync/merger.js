@@ -1,6 +1,7 @@
 import { migrations } from "../../migrations";
 import { areAllEmpty } from "./utils";
 import SparkMD5 from "spark-md5";
+import setManipulator from "../../utils/set";
 
 class Merger {
   /**
@@ -63,28 +64,23 @@ class Merger {
     }
   }
 
-  async _mergeArrayWithConflicts(array, get, set, resolve) {
+  async _mergeArrayWithConflicts(array, mergeItem) {
     if (!array) return;
-    return Promise.all(
-      array.map(
-        async (item) =>
-          await this._mergeItemWithConflicts(item, get, set, resolve)
-      )
-    );
+    return Promise.all(array.map(mergeItem));
   }
 
   async merge(serverResponse, lastSynced) {
     if (!serverResponse) return false;
     this._lastSynced = lastSynced;
     const {
-      notes,
+      notes = [],
       synced,
-      notebooks,
-      content,
-      trash,
-      vaultKey,
-      settings,
-      attachments,
+      notebooks = [],
+      content = [],
+      trash = [],
+      vaultKey = [],
+      settings = [],
+      attachments = [],
     } = serverResponse;
 
     if (synced || areAllEmpty(serverResponse)) return false;
@@ -94,11 +90,31 @@ class Merger {
       await this._db.vault._setKey(await this._deserialize(vaultKey, false));
     }
 
-    await this._mergeArray(
-      attachments,
-      (id) => this._db.attachments.attachment(id),
-      (item) => this._db.attachments.add(item)
-    );
+    await this._mergeArrayWithConflicts(attachments, async (item) => {
+      const remoteAttachment = await this._deserialize(item);
+      const localAttachment = this._db.attachments.attachment(
+        remoteAttachment.metadata.hash
+      );
+      if (
+        localAttachment &&
+        localAttachment.dateUploaded !== remoteAttachment.dateUploaded
+      ) {
+        const noteIds = localAttachment.noteIds.slice();
+        const isRemoved = await this._db.attachments.remove(
+          localAttachment.metadata.hash,
+          true
+        );
+        if (!isRemoved)
+          throw new Error(
+            "Conflict could not be resolved in one of the attachments."
+          );
+        remoteAttachment.noteIds = setManipulator.union(
+          remoteAttachment.noteIds,
+          noteIds
+        );
+      }
+      await this._db.attachments.add(remoteAttachment);
+    });
 
     await this._mergeArray(
       settings,
@@ -118,38 +134,40 @@ class Merger {
       (item) => this._db.notebooks.merge(item)
     );
 
-    await this._mergeArrayWithConflicts(
-      content,
-      (id) => this._db.content.raw(id, false),
-      (item) => this._db.content.add(item),
-      async (local, remote) => {
-        let note = this._db.notes.note(local.noteId);
-        if (!note || !note.data) return;
-        note = note.data;
+    await this._mergeArrayWithConflicts(content, (item) =>
+      this._mergeItemWithConflicts(
+        item,
+        (id) => this._db.content.raw(id, false),
+        (item) => this._db.content.add(item),
+        async (local, remote) => {
+          let note = this._db.notes.note(local.noteId);
+          if (!note || !note.data) return;
+          note = note.data;
 
-        // if hashes are equal do nothing
-        if (
-          !note.locked &&
-          (!remote ||
-            !local ||
-            !local.data ||
-            !remote.data ||
-            remote.data === "undefined" || //TODO not sure about this
-            SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
-        )
-          return;
+          // if hashes are equal do nothing
+          if (
+            !note.locked &&
+            (!remote ||
+              !local ||
+              !local.data ||
+              !remote.data ||
+              remote.data === "undefined" || //TODO not sure about this
+              SparkMD5.hash(local.data) === SparkMD5.hash(remote.data))
+          )
+            return;
 
-        if (remote.deleted || local.deleted || note.locked) {
-          // if note is locked or content is deleted we keep the most recent version.
-          if (remote.dateEdited > local.dateEdited)
-            await this._db.content.add({ id: local.id, ...remote });
-        } else {
-          // otherwise we trigger the conflicts
-          await this._db.content.add({ ...local, conflicted: remote });
-          await this._db.notes.add({ id: local.noteId, conflicted: true });
-          await this._db.storage.write("hasConflicts", true);
+          if (remote.deleted || local.deleted || note.locked) {
+            // if note is locked or content is deleted we keep the most recent version.
+            if (remote.dateEdited > local.dateEdited)
+              await this._db.content.add({ id: local.id, ...remote });
+          } else {
+            // otherwise we trigger the conflicts
+            await this._db.content.add({ ...local, conflicted: remote });
+            await this._db.notes.add({ id: local.noteId, conflicted: true });
+            await this._db.storage.write("hasConflicts", true);
+          }
         }
-      }
+      )
     );
 
     await this._mergeArray(

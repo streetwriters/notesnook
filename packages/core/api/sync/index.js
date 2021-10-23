@@ -52,6 +52,13 @@ export default class Sync {
     );
   }
 
+  async _fetchAttachments(lastSynced, token) {
+    return await http.get(
+      `${Constants.API_HOST}/sync/attachments?lst=${lastSynced}`,
+      token
+    );
+  }
+
   async _performChecks() {
     let lastSynced = (await this._db.storage.read("lastSynced")) || 0;
     let token = await this._tokenManager.getAccessToken();
@@ -73,6 +80,7 @@ export default class Sync {
       const now = Date.now();
       this._isSyncing = true;
 
+      await this._mergeAttachments(token, lastSynced);
       await this._uploadAttachments();
 
       // we prepare local data before merging so we always have correct data
@@ -147,6 +155,11 @@ export default class Sync {
     );
 
     return response.lastSynced;
+  }
+
+  async _mergeAttachments(token, lastSynced) {
+    var serverResponse = await this._fetchAttachments(lastSynced, token);
+    await this._merger.merge(serverResponse, lastSynced);
   }
 
   async _uploadAttachments() {

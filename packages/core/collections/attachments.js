@@ -101,6 +101,16 @@ export default class Attachments extends Collection {
     return await this._collection.updateItem(attachment);
   }
 
+  async remove(hash, localOnly) {
+    const attachment = this.all.find((a) => a.metadata.hash === hash);
+    if (!attachment) return false;
+    if (await this._db.fs.deleteFile(hash, localOnly)) {
+      await this._collection.deleteItem(attachment.id);
+      return true;
+    }
+    return false;
+  }
+
   /**
    * Get specified type of attachments of a note
    * @param {string} noteId
