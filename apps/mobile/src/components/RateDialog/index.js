@@ -112,7 +112,7 @@ const RateDialog = () => {
             fontSize={SIZE.md}
             width="48%"
             height={50}
-            type="shade"
+            type="grayBg"
             title="Later"
           />
         </View>
