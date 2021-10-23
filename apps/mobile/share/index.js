@@ -420,7 +420,7 @@ const NotesnookShare = ({quicknote = false}) => {
             style={{
               color: colors.pri,
               fontSize: SIZE.md,
-              fontFamily:"OpenSans-Regular"
+              fontFamily: 'OpenSans-Regular'
             }}>
             Quick note
           </Text>
@@ -680,7 +680,7 @@ const NotesnookShare = ({quicknote = false}) => {
 
           <View
             style={{
-              height: Platform.OS === 'ios' ? 100 : 40
+              height: Platform.isPad ? 150 : Platform.OS === 'ios' ? 110 : 40
             }}
           />
         </View>
