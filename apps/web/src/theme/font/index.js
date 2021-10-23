@@ -7,7 +7,7 @@ class FontFactory {
       fontWeights: {
         normal: 400,
         body: 400,
-        heading: 700,
+        heading: 600,
         bold: 600,
       },
       fonts: {
