@@ -64,6 +64,7 @@ const EditorHeader = () => {
   const insets = useSafeAreaInsets();
   const loading = useAttachmentStore(state => state.loading);
   const handleBack = useRef();
+  const keyboardListener = useRef();
 
   useEffect(() => {
     console.log(loading);
@@ -102,7 +103,7 @@ const EditorHeader = () => {
       useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
       await clearEditor(false, true, false);
-      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
+      keyboardListener.current?.remove();
     }
   };
 
@@ -200,7 +201,7 @@ const EditorHeader = () => {
   const load = async item => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-      Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+     keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',

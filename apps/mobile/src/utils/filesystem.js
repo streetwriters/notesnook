@@ -19,7 +19,6 @@ async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
-    console.log(cipherData);
     let output = await Sodium.decryptFile(
       key,
       {
@@ -175,7 +174,7 @@ async function downloadAttachment(hash, global = true) {
       !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
     )
       return;
-    let key = await db.user.getEncryptionKey();
+    let key = await db.attachments.decryptKey(attachment.key);
     let info = {
       iv: attachment.iv,
       salt: attachment.salt,
@@ -199,8 +198,8 @@ async function downloadAttachment(hash, global = true) {
 
     if (Platform.OS === 'ios') {
       fileUri = file.uri + '/' + attachment.hash.filename;
-    } 
-    console.log('saved file uri: ',fileUri)
+    }
+    console.log('saved file uri: ', fileUri);
 
     eSendEvent(eOpenProgressDialog, {
       title: `File downloaded`,
@@ -210,7 +209,7 @@ async function downloadAttachment(hash, global = true) {
           : 'File Manager/Notesnook/downloads'
       }`,
       noProgress: true,
-      icon:"download",
+      icon: 'download',
       context: global ? null : attachment.metadata.hash,
       component: (
         <ShareComponent

@@ -1,21 +1,20 @@
 import {createRef} from 'react';
-import {Dimensions, NativeModules, Platform} from 'react-native';
+import {Dimensions, Image, NativeModules, Platform} from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import {
   beginBackgroundTask,
   endBackgroundTask
 } from 'react-native-begin-background-task';
-import FastImage from 'react-native-fast-image';
 import RNTooltips from 'react-native-tooltips';
 import {dummyRef} from '../components/DummyText';
 import {useSettingStore} from '../provider/stores';
 import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
+import * as ackeeTracker from './ackee';
 import {refreshNotesPage} from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
-import * as ackeeTracker from './ackee';
 
 export const APP_VERSION = 1550;
 
@@ -42,59 +41,11 @@ const imgNames = [
   'sync',
   'richtext'
 ];
-const BaseURI = (img, color) =>
-  `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
-    '#',
-    '%23'
-  )}.png`;
-
-const allColors = [
-  '#00c853',
-  '#FF5722',
-  '#FFA000',
-  '#1B5E20',
-  '#01c352',
-  '#757575',
-  '#0560ff',
-  '#009688',
-  '#2196F3',
-  '#880E4F',
-  '#9C27B0',
-  '#9381ff',
-  '#FF1744',
-  '#B71C1C',
-  '#ffadad'
-];
-
-const noteColors = [
-  '#f44336',
-  '#FF9800',
-  '#FFD600',
-  '#4CAF50',
-  '#2196F3',
-  '#673AB7',
-  '#9E9E9E'
-];
 
 export const updateList = items => {
   eSendEvent('onListUpdate', items);
 };
 
-export function preloadImages(color) {
-  let uri = imgNames.map(name => {
-    return {
-      uri: BaseURI(name, color)
-    };
-  });
-  uri.concat(
-    noteColors.map(color => {
-      return {
-        uri: BaseURI('notes', color)
-      };
-    })
-  );
-  FastImage.preload(uri);
-}
 
 export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time)
@@ -397,7 +348,7 @@ export const BUTTON_TYPES = {
     selected: 'red',
     opacity: 0.12
   },
-  warn:{
+  warn: {
     primary: 'warningBg',
     text: 'warningText',
     selected: 'warningBg',

@@ -448,11 +448,19 @@ const LoginDialog = () => {
               positiveType="error"
               positiveTitle="Logout"
               onPressPositive={async () => {
-                await db.user.logout();
-                await BiometricService.resetCredentials();
-                await Storage.write('introCompleted', 'true');
-                setConfirm(false);
-                close();
+                try {
+                  await db.user.logout();
+                  await BiometricService.resetCredentials();
+                  await Storage.write('introCompleted', 'true');
+                  setConfirm(false);
+                  close();
+                } catch (e) {
+                  ToastEvent.show({
+                    heading: e.message,
+                    type: 'error',
+                    context: 'local'
+                  });
+                }
               }}
             />
           </DialogContainer>

@@ -466,13 +466,18 @@ const AccoutLogoutSection = () => {
               negativeTitle="Cancel"
               onPressNegative={() => setVisible(false)}
               onPressPositive={async () => {
-                setVisible(false);
-                setLoading(true);
-                await sleep(10);
-                await db.user.logout();
-                await BiometricService.resetCredentials();
-                await Storage.write('introCompleted', 'true');
-                setLoading(false);
+                try {
+                  setVisible(false);
+                  setLoading(true);
+                  await sleep(10);
+                  await db.user.logout();
+                  await BiometricService.resetCredentials();
+                  await Storage.write('introCompleted', 'true');
+                  setLoading(false);
+                } catch (e) {
+                  setVisible(false);
+                  setLoading(false);
+                }
               }}
             />
           </DialogContainer>
@@ -1976,7 +1981,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
                           }
                         }
                         await SettingsService.set('reminder', item.value);
-                     });
+                      });
                     }
                     updateAskForBackup();
                   }}

@@ -3,7 +3,7 @@ import { enabled } from 'react-native-privacy-snapshot';
 import { updateEvent } from '../components/DialogManager/recievers';
 import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
-import { AndroidModule, preloadImages } from '../utils';
+import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
@@ -93,7 +93,6 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    preloadImages(newColors.accent);
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };

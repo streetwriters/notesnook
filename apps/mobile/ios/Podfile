@@ -3,25 +3,19 @@ require_relative '../node_modules/@react-native-community/cli-platform-ios/nativ
 
 platform :ios, '11.0'
 
-permissions_path = '../node_modules/react-native-permissions/ios'
-
 pod 'Base64'
-pod 'Permission-PhotoLibrary', :path => "#{permissions_path}/PhotoLibrary/Permission-PhotoLibrary.podspec"
 pod 'SexyTooltip',:git => 'https://github.com/prscX/SexyTooltip.git'
-pod 'RNTooltips', :path => '../node_modules/react-native-tooltips/ios'
-
-
+pod 'MMKV'
 
 target 'Notesnook' do
   config = use_native_modules!
-  pod 'MMKV'
+  
   use_react_native!(
     :path => config[:reactNativePath],
     # to enable hermes on iOS, change `false` to `true` and then install pods
     :hermes_enabled => true
   )
-  pod 'react-native-mmkv-storage', :path => '../node_modules/react-native-mmkv-storage/react-native-mmkv-storage.podspec'
- 
+
   # for share extension
   target 'Make Note' do
     use_native_modules!

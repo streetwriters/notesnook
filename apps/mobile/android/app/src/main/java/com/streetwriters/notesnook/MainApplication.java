@@ -27,10 +27,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.learnium.RNDeviceInfo.RNDeviceModule;
 import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
+import com.reactnativedocumentpicker.DocumentPickerModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
 
 import cl.json.RNShareModule;
-import io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule;
 import px.tooltips.RNTooltipsModule;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {

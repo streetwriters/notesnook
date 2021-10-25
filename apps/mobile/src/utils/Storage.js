@@ -1,10 +1,9 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import 'react-native-get-random-values';
-import {PERMISSIONS, requestMultiple, RESULTS} from 'react-native-permissions';
-import {generateSecureRandom} from 'react-native-securerandom';
-import {MMKV} from './mmkv';
-import Sodium from 'react-native-sodium';
 import * as Keychain from 'react-native-keychain';
+import { generateSecureRandom } from 'react-native-securerandom';
+import Sodium from 'react-native-sodium';
+import { MMKV } from './mmkv';
 
 
 let RNFetchBlob;
@@ -77,8 +76,9 @@ function getAlgorithm(base64Variant) {
 async function decrypt(password, data) {
   if (!password.password && !password.key) return undefined
   if (password.password && password.password === "" && !password.key) return undefined
-  data.output = 'plain';
-  return await Sodium.decrypt(password, data);
+  let _data = {...data};
+  _data.output = 'plain';
+  return await Sodium.decrypt(password, _data);
 }
 
 function parseAlgorithm(alg) {
@@ -144,18 +144,8 @@ async function getRandomBytes(length) {
 
 async function requestPermission() {
   if (Platform.OS === "ios") return true;
-  let granted = false;
-  try {
-    const response = await requestMultiple([
-      PERMISSIONS.ANDROID.WRITE_EXTERNAL_STORAGE,
-      PERMISSIONS.ANDROID.READ_EXTERNAL_STORAGE,
-    ]);
-    granted =
-      response['android.permission.READ_EXTERNAL_STORAGE'] ===
-        RESULTS.GRANTED &&
-      response['android.permission.WRITE_EXTERNAL_STORAGE'] === RESULTS.GRANTED;
-  } catch (err) {}
-  return granted;
+
+  return true
 }
 async function checkAndCreateDir(path) {
   if (!RNFetchBlob) {
@@ -185,6 +175,16 @@ async function hash(password, email) {
   return result
 }
 
+async function generateCryptoKey(password,salt) {
+  try {
+    let credentials = await Sodium.deriveKey(password, undefined);
+    return credentials;
+  } catch (e) {
+    console.log('generateCryptoKey: ', e)
+  }
+}
+
+
 export default {
   read,
   write,
@@ -201,4 +201,5 @@ export default {
   getCryptoKey,
   removeCryptoKey,
   hash,
+  generateCryptoKey
 };

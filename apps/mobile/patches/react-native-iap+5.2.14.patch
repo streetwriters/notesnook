@@ -1,0 +1,40 @@
+diff --git a/node_modules/react-native-iap/android/src/main/java/com/dooboolab/RNIap/RNIapModule.java b/node_modules/react-native-iap/android/src/main/java/com/dooboolab/RNIap/RNIapModule.java
+index 0a77a6a..43df636 100644
+--- a/node_modules/react-native-iap/android/src/main/java/com/dooboolab/RNIap/RNIapModule.java
++++ b/node_modules/react-native-iap/android/src/main/java/com/dooboolab/RNIap/RNIapModule.java
+@@ -74,6 +74,16 @@ public class RNIapModule extends ReactContextBaseJavaModule implements Purchases
+     }
+   };
+ 
++  @ReactMethod
++  public void addListener(String eventName) {
++    // Keep: Required for RN built in Event Emitter Calls.
++  }
++
++  @ReactMethod
++  public void removeListeners(double count) {
++    // Keep: Required for RN built in Event Emitter Calls.
++  }
++
+   public RNIapModule(ReactApplicationContext reactContext) {
+     super(reactContext);
+     this.reactContext = reactContext;
+diff --git a/node_modules/react-native-iap/ios/RNIapIos.m b/node_modules/react-native-iap/ios/RNIapIos.m
+index 92e0ba9..b9d566a 100644
+--- a/node_modules/react-native-iap/ios/RNIapIos.m
++++ b/node_modules/react-native-iap/ios/RNIapIos.m
+@@ -123,6 +123,14 @@ - (BOOL)paymentQueue:(SKPaymentQueue *)queue shouldAddStorePayment:(SKPayment *)
+     resolve(nil);
+ }
+ 
++RCT_EXPORT_METHOD(addListener : (NSString *)eventName) {
++  // Keep: Required for RN built in Event Emitter Calls.
++}
++
++RCT_EXPORT_METHOD(removeListeners : (NSInteger)count) {
++  // Keep: Required for RN built in Event Emitter Calls.
++}
++
+ RCT_EXPORT_METHOD(getItems:(NSArray*)skus
+                   resolve:(RCTPromiseResolveBlock)resolve
+                   reject:(RCTPromiseRejectBlock)reject) {

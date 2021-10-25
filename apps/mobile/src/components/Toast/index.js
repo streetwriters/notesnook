@@ -127,14 +127,14 @@ export const Toast = ({context = 'global'}) => {
     toastMessages = [];
     toastTranslate.setValue(-dHeight);
     toastOpacity.setValue(0);
-    Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
-    Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
+    let sub1 =  Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
+    let sub2 = Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
     eSubscribeEvent(eShowToast, showToastFunc);
     eSubscribeEvent(eHideToast, hideToastFunc);
     return () => {
       toastMessages = [];
-      Keyboard.removeListener('keyboardDidShow', _onKeyboardShow);
-      Keyboard.removeListener('keyboardDidHide', _onKeyboardHide);
+      sub1?.remove();
+      sub2?.remove();
       eUnSubscribeEvent(eShowToast, showToastFunc);
       eUnSubscribeEvent(eHideToast, hideToastFunc);
     };

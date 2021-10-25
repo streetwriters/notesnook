@@ -1,7 +1,6 @@
-import React, {useEffect, useState} from 'react';
-import {Image} from 'react-native';
-import {View} from 'react-native';
-import {SvgXml} from 'react-native-svg';
+import React, { useState } from 'react';
+import { View } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import {
   FAV_SVG,
   LOGIN_SVG,
@@ -12,10 +11,9 @@ import {
   SETTINGS_SVG,
   TAG_SVG,
   TOPIC_SVG,
-  TRASH_SVG,
+  TRASH_SVG
 } from '../../assets/images/assets';
-import {useTracked} from '../../provider';
-import FastImage from 'react-native-fast-image';
+import { useTracked } from '../../provider';
 export const Placeholder = ({type, w, h, color}) => {
     const [state, dispatch] = useTracked();
     const {colors} = state;
@@ -64,27 +62,7 @@ export const SvgToPngView = ({width, height, src, color, img}) => {
         height: width || 250,
         width: height || 250,
       }}>
-      {error ? (
-        <SvgXml xml={src} width="100%" height="100%" />
-      ) : (
-        <FastImage
-          style={{
-            width: '100%',
-            height: '100%',
-          }}
-          onError={() => {
-            setError(true);
-          }}
-          source={{
-            uri: `https://github.com/ammarahm-ed/notesnook/raw/main/assets/${img}-${color.replace(
-              '#',
-              '%23',
-            )}.png`,
-            cache: 'immutable',
-            priority: 'high',
-          }}
-        />
-      )}
+      <SvgXml xml={src} width="100%" height="100%" />
     </View>
   );
 };

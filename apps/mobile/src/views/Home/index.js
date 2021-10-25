@@ -8,7 +8,6 @@ import { useNoteStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import Notifications from '../../services/Notifications';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager, scrollRef } from '../../utils';
 import { db } from '../../utils/database';
@@ -80,10 +79,6 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-   
-    Notifications.pinQuickNote();
-
-    return;
     if (!DDS.isTab) {
       if (getNote()) {
        eSendEvent(eOnLoadNote, {type: 'new'});

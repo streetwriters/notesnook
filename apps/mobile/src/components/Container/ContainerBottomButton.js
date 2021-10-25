@@ -1,6 +1,6 @@
 import React, {useEffect} from 'react';
 import {Keyboard, Platform, View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import Animated, {Easing, sub} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
@@ -45,11 +45,11 @@ export const ContainerBottomButton = ({
   };
 
   useEffect(() => {
-    Keyboard.addListener('keyboardDidShow', onKeyboardShow);
-    Keyboard.addListener('keyboardDidHide', onKeyboardHide);
+   let sub1 = Keyboard.addListener('keyboardDidShow', onKeyboardShow);
+   let sub2 =  Keyboard.addListener('keyboardDidHide', onKeyboardHide);
     return () => {
-      Keyboard.removeListener('keyboardDidShow', onKeyboardShow);
-      Keyboard.removeListener('keyboardDidHide', onKeyboardHide);
+      sub1?.remove();
+      sub2?.remove();
     };
   }, [deviceMode]);
 

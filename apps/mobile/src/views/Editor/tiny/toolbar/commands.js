@@ -1,7 +1,8 @@
 import React from 'react';
 import {Platform, View} from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import Sodium, {launchCamera, launchImageLibrary} from 'react-native-sodium';
+import Sodium from 'react-native-sodium';
+import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import {Attachment} from '../../../../components/AttachmentDialog';
 import {eSendEvent, ToastEvent} from '../../../../services/EventManager';
@@ -89,14 +90,17 @@ export const execCommands = {
     try {
       let options = {
         mode: 'import',
-        
+        allowMultiSelection: false
       };
-      if (Platform.OS == "ios") {
+      if (Platform.OS == 'ios') {
         options.copyTo = 'cachesDirectory';
       }
 
-      let file = await DocumentPicker.pick(options);
+      let key = await db.attachments.generateKey();
 
+      console.log('generated key for attachments: ', key);
+      let file = await DocumentPicker.pick(options);
+      file = file[0];
       if (file.copyError) {
         ToastEvent.show({
           heading: 'Failed to open file',
@@ -139,8 +143,9 @@ export const execCommands = {
         uri: uri,
         type: 'url'
       });
+      console.log(hash);
       let result = await attachFile(uri, hash, file.type, file.name);
-      console.log('attach file: ',result);
+      console.log('attach file: ', result);
       if (Platform.OS === 'ios') {
         await RNFetchBlob.fs.unlink(uri);
       }
@@ -166,7 +171,13 @@ export const execCommands = {
     `
       );
     } catch (e) {
-      console.log('filepicker: ', e);
+      ToastEvent.show({
+        heading: e.message,
+        message: 'Please connect to internet to attach a file',
+        type: 'error',
+        context: 'global'
+      });
+      console.log('attachment error: ', e);
     }
   },
   image: async () => {
@@ -181,38 +192,59 @@ export const execCommands = {
       actionsArray: [
         {
           action: async () => {
-            eSendEvent(eCloseProgressDialog);
-            await sleep(400);
-            launchCamera(
-              {
-                includeBase64: true,
-                maxWidth: 2000,
-                maxHeight: 2000,
-                quality: 0.8,
-                mediaType: 'photo',
-                encryptToFile: false
-              },
-              handleImageResponse
-            );
+            try {
+              let key = await db.attachments.generateKey();
+              eSendEvent(eCloseProgressDialog);
+              await sleep(400);
+              launchCamera(
+                {
+                  includeBase64: true,
+                  maxWidth: 2000,
+                  maxHeight: 2000,
+                  quality: 0.8,
+                  mediaType: 'photo'
+                },
+                handleImageResponse
+              );
+            } catch (e) {
+              ToastEvent.show({
+                heading: e.message,
+                message: 'Please connect to internet to attach a file',
+                type: 'error',
+                context: 'global'
+              });
+              console.log('attachment error:', e);
+            }
           },
           actionText: 'Take photo',
           icon: 'camera'
         },
         {
           action: async () => {
-            eSendEvent(eCloseProgressDialog);
-            await sleep(400);
-            launchImageLibrary(
-              {
-                includeBase64: true,
-                maxWidth: 2000,
-                maxHeight: 2000,
-                quality: 0.8,
-                mediaType: 'photo',
-                encryptToFile: false
-              },
-              handleImageResponse
-            );
+            try {
+              let key = await db.attachments.generateKey();
+
+              eSendEvent(eCloseProgressDialog);
+              await sleep(400);
+              launchImageLibrary(
+                {
+                  includeBase64: true,
+                  maxWidth: 2000,
+                  maxHeight: 2000,
+                  quality: 0.8,
+                  mediaType: 'photo'
+                },
+                handleImageResponse
+              );
+            } catch (e) {
+              ToastEvent.show({
+                heading: e.message,
+                message: 'Please connect to internet to attach a file',
+                type: 'error',
+                context: 'global'
+              });
+              console.log('attachment error:', e);
+            }
           },
           actionText: 'Select from gallery',
           icon: 'image-multiple'
@@ -328,7 +360,7 @@ async function attachFile(uri, hash, type, filename) {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
     if (!exists) {
-      let key = await db.user.getEncryptionKey();
+      let key = await db.attachments.generateKey();
       encryptionInfo = await Sodium.encryptFile(key, {
         uri: uri,
         type: 'url',
@@ -336,15 +368,16 @@ async function attachFile(uri, hash, type, filename) {
       });
       encryptionInfo.type = type;
       encryptionInfo.filename = filename;
-      encryptionInfo.alg = `xcha-argon2i13`;
+      encryptionInfo.alg = `xcha-argon2i13-s`;
       encryptionInfo.size = encryptionInfo.length;
+      encryptionInfo.key = key;
     } else {
       encryptionInfo = {hash: hash};
     }
     await db.attachments.add(encryptionInfo, getNote()?.id);
     return true;
   } catch (e) {
-    console.log('attach file error: ', uri, hash, type, filename);
+    console.log('attach file error: ', e);
     return false;
   }
 }
