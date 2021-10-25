@@ -173,7 +173,7 @@ export const execCommands = {
     } catch (e) {
       ToastEvent.show({
         heading: e.message,
-        message: 'Please connect to internet to attach a file',
+        message: 'You need internet access to attach a file',
         type: 'error',
         context: 'global'
       });
@@ -209,7 +209,7 @@ export const execCommands = {
             } catch (e) {
               ToastEvent.show({
                 heading: e.message,
-                message: 'Please connect to internet to attach a file',
+                message: 'You need internet access to attach a file',
                 type: 'error',
                 context: 'global'
               });
@@ -239,7 +239,7 @@ export const execCommands = {
             } catch (e) {
               ToastEvent.show({
                 heading: e.message,
-                message: 'Please connect to internet to attach a file',
+                message: 'You need internet access to attach a file',
                 type: 'error',
                 context: 'global'
               });
