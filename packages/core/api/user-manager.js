@@ -159,6 +159,45 @@ class UserManager {
     return { key, salt: user.salt };
   }
 
+  async getAttachmentsKey() {
+    let user = await this.getUser();
+    if (!user) return;
+
+    let token = await this.tokenManager.getAccessToken();
+    if (!token) return;
+
+    if (!user.attachmentsKey) {
+      user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
+    }
+
+    const userEncryptionKey = await this.getEncryptionKey();
+    if (!userEncryptionKey) return;
+
+    if (!user.attachmentsKey) {
+      const key = await this._storage.generateRandomKey();
+      const encryptedKey = await this._storage.encrypt(
+        userEncryptionKey,
+        JSON.stringify(key)
+      );
+
+      user.attachmentsKey = encryptedKey;
+      await http.patch.json(
+        `${constants.API_HOST}${ENDPOINTS.user}`,
+        user,
+        token
+      );
+
+      await this.setUser(user);
+      return key;
+    }
+
+    const plainData = await this._storage.decrypt(
+      userEncryptionKey,
+      user.attachmentsKey
+    );
+    return JSON.parse(plainData);
+  }
+
   async sendVerificationEmail() {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;

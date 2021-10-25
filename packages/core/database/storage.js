@@ -1,3 +1,5 @@
+import { randomBytes } from "../utils/random";
+
 export default class Storage {
   constructor(context) {
     this.storage = context;
@@ -45,5 +47,11 @@ export default class Storage {
 
   getCryptoKey(name) {
     return this.storage.getCryptoKey(name);
+  }
+
+  async generateRandomKey() {
+    const passwordBytes = randomBytes(124);
+    const password = passwordBytes.toString("base64");
+    return await this.storage.generateCryptoKey(password, false);
   }
 }

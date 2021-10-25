@@ -78,7 +78,7 @@ class Merger {
       notebooks = [],
       content = [],
       trash = [],
-      vaultKey = [],
+      vaultKey,
       settings = [],
       attachments = [],
     } = serverResponse;

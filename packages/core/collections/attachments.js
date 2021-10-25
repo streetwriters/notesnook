@@ -12,36 +12,25 @@ export default class Attachments extends Collection {
     this.key = null;
   }
 
-  async _getEncryptionKey() {
-    if (!this.key) this.key = await this._db.user.getEncryptionKey();
-    if (!this.key)
-      throw new Error(
-        "Failed to get user encryption key. Cannot cache attachments."
-      );
-    return this.key;
-  }
-
   /**
    *
    * @param {{
    *  iv: string,
-   *  salt: string,
    *  length: number,
    *  alg: string,
    *  hash: string,
    *  hashType: string,
    *  filename: string,
-   *  type: string
+   *  type: string,
+   *  salt: string,
+   *  key: {}
    * }} attachment
    * @param {string} noteId Optional as attachments will be parsed at extraction time
    * @returns
    */
-  add(attachment, noteId) {
-    if (!attachment)
-      return console.error("attachment or noteId cannot be null");
-
+  async add(attachment, noteId) {
+    if (!attachment) return console.error("attachment cannot be undefined");
     if (attachment.remote) return this._collection.addItem(attachment);
-
     if (!attachment.hash) throw new Error("Please provide attachment hash.");
 
     const oldAttachment = this.all.find(
@@ -55,21 +44,23 @@ export default class Attachments extends Collection {
       return this._collection.updateItem(oldAttachment);
     }
 
-    const { iv, salt, length, alg, hash, hashType, filename, type } =
+    const { iv, length, alg, hash, hashType, filename, salt, type, key } =
       attachment;
 
     if (
       !iv ||
-      !salt ||
       !length ||
       !alg ||
       !hash ||
       !hashType ||
       !filename ||
-      !type
+      !type ||
+      !salt ||
+      !key
     )
       throw new Error("Could not add attachment: all properties are required.");
 
+    const encryptedKey = await this._encryptKey(key);
     const attachmentItem = {
       id: id(),
       noteIds: noteId ? [noteId] : [],
@@ -77,6 +68,7 @@ export default class Attachments extends Collection {
       salt,
       length,
       alg,
+      key: encryptedKey,
       metadata: {
         hash,
         hashType,
@@ -89,6 +81,17 @@ export default class Attachments extends Collection {
       dateDeleted: undefined,
     };
     return this._collection.addItem(attachmentItem);
+  }
+
+  async generateKey() {
+    await this._getEncryptionKey();
+    return await this._db.storage.generateRandomKey();
+  }
+
+  async decryptKey(key) {
+    const encryptionKey = await this._getEncryptionKey();
+    const plainData = await this._db.storage.decrypt(encryptionKey, key);
+    return JSON.parse(plainData);
   }
 
   async delete(hash, noteId) {
@@ -252,5 +255,29 @@ export default class Attachments extends Collection {
 
   get all() {
     return this._collection.getItems();
+  }
+
+  /**
+   * @private
+   */
+  async _encryptKey(key) {
+    const encryptionKey = await this._getEncryptionKey();
+    const encryptedKey = await this._db.storage.encrypt(
+      encryptionKey,
+      JSON.stringify(key)
+    );
+    return encryptedKey;
+  }
+
+  /**
+   * @private
+   */
+  async _getEncryptionKey() {
+    if (!this.key) this.key = await this._db.user.getAttachmentsKey();
+    if (!this.key)
+      throw new Error(
+        "Failed to get user encryption key. Cannot cache attachments."
+      );
+    return this.key;
   }
 }
