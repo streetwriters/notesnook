@@ -145,9 +145,10 @@ export default class Attachments extends Collection {
     const attachment = this.all.find((a) => a.metadata.hash === hash);
     if (!attachment) return;
 
+    const key = await this.decryptKey(attachment.key);
     const data = await this._db.fs.readEncrypted(
       attachment.metadata.hash,
-      await this._getEncryptionKey(),
+      key,
       {
         iv: attachment.iv,
         salt: attachment.salt,
@@ -173,12 +174,8 @@ export default class Attachments extends Collection {
   }
 
   async save(data, type) {
-    return await this._db.fs.writeEncrypted(
-      null,
-      data,
-      type,
-      await this._getEncryptionKey()
-    );
+    const key = await this.decryptKey(attachment.key);
+    return await this._db.fs.writeEncrypted(null, data, type, key);
   }
 
   async downloadImages(noteId) {
