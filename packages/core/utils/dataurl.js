@@ -2,7 +2,7 @@ const REGEX = /^data:(image\/.+);base64,(.+)/;
 
 function toObject(dataurl) {
   const regexResult = REGEX.exec(dataurl);
-  if (regexResult.length < 3) return {};
+  if (!regexResult || regexResult.length < 3) return {};
   const [_, mime, data] = regexResult;
   return { mime, data };
 }
