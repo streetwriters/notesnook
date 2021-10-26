@@ -1,4 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
+import { StatusBar } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
@@ -25,7 +26,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
   const notes = useRef(null);
   const timer = useRef(null);
   const inputRef = useRef();
-  const insets = useSafeAreaInsets();
+  const insets = Platform.OS === "android" ? {top:StatusBar.currentHeight} : useSafeAreaInsets();
 
   const onSelectItem = async item => {
     setAppendNote(item);

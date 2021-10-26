@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  StatusBar,
   Text,
   TouchableOpacity,
   useWindowDimensions,
@@ -135,7 +136,10 @@ const NotesnookShare = ({quicknote = false}) => {
   const webviewRef = useRef();
   const opacity = useValue(0);
   const translate = useValue(1000);
-  const insets = useSafeAreaInsets();
+  const insets =
+    Platform.OS === 'android'
+      ? {top: StatusBar.currentHeight}
+      : useSafeAreaInsets();
   const prevAnimation = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -381,7 +385,7 @@ const NotesnookShare = ({quicknote = false}) => {
         height: height,
         justifyContent: quicknote ? 'flex-start' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1,
-        alignSelf:'center'
+        alignSelf: 'center'
       }}>
       {quicknote && !showSearch ? (
         <View
@@ -489,6 +493,7 @@ const NotesnookShare = ({quicknote = false}) => {
           paddingVertical: 25,
           backgroundColor: 'transparent',
           marginBottom: insets.top,
+
           transform: [
             {
               translateY:
@@ -578,7 +583,8 @@ const NotesnookShare = ({quicknote = false}) => {
                 minHeight: 100,
                 borderRadius: 10,
                 ...getElevation(quicknote ? 1 : 5),
-                backgroundColor: colors.bg
+                backgroundColor: colors.bg,
+                overflow: 'hidden'
               }}>
               <View
                 style={{

@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {AppRegistry} from 'react-native';
+import {AppRegistry, Platform} from 'react-native';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
 import Notifications from './src/services/Notifications';
@@ -30,10 +30,12 @@ AppRegistry.registerComponent(appName, () => AppProvider);
 
 const ShareProvider = () => {
   NotesnookShare = require('./share/index').default;
-  return (
+  return Platform.OS === 'ios' ? (
     <SafeAreaProvider>
       <NotesnookShare quicknote={false} />
     </SafeAreaProvider>
+  ) : (
+    <NotesnookShare quicknote={false} />
   );
 };
 
