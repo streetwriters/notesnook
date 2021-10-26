@@ -147,7 +147,8 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height: 50
+    height: 50,
+    fontFamily:"OpenSans-Regular"
   };
 
   return (
