@@ -263,7 +263,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     borderRadius: 5,
                     minHeight: 45,
                     fontSize: SIZE.md,
-                    //fontFamily: "sans-serif",
+                    fontFamily: 'OpenSans-Regular',
                     padding: pv - 2,
                   },
                 ]}
@@ -408,6 +408,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                               height: 40,
                               fontSize: SIZE.sm,
                               padding: pv - 2,
+                              fontFamily: 'OpenSans-Regular',
                             },
                           ]}
                           placeholder="Add a topic"

@@ -42,7 +42,6 @@ export const SearchInput = props => {
       <TextInput
         ref={inputRef}
         style={{
-          fontWeight: 'bold',
           color: colors.pri,
           fontSize: SIZE.xl,
           flexGrow: 1,
@@ -51,6 +50,7 @@ export const SearchInput = props => {
           paddingVertical: 0,
           paddingHorizontal: 0,
           margin: 0,
+          fontFamily: 'OpenSans-SemiBold',
         }}
         returnKeyLabel="Search"
         returnKeyType="search"
