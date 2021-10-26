@@ -6,8 +6,10 @@ import { hasItem } from "../utils/array";
 export default class Content extends Collection {
   async add(content) {
     if (!content) return;
-    if (content.deleted || content.migrated)
-      return await this._collection.addItem(content);
+    if (content.remote || content.deleted || content.migrated)
+      return await this._collection.addItem(
+        await this.extractAttachments(content)
+      );
 
     const oldContent = await this.raw(content.id, false);
     if (content.id && oldContent) {

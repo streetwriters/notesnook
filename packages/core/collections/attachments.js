@@ -174,8 +174,9 @@ export default class Attachments extends Collection {
   }
 
   async save(data, type) {
-    const key = await this.decryptKey(attachment.key);
-    return await this._db.fs.writeEncrypted(null, data, type, key);
+    const key = await this._db.attachments.generateKey();
+    const metadata = await this._db.fs.writeEncrypted(null, data, type, key);
+    return { key, metadata };
   }
 
   async downloadImages(noteId) {

@@ -101,13 +101,15 @@ class Tiny {
 
             const type =
               getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
-            const metadata = await store(data, "base64");
+            const { key, metadata } = await store(noteId, data, "base64");
             setDatasetAttribute(attachment, "hash", metadata.hash);
 
             attachments.push({
               type,
-              filename: getDatasetAttribute(attachment, "filename"),
+              filename:
+                getDatasetAttribute(attachment, "filename") || metadata.hash,
               ...metadata,
+              key,
             });
           } else {
             attachments.push({
