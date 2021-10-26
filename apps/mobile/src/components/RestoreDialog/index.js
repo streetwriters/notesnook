@@ -197,7 +197,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       if (restoring) {
         return;
       }
-      DocumentPicker.pick()
+      
+      DocumentPicker.pickSingle()
         .then(r => {
           setRestoring(true);
           fetch(r.uri).then(async r => {
@@ -224,7 +225,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                 context: 'local'
               });
             }
-          });
+          }).catch(console.log)
         })
         .catch(console.log);
     }
