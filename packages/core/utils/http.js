@@ -7,19 +7,19 @@ function deleteRequest(url, token) {
 }
 
 function patch(url, data, token) {
-  return bodyRequest(url, data, false, token, "PATCH");
+  return bodyRequest(url, data, token, "PATCH");
 }
 
 patch.json = function (url, data, token) {
-  return bodyRequest(url, data, true, token, "PATCH");
+  return bodyRequest(url, data, token, "PATCH", "application/json");
 };
 
 function post(url, data, token) {
-  return bodyRequest(url, data, false, token, "POST");
+  return bodyRequest(url, data, token, "POST");
 }
 
 post.json = function (url, data, token) {
-  return bodyRequest(url, data, true, token, "POST");
+  return bodyRequest(url, data, token, "POST", "application/json");
 };
 
 export default {
@@ -29,9 +29,9 @@ export default {
   patch,
 };
 
-function transformer(data, json) {
+function transformer(data, type) {
   if (!data) return;
-  if (json) return JSON.stringify(data);
+  if (type === "application/json") return JSON.stringify(data);
   else {
     return Object.entries(data)
       .map(
@@ -70,16 +70,20 @@ async function request(url, token, method) {
   );
 }
 
-async function bodyRequest(url, data, json = true, token, method) {
+async function bodyRequest(
+  url,
+  data,
+  token,
+  method,
+  contentType = "application/x-www-form-urlencoded"
+) {
   return handleResponse(
     await fetch(url, {
       method,
-      body: transformer(data, json),
+      body: transformer(data, contentType),
       headers: {
         ...getAuthorizationHeader(token),
-        "Content-Type": json
-          ? "application/json"
-          : "application/x-www-form-urlencoded",
+        "Content-Type": contentType,
       },
     })
   );

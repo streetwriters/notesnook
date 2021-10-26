@@ -160,42 +160,46 @@ class UserManager {
   }
 
   async getAttachmentsKey() {
-    let user = await this.getUser();
-    if (!user) return;
+    try {
+      let user = await this.getUser();
+      if (!user) return;
 
-    let token = await this.tokenManager.getAccessToken();
-    if (!token) return;
+      if (!user.attachmentsKey) {
+        let token = await this.tokenManager.getAccessToken();
+        user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
+      }
 
-    if (!user.attachmentsKey) {
-      user = await http.get(`${constants.API_HOST}${ENDPOINTS.user}`, token);
-    }
+      const userEncryptionKey = await this.getEncryptionKey();
+      if (!userEncryptionKey) return;
 
-    const userEncryptionKey = await this.getEncryptionKey();
-    if (!userEncryptionKey) return;
+      if (!user.attachmentsKey) {
+        const key = await this._storage.generateRandomKey();
+        const encryptedKey = await this._storage.encrypt(
+          userEncryptionKey,
+          JSON.stringify(key)
+        );
 
-    if (!user.attachmentsKey) {
-      const key = await this._storage.generateRandomKey();
-      const encryptedKey = await this._storage.encrypt(
+        user.attachmentsKey = encryptedKey;
+
+        let token = await this.tokenManager.getAccessToken();
+        await http.patch.json(
+          `${constants.API_HOST}${ENDPOINTS.user}`,
+          user,
+          token
+        );
+
+        await this.setUser(user);
+        return key;
+      }
+
+      const plainData = await this._storage.decrypt(
         userEncryptionKey,
-        JSON.stringify(key)
+        user.attachmentsKey
       );
-
-      user.attachmentsKey = encryptedKey;
-      await http.patch.json(
-        `${constants.API_HOST}${ENDPOINTS.user}`,
-        user,
-        token
-      );
-
-      await this.setUser(user);
-      return key;
+      return JSON.parse(plainData);
+    } catch (e) {
+      throw new Error("Could not get attachments encryption key.");
     }
-
-    const plainData = await this._storage.decrypt(
-      userEncryptionKey,
-      user.attachmentsKey
-    );
-    return JSON.parse(plainData);
   }
 
   async sendVerificationEmail() {
