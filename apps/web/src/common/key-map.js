@@ -51,7 +51,7 @@ const KEYMAP = [
     global: false,
     action: (e) => {
       e.preventDefault();
-      navigate("/");
+      navigate("/notes");
     },
   },
   {

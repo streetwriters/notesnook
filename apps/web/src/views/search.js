@@ -8,7 +8,7 @@ import { useStore as useNoteStore } from "../stores/note-store";
 import { Flex, Text } from "rebass";
 import { showToast } from "../utils/toast";
 import { store as notebookstore } from "../stores/notebook-store";
-import { navigate } from "../navigation";
+import { hardNavigate, navigate } from "../navigation";
 
 async function typeToItems(type, context) {
   switch (type) {
@@ -77,7 +77,7 @@ function Search({ type }) {
     }
   }, [type, context]);
 
-  if (!title) return navigate("/");
+  if (!title) return hardNavigate("/");
 
   return (
     <>

@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Button, Flex, Image, Text } from "rebass";
-import { useQueryParams } from "../navigation";
+import { hardNavigate, useQueryParams } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import Field from "../components/field";
 import * as Icon from "../components/icons";
@@ -49,7 +49,7 @@ function useAuthenticateUser({ code, userId, performAction }) {
     performAction({
       message: "Authenticating. Please wait...",
       error: "Failed to authenticate. Please try again.",
-      onError: () => navigate("/"),
+      onError: () => hardNavigate("/"),
       action: authenticateUser,
     });
 
@@ -77,7 +77,7 @@ function AccountRecovery() {
   const Step = useMemo(() => steps[step], [step]);
   useAuthenticateUser({ code, userId, performAction });
   useEffect(() => {
-    if (!code || !userId) return navigate("/");
+    if (!code || !userId) return hardNavigate("/");
   }, [code, userId]);
 
   return (

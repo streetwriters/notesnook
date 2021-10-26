@@ -215,7 +215,7 @@ function Auth(props) {
           title="Go to app"
           onClick={() => {
             Config.set("skipInitiation", true);
-            navigate("/");
+            hardNavigate("/");
           }}
         >
           <ArrowRight size={16} />
