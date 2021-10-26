@@ -3,12 +3,7 @@ import { Box, Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import { CheckCircle, Loading, ArrowRight, Error } from "../components/icons";
 import Field from "../components/field";
-import {
-  getQueryParams,
-  hardNavigate,
-  navigate,
-  useQueryParams,
-} from "../navigation";
+import { getQueryParams, hardNavigate, useQueryParams } from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
@@ -103,7 +98,7 @@ const authTypes = {
       }
       return await userstore
         .signup(form)
-        .then(async () => navigate(form.redirect || "/"))
+        .then(async () => hardNavigate(form.redirect || "/"))
         .catch((e) => onError(e.message));
     },
   },
@@ -127,7 +122,7 @@ const authTypes = {
     onSubmit: async (form, onError) => {
       return await userstore
         .login(form)
-        .then(async () => navigate(form.redirect || "/"))
+        .then(async () => hardNavigate(form.redirect || "/"))
         .catch((e) => onError(e.message));
     },
   },
