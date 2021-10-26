@@ -44,12 +44,12 @@ export class NNCrypto implements INNCrypto {
     return Password.hash(password, salt);
   }
 
-  async deriveKey(password: string, salt: string): Promise<EncryptionKey> {
+  async deriveKey(password: string, salt?: string): Promise<EncryptionKey> {
     await this.init();
     return KeyUtils.deriveKey(password, salt);
   }
 
-  async exportKey(password: string, salt: string): Promise<string> {
+  async exportKey(password: string, salt?: string): Promise<SerializedKey> {
     await this.init();
     return KeyUtils.exportKey(password, salt);
   }

@@ -307,8 +307,11 @@ function Properties({ noteId }) {
                               attachment.metadata.hash
                             )
                           ) {
+                            const key = await db.attachments.decryptKey(
+                              attachment.key
+                            );
                             await FS.saveFile(attachment.metadata.hash, {
-                              key: await db.user.getEncryptionKey(),
+                              key,
                               iv: attachment.iv,
                               name: attachment.metadata.filename,
                               type: attachment.metadata.type,

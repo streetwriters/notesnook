@@ -27,9 +27,9 @@ export interface INNCrypto {
 
   hash(password: string, salt: string): Promise<string>;
 
-  deriveKey(password: string, salt: string): Promise<EncryptionKey>;
+  deriveKey(password: string, salt?: string): Promise<EncryptionKey>;
 
-  exportKey(password: string, salt: string): Promise<string>;
+  exportKey(password: string, salt?: string): Promise<SerializedKey>;
 
   encryptStream(
     key: SerializedKey,

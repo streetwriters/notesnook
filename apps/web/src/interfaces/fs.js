@@ -323,11 +323,26 @@ async function saveFile(filename, { key, iv, name, type }) {
   await streamablefs.deleteFile(filename);
 }
 
+async function deleteFile(filename, requestOptions) {
+  if (!requestOptions) return await streamablefs.deleteFile(filename);
+
+  const { url, headers } = requestOptions;
+  if (!(await streamablefs.exists(filename))) return true;
+
+  const response = await axios.delete(url, {
+    headers: headers,
+  });
+  const result = isSuccessStatusCode(response.status);
+  if (result) await streamablefs.deleteFile(filename);
+  return result;
+}
+
 const FS = {
   writeEncrypted,
   readEncrypted,
   uploadFile: cancellable(uploadFile),
   downloadFile: cancellable(downloadFile),
+  deleteFile,
   saveFile,
   exists,
   hashBuffer,

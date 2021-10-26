@@ -45,10 +45,10 @@ async function deriveCryptoKey(name, data) {
   if (isIndexedDBSupported() && window?.crypto?.subtle) {
     const pbkdfKey = await derivePBKDF2Key(password);
     await write(name, pbkdfKey);
-    const cipheredKey = await aesEncrypt(pbkdfKey, keyData);
+    const cipheredKey = await aesEncrypt(pbkdfKey, keyData.key);
     await write(`${name}@_k`, cipheredKey);
   } else {
-    await write(`${name}@_k`, keyData);
+    await write(`${name}@_k`, keyData.key);
   }
 }
 
@@ -68,6 +68,12 @@ function isIndexedDBSupported() {
   return localforage.driver() === "asyncStorage";
 }
 
+async function generateCryptoKey(password, salt = false) {
+  if (!password) throw new Error("Invalid data provided to generateCryptoKey.");
+  const crypto = await getNNCrypto();
+  return await crypto.exportKey(password, salt);
+}
+
 const APP_SALT = "oVzKtazBo7d8sb7TBvY9jw";
 const Storage = {
   read,
@@ -76,6 +82,7 @@ const Storage = {
   remove,
   clear,
   getAllKeys,
+  generateCryptoKey,
   deriveCryptoKey,
   getCryptoKey,
   hash: async function (password, email) {

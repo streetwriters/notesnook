@@ -59,14 +59,14 @@ export class NNCryptoWorker implements INNCrypto {
     return this.workermodule.hash(password, salt);
   }
 
-  async deriveKey(password: string, salt: string): Promise<EncryptionKey> {
+  async deriveKey(password: string, salt?: string): Promise<EncryptionKey> {
     await this.init();
     if (!this.workermodule) throw new Error("Worker module is not ready.");
 
     return this.workermodule.deriveKey(password, salt);
   }
 
-  async exportKey(password: string, salt: string): Promise<string> {
+  async exportKey(password: string, salt?: string): Promise<SerializedKey> {
     await this.init();
     if (!this.workermodule) throw new Error("Worker module is not ready.");
 

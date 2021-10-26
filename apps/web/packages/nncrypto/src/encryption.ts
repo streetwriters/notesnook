@@ -21,24 +21,28 @@ import {
   SerializedKey,
 } from "./types";
 
+const encoder = new TextEncoder();
 export default class Encryption {
+  private static transformInput(plaintext: Plaintext): Uint8Array {
+    let data: Uint8Array | null = null;
+    if (typeof plaintext.data === "string" && plaintext.format === "base64") {
+      data = from_base64(plaintext.data, base64_variants.ORIGINAL);
+    } else if (typeof plaintext.data === "string") {
+      data = encoder.encode(plaintext.data);
+    } else if (plaintext.data instanceof Uint8Array) {
+      data = plaintext.data;
+    }
+    if (!data) throw new Error("Data cannot be null.");
+    return data;
+  }
+
   static encrypt(
     key: SerializedKey,
     plaintext: Plaintext,
     outputFormat: OutputFormat = "uint8array"
   ): Cipher {
     const encryptionKey = KeyUtils.transform(key);
-
-    let data: Uint8Array | null = null;
-    if (typeof plaintext.data === "string" && plaintext.format === "base64") {
-      data = from_base64(plaintext.data, base64_variants.ORIGINAL);
-    } else if (typeof plaintext.data === "string") {
-      data = from_string(plaintext.data);
-    } else if (plaintext.data instanceof Uint8Array) {
-      data = plaintext.data;
-    }
-
-    if (!data) throw new Error("Data cannot be null.");
+    const data = this.transformInput(plaintext);
 
     const nonce = randombytes_buf(crypto_aead_xchacha20poly1305_ietf_NPUBBYTES);
 

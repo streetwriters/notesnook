@@ -35,9 +35,9 @@ export default class KeyUtils {
     };
   }
 
-  static exportKey(password: string, salt: string): string {
-    const { key } = this.deriveKey(password, salt);
-    return to_base64(key);
+  static exportKey(password: string, salt?: string): SerializedKey {
+    const { key, salt: keySalt } = this.deriveKey(password, salt);
+    return { key: to_base64(key), salt: keySalt };
   }
 
   /**

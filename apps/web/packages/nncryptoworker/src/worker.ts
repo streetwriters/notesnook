@@ -16,11 +16,11 @@ async function loadNNCrypto(): Promise<NNCrypto> {
 }
 
 const module = {
-  exportKey: async function (password: string, salt: string) {
+  exportKey: async function (password: string, salt?: string) {
     const crypto = await loadNNCrypto();
     return crypto.exportKey(password, salt);
   },
-  deriveKey: async function (password: string, salt: string) {
+  deriveKey: async function (password: string, salt?: string) {
     const crypto = await loadNNCrypto();
     return crypto.deriveKey(password, salt);
   },

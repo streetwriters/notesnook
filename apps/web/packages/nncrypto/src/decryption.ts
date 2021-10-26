@@ -7,6 +7,7 @@ import {
   base64_variants,
   StateAddress,
   to_string,
+  from_hex,
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
 import {
@@ -18,15 +19,8 @@ import {
 } from "./types";
 
 export default class Decryption {
-  static decrypt(
-    key: SerializedKey,
-    cipherData: Cipher,
-    outputFormat: OutputFormat = "text"
-  ): Plaintext {
-    if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
-
-    const encryptionKey = KeyUtils.transform(key);
-    let input: Uint8Array = cipherData.cipher as Uint8Array;
+  private static transformInput(cipherData: Cipher): Uint8Array {
+    let input: Uint8Array | null = null;
     if (
       typeof cipherData.cipher === "string" &&
       cipherData.format === "base64"
@@ -35,8 +29,27 @@ export default class Decryption {
         cipherData.cipher,
         base64_variants.URLSAFE_NO_PADDING
       );
+    } else if (
+      typeof cipherData.cipher === "string" &&
+      cipherData.format === "hex"
+    ) {
+      input = from_hex(cipherData.cipher);
+    } else if (cipherData.cipher instanceof Uint8Array) {
+      input = cipherData.cipher;
     }
+    if (!input) throw new Error("Data cannot be null.");
+    return input;
+  }
 
+  static decrypt(
+    key: SerializedKey,
+    cipherData: Cipher,
+    outputFormat: OutputFormat = "text"
+  ): Plaintext {
+    if (!key.salt && cipherData.salt) key.salt = cipherData.salt;
+    const encryptionKey = KeyUtils.transform(key);
+
+    const input = this.transformInput(cipherData);
     const plaintext = crypto_aead_xchacha20poly1305_ietf_decrypt(
       null,
       input,

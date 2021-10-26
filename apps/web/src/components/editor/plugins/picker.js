@@ -4,6 +4,7 @@ import { db } from "../../../common/db";
 import { showProgressDialog } from "../../../common/dialog-controller";
 import fs from "../../../interfaces/fs";
 import { formatBytes } from "../../../utils/filename";
+import { showToast } from "../../../utils/toast";
 
 function register(editor) {
   editor.ui.registry.addButton("attachment", {
@@ -36,99 +37,115 @@ async function insertFile(editor) {
 })();
 
 async function pickFile() {
-  const key = await getEncryptionKey();
+  try {
+    const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
+    if (!selectedFile) return;
 
-  const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
-  if (!selectedFile) return;
+    const result = await showProgressDialog({
+      title: `Encrypting attachment`,
+      subtitle: "Please wait while we encrypt this attachment for upload.",
+      message: selectedFile.name,
+      total: formatBytes(selectedFile.size, 0),
+      setProgress: (set) => {
+        const event = AppEventManager.subscribe(
+          AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+          ({ type, total, loaded }) => {
+            if (type !== "encrypt") return;
 
-  const result = await showProgressDialog({
-    title: `Encrypting attachment`,
-    subtitle: "Please wait while we encrypt this attachment for upload.",
-    message: selectedFile.name,
-    total: formatBytes(selectedFile.size, 0),
-    setProgress: (set) => {
-      const event = AppEventManager.subscribe(
-        AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-        ({ type, total, loaded }) => {
-          if (type !== "encrypt") return;
+            const percent = Math.round((loaded / total) * 100);
+            set({ loaded: formatBytes(loaded, 0), progress: percent });
+          }
+        );
+        return () => {
+          event.unsubscribe();
+        };
+      },
+      action: async () => {
+        const key = await getEncryptionKey();
 
-          const percent = Math.round((loaded / total) * 100);
-          set({ loaded: formatBytes(loaded, 0), progress: percent });
+        const reader = selectedFile.stream().getReader();
+        const { hash, type: hashType } = await fs.hashStream(reader);
+        reader.releaseLock();
+
+        let output = {};
+        if (!db.attachments.exists(hash)) {
+          output = await fs.writeEncryptedFile(selectedFile, key, hash);
         }
-      );
-      return () => {
-        event.unsubscribe();
-      };
-    },
-    action: async () => {
-      const reader = selectedFile.stream().getReader();
-      const { hash, type: hashType } = await fs.hashStream(reader);
-      reader.releaseLock();
 
-      let output = {};
-      if (!db.attachments.exists(hash)) {
-        output = await fs.writeEncryptedFile(selectedFile, key, hash);
-      }
+        await db.attachments.add({
+          ...output,
+          hash,
+          hashType,
+          filename: selectedFile.name,
+          type: selectedFile.type,
+          key,
+        });
 
-      await db.attachments.add({
-        ...output,
-        hash,
-        hashType,
-        salt: "helloworld",
-        filename: selectedFile.name,
-        type: selectedFile.type,
-      });
-
-      return {
-        hash: hash,
-        filename: selectedFile.name,
-        type: selectedFile.type,
-        size: selectedFile.size,
-      };
-    },
-  });
-
-  if (!result.hash) throw new Error("Could not add attachment.");
-  return result;
+        return {
+          hash: hash,
+          filename: selectedFile.name,
+          type: selectedFile.type,
+          size: selectedFile.size,
+        };
+      },
+    });
+    if (!result.hash) throw new Error("Could not add attachment.");
+    return result;
+  } catch (e) {
+    showToast(
+      "error",
+      `${e.message} You need internet access to attach a file.`
+    );
+  }
 }
 
 async function pickImage() {
-  const key = await getEncryptionKey();
+  try {
+    const selectedImage = await showFilePicker({
+      acceptedFileTypes: "image/*",
+    });
+    if (!selectedImage) return;
 
-  const selectedImage = await showFilePicker({ acceptedFileTypes: "image/*" });
-  if (!selectedImage) return;
+    const key = await getEncryptionKey();
 
-  const { dataurl, blob } = await compressImage(selectedImage, "buffer");
+    const { dataurl, blob } = await compressImage(selectedImage, "buffer");
 
-  const reader = blob.stream().getReader();
-  const { hash, type: hashType } = await fs.hashStream(reader);
-  reader.releaseLock();
+    const reader = blob.stream().getReader();
+    const { hash, type: hashType } = await fs.hashStream(reader);
+    reader.releaseLock();
 
-  var output = {};
-  if (!db.attachments.exists(hash)) {
-    output = await fs.writeEncryptedFile(blob, key, hash);
+    var output = {};
+    if (!db.attachments.exists(hash)) {
+      output = await fs.writeEncryptedFile(blob, key, hash);
+    }
+
+    await db.attachments.add({
+      ...output,
+      key,
+      hash,
+      hashType,
+      filename: selectedImage.name,
+      type: selectedImage.type,
+    });
+
+    return {
+      hash,
+      filename: selectedImage.name,
+      type: selectedImage.type,
+      size: selectedImage.size,
+      dataurl,
+    };
+  } catch (e) {
+    showToast(
+      "error",
+      `${e.message} You need internet access to attach an image.`
+    );
   }
-
-  await db.attachments.add({
-    ...output,
-    hash,
-    hashType,
-    filename: selectedImage.name,
-    type: selectedImage.type,
-  });
-
-  return {
-    hash,
-    filename: selectedImage.name,
-    type: selectedImage.type,
-    size: selectedImage.size,
-    dataurl,
-  };
 }
 
 async function getEncryptionKey() {
-  const key = await db.user.getEncryptionKey();
-  if (!key) throw new Error("No encryption key found. Are you logged in?");
+  const key = await db.attachments.generateKey();
+  if (!key) throw new Error("Could not generate a new encryption key.");
   return key; // { password: "helloworld" };
 }
 

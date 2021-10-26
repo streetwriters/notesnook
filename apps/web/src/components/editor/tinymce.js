@@ -245,8 +245,9 @@ function TinyMCE(props) {
           const attachment = db.attachments.attachment(hash);
           if (!attachment) return;
           await db.fs.downloadFile(hash, hash);
+          const key = await db.attachments.decryptKey(attachment.key);
           await FS.saveFile(hash, {
-            key: await db.user.getEncryptionKey(),
+            key,
             iv: attachment.iv,
             name: attachment.metadata.filename,
             type: attachment.metadata.type,
