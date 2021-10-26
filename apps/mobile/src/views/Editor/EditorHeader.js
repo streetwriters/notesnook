@@ -332,7 +332,7 @@ const EditorHeader = () => {
               onPress={showActionsheet}
             />
 
-            {loading ? (
+            {loading && loading.current !== loading.total ? (
               <View
                 style={{
                   justifyContent: 'center',
