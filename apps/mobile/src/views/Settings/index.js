@@ -57,7 +57,6 @@ import {
   APP_VERSION,
   InteractionManager,
   MenuItemsList,
-  preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
@@ -384,16 +383,16 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
       }}
       style={{
         height: 50,
-        backgroundColor: colors.nav,
         paddingHorizontal: 12,
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
         width: '95%',
         alignSelf: 'center',
-        borderRadius: 5,
         marginBottom: 5,
-        marginTop: 5
+        marginTop: 5,
+        borderBottomWidth:1,
+        borderBottomColor:colors.nav
       }}>
       {collapsed ? (
         <Paragraph
@@ -778,17 +777,16 @@ const SettingsUserSection = () => {
                 width: '100%',
                 paddingVertical: 12,
                 backgroundColor: colors.bg,
-                borderRadius: 5,
-                paddingHorizontal: 12,
-                borderWidth: 1,
-                borderColor: colors.accent
+                borderRadius: 5
               }}>
               <View
                 style={{
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 2.5
+                  paddingBottom: 2.5,
+                  borderBottomWidth: 1,
+                  borderColor: colors.accent
                 }}>
                 <View
                   style={{
@@ -839,6 +837,9 @@ const SettingsUserSection = () => {
                     <Seperator />
                     <Paragraph
                       size={SIZE.lg}
+                      style={{
+                        textAlign: 'center'
+                      }}
                       color={
                         (subscriptionDaysLeft.time > 5 &&
                           !subscriptionDaysLeft.isHour) ||
@@ -848,15 +849,19 @@ const SettingsUserSection = () => {
                       }>
                       {isExpired
                         ? 'Your subscription has ended.'
-                        : `${subscriptionDaysLeft.time} ${
-                            subscriptionDaysLeft.isHour ? 'hours' : 'days'
-                          } remaining`}
+                        : user.subscription?.type === 1
+                        ? `Your trial has started`
+                        : `Subscribed to Notesnook Pro`}
                     </Paragraph>
-                    <Paragraph color={colors.pri}>
+                    <Paragraph
+                      style={{
+                        textAlign: 'center'
+                      }}
+                      color={colors.pri}>
                       {user.subscription?.type === 2
                         ? 'You signed up on ' + startDate
                         : user.subscription?.type === 1
-                        ? 'Your trial period started on ' + startDate
+                        ? 'Your trial will end on ' + expiryDate
                         : user.subscription?.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
@@ -864,7 +869,7 @@ const SettingsUserSection = () => {
                         : user.subscription?.type === 7
                         ? `Your subscription will end on ${expiryDate}.`
                         : user.subscription?.type === 5
-                        ? `Your subscription will auto renew on ${expiryDate}.`
+                        ? `Your subscription will renew on ${expiryDate}.`
                         : null}
                     </Paragraph>
                   </View>
@@ -901,7 +906,7 @@ const SettingsUserSection = () => {
                               } / mo)`
                         }
                         height={50}
-                        type="transparent"
+                        type="accent"
                       />
                     </>
                   )}
@@ -1197,7 +1202,6 @@ const SettingsAppearanceSection = () => {
                 onPress={async () => {
                   await PremiumService.verify(async () => {
                     changeAccentColor(item);
-                    preloadImages(item);
                     await MMKV.setStringAsync('accentColor', item);
                   });
                 }}
