@@ -25,13 +25,21 @@
  * Syncing should pause until all the conflicts have been resolved
  * And then it should continue.
  */
-import { EV, EVENTS, sendAttachmentsProgressEvent } from "../../common";
+import {
+  checkIsUserPremium,
+  CHECK_IDS,
+  EV,
+  EVENTS,
+  sendAttachmentsProgressEvent,
+} from "../../common";
 import Constants from "../../utils/constants";
 import http from "../../utils/http";
 import TokenManager from "../token-manager";
 import Collector from "./collector";
 import Merger from "./merger";
 import { areAllEmpty } from "./utils";
+import { Mutex, withTimeout } from "async-mutex";
+
 export default class Sync {
   /**
    *
@@ -42,109 +50,107 @@ export default class Sync {
     this._collector = new Collector(this._db);
     this._merger = new Merger(this._db);
     this._tokenManager = new TokenManager(this._db.storage);
-    this._isSyncing = false;
-  }
+    this._autoSyncTimeout = 0;
+    this._autoSyncInterval = 0;
 
-  async _fetch(lastSynced, token) {
-    return await http.get(
-      `${Constants.API_HOST}/sync?lst=${lastSynced}`,
-      token
+    this.syncMutex = withTimeout(
+      new Mutex(),
+      20 * 1000,
+      new Error("Sync timed out.")
     );
-  }
-
-  async _fetchAttachments(lastSynced, token) {
-    return await http.get(
-      `${Constants.API_HOST}/sync/attachments?lst=${lastSynced}`,
-      token
-    );
-  }
-
-  async _performChecks() {
-    let lastSynced = (await this._db.storage.read("lastSynced")) || 0;
-    let token = await this._tokenManager.getAccessToken();
-
-    // update the conflicts status and if find any, throw
-    await this._db.conflicts.recalculate();
-    await this._db.conflicts.check();
-
-    return { lastSynced, token };
   }
 
   async start(full, force) {
-    if (this._isSyncing) return false;
+    if (this.syncMutex.isLocked()) return false;
 
-    if (force) await this._db.storage.write("lastSynced", 0);
-    let { lastSynced, token } = await this._performChecks();
-
-    try {
-      const now = Date.now();
-      this._isSyncing = true;
-
-      await this._mergeAttachments(token, lastSynced);
-      await this._uploadAttachments();
-
-      // we prepare local data before merging so we always have correct data
-      const data = await this._collector.collect(lastSynced);
-      data.lastSynced = now;
-
-      if (full) {
-        var serverResponse = await this._fetch(lastSynced, token);
-        // merge the server response
-        await this._merger.merge(serverResponse, lastSynced);
-      }
-
-      // check for conflicts and throw
-      await this._db.conflicts.check();
-
-      // send the data back to server
-      lastSynced = await this._send(data, token);
-
-      // update our lastSynced time
-      if (lastSynced) {
-        await this._db.storage.write("lastSynced", lastSynced);
-      }
-
-      return true;
-    } catch (e) {
-      this._isSyncing = false;
-      throw e;
-    } finally {
-      this._isSyncing = false;
-    }
+    return this.syncMutex
+      .runExclusive(() => {
+        this.stopAutoSync();
+        return this._sync(full, force);
+      })
+      .finally(() => this._afterSync());
   }
 
-  async eventMerge(serverResponse) {
+  async _sync(full, force) {
     let { lastSynced, token } = await this._performChecks();
+    if (force) lastSynced = 0;
 
+    // We request and merge remote attachments beforehand to handle
+    // all possible conflicts that will occur if a user attaches
+    // the same file/image on both his devices. Since both files
+    // will have the same hash but different encryption key, it
+    // will cause problems on the local device.
+    await this._mergeAttachments(token, lastSynced);
+
+    // All pending attachments are uploaded before anything else.
+    // This is done to ensure that when any note arrives on user's
+    // device, its attachments can be downloaded.
+    await this._uploadAttachments();
+
+    // We collect, encrypt, and ready local changes before asking
+    // the server for remote changes. This is done to ensure we
+    // don't accidentally send the remote changes back to the server.
     const data = await this._collector.collect(lastSynced);
-
-    // merge the server response
-    await this._merger.merge(serverResponse, lastSynced);
-
-    // check for conflicts and throw
-    await this._db.conflicts.check();
-
-    // send the data back to server
-    lastSynced = await this._send(data, token);
-
-    // update our lastSynced time
-    if (lastSynced) {
-      await this._db.storage.write("lastSynced", lastSynced);
+    if (full) {
+      // We request remote changes and merge them. If any new changes
+      // come before or during this step (e.g. SSE), it can be safely
+      // ignored because the `lastSynced` time can never be newer
+      // than the change time.
+      var serverResponse = await this._fetch(lastSynced, token);
+      await this._merger.merge(serverResponse, lastSynced);
+      await this._db.conflicts.check();
+      // ignore the changes that have arrived uptil this point.
+      this.hasNewChanges = false;
     }
 
-    EV.publish(EVENTS.appRefreshRequested);
+    // We update the local last synced time before pushing local data
+    // to the server. This is necessary to ensure that if the user
+    // makes any local changes during the HTTP request, it is not ignored.
+    // This is also the last synced time that is set for later sync cycles.
+    data.lastSynced = Date.now();
+    if (areAllEmpty(data)) await this._send(data, token);
 
-    // check for conflicts and throw
-    // await this._db.conflicts.check();
+    await this._db.storage.write("lastSynced", data.lastSynced);
+    return true;
+  }
 
-    // TODO test this.
-    // we won't be updating lastSynced time here because
-    // it can cause the lastSynced time to move ahead of any
-    // last edited (but unsynced) time resulting in edited notes
-    // not getting synced.
-    // if (serverResponse.lastSynced) {
-    //   await this._db.storage.write("lastSynced", serverResponse.lastSynced);
-    // }
+  async remoteSync() {
+    if (this.syncMutex.isLocked()) {
+      this.hasNewChanges = true;
+      return;
+    }
+    await this.syncMutex
+      .runExclusive(async () => {
+        this.stopAutoSync();
+        await this._sync(true, false);
+        EV.publish(EVENTS.appRefreshRequested);
+      })
+      .finally(() => this._afterSync());
+  }
+
+  async startAutoSync() {
+    if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
+    this.databaseUpdatedEvent = EV.subscribe(
+      EVENTS.databaseUpdated,
+      this._scheduleSync.bind(this)
+    );
+  }
+
+  stopAutoSync() {
+    clearTimeout(this._autoSyncTimeout);
+    this.databaseUpdatedEvent.unsubscribe();
+  }
+
+  async _afterSync() {
+    if (!this.nextSyncTimestamp) this.startAutoSync();
+    else return this.remoteSync();
+  }
+
+  _scheduleSync() {
+    this.stopAutoSync();
+    this._autoSyncTimeout = setTimeout(() => {
+      EV.publish(EVENTS.databaseSyncRequested);
+    }, this._autoSyncTimeout);
   }
 
   async _send(data, token) {
@@ -180,5 +186,30 @@ export default class Sync {
     } finally {
       sendAttachmentsProgressEvent("upload", null, attachments.length);
     }
+  }
+
+  async _performChecks() {
+    let lastSynced = (await this._db.lastSynced()) || 0;
+    let token = await this._tokenManager.getAccessToken();
+
+    // update the conflicts status and if find any, throw
+    await this._db.conflicts.recalculate();
+    await this._db.conflicts.check();
+
+    return { lastSynced, token };
+  }
+
+  async _fetch(lastSynced, token) {
+    return await http.get(
+      `${Constants.API_HOST}/sync?lst=${lastSynced}`,
+      token
+    );
+  }
+
+  async _fetchAttachments(lastSynced, token) {
+    return await http.get(
+      `${Constants.API_HOST}/sync/attachments?lst=${lastSynced}`,
+      token
+    );
   }
 }

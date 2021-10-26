@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@stablelib/blake2s": "^1.0.1",
+    "async-mutex": "^0.3.2",
     "dayjs": "^1.10.6",
     "fast-sort": "^2.0.1",
     "no-internet": "^1.5.2",

@@ -22,6 +22,7 @@ import Monographs from "./monographs";
 import Offers from "./offers";
 import Attachments from "../collections/attachments";
 import Debug from "./debug";
+import { Mutex } from "async-mutex";
 
 /**
  * @type {EventSource}
@@ -34,10 +35,13 @@ class Database {
    * @param {EventSource} eventsource
    */
   constructor(storage, eventsource, fs) {
+    /**
+     * @type {EventSource}
+     */
+    this.evtSource = null;
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
     NNEventSource = eventsource;
-    this._syncTimeout = 0;
   }
 
   async _validate() {
@@ -60,13 +64,9 @@ class Database {
     });
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();
-      clearTimeout(this._syncTimeout);
-      if (this.evtSource) {
-        this.evtSource.close();
-        this.evtSource = null;
-      }
+      this.syncer.stopAutoSync();
+      disconnectSSE();
     });
-    EV.subscribe(EVENTS.databaseUpdated, this._onDBWrite.bind(this));
 
     this.session = new Session(this.storage);
     await this._validate();
@@ -111,85 +111,79 @@ class Database {
     this.monographs.init();
   }
 
+  disconnectSSE() {
+    if (!this.evtSource) return;
+    this.evtSource.onopen = null;
+    this.evtSource.onmessage = null;
+    this.evtSource.onerror = null;
+    this.evtSource.close();
+    this.evtSource = null;
+  }
+
   async connectSSE(args) {
-    if (args && !!args.error) return;
+    await this.sseMutex.runExclusive(() => {
+      if (args && !!args.error) return;
 
-    this.monographs.init();
+      if (!NNEventSource) return;
+      this.disconnectSSE();
 
-    if (!NNEventSource) return;
-    if (this.evtSource) {
-      this.evtSource.close();
-      this.evtSource = null;
-    }
+      let token = await this.user.tokenManager.getAccessToken();
+      this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    let token = await this.user.tokenManager.getAccessToken();
-    this.evtSource = new NNEventSource(`${Constants.SSE_HOST}/sse`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      this.evtSource.onopen = async () => {
+        console.log("SSE: opened channel successfully!");
+      };
 
-    this.evtSource.onopen = async () => {
-      console.log("SSE: opened channel successfully!");
-    };
+      this.evtSource.onerror = function (error) {
+        console.log("SSE: error:", error);
+      };
 
-    this.evtSource.onerror = function (error) {
-      console.log("SSE: error:", error);
-    };
+      this.evtSource.onmessage = async (event) => {
+        try {
+          var { type, data } = JSON.parse(event.data);
+          data = JSON.parse(data);
+          // console.log(type, data);
+        } catch (e) {
+          console.log("SSE: Unsupported message. Message = ", event.data);
+          return;
+        }
 
-    this.evtSource.onmessage = async (event) => {
-      try {
-        var { type, data } = JSON.parse(event.data);
-        data = JSON.parse(data);
-        // console.log(type, data);
-      } catch (e) {
-        console.log("SSE: Unsupported message. Message = ", event.data);
-        return;
-      }
-
-      switch (type) {
-        case "upgrade":
-          const user = await this.user.getUser();
-          user.subscription = data;
-          await this.user.setUser(user);
-          EV.publish(EVENTS.userSubscriptionUpdated, data);
-          break;
-        case "userDeleted":
-          await this.user.logout(false, "Account Deleted");
-          break;
-        case "userPasswordChanged":
-          await this.user.logout(true, "Password Changed");
-          break;
-        case "emailConfirmed":
-          const token = await this.storage.read("token");
-          await this.user.tokenManager._refreshToken(token);
-          await this.user.fetchUser(true);
-          EV.publish(EVENTS.userEmailConfirmed);
-          break;
-        case "sync":
+        switch (type) {
+          case "upgrade":
+            const user = await this.user.getUser();
+            user.subscription = data;
+            await this.user.setUser(user);
+            EV.publish(EVENTS.userSubscriptionUpdated, data);
+            break;
+          case "userDeleted":
+            await this.user.logout(false, "Account Deleted");
+            break;
+          case "userPasswordChanged":
+            await this.user.logout(true, "Password Changed");
+            break;
+          case "emailConfirmed":
+            const token = await this.storage.read("token");
+            await this.user.tokenManager._refreshToken(token);
+            await this.user.fetchUser(true);
+            EV.publish(EVENTS.userEmailConfirmed);
+            break;
+          case "sync":
             if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) break;
-          break;
-      }
-    };
+
+            await this.syncer.remoteSync(data);
+            break;
+        }
+      };
+    });
   }
 
   async lastSynced() {
     return this.storage.read("lastSynced");
   }
 
-  async _onDBWrite(item) {
-    if (
-      item.remote ||
-      !(await sendCheckUserStatusEvent(CHECK_IDS.databaseSync))
-    ) {
-      return;
-    }
-    clearTimeout(this._syncTimeout);
-    this._syncTimeout = setTimeout(() => {
-      EV.publish(EVENTS.databaseSyncRequested);
-    }, 5 * 1000);
-  }
-
   sync(full = true, force = false) {
-    clearTimeout(this._syncTimeout);
     return this.syncer.start(full, force);
   }
 
