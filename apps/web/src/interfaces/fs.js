@@ -34,7 +34,7 @@ async function writeEncryptedFile(file, key, hash) {
   let encrypted = 0;
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
 
-  sendAttachmentsProgressEvent("encrypt", 1, 0);
+  sendAttachmentsProgressEvent("encrypt", hash, 1, 0);
 
   const iv = await crypto.encryptStream(
     key,
@@ -64,7 +64,7 @@ async function writeEncryptedFile(file, key, hash) {
     file.name
   );
 
-  sendAttachmentsProgressEvent("encrypt", 1);
+  sendAttachmentsProgressEvent("encrypt", hash, 1);
 
   return {
     iv: iv,
@@ -81,14 +81,19 @@ async function writeEncryptedFile(file, key, hash) {
  * 3. We encrypt the Uint8Array
  * 4. We save the encrypted Uint8Array
  */
-async function writeEncrypted(filename, { data, type, key, hash }) {
+async function writeEncrypted(filename, { data, type, key }) {
   if (type === "base64") data = new Uint8Array(Buffer.from(data, "base64"));
 
-  if (!hash) hash = await hashBuffer(data);
+  const { hash, type: hashType } = await hashBuffer(data);
   if (!filename) filename = hash;
 
-  const blob = new Blob([data], { type });
-  return await writeEncryptedFile(blob, key, hash);
+  const file = new File([data], filename, { type });
+  const result = await writeEncryptedFile(file, key, hash);
+  return {
+    ...result,
+    hash,
+    hashType,
+  };
 }
 
 /**
