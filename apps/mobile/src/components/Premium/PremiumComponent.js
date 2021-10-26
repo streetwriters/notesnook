@@ -41,7 +41,7 @@ const features = [
     title: 'Secure private vault for notes'
   },
   {
-    title: 'Full rich text editor with markdown support'
+    title: 'Full rich text editor with markdown'
   },
   {
     title: 'Export notes in PDF, Markdown and HTML'
@@ -53,7 +53,7 @@ const features = [
     title: 'Change app theme & accent colors'
   },
   {
-    title: 'Special Pro badge on our Discord server'
+    title: 'Pro badge on our Discord server'
   }
 ];
 
@@ -229,7 +229,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
       <View
         style={{
           borderRadius: 10,
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         {product?.type !== 'promo' ? (
           user ? (
@@ -238,7 +238,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'center',
-                marginBottom:10
+                marginBottom: 10
               }}>
               <Paragraph
                 onPress={() => {
@@ -339,7 +339,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                           Platform.OS
                         );
                         if (productId) {
-                          getPromo(productId)
+                          getPromo(productId);
                           ToastEvent.show({
                             heading: 'Discount applied!',
                             type: 'success',
@@ -526,7 +526,7 @@ const RenderItem = React.memo(
     return (
       <View
         style={{
-          paddingHorizontal: 12,
+          paddingHorizontal: 24,
           paddingVertical: 8,
           flexDirection: 'row',
           alignItems: 'center'
@@ -536,7 +536,7 @@ const RenderItem = React.memo(
           style={{
             marginLeft: 10
           }}
-          size={SIZE.md + 2}>
+          size={SIZE.md}>
           {item.title}
         </Paragraph>
       </View>

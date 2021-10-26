@@ -855,24 +855,6 @@ export const ActionSheetComponent = ({
                 }}
               />
             ) : null}
-            {note.type !== 'note' || refreshing ? null : (
-              <Button
-                onPress={async () => await Sync.run('local')}
-                title={
-                  user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'
-                }
-                type="shade"
-                height={30}
-                fontSize={SIZE.sm}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
-            )}
 
             {note.type === 'note' && (
               <Button
