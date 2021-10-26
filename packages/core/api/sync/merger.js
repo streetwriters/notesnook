@@ -66,7 +66,9 @@ class Merger {
 
   async _mergeArrayWithConflicts(array, mergeItem) {
     if (!array) return;
-    return Promise.all(array.map(mergeItem));
+    for (let item of array) {
+      await mergeItem(item);
+    }
   }
 
   async merge(serverResponse, lastSynced) {
