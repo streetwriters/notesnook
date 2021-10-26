@@ -2,7 +2,7 @@ import Collection from "./collection";
 import Notebook from "../models/notebook";
 import sort from "fast-sort";
 import getId from "../utils/id";
-import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { qclone } from "qclone";
 import setManipulator from "../utils/set";
 
@@ -65,7 +65,7 @@ export default class Notebooks extends Collection {
     if (
       !oldNotebook &&
       this.all.length >= 3 &&
-      !(await sendCheckUserStatusEvent(CHECK_IDS.notebookAdd))
+      !(await checkIsUserPremium(CHECK_IDS.notebookAdd))
     )
       return;
 

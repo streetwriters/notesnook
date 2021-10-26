@@ -1,4 +1,4 @@
-import { CHECK_IDS, EV, EVENTS, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 
 const ERASE_TIME = 1000 * 60 * 30;
 var ERASER_TIMEOUT = null;
@@ -46,7 +46,7 @@ export default class Vault {
    * @returns {Promise<Boolean>}
    */
   async create(password) {
-    if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
+    if (!(await checkIsUserPremium(CHECK_IDS.vaultAdd))) return;
 
     const vaultKey = await this._storage.read("vaultKey");
     if (!vaultKey || !vaultKey.cipher || !vaultKey.iv) {
@@ -115,7 +115,7 @@ export default class Vault {
    * @param {string} noteId The id of the note to lock
    */
   async add(noteId) {
-    if (!(await sendCheckUserStatusEvent(CHECK_IDS.vaultAdd))) return;
+    if (!(await checkIsUserPremium(CHECK_IDS.vaultAdd))) return;
 
     await this._check();
     await this._lockNote({ id: noteId }, this._password);

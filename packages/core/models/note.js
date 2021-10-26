@@ -2,7 +2,7 @@ import MarkdownBuilder from "../utils/templates/markdown/builder";
 import HTMLBuilder from "../utils/templates/html/builder";
 import TextBuilder from "../utils/templates/text/builder";
 import { getContentFromData } from "../content-types";
-import { CHECK_IDS, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, checkIsUserPremium } from "../common";
 import { addItem, deleteItem } from "../utils/array";
 
 export default class Note {
@@ -58,7 +58,7 @@ export default class Note {
    * @param {string?} rawContent - Use this raw content instead of generating itself
    */
   async export(to = "html", rawContent) {
-    if (to !== "txt" && !(await sendCheckUserStatusEvent(CHECK_IDS.noteExport)))
+    if (to !== "txt" && !(await checkIsUserPremium(CHECK_IDS.noteExport)))
       return false;
 
     const templateData = {
@@ -98,7 +98,7 @@ export default class Note {
   }
 
   async color(color) {
-    if (!(await sendCheckUserStatusEvent(CHECK_IDS.noteColor))) return;
+    if (!(await checkIsUserPremium(CHECK_IDS.noteColor))) return;
     await this.uncolor();
     let tag = await this._db.colors.add(color, this._note.id);
     await this._db.notes._collection.addItem({
@@ -119,7 +119,7 @@ export default class Note {
   async tag(tag) {
     if (
       this._db.tags.all.length >= 5 &&
-      !(await sendCheckUserStatusEvent(CHECK_IDS.noteTag))
+      !(await checkIsUserPremium(CHECK_IDS.noteTag))
     )
       return;
 

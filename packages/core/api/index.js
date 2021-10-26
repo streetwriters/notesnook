@@ -12,7 +12,7 @@ import Backup from "../database/backup";
 import Conflicts from "./sync/conflicts";
 import Session from "./session";
 import Constants from "../utils/constants";
-import { CHECK_IDS, EV, EVENTS, sendCheckUserStatusEvent } from "../common";
+import { CHECK_IDS, EV, EVENTS, checkIsUserPremium } from "../common";
 import Settings from "./settings";
 import Migrations from "./migrations";
 import Outbox from "./outbox";
@@ -165,8 +165,7 @@ class Database {
           EV.publish(EVENTS.userEmailConfirmed);
           break;
         case "sync":
-          if (await sendCheckUserStatusEvent(CHECK_IDS.databaseSync))
-            await this.syncer.eventMerge(data);
+            if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) break;
           break;
       }
     };

@@ -1,7 +1,7 @@
 import Migrator from "./migrator.js";
 import {
   CHECK_IDS,
-  sendCheckUserStatusEvent,
+  checkIsUserPremium,
   CURRENT_DATABASE_VERSION,
 } from "../common.js";
 import SparkMD5 from "spark-md5";
@@ -29,8 +29,7 @@ export default class Backup {
    * @param {boolean} encrypt
    */
   async export(type, encrypt = false) {
-    if (encrypt && !(await sendCheckUserStatusEvent(CHECK_IDS.backupEncrypt)))
-      return;
+    if (encrypt && !(await checkIsUserPremium(CHECK_IDS.backupEncrypt))) return;
 
     if (!validTypes.some((t) => t === type))
       throw new Error("Invalid type. It must be one of 'mobile' or 'web'.");

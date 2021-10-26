@@ -2,7 +2,7 @@ import EventManager from "./utils/event-manager";
 
 export const EV = new EventManager();
 
-export async function sendCheckUserStatusEvent(type) {
+export async function checkIsUserPremium(type) {
   if (process.env.NODE_ENV === "test") return true;
 
   const results = await EV.publishWithResult(EVENTS.userCheckStatus, type);
