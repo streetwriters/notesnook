@@ -24,7 +24,7 @@ function Toggle(props) {
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
-      <ReactToggle size={20} checked={isOn} icons={false} />
+      <ReactToggle size={20} onChange={() => {}} checked={isOn} icons={false} />
     </Flex>
   );
 }

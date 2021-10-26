@@ -3,7 +3,12 @@ import { Box, Button, Flex, Text } from "rebass";
 import ThemeProvider from "../components/theme-provider";
 import { CheckCircle, Loading, ArrowRight, Error } from "../components/icons";
 import Field from "../components/field";
-import { getQueryParams, navigate, useQueryParams } from "../navigation";
+import {
+  getQueryParams,
+  hardNavigate,
+  navigate,
+  useQueryParams,
+} from "../navigation";
 import { store as userstore } from "../stores/user-store";
 import { db } from "../common/db";
 import Config from "../utils/config";
@@ -56,7 +61,7 @@ const authTypes = {
       text: "Already have an account?",
       action: {
         text: "Log in",
-        onClick: () => navigate("/login", getQueryParams()),
+        onClick: () => hardNavigate("/login", getQueryParams()),
       },
     },
     labels: { email: "Your email", password: "Set password" },
@@ -109,7 +114,7 @@ const authTypes = {
       text: "Don't have an account?",
       action: {
         text: "Sign up!",
-        onClick: () => navigate("/signup", getQueryParams()),
+        onClick: () => hardNavigate("/signup", getQueryParams()),
       },
     },
     autoComplete: { password: "current-password" },
@@ -133,7 +138,7 @@ const authTypes = {
       text: "Remember your password?",
       action: {
         text: "Log in",
-        onClick: () => navigate("/login", getQueryParams()),
+        onClick: () => hardNavigate("/login", getQueryParams()),
       },
     },
     helpTexts: {
@@ -384,7 +389,7 @@ function Auth(props) {
                   alignSelf="start"
                   mt={2}
                   variant="anchor"
-                  onClick={() => navigate("/recover", getQueryParams())}
+                  onClick={() => hardNavigate("/recover", getQueryParams())}
                 >
                   Forgot password?
                 </Button>

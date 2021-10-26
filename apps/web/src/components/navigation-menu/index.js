@@ -19,7 +19,7 @@ import {
 } from "../icons";
 import { AnimatedFlex } from "../animated";
 import NavigationItem from "./navigation-item";
-import { navigate } from "../../navigation";
+import { hardNavigate, navigate } from "../../navigation";
 import { db } from "../../common/db";
 import useMobile from "../../utils/use-mobile";
 import { showRenameColorDialog } from "../../common/dialog-controller";
@@ -243,7 +243,7 @@ function NavigationMenu(props) {
           <NavigationItem
             title="Login"
             icon={Login}
-            onClick={() => navigate("/login")}
+            onClick={() => hardNavigate("/login")}
           />
         )}
         {bottomRoutes.map((item) => (

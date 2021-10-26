@@ -21,7 +21,7 @@ import ScrollContainer from "../components/scroll-container";
 import { showLoadingDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../common/dialog-controller";
-import { hashNavigate, navigate } from "../navigation";
+import { hardNavigate, hashNavigate } from "../navigation";
 import useVersion from "../utils/useVersion";
 import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
@@ -179,7 +179,7 @@ function Settings(props) {
             p={1}
             sx={{ borderRadius: "default", cursor: "pointer" }}
             onClick={async () => {
-              navigate("/login", { redirect: "/settings" });
+              hardNavigate("/login", { redirect: "/settings" });
             }}
           >
             <Flex

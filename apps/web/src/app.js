@@ -1,12 +1,11 @@
 import React, { useState, Suspense } from "react";
-import { Box, Flex, Text } from "rebass";
+import { Box, Flex } from "rebass";
 import ThemeProvider from "./components/theme-provider";
 import { AnimatedFlex } from "./components/animated";
 import NavigationMenuPlaceholder from "./components/navigationmenu/index.lite";
 import StatusBarPlaceholder from "./components/statusbar/index.lite";
 import useMobile from "./utils/use-mobile";
 import useTablet from "./utils/use-tablet";
-import { Loading } from "./components/icons";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import Loader from "./components/loader";

@@ -91,3 +91,7 @@ const HOMEPAGE_ROUTE = {
 export function getHomeRoute() {
   return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
 }
+
+export function hardNavigate(route) {
+  window.location.assign(route);
+}

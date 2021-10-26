@@ -17,6 +17,10 @@ async function loadNNCrypto() {
 }
 
 var instance = null;
+/**
+ *
+ * @returns {Promise<import("nncrypto/src/interfaces").INNCrypto>}
+ */
 export async function getNNCrypto() {
   if (instance) return instance;
   const NNCrypto = await loadNNCrypto();

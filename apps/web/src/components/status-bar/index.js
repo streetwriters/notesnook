@@ -5,7 +5,7 @@ import { Circle, Sync, Loading, Update } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "timeago-react";
-import { hashNavigate, navigate } from "../../navigation";
+import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import useAutoUpdater from "../../hooks/use-auto-updater";
 import downloadUpdate from "../../commands/download-update";
 import installUpdate from "../../commands/install-update";
@@ -73,7 +73,7 @@ function StatusBar() {
           <Button
             variant="statusitem"
             display="flex"
-            onClick={() => navigate("/login")}
+            onClick={() => hardNavigate("/login")}
             sx={{ alignItems: "center", justifyContent: "center" }}
           >
             <Circle size={7} color="error" />

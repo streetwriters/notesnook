@@ -10,6 +10,7 @@ import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";
 import Modal from "react-modal";
+import useDatabase from "./hooks/use-database";
 
 Modal.setAppElement("#root");
 if (process.env.NODE_ENV === "production") {
@@ -27,9 +28,11 @@ export default function AppEffects({ setShow }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
+  const [isAppLoaded] = useDatabase();
 
   useEffect(
     function initializeApp() {
+      if (!isAppLoaded) return;
       refreshColors();
       refreshMenuPins();
       initUser();
@@ -41,6 +44,7 @@ export default function AppEffects({ setShow }) {
       })();
     },
     [
+      isAppLoaded,
       updateLastSynced,
       refreshColors,
       refreshMenuPins,
