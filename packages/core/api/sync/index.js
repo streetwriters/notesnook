@@ -72,7 +72,7 @@ export default class Sync {
   }
 
   async _sync(full, force) {
-    let { lastSynced, token } = await this._performChecks();
+    let { lastSynced } = await this._performChecks();
     if (force) lastSynced = 0;
 
     // We request and merge remote attachments beforehand to handle
@@ -80,7 +80,7 @@ export default class Sync {
     // the same file/image on both his devices. Since both files
     // will have the same hash but different encryption key, it
     // will cause problems on the local device.
-    await this._mergeAttachments(token, lastSynced);
+    await this._mergeAttachments(lastSynced);
 
     // All pending attachments are uploaded before anything else.
     // This is done to ensure that when any note arrives on user's
@@ -96,7 +96,7 @@ export default class Sync {
       // come before or during this step (e.g. SSE), it can be safely
       // ignored because the `lastSynced` time can never be newer
       // than the change time.
-      var serverResponse = await this._fetch(lastSynced, token);
+      var serverResponse = await this._fetch(lastSynced);
       await this._merger.merge(serverResponse, lastSynced);
       await this._db.conflicts.check();
       // ignore the changes that have arrived uptil this point.
@@ -110,7 +110,7 @@ export default class Sync {
 
     if (!areAllEmpty(data)) {
       data.lastSynced = Date.now();
-      lastSynced = await this._send(data, token);
+      lastSynced = await this._send(data);
     } else if (serverResponse) lastSynced = serverResponse.lastSynced;
 
     await this._db.storage.write("lastSynced", lastSynced);
@@ -160,17 +160,18 @@ export default class Sync {
     }, this._autoSyncTimeout);
   }
 
-  async _send(data, token) {
+  async _send(data) {
+    let token = await this._tokenManager.getAccessToken();
     let response = await http.post.json(
       `${Constants.API_HOST}/sync`,
       data,
       token
     );
-
     return response.lastSynced;
   }
 
-  async _mergeAttachments(token, lastSynced) {
+  async _mergeAttachments(lastSynced) {
+    let token = await this._tokenManager.getAccessToken();
     var serverResponse = await this._fetchAttachments(lastSynced, token);
     await this._merger.merge(serverResponse, lastSynced);
   }
@@ -197,23 +198,24 @@ export default class Sync {
 
   async _performChecks() {
     let lastSynced = (await this._db.lastSynced()) || 0;
-    let token = await this._tokenManager.getAccessToken();
 
     // update the conflicts status and if find any, throw
     await this._db.conflicts.recalculate();
     await this._db.conflicts.check();
 
-    return { lastSynced, token };
+    return { lastSynced };
   }
 
-  async _fetch(lastSynced, token) {
+  async _fetch(lastSynced) {
+    let token = await this._tokenManager.getAccessToken();
     return await http.get(
       `${Constants.API_HOST}/sync?lst=${lastSynced}`,
       token
     );
   }
 
-  async _fetchAttachments(lastSynced, token) {
+  async _fetchAttachments(lastSynced) {
+    let token = await this._tokenManager.getAccessToken();
     return await http.get(
       `${Constants.API_HOST}/sync/attachments?lst=${lastSynced}`,
       token
