@@ -28,10 +28,10 @@ export default class Content extends Collection {
         data: content.data || content,
         dateEdited: content.dateEdited,
         dateCreated: content.dateCreated,
-        remote: content.remote,
         localOnly: !!content.localOnly,
         conflicted: content.conflicted,
         dateResolved: content.dateResolved,
+        persistDateEdited: !!content.persistDateEdited,
       })
     );
     return id;

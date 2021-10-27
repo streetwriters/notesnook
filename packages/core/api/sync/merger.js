@@ -50,7 +50,6 @@ class Merger {
 
   async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
     let localItem = await get(remoteItem.id);
-
     remoteItem = await this._deserialize(remoteItem);
     if (!localItem) {
       await add(remoteItem);
@@ -58,6 +57,18 @@ class Merger {
       localItem.dateResolved !== remoteItem.dateEdited &&
       localItem.dateEdited > this._lastSynced
     ) {
+      // If time difference between local item's edits & remote item's edits
+      // is less than 1 minute, we shouldn't trigger a merge conflict; instead
+      // we will keep the most recently changed item.
+      const timeDiff =
+        Math.max(remoteItem.dateEdited, localItem.dateEdited) -
+        Math.min(remoteItem.dateEdited, localItem.dateEdited);
+      const ONE_MINUTE = 60 * 1000;
+      if (timeDiff < ONE_MINUTE) {
+        if (remoteItem.dateEdited > localItem.dateEdited) await add(remoteItem);
+        return;
+      }
+
       await markAsConflicted(localItem, remoteItem);
     } else {
       await add(remoteItem);

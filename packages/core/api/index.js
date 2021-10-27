@@ -39,6 +39,8 @@ class Database {
      * @type {EventSource}
      */
     this.evtSource = null;
+    this.sseMutex = new Mutex();
+
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
     NNEventSource = eventsource;
@@ -121,7 +123,7 @@ class Database {
   }
 
   async connectSSE(args) {
-    await this.sseMutex.runExclusive(() => {
+    await this.sseMutex.runExclusive(async () => {
       if (args && !!args.error) return;
 
       if (!NNEventSource) return;

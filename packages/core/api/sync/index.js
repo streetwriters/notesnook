@@ -100,17 +100,20 @@ export default class Sync {
       await this._merger.merge(serverResponse, lastSynced);
       await this._db.conflicts.check();
       // ignore the changes that have arrived uptil this point.
-      this.hasNewChanges = false;
+      // this.hasNewChanges = false;
     }
 
     // We update the local last synced time before pushing local data
     // to the server. This is necessary to ensure that if the user
     // makes any local changes during the HTTP request, it is not ignored.
     // This is also the last synced time that is set for later sync cycles.
-    data.lastSynced = Date.now();
-    if (areAllEmpty(data)) await this._send(data, token);
 
-    await this._db.storage.write("lastSynced", data.lastSynced);
+    if (!areAllEmpty(data)) {
+      data.lastSynced = Date.now();
+      lastSynced = await this._send(data, token);
+    } else if (serverResponse) lastSynced = serverResponse.lastSynced;
+
+    await this._db.storage.write("lastSynced", lastSynced);
     return true;
   }
 
@@ -122,6 +125,7 @@ export default class Sync {
     await this.syncMutex
       .runExclusive(async () => {
         this.stopAutoSync();
+        this.hasNewChanges = false;
         await this._sync(true, false);
         EV.publish(EVENTS.appRefreshRequested);
       })
@@ -138,12 +142,15 @@ export default class Sync {
 
   stopAutoSync() {
     clearTimeout(this._autoSyncTimeout);
-    this.databaseUpdatedEvent.unsubscribe();
+    if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
   }
 
   async _afterSync() {
-    if (!this.nextSyncTimestamp) this.startAutoSync();
-    else return this.remoteSync();
+    if (!this.hasNewChanges) {
+      this.startAutoSync();
+    } else {
+      return this.remoteSync();
+    }
   }
 
   _scheduleSync() {

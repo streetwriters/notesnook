@@ -30,7 +30,9 @@ export default class IndexedCollection {
     EV.publish(EVENTS.databaseUpdated, item);
 
     // if item is newly synced, remote will be true.
-    item.dateEdited = item.remote ? item.dateEdited : Date.now();
+    item.dateEdited =
+      item.remote || item.persistDateEdited ? item.dateEdited : Date.now();
+
     // the item has become local now, so remove the flags
     delete item.remote;
     delete item.migrated;
