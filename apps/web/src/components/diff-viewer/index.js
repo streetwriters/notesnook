@@ -55,17 +55,12 @@ function DiffViewer(props) {
     async ({ toKeep, toCopy, toKeepDateEdited, dateResolved }) => {
       if (!conflictedNote) return;
 
-      toKeep = await differ.clean(toKeep);
-      if (toCopy) toCopy = await differ.clean(toCopy);
-
       const toKeepContent = {
         data: toKeep,
         type: "tiny",
-        // HACK: we need to set remote = true so the database doesn't
-        // overwrite the dateEdited of the content.
-        remote: true,
         dateEdited: toKeepDateEdited,
         dateResolved,
+        persistDateEdited: true,
       };
 
       await db.notes.add({
@@ -159,7 +154,7 @@ function DiffViewer(props) {
   }, [theme]);
 
   useEffect(() => {
-    clearSession();
+    clearSession(false);
     setIsEditorOpen(true);
   }, [setIsEditorOpen, clearSession]);
 
@@ -282,8 +277,8 @@ function DiffViewer(props) {
               onToggle={() => setSelectedContent((s) => (s === 0 ? -1 : 0))}
               resolveConflict={({ saveCopy }) => {
                 resolveConflict({
-                  toKeep: htmlDiff.after,
-                  toCopy: saveCopy ? htmlDiff.before : null,
+                  toKeep: remoteContent.data,
+                  toCopy: saveCopy ? localContent.data : null,
                   toKeepDateEdited: localContent.dateEdited,
                   dateResolved: remoteContent.dateEdited,
                 });
@@ -324,8 +319,8 @@ function DiffViewer(props) {
             <ContentToggle
               resolveConflict={({ saveCopy }) => {
                 resolveConflict({
-                  toKeep: htmlDiff.before,
-                  toCopy: saveCopy ? htmlDiff.after : null,
+                  toKeep: localContent.data,
+                  toCopy: saveCopy ? remoteContent.data : null,
                   toKeepDateEdited: remoteContent.dateEdited,
                   dateResolved: remoteContent.dateEdited,
                 });
