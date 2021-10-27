@@ -1,6 +1,7 @@
 import http from "../utils/http";
 import constants from "../utils/constants";
 import { EV, EVENTS } from "../common";
+import { withTimeout, Mutex } from "async-mutex";
 
 const ENDPOINTS = {
   token: "/connect/token",
@@ -9,7 +10,6 @@ const ENDPOINTS = {
   logout: "/account/logout",
 };
 
-var isRefreshingToken = false;
 class TokenManager {
   /**
    *
@@ -17,13 +17,14 @@ class TokenManager {
    */
   constructor(storage) {
     this._storage = storage;
+    this._refreshTokenMutex = withTimeout(new Mutex(), 10 * 1000);
   }
 
   async getToken(renew = true, forceRenew = false) {
     let token = await this._storage.read("token");
     if (!token) return;
     if (forceRenew || (renew && this._isTokenExpired(token))) {
-      await this._refreshToken(token);
+      await this._refreshToken();
       return await this.getToken();
     }
     return token;
@@ -49,29 +50,15 @@ class TokenManager {
     }
   }
 
-  async _refreshToken(token) {
-    const { refresh_token, scope } = token;
-    if (!refresh_token || !scope) return;
+  async _refreshToken() {
+    await this._refreshTokenMutex.runExclusive(async () => {
+      const token = await this.getToken(false, false);
+      if (!this._isTokenExpired(token)) {
+        return;
+      }
 
-    if (isRefreshingToken) {
-      return new Promise((resolve, reject) => {
-        EV.subscribe(EVENTS.tokenRefreshed, onTokenRefreshed, true);
-
-        function onTokenRefreshed({ success, error }) {
-          clearTimeout(timeout);
-          if (success) return resolve();
-          else return reject(error);
-        }
-
-        const timeout = setTimeout(() => {
-          EV.unsubscribe(EVENTS.tokenRefreshed, onTokenRefreshed);
-          reject("Timeout while refreshing token.");
-        }, 15000);
-      });
-    }
-
-    isRefreshingToken = true;
-    try {
+      const { refresh_token, scope } = token;
+      if (!refresh_token || !scope) return;
       await this.saveToken(
         await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
           refresh_token,
@@ -80,17 +67,8 @@ class TokenManager {
           client_id: "notesnook",
         })
       );
-      EV.publish(EVENTS.tokenRefreshed, { success: true });
-    } catch (e) {
-      EV.publish(EVENTS.tokenRefreshed, {
-        success: false,
-        error: e,
-      });
-      console.error("Failed to refresh token:", e);
-      throw e;
-    } finally {
-      isRefreshingToken = false;
-    }
+      EV.publish(EVENTS.tokenRefreshed);
+    });
   }
 
   async revokeToken() {
