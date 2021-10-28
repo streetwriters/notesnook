@@ -6,6 +6,9 @@ import fs from "../../../interfaces/fs";
 import { formatBytes } from "../../../utils/filename";
 import { showToast } from "../../../utils/toast";
 
+const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
+const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+
 function register(editor) {
   editor.ui.registry.addButton("attachment", {
     icon: "attachment",
@@ -39,6 +42,8 @@ async function insertFile(editor) {
 async function pickFile() {
   try {
     const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
+    if (selectedFile.size > FILE_SIZE_LIMIT)
+      throw new Error("File too big. You cannot add files over 500 MB.");
     if (!selectedFile) return;
 
     const result = await showProgressDialog({
@@ -92,10 +97,7 @@ async function pickFile() {
     if (!result.hash) throw new Error("Could not add attachment.");
     return result;
   } catch (e) {
-    showToast(
-      "error",
-      `${e.message} You need internet access to attach a file.`
-    );
+    showToast("error", `${e.message}`);
   }
 }
 
@@ -178,13 +180,16 @@ function compressImage(file, type) {
     new Compressor(file, {
       quality: 0.8,
       mimeType: file.type,
-      maxWidth: 2000,
-      maxHeight: 2000,
+      maxWidth: 4000,
+      maxHeight: 4000,
       /**
        *
        * @param {Blob} result
        */
       async success(result) {
+        if (result.size > IMAGE_SIZE_LIMIT)
+          reject("Image too big. You cannot add images over 50 MB.");
+
         const buffer = await result.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
         resolve({
