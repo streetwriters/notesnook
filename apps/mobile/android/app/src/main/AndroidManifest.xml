@@ -84,7 +84,18 @@
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
-        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />    
+        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
+
+        <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.provider"
+        android:grantUriPermissions="true"
+        android:exported="false">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_viewer_provider_paths" />
+    </provider> 
+
         <provider
             android:name="com.vinzscam.reactnativefileviewer.FileProvider"
             android:authorities="${applicationId}.provider"
