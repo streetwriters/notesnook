@@ -14,7 +14,7 @@ function EditorFooter() {
       <Text variant="subBody" color="bgSecondaryText">
         {totalWords + " words"}
         <TextSeperator />
-        {timeConverter(dateEdited)}
+        {timeConverter(dateEdited || Date.now())}
         <TextSeperator />
         {isSaving ? "Saving" : "Saved"}
       </Text>
