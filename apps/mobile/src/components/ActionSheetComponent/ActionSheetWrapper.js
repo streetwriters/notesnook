@@ -73,6 +73,7 @@ const ActionSheetWrapper = ({
           : hexToRGBA(colors.shade)
       }
       onOpen={_onOpen}
+      keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
@@ -87,7 +88,7 @@ const ActionSheetWrapper = ({
       onClose={_onClose}>
       <BouncingView>
         {children}
-        <View style={{height: Platform.OS === 'ios' ? insets.bottom / 2 : 20}} />
+        <View style={{height: Platform.OS === 'ios' && insets.bottom !== 0 ? insets.bottom / 2 : 20}} />
       </BouncingView>
     </ActionSheet>
   );
