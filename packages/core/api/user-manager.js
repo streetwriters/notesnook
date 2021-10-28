@@ -198,7 +198,9 @@ class UserManager {
       );
       return JSON.parse(plainData);
     } catch (e) {
-      throw new Error("Could not get attachments encryption key.");
+      throw new Error(
+        `Could not get attachments encryption key. Please make sure you have Internet access. Error: ${e.message}`
+      );
     }
   }
 
