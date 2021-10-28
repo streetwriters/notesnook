@@ -266,8 +266,14 @@ async function downloadFile(filename, requestOptions) {
   if (await streamablefs.exists(filename)) return true;
 
   try {
-    const response = await axios.get(url, {
-      headers: process.env.NODE_ENV === "production" ? headers : null,
+    const signedUrlResponse = await axios.get(url, {
+      headers,
+      responseType: "text",
+    });
+    if (!isSuccessStatusCode(signedUrlResponse.status)) return false;
+
+    const signedUrl = signedUrlResponse.data;
+    const response = await axios.get(signedUrl, {
       responseType: "arraybuffer",
       cancelToken: cancellationToken,
       onDownloadProgress: (ev) =>
