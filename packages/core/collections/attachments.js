@@ -2,7 +2,12 @@ import Collection from "./collection";
 import id from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
 import hosts from "../utils/constants";
-import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
+import {
+  checkIsUserPremium,
+  EV,
+  EVENTS,
+  sendAttachmentsProgressEvent,
+} from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 
@@ -85,6 +90,9 @@ export default class Attachments extends Collection {
   }
 
   async generateKey() {
+    if (!(await checkIsUserPremium("attachment")))
+      throw new Error("Please upgrade your account to Pro to use attachments.");
+
     await this._getEncryptionKey();
     return await this._db.storage.generateRandomKey();
   }
