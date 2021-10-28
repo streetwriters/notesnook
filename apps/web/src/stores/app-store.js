@@ -167,6 +167,8 @@ class AppStore extends BaseStore {
         }
       })
       .finally(() => {
+        if (this.get().syncStatus === "conflicts") return;
+
         syncStatusTimeout = setTimeout(() => {
           this.set((state) => (state.syncStatus = "synced"));
         }, 3000);
