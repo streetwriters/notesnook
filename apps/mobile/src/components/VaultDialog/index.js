@@ -576,7 +576,7 @@ export class VaultDialog extends Component {
     text = `${note.title}\n \n ${text}`;
     try {
       await Share.open({
-        heading: 'Share note to',
+        heading: 'Share note',
         failOnCancel: false,
         message: text,
       });
