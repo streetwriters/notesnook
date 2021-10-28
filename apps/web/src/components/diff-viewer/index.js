@@ -110,7 +110,7 @@ function DiffViewer(props) {
 
       const content = await db.content.insertPlaceholders(
         await db.content.raw(note.contentId),
-        "placeholder.svg"
+        "/placeholder.svg"
       );
       if (!content.conflicted)
         return resolveConflict({
@@ -120,7 +120,7 @@ function DiffViewer(props) {
 
       content.conflicted = await db.content.insertPlaceholders(
         content.conflicted,
-        "placeholder.svg"
+        "/placeholder.svg"
       );
 
       setConflictedNote(note);

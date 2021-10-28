@@ -1,5 +1,3 @@
-import React from "react";
-import Note from "../../assets/note.svg";
 import Placeholder from "./index";
 import * as Icon from "../icons";
 import { hashNavigate } from "../../navigation";
@@ -7,7 +5,7 @@ import { hashNavigate } from "../../navigation";
 function NotesPlaceholder() {
   return (
     <Placeholder
-      image={Note}
+      id="note"
       title="Your notes"
       text="You have not made any notes yet."
       callToAction={{

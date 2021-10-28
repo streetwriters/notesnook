@@ -1,11 +1,9 @@
-import React from "react";
-import Fav from "../../assets/fav.svg";
 import Placeholder from "./index";
 
 function FavoritesPlaceholder() {
   return (
     <Placeholder
-      image={Fav}
+      id="favorites"
       title="Your favorites"
       text="Notes you favorite will appear here."
     />

@@ -1,14 +1,12 @@
-import React, { useEffect } from "react";
-import { Button, Flex, Image, Text } from "rebass";
+import React from "react";
+import { Button, Flex, Text } from "rebass";
 import { useStore } from "../../stores/theme-store";
 import { changeSvgTheme } from "../../utils/css";
 
+const PlaceholderLoader = React.lazy(() => import("./loader"));
 function Placeholder(props) {
   const accent = useStore((store) => store.accent);
-  useEffect(() => {
-    changeSvgTheme(accent);
-  }, [accent]);
-  const { image: PlaceholderImage, text, callToAction } = props;
+  const { id, text, callToAction } = props;
 
   return (
     <>
@@ -17,7 +15,16 @@ function Placeholder(props) {
         alignSelf="stretch"
         sx={{ position: "relative" }}
       >
-        <Image src={PlaceholderImage} width={"100%"} height={"100px"} />
+        <React.Suspense fallback={<div />}>
+          <PlaceholderLoader
+            onLoad={() => {
+              changeSvgTheme(accent);
+            }}
+            name={id}
+            width={"150px"}
+            height={"150px"}
+          />
+        </React.Suspense>
         <Text
           variant="body"
           mt={2}
