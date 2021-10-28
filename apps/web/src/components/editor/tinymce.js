@@ -103,6 +103,8 @@ const premiumCommands = [
   "JustifyCenter",
   "FontSize",
   "mceMedia",
+  "mceAttachFile",
+  "mceAttachImage",
 ];
 
 function useSkin() {
@@ -117,8 +119,8 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "icons picker blockescape keyboardquirks collapsibleheaders attachmentshandler shortlink paste codeblock inlinecode checklist",
-  pro: "textpattern",
+    "icons blockescape keyboardquirks collapsibleheaders shortlink paste codeblock inlinecode checklist attachmentshandler",
+  pro: "textpattern picker",
 };
 
 function TinyMCE(props) {
@@ -240,7 +242,7 @@ function TinyMCE(props) {
         invalid_styles: {
           span: "--progress",
         },
-        extended_valid_elements: `img[*|src=placeholder.svg]`,
+        extended_valid_elements: `img[*|src=/placeholder.svg]`,
         attachmenthandler_download_attachment: async (hash) => {
           const attachment = db.attachments.attachment(hash);
           if (!attachment) return;
