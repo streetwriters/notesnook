@@ -131,7 +131,7 @@ function GroupHeader(props) {
       <Text
         variant="subtitle"
         fontSize={isCompact ? "body" : "subtitle"}
-        color={"primary"}
+        color={title === "Conflicted" ? "error" : "primary"}
       >
         {title}
       </Text>
