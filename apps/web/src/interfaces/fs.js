@@ -52,13 +52,13 @@ async function writeEncryptedFile(file, key, hash) {
           data: chunk,
         };
       },
-      write: (chunk) => {
-        encrypted += chunk.length - ABYTES;
+      write: async (chunk) => {
+        encrypted += chunk.data.length - ABYTES;
         reportProgress(
           { total: file.size, loaded: encrypted },
           { type: "encrypt", hash }
         );
-        return fileHandle.write(chunk);
+        await fileHandle.write(chunk.data);
       },
     },
     file.name
@@ -134,8 +134,7 @@ async function readEncrypted(filename, key, cipherData) {
   }
 
   const reader = fileHandle.getReader();
-  const ENCRYPTED_SIZE = fileHandle.file.size + fileHandle.file.chunks * ABYTES;
-  const plainText = new Uint8Array(ENCRYPTED_SIZE);
+  const plainText = new Uint8Array(fileHandle.file.size);
   let offset = 0;
 
   const crypto = await getNNCrypto();
@@ -148,10 +147,8 @@ async function readEncrypted(filename, key, cipherData) {
         return value;
       },
       write: async (chunk) => {
-        if (!chunk) return;
-
         plainText.set(chunk, offset);
-        offset += chunk.length;
+        offset += chunk.data.length;
       },
     },
     filename
@@ -327,8 +324,7 @@ async function saveFile(filename, { key, iv, name, type }) {
         return value;
       },
       write: async (chunk) => {
-        if (!chunk) return;
-        else blobParts.push(chunk);
+        blobParts.push(chunk.data);
       },
     },
     filename

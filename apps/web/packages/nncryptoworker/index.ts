@@ -83,7 +83,14 @@ export class NNCryptoWorker implements INNCrypto {
     if (!this.workermodule) throw new Error("Worker module is not ready.");
     if (!this.worker) throw new Error("Worker is not ready.");
 
-    const eventListener = await this.createWorkerStream(streamId, stream);
+    const eventListener = await this.createWorkerStream(
+      streamId,
+      stream,
+      () => {
+        if (this.worker)
+          this.worker.removeEventListener("message", eventListener);
+      }
+    );
     this.worker.addEventListener("message", eventListener);
     const iv = await this.workermodule.createEncryptionStream(streamId, key);
     this.worker.removeEventListener("message", eventListener);
@@ -101,29 +108,43 @@ export class NNCryptoWorker implements INNCrypto {
     if (!this.workermodule) throw new Error("Worker module is not ready.");
     if (!this.worker) throw new Error("Worker is not ready.");
 
-    const eventListener = await this.createWorkerStream(streamId, stream);
+    const eventListener = await this.createWorkerStream(
+      streamId,
+      stream,
+      () => {
+        if (this.worker)
+          this.worker.removeEventListener("message", eventListener);
+      }
+    );
     this.worker.addEventListener("message", eventListener);
     await this.workermodule.createDecryptionStream(streamId, iv, key);
-    await stream.write(undefined);
     this.worker.removeEventListener("message", eventListener);
   }
 
   private async createWorkerStream(
     streamId: string,
-    stream: IStreamable
+    stream: IStreamable,
+    done: () => void
   ): Promise<EventListenerObject> {
     const readEventType = `${streamId}:read`;
     const writeEventType = `${streamId}:write`;
+    let finished = false;
     return {
       handleEvent: async (ev: MessageEvent) => {
+        if (finished) return;
+
         const { type } = ev.data;
         if (type === readEventType) {
           const chunk = await stream.read();
           if (!chunk || !this.worker) return;
           this.worker.postMessage({ type, data: chunk }, [chunk.data.buffer]);
         } else if (type === writeEventType) {
-          const { data } = ev.data as Chunk;
-          await stream.write(data);
+          const chunk = ev.data.data as Chunk;
+          await stream.write(chunk);
+          if (chunk.final) {
+            finished = true;
+            done();
+          }
         }
       },
     };

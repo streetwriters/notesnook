@@ -1,4 +1,5 @@
 import { ready } from "libsodium-wrappers";
+import { Chunk } from "streamablefs/dist/src/types";
 import Decryption from "./src/decryption";
 import Encryption from "./src/encryption";
 import { INNCrypto, IStreamable } from "./src/interfaces";
@@ -65,7 +66,12 @@ export class NNCrypto implements INNCrypto {
       if (!chunk) break;
 
       const { data, final } = chunk;
-      await stream.write(encryptionStream.write(data, final));
+
+      const encryptedChunk: Chunk = {
+        data: encryptionStream.write(data, final),
+        final,
+      };
+      await stream.write(encryptedChunk);
 
       if (final) break;
     }
@@ -84,7 +90,11 @@ export class NNCrypto implements INNCrypto {
       if (!chunk) break;
 
       const { data, final } = chunk;
-      await stream.write(decryptionStream.read(data));
+      const decryptedChunk: Chunk = {
+        data: decryptionStream.read(data),
+        final,
+      };
+      await stream.write(decryptedChunk);
 
       if (final) break;
     }

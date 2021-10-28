@@ -23,8 +23,8 @@ export default class WorkerStream
   /**
    * @param {Uint8Array} chunk
    */
-  async write(chunk: Uint8Array): Promise<void> {
-    postMessage({ type: `${this.id}:write`, data: chunk }, [chunk.buffer]);
+  async write(chunk: Chunk): Promise<void> {
+    postMessage({ type: `${this.id}:write`, data: chunk }, [chunk.data.buffer]);
   }
 }
 
