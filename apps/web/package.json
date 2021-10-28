@@ -48,6 +48,7 @@
     "react-virtuoso": "^1.9.3",
     "rebass": "^4.0.7",
     "streamablefs": "file:packages/streamablefs",
+    "timeago.js": "^4.0.2",
     "tinymce": "^5.10.0",
     "uzip": "^0.20201231.0",
     "web-streams-polyfill": "^3.1.1",

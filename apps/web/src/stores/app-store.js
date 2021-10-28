@@ -9,6 +9,7 @@ import BaseStore from "./index";
 import { showToast } from "../utils/toast";
 import { resetReminders } from "../common/reminders";
 
+var syncStatusTimeout = 0;
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
@@ -140,6 +141,7 @@ class AppStore extends BaseStore {
   };
 
   sync = async (full = true, force = false) => {
+    clearTimeout(syncStatusTimeout);
     this.updateLastSynced();
     this.set((state) => (state.isSyncing = true));
 
@@ -165,9 +167,9 @@ class AppStore extends BaseStore {
         }
       })
       .finally(() => {
-        setTimeout(() => {
+        syncStatusTimeout = setTimeout(() => {
           this.set((state) => (state.syncStatus = "synced"));
-        }, 5000);
+        }, 3000);
       });
   };
 }

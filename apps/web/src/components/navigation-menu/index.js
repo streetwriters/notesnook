@@ -77,7 +77,7 @@ function NavigationMenu(props) {
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
   const refreshMenuPins = useAppStore((store) => store.refreshMenuPins);
-  const isSyncing = useAppStore((store) => store.isSyncing);
+  const isSyncing = useAppStore((store) => store.syncStatus === "syncing");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const sync = useAppStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
