@@ -197,35 +197,41 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       if (restoring) {
         return;
       }
-      
+
       DocumentPicker.pickSingle()
         .then(r => {
           setRestoring(true);
-          fetch(r.uri).then(async r => {
-            try {
-              let backup = await r.json();
-              await db.backup.import(JSON.stringify(backup));
-              setRestoring(false);
-              initialize();
+          console.log(r.uri);
+          fetch(r.uri)
+            .then(async r => {
+              try {
+                let backup = await r.json();
+                //console.log(backup);
+                await db.backup.import(JSON.stringify(backup));
+                setRestoring(false);
+                initialize();
 
-              ToastEvent.show({
-                heading: 'Restore successful',
-                message: 'Your backup data has been restored successfully.',
-                type: 'success',
-                context: 'global'
-              });
-              actionSheetRef.current?.hide();
-            } catch (e) {
-              setRestoring(false);
-              ToastEvent.show({
-                heading: 'Restore failed',
-                message:
-                  'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
-                type: 'error',
-                context: 'local'
-              });
-            }
-          }).catch(console.log)
+                ToastEvent.show({
+                  heading: 'Restore successful',
+                  message: 'Your backup data has been restored successfully.',
+                  type: 'success',
+                  context: 'global'
+                });
+                actionSheetRef.current?.hide();
+              } catch (e) {
+                console.log(e);
+                setRestoring(false);
+                ToastEvent.show({
+                  heading: 'Restore failed',
+                  message:
+                    e.message ||
+                    'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
+                  type: 'error',
+                  context: 'local'
+                });
+              }
+            })
+            .catch(console.log);
         })
         .catch(console.log);
     }
