@@ -118,6 +118,10 @@ export default class Backup {
     reindex(data);
     const collections = [
       {
+        index: data["attachments"],
+        dbCollection: this._db.attachments,
+      },
+      {
         index: data["notebooks"],
         dbCollection: this._db.notebooks,
       },

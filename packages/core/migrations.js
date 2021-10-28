@@ -30,6 +30,7 @@ export const migrations = {
     note: false,
     notebook: false,
     tag: false,
+    attachment: false,
     trash: false,
     tiny: false,
     settings: false,

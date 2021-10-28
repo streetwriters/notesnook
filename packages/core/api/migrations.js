@@ -24,6 +24,7 @@ class Migrations {
     const content = await this._db.content.all();
 
     const collections = [
+      { index: this._db.attachments.all, dbCollection: this._db.attachments },
       {
         index: this._db.notebooks.raw,
         dbCollection: this._db.notebooks,

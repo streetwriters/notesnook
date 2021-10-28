@@ -62,6 +62,7 @@ export default class Attachments extends Collection {
 
     const encryptedKey = await this._encryptKey(key);
     const attachmentItem = {
+      type: "attachment",
       id: id(),
       noteIds: noteId ? [noteId] : [],
       iv,
