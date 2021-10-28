@@ -94,6 +94,8 @@ import {
   mdiImage,
   mdiNoteOutline,
   mdiSyncAlert,
+  mdiAlertOutline,
+  mdiAlertOctagramOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -158,11 +160,11 @@ export const ArrowRight = createIcon(mdiArrowRight);
 export const ArrowDown = createIcon(mdiArrowDown);
 export const Move = createIcon(mdiBookPlusMultipleOutline);
 export const Topic = createIcon(mdiBookmarkOutline);
-export const Alert = createIcon(mdiAlert);
+export const Alert = createIcon(mdiAlertOctagramOutline);
 export const Vault = createIcon(mdiShieldOutline);
 export const Unlock = createIcon(mdiLockOpenOutline);
 export const Lock = createIcon(mdiLockOutline);
-export const Star = createIcon(mdiStar);
+export const Star = createIcon(mdiStarOutline);
 export const StarOutline = createIcon(mdiStarOutline);
 export const Circle = createIcon(mdiCircle);
 export const CircleEmpty = createIcon(mdiCircleOutline);
@@ -210,7 +212,7 @@ export const HTML = createIcon(mdiLanguageHtml5);
 export const Text = createIcon(mdiFormatTitle);
 export const Success = createIcon(mdiCheckCircle);
 export const Error = createIcon(mdiAlertCircle);
-export const Warn = createIcon(mdiAlert);
+export const Warn = createIcon(mdiAlertOutline);
 export const Info = createIcon(mdiInformation);
 export const ToggleUnchecked = createIcon(mdiToggleSwitchOffOutline);
 export const ToggleChecked = createIcon(mdiToggleSwitchOutline);

@@ -101,26 +101,26 @@ function Note(props) {
             color: isOpened ? "bgSecondaryText" : "fontTertiary",
           }}
         >
+          {note.conflicted && (
+            <Text
+              display="flex"
+              mr={1}
+              fontSize="subBody"
+              color="error"
+              fontWeight="bold"
+              sx={{ borderRadius: "default" }}
+            >
+              <Icon.Alert size={15} color="error" sx={{ mr: "2px" }} />{" "}
+              Conflicted
+            </Text>
+          )}
           <TimeAgo
             live={false}
             datetime={note.dateCreated}
             style={{ marginRight: 5 }}
           />
-          {note.conflicted && (
-            <Text
-              mr={1}
-              px={1}
-              py="1px"
-              bg="error"
-              fontSize="subBody"
-              color="static"
-              sx={{ borderRadius: "default" }}
-            >
-              CONFLICT
-            </Text>
-          )}
           {note.pinned && !props.context && (
-            <Icon.PinFilled size={13} color={primary} sx={{ mr: 1 }} />
+            <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
           )}
           {note.locked && (
             <Icon.Lock
