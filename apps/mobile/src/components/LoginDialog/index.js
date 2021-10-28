@@ -483,7 +483,7 @@ const LoginDialog = () => {
       <ScrollView
         ref={scrollViewRef}
         keyboardShouldPersistTaps="always"
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode="none"
         nestedScrollEnabled={mode !== MODES.sessionExpired}
         onMomentumScrollEnd={() => {
           actionSheetRef.current.handleChildScrollEnd();
@@ -496,6 +496,7 @@ const LoginDialog = () => {
           backgroundColor: colors.bg,
           zIndex: 10,
           minHeight: DDS.isTab ? '50%' : '85%'
+        
         }}>
         <Header
           color="transparent"
@@ -754,6 +755,12 @@ const LoginDialog = () => {
             />
           )}
         </View>
+
+        <View
+          style={{
+            height: 100
+          }}
+        />
       </ScrollView>
     </ActionSheetWrapper>
   );
