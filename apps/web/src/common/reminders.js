@@ -11,6 +11,8 @@ import saveFile from "../commands/save-file";
 import { PATHS } from "@notesnook/desktop/paths";
 
 export async function shouldAddBackupReminder() {
+  if (isIgnored("backup")) return false;
+
   const backupReminderOffset = Config.get("backupReminderOffset", 0);
   if (!backupReminderOffset) return false;
 
@@ -24,6 +26,8 @@ export async function shouldAddBackupReminder() {
 }
 
 export async function shouldAddRecoveryKeyBackupReminder() {
+  if (isIgnored("recoverykey")) return false;
+
   const recoveryKeyBackupDate = Config.get("recoveryKeyBackupDate", 0);
   if (!recoveryKeyBackupDate) return true;
   return dayjs(recoveryKeyBackupDate).add(7, "d").isBefore(dayjs());
@@ -41,7 +45,9 @@ export async function shouldAddConfirmEmailReminder() {
 
 export const Reminders = {
   backup: {
+    key: "backup",
     subtitle: "Create a backup to keep your notes safe",
+    dismissable: true,
     title: "Back up your data",
     action: async () => {
       if (await verifyAccount()) await createBackup();
@@ -49,20 +55,24 @@ export const Reminders = {
     icon: Icon.Backup,
   },
   login: {
+    key: "login",
     title: "Login to sync your notes",
     subtitle: "You are not logged in",
     action: () => hardNavigate("/login"),
     icon: Icon.User,
   },
   email: {
+    key: "email",
     title: "Please confirm your email",
     subtitle: "Confirm your email to sync notes",
     action: () => hashNavigate("/email/verify"),
     icon: Icon.Email,
   },
   recoverykey: {
+    key: "recoverykey",
     title: "Backup your recovery key",
     subtitle: "Keep your recovery key safe",
+    dismissable: true,
     action: async () => {
       if (await verifyAccount()) await showRecoveryKeyDialog();
     },
@@ -95,4 +105,8 @@ export async function resetReminders() {
     reminders.push({ type: "recoverykey", priority: "high" });
   }
   appStore.get().setReminders(...reminders);
+}
+
+function isIgnored(key) {
+  return Config.get(`ignored:${key}`, false);
 }

@@ -3,6 +3,7 @@ import { Button, Flex, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
 import { Reminders } from "../../common/reminders";
 import * as Icon from "../icons";
+import Config from "../../utils/config";
 
 function ReminderBar() {
   const reminders = useAppStore((store) => store.reminders);
@@ -44,22 +45,30 @@ function ReminderBar() {
           </Text>
         </Flex>
       </Flex>
-      <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          dismissReminders(reminder);
-        }}
-        sx={{
-          borderRadius: 50,
-          p: 1,
-          mr: 1,
-          bg: "transparent",
-          ":hover": { backgroundColor: "shade" },
-        }}
-        variant="tool"
-      >
-        <Icon.Dismiss size={20} color="primary" />
-      </Button>
+      {reminder.dismissable && (
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            const dontShowAgain = window.confirm(
+              "Don't show again on this device?"
+            );
+            dismissReminders(reminder);
+            if (dontShowAgain) {
+              Config.set(`ignored:${reminder.key}`, true);
+            }
+          }}
+          sx={{
+            borderRadius: 50,
+            p: 1,
+            mr: 1,
+            bg: "transparent",
+            ":hover": { backgroundColor: "shade" },
+          }}
+          variant="tool"
+        >
+          <Icon.Dismiss size={20} color="primary" />
+        </Button>
+      )}
     </Flex>
   );
 }
