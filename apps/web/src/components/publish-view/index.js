@@ -57,158 +57,171 @@ function PublishView(props) {
       <Text variant="body" fontSize="title" fontWeight="bold" color="primary">
         {noteTitle}
       </Text>
-      {publishId ? (
+      {isPublishing ? (
         <Flex
-          mt={1}
-          p={1}
-          sx={{
-            border: "1px solid",
-            borderColor: "primary",
-            borderRadius: "default",
-          }}
-          justifyContent="space-between"
+          flexDirection="column"
+          alignItems="center"
+          my={50}
+          justifyContent="center"
         >
-          <Flex flexDirection="column" mr={2} overflow="hidden">
-            <Text variant="body" fontWeight="bold">
-              This note is published at:
+          <Text>Publishing note</Text>
+          {processingStatus && (
+            <Text variant="subBody" mt={1}>
+              Downloading images ({processingStatus.current}/
+              {processingStatus.total})
             </Text>
-            <Text
-              variant="subBody"
-              as="a"
-              target="_blank"
-              href={`https://monograph.notesnook.com/${publishId}`}
-              sx={{
-                textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
-                overflow: "hidden",
-              }}
-            >
-              {`https://monograph.notesnook.com/${publishId}`}
-            </Text>
-          </Flex>
-          <Button
-            variant="anchor"
-            className="copyPublishLink"
-            onClick={() => {
-              clipboard.writeText(
-                `https://monograph.notesnook.com/${publishId}`
-              );
-            }}
-          >
-            <Icon.Copy size={20} color="primary" />
-          </Button>
+          )}
         </Flex>
       ) : (
         <>
-          <Text variant="body" color="fontTertiary">
-            This note will be published to a public URL.
-          </Text>
+          {publishId ? (
+            <Flex
+              mt={1}
+              p={1}
+              sx={{
+                border: "1px solid",
+                borderColor: "primary",
+                borderRadius: "default",
+              }}
+              justifyContent="space-between"
+            >
+              <Flex flexDirection="column" mr={2} overflow="hidden">
+                <Text variant="body" fontWeight="bold">
+                  This note is published at:
+                </Text>
+                <Text
+                  variant="subBody"
+                  as="a"
+                  target="_blank"
+                  href={`https://monograph.notesnook.com/${publishId}`}
+                  sx={{
+                    textOverflow: "ellipsis",
+                    whiteSpace: "nowrap",
+                    overflow: "hidden",
+                  }}
+                >
+                  {`https://monograph.notesnook.com/${publishId}`}
+                </Text>
+              </Flex>
+              <Button
+                variant="anchor"
+                className="copyPublishLink"
+                onClick={() => {
+                  clipboard.writeText(
+                    `https://monograph.notesnook.com/${publishId}`
+                  );
+                }}
+              >
+                <Icon.Copy size={20} color="primary" />
+              </Button>
+            </Flex>
+          ) : (
+            <>
+              <Text variant="body" color="fontTertiary">
+                This note will be published to a public URL.
+              </Text>
+            </>
+          )}
+          <Toggle
+            title="Self destruct?"
+            onTip="Note will be automatically unpublished after first view."
+            offTip="Note will stay published until manually unpublished."
+            isToggled={selfDestruct}
+            onToggled={() => setSelfDestruct((s) => !s)}
+          />
+          <Toggle
+            title="Password protect?"
+            onTip="Protect published note with a password."
+            offTip="Do not protect published note with a password."
+            isToggled={isPasswordProtected}
+            onToggled={() => setIsPasswordProtected((s) => !s)}
+          />
+          {isPasswordProtected && (
+            <Field
+              autoFocus
+              id="publishPassword"
+              label="Password"
+              helpText="Enter password to encrypt this note"
+              required
+              sx={{ my: 1 }}
+            />
+          )}
+          <Flex alignItems="center" justifyContent="space-evenly" mt={1}>
+            <Button
+              flex={1}
+              mr={2}
+              onClick={async () => {
+                try {
+                  setIsPublishing(true);
+                  const password =
+                    document.getElementById("publishPassword")?.value;
+
+                  const publishId = await db.monographs.publish(noteId, {
+                    selfDestruct,
+                    password,
+                  });
+                  setPublishId(publishId);
+                  showToast("success", "Note published.");
+                } catch (e) {
+                  console.error(e);
+                  showToast(
+                    "error",
+                    "Note could not be published: " + e.message
+                  );
+                } finally {
+                  setIsPublishing(false);
+                }
+              }}
+            >
+              {isPublishing ? (
+                <>
+                  <Icon.Loading color="static" />
+                </>
+              ) : publishId ? (
+                "Update"
+              ) : (
+                "Publish"
+              )}
+            </Button>
+            {publishId && (
+              <Button
+                flex={1}
+                bg="errorBg"
+                mr={2}
+                color="error"
+                onClick={async () => {
+                  try {
+                    setIsPublishing(true);
+                    await db.monographs.unpublish(noteId);
+                    setPublishId();
+                    onClose(true);
+                    showToast("success", "Note unpublished.");
+                  } catch (e) {
+                    console.error(e);
+                    showToast(
+                      "error",
+                      "Note could not be unpublished: " + e.message
+                    );
+                  } finally {
+                    setIsPublishing(false);
+                  }
+                }}
+              >
+                Unpublish
+              </Button>
+            )}
+            <Button
+              flex={1}
+              variant="secondary"
+              onClick={() => {
+                onClose(false);
+              }}
+            >
+              Cancel
+            </Button>
+          </Flex>
         </>
       )}
-      <Toggle
-        title="Self destruct?"
-        onTip="Note will be automatically unpublished after first view."
-        offTip="Note will stay published until manually unpublished."
-        isToggled={selfDestruct}
-        onToggled={() => setSelfDestruct((s) => !s)}
-      />
-      <Toggle
-        title="Password protect?"
-        onTip="Protect published note with a password."
-        offTip="Do not protect published note with a password."
-        isToggled={isPasswordProtected}
-        onToggled={() => setIsPasswordProtected((s) => !s)}
-      />
-      {isPasswordProtected && (
-        <Field
-          autoFocus
-          id="publishPassword"
-          label="Password"
-          helpText="Enter password to encrypt this note"
-          required
-          sx={{ my: 1 }}
-        />
-      )}
-      {processingStatus && (
-        <Text variant="subBody" mt={2}>
-          Downloading images ({processingStatus.current}/
-          {processingStatus.total})
-        </Text>
-      )}
-      <Flex alignItems="center" justifyContent="space-evenly" mt={1}>
-        <Button
-          flex={1}
-          mr={2}
-          disabled={isPublishing}
-          onClick={async () => {
-            try {
-              setIsPublishing(true);
-              const password =
-                document.getElementById("publishPassword")?.value;
-
-              const publishId = await db.monographs.publish(noteId, {
-                selfDestruct,
-                password,
-              });
-              setPublishId(publishId);
-              showToast("success", "Note published.");
-            } catch (e) {
-              console.error(e);
-              showToast("error", "Note could not be published: " + e.message);
-            } finally {
-              setIsPublishing(false);
-            }
-          }}
-        >
-          {isPublishing ? (
-            <>
-              <Icon.Loading color="static" />
-            </>
-          ) : publishId ? (
-            "Update"
-          ) : (
-            "Publish"
-          )}
-        </Button>
-        {publishId && (
-          <Button
-            flex={1}
-            bg="errorBg"
-            mr={2}
-            color="error"
-            disabled={isPublishing}
-            onClick={async () => {
-              try {
-                setIsPublishing(true);
-                await db.monographs.unpublish(noteId);
-                setPublishId();
-                onClose(true);
-                showToast("success", "Note unpublished.");
-              } catch (e) {
-                console.error(e);
-                showToast(
-                  "error",
-                  "Note could not be unpublished: " + e.message
-                );
-              } finally {
-                setIsPublishing(false);
-              }
-            }}
-          >
-            Unpublish
-          </Button>
-        )}
-        <Button
-          flex={1}
-          disabled={isPublishing}
-          variant="secondary"
-          onClick={() => {
-            onClose(false);
-          }}
-        >
-          Cancel
-        </Button>
-      </Flex>
     </Flex>
   );
 }
