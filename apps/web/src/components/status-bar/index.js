@@ -1,6 +1,14 @@
 import { Box, Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
-import { Circle, Sync, Loading, Update, SyncError, Checkmark } from "../icons";
+import {
+  Circle,
+  Sync,
+  Loading,
+  Update,
+  SyncError,
+  Checkmark,
+  Alert,
+} from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
@@ -144,7 +152,7 @@ function SyncStatus() {
     case "synced":
       return (
         <>
-          <Sync size={10} />
+          <Sync size={12} />
           <Text variant="subBody" ml={1}>
             {"Synced "}
             <TimeAgo live={true} datetime={lastSynced} />
@@ -154,28 +162,36 @@ function SyncStatus() {
     case "syncing":
       return (
         <>
-          <Sync size={10} rotate={syncStatus === "syncing"} />
+          <Sync size={12} rotate={syncStatus === "syncing"} />
           <Text variant="subBody" ml={1}>
             Syncing
           </Text>
         </>
       );
     case "failed":
-    case "conflicts":
       return (
         <>
-          <SyncError size={10} />
+          <SyncError size={12} />
           <Text variant="subBody" ml={1}>
-            {syncStatus === "failed" ? "Sync failed" : "Merge conflicts"}
+            Sync failed
           </Text>
         </>
       );
     case "completed":
       return (
         <>
-          <Checkmark size={10} />
+          <Checkmark size={12} color="success" />
           <Text variant="subBody" ml={1}>
             Sync completed
+          </Text>
+        </>
+      );
+    case "conflicts":
+      return (
+        <>
+          <Alert size={12} color="error" />
+          <Text variant="subBody" ml={1}>
+            Merge conflicts
           </Text>
         </>
       );
