@@ -248,7 +248,10 @@ async function uploadFile(filename, requestOptions) {
     throw new Error("Could not complete multi-part upload.");
 
   await fileHandle.addAdditionalData("uploaded", true);
-
+  // Keep the images cached; delete everything else.
+  if (!fileHandle.file.type?.startsWith("image/")) {
+    await streamablefs.deleteFile(filename);
+  }
   return true;
 }
 
