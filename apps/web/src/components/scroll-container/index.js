@@ -1,6 +1,6 @@
-import React, { useRef } from "react";
 import RSC from "react-scrollbars-custom";
 import { Text } from "rebass";
+import "./style.css";
 
 const ScrollContainer = ({
   children,
@@ -9,30 +9,11 @@ const ScrollContainer = ({
   style,
   className,
 }) => {
-  const ref = useRef();
   return (
     <RSC
       className={className}
       style={style}
-      ref={ref}
       trackClickBehavior="step"
-      onMouseEnter={() => {
-        const scrollTrackY = ref.current?.trackYElement;
-        if (scrollTrackY) scrollTrackY.style.opacity = 1;
-      }}
-      onTouchStart={() => {
-        const scrollTrackY = ref.current?.trackYElement;
-        if (scrollTrackY) scrollTrackY.style.opacity = 1;
-      }}
-      onTouchEnd={() => {
-        const scrollTrackY = ref.current?.trackYElement;
-        if (scrollTrackY) scrollTrackY.style.opacity = 0;
-      }}
-      onMouseLeave={(e) => {
-        if (e.nativeEvent.buttons > 0) return;
-        const scrollTrackY = ref.current?.trackYElement;
-        if (scrollTrackY) scrollTrackY.style.opacity = 0;
-      }}
       wrapperProps={{
         style: { right: 0, inset: "0px 1px 0px 0px" },
       }}

@@ -1,0 +1,18 @@
+.ScrollbarsCustom.trackYVisible:hover
+  .ScrollbarsCustom-Track.ScrollbarsCustom-TrackY.scrollTrackY,
+.ScrollbarsCustom-Track.ScrollbarsCustom-TrackX.scrollTrackX,
+.ScrollbarsCustom.trackYVisible:focus
+  .ScrollbarsCustom-Track.ScrollbarsCustom-TrackY.scrollTrackY,
+.ScrollbarsCustom-Track.ScrollbarsCustom-TrackX.scrollTrackX,
+.ScrollbarsCustom.trackYVisible:focus-within
+  .ScrollbarsCustom-Track.ScrollbarsCustom-TrackY.scrollTrackY,
+.ScrollbarsCustom-Track.ScrollbarsCustom-TrackX.scrollTrackX,
+.ScrollbarsCustom.trackYVisible:active
+  .ScrollbarsCustom-Track.ScrollbarsCustom-TrackY.scrollTrackY
+  .ScrollbarsCustom-Track.ScrollbarsCustom-TrackX.scrollTrackX {
+  opacity: 1 !important;
+}
+
+.ScrollbarsCustom-Thumb.ScrollbarsCustom-ThumbY {
+  background-color: var(--bgSecondary) !important;
+}
