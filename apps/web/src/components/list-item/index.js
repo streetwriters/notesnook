@@ -152,9 +152,8 @@ function ListItem(props) {
         openContextMenu(e, menuItems, props.menu?.extraData, false)
       }
       p={2}
-      py={isCompact ? 2 : 3}
+      py={isCompact ? 1 : 2}
       tabIndex={0}
-      justifyContent="center"
       sx={{
         height: "inherit",
         cursor: "pointer",
@@ -175,7 +174,9 @@ function ListItem(props) {
       onKeyPress={(e) => {
         if (e.key === "Enter") e.target.click();
       }}
-      flexDirection="column"
+      flexDirection={isCompact ? "row" : "column"}
+      justifyContent={isCompact ? "space-between" : "center"}
+      alignItems={isCompact ? "center" : undefined}
       onClick={() => {
         //e.stopPropagation();
         if (isSelectionMode) {
@@ -186,17 +187,15 @@ function ListItem(props) {
       }}
       data-test-id={`${props.item.type}-${props.index}`}
     >
-      {props.header}
+      {!isCompact && props.header}
 
       <Text
         data-test-id={`${props.item.type}-${props.index}-title`}
         variant={isCompact ? "subtitle" : "title"}
-        fontWeight={"bold"}
+        fontWeight={isCompact ? "body" : "bold"}
         color={text}
         display={isSelectionMode ? "flex" : "block"}
         sx={{
-          lineHeight: "1.4rem",
-          maxHeight: "1.4rem", // 1 lines, i hope
           whiteSpace: "nowrap",
           overflow: "hidden",
           textOverflow: "ellipsis",
@@ -229,7 +228,11 @@ function ListItem(props) {
           {props.body}
         </Text>
       )}
-      {props.footer && <Box mt={isCompact ? 0 : 1}>{props.footer}</Box>}
+      {props.footer ? (
+        <Box flexShrink={0} ml={isCompact ? 1 : 0} mt={isCompact ? 0 : 1}>
+          {props.footer}
+        </Box>
+      ) : null}
     </Flex>
   );
 }

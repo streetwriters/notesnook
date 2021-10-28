@@ -95,6 +95,7 @@ function GroupHeader(props) {
     setNotesViewMode,
     setNotebooksViewMode,
   ]);
+  const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
 
   if (!title) return null;
 
@@ -117,15 +118,21 @@ function GroupHeader(props) {
       p={1}
       mx={1}
       my={1}
-      py={index > 0 ? [2, "8px"] : 1}
+      py={1}
       pl={1}
       pr={0}
       alignItems="center"
       justifyContent="space-between"
       bg="bgSecondary"
-      sx={{ borderRadius: "default" }}
+      sx={{
+        borderRadius: "default",
+      }}
     >
-      <Text variant="subtitle" color="primary">
+      <Text
+        variant="subtitle"
+        fontSize={isCompact ? "body" : "subtitle"}
+        color={"primary"}
+      >
         {title}
       </Text>
 
@@ -190,7 +197,7 @@ function IconButton(props) {
     >
       {text && <Text variant="body">{text}</Text>}
       {props.icon && (
-        <props.icon size={isMobile ? 20 : 16} sx={{ ml: text ? 1 : 0 }} />
+        <props.icon size={isMobile ? 20 : 14} sx={{ ml: text ? 1 : 0 }} />
       )}
     </Button>
   );

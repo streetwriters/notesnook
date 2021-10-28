@@ -4,7 +4,7 @@ import { confirm } from "../../common/dialog-controller";
 import * as Icon from "../icons";
 import { store } from "../../stores/trash-store";
 import { Flex, Text } from "rebass";
-import TimeAgo from "timeago-react";
+import TimeAgo from "../time-ago";
 import { toTitleCase } from "../../utils/string";
 import { showToast } from "../../utils/toast";
 import { showPermanentDeleteToast } from "../../common/toasts";

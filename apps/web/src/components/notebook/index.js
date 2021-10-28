@@ -14,13 +14,12 @@ import { showToast } from "../../utils/toast";
 function Notebook(props) {
   const { item, index } = props;
   const notebook = item;
-
-  const viewMode = useStore((store) => store.viewMode);
+  const isCompact = useStore((store) => store.viewMode === "compact");
 
   return (
     <ListItem
       selectable
-      isCompact={viewMode === "compact"}
+      isCompact={isCompact}
       item={notebook}
       onClick={() => {
         navigate(`/notebooks/${notebook.id}`);
@@ -30,45 +29,53 @@ function Notebook(props) {
       index={index}
       menu={{ items: menuItems, extraData: { notebook } }}
       footer={
-        <>
-          {notebook?.topics && (
-            <Flex mb={1}>
-              {notebook?.topics.slice(0, 3).map((topic) => (
-                <IconTag
-                  key={topic.id}
-                  text={topic.title}
-                  icon={Icon.Topic}
-                  onClick={(e) => {
-                    navigate(`/notebooks/${notebook.id}/${topic.id}`);
-                  }}
-                />
-              ))}
-            </Flex>
-          )}
-          <Flex
-            sx={{ fontSize: "subBody", color: "fontTertiary" }}
-            alignItems="center"
-          >
-            {notebook.pinned && (
-              <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
+        isCompact ? (
+          <>
+            <Text fontSize="subBody" color="fontTertiary">
+              {getTotalNotes(notebook)} Notes
+            </Text>
+          </>
+        ) : (
+          <>
+            {notebook?.topics && (
+              <Flex mb={1}>
+                {notebook?.topics.slice(0, 3).map((topic) => (
+                  <IconTag
+                    key={topic.id}
+                    text={topic.title}
+                    icon={Icon.Topic}
+                    onClick={(e) => {
+                      navigate(`/notebooks/${notebook.id}/${topic.id}`);
+                    }}
+                  />
+                ))}
+              </Flex>
             )}
-            <Text variant="subBody" color="primary">
-              Notebook
-            </Text>
-            <Text as="span" mx={1}>
-              •
-            </Text>
-            {new Date(notebook.dateCreated).toLocaleDateString("en", {
-              month: "long",
-              day: "2-digit",
-              year: "numeric",
-            })}
-            <Text as="span" mx={1}>
-              •
-            </Text>
-            <Text>{getTotalNotes(notebook)} Notes</Text>
-          </Flex>
-        </>
+            <Flex
+              sx={{ fontSize: "subBody", color: "fontTertiary" }}
+              alignItems="center"
+            >
+              {notebook.pinned && (
+                <Icon.PinFilled color="primary" size={13} sx={{ mr: 1 }} />
+              )}
+              <Text variant="subBody" color="primary">
+                Notebook
+              </Text>
+              <Text as="span" mx={1}>
+                •
+              </Text>
+              {new Date(notebook.dateCreated).toLocaleDateString("en", {
+                month: "long",
+                day: "2-digit",
+                year: "numeric",
+              })}
+              <Text as="span" mx={1}>
+                •
+              </Text>
+              <Text>{getTotalNotes(notebook)} Notes</Text>
+            </Flex>
+          </>
+        )
       }
     />
   );

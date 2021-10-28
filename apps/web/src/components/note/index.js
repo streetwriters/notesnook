@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
-import TimeAgo from "timeago-react";
+import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
@@ -35,11 +35,13 @@ function Note(props) {
     return notebook;
   }, [note.notebooks]);
 
+  const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
+
   return (
     <ListItem
       selectable
       isFocused={isOpened}
-      isCompact={viewMode === "compact"}
+      isCompact={isCompact}
       item={note}
       title={note.title}
       body={note.headline}
@@ -101,37 +103,56 @@ function Note(props) {
             color: isOpened ? "bgSecondaryText" : "fontTertiary",
           }}
         >
-          {note.conflicted && (
-            <Text
-              display="flex"
-              mr={1}
-              fontSize="subBody"
-              color="error"
-              fontWeight="bold"
-              sx={{ borderRadius: "default" }}
-            >
-              <Icon.Alert size={15} color="error" sx={{ mr: "2px" }} />{" "}
-              Conflicted
-            </Text>
-          )}
-          <TimeAgo
-            live={false}
-            datetime={note.dateCreated}
-            style={{ marginRight: 5 }}
-          />
-          {note.pinned && !props.context && (
-            <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
-          )}
-          {note.locked && (
-            <Icon.Lock
-              size={13}
-              color={"fontTertiary"}
-              sx={{ mr: 1 }}
-              data-test-id={`note-${index}-locked`}
-            />
-          )}
-          {note.favorite && (
-            <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+          {isCompact ? (
+            <>
+              {note.conflicted && (
+                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
+              )}
+              {note.locked && (
+                <Icon.Lock
+                  size={11}
+                  color={"fontTertiary"}
+                  sx={{ mr: 1 }}
+                  data-test-id={`note-${index}-locked`}
+                />
+              )}
+              <TimeAgo
+                live={false}
+                datetime={note.dateCreated}
+                locale="short"
+              />
+            </>
+          ) : (
+            <>
+              {note.conflicted && (
+                <Text
+                  display="flex"
+                  mr={1}
+                  fontSize="subBody"
+                  color="error"
+                  fontWeight="bold"
+                  sx={{ borderRadius: "default" }}
+                >
+                  <Icon.Alert size={15} color="error" sx={{ mr: "2px" }} />{" "}
+                  Conflicted
+                </Text>
+              )}
+              <TimeAgo live={false} datetime={note.dateCreated} mr={1} />
+              {note.pinned && !props.context && (
+                <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
+              )}
+              {note.locked && (
+                <Icon.Lock
+                  size={13}
+                  color={"fontTertiary"}
+                  sx={{ mr: 1 }}
+                  data-test-id={`note-${index}-locked`}
+                />
+              )}
+              {note.favorite && (
+                <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
+              )}
+            </>
           )}
         </Flex>
       }

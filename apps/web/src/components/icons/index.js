@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import MDIIcon from "@mdi/react";
 import {
   mdiPlus,
-  mdiHomeVariantOutline,
   mdiMinus,
   mdiBookOutline,
   mdiNotebookOutline,
@@ -11,11 +10,9 @@ import {
   mdiArrowDown,
   mdiBookPlusMultipleOutline,
   mdiBookmarkOutline,
-  mdiAlert,
   mdiShieldOutline,
   mdiLockOpenOutline,
   mdiLockOutline,
-  mdiStar,
   mdiStarOutline,
   mdiCircle,
   mdiCircleOutline,
