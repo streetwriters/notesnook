@@ -147,7 +147,7 @@ async function readEncrypted(filename, key, cipherData) {
         return value;
       },
       write: async (chunk) => {
-        plainText.set(chunk, offset);
+        plainText.set(chunk.data, offset);
         offset += chunk.data.length;
       },
     },
