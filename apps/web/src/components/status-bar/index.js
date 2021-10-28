@@ -1,7 +1,6 @@
-import React from "react";
 import { Box, Button, Flex, Text } from "rebass";
 import EditorFooter from "../editor/footer";
-import { Circle, Sync, Loading, Update } from "../icons";
+import { Circle, Sync, Loading, Update, SyncError, Checkmark } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "timeago-react";
@@ -14,9 +13,7 @@ import checkForUpdate from "../../commands/check-for-update";
 function StatusBar() {
   const user = useUserStore((state) => state.user);
   const sync = useAppStore((state) => state.sync);
-  const lastSynced = useAppStore((state) => state.lastSynced);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
-  const isSyncing = useAppStore((state) => state.isSyncing);
   const processingStatuses = useAppStore((state) =>
     Object.values(state.processingStatuses)
   );
@@ -58,15 +55,7 @@ function StatusBar() {
               onClick={sync}
               sx={{ alignItems: "center", justifyContent: "center" }}
             >
-              <Sync size={10} rotate={isSyncing} />
-              <Text variant="subBody" ml={1}>
-                {"Synced "}
-                {lastSynced ? (
-                  <TimeAgo live={true} datetime={lastSynced} />
-                ) : (
-                  "never"
-                )}
-              </Text>
+              <SyncStatus />
             </Button>
           </>
         ) : (
@@ -145,4 +134,52 @@ function statusToInfoText(status) {
     : type === "available"
     ? `v${version} available`
     : "";
+}
+
+function SyncStatus() {
+  const syncStatus = useAppStore((state) => state.syncStatus);
+  const lastSynced = useAppStore((state) => state.lastSynced);
+
+  switch (syncStatus) {
+    case "synced":
+      return (
+        <>
+          <Sync size={10} />
+          <Text variant="subBody" ml={1}>
+            {"Synced "}
+            <TimeAgo live={true} datetime={lastSynced} />
+          </Text>
+        </>
+      );
+    case "syncing":
+      return (
+        <>
+          <Sync size={10} rotate={syncStatus === "syncing"} />
+          <Text variant="subBody" ml={1}>
+            Syncing
+          </Text>
+        </>
+      );
+    case "failed":
+    case "conflicts":
+      return (
+        <>
+          <SyncError size={10} />
+          <Text variant="subBody" ml={1}>
+            {syncStatus === "failed" ? "Sync failed" : "Merge conflicts"}
+          </Text>
+        </>
+      );
+    case "completed":
+      return (
+        <>
+          <Checkmark size={10} />
+          <Text variant="subBody" ml={1}>
+            Sync completed
+          </Text>
+        </>
+      );
+    default:
+      return null;
+  }
 }

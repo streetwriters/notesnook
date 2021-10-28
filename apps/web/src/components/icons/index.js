@@ -93,6 +93,7 @@ import {
   mdiFileOutline,
   mdiImage,
   mdiNoteOutline,
+  mdiSyncAlert,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -183,6 +184,7 @@ export const Settings = createIcon(mdiCogOutline);
 export const Home = createIcon(mdiHomeOutline);
 export const Restore = createIcon(mdiRecycle);
 export const Sync = createIcon(mdiSync);
+export const SyncError = createIcon(mdiSyncAlert);
 export const Loading = createIcon(mdiLoading, true);
 export const Export = createIcon(mdiExportVariant);
 export const AddToNotebook = createIcon(mdiBookPlusMultipleOutline);

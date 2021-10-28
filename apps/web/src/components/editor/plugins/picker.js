@@ -94,7 +94,7 @@ async function pickFile() {
         };
       },
     });
-    if (!result.hash) throw new Error("Could not add attachment.");
+    if (result instanceof Error) throw result;
     return result;
   } catch (e) {
     showToast("error", `${e.message}`);
@@ -138,10 +138,7 @@ async function pickImage() {
       dataurl,
     };
   } catch (e) {
-    showToast(
-      "error",
-      `${e.message} You need internet access to attach an image.`
-    );
+    showToast("error", e.message);
   }
 }
 

@@ -12,11 +12,11 @@ import { resetReminders } from "../common/reminders";
 class AppStore extends BaseStore {
   // default state
   isSideMenuOpen = false;
-  isSyncing = false;
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
   processingStatuses = {};
+  syncStatus = "synced";
   colors = [];
   globalMenu = { items: [], data: {} };
   reminders = [];
@@ -142,13 +142,14 @@ class AppStore extends BaseStore {
   sync = async (full = true, force = false) => {
     this.updateLastSynced();
     this.set((state) => (state.isSyncing = true));
+
+    this.set((state) => (state.syncStatus = "syncing"));
     return db
       .sync(full, force)
       .then(async (result) => {
         if (!result) return;
-
-        showToast("success", "Sync completed.");
         await this.updateLastSynced();
+        this.set((state) => (state.syncStatus = "completed"));
         return await this.refresh();
       })
       .catch(async (err) => {
@@ -158,10 +159,15 @@ class AppStore extends BaseStore {
           if (editorstore.get().session.id)
             editorstore.openSession(editorstore.get().session.id, true);
           await this.refresh();
+          this.set((state) => (state.syncStatus = "conflicts"));
+        } else {
+          this.set((state) => (state.syncStatus = "failed"));
         }
       })
       .finally(() => {
-        this.set((state) => (state.isSyncing = false));
+        setTimeout(() => {
+          this.set((state) => (state.syncStatus = "synced"));
+        }, 5000);
       });
   };
 }
