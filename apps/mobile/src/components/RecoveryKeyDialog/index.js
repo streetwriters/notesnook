@@ -21,6 +21,7 @@ import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
+import FileViewer from 'react-native-file-viewer';
 
 import * as ScopedStorage from 'react-native-scoped-storage';
 
@@ -86,7 +87,6 @@ class RecoveryKeyDialog extends React.Component {
     }
   };
   async componentDidMount() {
-   
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
   }
 
@@ -133,23 +133,26 @@ class RecoveryKeyDialog extends React.Component {
 
       RNFetchBlob = require('rn-fetch-blob').default;
       if (Platform.OS === 'android') {
-        await ScopedStorage.createDocument(
+       let file = await ScopedStorage.createDocument(
           fileName,
           'text/plain',
           this.state.key,
           'utf8'
         );
+        if (!file) return;
+        path = file.uri;
       } else {
         await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+        path = path + fileName;
       }
 
       ToastEvent.show({
         heading: 'Recovery key text file saved',
-        message: 'Recovery key saved in text file at ' + path + fileName,
+        message: 'Recovery key saved in text file.',
         type: 'success',
         context: 'local'
       });
-      return path + fileName;
+      return path;
     } catch (e) {
       alert(e.message);
     }
@@ -169,11 +172,18 @@ class RecoveryKeyDialog extends React.Component {
     let path = await this.saveToTextFile();
     if (!path) return;
     try {
-      await Share.open({
-        url: Platform.OS === 'ios' ? path : 'file:/' + path,
-        title: 'Save recovery key to cloud',
-        failOnCancel: false
-      });
+      if (Platform.OS === 'ios') {
+        Share.open({
+          url: 'file:/' + result.filePath,
+          failOnCancel: false
+        }).catch(console.log);
+      } else {
+        FileViewer.open(path, {
+          showOpenWithDialog: true,
+          showAppsSuggestions: true,
+          shareFile: true
+        }).catch(console.log);
+      }
     } catch (e) {}
   };
 

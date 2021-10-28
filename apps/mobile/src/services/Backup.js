@@ -9,6 +9,7 @@ import {Platform} from 'react-native';
 import {sanitizeFilename} from '../utils/filename';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import {presentDialog} from '../components/Dialog/functions';
+import FileViewer from 'react-native-file-viewer';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
@@ -126,9 +127,18 @@ async function run() {
         actionsArray: [
           {
             action: () => {
-              Share.open({
-                url: backupFilePath
-              }).catch(e => console.log);
+              if (Platform.OS === 'ios') {
+                Share.open({
+                  url: 'file:/' + backupFilePath,
+                  failOnCancel: false
+                }).catch(console.log);
+              } else {
+                FileViewer.open(backupFilePath, {
+                  showOpenWithDialog: true,
+                  showAppsSuggestions: true,
+                  shareFile: true
+                }).catch(console.log);
+              }
             },
             actionText: 'Share'
           }

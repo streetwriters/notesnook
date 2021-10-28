@@ -41,8 +41,10 @@ export const ShareComponent = ({uri, name, padding}) => {
           marginTop: 10
         }}
         onPress={async () => {
-          Share.open({
-            url: uri
+          FileViewer.open(uri, {
+            showOpenWithDialog: true,
+            showAppsSuggestions: true,
+            shareFile: true
           }).catch(console.log);
         }}
         height={50}

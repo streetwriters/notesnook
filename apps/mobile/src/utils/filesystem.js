@@ -37,7 +37,7 @@ async function readEncrypted(filename, key, cipherData) {
 }
 
 async function writeEncrypted(filename, {data, type, key}) {
-  console.log('file input: ', {data, type, key});
+  console.log('file input: ', {type, key});
 
   let output = await Sodium.encryptFile(key, {
     data,
@@ -46,7 +46,7 @@ async function writeEncrypted(filename, {data, type, key}) {
   console.log('encrypted file output: ', output);
   return {
     ...output,
-    alg: `xcha-argon2i13`
+    alg: `xcha-stream`
   };
 }
 
