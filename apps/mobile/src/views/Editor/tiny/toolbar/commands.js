@@ -16,6 +16,9 @@ import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView, getNote} from '../../Functions';
 import tiny, {safeKeyboardDismiss} from '../tiny';
 
+const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
+const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
+
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
   alignleft: `tinymce.activeEditor.execCommand('JustifyLeft');`,
@@ -99,8 +102,18 @@ export const execCommands = {
       let key = await db.attachments.generateKey();
 
       console.log('generated key for attachments: ', key);
+
       let file = await DocumentPicker.pick(options);
       file = file[0];
+      if (file.size > FILE_SIZE_LIMIT) {
+        ToastEvent.show({
+          title: 'File too large',
+          message: 'The maximum allowed size per file is 512 MB',
+          type:'error'
+        });
+        return;
+      }
+
       if (file.copyError) {
         ToastEvent.show({
           heading: 'Failed to open file',
@@ -199,8 +212,8 @@ export const execCommands = {
               launchCamera(
                 {
                   includeBase64: true,
-                  maxWidth: 2000,
-                  maxHeight: 2000,
+                  maxWidth: 4000,
+                  maxHeight: 4000,
                   quality: 0.8,
                   mediaType: 'photo'
                 },
@@ -229,10 +242,11 @@ export const execCommands = {
               launchImageLibrary(
                 {
                   includeBase64: true,
-                  maxWidth: 2000,
-                  maxHeight: 2000,
+                  maxWidth: 4000,
+                  maxHeight: 4000,
                   quality: 0.8,
-                  mediaType: 'photo'
+                  mediaType: 'photo',
+                  selectionLimit: 1
                 },
                 handleImageResponse
               );
@@ -328,12 +342,30 @@ const handleImageResponse = async response => {
   }
 
   let image = response.assets[0];
+  if (image.fileSize > IMAGE_SIZE_LIMIT) {
+    ToastEvent.show({
+      title: 'File too large',
+      message: 'The maximum allowed size per image is 50 MB',
+      type:'error'
+    });
+    return;
+  }
   let b64 = `data:${image.type};base64, ` + image.base64;
-  let hash = await Sodium.hashFile({
-    uri: image.uri,
-    type: 'url'
-  });
+  let options;
+  if (Platform.OS === 'android') {
+    options = {
+      uri: image.uri,
+      type: 'url'
+    };
+  } else {
+    options = {
+      data: image.base64,
+      type: 'base64'
+    };
+  }
 
+  let hash = await Sodium.hashFile(options);
+  console.log(hash);
   tiny.call(
     EditorWebView,
     `
@@ -352,20 +384,33 @@ const handleImageResponse = async response => {
     })();
     `
   );
-  attachFile(image.uri, hash, image.type, image.fileName);
+  attachFile(
+    image.uri,
+    hash,
+    image.type,
+    image.fileName,
+    Platform.OS === 'ios' ? image.base64 : null
+  );
 };
 
-async function attachFile(uri, hash, type, filename) {
+async function attachFile(uri, hash, type, filename, b64) {
   try {
     let exists = db.attachments.exists(hash);
     let encryptionInfo;
     if (!exists) {
       let key = await db.attachments.generateKey();
-      encryptionInfo = await Sodium.encryptFile(key, {
-        uri: uri,
-        type: 'url',
+      let options = {
         hash: hash
-      });
+      };
+      if (Platform.OS === 'ios' && b64) {
+        options.data = b64;
+        options.type = 'base64';
+      } else {
+        options.uri = uri;
+        options.type = 'url';
+      }
+
+      encryptionInfo = await Sodium.encryptFile(key, options);
       encryptionInfo.type = type;
       encryptionInfo.filename = filename;
       encryptionInfo.alg = `xcha-argon2i13-s`;
@@ -374,6 +419,7 @@ async function attachFile(uri, hash, type, filename) {
     } else {
       encryptionInfo = {hash: hash};
     }
+    console.log(encryptionInfo);
     await db.attachments.add(encryptionInfo, getNote()?.id);
     return true;
   } catch (e) {
