@@ -207,7 +207,10 @@ async function uploadFile(filename, requestOptions) {
   }
 
   for (let i = uploadedChunks.length; i < TOTAL_PARTS; ++i) {
-    const blob = await fileHandle.readChunks(i, UPLOAD_PART_REQUIRED_CHUNKS);
+    const blob = await fileHandle.readChunks(
+      i * UPLOAD_PART_REQUIRED_CHUNKS,
+      UPLOAD_PART_REQUIRED_CHUNKS
+    );
     const url = parts[i];
     const response = await axios.request({
       url,
