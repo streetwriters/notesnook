@@ -263,7 +263,7 @@ const AppLoader = ({onLoad}) => {
             style={{
               flex: 1,
               justifyContent: 'center',
-              width: '100%',
+              width:Platform.OS == "ios" ? '95%'  : "100%",
               paddingHorizontal: 12
             }}>
             <Heading>Verify your identity</Heading>
