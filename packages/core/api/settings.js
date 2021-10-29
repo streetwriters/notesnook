@@ -138,6 +138,7 @@ class Settings {
   }
 
   async _saveSettings() {
+    this._settings.dateEdited = Date.now();
     await this._db.storage.write("settings", this._settings);
   }
 }

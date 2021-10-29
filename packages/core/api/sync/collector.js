@@ -15,7 +15,6 @@ class Collector {
   async collect(lastSyncedTimestamp) {
     this._lastSyncedTimestamp = lastSyncedTimestamp;
     this.key = await this._db.user.getEncryptionKey();
-
     return {
       notes: await this._encrypt(this._collect(this._db.notes.raw)),
       notebooks: await this._encrypt(this._collect(this._db.notebooks.raw)),

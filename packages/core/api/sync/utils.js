@@ -1,6 +1,9 @@
 function areAllEmpty(obj) {
-  const arrays = Object.values(obj).filter((v) => v && v.length !== undefined);
-  return arrays.every((array) => array.length === 0);
+  for (let key in obj) {
+    const value = obj[key];
+    if (Array.isArray(value) && value.length > 0) return false;
+  }
+  return true;
 }
 
 export { areAllEmpty };
