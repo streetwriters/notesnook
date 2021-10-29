@@ -159,7 +159,7 @@ function Properties({ noteId }) {
               ))}
             </Flex>
           </Card>
-          {notebooks?.length && (
+          {!!notebooks?.length && (
             <Card title="Referenced In">
               {notebooks.map((ref) => {
                 const notebook = db.notebooks.notebook(ref.id);
