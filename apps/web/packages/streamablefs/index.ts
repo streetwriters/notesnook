@@ -33,9 +33,9 @@ export class StreamableFS implements IStreamableFS {
     return new FileHandle(this.storage, file);
   }
 
-  async readFile(filename: string): Promise<FileHandle> {
+  async readFile(filename: string): Promise<FileHandle | undefined> {
     const file = await this.storage.getItem<File>(filename);
-    if (!file) throw new Error("File does not exist.");
+    if (!file) return undefined;
     return new FileHandle(this.storage, file);
   }
 
@@ -44,9 +44,10 @@ export class StreamableFS implements IStreamableFS {
     return !!file;
   }
 
-  async deleteFile(filename: string) {
+  async deleteFile(filename: string): Promise<boolean> {
     const handle = await this.readFile(filename);
-    if (!handle) return;
+    if (!handle) return true;
     await handle.delete();
+    return true;
   }
 }
