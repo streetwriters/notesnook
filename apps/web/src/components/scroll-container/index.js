@@ -1,3 +1,4 @@
+import React from "react";
 import RSC from "react-scrollbars-custom";
 import { Text } from "rebass";
 import "./style.css";
@@ -68,3 +69,10 @@ const ScrollContainer = ({
   );
 };
 export default ScrollContainer;
+
+export const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
+  <ScrollContainer
+    {...props}
+    forwardedRef={(scrollbarsRef) => (ref.current = scrollbarsRef)}
+  />
+));

@@ -54,6 +54,7 @@ function App() {
             variant="rowFill"
             overflowX={["auto", "hidden"]}
             sx={{
+              overflowY: "hidden",
               scrollSnapType: "x mandatory",
               scrollBehavior: "smooth",
               WebkitOverflowScrolling: "touch",

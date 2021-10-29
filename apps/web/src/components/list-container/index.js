@@ -6,17 +6,10 @@ import { Virtuoso } from "react-virtuoso";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
 import GroupHeader from "../group-header";
 import ListProfiles from "../../common/list-profiles";
-import ScrollContainer from "../scroll-container";
+import { CustomScrollbarsVirtualList } from "../scroll-container";
 import ReminderBar from "../reminder-bar";
 import Announcements from "../announcements";
 import useAnnouncements from "../../utils/use-announcements";
-
-const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
-  <ScrollContainer
-    {...props}
-    forwardedRef={(scrollbarsRef) => (ref.current = scrollbarsRef)}
-  />
-));
 
 function ListContainer(props) {
   const { type, groupType, items, context, refresh } = props;

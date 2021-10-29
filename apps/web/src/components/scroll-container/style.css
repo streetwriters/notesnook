@@ -14,5 +14,5 @@
 }
 
 .ScrollbarsCustom-Thumb.ScrollbarsCustom-ThumbY {
-  background-color: var(--bgSecondary) !important;
+  background-color: var(--bgSecondaryText) !important;
 }
