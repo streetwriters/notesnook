@@ -51,7 +51,7 @@ export default class Sync {
     this._merger = new Merger(this._db);
     this._tokenManager = new TokenManager(this._db.storage);
     this._autoSyncTimeout = 0;
-    this._autoSyncInterval = 0;
+    this._autoSyncInterval = 5000;
 
     this.syncMutex = withTimeout(
       new Mutex(),
