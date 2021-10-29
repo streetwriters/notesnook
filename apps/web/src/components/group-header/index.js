@@ -1,5 +1,5 @@
 import * as Icon from "../icons";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import { AnimatedFlex } from "../animated";
 import { db } from "../../common/db";
@@ -75,7 +75,9 @@ const getMenuItems = (groupOptions) => {
 
 function GroupHeader(props) {
   const { title, groups, onJump, index, type, refresh } = props;
-  const groupOptions = useMemo(() => db.settings.getGroupOptions(type), [type]);
+  const [groupOptions, setGroupOptions] = useState(
+    db.settings.getGroupOptions(type)
+  );
   const openContextMenu = useOpenContextMenu();
   const notesViewMode = useNoteStore((store) => store.viewMode);
   const setNotesViewMode = useNoteStore((store) => store.setViewMode);
@@ -146,6 +148,9 @@ function GroupHeader(props) {
             }
             title={`Grouped by ${groupByToTitleMap[groupOptions.groupBy]}`}
             onClick={(e) => {
+              const groupOptions = db.settings.getGroupOptions(type);
+              setGroupOptions(groupOptions);
+
               const items = getMenuItems(groupOptions);
               openContextMenu(e, items, {
                 title: "Group & sort",
