@@ -222,6 +222,11 @@ function TinyMCE(props) {
           onInit(editor);
         },
         setup: (editor) => {
+          editor.on("tap", (e) => {
+            if (e.target.classList.contains("mce-content-body")) {
+              e.preventDefault();
+            }
+          });
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();
             e.elm.scrollIntoView({
