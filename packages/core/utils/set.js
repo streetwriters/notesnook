@@ -3,19 +3,14 @@
 
 // Set operations union, intersection, symmetric difference,
 // relative complement, equals. Set operations are fast.
-class SetManipulator {
-  constructor() {
-    // Create and push the uid identity method.
-    let identityExtractor = (identity) => identity;
-    this.uidList = [identityExtractor];
-    this.uid = identityExtractor;
-  }
+export class SetManipulator {
+  constructor() {}
 
   // Processes a histogram consructed from two arrays, 'a' and 'b'.
   // This function is used generically by the below set operation
   // methods, a.k.a, 'evaluators', to return some subset of
   // a set union, based on frequencies in the histogram.
-  process(a, b, evaluator) {
+  process(a, b, getKey = (k) => k, evaluator) {
     // If identity extractor passed in, push it on the stack
     //if (identityExtractor) this.pushIdentityExtractor(identityExtractor);
     // Create a histogram of 'a'.
@@ -23,14 +18,14 @@ class SetManipulator {
     const out = [];
     let ukey;
     a.forEach((value) => {
-      ukey = this.uid(value);
+      ukey = getKey(value);
       if (!hist[ukey]) {
         hist[ukey] = { value: value, freq: 1 };
       }
     });
     // Merge 'b' into the histogram.
     b.forEach((value) => {
-      ukey = this.uid(value);
+      ukey = getKey(value);
       if (hist[ukey]) {
         if (hist[ukey].freq === 1) hist[ukey].freq = 3;
       } else hist[ukey] = { value: value, freq: 2 };
@@ -50,8 +45,8 @@ class SetManipulator {
 
   // Join two sets together.
   // Set.union([1, 2, 2], [2, 3]) => [1, 2, 3]
-  union(a, b) {
-    return this.process(a, b, () => true);
+  union(a, b, getKey) {
+    return this.process(a, b, getKey, () => true);
   }
 
   // Return items common to both sets.

@@ -31,17 +31,21 @@ class Settings {
     if (this._settings.dateEdited > (await this._db.lastSynced())) {
       this._settings.pins = setManipulator.union(
         this._settings.pins,
-        item.pins
+        item.pins,
+        (p) => p.data.id
       );
       this._settings.groupOptions = {
-        ...item.groupOptions,
         ...this._settings.groupOptions,
+        ...item.groupOptions,
       };
-      this._settings.aliases = {};
+      this._settings.aliases = {
+        ...this._settings.aliases,
+        ...item.aliases,
+      };
     } else {
       this._initSettings(item);
     }
-    await this._saveSettings();
+    await this._saveSettings(false);
   }
 
   /**
@@ -137,8 +141,8 @@ class Settings {
     };
   }
 
-  async _saveSettings() {
-    this._settings.dateEdited = Date.now();
+  async _saveSettings(updateDateEdited = true) {
+    if (updateDateEdited) this._settings.dateEdited = Date.now();
     await this._db.storage.write("settings", this._settings);
   }
 }
