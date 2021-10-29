@@ -59,11 +59,12 @@ export default class Attachments extends Collection {
       !hash ||
       !hashType ||
       !filename ||
-      !type ||
       !salt ||
       !key
-    )
+    ) {
+      console.error("Attachment invalid:", attachment);
       throw new Error("Could not add attachment: all properties are required.");
+    }
 
     const encryptedKey = await this._encryptKey(key);
     const attachmentItem = {
@@ -79,7 +80,7 @@ export default class Attachments extends Collection {
         hash,
         hashType,
         filename,
-        type,
+        type: type || "application/octet-stream",
       },
       dateCreated: Date.now(),
       dateEdited: undefined,
