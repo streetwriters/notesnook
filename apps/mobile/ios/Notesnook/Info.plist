@@ -81,6 +81,8 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Take a picture and add it to your note.</string>
+	<key>NSFaceIDUsageDescription</key>
+	<string>$(PRODUCT_NAME) requires FaceID access for App Lock</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Only required by library- not requested in application</string>
 	<key>NSPhotoLibraryUsageDescription</key>
