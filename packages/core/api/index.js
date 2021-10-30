@@ -67,7 +67,7 @@ class Database {
     EV.subscribe(EVENTS.userLoggedOut, async () => {
       await this.monographs.deinit();
       this.syncer.stopAutoSync();
-      disconnectSSE();
+      this.disconnectSSE();
     });
 
     this.session = new Session(this.storage);
