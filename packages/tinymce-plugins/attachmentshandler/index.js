@@ -11,7 +11,12 @@ function register(editor) {
     insertFile(editor, file);
   });
 
-  editor.addCommand("mceReplaceImage", async function (image) {
+  /**
+   * NOTE: we have to extend the editor interface directly
+   * because calling execCommand forces the editor to steal
+   * the focus. There is currently no way around that.
+   */
+  editor._replaceImage = async function (image) {
     const { hash, src } = image;
     const elements = editor.dom.doc.querySelectorAll(
       `img[data-hash="${hash}"]`
@@ -25,13 +30,8 @@ function register(editor) {
       }
       element.src = URL.createObjectURL(blob);
     }
-  });
+  };
 
-  /**
-   * NOTE: we have to extend the editor interface directly
-   * because calling execCommand forces the editor to steal
-   * the focus. There is currently no way around that.
-   */
   editor._updateAttachmentProgress = function (progressState) {
     const { hash, total, loaded } = progressState;
     const elements = editor.dom.doc.querySelectorAll(
@@ -73,7 +73,9 @@ function setupUI(editor) {
     icon: "close",
     tooltip: "Remove attachment",
     onAction: () => {
-      editor.execCommand("Delete");
+      editor.undoManager.transact(() => {
+        editor.execCommand("Delete");
+      });
     },
   });
 
@@ -97,8 +99,10 @@ async function insertImage(editor, image) {
         data-size="${image.size}"
         style="float: left;"/>
     `;
-  editor.insertContent(content);
-  editor.execCommand("mceInsertNewLine");
+  editor.undoManager.transact(() => {
+    editor.insertContent(content);
+    editor.execCommand("mceInsertNewLine");
+  });
 }
 
 async function insertFile(editor, file) {
@@ -114,7 +118,9 @@ async function insertFile(editor, file) {
           <em>&nbsp;</em>
           <span class="filename">${file.filename}</span>
       </span>`;
-  editor.insertContent(content);
+  editor.undoManager.transact(() => {
+    editor.insertContent(content);
+  });
 }
 
 function formatBytes(bytes, decimals = 2) {
