@@ -115,10 +115,8 @@ export default class Content extends Collection {
       return attachments.every((a) => a.hash !== attachment.metadata.hash);
     });
 
-    const toAdd = attachments.filter((a) => {
-      return noteAttachments.every(
-        (attachment) => a.hash !== attachment.metadata.hash
-      );
+    const toAdd = attachments.filter((attachment) => {
+      return noteAttachments.every((a) => attachment.hash !== a.metadata.hash);
     });
 
     for (let attachment of toDelete) {

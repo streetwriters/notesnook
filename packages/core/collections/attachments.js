@@ -28,6 +28,7 @@ export default class Attachments extends Collection {
    *  filename: string,
    *  type: string,
    *  salt: string,
+   *  chunkSize: number,
    *  key: {}
    * }} attachment
    * @param {string} noteId Optional as attachments will be parsed at extraction time
@@ -49,8 +50,18 @@ export default class Attachments extends Collection {
       return this._collection.updateItem(oldAttachment);
     }
 
-    const { iv, length, alg, hash, hashType, filename, salt, type, key } =
-      attachment;
+    const {
+      iv,
+      length,
+      alg,
+      hash,
+      hashType,
+      filename,
+      salt,
+      type,
+      key,
+      chunkSize,
+    } = attachment;
 
     if (
       !iv ||
@@ -60,6 +71,7 @@ export default class Attachments extends Collection {
       !hashType ||
       !filename ||
       !salt ||
+      !chunkSize ||
       !key
     ) {
       console.error("Attachment invalid:", attachment);
@@ -76,6 +88,7 @@ export default class Attachments extends Collection {
       length,
       alg,
       key: encryptedKey,
+      chunkSize,
       metadata: {
         hash,
         hashType,
@@ -160,6 +173,7 @@ export default class Attachments extends Collection {
       attachment.metadata.hash,
       key,
       {
+        chunkSize: attachment.chunkSize,
         iv: attachment.iv,
         salt: attachment.salt,
         length: attachment.length,
@@ -195,8 +209,11 @@ export default class Attachments extends Collection {
     );
     try {
       for (let i = 0; i < attachments.length; i++) {
-        const { hash } = attachments[i].metadata;
-        await this._downloadMedia(hash, {
+        const {
+          metadata: { hash },
+          chunkSize,
+        } = attachments[i];
+        await this._downloadMedia(hash, chunkSize, {
           total: attachments.length,
           current: i,
           groupId: noteId,
@@ -207,9 +224,18 @@ export default class Attachments extends Collection {
     }
   }
 
-  async _downloadMedia(hash, { total, current, groupId }, notify = true) {
+  async _downloadMedia(
+    hash,
+    chunkSize,
+    { total, current, groupId },
+    notify = true
+  ) {
     sendAttachmentsProgressEvent("download", groupId, total, current + 1);
-    const isDownloaded = await this._db.fs.downloadFile(groupId, hash);
+    const isDownloaded = await this._db.fs.downloadFile(
+      groupId,
+      hash,
+      chunkSize
+    );
     if (!isDownloaded) return;
 
     const src = await this.read(hash);
@@ -281,7 +307,7 @@ export default class Attachments extends Collection {
    * @private
    */
   async _getEncryptionKey() {
-    if (!this.key) this.key = await this._db.user.getAttachmentsKey();
+    this.key = await this._db.user.getAttachmentsKey();
     if (!this.key)
       throw new Error(
         "Failed to get user encryption key. Cannot cache attachments."

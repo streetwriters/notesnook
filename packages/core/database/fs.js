@@ -8,11 +8,12 @@ export default class FileStorage {
     this._queue = [];
   }
 
-  async downloadFile(groupId, hash) {
+  async downloadFile(groupId, hash, chunkSize) {
     const url = `${hosts.API_HOST}/s3?name=${hash}`;
     const token = await this.tokenManager.getAccessToken();
     const { execute, cancel } = this.fs.downloadFile(hash, {
       url,
+      chunkSize,
       headers: { Authorization: `Bearer ${token}` },
     });
     this._queue.push({ groupId, hash, cancel, type: "download" });

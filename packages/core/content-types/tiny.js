@@ -120,7 +120,7 @@ class Tiny {
           break;
         }
         default: {
-          if (!getDatasetAttribute(attachment, "hash")) return;
+          if (!getDatasetAttribute(attachment, "hash")) continue;
           attachments.push({
             hash: getDatasetAttribute(attachment, "hash"),
           });
