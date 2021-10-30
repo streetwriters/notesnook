@@ -124,8 +124,8 @@ function init_tiny(size) {
     directionality: EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
-    attachmenthandler_download_attachment:(hash) => {
-      reactNativeEventHandler('attachment_download',hash);
+    attachmenthandler_download_attachment: hash => {
+      reactNativeEventHandler('attachment_download', hash);
     },
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
@@ -137,9 +137,9 @@ function init_tiny(size) {
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
-    extended_valid_elements:`img[*|src=placeholder.svg]`,
-    invalid_styles:{
-      span:`--progress`
+    extended_valid_elements: `img[*|src=placeholder.svg]`,
+    invalid_styles: {
+      span: `--progress`
     },
     content_style: `
     body: {
@@ -255,7 +255,7 @@ function init_tiny(size) {
       }
     },
     setup: function (_editor) {
-      editor = _editor
+      editor = _editor;
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
         tooltip: 'Remove image',
@@ -355,6 +355,11 @@ function init_tiny(size) {
       editor.on('TypingUndos', onUndoChange);
       editor.on('BeforeAddUndo', onUndoChange);
       editor.on('AddUndo', onUndoChange);
+      editor.on('tap', e => {
+        if (e.target.classList.contains('mce-content-body')) {
+          e.preventDefault();
+        }
+      });
 
       editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
