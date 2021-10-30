@@ -15,7 +15,7 @@ export const ProgressCircle = () => {
       }}>
       <Progress.Circle
         size={SIZE.xxl}
-        progress={1}
+        progress={loading.current/loading.total}
         showsText
         textStyle={{
           fontSize: 8

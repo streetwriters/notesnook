@@ -73,21 +73,23 @@ export const useAppEvents = () => {
     removeInternetStateListener: null
   });
 
-  const onMediaDownloaded = ({hash,groupId, src}) => {
-    if (groupId?.startsWith("monograph")) return;
+  const onMediaDownloaded = ({hash, groupId, src}) => {
+    if (groupId?.startsWith('monograph')) return;
     tiny.call(
       EditorWebView,
       `
         (function(){
           let image = ${JSON.stringify({hash, src})};
-          tinymce.activeEditor.execCommand("mceReplaceImage",image);
+          tinymce.activeEditor._replaceImage(image);
         })();
         `
     );
   };
 
   const onLoadingAttachment = data => {
-    useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
+    useAttachmentStore
+      .getState()
+      .setLoading(data.total === data.current ? null : data);
   };
 
   const onSodiumProgress = ({total, progress}) => {
