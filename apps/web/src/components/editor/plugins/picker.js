@@ -13,35 +13,39 @@ function register(editor) {
   editor.ui.registry.addButton("attachment", {
     icon: "attachment",
     tooltip: "Attach a file",
-    onAction: () => insertFile(editor),
+    onAction: () => insertAttachment(editor, "*/*"),
   });
 
   editor.ui.registry.addButton("image", {
     icon: "image",
     tooltip: "Insert image",
-    onAction: () => insertImage(editor),
+    onAction: () => insertAttachment(editor, "image/*"),
   });
 }
 
-async function insertImage(editor) {
-  const image = await pickImage();
-  if (!image) return;
-  editor.execCommand("mceAttachImage", image);
-}
-
-async function insertFile(editor) {
-  const file = await pickFile();
-  if (!file) return;
-  editor.execCommand("mceAttachFile", file);
+async function insertAttachment(editor, type) {
+  const selectedFile = await showFilePicker({
+    acceptedFileTypes: type || "*/*",
+  });
+  if (selectedFile.type.startsWith("image/")) {
+    const image = await pickImage(selectedFile);
+    editor.execCommand("mceAttachImage", image);
+  } else {
+    const file = await pickFile(selectedFile);
+    editor.execCommand("mceAttachFile", file);
+  }
 }
 
 (function init() {
   global.tinymce.PluginManager.add("picker", register);
 })();
 
-async function pickFile() {
+/**
+ * @param {File} selectedFile
+ * @returns
+ */
+async function pickFile(selectedFile) {
   try {
-    const selectedFile = await showFilePicker({ acceptedFileTypes: "*/*" });
     if (selectedFile.size > FILE_SIZE_LIMIT)
       throw new Error("File too big. You cannot add files over 500 MB.");
     if (!selectedFile) return;
@@ -101,11 +105,14 @@ async function pickFile() {
   }
 }
 
-async function pickImage() {
+/**
+ * @param {File} selectedImage
+ * @returns
+ */
+async function pickImage(selectedImage) {
   try {
-    const selectedImage = await showFilePicker({
-      acceptedFileTypes: "image/*",
-    });
+    if (selectedImage.size > IMAGE_SIZE_LIMIT)
+      throw new Error("Image too big. You cannot add images over 50 MB.");
     if (!selectedImage) return;
 
     const key = await getEncryptionKey();
@@ -184,9 +191,6 @@ function compressImage(file, type) {
        * @param {Blob} result
        */
       async success(result) {
-        if (result.size > IMAGE_SIZE_LIMIT)
-          reject("Image too big. You cannot add images over 50 MB.");
-
         const buffer = await result.arrayBuffer();
         const base64 = Buffer.from(buffer).toString("base64");
         resolve({

@@ -43,8 +43,7 @@ import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { AppEventManager, AppEvents } from "../../common";
 import { EV, EVENTS } from "notes-core/common";
-import { db } from "../../common/db";
-import FS from "../../interfaces/fs";
+import { downloadAttachment } from "../../common/attachments";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -249,16 +248,7 @@ function TinyMCE(props) {
         },
         extended_valid_elements: `img[*|src=/placeholder.svg]`,
         attachmenthandler_download_attachment: async (hash) => {
-          const attachment = db.attachments.attachment(hash);
-          if (!attachment) return;
-          await db.fs.downloadFile(hash, hash);
-          const key = await db.attachments.decryptKey(attachment.key);
-          await FS.saveFile(hash, {
-            key,
-            iv: attachment.iv,
-            name: attachment.metadata.filename,
-            type: attachment.metadata.type,
-          });
+          await downloadAttachment(hash);
         },
       }}
       onBeforeExecCommand={async (command) => {

@@ -10,7 +10,6 @@ import {
   from_base64,
   base64_variants,
   StateAddress,
-  from_string,
 } from "libsodium-wrappers";
 import KeyUtils from "./keyutils";
 import {

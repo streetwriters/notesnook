@@ -67,6 +67,7 @@ async function writeEncryptedFile(file, key, hash) {
   sendAttachmentsProgressEvent("encrypt", hash, 1);
 
   return {
+    chunkSize: CHUNK_SIZE,
     iv: iv,
     length: file.size,
     salt: key.salt,
@@ -265,7 +266,7 @@ function reportProgress(ev, { type, hash }) {
 }
 
 async function downloadFile(filename, requestOptions) {
-  const { url, headers, cancellationToken } = requestOptions;
+  const { url, headers, chunkSize, cancellationToken } = requestOptions;
   if (await streamablefs.exists(filename)) return true;
 
   try {
@@ -284,7 +285,7 @@ async function downloadFile(filename, requestOptions) {
     });
 
     if (!isSuccessStatusCode(response.status)) return false;
-    const distributor = new ChunkDistributor(ENCRYPTED_CHUNK_SIZE);
+    const distributor = new ChunkDistributor(chunkSize + ABYTES);
     distributor.fill(new Uint8Array(response.data));
     distributor.close();
 
@@ -417,6 +418,8 @@ class ChunkDistributor {
   }
 
   close() {
+    if (!this.lastChunk)
+      throw new Error("No data available in this distributor.");
     this.lastChunk.data = this.lastChunk.data.slice(0, this.lastChunk.length);
     this.lastChunk.final = true;
     this.done = true;

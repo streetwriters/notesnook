@@ -9,9 +9,9 @@ import { AnimatedFlex } from "../animated";
 import Toggle from "./toggle";
 import { navigate } from "../../navigation";
 import IconTag from "../icon-tag";
-import FS from "../../interfaces/fs";
 import { formatBytes, truncateFilename } from "../../utils/filename";
 import ScrollContainer from "../scroll-container";
+import { downloadAttachment } from "../../common/attachments";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -303,22 +303,7 @@ function Properties({ noteId }) {
                           m={1}
                           sx={{ ":hover": { bg: "hover" }, opacity: 0 }}
                           onClick={async () => {
-                            if (
-                              await db.fs.downloadFile(
-                                attachment.metadata.hash,
-                                attachment.metadata.hash
-                              )
-                            ) {
-                              const key = await db.attachments.decryptKey(
-                                attachment.key
-                              );
-                              await FS.saveFile(attachment.metadata.hash, {
-                                key,
-                                iv: attachment.iv,
-                                name: attachment.metadata.filename,
-                                type: attachment.metadata.type,
-                              });
-                            }
+                            await downloadAttachment(attachment.metadata.hash);
                           }}
                         >
                           <Icon.Download size={16} />
