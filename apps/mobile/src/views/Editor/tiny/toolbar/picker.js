@@ -19,7 +19,7 @@ import tiny, {safeKeyboardDismiss} from '../tiny';
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-const showEncryptionSheet = () => {
+const showEncryptionSheet = (file) => {
   eSendEvent(eOpenProgressDialog, {
     title: 'Encrypting attachment',
     paragraph: 'Please wait while we encrypt file for upload',
@@ -100,7 +100,7 @@ const file = async () => {
 
     let uri = Platform.OS === 'ios' ? file.fileCopyUri : file.uri;
     uri = santizeUri(uri);
-    showEncryptionSheet();
+    showEncryptionSheet(file);
     let hash = await Sodium.hashFile({
       uri: uri,
       type: 'url'
