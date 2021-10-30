@@ -41,7 +41,7 @@ function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
   }, [datetime, live, locale, opts]);
 
   return (
-    <Text {...restProps} as="time" dateTime={toTime(datetime)}>
+    <Text ref={timeRef} {...restProps} as="time" dateTime={toTime(datetime)}>
       {format(datetime, locale, opts)}
     </Text>
   );
