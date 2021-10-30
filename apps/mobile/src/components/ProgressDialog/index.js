@@ -40,13 +40,14 @@ const ProgressDialog = ({context}) => {
   };
 
   const close = () => {
-    setVisible(false);
+    actionSheetRef.current?.setModalVisible(false);
   };
 
   return !visible ? null : (
     <ActionSheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={dialogData?.noProgress}
+      closeOnTouchBackdrop={dialogData?.noProgress}
       onClose={() => {
         if (dialogData.noProgress) {
           setVisible(false);
