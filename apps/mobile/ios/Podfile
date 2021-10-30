@@ -18,9 +18,7 @@ target 'Notesnook' do
 
   # for share extension
   target 'Make Note' do
-    use_native_modules!
     inherit! :complete
-    
   end
   
   target 'NotesnookTests' do
