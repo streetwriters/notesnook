@@ -52,21 +52,21 @@ export class SetManipulator {
   // Return items common to both sets.
   // Set.intersection([1, 1, 2], [2, 2, 3]) => [2]
   intersection(a, b) {
-    return this.process(a, b, (freq) => freq === 3);
+    return this.process(a, b, undefined, (freq) => freq === 3);
   }
 
   // Symmetric difference. Items from either set that
   // are not in both sets.
   // Set.difference([1, 1, 2], [2, 3, 3]) => [1, 3]
   difference(a, b) {
-    return this.process(a, b, (freq) => freq < 3);
+    return this.process(a, b, undefined, (freq) => freq < 3);
   }
 
   // Relative complement. Items from 'a' which are
   // not also in 'b'.
   // Set.complement([1, 2, 2], [2, 2, 3]) => [3]
   complement(a, b) {
-    return this.process(a, b, (freq) => freq === 1);
+    return this.process(a, b, undefined, (freq) => freq === 1);
   }
 
   // Returns true if both sets are equivalent, false otherwise.
