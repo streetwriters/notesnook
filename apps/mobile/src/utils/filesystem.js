@@ -36,13 +36,22 @@ async function readEncrypted(filename, key, cipherData) {
   }
 }
 
+function randId(prefix) {
+  return Math.random()
+    .toString(36)
+    .replace('0.', prefix || '');
+}
+
 async function writeEncrypted(filename, {data, type, key}) {
   console.log('file input: ', {type, key});
-
+  let filepath = cacheDir + `/${randId('imagecache_')}`;
+  console.log(filepath);
+  await RNFetchBlob.fs.writeFile(filepath, data, 'base64');
   let output = await Sodium.encryptFile(key, {
-    data,
-    type
+    uri: Platform.OS === 'ios' ? 'file://' + filepath : filepath,
+    type: 'url'
   });
+  await RNFetchBlob.fs.unlink(filepath);
   console.log('encrypted file output: ', output);
   return {
     ...output,
@@ -95,12 +104,21 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
   try {
     let path = `${cacheDir}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(path);
-    if (exists) return true;
+    if (exists) {
+      return true;
+    }
+
+    let res = await fetch(url, {
+      method: 'GET',
+      headers
+    });
+    const downloadUrl = await res.text();
+    console.log(downloadUrl);
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true
     })
-      .fetch('GET', url, __DEV__ ? null : headers)
+      .fetch('GET', downloadUrl, null)
       .progress((recieved, total) => {
         useAttachmentStore
           .getState()
@@ -119,8 +137,14 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
   }
 }
 
-async function deleteFile(filename, {url, headers}) {
-  console.log('deleting file', filename);
+async function deleteFile(filename, data) {
+  console.log('deleting file', data);
+  if (!data) {
+    if (!filename) return;
+    RNFetchBlob.fs.unlink(cacheDir + `/${filename}`);
+    return true;
+  }
+  let {url, headers} = data;
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
@@ -175,6 +199,7 @@ async function downloadAttachment(hash, global = true) {
     )
       return;
     let key = await db.attachments.decryptKey(attachment.key);
+    console.log('attachment key', key);
     let info = {
       iv: attachment.iv,
       salt: attachment.salt,
@@ -184,8 +209,10 @@ async function downloadAttachment(hash, global = true) {
       hashType: attachment.metadata.hashType,
       mime: attachment.metadata.type,
       fileName: attachment.metadata.filename,
-      uri: folder.uri
+      uri: folder.uri,
+      chunkSize:attachment.chunkSize
     };
+
     let fileUri = await Sodium.decryptFile(key, info, false);
     ToastEvent.show({
       heading: 'Download successful',
@@ -197,7 +224,7 @@ async function downloadAttachment(hash, global = true) {
     );
 
     if (Platform.OS === 'ios') {
-      fileUri = file.uri + '/' + attachment.hash.filename;
+      fileUri = folder.uri + `/${attachment.metadata.hash}`;
     }
     console.log('saved file uri: ', fileUri);
 
