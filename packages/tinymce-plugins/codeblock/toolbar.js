@@ -95,7 +95,6 @@ async function applyHighlighting(editor, language) {
   });
   changeCodeblockClassName(node, `language-${language}`);
 
-  editor.save();
   editor.setDirty(false); // Force not dirty state
 }
 

@@ -7,7 +7,8 @@ const {
 const { createCodeBlock, isCodeBlock, TAGNAME, state } = require("./utils");
 const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
 
-const TAB = `&nbsp;&nbsp;`;
+const TAB = `\u00A0\u00A0`;
+const TAB_SEQUENCE = ["\u00A0", "\u0020"];
 const TAB_LENGTH = 2;
 const EMPTY_LINE = "<p><br></p>";
 
@@ -169,8 +170,6 @@ var registerHandlers = function (api, editor) {
     const isDeindent = e.shiftKey;
     const text = node.innerText;
 
-    // const hasCodeAfterCaret = text.substring(characterRange.end).length > 0;
-    // if (hasCodeAfterCaret) {
     const isTextSelected = characterRange.start !== characterRange.end;
     if (isTextSelected) {
       // we need handle multiline tabbing as well
@@ -187,7 +186,9 @@ var registerHandlers = function (api, editor) {
 
       for (var i = 0; i < selectedLines.length; ++i) {
         const line = selectedLines[i];
-        selectedLines[i] = isDeindent ? line.replace(TAB, "") : `${TAB}${line}`;
+        selectedLines[i] = isDeindent
+          ? deindent(line, TAB_LENGTH)
+          : `${TAB}${line}`;
       }
       content += selectedLines.join("\n");
       content += afterSelection;
@@ -199,12 +200,17 @@ var registerHandlers = function (api, editor) {
 
       moveCaretTo(node, characterRange.start, endIndex);
     } else {
-      // TODO: handle line deindent
-      editor.selection.setContent(TAB);
+      if (isDeindent) {
+        const currentLine = getCurrentLine(node);
+        node.innerHTML = node.innerText.replace(
+          currentLine,
+          deindent(currentLine, TAB_LENGTH)
+        );
+        moveCaretTo(node, characterRange.start - TAB_LENGTH);
+      } else {
+        editor.selection.setContent(TAB);
+      }
     }
-    // } else {
-    //   editor.insertContent(TAB);
-    // }
   }
 
   function onKeyUp(e) {
@@ -220,9 +226,9 @@ var registerHandlers = function (api, editor) {
 
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);
-  editor.on("NodeChange", onNodeChanged);
   editor.on("keydown", onKeyDown);
   editor.on("keyup", onKeyUp);
+  editor.on("NodeChange", onNodeChanged);
   return function () {
     editor.off("BeforeExecCommand", onBeforeExecCommand);
     editor.off("BeforeSetContent", onBeforeSetContent);
@@ -232,8 +238,12 @@ var registerHandlers = function (api, editor) {
   };
 };
 
-function insertAt(str, token, index) {
-  return str.substring(0, index) + token + str.substring(index);
+function deindent(line, tabLength) {
+  for (let i = 0; i < tabLength; ++i) {
+    const char = line[i];
+    if (!TAB_SEQUENCE.some((c) => c === char)) return line;
+  }
+  return line.substring(2);
 }
 
 (function init() {

@@ -43,7 +43,8 @@ function getCurrentLine(node) {
   let prevLength = 0;
   for (let line of lines) {
     let length = prevLength + line.length + 1;
-    if (characterRange.start === length) {
+
+    if (characterRange.start >= prevLength && characterRange.end <= length) {
       currentLine = line;
       break;
     }
