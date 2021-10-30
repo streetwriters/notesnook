@@ -191,7 +191,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     tiny.call(EditorWebView, `
     (function() {
       let progress = ${JSON.stringify(progress)}
-      tinymce.activeEditor.execCommand("mceUpdateAttachmentProgress",progress);
+      tinymce.activeEditor._updateAttachmentProgress("mceUpdateAttachmentProgress",progress);
     })()`);
     set({ progress: { ..._p } });
   },
