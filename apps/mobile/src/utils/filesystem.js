@@ -224,7 +224,7 @@ async function downloadAttachment(hash, global = true) {
     );
 
     if (Platform.OS === 'ios') {
-      fileUri = folder.uri + `/${attachment.metadata.hash}`;
+      fileUri = folder.uri + `/${attachment.metadata.filename}`;
     }
     console.log('saved file uri: ', fileUri);
 
