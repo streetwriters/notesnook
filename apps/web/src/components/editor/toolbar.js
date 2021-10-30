@@ -112,17 +112,20 @@ function Toolbar(props) {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
+        hidden: !sessionId,
         onClick: () => tinymce.activeEditor.execCommand("Undo"),
       },
       {
         title: "Redo",
         icon: Icon.Redo,
         enabled: redoable,
+        hidden: !sessionId,
         onClick: () => tinymce.activeEditor.execCommand("Redo"),
       },
       {
         title: isNotePublished ? "Published" : "Publish",
         icon: isNotePublished ? Icon.Published : Icon.Publish,
+        hidden: !sessionId,
         enabled: !isLocked,
         onClick: () => showPublishView(store.get().session.id, "top"),
       },
@@ -130,7 +133,7 @@ function Toolbar(props) {
         title: "Properties",
         icon: Icon.Properties,
         enabled: true,
-        hidden: isFocusMode,
+        hidden: !sessionId || isFocusMode,
         onClick: toggleProperties,
       },
     ],
@@ -145,6 +148,7 @@ function Toolbar(props) {
       theme,
       toggleNightMode,
       isNotePublished,
+      sessionId,
     ]
   );
 
