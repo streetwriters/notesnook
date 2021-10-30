@@ -239,14 +239,15 @@ const LoginDialog = () => {
         context: 'local'
       });
       close();
-      await sleep(300);
       eSendEvent('userLoggedIn', true);
+
+      await MMKV.removeItem('loginSessionHasExpired');
+      await sleep(500);
       eSendEvent(eOpenProgressDialog, {
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false
       });
-      await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
       setLoading(false);
       setStatus(null);
