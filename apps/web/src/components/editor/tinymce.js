@@ -169,7 +169,7 @@ function TinyMCE(props) {
       (image) => {
         const { groupId, hash, src } = image;
         if (groupId?.startsWith("monograph")) return;
-        tinymceRef.current.editor.execCommand("mceReplaceImage", { hash, src });
+        tinymceRef.current.editor._replaceImage({ hash, src });
       }
     );
     return () => {

@@ -110,7 +110,7 @@ function Autosuggest({
         sx={{ width: "auto", border: "none", p: 0 }}
         placeholder="Add a tag..."
         data-test-id="editor-tag-input"
-        fontSize="body"
+        fontSize="subtitle"
         onChange={(e) => {
           const { value } = e.target;
           if (!value.length) {
