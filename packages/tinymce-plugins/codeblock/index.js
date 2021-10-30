@@ -167,45 +167,44 @@ var registerHandlers = function (api, editor) {
 
     // Shift + Tab = Deindent on all major platforms
     const isDeindent = e.shiftKey;
-    const text = node.textContent;
+    const text = node.innerText;
 
-    const hasCodeAfterCaret = text.substring(characterRange.end).length > 0;
-    if (hasCodeAfterCaret) {
-      const isTextSelected = characterRange.start !== characterRange.end;
-      if (isTextSelected) {
-        // we need handle multiline tabbing as well
-        // so we split the selected code into lines
-        // and indent each line seperately.
+    // const hasCodeAfterCaret = text.substring(characterRange.end).length > 0;
+    // if (hasCodeAfterCaret) {
+    const isTextSelected = characterRange.start !== characterRange.end;
+    if (isTextSelected) {
+      // we need handle multiline tabbing as well
+      // so we split the selected code into lines
+      // and indent each line seperately.
 
-        let [beforeSelection, selection, afterSelection] = [
-          text.substring(0, characterRange.start),
-          text.substring(characterRange.start, characterRange.end),
-          text.substring(characterRange.end),
-        ];
+      let [beforeSelection, selection, afterSelection] = [
+        text.substring(0, characterRange.start),
+        text.substring(characterRange.start, characterRange.end),
+        text.substring(characterRange.end),
+      ];
+      let content = beforeSelection;
+      const selectedLines = selection.split("\n");
 
-        let content = beforeSelection;
-        const selectedLines = selection.split("\n");
-        for (var i = 0; i < selectedLines.length; ++i) {
-          const line = selectedLines[i];
-          selectedLines[i] = isDeindent
-            ? line.replace(TAB, "")
-            : `${TAB}${line}`;
-        }
-        content += selectedLines.join("\n");
-        content += afterSelection;
-        node.textContent = content;
-
-        const endIndex = isDeindent
-          ? characterRange.end - TAB.length * selectedLines.length
-          : characterRange.end + TAB.length * selectedLines.length;
-        moveCaretTo(node, characterRange.start, endIndex);
-      } else {
-        // TODO: handle line deindent
-        editor.selection.setContent(TAB);
+      for (var i = 0; i < selectedLines.length; ++i) {
+        const line = selectedLines[i];
+        selectedLines[i] = isDeindent ? line.replace(TAB, "") : `${TAB}${line}`;
       }
+      content += selectedLines.join("\n");
+      content += afterSelection;
+      node.innerHTML = content;
+
+      const endIndex = isDeindent
+        ? characterRange.end - TAB_LENGTH * selectedLines.length
+        : characterRange.end + TAB_LENGTH * selectedLines.length;
+
+      moveCaretTo(node, characterRange.start, endIndex);
     } else {
-      editor.insertContent(TAB);
+      // TODO: handle line deindent
+      editor.selection.setContent(TAB);
     }
+    // } else {
+    //   editor.insertContent(TAB);
+    // }
   }
 
   function onKeyUp(e) {
