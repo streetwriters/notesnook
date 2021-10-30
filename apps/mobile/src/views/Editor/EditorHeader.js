@@ -52,6 +52,7 @@ import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
 import * as Progress from 'react-native-progress';
+import { ProgressCircle } from './ProgressCircle';
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -62,12 +63,10 @@ const EditorHeader = () => {
   const fullscreen = useSettingStore(state => state.fullscreen);
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
-  const loading = useAttachmentStore(state => state.loading);
   const handleBack = useRef();
   const keyboardListener = useRef();
 
   useEffect(() => {
-    console.log(loading);
     setColors(colors);
   }, [colors]);
 
@@ -76,7 +75,7 @@ const EditorHeader = () => {
       eSendEvent(eCloseFullscreenEditor);
       return;
     }
-    
+
     if (deviceMode === 'mobile') {
       editing.movedAway = true;
     }
@@ -201,7 +200,10 @@ const EditorHeader = () => {
   const load = async item => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-     keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+      keyboardListener.current = Keyboard.addListener(
+        'keyboardDidShow',
+        tiny.onKeyboardShow
+      );
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -237,7 +239,6 @@ const EditorHeader = () => {
   };
 
   const _onHardwareBackPress = async () => {
-    
     if (editing.currentlyEditing) {
       await _onBackPress();
       return true;
@@ -268,7 +269,6 @@ const EditorHeader = () => {
           {deviceMode !== 'mobile' && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
-                
                 await _onBackPress();
                 Navigation.popToTop();
               }}
@@ -332,26 +332,7 @@ const EditorHeader = () => {
               onPress={showActionsheet}
             />
 
-            {loading && loading.current !== loading.total ? (
-              <View
-                style={{
-                  justifyContent: 'center',
-                  marginLeft: 10
-                }}>
-                <Progress.Circle
-                  size={SIZE.xxl}
-                  progress={1}
-                  showsText
-                  textStyle={{
-                    fontSize: 8
-                  }}
-                  color={colors.accent}
-                  formatText={progress => (progress * 100).toFixed(0)}
-                  borderWidth={0}
-                  thickness={2}
-                />
-              </View>
-            ) : null}
+            <ProgressCircle/>
           </>
         </View>
       </View>
