@@ -192,9 +192,6 @@
 	<script src="./listeners.js"></script>
 	<script src="./constants.js"></script>
 	<script>
-		if (window.location.href.includes("nocontenteditable")) {
-			document.querySelector(".htmldiff_div").setAttribute("contenteditable","false");
-		}
 		function reactNativeEventHandler(type, value) {
 			if (window.ReactNativeWebView) {
 				window.ReactNativeWebView.postMessage(

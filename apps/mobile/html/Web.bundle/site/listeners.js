@@ -141,6 +141,7 @@ function attachMessageListener() {
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
+        document.querySelector(".htmldiff_div").setAttribute("contenteditable","false");
         break;
       case 'theme':
         pageTheme.colors = JSON.parse(value);
