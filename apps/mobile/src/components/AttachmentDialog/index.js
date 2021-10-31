@@ -50,7 +50,7 @@ export const AttachmentDialog = () => {
   const open = item => {
     setNote(item);
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id, "all");
+    let _attachments = db.attachments.ofNote(item.id, "files");
     setAttachments(_attachments);
   };
 
