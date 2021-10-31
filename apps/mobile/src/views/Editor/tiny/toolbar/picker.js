@@ -10,11 +10,13 @@ import {editing} from '../../../../utils';
 import {db} from '../../../../utils/database';
 import {
   eCloseProgressDialog,
-  eOpenProgressDialog
+  eOpenProgressDialog,
+  eShowGetPremium
 } from '../../../../utils/Events';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView, getNote} from '../../Functions';
 import tiny, {safeKeyboardDismiss} from '../tiny';
+import PremiumService from '../../../../services/PremiumService';
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -200,6 +202,24 @@ const gallery = async () => {
 };
 
 const pick = async () => {
+  if (!PremiumService.get()) {
+    let user = await db.user.getUser();
+    if (user && !user.isEmailConfirmed) {
+      if (editing.isFocused) {
+        safeKeyboardDismiss();
+        await sleep(500);
+        editing.isFocused = true;
+      }
+      PremiumService.showVerifyEmailDialog();
+    } else {
+      eSendEvent(eShowGetPremium, {
+        context: 'editor',
+        title: 'Get Notesnook Pro',
+        desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
+      });
+    }
+    return;
+  }
   if (editing.isFocused) {
     safeKeyboardDismiss();
     await sleep(500);
