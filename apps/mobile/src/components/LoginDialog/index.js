@@ -188,6 +188,7 @@ const LoginDialog = () => {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
       try {
+        console.log('TOKEN EXPIRED');
         await db.user.tokenManager.getToken();
         await MMKV.removeItem('loginSessionHasExpired');
         Sync.run();

@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {Keyboard, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -26,12 +26,12 @@ export const Toast = ({context = 'global'}) => {
     color: colors.errorText
   });
   const insets = useSafeAreaInsets();
-
+  const hideTimeout = useRef();
   let toastTranslate = useValue(-dHeight);
   let toastOpacity = useValue(0);
 
   const showToastFunc = async data => {
-    console.log('toast show',data.message);
+    console.log('toast show', data.message);
     if (!data) return;
     if (data.context !== context) return;
     if (toastMessages.findIndex(m => m.message === data.message) >= 0) {
@@ -59,14 +59,14 @@ export const Toast = ({context = 'global'}) => {
       easing: Easing.ease
     }).start();
 
-    setTimeout(() => {
+    hideTimeout.current = setTimeout(() => {
       hideToastFunc();
     }, data.duration);
   };
 
   const showNext = data => {
     if (!data) {
-      hideToastFunc() 
+      hideToastFunc();
       return;
     }
     setData(data);
@@ -79,7 +79,7 @@ export const Toast = ({context = 'global'}) => {
         color: colors.errorText
       });
     }
-    setTimeout(() => {
+    hideTimeout.current = setTimeout(() => {
       hideToastFunc();
     }, data?.duration);
   };
@@ -127,11 +127,15 @@ export const Toast = ({context = 'global'}) => {
     toastMessages = [];
     toastTranslate.setValue(-dHeight);
     toastOpacity.setValue(0);
-    let sub1 =  Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
+    let sub1 = Keyboard.addListener('keyboardDidShow', _onKeyboardShow);
     let sub2 = Keyboard.addListener('keyboardDidHide', _onKeyboardHide);
     eSubscribeEvent(eShowToast, showToastFunc);
     eSubscribeEvent(eHideToast, hideToastFunc);
     return () => {
+      if (hideTimeout.current) {
+        clearTimeout(hideTimeout.current);
+      }
+
       toastMessages = [];
       sub1?.remove();
       sub2?.remove();
