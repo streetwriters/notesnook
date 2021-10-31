@@ -1,17 +1,17 @@
-import { useNoteStore } from './../provider/stores';
+import {useNoteStore} from './../provider/stores';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import PushNotification, {
   Importance,
   PushNotificationDeliveredObject
 } from 'react-native-push-notification';
-import { eSendEvent } from './EventManager';
-import { db } from '../utils/database';
-import { DDS } from './DeviceDetection';
-import { tabBarRef } from '../utils/Refs';
-import { eOnLoadNote } from '../utils/Events';
-import { editing } from '../utils';
-import { MMKV } from '../utils/mmkv';
+import {eSendEvent} from './EventManager';
+import {db} from '../utils/database';
+import {DDS} from './DeviceDetection';
+import {tabBarRef} from '../utils/Refs';
+import {eOnLoadNote} from '../utils/Events';
+import {editing} from '../utils';
+import {MMKV} from '../utils/mmkv';
 import SettingsService from './SettingsService';
 
 const NOTIFICATION_TAG = 'notesnook';
@@ -63,14 +63,24 @@ function init() {
     onAction: async function (notification) {
       console.log('ACTION: ', notification.action);
       switch (notification.action) {
-        case "UNPIN":
+        case 'UNPIN':
           //@ts-ignore
           remove(notification.tag, notification.id);
-        case "Hide":
+        case 'Hide':
           unpinQuickNote();
-          break
-        case "ReplyInput":
-          console.log("texto", notification);
+          break;
+        case 'ReplyInput':
+          console.log('texto', notification);
+          present({
+            title: 'Quick note',
+            message: 'Tap on "Take note" to add a note.',
+            ongoing: true,
+            actions: ['ReplyInput', 'Hide'],
+            tag: 'notesnook_note_input',
+            reply_button_text: 'Take note',
+            reply_placeholder_text: 'Write something...',
+            id: 256266
+          });
           await db.init();
           await db.notes.add({
             content: {
@@ -78,13 +88,13 @@ function init() {
               //@ts-ignore
               data: `<p>${notification.reply_text} </p>`
             }
-          })
+          });
           //@ts-ignore
           await db.notes.init();
           useNoteStore.getState().setNotes();
           //@ts-ignore/////
-          pinQuickNote(notification.id);
-          break
+         
+          break;
       }
     },
     popInitialNotification: true,
@@ -116,22 +126,29 @@ function remove(tag: string, id: string) {
 }
 
 function pinQuickNote(launch) {
-  present({
-    title: 'Quick note',
-    message: 'Tap on "Take note" to add a note.',
-    ongoing: true,
-    actions: ['ReplyInput', 'Hide'],
-    tag: 'notesnook_note_input',
-    reply_button_text: 'Take note',
-    reply_placeholder_text: 'Write something...',
-    id: 256266
+  get().then(items => {
+    let notif = items.filter(i => i.tag === 'notesnook_note_input');
+    if (notif && launch) {
+      return;
+    }
+      console.log('showing');
+      present({
+        title: 'Quick note',
+        message: 'Tap on "Take note" to add a note.',
+        ongoing: true,
+        actions: ['ReplyInput', 'Hide'],
+        tag: 'notesnook_note_input',
+        reply_button_text: 'Take note',
+        reply_placeholder_text: 'Write something...',
+        id: 256266
+      });
+    
   });
-
 }
 
 async function unpinQuickNote() {
-  remove("notesnook_note_input", 256266 + "");
-  SettingsService.set("notifNotes", false);
+  remove('notesnook_note_input', 256266 + '');
+  SettingsService.set('notifNotes', false);
 }
 
 function present({
@@ -155,7 +172,7 @@ function present({
   tag?: string;
   reply_placeholder_text?: string;
   reply_button_text?: string;
-  id?: number
+  id?: number;
 }) {
   PushNotification.localNotification({
     id: id,
@@ -204,5 +221,6 @@ export default {
   remove,
   get,
   getPinnedNotes,
-  pinQuickNote, unpinQuickNote
+  pinQuickNote,
+  unpinQuickNote
 };
