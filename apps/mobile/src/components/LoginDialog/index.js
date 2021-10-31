@@ -168,7 +168,7 @@ const LoginDialog = () => {
       showForgotButton: true,
       loading: 'Please wait while we log in and sync your data.',
       showLoader: true,
-      buttonAlt: 'Logout & delete data',
+      buttonAlt: 'Logout',
       buttonAltFunc: () => {
         setConfirm(true);
       }
@@ -445,8 +445,8 @@ const LoginDialog = () => {
           visible>
           <DialogContainer>
             <DialogHeader
-              title="Logout & delete data"
-              paragraph="All synced and unsynced data on this device will be removed. Do you want to proceed?"
+              title="Logout"
+              paragraph="All user data on this device will be cleared including any unsynced changes. Do you want to proceed?"
               paragraphColor="red"
             />
             <DialogButtons
