@@ -211,6 +211,7 @@ export const loadNote = async item => {
       EditorWebView.current?.requestFocus();
       tiny.call(EditorWebView, tiny.focusEditor);
     } else {
+      await sleep(50);
       tiny.call(EditorWebView, tiny.focusEditor);
     }
     if (EDITOR_SETTINGS) {
@@ -295,6 +296,7 @@ export const _onMessage = async evt => {
       break;
     case 'tiny':
       if (message.value !== content.data) {
+        console.log('content changed');
         noteEdited = true;
         lastEditTime = Date.now();
         content = {
@@ -454,7 +456,7 @@ function onNoteChange() {
     if (noteEdited) {
       saveNote();
     }
-  }, 500);
+  }, 100);
 }
 
 let cTimeout = null;
