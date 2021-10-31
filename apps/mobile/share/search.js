@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import { StatusBar } from 'react-native';
+import {StatusBar} from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
@@ -26,7 +26,10 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
   const notes = useRef(null);
   const timer = useRef(null);
   const inputRef = useRef();
-  const insets = Platform.OS === "android" ? {top:StatusBar.currentHeight} : useSafeAreaInsets();
+  const insets =
+    Platform.OS === 'android'
+      ? {top: StatusBar.currentHeight}
+      : useSafeAreaInsets();
 
   const onSelectItem = async item => {
     setAppendNote(item);
@@ -44,7 +47,11 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
       timer.current = null;
     }
     timer.current = setTimeout(async () => {
-      if (!searchKeyword.current) return;
+      if (!searchKeyword.current) {
+        setResults([]);
+        setResults(db.notes.all);
+        return;
+      }
       setSearching(true);
       setResults(await db.lookup.notes(notes.current, searchKeyword.current));
       setSearching(false);
@@ -52,6 +59,12 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
   };
 
   useEffect(() => {
+    (async () => {
+      await db.init();
+      await db.notes.init();
+      notes.current = db.notes.all
+      setResults(notes.current);
+    })();
     setTimeout(() => {
       inputRef.current?.focus();
     }, 300);
@@ -103,7 +116,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
         width: quicknote ? '100%' : '95%',
         minHeight: 50,
         alignSelf: 'center',
-        overflow:"hidden",
+        overflow: 'hidden',
         zIndex: 999,
         ...getElevation(quicknote ? 1 : 5),
         ...extra
