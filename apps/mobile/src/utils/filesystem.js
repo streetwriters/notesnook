@@ -46,12 +46,13 @@ async function writeEncrypted(filename, {data, type, key}) {
   console.log('file input: ', {type, key});
   let filepath = cacheDir + `/${randId('imagecache_')}`;
   console.log(filepath);
-  await RNFetchBlob.fs.writeFile( filepath, data, 'base64');
+  await RNFetchBlob.fs.writeFile(filepath, data, 'base64');
   let output = await Sodium.encryptFile(key, {
-    uri:Platform.OS === "ios" ? filepath : `file://` + filepath,
+    uri: Platform.OS === 'ios' ? filepath : `file://` + filepath,
     type: 'url'
   });
-  await RNFetchBlob.fs.unlink(filepath);
+  RNFetchBlob.fs.unlink(filepath).catch(console.log);
+
   console.log('encrypted file output: ', output);
   return {
     ...output,
@@ -90,8 +91,16 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
     let response = await request;
     console.log(response.info().status);
     let status = response.info().status;
+    let result = status >= 200 && status < 300;
     useAttachmentStore.getState().remove(filename);
-    return status >= 200 && status < 300;
+    if (result) {
+      let attachment = db.attachments.attachment(filename);
+      if (!attachment.metadata.type.startsWith('image/')) {
+        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
+      }
+    }
+
+    return attachment;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     console.log('upload file: ', e, url, headers);
@@ -143,11 +152,7 @@ async function deleteFile(filename, data) {
   if (!data) {
     if (!filename) return;
     let delFilePath = cacheDir + `/${filename}`;
-    RNFetchBlob.fs.exists(delFilePath).then(r => {
-      if (r) {
-        RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
-      }
-    });
+    RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
     return true;
   }
   try {
@@ -174,7 +179,7 @@ function cancelable(operation) {
       execute: () => operation(filename, {url, headers}, cancelToken),
       cancel: async () => {
         await cancelToken.cancel();
-        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`);
+        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log)
       }
     };
   };
@@ -226,7 +231,7 @@ async function downloadAttachment(hash, global = true) {
     });
     RNFetchBlob.fs.unlink(
       RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`
-    );
+    ).catch(console.log);
 
     if (Platform.OS === 'ios') {
       fileUri = folder.uri + `/${attachment.metadata.filename}`;
