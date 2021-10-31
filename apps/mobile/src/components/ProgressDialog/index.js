@@ -76,12 +76,6 @@ const ProgressDialog = ({context}) => {
         {dialogData?.paragraph ? (
           <Paragraph style={{textAlign: 'center'}}>
             {dialogData?.paragraph}
-            {!dialogData?.noProgress && !dialogData?.nowarn ? (
-              <Paragraph color={colors.errorText}>
-                {' '}
-                Do not close the app.
-              </Paragraph>
-            ) : null}
           </Paragraph>
         ) : null}
       </View>
