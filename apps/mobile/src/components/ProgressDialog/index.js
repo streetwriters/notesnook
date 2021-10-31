@@ -1,13 +1,13 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {ActivityIndicator, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {useTracked} from '../../provider';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -30,7 +30,10 @@ const ProgressDialog = ({context}) => {
   }, []);
 
   const open = async data => {
-    if ((data.context && !context) || (data.context && data.context !== context)) {
+    if (
+      (data.context && !context) ||
+      (data.context && data.context !== context)
+    ) {
       return;
     }
     setDialogData(data);
@@ -96,7 +99,7 @@ const ProgressDialog = ({context}) => {
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom: 12
+          marginBottom:dialogData.valueArray ? 12 : 0
         }}>
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
@@ -136,7 +139,7 @@ const ProgressDialog = ({context}) => {
         ) : null}
 
         {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map(item => (
+          dialogData?.actionsArray.map((item,index) => (
             <Button
               onPress={item.action}
               key={item.accentText}
