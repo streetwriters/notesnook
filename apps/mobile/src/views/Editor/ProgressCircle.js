@@ -1,10 +1,13 @@
 import React from 'react';
 import {View} from 'react-native';
 import * as Progress from 'react-native-progress';
+import { useTracked } from '../../provider';
 import {useAttachmentStore} from '../../provider/stores';
 import {SIZE} from '../../utils/SizeUtils';
 
 export const ProgressCircle = () => {
+  const [state] = useTracked();
+  const {colors} = state;
   const loading = useAttachmentStore(state => state.loading);
 
   return loading && loading.current !== loading.total ? (
