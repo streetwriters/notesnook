@@ -2,12 +2,12 @@ import jsdom from 'jsdom-jscore-rn';
 import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
+import RNFetchBlob from 'rn-fetch-blob';
 import showdown from 'showdown';
 import { db } from '../utils/database';
 import { sanitizeFilename } from '../utils/filename';
 import Storage from '../utils/storage';
 
-let RNFetchBlob;
 
 const defaultStyle = `<style>
 .img_size_one {
@@ -127,7 +127,6 @@ async function saveToMarkdown(note) {
     path = file.uri;
   }
 
-  RNFetchBlob = require('rn-fetch-blob').default;
 
   let converter = new showdown.Converter();
   converter.setFlavor('original');
@@ -173,7 +172,6 @@ async function saveToText(note) {
     path = file.uri;
   }
 
-  RNFetchBlob = require('rn-fetch-blob').default;
   let text = await db.notes.note(note.id).export('txt');
 
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
@@ -212,7 +210,6 @@ async function saveToHTML(note) {
     path = file.uri;
   }
 
-  RNFetchBlob = require('rn-fetch-blob').default;
   let html = await db.notes.note(note.id).export('html');
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
   let html3 = html;
