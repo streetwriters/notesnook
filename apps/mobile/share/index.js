@@ -2,6 +2,7 @@ import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
 import {getLinkPreview} from 'link-preview-js';
 import React, {useEffect, useRef, useState} from 'react';
+import {ScrollView} from 'react-native';
 import {
   ActivityIndicator,
   Alert,
@@ -340,30 +341,30 @@ const NotesnookShare = ({quicknote = false}) => {
     onLoad();
   }, [note]);
 
-  const changeMode = async () => {
-    let _mode = modes[mode];
-    if (_mode.type === 'text' && validator.isURL(rawData.value)) {
-      let html = await sanitizeHtml(rawData.value);
-      html = await absolutifyImgs(html, rawData.value);
+  const changeMode = async m => {
+    setMode(m);
 
-      setNote(note => {
-        note.content.data = html;
-        return {...note};
-      });
-      setMode(2);
-      return;
-    }
-
-    if (_mode.type === 'clip') {
-      let html = validator.isURL(rawData.value)
-        ? makeHtmlFromUrl(rawData.value)
-        : makeHtmlFromPlainText(rawData.value);
-      setNote(note => {
-        note.content.data = html;
-        return {...note};
-      });
-      setMode(1);
-      return;
+    setLoading(true);
+    try {
+      if (m === 2) {
+        let html = await sanitizeHtml(rawData.value);
+        html = await absolutifyImgs(html, rawData.value);
+        setNote(note => {
+          note.content.data = html;
+          return {...note};
+        });
+      } else {
+        let html = validator.isURL(rawData.value)
+          ? makeHtmlFromUrl(rawData.value)
+          : makeHtmlFromPlainText(rawData.value);
+        setNote(note => {
+          note.content.data = html;
+          return {...note};
+        });
+      }
+    } catch (e) {
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -507,13 +508,17 @@ const NotesnookShare = ({quicknote = false}) => {
             maxHeight: '100%',
             paddingHorizontal: 12
           }}>
-          <View
+          <ScrollView
+            horizontal
+            contentContainerStyle={{
+              alignItems: 'center',
+              height: 45
+            }}
             style={{
               width: '100%',
-              height: 30,
+              height: 45,
               borderRadius: 10,
-              flexDirection: 'row',
-              alignItems: 'center'
+              flexDirection: 'row'
             }}>
             <Button
               color={appendNote ? colors.nav : colors.accent}
@@ -542,7 +547,7 @@ const NotesnookShare = ({quicknote = false}) => {
               iconSize={18}
               iconColor={appendNote ? colors.light : colors.icon}
               title={`${
-                appendNote ? appendNote.title.slice(0, 15) : 'Append to note'
+                appendNote ? appendNote.title.slice(0, 25) : 'Append to note'
               }`}
               textColor={appendNote ? colors.light : colors.icon}
               type="rounded"
@@ -551,7 +556,7 @@ const NotesnookShare = ({quicknote = false}) => {
                 ...getElevation(1)
               }}
             />
-          </View>
+          </ScrollView>
 
           <View
             style={{
@@ -657,30 +662,30 @@ const NotesnookShare = ({quicknote = false}) => {
                   paddingRight: 80,
                   alignItems: 'center'
                 }}>
+                {validator.isURL(rawData.value) && (
+                  <Button
+                    color={mode == 2 ? colors.shade : colors.nav}
+                    icon={modes[2].icon}
+                    onPress={() => changeMode(2)}
+                    title={modes[2].title}
+                    iconSize={18}
+                    iconColor={mode == 2 ? colors.accent : colors.icon}
+                    textColor={mode == 2 ? colors.accent : colors.icon}
+                    type="rounded"
+                    style={{paddingHorizontal: 12}}
+                  />
+                )}
                 <Button
-                  color={colors.shade}
-                  icon={modes[mode].icon}
-                  onPress={changeMode}
-                  title={modes[mode].title}
+                  color={mode == 1 ? colors.shade : colors.nav}
+                  icon={modes[1].icon}
+                  onPress={() => changeMode(1)}
+                  title={modes[1].title}
                   iconSize={18}
-                  iconColor={colors.accent}
-                  textColor={colors.accent}
+                  iconColor={mode == 1 ? colors.accent : colors.icon}
+                  textColor={mode == 1 ? colors.accent : colors.icon}
                   type="rounded"
                   style={{paddingHorizontal: 12}}
                 />
-
-                {Clipboard.hasString() ? (
-                  <Button
-                    color={colors.nav}
-                    icon="clipboard"
-                    onPress={onPaste}
-                    iconSize={18}
-                    iconColor={colors.icon}
-                    textColor={colors.icon}
-                    title="Paste"
-                    type="rounded"
-                  />
-                ) : null}
               </View>
             </View>
           </View>
