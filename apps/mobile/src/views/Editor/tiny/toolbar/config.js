@@ -330,7 +330,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
   [
-    {
+   /*  {
       format: 'filepicker',
       type: 'format',
       fullname: 'Attach file',
@@ -341,7 +341,7 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Image',
       premium: true
-    },
+    }, */
     {
       format: 'video',
       type: 'format',

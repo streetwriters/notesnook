@@ -52,7 +52,8 @@ import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
 import * as Progress from 'react-native-progress';
-import { ProgressCircle } from './ProgressCircle';
+import {ProgressCircle} from './ProgressCircle';
+import picker from './tiny/toolbar/picker';
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -305,6 +306,19 @@ const EditorHeader = () => {
               />
             )}
 
+            {currentlyEditingNote && (
+              <ActionIcon
+                name="attachment"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5
+                }}
+                top={50}
+                onPress={picker.pick}
+              />
+            )}
+
             {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
@@ -332,7 +346,7 @@ const EditorHeader = () => {
               onPress={showActionsheet}
             />
 
-            <ProgressCircle/>
+            <ProgressCircle />
           </>
         </View>
       </View>

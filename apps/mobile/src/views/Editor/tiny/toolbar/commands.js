@@ -70,8 +70,6 @@ export const execCommands = {
     })();`,
 
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
-  filepicker: picker.file,
-  image: picker.image,
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
   pre: `
     tinymce.activeEditor.execCommand('mceInsertCodeBlock')

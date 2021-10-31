@@ -99,14 +99,14 @@ const file = async () => {
     }
 
     let uri = Platform.OS === 'ios' ? file.fileCopyUri : file.uri;
-    console.log('file uri: ',uri);
-    uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
+    console.log('file uri: ', uri);
+    uri = Platform.OS === 'ios' ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
     let hash = await Sodium.hashFile({
       uri: uri,
       type: 'url'
     });
-    console.log('decoded uri: ',uri);
+    console.log('decoded uri: ', uri);
     let result = await attachFile(uri, hash, file.type, file.name, 'file');
     console.log('attach file: ', result);
 
@@ -146,7 +146,60 @@ const file = async () => {
   }
 };
 
-const image = async () => {
+const camera = async () => {
+  try {
+    await db.attachments.generateKey();
+    eSendEvent(eCloseProgressDialog);
+    await sleep(400);
+    launchCamera(
+      {
+        includeBase64: true,
+        maxWidth: 4000,
+        maxHeight: 4000,
+        quality: 0.8,
+        mediaType: 'photo'
+      },
+      handleImageResponse
+    );
+  } catch (e) {
+    ToastEvent.show({
+      heading: e.message,
+      message: 'You need internet access to attach a file',
+      type: 'error',
+      context: 'global'
+    });
+    console.log('attachment error:', e);
+  }
+};
+
+const gallery = async () => {
+  try {
+    await db.attachments.generateKey();
+    eSendEvent(eCloseProgressDialog);
+    await sleep(400);
+    launchImageLibrary(
+      {
+        includeBase64: true,
+        maxWidth: 4000,
+        maxHeight: 4000,
+        quality: 0.8,
+        mediaType: 'photo',
+        selectionLimit: 1
+      },
+      handleImageResponse
+    );
+  } catch (e) {
+    ToastEvent.show({
+      heading: e.message,
+      message: 'You need internet access to attach a file',
+      type: 'error',
+      context: 'global'
+    });
+    console.log('attachment error:', e);
+  }
+};
+
+const pick = async () => {
   if (editing.isFocused) {
     safeKeyboardDismiss();
     await sleep(500);
@@ -158,61 +211,21 @@ const image = async () => {
     actionsArray: [
       {
         action: async () => {
-          try {
-            await db.attachments.generateKey();
-            eSendEvent(eCloseProgressDialog);
-            await sleep(400);
-            launchCamera(
-              {
-                includeBase64: true,
-                maxWidth: 4000,
-                maxHeight: 4000,
-                quality: 0.8,
-                mediaType: 'photo'
-              },
-              handleImageResponse
-            );
-          } catch (e) {
-            ToastEvent.show({
-              heading: e.message,
-              message: 'You need internet access to attach a file',
-              type: 'error',
-              context: 'global'
-            });
-            console.log('attachment error:', e);
-          }
+          eSendEvent(eCloseProgressDialog);
+          await sleep(400);
+          await file();
         },
-        actionText: 'Take photo',
+        actionText: 'Attach a file',
+        icon: 'file'
+      },
+      {
+        action: camera,
+        actionText: 'Open camera',
         icon: 'camera'
       },
       {
-        action: async () => {
-          try {
-            await db.attachments.generateKey();
-            eSendEvent(eCloseProgressDialog);
-            await sleep(400);
-            launchImageLibrary(
-              {
-                includeBase64: true,
-                maxWidth: 4000,
-                maxHeight: 4000,
-                quality: 0.8,
-                mediaType: 'photo',
-                selectionLimit: 1
-              },
-              handleImageResponse
-            );
-          } catch (e) {
-            ToastEvent.show({
-              heading: e.message,
-              message: 'You need internet access to attach a file',
-              type: 'error',
-              context: 'global'
-            });
-            console.log('attachment error:', e);
-          }
-        },
-        actionText: 'Select from gallery',
+        action: gallery,
+        actionText: 'Select image from gallery',
         icon: 'image-multiple'
       }
     ]
@@ -308,5 +321,5 @@ async function attachFile(uri, hash, type, filename) {
 
 export default {
   file,
-  image
+  pick
 };
