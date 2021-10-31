@@ -380,6 +380,7 @@ function init_tiny(size) {
       });
 
       editor.on('NewBlock', function (e) {
+        console.log('New Block');
         const {newBlock} = e;
         let target;
         if (newBlock) {
@@ -430,18 +431,22 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
+  console.log(event.type, event.selectionChange);
+  onUndoChange();
   if (event.type === 'nodechange' && !event.selectionChange) return;
+
   if (isLoading) {
     isLoading = false;
     return;
   }
   if (editor.plugins.wordcount.getCount() === 0) return;
+  console.log('saving now doc');
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
     selectchange();
     reactNativeEventHandler('tiny', editor.getContent());
-  }, 1);
+  }, 10);
 };
 
 function getNodeColor(element) {
