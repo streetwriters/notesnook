@@ -21,6 +21,7 @@ import {
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
@@ -186,8 +187,15 @@ const LoginDialog = () => {
   async function open(mode) {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
-      let user = await db.user.getUser();
-      email = user.email;
+      try {
+        await db.user.tokenManager.getToken();
+        await MMKV.removeItem('loginSessionHasExpired');
+        Sync.run();
+        return;
+      } catch (e) {
+        let user = await db.user.getUser();
+        email = user.email;
+      }
     }
     setStatus(null);
     setVisible(true);
@@ -497,7 +505,6 @@ const LoginDialog = () => {
           backgroundColor: colors.bg,
           zIndex: 10,
           minHeight: DDS.isTab ? '50%' : '85%'
-        
         }}>
         <Header
           color="transparent"
