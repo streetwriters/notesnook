@@ -71,7 +71,7 @@ const file = async () => {
     }
 
     file = file[0];
-    if (file.type === 'image/') {
+    if (file.type.startsWith('image')) {
       ToastEvent.show({
         title: 'Type not supported',
         message: 'Please add images from gallery or camera picker.',
@@ -99,13 +99,14 @@ const file = async () => {
     }
 
     let uri = Platform.OS === 'ios' ? file.fileCopyUri : file.uri;
-    uri = santizeUri(uri);
+    console.log('file uri: ',uri);
+    uri = Platform.OS === "ios" ? santizeUri(uri) : uri;
     showEncryptionSheet(file);
     let hash = await Sodium.hashFile({
       uri: uri,
       type: 'url'
     });
-    console.log(uri);
+    console.log('decoded uri: ',uri);
     let result = await attachFile(uri, hash, file.type, file.name, 'file');
     console.log('attach file: ', result);
 
