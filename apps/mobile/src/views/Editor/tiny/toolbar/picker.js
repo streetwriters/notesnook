@@ -19,7 +19,7 @@ import tiny, {safeKeyboardDismiss} from '../tiny';
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
-const showEncryptionSheet = (file) => {
+const showEncryptionSheet = file => {
   eSendEvent(eOpenProgressDialog, {
     title: 'Encrypting attachment',
     paragraph: 'Please wait while we encrypt file for upload',
@@ -75,7 +75,7 @@ const file = async () => {
       ToastEvent.show({
         title: 'Type not supported',
         message: 'Please add images from gallery or camera picker.',
-        type: 'error',
+        type: 'error'
       });
       return;
     }
@@ -123,10 +123,14 @@ const file = async () => {
         type: file.type,
         size: file.size
       })}
-      tinymce.activeEditor.execCommand('mceAttachFile',file);
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
+      editor.undoManager.transact(function() {
+        tinymce.activeEditor.execCommand('mceAttachFile',file);
+        setTimeout(function() {
+          tinymce.activeEditor.nodeChanged({selectionChange:true})
+        },100)
+       }); 
+  
+      
     })();
     `
     );
@@ -254,10 +258,13 @@ const handleImageResponse = async response => {
       dataurl: b64,
       size: image.fileSize
     })}
-		tinymce.activeEditor.execCommand('mceAttachImage',image);
-		setTimeout(function() {
-		  tinymce.activeEditor.nodeChanged({selectionChange:true})
-		},100)
+		
+    editor.undoManager.transact(function() {
+      tinymce.activeEditor.execCommand('mceAttachImage',image);
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+     }); 
 	  })();
 	  `
   );
@@ -283,7 +290,7 @@ async function attachFile(uri, hash, type, filename) {
     } else {
       encryptionInfo = {hash: hash};
     }
-	
+
     console.log(encryptionInfo);
     await db.attachments.add(encryptionInfo, getNote()?.id);
     if (Platform.OS === 'ios') await RNFetchBlob.fs.unlink(uri);
