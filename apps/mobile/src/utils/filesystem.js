@@ -46,9 +46,9 @@ async function writeEncrypted(filename, {data, type, key}) {
   console.log('file input: ', {type, key});
   let filepath = cacheDir + `/${randId('imagecache_')}`;
   console.log(filepath);
-  await RNFetchBlob.fs.writeFile(filepath, data, 'base64');
+  await RNFetchBlob.fs.writeFile( filepath, data, 'base64');
   let output = await Sodium.encryptFile(key, {
-    uri: Platform.OS === 'ios' ? 'file://' + filepath : filepath,
+    uri:Platform.OS === "ios" ? filepath : `file://` + filepath,
     type: 'url'
   });
   await RNFetchBlob.fs.unlink(filepath);
@@ -138,13 +138,18 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
 }
 
 async function deleteFile(filename, data) {
+  let {url, headers} = data;
   console.log('deleting file', data);
   if (!data) {
     if (!filename) return;
-    RNFetchBlob.fs.unlink(cacheDir + `/${filename}`);
+    let delFilePath = cacheDir + `/${filename}`;
+    RNFetchBlob.fs.exists(delFilePath).then(r => {
+      if (r) {
+        RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
+      }
+    });
     return true;
   }
-  let {url, headers} = data;
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
@@ -210,7 +215,7 @@ async function downloadAttachment(hash, global = true) {
       mime: attachment.metadata.type,
       fileName: attachment.metadata.filename,
       uri: folder.uri,
-      chunkSize:attachment.chunkSize
+      chunkSize: attachment.chunkSize
     };
 
     let fileUri = await Sodium.decryptFile(key, info, false);
