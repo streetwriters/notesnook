@@ -383,7 +383,7 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
       }}
       style={{
         height: 50,
-        paddingHorizontal: 12,
+        paddingHorizontal: 0,
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
