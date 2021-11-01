@@ -1,4 +1,4 @@
-const storage = require("electron-data-storage").default;
+const { default: storage } = require("electron-data-storage");
 const { nativeTheme } = require("electron");
 
 function getTheme() {
