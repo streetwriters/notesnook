@@ -147,7 +147,9 @@ function statusToInfoText(status) {
 function SyncStatus() {
   const syncStatus = useAppStore((state) => state.syncStatus);
   const lastSynced = useAppStore((state) => state.lastSynced);
+  const user = useUserStore((state) => state.user);
 
+  if (!user.isEmailConfirmed) return null;
   switch (syncStatus) {
     case "synced":
       return (
