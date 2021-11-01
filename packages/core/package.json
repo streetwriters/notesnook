@@ -1,6 +1,6 @@
 {
   "name": "notes-core",
-  "version": "6.8.4",
+  "version": "6.9.0",
   "private": true,
   "main": "./api/index.js",
   "devDependencies": {
