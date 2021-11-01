@@ -432,9 +432,7 @@ function Settings(props) {
                   console.error(e);
                   await showToast(
                     "error",
-                    `Could not restore the backup. Error message: ${
-                      e.message || e
-                    }`
+                    `Could not restore the backup: ${e.message || e}`
                   );
                 }
               }}
