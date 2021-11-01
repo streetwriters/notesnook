@@ -404,6 +404,11 @@ function Settings(props) {
               variant="list"
               onClick={async () => {
                 try {
+                  if (!isLoggedIn)
+                    throw new Error(
+                      "You must be logged in to restore backups."
+                    );
+
                   const backupData = JSON.stringify(await importBackup());
                   const error = await showLoadingDialog({
                     title: "Restoring backup",
