@@ -32,6 +32,12 @@ function Toggle(props) {
       <Tip text={title} tip={isToggled ? onTip : offTip} />
       <ReactToggle
         size={20}
+        onClick={async () => {
+          if (isUserPremium() || !premium) onToggled();
+          else {
+            await showBuyDialog();
+          }
+        }}
         onChange={() => {}}
         checked={isToggled}
         icons={false}
