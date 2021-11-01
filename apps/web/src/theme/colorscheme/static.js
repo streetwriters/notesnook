@@ -4,6 +4,7 @@ class StaticColorSchemeFactory {
   constructor(accent) {
     return {
       shade: hexToRGB(accent, 0.1),
+      textSelection: hexToRGB(accent, 0.2),
       dimPrimary: hexToRGB(accent, 0.7),
       transparent: "transparent",
       static: "white",

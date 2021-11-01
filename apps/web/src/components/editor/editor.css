@@ -138,15 +138,9 @@
   height: 15px !important;
 }
 
-::-moz-selection {
-  /* Code for Firefox */
-  color: var(--fontSecondary);
-  background: var(--primary);
-}
-
+::-moz-selection,
 ::selection {
-  color: var(--fontSecondary);
-  background: var(--primary);
+  background: var(--textSelection);
 }
 
 .mce-content-body code[data-mce-selected="inline-boundary"] {
