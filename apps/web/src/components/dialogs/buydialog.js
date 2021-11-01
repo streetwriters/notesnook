@@ -7,6 +7,9 @@ import { getCouponData, upgrade } from "../../common/checkout";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import { navigate } from "../../navigation";
+import ReactToggle from "react-toggle";
+import "react-toggle/style.css";
+import "../properties/toggle.css";
 
 const premiumDetails = [
   {
@@ -180,11 +183,12 @@ function BuyDialog(props) {
                 <Text variant="body" mr={1}>
                   Monthly
                 </Text>
-                {plan === "monthly" ? (
-                  <Icon.ToggleUnchecked color="primary" />
-                ) : (
-                  <Icon.ToggleChecked color="primary" />
-                )}
+                <ReactToggle
+                  size={20}
+                  onChange={() => {}}
+                  checked={plan !== "monthly"}
+                  icons={false}
+                />
                 <Text variant="body" ml={1}>
                   Yearly
                 </Text>

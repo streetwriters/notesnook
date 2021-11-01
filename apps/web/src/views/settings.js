@@ -801,15 +801,15 @@ function AccountStatus(props) {
         mt={2}
       >
         {remainingDays > 0 && isPro
-          ? `You are subscribed to the Pro plan.`
+          ? `Subscribed to Notesnook Pro.`
           : remainingDays > 0 && isTrial
-          ? "Your free trial is ongoing."
+          ? "Your free trial has started."
           : isBeta
           ? "Your beta subscription has ended."
           : isTrial
           ? "Your trial has ended."
           : isPro
-          ? "Your premium subscription has ended."
+          ? "Your Notesnook Pro subscription has ended."
           : ""}
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
@@ -920,24 +920,23 @@ function Header(props) {
   const { title, isOpen, onClick } = props;
   return (
     <Flex
-      sx={{ borderRadius: "default", cursor: "pointer" }}
-      bg="bgSecondary"
-      mt={2}
-      p={2}
+      sx={{ borderBottom: "1px solid var(--border)", cursor: "pointer" }}
+      // mt={2}
+      py={2}
       justifyContent="space-between"
       onClick={onClick}
     >
       <Text
         variant="subtitle"
-        fontWeight="body"
-        color={isOpen ? "primary" : "text"}
+        fontWeight={isOpen ? "bold" : "body"}
+        color={isOpen ? "primary" : "fontTertiary"}
       >
         {title}
       </Text>
       {isOpen ? (
         <Icon.ChevronUp size={19} color="primary" />
       ) : (
-        <Icon.ChevronDown size={19} />
+        <Icon.ChevronDown size={19} color="fontTertiary" />
       )}
     </Flex>
   );

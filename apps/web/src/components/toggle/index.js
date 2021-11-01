@@ -1,9 +1,11 @@
 import React from "react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
-import * as Icon from "../icons";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { Flex } from "rebass";
+import ReactToggle from "react-toggle";
+import "react-toggle/style.css";
+import "../properties/toggle.css";
 
 function Toggle(props) {
   const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
@@ -28,11 +30,12 @@ function Toggle(props) {
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} />
-      {isToggled ? (
-        <Icon.ToggleChecked size={30} sx={{ flexShrink: 0 }} color="primary" />
-      ) : (
-        <Icon.ToggleUnchecked size={30} sx={{ flexShrink: 0 }} />
-      )}
+      <ReactToggle
+        size={20}
+        onChange={() => {}}
+        checked={isToggled}
+        icons={false}
+      />
     </Flex>
   );
 }
