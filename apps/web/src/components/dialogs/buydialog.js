@@ -7,9 +7,7 @@ import { getCouponData, upgrade } from "../../common/checkout";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import { navigate } from "../../navigation";
-import ReactToggle from "react-toggle";
-import "react-toggle/style.css";
-import "../properties/toggle.css";
+import Switch from "../switch";
 
 const premiumDetails = [
   {
@@ -171,28 +169,20 @@ function BuyDialog(props) {
             </>
           ) : (
             <>
-              <Button
-                variant="anchor"
-                display="flex"
-                justifyContent="center"
-                alignItems="center"
-                onClick={() => {
-                  setPlan((s) => (s === "monthly" ? "yearly" : "monthly"));
-                }}
-              >
+              <Flex justifyContent="center" alignItems="center">
                 <Text variant="body" mr={1}>
                   Monthly
                 </Text>
-                <ReactToggle
-                  size={20}
-                  onChange={() => {}}
+                <Switch
                   checked={plan !== "monthly"}
-                  icons={false}
+                  onClick={() => {
+                    setPlan((s) => (s === "monthly" ? "yearly" : "monthly"));
+                  }}
                 />
                 <Text variant="body" ml={1}>
                   Yearly
                 </Text>
-              </Button>
+              </Flex>
               {coupon ? (
                 <Flex mb={1} alignItems="center" justifyContent="space-between">
                   <Flex alignItems="center" justifyContent="center">

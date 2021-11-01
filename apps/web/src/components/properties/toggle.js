@@ -1,8 +1,6 @@
 import { Flex, Text } from "rebass";
 import { useStore } from "../../stores/editor-store";
-import ReactToggle from "react-toggle";
-import "react-toggle/style.css";
-import "./toggle.css";
+import Switch from "../switch";
 
 function Toggle(props) {
   const { icon: ToggleIcon, label, onToggle, toggleKey } = props;
@@ -24,7 +22,7 @@ function Toggle(props) {
         <ToggleIcon size={13} sx={{ flexShrink: 0, mr: 1 }} />
         {label}
       </Text>
-      <ReactToggle size={20} onChange={() => {}} checked={isOn} icons={false} />
+      <Switch onClick={() => onToggle(!isOn)} checked={isOn} />
     </Flex>
   );
 }

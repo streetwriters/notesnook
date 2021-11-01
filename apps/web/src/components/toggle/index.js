@@ -1,26 +1,25 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { showBuyDialog } from "../../common/dialog-controller";
 import Tip from "../tip";
 import { isUserPremium } from "../../hooks/use-is-user-premium";
 import { Flex } from "rebass";
-import ReactToggle from "react-toggle";
-import "react-toggle/style.css";
-import "../properties/toggle.css";
+import Switch from "../switch";
 
 function Toggle(props) {
   const { title, onTip, offTip, isToggled, onToggled, onlyIf, premium } = props;
+  const onClick = useCallback(async () => {
+    if (isUserPremium() || !premium) onToggled();
+    else {
+      await showBuyDialog();
+    }
+  }, [onToggled, premium]);
 
   if (onlyIf === false) return null;
   return (
     <Flex
       justifyContent="space-between"
       alignItems="center"
-      onClick={async () => {
-        if (isUserPremium() || !premium) onToggled();
-        else {
-          await showBuyDialog();
-        }
-      }}
+      onClick={onClick}
       py={2}
       sx={{
         cursor: "pointer",
@@ -30,18 +29,7 @@ function Toggle(props) {
       }}
     >
       <Tip text={title} tip={isToggled ? onTip : offTip} />
-      <ReactToggle
-        size={20}
-        onClick={async () => {
-          if (isUserPremium() || !premium) onToggled();
-          else {
-            await showBuyDialog();
-          }
-        }}
-        onChange={() => {}}
-        checked={isToggled}
-        icons={false}
-      />
+      <Switch onClick={onClick} checked={isToggled} />
     </Flex>
   );
 }
