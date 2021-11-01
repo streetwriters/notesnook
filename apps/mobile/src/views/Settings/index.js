@@ -1778,6 +1778,15 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
         {
           name: 'Restore backup',
           func: async () => {
+            if (!user || !user?.email) {
+              ToastEvent.show({
+                heading:"Login required",
+                message:"Please login to your account to restore backup",
+                type:"error",
+                 context:'global'
+              })
+              return;
+            }
             if (isSheet) {
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
