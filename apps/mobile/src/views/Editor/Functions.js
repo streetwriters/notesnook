@@ -321,7 +321,7 @@ export const _onMessage = async evt => {
       eSendEvent('editorScroll', message);
       break;
     case 'attachment_download':
-      filesystem.downloadAttachment(message.value,true);
+      filesystem.downloadAttachment(message.value, true);
       break;
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
@@ -735,9 +735,9 @@ const loadNoteInEditor = async (keepHistory = true) => {
       );
     } else {
       post('html', content.data);
-      if (id) {
-        db.attachments.downloadImages(id);
-      }
+    }
+    if (id) {
+      db.attachments.downloadImages(id);
     }
 
     setColors();
