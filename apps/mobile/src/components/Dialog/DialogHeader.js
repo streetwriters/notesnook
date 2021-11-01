@@ -17,17 +17,17 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          minHeight: 50,
+          minHeight: 50
         }}>
         <View
           style={{
-            width: '100%',
+            width: '100%'
           }}>
           <View
             style={{
               flexDirection: 'row',
               justifyContent: 'space-between',
-              alignItems: 'center',
+              alignItems: 'center'
             }}>
             <Heading size={SIZE.xl}>{title}</Heading>
 
@@ -36,10 +36,11 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
                 onPress={button.onPress}
                 style={{
                   borderRadius: 100,
+                  paddingHorizontal: 12
                 }}
                 fontSize={13}
                 title={button.title}
-                type="accent"
+                type={button.type || 'grayBg'}
                 height={25}
               />
             ) : null}

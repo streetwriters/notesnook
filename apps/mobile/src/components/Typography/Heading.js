@@ -28,7 +28,7 @@ const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
         {
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          fontFamily:Platform.OS === "android"  ? "Roboto-Medium" : null,
+          fontFamily:Platform.OS === "android"  ? "OpenSans-SemiBold" : null,
           fontWeight:Platform.OS === "ios" ? "600" : null
         },
         style,

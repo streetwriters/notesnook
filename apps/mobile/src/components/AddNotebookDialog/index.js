@@ -6,7 +6,7 @@ import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -88,13 +88,6 @@ export class AddNotebookDialog extends React.Component {
     this.description = null;
     this.currentInputValue = null;
     this.id = null;
-    this.setState({
-      visible: false,
-      topics: [],
-      descFocused: false,
-      titleFocused: false,
-      editTopic: false
-    });
   };
 
   onDelete = index => {
@@ -269,10 +262,13 @@ export class AddNotebookDialog extends React.Component {
         }}
         fwdRef={this.actionSheetRef}
         onClose={() => {
-          console.log('closing now');
           this.close();
           this.setState({
-            visible: false
+            visible: false,
+            topics: [],
+            descFocused: false,
+            titleFocused: false,
+            editTopic: false
           });
         }}
         statusBarTranslucent={false}

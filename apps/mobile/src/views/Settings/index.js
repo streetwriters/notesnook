@@ -48,6 +48,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
+import Notifications from '../../services/Notifications';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
@@ -56,7 +57,6 @@ import {
   APP_VERSION,
   InteractionManager,
   MenuItemsList,
-  preloadImages,
   SUBSCRIPTION_PROVIDER,
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
@@ -69,7 +69,7 @@ import {
   setColorScheme
 } from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
@@ -104,7 +104,6 @@ export const Settings = ({navigation}) => {
   let pageIsLoaded = false;
 
   const onFocus = useCallback(() => {
-    eSendEvent(eScrollEvent, {name: 'Settings', type: 'in'});
     eSendEvent(eUpdateSearchState, {
       placeholder: '',
       data: [],
@@ -143,7 +142,6 @@ export const Settings = ({navigation}) => {
 
     return () => {
       pageIsLoaded = false;
-      eSendEvent(eScrollEvent, {name: 'Settings', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);
@@ -287,7 +285,11 @@ export const Settings = ({navigation}) => {
             paddingHorizontal: 0
           }}>
           <SettingsUserSection />
+
           <SettingsAppearanceSection />
+
+          {Platform.OS === 'android' && <SettingsGeneralOptions />}
+
           <SettingsPrivacyAndSecurity />
 
           <SettingsBackupAndRestore />
@@ -381,16 +383,16 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
       }}
       style={{
         height: 50,
-        backgroundColor: colors.nav,
-        paddingHorizontal: 12,
+        paddingHorizontal: 0,
         justifyContent: 'space-between',
         flexDirection: 'row',
         alignItems: 'center',
         width: '95%',
         alignSelf: 'center',
-        borderRadius: 5,
         marginBottom: 5,
-        marginTop: 5
+        marginTop: 5,
+        borderBottomWidth:1,
+        borderBottomColor:colors.nav
       }}>
       {collapsed ? (
         <Paragraph
@@ -463,13 +465,18 @@ const AccoutLogoutSection = () => {
               negativeTitle="Cancel"
               onPressNegative={() => setVisible(false)}
               onPressPositive={async () => {
-                setVisible(false);
-                setLoading(true);
-                await sleep(10);
-                await db.user.logout();
-                await BiometricService.resetCredentials();
-                await Storage.write('introCompleted', 'true');
-                setLoading(false);
+                try {
+                  setVisible(false);
+                  setLoading(true);
+                  await sleep(10);
+                  await db.user.logout();
+                  await BiometricService.resetCredentials();
+                  await Storage.write('introCompleted', 'true');
+                  setLoading(false);
+                } catch (e) {
+                  setVisible(false);
+                  setLoading(false);
+                }
               }}
             />
           </DialogContainer>
@@ -645,17 +652,23 @@ const CustomButton = ({
       }}>
       <View
         style={{
-          maxWidth: maxWidth
+          flexShrink: 1
         }}>
         <Paragraph
           size={SIZE.md}
           color={color || colors.pri}
           style={{
-            textAlignVertical: 'center'
+            textAlignVertical: 'center',
+            flexWrap: 'wrap'
           }}>
           {title}
         </Paragraph>
-        <Paragraph size={SIZE.sm} color={colors.icon}>
+        <Paragraph
+          style={{
+            flexWrap: 'wrap'
+          }}
+          size={SIZE.sm}
+          color={colors.icon}>
           {tagline}
         </Paragraph>
       </View>
@@ -764,17 +777,16 @@ const SettingsUserSection = () => {
                 width: '100%',
                 paddingVertical: 12,
                 backgroundColor: colors.bg,
-                borderRadius: 5,
-                paddingHorizontal: 12,
-                borderWidth: 1,
-                borderColor: colors.accent
+                borderRadius: 5
               }}>
               <View
                 style={{
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 2.5
+                  paddingBottom: 2.5,
+                  borderBottomWidth: 1,
+                  borderColor: colors.accent
                 }}>
                 <View
                   style={{
@@ -825,6 +837,9 @@ const SettingsUserSection = () => {
                     <Seperator />
                     <Paragraph
                       size={SIZE.lg}
+                      style={{
+                        textAlign: 'center'
+                      }}
                       color={
                         (subscriptionDaysLeft.time > 5 &&
                           !subscriptionDaysLeft.isHour) ||
@@ -834,15 +849,19 @@ const SettingsUserSection = () => {
                       }>
                       {isExpired
                         ? 'Your subscription has ended.'
-                        : `${subscriptionDaysLeft.time} ${
-                            subscriptionDaysLeft.isHour ? 'hours' : 'days'
-                          } remaining`}
+                        : user.subscription?.type === 1
+                        ? `Your trial has started`
+                        : `Subscribed to Notesnook Pro`}
                     </Paragraph>
-                    <Paragraph color={colors.pri}>
+                    <Paragraph
+                      style={{
+                        textAlign: 'center'
+                      }}
+                      color={colors.pri}>
                       {user.subscription?.type === 2
                         ? 'You signed up on ' + startDate
                         : user.subscription?.type === 1
-                        ? 'Your trial period started on ' + startDate
+                        ? 'Your trial will end on ' + expiryDate
                         : user.subscription?.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
@@ -850,7 +869,7 @@ const SettingsUserSection = () => {
                         : user.subscription?.type === 7
                         ? `Your subscription will end on ${expiryDate}.`
                         : user.subscription?.type === 5
-                        ? `Your subscription will auto renew on ${expiryDate}.`
+                        ? `Your subscription will renew on ${expiryDate}.`
                         : null}
                     </Paragraph>
                   </View>
@@ -887,7 +906,7 @@ const SettingsUserSection = () => {
                               } / mo)`
                         }
                         height={50}
-                        type="transparent"
+                        type="accent"
                       />
                     </>
                   )}
@@ -996,13 +1015,13 @@ const SettingsUserSection = () => {
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
             },
-            {
+           /*  {
               name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
               },
               desc: 'Setup a new password for your account.'
-            },
+            }, */
             {
               name: 'Having problems with syncing?',
               func: async () => {
@@ -1183,7 +1202,6 @@ const SettingsAppearanceSection = () => {
                 onPress={async () => {
                   await PremiumService.verify(async () => {
                     changeAccentColor(item);
-                    preloadImages(item);
                     await MMKV.setStringAsync('accentColor', item);
                   });
                 }}
@@ -1632,6 +1650,65 @@ const SettingsPrivacyAndSecurity = () => {
   );
 };
 
+export const SettingsGeneralOptions = ({isSheet}) => {
+  const [state] = useTracked();
+  const {colors} = state;
+  const settings = useSettingStore(state => state.settings);
+  const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+  const toggleNotifNotes = () => {
+    if (settings.notifNotes) {
+      Notifications.unpinQuickNote();
+    } else {
+      Notifications.pinQuickNote();
+    }
+    SettingsService.set('notifNotes', !settings.notifNotes);
+  };
+
+  const generalList = [
+    {
+      name: 'Notes in notifications',
+      func: toggleNotifNotes,
+      desc: 'Add quick notes from notifications without opening the app.',
+      customComponent: (
+        <ToggleSwitch
+          isOn={settings.notifNotes}
+          onColor={colors.accent}
+          offColor={colors.icon}
+          size="small"
+          animationSpeed={150}
+          onToggle={toggleNotifNotes}
+        />
+      )
+    }
+  ];
+
+  return (
+    <>
+      {!isSheet && (
+        <SectionHeader
+          collapsed={collapsed}
+          setCollapsed={setCollapsed}
+          title="General"
+        />
+      )}
+
+      {!collapsed && (
+        <>
+          {generalList.map(item => (
+            <CustomButton
+              key={item.name}
+              title={item.name}
+              tagline={item.desc}
+              onPress={item.func}
+              customComponent={item.customComponent}
+            />
+          ))}
+        </>
+      )}
+    </>
+  );
+};
+
 export const SettingsDeveloperOptions = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -1639,9 +1716,8 @@ export const SettingsDeveloperOptions = ({isSheet}) => {
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
 
   const toggleDevMode = () => {
-    SettingsService.set("devMode",!settings.devMode);
-  }
-
+    SettingsService.set('devMode', !settings.devMode);
+  };
 
   const devModeList = [
     {
@@ -1702,6 +1778,15 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
         {
           name: 'Restore backup',
           func: async () => {
+            if (!user || !user?.email) {
+              ToastEvent.show({
+                heading:"Login required",
+                message:"Please login to your account to restore backup",
+                type:"error",
+                 context:'global'
+              })
+              return;
+            }
             if (isSheet) {
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
@@ -1902,20 +1987,13 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
                     } else {
                       await PremiumService.verify(async () => {
                         if (Platform.OS === 'android') {
-                          let granted = await Storage.requestPermission();
+                          let granted = await Backup.checkBackupDirExists();
                           if (!granted) {
-                            ToastEvent.show({
-                              heading: 'Could not enable auto backups',
-                              message:
-                                'You must give storage access to enable auto backups.',
-                              type: 'error',
-                              context: 'local'
-                            });
+                            console.log('returning');
                             return;
                           }
                         }
                         await SettingsService.set('reminder', item.value);
-                        //await Backup.run();
                       });
                     }
                     updateAskForBackup();

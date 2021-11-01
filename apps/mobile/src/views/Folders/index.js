@@ -12,7 +12,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import {InteractionManager} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eScrollEvent} from '../../utils/Events';
 
 export const Folders = ({route, navigation}) => {
@@ -43,7 +43,6 @@ export const Folders = ({route, navigation}) => {
         setNotebooks()
       });
     });
-    eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -54,7 +53,6 @@ export const Folders = ({route, navigation}) => {
       ranAfterInteractions = false;
       pageIsLoaded = false;
       navigation.removeListener('focus', onFocus);
-      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
     };
   }, []);
 

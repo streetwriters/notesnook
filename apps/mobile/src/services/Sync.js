@@ -1,10 +1,9 @@
 import NetInfo from '@react-native-community/netinfo';
 import { initialize, useUserStore } from '../provider/stores';
 import { doInBackground } from '../utils';
-import { db } from '../utils/DB';
-import { eOpenLoginDialog } from '../utils/Events';
+import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
-import { eSendEvent, ToastEvent } from './EventManager';
+import { ToastEvent } from './EventManager';
 
 const run = async (context = 'global', forced) => {
   const userstore = useUserStore.getState();
@@ -14,6 +13,7 @@ const run = async (context = 'global', forced) => {
       try {
         return await db.sync(true, forced);
       } catch (e) {
+        console.log(e.stack)
         return e.message;
       }
     });
@@ -28,17 +28,7 @@ const run = async (context = 'global', forced) => {
     });
   } catch (e) {
     if (e.message === "Sync already running") return;
-    if (e.message === 'You need to login to sync.') {
-      ToastEvent.show({
-        heading: 'Enable sync',
-        message: 'Login to encrypt and sync notes.',
-        context: context,
-        func: () => {
-          eSendEvent(eOpenLoginDialog);
-        },
-        actionText: 'Login'
-      });
-    } else {
+    if (userstore.user)  {
       userstore.setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
@@ -52,7 +42,7 @@ const run = async (context = 'global', forced) => {
   } finally {
     userstore.setLastSynced(await db.lastSynced());
     initialize();
-    if (getNote()) {
+    if (getNote()?.id) {
       await updateNoteInEditor();
     }
     userstore.setSyncing(false);

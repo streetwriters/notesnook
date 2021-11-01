@@ -4,8 +4,10 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { getTotalNotes, history } from '../../utils';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
@@ -43,7 +45,9 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
       id: topic.id,
       type: topic.type
     };
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate(routeName, params, headerState);
+   
   };
 
   return (

@@ -1,19 +1,18 @@
-import React, {useEffect} from 'react';
-import {Platform} from 'react-native';
-import {View} from 'react-native';
+import React from 'react';
+import { Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {ActionSheetEvent} from '../DialogManager/recievers';
-import {TimeSince} from '../Menu/TimeSince';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { ActionSheetEvent } from '../DialogManager/recievers';
+import { TimeSince } from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -31,6 +30,7 @@ function navigateToNotebook(item) {
     id: notebook.id,
     type: notebook.type
   };
+  eSendEvent(eOnNewTopicAdded, params);
   Navigation.navigate(routeName, params, headerState);
 }
 
@@ -42,12 +42,13 @@ function navigateToTag(item) {
     type: 'tag',
     get: 'tagged'
   };
+
+  eSendEvent(refreshNotesPage, params);
   Navigation.navigate('NotesPage', params, {
     heading: '#' + _tag.title,
     id: _tag.id,
     type: _tag.type
   });
-  eSendEvent(refreshNotesPage, params);
 }
 
 const showActionSheet = (item, isTrash) => {
@@ -67,6 +68,7 @@ const showActionSheet = (item, isTrash) => {
           'Publish',
           'Pin',
           'Favorite',
+          'Attachments',
           'Vault',
           'Delete',
           'RemoveTopic',
@@ -157,7 +159,7 @@ const NoteItem = ({item, isTrash, tags}) => {
 
         <Heading
           numberOfLines={1}
-          color={COLORS_NOTE[item.color] || colors.heading}
+          color={COLORS_NOTE[item.color?.toLowerCase()] || colors.heading}
           style={{
             flexWrap: 'wrap'
           }}
@@ -205,7 +207,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     width: SIZE.xs,
                     height: SIZE.xs,
                     borderRadius: 100,
-                    backgroundColor: COLORS_NOTE[item.color],
+                    backgroundColor: COLORS_NOTE[item.color.toLowerCase()],
                     marginRight: -4.5,
                     marginRight: 10
                   }}
@@ -220,7 +222,9 @@ const NoteItem = ({item, isTrash, tags}) => {
                   style={{
                     marginRight: 5
                   }}
-                  color={COLORS_NOTE[item.color] || colors.accent}
+                  color={
+                    COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
+                  }
                 />
               ) : null}
 
@@ -238,7 +242,6 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.favorite ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="star"
                   size={SIZE.md}
                   style={{

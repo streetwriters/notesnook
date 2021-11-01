@@ -1,22 +1,18 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import Clipboard from "@react-native-clipboard/clipboard"
+import Clipboard from '@react-native-clipboard/clipboard';
 import {useTracked} from '../../provider';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eClosePublishNoteDialog,
-  eOpenPublishNoteDialog,
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
@@ -28,6 +24,8 @@ import Input from '../Input';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import {useAttachmentStore} from '../../provider/stores';
+import {editing} from '../../utils';
 
 let passwordValue = null;
 const PublishNoteDialog = () => {
@@ -35,6 +33,7 @@ const PublishNoteDialog = () => {
   const colors = state.colors;
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
+  const loading = useAttachmentStore(state => state.loading);
   const [selfDestruct, setSelfDestruct] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [note, setNote] = useState(null);
@@ -77,18 +76,19 @@ const PublishNoteDialog = () => {
   const publishNote = async () => {
     if (publishing) return;
     setPublishing(true);
+
     try {
       if (note?.id) {
         if (isLocked && !passwordValue) return;
         await db.monographs.publish(note.id, {
           selfDestruct: selfDestruct,
-          password: isLocked && passwordValue,
+          password: isLocked && passwordValue
         });
         setNote(db.notes.note(note.id)?.data);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Favorites
         ]);
       }
     } catch (e) {
@@ -96,9 +96,10 @@ const PublishNoteDialog = () => {
         heading: 'Could not publish note',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
+
     setPublishing(false);
   };
 
@@ -112,7 +113,7 @@ const PublishNoteDialog = () => {
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Favorites
         ]);
       }
     } catch (e) {
@@ -120,7 +121,7 @@ const PublishNoteDialog = () => {
         heading: 'Could not unpublish note',
         message: e.message,
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
     actionSheetRef.current?.hide();
@@ -132,6 +133,7 @@ const PublishNoteDialog = () => {
       centered={false}
       fwdRef={actionSheetRef}
       closeOnTouchBackdrop={!publishing}
+      gestureEnabled={!publishing}
       onClose={async () => {
         passwordValue = null;
         setVisible(false);
@@ -140,13 +142,13 @@ const PublishNoteDialog = () => {
         style={{
           width: '100%',
           alignSelf: 'center',
-          paddingHorizontal: 12,
+          paddingHorizontal: 12
         }}>
         <DialogHeader
-          title="Publish note"
+          title={note.title}
           paragraph={`Anyone with the link${
             isLocked ? ' and password' : ''
-          } of a published note can view it.`}
+          } of the published note can view it.`}
         />
 
         {publishing ? (
@@ -155,14 +157,18 @@ const PublishNoteDialog = () => {
               justifyContent: 'center',
               alignContent: 'center',
               height: 150,
-              width: '100%',
+              width: '100%'
             }}>
             <ActivityIndicator size={25} color={colors.accent} />
             <Paragraph
               style={{
-                textAlign: 'center',
+                textAlign: 'center'
               }}>
               Please wait...
+              {loading &&
+                `\nDownloading attachments (${
+                  loading?.current / loading?.total
+                })`}
             </Paragraph>
           </View>
         ) : (
@@ -173,31 +179,32 @@ const PublishNoteDialog = () => {
                   flexDirection: 'row',
                   alignItems: 'center',
                   marginTop: 15,
-                  backgroundColor: colors.shade,
-                  padding: 10,
-                  borderRadius: 5,
-                  borderWidth: 1,
-                  borderColor: colors.accent,
+                  backgroundColor: colors.nav,
+                  padding: 12,
+                  borderRadius: 5
                 }}>
                 <View
                   style={{
                     width: '100%',
-                    flexShrink: 1,
+                    flexShrink: 1
                   }}>
-                  <Heading size={SIZE.md}>This Note is published</Heading>
-                  <Paragraph numberOfLines={1}>{publishUrl}</Paragraph>
-
+                  <Heading size={SIZE.sm}>Published at:</Heading>
+                  <Paragraph size={SIZE.xs + 1} numberOfLines={1}>
+                    {publishUrl}
+                  </Paragraph>
                   <Paragraph
                     onPress={async () => {
                       try {
                         await openLinkInBrowser(publishUrl, colors.accent);
                       } catch (e) {}
                     }}
+                    size={SIZE.xs + 1}
                     style={{
                       marginTop: 5,
-                      color: colors.accent,
+                      color: colors.pri
                     }}>
-                    <Icon name="open-in-new" /> Open in browser
+                    <Icon color={colors.accent} name="open-in-new" /> Open in
+                    browser
                   </Paragraph>
                 </View>
 
@@ -207,10 +214,10 @@ const PublishNoteDialog = () => {
                     ToastEvent.show({
                       heading: 'Note publish url copied',
                       type: 'success',
-                      context: 'local',
+                      context: 'local'
                     });
                   }}
-                  color={colors.icon}
+                  color={colors.accent}
                   size={SIZE.lg}
                   name="content-copy"
                 />
@@ -227,7 +234,7 @@ const PublishNoteDialog = () => {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
-                marginBottom: 10,
+                marginBottom: 10
               }}>
               <ActionIcon
                 onPress={() => {
@@ -246,7 +253,7 @@ const PublishNoteDialog = () => {
               <View
                 style={{
                   width: '100%',
-                  flexShrink: 1,
+                  flexShrink: 1
                 }}>
                 <Heading size={SIZE.md}>Password protection</Heading>
                 <Paragraph>
@@ -263,7 +270,7 @@ const PublishNoteDialog = () => {
               activeOpacity={0.9}
               style={{
                 flexDirection: 'row',
-                alignItems: 'center',
+                alignItems: 'center'
               }}>
               <ActionIcon
                 onPress={() => {
@@ -281,7 +288,7 @@ const PublishNoteDialog = () => {
               <View
                 style={{
                   width: '100%',
-                  flexShrink: 1,
+                  flexShrink: 1
                 }}>
                 <Heading size={SIZE.md}>Self destruct</Heading>
                 <Paragraph>
@@ -295,7 +302,7 @@ const PublishNoteDialog = () => {
               style={{
                 width: '100%',
                 alignSelf: 'center',
-                marginTop: 10,
+                marginTop: 10
               }}>
               {isLocked ? (
                 <>
@@ -315,6 +322,9 @@ const PublishNoteDialog = () => {
                 onPress={publishNote}
                 fontSize={SIZE.md}
                 width="100%"
+                style={{
+                  marginTop: 10
+                }}
                 height={50}
                 type="accent"
                 title={isPublished ? 'Update published note' : 'Publish note'}
@@ -343,13 +353,13 @@ const PublishNoteDialog = () => {
           style={{
             textAlign: 'center',
             marginTop: 5,
-            textDecorationLine: 'underline',
+            textDecorationLine: 'underline'
           }}
           onPress={async () => {
             try {
               await openLinkInBrowser(
                 'https://docs.notesnook.com/monographs/',
-                colors.accent,
+                colors.accent
               );
             } catch (e) {}
           }}>

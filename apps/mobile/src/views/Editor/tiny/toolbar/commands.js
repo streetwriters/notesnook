@@ -1,13 +1,4 @@
-import { launchCamera, launchImageLibrary } from 'react-native-sodium';
-import { eSendEvent } from '../../../../services/EventManager';
-import { editing } from '../../../../utils';
-import {
-  eCloseProgressDialog,
-  eOpenProgressDialog
-} from '../../../../utils/Events';
-import { sleep } from '../../../../utils/TimeUtils';
-import { safeKeyboardDismiss } from '../tiny';
-import { formatSelection } from './constants';
+import picker from './picker';
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,
@@ -79,53 +70,6 @@ export const execCommands = {
     })();`,
 
   cl: `tinymce.activeEditor.execCommand('insertCheckList')`,
-  image: async () => {
-    if (editing.isFocused) {
-      safeKeyboardDismiss();
-      await sleep(500);
-      editing.isFocused = true;
-    }
-    eSendEvent(eOpenProgressDialog, {
-      noProgress: true,
-      noIcon: true,
-      actionsArray: [
-        {
-          action: async () => {
-            eSendEvent(eCloseProgressDialog);
-            await sleep(500);
-            launchCamera(
-              {
-                includeBase64: true,
-                maxWidth: 1024,
-                mediaType: 'photo'
-              },
-              handleImageResponse
-            );
-          },
-          actionText: 'Take photo',
-          icon: 'camera'
-        },
-        {
-          action: async () => {
-            eSendEvent(eCloseProgressDialog);
-            await sleep(300);
-            launchImageLibrary(
-              {
-                includeBase64: true,
-                maxWidth: 1024,
-                mediaType: 'photo'
-              },
-              handleImageResponse
-            );
-          },
-          actionText: 'Select from gallery',
-          icon: 'image-multiple'
-        }
-      ]
-    });
-
-    return;
-  },
   video: `tinymce.activeEditor.execCommand('mceMedia')`,
   pre: `
     tinymce.activeEditor.execCommand('mceInsertCodeBlock')
@@ -135,69 +79,9 @@ export const execCommands = {
   tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
   tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
   tablerowprops: "tinymce.activeEditor.execCommand('mceTableRowProps');",
-  imageResize25: `(function() {
-    let node = tinymce.activeEditor.selection.getNode();
-  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-
-    tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_size_three")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-    });
- 
-  }
-
-  })();
-  
-  `,
-  imageResize50: `(function() {
-    let node = tinymce.activeEditor.selection.getNode();
-  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-      tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_one")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_one")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_size_two")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-    
-    });
-   
-  }
-  })()
-  
-  `,
-  imageResize100: `(function() {
-    let node = tinymce.activeEditor.selection.getNode();
-  if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
-    tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_three")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_three")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_size_two")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_size_two")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_size_one")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-     
-    });
-  }
-  })()
-  
-  `,
+  imageResize25: () => setImageSize(0.25),
+  imageResize50: () => setImageSize(0.5),
+  imageResize100: () => setImageSize(1),
   imagepreview: `(function() {
     if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
       var xhr = new XMLHttpRequest();
@@ -237,67 +121,9 @@ export const execCommands = {
     }  
   })();
   `,
-  imagefloatleft: `(function () {
-let node = tinymce.activeEditor.selection.getNode();
-  if (node.tagName === 'IMG') {
-   
-    tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_float_left")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-    });
-  }
-  })();
-  
-  `,
-  imagefloatright: `(function () {
-let node = tinymce.activeEditor.selection.getNode();
-  if (node.tagName === 'IMG') {
-   
-    tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
-        tinymce.activeEditor.dom.removeClass(node, "img_float_left")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_none")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_float_none")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_float_right")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-     
-    });
-  }
-  })()
-  
-  `,
-  imagefloatnone: `(function () {
-  let node = tinymce.activeEditor.selection.getNode();
-  if (node.tagName === 'IMG') {
-   
-    tinymce.activeEditor.undoManager.transact(function() {
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_left")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_float_left")
-      }
-      if (tinymce.activeEditor.dom.hasClass(node,"img_float_right")) {
-        tinymce.activeEditor.dom.removeClass(node,"img_float_right")
-      }
-      tinymce.activeEditor.dom.addClass(node,"img_float_none")
-      setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
-      },100)
-    });
-  }
-  })()
-  
-  `,
+  imagefloatleft: () => setFloat('left'),
+  imagefloatright: () => setFloat('right'),
+  imagefloatnone: () => setFloat('none'),
   'line-break': `
   tinymce.activeEditor.undoManager.transact(function() {
     tinymce.activeEditor.execCommand('InsertLineBreak');
@@ -307,34 +133,38 @@ let node = tinymce.activeEditor.selection.getNode();
 });`
 };
 
-const handleImageResponse = (response) => {
-  if (response.didCancel || response.errorMessage || !response.assets || response.assets?.length === 0) {
-    return;
+const setFloat = float => `(function () {
+  let node = tinymce.activeEditor.selection.getNode();
+  if (node.tagName === 'IMG') {
+    tinymce.activeEditor.undoManager.transact(function() {
+      node.style.float = "${float}";
+      setTimeout(function() {
+        tinymce.activeEditor.nodeChanged({selectionChange:true})
+      },100)
+    });
   }
-  // For not support only single image picker
-  let image = response.assets[0];
+  })()`;
 
-  let b64 = `data:${image.type};base64, ` + image.base64;
-
-  formatSelection(`
-  (function() {
-    let pTag = "";
-    let body = tinymce.activeEditor.contentDocument.getElementsByTagName("body")[0];
-    if (body.lastElementChild && body.lastElementChild.innerHTML === tinymce.activeEditor.selection.getNode().innerHTML) {
-      pTag = "<p></p>"
+const setImageSize = size => `(function() {
+  let node = tinymce.activeEditor.selection.getNode();
+if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+  tinymce.activeEditor.undoManager.transact(function() { 
+  let rect = node.getBoundingClientRect();
+    let originalWidth = rect.width;
+    let originalHeight = rect.height;
+    if (node.dataset.width) {
+      originalWidth = node.dataset.width;
+      originalHeight = node.dataset.height;
+    } else {
+      node.dataset.width = originalWidth;
+      node.dataset.height = originalHeight;
     }
-    
-  minifyImg(
-  "${b64}",
-  1024,
-  'image/jpeg',
-  function(r) {
-    var content = "<img style=" + "max-width:100% !important;" + "src=" + r + ">" + pTag;
-    editor.undoManager.transact(function() {editor.execCommand("mceInsertContent",false,content)}); 
-  },
-  0.6
-  );
-  
-  })();
-`);
-};
+
+    node.width = originalWidth * ${size}
+    setTimeout(function() {
+      tinymce.activeEditor.nodeChanged({selectionChange:true})
+    },100)
+  });
+}
+})();
+`;

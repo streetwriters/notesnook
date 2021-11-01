@@ -1,5 +1,6 @@
 import React, {useEffect, useRef} from 'react';
 import {
+  ActivityIndicator,
   BackHandler,
   InteractionManager,
   Keyboard,
@@ -12,6 +13,7 @@ import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent} from '../../components/DialogManager/recievers';
 import {useTracked} from '../../provider';
 import {
+  useAttachmentStore,
   useEditorStore,
   useSettingStore,
   useUserStore
@@ -25,35 +27,33 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {editing} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor,
-  eOpenPublishNoteDialog,
-  eOpenLoginDialog
+  eOpenLoginDialog,
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {EditorTitle} from './EditorTitle';
 import {
-  checkNote,
   clearEditor,
   clearTimer,
-  EditorWebView,
   getNote,
-  isNotedEdited,
   loadNote,
-  presentResolveConflictDialog,
-  setColors,
-  textInput
+  setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
 
+import * as Progress from 'react-native-progress';
+import {ProgressCircle} from './ProgressCircle';
+import picker from './tiny/toolbar/picker';
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -65,6 +65,7 @@ const EditorHeader = () => {
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
   const handleBack = useRef();
+  const keyboardListener = useRef();
 
   useEffect(() => {
     setColors(colors);
@@ -75,6 +76,7 @@ const EditorHeader = () => {
       eSendEvent(eCloseFullscreenEditor);
       return;
     }
+
     if (deviceMode === 'mobile') {
       editing.movedAway = true;
     }
@@ -98,17 +100,10 @@ const EditorHeader = () => {
         undo: 0,
         redo: 0
       });
-      if (checkNote() && isNotedEdited()) {
-        ToastEvent.show({
-          heading: 'Note is saved',
-          type: 'success',
-          duration: 1500
-        });
-      }
       useEditorStore.getState().setCurrentlyEditingNote(null);
       await clearTimer(true);
       await clearEditor(false, true, false);
-      Keyboard.removeListener('keyboardDidShow', tiny.onKeyboardShow);
+      keyboardListener.current?.remove();
     }
   };
 
@@ -169,6 +164,7 @@ const EditorHeader = () => {
       'Copy',
       'Dark Mode',
       'Add to Vault',
+      'Attachments',
       'Pin',
       'Favorite',
       'Publish',
@@ -205,7 +201,10 @@ const EditorHeader = () => {
   const load = async item => {
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-      Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
+      keyboardListener.current = Keyboard.addListener(
+        'keyboardDidShow',
+        tiny.onKeyboardShow
+      );
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -278,7 +277,7 @@ const EditorHeader = () => {
               left={50}
               testID={notesnook.ids.default.header.buttons.back}
               name="arrow-left"
-              color={colors.heading}
+              color={colors.pri}
               onPress={_onBackPress}
               bottom={5}
               customStyle={{
@@ -297,7 +296,7 @@ const EditorHeader = () => {
             {currentlyEditingNote && (
               <ActionIcon
                 name="cloud-upload-outline"
-                color={colors.accent}
+                color={colors.pri}
                 customStyle={{
                   marginLeft: 10,
                   borderRadius: 5
@@ -307,10 +306,23 @@ const EditorHeader = () => {
               />
             )}
 
+            {currentlyEditingNote && (
+              <ActionIcon
+                name="attachment"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5
+                }}
+                top={50}
+                onPress={picker.pick}
+              />
+            )}
+
             {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
                 name="fullscreen"
-                color={colors.heading}
+                color={colors.pri}
                 customStyle={{
                   marginLeft: 10
                 }}
@@ -325,7 +337,7 @@ const EditorHeader = () => {
 
             <ActionIcon
               name="dots-horizontal"
-              color={colors.heading}
+              color={colors.pri}
               customStyle={{
                 marginLeft: 10
               }}
@@ -333,6 +345,8 @@ const EditorHeader = () => {
               right={50}
               onPress={showActionsheet}
             />
+
+            <ProgressCircle />
           </>
         </View>
       </View>

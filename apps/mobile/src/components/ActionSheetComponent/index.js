@@ -39,11 +39,13 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import {
+  eOpenAttachmentsDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
-  eOpenTagsDialog
+  eOpenTagsDialog,
+  refreshNotesPage
 } from '../../utils/Events';
 import { deleteItems, openLinkInBrowser } from '../../utils/functions';
 import { MMKV } from '../../utils/mmkv';
@@ -532,6 +534,16 @@ export const ActionSheetComponent = ({
       }
     },
     {
+      name: 'Attachments',
+      title: 'Attachments',
+      icon: 'attachment',
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAttachmentsDialog,note);
+      }
+    },
+    {
       name: 'Export',
       title: 'Export',
       icon: 'export',
@@ -672,7 +684,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.sm - 1} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.sm - 1.5} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
@@ -812,7 +824,8 @@ export const ActionSheetComponent = ({
                           heading: topic.title,
                           id: topic.id,
                           type: topic.type
-                        };
+                        }; 
+                        eSendEvent(refreshNotesPage, params);
                         Navigation.navigate(routeName, params, headerState);
                       }}
                       icon="book-open-outline"
@@ -842,24 +855,6 @@ export const ActionSheetComponent = ({
                 }}
               />
             ) : null}
-            {note.type !== 'note' || refreshing ? null : (
-              <Button
-                onPress={async () => await Sync.run('local')}
-                title={
-                  user && lastSynced > note.dateEdited ? 'Synced' : 'Sync Now'
-                }
-                type="shade"
-                height={30}
-                fontSize={SIZE.sm}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
-            )}
 
             {note.type === 'note' && (
               <Button

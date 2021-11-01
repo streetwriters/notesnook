@@ -4,13 +4,10 @@ import ActionSheet from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
-import { editing } from '../../utils';
 import { hexToRGBA } from '../../utils/ColorUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorWebView, textInput } from '../../views/Editor/Functions';
-import tiny from '../../views/Editor/tiny/tiny';
-import { focusEditor, reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
 import { Toast } from '../Toast';
+import { BouncingView } from './BouncingView';
 import { GetPremium } from './GetPremium';
 
 const ActionSheetWrapper = ({
@@ -53,7 +50,7 @@ const ActionSheetWrapper = ({
   };
 
   const _onClose = async () => {
-    await reFocusEditor();
+    //await reFocusEditor();
     if (onClose) {
       onClose();
     }
@@ -76,6 +73,7 @@ const ActionSheetWrapper = ({
           : hexToRGBA(colors.shade)
       }
       onOpen={_onOpen}
+      keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
@@ -88,8 +86,10 @@ const ActionSheetWrapper = ({
         </>
       }
       onClose={_onClose}>
-      {children}
-      <View style={{height: Platform.OS === 'ios' ? insets.bottom / 2 : 0}} />
+      <BouncingView>
+        {children}
+        <View style={{height: Platform.OS === 'ios' && insets.bottom !== 0 ? insets.bottom / 2 : 20}} />
+      </BouncingView>
     </ActionSheet>
   );
 };

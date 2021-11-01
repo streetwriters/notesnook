@@ -1,0 +1,5 @@
+# exclude all files
+*
+# except index.css
+!index.css
+!.gitignore

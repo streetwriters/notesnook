@@ -14,7 +14,7 @@ import {
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
-import {db} from '../../../../utils/DB';
+import {db} from '../../../../utils/database';
 import {eShowGetPremium} from '../../../../utils/Events';
 import {MMKV} from '../../../../utils/mmkv';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
@@ -276,6 +276,11 @@ const ToolbarItem = ({
       return;
     }
 
+    if (format === 'filepicker') {
+      await execCommands.filepicker();
+      return;
+    }
+
     if (format === 'image') {
       await execCommands.image();
       return;
@@ -314,7 +319,12 @@ const ToolbarItem = ({
     } else if (value || value === '') {
       formatSelection(execCommands[format](value));
     } else {
-      formatSelection(execCommands[format]);
+      if (typeof execCommands[format] === "function") {
+        formatSelection(execCommands[format]());
+      } else {
+        formatSelection(execCommands[format]);
+      }
+      
     }
 
     focusEditor(format);
@@ -377,14 +387,9 @@ const ToolbarItem = ({
                   paddingHorizontal: 12,
                   fontFamily:
                     format === 'fontname' &&
-                    formatValue &&
-                    formatValue !== '-apple-system'
-                      ? formatValue
-                      : format === 'fontname' &&
-                        icon !== '-apple-system' &&
-                        icon
-                      ? icon
-                      : null
+                    formatValue
+                      ? formatValue === 'open sans' ? "OpenSans-Regular" : formatValue
+                      : 'OpenSans-Regular'
                 }}
                 size={text.includes('%') ? SIZE.sm : SIZE.md}>
                 {currentText || text}

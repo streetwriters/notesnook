@@ -22,7 +22,6 @@ export const Tags = ({route, navigation}) => {
         setTags();
       });
     });
-    eSendEvent(eScrollEvent, {name: 'Tags', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -48,7 +47,6 @@ export const Tags = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     return () => {
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Tags', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);

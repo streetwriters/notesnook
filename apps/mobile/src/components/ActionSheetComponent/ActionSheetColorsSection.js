@@ -8,7 +8,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
@@ -39,7 +39,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
   const _renderColor = c => {
     const color = {
       name: c,
-      value: COLORS_NOTE[c]
+      value: COLORS_NOTE[c?.toLowerCase()]
     };
 
     return (
@@ -56,7 +56,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-        {note.color === color.name ? (
+        {note.color?.toLowerCase() === color.name ? (
           <Icon name="check" color="white" size={SIZE.lg} />
         ) : null}
       </PressableButton>

@@ -21,8 +21,10 @@ import {
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
+import Sync from '../../services/Sync';
+import {dHeight} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
@@ -166,7 +168,7 @@ const LoginDialog = () => {
       showForgotButton: true,
       loading: 'Please wait while we log in and sync your data.',
       showLoader: true,
-      buttonAlt: 'Logout & delete data',
+      buttonAlt: 'Logout',
       buttonAltFunc: () => {
         setConfirm(true);
       }
@@ -185,8 +187,16 @@ const LoginDialog = () => {
   async function open(mode) {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
-      let user = await db.user.getUser();
-      email = user.email;
+      try {
+        console.log('TOKEN EXPIRED');
+        await db.user.tokenManager.getToken();
+        await MMKV.removeItem('loginSessionHasExpired');
+        Sync.run();
+        return;
+      } catch (e) {
+        let user = await db.user.getUser();
+        email = user.email;
+      }
     }
     setStatus(null);
     setVisible(true);
@@ -238,14 +248,15 @@ const LoginDialog = () => {
         context: 'local'
       });
       close();
-      await sleep(300);
       eSendEvent('userLoggedIn', true);
+
+      await MMKV.removeItem('loginSessionHasExpired');
+      await sleep(500);
       eSendEvent(eOpenProgressDialog, {
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false
       });
-      await MMKV.removeItem('loginSessionHasExpired');
     } catch (e) {
       setLoading(false);
       setStatus(null);
@@ -341,13 +352,20 @@ const LoginDialog = () => {
       let lastRecoveryEmailTime = await MMKV.getItem('lastRecoveryEmailTime');
       if (
         lastRecoveryEmailTime &&
-        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 10
+        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
       ) {
         throw new Error('Please wait before requesting another email');
       }
       !nostatus && setStatus('Password Recovery Email Sent!');
       await db.user.recoverAccount(email);
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
+      ToastEvent.show({
+        heading: `Check your email to reset password`,
+        message: `Recovery email has been sent to ${email}`,
+        type: 'success',
+        context: 'local',
+        duration: 7000
+      });
     } catch (e) {
       setStatus(null);
       ToastEvent.show({
@@ -373,6 +391,11 @@ const LoginDialog = () => {
     setStatus('Setting new Password');
     try {
       await db.user.changePassword(oldPassword, password);
+      ToastEvent.show({
+        heading: `Account password updated`,
+        type: 'success',
+        context: 'local'
+      });
     } catch (e) {
       setStatus(null);
       ToastEvent.show({
@@ -411,7 +434,7 @@ const LoginDialog = () => {
             return;
           }
           _email.current?.focus();
-        }, 150);
+        }, 300);
       }}
       background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
@@ -423,8 +446,8 @@ const LoginDialog = () => {
           visible>
           <DialogContainer>
             <DialogHeader
-              title="Logout & delete data"
-              paragraph="All synced and unsynced data on this device will be removed. Do you want to proceed?"
+              title="Logout"
+              paragraph="All user data on this device will be cleared including any unsynced changes. Do you want to proceed?"
               paragraphColor="red"
             />
             <DialogButtons
@@ -435,11 +458,19 @@ const LoginDialog = () => {
               positiveType="error"
               positiveTitle="Logout"
               onPressPositive={async () => {
-                await db.user.logout();
-                await BiometricService.resetCredentials();
-                await Storage.write('introCompleted', 'true');
-                setConfirm(false);
-                close();
+                try {
+                  await db.user.logout();
+                  await BiometricService.resetCredentials();
+                  await Storage.write('introCompleted', 'true');
+                  setConfirm(false);
+                  close();
+                } catch (e) {
+                  ToastEvent.show({
+                    heading: e.message,
+                    type: 'error',
+                    context: 'local'
+                  });
+                }
               }}
             />
           </DialogContainer>
@@ -462,7 +493,7 @@ const LoginDialog = () => {
       <ScrollView
         ref={scrollViewRef}
         keyboardShouldPersistTaps="always"
-        keyboardDismissMode="on-drag"
+        keyboardDismissMode="none"
         nestedScrollEnabled={mode !== MODES.sessionExpired}
         onMomentumScrollEnd={() => {
           actionSheetRef.current.handleChildScrollEnd();
@@ -473,7 +504,8 @@ const LoginDialog = () => {
         style={{
           borderRadius: DDS.isTab ? 5 : 0,
           backgroundColor: colors.bg,
-          zIndex: 10
+          zIndex: 10,
+          minHeight: DDS.isTab ? '50%' : '85%'
         }}>
         <Header
           color="transparent"
@@ -621,7 +653,7 @@ const LoginDialog = () => {
             </>
           )}
 
-          {mode === MODES.login || mode === MODES.sessionExpired ? (
+         {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
             <TouchableOpacity
               onPress={() => {
                 if (MODES.sessionExpired === mode) {
@@ -636,7 +668,7 @@ const LoginDialog = () => {
               }}>
               <Paragraph color={colors.accent}>Forgot password?</Paragraph>
             </TouchableOpacity>
-          ) : null}
+          ) : null} */}
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
@@ -709,11 +741,12 @@ const LoginDialog = () => {
           {mode !== MODES.signup ? null : <Seperator />}
 
           <Button
-            title={current.button}
+            title={loading ? '' : current.button}
             onPress={current.buttonFunc}
             width="100%"
             type="accent"
             fontSize={SIZE.md}
+            loading={loading}
             height={50}
           />
 
@@ -730,48 +763,13 @@ const LoginDialog = () => {
               height={50}
             />
           )}
-
-          {status && (
-            <View
-              style={{
-                alignItems: 'center',
-                width: '100%',
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                backgroundColor: colors.bg,
-                alignSelf: 'center',
-                paddingVertical: 20
-              }}>
-              <View
-                style={{
-                  flexShrink: 1
-                }}>
-                <Heading size={SIZE.md}>{status}</Heading>
-                <Paragraph style={{flexWrap: 'wrap'}} color={colors.icon}>
-                  {current.loading}{' '}
-                  {!current.showLoader ? null : (
-                    <Paragraph color={colors.errorText}>
-                      Do not close the app.
-                    </Paragraph>
-                  )}
-                </Paragraph>
-              </View>
-
-              {!current.showLoader ? (
-                <Button
-                  title="Ok"
-                  width={50}
-                  onPress={() => {
-                    setStatus(null);
-                  }}
-                  type="accent"
-                />
-              ) : (
-                <ActivityIndicator size={SIZE.xxl} color={colors.accent} />
-              )}
-            </View>
-          )}
         </View>
+
+        <View
+          style={{
+            height: 100
+          }}
+        />
       </ScrollView>
     </ActionSheetWrapper>
   );

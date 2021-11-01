@@ -1,0 +1,31 @@
+diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+index 5fa44b5..af6d7be 100644
+--- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
++++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
+@@ -623,7 +623,18 @@ - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView
+                                          : MAX(0, _scrollView.contentSize.height - viewportSize.height);
+ 
+     // Calculate the snap offsets adjacent to the initial offset target
+-    CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    //CGFloat targetOffset = isHorizontal ? targetContentOffset->x : targetContentOffset->y;
++    /**
++     * https://github.com/facebook/react-native/pull/30033/files/af9c24639073e57f4e309851893e96da2e54271d..52a3d8d87778614b84a113f9198b88fc152a5a26
++     */
++    CGFloat targetOffset = targetContentOffset->y;
++    if (isHorizontal) {
++      // Use current scroll offset to determine the next index to snap to when momentum disabled
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.x : targetContentOffset->x;
++    } else {
++      targetOffset = self.disableIntervalMomentum ? scrollView.contentOffset.y : targetContentOffset->y;
++    }
++
+     CGFloat smallerOffset = 0.0;
+     CGFloat largerOffset = maximumOffset;
+ 
+diff --git a/node_modules/react-native/scripts/.packager.env b/node_modules/react-native/scripts/.packager.env
+new file mode 100644
+index 0000000..361f5fb
+--- /dev/null
++++ b/node_modules/react-native/scripts/.packager.env
+@@ -0,0 +1 @@
++export RCT_METRO_PORT=8081

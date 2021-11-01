@@ -11,7 +11,7 @@ import {
 import { openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { dWidth, getElevation, toTXT } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { deleteItems } from '../../utils/functions';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';

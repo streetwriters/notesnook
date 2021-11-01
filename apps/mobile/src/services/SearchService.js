@@ -1,5 +1,5 @@
 import { useSearchStore } from '../provider/stores';
-import { db } from '../utils/DB';
+import { db } from '../utils/database';
 
 let searchInformation = {
   placeholder: 'Search in all notes',

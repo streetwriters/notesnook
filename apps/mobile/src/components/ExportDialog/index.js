@@ -1,38 +1,39 @@
-import React, {Fragment, useEffect, useState} from 'react';
-import {Platform, StyleSheet, TouchableOpacity, View} from 'react-native';
+import React, {Fragment, useEffect, useRef, useState} from 'react';
+import {Platform, StyleSheet, View} from 'react-native';
 import FileViewer from 'react-native-file-viewer';
+import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
 import {ToastEvent} from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
 import {getElevation} from '../../utils';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import {GetPremium} from '../ActionSheetComponent/GetPremium';
-import BaseDialog from '../Dialog/base-dialog';
-import DialogButtons from '../Dialog/dialog-buttons';
+import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
+import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const {
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } = require('../../services/EventManager');
 const {
   eOpenExportDialog,
   eCloseExportDialog,
-  eShowGetPremium,
+  eShowGetPremium
 } = require('../../utils/Events');
 
 const ExportDialog = () => {
   const [state] = useTracked();
   const {colors} = state;
-  
+
   const [visible, setVisible] = useState(false);
+  const actionSheetRef = useRef();
   const [notes, setNotes] = useState([]);
   const [exporting, setExporting] = useState(false);
   const [complete, setComplete] = useState(false);
@@ -48,12 +49,12 @@ const ExportDialog = () => {
     };
   }, []);
 
-  const open = (data) => {
+  const open = data => {
     setVisible(true);
     setNotes(data);
   };
 
-  const close = (data) => {
+  const close = data => {
     setComplete(false);
     setExporting(false);
     setVisible(false);
@@ -78,13 +79,19 @@ const ExportDialog = () => {
         Platform.OS === 'ios'
           ? 'Files Manager/Notesnook'
           : `Storage/Notesnook/exported/${name}`
-      }.`,
+      }.`
     );
 
     setResult(res);
     setExporting(false);
     setComplete(true);
   };
+
+  useEffect(() => {
+    if (visible) {
+      actionSheetRef.current.show();
+    }
+  }, [visible]);
 
   const actions = [
     {
@@ -93,9 +100,8 @@ const ExportDialog = () => {
         await save(Exporter.saveToPDF, 'PDF');
       },
       icon: 'file-pdf-box',
-      desc:
-        'Can be opened in any pdf reader like Adobe Acrobat or Foxit Reader',
-      id: notesnook.ids.dialogs.export.pdf,
+      desc: 'Can be opened in a pdf reader like Adobe or Foxit Reader',
+      id: notesnook.ids.dialogs.export.pdf
     },
     {
       title: 'Markdown',
@@ -103,8 +109,8 @@ const ExportDialog = () => {
         await save(Exporter.saveToMarkdown, 'Markdown');
       },
       icon: 'language-markdown',
-      desc: 'Can be opened in any plain-text or markdown editor',
-      id: notesnook.ids.dialogs.export.md,
+      desc: 'Can be opened in any text or markdown editor',
+      id: notesnook.ids.dialogs.export.md
     },
     {
       title: 'Plain Text',
@@ -112,8 +118,8 @@ const ExportDialog = () => {
         await save(Exporter.saveToText, 'Text');
       },
       icon: 'card-text',
-      desc: 'Can be opened in any plain text editor',
-      id: notesnook.ids.dialogs.export.text,
+      desc: 'Can be opened in any text editor',
+      id: notesnook.ids.dialogs.export.text
     },
     {
       title: 'HTML',
@@ -121,116 +127,150 @@ const ExportDialog = () => {
         await save(Exporter.saveToHTML, 'Html');
       },
       icon: 'language-html5',
-      desc: 'Can be opened in any web browser like Google Chrome.',
-      id: notesnook.ids.dialogs.export.html,
-    },
+      desc: 'Can be opened in any web browser',
+      id: notesnook.ids.dialogs.export.html
+    }
   ];
 
   return !visible ? null : (
-    <BaseDialog
-      premium={<GetPremium context="export" offset={50} close={close} />}
-      onRequestClose={close}
-      visible={true}>
-      <View
-        style={[
-          {
-            width: DDS.isTab ? 350 : '80%',
-            backgroundColor: colors.bg,
-          },
-          styles.container,
-        ]}>
-        <DialogHeader
-          icon="export"
-          title="Export Note"
-          paragraph={
-            exporting
-              ? null
-              : 'All exports are saved in Notesnook/exported folder in phone storage'
-          }
-        />
+    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={close} visible={true}>
+      <View>
+        <View
+          style={{
+            paddingHorizontal: 12
+          }}>
+          <DialogHeader
+            icon="export"
+            title="Export Note"
+            paragraph={
+              'All exports are saved in Notesnook/exported folder in phone storage'
+            }
+          />
+        </View>
 
         <Seperator half />
         <View style={styles.buttonContainer}>
-          {actions.map((item) => (
+          {actions.map(item => (
             <Fragment key={item.title}>
               <Seperator half />
-              <TouchableOpacity
-                testID={item.id}
+              <PressableButton
                 onPress={item.func}
-                activeOpacity={1}
-                style={{
+                customStyle={{
                   width: '100%',
                   alignItems: 'center',
                   flexDirection: 'row',
                   paddingRight: 12,
                   paddingVertical: 10,
+                  justifyContent: 'flex-start',
+                  borderRadius: 0,
+                  paddingHorizontal: 12
                 }}>
                 <View
                   style={{
                     backgroundColor: colors.shade,
                     borderRadius: 5,
-                    height: 40,
-                    width: 40,
+                    height: 60,
+                    width: 60,
                     justifyContent: 'center',
-                    alignItems: 'center',
+                    alignItems: 'center'
                   }}>
                   <Icon
                     name={item.icon}
                     color={colors.accent}
-                    size={SIZE.xxxl}
+                    size={SIZE.xxxl + 10}
                   />
                 </View>
-                <View>
-                  <Heading
-                    style={{marginLeft: 5, maxWidth: '90%'}}
-                    size={SIZE.md}>
+                <View
+                  style={{
+                    flexShrink: 1
+                  }}>
+                  <Heading style={{marginLeft: 10}} size={SIZE.md}>
                     {item.title}
                   </Heading>
                   <Paragraph
-                    style={{marginLeft: 5, maxWidth: '90%'}}
+                    style={{marginLeft: 10}}
                     size={SIZE.sm}
                     color={colors.icon}>
                     {item.desc}
                   </Paragraph>
                 </View>
-              </TouchableOpacity>
+              </PressableButton>
             </Fragment>
           ))}
 
           <View
             style={{
               width: '100%',
+              paddingHorizontal: 12,
+              marginTop: 10
             }}>
-            <DialogButtons
-              onPressNegative={close}
-              negativeTitle="Cancel"
-              positiveTitle={complete && 'Open file'}
-              onPressPositive={
-                complete
-                  ? async () => {
-                      close();
-                      await sleep(500);
+            {complete && (
+              <>
+                <Button
+                  title="Open"
+                  type="accent"
+                  width="100%"
+                  fontSize={SIZE.md}
+                  onPress={async () => {
+                    close();
+                    await sleep(500);
+                    FileViewer.open(result.filePath, {
+                      showOpenWithDialog: true,
+                      showAppsSuggestions: true
+                    }).catch(e => {
+                      ToastEvent.show({
+                        heading: 'Cannot open',
+                        message: `No application found to open ${result.name} file.`,
+                        type: 'success',
+                        context: 'local'
+                      });
+                    });
+                  }}
+                  height={50}
+                />
+                <Button
+                  title="Share"
+                  type="shade"
+                  width="100%"
+                  fontSize={SIZE.md}
+                  style={{
+                    marginTop: 10
+                  }}
+                  onPress={async () => {
+                    if (Platform.OS === 'ios') {
+                      Share.open({
+                        url: 'file:/' + result.filePath
+                      }).catch(console.log);
+                    } else {
                       FileViewer.open(result.filePath, {
                         showOpenWithDialog: true,
                         showAppsSuggestions: true,
-                      }).catch((e) => {
-                        ToastEvent.show({
-                          heading: 'Cannot open',
-                          message: `No application found to open ${result.name} file.`,
-                          type: 'success',
-                          context: 'local',
-                        });
-                      });
+                        shareFile: true
+                      }).catch(console.log);
                     }
-                  : null
-              }
-              loading={exporting && !complete}
-              doneText={complete && 'Exported as ' + result.name}
-            />
+                  }}
+                  height={50}
+                />
+              </>
+            )}
+            {complete && (
+              <Paragraph
+                style={{
+                  textAlign: 'center',
+                  marginTop: 5
+                }}
+                color={colors.icon}
+                size={SIZE.xs}>
+                {'Note exported as ' + result.fileName}
+              </Paragraph>
+            )}
+            {exporting && !complete && (
+              <Button loading={true} height={50} width="100%" />
+            )}
           </View>
         </View>
       </View>
-    </BaseDialog>
+    </ActionSheetWrapper>
   );
 };
 
@@ -238,12 +278,11 @@ const styles = StyleSheet.create({
   container: {
     ...getElevation(5),
     borderRadius: 5,
-    paddingHorizontal: ph,
-    paddingVertical: pv,
+    paddingVertical: pv
   },
   buttonContainer: {
     justifyContent: 'space-between',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   button: {
     paddingVertical: pv,
@@ -254,19 +293,19 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   buttonText: {
     //fontFamily: "sans-serif",
     color: 'white',
     fontSize: SIZE.sm,
-    marginLeft: 5,
+    marginLeft: 5
   },
   overlay: {
     width: '100%',
     height: '100%',
-    position: 'absolute',
-  },
+    position: 'absolute'
+  }
 });
 
 export default ExportDialog;

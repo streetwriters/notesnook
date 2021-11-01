@@ -62,7 +62,7 @@ export const EditorTitle = () => {
       <TextInput
         defaultValue={title}
         style={{
-          fontWeight:'bold',
+          fontFamily: 'OpenSans-SemiBold',
           fontSize: SIZE.xl,
           color: colors.heading,
           maxWidth: '100%',

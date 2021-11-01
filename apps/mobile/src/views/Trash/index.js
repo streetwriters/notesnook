@@ -11,7 +11,7 @@ import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eScrollEvent } from '../../utils/Events';
 
 export const Trash = ({route, navigation}) => {
@@ -26,8 +26,6 @@ export const Trash = ({route, navigation}) => {
         setTrash();
       });
     });
-
-    eSendEvent(eScrollEvent, {name: 'Trash', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -62,7 +60,6 @@ export const Trash = ({route, navigation}) => {
     return () => {
       pageIsLoaded = false;
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Trash', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);

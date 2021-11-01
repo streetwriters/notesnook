@@ -3,10 +3,11 @@ import { enabled } from 'react-native-privacy-snapshot';
 import { updateEvent } from '../components/DialogManager/recievers';
 import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
-import { AndroidModule, preloadImages } from '../utils';
+import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
+import Notifications from './Notifications';
 
 export const defaultSettings = {
   showToolbarOnTop: false,
@@ -25,7 +26,8 @@ export const defaultSettings = {
   telemetry: true,
   notebooksListMode: 'normal',
   notesListMode: 'normal',
-  devMode:false
+  devMode:false,
+  notifNotes:false
 };
 
 let settings = {...defaultSettings};
@@ -61,6 +63,9 @@ async function init() {
       settings.notebooksListMode = 'normal';
     }
   }
+  if (settings.notifNotes) {
+    Notifications.pinQuickNote(true);
+  }
 
   if (settings.fontScale) {
     scale.fontScale = settings.fontScale;
@@ -88,7 +93,6 @@ async function init() {
 const setTheme = async () => {
   if (settings) {
     let newColors = await getColorScheme(settings.useSystemTheme);
-    preloadImages(newColors.accent);
     updateEvent({type: Actions.THEME, colors: newColors});
   }
 };

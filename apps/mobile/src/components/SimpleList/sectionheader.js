@@ -10,7 +10,7 @@ import {
 import SettingsService from '../../services/SettingsService';
 import {GROUP, SORT} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eOpenJumpToDialog, eOpenSortDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -73,7 +73,7 @@ export const SectionHeader = ({item, index, type, title,color}) => {
           justifyContent: 'center'
         }}>
         <Heading
-          color={COLORS_NOTE[color] || colors.accent  }
+          color={COLORS_NOTE[color?.toLowerCase()] || colors.accent  }
           size={SIZE.sm}
           style={{
             minWidth: 60,

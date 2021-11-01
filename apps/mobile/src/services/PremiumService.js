@@ -3,7 +3,7 @@ import * as RNIap from 'react-native-iap';
 import InAppBrowser from 'react-native-inappbrowser-reborn';
 import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
-import {db} from '../utils/DB';
+import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
@@ -39,11 +39,14 @@ async function setPremiumStatus() {
     if (get()) {
       await subscriptions.clear();
     }
-    await RNIap.initConnection();
-    products = await RNIap.getSubscriptions(itemSkus);
+    try {
+      await RNIap.initConnection();
+      products = await RNIap.getSubscriptions(itemSkus);
+    } catch (e) {
+      console.log('subscriptions: ',e)
+    }
   }
 }
-
 
 function getMontlySub() {
   let _product = {

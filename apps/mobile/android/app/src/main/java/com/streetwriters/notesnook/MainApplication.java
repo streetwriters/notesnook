@@ -27,10 +27,10 @@ import com.facebook.react.bridge.ReactApplicationContext;
 import com.learnium.RNDeviceInfo.RNDeviceModule;
 import com.oblador.keychain.KeychainPackage;
 import com.onibenjo.htmltopdf.RNHTMLtoPDFModule;
+import com.reactnativedocumentpicker.DocumentPickerModule;
 import com.vinzscam.reactnativefileviewer.RNFileViewerModule;
 
 import cl.json.RNShareModule;
-import io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule;
 import px.tooltips.RNTooltipsModule;
 
 public class MainApplication extends MultiDexApplication implements ReactApplication {
@@ -65,8 +65,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     return new DocumentPickerModule(reactContext);
                                 case "RNShare":
                                     return new RNShareModule(reactContext);
-                                case RNDeviceModule.NAME:
-                                    return new RNDeviceModule(reactContext);
                                 case "RNIapModule":
                                     return new RNIapModule(reactContext);
                                 default:
@@ -88,7 +86,6 @@ public class MainApplication extends MultiDexApplication implements ReactApplica
                                     map.put("RNFileViewer", getModuleInfo("RNFileViewer", "com.vinzscam.reactnativefileviewer.RNFileViewerModule"));
                                     map.put("RNDocumentPicker", getModuleInfo("RNDocumentPicker", "io.github.elyx0.reactnativedocumentpicker.DocumentPickerModule"));
                                     map.put("RNShare", getModuleInfo("RNShare", "cl.json.RNShareModule"));
-                                    map.put(RNDeviceModule.NAME, getModuleInfo(RNDeviceModule.NAME, "com.learnium.RNDeviceInfo.RNDeviceModule"));
                                     map.put("RNIapModule", getModuleInfo("RNIapModule", "com.dooboolab.RNIap.RNIapModule"));
 
                                     return map;

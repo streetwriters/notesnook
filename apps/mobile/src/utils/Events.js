@@ -130,3 +130,6 @@ export const eClosePublishNoteDialog = '567';
 
 export const eOpenTagsDialog = '568';
 export const eCloseTagsDialog = '569';
+
+export const eOpenAttachmentsDialog = '600';
+export const eCloseAttachmentDialog = '601';

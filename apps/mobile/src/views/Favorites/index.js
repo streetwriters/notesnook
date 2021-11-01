@@ -28,7 +28,6 @@ export const Favorites = ({route, navigation}) => {
         setFavorites();
       });
     });
-    eSendEvent(eScrollEvent, {name: 'Favorites', type: 'in'});
     updateSearch();
     ranAfterInteractions = false;
   };
@@ -65,7 +64,6 @@ export const Favorites = ({route, navigation}) => {
     return () => {
       pageIsLoaded = false;
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Notebooks', type: 'back'});
       navigation.removeListener('focus', onFocus);
     };
   }, []);

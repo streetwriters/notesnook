@@ -1,0 +1,15 @@
+diff --git a/node_modules/react-native-progress/Circle.js b/node_modules/react-native-progress/Circle.js
+index 79f0a9e..3f9ff26 100644
+--- a/node_modules/react-native-progress/Circle.js
++++ b/node_modules/react-native-progress/Circle.js
+@@ -120,8 +120,8 @@ export class ProgressCircle extends Component {
+     return (
+       <View style={[styles.container, style]} {...restProps}>
+         <Surface
+-          width={size}
+-          height={size}
++          width={size + 5}
++          height={size + 5}
+           style={
+             indeterminate && rotation
+               ? {

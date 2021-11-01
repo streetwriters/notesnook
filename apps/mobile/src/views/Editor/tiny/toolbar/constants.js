@@ -111,17 +111,14 @@ export const INPUT_MODE = {
 
 export const font_names = Platform.select({
   android: [
-    {name: 'System Font', value: ''},
-    {name: 'Times New Roman', value: 'times new roman'},
-    {name: 'Serif', value: 'serif'},
-    {name: 'Sans', value: 'sans-serif'},
+    {name: 'Sans', value: 'open sans'},
+    {name: 'Serif', value: 'times new roman'},
     {name: 'Mono', value: 'courier'},
     {name: 'Classic', value: 'courier new'}
   ],
   ios: [
-    {name: 'System Font', value: ''},
-    {name: 'Sans', value: '-apple-system'},
-    {name: 'Times New Roman', value: 'times new roman'},
+    {name: 'Sans Serif', value: 'open sans'},
+    {name: 'Serif', value: 'times new roman'},
     {name: 'Mono', value: 'courier'},
     {name: 'Classic', value: 'courier new'}
   ]
@@ -236,5 +233,6 @@ export const TOOLBAR_ICONS = {
   imagefloatright: 'format-float-right',
   imagefloatnone: 'format-float-none',
   'line-break': 'keyboard-return',
-  code: 'code-tags'
+  code: 'code-tags',
+  filepicker:'attachment'
 };

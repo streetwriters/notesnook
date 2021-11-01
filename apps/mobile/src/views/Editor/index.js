@@ -1,22 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, ScrollView, TextInput, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, ScrollView, TextInput, View} from 'react-native';
 import WebView from 'react-native-webview';
-import { notesnook } from '../../../e2e/test.ids';
-import { useUserStore } from '../../provider/stores';
+import {notesnook} from '../../../e2e/test.ids';
+import {useUserStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import { getCurrentColors } from '../../utils/Colors';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {getCurrentColors} from '../../utils/Colors';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   EditorWebView,
-  getNote, onWebViewLoad,
+  getNote,
+  onWebViewLoad,
   sourceUri,
   textInput,
   _onMessage,
@@ -25,14 +24,14 @@ import {
 import tiny from './tiny/tiny';
 import EditorToolbar from './tiny/toolbar';
 
-const source = {uri: sourceUri + 'index.html'}
+const source = {uri: sourceUri + 'index.html'};
 
 const style = {
   height: '100%',
   maxHeight: '100%',
   width: '100%',
   alignSelf: 'center',
-  backgroundColor: 'transparent',
+  backgroundColor: 'transparent'
 };
 
 const CustomView = Platform.OS === 'ios' ? ScrollView : View;
@@ -46,11 +45,11 @@ const Editor = React.memo(
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
 
-    useEffect(()=>{
+    useEffect(() => {
       if (premiumUser) {
-        tiny.call(EditorWebView,tiny.setMarkdown,true)
+        tiny.call(EditorWebView, tiny.setMarkdown, true);
       }
-    },[premiumUser])
+    }, [premiumUser]);
 
     const onResetRequested = async noload => {
       setResetting(true);
@@ -69,7 +68,6 @@ const Editor = React.memo(
       };
     }, []);
 
-
     return resetting ? null : (
       <>
         <TextInput
@@ -81,9 +79,8 @@ const Editor = React.memo(
         <CustomView
           style={{
             height: '100%',
-            width:"100%",
-            paddingBottom: Platform.OS === 'android' ? normalize(50) + 5 : null,
-          
+            width: '100%',
+            paddingBottom: Platform.OS === 'android' ? normalize(50) + 5 : null
           }}
           bounces={false}
           bouncesZoom={false}
@@ -95,7 +92,7 @@ const Editor = React.memo(
           nestedScrollEnabled
           contentContainerStyle={{
             width: '100%',
-            height: '100%',
+            height: '100%'
           }}>
           <EditorHeader />
           <WebView
@@ -122,7 +119,6 @@ const Editor = React.memo(
             originWhitelist={['*']}
             source={source}
             style={style}
-            
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
@@ -131,7 +127,7 @@ const Editor = React.memo(
       </>
     );
   },
-  () => true,
+  () => true
 );
 
 export default Editor;

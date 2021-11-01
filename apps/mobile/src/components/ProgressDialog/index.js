@@ -8,12 +8,10 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
-import Seperator from '../Seperator';
-import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const ProgressDialog = () => {
+const ProgressDialog = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
@@ -32,6 +30,12 @@ const ProgressDialog = () => {
   }, []);
 
   const open = async data => {
+    if (
+      (data.context && !context) ||
+      (data.context && data.context !== context)
+    ) {
+      return;
+    }
     setDialogData(data);
     setVisible(true);
     await sleep(1);
@@ -39,13 +43,14 @@ const ProgressDialog = () => {
   };
 
   const close = () => {
-    setVisible(false);
+    actionSheetRef.current?.setModalVisible(false);
   };
 
   return !visible ? null : (
     <ActionSheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={dialogData?.noProgress}
+      closeOnTouchBackdrop={dialogData?.noProgress}
       onClose={() => {
         if (dialogData.noProgress) {
           setVisible(false);
@@ -59,7 +64,7 @@ const ProgressDialog = () => {
           marginBottom: 10,
           paddingHorizontal: 12
         }}>
-        {!dialogData?.noProgress ? (
+        {!dialogData?.noProgress && !dialogData.component ? (
           <ActivityIndicator size={50} color={colors.accent} />
         ) : dialogData?.noIcon ? null : (
           <Icon
@@ -74,14 +79,8 @@ const ProgressDialog = () => {
         {dialogData?.paragraph ? (
           <Paragraph style={{textAlign: 'center'}}>
             {dialogData?.paragraph}
-            {!dialogData?.noProgress ? (
-              <Paragraph color={colors.errorText}>
-                {' '}
-                Do not close the app.
-              </Paragraph>
-            ) : null}
           </Paragraph>
-        ) : null} 
+        ) : null}
       </View>
 
       {dialogData.component}
@@ -100,13 +99,14 @@ const ProgressDialog = () => {
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom: 12
+          marginBottom:dialogData.valueArray ? 12 : 0
         }}>
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
             <Button
               title={v}
               type="gray"
+              key={v}
               textStyle={{fontWeight: 'normal'}}
               fontSize={SIZE.sm}
               icon="check"
@@ -126,6 +126,7 @@ const ProgressDialog = () => {
         {dialogData?.action ? (
           <Button
             onPress={dialogData.action}
+            key={dialogData.actionText}
             title={dialogData.actionText}
             accentColor={dialogData.iconColor || 'accent'}
             accentText="light"
@@ -138,7 +139,7 @@ const ProgressDialog = () => {
         ) : null}
 
         {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map(item => (
+          dialogData?.actionsArray.map((item,index) => (
             <Button
               onPress={item.action}
               key={item.accentText}

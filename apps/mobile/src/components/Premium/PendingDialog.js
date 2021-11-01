@@ -1,9 +1,9 @@
-import React, { createRef } from 'react';
-import { View } from 'react-native';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { db } from '../../utils/DB';
-import { eClosePendingDialog, eOpenPendingDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
+import React, {createRef} from 'react';
+import {View} from 'react-native';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {db} from '../../utils/database';
+import {eClosePendingDialog, eOpenPendingDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -15,7 +15,7 @@ class PendingDialog extends React.Component {
     super(props);
     this.state = {
       user: null,
-      product: null,
+      product: null
     };
   }
 
@@ -23,14 +23,14 @@ class PendingDialog extends React.Component {
     actionSheet.current?.setModalVisible(true);
     let u = await db.user.getUser();
     this.setState({
-      user: u && u.Id ? u : null,
+      user: u && u.Id ? u : null
     });
   }
 
   close() {
     actionSheet.current?.setModalVisible(false);
     this.setState({
-      user: null,
+      user: null
     });
   }
   async componentDidMount() {
@@ -54,7 +54,7 @@ class PendingDialog extends React.Component {
             justifyContent: 'space-between',
             paddingHorizontal: 12,
             borderRadius: 10,
-            paddingTop: 10,
+            paddingTop: 10
           }}>
           <Heading
             size={SIZE.xxxl}
@@ -62,7 +62,7 @@ class PendingDialog extends React.Component {
             style={{
               paddingBottom: 20,
               paddingTop: 10,
-              alignSelf: 'center',
+              alignSelf: 'center'
             }}>
             Thank you!
           </Heading>
@@ -75,7 +75,7 @@ class PendingDialog extends React.Component {
               fontSize: SIZE.md,
               width: '80%',
               alignSelf: 'center',
-              textAlign: 'center',
+              textAlign: 'center'
             }}>
             We are processing your subscription. You account will be upgraded to
             Notesnook Pro very soon.

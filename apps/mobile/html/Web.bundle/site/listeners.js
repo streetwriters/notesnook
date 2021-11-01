@@ -32,7 +32,6 @@ function attachTitleInputListeners() {
     if (tinymce.activeEditor) {
       tinymce.activeEditor && tinymce.activeEditor.focus();
     }
-
     onTitleChange();
   };
 
@@ -42,7 +41,6 @@ function attachTitleInputListeners() {
       if (tinymce.activeEditor) {
         tinymce.activeEditor && tinymce.activeEditor.focus();
       }
-
       onTitleChange();
       return false;
     }
@@ -51,6 +49,7 @@ function attachTitleInputListeners() {
   document
     .getElementById('titleInput')
     .addEventListener('focus', function (evt) {
+      autosize();
       if (window.ReactNativeWebView) {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
@@ -60,36 +59,40 @@ function attachTitleInputListeners() {
         );
       }
     });
-
+  document.getElementById('titleInput').onpaste = function (evt) {
+    onTitleChange();
+  };
   document.getElementById('titleInput').onchange = function (evt) {
-    autosize();
+    onTitleChange();
   };
   document.getElementById('titleInput').onkeyup = function (evt) {
-    onTitleChange(evt);
+    onTitleChange();
   };
 }
 
-function onTitleChange(ele) {
-  autosize();
-  if (isLoading) {
-    return;
-  }
-  let titleMessage = {
-    type: 'title',
-    value: titleInput.value
-  };
-
-  info = document.querySelector(infoBar);
-  if (tinymce.activeEditor) {
-    info.querySelector('#infowords').innerText =
-      tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
-  }
-
-  if (titleMessage && typeof titleMessage.value === 'string') {
-    if (window.ReactNativeWebView) {
-      window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+function onTitleChange() {
+  setTimeout(() => {
+    autosize();
+    if (isLoading) {
+      return;
     }
-  }
+    let titleMessage = {
+      type: 'title',
+      value: titleInput.value
+    };
+
+    info = document.querySelector(infoBar);
+    if (tinymce.activeEditor) {
+      info.querySelector('#infowords').innerText =
+        tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+    }
+
+    if (titleMessage && typeof titleMessage.value === 'string') {
+      if (window.ReactNativeWebView) {
+        window.ReactNativeWebView.postMessage(JSON.stringify(titleMessage));
+      }
+    }
+  }, 500);
 }
 
 function autosize() {
@@ -141,6 +144,9 @@ function attachMessageListener() {
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
+        document
+          .querySelector('.htmldiff_div')
+          .setAttribute('contenteditable', 'false');
         break;
       case 'theme':
         pageTheme.colors = JSON.parse(value);

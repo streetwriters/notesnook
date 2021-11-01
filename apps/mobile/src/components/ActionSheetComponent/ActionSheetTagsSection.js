@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View} from 'react-native';
 import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
@@ -41,12 +41,13 @@ const TagItem = ({tag, close}) => {
       type: 'tag',
       get: 'tagged',
     };
+
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate('NotesPage', params, {
       heading: '#' + _tag.title,
       id: _tag.id,
       type: _tag.type,
     });
-    eSendEvent(refreshNotesPage, params);
     await sleep(300);
     close();
   };

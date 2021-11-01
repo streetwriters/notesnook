@@ -20,7 +20,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getElevation, toTXT} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseActionSheet,
@@ -576,7 +576,7 @@ export class VaultDialog extends Component {
     text = `${note.title}\n \n ${text}`;
     try {
       await Share.open({
-        heading: 'Share note to',
+        heading: 'Share note',
         failOnCancel: false,
         message: text,
       });

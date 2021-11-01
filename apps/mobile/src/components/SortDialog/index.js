@@ -8,7 +8,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
@@ -117,7 +117,8 @@ class SortDialog extends React.Component {
                   : 'sort-descending'
               }
               height={25}
-              iconPosition="right"
+              iconPosition="left"
+              fontSize={SIZE.sm - 1}
               type="grayBg"
               style={{
                 borderRadius: 100

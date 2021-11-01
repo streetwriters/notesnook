@@ -10,10 +10,9 @@ import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { editing, InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/DB';
-import { eClearEditor, eOnLoadNote, eScrollEvent } from '../../utils/Events';
+import { db } from '../../utils/database';
+import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
-import { sleep } from '../../utils/TimeUtils';
 import { getNote } from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
@@ -45,7 +44,6 @@ export const Home = ({navigation}) => {
 
   const runAfterInteractions = () => {
     updateSearch();
-    eSendEvent(eScrollEvent, {name: 'Notes', type: 'in'});
 
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notes', () => {
@@ -60,7 +58,6 @@ export const Home = ({navigation}) => {
     navigation.addListener('blur', onBlur);
     return () => {
       ranAfterInteractions = false;
-      eSendEvent(eScrollEvent, {name: 'Notes', type: 'back'});
       navigation.removeListener('focus', onFocus);
       navigation.removeListener('blur', onBlur);
     };

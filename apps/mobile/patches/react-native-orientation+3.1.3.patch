@@ -24,3 +24,46 @@ index e09fb27..b5af68d 100644
          }
      }
  }
+diff --git a/node_modules/react-native-orientation/android/src/main/java/com/github/yamill/orientation/OrientationModule.java b/node_modules/react-native-orientation/android/src/main/java/com/github/yamill/orientation/OrientationModule.java
+index 85331ae..6440978 100644
+--- a/node_modules/react-native-orientation/android/src/main/java/com/github/yamill/orientation/OrientationModule.java
++++ b/node_modules/react-native-orientation/android/src/main/java/com/github/yamill/orientation/OrientationModule.java
+@@ -57,6 +57,18 @@ public class OrientationModule extends ReactContextBaseJavaModule implements Lif
+         return "Orientation";
+     }
+ 
++    @ReactMethod
++    public void addListener(String eventName) {
++        // Keep: Required for RN built in Event Emitter Calls.
++    }
++
++    @ReactMethod
++    public void removeListeners(Integer count) {
++        // Keep: Required for RN built in Event Emitter Calls.
++    }
++
++    
++
+     @ReactMethod
+     public void getOrientation(Callback callback) {
+         final int orientationInt = getReactApplicationContext().getResources().getConfiguration().orientation;
+diff --git a/node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.m b/node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.m
+index 15e9927..2e4d4b9 100644
+--- a/node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.m
++++ b/node_modules/react-native-orientation/iOS/RCTOrientation/Orientation.m
+@@ -137,6 +137,15 @@ - (NSString *)getSpecificOrientationStr: (UIDeviceOrientation)orientation {
+ 
+ RCT_EXPORT_MODULE();
+ 
++
++RCT_EXPORT_METHOD(addListener : (NSString *)eventName) {
++  // Keep: Required for RN built in Event Emitter Calls.
++}
++
++RCT_EXPORT_METHOD(removeListeners : (NSInteger)count) {
++  // Keep: Required for RN built in Event Emitter Calls.
++}
++
+ RCT_EXPORT_METHOD(getOrientation:(RCTResponseSenderBlock)callback)
+ {
+   UIDeviceOrientation orientation = [[UIDevice currentDevice] orientation];

@@ -26,8 +26,11 @@ const setMarkdown = `
 `;
 
 const keyboardStateChanged = `(function() {
-  let node = tinymce.activeEditor.selection.getNode();
-  node.scrollIntoView({behavior: "smooth", block: "end"});
+  setTimeout(function() {
+    let node = tinymce.activeEditor.selection.getNode();
+    if (node.nodeName === "IMG" || node.nodeName === "BODY" ) return;
+    node.scrollIntoView({behavior: "smooth", block: "end"});
+  },100)
 })();
 `;
 const blur = `

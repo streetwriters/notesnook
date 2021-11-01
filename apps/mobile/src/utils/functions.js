@@ -4,7 +4,7 @@ import { history } from '.';
 import { useMenuStore, useSelectionStore } from '../provider/stores';
 import { eSendEvent, ToastEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import { db } from './DB';
+import { db } from './database';
 import { eClearEditor } from './Events';
 
 export const deleteItems = async (item) => {

@@ -1,27 +1,32 @@
-import React, { Component, createRef } from 'react';
+import React, {Component, createRef} from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault
 } from '../../services/EventManager';
-import { getCurrentColors } from '../../utils/Colors';
+import {getCurrentColors} from '../../utils/Colors';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
-  eCloseLoginDialog, eClosePremiumDialog, eOnLoadNote,
+  eCloseLoginDialog,
+  eClosePremiumDialog,
+  eOnLoadNote,
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenExportDialog,
-  eOpenLoginDialog, eOpenPremiumDialog, eShowGetPremium,
+  eOpenLoginDialog,
+  eOpenPremiumDialog,
+  eShowGetPremium,
   eThemeUpdated
 } from '../../utils/Events';
-import { EditorSettings } from '../../views/Editor/EditorSettings';
-import { ActionSheetComponent } from '../ActionSheetComponent';
+import {EditorSettings} from '../../views/Editor/EditorSettings';
+import {ActionSheetComponent} from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { Dialog } from '../Dialog';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {AttachmentDialog} from '../AttachmentDialog';
+import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import ImagePreview from '../ImagePreview';
 import LoginDialog from '../LoginDialog';
@@ -38,8 +43,8 @@ import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SortDialog from '../SortDialog';
 import TagsDialog from '../TagsDialog';
-import { UpdateDialog } from '../UpdateDialog';
-import { VaultDialog } from '../VaultDialog';
+import {UpdateDialog} from '../UpdateDialog';
+import {VaultDialog} from '../VaultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -54,7 +59,7 @@ export class DialogManager extends Component {
         colors: false,
         tags: false,
         rowItems: [],
-        columnItems: [],
+        columnItems: []
       },
       simpleDialog: {
         title: '',
@@ -62,8 +67,8 @@ export class DialogManager extends Component {
         positiveText: '',
         negativeText: '',
         action: 0,
-        icon: '',
-      },
+        icon: ''
+      }
     };
   }
 
@@ -79,11 +84,11 @@ export class DialogManager extends Component {
       {
         actionSheetData: data,
         item: data.item ? data.item : {},
-        actionSheetVisible: true,
+        actionSheetVisible: true
       },
       () => {
         this.actionSheet.current?.setModalVisible();
-      },
+      }
     );
   };
 
@@ -94,11 +99,11 @@ export class DialogManager extends Component {
   loadNote = i => {
     if (i && i.type === 'new') {
       this.setState({
-        item: {},
+        item: {}
       });
     } else {
       this.setState({
-        item: i,
+        item: i
       });
     }
   };
@@ -107,7 +112,7 @@ export class DialogManager extends Component {
     let item = this.state.item;
     this.addTopicsDialog.open({
       notebookId: item?.type !== 'topic' ? item.id : item.notebookId,
-      toEdit: item?.type === 'topic' ? item : null,
+      toEdit: item?.type === 'topic' ? item : null
     });
   };
 
@@ -117,7 +122,7 @@ export class DialogManager extends Component {
 
   onThemeChange = () => {
     this.setState({
-      colors: getCurrentColors(),
+      colors: getCurrentColors()
     });
   };
 
@@ -163,11 +168,11 @@ export class DialogManager extends Component {
   showAddNotebook = data => {
     this.setState(
       {
-        item: data.item ? data.item : data.type === 'notebook' ? data : {},
+        item: data.item ? data.item : data.type === 'notebook' ? data : {}
       },
       () => {
         this.addNotebooksDialog.open();
-      },
+      }
     );
   };
   hideAddNotebook = () => {
@@ -182,7 +187,7 @@ export class DialogManager extends Component {
             item: this.state.item,
             novault: false,
             title: 'Create vault',
-            description: 'Set a password to create a vault and lock note.',
+            description: 'Set a password to create a vault and lock note.'
           });
           break;
         }
@@ -192,7 +197,7 @@ export class DialogManager extends Component {
             novault: true,
             locked: true,
             title: 'Lock note',
-            description: 'Give access to vault to lock this note.',
+            description: 'Give access to vault to lock this note.'
           });
           break;
         }
@@ -203,7 +208,7 @@ export class DialogManager extends Component {
             locked: true,
             permanant: true,
             title: 'Unlock note',
-            description: 'Remove note from the vault.',
+            description: 'Remove note from the vault.'
           });
           break;
         }
@@ -239,7 +244,7 @@ export class DialogManager extends Component {
               eSendEvent(eShowGetPremium, null);
               this.onActionSheetHide();
               this.setState({
-                actionSheetVisible: false,
+                actionSheetVisible: false
               });
             }}>
             <ActionSheetComponent
@@ -250,7 +255,7 @@ export class DialogManager extends Component {
               getRef={() => this.actionSheet}
               hasColors={actionSheetData.colors}
               hasTags={actionSheetData.colors}
-              overlayColor='rgba(0,0,0,0.3)'
+              overlayColor="rgba(0,0,0,0.3)"
               rowItems={actionSheetData.rowItems}
               columnItems={actionSheetData.columnItems}
               close={value => {
@@ -262,13 +267,12 @@ export class DialogManager extends Component {
             />
           </ActionSheetWrapper>
         )}
-
         <Dialog context="global" />
         <AddTopicDialog
           ref={ref => (this.addTopicsDialog = ref)}
           close={() => {
             this.setState({
-              item: {},
+              item: {}
             });
           }}
           colors={colors}
@@ -293,13 +297,13 @@ export class DialogManager extends Component {
         <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
-
         <UpdateDialog />
         <RateDialog />
         <ImagePreview />
         <EditorSettings />
         <PublishNoteDialog />
-        <TagsDialog/>
+        <TagsDialog />
+        <AttachmentDialog />
       </>
     );
   }

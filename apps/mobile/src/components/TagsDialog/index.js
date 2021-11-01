@@ -5,7 +5,7 @@ import {useTracked} from '../../provider';
 import {useTagStore} from '../../provider/stores';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eCloseTagsDialog, eOpenTagsDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';

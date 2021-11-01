@@ -4,8 +4,6 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="com.android.vending.BILLING" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.USE_FINGERPRINT" />
     <uses-permission android:name="android.permission.USE_BIOMETRIC" />
@@ -24,6 +22,15 @@
         android:theme="@style/AppTheme"
         android:largeHeap="true"
         android:usesCleartextTraffic="true">
+        <receiver android:name=".NoteWidget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/note_widget_info" />
+        </receiver>
 
         <activity
             android:name=".MainActivity"
@@ -34,9 +41,9 @@
             android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
             <intent-filter android:label="Notesnook">
                 <action android:name="android.intent.action.VIEW" />
 
@@ -45,14 +52,10 @@
 
                 <data
                     android:host="app.notesnook.com"
-                    android:scheme="https"></data>
-
+                    android:scheme="https" />
             </intent-filter>
-
         </activity>
-
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
-
         <activity
             android:name=".ShareActivity"
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
@@ -62,25 +65,37 @@
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.SEND" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
             </intent-filter>
-
             <intent-filter android:label="Make Note">
                 <action android:name="android.intent.action.PROCESS_TEXT" />
+
                 <category android:name="android.intent.category.DEFAULT" />
+
                 <data android:mimeType="text/*" />
             </intent-filter>
-
-
         </activity>
 
         <service
-            android:name="com.streetwriters.notesnook.OnClearFromRecentService"
+            android:name=".OnClearFromRecentService"
             android:enabled="true"
             android:exported="true"
             android:stopWithTask="false" />
-        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />    
+        <service android:name="com.asterinet.react.bgactions.RNBackgroundActionsTask" />   
+
+        <provider
+        android:name="androidx.core.content.FileProvider"
+        android:authorities="${applicationId}.provider"
+        android:grantUriPermissions="true"
+        android:exported="false">
+        <meta-data
+            android:name="android.support.FILE_PROVIDER_PATHS"
+            android:resource="@xml/file_viewer_provider_paths" />
+    </provider> 
+
         <provider
             android:name="com.vinzscam.reactnativefileviewer.FileProvider"
             android:authorities="${applicationId}.provider"

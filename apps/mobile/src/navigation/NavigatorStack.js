@@ -1,30 +1,23 @@
-import {NavigationContainer} from '@react-navigation/native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
-import { Platform } from 'react-native';
-import {createNativeStackNavigator} from 'react-native-screens/native-stack';
 import Container from '../components/Container';
-import {useSelectionStore, useSettingStore} from '../provider/stores';
-import {eSendEvent} from '../services/EventManager';
+import { useSelectionStore, useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import SettingsService from '../services/SettingsService';
-import {history} from '../utils';
-import {rootNavigatorRef} from '../utils/Refs';
+import { history } from '../utils';
+import { rootNavigatorRef } from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import {Search} from '../views/Search';
+import { Search } from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
 const Stack = createNativeStackNavigator();
-
-const screenOptionsForAnimation = {
-  gestureEnabled: true,
-  stackAnimation: 'none',
-};
 
 export const NavigatorStack = React.memo(
   () => {
@@ -66,7 +59,7 @@ export const NavigatorStack = React.memo(
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                stackAnimation: "none",
+                animation:"none"
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />

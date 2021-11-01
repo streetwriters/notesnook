@@ -108,6 +108,13 @@ function collapseElement(target) {
   }
 }
 
+function onUndoChange() {
+  reactNativeEventHandler('history', {
+    undo: editor.undoManager.hasUndo(),
+    redo: editor.undoManager.hasRedo()
+  });
+}
+
 function init_tiny(size) {
   loadFontSize();
   tinymce.init({
@@ -117,17 +124,27 @@ function init_tiny(size) {
     directionality: EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
+    attachmenthandler_download_attachment: hash => {
+      reactNativeEventHandler('attachment_download', hash);
+    },
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
-      'searchreplace codeblock shortcuts inlinecode keyboardquirks',
-      'media imagetools table paste wordcount autoresize directionality'
+      'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
+      'media imagetools table paste wordcount autoresize directionality blockescape'
     ],
     toolbar: false,
     paste_data_images: true,
     statusbar: false,
     textpattern_patterns: markdownPatterns,
     contextmenu: false,
+    extended_valid_elements: `img[*|src=placeholder.svg]`,
+    invalid_styles: {
+      span: `--progress`
+    },
     content_style: `
+    body: {
+      font-family:"Open Sans";
+    }
     .mce-content-body h2::before,
     h3::before,
     h4::before,
@@ -163,24 +180,6 @@ function init_tiny(size) {
       .h {
         display: none;
       }
-    .img_float_left {
-      float:left;
-    }
-    .img_float_right {
-      float:right;
-    }
-    .img_float_none {
-      float:none;
-    }
-    .img_size_one {
-      width:100%;
-    }
-    .img_size_two {
-      width:50%;
-    }
-    .img_size_three {
-      width:25%;
-    }
     span.diff-del {
       background-color: #FDB0C0;  
     }
@@ -193,6 +192,7 @@ function init_tiny(size) {
     img {
       max-width:100% !important;
       height:auto !important;
+      border-radius:5px !important;
     }
     .tox .tox-edit-area__iframe {
       background-color:transparent !important;
@@ -216,6 +216,15 @@ function init_tiny(size) {
     td {
       min-width:10vw !important;
     }
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6,
+    strong {
+      font-weight:600 !important;
+    }
 `,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
@@ -235,7 +244,7 @@ function init_tiny(size) {
     font_formats:
       'Times New Roman=times new roman,times;' +
       'Serif=serif;' +
-      'Sans=sans-serif;' +
+      'Open Sans=open sans;' +
       'Classic=courier new;' +
       'Mono=monospace;',
     paste_postprocess: function (_, args) {
@@ -245,7 +254,8 @@ function init_tiny(size) {
         console.error(e);
       }
     },
-    setup: function (editor) {
+    setup: function (_editor) {
+      editor = _editor;
       editor.ui.registry.addButton('deleteimage', {
         icon: 'remove',
         tooltip: 'Remove image',
@@ -261,10 +271,10 @@ function init_tiny(size) {
         }
       });
 
-      editor.on('init', function(e) {
+      editor.on('init', function (e) {
         setTimeout(() => {
           reactNativeEventHandler('status', true);
-        },300)
+        }, 300);
       });
 
       editor.ui.registry.addButton('deletevideo', {
@@ -331,16 +341,24 @@ function init_tiny(size) {
         onclick: function () {}
       });
     },
-    init_instance_callback: function (edit) {
-      editor = edit;
+    init_instance_callback: function (_editor) {
+      editor = _editor;
       setTheme();
 
       editor.on('SelectionChange', function (e) {
         selectchange();
-        reactNativeEventHandler('history', {
-          undo: editor.undoManager.hasUndo(),
-          redo: editor.undoManager.hasRedo()
-        });
+      });
+
+      editor.on('ClearUndos', onUndoChange);
+      editor.on('Undo', onUndoChange);
+      editor.on('Redo', onUndoChange);
+      editor.on('TypingUndos', onUndoChange);
+      editor.on('BeforeAddUndo', onUndoChange);
+      editor.on('AddUndo', onUndoChange);
+      editor.on('tap', e => {
+        if (e.target.classList.contains('mce-content-body')) {
+          e.preventDefault();
+        }
       });
 
       editor.on('focus', function () {
@@ -362,6 +380,7 @@ function init_tiny(size) {
       });
 
       editor.on('NewBlock', function (e) {
+        console.log('New Block');
         const {newBlock} = e;
         let target;
         if (newBlock) {
@@ -412,22 +431,22 @@ function init_tiny(size) {
 }
 window.prevContent = '';
 const onChange = function (event) {
+  console.log(event.type, event.selectionChange);
+  onUndoChange();
   if (event.type === 'nodechange' && !event.selectionChange) return;
+
   if (isLoading) {
     isLoading = false;
     return;
   }
   if (editor.plugins.wordcount.getCount() === 0) return;
+  console.log('saving now doc');
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
     selectchange();
     reactNativeEventHandler('tiny', editor.getContent());
-    reactNativeEventHandler('history', {
-      undo: editor.undoManager.hasUndo(),
-      redo: editor.undoManager.hasRedo()
-    });
-  }, 1);
+  }, 10);
 };
 
 function getNodeColor(element) {

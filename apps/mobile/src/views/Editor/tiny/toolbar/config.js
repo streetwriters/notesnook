@@ -330,12 +330,18 @@ export const TOOLBAR_CONFIG = [
     }
   ],
   [
+   /*  {
+      format: 'filepicker',
+      type: 'format',
+      fullname: 'Attach file',
+      premium: true
+    },
     {
       format: 'image',
       type: 'format',
       fullname: 'Image',
       premium: true
-    },
+    }, */
     {
       format: 'video',
       type: 'format',

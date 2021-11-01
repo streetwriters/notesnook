@@ -3,14 +3,14 @@ import {Platform, View} from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
 import {LOGO_BASE64} from '../../assets/images/assets';
-import Clipboard from "@react-native-clipboard/clipboard"
+import Clipboard from '@react-native-clipboard/clipboard';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
 import {sanitizeFilename} from '../../utils/filename';
 import {SIZE} from '../../utils/SizeUtils';
@@ -21,6 +21,9 @@ import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
+import FileViewer from 'react-native-file-viewer';
+
+import * as ScopedStorage from 'react-native-scoped-storage';
 
 let RNFetchBlob;
 
@@ -29,7 +32,7 @@ class RecoveryKeyDialog extends React.Component {
     super(props);
     this.state = {
       key: null,
-      visible: false,
+      visible: false
     };
     this.actionSheetRef = createRef();
     this.svg = createRef();
@@ -38,17 +41,17 @@ class RecoveryKeyDialog extends React.Component {
     this.tapCount = 0;
   }
 
-  open = (signup) => {
+  open = signup => {
     if (signup) {
       this.signup = true;
     }
     this.setState(
       {
-        visible: true,
+        visible: true
       },
       () => {
         this.actionSheetRef.current?.setModalVisible(true);
-      },
+      }
     );
   };
 
@@ -58,7 +61,7 @@ class RecoveryKeyDialog extends React.Component {
         heading: 'Did you save recovery key?',
         message: 'Tap one more time to confirm.',
         type: 'success',
-        context: 'local',
+        context: 'local'
       });
       this.tapCount++;
       return;
@@ -67,7 +70,7 @@ class RecoveryKeyDialog extends React.Component {
     this.actionSheetRef.current?.setModalVisible(false);
     sleep(200).then(() => {
       this.setState({
-        visible: false,
+        visible: false
       });
     });
     if (this.signup) {
@@ -78,7 +81,7 @@ class RecoveryKeyDialog extends React.Component {
           paragraph:
             'Please confirm your email to encrypt and sync all your notes.',
           icon: 'check',
-          button: 'Start taking notes',
+          button: 'Start taking notes'
         });
       }, 500);
     }
@@ -92,55 +95,36 @@ class RecoveryKeyDialog extends React.Component {
   }
 
   saveQRCODE = async () => {
-    if ((await Storage.requestPermission()) === false) {
-      ToastEvent.show({
-        heading: 'Storage access not granted',
-        message: 'You must provide access to phone storage to save QR-Code',
-        type: 'error',
-        context: 'local',
-      });
-      return;
-    }
-
-    this.svg.current?.toDataURL(async (data) => {
+    this.svg.current?.toDataURL(async data => {
       try {
         let path = await Storage.checkAndCreateDir('/');
         RNFetchBlob = require('rn-fetch-blob').default;
         let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode';
         fileName = sanitizeFilename(fileName, {replacement: '_'});
         fileName = fileName + '.png';
-        await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
 
         if (Platform.OS === 'android') {
-          await RNFetchBlob.fs.scanFile([
-            {
-              path: path + fileName,
-              mime: 'image/png',
-            },
-          ]);
+          await ScopedStorage.createDocument(
+            fileName,
+            'image/png',
+            data,
+            'base64'
+          );
+        } else {
+          await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
         }
         ToastEvent.show({
           heading: 'Recovery key QR-Code saved',
           message:
             'QR-Code image has been saved to Gallery at ' + path + fileName,
           type: 'success',
-          context: 'local',
+          context: 'local'
         });
       } catch (e) {}
     });
   };
 
   saveToTextFile = async () => {
-    if ((await Storage.requestPermission()) === false) {
-      ToastEvent.show({
-        heading: 'Storage access not granted',
-        message:
-          'You must provide access to phone storage to save recovery key text file.',
-        type: 'error',
-        context: 'local',
-      });
-      return;
-    }
     try {
       let path = await Storage.checkAndCreateDir('/');
       let fileName = 'nn_' + this.user?.email + '_recovery_key';
@@ -148,15 +132,27 @@ class RecoveryKeyDialog extends React.Component {
       fileName = fileName + '.txt';
 
       RNFetchBlob = require('rn-fetch-blob').default;
-      await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+      if (Platform.OS === 'android') {
+       let file = await ScopedStorage.createDocument(
+          fileName,
+          'text/plain',
+          this.state.key,
+          'utf8'
+        );
+        if (!file) return;
+        path = file.uri;
+      } else {
+        await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
+        path = path + fileName;
+      }
 
       ToastEvent.show({
         heading: 'Recovery key text file saved',
-        message: 'Recovery key saved in text file at ' + path + fileName,
+        message: 'Recovery key saved in text file.',
         type: 'success',
-        context: 'local',
+        context: 'local'
       });
-      return path + fileName;
+      return path;
     } catch (e) {
       alert(e.message);
     }
@@ -167,7 +163,7 @@ class RecoveryKeyDialog extends React.Component {
     this.user = await db.user.getUser();
     if (k) {
       this.setState({
-        key: k.key,
+        key: k.key
       });
     }
   };
@@ -176,11 +172,18 @@ class RecoveryKeyDialog extends React.Component {
     let path = await this.saveToTextFile();
     if (!path) return;
     try {
-      await Share.open({
-        url: Platform.OS === 'ios' ? path : 'file:/' + path,
-        title: 'Save recovery key to cloud',
-        failOnCancel: false,
-      });
+      if (Platform.OS === 'ios') {
+        Share.open({
+          url: 'file:/' + result.filePath,
+          failOnCancel: false
+        }).catch(console.log);
+      } else {
+        FileViewer.open(path, {
+          showOpenWithDialog: true,
+          showAppsSuggestions: true,
+          shareFile: true
+        }).catch(console.log);
+      }
     } catch (e) {}
   };
 
@@ -200,7 +203,7 @@ class RecoveryKeyDialog extends React.Component {
             justifyContent: 'space-between',
             paddingHorizontal: 12,
             borderRadius: 10,
-            paddingTop: 10,
+            paddingTop: 10
           }}>
           <DialogHeader
             title="Your data recovery key"
@@ -213,7 +216,7 @@ class RecoveryKeyDialog extends React.Component {
               backgroundColor: colors.nav,
               borderRadius: 5,
               padding: 10,
-              marginTop: 10,
+              marginTop: 10
             }}>
             <Paragraph
               color={colors.icon}
@@ -224,7 +227,7 @@ class RecoveryKeyDialog extends React.Component {
                 maxWidth: '100%',
                 paddingRight: 10,
                 marginBottom: 10,
-                textAlign: 'center',
+                textAlign: 'center'
               }}>
               {this.state.key}
             </Paragraph>
@@ -235,7 +238,7 @@ class RecoveryKeyDialog extends React.Component {
                 ToastEvent.show({
                   heading: 'Recovery key copied!',
                   type: 'success',
-                  context: 'local',
+                  context: 'local'
                 });
               }}
               icon="content-copy"
@@ -257,7 +260,7 @@ class RecoveryKeyDialog extends React.Component {
               justifyContent: 'center',
               position: 'absolute',
               opacity: 0,
-              zIndex: -1,
+              zIndex: -1
             }}>
             {this.state.key ? (
               <QRCode
@@ -307,7 +310,7 @@ class RecoveryKeyDialog extends React.Component {
               width: '100%',
               maxWidth: '100%',
               marginBottom: 5,
-              textAlign: 'center',
+              textAlign: 'center'
             }}>
             Tap twice to confirm you have saved the recovery key.
           </Paragraph>

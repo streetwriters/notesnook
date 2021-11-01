@@ -9,7 +9,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/DB';
+import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
 import {normalize, SIZE} from '../../utils/SizeUtils';
 import {presentDialog} from '../Dialog/functions';
@@ -62,12 +62,13 @@ const ColorItem = ({item, index}) => {
       menu: true,
       get: 'colored'
     };
+
+    eSendEvent(refreshNotesPage, params);
     Navigation.navigate('NotesPage', params, {
       heading: alias.slice(0, 1).toUpperCase() + alias.slice(1),
       id: item.id,
       type: 'color'
     });
-    eSendEvent(refreshNotesPage, params);
     Navigation.closeDrawer();
   };
 
@@ -94,7 +95,7 @@ const ColorItem = ({item, index}) => {
         headerTextState?.id === item.id ? 'rgba(0,0,0,0.04)' : 'transparent'
       }
       onLongPress={onLongPress}
-      customSelectedColor={COLORS_NOTE[item.title]}
+      customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={0.12}
       onPress={() => onPress(item)}
@@ -124,7 +125,7 @@ const ColorItem = ({item, index}) => {
             style={{
               width: SIZE.lg - 2,
               height: SIZE.lg - 2,
-              backgroundColor: COLORS_NOTE[item.title],
+              backgroundColor: COLORS_NOTE[item.title.toLowerCase()],
               borderRadius: 100,
               justifyContent: 'center',
               marginRight: 10

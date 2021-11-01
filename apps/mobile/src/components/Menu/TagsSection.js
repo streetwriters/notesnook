@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/DB';
+import { db } from '../../utils/database';
 import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
 import { normalize, SIZE } from '../../utils/SizeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
@@ -38,13 +38,12 @@ export const TagsSection = () => {
         title: item.title,
         menu: true
       };
-
+      eSendEvent(eOnNewTopicAdded, params);
       Navigation.navigate('Notebook', params, {
         heading: item.title,
         id: item.id,
         type: item.type
       });
-      eSendEvent(eOnNewTopicAdded, params);
     } else if (item.type === 'tag') {
       params = params = {
         ...item,
@@ -52,20 +51,20 @@ export const TagsSection = () => {
         menu: true,
         get: 'tagged'
       };
+      eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
         heading: '#' + db.tags.alias(item.id),
         id: item.id,
         type: item.type
       });
-      eSendEvent(refreshNotesPage, params);
     } else {
       params = {...item, menu: true, get: 'topics'};
+      eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
         heading: item.title,
         id: item.id,
         type: item.type
       });
-      eSendEvent(refreshNotesPage, params);
     }
     Navigation.closeDrawer();
   };

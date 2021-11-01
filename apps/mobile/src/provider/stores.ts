@@ -3,7 +3,7 @@ import { Dimensions } from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
 import { history, SUBSCRIPTION_STATUS } from '../utils';
-import { db } from '../utils/DB';
+import { db } from '../utils/database';
 import { MMKV } from '../utils/mmkv';
 import {
   MenuStore,
@@ -21,6 +21,8 @@ import {
   Announcement,
 } from './interfaces';
 import { groupArray } from "notes-core/utils/grouping"
+import { EditorWebView, post } from '../views/Editor/Functions';
+import tiny from '../views/Editor/tiny/tiny';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -148,6 +150,57 @@ export const useUserStore = create<UserStore>((set, get) => ({
   setVerifyUser: (verified) => set({ verifyUser: verified })
 }));
 
+interface AttachmentStore {
+  progress?: {
+    [name: string]: {
+      sent: number,
+      total: number,
+      hash: string,
+      recieved: number,
+      type: "upload" | "download",
+    }
+  },
+  encryptionProgress: number,
+  setEncryptionProgress: (encryptionProgress) => void
+  remove: (hash: string) => void
+  setProgress: (sent: number, total: number, hash: string, recieved: number, type: "upload" | "download") => void,
+  loading:{total:number,current:number},
+  setLoading:(data:{total:number,current:number}) => void
+}
+
+export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
+  progress: {},
+  remove: (hash) => {
+    let _p = get().progress;
+    _p[hash] = null
+    tiny.call(EditorWebView, `
+    (function() {
+      let progress = ${JSON.stringify({
+      loaded: 1,
+      total: 1,
+      hash
+    })}
+    tinymce.activeEditor._updateAttachmentProgress(progress);
+    })()`);
+    set({ progress: { ..._p } });
+  },
+  setProgress: (sent, total, hash, recieved, type) => {
+    let _p = get().progress;
+    _p[hash] = { sent, total, hash, recieved, type };
+    let progress = { total, hash, loaded: type === "download" ? recieved : sent };
+    tiny.call(EditorWebView, `
+    (function() {
+      let progress = ${JSON.stringify(progress)}
+      tinymce.activeEditor._updateAttachmentProgress(progress);
+    })()`);
+    set({ progress: { ..._p } });
+  },
+  encryptionProgress: null,
+  setEncryptionProgress: (encryptionProgress) => set({ encryptionProgress: encryptionProgress }),
+  loading:{total:0,current:0},
+  setLoading:(data) => set({loading:data})
+}));
+
 let { width, height } = Dimensions.get('window');
 
 export const useSettingStore = create<SettingStore>((set, get) => ({
@@ -168,7 +221,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     telemetry: true,
     notebooksListMode: "normal",
     notesListMode: "normal",
-    devMode:false,
+    devMode: false,
+    notifNotes:false
   },
   fullscreen: false,
   deviceMode: "mobile",
@@ -194,7 +248,7 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
       setTimeout(() => {
         try {
           set({ menuPins: db.settings.pins })
-        } catch (e) {}
+        } catch (e) { }
       }, 1000)
     }
   },
