@@ -20,10 +20,10 @@ const ROUTES = {
     component: () => import("./views/auth"),
     props: { type: "login" },
   },
-  "/recover": {
-    component: () => import("./views/auth"),
-    props: { type: "recover" },
-  },
+  // "/recover": {
+  //   component: () => import("./views/auth"),
+  //   props: { type: "recover" },
+  // },
   default: { component: () => import("./app"), props: {} },
 };
 

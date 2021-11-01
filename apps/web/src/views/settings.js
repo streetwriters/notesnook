@@ -223,7 +223,7 @@ function Settings(props) {
                 tip="In case you lose your password, you can recover your data using your recovery key."
               />
             </Button>
-            <Button
+            {/* <Button
               variant="list"
               onClick={async () => {
                 const result = await showPasswordDialog(
@@ -244,7 +244,7 @@ function Settings(props) {
                 text="Change account password"
                 tip="Set a new password for your account"
               />
-            </Button>
+            </Button> */}
             <Button variant="list" onClick={() => sync(true, true)}>
               <Tip
                 text="Having problems with syncing?"

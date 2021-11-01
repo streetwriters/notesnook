@@ -126,34 +126,34 @@ const authTypes = {
         .catch((e) => onError(e.message));
     },
   },
-  recover: {
-    resetOnNavigate: false,
-    title: "Recover your account",
-    subtitle: {
-      text: "Remember your password?",
-      action: {
-        text: "Log in",
-        onClick: () => hardNavigate("/login", getQueryParams()),
-      },
-    },
-    helpTexts: {
-      email:
-        "Enter your Notesnook account email so we can send you instructions on how to recover your account.",
-    },
-    labels: { email: "Email address" },
-    primaryAction: {
-      text: "Recover account",
-      loadingText: "Sending recovery email...",
-    },
-    onSubmit: async (form, onError, onSuccess) => {
-      return await db.user
-        .recoverAccount(form.email.toLowerCase())
-        .then(async () =>
-          onSuccess("Recovery email sent. Please check your inbox (and spam).")
-        )
-        .catch((e) => onError(e.message));
-    },
-  },
+  // recover: {
+  //   resetOnNavigate: false,
+  //   title: "Recover your account",
+  //   subtitle: {
+  //     text: "Remember your password?",
+  //     action: {
+  //       text: "Log in",
+  //       onClick: () => hardNavigate("/login", getQueryParams()),
+  //     },
+  //   },
+  //   helpTexts: {
+  //     email:
+  //       "Enter your Notesnook account email so we can send you instructions on how to recover your account.",
+  //   },
+  //   labels: { email: "Email address" },
+  //   primaryAction: {
+  //     text: "Recover account",
+  //     loadingText: "Sending recovery email...",
+  //   },
+  //   onSubmit: async (form, onError, onSuccess) => {
+  //     return await db.user
+  //       .recoverAccount(form.email.toLowerCase())
+  //       .then(async () =>
+  //         onSuccess("Recovery email sent. Please check your inbox (and spam).")
+  //       )
+  //       .catch((e) => onError(e.message));
+  //   },
+  // },
 };
 
 function Auth(props) {
@@ -378,7 +378,7 @@ function Auth(props) {
                 />
               )}
 
-              {data.supportsPasswordRecovery && (
+              {/* {data.supportsPasswordRecovery && (
                 <Button
                   type="button"
                   alignSelf="start"
@@ -388,7 +388,7 @@ function Auth(props) {
                 >
                   Forgot password?
                 </Button>
-              )}
+              )} */}
               <Button
                 data-test-id="submitButton"
                 display="flex"
