@@ -123,8 +123,7 @@ class UserManager {
         const oldUser = await this.getUser();
         if (!!oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed) {
           // generate new token
-          const token = await this.tokenManager.getToken(false);
-          await this.tokenManager._refreshToken(token);
+          await this.tokenManager.getToken(true, true);
         }
 
         await this.setUser(user);

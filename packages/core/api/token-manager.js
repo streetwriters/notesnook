@@ -24,7 +24,7 @@ class TokenManager {
     let token = await this._storage.read("token");
     if (!token) return;
     if (forceRenew || (renew && this._isTokenExpired(token))) {
-      await this._refreshToken();
+      await this._refreshToken(forceRenew);
       return await this.getToken();
     }
     return token;
@@ -50,10 +50,10 @@ class TokenManager {
     }
   }
 
-  async _refreshToken() {
+  async _refreshToken(forceRenew = false) {
     await this._refreshTokenMutex.runExclusive(async () => {
       const token = await this.getToken(false, false);
-      if (!this._isTokenExpired(token)) {
+      if (!forceRenew && !this._isTokenExpired(token)) {
         return;
       }
 
