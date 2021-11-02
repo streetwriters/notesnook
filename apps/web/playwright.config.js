@@ -1,5 +1,33 @@
 const IS_CI = !!process.env.CI;
 
+const projects = IS_CI
+  ? [
+      {
+        name: "Firefox",
+        use: { browserName: "firefox" },
+      },
+      {
+        name: "WebKit",
+        use: { browserName: "webkit" },
+      },
+    ]
+  : [
+      {
+        name: "Chromium",
+        use: {
+          browserName: "chromium",
+        },
+      },
+      {
+        name: "Firefox",
+        use: { browserName: "firefox" },
+      },
+      {
+        name: "WebKit",
+        use: { browserName: "webkit" },
+      },
+    ];
+
 module.exports = {
   webServer: {
     command: "npm run debug",
@@ -33,20 +61,5 @@ module.exports = {
       height: 720,
     },
   },
-  projects: [
-    {
-      name: "Chromium",
-      use: {
-        browserName: "chromium",
-      },
-    },
-    {
-      name: "Firefox",
-      use: { browserName: "firefox" },
-    },
-    {
-      name: "WebKit",
-      use: { browserName: "webkit" },
-    },
-  ],
+  projects,
 };

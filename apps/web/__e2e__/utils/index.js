@@ -27,7 +27,13 @@ async function createNote(note, actionButtonId) {
 async function editNote(title, content) {
   await page.waitForSelector(".mce-content-body");
 
-  if (title) await page.fill(getTestId("editor-title"), title);
+  await page.waitForTimeout(1000);
+
+  if (title)
+    await page.fill(getTestId("editor-title"), title, {
+      strict: true,
+      force: true,
+    });
 
   await page.waitForTimeout(100);
 
