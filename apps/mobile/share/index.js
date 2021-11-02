@@ -252,6 +252,11 @@ const NotesnookShare = ({quicknote = false}) => {
 
   const onLoad = () => {
     postMessage(webviewRef, 'htmldiff', note.content?.data || '');
+    setTimeout(() => {
+      webviewRef.current?.injectJavaScript(`document
+      .querySelector('.htmldiff_div')
+      .setAttribute('contenteditable', 'true');`)
+    },300)
     let theme = {...colors};
     theme.factor = 1;
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
@@ -352,7 +357,7 @@ const NotesnookShare = ({quicknote = false}) => {
           return {...note};
         });
       } else {
-        let html = validator.isURL(rawData.value)
+        let html =  validator.isURL(rawData.value)
           ? makeHtmlFromUrl(rawData.value)
           : makeHtmlFromPlainText(rawData.value);
         setNote(note => {
@@ -660,7 +665,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   paddingRight: 80,
                   alignItems: 'center'
                 }}>
-                {validator.isURL(rawData.value) && (
+                {rawData.value && validator.isURL(rawData.value) && (
                   <Button
                     color={mode == 2 ? colors.shade : colors.nav}
                     icon={modes[2].icon}
