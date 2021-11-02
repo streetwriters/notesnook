@@ -131,6 +131,7 @@ export default class Content extends Collection {
     }
 
     contentItem.data = data;
+    contentItem.dateEdited = Date.now();
     return contentItem;
   }
 }
