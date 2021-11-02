@@ -130,7 +130,7 @@ export default class Content extends Collection {
       await this._db.attachments.add(attachment, contentItem.noteId);
     }
 
-    if (attachments && attachments.length > 0) {
+    if (toAdd.length > 0) {
       contentItem.dateEdited = Date.now();
       contentItem.data = data;
     }

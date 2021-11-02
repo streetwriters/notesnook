@@ -91,6 +91,12 @@ export default class Sync {
     // the server for remote changes. This is done to ensure we
     // don't accidentally send the remote changes back to the server.
     const data = await this._collector.collect(lastSynced);
+
+    // We update the local last synced time before fetching data
+    // from the server. This is necessary to ensure that if the user
+    // makes any local changes, it is not ignored in the next sync.
+    // This is also the last synced time that is set for later sync cycles.
+    data.lastSynced = Date.now();
     if (full) {
       // We request remote changes and merge them. If any new changes
       // come before or during this step (e.g. SSE), it can be safely
@@ -103,13 +109,7 @@ export default class Sync {
       // this.hasNewChanges = false;
     }
 
-    // We update the local last synced time before pushing local data
-    // to the server. This is necessary to ensure that if the user
-    // makes any local changes during the HTTP request, it is not ignored.
-    // This is also the last synced time that is set for later sync cycles.
-
     if (!areAllEmpty(data)) {
-      data.lastSynced = Date.now();
       lastSynced = await this._send(data);
     } else if (serverResponse) lastSynced = serverResponse.lastSynced;
 
