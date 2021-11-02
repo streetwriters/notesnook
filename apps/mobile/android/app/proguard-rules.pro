@@ -43,4 +43,6 @@
 
 -dontwarn java.awt.*
 -keep class com.sun.jna.* { *; }
+-keep class net.jpountz.** { *; }
+-keep class com.goterl.** { *; }
 -keepclassmembers class * extends com.sun.jna.* { public *; }
