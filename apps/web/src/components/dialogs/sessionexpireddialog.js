@@ -37,6 +37,7 @@ function SessionExpiredDialog(props) {
         const token = await db.user.tokenManager.getToken();
         if (token) onClose(true);
       } catch (e) {
+        setError(`Could not refresh access_token. Error: ${e.message}`);
       } finally {
         setIsLoading(false);
       }
