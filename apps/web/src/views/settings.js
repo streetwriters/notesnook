@@ -801,15 +801,15 @@ function AccountStatus(props) {
         mt={2}
       >
         {remainingDays > 0 && isPro
-          ? `Subscribed to Notesnook Pro.`
+          ? `Subscribed to Notesnook Pro`
           : remainingDays > 0 && isTrial
-          ? "Your free trial has started."
+          ? "Your free trial has started"
           : isBeta
-          ? "Your beta subscription has ended."
+          ? "Your beta subscription has ended"
           : isTrial
-          ? "Your trial has ended."
+          ? "Your trial has ended"
           : isPro
-          ? "Your Notesnook Pro subscription has ended."
+          ? "Your Notesnook Pro subscription has ended"
           : ""}
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}

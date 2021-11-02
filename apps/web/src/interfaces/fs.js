@@ -351,6 +351,10 @@ async function deleteFile(filename, requestOptions) {
   return result;
 }
 
+function clearFileStorage() {
+  return streamablefs.clear();
+}
+
 const FS = {
   writeEncrypted,
   readEncrypted,
@@ -362,6 +366,7 @@ const FS = {
   hashBuffer,
   hashStream,
   writeEncryptedFile,
+  clearFileStorage,
 };
 export default FS;
 

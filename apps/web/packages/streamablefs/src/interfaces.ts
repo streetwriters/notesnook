@@ -5,4 +5,5 @@ export interface IStreamableFS {
   readFile(filename: string): Promise<FileHandle | undefined>;
   exists(filename: string): Promise<boolean>;
   deleteFile(filename: string): Promise<boolean>;
+  clear(): Promise<void>;
 }

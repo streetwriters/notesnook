@@ -50,4 +50,8 @@ export class StreamableFS implements IStreamableFS {
     await handle.delete();
     return true;
   }
+
+  async clear(): Promise<void> {
+    await this.storage.clear();
+  }
 }
