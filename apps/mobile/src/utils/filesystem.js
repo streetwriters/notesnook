@@ -270,9 +270,12 @@ async function clearFileStorage() {
   try {
     let files = await RNFetchBlob.fs.ls(cacheDir);
     for (let file of files) {
-      await RNFetchBlob.fs.unlink(file).catch(console.log);
+      try {
+        await RNFetchBlob.fs.unlink(cacheDir + `/${file}`);
+      } catch (e) {
+        console.log(e);
+      }
     }
-    console.log(await RNFetchBlob.fs.ls(cacheDir));
   } catch (e) {
     console.log(e);
   }
