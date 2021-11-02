@@ -17,7 +17,6 @@ import {
   View
 } from 'react-native';
 import Animated, {
-  color,
   Easing,
   timing,
   useValue
@@ -34,7 +33,6 @@ import {
 } from '../src/services/EventManager';
 import {getElevation} from '../src/utils';
 import {db} from '../src/utils/database';
-import {SIZE} from '../src/utils/SizeUtils';
 import Storage from '../src/utils/storage';
 import {sleep} from '../src/utils/TimeUtils';
 import {Search} from './search';
@@ -425,7 +423,7 @@ const NotesnookShare = ({quicknote = false}) => {
           <Text
             style={{
               color: colors.pri,
-              fontSize: SIZE.md,
+              fontSize: 17,
               fontFamily: 'OpenSans-Regular'
             }}>
             Quick note
