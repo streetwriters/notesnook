@@ -182,7 +182,7 @@ export default class Sync {
       for (var i = 0; i < attachments.length; ++i) {
         const attachment = attachments[i];
         const { hash } = attachment.metadata;
-        sendAttachmentsProgressEvent("upload", hash, attachments.length, i + 1);
+        sendAttachmentsProgressEvent("upload", hash, attachments.length, i);
 
         const isUploaded = await this._db.fs.uploadFile(hash, hash);
         if (!isUploaded) throw new Error("Failed to upload file.");
