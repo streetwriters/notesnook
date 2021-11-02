@@ -66,6 +66,7 @@ class Tiny {
       switch (attachment.tagName) {
         case "IMG": {
           const hash = getDatasetAttribute(attachment, "hash");
+          if (!hash) continue;
 
           const src = await getData(hash, {
             total: attachmentElements.length,
