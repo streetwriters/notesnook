@@ -80,4 +80,12 @@ export default class FileStorage {
   exists(filename) {
     return this.fs.exists(filename);
   }
+
+  /**
+   *
+   * @returns {Promise<void>}
+   */
+  clear() {
+    return this.fs.clearFileStorage();
+  }
 }
