@@ -96,6 +96,7 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
     useAttachmentStore.getState().remove(filename);
     if (result) {
       let attachment = db.attachments.attachment(filename);
+      if (!attachment) return result;
       if (!attachment.metadata.type.startsWith('image/')) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
