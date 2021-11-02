@@ -28,7 +28,7 @@ function Toggle(props) {
         ":hover": { borderBottomColor: "primary" },
       }}
     >
-      <Tip text={title} tip={isToggled ? onTip : offTip} />
+      <Tip text={title} tip={isToggled ? onTip : offTip} sx={{ mr: 2 }} />
       <Switch onClick={onClick} checked={isToggled} />
     </Flex>
   );

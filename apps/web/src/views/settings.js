@@ -176,7 +176,7 @@ function Settings(props) {
           <AccountStatus user={user} />
         ) : (
           <Flex
-            p={1}
+            py={1}
             sx={{ borderRadius: "default", cursor: "pointer" }}
             onClick={async () => {
               hardNavigate("/login", { redirect: "/settings" });
