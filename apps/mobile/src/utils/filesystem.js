@@ -70,6 +70,7 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
     });
     const uploadUrl = await res.text();
     console.log(uploadUrl);
+    console.log(uploadUrl);
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
     })
@@ -100,7 +101,7 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
       }
     }
 
-    return attachment;
+    return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     console.log('upload file: ', e, url, headers);
@@ -114,9 +115,10 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
     let path = `${cacheDir}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
+      console.log("file is downloaded");
       return true;
     }
-
+    console.log('downloading again')
     let res = await fetch(url, {
       method: 'GET',
       headers
