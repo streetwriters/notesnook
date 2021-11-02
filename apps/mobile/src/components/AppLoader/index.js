@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Appearance, Platform, SafeAreaView, View } from 'react-native';
+import deviceInfoModule from 'react-native-device-info';
 import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import SpInAppUpdates, {
@@ -21,7 +22,7 @@ import {
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import { editing } from '../../utils';
+import { APP_VERSION, editing } from '../../utils';
 import { COLOR_SCHEME_DARK } from '../../utils/Colors';
 import { db } from '../../utils/database';
 import {
@@ -141,6 +142,7 @@ const AppLoader = ({onLoad}) => {
   };
 
   const checkAppUpdates = async () => {
+    return false;
     if (Platform.OS === 'android') {
       try {
         let needsUpdate = await inAppUpdates.checkNeedsUpdate();
