@@ -16,11 +16,7 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, {
-  Easing,
-  timing,
-  useValue
-} from 'react-native-reanimated';
+import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
@@ -255,8 +251,8 @@ const NotesnookShare = ({quicknote = false}) => {
     setTimeout(() => {
       webviewRef.current?.injectJavaScript(`document
       .querySelector('.htmldiff_div')
-      .setAttribute('contenteditable', 'true');`)
-    },300)
+      .setAttribute('contenteditable', 'true');`);
+    }, 300);
     let theme = {...colors};
     theme.factor = 1;
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
@@ -357,7 +353,7 @@ const NotesnookShare = ({quicknote = false}) => {
           return {...note};
         });
       } else {
-        let html =  validator.isURL(rawData.value)
+        let html = validator.isURL(rawData.value)
           ? makeHtmlFromUrl(rawData.value)
           : makeHtmlFromPlainText(rawData.value);
         setNote(note => {
@@ -565,7 +561,7 @@ const NotesnookShare = ({quicknote = false}) => {
             style={{
               width: '100%'
             }}>
-            {!quicknote && (
+            {!quicknote ? (
               <Button
                 color={colors.accent}
                 onPress={onPress}
@@ -583,7 +579,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   bottom: -35
                 }}
               />
-            )}
+            ) : null}
 
             <View
               style={{
@@ -665,7 +661,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   paddingRight: 80,
                   alignItems: 'center'
                 }}>
-                {rawData.value && validator.isURL(rawData.value) && (
+                {rawData.value && validator.isURL(rawData.value) ? (
                   <Button
                     color={mode == 2 ? colors.shade : colors.nav}
                     icon={modes[2].icon}
@@ -677,7 +673,7 @@ const NotesnookShare = ({quicknote = false}) => {
                     type="rounded"
                     style={{paddingHorizontal: 12}}
                   />
-                )}
+                ) : null}
                 <Button
                   color={mode == 1 ? colors.shade : colors.nav}
                   icon={modes[1].icon}
