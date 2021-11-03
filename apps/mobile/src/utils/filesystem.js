@@ -70,6 +70,7 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
     });
     const uploadUrl = await res.text();
     console.log(uploadUrl);
+    console.log(uploadUrl);
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
     })
@@ -95,12 +96,13 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
     useAttachmentStore.getState().remove(filename);
     if (result) {
       let attachment = db.attachments.attachment(filename);
+      if (!attachment) return result;
       if (!attachment.metadata.type.startsWith('image/')) {
         RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     }
 
-    return attachment;
+    return result;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     console.log('upload file: ', e, url, headers);
@@ -114,9 +116,10 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
     let path = `${cacheDir}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
+      console.log('file is downloaded');
       return true;
     }
-
+    console.log('downloading again');
     let res = await fetch(url, {
       method: 'GET',
       headers
@@ -179,7 +182,7 @@ function cancelable(operation) {
       execute: () => operation(filename, {url, headers}, cancelToken),
       cancel: async () => {
         await cancelToken.cancel();
-        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log)
+        RNFetchBlob.fs.unlink(`${cacheDir}/${filename}`).catch(console.log);
       }
     };
   };
@@ -229,9 +232,9 @@ async function downloadAttachment(hash, global = true) {
       message: attachment.metadata.filename + ' downloaded',
       type: 'success'
     });
-    RNFetchBlob.fs.unlink(
-      RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`
-    ).catch(console.log);
+    RNFetchBlob.fs
+      .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+      .catch(console.log);
 
     if (Platform.OS === 'ios') {
       fileUri = folder.uri + `/${attachment.metadata.filename}`;
@@ -263,6 +266,21 @@ async function downloadAttachment(hash, global = true) {
   }
 }
 
+async function clearFileStorage() {
+  try {
+    let files = await RNFetchBlob.fs.ls(cacheDir);
+    for (let file of files) {
+      try {
+        await RNFetchBlob.fs.unlink(cacheDir + `/${file}`);
+      } catch (e) {
+        console.log(e);
+      }
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
 export default {
   readEncrypted,
   writeEncrypted,
@@ -270,5 +288,6 @@ export default {
   downloadFile: cancelable(downloadFile),
   deleteFile,
   exists,
-  downloadAttachment
+  downloadAttachment,
+  clearFileStorage
 };

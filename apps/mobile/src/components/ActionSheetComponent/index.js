@@ -977,21 +977,25 @@ export const ActionSheetComponent = ({
           style={{
             width: '100%',
             paddingHorizontal: 12,
-            marginTop: 10
+            marginTop: 10,
           }}>
           <Button
             onPress={async () => {
+              console.log('copy data');
               let additionalData = {}
               if (note.type === "note") {
                 let content = await db.content.raw(note.contentId);
-                content = db.debug.strip(content);
-                additionalData.content = content;
+                if (content) {
+                  content = db.debug.strip(content);
+                  additionalData.content = content;
+                }
               }
               additionalData.lastSynced = await db.lastSynced();
-              
+              console.log(_note);
               let _note = {...note};
               _note.additionalData = additionalData;
               Clipboard.setString(db.debug.strip(_note));
+
               ToastEvent.show({
                 heading:"Debug data copied!",
                 type:'success',
