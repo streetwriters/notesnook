@@ -1,4 +1,4 @@
-const fs = {};
+var fs = {};
 
 function hasItem(key) {
   return !!fs[key];
@@ -62,6 +62,10 @@ function exists(filename) {
   return hasItem(filename);
 }
 
+async function clearFileStorage() {
+  fs = {};
+}
+
 module.exports = {
   writeEncrypted,
   readEncrypted,
@@ -69,6 +73,7 @@ module.exports = {
   downloadFile: cancellable(downloadFile),
   deleteFile,
   exists,
+  clearFileStorage,
 };
 
 function cancellable(operation) {

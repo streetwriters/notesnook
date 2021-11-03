@@ -41,7 +41,11 @@ function encrypt(password, data) {
 }
 
 function decrypt(key, data) {
-  if (!key || key.password === data.key.password)
+  if (
+    !key ||
+    key.password === data.key.password ||
+    key.key.password === data.key.password
+  )
     return Promise.resolve(data.cipher);
   else throw new Error("Wrong password");
 }

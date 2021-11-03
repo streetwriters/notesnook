@@ -2,6 +2,7 @@ import DB from "../../api";
 import StorageInterface from "../../__mocks__/storage.mock";
 import dayjs from "dayjs";
 import { groupArray } from "../../utils/grouping";
+import FS from "../../__mocks__/fs.mock";
 
 const TEST_NOTEBOOK = {
   title: "Test Notebook",
@@ -16,7 +17,7 @@ const TEST_NOTEBOOK2 = {
 };
 
 function databaseTest() {
-  let db = new DB(StorageInterface);
+  let db = new DB(StorageInterface, null, FS);
   return db.init().then(() => db);
 }
 
@@ -32,6 +33,8 @@ var TEST_NOTE = {
     data: `<p>Hello<br><span style="color:#f00">This is colorful</span></p>`,
   },
 };
+
+const IMG_CONTENT = `"<p>This is a note for me.j</p>\n<p><img src=\"data:image/png;base64,iVBORw0K\" class=\"attachment\" alt=\"Screenshot_20210915_102333.png\" data-mime=\"image/png\" data-hash=\"d3eab72e94e3cd35\" data-filename=\"Screenshot_20210915_102333.png\" data-size=\"68609\" style=\"float: left;\" /> &nbsp;</p>\n<p>&nbsp;</p>"`;
 
 const LONG_TEXT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
@@ -69,6 +72,7 @@ export {
   notebookTest,
   noteTest,
   groupedTest,
+  IMG_CONTENT,
   StorageInterface,
   TEST_NOTEBOOK,
   TEST_NOTEBOOK2,
