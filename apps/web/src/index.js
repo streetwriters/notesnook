@@ -24,12 +24,19 @@ const ROUTES = {
   //   component: () => import("./views/auth"),
   //   props: { type: "recover" },
   // },
-  default: { component: () => import("./app"), props: {} },
+  "/": { component: () => import("./app"), props: {} },
 };
 
 function getRoute() {
   const path = getCurrentPath();
-  return ROUTES[path] || ROUTES.default;
+  if (!ROUTES[path]) {
+    return shouldSkipInitiation() ? ROUTES["/"] : ROUTES["/signup"];
+  }
+  return ROUTES[path];
+}
+
+function shouldSkipInitiation() {
+  return localStorage.getItem("skipInitiation") || false;
 }
 
 const route = getRoute();
