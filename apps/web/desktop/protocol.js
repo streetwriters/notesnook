@@ -1,4 +1,4 @@
-const { protocol, session } = require("electron");
+const { protocol } = require("electron");
 const { isDevelopment, getPath } = require("./utils");
 const fs = require("fs");
 const path = require("path");
@@ -62,6 +62,7 @@ function registerProtocol() {
             redirect: "manual",
           });
         } catch (e) {
+          console.error(e);
           logger.error(`Error sending request to `, request.url, "Error: ", e);
           callback({ statusCode: 400 });
           return;
@@ -94,13 +95,18 @@ function shouldInterceptRequest(url) {
  * @param {Electron.ProtocolRequest} request
  */
 async function getBody(request) {
+  /**
+   * @type {Electron.Session}
+   */
+  const session = global.win.webContents.session;
+
   const blobParts = [];
   if (!request.uploadData || !request.uploadData.length) return null;
   for (let data of request.uploadData) {
     if (data.type === "rawData") {
       blobParts.push(new Uint8Array(data.bytes));
     } else if (data.type === "blob") {
-      const buffer = await session.defaultSession.getBlobData(data.blobUUID);
+      const buffer = await session.getBlobData(data.blobUUID);
       blobParts.push(new Uint8Array(buffer));
     }
   }

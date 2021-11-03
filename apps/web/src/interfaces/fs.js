@@ -213,12 +213,13 @@ async function uploadFile(filename, requestOptions) {
       UPLOAD_PART_REQUIRED_CHUNKS
     );
     const url = parts[i];
+    const data = await blob.arrayBuffer();
     const response = await axios.request({
       url,
       method: "PUT",
       headers: { "Content-Type": "" },
       cancelToken: cancellationToken,
-      data: blob,
+      data,
       onUploadProgress,
     });
     if (!isSuccessStatusCode(response.status) || !response.headers.etag)
