@@ -149,7 +149,7 @@ function SyncStatus() {
   const lastSynced = useAppStore((state) => state.lastSynced);
   const user = useUserStore((state) => state.user);
 
-  if (!user.isEmailConfirmed) return null;
+  if (!user.isEmailConfirmed || !lastSynced) return null;
   switch (syncStatus) {
     case "synced":
       return (
