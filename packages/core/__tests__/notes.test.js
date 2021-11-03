@@ -1,3 +1,4 @@
+import { groupArray } from "../utils/grouping";
 import {
   StorageInterface,
   databaseTest,
@@ -272,3 +273,13 @@ test("deleting a colored note should remove it from that color", () =>
     expect(color).toBeFalsy();
     // TODO expect(color.noteIds.indexOf(id)).toBe(-1);
   }));
+
+test("grouping items where item.title is empty or undefined shouldn't throw", () => {
+  expect(
+    groupArray([{ title: "" }], {
+      groupBy: "abc",
+      sortBy: "title",
+      sortDirection: "asc",
+    })
+  ).toBeTruthy();
+});
