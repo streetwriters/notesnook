@@ -1,9 +1,10 @@
-const { protocol } = require("electron");
+const { protocol, session } = require("electron");
 const { isDevelopment, getPath } = require("./utils");
 const fs = require("fs");
 const path = require("path");
 const fetch = require("node-fetch").default;
 const { logger } = require("./logger");
+const { Blob } = require("buffer");
 
 const FILE_NOT_FOUND = -6;
 const BASE_PATH = isDevelopment() ? "../public" : "";
@@ -50,9 +51,10 @@ function registerProtocol() {
       } else {
         var response;
         try {
+          const body = await getBody(request);
           response = await fetch(request.url, {
             ...request,
-            body: !!request.uploadData ? request.uploadData[0].bytes : null,
+            body,
             headers: {
               ...request.headers,
               origin: `${PROTOCOL}://${HOSTNAME}/`,
@@ -85,6 +87,25 @@ const bypassedRoutes = ["/notes/index_v14.json", "/notes/welcome-web"];
 function shouldInterceptRequest(url) {
   let shouldIntercept = url.hostname === HOSTNAME;
   return shouldIntercept && !bypassedRoutes.includes(url.pathname);
+}
+
+/**
+ *
+ * @param {Electron.ProtocolRequest} request
+ */
+async function getBody(request) {
+  const blobParts = [];
+  if (!request.uploadData || !request.uploadData.length) return null;
+  for (let data of request.uploadData) {
+    if (data.type === "rawData") {
+      blobParts.push(new Uint8Array(data.bytes));
+    } else if (data.type === "blob") {
+      const buffer = await session.defaultSession.getBlobData(data.blobUUID);
+      blobParts.push(new Uint8Array(buffer));
+    }
+  }
+  const blob = new Blob(blobParts);
+  return await blob.arrayBuffer();
 }
 
 module.exports = { registerProtocol, URL: `${PROTOCOL}://${HOSTNAME}/` };
