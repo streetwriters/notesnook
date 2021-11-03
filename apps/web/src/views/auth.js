@@ -98,7 +98,9 @@ const authTypes = {
       }
       return await userstore
         .signup(form)
-        .then(async () => hardNavigate(form.redirect || "/"))
+        .then(async () => {
+          redirectToURL(form.redirect || "/");
+        })
         .catch((e) => onError(e.message));
     },
   },
@@ -122,7 +124,9 @@ const authTypes = {
     onSubmit: async (form, onError) => {
       return await userstore
         .login(form)
-        .then(async () => hardNavigate(form.redirect || "/"))
+        .then(async () => {
+          redirectToURL(form.redirect || "/");
+        })
         .catch((e) => onError(e.message));
     },
   },
@@ -194,6 +198,14 @@ function Auth(props) {
     }
   }, [type]);
 
+  useEffect(() => {
+    if (!isAppLoaded) return;
+    (async () => {
+      const user = await db.user.getUser();
+      if (!!user) redirectToURL("/");
+    })();
+  }, [isAppLoaded]);
+
   return (
     <ThemeProvider>
       <Flex
@@ -209,8 +221,7 @@ function Auth(props) {
           sx={{ position: "absolute", top: 3, right: 30, cursor: "pointer" }}
           title="Go to app"
           onClick={() => {
-            Config.set("skipInitiation", true);
-            hardNavigate("/");
+            redirectToURL("/");
           }}
         >
           <ArrowRight size={16} />
@@ -458,3 +469,8 @@ function Auth(props) {
   );
 }
 export default Auth;
+
+function redirectToURL(url) {
+  Config.set("skipInitiation", true);
+  hardNavigate(url);
+}

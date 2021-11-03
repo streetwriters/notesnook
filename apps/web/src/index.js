@@ -35,10 +35,6 @@ function getRoute() {
   return ROUTES[path];
 }
 
-function shouldSkipInitiation() {
-  return localStorage.getItem("skipInitiation") || false;
-}
-
 const route = getRoute();
 route.component().then(({ default: Component }) => {
   render(
@@ -55,3 +51,7 @@ route.component().then(({ default: Component }) => {
 // Learn more about service workers: https://bit.ly/CRA-PWA
 if (process.env.REACT_APP_PLATFORM !== "desktop") serviceWorker.register();
 else serviceWorker.unregister();
+
+function shouldSkipInitiation() {
+  return localStorage.getItem("skipInitiation") || false;
+}
