@@ -168,6 +168,10 @@ function setTheme() {
     .tox-textfield:hover {
       border-color: ${pageTheme.colors.accent + '80'} !important;
     }
+
+    .tox .tox-tbtn--select {
+      min-width: 92px;
+    }
     
     .tox-button {
       background-color: ${pageTheme.colors.accent} !important;
