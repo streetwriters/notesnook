@@ -57,7 +57,6 @@ function getCurrentLine(node) {
 
 function persistSelection(node, action) {
   let saved = rangy.getSelection(getWindow()).saveCharacterRanges(node);
-  console.log(saved);
   action();
   rangy.getSelection(getWindow()).restoreCharacterRanges(node, saved);
 }
