@@ -24,9 +24,9 @@ We are really exciting about what is coming to Notesnook by the end of Q2 2021.
 
 ## `Q3 2021`
 
-- [ ] **Encrypted file attachements and data compression**
+- [x] **Encrypted file attachements and data compression**
 - [ ] **Stylus & Drawing Support** to take notes by drawing on the screen. We will be adding a dedicated editor where you can draw and take notes.
-- [ ] **Widgets on Android & iOS** - Initially we are working on adding a Quick Note widget to add notes without opening app. [WIP]
+- [x] **Widgets on Android & iOS** - Initially we are working on adding a Quick Note widget to add notes without opening app. [WIP]
 - [ ] **Reminders**
 - [ ] **Global Discord-like search** with advanced filtering
 - [ ] Complete app documentation
