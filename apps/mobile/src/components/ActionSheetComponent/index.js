@@ -42,6 +42,7 @@ import {
 import { db } from '../../utils/database';
 import {
   eOpenAttachmentsDialog,
+  eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
   eOpenTagsDialog,
