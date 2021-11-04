@@ -213,16 +213,9 @@ var registerHandlers = function (api, editor) {
     }
   }
 
-  function onKeyUp(e) {
-    debounce(
-      () => refreshHighlighting(editor),
-      500,
-      e.code === "Enter" ||
-        e.code === "Space" ||
-        e.code === "Backspace" ||
-        e.code === "Tab"
-    );
-  }
+  const onKeyUp = debounce((e) => {
+    refreshHighlighting(editor);
+  }, 500);
 
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);
