@@ -15,6 +15,11 @@ compressorjs@^1.0.7:
     blueimp-canvas-to-blob "^3.28.0"
     is-blob "^2.1.0"
 
+highlight.js@^11.3.1:
+  version "11.3.1"
+  resolved "https://registry.yarnpkg.com/highlight.js/-/highlight.js-11.3.1.tgz#813078ef3aa519c61700f84fe9047231c5dc3291"
+  integrity sha512-PUhCRnPjLtiLHZAQ5A/Dt5F8cWZeMyj9KRsACsWT+OD6OP0x6dp5OmT5jdx0JgEyPxPZZIPQpRN2TciUT7occw==
+
 is-blob@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/is-blob/-/is-blob-2.1.0.tgz#e36cd82c90653f1e1b930f11baf9c64216a05385"

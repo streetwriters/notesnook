@@ -1,6 +1,8 @@
 const { persistSelection } = require("../utils");
 const { TAGNAME, state } = require("./utils");
 const languages = require("./languages");
+const hljs = require("highlight.js/lib/core");
+globalThis.hljs = hljs;
 
 const LANGUAGE_SELECT_LABEL_SELECTOR =
   ".tox-pop__dialog span.tox-tbtn__select-label";
@@ -82,7 +84,6 @@ function parseCodeblockLanguage(node) {
 
 async function applyHighlighting(editor, language) {
   if (!language) return;
-  let hljs = await getHighlightJS(editor);
   if (!hljs.getLanguage(language)) await loadLanguage(editor, language);
 
   const node = state.activeBlock;
@@ -124,8 +125,6 @@ async function refreshHighlighting(editor) {
 
 const loadedLanguages = {};
 async function loadLanguage(editor, shortName) {
-  let hljs = await getHighlightJS(editor);
-  if (!hljs) return;
   if (loadedLanguages[shortName]) return hljs.getLanguage(shortName);
 
   const url = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/languages/${shortName}.min.js`;
@@ -135,18 +134,8 @@ async function loadLanguage(editor, shortName) {
   loadedLanguages[shortName] = lang;
 }
 
-async function getHighlightJS(editor) {
-  if (global.hljs) {
-    return global.hljs;
-  }
-
-  const url = `https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.3.1/highlight.min.js`;
-  await loadScript(editor, url);
-  return global.hljs;
-}
-
 function loadScript(editor, url) {
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
     const document = editor.dom.doc;
     const script = document.createElement("script");
     script.src = url;
@@ -154,6 +143,10 @@ function loadScript(editor, url) {
     document.head.appendChild(script);
     script.addEventListener("load", () => {
       resolve();
+    });
+    script.addEventListener("error", (error) => {
+      console.error(error);
+      reject(`Could not load script at url ${url}.`);
     });
   });
 }
