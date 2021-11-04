@@ -1,7 +1,7 @@
 {
   "name": "@streetwritersco/tinymce-plugins",
   "private": false,
-  "version": "1.3.5",
+  "version": "1.3.6",
   "description": "All the custom made or modified plugins for TinyMCE used in Notesnook & other apps maintained by Streetwriters team.",
   "main": "index.js",
   "scripts": {
