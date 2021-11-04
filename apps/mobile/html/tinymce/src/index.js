@@ -17,6 +17,7 @@ import "tinymce/plugins/hr";
 import "tinymce/plugins/noneditable";
 import "tinymce/plugins/textpattern";
 import {processPastedContent} from "@streetwritersco/tinymce-plugins/codeblock";
+import "@streetwritersco/tinymce-plugins/codeblock";
 import "@streetwritersco/tinymce-plugins/checklist";
 import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/inlinecode"

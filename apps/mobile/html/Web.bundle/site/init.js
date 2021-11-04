@@ -197,6 +197,11 @@ function init_tiny(size) {
     .tox .tox-edit-area__iframe {
       background-color:transparent !important;
     }
+
+    .tox .tox-tbtn--select {
+      min-width: 120px;
+    }
+
     body {
       background-color:transparent !important;
       font-size:${DEFAULT_FONT_SIZE}

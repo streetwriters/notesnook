@@ -170,7 +170,7 @@ function setTheme() {
     }
 
     .tox .tox-tbtn--select {
-      min-width: 92px;
+      min-width: 120px;
     }
     
     .tox-button {
