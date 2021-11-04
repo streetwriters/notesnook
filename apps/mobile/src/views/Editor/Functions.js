@@ -568,8 +568,6 @@ export async function saveNote(preventUpdate) {
   if (!noteEdited) return;
   if (isSaving && !id) return;
   isSaving = true;
-  console.log('saving note now', Date.now());
-
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
@@ -584,6 +582,7 @@ export async function saveNote(preventUpdate) {
       }
       locked = _note.locked;
     }
+
     let noteData = {
       title,
       content: {
@@ -595,10 +594,6 @@ export async function saveNote(preventUpdate) {
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
-
-      let _d = await db.content.raw(note.contentId);
-      
-    console.log("COTENT_STATUSS:", _d.data)
       if (!id || saveCounter < 3) {
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
@@ -739,14 +734,11 @@ const loadNoteInEditor = async (keepHistory = true) => {
     `
       );
     } else {
-     
       post('html', content.data);
     }
     if (id) {
       db.attachments.downloadImages(id);
     }
-
-    
 
     setColors();
     tiny.call(
