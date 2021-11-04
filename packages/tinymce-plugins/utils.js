@@ -38,21 +38,39 @@ function moveCaretTo(node, index, endIndex) {
 }
 
 function getCurrentLine(node) {
-  const characterRange = getCharacterRange(node);
-  const lines = node.innerText.split("\n");
+  const lines = getLines(node);
+  const index = getCurrentLineIndex(node);
+  return lines[index];
+}
 
-  let currentLine = "";
+function getPreviousLine(node) {
+  const lines = getLines(node);
+  const index = getCurrentLineIndex(node);
+  if (index === 0) return "";
+  return lines[index - 1];
+}
+
+function getCurrentLineIndex(node) {
+  const lines = getLines(node);
+  const characterRange = getCharacterRange(node);
+
   let prevLength = 0;
+  let index = 0;
   for (let line of lines) {
     let length = prevLength + line.length + 1;
 
-    if (characterRange.start >= prevLength && characterRange.end <= length) {
-      currentLine = line;
+    if (characterRange.start >= prevLength && characterRange.end <= length)
       break;
-    }
+
     prevLength += line.length + 1;
+    ++index;
   }
-  return currentLine;
+  return index;
+}
+
+function getLines(node) {
+  const lines = node.innerText.split("\n");
+  return lines;
 }
 
 function persistSelection(node, action) {
@@ -77,6 +95,7 @@ function getWindow() {
 
 module.exports = {
   getCurrentLine,
+  getPreviousLine,
   getCharacterRange,
   moveCaretTo,
   persistSelection,

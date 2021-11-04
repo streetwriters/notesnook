@@ -1,0 +1,1 @@
+<pre class="hljs language-javascript" spellcheck="false"><span class="hljs-keyword">function</span> <span class="hljs-title function_">google</span>(<span class="hljs-params"></span>) { }</pre><p><br data-mce-bogus="1"></p>

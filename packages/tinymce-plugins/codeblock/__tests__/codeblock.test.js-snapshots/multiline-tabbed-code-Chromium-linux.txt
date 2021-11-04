@@ -1,0 +1,4 @@
+function test() {
+        var test_var = "hello";
+        var test_var2 = "hello2";
+}

@@ -1,0 +1,1 @@
+<p>function test() {<br> &nbsp;var test_var = "hello";<br> &nbsp;var test_var2 = "hello2";<br>}</p><p><br data-mce-bogus="1"></p>

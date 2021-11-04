@@ -3,12 +3,15 @@ const {
   getCharacterRange,
   moveCaretTo,
   getCurrentLine,
+  getPreviousLine,
 } = require("../utils");
 const {
   createCodeBlock,
   isCodeBlock,
   state,
   isInsideCodeBlock,
+  newlineToBR,
+  brToNewline,
 } = require("./utils");
 const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
 
@@ -58,16 +61,15 @@ var toggleCodeBlock = function (editor, api, type) {
   const isCodeBlock =
     (api && api.isActive && api.isActive()) || isInsideCodeBlock(node);
   if (isCodeBlock) {
-    const rng = editor.selection.getRng();
-    const isTextSelected = rng.startOffset !== rng.endOffset;
-    if (isTextSelected) {
-      editor.undoManager.transact(() => {
-        var content = editor.selection.getContent({ format: "text" });
-        node.innerText = node.innerText.replace(content.trim(), "").trim();
-        blurCodeBlock(editor, node, content.replace(/\n/gm, "<br>").trim());
-        if (node.innerText.length <= 0) node.remove();
-        else refreshHighlighting(editor);
-      });
+    var content = editor.selection.getContent({ format: "text" });
+    if (content.length > 0) {
+      console.log(content);
+      node.innerHTML = newlineToBR(
+        node.innerText.replace(content.trim(), "").trim()
+      );
+      blurCodeBlock(editor, node, content);
+      if (node.innerText.length <= 0) node.remove();
+      else refreshHighlighting(editor);
     } else {
       blurCodeBlock(editor, node);
     }
@@ -99,7 +101,7 @@ function insertCodeBlock(editor, content) {
 function blurCodeBlock(editor, block, content = "<br>") {
   editor.undoManager.transact(function () {
     const p = document.createElement("p");
-    p.innerHTML = content;
+    p.innerHTML = newlineToBR(content).trim();
     editor.focus();
     editor.dom.insertAfter(p, block);
 
@@ -165,20 +167,13 @@ var registerHandlers = function (editor) {
 
     if (e.code === "Tab") {
       e.preventDefault();
-      handleTab(e, node);
+      editor.undoManager.transact(() => {
+        handleTab(e, node);
+      });
     } else if (e.ctrlKey && e.code === "KeyA") {
       e.preventDefault();
       handleCtrlA(node);
-    } else if (e.code === "Enter") {
-      handleEnter(node);
     }
-  }
-
-  function handleEnter(node) {
-    const currentLine = getCurrentLine(node);
-    const indent =
-      (currentLine.length - currentLine.trimStart().length) / TAB_LENGTH;
-    editor.insertContent(TAB.repeat(indent));
   }
 
   function handleCtrlA(node) {
@@ -215,7 +210,8 @@ var registerHandlers = function (editor) {
       }
       content += selectedLines.join("\n");
       content += afterSelection;
-      node.innerHTML = content;
+
+      node.innerHTML = newlineToBR(content);
 
       const endIndex = isDeindent
         ? characterRange.end - TAB_LENGTH * selectedLines.length
@@ -225,20 +221,37 @@ var registerHandlers = function (editor) {
     } else {
       if (isDeindent) {
         const currentLine = getCurrentLine(node);
-        node.innerHTML = node.innerText.replace(
-          currentLine,
-          deindent(currentLine, TAB_LENGTH)
+        node.innerHTML = newlineToBR(
+          node.innerText.replace(currentLine, deindent(currentLine, TAB_LENGTH))
         );
         moveCaretTo(node, characterRange.start - TAB_LENGTH);
       } else {
-        editor.selection.setContent(TAB);
+        editor.insertContent(TAB);
       }
     }
   }
 
-  const onKeyUp = debounce((e) => {
-    refreshHighlighting(editor);
-  }, 500);
+  function onKeyUp(e) {
+    if (e.code === "Enter") {
+      const node = state.activeBlock;
+      if (!node) return;
+
+      editor.undoManager.transact(() => {
+        handleEnter(node);
+      });
+    }
+
+    debounce(() => {
+      refreshHighlighting(editor);
+    }, 500)();
+  }
+
+  function handleEnter(node) {
+    const currentLine = getCurrentLine(node);
+    const indent =
+      (currentLine.length - currentLine.trimStart().length) / TAB_LENGTH;
+    editor.insertContent(TAB.repeat(indent));
+  }
 
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);

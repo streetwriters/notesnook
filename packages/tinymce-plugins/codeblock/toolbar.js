@@ -1,5 +1,5 @@
 const { persistSelection } = require("../utils");
-const { TAGNAME, state } = require("./utils");
+const { TAGNAME, state, newlineToBR } = require("./utils");
 const languages = require("./languages");
 const hljs = require("highlight.js/lib/core");
 
@@ -51,9 +51,11 @@ function setupChangeLanguageButton(editor, text = "Plain text") {
       const isPlaintext = text === "Plain text";
       if (!isPlaintext) return;
       const language = parseCodeblockLanguage(state.activeBlock);
+      if (!language) return;
       selectLanguage(editor, language);
     },
     onItemAction: async (_, language) => {
+      if (!language) return;
       await selectLanguage(editor, language);
     },
     select: (language) => language && language.name === text,
@@ -65,6 +67,7 @@ async function selectLanguage(editor, language) {
   setupChangeLanguageButton(editor, "Loading");
   await applyHighlighting(editor, language.shortname);
   setupChangeLanguageButton(editor, language.name);
+  editor.focus();
 }
 
 function changeLanguageSelectLabel(text) {
@@ -96,7 +99,7 @@ async function applyHighlighting(editor, language) {
     const code = hljs.highlight(node.innerText, {
       language,
     });
-    node.innerHTML = code.value.replace(/\n/gm, "<br>");
+    node.innerHTML = newlineToBR(code.value);
   });
   changeCodeblockClassName(node, `language-${language}`);
 

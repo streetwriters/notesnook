@@ -7,7 +7,7 @@ function createCodeBlock(content) {
   const pre = document.createElement(TAGNAME);
   pre.spellcheck = false;
   pre.classList.add("hljs");
-  pre.innerHTML = content;
+  pre.innerHTML = newlineToBR(content);
   return pre;
 }
 
@@ -27,7 +27,12 @@ function isInsideCodeBlock(element) {
   return elem && elem.tagName === TAGNAME;
 }
 
+function newlineToBR(html) {
+  return html.replace(/\n/gm, "<br>");
+}
+
 module.exports = {
+  newlineToBR,
   isInsideCodeBlock,
   createCodeBlock,
   isCodeBlock,

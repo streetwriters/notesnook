@@ -5,7 +5,7 @@
   "description": "All the custom made or modified plugins for TinyMCE used in Notesnook & other apps maintained by Streetwriters team.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node scripts/testHarness.js"
   },
   "keywords": [
     "tinymce",
@@ -20,6 +20,11 @@
   "license": "MIT",
   "peerDependencies": {
     "tinymce": "^5"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.16.0",
+    "@types/node": "^16.11.6",
+    "serve": "^12.0.1"
   },
   "dependencies": {
     "compressorjs": "^1.0.7",
