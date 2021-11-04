@@ -2,7 +2,6 @@ const { persistSelection } = require("../utils");
 const { TAGNAME, state } = require("./utils");
 const languages = require("./languages");
 const hljs = require("highlight.js/lib/core");
-globalThis.hljs = hljs;
 
 const LANGUAGE_SELECT_LABEL_SELECTOR =
   ".tox-pop__dialog span.tox-tbtn__select-label";
@@ -83,6 +82,11 @@ function parseCodeblockLanguage(node) {
 }
 
 async function applyHighlighting(editor, language) {
+  // load hljs into the editor window which can be the iframe
+  // or the main window. This is required so language definitions
+  // can be loaded.
+  editor.contentWindow.hljs = hljs;
+
   if (!language) return;
   if (!hljs.getLanguage(language)) await loadLanguage(editor, language);
 

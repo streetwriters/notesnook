@@ -2,7 +2,7 @@ const rangy = require("rangy/lib/rangy-textrange");
 
 function getCharacterRange(node) {
   if (!node) return;
-  const ranges = rangy.getSelection().saveCharacterRanges(node);
+  const ranges = rangy.getSelection(getWindow()).saveCharacterRanges(node);
   if (!ranges || !ranges.length) return;
   const { characterRange } = ranges[0];
   return characterRange;
@@ -32,7 +32,9 @@ function moveCaretTo(node, index, endIndex) {
     },
   };
 
-  rangy.getSelection().restoreCharacterRanges(node, [newCharacterRange]);
+  rangy
+    .getSelection(getWindow())
+    .restoreCharacterRanges(node, [newCharacterRange]);
 }
 
 function getCurrentLine(node) {
@@ -54,19 +56,24 @@ function getCurrentLine(node) {
 }
 
 function persistSelection(node, action) {
-  let saved = rangy.getSelection().saveCharacterRanges(node);
+  let saved = rangy.getSelection(getWindow()).saveCharacterRanges(node);
+  console.log(saved);
   action();
-  rangy.getSelection().restoreCharacterRanges(node, saved);
+  rangy.getSelection(getWindow()).restoreCharacterRanges(node, saved);
 }
 
 function addPluginToPluginManager(name, register) {
   // tinymce puts itself in the global namespace
-  if (!global.tinymce)
+  if (!globalThis.tinymce)
     throw new Error(
       `Please import tinymce before importing the ${name} plugin.`
     );
 
-  global.tinymce.PluginManager.add(name, register);
+  globalThis.tinymce.PluginManager.add(name, register);
+}
+
+function getWindow() {
+  return globalThis.tinymce.activeEditor.contentWindow;
 }
 
 module.exports = {
