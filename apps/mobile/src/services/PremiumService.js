@@ -43,22 +43,21 @@ async function setPremiumStatus() {
       await RNIap.initConnection();
       products = await RNIap.getSubscriptions(itemSkus);
     } catch (e) {
-      console.log('subscriptions: ',e)
+      console.log('subscriptions: ', e);
     }
   }
 }
 
 function getMontlySub() {
-  let _product = {
-    localizedPrice: '$4.49'
-  };
-  if (
-    products.find(p => p.productId === 'com.streetwriters.notesnook.sub.mo')
-  ) {
-    _product = products.find(
-      p => p.productId === 'com.streetwriters.notesnook.sub.mo'
-    );
+  let _product = products.find(
+    p => p.productId === 'com.streetwriters.notesnook.sub.mo'
+  );
+  if (!_product) {
+    _product = {
+      localizedPrice: '$4.49'
+    };
   }
+  console.log(_product.localizedPrice);
   return _product;
 }
 

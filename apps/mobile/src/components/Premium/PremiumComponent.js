@@ -121,6 +121,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
           product.introductoryPriceCyclesAndroid ||
             product.introductoryPriceNumberOfPeriodsIOS
         ];
+
     setProduct({
       type: 'promo',
       offerType: isMonthly ? 'monthly' : 'yearly',
@@ -128,10 +129,6 @@ export const PremiumComponent = ({close, promo, getRef}) => {
       cycleText: cycleText
     });
   };
-
-  useEffect(() => {
-    console.log(product);
-  }, [product]);
 
   useEffect(() => {
     getSkus();
@@ -310,7 +307,10 @@ export const PremiumComponent = ({close, promo, getRef}) => {
                   ? promo.text
                   : user
                   ? `Subscribe for ${product?.data?.localizedPrice} / ${
-                      product.type === 'yearly' ? 'yr' : 'mo'
+                      product.type === 'yearly' ||
+                      product.offerType === 'yearly'
+                        ? 'yr'
+                        : 'mo'
                     }`
                   : 'Try free for 14 days'
               }
