@@ -16,6 +16,7 @@ const TAB = `\u00A0\u00A0`;
 const TAB_SEQUENCE = ["\u00A0", "\u0020"];
 const TAB_LENGTH = 2;
 const EMPTY_LINE = "<p><br></p>";
+var handlersRegistered = false;
 
 /**
  * @param {import("tinymce").Editor} editor
@@ -34,16 +35,29 @@ function register(editor) {
       return toggleCodeBlock(editor, api);
     },
     onSetup: (api) => {
-      return registerHandlers(api, editor);
+      function onNodeChanged(event) {
+        const element = event.element;
+        let isActive = isInsideCodeBlock(element);
+        api.setActive(isActive);
+      }
+      editor.on("NodeChange", onNodeChanged);
+      return function () {
+        editor.off("NodeChange", onNodeChanged);
+      };
     },
   });
+
+  if (!handlersRegistered) {
+    registerHandlers(editor);
+    handlersRegistered = true;
+  }
 }
 
 var toggleCodeBlock = function (editor, api, type) {
   const node = editor.selection.getNode();
-  const isInsideCodeBlock =
+  const isCodeBlock =
     (api && api.isActive && api.isActive()) || isInsideCodeBlock(node);
-  if (isInsideCodeBlock) {
+  if (isCodeBlock) {
     const rng = editor.selection.getRng();
     const isTextSelected = rng.startOffset !== rng.endOffset;
     if (isTextSelected) {
@@ -104,13 +118,7 @@ var isCreatingCodeBlock = false;
  * @param {import("tinymce").Editor} editor
  * @returns
  */
-var registerHandlers = function (api, editor) {
-  function onNodeChanged(event) {
-    const element = event.element;
-    let isActive = isInsideCodeBlock(element);
-    api.setActive(isActive);
-  }
-
+var registerHandlers = function (editor) {
   // A simple hack to handle the ``` markdown text pattern
   // This acts as a "command" for us. Whenever, TinyMCE adds
   // <pre></pre> we override it and insert our own modified
@@ -236,13 +244,11 @@ var registerHandlers = function (api, editor) {
   editor.on("BeforeSetContent", onBeforeSetContent);
   editor.on("keydown", onKeyDown);
   editor.on("keyup", onKeyUp);
-  editor.on("NodeChange", onNodeChanged);
   return function () {
     editor.off("BeforeExecCommand", onBeforeExecCommand);
     editor.off("BeforeSetContent", onBeforeSetContent);
     editor.off("keydown", onKeyDown);
     editor.off("keyup", onKeyUp);
-    editor.off("NodeChange", onNodeChanged);
   };
 };
 
