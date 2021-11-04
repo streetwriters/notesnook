@@ -15,4 +15,22 @@ function isCodeBlock(node) {
   return node.nodeName === TAGNAME;
 }
 
-module.exports = { createCodeBlock, isCodeBlock, TAGNAME, state };
+function isInsideCodeBlock(element) {
+  let elem = element;
+  while (elem.tagName !== TAGNAME && !!elem.parentElement) {
+    elem = elem.parentElement;
+    if (elem.classList.contains("mce-content-body")) {
+      elem = undefined;
+      break;
+    }
+  }
+  return elem && elem.tagName === TAGNAME;
+}
+
+module.exports = {
+  isInsideCodeBlock,
+  createCodeBlock,
+  isCodeBlock,
+  TAGNAME,
+  state,
+};

@@ -4,7 +4,12 @@ const {
   moveCaretTo,
   getCurrentLine,
 } = require("../utils");
-const { createCodeBlock, isCodeBlock, TAGNAME, state } = require("./utils");
+const {
+  createCodeBlock,
+  isCodeBlock,
+  state,
+  isInsideCodeBlock,
+} = require("./utils");
 const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
 
 const TAB = `\u00A0\u00A0`;
@@ -35,12 +40,20 @@ function register(editor) {
 }
 
 var toggleCodeBlock = function (editor, api, type) {
-  const isInsideCodeBlock = api && api.isActive && api.isActive();
+  const node = editor.selection.getNode();
+  const isInsideCodeBlock =
+    (api && api.isActive && api.isActive()) || isInsideCodeBlock(node);
   if (isInsideCodeBlock) {
-    const node = editor.selection.getNode();
-    let selectedText = node.textContent;
-    if (selectedText) {
-      editor.selection.setContent(`<p>${selectedText}</p>`);
+    const rng = editor.selection.getRng();
+    const isTextSelected = rng.startOffset !== rng.endOffset;
+    if (isTextSelected) {
+      editor.undoManager.transact(() => {
+        var content = editor.selection.getContent({ format: "text" });
+        node.innerText = node.innerText.replace(content.trim(), "").trim();
+        blurCodeBlock(editor, node, content.replace(/\n/gm, "<br>").trim());
+        if (node.innerText.length <= 0) node.remove();
+        else refreshHighlighting(editor);
+      });
     } else {
       blurCodeBlock(editor, node);
     }
@@ -69,10 +82,10 @@ function insertCodeBlock(editor, content) {
   });
 }
 
-function blurCodeBlock(editor, block) {
+function blurCodeBlock(editor, block, content = "<br>") {
   editor.undoManager.transact(function () {
     const p = document.createElement("p");
-    p.innerHTML = "<br>";
+    p.innerHTML = content;
     editor.focus();
     editor.dom.insertAfter(p, block);
 
@@ -93,7 +106,9 @@ var isCreatingCodeBlock = false;
  */
 var registerHandlers = function (api, editor) {
   function onNodeChanged(event) {
-    api.setActive(event.element.tagName === TAGNAME);
+    const element = event.element;
+    let isActive = isInsideCodeBlock(element);
+    api.setActive(isActive);
   }
 
   // A simple hack to handle the ``` markdown text pattern
