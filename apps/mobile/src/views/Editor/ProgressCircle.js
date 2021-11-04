@@ -56,7 +56,7 @@ export const ProgressCircle = () => {
         progress={prog}
         showsText
         textStyle={{
-          fontSize: 8.5
+          fontSize: 7
         }}
         color={colors.accent}
         formatText={formatText}
