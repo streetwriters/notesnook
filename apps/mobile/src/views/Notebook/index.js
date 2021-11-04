@@ -23,11 +23,11 @@ import {
 export const Notebook = ({route, navigation}) => {
   const [topics, setTopics] = useState(
     groupArray(
-      route.params.notebook?.topics || [],
+      route?.params.notebook?.topics || [],
       db.settings.getGroupOptions('topics')
     )
   );
-  const params = useRef(route.params);
+  const params = useRef(route?.params);
 
   const onLoad = data => {
     if (data) params.current = data;

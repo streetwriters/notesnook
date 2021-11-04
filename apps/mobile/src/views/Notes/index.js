@@ -19,9 +19,7 @@ import { editing, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 import {
   eOnLoadNote,
-  eOpenAddTopicDialog,
-  eScrollEvent,
-  refreshNotesPage
+  eOpenAddTopicDialog, refreshNotesPage
 } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';
 import { tabBarRef } from '../../utils/Refs';
@@ -31,7 +29,7 @@ export const Notes = ({route, navigation}) => {
   const colors = state.colors;
   const [notes, setNotes] = useState([]);
   const loading = useNoteStore(state => state.loading);
-  let params = route.params ? route.params : null;
+  let params = route?.params ? route.params : null;
   const alias = params.type === "tag" ? db.tags.alias(params.id) : params.type === "color" ? db.colors.alias(params.id) : params.title
 
   let ranAfterInteractions = false;
@@ -176,12 +174,12 @@ export const Notes = ({route, navigation}) => {
         ? '#' + alias
         : alias.slice(0, 1).toUpperCase() + alias.slice(1),
     color: params.type === 'color' ? params.title.toLowerCase() : null,
-    paragraph: route.params.type === 'topic' ? 'Edit topic' : null,
+    paragraph: params.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
-      if (route.params.type !== 'topic') return;
+      if (params.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
-        notebookId: route.params.notebookId,
-        toEdit: route.params
+        notebookId: params.notebookId,
+        toEdit: params
       });
     },
     icon: 'pencil'
@@ -216,10 +214,10 @@ export const Notes = ({route, navigation}) => {
       icon: 'pencil',
       title: 'Edit topic',
       func: () => {
-        if (route.params.type !== 'topic') return;
+        if (params.type !== 'topic') return;
         eSendEvent(eOpenAddTopicDialog, {
-          notebookId: route.params.notebookId,
-          toEdit: route.params
+          notebookId: params.notebookId,
+          toEdit: params
         });
       }
     }
@@ -242,7 +240,7 @@ export const Notes = ({route, navigation}) => {
           screen="NotesPage"
           action={_onPressBottomButton}
           rightButtons={
-            route.params.type !== 'topic' ? null : headerRightButtons
+            params.type !== 'topic' ? null : headerRightButtons
           }
         />
       </ContainerTopSection>

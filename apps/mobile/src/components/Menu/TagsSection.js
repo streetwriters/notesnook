@@ -31,7 +31,7 @@ export const TagsSection = () => {
   }, [loading]);
 
   const onPress = item => {
-    let params;
+    let params = {};
     if (item.type === 'notebook') {
       params = {
         notebook: item,
@@ -45,7 +45,7 @@ export const TagsSection = () => {
         type: item.type
       });
     } else if (item.type === 'tag') {
-      params = params = {
+      params = {
         ...item,
         type: 'tag',
         menu: true,

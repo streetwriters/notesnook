@@ -236,13 +236,13 @@ export const MenuItemsList = [
     icon: 'text-box-multiple-outline',
     close: true,
     func: () => {
-      let params = (params = {
+      let params = {
         type: 'notes',
         menu: true,
         get: 'monographs',
         title: 'Monographs',
         id: 'monographs_navigation'
-      });
+      }
 
       eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
