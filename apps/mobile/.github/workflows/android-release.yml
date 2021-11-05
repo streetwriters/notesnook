@@ -1,0 +1,74 @@
+name: Android Release
+
+on: workflow_dispatch
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        
+      - uses: actions/setup-node@master
+      - uses: c-hive/gha-yarn-cache@v1  
+      
+      - name: Use specific Java version for the builds
+        uses: joschi/setup-jdk@v2
+        with:
+          java-version: 'openjdk8'
+          architecture: 'x64'
+
+      - name: Install node modules
+        run: |
+          yarn install
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+
+      - name: Cache Gradle Dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-caches-    
+          
+      - name: Make Gradlew Executable
+        run: cd android && chmod +x ./gradlew          
+
+      - name: Build Android App Bundle
+        run: |
+          cd android && ./gradlew bundleRelease --no-daemon
+
+      - name: Sign AAB
+        id: sign_app
+        uses: r0adkll/sign-android-release@v1
+        with:
+          releaseDirectory: app/build/outputs/bundle/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+         name: Signed App Bundle
+         path: ${{steps.sign_app.outputs.signedReleaseFile}}    
+
+      - name: Deploy to Play Store (ALPHA)
+        id: deploy
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.streetwriters.notesnook
+          releaseFile: ${{steps.sign_app.outputs.signedReleaseFile}}
+          track: alpha
+          status: draft
+          whatsNewDirectory: android/releasenotes/
