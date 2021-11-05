@@ -12,7 +12,7 @@ function convert(files) {
   let notes = [];
   for (var file of files) {
     if (typeof file.data !== "string") {
-      file.data = file.data.toString()
+      file.data = file.data.toString();
     }
     if (extension.get(file.fileName) === "enex") {
       let document = parser.parseFromString(file.data, "text/xml");
@@ -26,13 +26,13 @@ function convert(files) {
         }
         note.title = node.querySelector("title").textContent;
         getTags(node, note);
-        
+
         note.dateCreated = getUnixTime(node, "created");
         note.dateEdited = getUnixTime(node, "updated");
 
         let content = node.querySelector("content").textContent;
         content = content.substring(
-          content.lastIndexOf("<en-note>") + 1,
+          content.indexOf("<en-note>") + "<en-note>".length,
           content.lastIndexOf("</en-note>")
         );
         note.content.data = getHtmlContent(content, node);
@@ -44,8 +44,6 @@ function convert(files) {
   }
   return notes;
 }
-
-
 
 /**
  *
@@ -125,7 +123,10 @@ function getHtmlContent(content, node) {
           url = url.split("+")[url.split("+").length - 2];
           if (hash === url) {
             let img = html.createElement("img");
-            img.src = res.querySelector("data").textContent;
+            img.src = res
+              .querySelector("data")
+              .textContent.replace(/\n/gm, "")
+              .trim();
             img.width = res.querySelector("width").textContent;
             img.height = res.querySelector("height").textContent;
             media.parentNode.replaceChild(img, media);
@@ -141,5 +142,5 @@ function getHtmlContent(content, node) {
 }
 
 module.exports = {
-  convert
+  convert,
 };

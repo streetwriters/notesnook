@@ -22,8 +22,5 @@
     "jest": "^27.0.6"
   },
   "author": "",
-  "license": "MIT",
-  "engines": {
-    "node": "14.x"
-  }
+  "license": "MIT"
 }
