@@ -12,6 +12,8 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
         
       - uses: actions/setup-node@master
       - uses: c-hive/gha-yarn-cache@v1  
