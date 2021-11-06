@@ -10,7 +10,7 @@ workflows:
                 - provisioning_profile
                 - other
             vars:
-                XCODE_WORKSPACE: "ios/Notesnook.xcworkspace" # <-- Put the name of your Xcode workspace here
+                XCODE_WORKSPACE: "Notesnook.xcworkspace" # <-- Put the name of your Xcode workspace here
                 XCODE_SCHEME: "Notesnook" # <-- Put the name of your Xcode scheme here
                 BUNDLE_ID: "org.streetwriters.notesnook" # <-- Put your Bundle Id here e.g com.domain.myapp
                 APP_STORE_APP_ID: 1544027013 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
