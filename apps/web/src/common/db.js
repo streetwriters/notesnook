@@ -18,11 +18,11 @@ async function initializeDatabase() {
   db = new Database(Storage, EventSource, FS);
 
   // if (isTesting()) {
-  // db.host({
-  //   API_HOST: "https://api.notesnook.com",
-  //   AUTH_HOST: "https://auth.streetwriters.co",
-  //   SSE_HOST: "https://events.streetwriters.co",
-  // });
+  db.host({
+    API_HOST: "https://api.notesnook.com",
+    AUTH_HOST: "https://auth.streetwriters.co",
+    SSE_HOST: "https://events.streetwriters.co",
+  });
   // } else {
   // db.host({
   //   API_HOST: "http://localhost:5264",

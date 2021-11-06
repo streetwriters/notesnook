@@ -93,6 +93,8 @@ import {
   mdiSyncAlert,
   mdiAlertOutline,
   mdiAlertOctagramOutline,
+  mdiEyeOutline,
+  mdiEyeOffOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -223,8 +225,8 @@ export const ChevronDown = createIcon(mdiChevronDown);
 export const ChevronUp = createIcon(mdiChevronUp);
 export const SortAsc = createIcon(mdiSortAscending);
 export const SortDesc = createIcon(mdiSortDescending);
-export const PasswordInvisible = createIcon(mdiEye);
-export const PasswordVisible = createIcon(mdiEyeOff);
+export const PasswordInvisible = createIcon(mdiEyeOutline);
+export const PasswordVisible = createIcon(mdiEyeOffOutline);
 export const Fullscreen = createIcon(mdiFullscreen);
 export const ExitFullscreen = createIcon(mdiFullscreenExit);
 export const Announcement = createIcon(mdiBullhorn);

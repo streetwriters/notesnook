@@ -1,15 +1,10 @@
-import React from "react";
 import createStore from "../common/store";
 import { db } from "../common/db";
 import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "notes-core/common";
-import {
-  showLoadingDialog,
-  showSessionExpiredDialog,
-} from "../common/dialog-controller";
-import { Text } from "rebass";
+import { showSessionExpiredDialog } from "../common/dialog-controller";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
@@ -99,19 +94,7 @@ class UserStore extends BaseStore {
       .login(form.email.toLowerCase(), form.password)
       .then(() => {
         if (skipInit) return true;
-        return showLoadingDialog({
-          title: "Importing your data...",
-          subtitle:
-            "We are importing your data from the server. Please wait...",
-          action: async () => {
-            return await this.init();
-          },
-          message: (
-            <Text color="error">
-              Please do NOT close your browser or power off your device.
-            </Text>
-          ),
-        });
+        return this.init();
       })
       .finally(() => {
         this.set((state) => (state.isLoggingIn = false));

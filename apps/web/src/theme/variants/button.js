@@ -25,15 +25,20 @@ class Default {
       fontSize: "body",
       borderRadius: "default",
       cursor: "pointer",
-      p: "7px",
+      p: 2,
       px: 2,
-      ":focus": {
-        outline: "none",
+      transition: "filter 200ms ease-in",
+      ":hover": {
+        filter: "brightness(90%)",
       },
-      ":focus-visible": {
-        border: "2px solid",
-        borderColor: "primary",
+      ":active": {
+        filter: "brightness(110%)",
       },
+      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
+        {
+          outline: "none",
+          boxShadow: "0px 0px 0px 2px var(--primary)",
+        },
       ":disabled": {
         opacity: 0.5,
         cursor: "not-allowed",
@@ -50,8 +55,7 @@ class Primary {
       bg: "primary",
       px: 4,
       ":focus-visible": {
-        border: "2px solid",
-        borderColor: "text",
+        boxShadow: "0px 0px 0px 2px var(--text)",
       },
     };
   }
@@ -118,6 +122,9 @@ class Anchor {
       m: 0,
       px: 0,
       py: 0,
+      ":hover": {
+        textDecoration: "underline",
+      },
     };
   }
 }

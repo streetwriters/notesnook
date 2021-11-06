@@ -12,19 +12,19 @@ class Default {
   constructor() {
     return {
       borderRadius: "default",
-      border: "1px solid",
-      borderColor: "border",
+      border: "none",
+      // borderColor: "border",
+      boxShadow: "0px 0px 0px 1px var(--border)",
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
       color: "text",
-      ":focus": {
+      ":focus, :focus-within": {
         outline: "none",
-        borderColor: "primary",
-        borderWidth: "2px",
+        boxShadow: "0px 0px 0px 2px var(--primary)",
       },
-      ":hover": {
-        borderColor: "dimPrimary",
+      ":hover:not(:focus)": {
+        boxShadow: "0px 0px 0px 1px var(--dimPrimary)",
       },
     };
   }
