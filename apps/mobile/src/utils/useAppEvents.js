@@ -212,11 +212,10 @@ export const useAppEvents = () => {
     let user = await db.user.getUser();
     setUser(user);
     if (!user) return;
+    MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
     let message =
-      user?.subscription?.type === 2
-        ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
-        : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for the next 14 days for free!';
+      'You have been rewarded 7 more days of free trial. Thank you for using Notesnook!';
     eSendEvent(eOpenProgressDialog, {
       title: 'Email confirmed!',
       paragraph: message,
@@ -327,6 +326,11 @@ export const useAppEvents = () => {
   const setCurrentUser = async login => {
     try {
       let user = await db.user.getUser();
+
+      let isUserEmailConfirmed = await MMKV.getStringAsync(
+        'isUserEmailConfirmed'
+      );
+
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
         return;
@@ -338,12 +342,20 @@ export const useAppEvents = () => {
         await Sync.run();
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
+          MMKV.setItem('isUserEmailConfirmed', 'no');
           return;
+        } else {
+          MMKV.setItem('isUserEmailConfirmed', 'yes');
         }
 
         let res = await doInBackground(async () => {
           try {
             user = await db.user.fetchUser();
+            if (user.isEmailConfirmed && isUserEmailConfirmed === 'no') {
+              setTimeout(() => {
+                onEmailVerified();
+              }, 1000);
+            }
             return true;
           } catch (e) {
             return e.message;
