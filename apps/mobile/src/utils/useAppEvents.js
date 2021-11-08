@@ -7,7 +7,8 @@ import {
   Linking,
   NativeEventEmitter,
   NativeModules,
-  Platform
+  Platform,
+  View
 } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
@@ -56,6 +57,7 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
+import {ProFeatures} from '../components/ResultDialog/pro-features';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -215,11 +217,21 @@ export const useAppEvents = () => {
     MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
     let message =
-      'You have been rewarded 7 more days of free trial. Thank you for using Notesnook!';
+      'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
     eSendEvent(eOpenProgressDialog, {
       title: 'Email confirmed!',
       paragraph: message,
-      noProgress: true
+      noProgress: true,
+      component: (
+        <View
+          style={{
+            paddingHorizontal: 12,
+            paddingBottom: 15,
+            alignItems: 'center'
+          }}>
+          <ProFeatures />
+        </View>
+      )
     });
 
     if (user?.isEmailConfirmed) {
