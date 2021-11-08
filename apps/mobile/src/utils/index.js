@@ -303,7 +303,7 @@ export const BUTTON_TYPES = {
   transparent: {
     primary: 'transparent',
     text: 'accent',
-    selected: 'shade'
+    selected: 'nav'
   },
   gray: {
     primary: 'transparent',
