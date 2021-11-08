@@ -19,10 +19,10 @@ const ResultDialog = () => {
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
-    title: 'Welcome to your private\nnote taking haven',
-    paragraph: 'Please confirm your email to encrypt and sync all your notes.',
-    icon: 'check',
-    button: 'Start taking notes',
+    title: 'Thank you for signing up!',
+    paragraph:
+      'Try out all features of Notesnook free for 7 days. No limitations. No commitments.',
+    button: 'Start taking notes'
   });
   useEffect(() => {
     eSubscribeEvent(eOpenResultDialog, open);
@@ -48,13 +48,13 @@ const ResultDialog = () => {
         style={{
           ...getElevation(5),
           width: DDS.isTab ? 350 : '85%',
-          maxHeight: 450,
+          maxHeight: 500,
           borderRadius: 5,
           backgroundColor: colors.bg,
           paddingHorizontal: ph,
           paddingVertical: 20,
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         <SvgToPngView
           src={WELCOME_SVG(colors.accent)}
@@ -71,17 +71,18 @@ const ResultDialog = () => {
             textAlign: 'center',
             marginTop: 10,
             maxWidth: '80%',
-            marginBottom:10
+            marginBottom: 10
           }}>
           {dialogData.title}
         </Heading>
         <Paragraph
           color={colors.icon}
+          size={SIZE.md}
           style={{
             alignSelf: 'center',
             textAlign: 'center',
             maxWidth: '80%',
-            lineHeight:SIZE.sm + 5
+            lineHeight: SIZE.sm + 5
           }}>
           {dialogData.paragraph}
         </Paragraph>
@@ -90,6 +91,8 @@ const ResultDialog = () => {
           title={dialogData.button}
           width="100%"
           onPress={close}
+          type="accent"
+          height={50}
           fontSize={SIZE.md}
         />
       </View>
