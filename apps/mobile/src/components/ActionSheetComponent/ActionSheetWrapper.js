@@ -4,8 +4,6 @@ import ActionSheet from 'react-native-actions-sheet';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
 import { Toast } from '../Toast';
 import { BouncingView } from './BouncingView';
 import { GetPremium } from './GetPremium';
@@ -35,7 +33,7 @@ const ActionSheetWrapper = ({
       width: largeTablet || smallTablet ? width : '100%',
       backgroundColor: colors.bg,
       zIndex: 10,
-      paddingTop: 10,
+      paddingTop: 5,
       paddingBottom: 0,
       borderTopRightRadius: 10,
       borderTopLeftRadius: 10,
@@ -67,11 +65,7 @@ const ActionSheetWrapper = ({
       closeOnTouchBackdrop={closeOnTouchBackdrop}
       keyboardMode={keyboardMode}
       closeOnPressBack={closeOnTouchBackdrop}
-      indicatorColor={
-        Platform.OS === 'ios'
-          ? hexToRGBA(colors.accent + '19')
-          : hexToRGBA(colors.shade)
-      }
+      indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
       keyboardShouldPersistTaps="always"
@@ -88,7 +82,14 @@ const ActionSheetWrapper = ({
       onClose={_onClose}>
       <BouncingView>
         {children}
-        <View style={{height: Platform.OS === 'ios' && insets.bottom !== 0 ? insets.bottom / 2 : 20}} />
+        <View
+          style={{
+            height:
+              Platform.OS === 'ios' && insets.bottom !== 0
+                ? insets.bottom / 2
+                : 20
+          }}
+        />
       </BouncingView>
     </ActionSheet>
   );
