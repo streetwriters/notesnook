@@ -28,7 +28,8 @@ import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
-  eOpenRecoveryKeyDialog
+  eOpenRecoveryKeyDialog,
+  eOpenResultDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -326,7 +327,7 @@ const LoginDialog = () => {
       setEmailVerifyMessage();
       close();
       await sleep(300);
-      eSendEvent(eOpenRecoveryKeyDialog, true);
+      eSendEvent(eOpenResultDialog);
     } catch (e) {
       setStatus(null);
       setLoading(false);
@@ -653,7 +654,7 @@ const LoginDialog = () => {
             </>
           )}
 
-         {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
+          {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
             <TouchableOpacity
               onPress={() => {
                 if (MODES.sessionExpired === mode) {
