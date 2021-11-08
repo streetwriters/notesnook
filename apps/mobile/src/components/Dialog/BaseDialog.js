@@ -7,8 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
+import {BouncingView} from '../ActionSheetComponent/BouncingView';
 
 const BaseDialog = ({
   visible,
@@ -25,7 +26,7 @@ const BaseDialog = ({
 }) => {
   const [state, dispatch] = useTracked();
   const floating = useIsFloatingKeyboard();
-  
+
   return (
     <Modal
       visible={visible}
@@ -41,26 +42,36 @@ const BaseDialog = ({
       onRequestClose={onRequestClose}>
       <SafeAreaView
         style={{
-          backgroundColor:background? background : transparent
+          backgroundColor: background
+            ? background
+            : transparent
             ? 'transparent'
-            : 'rgba(0,0,0,0.3)',
+            : 'rgba(0,0,0,0.3)'
         }}>
         <KeyboardAvoidingView
           enabled={!floating && Platform.OS === 'ios'}
-          behavior="padding"
-          style={[
-            styles.backdrop,
-            {
-              justifyContent: centered ? 'center' : bottom ? 'flex-end' : 'flex-start',
-            },
-          ]}>
-          <TouchableOpacity
+          behavior="padding">
+           
+
+          <BouncingView
+          duration={400}
+            style={[
+              styles.backdrop,
+              {
+                justifyContent: centered
+                  ? 'center'
+                  : bottom
+                  ? 'flex-end'
+                  : 'flex-start'
+              }
+            ]}>
+                <TouchableOpacity
             onPress={onRequestClose}
             style={styles.overlayButton}
           />
           {premium}
-
-          {children}
+            {children}
+          </BouncingView>
         </KeyboardAvoidingView>
       </SafeAreaView>
     </Modal>
@@ -72,13 +83,13 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     justifyContent: 'center',
-    alignItems: 'center',
+    alignItems: 'center'
   },
   overlayButton: {
     width: '100%',
     height: '100%',
     position: 'absolute',
-  },
+  }
 });
 
 export default BaseDialog;

@@ -116,7 +116,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
           zIndex: 100,
           bottom: 20,
           maxHeight: '65%',
-          borderRadius: 5,
+          borderRadius: 10,
           alignSelf: 'center',
           padding: 10,
         }}>

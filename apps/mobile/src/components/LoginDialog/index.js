@@ -450,7 +450,9 @@ const LoginDialog = () => {
               title="Logout"
               paragraph="All user data on this device will be cleared including any unsynced changes. Do you want to proceed?"
               paragraphColor="red"
+              padding={12}
             />
+            <Seperator/>
             <DialogButtons
               negativeTitle="Cancel"
               onPressNegative={() => {
@@ -482,7 +484,7 @@ const LoginDialog = () => {
         <BaseDialog
           visible={true}
           transparent={current.showLoader}
-          animation="slide"
+          animation="fade"
           onRequestClose={() => {
             if (!current.showLoader) {
               setStatus(null);

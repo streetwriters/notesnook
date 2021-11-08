@@ -26,7 +26,7 @@ import {useUserStore} from '../../provider/stores';
 
 const features = [
   {
-    title: 'Unlimited attachments'
+    title: 'Unlimited file & image attachments'
   },
   {
     title: 'Unlimited storage'

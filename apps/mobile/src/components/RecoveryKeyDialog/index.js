@@ -76,13 +76,7 @@ class RecoveryKeyDialog extends React.Component {
     if (this.signup) {
       this.signup = false;
       setTimeout(() => {
-        eSendEvent(eOpenResultDialog, {
-          title: 'Welcome to your private\nnote taking haven',
-          paragraph:
-            'Please confirm your email to encrypt and sync all your notes.',
-          icon: 'check',
-          button: 'Start taking notes'
-        });
+        eSendEvent(eOpenResultDialog);
       }, 500);
     }
   };
