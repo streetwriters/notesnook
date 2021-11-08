@@ -3,7 +3,7 @@ import {useWindowDimensions, View} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {PressableButton} from '../../components/PressableButton';
 import {useTracked} from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
@@ -18,20 +18,18 @@ const TagItem = ({item, index}) => {
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
   const onPress = () => {
+    let params = {
+      ...item,
+      type: 'tag',
+      get: 'tagged'
+    };
+
     eSendEvent(refreshNotesPage, params);
-    Navigation.navigate(
-      'NotesPage',
-      {
-        ...item,
-        type: 'tag',
-        get: 'tagged'
-      },
-      {
-        heading: '#' + item.title,
-        id: item.id,
-        type: item.type
-      }
-    );
+    Navigation.navigate('NotesPage', params, {
+      heading: '#' + item.title,
+      id: item.id,
+      type: item.type
+    });
   };
 
   return (
