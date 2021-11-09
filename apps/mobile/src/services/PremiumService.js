@@ -134,10 +134,10 @@ const onUserStatusCheck = async type => {
 
 const showVerifyEmailDialog = () => {
   eSendEvent(eOpenProgressDialog, {
-    title: 'Email not verified',
+    title: 'Confirm your email',
     icon: 'email',
     paragraph:
-      'We have sent you an email confirmation link. Please check your email inbox to verify your account. If you cannot find the email, check your spam folder.',
+      'We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.',
     action: async () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
