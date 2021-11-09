@@ -20,6 +20,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import { APP_VERSION, editing } from '../../utils';
@@ -172,7 +173,7 @@ const AppLoader = ({onLoad}) => {
     ) {
       askForBackup = JSON.parse(askForBackup);
       if (askForBackup?.timestamp < Date.now()) {
-        eSendEvent(eOpenProgressDialog, {
+        presentSheet({
           title: 'Backup & restore',
           paragraph: 'Please enable automatic backups to keep your data safe',
           noProgress: true,

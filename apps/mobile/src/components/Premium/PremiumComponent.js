@@ -4,7 +4,7 @@ import {FlatList} from 'react-native-gesture-handler';
 import * as RNIap from 'react-native-iap';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {eSendEvent, presentSheet, ToastEvent} from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {db} from '../../utils/database';
 import {
@@ -155,7 +155,7 @@ export const PremiumComponent = ({close, promo, getRef}) => {
           setBuying(false);
           close();
           await sleep(1000);
-          eSendEvent(eOpenProgressDialog, {
+          presentSheet({
             title: 'Thank you for subscribing!',
             paragraph: `Your Notesnook Pro subscription will be activated within a few hours. If your account is not upgraded to Notesnook Pro, your money will be refunded to you. In case of any issues, please reach out to us at support@streetwriters.co`,
             action: async () => {

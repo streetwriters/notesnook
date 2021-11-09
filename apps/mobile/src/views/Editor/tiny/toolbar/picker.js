@@ -5,7 +5,11 @@ import Sodium from 'react-native-sodium';
 import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
 import {Attachment} from '../../../../components/AttachmentDialog';
-import {eSendEvent, ToastEvent} from '../../../../services/EventManager';
+import {
+  eSendEvent,
+  presentSheet,
+  ToastEvent
+} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {db} from '../../../../utils/database';
 import {
@@ -22,7 +26,7 @@ const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
 
 const showEncryptionSheet = file => {
-  eSendEvent(eOpenProgressDialog, {
+  presentSheet({
     title: 'Encrypting attachment',
     paragraph: 'Please wait while we encrypt file for upload',
     nowarn: true,
@@ -225,7 +229,7 @@ const pick = async () => {
     await sleep(500);
     editing.isFocused = true;
   }
-  eSendEvent(eOpenProgressDialog, {
+  presentSheet({
     noProgress: true,
     noIcon: true,
     actionsArray: [

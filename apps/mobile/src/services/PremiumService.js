@@ -10,7 +10,7 @@ import {
   eShowGetPremium
 } from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
+import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 
 let premiumStatus = 0;
 let products = [];
@@ -133,7 +133,7 @@ const onUserStatusCheck = async type => {
 };
 
 const showVerifyEmailDialog = () => {
-  eSendEvent(eOpenProgressDialog, {
+  presentSheet({
     title: 'Confirm your email',
     icon: 'email',
     paragraph:

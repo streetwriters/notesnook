@@ -6,7 +6,7 @@ import {
   useMessageStore,
   useSelectionStore
 } from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import {eSendEvent, presentSheet} from '../../services/EventManager';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {eOpenPremiumDialog, eOpenProgressDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
@@ -160,8 +160,6 @@ export const Announcement = ({color}) => {
                       opacity: 1
                     }}
                     onPress={async () => {
-                      console.log(index);
-                      return;
                       if (item.type === 'link') {
                         try {
                           await openLinkInBrowser(item.data, state.colors);
@@ -172,7 +170,7 @@ export const Announcement = ({color}) => {
                           text: item.title
                         });
                       } else if (item.type === 'backup') {
-                        eSendEvent(eOpenProgressDialog, {
+                        presentSheet({
                           title: 'Backup & restore',
                           paragraph:
                             'Please enable automatic backups to keep your data safe',

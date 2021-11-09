@@ -1,7 +1,7 @@
 const {MMKV} = require('../utils/MMKV');
 import storage from '../utils/storage';
 import {db} from '../utils/database';
-import {eSendEvent, ToastEvent} from './EventManager';
+import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
 import Share from 'react-native-share';
@@ -65,7 +65,7 @@ async function run() {
   if (!androidBackupDirectory) return;
 
   RNFetchBlob = require('rn-fetch-blob').default;
-  eSendEvent(eOpenProgressDialog, {
+  presentSheet({
     title: 'Backing up your data',
     paragraph:
       "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
@@ -117,7 +117,7 @@ async function run() {
         context: 'global'
       });
 
-      eSendEvent(eOpenProgressDialog, {
+      presentSheet( {
         title: 'Backup complete',
         icon: 'cloud-upload',
         paragraph:

@@ -1,11 +1,11 @@
-import React, {Component, createRef} from 'react';
+import React, { Component, createRef } from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault
 } from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
+import { getCurrentColors } from '../../utils/Colors';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -20,13 +20,13 @@ import {
   eShowGetPremium,
   eThemeUpdated
 } from '../../utils/Events';
-import {EditorSettings} from '../../views/Editor/EditorSettings';
-import {ActionSheetComponent} from '../ActionSheetComponent';
+import { EditorSettings } from '../../views/Editor/EditorSettings';
+import { ActionSheetComponent } from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {AddNotebookDialog} from '../AddNotebookDialog';
-import {AddTopicDialog} from '../AddTopicDialog';
-import {AttachmentDialog} from '../AttachmentDialog';
-import {Dialog} from '../Dialog';
+import { AddNotebookDialog } from '../AddNotebookDialog';
+import { AddTopicDialog } from '../AddTopicDialog';
+import { AttachmentDialog } from '../AttachmentDialog';
+import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import ImagePreview from '../ImagePreview';
 import LoginDialog from '../LoginDialog';
@@ -35,16 +35,15 @@ import MoveNoteDialog from '../MoveNoteDialog';
 import PendingDialog from '../Premium/PendingDialog';
 import PremiumDialog from '../Premium/PremiumDialog';
 import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
-import ProgressDialog from '../ProgressDialog';
+import GeneralSheet from '../GeneralSheet';
 import PublishNoteDialog from '../PublishNoteDialog';
 import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
-import SortDialog from '../SortDialog';
 import TagsDialog from '../TagsDialog';
-import {UpdateDialog} from '../UpdateDialog';
-import {VaultDialog} from '../VaultDialog';
+import { UpdateDialog } from '../UpdateDialog';
+import { VaultDialog } from '../VaultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -292,7 +291,7 @@ export class DialogManager extends Component {
         <RecoveryKeyDialog colors={colors} />
         <PendingDialog colors={colors} />
         <PremiumStatusDialog />
-        <ProgressDialog />
+        <GeneralSheet />
         <RestoreDialog />
         <ResultDialog />
         <VaultDialog colors={colors} />

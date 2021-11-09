@@ -17,6 +17,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
@@ -253,7 +254,7 @@ const LoginDialog = () => {
 
       await MMKV.removeItem('loginSessionHasExpired');
       await sleep(500);
-      eSendEvent(eOpenProgressDialog, {
+      presentSheet({
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false

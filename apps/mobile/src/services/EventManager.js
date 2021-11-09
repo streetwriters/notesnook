@@ -2,6 +2,7 @@ import EventManager from 'notes-core/utils/event-manager';
 import {
   eHideToast,
   eOnNoteEdited,
+  eOpenProgressDialog,
   eOpenVaultDialog,
   eShowToast,
 } from '../utils/Events';
@@ -53,6 +54,10 @@ export const openVault = (data) => {
  */
 export function sendNoteEditedEvent(data) {
   eSendEvent(eOnNoteEdited, data);
+}
+
+export function presentSheet(data) {
+  eSendEvent(eOpenProgressDialog,data);
 }
 
 export const ToastEvent = {

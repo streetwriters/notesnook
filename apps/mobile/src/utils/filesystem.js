@@ -2,7 +2,7 @@ import React from 'react';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import {useAttachmentStore} from '../provider/stores';
-import {eSendEvent, ToastEvent} from '../services/EventManager';
+import {eSendEvent, presentSheet, ToastEvent} from '../services/EventManager';
 import {db} from './database';
 import Storage from './storage';
 import * as ScopedStorage from 'react-native-scoped-storage';
@@ -241,7 +241,7 @@ async function downloadAttachment(hash, global = true) {
     }
     console.log('saved file uri: ', fileUri);
 
-    eSendEvent(eOpenProgressDialog, {
+    presentSheet({
       title: `File downloaded`,
       paragraph: `${attachment.metadata.filename} is saved to ${
         Platform.OS === 'android'

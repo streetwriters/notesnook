@@ -26,6 +26,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../services/EventManager';
 import {
@@ -218,7 +219,7 @@ export const useAppEvents = () => {
     await PremiumService.setPremiumStatus();
     let message =
       'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
-    eSendEvent(eOpenProgressDialog, {
+    presentSheet({
       title: 'Email confirmed!',
       paragraph: message,
       noProgress: true,
@@ -255,7 +256,7 @@ export const useAppEvents = () => {
   const onAccountStatusChange = async userStatus => {
     if (!PremiumService.get() && userStatus.type === 5) {
       PremiumService.subscriptions.clear();
-      eSendEvent(eOpenProgressDialog, {
+      presentSheet({
         title: 'Notesnook Pro',
         paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
         action: async () => {
@@ -306,7 +307,7 @@ export const useAppEvents = () => {
     setLoginMessage();
     await PremiumService.setPremiumStatus();
     await MMKV.setItem('introCompleted', 'true');
-    eSendEvent(eOpenProgressDialog, {
+    presentSheet({
       title: reason ? reason : 'User logged out',
       paragraph: `You have been logged out of your account.`,
       action: async () => {

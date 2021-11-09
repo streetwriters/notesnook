@@ -45,6 +45,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -198,7 +199,7 @@ export const Settings = ({navigation}) => {
       name: 'Join our Discord community',
 
       func: async () => {
-        eSendEvent(eOpenProgressDialog, {
+        presentSheet({
           title: 'Join our Discord Community',
           iconColor: 'discord',
           paragraph:
@@ -923,7 +924,7 @@ const SettingsUserSection = () => {
                     SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
                   }
                   onPress={() => {
-                    eSendEvent(eOpenProgressDialog, {
+                    presentSheet({
                       title:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .title,
@@ -1024,7 +1025,7 @@ const SettingsUserSection = () => {
               name: 'Subscription not activated?',
               func: async () => {
                 if (Platform.OS === 'android') return;
-                eSendEvent(eOpenProgressDialog, {
+                presentSheet({
                   title: 'Loading subscriptions',
                   paragraph: `Please wait while we fetch your subscriptions.`
                 });
@@ -1033,13 +1034,13 @@ const SettingsUserSection = () => {
                   (a, b) => b.transactionDate - a.transactionDate
                 );
                 let currentSubscription = subscriptions[0];
-                eSendEvent(eOpenProgressDialog, {
+                presentSheet({
                   title: 'Notesnook Pro',
                   paragraph: `You subscribed to Notesnook Pro on ${new Date(
                     currentSubscription.transactionDate
                   ).toLocaleString()}. Verify this subscription?`,
                   action: async () => {
-                    eSendEvent(eOpenProgressDialog, {
+                    presentSheet({
                       title: 'Verifying subscription',
                       paragraph: `Please wait while we verify your subscription.`
                     });
@@ -1806,7 +1807,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
             }
-            eSendEvent(eOpenProgressDialog, {
+            presentSheet({
               title: 'Notesnook Importer',
               icon: 'import',
               noProgress: true,
