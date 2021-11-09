@@ -44,7 +44,11 @@ class TokenManager {
     } catch (e) {
       console.error("Error getting access token:", e);
       if (e.message === "invalid_grant" || e.message === "invalid_client") {
-        EV.publish(EVENTS.userSessionExpired);
+        await this._refreshToken(true);
+        const token = await this.getToken(false, false);
+        if (!token || this._isTokenExpired(token))
+          EV.publish(EVENTS.userSessionExpired);
+        return token.access_token;
       }
       throw e;
     }

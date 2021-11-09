@@ -120,12 +120,6 @@ class UserManager {
         token
       );
       if (user) {
-        const oldUser = await this.getUser();
-        if (!!oldUser && !oldUser.isEmailConfirmed && user.isEmailConfirmed) {
-          // generate new token
-          await this.tokenManager.getToken(true, true);
-        }
-
         await this.setUser(user);
         EV.publish(EVENTS.userFetched, user);
         return user;
