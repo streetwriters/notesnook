@@ -21,10 +21,10 @@ function TrackingDetailsDialog(props) {
       <Box overflowY="auto">
         <table>
           <tr>
-            <Text as="th" textAlign="left" variant="title">
+            <Text as="th" textAlign="left" variant="subtitle">
               Event name
             </Text>{" "}
-            <Text as="th" textAlign="left" variant="title">
+            <Text as="th" textAlign="left" variant="subtitle">
               Event detail
             </Text>
           </tr>

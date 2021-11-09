@@ -1,15 +1,37 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Flex, Button, Text } from "rebass";
 import Dialog from "./dialog";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { db } from "../../common/db";
 import { useState } from "react";
+import { useSessionState } from "../../utils/hooks";
 
+var interval = 0;
 function EmailVerificationDialog(props) {
   const user = useUserStore((store) => store.user);
-  const [error, setError] = useState();
   const [isSending, setIsSending] = useState(false);
-  const [canSendAgain, setCanSendAgain] = useState(true);
+  const [canSendAgain, setCanSendAgain] = useSessionState("canSendAgain", true);
+  const [resetTimer, setResetTimer] = useSessionState("resetTimer", 60);
+
+  useEffect(() => {
+    if (!canSendAgain) {
+      interval = setInterval(() => {
+        setResetTimer((s) => {
+          --s;
+          if (s <= 0) {
+            setCanSendAgain(true);
+            clearInterval(interval);
+            return 60;
+          }
+          return s;
+        });
+      }, 1000);
+    }
+    return () => {
+      clearInterval(interval);
+    };
+  }, [canSendAgain, setResetTimer, setCanSendAgain]);
+
   if (!user) {
     props.onCancel();
     return null;
@@ -18,12 +40,29 @@ function EmailVerificationDialog(props) {
     <Dialog
       isOpen={true}
       title={"Verify your email"}
-      description={"Please check your inbox for the confirmation email."}
+      description={
+        "Check your spam folder if you haven't received an email yet."
+      }
       onClose={props.onCancel}
       positiveButton={{
-        text: "Done",
-        onClick: props.onCancel,
+        text: canSendAgain || isSending ? "Resend" : `Resend (${resetTimer})`,
+        onClick: async () => {
+          setIsSending(true);
+          try {
+            await db.user.sendVerificationEmail();
+            setCanSendAgain(false);
+          } catch (e) {
+            console.error(e);
+          } finally {
+            setIsSending(false);
+          }
+        },
         loading: isSending,
+        disabled: isSending || !canSendAgain,
+      }}
+      negativeButton={{
+        text: "Cancel",
+        onClick: props.onCancel,
         disabled: isSending,
       }}
     >
@@ -31,43 +70,14 @@ function EmailVerificationDialog(props) {
         <Text
           as="span"
           variant="body"
-          bg="shade"
-          color="primary"
-          p={1}
           alignSelf="stretch"
           sx={{ borderRadius: "default" }}
         >
-          We have sent the email with the confirmation link to{" "}
-          <b>{user.email}</b>.
-        </Text>
-        {canSendAgain && (
-          <Button
-            mt={2}
-            variant="anchor"
-            onClick={async () => {
-              try {
-                setIsSending(true);
-                setCanSendAgain(false);
-                setTimeout(() => setCanSendAgain(true), 60 * 1000);
-                await db.user.sendVerificationEmail();
-              } catch (e) {
-                setError(e.message);
-              } finally {
-                setIsSending(false);
-              }
-            }}
-          >
-            Resend confirmation email
-          </Button>
-        )}
-        <Text variant="error" mt={2} color={error ? "error" : "success"}>
-          {isSending
-            ? "Sending confirmation email. Please wait..."
-            : !canSendAgain && !isSending
-            ? "Confirmation email sent. You can resend the email after 1 minute in case you didn't receive it."
-            : !!error
-            ? error
-            : ""}
+          We have sent the confirmation link to your email at{" "}
+          <Text as="b" fontWeight="bold">
+            {user.email}
+          </Text>
+          .
         </Text>
       </Flex>
     </Dialog>

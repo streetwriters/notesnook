@@ -52,6 +52,7 @@ function TitleBox(props) {
       ></Text>
       <Input
         ref={inputRef}
+        variant="clean"
         data-test-id="editor-title"
         className="editorTitle"
         autoFocus={shouldFocus}
@@ -68,7 +69,6 @@ function TitleBox(props) {
           fontWeight: "heading",
           border: "none",
           resize: "none",
-          ":focus": { outline: "none" },
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.preventDefault();

@@ -5,6 +5,7 @@ import {
   showCreateTagDialog,
   showEditTagDialog,
   showEmailVerificationDialog,
+  showFeatureDialog,
 } from "../common/dialog-controller";
 import {
   showAddNotebookDialog,
@@ -113,6 +114,12 @@ const hashroutes = {
   },
   "/buy/:plan/:code": ({ plan, code }) => {
     showBuyDialog(plan, code);
+  },
+  "/welcome": () => {
+    showFeatureDialog("welcome");
+  },
+  "/confirmed": () => {
+    showFeatureDialog("confirmed");
   },
 };
 

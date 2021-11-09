@@ -51,9 +51,8 @@ function Dialog(props) {
       }}
     >
       <Flex
-        p={props.padding || 30}
         flexDirection="column"
-        width={["100%", "90%", props.width || "33%"]}
+        width={["100%", "90%", props.width || "25%"]}
         maxHeight={["100%", "80%", "70%"]}
         height={["100%", "auto", "auto"]}
         bg="background"
@@ -64,7 +63,7 @@ function Dialog(props) {
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
-          borderRadius: "default",
+          borderRadius: "dialog",
         }}
       >
         {props.showClose && (
@@ -81,38 +80,61 @@ function Dialog(props) {
             onClick={props.onClose}
           />
         )}
-        <Flex
-          flexDirection="column"
-          pb={props.headerPaddingBottom || 2}
-          //sx={{ borderBottom: "1px solid", borderColor: "border" }}
-        >
-          {/* {props.icon && (
-            <props.icon size={props.iconSize || 38} color="primary" />
-          )} */}
-          <Text variant="heading" textAlign="left" color="text">
+        <Flex flexDirection="column" p={4} pb={0}>
+          <Text
+            variant="heading"
+            fontSize="subheading"
+            textAlign="left"
+            color="text"
+          >
             {props.title}
           </Text>
           {props.description && (
-            <Text variant="body" textAlign="left" color="fontTertiary" mt={1}>
+            <Text variant="body" textAlign="left" color="fontTertiary">
               {props.description}
             </Text>
           )}
         </Flex>
-        {props.children}
-
+        <Flex flexDirection="column" my={1} mx={4}>
+          {props.children}
+        </Flex>
         {(props.positiveButton || props.negativeButton) && (
           <Flex
             sx={{ justifyContent: props.buttonsAlignment || "flex-end" }}
-            mt={3}
+            bg="bgSecondary"
+            p={1}
+            px={2}
+            mt={2}
           >
+            {props.negativeButton && (
+              <RebassButton
+                variant="primary"
+                data-test-id="dialog-no"
+                onClick={props.negativeButton.onClick}
+                color="text"
+                fontWeight="bold"
+                bg={"transparent"}
+                sx={{
+                  opacity: props.negativeButton.disabled ? 0.7 : 1,
+                  ":hover": { bg: "bgSecondary" },
+                }}
+              >
+                {props.negativeButton.text || "Cancel"}
+              </RebassButton>
+            )}
             {props.positiveButton && (
               <RebassButton
                 {...props.positiveButton.props}
                 variant="primary"
+                color="primary"
+                fontWeight="bold"
+                bg={"transparent"}
                 data-test-id="dialog-yes"
-                sx={{ opacity: props.positiveButton.disabled ? 0.7 : 1 }}
-                mx={1}
-                autoFocus={props.positiveButton.autoFocus}
+                sx={{
+                  opacity: props.positiveButton.disabled ? 0.7 : 1,
+                  ":hover": { bg: "bgSecondary" },
+                }}
+                autoFocus
                 disabled={props.positiveButton.disabled || false}
                 onClick={
                   !props.positiveButton.disabled
@@ -121,19 +143,10 @@ function Dialog(props) {
                 }
               >
                 {props.positiveButton.loading ? (
-                  <Icon.Loading rotate={true} color="static" />
+                  <Icon.Loading size={16} color="primary" />
                 ) : (
                   props.positiveButton.text || "OK"
                 )}
-              </RebassButton>
-            )}
-            {props.negativeButton && (
-              <RebassButton
-                variant="secondary"
-                data-test-id="dialog-no"
-                onClick={props.negativeButton.onClick}
-              >
-                {props.negativeButton.text || "Cancel"}
               </RebassButton>
             )}
           </Flex>

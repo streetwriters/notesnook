@@ -95,6 +95,9 @@ import {
   mdiAlertOctagramOutline,
   mdiEyeOutline,
   mdiEyeOffOutline,
+  mdiAttachment,
+  mdiPen,
+  mdiPencilOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -207,6 +210,8 @@ export const CheckCircle = createIcon(mdiCheckCircle);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
 export const PDF = createIcon(mdiFilePdfOutline);
+export const Attachment = createIcon(mdiAttachment);
+export const Write = createIcon(mdiPencilOutline);
 export const HTML = createIcon(mdiLanguageHtml5);
 export const Text = createIcon(mdiFormatTitle);
 export const Success = createIcon(mdiCheckCircle);

@@ -37,11 +37,11 @@ function ReminderBar() {
           sx={{ bg: "shade", mr: 2, p: 2, borderRadius: 80 }}
         />
         <Flex variant="columnCenter" alignItems="flex-start">
-          <Text display={["block", "none", "block"]} variant="subBody">
-            {reminder.subtitle}
-          </Text>
           <Text variant="body" fontSize={"body"}>
             {reminder.title}
+          </Text>
+          <Text display={["block", "none", "block"]} variant="subBody">
+            {reminder.subtitle}
           </Text>
         </Flex>
       </Flex>

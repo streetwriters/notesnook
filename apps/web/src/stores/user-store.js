@@ -8,6 +8,7 @@ import { showSessionExpiredDialog } from "../common/dialog-controller";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
+import { extendHomeRoute, hardNavigate, hashNavigate } from "../navigation";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -57,8 +58,8 @@ class UserStore extends BaseStore {
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         this.set((state) => (state.user.subscription = subscription));
       });
-      EV.subscribe(EVENTS.userEmailConfirmed, async () => {
-        window.location.reload();
+      EV.subscribe(EVENTS.userEmailConfirmed, () => {
+        hashNavigate("/confirmed");
       });
 
       EV.subscribe(EVENTS.databaseSyncRequested, async () => {

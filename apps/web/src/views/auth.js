@@ -31,6 +31,9 @@ const authTypes = {
     },
     secondaryAction: {
       text: "Continue without creating an account",
+      onClick: () => {
+        redirectToURL("/");
+      },
     },
     loading: {
       title: "Creating your account",
@@ -67,8 +70,8 @@ const authTypes = {
       }
       return await userstore
         .signup(form)
-        .then(async () => {
-          redirectToURL(form.redirect || "/");
+        .then(() => {
+          redirectToURL("/notes/#/welcome");
         })
         .catch((e) => onError(e.message));
     },
@@ -384,271 +387,13 @@ function Auth(props) {
                 </Flex>
               )}
               {data.agreementText && (
-                <Text mt={2} variant="subBody">
+                <Text mt={2} variant="subBody" textAlign="center">
                   {data.agreementText}
                 </Text>
               )}
             </>
           )}
         </Flex>
-
-        {/* <Flex
-        bg="background"
-        height={"100%"}
-        overflowY="auto"
-        flexDirection={"row"}
-      >
-        <Button
-          variant="secondary"
-          display="flex"
-          alignItems="center"
-          sx={{ position: "absolute", top: 3, right: 30, cursor: "pointer" }}
-          title="Go to app"
-          onClick={() => {
-            redirectToURL("/");
-          }}
-        >
-          <ArrowRight size={16} />
-          <Text variant="body" ml={1}>
-            Go to app
-          </Text>
-        </Button>
-        <Box
-          flexDirection="column"
-          justifyContent="center"
-          flex={0.35}
-          bg="primary"
-          p={50}
-          display={["none", "none", "flex"]}
-        >
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="start"
-          >
-            <Text
-              color="static"
-              variant="title"
-              fontWeight="heading"
-              ml={1}
-              fontSize={20}
-            >
-              Notesnook
-            </Text>
-
-            <Flex mt={100} flexDirection="column" height={250}>
-              <Text
-                color="static"
-                variant="heading"
-                fontWeight="bold"
-                fontSize="2em"
-              >
-                {feature.title}
-              </Text>
-              <Text mt={4} variant="body" fontSize={"1.1em"} color="static">
-                {feature.description}
-              </Text>
-              {feature.link && (
-                <Flex
-                  as="a"
-                  sx={{
-                    textDecorationLine: "underline",
-                    textDecorationColor: "#fff",
-                  }}
-                  href={feature.link}
-                  mt={4}
-                  alignItems="center"
-                >
-                  <ArrowRight size={18} color="static" />
-                  <Text variant="title" ml={1} color="static">
-                    {feature.linkText}
-                  </Text>
-                </Flex>
-              )}
-            </Flex>
-            <Flex alignSelf="center" mt={50}>
-              {features.map((_, i) => (
-                <Box
-                  key={i}
-                  height={5}
-                  width={20}
-                  mr={1}
-                  sx={{ borderRadius: 100 }}
-                  bg={featureIndex === i ? "static" : "#ffffff99"}
-                  onClick={() => setFeatureIndex(i)}
-                />
-              ))}
-            </Flex>
-          </Flex>
-        </Box>
-        <Flex justifyContent="center" flex={1} flexShrink={0}>
-          {isAppLoaded ? (
-            <Flex
-              as="form"
-              id="authForm"
-              flexDirection="column"
-              justifyContent="center"
-              alignItems="stretch"
-              width={["95%", "55%", "35%"]}
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setIsSubmitting(true);
-                const form = new FormData(e.target);
-                const obj = Object.fromEntries(form.entries());
-                obj.redirect = redirect;
-                await data.onSubmit(
-                  obj,
-                  (error) => {
-                    setIsSubmitting(false);
-                    setError(error);
-                  },
-                  setSuccess
-                );
-                setIsSubmitting(false);
-              }}
-            >
-              <Text variant="heading" textAlign="center" fontWeight="heading">
-                {data.title}
-              </Text>
-              <Text
-                variant="body"
-                mt={1}
-                textAlign="center"
-                color="fontTertiary"
-              >
-                {data.subtitle.text}{" "}
-                {data.subtitle.action && (
-                  <Text
-                    sx={{
-                      ":hover": { color: "dimPrimary" },
-                      cursor: "pointer",
-                    }}
-                    as="b"
-                    color="primary"
-                    onClick={data.subtitle.action.onClick}
-                  >
-                    {data.subtitle.action.text}
-                  </Text>
-                )}
-              </Text>
-              <Field
-                styles={{
-                  container: { mt: 50 },
-                }}
-                data-test-id="email"
-                id="email"
-                required
-                name="email"
-                autoComplete="email"
-                label={data.labels.email}
-                helpText={data.helpTexts?.email}
-              />
-              {data.labels.password && (
-                <Field
-                  styles={{
-                    container: { mt: 2 },
-                  }}
-                  data-test-id="password"
-                  id="password"
-                  required
-                  name="password"
-                  autoComplete={data.autoComplete?.password}
-                  label={data.labels.password}
-                  type="password"
-                />
-              )}
-
-              {data.confirmPassword && (
-                <Field
-                  styles={{
-                    container: { mt: 2 },
-                  }}
-                  data-test-id="confirm-password"
-                  id="confirmPassword"
-                  required
-                  name="confirmPassword"
-                  autoComplete="confirm-password"
-                  label="Confirm your password"
-                  type="password"
-                />
-              )}
-
-              {/* {data.supportsPasswordRecovery && (
-                <Button
-                  type="button"
-                  alignSelf="start"
-                  mt={2}
-                  variant="anchor"
-                  onClick={() => hardNavigate("/recover", getQueryParams())}
-                >
-                  Forgot password?
-                </Button>
-              )}
-              <Button
-                data-test-id="submitButton"
-                display="flex"
-                type="submit"
-                mt={4}
-                variant="primary"
-                disabled={isSubmitting}
-                sx={{ borderRadius: "default" }}
-                justifyContent="center"
-                alignItems="center"
-              >
-                {isSubmitting ? (
-                  <>
-                    <Loading color="static" size={16} sx={{ mr: 1 }} />{" "}
-                    {data.primaryAction.loadingText}
-                  </>
-                ) : (
-                  data.primaryAction.text
-                )}
-              </Button>
-              {data.secondaryAction && (
-                <Button
-                  type="button"
-                  variant="secondary"
-                  mt={1}
-                  onClick={data.secondaryAction.onClick}
-                >
-                  {data.secondaryAction.text}
-                </Button>
-              )}
-              {error && (
-                <Flex
-                  bg="errorBg"
-                  p={1}
-                  mt={2}
-                  sx={{ borderRadius: "default" }}
-                >
-                  <Error size={15} color="error" />
-                  <Text variant="error" ml={1}>
-                    {error}
-                  </Text>
-                </Flex>
-              )}
-              {success && (
-                <Flex bg="shade" p={1} mt={2} sx={{ borderRadius: "default" }}>
-                  <CheckCircle size={15} color="primary" />
-                  <Text variant="error" color="primary" ml={1}>
-                    {success}
-                  </Text>
-                </Flex>
-              )}
-              {data.agreementText && (
-                <Text mt={2} variant="subBody">
-                  {data.agreementText}
-                </Text>
-              )}
-            </Flex>
-          ) : (
-            <Loader
-              title="Did you know?"
-              text="Your password never leaves your device. Ever."
-            />
-          )}
-        </Flex>
-      </Flex> */}
       </Flex>
     </ThemeProvider>
   );

@@ -92,6 +92,10 @@ export function getHomeRoute() {
   return HOMEPAGE_ROUTE[Config.get("homepage", 0)];
 }
 
+export function extendHomeRoute(route) {
+  return `${getHomeRoute()}${route}`;
+}
+
 export function hardNavigate(route) {
-  window.location.assign(route);
+  window.open(route, "_self");
 }

@@ -1,12 +1,26 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import config from "./config";
 
 export const usePersistentState = (key, def) => {
   let defState = config.get(key, def);
-  const [k, setKey] = useState(defState);
-  const _setKey = (s) => {
-    setKey(s);
-    config.set(key, s);
-  };
-  return [k, _setKey];
+  const [value, setValue] = useState(defState);
+
+  useEffect(() => {
+    config.set(key, value);
+  }, [key, value]);
+
+  return [value, setValue];
+};
+
+const memory = {};
+export const useSessionState = (key, def) => {
+  const [value, setValue] = useState(
+    memory[key] === undefined ? def : memory[key]
+  );
+
+  useEffect(() => {
+    memory[key] = value;
+  }, [key, value]);
+
+  return [value, setValue];
 };

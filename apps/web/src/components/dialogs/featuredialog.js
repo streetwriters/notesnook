@@ -1,8 +1,8 @@
 import React from "react";
-import { Text, Flex, Button } from "rebass";
+import { Text, Flex } from "rebass";
 import Dialog from "./dialog";
 import * as Icon from "../icons";
-import Config from "../../utils/config";
+import { getHomeRoute, hardNavigate } from "../../navigation";
 
 const features = {
   monographs: {
@@ -39,6 +39,66 @@ const features = {
       },
     ],
   },
+  welcome: {
+    title: "Thank you for signing up!",
+    subtitle:
+      "You can use all features of Notesnook for 7 days. No limitations. No commitments.",
+
+    subFeatures: [
+      {
+        title: "Unlimited notes & notebooks",
+        icon: Icon.Note,
+      },
+      {
+        title: "Unlimited file & image attachments",
+        icon: Icon.Attachment,
+      },
+      {
+        title: "Lock any note with a password",
+        icon: Icon.Vault,
+      },
+      {
+        title: "Automatic encrypted backups",
+        icon: Icon.Backup,
+      },
+    ],
+    help: {
+      title: "What else is included in the free trial?",
+      link: "https://notesnook.com/pricing",
+    },
+    cta: { title: "Start taking notes", icon: Icon.Write },
+  },
+  confirmed: {
+    title: "Email confirmed!",
+    subtitle: "Your have been rewarded 7 more days of free trial. Enjoy!",
+    subFeatures: [
+      {
+        title: "Unlimited notes & notebooks",
+        icon: Icon.Note,
+      },
+      {
+        title: "Unlimited file & image attachments",
+        icon: Icon.Attachment,
+      },
+      {
+        title: "Lock any note with a password",
+        icon: Icon.Vault,
+      },
+      {
+        title: "Automatic encrypted backups",
+        icon: Icon.Backup,
+      },
+    ],
+    help: {
+      title: "What else is included in the free trial?",
+      link: "https://notesnook.com/pricing",
+    },
+    cta: {
+      title: "Start taking notes",
+      icon: Icon.Write,
+      action: () => hardNavigate(getHomeRoute()),
+    },
+  },
 };
 
 function FeatureDialog(props) {
@@ -48,56 +108,54 @@ function FeatureDialog(props) {
   return (
     <Dialog
       isOpen={true}
-      // showClose
-      headerPaddingBottom={"0px"}
+      title={feature.title}
+      scrollable
+      description={feature.subtitle}
+      buttonsAlignment="center"
+      positiveButton={{
+        text: (
+          <Flex>
+            <feature.cta.icon color="primary" size={16} sx={{ mr: 1 }} />
+            {feature.cta.title}
+          </Flex>
+        ),
+        onClick: () => {
+          if (feature.cta.action) feature.cta.action();
+          props.onClose(true);
+        },
+      }}
     >
-      <Flex flexDirection="column" flex={1} overflowY="hidden">
-        <Flex sx={{ position: "relative" }} alignSelf="center">
-          <Text variant="heading" textAlign="center" fontSize="28px">
-            {feature.title}
-            <Text
-              variant="subBody"
-              textAlign="center"
-              fontWeight="normal"
-              fontSize="title"
-            >
-              {feature.subtitle}
-            </Text>
-          </Text>
-        </Flex>
-        <Flex flexDirection="column" py={2} overflowY="auto">
-          {feature.subFeatures.map((feature) => (
-            <Flex my={2}>
-              <feature.icon size={28} color="primary" />
-              <Text variant="title" fontWeight="normal" ml={2} flex={1}>
-                {feature.title}
+      <Flex flexDirection="column" overflowY="auto">
+        {feature.subFeatures.map((feature) => (
+          <Flex
+            my={feature.subtitle ? 2 : 1}
+            bg="bgSecondary"
+            p={1}
+            sx={{ borderRadius: "default" }}
+          >
+            <feature.icon size={18} color="primary" />
+            <Text variant="subtitle" fontWeight="normal" ml={2} flex={1}>
+              {feature.title}
+              {feature.subtitle && (
                 <Text variant="body" color="fontTertiary">
                   {feature.subtitle}
                 </Text>
-              </Text>
-            </Flex>
-          ))}
-        </Flex>
-        <Flex pb={2}>
-          <Text as="a" href={feature.help.link} target="_blank" variant="body">
-            {feature.help.title}
-          </Text>
-        </Flex>
-        <Button
-          display="flex"
-          fontSize="title"
-          fontWeight="bold"
-          alignSelf="center"
-          mt={2}
-          onClick={() => {
-            Config.set(`feature:${featureName}`, true);
-            props.onClose(true);
-          }}
-        >
-          <feature.cta.icon color="static" size={18} sx={{ mr: 1 }} />
-          {feature.cta.title}
-        </Button>
+              )}
+            </Text>
+          </Flex>
+        ))}
       </Flex>
+      {feature.help && (
+        <Text
+          as="a"
+          mt={1}
+          href={feature.help.link}
+          target="_blank"
+          variant="body"
+        >
+          {feature.help.title}
+        </Text>
+      )}
     </Dialog>
   );
 }

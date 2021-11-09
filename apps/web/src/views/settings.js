@@ -777,20 +777,6 @@ function AccountStatus(props) {
     }
   }, [user]);
 
-  if (!user.isEmailConfirmed)
-    return (
-      <AccountStatusContainer user={user} bg={"errorBg"} color={"error"}>
-        <Button mt={2} bg="error" onClick={() => hashNavigate("/email/verify")}>
-          <Flex alignItems="center">
-            <Icon.Warn color="static" size={13} />
-            <Text color="static" ml={1}>
-              Please verify your email.
-            </Text>
-          </Flex>
-        </Button>
-      </AccountStatusContainer>
-    );
-
   return (
     <AccountStatusContainer user={user} color={"fontTertiary"}>
       <Text

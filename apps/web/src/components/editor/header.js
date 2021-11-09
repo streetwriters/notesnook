@@ -105,6 +105,7 @@ function Autosuggest({
     >
       <Input
         ref={inputRef}
+        variant="clean"
         width="auto"
         alignSelf="flex-start"
         sx={{ width: "auto", border: "none", p: 0 }}

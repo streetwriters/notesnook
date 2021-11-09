@@ -3,6 +3,7 @@ class InputFactory {
     return {
       input: new Default(),
       error: new Error(),
+      clean: new Clean(),
     };
   }
 }
@@ -14,17 +15,33 @@ class Default {
       borderRadius: "default",
       border: "none",
       // borderColor: "border",
-      boxShadow: "0px 0px 0px 1px var(--border)",
+      boxShadow: "0px 0px 0px 1px var(--border) inset",
       fontFamily: "body",
       fontWeight: "body",
       fontSize: "input",
       color: "text",
-      ":focus, :focus-within": {
-        outline: "none",
-        boxShadow: "0px 0px 0px 2px var(--primary)",
+      outline: "none",
+      ":focus": {
+        boxShadow: "0px 0px 0px 2px var(--primary) inset",
       },
       ":hover:not(:focus)": {
-        boxShadow: "0px 0px 0px 1px var(--dimPrimary)",
+        boxShadow: "0px 0px 0px 1px var(--dimPrimary) inset",
+      },
+    };
+  }
+}
+
+class Clean {
+  constructor() {
+    return {
+      variant: "forms.input",
+      outline: "none",
+      boxShadow: "none",
+      ":focus": {
+        boxShadow: "none",
+      },
+      ":hover:not(:focus)": {
+        boxShadow: "none",
       },
     };
   }

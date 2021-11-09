@@ -52,9 +52,9 @@ const menuItems = [
     color: "red",
     onClick: ({ item }) => {
       confirm({
-        title: `Permanently Delete ${toTitleCase(item.itemType)}`,
+        title: `Permanently delete ${item.itemType}`,
         subtitle: `Are you sure you want to permanently delete this ${item.itemType}?`,
-        yesText: `Delete ${item.itemType}`,
+        yesText: `Delete`,
         noText: "Cancel",
         message: (
           <>
@@ -63,7 +63,7 @@ const menuItems = [
               IRREVERSIBLE
             </Text>
             . You will{" "}
-            <Text as="span" color="primary">
+            <Text as="span" color="error">
               not be able to recover this {item.itemType}.
             </Text>
           </>

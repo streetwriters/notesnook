@@ -26,19 +26,17 @@ class Default {
       borderRadius: "default",
       cursor: "pointer",
       p: 2,
-      px: 2,
       transition: "filter 200ms ease-in",
-      ":hover": {
+      ":hover:not(:disabled)": {
         filter: "brightness(90%)",
       },
       ":active": {
-        filter: "brightness(110%)",
+        filter: "brightness(98%)",
       },
-      ":focus:not(:active), :focus-within:not(:active), :focus-visible:not(:active)":
-        {
-          outline: "none",
-          boxShadow: "0px 0px 0px 2px var(--primary)",
-        },
+      outline: "none",
+      ":focus-visible:not(:active)": {
+        boxShadow: "0px 0px 0px 2px var(--text)",
+      },
       ":disabled": {
         opacity: 0.5,
         cursor: "not-allowed",
@@ -53,10 +51,7 @@ class Primary {
       variant: "buttons.default",
       color: "static",
       bg: "primary",
-      px: 4,
-      ":focus-visible": {
-        boxShadow: "0px 0px 0px 2px var(--text)",
-      },
+      px: 2,
     };
   }
 }
@@ -73,7 +68,6 @@ class Secondary {
       variant: "buttons.default",
       color: "text",
       bg: "border",
-      ":hover:not(:disabled)": { bg: "hover", filter: "brightness(90%)" },
     };
   }
 }
