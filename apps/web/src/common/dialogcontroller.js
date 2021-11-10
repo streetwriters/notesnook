@@ -528,6 +528,20 @@ export function showFeatureDialog(featureName) {
   ));
 }
 
+export function showReminderDialog(reminderKey) {
+  if (Config.get(reminderKey, false)) return;
+
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ReminderDialog
+      reminderKey={reminderKey}
+      onClose={(res) => {
+        Config.set(reminderKey, true);
+        perform(res);
+      }}
+    />
+  ));
+}
+
 export function showTrackingDetailsDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.TrackingDetailsDialog onClose={(res) => perform(res)} />

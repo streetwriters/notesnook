@@ -52,7 +52,7 @@ function Dialog(props) {
     >
       <Flex
         flexDirection="column"
-        width={["100%", "90%", props.width || "25%"]}
+        width={["100%", "90%", props.width || "380px"]}
         maxHeight={["100%", "80%", "70%"]}
         height={["100%", "auto", "auto"]}
         bg="background"
@@ -72,11 +72,11 @@ function Dialog(props) {
               position: "absolute",
               cursor: "pointer",
               top: 0,
-              right: 30,
-              mt: 38,
+              right: 20,
+              mt: 26,
               zIndex: 999,
             }}
-            size={26}
+            size={20}
             onClick={props.onClose}
           />
         )}
@@ -84,13 +84,17 @@ function Dialog(props) {
           <Text
             variant="heading"
             fontSize="subheading"
-            textAlign="left"
+            textAlign={props.alignment || "left"}
             color="text"
           >
             {props.title}
           </Text>
           {props.description && (
-            <Text variant="body" textAlign="left" color="fontTertiary">
+            <Text
+              variant="body"
+              textAlign={props.alignment || "left"}
+              color="fontTertiary"
+            >
               {props.description}
             </Text>
           )}
@@ -100,7 +104,7 @@ function Dialog(props) {
         </Flex>
         {(props.positiveButton || props.negativeButton) && (
           <Flex
-            sx={{ justifyContent: props.buttonsAlignment || "flex-end" }}
+            sx={{ justifyContent: props.alignment || "flex-end" }}
             bg="bgSecondary"
             p={1}
             px={2}

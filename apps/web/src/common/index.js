@@ -7,6 +7,7 @@ import {
   showFeatureDialog,
   showLoadingDialog,
   showPasswordDialog,
+  showReminderDialog,
 } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { hashNavigate, getCurrentHash } from "../navigation";
@@ -141,3 +142,26 @@ export const AppEventManager = new EventManager();
 export const AppEvents = {
   UPDATE_ATTACHMENT_PROGRESS: "updateAttachmentProgress",
 };
+
+export function totalSubscriptionConsumed(user) {
+  if (!user) return 0;
+  const start = user.subscription?.start;
+  const end = user.subscription?.expiry;
+  if (!start || !end) return 0;
+
+  const total = end - start;
+  const consumed = Date.now() - start;
+
+  return Math.round((consumed / total) * 100);
+}
+
+export async function showUpgradeReminderDialogs(user) {
+  const consumed = totalSubscriptionConsumed(user);
+  const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
+  const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;
+  if (isBasic && consumed >= 100) {
+    await showReminderDialog("trialexpired");
+  } else if (isTrial && consumed >= 75) {
+    await showReminderDialog("trialexpiring");
+  }
+}

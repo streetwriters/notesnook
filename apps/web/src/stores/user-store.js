@@ -8,7 +8,8 @@ import { showSessionExpiredDialog } from "../common/dialog-controller";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
-import { extendHomeRoute, hardNavigate, hashNavigate } from "../navigation";
+import { hashNavigate } from "../navigation";
+import { showUpgradeReminderDialogs } from "../common";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -45,6 +46,7 @@ class UserStore extends BaseStore {
 
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;
+
       EV.remove(
         EVENTS.userSubscriptionUpdated,
         EVENTS.userEmailConfirmed,
@@ -55,9 +57,11 @@ class UserStore extends BaseStore {
         state.user = user;
         state.isLoggedIn = true;
       });
+
       EV.subscribe(EVENTS.userSubscriptionUpdated, (subscription) => {
         this.set((state) => (state.user.subscription = subscription));
       });
+
       EV.subscribe(EVENTS.userEmailConfirmed, () => {
         hashNavigate("/confirmed");
       });
@@ -84,6 +88,8 @@ class UserStore extends BaseStore {
           await db.connectSSE();
         }
       });
+
+      await showUpgradeReminderDialogs(user);
       await appStore.sync();
       return true;
     });
