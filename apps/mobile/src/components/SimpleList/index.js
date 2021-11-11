@@ -1,18 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, RefreshControl } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, RefreshControl} from 'react-native';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import { eScrollEvent } from '../../utils/Events';
+import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
-import { NotebookWrapper } from '../NotebookItem/wrapper';
-import { NoteWrapper } from '../NoteItem/wrapper';
+import {NotebookWrapper} from '../NotebookItem/wrapper';
+import {NoteWrapper} from '../NoteItem/wrapper';
 import SortDialog from '../SortDialog';
 import TagItem from '../TagItem';
-import { Empty } from './empty';
-import { Footer } from './footer';
-import { Header } from './header';
-import { SectionHeader } from './section-header';
+import {Empty} from './empty';
+import {Footer} from './footer';
+import {Header} from './header';
+import {SectionHeader} from './section-header';
 
 let renderItems = {
   note: NoteWrapper,
@@ -50,8 +50,9 @@ const SimpleList = ({
   const refreshing = false;
 
   useEffect(() => {
+    let timeout = null;
     if (!loading) {
-      setTimeout(
+      timeout = setTimeout(
         () => {
           _setLoading(false);
         },
@@ -60,6 +61,9 @@ const SimpleList = ({
     } else {
       _setLoading(true);
     }
+    return () => {
+      clearTimeout(timeout);
+    };
   }, [loading]);
 
   const renderItem = React.useCallback(
@@ -106,8 +110,6 @@ const SimpleList = ({
   };
 
   const _keyExtractor = item => item.id || item.title;
-
-  
 
   return (
     <>
