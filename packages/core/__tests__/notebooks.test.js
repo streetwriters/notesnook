@@ -108,6 +108,32 @@ test("merge notebook when local notebook is also edited", () =>
     expect(notebook.topics.has("hello")).toBe(false);
   }));
 
+test("merge notebook when local notebook is also edited should merge noteIds too", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let notebook = db.notebooks.notebook(id);
+
+    let note = await db.notes.add(TEST_NOTE);
+    await db.notes.move(
+      { id: notebook.data.id, topic: notebook.data.topics[0].id },
+      note
+    );
+
+    const newNotebook = { ...notebook.data, remote: true };
+    newNotebook.topics[0].title = "hello (edited)";
+    newNotebook.topics[0].notes.push("hello-new-note");
+
+    await delay(500);
+
+    await notebook.topics.add({
+      ...notebook.topics.all[0],
+      title: "hello (edited too)",
+    });
+
+    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
+
+    expect(notebook.topics.all[0].notes.length).toBe(2);
+  }));
+
 test("merge notebook with topic removed that is edited in the local notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
