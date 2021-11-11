@@ -1,13 +1,13 @@
-import { groupArray } from 'notes-core/utils/grouping';
-import React, { useCallback, useEffect, useState } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header';
+import {groupArray} from 'notes-core/utils/grouping';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
-import { useNoteStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {useTracked} from '../../provider';
+import {useNoteStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -15,61 +15,64 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { editing, InteractionManager } from '../../utils';
-import { db } from '../../utils/database';
+import {editing, InteractionManager} from '../../utils';
+import {db} from '../../utils/database';
 import {
   eOnLoadNote,
-  eOpenAddTopicDialog, refreshNotesPage
+  eOpenAddTopicDialog,
+  refreshNotesPage
 } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { tabBarRef } from '../../utils/Refs';
+import {openLinkInBrowser} from '../../utils/functions';
+import {tabBarRef} from '../../utils/Refs';
+
+const getNotes = params => {
+  if (!params) return [];
+  let notes = [];
+  if (params.type !== 'topic' && params.get !== 'monographs') {
+    notes = db.notes[params.get](params.id);
+  } else if (params.get === 'monographs') {
+    notes = db.monographs.all;
+  } else {
+    notes = db.notebooks
+      .notebook(params.notebookId)
+      ?.topics.topic(params.id)?.all;
+  }
+  if (!notes) {
+    notes = [];
+  }
+
+  return groupArray(notes, 'notes');
+};
 
 export const Notes = ({route, navigation}) => {
   const [state] = useTracked();
   const colors = state.colors;
-  const [notes, setNotes] = useState([]);
+  const params = useRef(route?.params);
+  const [notes, setNotes] = useState(getNotes(params.current) || []);
   const loading = useNoteStore(state => state.loading);
-  let params = route?.params ? route.params : null;
-  const alias = params.type === "tag" ? db.tags.alias(params.id) : params.type === "color" ? db.colors.alias(params.id) : params.title
+  const alias =
+    params.current?.type === 'tag'
+      ? db.tags.alias(params.id)
+      : params.current?.type === 'color'
+      ? db.colors.alias(params.id)
+      : params.current?.title;
 
-  let ranAfterInteractions = false;
-
-
-  const runAfterInteractions = (time = 300) => {
-    InteractionManager.runAfterInteractions(() => {
-      Navigation.routeNeedsUpdate('NotesPage', () => {
-        init();
-      });
-    }, time);
-
-    let _notes = [];
-    if (params.type !== 'topic' && params.get !== 'monographs') {
-      _notes = db.notes[params.get](params?.id);
-    } else if (params.get === 'monographs') {
-      _notes = db.monographs.all;
-    } else {
-      _notes = db.notebooks
-        .notebook(params.notebookId)
-        ?.topics.topic(params.id)?.all;
-    }
-    if (!_notes) {
-      _notes = [];
-    }
+  const onLoad = () => {
+    let _notes = getNotes(params.current);
+    setNotes(_notes);
+    if (!params.current) return;
     if (
-      (params.type === 'tag' || params.type === 'color') &&
+      (params.current.type === 'tag' || params.current.type === 'color') &&
       (!_notes || _notes.length === 0)
     ) {
       Navigation.goBack();
     }
-    setNotes(groupArray(_notes, 'notes'));
     updateSearch();
-    ranAfterInteractions = false;
   };
 
   useEffect(() => {
     eSubscribeEvent(refreshNotesPage, init);
     return () => {
-      ranAfterInteractions = false;
       eUnSubscribeEvent(refreshNotesPage, init);
       editing.actionAfterFirstSave = {
         type: null
@@ -78,39 +81,39 @@ export const Notes = ({route, navigation}) => {
   }, []);
 
   const setActionAfterFirstSave = () => {
-    if (params.get === 'monographs') return;
+    if (params.current?.get === 'monographs') return;
     editing.actionAfterFirstSave = {
-      type: params.type,
-      id: params.id,
-      notebook: params.notebookId
+      type: params.current?.type,
+      id: params.current?.id,
+      notebook: params.current?.notebookId
     };
   };
 
   const init = data => {
-    if (data) {
-      params = data;
-    }
+    if (data) params.current = data;
+
     setActionAfterFirstSave();
-    if (!ranAfterInteractions) {
-      ranAfterInteractions = true;
-      runAfterInteractions(data ? 300 : 1);
-    }
+    onLoad();
     Navigation.setHeaderState('NotesPage', params, {
       heading:
-        params.type === 'tag'
-          ? '#' + alias 
+        params.current?.type === 'tag'
+          ? '#' + alias
           : alias.slice(0, 1).toUpperCase() + alias.slice(1),
-      id: params.id,
-      type: params.type
+      id: params.current?.id,
+      type: params.current?.type
     });
   };
 
   const onFocus = () => {
-    init();
+    InteractionManager.runAfterInteractions(() => {
+      Navigation.routeNeedsUpdate('NotesPage', init);
+    }, 150);
   };
 
   const onBlur = useCallback(() => {
-    setNotes([]);
+    InteractionManager.runAfterInteractions(() => {
+      setNotes([]);
+    }, 150);
     editing.actionAfterFirstSave = {
       type: null
     };
@@ -137,21 +140,21 @@ export const Notes = ({route, navigation}) => {
   const updateSearch = () => {
     SearchService.update({
       placeholder: `Search in ${
-        params.type === 'tag' ? '#' + alias : alias
+        params.current?.type === 'tag' ? '#' + alias : alias
       }`,
       data: notes,
       noSearch: false,
       type: 'notes',
-      color: params.type === 'color' ? params.title : null,
+      color: params.current?.type === 'color' ? params.current?.title : null,
       title:
-        params.type === 'tag'
+        params.current?.type === 'tag'
           ? '#' + alias
           : alias.slice(0, 1).toUpperCase() + alias.slice(1)
     });
   };
 
   const _onPressBottomButton = async () => {
-    if (params.get === 'monographs') {
+    if (params.current?.get === 'monographs') {
       try {
         await openLinkInBrowser(
           'https://docs.notesnook.com/monographs/',
@@ -170,15 +173,18 @@ export const Notes = ({route, navigation}) => {
 
   const headerProps = {
     heading:
-      params.type === 'tag'
+      params.current?.type === 'tag'
         ? '#' + alias
         : alias.slice(0, 1).toUpperCase() + alias.slice(1),
-    color: params.type === 'color' ? params.title.toLowerCase() : null,
-    paragraph: params.type === 'topic' ? 'Edit topic' : null,
+    color:
+      params.current?.type === 'color'
+        ? params.current?.title.toLowerCase()
+        : null,
+    paragraph: params.current?.type === 'topic' ? 'Edit topic' : null,
     onPress: () => {
-      if (params.type !== 'topic') return;
+      if (params.current?.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
-        notebookId: params.notebookId,
+        notebookId: params.current?.notebookId,
         toEdit: params
       });
     },
@@ -190,19 +196,21 @@ export const Notes = ({route, navigation}) => {
   };
 
   const placeholderData = {
-    heading: params.get === 'monographs' ? 'Your monographs' : 'Your notes',
+    heading:
+      params.current?.get === 'monographs' ? 'Your monographs' : 'Your notes',
     paragraph:
-      params.get === 'monographs'
+      params.current?.get === 'monographs'
         ? 'You have not published any notes as monographs yet.'
         : 'You have not added any notes yet.',
     button:
-      params.get === 'monographs'
+      params.current?.get === 'monographs'
         ? 'Learn about monographs'
         : 'Add your first Note',
     action: _onPressBottomButton,
-    buttonIcon: params.get === 'monographs' ? 'information-outline' : null,
+    buttonIcon:
+      params.current?.get === 'monographs' ? 'information-outline' : null,
     loading:
-      params.get === 'monographs'
+      params.current?.get === 'monographs'
         ? 'Loading published notes'
         : 'Loading your notes.'
   };
@@ -214,9 +222,9 @@ export const Notes = ({route, navigation}) => {
       icon: 'pencil',
       title: 'Edit topic',
       func: () => {
-        if (params.type !== 'topic') return;
+        if (params.current?.type !== 'topic') return;
         eSendEvent(eOpenAddTopicDialog, {
-          notebookId: params.notebookId,
+          notebookId: params.current?.notebookId,
           toEdit: params
         });
       }
@@ -226,21 +234,21 @@ export const Notes = ({route, navigation}) => {
   return (
     <>
       <SelectionHeader
-        type={params.type}
+        type={params.current?.type}
         extras={{
-          topic: params.id,
-          notebook: params.notebookId
+          topic: params.current?.id,
+          notebook: params.current?.notebookId
         }}
         screen="NotesPage"
       />
       <ContainerTopSection>
         <Header
           title={headerProps.heading}
-          isBack={!params.menu}
+          isBack={!params.current?.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
           rightButtons={
-            params.type !== 'topic' ? null : headerRightButtons
+            params.current?.type !== 'topic' ? null : headerRightButtons
           }
         />
       </ContainerTopSection>
@@ -253,15 +261,15 @@ export const Notes = ({route, navigation}) => {
         loading={loading}
         focused={isFocused}
         placeholderText={`Add some notes to this" ${
-          params.type ? params.type : 'topic.'
+          params.current?.type ? params.current?.type : 'topic.'
         }`}
         placeholderData={placeholderData}
       />
-      {params.get === 'monographs' ? null : (
+      {params.current?.get === 'monographs' ? null : (
         <ContainerBottomButton
           title="Create a new note"
           onPress={_onPressBottomButton}
-          color={params.type == 'color' ? params.title : null}
+          color={params.current?.type == 'color' ? params.current?.title : null}
         />
       )}
     </>
