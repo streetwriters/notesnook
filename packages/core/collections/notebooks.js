@@ -41,11 +41,7 @@ export default class Notebooks extends Collection {
         else if (newTopic && oldTopic.dateEdited > newTopic.dateEdited) {
           remoteNotebook.topics[newTopicIndex] = {
             ...oldTopic,
-            notes: setManipulator.union(
-              oldTopic.notes,
-              newTopic.notes,
-              (n) => n.id
-            ),
+            notes: setManipulator.union(oldTopic.notes, newTopic.notes),
             dateEdited: Date.now(),
           };
         }
