@@ -15,6 +15,7 @@ import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
 import { isTesting } from "../utils/platform";
 import EventManager from "notes-core/utils/eventmanager";
+import { store as userstore } from "../stores/user-store";
 
 export const COLORS = [
   "Red",
@@ -155,7 +156,10 @@ export function totalSubscriptionConsumed(user) {
   return Math.round((consumed / total) * 100);
 }
 
-export async function showUpgradeReminderDialogs(user) {
+export async function showUpgradeReminderDialogs() {
+  const user = userstore.get().user;
+  if (!user) return;
+
   const consumed = totalSubscriptionConsumed(user);
   const isTrial = user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL;
   const isBasic = user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC;

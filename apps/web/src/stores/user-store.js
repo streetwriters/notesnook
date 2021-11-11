@@ -9,7 +9,6 @@ import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
 import { hashNavigate } from "../navigation";
-import { showUpgradeReminderDialogs } from "../common";
 
 class UserStore extends BaseStore {
   isLoggedIn = false;
@@ -88,8 +87,6 @@ class UserStore extends BaseStore {
           await db.connectSSE();
         }
       });
-
-      await showUpgradeReminderDialogs(user);
       await appStore.sync();
       return true;
     });

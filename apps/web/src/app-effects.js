@@ -3,14 +3,18 @@ import { useStore, store } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { resetReminders } from "./common/reminders";
-import { AppEventManager, AppEvents, introduceFeatures } from "./common";
+import {
+  AppEventManager,
+  AppEvents,
+  introduceFeatures,
+  showUpgradeReminderDialogs,
+} from "./common";
 import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";
 import Modal from "react-modal";
-import useDatabase from "./hooks/use-database";
 
 Modal.setAppElement("#root");
 if (process.env.NODE_ENV === "production") {
@@ -28,23 +32,21 @@ export default function AppEffects({ setShow }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
-  const [isAppLoaded] = useDatabase();
 
   useEffect(
     function initializeApp() {
-      if (!isAppLoaded) return;
       refreshColors();
       refreshMenuPins();
-      initUser();
       initNotes();
-      updateLastSynced();
       (async function () {
+        await initUser();
+        await updateLastSynced();
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
+        await showUpgradeReminderDialogs();
       })();
     },
     [
-      isAppLoaded,
       updateLastSynced,
       refreshColors,
       refreshMenuPins,
