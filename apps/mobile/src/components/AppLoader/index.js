@@ -1,12 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Appearance, Platform, SafeAreaView, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {Appearance, Platform, SafeAreaView, View} from 'react-native';
 import deviceInfoModule from 'react-native-device-info';
-import Animated, { Easing } from 'react-native-reanimated';
+import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import SpInAppUpdates, {
-  IAUUpdateKind
-} from 'sp-react-native-in-app-updates';
-import { useTracked } from '../../provider';
+import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
+import {useTracked} from '../../provider';
 import {
   useFavoriteStore,
   useNoteStore,
@@ -15,7 +13,7 @@ import {
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -23,20 +21,21 @@ import {
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
-import { APP_VERSION, editing } from '../../utils';
-import { COLOR_SCHEME_DARK } from '../../utils/Colors';
-import { db } from '../../utils/database';
+import PremiumService from '../../services/PremiumService';
+import {APP_VERSION, editing} from '../../utils';
+import {COLOR_SCHEME_DARK} from '../../utils/Colors';
+import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
   eOpenRateDialog
 } from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { SettingsBackupAndRestore } from '../../views/Settings';
-import { Button } from '../Button';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {SettingsBackupAndRestore} from '../../views/Settings';
+import {Button} from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
@@ -104,7 +103,8 @@ const AppLoader = ({onLoad}) => {
           return;
         }
         if (await checkForRateAppRequest()) return;
-        await checkNeedsBackup();
+        if (await checkNeedsBackup()) return;
+        PremiumService.getRemainingTrialDaysStatus();
       })();
     }
   }, [_loading]);
@@ -266,7 +266,7 @@ const AppLoader = ({onLoad}) => {
             style={{
               flex: 1,
               justifyContent: 'center',
-              width:Platform.OS == "ios" ? '95%'  : "100%",
+              width: Platform.OS == 'ios' ? '95%' : '100%',
               paddingHorizontal: 12
             }}>
             <Heading>Verify your identity</Heading>
