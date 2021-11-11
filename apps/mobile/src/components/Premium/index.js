@@ -1,0 +1,51 @@
+import React, {createRef} from 'react';
+import BaseDialog from '../Dialog/base-dialog';
+import {Component} from './component';
+
+class PremiumDialog extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      visible: false,
+      promo: null
+    };
+    this.actionSheetRef = createRef();
+  }
+
+  open(promoInfo) {
+    console.log(promoInfo);
+    this.setState({
+      visible: true,
+      promo: promoInfo
+    });
+  }
+
+  close = () => {
+    this.setState({
+      visible: false,
+      promo: null
+    });
+  };
+
+  onClose = () => {
+    this.setState({
+      visible: false
+    });
+  };
+
+  render() {
+    return !this.state.visible ? null : (
+      <BaseDialog
+        background={this.props.colors.bg}
+        onRequestClose={this.onClose}>
+        <Component
+          getRef={() => this.actionSheetRef}
+          promo={this.state.promo}
+          close={this.close}
+        />
+      </BaseDialog>
+    );
+  }
+}
+
+export default PremiumDialog;

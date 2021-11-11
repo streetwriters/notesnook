@@ -28,14 +28,13 @@ import { AddTopicDialog } from '../AddTopicDialog';
 import { AttachmentDialog } from '../AttachmentDialog';
 import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
+import GeneralSheet from '../GeneralSheet';
 import ImagePreview from '../ImagePreview';
 import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
-import PendingDialog from '../Premium/PendingDialog';
-import PremiumDialog from '../Premium/PremiumDialog';
-import PremiumStatusDialog from '../Premium/PremiumStatusDialog';
-import GeneralSheet from '../GeneralSheet';
+import PremiumDialog from '../Premium';
+import { Expiring } from '../Premium/expiring';
 import PublishNoteDialog from '../PublishNoteDialog';
 import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
@@ -289,8 +288,6 @@ export class DialogManager extends Component {
         <MergeEditor />
         <ExportDialog />
         <RecoveryKeyDialog colors={colors} />
-        <PendingDialog colors={colors} />
-        <PremiumStatusDialog />
         <GeneralSheet />
         <RestoreDialog />
         <ResultDialog />
@@ -303,6 +300,7 @@ export class DialogManager extends Component {
         <PublishNoteDialog />
         <TagsDialog />
         <AttachmentDialog />
+        <Expiring/>
       </>
     );
   }

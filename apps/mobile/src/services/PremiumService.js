@@ -7,6 +7,7 @@ import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
+  eOpenTrialEndingDialog,
   eShowGetPremium
 } from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
@@ -273,6 +274,34 @@ const subscriptions = {
   }
 };
 
+async function getRemainingTrialDaysStatus() {
+  let user = await db.user.getUser();
+  if (!user) return;
+
+  let total = user.subscription.expiry - user.subscription.start;
+  let current = Date.now() - user.subscription.start;
+
+  current = ((current / total) * 100).toFixed(0);
+  let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+  if (current > 75 && lastTrialDialogShownAt !== 'ending') {
+    eSendEvent(eOpenTrialEndingDialog, {
+      title: 'Your trial is ending soon',
+      offer: null,
+      extend: false
+    });
+    MMKV.setItem('lastTrialDialogShownAt', 'ending');
+  } else if (!get() && lastTrialDialogShownAt !== 'expired') {
+    eSendEvent(eOpenTrialEndingDialog, {
+      title: 'Your trial has expired',
+      offer: 30,
+      extend: true
+    });
+    MMKV.setItem('lastTrialDialogShownAt', 'expired');
+  } else {
+    return;
+  }
+}
+
 export default {
   verify,
   setPremiumStatus,
@@ -282,5 +311,6 @@ export default {
   getProducts,
   getUser,
   subscriptions,
-  getMontlySub
+  getMontlySub,
+  getRemainingTrialDaysStatus
 };
