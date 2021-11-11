@@ -22,6 +22,7 @@ import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import {presentDialog} from '../../components/Dialog/functions';
+import { Issue } from '../../components/Github/issue';
 import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
@@ -189,9 +190,10 @@ export const Settings = ({navigation}) => {
     {
       name: `Report an issue`,
       func: async () => {
-        try {
-          await Linking.openURL('https://github.com/streetwriters/notesnook');
-        } catch (e) {}
+        presentSheet({
+          noIcon:true,
+          component:<Issue/>
+        });
       },
       desc: `Facing an issue? Report it on our Github`
     },

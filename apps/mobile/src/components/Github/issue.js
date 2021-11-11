@@ -1,10 +1,14 @@
 import React, {useRef} from 'react';
 import {Text, TextInput, View} from 'react-native';
 import {useTracked} from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { eCloseProgressDialog } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
+import { presentDialog } from '../Dialog/functions';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 
@@ -13,7 +17,21 @@ export const Issue = () => {
   const colors = state.colors;
   const value = useRef(null);
 
-  onPress = async () => {};
+  onPress = async () => {
+
+    eSendEvent(eCloseProgressDialog);
+    await sleep(300);
+    presentDialog({
+      title:"Issue submitted",
+      paragraph:"The issue you submitted has been published on github",
+      positiveText:"View",
+      negativeText:"Done",
+      positivePress:async () => {
+        
+      }
+    })
+
+  };
 
   return (
     <View
