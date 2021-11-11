@@ -51,10 +51,8 @@ const BaseDialog = ({
         <KeyboardAvoidingView
           enabled={!floating && Platform.OS === 'ios'}
           behavior="padding">
-           
-
           <BouncingView
-          duration={400}
+            duration={400}
             style={[
               styles.backdrop,
               {
@@ -65,11 +63,11 @@ const BaseDialog = ({
                   : 'flex-start'
               }
             ]}>
-                <TouchableOpacity
-            onPress={onRequestClose}
-            style={styles.overlayButton}
-          />
-          {premium}
+            <TouchableOpacity
+              onPress={onRequestClose}
+              style={styles.overlayButton}
+            />
+            {premium}
             {children}
           </BouncingView>
         </KeyboardAvoidingView>
@@ -88,7 +86,7 @@ const styles = StyleSheet.create({
   overlayButton: {
     width: '100%',
     height: '100%',
-    position: 'absolute',
+    position: 'absolute'
   }
 });
 
