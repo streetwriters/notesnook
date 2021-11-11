@@ -33,7 +33,9 @@ const ResultDialog = () => {
   }, []);
 
   const open = data => {
-    setDialogData(data);
+    if (data) {
+      setDialogData(data);
+    } 
     setVisible(true);
   };
 
