@@ -8,7 +8,10 @@ import { useStore as useSettingStore } from "../stores/setting-store";
 import { useStore as useAppStore } from "../stores/app-store";
 import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
-import { showTrackingDetailsDialog } from "../common/dialog-controller";
+import {
+  showEmailVerificationDialog,
+  showTrackingDetailsDialog,
+} from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
 import useSystemTheme from "../utils/use-system-theme";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
@@ -755,7 +758,7 @@ function AccountStatus(props) {
       : isBeta
       ? `Your were enrolled in our beta program on ${startDate}`
       : isTrial
-      ? `Your free trial period will end on ${expiryDate}`
+      ? `Your trial will end on ${expiryDate}`
       : null;
   }, [isPro, isProExpired, isProCancelled, isBeta, isTrial, user]);
 
@@ -789,21 +792,16 @@ function AccountStatus(props) {
     );
 
   return (
-    <AccountStatusContainer
-      user={user}
-      color={"primary"}
-      sx={{ borderWidth: 1, borderColor: "primary", borderStyle: "solid" }}
-    >
+    <AccountStatusContainer user={user} color={"fontTertiary"}>
       <Text
-        color={remainingDays <= 5 ? "error" : "primary"}
+        color={remainingDays <= 5 ? "error" : "text"}
         variant="body"
-        fontSize={26}
-        mt={2}
+        fontSize={"heading"}
       >
         {remainingDays > 0 && isPro
           ? `Subscribed to Notesnook Pro`
           : remainingDays > 0 && isTrial
-          ? "Your free trial has started"
+          ? "You are on free trial"
           : isBeta
           ? "Your beta subscription has ended"
           : isTrial
@@ -814,8 +812,17 @@ function AccountStatus(props) {
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
       {isBasic || isTrial || remainingDays <= 0 ? (
-        <Button mt={2} onClick={() => showBuyDialog()}>
-          Upgrade to Notesnook Pro
+        <Button
+          variant="primary"
+          mt={1}
+          onClick={() => {
+            if (user.isEmailConfirmed) showBuyDialog();
+            else showEmailVerificationDialog();
+          }}
+        >
+          {user.isEmailConfirmed
+            ? "Upgrade to Notesnook Pro"
+            : "Confirm your email to get 7 more days"}
         </Button>
       ) : provider === "Streetwriters" ? (
         <>
@@ -885,18 +892,18 @@ function AccountStatus(props) {
 }
 
 function AccountStatusContainer(props) {
-  const { bg, color, user, sx, children } = props;
+  const { bg, color, user, children } = props;
   return (
     <Flex
       bg={bg}
       flexDirection="column"
       p={2}
-      sx={{ borderRadius: "default", ...sx }}
+      sx={{ borderRadius: "default", border: "1px solid var(--border)" }}
     >
       <Flex flex="1" justifyContent="space-between">
         <Flex>
           <Icon.User size={15} color={color} />
-          <Text variant="body" color="text" ml={1}>
+          <Text color={color} variant="body" ml={1}>
             {user.email}
           </Text>
         </Flex>
