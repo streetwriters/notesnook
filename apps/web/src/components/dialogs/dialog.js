@@ -57,7 +57,6 @@ function Dialog(props) {
         height={["100%", "auto", "auto"]}
         bg="background"
         alignSelf={"center"}
-        m={props.margin || [0, 2, 2]}
         overflowY={props.scrollable ? "auto" : "hidden"}
         sx={{
           position: "relative",

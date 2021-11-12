@@ -65,8 +65,6 @@ import {
   mdiChevronUp,
   mdiSortAscending,
   mdiSortDescending,
-  mdiEye,
-  mdiEyeOff,
   mdiFullscreen,
   mdiFullscreenExit,
   mdiBullhorn,
@@ -96,8 +94,36 @@ import {
   mdiEyeOutline,
   mdiEyeOffOutline,
   mdiAttachment,
-  mdiPen,
   mdiPencilOutline,
+  mdiBillboard,
+  mdiCellphone,
+  mdiCellphoneLock,
+  mdiFileLockOutline,
+  mdiShieldLockOutline,
+  mdiImageMultipleOutline,
+  mdiHarddisk,
+  mdiFileCabinet,
+  mdiEmoticonOutline,
+  mdiPaletteOutline,
+  mdiFormatBold,
+  mdiTable,
+  mdiCrownOutline,
+  mdiDatabaseLockOutline,
+  mdiPaletteSwatchOutline,
+  mdiAppleIos,
+  mdiCellphoneAndroid,
+  mdiMicrosoftWindows,
+  mdiLinux,
+  mdiApple,
+  mdiWeb,
+  mdiYoutube,
+  mdiCheckCircleOutline,
+  mdiAndroid,
+  mdiIncognito,
+  mdiCloudLockOutline,
+  mdiGoogleChrome,
+  mdiFirefox,
+  mdiAppleSafari,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -207,6 +233,7 @@ export const LightMode = createIcon(mdiWeatherSunny);
 export const Theme = createIcon(mdiThemeLightDark);
 export const Checkmark = createIcon(mdiCheck);
 export const CheckCircle = createIcon(mdiCheckCircle);
+export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
 export const PDF = createIcon(mdiFilePdfOutline);
@@ -256,3 +283,32 @@ export const Dismiss = createIcon(mdiClose);
 export const File = createIcon(mdiFileOutline);
 export const Download = createIcon(mdiArrowDown);
 export const ImageDownload = createIcon(mdiImage);
+export const Billboard = createIcon(mdiBillboard);
+export const Cellphone = createIcon(mdiCellphone);
+export const CellphoneLock = createIcon(mdiCellphoneLock);
+export const FileLock = createIcon(mdiFileLockOutline);
+export const ShieldLock = createIcon(mdiShieldLockOutline);
+export const ImageMultiple = createIcon(mdiImageMultipleOutline);
+export const Harddisk = createIcon(mdiHarddisk);
+export const FileCabinet = createIcon(mdiFileCabinet);
+export const Emoticon = createIcon(mdiEmoticonOutline);
+export const Palette = createIcon(mdiPaletteOutline);
+export const Bold = createIcon(mdiFormatBold);
+export const Table = createIcon(mdiTable);
+export const Pro = createIcon(mdiCrownOutline);
+export const EncryptedBackup = createIcon(mdiDatabaseLockOutline);
+export const Accent = createIcon(mdiPaletteSwatchOutline);
+
+export const iOS = createIcon(mdiAppleIos);
+export const Android = createIcon(mdiAndroid);
+export const Windows = createIcon(mdiMicrosoftWindows);
+export const Linux = createIcon(mdiLinux);
+export const MacOS = createIcon(mdiApple);
+export const Chrome = createIcon(mdiGoogleChrome);
+export const Firefox = createIcon(mdiFirefox);
+export const Safari = createIcon(mdiAppleSafari);
+
+export const Embed = createIcon(mdiYoutube);
+export const Anonymous = createIcon(mdiIncognito);
+export const CloudLock = createIcon(mdiCloudLockOutline);
+export const Timebomb = createIcon(mdiBomb);

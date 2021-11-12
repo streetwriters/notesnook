@@ -26,7 +26,8 @@ class Default {
       borderRadius: "default",
       cursor: "pointer",
       p: 2,
-      transition: "filter 200ms ease-in",
+      py: "7.5px",
+      transition: "filter 200ms ease-in, box-shadow 200ms ease-out",
       ":hover:not(:disabled)": {
         filter: "brightness(90%)",
       },
@@ -51,7 +52,6 @@ class Primary {
       variant: "buttons.default",
       color: "static",
       bg: "primary",
-      px: 2,
     };
   }
 }
@@ -142,7 +142,6 @@ class Tool {
     return {
       variant: "buttons.default",
       color: "text",
-      py: 1,
       backgroundColor: "bgSecondary",
       borderRadius: "default",
       ":hover": {

@@ -6,6 +6,7 @@ class LightColorSchemeFactory {
     return {
       primary: accent,
       background: "white",
+      bgTransparent: "#ffffff99",
       accent: "white",
       bgSecondary: "#f7f7f7",
       bgSecondaryText: "#5E5E5E",
