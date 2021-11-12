@@ -133,18 +133,4 @@ export default class Notebooks extends Collection {
       await this._db.trash.add(notebookData);
     }
   }
-
-  async cleanup() {
-    await this._db.notes.init();
-    for (let notebook of this.all) {
-      for (let topic of notebook.topics) {
-        const clonedIds = topic.notes.slice();
-        topic.notes = [];
-        for (let noteId of clonedIds) {
-          if (!!this._db.notes.note(noteId)) topic.notes.push(noteId);
-        }
-      }
-      await this._collection.updateItem(notebook);
-    }
-  }
 }

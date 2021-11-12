@@ -240,6 +240,30 @@ export default class Notes extends Collection {
     if (!topic) throw new Error("No such topic exists.");
     await topic.add(...noteIds);
   }
+
+  async repairReferences() {
+    const notes = this.all;
+    for (let note of notes) {
+      const { notebooks } = note;
+      if (!notebooks) continue;
+
+      for (let notebook of notebooks) {
+        const nb = this._db.notebooks.notebook(notebook.id);
+        if (!nb) {
+          deleteItem(notebooks, notebook);
+          continue;
+        }
+        for (let topic of notebook.topics) {
+          const _topic = nb.topics.topic(topic);
+          if (!_topic || _topic.has(note.id)) {
+            deleteItem(notebook.topics, topic);
+            continue;
+          }
+          await _topic.add(note.id);
+        }
+      }
+    }
+  }
 }
 
 function isNoteEmpty(note, content) {

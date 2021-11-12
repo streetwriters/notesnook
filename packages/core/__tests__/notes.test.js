@@ -8,6 +8,7 @@ import {
   TEST_NOTE,
   TEST_NOTEBOOK,
   IMG_CONTENT,
+  notebookTest,
 } from "./utils";
 
 beforeEach(async () => {
@@ -323,4 +324,16 @@ test("note content should not contain image base64 data after save", () =>
     const content = await note.content();
     expect(content).not.toContain(`src="data:image/png;`);
     expect(content).not.toContain(`src=`);
+  }));
+
+test("repairing notebook references should reinclude the missing noteIds", () =>
+  notebookTest().then(async ({ db, id }) => {
+    const notebook = db.notebooks.notebook(id);
+    const note = {
+      ...TEST_NOTE,
+      notebooks: [{ id, topics: [notebook.topics.all[0].id] }],
+    };
+    await db.notes.add(note);
+    await db.notes.repairReferences();
+    expect(notebook.topics.all[0].notes.length).toBe(1);
   }));

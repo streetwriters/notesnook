@@ -37,7 +37,11 @@ export default class Topic {
         array.push(notebook);
       } else {
         const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
-        if (topicIndex > -1) return;
+        if (topicIndex > -1) {
+          if (!this.has(noteId)) topic.notes.push(noteId);
+          continue;
+        }
+
         array[notebookIndex].topics.push(topic.id);
       }
 

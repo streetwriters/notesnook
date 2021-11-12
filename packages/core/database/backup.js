@@ -141,7 +141,7 @@ export default class Backup {
     ];
 
     if (await this._migrator.migrate(collections, (id) => data[id], version)) {
-      await this._db.notebooks.cleanup();
+      await this._db.notes.repairReferences();
     }
   }
 
