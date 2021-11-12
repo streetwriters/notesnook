@@ -133,4 +133,14 @@ export default class Notebooks extends Collection {
       await this._db.trash.add(notebookData);
     }
   }
+
+  async repairReferences() {
+    for (let notebook of this.all) {
+      const _notebook = this.notebook(notebook.id);
+      for (let topic of notebook.topics) {
+        const _topic = _notebook.topics.topic(topic.id);
+        await _topic.add(...topic.notes);
+      }
+    }
+  }
 }

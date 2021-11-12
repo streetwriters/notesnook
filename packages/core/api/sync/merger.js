@@ -183,6 +183,7 @@ class Merger {
     );
 
     await this._db.notes.repairReferences();
+    await this._db.notebooks.repairReferences();
     return true;
   }
 }

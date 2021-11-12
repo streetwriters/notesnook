@@ -26,7 +26,7 @@ export default class Topic {
     const topic = qclone(this._topic);
     for (let noteId of noteIds) {
       let note = this._db.notes.note(noteId);
-      if (this.has(noteId) || !note || note.data.deleted) continue;
+      if (!note || note.data.deleted) continue;
 
       let array = note.notebooks || [];
       const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
@@ -50,7 +50,7 @@ export default class Topic {
         notebooks: array,
       });
 
-      topic.notes.push(noteId);
+      if (!this.has(noteId)) topic.notes.push(noteId);
     }
     return await this._save(topic);
   }
