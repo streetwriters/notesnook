@@ -433,6 +433,7 @@ export function showEditTopicDialog(notebookId, topicId) {
     <Dialogs.ItemDialog
       title={"Edit topic"}
       subtitle={`You are editing "${topic.title}" topic.`}
+      defaultValue={topic.title}
       icon={Icon.Topic}
       item={topic}
       onClose={() => perform(false)}
