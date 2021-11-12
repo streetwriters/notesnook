@@ -1,10 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Appearance, Platform, SafeAreaView, View} from 'react-native';
-import deviceInfoModule from 'react-native-device-info';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Appearance, Platform, SafeAreaView, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import SpInAppUpdates, {IAUUpdateKind} from 'sp-react-native-in-app-updates';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import {
   useFavoriteStore,
   useNoteStore,
@@ -13,7 +11,7 @@ import {
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -22,29 +20,23 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {APP_VERSION, editing} from '../../utils';
-import {COLOR_SCHEME_DARK} from '../../utils/Colors';
-import {db} from '../../utils/database';
+import { editing } from '../../utils';
+import { COLOR_SCHEME_DARK } from '../../utils/Colors';
+import { db } from '../../utils/database';
 import {
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  eOpenRateDialog
+  eOpenLoginDialog, eOpenRateDialog
 } from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {SettingsBackupAndRestore} from '../../views/Settings';
-import {Button} from '../Button';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { SettingsBackupAndRestore } from '../../views/Settings';
+import { Button } from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-
-const inAppUpdates = new SpInAppUpdates(
-  false // isDebug
-);
 
 let passwordValue = null;
 let didVerifyUser = false;
@@ -56,7 +48,6 @@ const AppLoader = ({onLoad}) => {
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);
-
   const _loading = useNoteStore(state => state.loading);
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
@@ -97,7 +88,6 @@ const AppLoader = ({onLoad}) => {
           return;
         }
         let settingsStore = useSettingStore.getState();
-        if (await checkAppUpdates()) return;
         if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
           await Backup.checkAndRun();
           return;
@@ -142,27 +132,7 @@ const AppLoader = ({onLoad}) => {
     return false;
   };
 
-  const checkAppUpdates = async () => {
-    return false;
-    if (Platform.OS === 'android') {
-      try {
-        let needsUpdate = await inAppUpdates.checkNeedsUpdate();
-        if (needsUpdate.shouldUpdate) {
-          let updateOptions = {};
-          if (Platform.OS === 'android') {
-            updateOptions = {
-              updateType: IAUUpdateKind.IMMEDIATE
-            };
-          }
-          inAppUpdates.startUpdate(updateOptions);
-          return true;
-        }
-      } catch (e) {
-        return false;
-      }
-    }
-    return false;
-  };
+
 
   const checkNeedsBackup = async () => {
     let settingsStore = useSettingStore.getState();

@@ -2,7 +2,7 @@ diff --git a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m b/
 index 5fa44b5..af6d7be 100644
 --- a/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
 +++ b/node_modules/react-native/React/Views/ScrollView/RCTScrollView.m
-@@ -623,7 +623,18 @@ - (void)scrollViewWillEndDragging:(UIScrollView *)scrollView
+@@ -623,7 +623,18 @@ RCT_SCROLL_EVENT_HANDLER(scrollViewDidScrollToTop, onScrollToTop)
                                           : MAX(0, _scrollView.contentSize.height - viewportSize.height);
  
      // Calculate the snap offsets adjacent to the initial offset target
