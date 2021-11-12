@@ -13,6 +13,7 @@ export function loadTrackerScript() {
     script.dataset.domains = "app.notesnook.com";
   script.dataset.autoTrack = "false";
   script.dataset.doNotTrack = "true";
+  script.dataset.dataHostUrl = "https://analytics.streetwriters.co";
   var firstScriptElement = document.getElementsByTagName("script")[0];
   script.onload = function () {
     trackVisit();
