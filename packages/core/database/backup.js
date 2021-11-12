@@ -126,10 +126,6 @@ export default class Backup {
         dbCollection: this._db.notebooks,
       },
       {
-        index: data["trash"],
-        dbCollection: this._db.trash,
-      },
-      {
         index: data["content"],
         dbCollection: this._db.content,
       },

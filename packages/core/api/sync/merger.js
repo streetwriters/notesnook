@@ -90,7 +90,6 @@ class Merger {
       synced,
       notebooks = [],
       content = [],
-      trash = [],
       vaultKey,
       settings = [],
       attachments = [],
@@ -181,12 +180,6 @@ class Merger {
           }
         }
       )
-    );
-
-    await this._mergeArray(
-      trash,
-      () => undefined,
-      (item) => this._db.trash.add(item)
     );
 
     return true;
