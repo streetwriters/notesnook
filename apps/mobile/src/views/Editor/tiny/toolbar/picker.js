@@ -281,7 +281,8 @@ const handleImageResponse = async response => {
     type: 'url'
   });
   let fileName = image.originalFileName || image.fileName;
-  await attachFile(uri, hash, image.type, fileName, 'image');
+  let result = await attachFile(uri, hash, image.type, fileName, 'image');
+  if (!result) return;
   tiny.call(
     EditorWebView,
     `
@@ -303,7 +304,6 @@ const handleImageResponse = async response => {
 	  })();
 	  `
   );
-  
 };
 
 async function attachFile(uri, hash, type, filename) {
