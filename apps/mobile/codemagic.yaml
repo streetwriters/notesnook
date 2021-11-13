@@ -14,7 +14,7 @@ workflows:
                 BUNDLE_ID: "org.streetwriters.notesnook" # <-- Put your Bundle Id here e.g com.domain.myapp
                 APP_STORE_APP_ID: 1544027013 # <-- Put the app id number here. This is found in App Store Connect > App > General > App Information
             node: latest
-            xcode: 12.5
+            xcode: 12.4
             cocoapods: default
         scripts:
             - name: Install npm dependencies
