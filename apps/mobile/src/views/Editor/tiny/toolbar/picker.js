@@ -276,11 +276,12 @@ const handleImageResponse = async response => {
   let b64 = `data:${image.type};base64, ` + image.base64;
   let uri = image.uri;
   uri = decodeURI(uri);
-  console.log(uri);
   let hash = await Sodium.hashFile({
     uri: uri,
     type: 'url'
   });
+  let fileName = image.originalFileName || image.fileName;
+  await attachFile(uri, hash, image.type, fileName, 'image');
   tiny.call(
     EditorWebView,
     `
@@ -288,7 +289,7 @@ const handleImageResponse = async response => {
 		let image = ${JSON.stringify({
       hash: hash,
       type: image.type,
-      filename: image.fileName,
+      filename: fileName,
       dataurl: b64,
       size: image.fileSize
     })}
@@ -302,7 +303,7 @@ const handleImageResponse = async response => {
 	  })();
 	  `
   );
-  attachFile(uri, hash, image.type, image.fileName, 'image');
+  
 };
 
 async function attachFile(uri, hash, type, filename) {
@@ -324,8 +325,6 @@ async function attachFile(uri, hash, type, filename) {
     } else {
       encryptionInfo = {hash: hash};
     }
-
-    console.log(encryptionInfo);
     await db.attachments.add(encryptionInfo, getNote()?.id);
     if (Platform.OS === 'ios') await RNFetchBlob.fs.unlink(uri);
 
