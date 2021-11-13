@@ -284,8 +284,13 @@ async function downloadFile(filename, requestOptions) {
       onDownloadProgress: (ev) =>
         reportProgress(ev, { type: "download", hash: filename }),
     });
+    const contentLength =
+      response.headers["content-length"] || response.headers["Content-Length"];
+    if (!isSuccessStatusCode(response.status) || contentLength === "0") {
+      console.error("Abort: file length is 0.", filename);
+      return false;
+    }
 
-    if (!isSuccessStatusCode(response.status)) return false;
     const distributor = new ChunkDistributor(chunkSize + ABYTES);
     distributor.fill(new Uint8Array(response.data));
     distributor.close();
