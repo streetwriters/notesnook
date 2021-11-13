@@ -16,6 +16,9 @@ workflows:
             node: 14.18.1
             xcode: 12.4
             cocoapods: default
+        cache:
+          cache_paths:
+            - $HOME/Library/Caches/CocoaPods
         scripts:
             - name: Install npm dependencies
               script: |
