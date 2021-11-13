@@ -160,8 +160,6 @@ export const Announcement = ({color}) => {
                       opacity: 1
                     }}
                     onPress={async () => {
-                      console.log(index);
-                      return;
                       if (item.type === 'link') {
                         try {
                           await openLinkInBrowser(item.data, state.colors);
