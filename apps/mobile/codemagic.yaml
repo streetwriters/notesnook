@@ -8,7 +8,6 @@ workflows:
                 - appstore_credentials
                 - certificate_credentials
                 - provisioning_profile
-                - other
             vars:
                 XCODE_WORKSPACE: "Notesnook.xcworkspace" # <-- Put the name of your Xcode workspace here
                 XCODE_SCHEME: "Notesnook" # <-- Put the name of your Xcode scheme here
