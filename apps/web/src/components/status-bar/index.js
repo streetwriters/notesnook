@@ -57,16 +57,15 @@ function StatusBar() {
                 {user.isEmailConfirmed ? "" : " (not verified)"}
               </Text>
             </Button>
-            {SyncStatus && (
-              <Button
-                variant="statusitem"
-                display="flex"
-                onClick={sync}
-                sx={{ alignItems: "center", justifyContent: "center" }}
-              >
-                <SyncStatus />
-              </Button>
-            )}
+
+            <Button
+              variant="statusitem"
+              display="flex"
+              onClick={sync}
+              sx={{ alignItems: "center", justifyContent: "center" }}
+            >
+              <SyncStatus />
+            </Button>
           </>
         ) : (
           <Button
@@ -150,7 +149,7 @@ function SyncStatus() {
   const syncStatus = useAppStore((state) => state.syncStatus);
   const lastSynced = useAppStore((state) => state.lastSynced);
 
-  if (!lastSynced) return null;
+  if (!lastSynced && syncStatus === "synced") return null;
   switch (syncStatus) {
     case "synced":
       return (

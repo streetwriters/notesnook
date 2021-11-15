@@ -87,7 +87,6 @@ class UserStore extends BaseStore {
           await db.connectSSE();
         }
       });
-      await appStore.sync();
       return true;
     });
   };

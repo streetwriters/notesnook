@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === "production") {
 
 export default function AppEffects({ setShow }) {
   const refreshColors = useStore((store) => store.refreshColors);
+  const sync = useStore((store) => store.sync);
   const refreshMenuPins = useStore((store) => store.refreshMenuPins);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const setProcessingStatus = useStore((store) => store.setProcessingStatus);
@@ -39,14 +40,16 @@ export default function AppEffects({ setShow }) {
       refreshMenuPins();
       initNotes();
       (async function () {
-        await initUser();
         await updateLastSynced();
         await resetReminders();
         setIsVaultCreated(await db.vault.exists());
-        await showUpgradeReminderDialogs();
+        await initUser();
+        showUpgradeReminderDialogs();
+        await sync();
       })();
     },
     [
+      sync,
       updateLastSynced,
       refreshColors,
       refreshMenuPins,

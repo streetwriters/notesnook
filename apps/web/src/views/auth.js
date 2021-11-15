@@ -95,7 +95,7 @@ const authTypes = {
     },
     loading: {
       title: "Logging you in",
-      text: "Please wait while your data is downloaded & decrypted.",
+      text: "Please wait while you are authenticated.",
     },
     supportsPasswordRecovery: true,
     onSubmit: async (form, onError) => {
