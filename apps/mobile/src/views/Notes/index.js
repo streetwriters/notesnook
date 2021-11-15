@@ -52,9 +52,9 @@ export const Notes = ({route, navigation}) => {
   const loading = useNoteStore(state => state.loading);
   const alias =
     params.current?.type === 'tag'
-      ? db.tags.alias(params.id)
+      ? db.tags.alias(params.current?.id)
       : params.current?.type === 'color'
-      ? db.colors.alias(params.id)
+      ? db.colors.alias(params.current?.id)
       : params.current?.title;
 
   const onLoad = () => {
@@ -184,8 +184,8 @@ export const Notes = ({route, navigation}) => {
     onPress: () => {
       if (params.current?.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
-        notebookId: params.current?.notebookId,
-        toEdit: params
+        notebookId: params.current?.notebookId,      
+        toEdit: params.current
       });
     },
     icon: 'pencil'
@@ -225,7 +225,7 @@ export const Notes = ({route, navigation}) => {
         if (params.current?.type !== 'topic') return;
         eSendEvent(eOpenAddTopicDialog, {
           notebookId: params.current?.notebookId,
-          toEdit: params
+          toEdit: params.current
         });
       }
     }

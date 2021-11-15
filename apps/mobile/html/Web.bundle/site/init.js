@@ -235,7 +235,7 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-    imagetools_toolbar: 'rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar: 'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
@@ -315,6 +315,23 @@ function init_tiny(size) {
         onclick: function () {
           reactNativeEventHandler('imageoptions');
         }
+      });
+
+      editor.ui.registry.addButton('imagedownload', {
+        icon: 'save',
+        tooltip: 'Download image',
+        onAction: function () {
+          let node = tinymce.activeEditor.selection.getNode();
+          if (node.tagName === 'IMG' && node.dataset && node.dataset.hash) {
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                type: 'attachment_download',
+                value: node.dataset.hash
+              })
+            );
+          }
+        },
+        onclick: function () {}
       });
 
       editor.ui.registry.addButton('imagepreview', {

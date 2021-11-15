@@ -83,10 +83,11 @@ export const execCommands = {
   imageResize50: () => setImageSize(0.5),
   imageResize100: () => setImageSize(1),
   imagepreview: `(function() {
-    if (tinymce.activeEditor.selection.getNode().tagName === 'IMG') {
+    let node = tinymce.activeEditor.selection.getNode()
+    if (node.tagName === 'IMG') {
       var xhr = new XMLHttpRequest();
       xhr.responseType = 'blob';
-  
+
       xhr.onload = function () {
         var recoveredBlob = xhr.response;
         var reader = new FileReader();
@@ -105,7 +106,7 @@ export const execCommands = {
       };
       xhr.open(
         'GET',
-        tinymce.activeEditor.selection.getNode().getAttribute('src')
+        node.getAttribute('src')
       );
       xhr.send();
     }

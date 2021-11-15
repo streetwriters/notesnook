@@ -47,6 +47,7 @@ const ImagePreview = () => {
             enableSwipeDown
             useNativeDriver
             onSwipeDown={close}
+            saveToLocalByLongPress={false}
             renderHeader={() => (
               <View
                 style={{
@@ -77,6 +78,8 @@ const ImagePreview = () => {
               }
             ]}
           />
+
+
         </View>
       </BaseDialog>
     )

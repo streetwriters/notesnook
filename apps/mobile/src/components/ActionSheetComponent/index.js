@@ -829,7 +829,7 @@ export const ActionSheetComponent = ({
                         eSendEvent(refreshNotesPage, params);
                         Navigation.navigate(routeName, params, headerState);
                       }}
-                      icon="book-open-outline"
+                      icon="bookmark-outline"
                       fontSize={SIZE.sm - 1}
                       style={{
                         marginRight: 5,

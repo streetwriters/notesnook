@@ -195,8 +195,14 @@ class SortDialog extends React.Component {
                     ...groupOptions,
                     groupBy: GROUP[item]
                   };
-                  if (item === "alphabetical") {
-                    _groupOptions.sortBy = "title"
+                 
+
+                  if (item === 'alphabetical') {
+                    _groupOptions.sortBy = 'title';
+                  } else {
+                    if (this.state.groupOptions.sortBy === 'title') {
+                      _groupOptions.sortBy = 'dateEdited';
+                    }
                   }
 
                   this.updateGroupOptions(_groupOptions);
