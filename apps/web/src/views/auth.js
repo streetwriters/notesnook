@@ -239,7 +239,6 @@ function Auth(props) {
               },
               setSuccess
             );
-            setIsSubmitting(false);
           }}
         >
           {!isAppLoaded ? (
