@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
 import {
   eSendEvent,
   presentSheet,
@@ -9,7 +10,11 @@ import {
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {db} from '../../utils/database';
-import {eCloseProgressDialog, eOpenLoginDialog} from '../../utils/Events';
+import {
+  eClosePremiumDialog,
+  eCloseProgressDialog,
+  eOpenLoginDialog
+} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
@@ -35,7 +40,7 @@ const promoCyclesYearly = {
 export const PricingPlans = ({promo, marginTop}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = {}; //useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);
@@ -233,19 +238,38 @@ export const PricingPlans = ({promo, marginTop}) => {
         </>
       ) : (
         <View>
-          <PricingItem
-            product={product}
-            onPress={() => buySubscription(product)}
-          />
-
-          <Button
-            onPress={() => {
-              setProduct(null);
-            }}
-            height={30}
-            type="errorShade"
-            title="Cancel promo code"
-          />
+          {!user ? (
+            <Button
+              onPress={() => {
+                eSendEvent(eClosePremiumDialog);
+                setTimeout(() => {
+                  eSendEvent(eOpenLoginDialog, 1);
+                }, 400);
+              }}
+              title={'Try free for 14 days'}
+              type="accent"
+              style={{
+                paddingHorizontal: 24,
+                marginTop: 20,
+                marginBottom: 10
+              }}
+            />
+          ) : (
+            <>
+              <PricingItem
+                product={product}
+                onPress={() => buySubscription(product)}
+              />
+              <Button
+                onPress={() => {
+                  setProduct(null);
+                }}
+                height={30}
+                type="errorShade"
+                title="Cancel promo code"
+              />
+            </>
+          )}
         </View>
       )}
 

@@ -21,11 +21,11 @@ export const PricingItem = ({product, onPress}) => {
       }}>
       <View>
         <Heading size={SIZE.lg - 2}>
-          {product.type === 'yearly' || product.offerType === 'yearly'
+          {product?.type === 'yearly' || product?.offerType === 'yearly'
             ? 'Yearly'
             : 'Monthly'}
         </Heading>
-        {product.info && (
+        {product?.info && (
           <Paragraph size={SIZE.xs + 1}>{product.info}</Paragraph>
         )}
       </View>
@@ -33,7 +33,7 @@ export const PricingItem = ({product, onPress}) => {
       <View>
         <Paragraph size={SIZE.sm}>
           <Heading size={SIZE.lg - 2}>{product?.data?.localizedPrice}/</Heading>
-          {product.type === 'yearly' || product.offerType === 'yearly'
+          {product?.type === 'yearly' || product?.offerType === 'yearly'
             ? '/year'
             : '/month'}
         </Paragraph>

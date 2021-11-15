@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Image, ScrollView, View } from 'react-native';
 import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, presentSheet } from '../../services/EventManager';
 import { getElevation } from '../../utils';
@@ -21,7 +22,7 @@ import { PricingPlans } from './pricing-plans';
 export const Component = ({close, promo, getRef}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = {}; //useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const [floatingButton, setFloatingButton] = useState(false);
 
   const onPress = async () => {
