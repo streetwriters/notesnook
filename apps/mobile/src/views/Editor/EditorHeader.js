@@ -1,6 +1,5 @@
 import React, {useEffect, useRef} from 'react';
 import {
-  ActivityIndicator,
   BackHandler,
   InteractionManager,
   Keyboard,
@@ -13,7 +12,6 @@ import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent} from '../../components/DialogManager/recievers';
 import {useTracked} from '../../provider';
 import {
-  useAttachmentStore,
   useEditorStore,
   useSettingStore,
   useUserStore
@@ -37,8 +35,6 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
 import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
@@ -48,12 +44,11 @@ import {
   setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
+import {ProgressCircle} from './ProgressCircle';
 import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
-
-import * as Progress from 'react-native-progress';
-import {ProgressCircle} from './ProgressCircle';
 import picker from './tiny/toolbar/picker';
+
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -101,8 +96,10 @@ const EditorHeader = () => {
         redo: 0
       });
       useEditorStore.getState().setCurrentlyEditingNote(null);
-      await clearTimer(true);
-      await clearEditor(false, true, false);
+      setTimeout(async () => {
+        await clearTimer(true);
+        await clearEditor(false, true, false);
+      }, 1);
       keyboardListener.current?.remove();
     }
   };
@@ -139,10 +136,8 @@ const EditorHeader = () => {
       });
       return;
     }
-    console.log(editing.isFocused);
     if (editing.isFocused) {
       safeKeyboardDismiss();
-      await sleep(300);
       editing.isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
@@ -154,7 +149,6 @@ const EditorHeader = () => {
       safeKeyboardDismiss();
       editing.isFocused = true;
     }
-    await sleep(500);
     let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
     ActionSheetEvent(note, true, true, [
       'Add to notebook',
