@@ -11,7 +11,7 @@ import {useSettingStore} from '../provider/stores';
 import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
-import {refreshNotesPage} from './Events';
+import {eOpenPremiumDialog, refreshNotesPage} from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
@@ -256,6 +256,13 @@ export const MenuItemsList = [
     name: 'Trash',
     icon: 'delete-outline',
     close: true
+  },
+  {
+    name: 'Notesnook Pro',
+    icon: 'crown',
+    func:() => {
+      eSendEvent(eOpenPremiumDialog);
+    }
   }
 ];
 
