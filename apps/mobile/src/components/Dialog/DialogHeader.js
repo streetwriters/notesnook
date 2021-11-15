@@ -6,7 +6,7 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
+const DialogHeader = ({icon, title, paragraph, button, paragraphColor,padding}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
 
@@ -17,7 +17,8 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor}) => {
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'space-between',
-          minHeight: 50
+          minHeight: 50,
+          paddingHorizontal:padding
         }}>
         <View
           style={{

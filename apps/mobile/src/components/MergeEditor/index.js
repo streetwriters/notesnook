@@ -36,6 +36,7 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
+import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 
 const primaryWebView = createRef();
@@ -272,7 +273,9 @@ const MergeEditor = () => {
               <DialogHeader
                 title="Apply Changes"
                 paragraph="Apply selected changes to note?"
+                padding={12}
               />
+              <Seperator/>
               <DialogButtons
                 positiveTitle="Apply"
                 negativeTitle="Cancel"

@@ -7,10 +7,11 @@ import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
   eOpenProgressDialog,
+  eOpenTrialEndingDialog,
   eShowGetPremium
 } from '../utils/Events';
 import {MMKV} from '../utils/mmkv';
-import {eSendEvent, ToastEvent} from './EventManager';
+import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 
 let premiumStatus = 0;
 let products = [];
@@ -133,11 +134,11 @@ const onUserStatusCheck = async type => {
 };
 
 const showVerifyEmailDialog = () => {
-  eSendEvent(eOpenProgressDialog, {
-    title: 'Email not verified',
+  presentSheet({
+    title: 'Confirm your email',
     icon: 'email',
     paragraph:
-      'We have sent you an email confirmation link. Please check your email inbox to verify your account. If you cannot find the email, check your spam folder.',
+      'We have sent you an email confirmation link. Please check your email inbox. If you cannot find the email, check your spam folder.',
     action: async () => {
       try {
         let lastEmailTime = await MMKV.getItem('lastEmailTime');
@@ -273,6 +274,34 @@ const subscriptions = {
   }
 };
 
+async function getRemainingTrialDaysStatus() {
+  let user = await db.user.getUser();
+  if (!user) return;
+
+  let total = user.subscription.expiry - user.subscription.start;
+  let current = Date.now() - user.subscription.start;
+
+  current = ((current / total) * 100).toFixed(0);
+  let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+  if (current > 75 && lastTrialDialogShownAt !== 'ending') {
+    eSendEvent(eOpenTrialEndingDialog, {
+      title: 'Your trial is ending soon',
+      offer: null,
+      extend: false
+    });
+    MMKV.setItem('lastTrialDialogShownAt', 'ending');
+  } else if (!get() && lastTrialDialogShownAt !== 'expired') {
+    eSendEvent(eOpenTrialEndingDialog, {
+      title: 'Your trial has expired',
+      offer: 30,
+      extend: true
+    });
+    MMKV.setItem('lastTrialDialogShownAt', 'expired');
+  } else {
+    return;
+  }
+}
+
 export default {
   verify,
   setPremiumStatus,
@@ -282,5 +311,6 @@ export default {
   getProducts,
   getUser,
   subscriptions,
-  getMontlySub
+  getMontlySub,
+  getRemainingTrialDaysStatus
 };

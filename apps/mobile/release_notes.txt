@@ -5,3 +5,4 @@
 - Improved syncing on multiple devices
 
 Thank you for using Notesnook!
+

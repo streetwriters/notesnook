@@ -184,7 +184,7 @@ export const Notes = ({route, navigation}) => {
     onPress: () => {
       if (params.current?.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
-        notebookId: params.current?.notebookId,
+        notebookId: params.current?.notebookId,      
         toEdit: params.current
       });
     },

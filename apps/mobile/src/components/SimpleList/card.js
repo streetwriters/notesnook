@@ -52,7 +52,7 @@ export const Card = ({color}) => {
       <View
         style={{
           marginLeft: 10,
-          maxWidth: '75%'
+          maxWidth: '70%'
         }}>
         <Paragraph color={colors.icon} size={SIZE.xs + 1}>
           {messageBoardState.message}

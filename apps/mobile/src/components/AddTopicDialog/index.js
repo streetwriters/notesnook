@@ -1,4 +1,5 @@
 import React, {createRef} from 'react';
+import {View} from 'react-native';
 import {Actions} from '../../provider/Actions';
 import {useMenuStore} from '../../provider/stores';
 import {
@@ -119,25 +120,31 @@ export class AddTopicDialog extends React.Component {
             paragraph={
               this.toEdit
                 ? 'Edit title of the topic'
-                : 'Add a new topic to ' + this.notebook.title
+                : 'Create a new topic in ' + this.notebook.title
             }
+            padding={12}
           />
           <Seperator half />
-          <Input
-            fwdRef={this.titleRef}
-            onChangeText={value => {
-              this.title = value;
-            }}
-            blurOnSubmit={false}
-            defaultValue={this.toEdit ? this.toEdit.title : null}
-            placeholder="Enter title of topic"
-            onSubmit={() => this.addNewTopic()}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-          />
+          <View
+            style={{
+              paddingHorizontal: 12
+            }}>
+            <Input
+              fwdRef={this.titleRef}
+              onChangeText={value => {
+                this.title = value;
+              }}
+              blurOnSubmit={false}
+              defaultValue={this.toEdit ? this.toEdit.title : null}
+              placeholder="Enter title of topic"
+              onSubmit={() => this.addNewTopic()}
+              returnKeyLabel="Done"
+              returnKeyType="done"
+            />
+          </View>
 
           <DialogButtons
-            positiveTitle={this.toEdit ? 'Save' : 'Add'}
+            positiveTitle={this.toEdit ? 'Save' : 'Create'}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
             loading={this.state.loading}

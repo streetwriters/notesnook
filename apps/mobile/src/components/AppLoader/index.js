@@ -16,15 +16,14 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import { editing } from '../../utils';
 import { COLOR_SCHEME_DARK } from '../../utils/Colors';
 import { db } from '../../utils/database';
 import {
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  eOpenRateDialog
+  eOpenLoginDialog, eOpenRateDialog
 } from '../../utils/Events';
 import { MMKV } from '../../utils/mmkv';
 import { tabBarRef } from '../../utils/Refs';
@@ -48,7 +47,6 @@ const AppLoader = ({onLoad}) => {
   const setNotes = useNoteStore(state => state.setNotes);
   const setFavorites = useFavoriteStore(state => state.setFavorites);
   const _setLoading = useNoteStore(state => state.setLoading);
-
   const _loading = useNoteStore(state => state.loading);
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
@@ -94,7 +92,8 @@ const AppLoader = ({onLoad}) => {
           return;
         }
         if (await checkForRateAppRequest()) return;
-        await checkNeedsBackup();
+        if (await checkNeedsBackup()) return;
+        PremiumService.getRemainingTrialDaysStatus();
       })();
     }
   }, [_loading]);
@@ -141,7 +140,7 @@ const AppLoader = ({onLoad}) => {
     ) {
       askForBackup = JSON.parse(askForBackup);
       if (askForBackup?.timestamp < Date.now()) {
-        eSendEvent(eOpenProgressDialog, {
+        presentSheet({
           title: 'Backup & restore',
           paragraph: 'Please enable automatic backups to keep your data safe',
           noProgress: true,
@@ -234,7 +233,7 @@ const AppLoader = ({onLoad}) => {
             style={{
               flex: 1,
               justifyContent: 'center',
-              width:Platform.OS == "ios" ? '95%'  : "100%",
+              width: Platform.OS == 'ios' ? '95%' : '100%',
               paddingHorizontal: 12
             }}>
             <Heading>Verify your identity</Heading>

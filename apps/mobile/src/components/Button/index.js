@@ -5,6 +5,7 @@ import {useTracked} from '../../provider';
 import {BUTTON_TYPES, showTooltip} from '../../utils';
 import {ph, SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
+import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 /**
@@ -12,7 +13,7 @@ import Paragraph from '../Typography/Paragraph';
  * @param {import('../PressableButton').buttonTypes} type
  */
 export const Button = ({
-  height = 40,
+  height = 45,
   width = null,
   onPress = () => {},
   loading = false,
@@ -30,7 +31,8 @@ export const Button = ({
   textStyle,
   iconPosition = 'left',
   hitSlop,
-  buttonType = {}
+  buttonType = {},
+  bold
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -42,6 +44,8 @@ export const Button = ({
           ? BUTTON_TYPES[type](accentColor, accentText).text
           : BUTTON_TYPES[type].text
       ];
+  const Component = bold ? Heading : Paragraph
+
 
   return (
     <PressableButton
@@ -68,7 +72,7 @@ export const Button = ({
       customStyle={{
         height: height,
         width: width || null,
-        paddingHorizontal: ph,
+        paddingHorizontal: 12,
         borderRadius: 5,
         alignSelf: 'center',
         justifyContent: 'center',
@@ -89,7 +93,7 @@ export const Button = ({
       ) : null}
 
       {!title ? null : (
-        <Paragraph
+        <Component
           color={textColor}
           size={fontSize}
           numberOfLines={1}
@@ -101,7 +105,7 @@ export const Button = ({
             textStyle
           ]}>
           {title}
-        </Paragraph>
+        </Component>
       )}
 
       {icon && !loading && iconPosition === 'right' ? (

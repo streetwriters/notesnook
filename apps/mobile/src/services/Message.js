@@ -6,7 +6,7 @@ import PremiumService from './PremiumService';
 const loginMessage = {
   visible: true,
   message: 'You are not logged in',
-  actionText: 'Login to encrypt and sync notes.',
+  actionText: 'Login to encrypt and sync notes',
   onPress: () => {
     eSendEvent(eOpenLoginDialog);
   },
@@ -22,13 +22,13 @@ export function setLoginMessage() {
 const emailMessage = {
   visible: true,
   message: 'Email not confirmed',
-  actionText: 'Please confrim your email to encrypt and sync notes.',
+  actionText: 'Confirm now to get 7 more days of free trial',
   onPress: () => {
     PremiumService.showVerifyEmailDialog();
   },
   data: {},
-  icon: 'alert',
-  type: 'error',
+  icon: 'email',
+  type: 'normal',
 };
 
 export function setEmailVerifyMessage() {

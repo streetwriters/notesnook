@@ -7,7 +7,8 @@ import {
   Linking,
   NativeEventEmitter,
   NativeModules,
-  Platform
+  Platform,
+  View
 } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
@@ -25,6 +26,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../services/EventManager';
 import {
@@ -56,6 +58,7 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
+import {ProFeatures} from '../components/ResultDialog/pro-features';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -212,15 +215,24 @@ export const useAppEvents = () => {
     let user = await db.user.getUser();
     setUser(user);
     if (!user) return;
+    MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
     let message =
-      user?.subscription?.type === 2
-        ? 'Thank you for signing up for Notesnook Beta Program. Enjoy all premium features for free for the next 3 months.'
-        : 'Your Notesnook Pro Trial has been activated. Enjoy all premium features for the next 14 days for free!';
-    eSendEvent(eOpenProgressDialog, {
+      'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
+    presentSheet({
       title: 'Email confirmed!',
       paragraph: message,
-      noProgress: true
+      noProgress: true,
+      component: (
+        <View
+          style={{
+            paddingHorizontal: 12,
+            paddingBottom: 15,
+            alignItems: 'center'
+          }}>
+          <ProFeatures />
+        </View>
+      )
     });
 
     if (user?.isEmailConfirmed) {
@@ -244,7 +256,7 @@ export const useAppEvents = () => {
   const onAccountStatusChange = async userStatus => {
     if (!PremiumService.get() && userStatus.type === 5) {
       PremiumService.subscriptions.clear();
-      eSendEvent(eOpenProgressDialog, {
+      presentSheet({
         title: 'Notesnook Pro',
         paragraph: `Your Notesnook Pro subscription has been successfully activated.`,
         action: async () => {
@@ -295,7 +307,7 @@ export const useAppEvents = () => {
     setLoginMessage();
     await PremiumService.setPremiumStatus();
     await MMKV.setItem('introCompleted', 'true');
-    eSendEvent(eOpenProgressDialog, {
+    presentSheet({
       title: reason ? reason : 'User logged out',
       paragraph: `You have been logged out of your account.`,
       action: async () => {
@@ -327,6 +339,11 @@ export const useAppEvents = () => {
   const setCurrentUser = async login => {
     try {
       let user = await db.user.getUser();
+
+      let isUserEmailConfirmed = await MMKV.getStringAsync(
+        'isUserEmailConfirmed'
+      );
+
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
         return;
@@ -338,12 +355,20 @@ export const useAppEvents = () => {
         await Sync.run();
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
+          MMKV.setItem('isUserEmailConfirmed', 'no');
           return;
+        } else {
+          MMKV.setItem('isUserEmailConfirmed', 'yes');
         }
 
         let res = await doInBackground(async () => {
           try {
             user = await db.user.fetchUser();
+            if (user.isEmailConfirmed && isUserEmailConfirmed === 'no') {
+              setTimeout(() => {
+                onEmailVerified();
+              }, 1000);
+            }
             return true;
           } catch (e) {
             return e.message;

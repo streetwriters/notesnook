@@ -20,7 +20,13 @@ const DialogButtons = ({
   const {colors} = state;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container,{
+      backgroundColor:colors.nav,
+      height:60,
+      borderBottomRightRadius:10,
+      borderBottomLeftRadius:10,
+      paddingHorizontal:12
+    }]}>
       {loading ? (
         <ActivityIndicator color={colors.accent} size={SIZE.lg} />
       ) : doneText ? (
@@ -50,6 +56,7 @@ const DialogButtons = ({
           fontSize={SIZE.md}
           testID={notesnook.ids.default.dialog.no}
           type="gray"
+          bold
           title={negativeTitle}
         />
         {onPressPositive ? (
@@ -60,6 +67,7 @@ const DialogButtons = ({
             style={{
               marginLeft: 10,
             }}
+            bold
             type={positiveType || "transparent"}
             title={positiveTitle}
           />

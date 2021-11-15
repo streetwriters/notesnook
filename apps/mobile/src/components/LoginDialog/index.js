@@ -17,6 +17,7 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
@@ -28,7 +29,8 @@ import {db} from '../../utils/database';
 import {
   eOpenLoginDialog,
   eOpenProgressDialog,
-  eOpenRecoveryKeyDialog
+  eOpenRecoveryKeyDialog,
+  eOpenResultDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -252,7 +254,7 @@ const LoginDialog = () => {
 
       await MMKV.removeItem('loginSessionHasExpired');
       await sleep(500);
-      eSendEvent(eOpenProgressDialog, {
+      presentSheet({
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
         noProgress: false
@@ -326,7 +328,7 @@ const LoginDialog = () => {
       setEmailVerifyMessage();
       close();
       await sleep(300);
-      eSendEvent(eOpenRecoveryKeyDialog, true);
+      eSendEvent(eOpenResultDialog);
     } catch (e) {
       setStatus(null);
       setLoading(false);
@@ -449,7 +451,9 @@ const LoginDialog = () => {
               title="Logout"
               paragraph="All user data on this device will be cleared including any unsynced changes. Do you want to proceed?"
               paragraphColor="red"
+              padding={12}
             />
+            <Seperator/>
             <DialogButtons
               negativeTitle="Cancel"
               onPressNegative={() => {
@@ -481,7 +485,7 @@ const LoginDialog = () => {
         <BaseDialog
           visible={true}
           transparent={current.showLoader}
-          animation="slide"
+          animation="fade"
           onRequestClose={() => {
             if (!current.showLoader) {
               setStatus(null);
@@ -653,7 +657,7 @@ const LoginDialog = () => {
             </>
           )}
 
-         {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
+          {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
             <TouchableOpacity
               onPress={() => {
                 if (MODES.sessionExpired === mode) {

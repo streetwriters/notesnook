@@ -9,7 +9,7 @@ import {ph, pv} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import Input from '../Input';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import BaseDialog from './base-dialog';
 import DialogButtons from './dialog-buttons';
 import DialogHeader from './dialog-header';
@@ -48,7 +48,9 @@ export const Dialog = ({context = 'global'}) => {
   const onPressPositive = async () => {
     if (dialogInfo.positivePress) {
       inputRef.current?.blur();
-      let result = await dialogInfo.positivePress(inputValue || dialogInfo.defaultValue);
+      let result = await dialogInfo.positivePress(
+        inputValue || dialogInfo.defaultValue
+      );
       if (result === false) {
         return;
       }
@@ -80,8 +82,7 @@ export const Dialog = ({context = 'global'}) => {
     maxHeight: 450,
     borderRadius: 5,
     backgroundColor: colors.bg,
-    paddingHorizontal: ph,
-    paddingVertical: pv
+    paddingTop: 12
   };
 
   return (
@@ -102,23 +103,29 @@ export const Dialog = ({context = 'global'}) => {
             icon={dialogInfo.icon}
             paragraph={dialogInfo.paragraph}
             paragraphColor={dialogInfo.paragraphColor}
+            padding={12}
           />
           <Seperator half />
 
           {dialogInfo.input && (
-            <Input
-              fwdRef={inputRef}
-              autoCapitalize="none"
-              onChangeText={value => {
-                setInputValue(value);
-              }}
-              secureTextEntry={dialogInfo.secureTextEntry}
-              defaultValue={dialogInfo.defaultValue}
-              onSubmit={onPressPositive}
-              returnKeyLabel="Done"
-              returnKeyType="done"
-              placeholder={dialogInfo.inputPlaceholder}
-            />
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}>
+              <Input
+                fwdRef={inputRef}
+                autoCapitalize="none"
+                onChangeText={value => {
+                  setInputValue(value);
+                }}
+                secureTextEntry={dialogInfo.secureTextEntry}
+                defaultValue={dialogInfo.defaultValue}
+                onSubmit={onPressPositive}
+                returnKeyLabel="Done"
+                returnKeyType="done"
+                placeholder={dialogInfo.inputPlaceholder}
+              />
+            </View>
           )}
 
           <DialogButtons
@@ -129,7 +136,7 @@ export const Dialog = ({context = 'global'}) => {
             positiveType={dialogInfo.positiveType}
           />
         </View>
-        <Toast context="local"/>
+        <Toast context="local" />
       </BaseDialog>
     )
   );

@@ -11,7 +11,8 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const ProgressDialog = ({context}) => {
+
+const GeneralSheet = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
@@ -159,4 +160,4 @@ const ProgressDialog = ({context}) => {
   );
 };
 
-export default ProgressDialog;
+export default GeneralSheet;

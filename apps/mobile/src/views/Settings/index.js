@@ -22,6 +22,7 @@ import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
 import {presentDialog} from '../../components/Dialog/functions';
+import { Issue } from '../../components/Github/issue';
 import {Header as TopHeader} from '../../components/Header/index';
 import Input from '../../components/Input';
 import {PressableButton} from '../../components/PressableButton';
@@ -45,6 +46,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -188,9 +190,10 @@ export const Settings = ({navigation}) => {
     {
       name: `Report an issue`,
       func: async () => {
-        try {
-          await Linking.openURL('https://github.com/streetwriters/notesnook');
-        } catch (e) {}
+        presentSheet({
+          noIcon:true,
+          component:<Issue/>
+        });
       },
       desc: `Facing an issue? Report it on our Github`
     },
@@ -198,7 +201,7 @@ export const Settings = ({navigation}) => {
       name: 'Join our Discord community',
 
       func: async () => {
-        eSendEvent(eOpenProgressDialog, {
+        presentSheet({
           title: 'Join our Discord Community',
           iconColor: 'discord',
           paragraph:
@@ -391,8 +394,8 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
         alignSelf: 'center',
         marginBottom: 5,
         marginTop: 5,
-        borderBottomWidth:1,
-        borderBottomColor:colors.nav
+        borderBottomWidth: 1,
+        borderBottomColor: colors.nav
       }}>
       {collapsed ? (
         <Paragraph
@@ -437,9 +440,12 @@ const AccoutLogoutSection = () => {
               justifyContent: 'center',
               alignItems: 'center'
             }}>
-            <Heading color={colors.pri} size={SIZE.md}>
+            <Heading color={colors.pri} size={SIZE.lg}>
               Logging out
             </Heading>
+            <Paragraph color={colors.icon}>
+              Please wait while log out and clear app data.
+            </Paragraph>
             <View
               style={{
                 flexDirection: 'row',
@@ -459,7 +465,9 @@ const AccoutLogoutSection = () => {
             <DialogHeader
               title="Logout"
               paragraph="Clear all your data and reset the app."
+              padding={12}
             />
+            <Seperator />
             <DialogButtons
               positiveTitle="Logout"
               negativeTitle="Cancel"
@@ -493,65 +501,57 @@ const AccoutLogoutSection = () => {
           <DialogContainer>
             <DialogHeader
               title="Delete account"
-              paragraph="Your account will be deleted and all your data will be removed
+              paragraph="All your data will be removed
                 permanantly. Make sure you have saved backup of your notes. This action is IRREVERSIBLE."
               paragraphColor={colors.red}
+              padding={12}
             />
 
-            <Input
-              placeholder="Enter account password"
-              fwdRef={pwdInput}
-              onChangeText={v => {
-                passwordValue = v;
-              }}
-              secureTextEntry={true}
-            />
+            <Seperator half />
 
             <View
               style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                alignSelf: 'flex-end'
+                paddingHorizontal: 12
               }}>
-              <Button
-                onPress={() => {
-                  setDeleteAccount(false);
-                  passwordValue = null;
+              <Input
+                placeholder="Enter account password"
+                fwdRef={pwdInput}
+                onChangeText={v => {
+                  passwordValue = v;
                 }}
-                fontSize={SIZE.md}
-                type="gray"
-                title="Cancel"
-              />
-              <Button
-                onPress={async () => {
-                  if (!passwordValue) {
-                    ToastEvent.show({
-                      heading: 'Account Password is required',
-                      type: 'error',
-                      context: 'local'
-                    });
-                    return;
-                  }
-                  try {
-                    await db.user.deleteUser(passwordValue);
-                  } catch (e) {
-                    ToastEvent.show({
-                      heading: 'Failed to delete account',
-                      message: e.message,
-                      type: 'error',
-                      context: 'local'
-                    });
-                  }
-                  close();
-                }}
-                fontSize={SIZE.md}
-                style={{
-                  marginLeft: 10
-                }}
-                type="error"
-                title="Delete"
+                secureTextEntry={true}
               />
             </View>
+
+            <DialogButtons
+              positiveTitle="Delete"
+              positiveType="errorShade"
+              onPressPositive={async () => {
+                if (!passwordValue) {
+                  ToastEvent.show({
+                    heading: 'Account Password is required',
+                    type: 'error',
+                    context: 'local'
+                  });
+                  return;
+                }
+                try {
+                  await db.user.deleteUser(passwordValue);
+                } catch (e) {
+                  ToastEvent.show({
+                    heading: 'Failed to delete account',
+                    message: e.message,
+                    type: 'error',
+                    context: 'local'
+                  });
+                }
+                close();
+              }}
+              onPressNegative={() => {
+                setDeleteAccount(false);
+                passwordValue = null;
+              }}
+            />
           </DialogContainer>
           <Toast context="local" />
         </BaseDialog>
@@ -735,6 +735,10 @@ const SettingsUserSection = () => {
   };
 
   const manageSubscription = () => {
+    if (!user.isEmailConfirmed) {
+      PremiumService.showVerifyEmailDialog();
+      return;
+    }
     if (
       user.subscription?.type === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
       Platform.OS === 'android'
@@ -784,7 +788,7 @@ const SettingsUserSection = () => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   flexDirection: 'row',
-                  paddingBottom: 2.5,
+                  paddingBottom: 4,
                   borderBottomWidth: 1,
                   borderColor: colors.accent
                 }}>
@@ -850,7 +854,7 @@ const SettingsUserSection = () => {
                       {isExpired
                         ? 'Your subscription has ended.'
                         : user.subscription?.type === 1
-                        ? `Your trial has started`
+                        ? `Your free trial has started`
                         : `Subscribed to Notesnook Pro`}
                     </Paragraph>
                     <Paragraph
@@ -861,7 +865,7 @@ const SettingsUserSection = () => {
                       {user.subscription?.type === 2
                         ? 'You signed up on ' + startDate
                         : user.subscription?.type === 1
-                        ? 'Your trial will end on ' + expiryDate
+                        ? 'Your free trial will end on ' + expiryDate
                         : user.subscription?.type === 6
                         ? subscriptionDaysLeft.time < -3
                           ? 'Your subscription has ended'
@@ -875,8 +879,7 @@ const SettingsUserSection = () => {
                   </View>
                 ) : null}
 
-                {user.isEmailConfirmed &&
-                  user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
+                {user.subscription?.type !== SUBSCRIPTION_STATUS.PREMIUM &&
                   user.subscription?.type !== SUBSCRIPTION_STATUS.BETA && (
                     <>
                       <Seperator />
@@ -888,9 +891,11 @@ const SettingsUserSection = () => {
                         }}
                         fontSize={SIZE.md}
                         title={
-                          user.subscription?.provider === 3 &&
-                          user.subscription?.type ===
-                            SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+                          !user.isEmailConfirmed
+                            ? 'Confirm your email to get 7 days more'
+                            : user.subscription?.provider === 3 &&
+                              user.subscription?.type ===
+                                SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
                             ? 'Manage subscription from desktop app'
                             : user.subscription?.type ===
                                 SUBSCRIPTION_STATUS.PREMIUM_CANCELLED &&
@@ -921,7 +926,7 @@ const SettingsUserSection = () => {
                     SUBSCRIPTION_PROVIDER[user?.subscription?.provider]?.title
                   }
                   onPress={() => {
-                    eSendEvent(eOpenProgressDialog, {
+                    presentSheet({
                       title:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .title,
@@ -965,43 +970,32 @@ const SettingsUserSection = () => {
                 <DialogHeader
                   title="Verify it's you"
                   paragraph="Enter your account password to save your data recovery key."
+                  padding={12}
                 />
                 <Seperator half />
-                <Input
-                  fwdRef={input}
-                  placeholder="Enter account password"
-                  onChangeText={v => {
-                    passwordVerifyValue = v;
-                  }}
-                  onSubmit={tryVerification}
-                  secureTextEntry={true}
-                />
-
                 <View
                   style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    alignSelf: 'flex-end'
+                    paddingHorizontal: 12
                   }}>
-                  <Button
-                    onPress={() => {
-                      setVerifyUser(false);
-                      passwordVerifyValue = null;
+                  <Input
+                    fwdRef={input}
+                    placeholder="Enter account password"
+                    onChangeText={v => {
+                      passwordVerifyValue = v;
                     }}
-                    fontSize={SIZE.md}
-                    type="gray"
-                    title="Cancel"
-                  />
-                  <Button
-                    onPress={tryVerification}
-                    fontSize={SIZE.md}
-                    style={{
-                      marginLeft: 10
-                    }}
-                    type="transparent"
-                    title="Verify"
+                    onSubmit={tryVerification}
+                    secureTextEntry={true}
                   />
                 </View>
+
+                <DialogButtons
+                  positiveTitle="Verify"
+                  onPressPositive={tryVerification}
+                  onPressNegative={() => {
+                    setVerifyUser(false);
+                    passwordVerifyValue = null;
+                  }}
+                />
               </DialogContainer>
               <Toast context="local" />
             </BaseDialog>
@@ -1015,7 +1009,7 @@ const SettingsUserSection = () => {
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
             },
-           /*  {
+            /*  {
               name: 'Change password',
               func: async () => {
                 eSendEvent(eOpenLoginDialog, 3);
@@ -1033,7 +1027,7 @@ const SettingsUserSection = () => {
               name: 'Subscription not activated?',
               func: async () => {
                 if (Platform.OS === 'android') return;
-                eSendEvent(eOpenProgressDialog, {
+                presentSheet({
                   title: 'Loading subscriptions',
                   paragraph: `Please wait while we fetch your subscriptions.`
                 });
@@ -1042,13 +1036,13 @@ const SettingsUserSection = () => {
                   (a, b) => b.transactionDate - a.transactionDate
                 );
                 let currentSubscription = subscriptions[0];
-                eSendEvent(eOpenProgressDialog, {
+                presentSheet({
                   title: 'Notesnook Pro',
                   paragraph: `You subscribed to Notesnook Pro on ${new Date(
                     currentSubscription.transactionDate
                   ).toLocaleString()}. Verify this subscription?`,
                   action: async () => {
-                    eSendEvent(eOpenProgressDialog, {
+                    presentSheet({
                       title: 'Verifying subscription',
                       paragraph: `Please wait while we verify your subscription.`
                     });
@@ -1335,7 +1329,7 @@ const SettingsAppearanceSection = () => {
                       style={{
                         backgroundColor:
                           settings.homepage === item.name
-                            ? colors.shade
+                            ? colors.nav
                             : 'transparent'
                       }}
                       textStyle={{
@@ -1398,17 +1392,17 @@ const SettingsPrivacyAndSecurity = () => {
     {
       title: 'None',
       value: 'none',
-      desc: 'Disable app lock. Notes will be accessible to anyone who opens the app'
+      desc: 'Disable app lock. Notes can be accessed by anyone who opens the app'
     },
     {
       title: 'Secure Mode',
       value: 'launch',
-      desc: 'Lock app on launch and keep it unlocked when you switch to other apps.'
+      desc: 'Locks app on launch and keeps it unlocked when you switch to other apps.'
     },
     {
       title: 'Strict Mode',
       value: 'background',
-      desc: 'Lock app on launch and also when you switch from other apps or background.'
+      desc: 'Locks app on launch and also when you switch from other apps or background.'
     }
   ];
 
@@ -1423,7 +1417,7 @@ const SettingsPrivacyAndSecurity = () => {
         : 'Enable biometery unlock',
       description: vaultStatus.biometryEnrolled
         ? 'Disable biometric unlocking for notes in vault'
-        : 'Disable biometric unlocking for notes in vault'
+        : 'Enable biometric unlocking for notes in vault'
     });
   };
 
@@ -1439,48 +1433,60 @@ const SettingsPrivacyAndSecurity = () => {
             <DialogHeader
               title="App lock mode"
               paragraph="Select the level of security you want to enable."
+              padding={12}
             />
             <Seperator />
-            {modes.map(item => (
-              <PressableButton
-                type={
-                  settings.appLockMode === item.value ? 'accent' : 'transparent'
-                }
-                onPress={() => {
-                  SettingsService.set('appLockMode', item.value);
-                }}
-                customStyle={{
-                  justifyContent: 'flex-start',
-                  alignItems: 'flex-start',
-                  paddingHorizontal: 6,
-                  paddingVertical: 6,
-                  marginTop: 3,
-                  marginBottom: 3
-                }}
-                style={{
-                  marginBottom: 10
-                }}>
-                <Heading
-                  color={
-                    settings.appLockMode === item.value ? 'white' : colors.pri
+            <View
+              style={{
+                paddingHorizontal: 12
+              }}>
+              {modes.map(item => (
+                <PressableButton
+                  type={
+                    settings.appLockMode === item.value
+                      ? 'grayBg'
+                      : 'transparent'
                   }
-                  style={{maxWidth: '95%'}}
-                  size={SIZE.md}>
-                  {item.title}
-                </Heading>
-                <Paragraph
-                  color={
-                    settings.appLockMode === item.value ? 'white' : colors.icon
-                  }
-                  style={{maxWidth: '95%'}}
-                  size={SIZE.sm}>
-                  {item.desc}
-                </Paragraph>
-              </PressableButton>
-            ))}
+                  onPress={() => {
+                    SettingsService.set('appLockMode', item.value);
+                  }}
+                  customStyle={{
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    paddingHorizontal: 6,
+                    paddingVertical: 6,
+                    marginTop: 3,
+                    marginBottom: 3
+                  }}
+                  style={{
+                    marginBottom: 10
+                  }}>
+                  <Heading
+                    color={
+                      settings.appLockMode === item.value
+                        ? colors.accent
+                        : colors.pri
+                    }
+                    style={{maxWidth: '95%'}}
+                    size={SIZE.md}>
+                    {item.title}
+                  </Heading>
+                  <Paragraph
+                    color={
+                      settings.appLockMode === item.value
+                        ? colors.accent
+                        : colors.icon
+                    }
+                    style={{maxWidth: '95%'}}
+                    size={SIZE.sm}>
+                    {item.desc}
+                  </Paragraph>
+                </PressableButton>
+              ))}
+            </View>
 
             <DialogButtons
-              negativeTitle="Close"
+              negativeTitle="Done"
               onPressNegative={() => {
                 setAppLockVisible(false);
               }}
@@ -1780,11 +1786,11 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
           func: async () => {
             if (!user || !user?.email) {
               ToastEvent.show({
-                heading:"Login required",
-                message:"Please login to your account to restore backup",
-                type:"error",
-                 context:'global'
-              })
+                heading: 'Login required',
+                message: 'Please login to your account to restore backup',
+                type: 'error',
+                context: 'global'
+              });
               return;
             }
             if (isSheet) {
@@ -1803,7 +1809,7 @@ export const SettingsBackupAndRestore = ({isSheet}) => {
               eSendEvent(eCloseProgressDialog);
               await sleep(300);
             }
-            eSendEvent(eOpenProgressDialog, {
+            presentSheet({
               title: 'Notesnook Importer',
               icon: 'import',
               noProgress: true,

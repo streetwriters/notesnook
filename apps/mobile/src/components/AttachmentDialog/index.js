@@ -1,35 +1,26 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Platform, TouchableOpacity, View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { useEffect, useRef, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import * as Progress from 'react-native-progress';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useAttachmentStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useAttachmentStore } from '../../provider/stores';
 import {
-  eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
   eCloseAttachmentDialog,
-  eOpenAttachmentsDialog,
-  eOpenProgressDialog
+  eOpenAttachmentsDialog
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import DialogHeader from '../Dialog/dialog-header';
-import {presentDialog} from '../Dialog/functions';
+import GeneralSheet from '../GeneralSheet';
 import Paragraph from '../Typography/Paragraph';
-import FileViewer from 'react-native-file-viewer';
-import {ToastEvent} from '../../services/EventManager';
-import RNFetchBlob from 'rn-fetch-blob';
-import {Button} from '../Button';
-import Share from 'react-native-share';
-import ProgressDialog from '../ProgressDialog';
-import {ShareComponent} from '../ExportDialog/share';
 export const AttachmentDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -192,7 +183,7 @@ export const Attachment = ({attachment, encryption}) => {
         backgroundColor: colors.nav
       }}
       type="grayBg">
-      <ProgressDialog context={attachment.metadata.hash} />
+      <GeneralSheet context={attachment.metadata.hash} />
       <View
         style={{
           flexShrink: 1,
