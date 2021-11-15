@@ -19,6 +19,7 @@ import {
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import { editing } from '../../utils';
 import { COLOR_SCHEME_DARK } from '../../utils/Colors';
 import { db } from '../../utils/database';
