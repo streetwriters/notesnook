@@ -478,7 +478,7 @@ export async function clearEditor(
   }
   let func = async () => {
     try {
-      reset && tiny.call(EditorWebView, tiny.reset, true);
+      reset && EditorWebView.current?.reload();
       editing.focusType = null;
       eSendEvent('historyEvent', {
         undo: 0,
