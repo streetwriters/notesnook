@@ -84,7 +84,7 @@ const GeneralSheet = ({context}) => {
         ) : null}
       </View>
 
-      {dialogData.component}
+      {typeof dialogData.component === "function" ? dialogData.component(actionSheetRef):dialogData.component}
 
       {dialogData?.learnMore ? (
         <Paragraph

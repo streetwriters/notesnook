@@ -37,10 +37,15 @@ const promoCyclesYearly = {
   3: 'first 3 years'
 };
 
-export const PricingPlans = ({promo, marginTop}) => {
+export const PricingPlans = ({
+  promo,
+  marginTop,
+  heading = true,
+  compact = false
+}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = useUserStore(state => state.user);
+  const user = {}; //useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);
@@ -155,40 +160,52 @@ export const PricingPlans = ({promo, marginTop}) => {
 
       {user && !product ? (
         <>
-          <Heading
-            style={{
-              alignSelf: 'center',
-              marginTop: marginTop || 20,
-              marginBottom: 20
-            }}>
-            Choose a plan
-          </Heading>
-
-          <PricingItem
-            onPress={() => buySubscription(offers?.monthly)}
-            product={{
-              type: 'monthly',
-              data: offers?.monthly,
-              info: 'Pay monthly, cancel anytime.'
-            }}
-          />
+          {heading ? (
+            <Heading
+              style={{
+                alignSelf: 'center',
+                marginTop: marginTop || 20,
+                marginBottom: 20
+              }}>
+              Choose a plan
+            </Heading>
+          ) : null}
 
           <View
             style={{
-              height: 1,
-              backgroundColor: colors.nav,
-              marginVertical: 10
-            }}
-          />
+              flexDirection: !compact ? 'column' : 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-around'
+            }}>
+            <PricingItem
+              onPress={() => buySubscription(offers?.monthly)}
+              compact={compact}
+              product={{
+                type: 'monthly',
+                data: offers?.monthly,
+                info: 'Pay monthly, cancel anytime.'
+              }}
+            />
 
-          <PricingItem
-            onPress={() => buySubscription(offers?.yearly)}
-            product={{
-              type: 'yearly',
-              data: offers?.yearly,
-              info: 'Pay yearly'
-            }}
-          />
+            {!compact && (
+              <View
+                style={{
+                  height: 1,
+                  marginVertical: 5
+                }}
+              />
+            )}
+
+            <PricingItem
+              onPress={() => buySubscription(offers?.yearly)}
+              compact={compact}
+              product={{
+                type: 'yearly',
+                data: offers?.yearly,
+                info: 'Pay yearly'
+              }}
+            />
+          </View>
 
           <Button
             height={35}
@@ -258,7 +275,7 @@ export const PricingPlans = ({promo, marginTop}) => {
             <>
               <PricingItem
                 product={product}
-                onPress={() => buySubscription(product)}
+                onPress={() => buySubscription(product.data)}
               />
               <Button
                 onPress={() => {
@@ -318,20 +335,12 @@ export const PricingPlans = ({promo, marginTop}) => {
                 marginTop: 10,
                 textAlign: 'center'
               }}>
-              By tapping Subscribe,
-              <Paragraph size={SIZE.xs + 1} color={colors.accent}>
-                {product?.data?.localizedPrice}
-              </Paragraph>{' '}
-              will be charged to your iTunes Account for 1-
-              {product?.type === 'yearly' ? 'year' : 'month'} subscription of
-              Notesnook Pro.{'\n\n'}
-              Subscriptions will automatically renew unless cancelled within
-              24-hours before the end of the current period. You can cancel
-              anytime with your iTunes Account settings.
+              By subscribing, you will be charged to your iTunes Account for the
+              selected plan. Subscriptions will automatically renew unless
+              cancelled within 24-hours before the end of the current period.
             </Paragraph>
           ) : (
             <Paragraph
-              textBreakStrategy="balanced"
               size={SIZE.xs + 1}
               color={colors.icon}
               style={{
@@ -339,22 +348,15 @@ export const PricingPlans = ({promo, marginTop}) => {
                 marginTop: 10,
                 textAlign: 'center'
               }}>
-              By tapping Subscribe, your payment will be charged on your Google
-              Account, and your subscription will automatically renew for the
-              same package length at the same price until you cancel in settings
-              in the Android Play Store prior to the end of the then current
-              period.
+              By subscribing, your will be charged on your Google Account, and
+              your subscription will automatically renew until you cancel prior
+              to the end of the then current period.
             </Paragraph>
           )}
 
           <View
             style={{
-              backgroundColor: colors.nav,
               width: '100%',
-              paddingVertical: 10,
-              marginTop: 5,
-              borderRadius: 5,
-              paddingHorizontal: 12
             }}>
             <Paragraph
               size={SIZE.xs + 1}

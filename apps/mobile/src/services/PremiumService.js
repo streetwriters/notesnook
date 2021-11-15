@@ -1,12 +1,15 @@
 import {CHECK_IDS} from 'notes-core/common';
+import React from 'react';
 import * as RNIap from 'react-native-iap';
-import InAppBrowser from 'react-native-inappbrowser-reborn';
+import DialogHeader from '../components/Dialog/dialog-header';
+import {CompactFeatures} from '../components/Premium/compact-features';
+import {PricingPlans} from '../components/Premium/pricing-plans';
+import Seperator from '../components/Seperator';
 import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
 import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
-  eOpenProgressDialog,
   eOpenTrialEndingDialog,
   eShowGetPremium
 } from '../utils/Events';
@@ -302,6 +305,56 @@ async function getRemainingTrialDaysStatus() {
   }
 }
 
+const features_list = [
+  {
+    content: 'Unlock unlimited notebooks, tags, colors. Organize like a pro'
+  },
+  {
+    content: 'Attach files upto 500MB, upload 4K images with unlimited storage'
+  },
+  {
+    content: 'Instantly sync to unlimited devices'
+  },
+  {
+    content: 'A private vault to keep everything imporant always locked'
+  },
+  {
+    content:
+      'Rich note editing experience with markdown, tables, checklists and more'
+  },
+  {
+    content: 'Export your notes in Pdf, markdown and html formats'
+  }
+];
+
+const sheet = (context, promo) => {
+  presentSheet({
+    context:context,
+    component: ref => (
+      <>
+        <DialogHeader
+          centered
+          title="Upgrade to Notesnook"
+          titlePart="Pro"
+          paragraph="Manage your work on another level, enjoy seemless sync and keep all notes in one place."
+          padding={12}
+        />
+        <Seperator />
+        <CompactFeatures
+          scrollRef={ref}
+          maxHeight={300}
+          features={features_list}
+          vertical
+        />
+        <Seperator half />
+        <PricingPlans compact heading={false} promo={promo} />
+      </>
+    ),
+    noIcon: true,
+    noProgress: true
+  });
+};
+
 export default {
   verify,
   setPremiumStatus,
@@ -312,5 +365,6 @@ export default {
   getUser,
   subscriptions,
   getMontlySub,
-  getRemainingTrialDaysStatus
+  getRemainingTrialDaysStatus,
+  sheet
 };

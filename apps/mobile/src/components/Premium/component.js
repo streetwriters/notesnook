@@ -9,7 +9,6 @@ import { eOpenLoginDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
-import { Dialog } from '../Dialog';
 import GeneralSheet from '../GeneralSheet';
 import Seperator from '../Seperator';
 import { Toast } from '../Toast';
@@ -62,7 +61,6 @@ export const Component = ({close, promo, getRef}) => {
         borderRadius: 10,
         maxHeight: DDS.isTab ? '90%' : '100%'
       }}>
-
       <GeneralSheet context="pricing_plans" />
       <ActionIcon
         onPress={() => {
