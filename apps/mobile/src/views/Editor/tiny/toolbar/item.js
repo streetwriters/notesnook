@@ -6,6 +6,7 @@ import {PressableButton} from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
 import {useTracked} from '../../../../provider';
+import {useUserStore} from '../../../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -54,6 +55,7 @@ const ToolbarItem = ({
   const [icon, setIcon] = useState(valueIcon);
   const [color, setColor] = useState(null);
   const [currentText, setCurrentText] = useState(null);
+  const isPro = useUserStore(state => state.premium);
 
   useEffect(() => {
     if (/^(dhilitecolor|dforecolor)$/.test(format)) return;
@@ -211,28 +213,22 @@ const ToolbarItem = ({
   };
 
   const onPress = async event => {
-    if (premium && !PremiumService.get()) {
+    if (premium && !isPro) {
       let user = await db.user.getUser();
-      if (user && !user.isEmailConfirmed) {
-        if (editing.isFocused) {
-          safeKeyboardDismiss();
-          await sleep(500);
-          editing.isFocused = true;
-        }
+      if (editing.isFocused) {
+        safeKeyboardDismiss();
+        editing.isFocused = true;
+      }
+      if (user && !isPro && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
       } else {
-        eSendEvent(eShowGetPremium, {
-          context: 'editor',
-          title: 'Get Notesnook Pro',
-          desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
-        });
+        PremiumService.sheet();
       }
       return;
     }
     if (type === 'settings') {
       if (editing.isFocused) {
         safeKeyboardDismiss();
-        await sleep(500);
         editing.isFocused = true;
       }
       eSendEvent('openEditorSettings');
@@ -319,12 +315,11 @@ const ToolbarItem = ({
     } else if (value || value === '') {
       formatSelection(execCommands[format](value));
     } else {
-      if (typeof execCommands[format] === "function") {
+      if (typeof execCommands[format] === 'function') {
         formatSelection(execCommands[format]());
       } else {
         formatSelection(execCommands[format]);
       }
-      
     }
 
     focusEditor(format);
@@ -346,6 +341,19 @@ const ToolbarItem = ({
           height: normalize(50),
           minWidth: /^(dhilitecolor|dforecolor)$/.test(format) ? 30 : 60
         }}>
+        {premium && !isPro && (
+          <Icon
+            size={12}
+            style={{
+              position: 'absolute',
+              top: 0,
+              alignSelf: 'center'
+            }}
+            name="crown"
+            color={colors.yellow}
+          />
+        )}
+
         {/^(dhilitecolor|dforecolor)$/.test(format) ? (
           <View
             style={{
@@ -386,9 +394,10 @@ const ToolbarItem = ({
                 style={{
                   paddingHorizontal: 12,
                   fontFamily:
-                    format === 'fontname' &&
-                    formatValue
-                      ? formatValue === 'open sans' ? "OpenSans-Regular" : formatValue
+                    format === 'fontname' && formatValue
+                      ? formatValue === 'open sans'
+                        ? 'OpenSans-Regular'
+                        : formatValue
                       : 'OpenSans-Regular'
                 }}
                 size={text.includes('%') ? SIZE.sm : SIZE.md}>

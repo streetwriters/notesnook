@@ -1,26 +1,24 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import { Platform, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
+import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Sodium from 'react-native-sodium';
-import {launchCamera, launchImageLibrary} from 'react-native-image-picker';
 import RNFetchBlob from 'rn-fetch-blob';
-import {Attachment} from '../../../../components/AttachmentDialog';
+import { Attachment } from '../../../../components/AttachmentDialog';
 import {
   eSendEvent,
   presentSheet,
   ToastEvent
 } from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
-import {db} from '../../../../utils/database';
-import {
-  eCloseProgressDialog,
-  eOpenProgressDialog,
-  eShowGetPremium
-} from '../../../../utils/Events';
-import {sleep} from '../../../../utils/TimeUtils';
-import {EditorWebView, getNote} from '../../Functions';
-import tiny, {safeKeyboardDismiss} from '../tiny';
 import PremiumService from '../../../../services/PremiumService';
+import { editing } from '../../../../utils';
+import { db } from '../../../../utils/database';
+import {
+  eCloseProgressDialog
+} from '../../../../utils/Events';
+import { sleep } from '../../../../utils/TimeUtils';
+import { EditorWebView, getNote } from '../../Functions';
+import tiny, { safeKeyboardDismiss } from '../tiny';
 
 const FILE_SIZE_LIMIT = 500 * 1024 * 1024;
 const IMAGE_SIZE_LIMIT = 50 * 1024 * 1024;
@@ -208,25 +206,19 @@ const gallery = async () => {
 const pick = async () => {
   if (!PremiumService.get()) {
     let user = await db.user.getUser();
-    if (user && !user.isEmailConfirmed) {
-      if (editing.isFocused) {
-        safeKeyboardDismiss();
-        await sleep(500);
-        editing.isFocused = true;
-      }
+    if (editing.isFocused) {
+      safeKeyboardDismiss();
+      editing.isFocused = true;
+    }
+    if (user && !PremiumService.get() && !user.isEmailConfirmed) {
       PremiumService.showVerifyEmailDialog();
     } else {
-      eSendEvent(eShowGetPremium, {
-        context: 'editor',
-        title: 'Get Notesnook Pro',
-        desc: 'Enjoy Full Rich Text Editor with Markdown Support!'
-      });
+      PremiumService.sheet();
     }
     return;
   }
   if (editing.isFocused) {
     safeKeyboardDismiss();
-    await sleep(500);
     editing.isFocused = true;
   }
   presentSheet({
