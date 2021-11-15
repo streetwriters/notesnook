@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
-import { ph, SIZE } from '../../utils/SizeUtils';
-import { Button } from '../Button';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
+import {ph, SIZE} from '../../utils/SizeUtils';
+import {Button} from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ProFeatures } from './pro-features';
+import {ProFeatures} from './pro-features';
 
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
@@ -35,7 +35,7 @@ const ResultDialog = () => {
   const open = data => {
     if (data) {
       setDialogData(data);
-    } 
+    }
     setVisible(true);
   };
 
@@ -52,8 +52,7 @@ const ResultDialog = () => {
           maxHeight: 500,
           borderRadius: 10,
           backgroundColor: colors.bg,
-          paddingHorizontal: ph,
-          paddingVertical: 20,
+          paddingTop: 20,
           justifyContent: 'center',
           alignItems: 'center'
         }}>
@@ -64,8 +63,9 @@ const ResultDialog = () => {
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10,
-            maxWidth: '80%',
-            marginBottom: 10
+            maxWidth: '100%',
+            marginBottom: 10,
+            paddingHorizontal: 12
           }}>
           {dialogData.title}
         </Heading>
@@ -87,14 +87,25 @@ const ResultDialog = () => {
         <ProFeatures />
 
         <Seperator />
-        <Button
-          title={dialogData.button}
-          width="100%"
-          onPress={close}
-          type="accent"
-          height={50}
-          fontSize={SIZE.md}
-        />
+        <View
+          style={{
+            backgroundColor: colors.nav,
+            width: '100%',
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
+            paddingVertical: 10
+          }}>
+          <Button
+            title={dialogData.button}
+            width={null}
+            style={{
+              paddingHorizontal: 12
+            }}
+            onPress={close}
+            height={50}
+            fontSize={SIZE.md + 2}
+          />
+        </View>
       </View>
     </BaseDialog>
   );

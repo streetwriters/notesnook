@@ -2,7 +2,10 @@ import React from 'react';
 import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
+import {eCloseResultDialog, eOpenPremiumDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
 export const ProFeatures = () => {
   const [state, dispatch] = useTracked();
@@ -33,7 +36,7 @@ export const ProFeatures = () => {
             flexDirection: 'row',
             width: '100%',
             height: 40,
-            paddingHorizontal: 12,
+            paddingHorizontal: 24,
             marginBottom: 10,
             alignItems: 'center',
             borderRadius: 5
@@ -43,7 +46,11 @@ export const ProFeatures = () => {
         </View>
       ))}
       <Paragraph
-        onPress={() => {}}
+        onPress={async () => {
+          eSendEvent(eCloseResultDialog);
+          await sleep(300);
+          eSendEvent(eOpenPremiumDialog);
+        }}
         size={SIZE.xs + 2}
         style={{
           textDecorationLine: 'underline',
