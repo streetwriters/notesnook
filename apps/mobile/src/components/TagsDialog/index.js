@@ -89,18 +89,7 @@ const TagsDialog = () => {
       return;
     }
 
-    if (_query.startsWith('#')) {
-      _query = _query.slice(1);
-    }
-
     let tag = _query;
-    tag = tag.trim();
-    if (tag.includes(' ')) {
-      tag = tag.replace(' ', '_');
-    }
-    if (tag.includes(',')) {
-      tag = tag.replace(',', '');
-    }
     setNote({...note, tags: note.tags ? [...note.tags, tag] : [tag]});
     inputRef.current?.setNativeProps({
       text: '',
@@ -150,7 +139,7 @@ const TagsDialog = () => {
           fwdRef={inputRef}
           autoCapitalize="none"
           onChangeText={v => {
-            setQuery(v);
+            setQuery(v ? v.replace(/[\s+#|&;$%@"'=<>()+,]/g, "").toLowerCase() : v);
           }}
           onSubmit={onSubmit}
           height={50}

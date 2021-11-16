@@ -494,7 +494,8 @@ export const ActionSheetComponent = ({
           title: 'Rename tag',
           paragraph: 'Change the title of the tag ' + alias,
           positivePress: async value => {
-            await db.tags.rename(note.id, value);
+            if (!value || value === '' || value.trimStart().length == 0) return;
+            await db.tags.rename(note.id, value.replace(/[\s+#|&;$%@"'=<>()+,]/g, "").toLowerCase());
             Navigation.setRoutesToUpdate([
               Navigation.routeNames.Notes,
               Navigation.routeNames.NotesPage,
