@@ -7,6 +7,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {useSettingStore, useUserStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import {DrawerScale} from '../../utils/Animations';
 import {
   ACCENT,
@@ -15,6 +16,7 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
+import { eOpenPremiumDialog } from '../../utils/Events';
 import {MenuItemsList, SUBSCRIPTION_STATUS} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
 import {ColorSection} from './ColorSection';
@@ -51,6 +53,14 @@ export const Menu = React.memo(
         switch: true,
         on: !!colors.night,
         close: false
+      },
+
+      {
+        name: 'Notesnook Pro',
+        icon: 'crown',
+        func: () => {
+          eSendEvent(eOpenPremiumDialog);
+        }
       },
       {
         name: 'Settings',
@@ -117,21 +127,29 @@ export const Menu = React.memo(
             style={{
               paddingHorizontal: 12
             }}>
-            {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 2).map(
-              (item, index) => (
-                <MenuListItem
-                  testID={
-                    item.name == 'Night mode'
-                      ? notesnook.ids.menu.nightmode
-                      : item.name
-                  }
-                  key={item.name}
-                  item={item}
-                  index={index}
-                  ignore={true}
-                  rightBtn={DDS.isLargeTablet() ? null : BottomItemsList[0]}
-                />
-              )
+            {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 3).map(
+              (item, index) =>
+                item.name === 'Notesnook Pro' &&
+                (user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
+                  user?.subscription?.type ===
+                    SUBSCRIPTION_STATUS.BASIC) ? null : (
+                  <MenuListItem
+                    testID={
+                      item.name == 'Night mode'
+                        ? notesnook.ids.menu.nightmode
+                        : item.name
+                    }
+                    key={item.name}
+                    item={item}
+                    index={index}
+                    ignore={true}
+                    rightBtn={
+                      DDS.isLargeTablet() || item.name === 'Notesnook Pro'
+                        ? null
+                        : BottomItemsList[0]
+                    }
+                  />
+                )
             )}
           </View>
 

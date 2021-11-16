@@ -83,7 +83,13 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
             textAlign: 'left'
           }}
           name={item.icon}
-          color={isFocused ? colors.accent : colors.pri}
+          color={
+            item.icon === 'crown'
+              ? colors.yellow
+              : isFocused
+              ? colors.accent
+              : colors.pri
+          }
           size={SIZE.lg - 2}
         />
         {isFocused ? (
