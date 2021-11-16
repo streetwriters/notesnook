@@ -28,13 +28,14 @@ export const features = [
         highlight: 'Password protected',
         content: 'notes sharing',
         icon: 'file-lock'
-      },
-      {
-        highlight: 'Private vault',
-        content: 'for notes',
-        icon: 'shield-lock'
       }
     ]
+  },
+
+  {
+    title: 'No limit on notes or devices',
+    detail:
+      "Basic or Pro, you can create unlimited number of notes and access them on all your devices. You won't be running out of space or blocks ever."
   },
   {
     title: 'Keep your files where they belong',
@@ -70,9 +71,10 @@ export const features = [
     ]
   },
   {
-    title: 'No limit on notes for free users',
+    title: 'Keep secrets always locked with private vault',
     detail:
-      "Basic or Pro, you can create unlimited number of notes. You won't be running out of space or blocks ever."
+      'An extra layer of security for any important data. Notes in the vault always stay encrypted and require a password to be accessed or edited everytime.',
+    pro: true
   },
   {
     title: 'Find what you need, when you need to',
@@ -95,6 +97,12 @@ export const features = [
         highlight: 'Side menu',
         content: 'shortcuts',
         icon: 'link-variant'
+      },
+      {
+        highlight: 'Pin note in',
+        content: 'notifications',
+        icon: 'pin',
+        platform: 'android'
       }
     ],
     info: '* Free users are limited to keeping 3 notebooks (no limit on topics) and 5 tags.'
@@ -103,7 +111,7 @@ export const features = [
   {
     title: 'Instant syncing',
     detail:
-      'Seemlessly work from anywhere. Every change is synced instantly everywhere.',
+      'Seemlessly work from anywhere on any device. Every change is synced instantly to all your devices.',
     pro: true
   },
   {
@@ -127,6 +135,29 @@ export const features = [
         content: 'support',
         icon: 'language-markdown',
         pro: true
+      },
+      {
+        highlight: 'Write notes from',
+        content: 'notifications',
+        icon: 'bell',
+        platform: 'android'
+      }
+    ]
+  },
+  {
+    title: "Share notes with people who don't have Notesnook",
+    detail:
+      "With monographs, you can publish share your notes with anyone even if they don't have the Notesnook App.",
+    features: [
+      {
+        highlight: 'Password protected',
+        content: 'sharing',
+        icon: 'send-lock'
+      },
+      {
+        highlight: 'Self destruct',
+        content: 'monographs',
+        icon: 'bomb'
       }
     ]
   },
@@ -160,7 +191,21 @@ export const features = [
         highlight: 'Automatic',
         content: 'dark mode',
         icon: 'theme-light-dark'
+      },
+      {
+        highlight: 'Change accent',
+        content: 'color',
+        icon: 'invert-colors'
       }
     ]
   }
 ];
+
+/**
+ * 
+      {
+        highlight: 'Private vault',
+        content: 'for notes',
+        icon: 'shield-lock'
+      }
+ */
