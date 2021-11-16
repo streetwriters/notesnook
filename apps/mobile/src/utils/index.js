@@ -257,13 +257,6 @@ export const MenuItemsList = [
     icon: 'delete-outline',
     close: true
   },
-  {
-    name: 'Notesnook Pro',
-    icon: 'crown',
-    func:() => {
-      eSendEvent(eOpenPremiumDialog);
-    }
-  }
 ];
 
 export const SUBSCRIPTION_STATUS = {

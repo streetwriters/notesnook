@@ -45,7 +45,7 @@ export const PricingPlans = ({
 }) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = {}; //useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);

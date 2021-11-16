@@ -1,22 +1,24 @@
-import React, { useState } from 'react';
-import { Image, ScrollView, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { useUserStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
+import React, {useState} from 'react';
+import {Image, ScrollView, View} from 'react-native';
+import {LAUNCH_ROCKET} from '../../assets/images/assets';
+import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, presentSheet} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
 import GeneralSheet from '../GeneralSheet';
+import {SvgToPngView} from '../ListPlaceholders';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { features } from './features';
-import { Group } from './group';
-import { PricingPlans } from './pricing-plans';
+import {features} from './features';
+import {Group} from './group';
+import {PricingPlans} from './pricing-plans';
 
 export const Component = ({close, promo, getRef}) => {
   const [state, dispatch] = useTracked();
@@ -79,13 +81,20 @@ export const Component = ({close, promo, getRef}) => {
       />
 
       <ScrollView onScroll={onScroll}>
-        <Image
-          source={require('../../assets/images/to_the_stars.png')}
+        <View
           style={{
             width: '100%',
-            height: 400
-          }}
-        />
+            alignItems: 'center',
+            height:400,
+            justifyContent:'center'
+          }}>
+          <SvgToPngView
+            width={350}
+            height={350}
+            src={LAUNCH_ROCKET(colors.accent)}
+          />
+        </View>
+
         <Heading
           size={SIZE.lg}
           style={{
