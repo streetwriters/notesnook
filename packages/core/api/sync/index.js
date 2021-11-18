@@ -52,6 +52,7 @@ export default class Sync {
     this._tokenManager = new TokenManager(this._db.storage);
     this._autoSyncTimeout = 0;
     this._autoSyncInterval = 5000;
+    this._locked = false;
 
     this.syncMutex = withTimeout(
       new Mutex(),
@@ -71,7 +72,51 @@ export default class Sync {
       .finally(() => this._afterSync());
   }
 
+  async remoteSync() {
+    if (this.syncMutex.isLocked()) {
+      this.hasNewChanges = true;
+      return;
+    }
+    await this.syncMutex
+      .runExclusive(async () => {
+        this.stopAutoSync();
+        this.hasNewChanges = false;
+        if (await this._sync(true, false))
+          EV.publish(EVENTS.appRefreshRequested);
+      })
+      .finally(() => this._afterSync());
+  }
+
+  async startAutoSync() {
+    if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
+    this.databaseUpdatedEvent = EV.subscribe(
+      EVENTS.databaseUpdated,
+      this._scheduleSync.bind(this)
+    );
+  }
+
+  stopAutoSync() {
+    clearTimeout(this._autoSyncTimeout);
+    if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
+  }
+
+  acquireLock() {
+    this.stopAutoSync();
+    this._locked = true;
+  }
+
+  async releaseLock() {
+    this._locked = false;
+    await this.startAutoSync();
+  }
+
+  isLocked() {
+    return this._locked;
+  }
+
   async _sync(full, force) {
+    if (this.isLocked()) return false;
+
     let { lastSynced } = await this._performChecks();
     if (force) lastSynced = 0;
 
@@ -115,34 +160,6 @@ export default class Sync {
 
     await this._db.storage.write("lastSynced", lastSynced);
     return true;
-  }
-
-  async remoteSync() {
-    if (this.syncMutex.isLocked()) {
-      this.hasNewChanges = true;
-      return;
-    }
-    await this.syncMutex
-      .runExclusive(async () => {
-        this.stopAutoSync();
-        this.hasNewChanges = false;
-        await this._sync(true, false);
-        EV.publish(EVENTS.appRefreshRequested);
-      })
-      .finally(() => this._afterSync());
-  }
-
-  async startAutoSync() {
-    if (!(await checkIsUserPremium(CHECK_IDS.databaseSync))) return;
-    this.databaseUpdatedEvent = EV.subscribe(
-      EVENTS.databaseUpdated,
-      this._scheduleSync.bind(this)
-    );
-  }
-
-  stopAutoSync() {
-    clearTimeout(this._autoSyncTimeout);
-    if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
   }
 
   async _afterSync() {

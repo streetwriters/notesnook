@@ -140,9 +140,16 @@ export default class Backup {
       },
     ];
 
-    if (await this._migrator.migrate(collections, (id) => data[id], version)) {
-      await this._db.notes.repairReferences();
-      await this._db.notebooks.repairReferences();
+    try {
+      this._db.syncer.acquireLock();
+      if (
+        await this._migrator.migrate(collections, (id) => data[id], version)
+      ) {
+        await this._db.notes.repairReferences();
+        await this._db.notebooks.repairReferences();
+      }
+    } finally {
+      await this._db.syncer.releaseLock();
     }
   }
 
