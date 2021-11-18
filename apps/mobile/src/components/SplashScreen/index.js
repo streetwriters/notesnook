@@ -205,7 +205,7 @@ const SplashScreen = () => {
                 }}
                 style={{
                   paddingHorizontal: 24,
-                  alignSelf: !isNext ? 'center' : 'flex-end'
+                  alignSelf:'center' 
                 }}
                 type="accent"
                 title={isNext ? 'Next' : 'Sign up'}
@@ -215,14 +215,14 @@ const SplashScreen = () => {
                 <Button
                   fontSize={SIZE.md}
                   height={50}
-                  width="100%"
+                  width={DDS.isTab ? 350 : '100%'}
                   onPress={async () => {
                     await hide();
                     await MMKV.setItem('introCompleted', 'true');
                   }}
                   style={{
                     paddingHorizontal: 24,
-                    alignSelf: !isNext ? 'center' : 'flex-end',
+                    alignSelf:'center',
                     marginTop: 10
                   }}
                   type="grayBg"
