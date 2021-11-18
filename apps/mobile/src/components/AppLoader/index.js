@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { Appearance, Platform, SafeAreaView, View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
+import React, {useEffect, useRef, useState} from 'react';
+import {Appearance, Platform, SafeAreaView, View} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import {
   useFavoriteStore,
   useNoteStore,
@@ -11,7 +11,7 @@ import {
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -20,18 +20,16 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import { editing } from '../../utils';
-import { COLOR_SCHEME_DARK } from '../../utils/Colors';
-import { db } from '../../utils/database';
-import {
-  eOpenLoginDialog, eOpenRateDialog
-} from '../../utils/Events';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { SettingsBackupAndRestore } from '../../views/Settings';
-import { Button } from '../Button';
+import {editing} from '../../utils';
+import {COLOR_SCHEME_DARK} from '../../utils/Colors';
+import {db} from '../../utils/database';
+import {eOpenLoginDialog, eOpenRateDialog} from '../../utils/Events';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {SettingsBackupAndRestore} from '../../views/Settings';
+import {Button} from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
@@ -52,6 +50,7 @@ const AppLoader = ({onLoad}) => {
   const user = useUserStore(state => state.user);
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
+  const deviceMode = useSettingStore(state => state.deviceMode);
   const pwdInput = useRef();
 
   const load = async value => {
@@ -234,17 +233,31 @@ const AppLoader = ({onLoad}) => {
             style={{
               flex: 1,
               justifyContent: 'center',
-              width: Platform.OS == 'ios' ? '95%' : '100%',
+              width:
+                deviceMode !== 'mobile'
+                  ? '50%'
+                  : Platform.OS == 'ios'
+                  ? '95%'
+                  : '100%',
               paddingHorizontal: 12
             }}>
-            <Heading>Verify your identity</Heading>
+            <Heading
+              style={{
+                alignSelf: 'center'
+              }}>
+              Verify your identity
+            </Heading>
+
             {user ? (
               <>
-                <Paragraph>
+                <Paragraph
+                  style={{
+                    alignSelf: 'center'
+                  }}>
                   To keep your notes secure, please enter password of the
                   account you are logged in to.
                 </Paragraph>
-                <Seperator half />
+                <Seperator />
                 <Input
                   fwdRef={pwdInput}
                   secureTextEntry
@@ -252,6 +265,7 @@ const AppLoader = ({onLoad}) => {
                   onChangeText={v => (passwordValue = v)}
                   onSubmit={onSubmit}
                 />
+                <Seperator half />
                 <Button
                   title="Unlock"
                   type="accent"
@@ -264,7 +278,10 @@ const AppLoader = ({onLoad}) => {
               </>
             ) : (
               <>
-                <Paragraph>
+                <Paragraph
+                  style={{
+                    alignSelf: 'center'
+                  }}>
                   To keep your notes secure, please unlock app the with
                   biometrics.
                 </Paragraph>
