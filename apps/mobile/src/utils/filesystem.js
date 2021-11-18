@@ -1,12 +1,12 @@
 import React from 'react';
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import { ShareComponent } from '../components/ExportDialog/share';
-import { useAttachmentStore } from '../provider/stores';
-import { presentSheet, ToastEvent } from '../services/EventManager';
-import { db } from './database';
+import {ShareComponent} from '../components/ExportDialog/share';
+import {useAttachmentStore} from '../provider/stores';
+import {presentSheet, ToastEvent} from '../services/EventManager';
+import {db} from './database';
 import Storage from './storage';
 
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
@@ -60,7 +60,6 @@ async function writeEncrypted(filename, {data, type, key}) {
 }
 
 async function uploadFile(filename, data, cancelToken) {
-  
   if (!data) return false;
   let {url, headers} = data;
 
@@ -112,9 +111,16 @@ async function uploadFile(filename, data, cancelToken) {
   }
 }
 
+const santizeUri = uri => {
+  uri = decodeURI(uri);
+  uri = Platform.OS === 'ios' ? uri.replace('file:///', '/') : uri;
+  return uri;
+};
+
 async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
-  let {url, headers} = data;
+  let {url, headers, metadata} = data;
+
   console.log('downloading file: ', filename, url);
   try {
     let path = `${cacheDir}/${filename}`;
@@ -143,9 +149,17 @@ async function downloadFile(filename, data, cancelToken) {
       });
     cancelToken.cancel = request.cancel;
     let response = await request;
+    let originalHash = metadata?.hash || filename;
+    let hash = Sodium.hashFile({
+      uri: santizeUri(path),
+      type: 'url'
+    });
+
+    console.log('downloaded file hash:', hash, 'original hash: ', originalHash);
+
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
-    return status >= 200 && status < 300;
+    return status >= 200 && status < 300 && hash === originalHash;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
     console.log('download file error: ', e, url, headers);
