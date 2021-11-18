@@ -10,7 +10,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import {editing, InteractionManager} from '../../utils';
+import {editing} from '../../utils';
 import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
@@ -26,6 +26,7 @@ import {tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
+import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -46,8 +47,15 @@ let title = '';
 let saveCounter = 0;
 let timer = null;
 let webviewInit = false;
-let intent = false;
 let appColors = COLOR_SCHEME;
+
+let currentEditingTimer = null;
+let webviewTimer = null;
+let requestedReload = false;
+let cTimeout = null;
+let disableSaving = false;
+let isSaving = false;
+let waitForContent = false;
 
 export function setWebviewInit(init) {
   webviewInit = init;
@@ -55,14 +63,6 @@ export function setWebviewInit(init) {
 
 export function getWebviewInit() {
   return webviewInit;
-}
-
-export function setIntent() {
-  intent = true;
-}
-
-export function getIntent() {
-  return intent;
 }
 
 export function setColors(colors) {
@@ -81,20 +81,42 @@ export function isNotedEdited() {
   return noteEdited;
 }
 
+async function waitForEvent(event, caller) {
+  return new Promise((resolve, reject) => {
+    let resolved;
+    let event_callback = () => {
+      eUnSubscribeEvent(event, event_callback);
+      resolved = true;
+      clearTimeout(resolved);
+      waitForContent = false;
+      resolve(true);
+    };
+    eSubscribeEvent(event, event_callback);
+    caller();
+    resolved = setTimeout(() => {
+      resolve(true);
+    }, 2000);
+  });
+}
+
 export async function clearTimer(clear) {
-  if (timer) {
-    clearTimeout(timer);
-    timer = null;
-    if (clear) {
-      if (!id) return;
-      if (
-        (content?.data &&
-          typeof content.data === 'string' &&
-          content.data?.trim().length > 0) ||
-        (title && title?.trim().length > 0)
-      ) {
-        await saveNote(true);
-      }
+  clearTimeout(timer);
+  timer = null;
+  if (waitForContent) {
+    await waitForEvent('content_event', () => {
+      tiny.call(EditorWebView, request_content);
+    });
+  }
+  if (clear) {
+    if (!id) return;
+    if (
+      (content?.data &&
+        typeof content.data === 'string' &&
+        content.data?.trim().length > 0) ||
+      (title && title?.trim().length > 0)
+    ) {
+      console.log('saving note');
+      await saveNote(true);
     }
   }
   if (currentEditingTimer) {
@@ -112,6 +134,17 @@ export const CHECK_STATUS = `(function() {
         window.ReactNativeWebView.postMessage(msg)
 
        },${Platform.OS === 'ios' ? '300' : '1'})
+})();`;
+
+const request_content = `(function() {
+  if (window.ReactNativeWebView) {
+    window.ReactNativeWebView.postMessage(
+      JSON.stringify({
+        type: 'tiny',
+        value: tinymce.activeEditor.dom.doc.body.innerHTML
+      })
+    );
+  }
 })();`;
 
 export function getNote() {
@@ -183,10 +216,6 @@ function clearNote() {
   };
 }
 
-let currentEditingTimer = null;
-
-let webviewTimer = null;
-let requestedReload = false;
 export const loadNote = async item => {
   console.log('.....OPEN NOTE.....');
   editing.currentlyEditing = true;
@@ -204,7 +233,6 @@ export const loadNote = async item => {
     lastEditTime = 0;
     clearNote();
     noteEdited = false;
-    isFirstLoad = false;
     if (Platform.OS === 'android') {
       await sleep(100);
       textInput.current?.focus();
@@ -236,7 +264,6 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, false, true);
     }
-    isFirstLoad = true;
     disableSaving = false;
     noteEdited = false;
     await setNote(item);
@@ -292,11 +319,11 @@ export const _onMessage = async evt => {
   }
   switch (message.type) {
     case 'history':
+      console.log('history', message.value);
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
       if (message.value !== content.data) {
-        console.log('content changed');
         noteEdited = true;
         lastEditTime = Date.now();
         content = {
@@ -304,6 +331,9 @@ export const _onMessage = async evt => {
           data: message.value
         };
         onNoteChange();
+      }
+      if (waitForContent) {
+        eSendEvent('content_event');
       }
       break;
     case 'title':
@@ -326,7 +356,6 @@ export const _onMessage = async evt => {
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
       eSendEvent('loadingNote');
-
       break;
     case 'premium':
       let user = await db.user.getUser();
@@ -385,90 +414,33 @@ export const _onMessage = async evt => {
 
 function showImageOptionsTooltip() {
   editing.tooltip = 'imageoptions';
-  eSendEvent('showTooltip', {
-    data: [
-      {
-        format: 'imagepreview',
-        type: 'format',
-        fullname: 'Image preview'
-      },
-      {
-        format: 'imageResize25',
-        text: '25%',
-        type: 'format',
-        showTitle: false,
-        fullname: 'Resize to 25%'
-      },
-      {
-        format: 'imageResize50',
-        text: '50%',
-        type: 'format',
-        showTitle: false,
-        fullname: 'Resize to 25%'
-      },
-      {
-        format: 'imageResize100',
-        text: '100%',
-        type: 'format',
-        showTitle: false,
-        fullname: 'Resize to 25%'
-      },
-      {
-        format: 'imagefloatleft',
-        type: 'format',
-        fullname: 'Remove image'
-      },
-      {
-        format: 'imagefloatright',
-        type: 'format',
-        fullname: 'Image preview'
-      },
-      {
-        format: 'imagefloatnone',
-        type: 'format',
-        fullname: 'Image preview'
-      },
-      {
-        format: 'removeimage',
-        type: 'format',
-        fullname: 'Remove image'
-      }
-    ],
-    title: 'imageoptions',
-    default: null,
-    type: 'imageoptions',
-    pageX: 0
-  });
+  eSendEvent('showTooltip', IMAGE_TOOLTIP_CONFIG);
 }
-
-let isFirstLoad = true;
 
 function onNoteChange() {
   clearTimeout(timer);
   timer = null;
-  if (isFirstLoad) {
-    isFirstLoad = false;
-    noteEdited = false;
-    return;
-  }
   noteEdited = true;
   timer = setTimeout(() => {
     if (noteEdited) {
       saveNote();
     }
-  }, 250);
+  }, 150);
 }
 
-let cTimeout = null;
-let disableSaving = false;
 export async function clearEditor(
   clear = true,
   reset = true,
   immediate = false
 ) {
   tiny.call(EditorWebView, tiny.isLoading);
-  clear && (await clearTimer(true));
-  isFirstLoad = true;
+  if (clear) {
+    console.log('clearing content start');
+    waitForContent = true;
+
+    await clearTimer(true);
+    console.log('clearing content end');
+  }
   disableSaving = true;
   db.fs.cancel(getNote()?.id);
   clearNote();
@@ -479,6 +451,7 @@ export async function clearEditor(
   let func = async () => {
     try {
       reset && EditorWebView.current?.reload();
+
       editing.focusType = null;
       eSendEvent('historyEvent', {
         undo: 0,
@@ -559,14 +532,10 @@ async function addToCollection(id) {
     }
   }
 }
-let isSaving = false;
-export async function saveNote(preventUpdate) {
-  if (disableSaving) {
-    return;
-  }
 
-  if (!noteEdited) return;
-  if (isSaving && !id) return;
+export async function saveNote(preventUpdate) {
+  if (disableSaving || !noteEdited || (isSaving && !id)) return;
+
   isSaving = true;
   try {
     if (id && !db.notes.note(id)) {
@@ -682,38 +651,6 @@ export const presentResolveConflictDialog = _note => {
   });
 };
 
-export async function updateNoteInEditor() {
-  return;
-  let _note = db.notes.note(id).data;
-  if (_note.conflicted) {
-    presentResolveConflictDialog(_note);
-    return;
-  }
-  let data = await db.content.raw(_note.contentId);
-  if (lastEditTime > _note.dateEdited) return;
-  if (data.data === content.data) return;
-  if (content.data.indexOf(data.data) !== -1) return;
-  if (note.dateEdited === _note.dateEdited) return;
-
-  console.log('injecting note in editor', lastEditTime, _note.dateEdited);
-  title = note.title;
-  content.data = data.data;
-  note = _note;
-  lastEditTime = _note.dateEdited + 10;
-  tiny.call(EditorWebView, tiny.isLoading);
-  await setNote(_note);
-  tiny.call(EditorWebView, tiny.isLoading);
-  post('title', title);
-  post('inject', content.data);
-  setTimeout(() => {
-    tiny.call(EditorWebView, tiny.notLoading);
-  }, 50);
-  if (id) {
-    db.attachments.downloadImages(id);
-  }
-  tiny.call(EditorWebView, tiny.notLoading);
-}
-
 const loadNoteInEditor = async (keepHistory = true) => {
   if (!webviewInit) return;
   saveCounter = 0;
@@ -753,3 +690,35 @@ const loadNoteInEditor = async (keepHistory = true) => {
     tiny.call(EditorWebView, tiny.clearHistory);
   }
 };
+
+export async function updateNoteInEditor() {
+  return;
+  let _note = db.notes.note(id).data;
+  if (_note.conflicted) {
+    presentResolveConflictDialog(_note);
+    return;
+  }
+  let data = await db.content.raw(_note.contentId);
+  if (lastEditTime > _note.dateEdited) return;
+  if (data.data === content.data) return;
+  if (content.data.indexOf(data.data) !== -1) return;
+  if (note.dateEdited === _note.dateEdited) return;
+
+  console.log('injecting note in editor', lastEditTime, _note.dateEdited);
+  title = note.title;
+  content.data = data.data;
+  note = _note;
+  lastEditTime = _note.dateEdited + 10;
+  tiny.call(EditorWebView, tiny.isLoading);
+  await setNote(_note);
+  tiny.call(EditorWebView, tiny.isLoading);
+  post('title', title);
+  post('inject', content.data);
+  setTimeout(() => {
+    tiny.call(EditorWebView, tiny.notLoading);
+  }, 50);
+  if (id) {
+    db.attachments.downloadImages(id);
+  }
+  tiny.call(EditorWebView, tiny.notLoading);
+}

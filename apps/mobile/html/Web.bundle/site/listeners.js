@@ -1,3 +1,24 @@
+function countWords(str) {
+  let count = 0;
+  let shouldCount = false;
+
+  for (var i = 0; i < str.length; ++i) {
+    const s = str[i];
+
+    if (s === " " || s === "\r" || s === "\n" || s === "*") {
+      if (!shouldCount) continue;
+      ++count;
+      shouldCount = false;
+    } else {
+      shouldCount = true;
+    }
+  }
+
+  if (shouldCount) ++count;
+  return count;
+}
+
+
 let titleInput = document.getElementById('titleInput');
 let infoBar = '.info-bar';
 let info = null;
@@ -84,7 +105,7 @@ function onTitleChange() {
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
       info.querySelector('#infowords').innerText =
-        tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+      countWords(tinymce.activeEditor.dom.doc.body.innerText) + ' words';
     }
 
     if (titleMessage && typeof titleMessage.value === 'string') {
@@ -140,7 +161,7 @@ function attachMessageListener() {
           window.blur();
         }, 300);
         info.querySelector('#infowords').innerText =
-          tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+         countWords(tinymce.activeEditor.dom.doc.body.innerText) + ' words';
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;

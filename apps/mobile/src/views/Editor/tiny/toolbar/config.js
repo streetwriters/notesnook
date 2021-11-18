@@ -6,6 +6,61 @@ import {
   editor_colors
 } from './constants';
 
+export const IMAGE_TOOLTIP_CONFIG = {
+  data: [
+    {
+      format: 'imagepreview',
+      type: 'format',
+      fullname: 'Image preview'
+    },
+    {
+      format: 'imageResize25',
+      text: '25%',
+      type: 'format',
+      showTitle: false,
+      fullname: 'Resize to 25%'
+    },
+    {
+      format: 'imageResize50',
+      text: '50%',
+      type: 'format',
+      showTitle: false,
+      fullname: 'Resize to 25%'
+    },
+    {
+      format: 'imageResize100',
+      text: '100%',
+      type: 'format',
+      showTitle: false,
+      fullname: 'Resize to 25%'
+    },
+    {
+      format: 'imagefloatleft',
+      type: 'format',
+      fullname: 'Remove image'
+    },
+    {
+      format: 'imagefloatright',
+      type: 'format',
+      fullname: 'Image preview'
+    },
+    {
+      format: 'imagefloatnone',
+      type: 'format',
+      fullname: 'Image preview'
+    },
+    {
+      format: 'removeimage',
+      type: 'format',
+      fullname: 'Remove image'
+    }
+  ],
+  title: 'imageoptions',
+  default: null,
+  type: 'imageoptions',
+  pageX: 0
+}
+
 export const TOOLBAR_CONFIG = [
   [
     {
