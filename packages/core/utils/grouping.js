@@ -13,14 +13,15 @@ const getSortSelectors = (options) => [
   { desc: (t) => t.pinned },
   {
     [options.sortDirection]: (item) => {
-      if (options.sortBy === "title") return getFirstCharacter(item);
+      if (options.sortBy === "title")
+        return getFirstCharacter(item.alias || item.title);
       return item[options.sortBy];
     },
   },
 ];
 
 const KEY_SELECTORS = {
-  abc: (item) => getFirstCharacter(item),
+  abc: (item) => getFirstCharacter(item.alias || item.title),
   month: (item, groupBy) => dayjs(item[groupBy]).format("MMMM"),
   week: (item, groupBy) => getWeekGroupFromTimestamp(item[groupBy]),
   year: (item, groupBy) => dayjs(item[groupBy]).year(),
@@ -73,8 +74,9 @@ export function groupArray(
   return items;
 }
 
-function getFirstCharacter(item) {
-  const title = item.title && item.title.trim();
-  if (!title || title.length <= 0) return "-";
-  return title[0].toUpperCase();
+function getFirstCharacter(str) {
+  if (!str) return "-";
+  str = str.trim();
+  if (str.length <= 0) return "-";
+  return str[0].toUpperCase();
 }

@@ -47,11 +47,12 @@ export default class CachedCollection extends IndexedCollection {
     return Array.from(this.map.values());
   }
 
-  getItems(sortFn = (u) => u.dateCreated) {
+  getItems(sortFn = (u) => u.dateCreated, manipulate = (item) => item) {
     let items = [];
     this.map.forEach((value) => {
       if (!value || value.deleted || !value.id) return;
-      items[items.length] = value;
+      value = manipulate ? manipulate(value) : value;
+      items.push(value);
     });
     return sort(items).desc(sortFn);
   }

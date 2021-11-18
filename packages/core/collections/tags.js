@@ -6,7 +6,9 @@ import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
-    const tagItem = this.all.find((t) => t.id === id || t.title === id);
+    const tagItem = this._collection
+      .getItems()
+      .find((t) => t.id === id || t.title === id);
     return tagItem;
   }
 
@@ -63,7 +65,11 @@ export default class Tags extends Collection {
   }
 
   get all() {
-    return this._collection.getItems();
+    return this._collection.getItems(undefined, (item) => {
+      const alias = this.alias(item.id);
+      if (alias) item.alias = alias;
+      return item;
+    });
   }
 
   async remove(tagId) {
