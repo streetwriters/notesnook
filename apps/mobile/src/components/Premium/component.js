@@ -61,7 +61,7 @@ export const Component = ({close, promo, getRef}) => {
         backgroundColor: colors.bg,
         justifyContent: 'space-between',
         borderRadius: 10,
-        maxHeight: DDS.isTab ? '90%' : '100%'
+        maxHeight:'100%'
       }}>
       <GeneralSheet context="pricing_plans" />
       <ActionIcon
@@ -70,7 +70,7 @@ export const Component = ({close, promo, getRef}) => {
         }}
         customStyle={{
           position: 'absolute',
-          right: 15,
+          right:DDS.isTab ? 30 : 15,
           top: 30,
           zIndex: 10,
           width: 50,
@@ -80,7 +80,11 @@ export const Component = ({close, promo, getRef}) => {
         name="close"
       />
 
-      <ScrollView onScroll={onScroll}>
+      <ScrollView
+      style={{
+        paddingHorizontal:DDS.isTab ? DDS.width/5 : 0
+      }}
+      onScroll={onScroll}>
         <View
           style={{
             width: '100%',
