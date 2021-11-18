@@ -7,7 +7,8 @@ export async function downloadAttachment(hash) {
   const downloadResult = await db.fs.downloadFile(
     attachment.metadata.hash,
     attachment.metadata.hash,
-    attachment.chunkSize
+    attachment.chunkSize,
+    attachment.metadata
   );
   if (!downloadResult) throw new Error("Failed to download file.");
 

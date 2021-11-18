@@ -8,6 +8,7 @@ import { getNNCrypto } from "./nncrypto.stub";
 import hosts from "notes-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
 import { saveAs } from "file-saver";
+import { showToast } from "../utils/toast";
 
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
@@ -267,7 +268,8 @@ function reportProgress(ev, { type, hash }) {
 }
 
 async function downloadFile(filename, requestOptions) {
-  const { url, headers, chunkSize, cancellationToken } = requestOptions;
+  const { url, headers, chunkSize, cancellationToken, metadata } =
+    requestOptions;
   if (await streamablefs.exists(filename)) return true;
 
   try {
@@ -284,11 +286,19 @@ async function downloadFile(filename, requestOptions) {
       onDownloadProgress: (ev) =>
         reportProgress(ev, { type: "download", hash: filename }),
     });
+
     const contentLength =
       response.headers["content-length"] || response.headers["Content-Length"];
     if (!isSuccessStatusCode(response.status) || contentLength === "0") {
       console.error("Abort: file length is 0.", filename);
       return false;
+    }
+
+    if (
+      metadata &&
+      !(await verify(response.data, metadata.hash, metadata.hashType))
+    ) {
+      throw new Error("File verification failed.");
     }
 
     const distributor = new ChunkDistributor(chunkSize + ABYTES);
@@ -307,9 +317,25 @@ async function downloadFile(filename, requestOptions) {
 
     return true;
   } catch (e) {
+    showToast("error", `Could not download file: ${e.message}`);
     console.error(e);
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
+  }
+}
+
+/**
+ *
+ * @param {Uint8Array} data
+ * @param {string} hash
+ * @param {string} hashType
+ */
+async function verify(data, hash, hashType) {
+  switch (hashType) {
+    case "xxh64":
+      return (await xxhash64(data)) === hash;
+    default:
+      return false;
   }
 }
 
