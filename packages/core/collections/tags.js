@@ -11,11 +11,15 @@ export default class Tags extends Collection {
   }
 
   async add(tagId, ...noteIds) {
-    if (!tagId) return console.error("tagId cannot be undefined.");
-    if (typeof tagId === "object")
-      throw new Error("tagId cannot be an object: " + JSON.stringify(tagId));
+    tagId = this.sanitize(tagId);
+    if (!tagId) throw new Error("Tag title cannot be empty.");
 
-    let tag = this.tag(tagId) || {
+    let tag = this.tag(tagId);
+
+    if (tag && !noteIds.length)
+      throw new Error("A tag with this id already exists.");
+
+    tag = tag || {
       title: tagId,
     };
 
@@ -93,5 +97,12 @@ export default class Tags extends Collection {
       await this._db.settings.unpin(tag.id);
       await this._collection.deleteItem(tag.id);
     }
+  }
+
+  sanitize(tag) {
+    if (!tag) return;
+    let sanitized = tag.toLocaleLowerCase();
+    sanitized = sanitized.replace(/[^a-z0-9_\-]+/g, "");
+    return sanitized.trim();
   }
 }
