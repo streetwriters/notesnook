@@ -1,14 +1,13 @@
 import React from 'react';
+import { Platform } from 'react-native';
+import * as ScopedStorage from 'react-native-scoped-storage';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
-import {useAttachmentStore} from '../provider/stores';
-import {eSendEvent, presentSheet, ToastEvent} from '../services/EventManager';
-import {db} from './database';
+import { ShareComponent } from '../components/ExportDialog/share';
+import { useAttachmentStore } from '../provider/stores';
+import { presentSheet, ToastEvent } from '../services/EventManager';
+import { db } from './database';
 import Storage from './storage';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import {eOpenProgressDialog} from './Events';
-import {ShareComponent} from '../components/ExportDialog/share';
-import {Platform} from 'react-native';
 
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 
@@ -60,9 +59,12 @@ async function writeEncrypted(filename, {data, type, key}) {
   };
 }
 
-async function uploadFile(filename, {url, headers}, cancelToken) {
-  console.log('uploading file: ', filename, headers);
+async function uploadFile(filename, data, cancelToken) {
+  
+  if (!data) return false;
+  let {url, headers} = data;
 
+  console.log('uploading file: ', filename, headers);
   try {
     let res = await fetch(url, {
       method: 'PUT',
@@ -110,7 +112,9 @@ async function uploadFile(filename, {url, headers}, cancelToken) {
   }
 }
 
-async function downloadFile(filename, {url, headers}, cancelToken) {
+async function downloadFile(filename, data, cancelToken) {
+  if (!data) return false;
+  let {url, headers} = data;
   console.log('downloading file: ', filename, url);
   try {
     let path = `${cacheDir}/${filename}`;
@@ -150,14 +154,14 @@ async function downloadFile(filename, {url, headers}, cancelToken) {
 }
 
 async function deleteFile(filename, data) {
-  let {url, headers} = data;
-  console.log('deleting file', data);
   if (!data) {
     if (!filename) return;
     let delFilePath = cacheDir + `/${filename}`;
     RNFetchBlob.fs.unlink(delFilePath).catch(console.log);
     return true;
   }
+
+  let {url, headers} = data;
   try {
     let response = await RNFetchBlob.fetch('DELETE', url, headers);
     let status = response.info().status;
