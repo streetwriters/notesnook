@@ -39,13 +39,13 @@ const menuItems = [
 ];
 
 function Tag({ item, index }) {
-  const { id, noteIds } = item;
+  const { id, noteIds, alias } = item;
   return (
     <ListItem
       item={item}
       selectable={false}
       index={index}
-      title={<TagNode title={db.tags.alias(id)} />}
+      title={<TagNode title={alias} />}
       footer={
         <Text mt={1} variant="subBody">
           {noteIds.length} notes
