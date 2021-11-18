@@ -48,6 +48,7 @@ function Field(props) {
     placeholder,
     validatePassword,
     onError,
+    variant,
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);
@@ -83,6 +84,7 @@ function Field(props) {
       <Flex mt={1} sx={{ position: "relative" }}>
         <Input
           data-test-id={props["data-test-id"]}
+          variant={variant}
           defaultValue={defaultValue}
           ref={inputRef}
           autoFocus={autoFocus}

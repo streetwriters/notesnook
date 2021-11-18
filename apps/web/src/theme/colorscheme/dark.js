@@ -7,6 +7,7 @@ class DarkColorSchemeFactory {
       primary: accent,
       placeholder: hexToRGB("#ffffff", 0.6),
       background: "#1f1f1f",
+      bgTransparent: "#1f1f1f99",
       accent: "#000",
       bgSecondary: "#2b2b2b",
       bgSecondaryText: "#A1A1A1",

@@ -22,6 +22,7 @@
     "emotion-theming": "^10.0.19",
     "event-source-polyfill": "^1.0.25",
     "fast-sort": "^2.1.1",
+    "fetch-jsonp": "^1.2.1",
     "file-saver": "^2.0.5",
     "framer-motion": "^4.1.17",
     "hash-wasm": "^4.9.0",

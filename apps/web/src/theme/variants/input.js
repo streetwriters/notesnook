@@ -22,7 +22,7 @@ class Default {
       color: "text",
       outline: "none",
       ":focus": {
-        boxShadow: "0px 0px 0px 2px var(--primary) inset",
+        boxShadow: "0px 0px 0px 1.5px var(--primary) inset",
       },
       ":hover:not(:focus)": {
         boxShadow: "0px 0px 0px 1px var(--dimPrimary) inset",
@@ -51,13 +51,13 @@ class Error {
   constructor() {
     return {
       variant: "forms.input",
-      borderColor: "red",
+      boxShadow: "0px 0px 0px 1px var(--error) inset",
+      outline: "none",
       ":focus": {
-        outline: "none",
-        borderColor: "red",
+        boxShadow: "0px 0px 0px 1.5px var(--error) inset",
       },
-      ":hover": {
-        borderColor: "darkred",
+      ":hover:not(:focus)": {
+        boxShadow: "0px 0px 0px 1px var(--error) inset",
       },
     };
   }
