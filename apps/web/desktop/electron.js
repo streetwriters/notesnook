@@ -8,6 +8,7 @@ const { getBackgroundColor, getTheme, setTheme } = require("./config/theme");
 const getZoomFactor = require("./ipc/calls/getZoomFactor");
 const { logger } = require("./logger");
 const { setupMenu } = require("./menu");
+const WindowState = require("./config/windowstate");
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
@@ -16,7 +17,19 @@ try {
 let mainWindow;
 
 async function createWindow() {
+  const mainWindowState = new WindowState({});
+  console.log({
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+  });
   mainWindow = new BrowserWindow({
+    x: mainWindowState.x,
+    y: mainWindowState.y,
+    width: mainWindowState.width,
+    height: mainWindowState.height,
+
     backgroundColor: getBackgroundColor(),
     darkTheme: getTheme() === "dark",
     autoHideMenuBar: true,
@@ -35,14 +48,15 @@ async function createWindow() {
       preload: __dirname + "/preload.js",
     },
   });
+  mainWindowState.manage(mainWindow);
+
   global.win = mainWindow;
+
   setTheme(getTheme());
   setupMenu(mainWindow);
 
   if (isDevelopment())
     mainWindow.webContents.openDevTools({ mode: "right", activate: true });
-
-  mainWindow.maximize();
 
   try {
     await mainWindow.loadURL(isDevelopment() ? "http://localhost:3000" : URL);

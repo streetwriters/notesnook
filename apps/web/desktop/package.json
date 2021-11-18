@@ -10,7 +10,6 @@
   "dependencies": {
     "diary": "^0.1.6",
     "electron-better-ipc": "^2.0.1",
-    "electron-data-storage": "^1.0.7",
     "electron-serve": "^1.1.0",
     "electron-updater": "^4.3.8",
     "node-fetch": "^2.6.1"

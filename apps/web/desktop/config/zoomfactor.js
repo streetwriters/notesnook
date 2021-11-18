@@ -1,12 +1,12 @@
-const storage = require("electron-data-storage").default;
+const JSONStorage = require("../jsonstorage");
 
 function getZoomFactor() {
-  let factor = parseFloat(storage.getSync("zoomFactor"));
+  let factor = parseFloat(JSONStorage.get("zoomFactor"));
   return isNaN(factor) ? 1.0 : factor;
 }
 
 function setZoomFactor(factor) {
-  return storage.set("zoomFactor", factor.toString());
+  return JSONStorage.set("zoomFactor", factor.toString());
 }
 
 module.exports = { setZoomFactor, getZoomFactor };

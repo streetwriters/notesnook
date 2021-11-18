@@ -1,14 +1,14 @@
-const { default: storage } = require("electron-data-storage");
+const JSONStorage = require("../jsonstorage");
 const { nativeTheme } = require("electron");
 
 function getTheme() {
-  return storage.getSync("theme") || "light";
+  return JSONStorage.get("theme") || "light";
 }
 
 function setTheme(theme) {
   nativeTheme.themeSource = theme;
   if (global.win) global.win.setBackgroundColor(getBackgroundColor(theme));
-  return storage.set("theme", theme);
+  return JSONStorage.set("theme", theme);
 }
 
 function getBackgroundColor(theme) {
