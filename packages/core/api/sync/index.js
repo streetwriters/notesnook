@@ -52,7 +52,6 @@ export default class Sync {
     this._tokenManager = new TokenManager(this._db.storage);
     this._autoSyncTimeout = 0;
     this._autoSyncInterval = 5000;
-    this._locked = false;
 
     this.syncMutex = withTimeout(
       new Mutex(),
@@ -100,23 +99,13 @@ export default class Sync {
     if (this.databaseUpdatedEvent) this.databaseUpdatedEvent.unsubscribe();
   }
 
-  acquireLock() {
+  async acquireLock(callback) {
     this.stopAutoSync();
-    this._locked = true;
-  }
-
-  async releaseLock() {
-    this._locked = false;
+    await this.syncMutex.runExclusive(callback);
     await this.startAutoSync();
   }
 
-  isLocked() {
-    return this._locked;
-  }
-
   async _sync(full, force) {
-    if (this.isLocked()) return false;
-
     let { lastSynced } = await this._performChecks();
     if (force) lastSynced = 0;
 
