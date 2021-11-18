@@ -170,6 +170,8 @@ function ListItem(props) {
           border: "1px solid",
           borderColor: "primary",
         },
+        overflow: "hidden",
+        maxWidth: "100%",
       }}
       onKeyPress={(e) => {
         if (e.key === "Enter") e.target.click();

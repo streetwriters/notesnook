@@ -458,11 +458,15 @@ export function showCreateTagDialog() {
         perform(false);
       }}
       onAction={async (title) => {
-        if (!title) return;
-        await db.tags.add(title);
-        showToast("success", "Tag created!");
-        tagStore.refresh();
-        perform(true);
+        if (!title) return showToast("error", "Tag title cannot be empty.");
+        try {
+          await db.tags.add(title);
+          showToast("success", "Tag created!");
+          tagStore.refresh();
+          perform(true);
+        } catch (e) {
+          showToast("error", e.message);
+        }
       }}
     />
   ));

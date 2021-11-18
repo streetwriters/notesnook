@@ -27,7 +27,7 @@ function Header() {
       />
 
       {id && (
-        <Flex alignItems="center" flexWrap="wrap">
+        <Flex alignItems="center" flexWrap="wrap" sx={{ lineHeight: 2.5 }}>
           {tags.map((tag) => (
             <IconTag
               testId={`tag-${tag}`}
@@ -36,14 +36,14 @@ function Header() {
               icon={Icon.Tag}
               title={`Click to remove`}
               onClick={() => setTag(tag)}
-              styles={{ container: { mb: 1 }, text: { fontSize: "body" } }}
+              styles={{ text: { fontSize: "body" } }}
             />
           ))}
           <Autosuggest
             sx={{ ml: 1 }}
             getData={() => db.tags.all}
             getFields={(item) => [db.tags.alias(item.id)]}
-            limit={5}
+            limit={10}
             onAdd={(value) => setTag(value)}
             onSelect={(item) => setTag(item.title)}
             onRemove={() => {
@@ -52,20 +52,17 @@ function Header() {
             }}
             customFilter={(item) => tags.indexOf(item.title) === -1}
             renderSuggestion={(item, isSelected) => (
-              <Flex
-                flex={1}
-                pr={50}
-                pl={2}
-                py={1}
-                bg={isSelected ? "hover" : "transparent"}
-                title={`Press enter or click to add this tag`}
-                sx={{ cursor: "pointer" }}
-              >
-                <Icon.Tag size={14} />
-                <Text variant="title" fontWeight="body">
+              <>
+                <Icon.Tag size={12} sx={{ flexShrink: 0 }} />
+                <Text
+                  variant="subtitle"
+                  fontWeight="body"
+                  ml={1}
+                  sx={{ textOverflow: "ellipsis" }}
+                >
                   {db.tags.alias(item.id)}
                 </Text>
-              </Flex>
+              </>
             )}
           />
         </Flex>
@@ -108,7 +105,7 @@ function Autosuggest({
         variant="clean"
         width="auto"
         alignSelf="flex-start"
-        sx={{ width: "auto", border: "none", p: 0 }}
+        sx={{ width: "auto", border: "none", p: 0, fontSize: "body" }}
         placeholder="Add a tag..."
         data-test-id="editor-tag-input"
         fontSize="subtitle"
@@ -122,13 +119,7 @@ function Autosuggest({
             const fields = getFields(d);
             return (
               fields.some((field) => {
-                return (
-                  field
-                    ?.normalize("NFD")
-                    .replace(/[\u0300-\u036f]/g, "")
-                    .toLowerCase()
-                    .indexOf(value.toLowerCase()) !== -1
-                );
+                return field.startsWith(value.toLowerCase());
               }) &&
               (!customFilter || customFilter(d))
             );
@@ -140,10 +131,11 @@ function Autosuggest({
             if (selectedIndex > -1) {
               onSelect(filtered[selectedIndex]);
             } else {
-              onAdd(e.target.value);
+              onAdd(e.target.value.toLowerCase());
             }
             e.target.value = "";
             setFiltered([]);
+            setSelectedIndex(-1);
           } else if (e.target.value === "" && e.key === "Backspace") {
             onRemove();
           } else if (e.key === "Escape") {
@@ -168,32 +160,38 @@ function Autosuggest({
           flexDirection="column"
           sx={{
             position: "absolute",
-            top: 25,
+            top: 35,
             border: "1px solid",
             borderColor: "border",
             borderRadius: "default",
             boxShadow: "0px 4px 10px 0px #00000022",
             zIndex: 2,
+            height: 200,
+            width: 150,
+            overflowX: "hidden",
           }}
           bg="background"
         >
           {filtered.map((item, index) => (
             <Button
-              variant="tool"
+              variant="menuitem"
               className="suggestion-item"
               key={item.id}
-              onMouseEnter={() => {
-                setSelectedIndex(index);
-              }}
               onClick={(e) => {
                 onSelect(item);
                 inputRef.current.value = "";
                 setFiltered([]);
               }}
-              p={0}
               m={0}
+              lineHeight="initial"
+              display="flex"
+              justifyContent="start"
+              alignItems="center"
+              bg={selectedIndex === index ? "hover" : "transparent"}
+              title={`Press enter or click to add this tag`}
+              px={2}
             >
-              {renderSuggestion(item, selectedIndex === index)}
+              {renderSuggestion(item)}
             </Button>
           ))}
         </Flex>

@@ -46,7 +46,6 @@ function Menu(props) {
             />
           ) : (
             <Button
-              variant="anchor"
               title={
                 (disabled && disabled(data) && disableReason) || title(data)
               }
@@ -70,16 +69,8 @@ function Menu(props) {
               flexDirection="row"
               alignItems="center"
               justifyContent="center"
-              py={"0.7em"}
-              px={3}
-              sx={{
-                borderRadius: 0,
-                color: color || "text",
-                cursor: "pointer",
-                ":hover:not(:disabled)": {
-                  backgroundColor: "hover",
-                },
-              }}
+              variant="menuitem"
+              color={color || "text"}
             >
               {Icon && (
                 <Icon

@@ -11,6 +11,7 @@ class ButtonFactory {
       icon: new Icon(),
       shade: new Shade(),
       statusitem: new StatusItem(),
+      menuitem: new MenuItem(),
     };
   }
 }
@@ -158,6 +159,25 @@ class StatusItem {
       p: 0,
       py: 1,
       px: 1,
+    };
+  }
+}
+
+class MenuItem {
+  constructor() {
+    return {
+      bg: "transparent",
+      py: "8px",
+      px: 3,
+      borderRadius: 0,
+      color: "text",
+      cursor: "pointer",
+      ":hover:not(:disabled)": {
+        backgroundColor: "hover",
+      },
+      ":active:not(:disabled)": {
+        backgroundColor: "border",
+      },
     };
   }
 }
