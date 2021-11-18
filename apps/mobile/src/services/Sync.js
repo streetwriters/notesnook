@@ -7,6 +7,7 @@ import { ToastEvent } from './EventManager';
 
 const run = async (context = 'global', forced) => {
   const userstore = useUserStore.getState();
+  if (!userstore.user) return;
   userstore.setSyncing(true);
   try {
     let res = await doInBackground(async () => {
