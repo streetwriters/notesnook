@@ -86,7 +86,7 @@ const ActionSheetWrapper = ({
           style={{
             height:
               Platform.OS === 'ios' && insets.bottom !== 0
-                ? insets.bottom / 2
+                ? insets.bottom + 5
                 : 20
           }}
         />
