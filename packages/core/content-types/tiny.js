@@ -1,5 +1,5 @@
 import showdown from "showdown";
-import dataurl from "../utils/dataurl";
+import { decode, DecodingMode, EntityLevel } from "entities";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
@@ -22,11 +22,10 @@ class Tiny {
   }
 
   toTXT() {
-    if (!("HTMLParser" in global)) return "";
-
-    let doc = HTMLParser.createElement("div");
-    doc.innerHTML = this.data;
-    return doc.textContent.trim();
+    return decode(
+      this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, ""),
+      { level: EntityLevel.HTML, mode: DecodingMode.Strict }
+    ).trim();
   }
 
   toMD() {
