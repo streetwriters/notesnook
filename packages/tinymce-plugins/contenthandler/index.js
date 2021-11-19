@@ -8,7 +8,7 @@ function register(editor) {
    * use the Browser's native DOMParser.
    */
   editor.getHTML = async function () {
-    const html = editor.bodyElement.innerHTML;
+    const html = editor.getBody().innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
     const images = document.querySelectorAll("img[src]");
     for (let image of images) {
@@ -25,11 +25,11 @@ function register(editor) {
   };
 
   editor.getText = function () {
-    return editor.bodyElement.innerText;
+    return editor.getBody().innerText;
   };
 
   editor.countWords = function () {
-    const text = editor.bodyElement.innerText;
+    const text = editor.getBody().innerText;
     return countWords(text);
   };
 }
