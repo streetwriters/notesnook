@@ -31,6 +31,7 @@ import "@streetwritersco/tinymce-plugins/paste";
 import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import "@streetwritersco/tinymce-plugins/attachmentshandler";
+import "@streetwritersco/tinymce-plugins/contenthandler";
 import "./plugins/picker";
 import "./plugins/icons";
 import "./plugins/attachmentshandler.css";
@@ -44,6 +45,7 @@ import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { AppEventManager, AppEvents } from "../../common";
 import { EV, EVENTS } from "notes-core/common";
 import { downloadAttachment } from "../../common/attachments";
+import debounce from "just-debounce";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -118,9 +120,11 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "icons blockescape keyboardquirks collapsibleheaders shortlink paste codeblock inlinecode checklist attachmentshandler",
+    "contenthandler icons blockescape keyboardquirks collapsibleheaders shortlink paste codeblock inlinecode checklist attachmentshandler",
   pro: "textpattern picker",
 };
+
+const changeEvents = "change input compositionend setcontent";
 
 function TinyMCE(props) {
   const {
@@ -226,6 +230,7 @@ function TinyMCE(props) {
               e.preventDefault();
             }
           });
+
           editor.on("ScrollIntoView", (e) => {
             e.preventDefault();
             e.elm.scrollIntoView({
@@ -233,6 +238,20 @@ function TinyMCE(props) {
               block: "nearest",
             });
           });
+
+          const onEditorChange = debounce(() => {
+            if (!editor.getHTML) return;
+            if (editor.isLoading) {
+              editor.isLoading = false;
+              return;
+            }
+            onWordCountChanged(editor.countWords());
+            editor.getHTML().then((html) => {
+              onChange(html, editor);
+            });
+          }, changeInterval);
+
+          editor.on(changeEvents, onEditorChange);
         },
         toolbar_persist: true,
         toolbar_sticky: false,
@@ -285,50 +304,8 @@ function TinyMCE(props) {
           onSave();
         }
       }}
-      onEditorChange={(content, editor) => {
-        if (onWordCountChanged) {
-          const text = editor.getContent({
-            format: "text",
-            no_events: true,
-            get: true,
-            content,
-          });
-          onWordCountChanged(countWords(text));
-        }
-
-        if (editor.isLoading) {
-          editor.isLoading = false;
-          return;
-        }
-
-        clearTimeout(editor.changeTimeout);
-        editor.changeTimeout = setTimeout(
-          () => onChange(content, editor),
-          changeInterval
-        );
-      }}
     />
   );
 }
 
 export default React.memo(TinyMCE, () => true);
-
-function countWords(str) {
-  let count = 0;
-  let shouldCount = false;
-
-  for (var i = 0; i < str.length; ++i) {
-    const s = str[i];
-
-    if (s === " " || s === "\r" || s === "\n" || s === "*") {
-      if (!shouldCount) continue;
-      ++count;
-      shouldCount = false;
-    } else {
-      shouldCount = true;
-    }
-  }
-
-  if (shouldCount) ++count;
-  return count;
-}
