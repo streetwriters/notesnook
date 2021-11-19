@@ -18,6 +18,7 @@ async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
+   
     let output = await Sodium.decryptFile(
       key,
       {
@@ -142,9 +143,15 @@ async function downloadFile(filename, data, cancelToken) {
           .setProgress(0, total, filename, recieved, 'download');
         console.log('downloading: ', recieved, total);
       });
-
+    
     cancelToken.cancel = request.cancel;
     let response = await request;
+
+    let fileMD5 =  await RNFetchBlob.fs.hash(path,"md5");
+    let headerMD5 =  JSON.parse(response.info().headers["ETag"]); 
+    if (headerMD5 && fileMD5 !== headerMD5) {
+      throw new Error("File verification failed");
+    }
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
