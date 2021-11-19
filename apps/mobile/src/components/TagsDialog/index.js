@@ -95,6 +95,7 @@ const TagsDialog = () => {
       text: '',
     });
     try {
+    
       await db.notes.note(note.id).tag(tag);
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
@@ -139,7 +140,7 @@ const TagsDialog = () => {
           fwdRef={inputRef}
           autoCapitalize="none"
           onChangeText={v => {
-            setQuery(v ? v.replace(/[\s+#|&;$%@"'=<>()+,]/g, "").toLowerCase() : v);
+            setQuery(db.tags.sanitize(v));
           }}
           onSubmit={onSubmit}
           height={50}
