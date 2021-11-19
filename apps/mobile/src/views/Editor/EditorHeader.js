@@ -96,9 +96,9 @@ const EditorHeader = () => {
         redo: 0
       });
       useEditorStore.getState().setCurrentlyEditingNote(null);
-      setTimeout(async () => {
+     // setTimeout(async () => {
         await clearEditor(true, true, false);
-      }, 1);
+      //}, 1);
       keyboardListener.current?.remove();
     }
   };

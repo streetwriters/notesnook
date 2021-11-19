@@ -12,8 +12,8 @@ import Storage from './storage';
 const cacheDir = RNFetchBlob.fs.dirs.CacheDir;
 
 async function readEncrypted(filename, key, cipherData) {
+  let path = `${cacheDir}/${filename}`;
   try {
-    let path = `${cacheDir}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(path);
     if (!exists) {
       return false;
@@ -29,6 +29,7 @@ async function readEncrypted(filename, key, cipherData) {
     console.log('output length: ', output?.length);
     return output;
   } catch (e) {
+    RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log(e);
     console.log('error');
     return false;
@@ -111,19 +112,13 @@ async function uploadFile(filename, data, cancelToken) {
   }
 }
 
-const santizeUri = uri => {
-  uri = decodeURI(uri);
-  uri = Platform.OS === 'ios' ? uri.replace('file:///', '/') : uri;
-  return uri;
-};
-
 async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
   let {url, headers, metadata} = data;
 
   console.log('downloading file: ', filename, url);
+  let path = `${cacheDir}/${filename}`;
   try {
-    let path = `${cacheDir}/${filename}`;
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
       console.log('file is downloaded');
@@ -147,21 +142,15 @@ async function downloadFile(filename, data, cancelToken) {
           .setProgress(0, total, filename, recieved, 'download');
         console.log('downloading: ', recieved, total);
       });
+
     cancelToken.cancel = request.cancel;
     let response = await request;
-    let originalHash = metadata?.hash || filename;
-    let hash = Sodium.hashFile({
-      uri: santizeUri(path),
-      type: 'url'
-    });
-
-    console.log('downloaded file hash:', hash, 'original hash: ', originalHash);
-
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
-    return status >= 200 && status < 300 && hash === originalHash;
+    return status >= 200 && status < 300;
   } catch (e) {
     useAttachmentStore.getState().remove(filename);
+    RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log('download file error: ', e, url, headers);
     return false;
   }

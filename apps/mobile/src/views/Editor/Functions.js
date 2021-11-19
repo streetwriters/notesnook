@@ -102,23 +102,27 @@ async function waitForEvent(event, caller) {
 export async function clearTimer(clear) {
   clearTimeout(timer);
   timer = null;
-  if (waitForContent) {
+  if (waitForContent && noteEdited) {
     await waitForEvent('content_event', () => {
       tiny.call(EditorWebView, request_content);
     });
+  } else {
+    waitForContent = false;
   }
+
   if (clear) {
-    if (!id) return;
+    if (!id || !noteEdited) return;
     if (
       (content?.data &&
         typeof content.data === 'string' &&
         content.data?.trim().length > 0) ||
       (title && title?.trim().length > 0)
     ) {
-      console.log('saving note');
+      console.log('saving note after edit');
       await saveNote(true);
     }
   }
+
   if (currentEditingTimer) {
     clearTimeout(currentEditingTimer);
     currentEditingTimer = null;
@@ -141,7 +145,7 @@ const request_content = `(function() {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: 'tiny',
-        value: tinymce.activeEditor.dom.doc.body.innerHTML
+        value: editor.getHTML();
       })
     );
   }
@@ -322,9 +326,14 @@ export const _onMessage = async evt => {
       console.log('history', message.value);
       eSendEvent('historyEvent', message.value);
       break;
+    case 'noteedited':
+      console.log('note changed');
+      noteEdited = true;
+      break;
     case 'tiny':
       if (message.value !== content.data) {
         noteEdited = true;
+        console.log(message.value, '\nold: ', content.data);
         lastEditTime = Date.now();
         content = {
           type: message.type,

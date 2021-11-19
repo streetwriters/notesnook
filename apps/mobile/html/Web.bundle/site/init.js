@@ -479,12 +479,9 @@ const onChange = function (event) {
   if (prevCount === 0) {
     updateCount(0);
   }
-
   if (prevCount === 0) return;
-
   clearTimeout(changeTimer);
   changeTimer = null;
-
   changeTimer = setTimeout(function () {
     let now2 = performance.now();
       editor.getHTML().then(html => {
