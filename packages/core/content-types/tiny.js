@@ -118,7 +118,7 @@ class Tiny {
           break;
         }
         case "span": {
-          const matches = node.match(HASH_REGEX);
+          const matches = HASH_REGEX.exec(node);
           if (!matches) continue;
           const [_match, hash] = matches;
           attachments.push({ hash });
