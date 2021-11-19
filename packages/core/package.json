@@ -26,6 +26,7 @@
     "@stablelib/blake2s": "^1.0.1",
     "async-mutex": "^0.3.2",
     "dayjs": "^1.10.6",
+    "entities": "^3.0.1",
     "fast-sort": "^2.0.1",
     "no-internet": "^1.5.2",
     "qclone": "^1.0.4",

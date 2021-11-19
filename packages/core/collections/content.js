@@ -109,9 +109,7 @@ export default class Content extends Collection {
 
     const allAttachments = this._db.attachments.all;
     const content = getContentFromData(contentItem.type, contentItem.data);
-    const { data, attachments } = await content.extractAttachments(
-      (data, type) => this._db.attachments.save(data, type)
-    );
+    const { data, attachments } = content.extractAttachments();
 
     const noteAttachments = allAttachments.filter((attachment) =>
       hasItem(attachment.noteIds, contentItem.noteId)
@@ -133,6 +131,18 @@ export default class Content extends Collection {
     }
 
     for (let attachment of toAdd) {
+      if (attachment.data && attachment.type) {
+        const { key, metadata } = await this._db.attachments.save(
+          attachment.data,
+          attachment.type
+        );
+        attachment = {
+          type: attachment.type,
+          filename: metadata.hash,
+          ...metadata,
+          key,
+        };
+      }
       await this._db.attachments.add(attachment, contentItem.noteId);
     }
 
