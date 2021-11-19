@@ -133,7 +133,7 @@ function init_tiny(size) {
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
-      'media imagetools table paste wordcount autoresize directionality blockescape'
+      'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
     ],
     toolbar: false,
     paste_data_images: true,
@@ -438,7 +438,9 @@ function init_tiny(size) {
               target.classList.add(COLLAPSED_KEY);
             }
             collapseElement(target);
-            reactNativeEventHandler('tiny', editor.dom.doc.body.innerHTML);
+            editor.getHTML().then(html => {
+              reactNativeEventHandler('tiny', html);
+            })
           });
         }
       });
@@ -485,7 +487,9 @@ const onChange = function (event) {
 
   changeTimer = setTimeout(function () {
     let now2 = performance.now();
-    reactNativeEventHandler('tiny', editor.dom.doc.body.innerHTML);
+      editor.getHTML().then(html => {
+      reactNativeEventHandler('tiny', html);
+    })
     console.log('save:', performance.now() - now2);
     onUndoChange();
     let now3 = performance.now();
@@ -498,7 +502,7 @@ let countTimer;
 function updateCount(timer=1000) {
   countTimer = null;
   countTimer = setTimeout(function() {
-    let count = countWords(tinymce.activeEditor.dom.doc.body.innerText);
+    let count = editor.countWords();
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
