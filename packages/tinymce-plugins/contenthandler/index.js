@@ -14,6 +14,8 @@ function register(editor) {
     for (let element of elements) {
       switch (element.nodeName) {
         case "IMG": {
+          const image = element;
+
           if (image.hasAttribute("data-hash")) {
             image.removeAttribute("src");
             continue;
