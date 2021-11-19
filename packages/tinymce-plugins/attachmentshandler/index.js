@@ -23,12 +23,16 @@ function register(editor) {
     );
     if (!elements || !elements.length || !src) return;
     for (let element of elements) {
-      const blob = dataUriToBlob(src);
-      if (!blob) {
-        console.error("Could not convert data uri to blob.");
-        continue;
+      try {
+        const blob = await dataUriToBlob(src);
+        if (!blob) {
+          console.error("Could not convert data uri to blob.");
+          continue;
+        }
+        element.src = URL.createObjectURL(blob);
+      } catch (e) {
+        console.error(e);
       }
-      element.src = URL.createObjectURL(blob);
     }
   };
 
@@ -139,34 +143,9 @@ function formatBytes(bytes, decimals = 2) {
   addPluginToPluginManager("attachmentshandler", register);
 })();
 
-function dataUriToBlob(uri) {
-  const data = uri.split(",");
+async function dataUriToBlob(uri) {
+  if (!uri.startsWith("data:image")) return;
 
-  const matches = /data:([^;]+)/.exec(data[0]);
-  if (!matches) {
-    return null;
-  }
-
-  const mimetype = matches[1];
-  const base64 = data[1];
-
-  // al gore rhythm via http://stackoverflow.com/questions/16245767/creating-a-blob-from-a-base64-string-in-javascript
-  const sliceSize = 1024;
-  const byteCharacters = atob(base64);
-  const bytesLength = byteCharacters.length;
-  const slicesCount = Math.ceil(bytesLength / sliceSize);
-  const byteArrays = new Array(slicesCount);
-
-  for (let sliceIndex = 0; sliceIndex < slicesCount; ++sliceIndex) {
-    const begin = sliceIndex * sliceSize;
-    const end = Math.min(begin + sliceSize, bytesLength);
-
-    const bytes = new Array(end - begin);
-    // tslint:disable-next-line:one-variable-per-declaration
-    for (let offset = begin, i = 0; offset < end; ++i, ++offset) {
-      bytes[i] = byteCharacters[offset].charCodeAt(0);
-    }
-    byteArrays[sliceIndex] = new Uint8Array(bytes);
-  }
-  return new Blob(byteArrays, { type: mimetype });
+  const response = await fetch(uri);
+  return await response.blob();
 }
