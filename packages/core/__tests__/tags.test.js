@@ -88,4 +88,20 @@ describe.each([
       await db[collection].remove(tag.id);
       expect(db[collection].tag(value)).toBeUndefined();
     }));
+
+  test(`elements in ${collection}.all contain alias property`, () =>
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](value);
+
+      expect(db[collection].all.every((item) => !!item.alias)).toBe(true);
+    }));
+
+  test(`invalid characters from ${action} title are removed`, () =>
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      await note[action](`${value.toUpperCase()}/.,#=)(&*&^%$$$@$)`);
+      note = db.notes.note(id);
+      check(note, value);
+    }));
 });
