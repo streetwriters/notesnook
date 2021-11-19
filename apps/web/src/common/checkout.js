@@ -142,4 +142,17 @@ async function getPlans() {
   return json.response.products;
 }
 
-export { upgrade, openPaddleDialog, getPlans, inlineCheckout };
+async function getPlan(plan) {
+  const productId = PRODUCT_ID(plan);
+  const url = `https://checkout.paddle.com/api/2.0/prices?product_ids=${productId}&callback=getPlan`;
+  const response = await fetchJsonp(url, {
+    jsonpCallback: "callback",
+    jsonpCallbackFunction: "getPlan",
+  });
+  const json = await response.json();
+  if (!json || !json.success || !json.response?.products?.length)
+    throw new Error("Failed to get prices.");
+  return json.response.products[0];
+}
+
+export { upgrade, openPaddleDialog, getPlans, getPlan, inlineCheckout };

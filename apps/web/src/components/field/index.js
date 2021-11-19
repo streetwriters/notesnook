@@ -48,7 +48,7 @@ function Field(props) {
     placeholder,
     validatePassword,
     onError,
-    variant,
+    variant = "input",
   } = props;
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [rules, setRules] = useState(passwordValidationRules);

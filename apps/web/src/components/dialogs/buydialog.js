@@ -1,16 +1,16 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, Flex, Button, Box } from "rebass";
-import Dialog from "./dialog";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
-import { getPlans, inlineCheckout, upgrade } from "../../common/checkout";
+import { getPlans, getPlan, inlineCheckout } from "../../common/checkout";
 import getSymbolFromCurrency from "currency-symbol-map";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
-import { navigate } from "../../navigation";
-import Switch from "../switch";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
 import { ReactComponent as Rocket } from "../../assets/rocket.svg";
+import { ReactComponent as Nomad } from "../../assets/nomad.svg";
+import { ReactComponent as WorkAnywhere } from "../../assets/workanywhere.svg";
+import { ReactComponent as WorkLate } from "../../assets/worklate.svg";
 import Loader from "../loader";
 import Field from "../field";
 import { useSessionState } from "../../utils/hooks";
@@ -255,6 +255,7 @@ const sections = [
 ];
 
 function BuyDialog(props) {
+  const { couponCode, plan } = props;
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const [selectedPlan, setSelectedPlan] = useState();
@@ -264,6 +265,19 @@ function BuyDialog(props) {
   useEffect(() => {
     trackEvent(ANALYTICS_EVENTS.purchaseInitiated, "Buy dialog opened.");
   }, []);
+
+  useEffect(() => {
+    if (!plan) return;
+    (async function () {
+      const product = await getPlan(plan);
+      setDiscount({ isApplyingCoupon: true });
+      console.log(product);
+      setSelectedPlan({
+        ...productToPlan(product),
+        coupon: couponCode,
+      });
+    })();
+  }, [plan, couponCode]);
 
   return (
     <Modal
@@ -349,6 +363,8 @@ function BuyDialog(props) {
                   setSelectedPlan((plan) => ({ ...plan, coupon }));
                 }}
               />
+            ) : plan ? (
+              <Loader title="Please wait..." />
             ) : (
               <ChooseAPlan
                 selectedPlan={selectedPlan}
@@ -545,16 +561,7 @@ function PlansList({ selectedPlan, onPlanChanged }) {
         setIsLoading(true);
         let plans = await getPlans();
         plans = plans.map((product) => {
-          return {
-            key: `${product.subscription.interval}ly`,
-            country: product.customer_country,
-            currency: product.currency,
-            price: product.price.net,
-            id: product.product_id,
-            title:
-              product.subscription.interval === "month" ? "Monthly" : "Yearly",
-            subtitle: `Pay once a ${product.subscription.interval}.`,
-          };
+          return productToPlan(product);
         });
         setPlans(plans);
       } catch (e) {
@@ -563,7 +570,7 @@ function PlansList({ selectedPlan, onPlanChanged }) {
         setIsLoading(false);
       }
     })();
-  }, []);
+  }, [plans, setPlans]);
 
   return plans.map((plan) => (
     <Button
@@ -596,7 +603,7 @@ function PlansList({ selectedPlan, onPlanChanged }) {
 function ChooseAPlan({ selectedPlan, onPlanChanged }) {
   return (
     <>
-      <Rocket width={200} />
+      <Nomad width={200} />
       <Text variant="heading" textAlign="center" mt={4}>
         Choose a plan
       </Text>
@@ -629,15 +636,18 @@ function TryForFree() {
 }
 
 function SelectedPlan({ plan, onPlanChangeRequest, onCouponApplied }) {
-  console.log("SELECTED", plan);
   useEffect(() => {
     const couponInput = document.getElementById("coupon");
     couponInput.value = plan.coupon ? plan.coupon : couponInput.value;
   }, [plan.coupon]);
-
+  console.log(plan);
   return (
     <>
-      <Rocket width={200} />
+      {plan.key === "monthly" ? (
+        <WorkAnywhere width={180} />
+      ) : (
+        <WorkLate width={180} />
+      )}
       <Text variant="heading" textAlign="center" mt={4}>
         Notesnook Pro
       </Text>
@@ -777,5 +787,17 @@ function getPricingInfoFromCheckout(plan, eventData) {
     coupon: coupon.coupon_code,
     isRecurringDiscount: coupon.coupon_code && price === recurringPrice,
     isInvalidCoupon: !!plan.coupon !== !!coupon.coupon_code,
+  };
+}
+
+function productToPlan(product) {
+  return {
+    key: `${product.subscription.interval}ly`,
+    country: product.customer_country,
+    currency: product.currency,
+    price: product.price.net,
+    id: product.product_id,
+    title: product.subscription.interval === "month" ? "Monthly" : "Yearly",
+    subtitle: `Pay once a ${product.subscription.interval}.`,
   };
 }
