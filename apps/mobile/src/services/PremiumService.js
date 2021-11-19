@@ -280,12 +280,13 @@ const subscriptions = {
 async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
   if (!user) return;
-
+  let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
   let total = user.subscription.expiry - user.subscription.start;
   let current = Date.now() - user.subscription.start;
+  current = (current / total) * 100;
 
-  current = ((current / total) * 100).toFixed(0);
   let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+
   if (current > 75 && lastTrialDialogShownAt !== 'ending') {
     eSendEvent(eOpenTrialEndingDialog, {
       title: 'Your trial is ending soon',
@@ -293,15 +294,16 @@ async function getRemainingTrialDaysStatus() {
       extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'ending');
-  } else if (!get() && lastTrialDialogShownAt !== 'expired') {
+    return;
+  }
+
+  if (!premium && lastTrialDialogShownAt !== 'expired') {
     eSendEvent(eOpenTrialEndingDialog, {
       title: 'Your trial has expired',
       offer: 30,
-      extend: true
+      extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'expired');
-  } else {
-    return;
   }
 }
 
@@ -329,7 +331,7 @@ const features_list = [
 
 const sheet = (context, promo) => {
   presentSheet({
-    context:context,
+    context: context,
     component: ref => (
       <>
         <DialogHeader

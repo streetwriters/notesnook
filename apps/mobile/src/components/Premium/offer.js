@@ -1,10 +1,14 @@
 import React from 'react';
-import { Text } from 'react-native';
-import { useTracked } from '../../provider';
-import { SIZE } from '../../utils/SizeUtils';
+import {Text} from 'react-native';
+import {useTracked} from '../../provider';
+import {SIZE} from '../../utils/SizeUtils';
 import Paragraph from '../Typography/Paragraph';
 
-export const Offer = ({off = '30', text = 'on both yearly & monthly plans',padding=0}) => {
+export const Offer = ({
+  off = '30',
+  text = 'on yearly plan, offer ends soon',
+  padding = 0
+}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -12,7 +16,7 @@ export const Offer = ({off = '30', text = 'on both yearly & monthly plans',paddi
     <Paragraph
       style={{
         textAlign: 'center',
-        paddingVertical:padding
+        paddingVertical: padding
       }}
       size={SIZE.xxxl}>
       GET {off}

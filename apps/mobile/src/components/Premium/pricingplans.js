@@ -54,7 +54,6 @@ export const PricingPlans = ({
   const getSkus = async () => {
     try {
       let products = PremiumService.getProducts();
-
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
@@ -75,7 +74,9 @@ export const PricingPlans = ({
     }
   };
 
-  const getPromo = productId => {
+  const getPromo = async productId => {
+    await sleep(500);
+    let products = PremiumService.getProducts()
     let product = products.find(p => p.productId === productId);
     let isMonthly = product.productId.indexOf('.mo') > -1;
     let cycleText = isMonthly
