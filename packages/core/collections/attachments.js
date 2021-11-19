@@ -242,13 +242,13 @@ export default class Attachments extends Collection {
     );
     if (!isDownloaded) return;
 
-    const src = await this.read(hash);
+    const src = await this.read(metadata.hash);
     if (!src) return;
 
     if (notify)
       EV.publish(EVENTS.mediaAttachmentDownloaded, {
         groupId,
-        hash,
+        hash: metadata.hash,
         src,
       });
 
