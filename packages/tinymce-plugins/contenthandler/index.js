@@ -10,16 +10,23 @@ function register(editor) {
   editor.getHTML = async function () {
     const html = editor.getBody().innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
-    const images = document.querySelectorAll("img[src]");
-    for (let image of images) {
-      if (image.hasAttribute("data-hash")) {
-        image.removeAttribute("src");
-        continue;
-      }
-      if (!image.src.startsWith("blob:http")) continue;
+    const elements = document.querySelectorAll("img[src],[data-mce-bogus]");
+    for (let element of elements) {
+      switch (element.nodeName) {
+        case "IMG": {
+          if (image.hasAttribute("data-hash")) {
+            image.removeAttribute("src");
+            continue;
+          }
+          if (!image.src.startsWith("blob:")) continue;
 
-      const datauri = await blobUriToDataUri(image.src);
-      image.src = datauri;
+          const datauri = await blobUriToDataUri(image.src);
+          image.src = datauri;
+        }
+        default: {
+          if (element.hasAttribute("data-mce-bogus")) element.remove();
+        }
+      }
     }
     return document.body.innerHTML;
   };
