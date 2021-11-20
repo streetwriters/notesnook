@@ -79,6 +79,7 @@ export const PricingPlans = ({
     await sleep(500);
     let products = PremiumService.getProducts();
     let product = products.find(p => p.productId === productId);
+    if (!product) return;
     let isMonthly = product.productId.indexOf('.mo') > -1;
     let cycleText = isMonthly
       ? promoCyclesMonthly[
