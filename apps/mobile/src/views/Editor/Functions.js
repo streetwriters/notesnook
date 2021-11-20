@@ -89,6 +89,7 @@ async function waitForEvent(event, caller) {
       resolved = true;
       clearTimeout(resolved);
       waitForContent = false;
+      console.log('message returned');
       resolve(true);
     };
     eSubscribeEvent(event, event_callback);
@@ -145,7 +146,7 @@ const request_content = `(function() {
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
         type: 'tiny',
-        value: editor.getHTML();
+        value: editor.getHTML()
       })
     );
   }
@@ -325,10 +326,6 @@ export const _onMessage = async evt => {
     case 'history':
       console.log('history', message.value);
       eSendEvent('historyEvent', message.value);
-      break;
-    case 'noteedited':
-      console.log('note changed');
-      noteEdited = true;
       break;
     case 'tiny':
       if (message.value !== content.data) {

@@ -139,6 +139,7 @@ function attachMessageListener() {
           document.activeElement.blur();
           window.blur();
         }, 300);
+        info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
         editor.countWords() + ' words';
         break;
