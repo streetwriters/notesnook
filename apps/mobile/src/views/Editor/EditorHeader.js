@@ -24,7 +24,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
+import {editing, SUBSCRIPTION_STATUS} from '../../utils';
 import {db} from '../../utils/database';
 import {
   eClearEditor,
@@ -32,6 +32,7 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
+  eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
@@ -284,6 +285,26 @@ const EditorHeader = () => {
             flexDirection: 'row'
           }}>
           <>
+            {!user ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
+              <ActionIcon
+                name="crown"
+                color={colors.yellow}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5
+                }}
+                top={50}
+                onPress={() => {
+                  if (editing.isFocused) {
+                    safeKeyboardDismiss();
+                    editing.isFocused = true;
+                  }
+                  eSendEvent(eOpenPremiumDialog);
+                }}
+              />
+            ) : null}
             {currentlyEditingNote && (
               <ActionIcon
                 name="cloud-upload-outline"
