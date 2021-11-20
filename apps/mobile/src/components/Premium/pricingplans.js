@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {ActivityIndicator, Platform, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {useTracked} from '../../provider';
 import {useUserStore} from '../../provider/stores';
@@ -20,6 +20,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {Dialog} from '../Dialog';
+import BaseDialog from '../Dialog/base-dialog';
 import {presentDialog} from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -138,6 +139,11 @@ export const PricingPlans = ({
       style={{
         paddingHorizontal: 12
       }}>
+      {
+        buying ?  <BaseDialog statusBarTranslucent centered>
+        <ActivityIndicator size={80}  color="white"/>
+      </BaseDialog>  : null
+      } 
       {product?.type === 'promo' ? (
         <Heading
           style={{
