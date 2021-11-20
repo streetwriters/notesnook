@@ -1,4 +1,5 @@
 const { addPluginToPluginManager } = require("../utils");
+const { QUERY, ATTRIBUTES } = require("./filters");
 
 function register(editor) {
   /**
@@ -10,9 +11,7 @@ function register(editor) {
   editor.getHTML = async function () {
     const html = editor.getBody().innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
-    const elements = document.querySelectorAll(
-      "img[src],[data-mce-bogus],[data-mce-selected]"
-    );
+    const elements = document.querySelectorAll(QUERY);
     for (let element of elements) {
       switch (element.nodeName) {
         case "IMG": {
@@ -28,9 +27,12 @@ function register(editor) {
           image.src = datauri;
         }
         default: {
-          if (element.hasAttribute("data-mce-bogus")) element.remove();
-          else if (element.hasAttribute("data-mce-selected")) {
-            element.removeAttribute("data-mce-selected");
+          for (let attr of element.attributes) {
+            if (ATTRIBUTES.strip.indexOf(attr.name) > -1)
+              element.removeAttribute(attr.name);
+            else if (ATTRIBUTES.elementDelete.indexOf(attr.name) > -1) {
+              element.remove();
+            }
           }
         }
       }
