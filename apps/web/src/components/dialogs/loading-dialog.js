@@ -25,7 +25,7 @@ function LoadingDialog(props) {
         <Text as="span" variant="body">
           {props.message}
         </Text>
-        <Icon.Loading rotate sx={{ mt: 2 }} color="primary" />
+        <Icon.Loading rotate sx={{ my: 2 }} color="primary" />
       </Box>
     </Dialog>
   );

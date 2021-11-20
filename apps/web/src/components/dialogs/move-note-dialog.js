@@ -80,6 +80,7 @@ class MoveDialog extends React.Component {
         description={"Organize your notes by adding them to notebooks."}
         icon={Icon.Move}
         onClose={props.onClose}
+        width={"30%"}
         negativeButton={{
           text: "Done",
           onClick: props.onClose,
@@ -89,11 +90,11 @@ class MoveDialog extends React.Component {
           <Field
             inputRef={(ref) => (this.inputRef = ref)}
             data-test-id="mnd-new-notebook-title"
-            label="Notebooks"
+            label="Add a new notebook"
             id="notebook-title"
             name="notebook-title"
-            helpText="Add a new notebook"
-            placeholder="Enter new notebook title (press enter to confirm)"
+            helpText="Press enter to confirm"
+            placeholder="Enter new notebook title"
             action={{
               onClick: async () => {
                 await this.addNotebook(this.inputRef);

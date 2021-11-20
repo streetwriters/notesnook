@@ -9,6 +9,7 @@ function TrackingDetailsDialog(props) {
     <Dialog
       isOpen={true}
       title={"Telemetry details"}
+      width={"30%"}
       description={
         "List of all the events we send to our servers for diagnostics and analytics. The data is transmitted over SSL (fully encrypted) and does not pass through any 3rd party server. Furthermore, the data does not contain any personal info - not even your user id."
       }

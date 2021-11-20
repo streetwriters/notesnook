@@ -259,16 +259,10 @@ function Settings(props) {
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
                   await showLoadingDialog({
-                    title: "Logging you out",
-                    subtitle: "We are logging you out. Please wait...",
-                    action: async () => {
-                      await db.user.logout(true);
-                    },
-                    message: (
-                      <Text color="error">
-                        Please do NOT close your browser or shut down your PC.
-                      </Text>
-                    ),
+                    title: "You are being logged out",
+                    subtitle:
+                      "Please do NOT close your browser or shut down your PC.",
+                    action: () => db.user.logout(true),
                   });
                   showToast("success", "You have been logged out.");
                 }
@@ -415,15 +409,9 @@ function Settings(props) {
                   const backupData = JSON.stringify(await importBackup());
                   const error = await showLoadingDialog({
                     title: "Restoring backup",
-                    subtitle: "We are restoring your backup. Please wait...",
-                    action: async () => {
-                      await db.backup.import(backupData);
-                    },
-                    message: (
-                      <Text color="error">
-                        Please do NOT close your browser or shut down your PC.
-                      </Text>
-                    ),
+                    subtitle:
+                      "Please do NOT close your browser or shut down your PC.",
+                    action: () => db.backup.import(backupData),
                   });
                   if (!error) {
                     await showToast("success", "Backup restored!");
