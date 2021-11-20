@@ -146,14 +146,6 @@ async function downloadFile(filename, data, cancelToken) {
     
     cancelToken.cancel = request.cancel;
     let response = await request;
-
-    let fileMD5 =  await RNFetchBlob.fs.hash(path,"md5");
-    let etag_key = Platform.OS === "ios" ? "Etag" : 'ETag';  
-    let headerMD5 =  JSON.parse(response.info().headers[etag_key]); 
-
-    if (headerMD5 && fileMD5 !== headerMD5) {
-      throw new Error("File verification failed");
-    }
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
