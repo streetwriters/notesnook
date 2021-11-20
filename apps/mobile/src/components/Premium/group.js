@@ -14,7 +14,7 @@ export const Group = ({item, index}) => {
   return (
     <View
       style={{
-        paddingHorizontal: 24,
+        paddingHorizontal: 12,
         paddingVertical: 8,
         backgroundColor: index % 2 !== 0 ? colors.bg : colors.nav,
         paddingVertical: 40

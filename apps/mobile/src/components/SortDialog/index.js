@@ -105,10 +105,10 @@ class SortDialog extends React.Component {
               title={
                 groupOptions.sortDirection === 'asc'
                   ? groupOptions.groupBy === 'abc'
-                    ? 'Z - A'
+                    ? 'A - Z'
                     : 'Oldest - Newest'
                   : groupOptions.groupBy === 'abc'
-                  ? 'A - Z'
+                  ? 'Z - A'
                   : 'Newest - Oldest'
               }
               icon={
@@ -195,7 +195,6 @@ class SortDialog extends React.Component {
                     ...groupOptions,
                     groupBy: GROUP[item]
                   };
-                 
 
                   if (item === 'alphabetical') {
                     _groupOptions.sortBy = 'title';

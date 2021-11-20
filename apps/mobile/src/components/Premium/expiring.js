@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { ScrollView, View } from 'react-native';
+import { View } from 'react-native';
 import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
-  presentSheet
+  eUnSubscribeEvent
 } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
 import {
   eOpenPremiumDialog,
   eOpenResultDialog,
@@ -20,19 +20,22 @@ import DialogContainer from '../Dialog/dialog-container';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { FeatureBlock } from './feature';
+import { CompactFeatures } from './compact-features';
 import { Offer } from './offer';
-import { PricingPlans } from './pricing-plans';
 
 export const Expiring = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
-    title: '',
+    title: 'Your trial is ending soon',
     offer: null,
-    extend: false
+    extend: true
   });
+ const promo = status.offer ? {
+  promoCode:"com.streetwriters.notesnook.sub.yr.trialoffer",
+  text:"GET 30% OFF on yearly"
+}: null
 
   useEffect(() => {
     eSubscribeEvent(eOpenTrialEndingDialog, open);
@@ -97,63 +100,13 @@ export const Expiring = () => {
                   </>
                 )}
 
-                <ScrollView
-                  horizontal
-                  showsHorizontalScrollIndicator={false}
-                  style={{
-                    width: '100%'
-                  }}>
-                  {[
-                    {
-                      highlight: 'Everything',
-                      content: 'in basic',
-                      icon: 'emoticon-wink'
-                    },
-                    {
-                      highlight: 'Unlimited',
-                      content: 'notebooks',
-                      icon: 'notebook'
-                    },
-                    {
-                      highlight: 'File & image',
-                      content: 'attachments',
-                      icon: 'attachment'
-                    },
-                    {
-                      highlight: 'Instant',
-                      content: 'syncing',
-                      icon: 'sync'
-                    },
-                    {
-                      highlight: 'Private',
-                      content: 'vault',
-                      icon: 'shield'
-                    },
-                    {
-                      highlight: 'Rich text',
-                      content: 'editing',
-                      icon: 'square-edit-outline'
-                    },
-                    {
-                      highlight: 'PDF & markdown',
-                      content: 'exports',
-                      icon: 'file'
-                    },
-                    {
-                      highlight: 'Encrypted',
-                      content: 'backups',
-                      icon: 'backup-restore'
-                    }
-                  ].map(item => (
-                    <FeatureBlock {...item} />
-                  ))}
-                </ScrollView>
+               <CompactFeatures/>
 
                 <Paragraph
                   onPress={async () => {
                     setVisible(false);
                     await sleep(300);
-                    eSendEvent(eOpenPremiumDialog);
+                    eSendEvent(eOpenPremiumDialog, promo);
                   }}
                   size={SIZE.xs + 2}
                   style={{
@@ -181,16 +134,12 @@ export const Expiring = () => {
                 onPress={async () => {
                   setVisible(false);
                   await sleep(300);
-                  presentSheet({
-                    component: <PricingPlans marginTop={1} promo={null} />,
-                    noIcon: true,
-                    noProgress: true
-                  });
+                  PremiumService.sheet(null,promo)
                 }}
-                fontSize={SIZE.lg}
+                fontSize={SIZE.md + 2}
                 style={{
-                  marginBottom: status.extend ? 0 : 12,
-                  marginTop: 12,
+                  marginBottom: status.extend ? 0 : 10,
+                  marginTop: 10,
                   paddingHorizontal: 24
                 }}
               />
@@ -212,10 +161,10 @@ export const Expiring = () => {
                       button: 'Continue'
                     });
                   }}
-                  fontSize={SIZE.sm}
+                  fontSize={SIZE.xs + 1}
                   height={30}
                   style={{
-                    marginBottom: 12
+                    marginBottom: 10
                   }}
                 />
               )}

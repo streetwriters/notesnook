@@ -11,12 +11,12 @@ import {useSettingStore} from '../provider/stores';
 import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
-import {refreshNotesPage} from './Events';
+import {eOpenPremiumDialog, refreshNotesPage} from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 
-export const APP_VERSION = 1630;
+export const APP_VERSION = 1640;
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
@@ -45,7 +45,6 @@ const imgNames = [
 export const updateList = items => {
   eSendEvent('onListUpdate', items);
 };
-
 
 export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time)
@@ -207,7 +206,8 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.yr.15',
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
-  'com.streetwriters.notesnook.sub.yr.ofr'
+  'com.streetwriters.notesnook.sub.yr.trialoffer',
+  'com.streetwriters.notesnook.sub.mo.trialoffer'
 ];
 
 export const MenuItemsList = [
@@ -242,7 +242,7 @@ export const MenuItemsList = [
         get: 'monographs',
         title: 'Monographs',
         id: 'monographs_navigation'
-      }
+      };
 
       eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {

@@ -5,7 +5,7 @@ import { DDS } from '../../services/DeviceDetection';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import { getElevation } from '../../utils';
 import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
-import { ph, SIZE } from '../../utils/SizeUtils';
+import { SIZE } from '../../utils/SizeUtils';
 import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
@@ -24,6 +24,7 @@ const ResultDialog = () => {
     button: 'Start taking notes'
   });
   useEffect(() => {
+
     eSubscribeEvent(eOpenResultDialog, open);
     eSubscribeEvent(eCloseResultDialog, close);
     return () => {
@@ -35,7 +36,7 @@ const ResultDialog = () => {
   const open = data => {
     if (data) {
       setDialogData(data);
-    } 
+    }
     setVisible(true);
   };
 
@@ -52,8 +53,7 @@ const ResultDialog = () => {
           maxHeight: 500,
           borderRadius: 10,
           backgroundColor: colors.bg,
-          paddingHorizontal: ph,
-          paddingVertical: 20,
+          paddingTop: 20,
           justifyContent: 'center',
           alignItems: 'center'
         }}>
@@ -64,8 +64,9 @@ const ResultDialog = () => {
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10,
-            maxWidth: '80%',
-            marginBottom: 10
+            maxWidth: '100%',
+            marginBottom: 10,
+            paddingHorizontal: 12
           }}>
           {dialogData.title}
         </Heading>
@@ -84,17 +85,35 @@ const ResultDialog = () => {
 
         <Seperator />
 
-        <ProFeatures />
+        <View
+          style={{
+            paddingHorizontal: 12,
+            alignItems: 'center',
+            width: '100%'
+          }}>
+          <ProFeatures count={4} />
+        </View>
 
         <Seperator />
-        <Button
-          title={dialogData.button}
-          width="100%"
-          onPress={close}
-          type="accent"
-          height={50}
-          fontSize={SIZE.md}
-        />
+        <View
+          style={{
+            backgroundColor: colors.nav,
+            width: '100%',
+            borderBottomRightRadius: 10,
+            borderBottomLeftRadius: 10,
+            paddingVertical: 10
+          }}>
+          <Button
+            title={dialogData.button}
+            width={null}
+            style={{
+              paddingHorizontal: 12
+            }}
+            onPress={close}
+            height={50}
+            fontSize={SIZE.md + 2}
+          />
+        </View>
       </View>
     </BaseDialog>
   );

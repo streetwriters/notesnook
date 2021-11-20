@@ -8,11 +8,38 @@ import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 import {ProTag} from './pro-tag';
 
-export const FeatureBlock = ({highlight, content, icon, pro, proTagBg}) => {
+export const FeatureBlock = ({
+  vertical,
+  highlight,
+  content,
+  icon,
+  pro,
+  proTagBg
+}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  return (
+  return vertical ? (
+    <View
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        marginBottom: 10,
+      }}>
+      <Icon color={colors.accent} name="check" size={SIZE.lg} />
+
+      <Paragraph
+        style={{
+          flexWrap: 'wrap',
+          marginLeft: 5,
+          flexShrink: 1
+        }}
+        size={SIZE.md}>
+        {content}
+      </Paragraph>
+    </View>
+  ) : (
     <View
       style={{
         height: 100,

@@ -107,12 +107,15 @@ function collapseElement(target) {
     sibling = sibling.nextSibling;
   }
 }
-
+let undoTimer = null;
 function onUndoChange() {
-  reactNativeEventHandler('history', {
-    undo: editor.undoManager.hasUndo(),
-    redo: editor.undoManager.hasRedo()
-  });
+  clearTimeout(undoTimer);
+  undoTimer = setTimeout(function () {
+    reactNativeEventHandler('history', {
+      undo: editor.undoManager.hasUndo(),
+      redo: editor.undoManager.hasRedo()
+    });
+  }, 1000);
 }
 
 function init_tiny(size) {
@@ -130,7 +133,7 @@ function init_tiny(size) {
     plugins: [
       'checklist advlist autolink textpattern hr lists link noneditable image',
       'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
-      'media imagetools table paste wordcount autoresize directionality blockescape'
+      'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
     ],
     toolbar: false,
     paste_data_images: true,
@@ -235,7 +238,8 @@ function init_tiny(size) {
     autoresize_bottom_margin: 120,
     table_toolbar:
       'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
-    imagetools_toolbar: 'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
+    imagetools_toolbar:
+      'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
     resize: true,
@@ -377,6 +381,8 @@ function init_tiny(size) {
       editor.on('TypingUndos', onUndoChange);
       editor.on('BeforeAddUndo', onUndoChange);
       editor.on('AddUndo', onUndoChange);
+      editor.on('cut', onUndoChange);
+      editor.on('copy', onUndoChange);
       editor.on('tap', e => {
         if (e.target.classList.contains('mce-content-body')) {
           e.preventDefault();
@@ -432,8 +438,9 @@ function init_tiny(size) {
               target.classList.add(COLLAPSED_KEY);
             }
             collapseElement(target);
-            console.log('element has collapsed');
-            reactNativeEventHandler('tiny', editor.getContent());
+            editor.getHTML().then(html => {
+              reactNativeEventHandler('tiny', html);
+            })
           });
         }
       });
@@ -451,25 +458,55 @@ function init_tiny(size) {
     }
   });
 }
-window.prevContent = '';
-const onChange = function (event) {
-  console.log(event.type, event.selectionChange);
-  onUndoChange();
-  if (event.type === 'nodechange' && !event.selectionChange) return;
 
+let prevCount = 0;
+
+function delay(base = 0) {
+  if (prevCount < 20000) return base + 200;
+  if (prevCount > 20000 && prevCount < 40000) return base + 400;
+  if (prevCount > 40000 && prevCount < 70000) return base + 600;
+  if (prevCount > 70000) return base + 1000;
+}
+
+
+const onChange = function (event) {
+  if (event.type === 'nodechange' && !event.selectionChange) return;
   if (isLoading) {
     isLoading = false;
     return;
   }
-  if (editor.plugins.wordcount.getCount() === 0) return;
-  console.log('saving now doc');
+
+  if (prevCount === 0) {
+    updateCount(0);
+  }
+  if (prevCount === 0) return;
+  console.log("editor changed",event.selectionChange);
+  reactNativeEventHandler('noteedited')
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
+    let now2 = performance.now();
+      editor.getHTML().then(html => {
+      reactNativeEventHandler('tiny', html);
+    })
+    console.log('save:', performance.now() - now2);
+    onUndoChange();
+    let now3 = performance.now();
     selectchange();
-    reactNativeEventHandler('tiny', editor.getContent());
-  }, 10);
+    console.log('select:', performance.now() - now3);
+  }, delay());
 };
+
+let countTimer;
+function updateCount(timer=1000) {
+  countTimer = null;
+  countTimer = setTimeout(function() {
+    let count = editor.countWords();
+    info = document.querySelector('.info-bar');
+    info.querySelector('#infowords').innerText = count + ' words';
+    prevCount = count;
+  }, delay(timer));
+}
 
 function getNodeColor(element) {
   if (element.style.color && element.style.color !== '') {
@@ -485,83 +522,86 @@ function getNodeBg(element) {
   return null;
 }
 
+let selectionTimer = null;
 function selectchange() {
-  info = document.querySelector('.info-bar');
-  info.querySelector('#infowords').innerText =
-    editor.plugins.wordcount.getCount() + ' words';
+  clearTimeout(selectionTimer);
+  selectionTimer = null;
+  selectionTimer = setTimeout(function () {
+    console.log('selection change called');
+    updateCount();
+    let formats = Object.keys(editor.formatter.get());
+    let currentFormats = {};
+    editor.formatter.matchAll(formats).forEach(function (format) {
+      currentFormats[format] = true;
+    });
 
-  let formats = Object.keys(editor.formatter.get());
-  let currentFormats = {};
-  editor.formatter.matchAll(formats).forEach(function (format) {
-    currentFormats[format] = true;
-  });
+    let node = editor.selection.getNode();
+    currentFormats.hilitecolor = getNodeBg(node);
+    currentFormats.forecolor = getNodeColor(node);
 
-  let node = editor.selection.getNode();
-  currentFormats.hilitecolor = getNodeBg(node);
-  currentFormats.forecolor = getNodeColor(node);
-
-  if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
-    for (var i = 0; i < node.children.length; i++) {
-      let item = editor.selection.getNode().children.item(i);
-      currentFormats.hilitecolor = getNodeBg(item);
-      currentFormats.forecolor = getNodeColor(item);
-    }
-  }
-  let range = editor.selection.getRng();
-
-  currentFormats.current = {
-    index: range.startOffset,
-    length: range.endOffset - range.startOffset
-  };
-
-  currentFormats.fontsize = editor.selection.getNode().style.fontSize;
-
-  if (currentFormats.fontsize === '') {
-    currentFormats.fontsize = DEFAULT_FONT_SIZE;
-
-    if (currentFormats.h2) {
-      currentFormats.fontsize = '18pt';
-    }
-    if (currentFormats.h3) {
-      currentFormats.fontsize = '14pt';
-    }
-    if (currentFormats.h4) {
-      currentFormats.fontsize = '12pt';
-    }
-    if (currentFormats.h5) {
-      currentFormats.fontsize = '10pt';
-    }
-    if (currentFormats.h6) {
-      currentFormats.fontsize = '8pt';
-    }
-  }
-  if (node.nodeName === 'A') {
-    currentFormats.link = node.getAttribute('href');
-  }
-
-  currentFormats.fontname = editor.selection.getNode().style.fontFamily;
-
-  if (/^(LI|UL|OL|DL)$/.test(node.nodeName)) {
-    let listElm = editor.selection.getNode();
-    if (listElm.nodeName === 'LI') {
-      listElm = editor.dom.getParent(listElm, 'ol,ul');
-    }
-
-    let style = editor.dom.getStyle(listElm, 'listStyleType');
-    if (style === '') {
-      style = 'default';
-    }
-    if (listElm.nodeName === 'OL') {
-      currentFormats.ol = style;
-    } else {
-      if (!listElm) return;
-      if (listElm.className === 'tox-checklist') {
-        currentFormats.cl = true;
-      } else {
-        currentFormats.ul = style;
+    if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
+      for (var i = 0; i < node.children.length; i++) {
+        let item = editor.selection.getNode().children.item(i);
+        currentFormats.hilitecolor = getNodeBg(item);
+        currentFormats.forecolor = getNodeColor(item);
       }
     }
-  }
-  currentFormats.node = editor.selection.getNode().nodeName;
-  reactNativeEventHandler('selectionchange', currentFormats);
+    let range = editor.selection.getRng();
+
+    currentFormats.current = {
+      index: range.startOffset,
+      length: range.endOffset - range.startOffset
+    };
+
+    currentFormats.fontsize = editor.selection.getNode().style.fontSize;
+
+    if (currentFormats.fontsize === '') {
+      currentFormats.fontsize = DEFAULT_FONT_SIZE;
+
+      if (currentFormats.h2) {
+        currentFormats.fontsize = '18pt';
+      }
+      if (currentFormats.h3) {
+        currentFormats.fontsize = '14pt';
+      }
+      if (currentFormats.h4) {
+        currentFormats.fontsize = '12pt';
+      }
+      if (currentFormats.h5) {
+        currentFormats.fontsize = '10pt';
+      }
+      if (currentFormats.h6) {
+        currentFormats.fontsize = '8pt';
+      }
+    }
+    if (node.nodeName === 'A') {
+      currentFormats.link = node.getAttribute('href');
+    }
+
+    currentFormats.fontname = editor.selection.getNode().style.fontFamily;
+
+    if (/^(LI|UL|OL|DL)$/.test(node.nodeName)) {
+      let listElm = editor.selection.getNode();
+      if (listElm.nodeName === 'LI') {
+        listElm = editor.dom.getParent(listElm, 'ol,ul');
+      }
+
+      let style = editor.dom.getStyle(listElm, 'listStyleType');
+      if (style === '') {
+        style = 'default';
+      }
+      if (listElm.nodeName === 'OL') {
+        currentFormats.ol = style;
+      } else {
+        if (!listElm) return;
+        if (listElm.className === 'tox-checklist') {
+          currentFormats.cl = true;
+        } else {
+          currentFormats.ul = style;
+        }
+      }
+    }
+    currentFormats.node = editor.selection.getNode().nodeName;
+    reactNativeEventHandler('selectionchange', currentFormats);
+  }, 300);
 }

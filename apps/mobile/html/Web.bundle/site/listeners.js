@@ -84,7 +84,7 @@ function onTitleChange() {
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
       info.querySelector('#infowords').innerText =
-        tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+      editor.countWords() + ' words';
     }
 
     if (titleMessage && typeof titleMessage.value === 'string') {
@@ -139,8 +139,9 @@ function attachMessageListener() {
           document.activeElement.blur();
           window.blur();
         }, 300);
+        info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
-          tinymce.activeEditor.plugins.wordcount.getCount() + ' words';
+        editor.countWords() + ' words';
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;

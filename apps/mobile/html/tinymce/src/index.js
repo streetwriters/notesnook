@@ -24,6 +24,7 @@ import "@streetwritersco/tinymce-plugins/inlinecode"
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import "@streetwritersco/tinymce-plugins/attachmentshandler";
 import "@streetwritersco/tinymce-plugins/blockescape";
+import "@streetwritersco/tinymce-plugins/contenthandler";
 
 require.context(
   "file-loader?name=[path][name].[ext]&context=node_modules/tinymce!tinymce/skins",

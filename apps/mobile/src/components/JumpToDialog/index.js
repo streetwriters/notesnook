@@ -4,18 +4,14 @@ import BaseDialog from '../../components/Dialog/base-dialog';
 import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import {useTracked} from '../../provider';
-import {
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
-} from '../../provider/stores';
+import {useMessageStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {getElevation} from '../../utils';
 import {
   eCloseJumpToDialog,
   eOpenJumpToDialog,
-  eScrollEvent,
+  eScrollEvent
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
@@ -31,19 +27,13 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
   const [currentIndex, setCurrentIndex] = useState(null);
 
   const onPress = (item, index) => {
-    let offset = 35 * index;
     let ind = notes.findIndex(
-      i => i.title === item.title && i.type === 'header',
+      i => i.title === item.title && i.type === 'header'
     );
-    let messageState = useMessageStore.getState().message;
-    let msgOffset = messageState?.visible ? 60 : 10;
-    ind = ind + 1;
-    ind = ind - (index + 1);
-    offset = offset + ind * 100 + msgOffset;
-    console.log(scrollRef.current?.scrollToOffset);
-    scrollRef.current?.scrollToOffset({
-      offset: offset,
-      animated: true,
+    console.log(ind);
+    scrollRef.current?.scrollToIndex({
+      index: ind,
+      animated: true
     });
     close();
   };
@@ -60,7 +50,8 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
     };
   }, []);
 
-  const onScroll = y => {
+  const onScroll = data => {
+    let y = data.y;
     if (timeout) {
       clearTimeout(timeout);
       timeout = null;
@@ -90,7 +81,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
       .map((item, index) => {
         let offset = 35 * index;
         let ind = notes.findIndex(
-          i => i.title === item.title && i.type === 'header',
+          i => i.title === item.title && i.type === 'header'
         );
         let messageState = useMessageStore.getState().message;
         let msgOffset = messageState?.visible ? 60 : 10;
@@ -119,18 +110,11 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
           borderRadius: 10,
           alignSelf: 'center',
           padding: 10,
+          paddingTop: 30
         }}>
-        <Heading
-          size={SIZE.xl}
-          style={{
-            alignSelf: 'center',
-          }}>
-          Jump to
-        </Heading>
-        <Seperator />
         <ScrollView
           style={{
-            maxHeight: '100%',
+            maxHeight: '100%'
           }}>
           <View
             style={{
@@ -138,32 +122,8 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
               flexWrap: 'wrap',
               alignSelf: 'center',
               justifyContent: 'center',
-              paddingBottom: 20,
+              paddingBottom: 20
             }}>
-            <PressableButton
-              key="go to top"
-              onPress={() => {
-                scrollRef.current?.scrollToOffset(0, 0, true);
-                close();
-              }}
-              type="shade"
-              customStyle={{
-                minWidth: '20%',
-                width: null,
-                paddingHorizontal: 12,
-                margin: 5,
-                borderRadius: 100,
-                height: 25,
-              }}>
-              <Paragraph
-                size={SIZE.sm}
-                color={colors.accent}
-                style={{
-                  textAlign: 'center',
-                }}>
-                Top
-              </Paragraph>
-            </PressableButton>
             {notes
               .filter(i => i.type === 'header')
               .map((item, index) => {
@@ -171,7 +131,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                   <PressableButton
                     key={item.title}
                     onPress={() => onPress(item, index)}
-                    type={currentIndex === index ? 'accent' : 'shade'}
+                    type={currentIndex === index ? 'accent' : 'transparent'}
                     customStyle={{
                       minWidth: '20%',
                       width: null,
@@ -179,6 +139,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                       margin: 5,
                       borderRadius: 100,
                       height: 25,
+                      marginVertical: 10
                     }}>
                     <Paragraph
                       size={SIZE.sm}
@@ -186,7 +147,7 @@ const JumpToDialog = ({scrollRef, data, type, screen}) => {
                         currentIndex === index ? colors.light : colors.accent
                       }
                       style={{
-                        textAlign: 'center',
+                        textAlign: 'center'
                       }}>
                       {item.title}
                     </Paragraph>

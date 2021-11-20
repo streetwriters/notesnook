@@ -1,6 +1,5 @@
 import React, {useEffect, useRef} from 'react';
 import {
-  ActivityIndicator,
   BackHandler,
   InteractionManager,
   Keyboard,
@@ -13,7 +12,6 @@ import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent} from '../../components/DialogManager/recievers';
 import {useTracked} from '../../provider';
 import {
-  useAttachmentStore,
   useEditorStore,
   useSettingStore,
   useUserStore
@@ -26,7 +24,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing} from '../../utils';
+import {editing, SUBSCRIPTION_STATUS} from '../../utils';
 import {db} from '../../utils/database';
 import {
   eClearEditor,
@@ -34,11 +32,10 @@ import {
   eOnLoadNote,
   eOpenFullscreenEditor,
   eOpenLoginDialog,
+  eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
 import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
@@ -48,12 +45,11 @@ import {
   setColors
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
+import {ProgressCircle} from './ProgressCircle';
 import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {toolbarRef} from './tiny/toolbar/constants';
-
-import * as Progress from 'react-native-progress';
-import {ProgressCircle} from './ProgressCircle';
 import picker from './tiny/toolbar/picker';
+
 const EditorHeader = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -101,8 +97,7 @@ const EditorHeader = () => {
         redo: 0
       });
       useEditorStore.getState().setCurrentlyEditingNote(null);
-      await clearTimer(true);
-      await clearEditor(false, true, false);
+      await clearEditor(true, true, false);
       keyboardListener.current?.remove();
     }
   };
@@ -139,10 +134,8 @@ const EditorHeader = () => {
       });
       return;
     }
-    console.log(editing.isFocused);
     if (editing.isFocused) {
       safeKeyboardDismiss();
-      await sleep(300);
       editing.isFocused = true;
     }
     eSendEvent(eOpenPublishNoteDialog, note);
@@ -154,7 +147,6 @@ const EditorHeader = () => {
       safeKeyboardDismiss();
       editing.isFocused = true;
     }
-    await sleep(500);
     let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
     ActionSheetEvent(note, true, true, [
       'Add to notebook',
@@ -293,6 +285,26 @@ const EditorHeader = () => {
             flexDirection: 'row'
           }}>
           <>
+            {!user ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
+              <ActionIcon
+                name="crown"
+                color={colors.yellow}
+                customStyle={{
+                  marginLeft: 10,
+                  borderRadius: 5
+                }}
+                top={50}
+                onPress={() => {
+                  if (editing.isFocused) {
+                    safeKeyboardDismiss();
+                    editing.isFocused = true;
+                  }
+                  eSendEvent(eOpenPremiumDialog);
+                }}
+              />
+            ) : null}
             {currentlyEditingNote && (
               <ActionIcon
                 name="cloud-upload-outline"

@@ -72,9 +72,6 @@ const updateDateEdited = value => `
 	(function() {
 		info = document.querySelector(infoBar);
         info.querySelector('#infodate').innerText = "${value}";
-        info.querySelector('#infowords').innerText =
-		editor.plugins.wordcount.getCount() + " words";
-		
 	})();
 `;
 

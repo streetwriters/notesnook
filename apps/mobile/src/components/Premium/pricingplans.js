@@ -1,7 +1,8 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import {ActivityIndicator, Platform, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
 import {
   eSendEvent,
   presentSheet,
@@ -9,12 +10,17 @@ import {
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {db} from '../../utils/database';
-import {eCloseProgressDialog, eOpenLoginDialog} from '../../utils/Events';
+import {
+  eClosePremiumDialog,
+  eCloseProgressDialog,
+  eOpenLoginDialog
+} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {Dialog} from '../Dialog';
+import BaseDialog from '../Dialog/base-dialog';
 import {presentDialog} from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -32,10 +38,15 @@ const promoCyclesYearly = {
   3: 'first 3 years'
 };
 
-export const PricingPlans = ({promo, marginTop}) => {
+export const PricingPlans = ({
+  promo,
+  marginTop,
+  heading = true,
+  compact = false
+}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = {}; //useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const [product, setProduct] = useState(null);
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);
@@ -44,7 +55,6 @@ export const PricingPlans = ({promo, marginTop}) => {
   const getSkus = async () => {
     try {
       let products = PremiumService.getProducts();
-
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
@@ -65,8 +75,11 @@ export const PricingPlans = ({promo, marginTop}) => {
     }
   };
 
-  const getPromo = productId => {
+  const getPromo = async productId => {
+    await sleep(500);
+    let products = PremiumService.getProducts();
     let product = products.find(p => p.productId === productId);
+    if (!product) return;
     let isMonthly = product.productId.indexOf('.mo') > -1;
     let cycleText = isMonthly
       ? promoCyclesMonthly[
@@ -104,7 +117,8 @@ export const PricingPlans = ({promo, marginTop}) => {
         user.id
       );
       setBuying(false);
-      close();
+      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eClosePremiumDialog);
       await sleep(500);
       presentSheet({
         title: 'Thank you for subscribing!',
@@ -127,6 +141,11 @@ export const PricingPlans = ({promo, marginTop}) => {
       style={{
         paddingHorizontal: 12
       }}>
+      {buying ? (
+        <BaseDialog statusBarTranslucent centered>
+          <ActivityIndicator size={50} color="white" />
+        </BaseDialog>
+      ) : null}
       {product?.type === 'promo' ? (
         <Heading
           style={{
@@ -150,40 +169,52 @@ export const PricingPlans = ({promo, marginTop}) => {
 
       {user && !product ? (
         <>
-          <Heading
-            style={{
-              alignSelf: 'center',
-              marginTop: marginTop || 20,
-              marginBottom: 20
-            }}>
-            Choose a plan
-          </Heading>
-
-          <PricingItem
-            onPress={() => buySubscription(offers?.monthly)}
-            product={{
-              type: 'monthly',
-              data: offers?.monthly,
-              info: 'Pay monthly, cancel anytime.'
-            }}
-          />
+          {heading ? (
+            <Heading
+              style={{
+                alignSelf: 'center',
+                marginTop: marginTop || 20,
+                marginBottom: 20
+              }}>
+              Choose a plan
+            </Heading>
+          ) : null}
 
           <View
             style={{
-              height: 1,
-              backgroundColor: colors.nav,
-              marginVertical: 10
-            }}
-          />
+              flexDirection: !compact ? 'column' : 'row',
+              flexWrap: 'wrap',
+              justifyContent: 'space-around'
+            }}>
+            <PricingItem
+              onPress={() => buySubscription(offers?.monthly)}
+              compact={compact}
+              product={{
+                type: 'monthly',
+                data: offers?.monthly,
+                info: 'Pay monthly, cancel anytime.'
+              }}
+            />
 
-          <PricingItem
-            onPress={() => buySubscription(offers?.yearly)}
-            product={{
-              type: 'yearly',
-              data: offers?.yearly,
-              info: 'Pay yearly'
-            }}
-          />
+            {!compact && (
+              <View
+                style={{
+                  height: 1,
+                  marginVertical: 5
+                }}
+              />
+            )}
+
+            <PricingItem
+              onPress={() => buySubscription(offers?.yearly)}
+              compact={compact}
+              product={{
+                type: 'yearly',
+                data: offers?.yearly,
+                info: 'Pay yearly'
+              }}
+            />
+          </View>
 
           <Button
             height={35}
@@ -233,19 +264,38 @@ export const PricingPlans = ({promo, marginTop}) => {
         </>
       ) : (
         <View>
-          <PricingItem
-            product={product}
-            onPress={() => buySubscription(product)}
-          />
-
-          <Button
-            onPress={() => {
-              setProduct(null);
-            }}
-            height={30}
-            type="errorShade"
-            title="Cancel promo code"
-          />
+          {!user ? (
+            <Button
+              onPress={() => {
+                eSendEvent(eClosePremiumDialog);
+                setTimeout(() => {
+                  eSendEvent(eOpenLoginDialog, 1);
+                }, 400);
+              }}
+              title={'Try free for 14 days'}
+              type="accent"
+              style={{
+                paddingHorizontal: 24,
+                marginTop: 20,
+                marginBottom: 10
+              }}
+            />
+          ) : (
+            <>
+              <PricingItem
+                product={product}
+                onPress={() => buySubscription(product.data)}
+              />
+              <Button
+                onPress={() => {
+                  setProduct(null);
+                }}
+                height={30}
+                type="errorShade"
+                title="Cancel promo code"
+              />
+            </>
+          )}
         </View>
       )}
 
@@ -294,20 +344,12 @@ export const PricingPlans = ({promo, marginTop}) => {
                 marginTop: 10,
                 textAlign: 'center'
               }}>
-              By tapping Subscribe,
-              <Paragraph size={SIZE.xs + 1} color={colors.accent}>
-                {product?.data?.localizedPrice}
-              </Paragraph>{' '}
-              will be charged to your iTunes Account for 1-
-              {product?.type === 'yearly' ? 'year' : 'month'} subscription of
-              Notesnook Pro.{'\n\n'}
-              Subscriptions will automatically renew unless cancelled within
-              24-hours before the end of the current period. You can cancel
-              anytime with your iTunes Account settings.
+              By subscribing, you will be charged to your iTunes Account for the
+              selected plan. Subscriptions will automatically renew unless
+              cancelled within 24-hours before the end of the current period.
             </Paragraph>
           ) : (
             <Paragraph
-              textBreakStrategy="balanced"
               size={SIZE.xs + 1}
               color={colors.icon}
               style={{
@@ -315,22 +357,15 @@ export const PricingPlans = ({promo, marginTop}) => {
                 marginTop: 10,
                 textAlign: 'center'
               }}>
-              By tapping Subscribe, your payment will be charged on your Google
-              Account, and your subscription will automatically renew for the
-              same package length at the same price until you cancel in settings
-              in the Android Play Store prior to the end of the then current
-              period.
+              By subscribing, your will be charged on your Google Account, and
+              your subscription will automatically renew until you cancel prior
+              to the end of the then current period.
             </Paragraph>
           )}
 
           <View
             style={{
-              backgroundColor: colors.nav,
-              width: '100%',
-              paddingVertical: 10,
-              marginTop: 5,
-              borderRadius: 5,
-              paddingHorizontal: 12
+              width: '100%'
             }}>
             <Paragraph
               size={SIZE.xs + 1}

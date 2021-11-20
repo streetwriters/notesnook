@@ -1,12 +1,15 @@
 import {CHECK_IDS} from 'notes-core/common';
+import React from 'react';
 import * as RNIap from 'react-native-iap';
-import InAppBrowser from 'react-native-inappbrowser-reborn';
+import DialogHeader from '../components/Dialog/dialog-header';
+import {CompactFeatures} from '../components/Premium/compact-features';
+import {PricingPlans} from '../components/Premium/pricing-plans';
+import Seperator from '../components/Seperator';
 import {useMessageStore, useUserStore} from '../provider/stores';
 import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
 import {db} from '../utils/database';
 import {
   eOpenPremiumDialog,
-  eOpenProgressDialog,
   eOpenTrialEndingDialog,
   eShowGetPremium
 } from '../utils/Events';
@@ -192,7 +195,7 @@ const subscriptions = {
       _subscriptions = [];
     }
     let index = _subscriptions.findIndex(
-      s => s.transactionId === transactionId
+      s => s.transactionId === subscription.transactionId
     );
     if (index === -1) {
       _subscriptions.unshift(subscription);
@@ -219,7 +222,6 @@ const subscriptions = {
   verify: async subscription => {
     console.log(
       'verifying: ',
-      subscription.transactionId,
       new Date(subscription.transactionDate).toLocaleString()
     );
 
@@ -242,7 +244,9 @@ const subscriptions = {
             'https://payments.streetwriters.co/apple/verify',
             requestData
           );
+          
           let text = await result.text();
+          console.log(text);
           if (!result.ok) {
             if (text === 'Receipt already expired.') {
               await subscriptions.clear(subscription);
@@ -277,12 +281,13 @@ const subscriptions = {
 async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
   if (!user) return;
-
+  let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
   let total = user.subscription.expiry - user.subscription.start;
   let current = Date.now() - user.subscription.start;
-
-  current = ((current / total) * 100).toFixed(0);
+  current = (current / total) * 100;
+  console.log(current);
   let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
+
   if (current > 75 && lastTrialDialogShownAt !== 'ending') {
     eSendEvent(eOpenTrialEndingDialog, {
       title: 'Your trial is ending soon',
@@ -290,17 +295,68 @@ async function getRemainingTrialDaysStatus() {
       extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'ending');
-  } else if (!get() && lastTrialDialogShownAt !== 'expired') {
+    return;
+  }
+
+  if (!premium && lastTrialDialogShownAt !== 'expired') {
     eSendEvent(eOpenTrialEndingDialog, {
       title: 'Your trial has expired',
       offer: 30,
-      extend: true
+      extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'expired');
-  } else {
-    return;
   }
 }
+
+const features_list = [
+  {
+    content: 'Unlock unlimited notebooks, tags, colors. Organize like a pro'
+  },
+  {
+    content: 'Attach files upto 500MB, upload 4K images with unlimited storage'
+  },
+  {
+    content: 'Instantly sync to unlimited devices'
+  },
+  {
+    content: 'A private vault to keep everything imporant always locked'
+  },
+  {
+    content:
+      'Rich note editing experience with markdown, tables, checklists and more'
+  },
+  {
+    content: 'Export your notes in Pdf, markdown and html formats'
+  }
+];
+
+const sheet = (context, promo) => {
+  presentSheet({
+    context: context,
+    component: ref => (
+      <>
+        <DialogHeader
+          centered
+          title="Upgrade to Notesnook"
+          titlePart="Pro"
+          paragraph="Manage your work on another level, enjoy seemless sync and keep all notes in one place."
+          padding={12}
+        />
+        <Seperator />
+        <CompactFeatures
+          scrollRef={ref}
+          maxHeight={300}
+          features={features_list}
+          vertical
+        />
+        <Seperator half />
+        <PricingPlans compact heading={false} promo={promo} />
+      </>
+    ),
+    noIcon: true,
+    noProgress: true
+  });
+};
 
 export default {
   verify,
@@ -312,5 +368,6 @@ export default {
   getUser,
   subscriptions,
   getMontlySub,
-  getRemainingTrialDaysStatus
+  getRemainingTrialDaysStatus,
+  sheet
 };

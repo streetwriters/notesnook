@@ -1,27 +1,29 @@
-import React, { useState } from 'react';
-import { Image, ScrollView, View } from 'react-native';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
-import { getElevation } from '../../utils';
-import { eOpenLoginDialog } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { Dialog } from '../Dialog';
+import React, {useState} from 'react';
+import {Image, ScrollView, View} from 'react-native';
+import {LAUNCH_ROCKET} from '../../assets/images/assets';
+import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent, presentSheet} from '../../services/EventManager';
+import {getElevation} from '../../utils';
+import {eOpenLoginDialog} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
 import GeneralSheet from '../GeneralSheet';
+import {SvgToPngView} from '../ListPlaceholders';
 import Seperator from '../Seperator';
-import { Toast } from '../Toast';
+import {Toast} from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { features } from './features';
-import { Group } from './group';
-import { PricingPlans } from './pricing-plans';
+import {features} from './features';
+import {Group} from './group';
+import {PricingPlans} from './pricing-plans';
 
 export const Component = ({close, promo, getRef}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const user = {}; //useUserStore(state => state.user);
+  const user = useUserStore(state => state.user);
   const [floatingButton, setFloatingButton] = useState(false);
 
   const onPress = async () => {
@@ -59,9 +61,8 @@ export const Component = ({close, promo, getRef}) => {
         backgroundColor: colors.bg,
         justifyContent: 'space-between',
         borderRadius: 10,
-        maxHeight: DDS.isTab ? '90%' : '100%'
+        maxHeight: '100%'
       }}>
-
       <GeneralSheet context="pricing_plans" />
       <ActionIcon
         onPress={() => {
@@ -69,7 +70,7 @@ export const Component = ({close, promo, getRef}) => {
         }}
         customStyle={{
           position: 'absolute',
-          right: 15,
+          right: DDS.isTab ? 30 : 15,
           top: 30,
           zIndex: 10,
           width: 50,
@@ -79,14 +80,25 @@ export const Component = ({close, promo, getRef}) => {
         name="close"
       />
 
-      <ScrollView onScroll={onScroll}>
-        <Image
-          source={require('../../assets/images/to_the_stars.png')}
+      <ScrollView
+        style={{
+          paddingHorizontal: DDS.isTab ? DDS.width / 5 : 0
+        }}
+        onScroll={onScroll}>
+        <View
           style={{
             width: '100%',
-            height: 400
-          }}
-        />
+            alignItems: 'center',
+            height: 400,
+            justifyContent: 'center'
+          }}>
+          <SvgToPngView
+            width={350}
+            height={350}
+            src={LAUNCH_ROCKET(colors.accent)}
+          />
+        </View>
+
         <Heading
           size={SIZE.lg}
           style={{

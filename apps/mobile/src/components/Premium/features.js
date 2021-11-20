@@ -28,18 +28,19 @@ export const features = [
         highlight: 'Password protected',
         content: 'notes sharing',
         icon: 'file-lock'
-      },
-      {
-        highlight: 'Private vault',
-        content: 'for notes',
-        icon: 'shield-lock'
       }
     ]
   },
+
   {
-    title: 'Keep your files where they belong',
+    title: 'No limit on notes or devices',
     detail:
-      'Organize and simplify your work. Securely access your files from any device, anywhere without compromising on privacy.',
+      "Basic or Pro, you can create unlimited number of notes and access them on all your devices. You won't be running out of space or blocks ever."
+  },
+  {
+    title: 'Attach files & images',
+    detail:
+      'Add your documents, PDFs, images and videos, and keep them safe and organized.',
     pro: true,
     features: [
       {
@@ -70,14 +71,15 @@ export const features = [
     ]
   },
   {
-    title: 'No limit on notes for free users',
+    title: 'Keep secrets always locked with private vault',
     detail:
-      "Basic or Pro, you can create unlimited number of notes. You won't be running out of space or blocks ever."
+      'An extra layer of security for any important data. Notes in the vault always stay encrypted and require a password to be accessed or edited everytime.',
+    pro: true
   },
   {
-    title: 'Find what you need, when you need to',
+    title: 'Organize yourself in the best way',
     detail:
-      'You are not limited on how you want to organize your notes. Use tags, notebooks, topics, colors.',
+      'We offer multiple ways to keep you organized. The only limit is your imagination.',
     features: [
       {
         highlight: 'Unlimited',
@@ -95,6 +97,12 @@ export const features = [
         highlight: 'Side menu',
         content: 'shortcuts',
         icon: 'link-variant'
+      },
+      {
+        highlight: 'Pin note in',
+        content: 'notifications',
+        icon: 'pin',
+        platform: 'android'
       }
     ],
     info: '* Free users are limited to keeping 3 notebooks (no limit on topics) and 5 tags.'
@@ -103,13 +111,13 @@ export const features = [
   {
     title: 'Instant syncing',
     detail:
-      'Seemlessly work from anywhere. Every change is synced instantly everywhere.',
+      'Seemlessly work from anywhere on any device. Every change is synced instantly to all your devices.',
     pro: true
   },
   {
-    title: 'Write better, faster and smarter',
+    title: 'Rich tools for rich editing',
     detail:
-      'With our powerful rich text editor, edit your notes with advanced features like tables, checklists, images and videos.',
+      'Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.',
     features: [
       {
         highlight: 'Basic formating',
@@ -117,8 +125,8 @@ export const features = [
         icon: 'format-bold'
       },
       {
-        highlight: 'Advanced editing',
-        content: 'features',
+        highlight: 'Checklists',
+        content: '& tables',
         icon: 'table',
         pro: true
       },
@@ -127,18 +135,66 @@ export const features = [
         content: 'support',
         icon: 'language-markdown',
         pro: true
+      },
+      {
+        highlight: 'Write notes from',
+        content: 'notifications',
+        icon: 'bell',
+        platform: 'android'
       }
     ]
   },
   {
-    title: 'You own your data, take it anywhere',
-    pro: true,
+    title: 'Safe publishing to the Internet',
     detail:
-      'Export notes in the most commonly used formats such as PDF, Markdown and HTML.',
-    info: '* Free users can export notes in well formatted plain text.'
+      'Publishing is nothing new but we offer fully encrypted, anonymous publishing. Take any note & share it with the world.',
+    features: [
+      {
+        highlight: 'Password protected',
+        content: 'sharing',
+        icon: 'send-lock'
+      },
+      {
+        highlight: 'Self destruct',
+        content: 'monographs',
+        icon: 'bomb'
+      }
+    ]
   },
   {
-    title: 'Automatic backups',
+    title: 'Export and take your notes anywhere',
+    pro: true,
+    detail:
+      'You own your notes, not us. No proprietary formats. No vendor lock in. No waiting for hours to download your notes.',
+    info: '* Free users can export notes in well formatted plain text.',
+    features: [
+      {
+        highlight: 'Export as ',
+        content: 'Markdown',
+        icon: 'language-markdown',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'PDF',
+        icon: 'file-pdf-box',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'HTML',
+        icon: 'language-html5',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'text',
+        icon: 'clipboard-text-outline'
+      }
+    ]
+  },
+  {
+    title: 'Backup & keep your notes safe',
     detail:
       'Do not worry about losing your data. Turn on automatic backups on weekly or daily basis.',
     features: [
@@ -151,16 +207,30 @@ export const features = [
     pro: true
   },
   {
-    title: 'Personalize',
+    title: 'Personalize & make Notesnook your own',
     detail:
-      'Change app accent color from default to match your mood and use automatic dark mode.',
+      'Change app themes to match your style. Custom themes are coming soon.',
     pro: true,
     features: [
       {
         highlight: 'Automatic',
         content: 'dark mode',
         icon: 'theme-light-dark'
+      },
+      {
+        highlight: 'Change accent',
+        content: 'color',
+        icon: 'invert-colors'
       }
     ]
   }
 ];
+
+/**
+ * 
+      {
+        highlight: 'Private vault',
+        content: 'for notes',
+        icon: 'shield-lock'
+      }
+ */

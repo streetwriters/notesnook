@@ -213,7 +213,6 @@ const LoginDialog = () => {
     oldPassword = null;
     email = null;
     password = null;
-    setUserConsent(false);
     setError(false);
     setLoading(false);
     setStatus(null);

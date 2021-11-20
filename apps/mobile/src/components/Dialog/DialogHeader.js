@@ -1,4 +1,5 @@
 import React from 'react';
+import {Text} from 'react-native';
 import {View} from 'react-native';
 import {useTracked} from '../../provider';
 import {SIZE} from '../../utils/SizeUtils';
@@ -6,7 +7,16 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const DialogHeader = ({icon, title, paragraph, button, paragraphColor,padding}) => {
+const DialogHeader = ({
+  icon,
+  title,
+  paragraph,
+  button,
+  paragraphColor,
+  padding,
+  centered,
+  titlePart
+}) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
 
@@ -18,7 +28,7 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor,padding}) 
           alignItems: 'center',
           justifyContent: 'space-between',
           minHeight: 50,
-          paddingHorizontal:padding
+          paddingHorizontal: padding
         }}>
         <View
           style={{
@@ -27,10 +37,15 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor,padding}) 
           <View
             style={{
               flexDirection: 'row',
-              justifyContent: 'space-between',
+              justifyContent: centered ? 'center' : 'space-between',
               alignItems: 'center'
             }}>
-            <Heading size={SIZE.xl}>{title}</Heading>
+            <Heading size={SIZE.xl}>
+              {title}{' '}
+              {titlePart && (
+                <Text style={{color: colors.accent}}>{titlePart}</Text>
+              )}
+            </Heading>
 
             {button ? (
               <Button
@@ -48,7 +63,13 @@ const DialogHeader = ({icon, title, paragraph, button, paragraphColor,padding}) 
           </View>
 
           {paragraph ? (
-            <Paragraph color={paragraphColor || colors.icon}>
+            <Paragraph
+              style={{
+                textAlign: centered ? 'center' : 'left',
+                maxWidth: centered ? '90%' : '100%',
+                alignSelf: centered ? 'center' : 'flex-start'
+              }}
+              color={paragraphColor || colors.icon}>
               {paragraph}
             </Paragraph>
           ) : null}
