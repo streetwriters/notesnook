@@ -16,7 +16,7 @@ import { ProFeatures } from './pro-features';
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Thank you for signing up!',
     paragraph:
