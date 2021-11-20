@@ -480,6 +480,8 @@ const onChange = function (event) {
     updateCount(0);
   }
   if (prevCount === 0) return;
+  console.log("editor changed",event.selectionChange);
+  reactNativeEventHandler('noteedited')
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
