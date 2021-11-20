@@ -397,12 +397,7 @@ export function showPasswordDialog(type, validate) {
 
 export function showRecoveryKeyDialog() {
   return showDialog((Dialogs, perform) => (
-    <Dialogs.RecoveryKeyDialog
-      onDone={() => {
-        Config.set("recoveryKeyBackupDate", Date.now());
-        perform(true);
-      }}
-    />
+    <Dialogs.RecoveryKeyDialog onDone={() => perform(true)} />
   ));
 }
 

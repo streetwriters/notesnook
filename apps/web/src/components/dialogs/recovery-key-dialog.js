@@ -6,6 +6,7 @@ import Logo from "../../assets/notesnook-logo.png";
 import download from "../../utils/download";
 import * as clipboard from "clipboard-polyfill/text";
 import { Suspense } from "react";
+import Config from "../../utils/config";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
@@ -23,7 +24,17 @@ function RecoveryKeyDialog(props) {
   }, []);
 
   return (
-    <Dialog isOpen={true} title="Backup your recovery key">
+    <Dialog
+      isOpen={true}
+      title="Backup your recovery key"
+      positiveButton={{
+        text: "I have backed up my key",
+        onClick: () => {
+          Config.set("recoveryKeyBackupDate", Date.now());
+          props.onDone();
+        },
+      }}
+    >
       <Flex flexDirection="column" flex={1} sx={{ overflow: "hidden" }}>
         <Flex flexDirection="column" sx={{ overflowY: "auto" }}>
           <Text
@@ -35,8 +46,6 @@ function RecoveryKeyDialog(props) {
           >
             In case you forget your password, your recovery key is the only way
             to recover your data.
-            <br />
-            Please BACKUP your recovery key before proceeding
           </Text>
           <Text
             mt={2}
@@ -61,6 +70,7 @@ function RecoveryKeyDialog(props) {
 
             <Flex flexDirection="column">
               <Button
+                variant="secondary"
                 mt={1}
                 className="copyKey"
                 fontSize="body"
@@ -81,6 +91,7 @@ function RecoveryKeyDialog(props) {
                 {copyText}
               </Button>
               <Button
+                variant="secondary"
                 mt={1}
                 fontSize="body"
                 onClick={async () => {
@@ -93,6 +104,7 @@ function RecoveryKeyDialog(props) {
                 Download QR Code
               </Button>
               <Button
+                variant="secondary"
                 mt={1}
                 fontSize="body"
                 onClick={() => {
@@ -103,11 +115,6 @@ function RecoveryKeyDialog(props) {
               </Button>
             </Flex>
           </Flex>
-        </Flex>
-        <Flex flex={1} flexDirection="column" pt={2}>
-          <Button mt={1} fontSize="body" onClick={props.onDone}>
-            I have backed up my key
-          </Button>
         </Flex>
       </Flex>
     </Dialog>
