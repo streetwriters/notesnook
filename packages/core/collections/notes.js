@@ -259,7 +259,7 @@ export default class Notes extends Collection {
             deleteItem(notebook.topics, topic);
             continue;
           }
-          await _topic.add(note.id);
+          if (!_topic.has(note.id)) await _topic.add(note.id);
         }
       }
     }
