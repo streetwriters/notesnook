@@ -143,11 +143,11 @@
   background: var(--textSelection);
 }
 
-.mce-content-body code[data-mce-selected="inline-boundary"] {
+.mce-content-body code[data-mce-selected="inline-boundary"]:not(pre code) {
   background-color: var(--bgSecondary);
 }
 
-.mce-content-body code {
+.mce-content-body code:not(pre code) {
   background-color: var(--bgSecondary);
   border: 1px solid var(--border);
   border-radius: 5px;
