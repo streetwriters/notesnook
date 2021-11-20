@@ -9,9 +9,7 @@ import hosts from "notes-core/utils/constants";
 import { sendAttachmentsProgressEvent } from "notes-core/common";
 import { saveAs } from "file-saver";
 import { showToast } from "../utils/toast";
-import SparkMD5 from "spark-md5";
 
-const sparkMD5 = new SparkMD5.ArrayBuffer();
 const ABYTES = 17;
 const CHUNK_SIZE = 512 * 1024;
 const ENCRYPTED_CHUNK_SIZE = CHUNK_SIZE + ABYTES;
@@ -295,14 +293,6 @@ async function downloadFile(filename, requestOptions) {
       return false;
     }
 
-    let etag = response.headers["etag"] || response.headers["ETag"];
-    if (etag) {
-      etag = JSON.parse(etag);
-      if (!verify(response.data, etag, "md5")) {
-        throw new Error("File verification failed.");
-      }
-    }
-
     const distributor = new ChunkDistributor(chunkSize + ABYTES);
     distributor.fill(new Uint8Array(response.data));
     distributor.close();
@@ -323,21 +313,6 @@ async function downloadFile(filename, requestOptions) {
     console.error(e);
     reportProgress(undefined, { type: "download", hash: filename });
     return false;
-  }
-}
-
-/**
- *
- * @param {ArrayBuffer} data
- * @param {string} hash
- * @param {"md5"} hashType
- */
-function verify(data, hash, hashType = "md5") {
-  switch (hashType) {
-    case "md5":
-      return sparkMD5.append(data).end() === hash;
-    default:
-      return false;
   }
 }
 
