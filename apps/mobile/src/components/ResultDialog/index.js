@@ -1,22 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eCloseResultDialog, eOpenResultDialog} from '../../utils/Events';
-import {ph, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eCloseResultDialog, eOpenResultDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ProFeatures} from './pro-features';
+import { ProFeatures } from './pro-features';
 
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   const [dialogData, setDialogData] = useState({
     title: 'Thank you for signing up!',
     paragraph:
@@ -24,6 +24,7 @@ const ResultDialog = () => {
     button: 'Start taking notes'
   });
   useEffect(() => {
+
     eSubscribeEvent(eOpenResultDialog, open);
     eSubscribeEvent(eCloseResultDialog, close);
     return () => {
@@ -84,7 +85,14 @@ const ResultDialog = () => {
 
         <Seperator />
 
-        <ProFeatures />
+        <View
+          style={{
+            paddingHorizontal: 12,
+            alignItems: 'center',
+            width: '100%'
+          }}>
+          <ProFeatures count={4} />
+        </View>
 
         <Seperator />
         <View

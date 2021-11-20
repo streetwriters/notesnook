@@ -3,11 +3,11 @@ import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
-import {eCloseResultDialog, eOpenPremiumDialog} from '../../utils/Events';
+import {eCloseProgressDialog, eCloseResultDialog, eOpenPremiumDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
-export const ProFeatures = () => {
+export const ProFeatures = ({count = 6}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -15,39 +15,50 @@ export const ProFeatures = () => {
     <>
       {[
         {
-          title: 'Unlimited notes & notebooks',
-          icon: 'notebook'
+          content:
+            'Unlock unlimited notebooks, tags, colors. Organize like a pro'
         },
         {
-          title: 'Unlimited file & image attachments',
-          icon: 'attachment'
+          content:
+            'Attach files upto 500MB, upload 4K images with unlimited storage'
         },
         {
-          title: 'Lock any note with password',
-          icon: 'shield-outline'
+          content: 'Instantly sync to unlimited devices'
         },
         {
-          title: 'Rich text editing with markdown',
-          icon: 'pencil'
+          content: 'A private vault to keep everything imporant always locked'
+        },
+        {
+          content:
+            'Rich note editing experience with markdown, tables, checklists and more'
+        },
+        {
+          content: 'Export your notes in Pdf, markdown and html formats'
         }
-      ].map(item => (
-        <View
-          style={{
-            flexDirection: 'row',
-            width: '100%',
-            height: 40,
-            paddingHorizontal: 24,
-            marginBottom: 10,
-            alignItems: 'center',
-            borderRadius: 5
-          }}>
-          <Icon size={SIZE.md} color={colors.accent} name={item.icon} />
-          <Paragraph style={{marginLeft: 5}}>{item.title}</Paragraph>
-        </View>
-      ))}
+      ]
+        .slice(0, count)
+        .map(item => (
+          <View
+            style={{
+              flexDirection: 'row',
+              width: '100%',
+              height: 40,
+              paddingHorizontal: 0,
+              marginBottom: 10,
+              alignItems: 'center',
+              borderRadius: 5,
+              justifyContent:'flex-start'
+            }}>
+            <Icon size={SIZE.lg} color={colors.accent} name="check" />
+            <Paragraph style={{marginLeft: 5, flexShrink: 1}}>
+              {item.content}
+            </Paragraph>
+          </View>
+        ))}
       <Paragraph
         onPress={async () => {
           eSendEvent(eCloseResultDialog);
+          eSendEvent(eCloseProgressDialog);
           await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}
