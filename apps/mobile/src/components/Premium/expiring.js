@@ -33,7 +33,7 @@ export const Expiring = () => {
     extend: true
   });
  const promo = status.offer ? {
-  promoCode:"com.streetwriters.notesnook.sub.yr.15",
+  promoCode:"com.streetwriters.notesnook.sub.yr.trialoffer",
   text:"GET 30% OFF on yearly"
 }: null
 
