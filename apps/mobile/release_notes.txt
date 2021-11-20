@@ -1,3 +1,9 @@
+- Redesign dialogs in mobile & desktop apps
+- Fix tags not sorting and renaming
+- Fix subscription issues for ios users
+- Improved editor performance with large notes
+- Improved Login and Signup flow
+- Bug fixes and performance improvements
 
 Thank you for using Notesnook!
 
