@@ -32,6 +32,10 @@ export const Expiring = () => {
     offer: null,
     extend: true
   });
+ const promo = status.offer ? {
+  promoCode:"com.streetwriters.notesnook.sub.yr.15",
+  text:"GET 30% OFF on yearly"
+}: null
 
   useEffect(() => {
     eSubscribeEvent(eOpenTrialEndingDialog, open);
@@ -102,7 +106,7 @@ export const Expiring = () => {
                   onPress={async () => {
                     setVisible(false);
                     await sleep(300);
-                    eSendEvent(eOpenPremiumDialog);
+                    eSendEvent(eOpenPremiumDialog, promo);
                   }}
                   size={SIZE.xs + 2}
                   style={{
@@ -130,7 +134,7 @@ export const Expiring = () => {
                 onPress={async () => {
                   setVisible(false);
                   await sleep(300);
-                  PremiumService.sheet(null,status.offer)
+                  PremiumService.sheet(null,promo)
                 }}
                 fontSize={SIZE.md + 2}
                 style={{
