@@ -122,7 +122,7 @@ export const Menu = React.memo(
             style={{
               paddingHorizontal: 12
             }}>
-            {user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
+            {!user || user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
             user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC ? (
               <MenuListItem
                 testID={pro.name}
