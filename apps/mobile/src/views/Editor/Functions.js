@@ -49,6 +49,7 @@ let timer = null;
 let webviewInit = false;
 let appColors = COLOR_SCHEME;
 
+let closingSession = false;
 let currentEditingTimer = null;
 let webviewTimer = null;
 let requestedReload = false;
@@ -81,19 +82,18 @@ export function isNotedEdited() {
   return noteEdited;
 }
 
-async function waitForEvent(event, caller) {
+async function waitForEvent(event, caller, onend) {
   return new Promise((resolve, reject) => {
     let resolved;
     let event_callback = () => {
       eUnSubscribeEvent(event, event_callback);
       resolved = true;
       clearTimeout(resolved);
-      waitForContent = false;
-      console.log('message returned');
-      resolve(true);
+      onend && onend();
+      resolve();
     };
     eSubscribeEvent(event, event_callback);
-    caller();
+    caller && caller();
     resolved = setTimeout(() => {
       resolve(true);
     }, 2000);
@@ -104,12 +104,11 @@ export async function clearTimer(clear) {
   clearTimeout(timer);
   timer = null;
   if (waitForContent && noteEdited) {
-    await waitForEvent('content_event', () => {
+   await waitForEvent('content_event', () => {
       tiny.call(EditorWebView, request_content);
     });
-  } else {
-    waitForContent = false;
   }
+  waitForContent = false;
 
   if (clear) {
     if (!id || !noteEdited) return;
@@ -226,6 +225,12 @@ export const loadNote = async item => {
   editing.currentlyEditing = true;
   editing.movedAway = false;
 
+  if (closingSession) {
+    eSendEvent('loadingNote', item);
+    await waitForEvent('session_ended');
+    console.log('session ended');
+  }
+
   if (editing.isFocused) {
     tiny.call(EditorWebView, tiny.blur);
   }
@@ -326,6 +331,9 @@ export const _onMessage = async evt => {
     case 'history':
       console.log('history', message.value);
       eSendEvent('historyEvent', message.value);
+      break;
+    case 'noteedited':
+      console.log('noteedited');
       break;
     case 'tiny':
       if (message.value !== content.data) {
@@ -439,6 +447,7 @@ export async function clearEditor(
   reset = true,
   immediate = false
 ) {
+  closingSession = true;
   tiny.call(EditorWebView, tiny.isLoading);
   if (clear) {
     console.log('clearing content start');
@@ -470,10 +479,13 @@ export async function clearEditor(
     }
   };
   if (immediate) {
-    return await func();
+    await func();
   } else {
     cTimeout = setTimeout(func, 500);
   }
+  console.log('closing ended');
+  eSendEvent('session_ended');
+  closingSession = false;
 }
 
 async function setNoteInEditorAfterSaving(oldId, currentId) {
