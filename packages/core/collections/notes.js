@@ -255,11 +255,11 @@ export default class Notes extends Collection {
         }
         for (let topic of notebook.topics) {
           const _topic = nb.topics.topic(topic);
-          if (!_topic || _topic.has(note.id)) {
+          if (!_topic || !_topic.has(note.id)) {
             deleteItem(notebook.topics, topic);
             continue;
           }
-          if (!_topic.has(note.id)) await _topic.add(note.id);
+          await _topic.add(note.id);
         }
       }
     }
