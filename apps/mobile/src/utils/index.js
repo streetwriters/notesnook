@@ -46,7 +46,6 @@ export const updateList = items => {
   eSendEvent('onListUpdate', items);
 };
 
-
 export const InteractionManager = {
   runAfterInteractions: (func, time = 300) => setTimeout(func, time)
 };
@@ -207,7 +206,8 @@ export const itemSkus = [
   'com.streetwriters.notesnook.sub.yr.15',
   'com.streetwriters.notesnook.sub.mo.15',
   'com.streetwriters.notesnook.sub.mo.ofr',
-  'com.streetwriters.notesnook.sub.yr.ofr'
+  'com.streetwriters.notesnook.sub.yr.trialoffer',
+  'com.streetwriters.notesnook.sub.mo.trialoffer'
 ];
 
 export const MenuItemsList = [
@@ -242,7 +242,7 @@ export const MenuItemsList = [
         get: 'monographs',
         title: 'Monographs',
         id: 'monographs_navigation'
-      }
+      };
 
       eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
@@ -256,7 +256,7 @@ export const MenuItemsList = [
     name: 'Trash',
     icon: 'delete-outline',
     close: true
-  },
+  }
 ];
 
 export const SUBSCRIPTION_STATUS = {
