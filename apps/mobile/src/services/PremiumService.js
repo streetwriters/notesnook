@@ -195,7 +195,7 @@ const subscriptions = {
       _subscriptions = [];
     }
     let index = _subscriptions.findIndex(
-      s => s.transactionId === transactionId
+      s => s.transactionId === subscription.transactionId
     );
     if (index === -1) {
       _subscriptions.unshift(subscription);
@@ -222,7 +222,6 @@ const subscriptions = {
   verify: async subscription => {
     console.log(
       'verifying: ',
-      subscription.transactionId,
       new Date(subscription.transactionDate).toLocaleString()
     );
 
@@ -245,7 +244,9 @@ const subscriptions = {
             'https://payments.streetwriters.co/apple/verify',
             requestData
           );
+          
           let text = await result.text();
+          console.log(text);
           if (!result.ok) {
             if (text === 'Receipt already expired.') {
               await subscriptions.clear(subscription);
