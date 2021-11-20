@@ -38,9 +38,9 @@ export const features = [
       "Basic or Pro, you can create unlimited number of notes and access them on all your devices. You won't be running out of space or blocks ever."
   },
   {
-    title: 'Keep your files where they belong',
+    title: 'Attach files & images',
     detail:
-      'Organize and simplify your work. Securely access your files from any device, anywhere without compromising on privacy.',
+      'Add your documents, PDFs, images and videos, and keep them safe and organized.',
     pro: true,
     features: [
       {
@@ -77,9 +77,9 @@ export const features = [
     pro: true
   },
   {
-    title: 'Find what you need, when you need to',
+    title: 'Organize yourself in the best way',
     detail:
-      'You are not limited on how you want to organize your notes. Use tags, notebooks, topics, colors.',
+      'We offer multiple ways to keep you organized. The only limit is your imagination.',
     features: [
       {
         highlight: 'Unlimited',
@@ -115,9 +115,9 @@ export const features = [
     pro: true
   },
   {
-    title: 'Write better, faster and smarter',
+    title: 'Rich tools for rich editing',
     detail:
-      'With our powerful rich text editor, edit your notes with advanced features like tables, checklists, images and videos.',
+      'Having the right tool at the right time is crucial for note taking. Lists, tables, codeblocks — you name it, we have it.',
     features: [
       {
         highlight: 'Basic formating',
@@ -125,8 +125,8 @@ export const features = [
         icon: 'format-bold'
       },
       {
-        highlight: 'Advanced editing',
-        content: 'features',
+        highlight: 'Checklists',
+        content: '& tables',
         icon: 'table',
         pro: true
       },
@@ -145,9 +145,9 @@ export const features = [
     ]
   },
   {
-    title: "Share notes with people who don't have Notesnook",
+    title: 'Safe publishing to the Internet',
     detail:
-      "With monographs, you can publish share your notes with anyone even if they don't have the Notesnook App.",
+      'Publishing is nothing new but we offer fully encrypted, anonymous publishing. Take any note & share it with the world.',
     features: [
       {
         highlight: 'Password protected',
@@ -162,14 +162,39 @@ export const features = [
     ]
   },
   {
-    title: 'You own your data, take it anywhere',
+    title: 'Export and take your notes anywhere',
     pro: true,
     detail:
-      'Export notes in the most commonly used formats such as PDF, Markdown and HTML.',
-    info: '* Free users can export notes in well formatted plain text.'
+      'You own your notes, not us. No proprietary formats. No vendor lock in. No waiting for hours to download your notes.',
+    info: '* Free users can export notes in well formatted plain text.',
+    features: [
+      {
+        highlight: 'Export as ',
+        content: 'Markdown',
+        icon: 'language-markdown',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'PDF',
+        icon: 'file-pdf-box',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'HTML',
+        icon: 'language-html5',
+        pro: true
+      },
+      {
+        highlight: 'Export as',
+        content: 'text',
+        icon: 'clipboard-text-outline'
+      }
+    ]
   },
   {
-    title: 'Automatic backups',
+    title: 'Backup & keep your notes safe',
     detail:
       'Do not worry about losing your data. Turn on automatic backups on weekly or daily basis.',
     features: [
@@ -182,9 +207,9 @@ export const features = [
     pro: true
   },
   {
-    title: 'Personalize',
+    title: 'Personalize & make Notesnook your own',
     detail:
-      'Change app accent color from default to match your mood and use automatic dark mode.',
+      'Change app themes to match your style. Custom themes are coming soon.',
     pro: true,
     features: [
       {

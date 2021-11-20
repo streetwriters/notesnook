@@ -77,7 +77,7 @@ export const PricingPlans = ({
 
   const getPromo = async productId => {
     await sleep(500);
-    let products = PremiumService.getProducts()
+    let products = PremiumService.getProducts();
     let product = products.find(p => p.productId === productId);
     let isMonthly = product.productId.indexOf('.mo') > -1;
     let cycleText = isMonthly
@@ -140,11 +140,11 @@ export const PricingPlans = ({
       style={{
         paddingHorizontal: 12
       }}>
-      {
-        buying ?  <BaseDialog statusBarTranslucent centered>
-        <ActivityIndicator size={80}  color="white"/>
-      </BaseDialog>  : null
-      } 
+      {buying ? (
+        <BaseDialog statusBarTranslucent centered>
+          <ActivityIndicator size={50} color="white" />
+        </BaseDialog>
+      ) : null}
       {product?.type === 'promo' ? (
         <Heading
           style={{
@@ -364,7 +364,7 @@ export const PricingPlans = ({
 
           <View
             style={{
-              width: '100%',
+              width: '100%'
             }}>
             <Paragraph
               size={SIZE.xs + 1}
