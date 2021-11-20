@@ -6,9 +6,9 @@ import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
-    const tagItem = this._collection
-      .getItems()
-      .find((t) => t.id === id || t.title === id);
+    const tagItem = this.all.find(
+      (t) => t.id === id || t.title === this.sanitize(id)
+    );
     return tagItem;
   }
 
@@ -32,6 +32,7 @@ export default class Tags extends Collection {
       type: "tag",
       id,
       title: tag.title,
+      alias: tag.title,
       noteIds: setManipulator.union(notes, noteIds),
     };
 
@@ -48,6 +49,9 @@ export default class Tags extends Collection {
       return;
     }
     await this._db.settings.setAlias(tagId, newName);
+
+    tag.alias = newName;
+    await this._collection.addItem(tag);
   }
 
   alias(tagId) {
@@ -56,8 +60,8 @@ export default class Tags extends Collection {
       console.error(`No tag found. Tag id:`, tagId);
       return;
     }
-    const alias = this._db.settings.getAlias(tagId);
-    return alias || tag.alias || tag.title;
+
+    return tag.alias || this._db.settings.getAlias(tagId) || tag.title;
   }
 
   get raw() {
@@ -66,8 +70,8 @@ export default class Tags extends Collection {
 
   get all() {
     return this._collection.getItems(undefined, (item) => {
-      const alias = this.alias(item.id);
-      if (alias) item.alias = alias;
+      if (item.alias) return item;
+      item.alias = this._db.settings.getAlias(item.id) || tag.title;
       return item;
     });
   }
