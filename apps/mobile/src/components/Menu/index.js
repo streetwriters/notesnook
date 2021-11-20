@@ -7,7 +7,7 @@ import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {useSettingStore, useUserStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {eSendEvent} from '../../services/EventManager';
 import {DrawerScale} from '../../utils/Animations';
 import {
   ACCENT,
@@ -16,7 +16,7 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { eOpenPremiumDialog } from '../../utils/Events';
+import {eOpenPremiumDialog} from '../../utils/Events';
 import {MenuItemsList, SUBSCRIPTION_STATUS} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
 import {ColorSection} from './ColorSection';
@@ -54,20 +54,20 @@ export const Menu = React.memo(
         on: !!colors.night,
         close: false
       },
-
-      {
-        name: 'Notesnook Pro',
-        icon: 'crown',
-        func: () => {
-          eSendEvent(eOpenPremiumDialog);
-        }
-      },
       {
         name: 'Settings',
         icon: 'cog-outline',
         close: true
       }
     ];
+
+    const pro = {
+      name: 'Notesnook Pro',
+      icon: 'crown',
+      func: () => {
+        eSendEvent(eOpenPremiumDialog);
+      }
+    };
 
     return (
       <View
@@ -105,19 +105,14 @@ export const Menu = React.memo(
             keyExtractor={() => 'mainMenuView'}
             renderItem={() => (
               <>
-                {MenuItemsList.map((item, index) =>
-                  item.name === 'Notesnook Pro' &&
-                  (user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
-                    user?.subscription?.type ===
-                      SUBSCRIPTION_STATUS.BASIC) ? null : (
-                    <MenuListItem
-                      key={item.name}
-                      item={item}
-                      testID={item.name}
-                      index={index}
-                    />
-                  )
-                )}
+                {MenuItemsList.map((item, index) => (
+                  <MenuListItem
+                    key={item.name}
+                    item={item}
+                    testID={item.name}
+                    index={index}
+                  />
+                ))}
                 <ColorSection noTextMode={noTextMode} />
                 <TagsSection />
               </>
@@ -127,29 +122,36 @@ export const Menu = React.memo(
             style={{
               paddingHorizontal: 12
             }}>
+            {user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
+            user?.subscription?.type === SUBSCRIPTION_STATUS.BASIC ? (
+              <MenuListItem
+                testID={pro.name}
+                key={pro.name}
+                item={pro}
+                index={0}
+                ignore={true}
+              />
+            ) : null}
+
             {BottomItemsList.slice(DDS.isLargeTablet() ? 0 : 1, 3).map(
-              (item, index) =>
-                item.name === 'Notesnook Pro' &&
-                (user?.subscription?.type === SUBSCRIPTION_STATUS.TRIAL ||
-                  user?.subscription?.type ===
-                    SUBSCRIPTION_STATUS.BASIC) ? null : (
-                  <MenuListItem
-                    testID={
-                      item.name == 'Night mode'
-                        ? notesnook.ids.menu.nightmode
-                        : item.name
-                    }
-                    key={item.name}
-                    item={item}
-                    index={index}
-                    ignore={true}
-                    rightBtn={
-                      DDS.isLargeTablet() || item.name === 'Notesnook Pro'
-                        ? null
-                        : BottomItemsList[0]
-                    }
-                  />
-                )
+              (item, index) => (
+                <MenuListItem
+                  testID={
+                    item.name == 'Night mode'
+                      ? notesnook.ids.menu.nightmode
+                      : item.name
+                  }
+                  key={item.name}
+                  item={item}
+                  index={index}
+                  ignore={true}
+                  rightBtn={
+                    DDS.isLargeTablet() || item.name === 'Notesnook Pro'
+                      ? null
+                      : BottomItemsList[0]
+                  }
+                />
+              )
             )}
           </View>
 
