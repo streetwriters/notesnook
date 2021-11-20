@@ -114,7 +114,8 @@ export const PricingPlans = ({
         user.id
       );
       setBuying(false);
-      close();
+      eSendEvent(eCloseProgressDialog);
+      eSendEvent(eClosePremiumDialog);
       await sleep(500);
       presentSheet({
         title: 'Thank you for subscribing!',
