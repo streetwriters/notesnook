@@ -1,8 +1,3 @@
-- Added a dedicated download button for images in editor
-- Fix a crash when navigating to a tag from list of tags
-- Fix grouping not working once alphabetical grouping is selected
-- Numerous other bug fixes and performance improvements
-- Improved syncing on multiple devices
 
 Thank you for using Notesnook!
 
