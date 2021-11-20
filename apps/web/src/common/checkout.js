@@ -133,6 +133,7 @@ async function getPlans() {
   const yearlyProductId = PRODUCT_ID("yearly");
   const url = `https://checkout.paddle.com/api/2.0/prices?product_ids=${yearlyProductId},${monthlyProductId}&callback=getPrices`;
   const response = await fetchJsonp(url, {
+    timeout: 30000,
     jsonpCallback: "callback",
     jsonpCallbackFunction: "getPrices",
   });
@@ -146,6 +147,7 @@ async function getPlan(plan) {
   const productId = PRODUCT_ID(plan);
   const url = `https://checkout.paddle.com/api/2.0/prices?product_ids=${productId}&callback=getPlan`;
   const response = await fetchJsonp(url, {
+    timeout: 30000,
     jsonpCallback: "callback",
     jsonpCallbackFunction: "getPlan",
   });
