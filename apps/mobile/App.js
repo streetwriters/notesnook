@@ -31,7 +31,8 @@ let databaseHasLoaded = false;
 
 async function loadDefaultNotes() {
   try {
-    const isCreated = await MMKV.getItem('defaultNoteCreated');
+    return true;
+ /*    const isCreated = await MMKV.getItem('defaultNoteCreated');
     if (isCreated) return;
     const notes = await http.get(
       'https://app.notesnook.com/notes/index_v14.json'
@@ -47,7 +48,7 @@ async function loadDefaultNotes() {
       });
     }
     await MMKV.setItem('defaultNoteCreated', 'yes');
-    useNoteStore.getState().setNotes();
+    useNoteStore.getState().setNotes(); */
   } catch (e) {}
 }
 
@@ -55,7 +56,7 @@ const loadDatabase = async () => {
   SplashScreen.hide();
   await db.init();
   Notifications.get();
-  loadDefaultNotes();
+  //loadDefaultNotes();
   await checkFirstLaunch();
 };
 
