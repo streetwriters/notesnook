@@ -25,21 +25,26 @@ const reminders = {
           <Text as="span" fontWeight="bold" color="primary">
             get 30% off
           </Text>
+          *
         </>
       ),
-      subtitle: "on monthly & yearly plans",
+      subtitle: "*Only for yearly plan",
     },
     features,
-    footer: (
-      <Flex bg="bgSecondary" pb={2} justifyContent="center">
-        <Button variant="anchor" color="text">
-          Can't decide yet? Extend your trial!
-        </Button>
-      </Flex>
-    ),
+    // footer: (
+    //   <Flex bg="bgSecondary" pb={2} justifyContent="center">
+    //     <Button variant="anchor" color="text">
+    //       Can't decide yet? Extend your trial!
+    //     </Button>
+    //   </Flex>
+    // ),
     cta: {
       title: "Subscribe now",
-      action: () => showBuyDialog("monthly"),
+      action: () => {
+        setTimeout(async () => {
+          await showBuyDialog("yearly", "TRIAL2PRO");
+        }, 0);
+      },
     },
   },
   trialexpiring: {
@@ -56,7 +61,11 @@ const reminders = {
     features,
     cta: {
       title: "Upgrade now",
-      action: () => showBuyDialog("monthly"),
+      action: () => {
+        setTimeout(async () => {
+          await showBuyDialog();
+        }, 0);
+      },
     },
   },
 };
@@ -77,8 +86,9 @@ function ReminderDialog(props) {
       alignment="center"
       positiveButton={{
         text: <Flex>{reminder.cta.title}</Flex>,
-        onClick: () => {
-          if (reminder.cta.action) reminder.cta.action();
+        onClick: async () => {
+          if (reminder.cta.action) await reminder.cta.action();
+
           props.onClose(true);
         },
       }}

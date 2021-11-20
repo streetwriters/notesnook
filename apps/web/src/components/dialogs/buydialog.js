@@ -388,7 +388,7 @@ function BuyDialog(props) {
               setDiscount(pricingInfo);
             }}
           />
-        ) : (
+        ) : plan ? null : (
           <FeaturesList />
         )}
       </Flex>
