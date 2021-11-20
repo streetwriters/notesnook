@@ -10,7 +10,9 @@ function register(editor) {
   editor.getHTML = async function () {
     const html = editor.getBody().innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
-    const elements = document.querySelectorAll("img[src],[data-mce-bogus]");
+    const elements = document.querySelectorAll(
+      "img[src],[data-mce-bogus],[data-mce-selected]"
+    );
     for (let element of elements) {
       switch (element.nodeName) {
         case "IMG": {
@@ -27,6 +29,9 @@ function register(editor) {
         }
         default: {
           if (element.hasAttribute("data-mce-bogus")) element.remove();
+          else if (element.hasAttribute("data-mce-selected")) {
+            element.removeAttribute("data-mce-selected");
+          }
         }
       }
     }
