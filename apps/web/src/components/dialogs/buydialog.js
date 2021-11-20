@@ -346,8 +346,12 @@ function BuyDialog(props) {
             borderTopLeftRadius: "dialog",
             borderBottomLeftRadius: "dialog",
             overflow: "hidden",
-            bg: "bgTransparent",
-            backdropFilter: "blur(8px)",
+            bg: "bgSecondary",
+            "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
+              {
+                bg: "bgTransparent",
+                backdropFilter: "blur(8px)",
+              },
           }}
           width={350}
           p={4}
