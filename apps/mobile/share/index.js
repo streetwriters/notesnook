@@ -126,7 +126,6 @@ const NotesnookShare = ({quicknote = false}) => {
   });
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
-
   const {width, height} = useWindowDimensions();
   const webviewRef = useRef();
   const opacity = useValue(0);
@@ -156,6 +155,7 @@ const NotesnookShare = ({quicknote = false}) => {
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
+  
   };
 
   const onKeyboardDidHide = () => {
@@ -484,7 +484,7 @@ const NotesnookShare = ({quicknote = false}) => {
       )}
 
       <AnimatedKAV
-        enabled={!floating && Platform.OS === 'ios'}
+        enabled={!floating }
         onLayout={event => {
           if (prevAnimation.current === 0) return;
           translate.setValue(event.nativeEvent.layout.height + 30);
@@ -493,7 +493,6 @@ const NotesnookShare = ({quicknote = false}) => {
           paddingVertical: 25,
           backgroundColor: 'transparent',
           marginBottom: insets.top,
-
           transform: [
             {
               translateY:
@@ -501,11 +500,11 @@ const NotesnookShare = ({quicknote = false}) => {
             }
           ]
         }}
-        behavior="padding">
+        behavior={Platform.OS === 'ios' ? 'padding' : null}>
         <View
           style={{
             maxHeight: '100%',
-            paddingHorizontal: 12
+            paddingHorizontal: 12,
           }}>
           <ScrollView
             horizontal
