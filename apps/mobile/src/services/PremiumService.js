@@ -282,13 +282,14 @@ async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
   if (!user) return;
   let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
+  let isTrial = user.subscription.type === SUBSCRIPTION_STATUS.TRIAL;
   let total = user.subscription.expiry - user.subscription.start;
   let current = Date.now() - user.subscription.start;
   current = (current / total) * 100;
   console.log(current);
   let lastTrialDialogShownAt = await MMKV.getItem('lastTrialDialogShownAt');
 
-  if (current > 75 && lastTrialDialogShownAt !== 'ending') {
+  if (current > 75 && isTrial && lastTrialDialogShownAt !== 'ending') {
     eSendEvent(eOpenTrialEndingDialog, {
       title: 'Your trial is ending soon',
       offer: null,
