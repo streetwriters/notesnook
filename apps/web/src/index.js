@@ -1,6 +1,7 @@
 import { render } from "react-dom";
 import { getCurrentPath } from "./navigation";
 import * as serviceWorker from "./serviceWorkerRegistration";
+import { isTesting } from "./utils/platform";
 if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
 const ROUTES = {
@@ -29,7 +30,7 @@ const ROUTES = {
 
 function getRoute() {
   const path = getCurrentPath();
-  if (!shouldSkipInitiation() && !ROUTES[path]) {
+  if (!isTesting() && !shouldSkipInitiation() && !ROUTES[path]) {
     window.history.replaceState({}, null, "/signup");
     return ROUTES["/signup"];
   }
