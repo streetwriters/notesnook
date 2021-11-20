@@ -95,7 +95,7 @@ export function showBuyDialog(plan, couponCode) {
     <Dialogs.BuyDialog
       plan={plan}
       couponCode={couponCode}
-      onCancel={() => perform(false)}
+      onClose={() => perform(false)}
     />
   ));
 }
