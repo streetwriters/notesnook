@@ -11,8 +11,10 @@ function register(editor) {
   editor.getHTML = async function () {
     const html = editor.getBody().innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
+
     const elements = document.querySelectorAll(QUERY);
     for (let element of elements) {
+      sanitizeElement(element);
       switch (element.nodeName) {
         case "IMG": {
           const image = element;
@@ -25,15 +27,6 @@ function register(editor) {
 
           const datauri = await blobUriToDataUri(image.src);
           image.src = datauri;
-        }
-        default: {
-          for (let attr of element.attributes) {
-            if (ATTRIBUTES.strip.indexOf(attr.name) > -1)
-              element.removeAttribute(attr.name);
-            else if (ATTRIBUTES.elementDelete.indexOf(attr.name) > -1) {
-              element.remove();
-            }
-          }
         }
       }
     }
@@ -86,4 +79,14 @@ function countWords(str) {
 
   if (shouldCount) ++count;
   return count;
+}
+
+function sanitizeElement(element) {
+  for (let attr of element.attributes) {
+    if (ATTRIBUTES.strip.indexOf(attr.name) > -1)
+      element.removeAttribute(attr.name);
+    else if (ATTRIBUTES.elementDelete.indexOf(attr.name) > -1) {
+      element.remove();
+    }
+  }
 }
