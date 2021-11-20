@@ -32,15 +32,14 @@ function Header() {
             <IconTag
               testId={`tag-${tag}`}
               key={tag}
-              text={tag}
+              text={db.tags.alias(tag)}
               icon={Icon.Tag}
               title={`Click to remove`}
               onClick={() => setTag(tag)}
-              styles={{ text: { fontSize: "body" } }}
+              styles={{ container: { mr: 1 }, text: { fontSize: "body" } }}
             />
           ))}
           <Autosuggest
-            sx={{ ml: 1 }}
             getData={() => db.tags.all}
             getFields={(item) => [db.tags.alias(item.id)]}
             limit={10}
@@ -115,16 +114,19 @@ function Autosuggest({
             setFiltered([]);
             return;
           }
-          const filtered = getData().filter((d) => {
+          let filtered = getData().filter((d) => {
             const fields = getFields(d);
             return (
               fields.some((field) => {
-                return field.startsWith(value.toLowerCase());
+                return field.toLowerCase().startsWith(value.toLowerCase());
               }) &&
               (!customFilter || customFilter(d))
             );
           });
-          setFiltered(filtered.slice(0, limit));
+          filtered = filtered.slice(0, limit);
+          setFiltered(filtered);
+          if (filtered.length > 0) setSelectedIndex(0);
+          else setSelectedIndex(-1);
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") {

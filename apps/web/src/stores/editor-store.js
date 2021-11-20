@@ -52,6 +52,12 @@ class EditorStore extends BaseStore {
     await this.openSession(id, true);
   };
 
+  refreshTags = () => {
+    this.set((state) => {
+      state.session.tags = state.session.tags.slice();
+    });
+  };
+
   openLockedSession = async (note) => {
     this.set((state) => {
       state.session = {
@@ -245,6 +251,7 @@ class EditorStore extends BaseStore {
   };
 
   async _setTag(value) {
+    value = db.tags.sanitize(value);
     if (!value) return;
     const { tags, id } = this.get().session;
 
@@ -253,17 +260,16 @@ class EditorStore extends BaseStore {
 
     let index = tags.indexOf(value);
 
-    this.setSession((state) => {
-      if (index <= -1) state.session.tags.push(value);
-      else state.session.tags.splice(index, 1);
-    });
-
     if (index > -1) {
       await note.untag(value);
       appStore.refreshMenuPins();
     } else {
       await note.tag(value);
     }
+
+    this.set((state) => {
+      state.session.tags = db.notes.note(id).tags.slice();
+    });
 
     tagStore.refresh();
     noteStore.refresh();

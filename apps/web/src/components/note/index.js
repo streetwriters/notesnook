@@ -77,17 +77,15 @@ function Note(props) {
                 icon={Icon.Notebook}
               />
             )}
-            {tags?.slice(0, 2).map((tag) => {
-              const tagItem = db.tags.tag(tag);
-              if (!tagItem) return null;
+            {tags.map((tag) => {
               return (
                 <IconTag
-                  key={tagItem.id}
-                  text={db.tags.alias(tagItem.id)}
+                  key={tag.id}
+                  text={tag.alias}
                   icon={Icon.Tag}
                   onClick={() => {
-                    if (!tagItem.id) return showToast("Tag not found.");
-                    navigate(`/tags/${tagItem.id}`);
+                    if (!tag.id) return showToast("Tag not found.");
+                    navigate(`/tags/${tag.id}`);
                   }}
                 />
               );

@@ -11,22 +11,28 @@ import {
   getNoteHeight,
   MAX_HEIGHTS,
 } from "./height-calculator";
+import { db } from "./db";
 
 function createProfile(item, itemHeight, estimatedItemHeight) {
   return { item, itemHeight, estimatedItemHeight };
 }
 
 const NotesProfile = createProfile(
-  (index, item, context) => (
-    <Note
-      index={index}
-      pinnable={!context}
-      item={item}
-      tags={item.tags?.slice() || []}
-      notebooks={item.notebooks?.slice() || []}
-      context={context}
-    />
-  ),
+  (index, item, context) => {
+    let tags = item.tags;
+    if (tags) tags = tags.map((t) => db.tags.tag(t)).slice(0, 2);
+
+    return (
+      <Note
+        index={index}
+        pinnable={!context}
+        item={item}
+        tags={tags || []}
+        notebooks={item.notebooks?.slice() || []}
+        context={context}
+      />
+    );
+  },
   getNoteHeight,
   MAX_HEIGHTS.note
 );

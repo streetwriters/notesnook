@@ -6,6 +6,8 @@ import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
 import { store as tagStore } from "../stores/tag-store";
 import { store as appStore } from "../stores/app-store";
+import { store as editorStore } from "../stores/editor-store";
+import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
 import { Flex, Text } from "rebass";
@@ -487,6 +489,8 @@ export function showEditTagDialog(tagId) {
         await db.tags.rename(tagId, title);
         showToast("success", "Tag edited!");
         tagStore.refresh();
+        editorStore.refreshTags();
+        noteStore.refresh();
         perform(true);
       }}
     />
