@@ -3,7 +3,11 @@ import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
-import {eCloseProgressDialog, eCloseResultDialog, eOpenPremiumDialog} from '../../utils/Events';
+import {
+  eCloseProgressDialog,
+  eCloseResultDialog,
+  eOpenPremiumDialog
+} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
@@ -47,7 +51,7 @@ export const ProFeatures = ({count = 6}) => {
               marginBottom: 10,
               alignItems: 'center',
               borderRadius: 5,
-              justifyContent:'flex-start'
+              justifyContent: 'flex-start'
             }}>
             <Icon size={SIZE.lg} color={colors.accent} name="check" />
             <Paragraph style={{marginLeft: 5, flexShrink: 1}}>

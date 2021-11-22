@@ -1,18 +1,18 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
 import {
   allowedPlatforms,
   useMessageStore,
   useSelectionStore
 } from '../../provider/stores';
-import {eSendEvent, presentSheet} from '../../services/EventManager';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {eOpenPremiumDialog, eOpenProgressDialog} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {SettingsBackupAndRestore} from '../../views/Settings';
-import {Button} from '../Button';
+import { eSendEvent, presentSheet } from '../../services/EventManager';
+import { hexToRGBA, RGB_Linear_Shade } from '../../utils/ColorUtils';
+import { eOpenPremiumDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { SettingsBackupAndRestore } from '../../views/Settings';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
