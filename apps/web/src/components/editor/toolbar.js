@@ -168,6 +168,7 @@ function Toolbar(props) {
           }}
         />
         <AnimatedInput
+          variant="clean"
           ml={[2, 2, 0]}
           initial={{
             opacity: isTitleVisible ? 1 : 0,
@@ -191,11 +192,11 @@ function Toolbar(props) {
           sx={{
             p: 0,
             borderWidth: 0,
-            borderRadius: 0,
+            borderRadius: "default",
             textOverflow: "ellipsis",
             whiteSpace: "nowrap",
             overflow: "hidden",
-            ":focus": { borderWidth: 0 },
+            ":focus": { bg: "bgSecondary" },
           }}
         />
       </Flex>
