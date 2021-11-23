@@ -9,6 +9,7 @@ function Colors(props) {
   const { id, color } = props.note;
   const setColor = useStore((store) => store.setColor);
   const isMobile = useMobile();
+
   return (
     <Flex flexWrap="wrap">
       {COLORS.map((label) => (
@@ -26,7 +27,7 @@ function Colors(props) {
             strokeWidth={0}
             data-test-id={`menuitem-colors-${label}`}
           />
-          {color === label && (
+          {color === label.toLowerCase() && (
             <Icon.Checkmark
               data-test-id={`menuitem-colors-${label}-check`}
               sx={{
