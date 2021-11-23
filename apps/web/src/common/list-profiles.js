@@ -19,8 +19,14 @@ function createProfile(item, itemHeight, estimatedItemHeight) {
 
 const NotesProfile = createProfile(
   (index, item, context) => {
+    // TODO doing all this here could be a potential performance issue.
+
     let tags = item.tags;
+    let notebook = item.notebooks[0];
     if (tags) tags = tags.map((t) => db.tags.tag(t)).slice(0, 2);
+    if (notebook) {
+      notebook = db.notebooks.notebook(notebook.id)?.data;
+    }
 
     return (
       <Note
@@ -28,7 +34,7 @@ const NotesProfile = createProfile(
         pinnable={!context}
         item={item}
         tags={tags || []}
-        notebooks={item.notebooks?.slice() || []}
+        notebook={notebook}
         context={context}
       />
     );

@@ -59,6 +59,7 @@ export function showEditNotebookDialog(notebookId) {
         await notebookTopics.add(...topics);
 
         notebookStore.refresh();
+        noteStore.refresh();
         appStore.refreshMenuPins();
 
         showToast("success", "Notebook edited successfully!");

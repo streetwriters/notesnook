@@ -17,7 +17,7 @@ import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
 
 function Note(props) {
-  const { tags, item, index, context } = props;
+  const { tags, notebook, item, index, context } = props;
   const note = item;
   const selectedNote = useStore((store) => store.selectedNote);
   const viewMode = useStore((store) => store.viewMode);
@@ -27,13 +27,6 @@ function Note(props) {
     if (!note.color) return "primary";
     return note.color.toLowerCase();
   }, [note.color]);
-
-  const notebook = useMemo(() => {
-    if (!note.notebooks?.length) return;
-    const firstNotebook = note.notebooks[0];
-    const notebook = db.notebooks.notebook(firstNotebook.id)?.data;
-    return notebook;
-  }, [note.notebooks]);
 
   const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
 
@@ -169,8 +162,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
-    JSON.stringify(prevProps.notebooks) ===
-      JSON.stringify(nextProps.notebooks) &&
+    JSON.stringify(prevProps.notebook) === JSON.stringify(nextProps.notebook) &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
   );
 });
