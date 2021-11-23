@@ -113,7 +113,7 @@ export default class Tags extends Collection {
     if (!tag) return;
     let sanitized = tag.toLocaleLowerCase();
     sanitized = sanitized.replace(
-      /[-+!@#$%^&*()+\{\}\]\[:;'"<>?/\.\s=,]+/g,
+      /[+!@#$%^&*()+\{\}\]\[:;'"<>?\/\.\s=,]+/g,
       ""
     );
     return sanitized.trim();
