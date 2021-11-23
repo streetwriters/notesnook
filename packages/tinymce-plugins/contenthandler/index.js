@@ -9,7 +9,10 @@ function register(editor) {
    * use the Browser's native DOMParser.
    */
   editor.getHTML = async function () {
-    const html = editor.getBody().innerHTML;
+    const body = editor.getBody();
+    if (!body) return;
+
+    const html = body.innerHTML;
     const document = new DOMParser().parseFromString(html, "text/html");
 
     const elements = document.querySelectorAll(QUERY);
@@ -34,11 +37,17 @@ function register(editor) {
   };
 
   editor.getText = function () {
-    return editor.getBody().innerText;
+    const body = editor.getBody();
+    if (!body) return;
+
+    return body.innerText;
   };
 
   editor.countWords = function () {
-    const text = editor.getBody().innerText;
+    const body = editor.getBody();
+    if (!body) return;
+
+    const text = body.innerText;
     return countWords(text);
   };
 }
