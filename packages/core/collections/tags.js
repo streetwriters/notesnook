@@ -71,7 +71,7 @@ export default class Tags extends Collection {
   get all() {
     return this._collection.getItems(undefined, (item) => {
       if (item.alias) return item;
-      item.alias = this._db.settings.getAlias(item.id) || tag.title;
+      item.alias = this._db.settings.getAlias(item.id) || item.title;
       return item;
     });
   }
