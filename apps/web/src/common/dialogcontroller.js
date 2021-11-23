@@ -55,7 +55,7 @@ export function showEditNotebookDialog(notebookId) {
 
         // add or delete topics as required
         const notebookTopics = db.notebooks.notebook(notebookId).topics;
-        await notebookTopics.delete(...deletedTopics);
+        //  await notebookTopics.delete(...deletedTopics);
         await notebookTopics.add(...topics);
 
         notebookStore.refresh();
