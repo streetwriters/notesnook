@@ -379,20 +379,24 @@ function BuyDialog(props) {
             <TryForFree />
           )}
         </Flex>
-        {selectedPlan ? (
-          <Checkout
-            user={user}
-            plan={selectedPlan}
-            onCheckoutLoaded={(data) => {
-              const pricingInfo = getPricingInfoFromCheckout(
-                selectedPlan,
-                data
-              );
-              console.log(pricingInfo, selectedPlan.coupon);
-              setDiscount(pricingInfo);
-            }}
-          />
-        ) : plan ? null : (
+        {isLoggedIn ? (
+          selectedPlan ? (
+            <Checkout
+              user={user}
+              plan={selectedPlan}
+              onCheckoutLoaded={(data) => {
+                const pricingInfo = getPricingInfoFromCheckout(
+                  selectedPlan,
+                  data
+                );
+                console.log(pricingInfo, selectedPlan.coupon);
+                setDiscount(pricingInfo);
+              }}
+            />
+          ) : plan ? null : (
+            <FeaturesList />
+          )
+        ) : (
           <FeaturesList />
         )}
       </Flex>
