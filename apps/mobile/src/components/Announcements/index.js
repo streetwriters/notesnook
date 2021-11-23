@@ -33,7 +33,7 @@ export const AnnouncementDialog = () => {
   };
 
   const close = () => {
-    //remove(info.id);
+    remove(info.id);
     setInfo(null);
     setVisible(false);
   };

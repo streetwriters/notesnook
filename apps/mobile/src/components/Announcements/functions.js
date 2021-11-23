@@ -46,7 +46,6 @@ const renderItems = {
   title: Title,
   description: Description,
   body: Body,
-  cta: Cta,
   image: Photo,
   list: List,
   subheading: SubHeading,
@@ -57,5 +56,5 @@ const renderItems = {
 export const renderItem = ({item, index, color}) => {
   const Item = renderItems[item.type];
 
-  return <Item {...item} index={index} color={color} />;
+  return <Item key={item.text || item.src || item.type} {...item} index={index} color={color} />;
 };
