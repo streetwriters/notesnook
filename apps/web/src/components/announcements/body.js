@@ -1,67 +1,92 @@
-import { Button, Flex, Image as RebassImage, Text as RebassText } from "rebass";
+import {
+  Box,
+  Button,
+  Flex,
+  Image as RebassImage,
+  Text as RebassText,
+} from "rebass";
 import { allowedPlatforms } from "../../utils/use-announcements";
 import { showBuyDialog } from "../../common/dialog-controller";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
+import * as Icon from "../icons";
 
 var margins = [0, 2];
 var HORIZONTAL_MARGIN = 3;
 
+const features = [
+  { icon: Icon.Sync, title: "Instant private sync" },
+  { icon: Icon.Notebook, title: "Unlimited notebooks" },
+  { icon: Icon.Tag2, title: "Unlimited tags" },
+  { icon: Icon.Attachment, title: "Encrypted attachments" },
+  { icon: Icon.Backup, title: "Encrypted backups" },
+  { icon: Icon.Vault, title: "Secure private vault" },
+  { icon: Icon.PDF, title: "Export to PDF" },
+  { icon: Icon.Edit, title: "Rich text editor" },
+];
+
 export default function AnnouncementBody({ components, type }) {
-  return components.map((item) => {
-    item.style = item.style || {};
+  return components
+    .filter((item) =>
+      item.platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1)
+    )
+    .map((item) => {
+      item.style = item.style || {};
 
-    if (type === "inline") {
-      HORIZONTAL_MARGIN = 2;
-      margins = [0, 1];
-      switch (item.type) {
-        case "title":
-          return <Title item={item} />;
-        case "description":
-          return <Description item={item} />;
-        case "callToActions":
-          return <InlineCalltoActions item={item} />;
-        case "text":
-          return (
-            <Text
-              value={item.value}
-              sx={mapStyle(item.style)}
-              mx={HORIZONTAL_MARGIN}
-            />
-          );
-        default:
-          return null;
-      }
-    } else if (type === "dialog") {
-      HORIZONTAL_MARGIN = 3;
-      margins = [0, 2];
+      if (type === "inline") {
+        HORIZONTAL_MARGIN = 2;
+        margins = [0, 1];
 
-      switch (item.type) {
-        case "image":
-          return <Image item={item} />;
-        case "list":
-          return <List item={item} />;
-        case "title":
-          return <Title item={item} />;
-        case "subheading":
-          return <Title item={item} fontSize={"title"} />;
-        case "description":
-          return <Description item={item} />;
-        case "callToActions":
-          return <CalltoActions item={item} />;
-        case "text":
-          return (
-            <Text
-              value={item.value}
-              sx={mapStyle(item.style)}
-              mx={HORIZONTAL_MARGIN}
-            />
-          );
-        default:
-          return null;
+        switch (item.type) {
+          case "title":
+            return <Title item={item} />;
+          case "description":
+            return <Description item={item} />;
+          case "callToActions":
+            return <InlineCalltoActions item={item} />;
+          case "text":
+            return (
+              <Text
+                value={item.value}
+                sx={mapStyle(item.style)}
+                mx={HORIZONTAL_MARGIN}
+              />
+            );
+          default:
+            return null;
+        }
+      } else if (type === "dialog") {
+        HORIZONTAL_MARGIN = 3;
+        margins = [0, 2];
+
+        switch (item.type) {
+          case "image":
+            return <Image item={item} />;
+          case "list":
+            return <List item={item} />;
+          case "title":
+            return <Title item={item} />;
+          case "subheading":
+            return <Title item={item} fontSize={"title"} />;
+          case "description":
+            return <Description item={item} />;
+          case "callToActions":
+            return <CalltoActions item={item} />;
+          case "features":
+            return <Features item={item} />;
+          case "text":
+            return (
+              <Text
+                value={item.value}
+                sx={mapStyle(item.style)}
+                mx={HORIZONTAL_MARGIN}
+              />
+            );
+          default:
+            return null;
+        }
       }
-    }
-    return null;
-  });
+      return null;
+    });
 }
 
 function Image({ item }) {
@@ -214,6 +239,36 @@ function CalltoAction({ action, index }) {
     >
       {action.title}
     </Button>
+  );
+}
+
+function Features({ item }) {
+  const { style } = item;
+  return (
+    <Box
+      sx={{
+        display: "grid",
+        gridTemplateColumns: "1fr 1fr",
+        columnGap: 1,
+        rowGap: 1,
+        ...mapStyle(style),
+      }}
+    >
+      {features.map((feature) => (
+        <Flex
+          p={1}
+          sx={{
+            borderRadius: "default",
+            border: "1px solid var(--border)",
+          }}
+        >
+          <feature.icon size={16} sx={{ alignSelf: "start" }} />
+          <Text variant="body" ml={1}>
+            {feature.title}
+          </Text>
+        </Flex>
+      ))}
+    </Box>
   );
 }
 
