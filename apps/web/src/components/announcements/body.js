@@ -186,7 +186,12 @@ function CalltoActions({ item }) {
 function InlineCalltoActions({ item }) {
   const { actions, style } = item;
   return (
-    <Flex px={2} sx={mapStyle(style)}>
+    <Flex
+      px={2}
+      justifyContent="center"
+      alignItems="center"
+      sx={mapStyle(style)}
+    >
       {actions
         ?.filter((cta) =>
           cta.platforms.some(
