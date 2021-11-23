@@ -242,12 +242,13 @@ function TinyMCE(props) {
           });
 
           const onEditorChange = debounce(() => {
+            if (onWordCountChanged) onWordCountChanged(editor.countWords());
+
             if (!editor.getHTML) return;
             if (editor.isLoading) {
               editor.isLoading = false;
               return;
             }
-            onWordCountChanged(editor.countWords());
             editor.getHTML().then((html) => {
               onChange(html, editor);
             });
