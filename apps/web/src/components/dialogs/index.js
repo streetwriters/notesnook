@@ -13,6 +13,7 @@ import SessionExpiredDialog from "./sessionexpireddialog";
 import FeatureDialog from "./feature-dialog";
 import TrackingDetailsDialog from "./trackingdetailsdialog";
 import ReminderDialog from "./reminderdialog";
+import AnnouncementDialog from "./announcementdialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -30,5 +31,6 @@ const Dialogs = {
   FeatureDialog,
   ProgressDialog,
   ReminderDialog,
+  AnnouncementDialog,
 };
 export default Dialogs;

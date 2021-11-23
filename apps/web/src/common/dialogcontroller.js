@@ -551,3 +551,15 @@ export function showTrackingDetailsDialog() {
     <Dialogs.TrackingDetailsDialog onClose={(res) => perform(res)} />
   ));
 }
+
+export function showAnnouncementDialog(announcement, remove) {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.AnnouncementDialog
+      announcement={announcement}
+      onClose={(res) => {
+        remove(announcement.id);
+        perform(res);
+      }}
+    />
+  ));
+}

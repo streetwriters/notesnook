@@ -14,9 +14,9 @@ import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";
-import Modal from "react-modal";
+import useAnnouncements from "./utils/use-announcements";
+import { showAnnouncementDialog } from "./common/dialog-controller";
 
-Modal.setAppElement("#root");
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
   console.log = () => {};
@@ -33,6 +33,7 @@ export default function AppEffects({ setShow }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
+  const [announcements, remove] = useAnnouncements("dialog");
 
   useEffect(
     function initializeApp() {
@@ -127,6 +128,13 @@ export default function AppEffects({ setShow }) {
       EV.unsubscribeAll();
     };
   }, []);
+
+  useEffect(() => {
+    if (!announcements.length) return;
+    (async () => {
+      await showAnnouncementDialog(announcements[0], remove);
+    })();
+  }, [announcements, remove]);
 
   return <React.Fragment />;
 }

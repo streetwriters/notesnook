@@ -6,7 +6,12 @@ import { isUserPremium } from "../hooks/use-is-user-premium";
 
 var CACHED_ANNOUNCEMENTS = [];
 var cancelled = false;
-export default function useAnnouncements() {
+/**
+ *
+ * @param {"inline"|"dialog"} type
+ * @returns
+ */
+export default function useAnnouncements(type = "inline") {
   const [announcements, setAnnouncements] = useState([]);
 
   useEffect(() => {
@@ -22,8 +27,8 @@ export default function useAnnouncements() {
         if (cancelled) return;
         let announcements = [];
         for (let announcement of CACHED_ANNOUNCEMENTS) {
-          if (await shouldShowAnnouncement(announcement))
-            announcements.push(announcement);
+          if (!(await shouldShowAnnouncement(announcement))) continue;
+          announcements.push(announcement);
         }
         setAnnouncements(announcements);
       }
@@ -43,7 +48,8 @@ export default function useAnnouncements() {
       return copy;
     });
   }, []);
-  return [announcements, remove];
+
+  return [announcements.filter((a) => a.type === type), remove];
 }
 
 export const allowedPlatforms = ["all", process.env.REACT_APP_PLATFORM];

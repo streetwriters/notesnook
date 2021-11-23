@@ -1,9 +1,9 @@
-import React from "react";
 import { Flex, Text, Button as RebassButton } from "rebass";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
 
+Modal.setAppElement("#root");
 function Dialog(props) {
   const theme = useTheme();
   return (
