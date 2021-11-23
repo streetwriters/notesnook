@@ -329,11 +329,13 @@ test("note content should not contain image base64 data after save", () =>
 test("repairing notebook references should reinclude the missing noteIds", () =>
   notebookTest().then(async ({ db, id }) => {
     const notebook = db.notebooks.notebook(id);
-    const note = {
+    let note = {
       ...TEST_NOTE,
       notebooks: [{ id, topics: [notebook.topics.all[0].id] }],
     };
-    await db.notes.add(note);
+    const noteId = await db.notes.add(note);
     await db.notes.repairReferences();
-    expect(notebook.topics.all[0].notes.length).toBe(1);
+    note = db.notes.note(noteId);
+    expect(notebook.topics.all[0].notes.length).toBe(0);
+    expect(note.notebooks.length).toBe(0);
   }));
