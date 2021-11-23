@@ -42,11 +42,10 @@ export const Announcement = ({color}) => {
             onPress={() => {
               remove(announcement.id);
             }}
-            iconSize={20}
+            iconSize={22}
             style={{
               borderRadius: 100,
               paddingHorizontal: 0,
-              backgroundColor: 'transparent'
             }}
           />
         </View>
