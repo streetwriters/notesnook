@@ -435,7 +435,7 @@ test.describe("run tests independently", () => {
 
   test("add tags to note", async () => {
     await createNoteAndCheckPresence();
-    const tags = ["hello", "nevermind", "what", "no way", "gold and goldie"];
+    const tags = ["hello", "nevermind", "what", "no-way", "gold-and-goldie"];
 
     for (let tag of tags) {
       await page.fill(getTestId("editor-tag-input"), tag);
