@@ -104,4 +104,13 @@ describe.each([
       note = db.notes.note(id);
       check(note, value);
     }));
+
+  test(`accented characters from ${action} title are not removed`, () =>
+    noteTest().then(async ({ db, id }) => {
+      let note = db.notes.note(id);
+      const _value = `échantillo`;
+      await note[action](_value);
+      note = db.notes.note(id);
+      check(note, _value);
+    }));
 });
