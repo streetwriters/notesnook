@@ -105,6 +105,10 @@ function Toolbar(props) {
         hideOnMobile: true,
         onClick: () => {
           toggleFocusMode();
+          if (isFullscreen) {
+            exitFullscreen(document);
+            setIsFullscreen(false);
+          }
           if (tinymce.activeEditor) tinymce.activeEditor.focus();
         },
       },

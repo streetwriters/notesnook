@@ -117,9 +117,7 @@ export default function AppEffects({ setShow }) {
   }, [setProcessingStatus]);
 
   useEffect(() => {
-    if (isFocusMode) {
-      setShow(false);
-    }
+    setShow(!isFocusMode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isFocusMode]);
 
