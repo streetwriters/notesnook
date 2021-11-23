@@ -33,7 +33,7 @@ function Button(props) {
       }}
       onClick={props.onClick}
     >
-      {props.Icon && <props.Icon color="static" size={24} />}
+      {props.Icon && <props.Icon color="static" size={16} />}
       <Text
         display={["none", "none", "flex"]}
         as="span"

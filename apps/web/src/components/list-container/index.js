@@ -87,6 +87,7 @@ function ListContainer(props) {
       )}
       {props.button && (
         <Button
+          variant="primary"
           testId={`${props.type}-action-button`}
           Icon={props.button.icon || Icon.Plus}
           content={props.button.content}

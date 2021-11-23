@@ -60,6 +60,7 @@ async function showPermanentDeleteToast(item) {
   const messageText = `${noun} permanently deleted!`;
   const timeoutId = setTimeout(() => {
     trashstore.delete(item.id, true);
+    trashstore.refresh();
   }, 5000);
   const undoAction = async () => {
     toast.hide();
