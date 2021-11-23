@@ -11,6 +11,7 @@ import {SubHeading} from './subheading';
 import {Title} from './title';
 
 export function allowedOnPlatform(platforms) {
+  if (!platforms) return true;
   return platforms.some(platform => allowedPlatforms.indexOf(platform) > -1);
 }
 
