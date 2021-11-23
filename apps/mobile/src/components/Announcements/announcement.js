@@ -25,17 +25,9 @@ export const Announcement = ({color}) => {
           paddingVertical: 12,
           width: '100%',
           borderRadius: 10,
-          overflow: 'hidden'
+          overflow: 'hidden',
         }}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}>
-          <View />
           <Button
-            fontSize={12}
             type="errorShade"
             icon="close"
             height={null}
@@ -46,14 +38,16 @@ export const Announcement = ({color}) => {
             style={{
               borderRadius: 100,
               paddingHorizontal: 0,
+              position:'absolute',
+              top:10,
+              right:10
             }}
           />
-        </View>
-
         <View>
           <FlatList
             style={{
-              width: '100%'
+              width: '100%',
+              marginTop:15
             }}
             data={announcement?.body.filter(item =>
               allowedOnPlatform(item.platform)
