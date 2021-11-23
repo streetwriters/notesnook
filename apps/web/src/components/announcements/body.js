@@ -273,5 +273,9 @@ function Features({ item }) {
 }
 
 function mapStyle(style) {
-  return { mt: margins[style.marginTop], mb: margins[style.marginBottom] };
+  return {
+    mt: margins[style.marginTop],
+    mb: margins[style.marginBottom],
+    textAlign: style.textAlign,
+  };
 }
