@@ -332,6 +332,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     }
     set({ announcements: copy });
   },
+  dialogs:[],
   setAnnouncement: async function () {
     let announcements: Announcement[] = [];
     try {
@@ -342,14 +343,15 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     } catch (e) {
       set({ announcements: [] })
     } finally {
-      set({ announcements: await getFiltered(announcements) })
+      let all = await getFiltered(announcements);
+      set({ announcements: all.filter(a => a.type === "inline"),dialogs:all.filter(a => a.type === "dialog") })
     }
   }
 }));
 
-const getFiltered = async (announcements) => {
+const getFiltered = async (announcements:Announcement[]) => {
   if (!announcements) return [];
-  let filtered = [];
+  let filtered:Announcement[] = [];
   for (var announcement of announcements) {
     if (await shouldShowAnnouncement(announcement)) {
       filtered.push(announcement);
