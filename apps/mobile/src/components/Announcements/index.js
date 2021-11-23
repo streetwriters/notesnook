@@ -8,7 +8,7 @@ import {
   eOpenAnnouncementDialog
 } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
-import {renderItem} from "./functions";
+import {renderItem} from './functions';
 
 export const AnnouncementDialog = () => {
   const [state] = useTracked();
@@ -33,9 +33,11 @@ export const AnnouncementDialog = () => {
   };
 
   const close = () => {
-    remove(info.id);
-    setInfo(null);
-    setVisible(false);
+    if (visible) {
+      remove(info.id);
+      setInfo(null);
+      setVisible(false);
+    }
   };
 
   return (

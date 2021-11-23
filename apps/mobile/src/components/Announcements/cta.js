@@ -10,7 +10,7 @@ import { SettingsBackupAndRestore } from '../../views/Settings';
 import { Button } from '../Button';
 import { allowedOnPlatform, getStyle } from './functions';
 
-export const Cta = ({actions, style = {}, color}) => {
+export const Cta = ({actions, style = {}, color,inline}) => {
   const [state] = useTracked();
   const colors = state.colors;
   let buttons =
@@ -19,8 +19,10 @@ export const Cta = ({actions, style = {}, color}) => {
     ) || [];
 
   const onPress = async item => {
-    eSendEvent(eCloseAnnouncementDialog);
-    await sleep(500);
+    if (!inline) {
+      eSendEvent(eCloseAnnouncementDialog);
+      await sleep(500);
+    }
     if (item.type === 'link') {
       try {
         await openLinkInBrowser(item.data, colors);

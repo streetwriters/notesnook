@@ -17,43 +17,42 @@ export const Announcement = ({color}) => {
     <View
       style={{
         backgroundColor: colors.bg,
-        width: '100%',
-        paddingHorizontal: 12
+        width: '100%'
       }}>
       <View
         style={{
           paddingVertical: 12,
           width: '100%',
           borderRadius: 10,
-          overflow: 'hidden',
+          overflow: 'hidden'
         }}>
-          <Button
-            type="errorShade"
-            icon="close"
-            height={null}
-            onPress={() => {
-              remove(announcement.id);
-            }}
-            iconSize={22}
-            style={{
-              borderRadius: 100,
-              paddingHorizontal: 0,
-              position:'absolute',
-              top:10,
-              right:10
-            }}
-          />
+        <Button
+          type="errorShade"
+          icon="close"
+          height={null}
+          onPress={() => {
+            remove(announcement.id);
+          }}
+          iconSize={22}
+          style={{
+            borderRadius: 100,
+            paddingHorizontal: 0,
+            position: 'absolute',
+            top: 10,
+            right: 10
+          }}
+        />
         <View>
           <FlatList
             style={{
               width: '100%',
-              marginTop:15
+              marginTop: 15
             }}
             data={announcement?.body.filter(item =>
               allowedOnPlatform(item.platform)
             )}
             renderItem={({item, index}) =>
-              renderItem({item: item, index: index, color: colors[color]})
+              renderItem({item: item, index: index, color: colors[color],inline:true})
             }
           />
         </View>

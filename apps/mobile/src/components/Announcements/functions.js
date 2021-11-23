@@ -54,8 +54,8 @@ const renderItems = {
   callToActions: Cta
 };
 
-export const renderItem = ({item, index, color}) => {
+export const renderItem = ({item, index, color,inline}) => {
   const Item = renderItems[item.type];
 
-  return <Item key={item.text || item.src || item.type} {...item} index={index} color={color} />;
+  return <Item key={item.text || item.src || item.type} {...item} index={index} color={color} inline={inline} />;
 };
