@@ -135,3 +135,6 @@ export const eOpenAttachmentsDialog = '600';
 export const eCloseAttachmentDialog = '601';
 
 export const eOpenTrialEndingDialog = '602';
+
+export const eOpenAnnouncementDialog = '603';
+export const eCloseAnnouncementDialog = '604'

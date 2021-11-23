@@ -82,7 +82,7 @@ export const Home = ({navigation}) => {
     if (!DDS.isTab) {
       if (getNote()) {
        eSendEvent(eOnLoadNote, {type: 'new'});
-       editing.currentlyEditing;
+       editing.currentlyEditing = true;
        editing.movedAway = false;
       }
       tabBarRef.current?.goToPage(1);

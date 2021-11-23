@@ -108,6 +108,10 @@ export const PricingPlans = ({
     if (buying) return;
     setBuying(true);
     try {
+      if (!user) {
+        setBuying(false);
+        return;
+      }
       await RNIap.requestSubscription(
         product?.productId,
         false,

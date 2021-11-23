@@ -22,9 +22,9 @@ const BaseDialog = ({
   transparent,
   centered = true,
   bottom = false,
-  background = null
+  background = null,
+  animated = true
 }) => {
-  const [state, dispatch] = useTracked();
   const floating = useIsFloatingKeyboard();
 
   return (
@@ -53,6 +53,7 @@ const BaseDialog = ({
           behavior="padding">
           <BouncingView
             duration={400}
+            animated={animated}
             style={[
               styles.backdrop,
               {

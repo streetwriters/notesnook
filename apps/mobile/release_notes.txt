@@ -1,9 +1,7 @@
-- Redesign dialogs in mobile & desktop apps
-- Fix tags not sorting and renaming
-- Fix subscription issues for ios users
-- Improved editor performance with large notes
-- Improved Login and Signup flow
-- Bug fixes and performance improvements
+- Added a new announcement dialog
+- Fixed a new note cannot be created from inside a notebook
+- Fixed app crashing on launch for some users
+- Fixed tags in languages other than english not created
+- Other minor performance improvements
 
 Thank you for using Notesnook!
-

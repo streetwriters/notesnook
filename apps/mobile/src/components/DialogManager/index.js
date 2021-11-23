@@ -25,6 +25,7 @@ import { ActionSheetComponent } from '../ActionSheetComponent';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import { AddNotebookDialog } from '../AddNotebookDialog';
 import { AddTopicDialog } from '../AddTopicDialog';
+import { AnnouncementDialog } from '../Announcements';
 import { AttachmentDialog } from '../AttachmentDialog';
 import { Dialog } from '../Dialog';
 import ExportDialog from '../ExportDialog';
@@ -301,6 +302,7 @@ export class DialogManager extends Component {
         <TagsDialog />
         <AttachmentDialog />
         <Expiring/>
+        <AnnouncementDialog/>
       </>
     );
   }

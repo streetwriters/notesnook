@@ -73,11 +73,11 @@ export type Settings = {
     screenshotMode?: boolean,
     privacyScreen?: boolean,
     appLockMode?: string,
-    telemetry:boolean,
+    telemetry: boolean,
     notebooksListMode: "normal" | "compact",
     notesListMode: "normal" | "compact",
-    devMode:boolean,
-    notifNotes:boolean
+    devMode: boolean,
+    notifNotes: boolean
 
 }
 
@@ -95,10 +95,10 @@ export interface SettingStore extends State {
     setFullscreen: (fullscreen: boolean) => void,
     setDeviceMode: (mode: string) => void,
     setDimensions: (dimensions: Dimensions) => void
-    appLoading:boolean
-    setAppLoading:(appLoading:boolean) => void
-    isIntroCompleted:boolean
-    setIntroCompleted:(isIntroCompleted:boolean) => void
+    appLoading: boolean
+    setAppLoading: (appLoading: boolean) => void
+    isIntroCompleted: boolean
+    setIntroCompleted: (isIntroCompleted: boolean) => void
 }
 
 export interface MenuStore extends State {
@@ -149,10 +149,25 @@ export type Action = {
     title: string
     data: string
 }
+export type Style = {
+    marginTop?: number,
+    marginBottom?: number,
+    textAlign?: "center" | "left" | "right"
+}
+export type BodyItem = {
+    type: "image" | "title" | "description" | "body" | "list" | "features" | "poll" | "subheading" | "shapes"
+    src?: string
+    caption?: string
+    text?: string
+    style?: Style,
+    items?: Array<{
+        text?: string
+    }>
+}
 
 export type Announcement = {
-    title: string
-    description: string
+    type: "dialog" | "inline"
+    body: BodyItem[]
     id: string
     callToActions: Action[]
     timestamp: number
@@ -166,6 +181,7 @@ export interface MessageStore extends State {
     setMessage: (message: Message) => void
     announcements: Announcement[],
     setAnnouncement: () => Promise<void>
+    dialogs: Announcement[]
     remove: (id: string) => void
 }
 

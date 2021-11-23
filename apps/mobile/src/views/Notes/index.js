@@ -24,6 +24,7 @@ import {
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
+import { getNote } from '../Editor/Functions';
 
 const getNotes = params => {
   if (!params) return [];
@@ -165,6 +166,11 @@ export const Notes = ({route, navigation}) => {
     }
     setActionAfterFirstSave();
     if (!DDS.isTab) {
+      if (getNote()) {
+        eSendEvent(eOnLoadNote, {type: 'new'});
+        editing.currentlyEditing = true;
+        editing.movedAway = false;
+       }
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
