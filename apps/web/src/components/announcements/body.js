@@ -38,7 +38,7 @@ export default function AnnouncementBody({ components, type }) {
 
         switch (item.type) {
           case "title":
-            return <Title item={item} />;
+            return <Title item={item} fontSize="subheading" />;
           case "description":
             return <Description item={item} />;
           case "callToActions":

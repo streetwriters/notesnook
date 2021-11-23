@@ -9,26 +9,16 @@ function Announcements({ announcements, removeAnnouncement }) {
 
   return (
     <Flex flexDirection="column" mt={0} sx={{ borderRadius: "default" }}>
-      <Flex flex="1" justifyContent="space-between" alignItems="center" mx={2}>
-        <Flex
-          justifyContent="center"
-          alignItems="center"
-          sx={{ borderRadius: "default" }}
-        >
-          <Icon.Announcement size={12} color="primary" sx={{ mr: "3px" }} />
-          <Text color="primary" variant="subBody" fontWeight="bold">
-            Announcement
-          </Text>
-        </Flex>
+      <Flex flex="1" justifyContent="end" alignItems="center" mx={2}>
         <Text
           bg="errorBg"
           color="error"
-          px={1}
-          py={"1px"}
+          //py={"1px"}
+          p="2px"
           variant="subBody"
           fontWeight="bold"
           sx={{
-            borderRadius: "default",
+            borderRadius: 50,
             cursor: "pointer",
             ":hover": { opacity: 0.7 },
           }}
@@ -40,7 +30,7 @@ function Announcements({ announcements, removeAnnouncement }) {
             removeAnnouncement && removeAnnouncement(announcement.id);
           }}
         >
-          Dismiss
+          <Icon.Cross color="error" size={16} />
         </Text>
       </Flex>
       <AnnouncementBody components={announcement.body} type="inline" />
