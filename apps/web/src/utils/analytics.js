@@ -22,6 +22,10 @@ export function loadTrackerScript() {
 }
 
 export const ANALYTICS_EVENTS = {
+  version: {
+    name: "version",
+    description: "Sent on startup",
+  },
   checkoutStarted: {
     name: "checkout:started",
     description: "Sent when you start Paddle checkout.",
@@ -63,8 +67,8 @@ export function trackVisit() {
   if (window.umami) {
     window.umami.trackView("/");
     trackEvent(
-      `${getAppVersion().formatted}-${getPlatform().toLowerCase()}`,
-      "version"
+      ANALYTICS_EVENTS.version,
+      `${getAppVersion().formatted}-${getPlatform().toLowerCase()}`
     );
   }
 }
