@@ -28,7 +28,7 @@ import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import {SettingsBackupAndRestore} from '../../views/Settings';
+import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
 import {Button} from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';

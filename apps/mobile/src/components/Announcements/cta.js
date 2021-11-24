@@ -6,7 +6,7 @@ import { eCloseAnnouncementDialog, eOpenPremiumDialog } from '../../utils/Events
 import { openLinkInBrowser } from '../../utils/functions';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import { SettingsBackupAndRestore } from '../../views/Settings';
+import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
 import { Button } from '../Button';
 import { allowedOnPlatform, getStyle } from './functions';
 

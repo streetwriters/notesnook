@@ -1,33 +1,25 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  Linking,
-  Platform,
-  ScrollView, View
-} from 'react-native';
-import { Button as MButton } from '../../components/Button/index';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header as TopHeader } from '../../components/Header/index';
+import React, {useCallback, useEffect, useState} from 'react';
+import {Linking, Platform, ScrollView, View} from 'react-native';
+import {Button as MButton} from '../../components/Button/index';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Issue} from '../../components/Github/issue';
+import {Header as TopHeader} from '../../components/Header/index';
 import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
+import {useTracked} from '../../provider';
 import {
-  eSendEvent, presentSheet,
+  eSendEvent,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {
-  APP_VERSION,
-  InteractionManager
-} from '../../utils';
-import { db } from '../../utils/database';
-import {
-  eScrollEvent,
-  eUpdateSearchState
-} from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
+import {APP_VERSION, InteractionManager} from '../../utils';
+import {db} from '../../utils/database';
+import {eScrollEvent, eUpdateSearchState} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import SettingsAppearanceSection from './appearance';
 import SettingsBackupAndRestore from './backup-restore';
-import { CustomButton } from './button';
+import {CustomButton} from './button';
 import SettingsDeveloperOptions from './developeroptions';
 import SettingsGeneralOptions from './general';
 import AccoutLogoutSection from './logout';
@@ -136,14 +128,14 @@ export const Settings = ({navigation}) => {
     {
       name: `Report an issue`,
       func: async () => {
-        Linking.openURL('github.com/streetwriters/notesnook/issues').catch(
+        /*   Linking.openURL('github.com/streetwriters/notesnook/issues').catch(
           console.log
-        );
+        ); */
 
-        /*  presentSheet({
-          noIcon:true,
-          component:<Issue/>
-        }); */
+        presentSheet({
+          noIcon: true,
+          component: <Issue />
+        });
       },
       desc: `Facing an issue? Report it on our Github`
     },
