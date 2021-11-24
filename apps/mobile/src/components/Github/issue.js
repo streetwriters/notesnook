@@ -25,9 +25,11 @@ export const Issue = () => {
   const onPress = async () => {
     if (loading) return;
     if (!title.current || !body.current) return;
-    if (title.current.trim() === '' || body.trim().length === 0) return;
+    if (title.current?.trim() === '' || body.current?.trim().length === 0)
+      return;
     try {
       setLoading(true);
+
       let issue_url = await db.debug.report(
         title.current,
         body.current +
@@ -35,23 +37,29 @@ export const Issue = () => {
 Device information:
 App version: ${APP_VERSION}
 Platform: ${Platform.OS}
-Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${
-            Platform.constants.Version
-          }`
+Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`
       );
       setLoading(false);
       eSendEvent(eCloseProgressDialog);
       await sleep(300);
       presentDialog({
         title: 'Issue reported',
-        paragraph:
-          'You can track your issue at ' +
-          issue_url,
-        positiveText: 'Go to Github',
-        negativeText: 'Done',
-        positivePress: async () => {
-          Linking.openURL(issue_url);
-        }
+        paragraph: (
+          <Text>
+            You can track your issue at{' '}
+            <Text
+              style={{
+                textDecorationLine: 'underline',
+                color: colors.accent
+              }}
+              onPress={() => {
+                Linking.openURL(issue_url);
+              }}>
+              {issue_url}
+            </Text>
+          </Text>
+        ),
+        negativeText: 'Close'
       });
     } catch (e) {
       setLoading(false);
@@ -128,7 +136,7 @@ For example:
 
       <Paragraph
         color={colors.icon}
-        size={SIZE.xs + 1}
+        size={SIZE.xs}
         style={{
           marginTop: 10,
           textAlign: 'center'

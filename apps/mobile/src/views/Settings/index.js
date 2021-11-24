@@ -128,16 +128,12 @@ export const Settings = ({navigation}) => {
     {
       name: `Report an issue`,
       func: async () => {
-        /*   Linking.openURL('github.com/streetwriters/notesnook/issues').catch(
-          console.log
-        ); */
-
         presentSheet({
           noIcon: true,
           component: <Issue />
         });
       },
-      desc: `Facing an issue? Report it on our Github`
+      desc: `Facing an issue? Click here to create a bug report`
     },
     {
       name: 'Join our Discord community',
