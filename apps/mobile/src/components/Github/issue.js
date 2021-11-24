@@ -1,36 +1,66 @@
-import React, {useRef} from 'react';
-import {Text, TextInput, View} from 'react-native';
+import React, {useRef, useState} from 'react';
+import {Linking, Platform, Text, TextInput, View} from 'react-native';
+import deviceInfoModule from 'react-native-device-info';
 import {useTracked} from '../../provider';
-import { eSendEvent } from '../../services/EventManager';
-import { eCloseProgressDialog } from '../../utils/Events';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import {APP_VERSION} from '../../utils';
+import {db} from '../../utils/database';
+import {eCloseProgressDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import { presentDialog } from '../Dialog/functions';
+import {presentDialog} from '../Dialog/functions';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 
 export const Issue = () => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
-  const value = useRef(null);
+  const body = useRef(null);
+  const title = useRef(null);
+  const [loading, setLoading] = useState(false);
 
-  onPress = async () => {
-
-    eSendEvent(eCloseProgressDialog);
-    await sleep(300);
-    presentDialog({
-      title:"Issue submitted",
-      paragraph:"The issue you submitted has been published on github",
-      positiveText:"View",
-      negativeText:"Done",
-      positivePress:async () => {
-        
-      }
-    })
-
+  const onPress = async () => {
+    if (loading) return;
+    if (!title.current || !body.current) return;
+    if (title.current.trim() === '' || body.trim().length === 0) return;
+    try {
+      setLoading(true);
+      let issue_url = await db.debug.report(
+        title.current,
+        body.current +
+          `\n_______________
+Device information:
+App version: ${APP_VERSION}
+Platform: ${Platform.OS}
+Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${
+            Platform.constants.Version
+          }`
+      );
+      setLoading(false);
+      eSendEvent(eCloseProgressDialog);
+      await sleep(300);
+      presentDialog({
+        title: 'Issue reported',
+        paragraph:
+          'You can track your issue at ' +
+          issue_url,
+        positiveText: 'Go to Github',
+        negativeText: 'Done',
+        positivePress: async () => {
+          Linking.openURL(issue_url);
+        }
+      });
+    } catch (e) {
+      setLoading(false);
+      ToastEvent.show({
+        heading: 'An error occured',
+        message: e.message,
+        type: 'error'
+      });
+    }
   };
 
   return (
@@ -39,32 +69,58 @@ export const Issue = () => {
         paddingHorizontal: 12
       }}>
       <DialogHeader
-        title="Submit an issue"
-        paragraph="Let us know if you are facing any issue while using Notesnook."
+        title="Report issue"
+        paragraph="Let us know if you have faced any issue/bug while using Notesnook."
       />
 
       <Seperator half />
 
       <TextInput
-        placeholder="Tell us what issue you have faced."
-        multiline
-        numberOfLines={5}
-        textAlignVertical="top"
-        onChangeText={v => (value.current = v)}
+        placeholder="Title"
+        onChangeText={v => (title.current = v)}
         style={{
           borderWidth: 1,
           borderColor: colors.nav,
-          borderRadius: 10,
+          borderRadius: 5,
           padding: 12,
           fontFamily: 'OpenSans-Regular',
-          maxHeight: 150
+          marginBottom: 10,
+          fontSize: SIZE.md
         }}
       />
+
+      <TextInput
+        placeholder={`Tell us more about the issue you are facing.
+        
+For example:
+- Steps to reproduce the issue
+- Things you have tried etc.`}
+        multiline
+        numberOfLines={5}
+        textAlignVertical="top"
+        onChangeText={v => (body.current = v)}
+        style={{
+          borderWidth: 1,
+          borderColor: colors.nav,
+          borderRadius: 5,
+          padding: 12,
+          fontFamily: 'OpenSans-Regular',
+          maxHeight: 200,
+          fontSize: SIZE.sm,
+          marginBottom: 2.5
+        }}
+      />
+      <Paragraph
+        size={SIZE.xs}
+        color={
+          colors.icon
+        }>{`App version: ${APP_VERSION} Platform: ${Platform.OS} Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
 
       <Seperator />
       <Button
         onPress={onPress}
-        title="Submit"
+        title={loading ? null : 'Submit'}
+        loading={loading}
         height={50}
         width="100%"
         type="accent"
@@ -77,11 +133,23 @@ export const Issue = () => {
           marginTop: 10,
           textAlign: 'center'
         }}>
-        If you want to ask something general or request a feature, we would suggest that
-        you{' '}
+        The information above will be is publically available on{' '}
+        <Text
+          onPress={() => {
+            Linking.openURL('https://github.com/streetwriters/notesnook');
+          }}
+          style={{
+            textDecorationLine: 'underline',
+            color: colors.accent
+          }}>
+          github.com/streetwriters/notesnook.
+        </Text>{' '}
+        If you want to ask something general or need some assistance, we would
+        suggest that you{' '}
         <Text
           style={{
-            textDecorationLine: 'underline'
+            textDecorationLine: 'underline',
+            color: colors.accent
           }}
           onPress={async () => {
             try {

@@ -28,7 +28,7 @@ const AccoutLogoutSection = () => {
   const [loading, setLoading] = useState(false);
   const passwordValue = useRef();
 
-  return user ? null : (
+  return !user ? null : (
     <>
       {loading && (
         <BaseDialog visible={true}>
