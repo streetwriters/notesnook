@@ -1,94 +1,28 @@
-import dayjs from 'dayjs';
-import React, {useCallback, useEffect, useRef, useState} from 'react';
-import {
-  Appearance,
-  Linking,
-  Platform,
-  ScrollView,
-  TouchableOpacity,
-  View
-} from 'react-native';
-import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
-import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import React, {useState} from 'react';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
-import {Button} from '../../components/Button';
-import {Button as MButton} from '../../components/Button/index';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import DialogButtons from '../../components/Dialog/dialog-buttons';
-import DialogContainer from '../../components/Dialog/dialog-container';
-import DialogHeader from '../../components/Dialog/dialog-header';
-import {presentDialog} from '../../components/Dialog/functions';
-import {Issue} from '../../components/Github/issue';
-import {Header as TopHeader} from '../../components/Header/index';
-import Input from '../../components/Input';
-import {PressableButton} from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import {Card} from '../../components/SimpleList/card';
-import {Toast} from '../../components/Toast';
-import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {
-  useMessageStore,
-  useSettingStore,
-  useUserStore
-} from '../../provider/stores';
+import {useSettingStore, useUserStore} from '../../provider/stores';
 import Backup from '../../services/Backup';
-import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  openVault,
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
-import Navigation from '../../services/Navigation';
-import Notifications from '../../services/Notifications';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
-import Sync from '../../services/Sync';
-import {
-  AndroidModule,
-  APP_VERSION,
-  InteractionManager,
-  MenuItemsList,
-  SUBSCRIPTION_PROVIDER,
-  SUBSCRIPTION_STATUS,
-  SUBSCRIPTION_STATUS_STRINGS
-} from '../../utils';
-import {
-  ACCENT,
-  COLOR_SCHEME,
-  COLOR_SCHEME_DARK,
-  COLOR_SCHEME_LIGHT,
-  setColorScheme
-} from '../../utils/Colors';
-import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
-import {db} from '../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenLoginDialog,
-  eOpenPremiumDialog,
-  eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenRestoreDialog,
-  eScrollEvent,
-  eUpdateSearchState
+  eOpenRestoreDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {pv, SIZE} from '../../utils/SizeUtils';
-import Storage from '../../utils/storage';
+import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import { CustomButton } from './button';
+import {CustomButton} from './button';
+import {verifyUser} from './functions';
 import SectionHeader from './section-header';
 
 const SettingsBackupAndRestore = ({isSheet}) => {
@@ -172,40 +106,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
           await Backup.run();
           return;
         }
-        presentDialog({
-          title: "Verify it's you",
-          input: true,
-          inputPlaceholder: 'Enter account password',
-          paragraph: 'Please enter your account password to backup your data',
-          positiveText: 'Verify',
-          secureTextEntry: true,
-          positivePress: async value => {
-            try {
-              let verified = await db.user.verifyPassword(value);
-              if (verified) {
-                sleep(300).then(async () => {
-                  await Backup.run();
-                });
-              } else {
-                ToastEvent.show({
-                  heading: 'Incorrect password',
-                  message: 'The account password you entered is incorrect',
-                  type: 'error',
-                  context: 'local'
-                });
-                return false;
-              }
-            } catch (e) {
-              ToastEvent.show({
-                heading: 'Failed to backup data',
-                message: e.message,
-                type: 'error',
-                context: 'local'
-              });
-              return false;
-            }
-          }
-        });
+        verifyUser(null, Backup.run);
       },
       desc: 'Backup your data to phone storage'
     },

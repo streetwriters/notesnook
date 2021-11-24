@@ -1,17 +1,11 @@
 import dayjs from 'dayjs';
-import React, {useRef, useState} from 'react';
+import React from 'react';
 import {Linking, Platform, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import DialogButtons from '../../components/Dialog/dialog-buttons';
-import DialogContainer from '../../components/Dialog/dialog-container';
-import DialogHeader from '../../components/Dialog/dialog-header';
-import Input from '../../components/Input';
 import Seperator from '../../components/Seperator';
 import {Card} from '../../components/SimpleList/card';
-import {Toast} from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
@@ -28,7 +22,6 @@ import {
   SUBSCRIPTION_STATUS,
   SUBSCRIPTION_STATUS_STRINGS
 } from '../../utils';
-import {db} from '../../utils/database';
 import {
   eCloseProgressDialog,
   eOpenPremiumDialog,
@@ -36,7 +29,8 @@ import {
 } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import { CustomButton } from './button';
+import {CustomButton} from './button';
+import {verifyUser} from './functions';
 
 const getTimeLeft = t2 => {
   let daysRemaining = dayjs(t2).diff(dayjs(), 'days');
@@ -52,48 +46,11 @@ const SettingsUserSection = () => {
 
   const user = useUserStore(state => state.user);
   const messageBoardState = useMessageStore(state => state.message);
-  const [verifyUser, setVerifyUser] = useState(false);
   const subscriptionDaysLeft =
     user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');
   const startDate = dayjs(user?.subscription?.start).format('MMMM D, YYYY');
-  const passwordVerifyValue = useRef();
-  const input = useRef();
-
-  const tryVerification = async () => {
-    if (!passwordVerifyValue.current) {
-      ToastEvent.show({
-        heading: 'Account Password is required',
-        type: 'error',
-        context: 'local'
-      });
-      return;
-    }
-    try {
-      let verify = await db.user.verifyPassword(passwordVerifyValue.current);
-      if (verify) {
-        setVerifyUser(false);
-        passwordVerifyValue.current = null;
-        await sleep(300);
-        eSendEvent(eOpenRecoveryKeyDialog);
-      } else {
-        ToastEvent.show({
-          heading: 'Incorrect password',
-          message: 'Please enter the correct password to save recovery key.',
-          type: 'error',
-          context: 'local'
-        });
-      }
-    } catch (e) {
-      ToastEvent.show({
-        heading: 'Incorrect password',
-        message: e.message,
-        type: 'error',
-        context: 'local'
-      });
-    }
-  };
 
   const manageSubscription = () => {
     if (!user.isEmailConfirmed) {
@@ -314,59 +271,14 @@ const SettingsUserSection = () => {
             </View>
           </View>
 
-          {verifyUser && (
-            <BaseDialog
-              onRequestClose={() => {
-                setVerifyUser(false);
-                passwordVerifyValue.current = null;
-              }}
-              onShow={() => {
-                setTimeout(() => {
-                  input.current?.focus();
-                }, 300);
-              }}
-              statusBarTranslucent={false}
-              visible={true}>
-              <DialogContainer>
-                <DialogHeader
-                  title="Verify it's you"
-                  paragraph="Enter your account password to save your data recovery key."
-                  padding={12}
-                />
-                <Seperator half />
-                <View
-                  style={{
-                    paddingHorizontal: 12
-                  }}>
-                  <Input
-                    fwdRef={input}
-                    placeholder="Enter account password"
-                    onChangeText={v => {
-                      passwordVerifyValue.current = v;
-                    }}
-                    onSubmit={tryVerification}
-                    secureTextEntry={true}
-                  />
-                </View>
-
-                <DialogButtons
-                  positiveTitle="Verify"
-                  onPressPositive={tryVerification}
-                  onPressNegative={() => {
-                    setVerifyUser(false);
-                    passwordVerifyValue.current = null;
-                  }}
-                />
-              </DialogContainer>
-              <Toast context="local" />
-            </BaseDialog>
-          )}
-
           {[
             {
               name: 'Save data recovery key',
               func: async () => {
-                setVerifyUser(true);
+                verifyUser(null, async () => {
+                  await sleep(300);
+                  eSendEvent(eOpenRecoveryKeyDialog);
+                });
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
             },
