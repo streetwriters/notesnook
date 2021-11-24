@@ -34,7 +34,7 @@ export const Issue = () => {
         title.current,
         body.current +
           `\n_______________
-Device information:
+**Device information:**
 App version: ${APP_VERSION}
 Platform: ${Platform.OS}
 Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`
