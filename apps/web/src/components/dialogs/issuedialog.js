@@ -79,7 +79,7 @@ function IssueDialog(props) {
               title: "Thank you for reporting!",
               message: (
                 <>
-                  You can track your issue at{" "}
+                  You can track your bug report at{" "}
                   <Text as="a" href={url} sx={{ lineBreak: "anywhere" }}>
                     {url}
                   </Text>
