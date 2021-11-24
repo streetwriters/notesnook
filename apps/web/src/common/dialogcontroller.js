@@ -563,3 +563,13 @@ export function showAnnouncementDialog(announcement, remove) {
     />
   ));
 }
+
+export function showIssueDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.IssueDialog
+      onClose={(res) => {
+        perform(res);
+      }}
+    />
+  ));
+}

@@ -10,6 +10,7 @@ import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import {
   showEmailVerificationDialog,
+  showIssueDialog,
   showTrackingDetailsDialog,
 } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
@@ -96,8 +97,8 @@ const otherItems = [
   },
   {
     title: "Report an issue",
-    description: "Facing an issue? Report it on our Github Repo.",
-    link: "https://github.com/streetwriters/notesnook/issues/new",
+    description: "Facing an issue? Click here to create a bug report.",
+    onClick: () => showIssueDialog(),
   },
   {
     title: "Join our Discord community",
@@ -629,7 +630,8 @@ function Settings(props) {
                 key={item.title}
                 variant="list"
                 onClick={() => {
-                  window.open(item.link, "_blank");
+                  if (item.onClick) item.onClick();
+                  else if (item.link) window.open(item.link, "_blank");
                 }}
               >
                 <Tip text={item.title} tip={item.description} />

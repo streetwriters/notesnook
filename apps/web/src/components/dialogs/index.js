@@ -14,6 +14,7 @@ import FeatureDialog from "./feature-dialog";
 import TrackingDetailsDialog from "./trackingdetailsdialog";
 import ReminderDialog from "./reminderdialog";
 import AnnouncementDialog from "./announcementdialog";
+import IssueDialog from "./issuedialog";
 
 const Dialogs = {
   AddNotebookDialog,
@@ -32,5 +33,6 @@ const Dialogs = {
   ProgressDialog,
   ReminderDialog,
   AnnouncementDialog,
+  IssueDialog,
 };
 export default Dialogs;

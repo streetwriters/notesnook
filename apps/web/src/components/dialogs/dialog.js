@@ -137,7 +137,6 @@ function Dialog(props) {
                   opacity: props.positiveButton.disabled ? 0.7 : 1,
                   ":hover": { bg: "bgSecondary" },
                 }}
-                autoFocus
                 disabled={props.positiveButton.disabled || false}
                 onClick={
                   !props.positiveButton.disabled

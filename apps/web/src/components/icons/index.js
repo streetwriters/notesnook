@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import MDIIcon from "@mdi/react";
 import {
   mdiPlus,
@@ -111,11 +111,9 @@ import {
   mdiDatabaseLockOutline,
   mdiPaletteSwatchOutline,
   mdiAppleIos,
-  mdiCellphoneAndroid,
   mdiMicrosoftWindows,
   mdiLinux,
   mdiApple,
-  mdiWeb,
   mdiYoutube,
   mdiCheckCircleOutline,
   mdiAndroid,
@@ -124,6 +122,7 @@ import {
   mdiGoogleChrome,
   mdiFirefox,
   mdiAppleSafari,
+  mdiBugOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -312,3 +311,4 @@ export const Embed = createIcon(mdiYoutube);
 export const Anonymous = createIcon(mdiIncognito);
 export const CloudLock = createIcon(mdiCloudLockOutline);
 export const Timebomb = createIcon(mdiBomb);
+export const Issue = createIcon(mdiBugOutline);

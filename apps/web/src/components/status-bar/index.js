@@ -8,6 +8,7 @@ import {
   SyncError,
   Checkmark,
   Alert,
+  Issue,
 } from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
 import { useStore as useAppStore } from "../../stores/app-store";
@@ -17,6 +18,7 @@ import useAutoUpdater from "../../hooks/use-auto-updater";
 import downloadUpdate from "../../commands/download-update";
 import installUpdate from "../../commands/install-update";
 import checkForUpdate from "../../commands/check-for-update";
+import { showIssueDialog } from "../../common/dialog-controller";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
@@ -80,6 +82,18 @@ function StatusBar() {
             </Text>
           </Button>
         )}
+        <Button
+          variant="statusitem"
+          display="flex"
+          onClick={() => showIssueDialog()}
+          sx={{ alignItems: "center", justifyContent: "center" }}
+          title="Facing an issue? Click here to create a bug report."
+        >
+          <Issue size={12} />
+          <Text variant="subBody" color="bgSecondaryText" ml={1}>
+            Report an issue
+          </Text>
+        </Button>
         {processingStatuses?.map(({ key, status, progress }) => (
           <Flex key={key} ml={1} alignItems="center" justifyContent="center">
             <Loading size={12} />
