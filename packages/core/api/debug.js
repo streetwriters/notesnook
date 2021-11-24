@@ -1,3 +1,5 @@
+import hosts from "../utils/constants";
+
 export default class Debug {
   strip(item) {
     return JSON.stringify({
@@ -15,5 +17,16 @@ export default class Debug {
       dateCreated: item.dateCreated,
       additionalData: item.additionalData,
     });
+  }
+
+  async report(title, body) {
+    const response = await fetch(`${hosts.ISSUES_HOST}/create/notesnook`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ title, body }),
+    });
+    if (!response.ok) return;
+    const json = await response.json();
+    return json.url;
   }
 }

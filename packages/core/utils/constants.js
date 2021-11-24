@@ -15,6 +15,10 @@ const hosts = {
     process.env.NODE_ENV === "production"
       ? "https://subscriptions.streetwriters.co"
       : "http://localhost:9264",
+  ISSUES_HOST:
+    process.env.NODE_ENV === "production"
+      ? "https://issues.streetwriters.co"
+      : "http://localhost:2624",
 };
 
 export default hosts;
