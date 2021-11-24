@@ -130,7 +130,7 @@ export const Dialog = ({context = 'global'}) => {
 
           <DialogButtons
             onPressNegative={onNegativePress}
-            onPressPositive={onPressPositive}
+            onPressPositive={dialogInfo.positivePress && onPressPositive}
             positiveTitle={dialogInfo.positiveText}
             negativeTitle={dialogInfo.negativeText}
             positiveType={dialogInfo.positiveType}
