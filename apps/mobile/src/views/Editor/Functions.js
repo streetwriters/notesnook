@@ -390,7 +390,9 @@ export const _onMessage = async evt => {
       break;
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
-      eSendEvent('loadingNote');
+      setTimeout(() => {
+        eSendEvent('loadingNote');
+      },150);
       break;
     case 'premium':
       let user = await db.user.getUser();
