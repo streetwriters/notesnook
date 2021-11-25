@@ -497,15 +497,11 @@ const onChange = function (event) {
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
-    let now2 = performance.now();
     editor.getHTML().then(function (html) {
       reactNativeEventHandler('tiny', html);
     });
-    console.log('save:', performance.now() - now2);
     onUndoChange();
-    let now3 = performance.now();
     selectchange();
-    console.log('select:', performance.now() - now3);
   }, delay());
 };
 
