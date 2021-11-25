@@ -65,8 +65,8 @@ function getBaseUrl(site) {
 }
 
 async function absolutifyImgs(html, site) {
-  let parser = global.HTMLParser;
-  global.HTMLParser.body.innerHTML = html;
+  let parser = require('jsdom-jscore-rn').html();
+  parser.body.innerHTML = html;
 
   let images = parser.querySelectorAll('img');
   for (var i = 0; i < images.length; i++) {
