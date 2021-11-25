@@ -281,7 +281,7 @@ function init_tiny(size) {
       });
 
       editor.on('init', function (e) {
-        setTimeout(() => {
+        setTimeout(function () {
           reactNativeEventHandler('status', true);
         }, 300);
       });
@@ -381,8 +381,15 @@ function init_tiny(size) {
       editor.on('TypingUndos', onUndoChange);
       editor.on('BeforeAddUndo', onUndoChange);
       editor.on('AddUndo', onUndoChange);
-      editor.on('cut', onUndoChange);
+      editor.on('cut', function () {
+        onChange({type: 'cut'});
+        onUndoChange();
+      });
       editor.on('copy', onUndoChange);
+      editor.on('paste', function () {
+        onChange({type: 'paste'});
+      });
+
       editor.on('tap', e => {
         if (e.target.classList.contains('mce-content-body')) {
           e.preventDefault();
@@ -398,6 +405,9 @@ function init_tiny(size) {
           globalThis.isClearingNoteData = false;
           return;
         }
+        setTimeout(function() {
+          editor.undoManager.transact(function () {});
+        },1000);
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
@@ -431,16 +441,16 @@ function init_tiny(size) {
           e.preventDefault();
           e.stopImmediatePropagation();
           e.stopPropagation();
-          editor.undoManager.transact(() => {
+          editor.undoManager.transact(function () {
             if (target.classList.contains(COLLAPSED_KEY)) {
               target.classList.remove(COLLAPSED_KEY);
             } else {
               target.classList.add(COLLAPSED_KEY);
             }
             collapseElement(target);
-            editor.getHTML().then(html => {
+            editor.getHTML().then(function (html) {
               reactNativeEventHandler('tiny', html);
-            })
+            });
           });
         }
       });
@@ -455,6 +465,7 @@ function init_tiny(size) {
       editor.on('input', onChange);
       editor.on('keyup', onChange);
       editor.on('NodeChange', onChange);
+      editor.on('compositionend', onChange);
     }
   });
 }
@@ -468,9 +479,10 @@ function delay(base = 0) {
   if (prevCount > 70000) return base + 1000;
 }
 
-
 const onChange = function (event) {
+  console.log(event.type, event.selectionChange);
   if (event.type === 'nodechange' && !event.selectionChange) return;
+
   if (isLoading) {
     isLoading = false;
     return;
@@ -479,33 +491,38 @@ const onChange = function (event) {
   if (prevCount === 0) {
     updateCount(0);
   }
+
   if (prevCount === 0) return;
-  console.log("editor changed",event.selectionChange);
-  reactNativeEventHandler('noteedited')
+  console.log('editor changed', event.selectionChange);
+  reactNativeEventHandler('noteedited');
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
-    let now2 = performance.now();
-      editor.getHTML().then(html => {
+    editor.getHTML().then(function (html) {
       reactNativeEventHandler('tiny', html);
-    })
-    console.log('save:', performance.now() - now2);
+    });
     onUndoChange();
-    let now3 = performance.now();
     selectchange();
-    console.log('select:', performance.now() - now3);
   }, delay());
 };
 
 let countTimer;
-function updateCount(timer=1000) {
+function updateCount(timer = 1000) {
   countTimer = null;
-  countTimer = setTimeout(function() {
+
+  if (!timer) {
     let count = editor.countWords();
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
-  }, delay(timer));
+  } else {
+    countTimer = setTimeout(function () {
+      let count = editor.countWords();
+      info = document.querySelector('.info-bar');
+      info.querySelector('#infowords').innerText = count + ' words';
+      prevCount = count;
+    }, delay(timer));
+  }
 }
 
 function getNodeColor(element) {

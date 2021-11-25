@@ -21,7 +21,8 @@ db.host(
         API_HOST: 'http://192.168.10.29:5264',
         AUTH_HOST: 'http://192.168.10.29:8264',
         SSE_HOST: 'http://192.168.10.29:7264',
-        SUBSCRIPTIONS_HOST: 'http://192.168.10.29:9264'
+        SUBSCRIPTIONS_HOST: 'http://192.168.10.29:9264',
+        ISSUES_HOST: 'http://192.168.10.29:2624'
       }
     : {
         API_HOST: 'https://api.notesnook.com',

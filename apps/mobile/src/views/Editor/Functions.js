@@ -27,6 +27,7 @@ import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
+import {parse} from 'node-html-parser';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -57,6 +58,11 @@ let cTimeout = null;
 let disableSaving = false;
 let isSaving = false;
 let waitForContent = false;
+let prevNoteContent = null;
+
+export function startClosingSession() {
+  closingSession = true;
+}
 
 export function setWebviewInit(init) {
   webviewInit = init;
@@ -104,7 +110,7 @@ export async function clearTimer(clear) {
   clearTimeout(timer);
   timer = null;
   if (waitForContent && noteEdited) {
-   await waitForEvent('content_event', () => {
+    await waitForEvent('content_event', () => {
       tiny.call(EditorWebView, request_content);
     });
   }
@@ -142,12 +148,15 @@ export const CHECK_STATUS = `(function() {
 
 const request_content = `(function() {
   if (window.ReactNativeWebView) {
-    window.ReactNativeWebView.postMessage(
-      JSON.stringify({
-        type: 'tiny',
-        value: editor.getHTML()
-      })
-    );
+    editor.getHTML().then(function(html) {
+      window.ReactNativeWebView.postMessage(
+        JSON.stringify({
+          type: 'tiny',
+          value:html,
+          caller:"request_content"
+        })
+      );
+    })
   }
 })();`;
 
@@ -166,6 +175,10 @@ export function post(type, value = null) {
     type,
     value
   };
+  if (type === 'html') {
+    console.log('message type', type);
+  }
+
   EditorWebView.current?.postMessage(JSON.stringify(message));
 }
 
@@ -213,6 +226,8 @@ function clearNote() {
   note = null;
   title = '';
   noteEdited = false;
+  console.log('closing note id', id);
+  prevNoteContent = content.data;
   id = null;
   content = {
     data: '',
@@ -227,10 +242,11 @@ export const loadNote = async item => {
 
   if (closingSession) {
     eSendEvent('loadingNote', item);
+    console.log('waiting item');
     await waitForEvent('session_ended');
     console.log('session ended');
   }
-
+  closingSession = true;
   if (editing.isFocused) {
     tiny.call(EditorWebView, tiny.blur);
   }
@@ -239,6 +255,7 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, true, true);
     }
+    closingSession = false;
     disableSaving = false;
     lastEditTime = 0;
     clearNote();
@@ -274,6 +291,7 @@ export const loadNote = async item => {
     if (getNote()) {
       await clearEditor(true, false, true);
     }
+    closingSession = false;
     disableSaving = false;
     noteEdited = false;
     await setNote(item);
@@ -309,6 +327,7 @@ const checkStatus = async noreset => {
 
     webviewTimer = setTimeout(() => {
       if (!webviewOK && !noreset) {
+        console.log('webview not ok', 'ERROR');
         webviewInit = false;
         EditorWebView = createRef();
         eSendEvent('webviewreset');
@@ -329,16 +348,18 @@ export const _onMessage = async evt => {
   }
   switch (message.type) {
     case 'history':
-      console.log('history', message.value);
       eSendEvent('historyEvent', message.value);
       break;
-    case 'noteedited':
-      console.log('noteedited');
-      break;
     case 'tiny':
+      if (message.value === '<br>') return;
       if (message.value !== content.data) {
+        if (prevNoteContent && message.value === prevNoteContent) {
+          prevNoteContent = null;
+          noteEdited = false;
+          return;
+        }
+
         noteEdited = true;
-        console.log(message.value, '\nold: ', content.data);
         lastEditTime = Date.now();
         content = {
           type: message.type,
@@ -369,7 +390,9 @@ export const _onMessage = async evt => {
       break;
     case 'noteLoaded':
       tiny.call(EditorWebView, tiny.notLoading);
-      eSendEvent('loadingNote');
+      setTimeout(() => {
+        eSendEvent('loadingNote');
+      },150);
       break;
     case 'premium':
       let user = await db.user.getUser();
@@ -439,7 +462,7 @@ function onNoteChange() {
     if (noteEdited) {
       saveNote();
     }
-  }, 150);
+  }, 300);
 }
 
 export async function clearEditor(
@@ -612,7 +635,7 @@ export async function saveNote(preventUpdate) {
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
     }
   } catch (e) {
-    console.log('note save error', e);
+    console.log('note save error', e, e.stack);
   }
   isSaving = false;
 }
@@ -622,6 +645,9 @@ export async function onWebViewLoad(premium, colors) {
     tiny.call(EditorWebView, tiny.setMarkdown, true);
   } else {
     tiny.call(EditorWebView, tiny.removeMarkdown, true);
+  }
+  if (getNote()?.id) {
+    loadNoteInEditor();
   }
   setColors(colors);
 }
@@ -670,6 +696,8 @@ export const presentResolveConflictDialog = _note => {
 };
 
 const loadNoteInEditor = async (keepHistory = true) => {
+  console.log('loading note', id, webviewInit);
+
   if (!webviewInit) return;
   saveCounter = 0;
   if (note?.id) {
@@ -689,6 +717,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
     `
       );
     } else {
+      console.log('opening in editor');
       post('html', content.data);
     }
     if (id) {
@@ -704,6 +733,9 @@ const loadNoteInEditor = async (keepHistory = true) => {
   } else {
     await restoreEditorState();
   }
+  await sleep(500);
+  loadingNote = null;
+  disableSaving = false;
   if (keepHistory) {
     tiny.call(EditorWebView, tiny.clearHistory);
   }

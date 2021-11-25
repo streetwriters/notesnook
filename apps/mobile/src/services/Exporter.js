@@ -1,4 +1,3 @@
-import jsdom from 'jsdom-jscore-rn';
 import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
@@ -130,6 +129,7 @@ async function saveToMarkdown(note) {
 
   let converter = new showdown.Converter();
   converter.setFlavor('original');
+  let jsdom = require('jsdom-jscore-rn');
   let dom = jsdom.html();
   let content = await db.notes.note(note.id).content();
   let markdown = converter.makeMarkdown(content, dom);

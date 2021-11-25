@@ -40,9 +40,11 @@ import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
   clearTimer,
+  EditorWebView,
   getNote,
   loadNote,
-  setColors
+  setColors,
+  startClosingSession
 } from './Functions';
 import HistoryComponent from './HistoryComponent';
 import {ProgressCircle} from './ProgressCircle';
@@ -72,7 +74,6 @@ const EditorHeader = () => {
       eSendEvent(eCloseFullscreenEditor);
       return;
     }
-
     if (deviceMode === 'mobile') {
       editing.movedAway = true;
     }
@@ -89,6 +90,7 @@ const EditorHeader = () => {
         eSendEvent(eCloseFullscreenEditor);
       }
     } else {
+      startClosingSession();
       if (deviceMode === 'mobile') {
         tabBarRef.current?.goToPage(0);
       }

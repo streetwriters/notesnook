@@ -1,7 +1,7 @@
-- Added a new announcement dialog
-- Fixed a new note cannot be created from inside a notebook
-- Fixed app crashing on launch for some users
-- Fixed tags in languages other than english not created
+- Added issue reporting from within the app. Click on "Report an issue" in settings.
+- Fixed undo manager not updated on cut.
+- Fixed note is not saved when content is directly pasted
+- Fixed editor is empty sometimes when note is opened
 - Other minor performance improvements
 
 Thank you for using Notesnook!
