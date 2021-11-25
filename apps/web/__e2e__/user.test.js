@@ -37,8 +37,6 @@ async function loginUser() {
   expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
 }
 
-test("login user", async ({}, info) => {
-  info.setTimeout(0);
-
+test.skip("login user", async () => {
   await loginUser();
 });
