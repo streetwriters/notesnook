@@ -228,7 +228,10 @@ function TinyMCE(props) {
         },
         setup: (editor) => {
           editor.on("tap", (e) => {
-            if (e.target.classList.contains("mce-content-body")) {
+            if (
+              e.target.classList.contains("mce-content-body") &&
+              !e.target.innerText.length > 0
+            ) {
               e.preventDefault();
             }
           });
