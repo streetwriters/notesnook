@@ -8,13 +8,14 @@ import {useTracked} from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent,
+  eUnSubscribeEvent
 } from '../../services/EventManager';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 
 let timer = null;
 let timerError = null;
+let timerClosing = null;
 const EditorOverlay = () => {
   const [state] = useTracked();
   const {colors} = state;
@@ -25,6 +26,7 @@ const EditorOverlay = () => {
   const load = async _loading => {
     clearTimeout(timer);
     clearTimeout(timerError);
+    clearTimeout(timerClosing);
     if (_loading) {
       opacity.setValue(1);
       setLoading(_loading);
@@ -34,13 +36,15 @@ const EditorOverlay = () => {
     } else {
       clearTimeout(timer);
       clearTimeout(timerError);
+      clearTimeout(timerClosing);
       setError(false);
       timing(opacity, {
         toValue: 0,
         duration: 150,
-        easing: Easing.in(Easing.ease),
+        easing: Easing.in(Easing.ease)
       }).start();
-      setTimeout(() => {
+      timerClosing = setTimeout(() => {
+        console.log('clearing now');
         opacity.setValue(1);
         setLoading(null);
       }, 150);
@@ -66,10 +70,10 @@ const EditorOverlay = () => {
         opacity: opacity,
         transform: [
           {
-            translateY:loading? 0 : 6000,
-          },
+            translateY: loading ? 0 : 6000
+          }
         ],
-        zIndex: 100,
+        zIndex: 100
       }}>
       <View
         style={{
@@ -78,7 +82,7 @@ const EditorOverlay = () => {
           alignItems: 'center',
           backgroundColor: colors.bg,
           borderRadius: 5,
-          paddingVertical: 20,
+          paddingVertical: 20
         }}>
         <View
           style={{
@@ -88,14 +92,14 @@ const EditorOverlay = () => {
             marginBottom: 15,
             borderRadius: 5,
             overflow: 'hidden',
-            backgroundColor: colors.nav,
+            backgroundColor: colors.nav
           }}>
           <Animated.View
             style={{
               height: 10,
               borderRadius: 5,
               width: 100,
-              backgroundColor: colors.accent,
+              backgroundColor: colors.accent
             }}
           />
         </View>
@@ -122,12 +126,12 @@ const EditorOverlay = () => {
         <View
           style={{
             position: 'absolute',
-            bottom: 25,
+            bottom: 25
           }}>
           <Button
             type="errorShade"
             style={{
-              marginTop: 10,
+              marginTop: 10
             }}
             onPress={() => {
               setError(false);
@@ -142,7 +146,7 @@ const EditorOverlay = () => {
             style={{
               textAlign: 'center',
               maxWidth: '100%',
-              marginTop: 5,
+              marginTop: 5
             }}>
             If the editor fails to load even after reloading. Try restarting the
             app.
