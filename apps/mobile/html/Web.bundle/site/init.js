@@ -383,7 +383,6 @@ function init_tiny(size) {
       editor.on('AddUndo', onUndoChange);
       editor.on('cut', function () {
         onChange({type: 'cut'});
-        console.log('on cut text', editor.undoManager.hasUndo());
         onUndoChange();
       });
       editor.on('copy', onUndoChange);
@@ -406,7 +405,9 @@ function init_tiny(size) {
           globalThis.isClearingNoteData = false;
           return;
         }
-        editor.undoManager.transact(function () {});
+        setTimeout(function() {
+          editor.undoManager.transact(function () {});
+        },1000);
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
