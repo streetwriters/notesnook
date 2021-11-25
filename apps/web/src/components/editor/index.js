@@ -161,6 +161,7 @@ function Editor({ noteId, nonce }) {
                   onFocus={() => toggleProperties(false)}
                   onSave={saveSession}
                   onChange={(content) => {
+                    if (!content) return;
                     if (!content.length) content = "<p><br></pr>";
                     setSession((state) => {
                       state.session.content = {
