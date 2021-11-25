@@ -124,7 +124,7 @@ const plugins = {
   pro: "textpattern picker",
 };
 
-const changeEvents = "change input compositionend setcontent";
+const changeEvents = "change input compositionend setcontent paste";
 
 function TinyMCE(props) {
   const {
