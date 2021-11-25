@@ -6,9 +6,7 @@ import setManipulator from "../utils/set";
 
 export default class Tags extends Collection {
   tag(id) {
-    const tagItem = this.all.find(
-      (t) => t.id === id || t.title === this.sanitize(id)
-    );
+    const tagItem = this.all.find((t) => t.id === id || t.title === id);
     return tagItem;
   }
 
