@@ -10,6 +10,7 @@ import { AnimatedInput } from "../animated";
 import { showPublishView } from "../publish-view";
 import { db } from "../../common/db";
 
+const undoRedoEvents = "Undo BeforeAddUndo AddUndo Redo ClearUndos TypingUndo";
 function Toolbar(props) {
   const sessionState = useStore((store) => store.session.state);
   const sessionId = useStore((store) => store.session.id);
@@ -56,20 +57,9 @@ function Toolbar(props) {
       setRedoable(tinymce.activeEditor.undoManager.hasRedo());
     }
     tinymce.EditorManager.once("AddEditor", () => {
-      tinymce.activeEditor.on("Undo", updateState);
-      tinymce.activeEditor.on("BeforeAddUndo", updateState);
-      tinymce.activeEditor.on("AddUndo", updateState);
-      tinymce.activeEditor.on("Redo", updateState);
-      tinymce.activeEditor.on("ClearUndos", updateState);
-      tinymce.activeEditor.on("TypingUndo", updateState);
-
+      tinymce.activeEditor.on(undoRedoEvents, updateState);
       tinymce.activeEditor.on("remove", () => {
-        tinymce.activeEditor.off("Undo", updateState);
-        tinymce.activeEditor.off("BeforeAddUndo", updateState);
-        tinymce.activeEditor.off("AddUndo", updateState);
-        tinymce.activeEditor.off("Redo", updateState);
-        tinymce.activeEditor.off("ClearUndos", updateState);
-        tinymce.activeEditor.off("TypingUndo", updateState);
+        tinymce.activeEditor.off(undoRedoEvents, updateState);
       });
     });
   }, [sessionState]);
