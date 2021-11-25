@@ -1,13 +1,10 @@
 import showdown from "showdown";
 import { decode, DecodingMode, EntityLevel } from "entities";
+import dataurl from "../utils/dataurl";
+import { parseHTML } from "../utils/html-parser";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
-
-const HASH_REGEX = /data-hash="(\S+)"/g;
-const SRC_HASH_REGEX =
-  /src="data:(image\/.+);base64,(\S+)"|data-hash="(\S+)"/gm;
-const TAG_REGEX = /<(span|img)[^>]+/gm;
 
 const splitter = /\W+/gm;
 
@@ -22,10 +19,8 @@ class Tiny {
   }
 
   toTXT() {
-    return decode(
-      this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, ""),
-      { level: EntityLevel.HTML, mode: DecodingMode.Strict }
-    ).trim();
+    const document = parseHTML(this.data);
+    return document.textContent || document.body.textContent;
   }
 
   toMD() {
@@ -60,89 +55,79 @@ class Tiny {
   }
 
   async insertMedia(getData) {
-    let document = this.data;
+    let document = parseHTML(this.data);
+    const attachmentElements = document.querySelectorAll("img");
 
-    const matches = Array.from(this.data.matchAll(TAG_REGEX));
-    for (let i = 0; i < matches.length; ++i) {
-      const match = matches[i];
-      const nodeName = match[1];
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
+      switch (attachment.tagName) {
+        case "IMG": {
+          const hash = getDatasetAttribute(attachment, "hash");
+          if (!hash) continue;
 
-      if (nodeName === "img") {
-        const node = match[0];
-
-        const hashMatch = node.match(HASH_REGEX);
-        if (!hashMatch) continue;
-
-        const [attribute, hash] = hashMatch;
-
-        const src = await getData(hash, {
-          total: matches.length,
-          current: i,
-        });
-        if (!src) continue;
-
-        const srcAttribute = createAttribute("src", src);
-        const replacedNode = replaceAt(
-          node,
-          hashMatch.index,
-          attribute,
-          srcAttribute
-        );
-        document = replaceAt(this.data, match.index, node, replacedNode);
+          const src = await getData(hash, {
+            total: attachmentElements.length,
+            current: i,
+          });
+          if (!src) continue;
+          attachment.setAttribute("src", src);
+          break;
+        }
       }
     }
-    return document;
+    return document.outerHTML || document.body.innerHTML;
   }
 
-  extractAttachments() {
+  async extractAttachments(store) {
     const attachments = [];
-    let document = this.data;
+    let document = parseHTML(this.data);
 
-    for (let match of this.data.matchAll(TAG_REGEX)) {
-      const nodeName = match[1];
-      const node = match[0];
-      const attachment = { hash: undefined, data: undefined, type: undefined };
+    const attachmentElements = document.querySelectorAll("img,span");
 
-      switch (nodeName) {
-        case "img": {
-          const replacedNode = node.replace(
-            SRC_HASH_REGEX,
-            (match, mime, data, hash) => {
-              if (mime) attachment.type = mime;
-              if (data) attachment.data = data;
-              if (hash) attachment.hash = hash;
-              return match.startsWith("src") ? "" : match;
-            }
-          );
-          document = replaceAt(this.data, match.index, node, replacedNode);
+    for (var i = 0; i < attachmentElements.length; ++i) {
+      const attachment = attachmentElements[i];
+      switch (attachment.tagName) {
+        case "IMG": {
+          if (!getDatasetAttribute(attachment, "hash")) {
+            const src = attachment.getAttribute("src");
+            if (!src) continue;
+
+            const { data, mime } = dataurl.toObject(src);
+            if (!data) continue;
+
+            const type =
+              getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
+            const { key, metadata } = await store(data, "base64");
+            setDatasetAttribute(attachment, "hash", metadata.hash);
+
+            attachments.push({
+              type,
+              filename:
+                getDatasetAttribute(attachment, "filename") || metadata.hash,
+              ...metadata,
+              key,
+            });
+          } else {
+            attachments.push({
+              hash: getDatasetAttribute(attachment, "hash"),
+            });
+          }
+          attachment.removeAttribute("src");
           break;
         }
-        case "span": {
-          const matches = HASH_REGEX.exec(node);
-          if (!matches) continue;
-          const [_match, hash] = matches;
-          attachments.push({ hash });
+        default: {
+          if (!getDatasetAttribute(attachment, "hash")) continue;
+          attachments.push({
+            hash: getDatasetAttribute(attachment, "hash"),
+          });
           break;
         }
       }
-      if (attachment.hash || attachment.data) attachments.push(attachment);
     }
-
-    return { data: document, attachments };
+    return { data: document.outerHTML || document.body.innerHTML, attachments };
   }
 }
 export default Tiny;
-
-function replaceAt(str, index, match, replacement) {
-  let start = str.slice(0, index);
-  start += replacement;
-  start += str.slice(index + match.length);
-  return start;
-}
-
-function createAttribute(key, value) {
-  return `${key}="${value}"`;
-}
 
 function getHeadlineFromText(text) {
   for (var i = 0; i < text.length; ++i) {
@@ -175,4 +160,12 @@ function getTitleFromText(text) {
     } else title += char;
   }
   return title;
+}
+
+function getDatasetAttribute(element, attribute) {
+  return element.getAttribute(`data-${attribute}`);
+}
+
+function setDatasetAttribute(element, attribute, value) {
+  return element.setAttribute(`data-${attribute}`, value);
 }

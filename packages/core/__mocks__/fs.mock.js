@@ -17,6 +17,8 @@ async function writeEncrypted(filename, { data, type, key }) {
   if (hasItem(filename)) return { hash, hashType };
   fs[filename] = data;
   return {
+    chunkSize: 512,
+    alg: "xcha-stream",
     hash,
     hashType,
     iv: "some iv",

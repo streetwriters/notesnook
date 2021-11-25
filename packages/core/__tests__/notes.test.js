@@ -63,7 +63,7 @@ test("get all notes", () =>
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("Hello This is colorful");
+    expect(note.title).toBe("HelloThis is colorful");
   }));
 
 test("note should get headline from content", () =>

@@ -34,7 +34,8 @@ var TEST_NOTE = {
   },
 };
 
-const IMG_CONTENT = `<p>This is a note for me.j</p>\n<p><img src="data:image/png;base64,iVBORw0K" class="attachment" alt="Screenshot_20210915_102333.png" data-mime="image/png" data-hash="d3eab72e94e3cd35" data-filename="Screenshot_20210915_102333.png" data-size="68609" style="float: left;" /> &nbsp;</p>\n<p>&nbsp;</p>`;
+const IMG_CONTENT = `<p>This is a note for me.j</p>\n<p><img src="data:image/png;base64,iVBORw0K" data-hash="d3eab72e94e3cd35" class="attachment" alt="Screenshot_20210915_102333.png" data-mime="image/png" data-filename="Screenshot_20210915_102333.png" data-size="68609" style="float: left;" /> &nbsp;</p>\n<p>&nbsp;</p>`;
+const IMG_CONTENT_WITHOUT_HASH = `<p>This is a note for me.j</p>\n<p><img src="data:image/png;base64,iVBORw0K" class="attachment" alt="Screenshot_20210915_102333.png" data-mime="image/png" data-filename="Screenshot_20210915_102333.png" data-size="68609" style="float: left;" /> &nbsp;</p>\n<p>&nbsp;</p>`;
 
 const LONG_TEXT =
   "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
@@ -73,6 +74,7 @@ export {
   noteTest,
   groupedTest,
   IMG_CONTENT,
+  IMG_CONTENT_WITHOUT_HASH,
   StorageInterface,
   TEST_NOTEBOOK,
   TEST_NOTEBOOK2,

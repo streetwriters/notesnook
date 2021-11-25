@@ -62,6 +62,10 @@ async function hash(password, userId) {
   return password;
 }
 
+async function generateCryptoKey(password) {
+  return password;
+}
+
 module.exports = {
   read,
   readMulti,
@@ -71,6 +75,7 @@ module.exports = {
   encrypt,
   decrypt,
   deriveCryptoKey,
+  generateCryptoKey,
   getCryptoKey,
   getAllKeys,
   hash,
