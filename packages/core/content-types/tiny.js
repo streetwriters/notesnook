@@ -19,8 +19,10 @@ class Tiny {
   }
 
   toTXT() {
-    const document = parseHTML(this.data);
-    return document.textContent || document.body.textContent;
+    return decode(
+      this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, ""),
+      { level: EntityLevel.HTML, mode: DecodingMode.Strict }
+    ).trim();
   }
 
   toMD() {
@@ -57,7 +59,6 @@ class Tiny {
   async insertMedia(getData) {
     let document = parseHTML(this.data);
     const attachmentElements = document.querySelectorAll("img");
-
     for (var i = 0; i < attachmentElements.length; ++i) {
       const attachment = attachmentElements[i];
       switch (attachment.tagName) {
