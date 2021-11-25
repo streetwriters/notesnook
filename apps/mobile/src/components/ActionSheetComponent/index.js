@@ -1,5 +1,5 @@
 import Clipboard from "@react-native-clipboard/clipboard";
-import htmlToText from 'html-to-text';
+
 import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
@@ -61,6 +61,8 @@ import { ActionSheetColorsSection } from './ActionSheetColorsSection';
 import { ActionSheetTagsSection } from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
 
+
+let htmlToText;
 export const ActionSheetComponent = ({
   close = () => {},
   item,
@@ -284,6 +286,7 @@ export const ActionSheetComponent = ({
         }
         if (note.locked) return;
         let text = await db.notes.note(note.id).content();
+        htmlToText = htmlToText || require('html-to-text');
         text = htmlToText.convert(text, {
           selectors: [{selector: 'img', format: 'skip'}]
         });
@@ -334,6 +337,7 @@ export const ActionSheetComponent = ({
           });
         } else {
           let text = await db.notes.note(note.id).content();
+          htmlToText = htmlToText || require('html-to-text');
           text = htmlToText.convert(text, {
             selectors: [{selector: 'img', format: 'skip'}]
           });
