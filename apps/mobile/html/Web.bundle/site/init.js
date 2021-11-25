@@ -281,7 +281,7 @@ function init_tiny(size) {
       });
 
       editor.on('init', function (e) {
-        setTimeout(() => {
+        setTimeout(function () {
           reactNativeEventHandler('status', true);
         }, 300);
       });
@@ -383,6 +383,7 @@ function init_tiny(size) {
       editor.on('AddUndo', onUndoChange);
       editor.on('cut', function () {
         onChange({type: 'cut'});
+        console.log('on cut text', editor.undoManager.hasUndo());
         onUndoChange();
       });
       editor.on('copy', onUndoChange);
@@ -405,6 +406,7 @@ function init_tiny(size) {
           globalThis.isClearingNoteData = false;
           return;
         }
+        editor.undoManager.transact(function () {});
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
         }
@@ -438,14 +440,14 @@ function init_tiny(size) {
           e.preventDefault();
           e.stopImmediatePropagation();
           e.stopPropagation();
-          editor.undoManager.transact(() => {
+          editor.undoManager.transact(function () {
             if (target.classList.contains(COLLAPSED_KEY)) {
               target.classList.remove(COLLAPSED_KEY);
             } else {
               target.classList.add(COLLAPSED_KEY);
             }
             collapseElement(target);
-            editor.getHTML().then(html => {
+            editor.getHTML().then(function (html) {
               reactNativeEventHandler('tiny', html);
             });
           });
@@ -477,7 +479,9 @@ function delay(base = 0) {
 }
 
 const onChange = function (event) {
+  console.log(event.type, event.selectionChange);
   if (event.type === 'nodechange' && !event.selectionChange) return;
+
   if (isLoading) {
     isLoading = false;
     return;
@@ -494,7 +498,7 @@ const onChange = function (event) {
   changeTimer = null;
   changeTimer = setTimeout(function () {
     let now2 = performance.now();
-    editor.getHTML().then(html => {
+    editor.getHTML().then(function (html) {
       reactNativeEventHandler('tiny', html);
     });
     console.log('save:', performance.now() - now2);
