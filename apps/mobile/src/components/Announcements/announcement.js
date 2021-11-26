@@ -49,7 +49,7 @@ export const Announcement = ({color}) => {
               marginTop: 15
             }}
             data={announcement?.body.filter(item =>
-              allowedOnPlatform(item.platform)
+              allowedOnPlatform(item.platforms)
             )}
             renderItem={({item, index}) =>
               renderItem({item: item, index: index, color: colors[color],inline:true})

@@ -8,7 +8,7 @@ import {
   eOpenAnnouncementDialog
 } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
-import {renderItem} from './functions';
+import {allowedOnPlatform, renderItem} from './functions';
 
 export const AnnouncementDialog = () => {
   const [state] = useTracked();
@@ -28,13 +28,12 @@ export const AnnouncementDialog = () => {
 
   const open = data => {
     setInfo(data);
-    console.log(info);
     setVisible(true);
   };
 
   const close = () => {
     if (visible) {
-      remove(info.id);
+     remove(info.id);
       setInfo(null);
       setVisible(false);
     }
@@ -57,7 +56,9 @@ export const AnnouncementDialog = () => {
           style={{
             width: '100%'
           }}
-          data={info?.body}
+          data={info?.body.filter(item =>
+            allowedOnPlatform(item.platforms)
+          )}
           renderItem={renderItem}
         />
 
