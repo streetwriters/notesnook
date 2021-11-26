@@ -14,6 +14,7 @@ import { ReactComponent as WorkLate } from "../../assets/worklate.svg";
 import Loader from "../loader";
 import Field from "../field";
 import { useSessionState } from "../../utils/hooks";
+import { hardNavigate } from "../../navigation";
 
 const sections = [
   {
@@ -362,6 +363,7 @@ function BuyDialog(props) {
               <SelectedPlan
                 plan={{ ...selectedPlan, ...discount }}
                 onPlanChangeRequest={() => setSelectedPlan()}
+                isPlanChangeable={!plan}
                 onCouponApplied={(coupon) => {
                   setDiscount({ isApplyingCoupon: true });
                   setSelectedPlan((plan) => ({ ...plan, coupon }));
@@ -376,7 +378,7 @@ function BuyDialog(props) {
               />
             )
           ) : (
-            <TryForFree />
+            <TryForFree couponCode={couponCode} />
           )}
         </Flex>
         {isLoggedIn ? (
@@ -626,7 +628,7 @@ function ChooseAPlan({ selectedPlan, onPlanChanged }) {
   );
 }
 
-function TryForFree() {
+function TryForFree({ couponCode }) {
   return (
     <>
       <Rocket width={200} />
@@ -636,14 +638,31 @@ function TryForFree() {
       <Text variant="body" textAlign="center" mt={1}>
         Ready to take the next step in your private note taking journey?
       </Text>
-      <Button variant="primary" mt={4}>
-        Try free for 14 days
+      <Button variant="primary" mt={4} onClick={() => hardNavigate("/signup")}>
+        {couponCode ? "Claim my discount" : "Try free for 14 days"}
       </Button>
+      {couponCode && (
+        <Text
+          variant="subBody"
+          bg="shade"
+          color="primary"
+          mt={4}
+          p={1}
+          sx={{ borderRadius: "default" }}
+        >
+          Please sign up or login to use your coupon: <b>{couponCode}</b>
+        </Text>
+      )}
     </>
   );
 }
 
-function SelectedPlan({ plan, onPlanChangeRequest, onCouponApplied }) {
+function SelectedPlan({
+  plan,
+  isPlanChangeable,
+  onPlanChangeRequest,
+  onCouponApplied,
+}) {
   useEffect(() => {
     const couponInput = document.getElementById("coupon");
     couponInput.value = plan.coupon ? plan.coupon : couponInput.value;
@@ -698,9 +717,11 @@ function SelectedPlan({ plan, onPlanChangeRequest, onCouponApplied }) {
         discountedPrice={plan.discount || 0.0}
         isRecurringDiscount={plan.isRecurringDiscount}
       />
-      <Button variant="secondary" mt={4} px={4} onClick={onPlanChangeRequest}>
-        Change plan
-      </Button>
+      {isPlanChangeable && (
+        <Button variant="secondary" mt={4} px={4} onClick={onPlanChangeRequest}>
+          Change plan
+        </Button>
+      )}
     </>
   );
 }

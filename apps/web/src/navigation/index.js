@@ -20,7 +20,11 @@ export function navigate(url, replaceOrQuery, replace) {
     replace = false;
   }
 
-  window.history[`${replace ? "replace" : "push"}State`](null, null, url);
+  window.history[`${replace ? "replace" : "push"}State`](
+    null,
+    null,
+    makeURL(url, getCurrentHash())
+  );
   dispatchEvent(new PopStateEvent("popstate", null));
 }
 let last = 0;
@@ -97,5 +101,11 @@ export function extendHomeRoute(route) {
 }
 
 export function hardNavigate(route) {
-  window.open(route, "_self");
+  window.open(makeURL(route, getCurrentHash()), "_self");
+}
+
+export function makeURL(route, hash) {
+  const url = new URL(route, window.location.origin);
+  url.hash = hash || getCurrentHash();
+  return url;
 }
