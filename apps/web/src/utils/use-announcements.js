@@ -77,9 +77,9 @@ async function shouldShowAnnouncement(announcement) {
       case "loggedIn":
         return !!user;
       case "unverified":
-        return user && !user.isEmailVerified;
+        return user && !user.isEmailConfirmed;
       case "verified":
-        return user && user.isEmailVerified;
+        return user && user.isEmailConfirmed;
       case "proExpired":
         return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED;
       case "any":
