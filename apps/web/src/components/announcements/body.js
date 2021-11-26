@@ -24,7 +24,7 @@ const features = [
   { icon: Icon.Edit, title: "Rich text editor" },
 ];
 
-export default function AnnouncementBody({ components, type }) {
+export default function AnnouncementBody({ id, components, type }) {
   return components
     .filter((item) =>
       item.platforms.some((platform) => allowedPlatforms.indexOf(platform) > -1)
@@ -76,7 +76,7 @@ export default function AnnouncementBody({ components, type }) {
           case "text":
             return (
               <Text
-                value={item.value}
+                value={item.text}
                 sx={mapStyle(item.style)}
                 mx={HORIZONTAL_MARGIN}
               />
@@ -256,6 +256,7 @@ function Features({ item }) {
         gridTemplateColumns: "1fr 1fr",
         columnGap: 1,
         rowGap: 1,
+        mx: HORIZONTAL_MARGIN,
         ...mapStyle(style),
       }}
     >
@@ -268,9 +269,9 @@ function Features({ item }) {
           }}
         >
           <feature.icon size={16} sx={{ alignSelf: "start" }} />
-          <Text variant="body" ml={1}>
+          <RebassText variant="body" ml={1}>
             {feature.title}
-          </Text>
+          </RebassText>
         </Flex>
       ))}
     </Box>
