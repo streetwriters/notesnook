@@ -51,10 +51,12 @@ export const PricingPlans = ({
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);
   const [buying, setBuying] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getSkus = async () => {
     try {
-      let products = PremiumService.getProducts();
+      setLoading(true);
+      let products = await PremiumService.getProducts();
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
@@ -70,13 +72,14 @@ export const PricingPlans = ({
         }
         setProducts(products);
       }
+      setLoading(false);
     } catch (e) {
+      setLoading(false);
       console.log('error getting sku', e);
     }
   };
 
   const getPromo = async productId => {
-    await sleep(500);
     let products = PremiumService.getProducts();
     let product = products.find(p => p.productId === productId);
     if (!product) return;
@@ -140,7 +143,17 @@ export const PricingPlans = ({
     }
   };
 
-  return (
+  return loading ? (
+    <View
+      style={{
+        paddingHorizontal: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 100
+      }}>
+      <ActivityIndicator color={colors.accent} size={25} />
+    </View>
+  ) : (
     <View
       style={{
         paddingHorizontal: 12

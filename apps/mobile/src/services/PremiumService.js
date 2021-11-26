@@ -65,7 +65,10 @@ function getMontlySub() {
   return _product;
 }
 
-function getProducts() {
+async function getProducts() {
+  if (!products || products.length === 0) {
+     products = await RNIap.getSubscriptions(itemSkus);
+  }
   return products;
 }
 
