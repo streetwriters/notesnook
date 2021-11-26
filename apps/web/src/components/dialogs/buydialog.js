@@ -325,15 +325,15 @@ function BuyDialog(props) {
       }}
     >
       <Flex
-        flexDirection="row"
-        maxWidth={["100%", "80%", "60%"]}
-        maxHeight={["100%", "80%", "80%"]}
+        flexDirection={["column", "column", "row"]}
+        width={["95%", "80%", "60%"]}
+        maxHeight={["95%", "80%", "80%"]}
         bg="transparent"
         alignSelf={"center"}
-        overflowY={props.scrollable ? "auto" : "hidden"}
+        overflowY={["scroll", "scroll", "auto"]}
         sx={{
           position: "relative",
-          overflow: "hidden",
+          // overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
           borderRadius: "dialog",
         }}
@@ -345,7 +345,7 @@ function BuyDialog(props) {
           flexShrink={0}
           sx={{
             borderTopLeftRadius: "dialog",
-            borderBottomLeftRadius: "dialog",
+            borderBottomLeftRadius: [0, 0, "dialog"],
             overflow: "hidden",
             bg: "bgSecondary",
             "@supports ((-webkit-backdrop-filter: none) or (backdrop-filter: none))":
@@ -354,7 +354,7 @@ function BuyDialog(props) {
                 backdropFilter: "blur(8px)",
               },
           }}
-          width={350}
+          width={["100%", "100%", 350]}
           p={4}
           py={50}
         >
@@ -433,9 +433,10 @@ function Price(props) {
 function FeaturesList() {
   return (
     <Flex
-      flex={1}
       flexDirection="column"
-      overflowY="auto"
+      flex={1}
+      overflowY={["hidden", "hidden", "auto"]}
+      flexShrink={0}
       sx={{ position: "relative" }}
       pt={6}
       bg="background"
@@ -525,9 +526,11 @@ function Checkout({ user, plan, onCheckoutLoaded }) {
   return (
     <Flex
       bg="background"
-      width="500px"
+      //width="100%"
+      flex={1}
       padding={40}
-      overflowY="auto"
+      flexShrink={[0, 0, 1]}
+      overflowY={["hidden", "hidden", "auto"]}
       alignItems={"center"}
     >
       {isLoading ? (
