@@ -2,6 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {useMessageStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {
   eCloseAnnouncementDialog,
@@ -33,7 +34,7 @@ export const AnnouncementDialog = () => {
 
   const close = () => {
     if (visible) {
-     remove(info.id);
+      remove(info.id);
       setInfo(null);
       setVisible(false);
     }
@@ -48,17 +49,18 @@ export const AnnouncementDialog = () => {
       visible={visible}>
       <View
         style={{
-          width: '100%',
+          width: DDS.isTab ? 600 : '100%',
           backgroundColor: colors.bg,
-          maxHeight: '100%'
+          maxHeight: DDS.isTab ? '90%' : '100%',
+          borderRadius: DDS.isTab ? 10 : 0,
+          overflow: 'hidden',
+          marginBottom: DDS.isTab ? 20 : 0
         }}>
         <FlatList
           style={{
             width: '100%'
           }}
-          data={info?.body.filter(item =>
-            allowedOnPlatform(item.platforms)
-          )}
+          data={info?.body.filter(item => allowedOnPlatform(item.platforms))}
           renderItem={renderItem}
         />
 

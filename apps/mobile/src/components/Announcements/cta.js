@@ -1,22 +1,21 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet } from '../../services/EventManager';
-import { eCloseAnnouncementDialog, eOpenPremiumDialog } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
+import {View} from 'react-native';
+import {useTracked} from '../../provider';
+import {eSendEvent, presentSheet} from '../../services/EventManager';
+import {eCloseAnnouncementDialog} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
-import { Button } from '../Button';
-import { allowedOnPlatform, getStyle } from './functions';
+import {Button} from '../Button';
+import GeneralSheet from '../GeneralSheet';
+import {PricingPlans} from '../Premium/pricing-plans';
+import {allowedOnPlatform, getStyle} from './functions';
 
-export const Cta = ({actions, style = {}, color,inline}) => {
+export const Cta = ({actions, style = {}, color, inline}) => {
   const [state] = useTracked();
   const colors = state.colors;
-  let buttons =
-    actions.filter(item =>
-      allowedOnPlatform(item.platforms)
-    ) || [];
+  let buttons = actions.filter(item => allowedOnPlatform(item.platforms)) || [];
 
   const onPress = async item => {
     if (!inline) {
@@ -28,9 +27,18 @@ export const Cta = ({actions, style = {}, color,inline}) => {
         await openLinkInBrowser(item.data, colors);
       } catch (e) {}
     } else if (item.type === 'promo') {
-      eSendEvent(eOpenPremiumDialog, {
-        promoCode: item.data,
-        text: item.title
+      presentSheet({
+        component: (
+          <PricingPlans
+            marginTop={1}
+            promo={{
+              promoCode: item.data,
+              text: item.title
+            }}
+          />
+        ),
+        noIcon: true,
+        noProgress: true
       });
     } else if (item.type === 'backup') {
       presentSheet({
@@ -48,6 +56,7 @@ export const Cta = ({actions, style = {}, color,inline}) => {
         paddingHorizontal: 12,
         ...getStyle(style)
       }}>
+      <GeneralSheet context="premium_cta" />
       {buttons.length > 0 &&
         buttons.slice(0, 1).map(item => (
           <Button

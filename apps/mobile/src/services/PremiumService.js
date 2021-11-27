@@ -1,20 +1,20 @@
-import {CHECK_IDS} from 'notes-core/common';
+import { CHECK_IDS } from 'notes-core/common';
 import React from 'react';
 import * as RNIap from 'react-native-iap';
 import DialogHeader from '../components/Dialog/dialog-header';
-import {CompactFeatures} from '../components/Premium/compact-features';
-import {PricingPlans} from '../components/Premium/pricing-plans';
+import { CompactFeatures } from '../components/Premium/compact-features';
+import { PricingPlans } from '../components/Premium/pricing-plans';
 import Seperator from '../components/Seperator';
-import {useMessageStore, useUserStore} from '../provider/stores';
-import {itemSkus, SUBSCRIPTION_STATUS} from '../utils';
-import {db} from '../utils/database';
+import { useUserStore } from '../provider/stores';
+import { itemSkus, SUBSCRIPTION_STATUS } from '../utils';
+import { db } from '../utils/database';
 import {
   eOpenPremiumDialog,
   eOpenTrialEndingDialog,
   eShowGetPremium
 } from '../utils/Events';
-import {MMKV} from '../utils/mmkv';
-import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
+import { MMKV } from '../utils/mmkv';
+import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
 
 let premiumStatus = 0;
 let products = [];
@@ -39,7 +39,6 @@ async function setPremiumStatus() {
   } catch (e) {
     premiumStatus = 0;
   } finally {
-    useMessageStore.getState().setAnnouncement();
     if (get()) {
       await subscriptions.clear();
     }
@@ -283,7 +282,7 @@ const subscriptions = {
 
 async function getRemainingTrialDaysStatus() {
   let user = await db.user.getUser();
-  if (!user) return;
+  if (!user) return false;
   let premium = user.subscription.type !== SUBSCRIPTION_STATUS.BASIC;
   let isTrial = user.subscription.type === SUBSCRIPTION_STATUS.TRIAL;
   let total = user.subscription.expiry - user.subscription.start;
@@ -299,7 +298,7 @@ async function getRemainingTrialDaysStatus() {
       extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'ending');
-    return;
+    return true;
   }
 
   if (!premium && lastTrialDialogShownAt !== 'expired') {
@@ -309,7 +308,9 @@ async function getRemainingTrialDaysStatus() {
       extend: false
     });
     MMKV.setItem('lastTrialDialogShownAt', 'expired');
+    return true;
   }
+  return false;
 }
 
 const features_list = [
