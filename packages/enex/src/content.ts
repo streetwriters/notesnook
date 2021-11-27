@@ -15,7 +15,7 @@ const cssSelector: string = [
   ...invalidElements,
 ].join(",");
 
-type ElementHandler = (element: HTMLElement) => string;
+type ElementHandler = (element: HTMLElement) => string | undefined;
 
 export class Content {
   #contentElement: HTMLElement;
@@ -38,7 +38,8 @@ export class Content {
         case "en-todo":
         case "en-media": {
           if (handler) {
-            element.replaceWith(handler(element));
+            const result = handler(element);
+            if (!!result) element.replaceWith(result);
           } else element.remove();
           break;
         }
