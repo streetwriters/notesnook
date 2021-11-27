@@ -1,0 +1,22 @@
+{
+  "name": "@notesnook/enex",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "@types/tap": "^15.0.5",
+    "fdir": "^5.1.0",
+    "tap": "^15.1.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "test": "tap --ts "
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "node-html-parser": "^5.1.0"
+  }
+}
