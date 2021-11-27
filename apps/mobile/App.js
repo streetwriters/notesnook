@@ -112,7 +112,6 @@ const App = () => {
 
   useEffect(() => {
     databaseHasLoaded = false;
-    useMessageStore.getState().setAnnouncement();
     (async () => {
       try {
         await SettingsService.init();
