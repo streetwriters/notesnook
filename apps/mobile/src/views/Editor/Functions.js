@@ -1,8 +1,8 @@
-import {createRef} from 'react';
-import {Platform} from 'react-native';
-import {presentDialog} from '../../components/Dialog/functions';
-import {useEditorStore, useMenuStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { createRef } from 'react';
+import { Platform } from 'react-native';
+import { presentDialog } from '../../components/Dialog/functions';
+import { useEditorStore, useMenuStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -10,24 +10,23 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import {editing} from '../../utils';
-import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/database';
+import { editing } from '../../utils';
+import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/database';
 import {
   eOnLoadNote,
   eShowGetPremium,
   eShowMergeDialog
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {normalize} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { normalize } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
-import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
-import {parse} from 'node-html-parser';
+import { IMAGE_TOOLTIP_CONFIG } from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -59,6 +58,7 @@ let disableSaving = false;
 let isSaving = false;
 let waitForContent = false;
 let prevNoteContent = null;
+let timerForEditor = null;
 
 export function startClosingSession() {
   closingSession = true;
@@ -234,7 +234,6 @@ function clearNote() {
     type: 'tiny'
   };
 }
-
 export const loadNote = async item => {
   console.log('.....OPEN NOTE.....');
   editing.currentlyEditing = true;
@@ -281,6 +280,7 @@ export const loadNote = async item => {
     if (!webviewInit) {
       EditorWebView.current?.reload();
     }
+
     tiny.call(EditorWebView, tiny.notLoading);
     checkStatus();
   } else {
@@ -651,6 +651,7 @@ export async function onWebViewLoad(premium, colors) {
   } else {
     tiny.call(EditorWebView, tiny.removeMarkdown, true);
   }
+
   if (getNote()?.id) {
     loadNoteInEditor();
   }
@@ -701,17 +702,18 @@ export const presentResolveConflictDialog = _note => {
 };
 
 const loadNoteInEditor = async (keepHistory = true) => {
-  console.log('loading note', id, webviewInit);
+  clearTimeout(timerForEditor);
+  timerForEditor = setTimeout(async () => {
+    if (!webviewInit) return;
 
-  if (!webviewInit) return;
-  saveCounter = 0;
-  if (note?.id) {
-    post('title', title);
-    intent = false;
-    if (!content || !content.data || content?.data?.length === 0) {
-      tiny.call(
-        EditorWebView,
-        `
+    console.log('loading note', id, webviewInit);
+    if (note?.id) {
+      post('title', title);
+      intent = false;
+      if (!content || !content.data || content?.data?.length === 0) {
+        tiny.call(
+          EditorWebView,
+          `
     globalThis.isClearingNoteData = false;
     window.ReactNativeWebView.postMessage(
       JSON.stringify({
@@ -720,30 +722,30 @@ const loadNoteInEditor = async (keepHistory = true) => {
       }),
     );
     `
-      );
-    } else {
-      console.log('opening in editor');
-      post('html', content.data);
-    }
-    if (id) {
-      db.attachments.downloadImages(id);
-    }
+        );
+      } else {
+        console.log('opening in editor', content.data);
+        post('html', content.data);
+      }
+      if (id) {
+        db.attachments.downloadImages(id);
+      }
 
-    setColors();
-    tiny.call(
-      EditorWebView,
-      tiny.updateDateEdited(timeConverter(note.dateEdited))
-    );
-    tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
-  } else {
-    await restoreEditorState();
-  }
-  await sleep(500);
-  loadingNote = null;
-  disableSaving = false;
-  if (keepHistory) {
-    tiny.call(EditorWebView, tiny.clearHistory);
-  }
+      setColors();
+      tiny.call(
+        EditorWebView,
+        tiny.updateDateEdited(timeConverter(note.dateEdited))
+      );
+      tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+    } else {
+      await restoreEditorState();
+    }
+    loadingNote = null;
+    disableSaving = false;
+    if (keepHistory) {
+      tiny.call(EditorWebView, tiny.clearHistory);
+    }
+  }, 50);
 };
 
 export async function updateNoteInEditor() {

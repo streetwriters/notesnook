@@ -44,7 +44,6 @@ const EditorOverlay = () => {
         easing: Easing.in(Easing.ease)
       }).start();
       timerClosing = setTimeout(() => {
-        console.log('clearing now');
         opacity.setValue(1);
         setLoading(null);
       }, 150);
