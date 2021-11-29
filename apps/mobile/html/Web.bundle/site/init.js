@@ -390,11 +390,12 @@ function init_tiny(size) {
         onChange({type: 'paste'});
       });
 
-      editor.on('tap', e => {
-        if (e.target.classList.contains('mce-content-body')) {
-          e.preventDefault();
-        }
-      });
+      if (
+        e.target.classList.contains("mce-content-body") &&
+        !e.target.innerText.length > 0
+      ) {
+        e.preventDefault();
+      }
 
       editor.on('focus', function () {
         reactNativeEventHandler('focus', 'editor');
