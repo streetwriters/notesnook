@@ -261,12 +261,12 @@ export const loadNote = async item => {
     clearNote();
     noteEdited = false;
     if (Platform.OS === 'android') {
-      await sleep(100);
+      await sleep(300);
       textInput.current?.focus();
       EditorWebView.current?.requestFocus();
       tiny.call(EditorWebView, tiny.focusEditor);
     } else {
-      await sleep(50);
+      await sleep(150);
       tiny.call(EditorWebView, tiny.focusEditor);
     }
     if (EDITOR_SETTINGS) {
@@ -351,6 +351,7 @@ export const _onMessage = async evt => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
+      console.log(message.value);
       if (message.value === '<br>') return;
       if (message.value !== content.data) {
         if (prevNoteContent && message.value === prevNoteContent) {
@@ -392,7 +393,7 @@ export const _onMessage = async evt => {
       tiny.call(EditorWebView, tiny.notLoading);
       setTimeout(() => {
         eSendEvent('loadingNote');
-      },150);
+      }, 150);
       break;
     case 'premium':
       let user = await db.user.getUser();
@@ -581,6 +582,7 @@ export async function saveNote(preventUpdate) {
   try {
     if (id && !db.notes.note(id)) {
       clearNote();
+      useEditorStore.getState().setCurrentlyEditingNote(null);
       return;
     }
     let locked = false;
@@ -631,8 +633,11 @@ export async function saveNote(preventUpdate) {
       ]);
       let n = db.notes.note(id)?.data?.dateEdited;
       lastEditTime = n + 10;
-      tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(n)));
-      tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
+      tiny.call(
+        EditorWebView,
+        tiny.updateDateEdited(n ? timeConverter(n) : '')
+      );
+      tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
   } catch (e) {
     console.log('note save error', e, e.stack);

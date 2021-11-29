@@ -1,3 +1,4 @@
+import {EV, EVENTS} from 'notes-core/common';
 import React, {useEffect, useRef} from 'react';
 import {
   BackHandler,
@@ -169,11 +170,28 @@ const EditorHeader = () => {
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
     eSubscribeEvent(eClearEditor, onCallClear);
+    EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
     return () => {
+      EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
       eUnSubscribeEvent(eClearEditor, onCallClear);
       eUnSubscribeEvent(eOnLoadNote, load);
     };
   }, []);
+
+  const onNoteRemoved = async id => {
+    try {
+      console.log("NOTE REMOVED",id);
+      await db.notes.remove(id);
+      if (id !== getNote().id) return;
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Trash,
+        Navigation.routeNames.Notebook
+      ]);
+    } catch (e) {}
+  };
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -295,7 +313,6 @@ const EditorHeader = () => {
                 color={colors.yellow}
                 customStyle={{
                   marginLeft: 10,
-                  borderRadius: 5
                 }}
                 top={50}
                 onPress={() => {
@@ -313,7 +330,6 @@ const EditorHeader = () => {
                 color={colors.pri}
                 customStyle={{
                   marginLeft: 10,
-                  borderRadius: 5
                 }}
                 top={50}
                 onPress={publishNote}
@@ -326,7 +342,6 @@ const EditorHeader = () => {
                 color={colors.pri}
                 customStyle={{
                   marginLeft: 10,
-                  borderRadius: 5
                 }}
                 top={50}
                 onPress={picker.pick}
