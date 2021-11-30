@@ -1,17 +1,17 @@
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { getTotalNotes, history } from '../../utils';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {getTotalNotes, history} from '../../utils';
+import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
+import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -47,7 +47,6 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
     };
     eSendEvent(refreshNotesPage, params);
     Navigation.navigate(routeName, params, headerState);
-   
   };
 
   return (
@@ -87,10 +86,10 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               <Button
                 title={topic.title}
                 key={topic.id}
-                height={SIZE.xl}
+                height={null}
                 textStyle={{
                   fontWeight: 'normal',
-                  fontFamily: null,
+                  fontFamily: null
                 }}
                 type="grayBg"
                 fontSize={SIZE.xs + 1}
@@ -103,10 +102,11 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                   borderRadius: 5,
                   maxWidth: 120,
                   borderWidth: 0.5,
+                  paddingVertical:2.5,
                   borderColor: colors.icon,
                   paddingHorizontal: 6,
-                  marginVertical:5,
-                  marginRight:5
+                  marginVertical: 5,
+                  marginRight: 5
                 }}
                 onPress={() => navigateToTopic(topic)}
               />
