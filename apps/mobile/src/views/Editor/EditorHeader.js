@@ -180,7 +180,7 @@ const EditorHeader = () => {
 
   const onNoteRemoved = async id => {
     try {
-      console.log("NOTE REMOVED",id);
+      console.log('NOTE REMOVED', id);
       await db.notes.remove(id);
       if (id !== getNote().id) return;
       Navigation.setRoutesToUpdate([
@@ -312,10 +312,15 @@ const EditorHeader = () => {
                 name="crown"
                 color={colors.yellow}
                 customStyle={{
-                  marginLeft: 10,
+                  marginLeft: 10
                 }}
                 top={50}
-                onPress={() => {
+                onPress={async () => {
+                  let note = getNote();
+                  clearEditor(true, true, true);
+                  await loadNote(note);
+
+                  return;
                   if (editing.isFocused) {
                     safeKeyboardDismiss();
                     editing.isFocused = true;
@@ -329,7 +334,7 @@ const EditorHeader = () => {
                 name="cloud-upload-outline"
                 color={colors.pri}
                 customStyle={{
-                  marginLeft: 10,
+                  marginLeft: 10
                 }}
                 top={50}
                 onPress={publishNote}
@@ -341,7 +346,7 @@ const EditorHeader = () => {
                 name="attachment"
                 color={colors.pri}
                 customStyle={{
-                  marginLeft: 10,
+                  marginLeft: 10
                 }}
                 top={50}
                 onPress={picker.pick}

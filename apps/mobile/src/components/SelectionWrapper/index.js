@@ -1,13 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {useWindowDimensions} from 'react-native';
-import {useTracked} from '../../provider';
+import React, { useEffect, useState } from 'react';
+import { useTracked } from '../../provider';
 import { useSettingStore } from '../../provider/stores';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {history} from '../../utils';
-import {PressableButton} from '../PressableButton';
-import {ActionStrip} from './action-strip';
-import {Filler} from './back-fill';
-import {SelectionIcon} from './selection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { history } from '../../utils';
+import { PressableButton } from '../PressableButton';
+import { ActionStrip } from './action-strip';
+import { Filler } from './back-fill';
+import { SelectionIcon } from './selection';
 
 const SelectionWrapper = ({
   children,
@@ -55,7 +54,7 @@ const SelectionWrapper = ({
       testID={testID}
       onLongPress={_onLongPress}
       onPress={_onPress}
-      customSelectedColor={colors.nav}
+      customSelectedColor={colors.transGray}
       customAlpha={!colors.night ? -0.02 : 0.02}
       customOpacity={1}
       customStyle={{
