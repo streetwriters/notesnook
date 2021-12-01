@@ -9,13 +9,8 @@ class ThemeStore extends BaseStore {
   accent = Config.get("accent", getDefaultAccentColor());
   followSystemTheme = Config.get("followSystemTheme", false);
 
-  constructor(set, get) {
-    super(set, get);
-    changeAppTheme(Config.get("theme", "light"));
-  }
-
   setTheme = (theme) => {
-    changeAppTheme(theme);
+    if (!this.get().followSystemTheme) changeAppTheme(theme);
     this.set((state) => (state.theme = theme));
     Config.set("theme", theme);
   };
@@ -32,7 +27,8 @@ class ThemeStore extends BaseStore {
 
   setFollowSystemTheme = (followSystemTheme) => {
     this.set((state) => (state.followSystemTheme = followSystemTheme));
-    Config.set("preferSystemTheme", followSystemTheme);
+    Config.set("followSystemTheme", followSystemTheme);
+    changeAppTheme(followSystemTheme ? "system" : "light");
   };
 
   toggleFollowSystemTheme = () => {

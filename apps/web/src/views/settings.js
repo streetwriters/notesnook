@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import { useStore as useUserStore } from "../stores/user-store";
@@ -14,7 +14,6 @@ import {
   showTrackingDetailsDialog,
 } from "../common/dialog-controller";
 import { showLogoutConfirmation } from "../common/dialog-controller";
-import useSystemTheme from "../utils/use-system-theme";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
@@ -131,7 +130,6 @@ function Settings(props) {
     developer: false,
     other: true,
   });
-  const isSystemThemeDark = useSystemTheme();
   const isVaultCreated = useAppStore((store) => store.isVaultCreated);
   const setIsVaultCreated = useAppStore((store) => store.setIsVaultCreated);
   const refreshApp = useAppStore((store) => store.refresh);
@@ -139,7 +137,6 @@ function Settings(props) {
   const sync = useAppStore((store) => store.sync);
   const theme = useThemeStore((store) => store.theme);
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
-  const setTheme = useThemeStore((store) => store.setTheme);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const [zoomFactor, setZoomFactor] = useZoomFactor();
   const [, version] = useVersion();
@@ -167,11 +164,6 @@ function Settings(props) {
     "telemetry",
     true
   );
-
-  useEffect(() => {
-    if (!followSystemTheme) return;
-    setTheme(isSystemThemeDark ? "dark" : "light");
-  }, [followSystemTheme, isSystemThemeDark, setTheme]);
 
   return (
     <ScrollContainer>
@@ -337,7 +329,7 @@ function Settings(props) {
             />
             <Toggle
               title="Follow system theme"
-              onTip="Switch app theme according to system"
+              onTip="Switch app theme according to browser theme"
               offTip="Keep app theme independent"
               premium="customize"
               onToggled={toggleFollowSystemTheme}

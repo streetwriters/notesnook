@@ -11,9 +11,8 @@ function setTheme(theme) {
   return JSONStorage.set("theme", theme);
 }
 
-function getBackgroundColor(theme) {
-  if (!theme) theme = getTheme();
-  return theme === "dark" ? "#0f0f0f" : "#ffffff";
+function getBackgroundColor() {
+  return nativeTheme.shouldUseDarkColors ? "#0f0f0f" : "#ffffff";
 }
 
 module.exports = { getTheme, setTheme, getBackgroundColor };

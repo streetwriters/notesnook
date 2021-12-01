@@ -25,7 +25,7 @@ export default function useAutoUpdater() {
       changeStatus({ type: "available", version: info.version });
     }
 
-    function updateNotAvailable(info) {
+    function updateNotAvailable() {
       changeStatus({ type: "updated" });
     }
 

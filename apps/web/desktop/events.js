@@ -4,4 +4,5 @@ module.exports.EVENTS = {
   updateDownloadProgress: "updateDownloadProgress",
   updateDownloadCompleted: "updateDownloadCompleted",
   updateNotAvailable: "updateNotAvailable",
+  themeChanged: "themeChanged",
 };

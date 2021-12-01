@@ -14,6 +14,7 @@ export function invokeCommand(type, payload = {}) {
 
 if (isDesktop()) {
   window.api.receive("fromMain", (args) => {
+    console.log(args);
     const { type } = args;
     ElectronEventManager.publish(type, args);
   });

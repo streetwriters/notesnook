@@ -1,5 +1,4 @@
-const { contextBridge } = require("electron");
-const { ipcRenderer } = require("electron-better-ipc");
+const { contextBridge, ipcRenderer } = require("electron");
 
 // Expose protected methods that allow the renderer process to use
 // the ipcRenderer without exposing the entire object
@@ -14,8 +13,9 @@ contextBridge.exposeInMainWorld("api", {
   receive: (channel, func) => {
     let validChannels = ["fromMain"];
     if (validChannels.includes(channel)) {
+      ipcRenderer.removeAllListeners(channel);
       // Deliberately strip event as it includes `sender`
-      ipcRenderer.on(channel, (event, args) => {
+      ipcRenderer.addListener(channel, (event, args) => {
         func(args);
       });
     }
@@ -26,13 +26,15 @@ contextBridge.exposeInMainWorld("api", {
 // the ipcRenderer without exposing the entire object
 contextBridge.exposeInMainWorld("config", {
   zoomFactor: () => {
-    return ipcRenderer.callMain("fromRenderer", { type: "getZoomFactor" });
+    return ipcRenderer.invoke("fromRenderer", {
+      type: "getZoomFactor",
+    });
   },
 });
 
 contextBridge.exposeInMainWorld("native", {
   selectDirectory: ({ title, buttonLabel, defaultPath }) => {
-    return ipcRenderer.callMain("fromRenderer", {
+    return ipcRenderer.invoke("fromRenderer", {
       type: "selectDirectory",
       title,
       buttonLabel,

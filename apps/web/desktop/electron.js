@@ -1,4 +1,4 @@
-const { app, BrowserWindow } = require("electron");
+const { app, BrowserWindow, nativeTheme } = require("electron");
 const path = require("path");
 const os = require("os");
 const { isDevelopment } = require("./utils");
@@ -9,29 +9,28 @@ const getZoomFactor = require("./ipc/calls/getZoomFactor");
 const { logger } = require("./logger");
 const { setupMenu } = require("./menu");
 const WindowState = require("./config/windowstate");
+const { sendMessageToRenderer } = require("./ipc/utils");
+const { EVENTS } = require("./events");
+
 require("./ipc/index.js");
 try {
   require("electron-reloader")(module);
 } catch (_) {}
 
+/**
+ * @type {BrowserWindow}
+ */
 let mainWindow;
 
 async function createWindow() {
   const mainWindowState = new WindowState({});
-  console.log({
-    x: mainWindowState.x,
-    y: mainWindowState.y,
-    width: mainWindowState.width,
-    height: mainWindowState.height,
-  });
+  setTheme(getTheme());
   mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
     height: mainWindowState.height,
-
     backgroundColor: getBackgroundColor(),
-    darkTheme: getTheme() === "dark",
     autoHideMenuBar: true,
     icon: path.join(
       __dirname,
@@ -49,10 +48,7 @@ async function createWindow() {
     },
   });
   mainWindowState.manage(mainWindow);
-
   global.win = mainWindow;
-
-  setTheme(getTheme());
   setupMenu(mainWindow);
 
   if (isDevelopment())
@@ -66,6 +62,15 @@ async function createWindow() {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+  });
+
+  nativeTheme.on("updated", () => {
+    console.log("UPDATED", getTheme(), nativeTheme.themeSource);
+    if (getTheme() === "system") {
+      sendMessageToRenderer(EVENTS.themeChanged, {
+        theme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
+      });
+    }
   });
 }
 

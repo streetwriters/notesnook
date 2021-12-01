@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { useStore, store } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
+import { useStore as useThemeStore } from "./stores/theme-store";
 import { resetReminders } from "./common/reminders";
 import {
   AppEventManager,
@@ -16,6 +17,7 @@ import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";
 import useAnnouncements from "./utils/use-announcements";
 import { showAnnouncementDialog } from "./common/dialog-controller";
+import useSystemTheme from "./utils/use-system-theme";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -33,7 +35,10 @@ export default function AppEffects({ setShow }) {
   const initUser = useUserStore((store) => store.init);
   const initNotes = useNotesStore((store) => store.init);
   const setIsVaultCreated = useStore((store) => store.setIsVaultCreated);
+  const setTheme = useThemeStore((store) => store.setTheme);
+  const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const [announcements, remove] = useAnnouncements("dialog");
+  const isSystemThemeDark = useSystemTheme();
 
   useEffect(
     function initializeApp() {
@@ -135,6 +140,11 @@ export default function AppEffects({ setShow }) {
       await showAnnouncementDialog(announcements[0], remove);
     })();
   }, [announcements, remove]);
+
+  useEffect(() => {
+    if (!followSystemTheme) return;
+    setTheme(isSystemThemeDark ? "dark" : "light");
+  }, [isSystemThemeDark, followSystemTheme, setTheme]);
 
   return <React.Fragment />;
 }
