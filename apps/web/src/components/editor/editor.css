@@ -165,3 +165,14 @@
 .mce-content-body h6 {
   font-weight: 600 !important;
 }
+
+.mce-content-body a {
+  color: var(--primary) !important;
+}
+
+.mce-content-body [data-mce-selected="inline-boundary"] {
+  background-color: transparent !important;
+}
+.mce-content-body a[data-mce-selected] {
+  box-shadow: none !important;
+}
