@@ -14,7 +14,7 @@ const getSortSelectors = (options) => [
   {
     [options.sortDirection]: (item) => {
       if (options.sortBy === "title")
-        return getFirstCharacter(item.alias || item.title);
+        return item.alias || item.title;
       return item[options.sortBy];
     },
   },
