@@ -15,7 +15,7 @@ function Colors(props) {
       {COLORS.map((label) => (
         <Flex
           sx={{ position: "relative" }}
-          onClick={() => setColor(id, label)}
+          onClick={() => setColor(id, label.toLowerCase())}
           key={label}
           justifyContent="center"
           alignItems="center"
