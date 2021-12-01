@@ -109,16 +109,16 @@ class Settings {
     return this._settings.pins.reduce((prev, pin) => {
       if (!pin || !pin.data) return;
 
-      let item;
+      let item = null;
       if (pin.type === "notebook") {
         const notebook = this._db.notebooks.notebook(pin.data.id);
         item = notebook ? notebook.data : null;
       } else if (pin.type === "topic") {
         const notebook = this._db.notebooks.notebook(pin.data.notebookId);
-        if (!notebook) item = null;
-        const topic = notebook.topics.topic(pin.data.id);
-        if (!topic) item = null;
-        item = topic._topic;
+        if (notebook) {
+          const topic = notebook.topics.topic(pin.data.id);
+          if (topic) item = topic._topic;
+        }
       } else if (pin.type === "tag") {
         item = this._db.tags.tag(pin.data.id);
       }

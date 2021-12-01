@@ -136,7 +136,7 @@ export default class Notebooks extends Collection {
 
   async repairReferences() {
     for (let notebook of this.all) {
-      const _notebook = this.notebook(notebook.id);
+      const _notebook = this.notebook(notebook);
       for (let topic of notebook.topics) {
         const _topic = _notebook.topics.topic(topic.id);
         await _topic.add(...topic.notes);

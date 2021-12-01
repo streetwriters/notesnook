@@ -251,12 +251,15 @@ export default class Notes extends Collection {
 
       for (let notebook of notebooks) {
         const nb = this._db.notebooks.notebook(notebook.id);
-        for (let topic of notebook.topics) {
-          const _topic = nb.topics.topic(topic);
-          if (!_topic || !_topic.has(note.id)) {
-            deleteItem(notebook.topics, topic);
-            await this.add(note);
-            continue;
+
+        if (nb) {
+          for (let topic of notebook.topics) {
+            const _topic = nb.topics.topic(topic);
+            if (!_topic || !_topic.has(note.id)) {
+              deleteItem(notebook.topics, topic);
+              await this.add(note);
+              continue;
+            }
           }
         }
 
