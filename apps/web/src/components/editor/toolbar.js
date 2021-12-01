@@ -175,7 +175,7 @@ function Toolbar(props) {
           transition={{ duration: 0.5 }}
           fontWeight="heading"
           fontSize="heading"
-          defaultValue={title}
+          value={title}
           color="text"
           onChange={(e) => {
             const title = e.target.value;
