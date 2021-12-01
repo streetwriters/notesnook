@@ -36,11 +36,6 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     properties.inputMode = value ? INPUT_MODE.NO_EDIT : INPUT_MODE.EDITING;
     editing.tooltip = format;
     properties.userBlur = false;
-    if (properties.pauseSelectionChange) {
-      setTimeout(() => {
-        properties.pauseSelectionChange = false;
-      }, 100);
-    }
     return () => {
       properties.inputMode = null;
       editing.tooltip = null;
@@ -53,7 +48,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       if (properties.pauseSelectionChange) {
         setTimeout(() => {
           properties.pauseSelectionChange = false;
-        }, 100);
+        }, 500);
       }
       inputRef.current?.focus();
       return;
