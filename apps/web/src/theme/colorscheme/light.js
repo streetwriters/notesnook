@@ -23,13 +23,21 @@ class LightColorSchemeFactory {
       ...new StaticColorSchemeFactory(accent),
 
       // COLORS
-      red: "#D93B30",
-      orange: "#C75301",
-      yellow: "#AC660D",
+      // red: "#D93B30",
+      // orange: "#C75301",
+      // yellow: "#AC660D",
+      // green: "#4CAF50",
+      // blue: "#197AC7",
+      // purple: "#673AB7",
+      // gray: "#777777",
+
+      red: "#f44336",
+      orange: "#FF9800",
+      yellow: "#f0c800",
       green: "#4CAF50",
-      blue: "#197AC7",
-      purple: "#673AB7",
-      gray: "#777777",
+      blue: "#2196F3",
+      purple: "#9568ED",
+      gray: "#9E9E9E",
     };
   }
 }
