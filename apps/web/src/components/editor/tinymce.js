@@ -210,6 +210,7 @@ function TinyMCE(props) {
         font_formats:
           "Serif=serif; Classic=courier new; Monospace=courier; System font=Open Sans",
         quickbars_selection_toolbar: false,
+        link_context_toolbar: true,
         mobile: {
           toolbar_mode: "scrolling",
         },
@@ -253,6 +254,7 @@ function TinyMCE(props) {
               return;
             }
             editor.getHTML().then((html) => {
+              console.log("GOT CHNAGED");
               onChange(html, editor);
             });
           }, changeInterval);
