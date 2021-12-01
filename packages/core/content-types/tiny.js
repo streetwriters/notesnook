@@ -87,42 +87,51 @@ class Tiny {
 
     for (var i = 0; i < attachmentElements.length; ++i) {
       const attachment = attachmentElements[i];
-      switch (attachment.tagName) {
-        case "IMG": {
-          if (!getDatasetAttribute(attachment, "hash")) {
-            const src = attachment.getAttribute("src");
-            if (!src) continue;
+      try {
+        switch (attachment.tagName) {
+          case "IMG": {
+            if (!getDatasetAttribute(attachment, "hash")) {
+              const src = attachment.getAttribute("src");
+              if (!src) continue;
 
-            const { data, mime } = dataurl.toObject(src);
-            if (!data) continue;
+              const { data, mime } = dataurl.toObject(src);
+              if (!data) continue;
 
-            const type =
-              getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
-            const { key, metadata } = await store(data, "base64");
-            setDatasetAttribute(attachment, "hash", metadata.hash);
+              const type =
+                getDatasetAttribute(attachment, "mime") || mime || "image/jpeg";
+              const { key, metadata } = await store(data, "base64");
+              setDatasetAttribute(attachment, "hash", metadata.hash);
 
-            attachments.push({
-              type,
-              filename:
-                getDatasetAttribute(attachment, "filename") || metadata.hash,
-              ...metadata,
-              key,
-            });
-          } else {
+              attachments.push({
+                type,
+                filename:
+                  getDatasetAttribute(attachment, "filename") || metadata.hash,
+                ...metadata,
+                key,
+              });
+            } else {
+              attachments.push({
+                hash: getDatasetAttribute(attachment, "hash"),
+              });
+            }
+            attachment.removeAttribute("src");
+            break;
+          }
+          default: {
+            if (!getDatasetAttribute(attachment, "hash")) continue;
             attachments.push({
               hash: getDatasetAttribute(attachment, "hash"),
             });
+            break;
           }
-          attachment.removeAttribute("src");
-          break;
         }
-        default: {
-          if (!getDatasetAttribute(attachment, "hash")) continue;
-          attachments.push({
-            hash: getDatasetAttribute(attachment, "hash"),
-          });
-          break;
+      } catch (e) {
+        if (e.message === "bad base-64") {
+          attachment.remove();
+          console.error(e);
+          continue;
         }
+        throw e;
       }
     }
     return { data: document.outerHTML || document.body.innerHTML, attachments };
