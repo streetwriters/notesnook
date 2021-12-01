@@ -263,15 +263,15 @@ test("export note to txt", () =>
 
 test("deleting a colored note should remove it from that color", () =>
   noteTest().then(async ({ db, id }) => {
-    await db.notes.note(id).color("Yellow");
-    let color = db.colors.tag("Yellow");
+    await db.notes.note(id).color("yellow");
+    let color = db.colors.tag("yellow");
 
     expect(color).toBeTruthy();
     expect(color.noteIds.indexOf(id)).toBeGreaterThan(-1);
 
     await db.notes.delete(id);
 
-    color = db.colors.tag("Yellow");
+    color = db.colors.tag("yellow");
     expect(color).toBeFalsy();
     // TODO expect(color.noteIds.indexOf(id)).toBe(-1);
   }));
@@ -337,5 +337,15 @@ test("repairing notebook references should reinclude the missing noteIds", () =>
     await db.notes.repairReferences();
     note = db.notes.note(noteId);
     expect(notebook.topics.all[0].notes.length).toBe(0);
+    expect(note.notebooks.length).toBe(0);
+  }));
+
+test("repairing notebook references should delete non-existent notebooks", () =>
+  noteTest({
+    ...TEST_NOTE,
+    notebooks: [{ id: "hello", topics: ["helloworld"] }],
+  }).then(async ({ db, id }) => {
+    await db.notes.repairReferences();
+    let note = db.notes.note(id);
     expect(note.notebooks.length).toBe(0);
   }));
