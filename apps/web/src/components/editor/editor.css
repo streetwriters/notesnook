@@ -173,6 +173,7 @@
 .mce-content-body [data-mce-selected="inline-boundary"] {
   background-color: var(--shade) !important;
 }
+
 .mce-content-body a[data-mce-selected] {
   box-shadow: none !important;
 }

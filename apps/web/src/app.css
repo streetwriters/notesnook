@@ -95,3 +95,14 @@
   flex: 1;
   opacity: 1;
 }
+
+::-moz-selection {
+  /* Code for Firefox */
+  background-color: var(--primary);
+  color: var(--static);
+}
+
+::selection {
+  background-color: var(--primary);
+  color: var(--static);
+}
