@@ -779,7 +779,11 @@ function AccountStatus(props) {
           : ""}
       </Text>
       {subtitle && <Text variant="subBody">{subtitle}</Text>}
-      {isBasic || isTrial || remainingDays <= 0 ? (
+      {isBasic ||
+      isTrial ||
+      isProExpired ||
+      isProCancelled ||
+      remainingDays <= 0 ? (
         <Button
           variant="primary"
           mt={1}
