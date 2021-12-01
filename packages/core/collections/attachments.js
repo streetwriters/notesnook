@@ -10,11 +10,29 @@ import {
 } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
+import setManipulator from "../utils/set";
 
 export default class Attachments extends Collection {
   constructor(db, name, cached) {
     super(db, name, cached);
     this.key = null;
+  }
+
+  merge(remoteAttachment) {
+    if (remoteAttachment.deleted)
+      return this._collection.addItem(remoteAttachment);
+
+    const id = remoteAttachment.id;
+    let localAttachment = this._collection.getItem(id);
+
+    if (localAttachment && localAttachment.noteIds) {
+      remoteAttachment.noteIds = setManipulator.union(
+        remoteAttachment.noteIds,
+        localAttachment.noteIds
+      );
+    }
+
+    return this._collection.addItem(remoteAttachment);
   }
 
   /**
@@ -36,7 +54,6 @@ export default class Attachments extends Collection {
    */
   async add(attachment, noteId) {
     if (!attachment) return console.error("attachment cannot be undefined");
-    if (attachment.remote) return this._collection.addItem(attachment);
     if (!attachment.hash) throw new Error("Please provide attachment hash.");
 
     const oldAttachment = this.all.find(

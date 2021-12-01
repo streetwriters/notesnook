@@ -4,9 +4,7 @@ import {
   noteTest,
   notebookTest,
 } from "./utils";
-import v4Backup from "./__fixtures__/backup.v4.json";
-import v42Backup from "./__fixtures__/backup.v4.2.json";
-import v43Backup from "./__fixtures__/backup.v4.3.json";
+import v52Backup from "./__fixtures__/backup.v5.2.json";
 
 beforeEach(() => {
   StorageInterface.clear();
@@ -66,54 +64,52 @@ test("import tempered backup", () =>
     })
   ));
 
-describe.each([
-  ["v4", v4Backup],
-  ["v4.2", v42Backup],
-  ["v4.3", v43Backup],
-])("testing backup version: %s", (version, data) => {
-  test(`import ${version} backup`, () => {
-    return databaseTest().then(async (db) => {
-      await db.backup.import(JSON.stringify(data));
+describe.each([["v5.2", v52Backup]])(
+  "testing backup version: %s",
+  (version, data) => {
+    test(`import ${version} backup`, () => {
+      return databaseTest().then(async (db) => {
+        await db.backup.import(JSON.stringify(data));
 
-      expect(db.settings.raw.id).toBeDefined();
+        expect(db.settings.raw.id).toBeDefined();
 
-      expect(
-        db.notes.all.every((v) => {
-          const doesNotHaveContent = v.contentId && !v.content;
-          const doesNotHaveColors = !v.colors && (!v.color || v.color.length);
-          const hasTopicsInAllNotebooks =
-            !v.notebooks ||
-            v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
-          return (
-            doesNotHaveContent &&
-            !v.notebook &&
-            hasTopicsInAllNotebooks &&
-            doesNotHaveColors
-          );
-        })
-      ).toBeTruthy();
+        expect(
+          db.notes.all.every((v) => {
+            const doesNotHaveContent = v.contentId && !v.content;
+            const doesNotHaveColors = !v.colors && (!v.color || v.color.length);
+            const hasTopicsInAllNotebooks =
+              !v.notebooks ||
+              v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
+            return (
+              doesNotHaveContent &&
+              !v.notebook &&
+              hasTopicsInAllNotebooks &&
+              doesNotHaveColors
+            );
+          })
+        ).toBeTruthy();
 
-      expect(db.notebooks.all.every((v) => v.title != null)).toBeTruthy();
+        expect(db.notebooks.all.every((v) => v.title != null)).toBeTruthy();
 
-      const allContent = await db.content.all();
-      expect(
-        allContent.every((v) => v.type === "tiny" || v.deleted)
-      ).toBeTruthy();
+        const allContent = await db.content.all();
+        expect(
+          allContent.every((v) => v.type === "tiny" || v.deleted)
+        ).toBeTruthy();
+      });
     });
-  });
 
-  test(`verify indices of ${version} backup`, () => {
-    return databaseTest().then(async (db) => {
-      await db.backup.import(JSON.stringify(data));
+    test(`verify indices of ${version} backup`, () => {
+      return databaseTest().then(async (db) => {
+        await db.backup.import(JSON.stringify(data));
 
-      verifyIndex(data, db, "notes", "notes");
-      verifyIndex(data, db, "notebooks", "notebooks");
-      verifyIndex(data, db, "delta", "content");
-      verifyIndex(data, db, "content", "content");
-      // verifyIndex(data, db, "trash", "trash");
+        verifyIndex(data, db, "notes", "notes");
+        verifyIndex(data, db, "notebooks", "notebooks");
+        verifyIndex(data, db, "content", "content");
+        // verifyIndex(data, db, "trash", "trash");
+      });
     });
-  });
-});
+  }
+);
 
 function verifyIndex(backup, db, backupCollection, collection) {
   if (!backup.data[backupCollection]) return;
