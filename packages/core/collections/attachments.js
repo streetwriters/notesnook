@@ -226,30 +226,22 @@ export default class Attachments extends Collection {
     );
     try {
       for (let i = 0; i < attachments.length; i++) {
-        const { metadata, chunkSize } = attachments[i];
-        await this._downloadMedia(
-          metadata.hash,
-          chunkSize,
-          {
-            total: attachments.length,
-            current: i,
-            groupId: noteId,
-          },
-          metadata
-        );
+        const attachment = attachments[i];
+        await this._downloadMedia(attachment, {
+          total: attachments.length,
+          current: i,
+          groupId: noteId,
+        });
       }
     } finally {
       sendAttachmentsProgressEvent("download", noteId, attachments.length);
     }
   }
 
-  async _downloadMedia(
-    filename,
-    chunkSize,
-    { total, current, groupId },
-    metadata,
-    notify = true
-  ) {
+  async _downloadMedia(attachment, { total, current, groupId }, notify = true) {
+    const { metadata, chunkSize } = attachment;
+    const filename = metadata.hash;
+
     sendAttachmentsProgressEvent("download", groupId, total, current);
     const isDownloaded = await this._db.fs.downloadFile(
       groupId,

@@ -76,16 +76,15 @@ export default class Content extends Collection {
       const attachment = this._db.attachments.attachment(hash);
       if (!attachment) return;
 
-      const metadata = attachment.metadata;
       const progressData = {
         total,
         current,
         groupId,
       };
+
       return this._db.attachments._downloadMedia(
-        metadata.hash,
+        attachment,
         progressData,
-        metadata,
         notify
       );
     });

@@ -125,7 +125,7 @@ class Merger {
           noteIds
         );
       }
-      await this._db.attachments.add(remoteAttachment);
+      await this._db.attachments.merge(remoteAttachment);
     });
 
     await this._mergeArray(
