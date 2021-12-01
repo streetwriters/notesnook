@@ -136,6 +136,7 @@ function init_tiny(size) {
       'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
     ],
     toolbar: false,
+    keep_styles:false,
     paste_data_images: true,
     statusbar: false,
     textpattern_patterns: markdownPatterns,
