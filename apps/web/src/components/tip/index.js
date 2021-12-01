@@ -7,7 +7,7 @@ function TextWithTip({ text, tip, sx, color }) {
       <Text
         color={"fontTertiary"}
         fontSize="subBody"
-        sx={{ wordBreak: "break-all", whiteSpace: "pre-wrap" }}
+        sx={{ wordBreak: "break-word", whiteSpace: "pre-wrap" }}
       >
         {tip}
       </Text>
