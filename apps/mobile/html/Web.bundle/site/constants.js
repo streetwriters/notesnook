@@ -222,6 +222,12 @@ function setTheme() {
       background: none !important;
       border-bottom: 1px solid ${pageTheme.colors.nav} !important;
     }
+
+    ::selection {
+      color: white !important;
+      background: ${pageTheme.colors.accent} !important;
+    }
+    
     
  
     `;
@@ -260,6 +266,13 @@ function setTheme() {
 .mce-content-body [data-mce-selected="inline-boundary"] {
   background-color: ${pageTheme.colors.shade} !important;
 }
+
+::selection {
+  color: white !important;
+  background: ${pageTheme.colors.accent} !important;
+}
+  
+
 .mce-content-body a[data-mce-selected] {
   box-shadow: none !important;
 }
