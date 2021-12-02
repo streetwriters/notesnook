@@ -136,14 +136,11 @@ export async function clearTimer(clear) {
 }
 
 export const CHECK_STATUS = `(function() {
-       setTimeout(() => {
         let msg = JSON.stringify({
           data: true,
           type: 'running',
         });
         window.ReactNativeWebView.postMessage(msg)
-
-       },${Platform.OS === 'ios' ? '300' : '1'})
 })();`;
 
 const request_content = `(function() {
@@ -302,15 +299,12 @@ export const loadNote = async item => {
     editing.isFocused = false;
     console.log('opening note');
     setTimeout(async () => {
-      if (await checkStatus(true)) {
-        console.log('status checked');
-        requestedReload = true;
-        EditorWebView.current?.reload();
-      } else {
-        eSendEvent('webviewreset');
-      }
-      useEditorStore.getState().setCurrentlyEditingNote(item.id);
+      requestedReload = true;
+      EditorWebView.current?.reload();
     }, 1);
+    setTimeout(() => {
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    }, 300);
   }
 };
 
@@ -336,6 +330,7 @@ const checkStatus = async noreset => {
     );
 
     webviewTimer = setTimeout(() => {
+      console.log('timeout has ended');
       if (!webviewOK && !noreset) {
         console.log('webview not ok', 'ERROR');
         webviewInit = false;
@@ -361,7 +356,6 @@ export const _onMessage = async evt => {
       eSendEvent('historyEvent', message.value);
       break;
     case 'tiny':
-      console.log(message.value);
       if (message.value === '<br>') return;
       if (message.value !== content.data) {
         if (prevNoteContent && message.value === prevNoteContent) {
@@ -422,6 +416,7 @@ export const _onMessage = async evt => {
       if (!requestedReload && getNote()) return;
       requestedReload = false;
       setColors(COLOR_SCHEME);
+      eSendEvent('webviewOk');
       webviewInit = true;
       webviewOK = true;
       if (PremiumService.get()) {
@@ -734,7 +729,6 @@ const loadNoteInEditor = async (keepHistory = true) => {
     `
         );
       } else {
-        console.log('opening in editor', content.data);
         post('html', content.data);
       }
       if (id) {
