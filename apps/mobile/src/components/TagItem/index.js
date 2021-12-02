@@ -65,7 +65,7 @@ const TagItem = ({item, index}) => {
         </Heading>
         <Paragraph
           color={colors.icon}
-          size={SIZE.xs}
+          size={SIZE.xs + 1}
           style={{
             marginTop: 5
           }}>
