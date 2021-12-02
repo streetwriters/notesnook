@@ -254,7 +254,6 @@ function TinyMCE(props) {
             if (!editor.getHTML) return;
 
             editor.getHTML().then((html) => {
-              console.log("GOT CHNAGED");
               onChange(html, editor);
             });
           }, changeInterval);
