@@ -67,11 +67,39 @@ function Toolbar(props) {
   const tools = useMemo(
     () => [
       {
+        title: isNotePublished ? "Published" : "Publish",
+        icon: isNotePublished ? Icon.Published : Icon.Publish,
+        hidden: !sessionId,
+        enabled: !isLocked,
+        onClick: () => showPublishView(store.get().session.id, "top"),
+      },
+    ],
+    [sessionId, isLocked, isNotePublished]
+  );
+
+  const inlineTools = useMemo(
+    () => [
+      {
         title: theme === "Dark" ? "Light mode" : "Dark mode",
         icon: Icon.Theme,
         hidden: !isFocusMode,
         enabled: true,
         onClick: () => toggleNightMode(),
+      },
+
+      {
+        title: isFocusMode ? "Normal mode" : "Focus mode",
+        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
+        enabled: true,
+        hideOnMobile: true,
+        onClick: () => {
+          toggleFocusMode();
+          if (isFullscreen) {
+            exitFullscreen(document);
+            setIsFullscreen(false);
+          }
+          if (tinymce.activeEditor) tinymce.activeEditor.focus();
+        },
       },
       {
         title: isFullscreen ? "Exit fullscreen" : "Enter fullscreen",
@@ -89,20 +117,6 @@ function Toolbar(props) {
         },
       },
       {
-        title: isFocusMode ? "Normal mode" : "Focus mode",
-        icon: isFocusMode ? Icon.NormalMode : Icon.FocusMode,
-        enabled: true,
-        hideOnMobile: true,
-        onClick: () => {
-          toggleFocusMode();
-          if (isFullscreen) {
-            exitFullscreen(document);
-            setIsFullscreen(false);
-          }
-          if (tinymce.activeEditor) tinymce.activeEditor.focus();
-        },
-      },
-      {
         title: "Undo",
         icon: Icon.Undo,
         enabled: undoable,
@@ -115,13 +129,6 @@ function Toolbar(props) {
         enabled: redoable,
         hidden: !sessionId,
         onClick: () => tinymce.activeEditor.execCommand("Redo"),
-      },
-      {
-        title: isNotePublished ? "Published" : "Publish",
-        icon: isNotePublished ? Icon.Published : Icon.Publish,
-        hidden: !sessionId,
-        enabled: !isLocked,
-        onClick: () => showPublishView(store.get().session.id, "top"),
       },
       {
         title: "Properties",
@@ -138,10 +145,8 @@ function Toolbar(props) {
       toggleFocusMode,
       toggleProperties,
       isFocusMode,
-      isLocked,
       theme,
       toggleNightMode,
-      isNotePublished,
       sessionId,
     ]
   );
@@ -194,16 +199,16 @@ function Toolbar(props) {
           }}
         />
       </Flex>
-      <Flex alignItems="center" justifyContent="flex-end">
+      <Flex>
         {tools.map((tool) => (
           <Button
             data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
             disabled={!tool.enabled}
             variant="tool"
             flexShrink={0}
-            ml={2}
             title={tool.title}
             key={tool.title}
+            mr={1}
             sx={{
               display: [
                 tool.hideOnMobile ? "none" : "flex",
@@ -220,22 +225,54 @@ function Toolbar(props) {
             <Text display={["none", "none", "block"]} variant="body" ml={1}>
               {tool.title}
             </Text>
-            {tool.new && (
-              <Text
-                variant="subBody"
-                fontSize={10}
-                ml={1}
-                bg="primary"
-                color="static"
-                px={"3px"}
-                py="1px"
-                sx={{ borderRadius: "default" }}
-              >
-                NEW
-              </Text>
-            )}
           </Button>
         ))}
+        <Flex
+          alignItems="center"
+          justifyContent="flex-end"
+          bg="bgSecondary"
+          sx={{ borderRadius: "default", overflow: "hidden" }}
+        >
+          {inlineTools.map((tool) => (
+            <Button
+              data-test-id={tool.title.toLowerCase().replace(/ /g, "-")}
+              disabled={!tool.enabled}
+              variant="tool"
+              bg="transparent"
+              flexShrink={0}
+              title={tool.title}
+              key={tool.title}
+              sx={{
+                borderRadius: 0,
+                display: [
+                  tool.hideOnMobile ? "none" : "flex",
+                  tool.hidden ? "none" : "flex",
+                ],
+                color: tool.enabled ? "text" : "disabled",
+                cursor: tool.enabled ? "pointer" : "not-allowed",
+              }}
+              onClick={tool.onClick}
+              flexDirection="row"
+              alignItems="center"
+            >
+              <tool.icon size={18} color={tool.enabled ? "text" : "disabled"} />
+              {tool.new && (
+                <Text
+                  variant="subBody"
+                  fontSize={10}
+                  ml={1}
+                  bg="primary"
+                  color="static"
+                  px={"3px"}
+                  py="1px"
+                  sx={{ borderRadius: "default" }}
+                >
+                  NEW
+                </Text>
+              )}
+            </Button>
+          ))}
+        </Flex>
       </Flex>
     </Flex>
   );
