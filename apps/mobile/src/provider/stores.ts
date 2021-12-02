@@ -2,7 +2,7 @@ import {Platform} from 'react-native';
 import {Dimensions} from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import {history, SUBSCRIPTION_STATUS} from '../utils';
+import {APP_VERSION, history, SUBSCRIPTION_STATUS} from '../utils';
 import {db} from '../utils/database';
 import {MMKV} from '../utils/mmkv';
 import {
@@ -417,6 +417,11 @@ async function shouldShowAnnouncement(announcement) {
   let show = announcement.platforms.some(
     platform => allowedPlatforms.indexOf(platform) > -1
   );
+
+  if (announcement.version) {
+    return announcement.version === APP_VERSION;
+  }
+
   if (!show) return false;
   const subStatus = PremiumService.getUser()?.subscription?.type;
   show = announcement.userTypes.some(userType => {
