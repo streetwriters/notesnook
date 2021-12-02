@@ -1,4 +1,4 @@
-import React, { Fragment } from 'react';
+import React from 'react';
 import {View} from 'react-native';
 import {allowedPlatforms} from '../../provider/stores';
 import {ProFeatures} from '../ResultDialog/pro-features';
@@ -47,7 +47,6 @@ const renderItems = {
   title: Title,
   description: Description,
   body: Body,
-  text:Body,
   image: Photo,
   list: List,
   subheading: SubHeading,
@@ -56,7 +55,7 @@ const renderItems = {
 };
 
 export const renderItem = ({item, index, color,inline}) => {
-  const Item = renderItems[item.type] || Fragment
+  const Item = renderItems[item.type];
 
   return <Item key={item.text || item.src || item.type} {...item} index={index} color={color} inline={inline} />;
 };

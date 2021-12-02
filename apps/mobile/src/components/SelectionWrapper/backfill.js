@@ -1,8 +1,11 @@
 import React from 'react';
-import { View } from 'react-native';
-import { useTracked } from '../../provider';
+import {View} from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {useTracked} from '../../provider';
 import { useEditorStore } from '../../provider/stores';
-import { hexToRGBA } from '../../utils/ColorUtils';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import Heading from '../Typography/Heading';
 
 export const Filler = ({item, background}) => {
   const [state] = useTracked();

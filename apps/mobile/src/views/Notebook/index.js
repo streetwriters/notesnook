@@ -5,7 +5,6 @@ import { ContainerTopSection } from '../../components/Container/ContainerTopSect
 import { Header } from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { NotebookHeader } from '../../components/SimpleList/notebook-header';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -28,7 +27,6 @@ export const Notebook = ({route, navigation}) => {
       db.settings.getGroupOptions('topics')
     )
   );
-  console.log('params',route?.params.notebook?.topics)
   const params = useRef(route?.params);
 
   const onLoad = data => {
@@ -94,13 +92,20 @@ export const Notebook = ({route, navigation}) => {
   return (
     <>
       <SelectionHeader screen="Notebook" />
-
       <ContainerTopSection>
         <Header
           title={params.current.title}
           isBack={!params.current.menu}
           screen="Notebook"
           action={_onPressBottomButton}
+          rightButtons={[
+            {
+              icon: 'pencil',
+              title: 'Edit notebook',
+              func: () =>
+                eSendEvent(eOpenAddNotebookDialog, params.current.notebook)
+            }
+          ]}
         />
       </ContainerTopSection>
       <SimpleList
@@ -118,15 +123,6 @@ export const Notebook = ({route, navigation}) => {
           },
           icon: 'pencil'
         }}
-        ListHeader={
-          <NotebookHeader
-            onEditNotebook={() => {
-              eSendEvent(eOpenAddNotebookDialog, params.current.notebook);
-            }}
-            onPress={_onPressBottomButton}
-            notebook={params.current.notebook}
-          />
-        }
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: params.current.notebook.title,

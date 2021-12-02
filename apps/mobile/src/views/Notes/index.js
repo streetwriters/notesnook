@@ -24,7 +24,7 @@ import {
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {tabBarRef} from '../../utils/Refs';
-import {getNote} from '../Editor/Functions';
+import { getNote } from '../Editor/Functions';
 
 const getNotes = params => {
   if (!params) return [];
@@ -170,7 +170,7 @@ export const Notes = ({route, navigation}) => {
         eSendEvent(eOnLoadNote, {type: 'new'});
         editing.currentlyEditing = true;
         editing.movedAway = false;
-      }
+       }
       tabBarRef.current?.goToPage(1);
     } else {
       eSendEvent(eOnLoadNote, {type: 'new'});
@@ -190,7 +190,7 @@ export const Notes = ({route, navigation}) => {
     onPress: () => {
       if (params.current?.type !== 'topic') return;
       eSendEvent(eOpenAddTopicDialog, {
-        notebookId: params.current?.notebookId,
+        notebookId: params.current?.notebookId,      
         toEdit: params.current
       });
     },
@@ -253,10 +253,6 @@ export const Notes = ({route, navigation}) => {
           isBack={!params.current?.menu}
           screen="NotesPage"
           action={_onPressBottomButton}
-          notebook={
-            params.current?.notebookId &&
-            db.notebooks?.notebook(params.current?.notebookId).data
-          }
           rightButtons={
             params.current?.type !== 'topic' ? null : headerRightButtons
           }

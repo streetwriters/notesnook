@@ -41,8 +41,7 @@ const SimpleList = ({
   headerProps = {
     heading: 'Home'
   },
-  screen,
-  ListHeader
+  screen
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -104,10 +103,10 @@ const SimpleList = ({
 
   let styles = {
     height: '100%',
+    backgroundColor: colors.bg,
     width: '100%',
     minHeight: 1,
-    minWidth: 1,
-    backgroundColor:colors.bg
+    minWidth: 1
   };
 
   const _keyExtractor = item => item.id || item.title;
@@ -148,19 +147,15 @@ const SimpleList = ({
         ListFooterComponent={<Footer />}
         ListHeaderComponent={
           <>
-            {ListHeader ? (
-              ListHeader
-            ) : (
-              <Header
-                title={headerProps.heading}
-                paragraph={headerProps.paragraph}
-                onPress={headerProps.onPress}
-                icon={headerProps.icon}
-                color={headerProps.color}
-                type={type}
-                screen={screen}
-              />
-            )}
+            <Header
+              title={headerProps.heading}
+              paragraph={headerProps.paragraph}
+              onPress={headerProps.onPress}
+              icon={headerProps.icon}
+              color={headerProps.color}
+              type={type}
+              screen={screen}
+            />
           </>
         }
       />

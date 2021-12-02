@@ -112,6 +112,7 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.userSessionExpired, onSessionExpired);
     EV.subscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
     EV.subscribe(EVENTS.userSubscriptionUpdated, onAccountStatusChange);
+    EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
 
@@ -132,6 +133,7 @@ export const useAppEvents = () => {
       EV.unsubscribe(EVENTS.databaseSyncRequested, partialSync);
       EV.unsubscribe(EVENTS.userLoggedOut, onLogout);
       EV.unsubscribe(EVENTS.userEmailConfirmed, onEmailVerified);
+      EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
       EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
       EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
       EV.unsubscribe(EVENTS.userCheckStatus, PremiumService.onUserStatusCheck);
@@ -157,8 +159,7 @@ export const useAppEvents = () => {
         Navigation.routeNames.Trash,
         Navigation.routeNames.Notebook
       ]);
-       eSendEvent(eClearEditor, id);
- 
+      eSendEvent(eClearEditor);
     } catch (e) {}
   };
 
@@ -204,7 +205,6 @@ export const useAppEvents = () => {
     try {
       if (url.startsWith('https://app.notesnook.com/account/verified')) {
         await onEmailVerified();
-      
       } else {
         return;
       }

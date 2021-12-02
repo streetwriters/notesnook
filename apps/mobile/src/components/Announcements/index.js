@@ -2,14 +2,13 @@ import React, {useEffect, useState} from 'react';
 import {FlatList, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {useMessageStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {
   eCloseAnnouncementDialog,
   eOpenAnnouncementDialog
 } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
-import {allowedOnPlatform, renderItem} from './functions';
+import {renderItem} from './functions';
 
 export const AnnouncementDialog = () => {
   const [state] = useTracked();
@@ -29,6 +28,7 @@ export const AnnouncementDialog = () => {
 
   const open = data => {
     setInfo(data);
+    console.log(info);
     setVisible(true);
   };
 
@@ -49,18 +49,15 @@ export const AnnouncementDialog = () => {
       visible={visible}>
       <View
         style={{
-          width: DDS.isTab ? 600 : '100%',
+          width: '100%',
           backgroundColor: colors.bg,
-          maxHeight: DDS.isTab ? '90%' : '100%',
-          borderRadius: DDS.isTab ? 10 : 0,
-          overflow: 'hidden',
-          marginBottom: DDS.isTab ? 20 : 0
+          maxHeight: '100%'
         }}>
         <FlatList
           style={{
             width: '100%'
           }}
-          data={info?.body.filter(item => allowedOnPlatform(item.platforms))}
+          data={info?.body}
           renderItem={renderItem}
         />
 

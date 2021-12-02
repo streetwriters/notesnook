@@ -14,7 +14,6 @@ info = document.querySelector(infoBar);
 info.querySelector('#infosaved').innerText = "";
 info.querySelector('#infodate').innerText = "";
 info.querySelector('#infowords').innerText = ""
-updateInfoBar()
 document.activeElement.blur();
 window.blur();
 `;
@@ -73,7 +72,6 @@ const updateDateEdited = value => `
 	(function() {
 		info = document.querySelector(infoBar);
         info.querySelector('#infodate').innerText = "${value}";
-        updateInfoBar()
 	})();
 `;
 
@@ -81,7 +79,6 @@ const updateSavingState = value => `
 	(function() {
 		info = document.querySelector(infoBar);
     info.querySelector('#infosaved').innerText = "${value}";
-    updateInfoBar()
 	})();
 `;
 
