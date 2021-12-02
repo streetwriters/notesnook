@@ -2,7 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import {TextInput, View} from 'react-native';
 import {Button} from '../../../../components/Button';
 import {useTracked} from '../../../../provider';
-import {eSendEvent} from '../../../../services/EventManager';
+import {eSendEvent, ToastEvent} from '../../../../services/EventManager';
 import {editing} from '../../../../utils';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {EditorWebView} from '../../Functions';
@@ -15,6 +15,7 @@ import {
   properties
 } from './constants';
 import LinkPreview from './linkpreview';
+import validator from 'validator';
 
 let inputValue = null;
 
@@ -48,10 +49,16 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       if (properties.pauseSelectionChange) {
         setTimeout(() => {
           properties.pauseSelectionChange = false;
-        }, 500);
+        }, 1000);
       }
       inputRef.current?.focus();
       return;
+    } else {
+      if (properties.pauseSelectionChange) {
+        setTimeout(() => {
+          properties.pauseSelectionChange = false;
+        }, 1000);
+      }
     }
   }, [mode]);
 
@@ -63,11 +70,21 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
     if (value === 'clear') {
       inputValue = null;
     }
-    properties.userBlur = true;
     if (inputValue === '' || !inputValue) {
+      properties.userBlur = true;
       formatSelection(execCommands.unlink);
       setVisible(false);
     } else {
+      if (!inputValue.includes('://')) inputValue = 'https://' + inputValue;
+      if (!validator.isURL(inputValue)) {
+        ToastEvent.show({
+          heading: 'Invalid url',
+          message: 'Please enter a valid url',
+          type: 'error'
+        });
+        return;
+      }
+      properties.userBlur = true;
       formatSelection(execCommands[format](inputValue));
     }
 
@@ -110,8 +127,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               flexWrap: 'wrap',
               fontSize: SIZE.sm,
               flexShrink: 1,
-              minWidth:'80%',
-              fontFamily:"OpenSans-Regular"
+              minWidth: '80%',
+              fontFamily: 'OpenSans-Regular'
             }}
             autoCapitalize="none"
             autoCorrect={false}
