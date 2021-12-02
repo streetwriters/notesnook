@@ -418,8 +418,8 @@ async function shouldShowAnnouncement(announcement) {
     platform => allowedPlatforms.indexOf(platform) > -1
   );
 
-  if (announcement.version) {
-    return announcement.version === APP_VERSION;
+  if (announcement.appVersion) {
+    return announcement.appVersion === APP_VERSION;
   }
 
   if (!show) return false;
