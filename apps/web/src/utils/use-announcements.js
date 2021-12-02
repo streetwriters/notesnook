@@ -67,7 +67,7 @@ async function shouldShowAnnouncement(announcement) {
   show = announcement.userTypes.some((userType) => {
     switch (userType) {
       case "pro":
-        return isUserPremium();
+        return isUserPremium(user);
       case "trial":
         return subStatus === SUBSCRIPTION_STATUS.TRIAL;
       case "trialExpired":
