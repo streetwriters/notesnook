@@ -7,8 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
+import {useTracked} from '../../provider';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
-import { BouncingView } from '../ActionSheetComponent/BouncingView';
+import {BouncingView} from '../ActionSheetComponent/BouncingView';
 
 const BaseDialog = ({
   visible,

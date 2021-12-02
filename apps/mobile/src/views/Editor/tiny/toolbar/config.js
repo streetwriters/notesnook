@@ -59,7 +59,7 @@ export const IMAGE_TOOLTIP_CONFIG = {
   default: null,
   type: 'imageoptions',
   pageX: 0
-};
+}
 
 export const TOOLBAR_CONFIG = [
   [
@@ -93,7 +93,6 @@ export const TOOLBAR_CONFIG = [
       type: 'tooltip',
       valueIcon: 'alignleft',
       fullname: 'Text Alignment',
-      premium: true,
       group: [
         {
           format: 'alignleft',
@@ -386,7 +385,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
   [
-    /*  {
+   /*  {
       format: 'filepicker',
       type: 'format',
       fullname: 'Attach file',

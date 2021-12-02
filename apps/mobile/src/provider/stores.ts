@@ -364,11 +364,9 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log("ERROR",e);
       set({announcements: []});
     } finally {
       let all = await getFiltered(announcements);
-      console.log("all", all)
       set({
         announcements: all.filter(a => a.type === 'inline'),
         dialogs: all.filter(a => a.type === 'dialog')
@@ -417,7 +415,9 @@ async function shouldShowAnnouncement(announcement) {
   let show = announcement.platforms.some(
     platform => allowedPlatforms.indexOf(platform) > -1
   );
+
   if (!show) return false;
+
   const subStatus = PremiumService.getUser()?.subscription?.type;
   show = announcement.userTypes.some(userType => {
     switch (userType) {
@@ -428,15 +428,22 @@ async function shouldShowAnnouncement(announcement) {
       case 'trialExpired':
         return subStatus === SUBSCRIPTION_STATUS.BASIC;
       case 'loggedOut':
-        return !PremiumService.getUser();
+        show = !PremiumService.getUser();
+        break;
       case 'verified':
-        return PremiumService.getUser()?.isEmailVerified;
+        show = PremiumService.getUser()?.isEmailVerified;
+        break;
       case 'loggedIn':
-        return !!PremiumService.getUser();
+        show = !!PremiumService.getUser();
+        break;
       case 'unverified':
-        return !PremiumService.getUser()?.isEmailVerified;
+        show = !PremiumService.getUser()?.isEmailVerified;
+        break;
       case 'proExpired':
-        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+        show =
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+        break;
       case 'any':
       default:
         return true;

@@ -12,7 +12,7 @@ import {HeaderRightMenu} from './HeaderRightMenu';
 import {Title} from './title';
 
 export const Header = React.memo(
-  ({root, title, screen, isBack, color, action, rightButtons,notebook}) => {
+  ({root, title, screen, isBack, color, action, rightButtons}) => {
     const [state] = useTracked();
     const {colors} = state;
     const insets = useSafeAreaInsets();
@@ -52,7 +52,6 @@ export const Header = React.memo(
 
           {screen !== 'Search' ? (
             <Title
-              notebook={notebook}
               headerColor={color}
               heading={title}
               screen={screen}
