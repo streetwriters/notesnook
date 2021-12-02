@@ -92,7 +92,8 @@ function NotebookHeader({ notebook }) {
         </Text>
       )}
       <Text as="em" variant="subBody" mt={2}>
-        {topics.length} topic, {getTotalNotes(notebook)} notes
+        {topics.length} {topics.length > 1 ? "topics" : "topic"},{" "}
+        {getTotalNotes(notebook)} {topics.length > 1 ? "notes" : "note"}
       </Text>
     </Flex>
   );
