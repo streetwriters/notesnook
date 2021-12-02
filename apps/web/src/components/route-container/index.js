@@ -48,7 +48,7 @@ function Header(props) {
     (store) => store.toggleSelectionMode
   );
 
-  if (!title && !subtitle) return null;
+  // if (!subtitle) return null;
   return (
     <Flex mx={2} flexDirection="column" justifyContent="center">
       <Flex alignItems="center" justifyContent="space-between">
@@ -75,11 +75,14 @@ function Header(props) {
               size={30}
             />
           )}
-          <RouteTitle
-            title={title}
-            isEditable={isEditable}
-            onChange={onChange}
-          />
+          {title && (
+            <RouteTitle
+              subtitle={subtitle}
+              title={title}
+              isEditable={isEditable}
+              onChange={onChange}
+            />
+          )}
         </Flex>
         <SelectionOptions options={SELECTION_OPTIONS_MAP[type]} />
         {!isSelectionMode && (
@@ -111,18 +114,6 @@ function Header(props) {
           </Flex>
         )}
       </Flex>
-      {subtitle && (
-        <Text
-          variant="title"
-          color="primary"
-          sx={{
-            marginBottom: 2,
-            cursor: "normal",
-          }}
-        >
-          {subtitle}
-        </Text>
-      )}
       {isSelectionMode && (
         <Flex
           mb={2}
@@ -165,7 +156,7 @@ function SelectionOptions(props) {
   );
 }
 
-function RouteTitle({ title, isEditable, onChange }) {
+function RouteTitle({ title, subtitle, isEditable, onChange }) {
   const [isEditing, setIsEditing] = useState(false);
   const ref = useRef();
   useEffect(() => {
@@ -173,45 +164,48 @@ function RouteTitle({ title, isEditable, onChange }) {
   }, [title]);
 
   return (
-    <Input
-      ref={ref}
-      variant="heading"
-      data-test-id="routeHeader"
-      color={"text"}
-      title={title}
-      sx={{
-        overflow: "hidden",
-        textOverflow: isEditing ? "initial" : "ellipsis",
-        whiteSpace: "nowrap",
+    <Flex flexDirection="column">
+      {subtitle && <Text variant="subBody">{subtitle}</Text>}
+      <Input
+        ref={ref}
+        variant="clean"
+        data-test-id="routeHeader"
+        color={"text"}
+        title={title}
+        sx={{
+          overflow: "hidden",
+          textOverflow: isEditing ? "initial" : "ellipsis",
+          whiteSpace: "nowrap",
 
-        p: 0,
-        m: 0,
-        fontWeight: "bold",
-        fontFamily: "heading",
-        fontSize: "heading",
-        border: "none",
-        bg: isEditing ? "bgSecondary" : "transparent",
+          p: 0,
+          m: 0,
+          fontWeight: "bold",
+          fontFamily: "heading",
+          fontSize: subtitle ? "subheading" : "heading",
+          border: "none",
+          bg: isEditing ? "bgSecondary" : "transparent",
 
-        ":focus-visible": { outline: "none" },
-      }}
-      onDoubleClick={(e) => {
-        setIsEditing(isEditable && true);
-        e.target.focus();
-      }}
-      onKeyUp={(e) => {
-        if (e.key === "Escape") {
-          e.target.value = title;
-          setIsEditing(false);
-        } else if (e.key === "Enter") {
+          ":focus-visible": { outline: "none" },
+        }}
+        onDoubleClick={(e) => {
+          setIsEditing(isEditable && true);
+          e.target.focus();
+        }}
+        onKeyUp={(e) => {
+          if (e.key === "Escape") {
+            e.target.value = title;
+            setIsEditing(false);
+          } else if (e.key === "Enter") {
+            if (onChange) onChange(e.target.value);
+            setIsEditing(false);
+          }
+        }}
+        onBlur={(e) => {
           if (onChange) onChange(e.target.value);
           setIsEditing(false);
-        }
-      }}
-      onBlur={(e) => {
-        if (onChange) onChange(e.target.value);
-        setIsEditing(false);
-      }}
-      readOnly={!isEditing}
-    />
+        }}
+        readOnly={!isEditing}
+      />
+    </Flex>
   );
 }

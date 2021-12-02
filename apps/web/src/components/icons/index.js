@@ -123,6 +123,8 @@ import {
   mdiFirefox,
   mdiAppleSafari,
   mdiBugOutline,
+  mdiLinkVariant,
+  mdiLinkVariantOff,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -149,6 +151,7 @@ function createIcon(name, rotate = false) {
     const [isHovering, setIsHovering] = useState();
     return (
       <AnimatedFlex
+        flexShrink={0}
         id={props.id}
         title={props.title}
         variant={props.variant}
@@ -312,3 +315,5 @@ export const Anonymous = createIcon(mdiIncognito);
 export const CloudLock = createIcon(mdiCloudLockOutline);
 export const Timebomb = createIcon(mdiBomb);
 export const Issue = createIcon(mdiBugOutline);
+export const ShortcutLink = createIcon(mdiLinkVariant);
+export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);

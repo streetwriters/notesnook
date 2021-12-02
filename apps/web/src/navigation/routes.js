@@ -44,12 +44,6 @@ const routes = {
     return {
       key: "topics",
       type: "topics",
-      title: notebook.title,
-      isEditable: true,
-      onChange: (title) => {
-        db.notebooks.add({ id: notebookId, title });
-        showToast("success", "Notebook title updated!");
-      },
       component: <Topics />,
       buttons: {
         back: {

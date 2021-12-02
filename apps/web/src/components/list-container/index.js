@@ -12,7 +12,7 @@ import Announcements from "../announcements";
 import useAnnouncements from "../../utils/use-announcements";
 
 function ListContainer(props) {
-  const { type, groupType, items, context, refresh } = props;
+  const { type, groupType, items, context, refresh, header } = props;
   const [announcements, removeAnnouncement] = useAnnouncements();
   const profile = useMemo(() => ListProfiles[type], [type]);
   const shouldSelectAll = useSelectionStore((store) => store.shouldSelectAll);
@@ -27,9 +27,12 @@ function ListContainer(props) {
   return (
     <Flex variant="columnFill">
       {!props.items.length && props.placeholder ? (
-        <Flex variant="columnCenterFill">
-          {props.isLoading ? <Icon.Loading rotate /> : <props.placeholder />}
-        </Flex>
+        <>
+          {header}
+          <Flex variant="columnCenterFill">
+            {props.isLoading ? <Icon.Loading rotate /> : <props.placeholder />}
+          </Flex>
+        </>
       ) : (
         <>
           <Flex variant="columnFill" data-test-id="note-list">
@@ -43,7 +46,9 @@ function ListContainer(props) {
               components={{
                 Scroller: CustomScrollbarsVirtualList,
                 Header: () =>
-                  announcements.length ? (
+                  header ? (
+                    header
+                  ) : announcements.length ? (
                     <Announcements
                       announcements={announcements}
                       removeAnnouncement={removeAnnouncement}
