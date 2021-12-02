@@ -1,5 +1,5 @@
 import { Box, Button, Text } from "rebass";
-import { Circle } from "../icons";
+import { Loading } from "../icons";
 
 function StatusBar() {
   return (
@@ -15,9 +15,9 @@ function StatusBar() {
         display="flex"
         sx={{ alignItems: "center", justifyContent: "center" }}
       >
-        <Circle size={7} color="error" />
+        <Loading size={12} />
         <Text variant="subBody" color="bgSecondaryText" ml={1}>
-          Not logged in
+          Loading
         </Text>
       </Button>
     </Box>
