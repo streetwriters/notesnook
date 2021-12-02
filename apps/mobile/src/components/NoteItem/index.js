@@ -191,9 +191,22 @@ const NoteItem = ({item, isTrash, tags}) => {
                 }
               />
 
+              {/*     {db.attachments?.ofNote(item.id)?.length === 0 ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 6
+                  }}>
+                  <Icon name="attachment" size={SIZE.md} color={colors.icon} />
+                  <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+                    10
+                  </Paragraph>
+                </View>
+              ) : null} */}
+
               {item.pinned ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="pin"
                   size={SIZE.sm}
                   style={{
@@ -207,7 +220,6 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.locked ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="lock"
                   size={SIZE.sm}
                   style={{
@@ -245,7 +257,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                         paddingHorizontal: 2,
                         marginRight: 4,
                         zIndex: 10,
-                        maxWidth:tags?.slice(0, 3)?.length > 1 ? 130 : null
+                        maxWidth: tags?.slice(0, 3)?.length > 1 ? 130 : null
                       }}
                       onPress={() => navigateToTag(item)}
                     />
@@ -258,7 +270,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.icon}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 Deleted on{' '}
                 {item && item.dateDeleted
@@ -270,7 +282,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.accent}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
