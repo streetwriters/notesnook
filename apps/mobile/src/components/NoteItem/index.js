@@ -245,7 +245,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                         paddingHorizontal: 2,
                         marginRight: 4,
                         zIndex: 10,
-                        maxWidth: 120
+                        maxWidth:tags?.slice(0, 3)?.length > 1 ? 130 : null
                       }}
                       onPress={() => navigateToTag(item)}
                     />
