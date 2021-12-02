@@ -16,23 +16,17 @@ import {TimeSince} from '../Menu/TimeSince';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-function navigateToNotebook(item) {
-  let notebook = item;
-  let routeName = 'Notebook';
-  let params = {
-    menu: false,
-    notebook: notebook,
-    title: notebook.title
-  };
-
+const navigateToTopic = topic => {
+  let routeName = 'NotesPage';
+  let params = {...topic, menu: false, get: 'topics'};
   let headerState = {
-    heading: notebook.title,
-    id: notebook.id,
-    type: notebook.type
+    heading: topic.title,
+    id: topic.id,
+    type: topic.type
   };
-  eSendEvent(eOnNewTopicAdded, params);
+  eSendEvent(refreshNotesPage, params);
   Navigation.navigate(routeName, params, headerState);
-}
+};
 
 function navigateToTag(item) {
   let tags = db.tags.all;
@@ -83,6 +77,26 @@ const NoteItem = ({item, isTrash, tags}) => {
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
   const allTags = useTagStore(state => state.tags);
+
+  function getNotebook() {
+    if (isTrash || !item.notebooks) return [];
+    let item_notebook = item.notebooks?.slice(0, 1)[0];
+
+    notebook = db.notebooks.notebook(item_notebook.id);
+
+    if (!notebook) return [];
+    let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
+
+    notebook = notebook.data;
+
+    return [
+      {
+        title: `${notebook?.title} › ${topic?.title}`,
+        notebook: notebook,
+        topic: topic
+      }
+    ];
+  }
 
   return (
     <>

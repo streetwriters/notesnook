@@ -400,6 +400,11 @@ export class AddNotebookDialog extends React.Component {
             type="accent"
             onPress={this.addNewNotebook}
           />
+          <View
+          style={{
+            height:35
+          }}
+          />
         </View>
 
         <Toast context="local" />

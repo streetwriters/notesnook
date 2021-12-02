@@ -1,17 +1,15 @@
-import React, { useEffect } from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useMessageStore} from '../../provider/stores';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {Placeholder} from '../ListPlaceholders';
+import React from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useMessageStore } from '../../provider/stores';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Announcement } from '../Announcements/announcement';
+import { Button } from '../Button';
+import { Placeholder } from '../ListPlaceholders';
 import Heading from '../Typography/Heading';
-import {Announcement} from '../Announcements/announcement';
-import {Card} from './card';
-import { eSendEvent } from '../../services/EventManager';
-import { eOpenAnnouncementDialog } from '../../utils/Events';
+import { Card } from './card';
 
 export const Header = React.memo(
   ({
@@ -30,13 +28,7 @@ export const Header = React.memo(
     const [state] = useTracked();
     const {colors} = state;
     const announcements = useMessageStore(state => state.announcements);
-    const dialogs = useMessageStore(state => state.dialogs);
 
-    useEffect(() => {
-      if (dialogs.length > 0) {
-        eSendEvent(eOpenAnnouncementDialog,dialogs[0]);
-      }
-    },[dialogs])
     return announcements.length !== 0 && !noAnnouncement ? (
       <Announcement color={color || colors.accent} />
     ) : type === 'search' ? null : !shouldShow ? (
