@@ -111,7 +111,8 @@ const NoteItem = ({item, isTrash, tags}) => {
               flexDirection: 'row',
               alignItems: 'center',
               zIndex: 10,
-              elevation: 10
+              elevation: 10,
+              marginBottom:2.5
             }}>
             {getNotebook().map(_item => (
               <Button
