@@ -197,7 +197,7 @@ function Properties({ noteId }) {
                       sx={{
                         flexWrap: "wrap",
                       }}
-                      mt="2.5px"
+                      mt={1}
                     >
                       {topics.map((topic) => (
                         <IconTag
