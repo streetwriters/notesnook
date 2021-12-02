@@ -1,8 +1,9 @@
 import React, {useState} from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {useMenuStore} from '../../provider/stores';
 import {ToastEvent} from '../../services/EventManager';
+import {getTotalNotes} from '../../utils';
 import {db} from '../../utils/database';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
@@ -17,6 +18,7 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
     db.settings.isPinned(notebook.id)
   );
   const setMenuPins = useMenuStore(state => state.setMenuPins);
+  const totalNotes = getTotalNotes(notebook);
 
   const onPinNotebook = async () => {
     try {
@@ -46,6 +48,9 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
         borderRadius: 10,
         paddingTop: 25
       }}>
+      <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+        {new Date(notebook.dateEdited).toLocaleString()}
+      </Paragraph>
       <View
         style={{
           flexDirection: 'row',
@@ -59,27 +64,26 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
             flexDirection: 'row'
           }}>
           <ActionIcon
-            name="link-variant"
+            name={isPinnedToMenu ? 'link-variant-off' : 'link-variant'}
             onPress={onPinNotebook}
             customStyle={{
               marginRight: 15,
-              width:40,
-              height:40
+              width: 40,
+              height: 40
             }}
-            type={isPinnedToMenu ?  "transparent" : "grayBg"}
+            type={isPinnedToMenu ? 'grayBg' : 'grayBg'}
             color={isPinnedToMenu ? colors.accent : colors.icon}
             size={SIZE.lg}
           />
           <ActionIcon
             size={SIZE.lg}
-
             onPress={onEditNotebook}
             name="pencil"
             type="grayBg"
             color={colors.icon}
             customStyle={{
-              width:40,
-              height:40
+              width: 40,
+              height: 40
             }}
           />
         </View>
@@ -90,57 +94,22 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
           {notebook.description}
         </Paragraph>
       )}
-      {/*   <View
-        style={{
-          marginTop: 15,
-          flexDirection: 'row'
-        }}>
-        <Button
-          title="Edit notebook"
-          width={null}
-          height={null}
-          type="transparent"
-          icon="pencil"
-          fontSize={SIZE.sm}
-          onPress={onEditNotebook}
-          style={{
-            alignSelf: 'flex-start',
-            paddingHorizontal: 12,
-            borderRadius: 100,
-            height: 30,
-            marginRight: 10
-          }}
-        />
-
-        <Button
-          width={null}
-          height={null}
-          type={isPinnedToMenu ? 'shade' : 'transparent'}
-          icon="link-variant"
-          onPress={onPinNotebook}
-          style={{
-            alignSelf: 'flex-start',
-            paddingVertical: 0,
-            paddingHorizontal: 0,
-            width: 30,
-            height: 30,
-            borderColor: isPinnedToMenu ? colors.accent : colors.icon,
-            marginRight: 10
-          }}
-        />
-      </View> */}
 
       <Paragraph
         style={{
           marginTop: 10,
-          fontStyle: 'italic'
+          fontStyle: 'italic',
+          fontFamily: null
         }}
         size={SIZE.xs + 1}
         color={colors.icon}>
         {notebook.topics.length === 1
           ? '1 topic'
-          : `${notebook.topics.length} topics`}
-        , last modified on {new Date(notebook.dateEdited).toLocaleString()}
+          : `${notebook.topics.length} topics`}, {notebook && totalNotes > 1
+          ? totalNotes + ' notes'
+          : totalNotes === 1
+          ? totalNotes + ' note'
+          : '0 notes'}
       </Paragraph>
     </View>
   );
