@@ -26,7 +26,7 @@ export default class Debug {
    * body: string,
    * userId: string
    * }} reportData
-   * @returns {string} link to the github issue
+   * @returns {Promise<string>} link to the github issue
    */
   async report(reportData) {
     if (!reportData) return;
