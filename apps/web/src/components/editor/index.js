@@ -161,7 +161,6 @@ function Editor({ noteId, nonce }) {
             borderBottomColor: "border",
             justifyContent: "center",
             alignItems: "center",
-            minHeight: "39px",
           }}
         />
         <AnimatedFlex
