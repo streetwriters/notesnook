@@ -126,13 +126,9 @@ function setTheme() {
   let node = `
 	#titleInput {
 	  color:${pageTheme.colors.heading};
-	  font-size:${32 * pageTheme.colors.factor};
+	  font-size:${25 * pageTheme.colors.factor};
 	}
   
-	#textCopy {
-	  color:${pageTheme.colors.pri};
-	  font-size:${32 * pageTheme.colors.factor};
-	}
 	#titleInput::-webkit-input-placeholder {
 	  color:${pageTheme.colors.icon}
 	}
@@ -140,6 +136,7 @@ function setTheme() {
 	.info-bar {
 	  color:${pageTheme.colors.icon};
 	}
+  
 	  #titlebar {
 		display:flex !important;
 	  }
@@ -368,9 +365,8 @@ code {
 
 `;
 
-  let editorHead = tinymce.activeEditor.contentDocument.getElementsByTagName(
-    'head'
-  )[0];
+  let editorHead =
+    tinymce.activeEditor.contentDocument.getElementsByTagName('head')[0];
   let css2 = document.createElement('style');
   css2.appendChild(document.createTextNode(node2));
   editorHead.appendChild(css2);

@@ -14,15 +14,15 @@
 		<input id="image-input" accept='image/png, image/gif, image/jpeg, image/bmp, image/x-icon' type="file"
 			name="name" style="display: none;" />
 		<div id="titlebar">
-			<form id="formBox">
-				<textarea maxlength="150" id="titleInput" placeholder="Note title"></textarea>
-				<div id="textCopy"></div>
-			</form>
+			<div id="formBox">
+				<input maxlength="150" id="titleInput"
+					placeholder="Note title"></input>
+			</div>
 			<div class="info-bar">
 				<div style="display:flex;">
 					<p id="infowords"></p>
-					<p id="infodate"></p>
-					<p id="infosaved"></p>
+					<p style="display:none" id="infodate"></p>
+					<p style="display:none" id="infosaved"></p>
 				</div>
 			</div>
 		</div>

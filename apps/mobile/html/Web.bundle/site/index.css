@@ -1,7 +1,6 @@
 body {
-	margin:0px !important;
-	overflow: visible;
-	font-family:"Open Sans";
+  margin: 0px !important;
+  font-family: 'Open Sans';
 }
 
 .app-main {
@@ -74,34 +73,6 @@ body {
   padding-top: 2.5px;
 }
 
-  .info-bar a {
-	text-decoration: none;
-	color: gray
-  }
-  
-  #titlebar textarea:focus {
-	outline: none;
-  }
-  #infowords {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 0px;
-	border-radius: 5;
-	margin-top: 0;
-  }
-  
-  #infodate {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 5px;
-	margin-top: 0;
-	border-radius: 5;
-  }
-  
-  #infosaved {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 5px;
-	border-radius: 5;
-	margin-top: 0;
-  }
+.visible {
+  display: inline-flex !important;
+}
