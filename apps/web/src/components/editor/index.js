@@ -1,4 +1,11 @@
-import React, { useEffect, useRef, Suspense, useCallback } from "react";
+import React, {
+  useEffect,
+  useRef,
+  Suspense,
+  useCallback,
+  useMemo,
+  useState,
+} from "react";
 import { Flex } from "rebass";
 import Properties from "../properties";
 import {
@@ -19,8 +26,8 @@ const ReactMCE = React.lazy(() => import("./tinymce"));
 
 function Editor({ noteId, nonce }) {
   const editorRef = useRef();
-  const sessionState = useStore((store) => store.session.state);
-  const sessionNonce = useStore((store) => store.session.nonce);
+  const [isEditorLoading, setIsEditorLoading] = useState(true);
+  const sessionId = useStore((store) => store.session.id);
   const contentType = useStore((store) => store.session.content?.type);
   const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
@@ -32,6 +39,10 @@ function Editor({ noteId, nonce }) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
   const isTablet = useTablet();
+  const isSessionReady = useMemo(
+    () => nonce || sessionId || editorRef.current?.editor?.initialized,
+    [nonce, sessionId, editorRef]
+  );
 
   useEffect(() => {
     init();
@@ -39,6 +50,7 @@ function Editor({ noteId, nonce }) {
 
   const startSession = useCallback(
     async function startSession(noteId) {
+      console.log("starting session", nonce, noteId);
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId);
@@ -46,13 +58,6 @@ function Editor({ noteId, nonce }) {
     },
     [newSession, openSession, nonce]
   );
-
-  useEffect(() => {
-    if (!editorRef.current?.editor) return;
-    (async () => {
-      await startSession(noteId);
-    })();
-  }, [startSession, noteId, nonce]);
 
   const setContent = useCallback(() => {
     const {
@@ -62,12 +67,8 @@ function Editor({ noteId, nonce }) {
     const editor = editorRef.current?.editor;
     if (!editor) return;
 
-    clearTimeout(editor.changeTimeout);
     async function setContents() {
       if (!editor.initialized) return;
-
-      // NOTE: workaround to not fire onEditorChange event on content load
-      editor.isLoading = true;
       editor.setContent(data, { format: "html" });
 
       editor.undoManager.reset();
@@ -75,29 +76,52 @@ function Editor({ noteId, nonce }) {
 
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       if (id) await db.attachments.downloadImages(id);
-    }
 
-    if (!isMobile) editor.focus();
+      editor.focus();
+    }
 
     setContents();
-  }, [isMobile]);
+  }, []);
+
+  const clearContent = useCallback(() => {
+    const editor = editorRef.current?.editor;
+    console.log(editor);
+    if (!editor) return;
+
+    async function clearContents() {
+      if (!editor.initialized) return;
+      editor.setContent("<p><br/></p>", { format: "html" });
+      editor.undoManager.reset();
+      editor.setDirty(false);
+
+      editor.focus();
+    }
+
+    clearContents();
+  }, []);
 
   useEffect(() => {
-    if (sessionState === SESSION_STATES.new) {
-      setContent();
-    }
-  }, [
-    editorRef,
-    isMobile,
-    contentType,
-    sessionState,
-    sessionNonce,
-    setContent,
-  ]);
+    if (!sessionId || !editorstore.get().session.contentId) return;
+    setContent();
+  }, [sessionId, setContent]);
 
+  useEffect(() => {
+    if (!nonce) return;
+
+    clearContent();
+  }, [nonce, clearContent]);
+
+  useEffect(() => {
+    (async () => {
+      await startSession(noteId);
+    })();
+  }, [startSession, noteId, nonce]);
+
+  // if (!isSessionReady) return <EditorLoading />;
   return (
     <Flex
       flexDirection="column"
+      id="editorContainer"
       flex={1}
       sx={{
         position: "relative",
@@ -105,6 +129,19 @@ function Editor({ noteId, nonce }) {
         overflow: "hidden",
       }}
     >
+      {isEditorLoading ? (
+        <Flex
+          sx={{
+            position: "absolute",
+            width: "full",
+            height: "full",
+            bg: "background",
+            zIndex: 999,
+          }}
+        >
+          <EditorLoading />
+        </Flex>
+      ) : null}
       <Toolbar />
       <Flex
         variant="columnFill"
@@ -124,6 +161,7 @@ function Editor({ noteId, nonce }) {
             borderBottomColor: "border",
             justifyContent: "center",
             alignItems: "center",
+            minHeight: "39px",
           }}
         />
         <AnimatedFlex
@@ -153,33 +191,40 @@ function Editor({ noteId, nonce }) {
         >
           <Header />
 
-          <Suspense fallback={<EditorLoading />}>
-            {contentType === "tiny" ? (
-              <>
-                <ReactMCE
-                  editorRef={editorRef}
-                  onFocus={() => toggleProperties(false)}
-                  onSave={saveSession}
-                  onChange={(content) => {
-                    if (!content) return;
-                    if (!content.length) content = "<p><br></pr>";
-                    setSession((state) => {
-                      state.session.content = {
-                        type: "tiny",
-                        data: content,
-                      };
-                    });
-                  }}
-                  changeInterval={100}
-                  onWordCountChanged={updateWordCount}
-                  onInit={async () => {
-                    await startSession(noteId);
-                    setContent();
-                  }}
-                />
-              </>
-            ) : null}
-          </Suspense>
+          {isSessionReady && (
+            <Suspense fallback={<div />}>
+              {contentType === "tiny" ? (
+                <>
+                  <ReactMCE
+                    editorRef={editorRef}
+                    onFocus={() => toggleProperties(false)}
+                    onSave={saveSession}
+                    sessionId={sessionId}
+                    initialValue={editorstore.get()?.session?.content?.data}
+                    onChange={(content) => {
+                      if (!content || content === "<p><br></pr>") return;
+
+                      setSession((state) => {
+                        state.session.content = {
+                          type: "tiny",
+                          data: content,
+                        };
+                      });
+                    }}
+                    changeInterval={100}
+                    onWordCountChanged={updateWordCount}
+                    onInit={(editor) => {
+                      editor.focus();
+                      setTimeout(() => {
+                        setIsEditorLoading(false);
+                        // a short delay to make sure toolbar has rendered.
+                      }, 100);
+                    }}
+                  />
+                </>
+              ) : null}
+            </Suspense>
+          )}
         </AnimatedFlex>
       </Flex>
       <Properties noteId={noteId} />

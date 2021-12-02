@@ -69,8 +69,8 @@ const hashroutes = {
   "/notes/:noteId/edit": ({ noteId }) => {
     closeOpenedDialog();
     return (
-      <Suspense fallback={<EditorLoading text="Opening note..." />}>
-        <Editor noteId={noteId} nonce={Math.random()} />
+      <Suspense fallback={<EditorLoading />}>
+        <Editor noteId={noteId} />
       </Suspense>
     );
   },

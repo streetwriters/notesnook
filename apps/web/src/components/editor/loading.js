@@ -1,4 +1,3 @@
-import React from "react";
 import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 

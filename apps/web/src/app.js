@@ -9,6 +9,7 @@ import useTablet from "./utils/use-tablet";
 import { LazyMotion, domAnimation } from "framer-motion";
 import useDatabase from "./hooks/use-database";
 import Loader from "./components/loader";
+import EditorLoading from "./components/editor/loading";
 
 const GlobalMenuWrapper = React.lazy(() =>
   import("./components/global-menu-wrapper")
@@ -148,12 +149,7 @@ function App() {
               flexDirection="column"
             >
               <SuspenseLoader
-                fallback={
-                  <Loader
-                    title="Fun fact"
-                    text="Notesnook was released in January 2021 by a team of only 3 people."
-                  />
-                }
+                fallback={<EditorLoading />}
                 component={HashRouter}
                 condition={isAppLoaded}
               />

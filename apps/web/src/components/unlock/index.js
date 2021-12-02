@@ -46,8 +46,8 @@ function Unlock(props) {
 
   useEffect(() => {
     clearSession(false);
-    setSelectedNote(noteId);
     setIsEditorOpen(true);
+    setImmediate(() => setSelectedNote(noteId));
   }, [clearSession, setIsEditorOpen, setSelectedNote, noteId]);
 
   return (

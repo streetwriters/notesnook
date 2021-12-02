@@ -124,7 +124,7 @@ const plugins = {
   pro: "textpattern picker",
 };
 
-const changeEvents = "change input compositionend setcontent paste";
+const changeEvents = "change input compositionend paste";
 
 function TinyMCE(props) {
   const {
@@ -138,6 +138,7 @@ function TinyMCE(props) {
     onFocus,
     editorRef,
     onInit,
+    sessionId,
   } = props;
   const [oldSkin, newSkin] = useSkin();
   const isUserPremium = useIsUserPremium();
@@ -184,6 +185,7 @@ function TinyMCE(props) {
 
   return (
     <Editor
+      id={sessionId}
       ref={tinymceRef}
       onFocus={onFocus}
       initialValue={initialValue}
@@ -225,7 +227,8 @@ function TinyMCE(props) {
         init_instance_callback: (editor) => {
           editor.serializer.addTempAttr("data-progress");
           clearTimeout(editor.changeTimeout);
-          onInit(editor);
+          onInit && onInit(editor);
+          console.log("init");
         },
         setup: (editor) => {
           editor.on("tap", (e) => {
@@ -249,12 +252,8 @@ function TinyMCE(props) {
             if (onWordCountChanged) onWordCountChanged(editor.countWords());
 
             if (!editor.getHTML) return;
-            if (editor.isLoading) {
-              editor.isLoading = false;
-              return;
-            }
+
             editor.getHTML().then((html) => {
-              console.log("GOT CHNAGED");
               onChange(html, editor);
             });
           }, changeInterval);
