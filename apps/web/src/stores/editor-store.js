@@ -125,6 +125,7 @@ class EditorStore extends BaseStore {
         let note = db.notes.note(id)?.data;
         if (!note) {
           noteStore.refresh();
+          this.set((state) => (state.session.isSaving = false));
           return;
         }
         /* eslint-disable */
