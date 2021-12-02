@@ -5,13 +5,14 @@ export const BouncingView = ({
   children,
   style,
   duration = 600,
-  animated = true
+  animated = true,
+  initialScale = 0.9
 }) => {
-  const scale = Animated.useValue(!animated ? 1 : 0.9);
+  const scale = Animated.useValue(!animated ? 1 : initialScale);
 
   useEffect(() => {
     if (!animated) return;
-    scale.setValue(0.9);
+    scale.setValue(initialScale);
     timing(scale, {
       toValue: 1,
       duration: duration,
@@ -19,7 +20,7 @@ export const BouncingView = ({
     }).start();
     return () => {
       if (!animated) return;
-      scale.setValue(0.9);
+      scale.setValue(initialScale);
     };
   }, []);
 
