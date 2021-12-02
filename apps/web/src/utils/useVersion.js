@@ -4,11 +4,11 @@
 
 var APP_VERSION = {
   formatted: format(
-    1670,
+    1680,
     process.env.REACT_APP_GIT_HASH,
     process.env.REACT_APP_PLATFORM
   ),
-  numerical: 1670,
+  numerical: 1680,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
