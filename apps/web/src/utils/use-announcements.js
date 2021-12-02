@@ -3,6 +3,7 @@ import { SUBSCRIPTION_STATUS } from "../common";
 import { db } from "../common/db";
 import Config from "./config";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import { getAppVersion } from "./useVersion";
 
 var CACHED_ANNOUNCEMENTS = [];
 var cancelled = false;
@@ -60,6 +61,12 @@ async function shouldShowAnnouncement(announcement) {
   let show = announcement.platforms.some(
     (platform) => allowedPlatforms.indexOf(platform) > -1
   );
+  if (!show) return false;
+
+  show =
+    !announcement.appVersion ||
+    announcement.appVersion === getAppVersion().numerical;
+
   if (!show) return false;
 
   const user = await db.user.getUser();
