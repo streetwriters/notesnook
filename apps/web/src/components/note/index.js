@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Flex, Text } from "rebass";
+import { Button, Flex } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -59,31 +59,21 @@ function Note(props) {
         }
       }}
       header={
-        (tags?.length || notebook) && (
-          <Flex alignSelf="flex-start" justifySelf="flex-start" mb={1}>
-            {notebook && (
-              <IconTag
-                onClick={() => {
-                  navigate(`/notebooks/${notebook.id}/`);
-                }}
-                text={notebook.title}
-                icon={Icon.Notebook}
-              />
-            )}
-            {tags.map((tag) => {
-              return (
-                <IconTag
-                  key={tag.id}
-                  text={tag.alias}
-                  icon={Icon.Tag}
-                  onClick={() => {
-                    if (!tag.id) return showToast("Tag not found.");
-                    navigate(`/tags/${tag.id}`);
-                  }}
-                />
-              );
-            })}
-          </Flex>
+        notebook && (
+          <IconTag
+            styles={{
+              container: {
+                alignSelf: "flex-start",
+                justifySelf: "flex-start",
+                mb: 1,
+              },
+            }}
+            onClick={() => {
+              navigate(`/notebooks/${notebook.id}/${notebook.topic.id}`);
+            }}
+            text={`${notebook.title} › ${notebook.topic.title}`}
+            icon={Icon.Notebook}
+          />
         )
       }
       footer={
@@ -116,22 +106,21 @@ function Note(props) {
           ) : (
             <>
               {note.conflicted && (
-                <Text
-                  display="flex"
-                  mr={1}
-                  fontSize="subBody"
-                  color="error"
-                  fontWeight="bold"
-                  sx={{ borderRadius: "default" }}
-                >
-                  <Icon.Alert size={15} color="error" sx={{ mr: "2px" }} />{" "}
-                  Conflicted
-                </Text>
+                <Icon.Alert size={15} color="error" sx={{ mr: 1 }} />
               )}
-              <TimeAgo live={false} datetime={note.dateCreated} mr={1} />
+
+              <TimeAgo
+                sx={{ flexShrink: 0 }}
+                locale="en_short"
+                live={false}
+                datetime={note.dateCreated}
+                mr={1}
+              />
+
               {note.pinned && !props.context && (
                 <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
               )}
+
               {note.locked && (
                 <Icon.Lock
                   size={13}
@@ -140,9 +129,34 @@ function Note(props) {
                   data-test-id={`note-${index}-locked`}
                 />
               )}
+
               {note.favorite && (
                 <Icon.Star color={primary} size={15} sx={{ mr: 1 }} />
               )}
+
+              {tags?.map((tag) => {
+                return (
+                  <Button
+                    key={tag.id}
+                    variant="anchor"
+                    mr={1}
+                    color="fontTertiary"
+                    title={`Go to #${tag.alias}`}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (!tag.id) return showToast("Tag not found.");
+                      navigate(`/tags/${tag.id}`);
+                    }}
+                    sx={{
+                      maxWidth: `calc(100% / ${tags.length})`,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                    }}
+                  >
+                    #{tag.alias}
+                  </Button>
+                );
+              })}
             </>
           )}
         </Flex>

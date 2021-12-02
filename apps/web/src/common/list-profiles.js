@@ -22,10 +22,15 @@ const NotesProfile = createProfile(
     // TODO doing all this here could be a potential performance issue.
 
     let tags = item.tags;
-    let notebook = item.notebooks && item.notebooks[0];
-    if (tags) tags = tags.map((t) => db.tags.tag(t)).slice(0, 2);
-    if (notebook) {
-      notebook = db.notebooks.notebook(notebook.id)?.data;
+    if (tags) tags = tags.map((t) => db.tags.tag(t)).slice(0, 3);
+    if (context?.type !== "topic" && item.notebooks?.length) {
+      const noteNotebook = item.notebooks[0];
+      const _notebook = db.notebooks.notebook(noteNotebook.id);
+      var notebook = _notebook?.data;
+
+      const topicId = noteNotebook.topics[0];
+      const topic = _notebook?.topics.topic(topicId);
+      notebook.topic = topic?._topic;
     }
 
     return (

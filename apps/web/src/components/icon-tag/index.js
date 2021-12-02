@@ -21,7 +21,7 @@ function IconTag({ text, title, icon: Icon, onClick, styles, testId }) {
           bg: "hover",
           filter: "brightness(95%)",
         },
-        maxWidth: 150,
+        maxWidth: "100%",
         px: 1,
         mr: 1,
         cursor: onClick ? "pointer" : "default",
