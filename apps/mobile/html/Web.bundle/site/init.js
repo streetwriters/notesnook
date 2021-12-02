@@ -136,6 +136,7 @@ function init_tiny(size) {
       'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
     ],
     toolbar: false,
+    keep_styles:false,
     paste_data_images: true,
     statusbar: false,
     textpattern_patterns: markdownPatterns,
@@ -262,6 +263,104 @@ function init_tiny(size) {
       } catch (e) {
         console.error(e);
       }
+    },
+    init_instance_callback: function (_editor) {
+      editor = _editor;
+      setTheme();
+
+      editor.on('SelectionChange', function (e) {
+        selectchange();
+      });
+
+      editor.on('ClearUndos', onUndoChange);
+      editor.on('Undo', onUndoChange);
+      editor.on('Redo', onUndoChange);
+      editor.on('TypingUndos', onUndoChange);
+      editor.on('BeforeAddUndo', onUndoChange);
+      editor.on('AddUndo', onUndoChange);
+      editor.on('cut', function () {
+        onChange({type: 'cut'});
+        onUndoChange();
+      });
+      editor.on('copy', onUndoChange);
+      editor.on('paste', function () {
+        onChange({type: 'paste'});
+      });
+
+      editor.on('focus', function () {
+        reactNativeEventHandler('focus', 'editor');
+      });
+
+      editor.on('SetContent', function (event) {
+        if (globalThis.isClearingNoteData) {
+          globalThis.isClearingNoteData = false;
+          return;
+        }
+        setTimeout(function () {
+          editor.undoManager.transact(function () {});
+        }, 1000);
+        if (!event.paste) {
+          reactNativeEventHandler('noteLoaded', true);
+        }
+      });
+
+      editor.on('NewBlock', function (e) {
+        console.log('New Block');
+        const {newBlock} = e;
+        let target;
+        if (newBlock) {
+          target = newBlock.previousElementSibling;
+        }
+        if (target && target.classList.contains(COLLAPSED_KEY)) {
+          target.classList.remove(COLLAPSED_KEY);
+          collapseElement(target);
+        }
+      });
+
+      editor.on('touchstart mousedown', function (e) {
+        const {target} = e;
+        if (
+          e.offsetX < 6 &&
+          collapsibleTags[target.tagName] &&
+          target.parentElement &&
+          target.parentElement.tagName === 'BODY'
+        ) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          e.stopPropagation();
+          editor.undoManager.transact(function () {
+            if (target.classList.contains(COLLAPSED_KEY)) {
+              target.classList.remove(COLLAPSED_KEY);
+            } else {
+              target.classList.add(COLLAPSED_KEY);
+            }
+            collapseElement(target);
+            editor.getHTML().then(function (html) {
+              reactNativeEventHandler('tiny', html);
+            });
+          });
+        }
+      });
+
+      editor.on('tap', function (e) {
+        if (
+          e.target.classList.contains('mce-content-body') &&
+          !e.target.innerText.length > 0
+        ) {
+          e.preventDefault();
+        }
+      });
+      editor.on('ScrollIntoView', function (e) {
+        e.preventDefault();
+        e.elm.scrollIntoView({
+          behavior: 'smooth',
+          block: 'nearest'
+        });
+      });
+      editor.on('input', onChange);
+      editor.on('keyup', onChange);
+      editor.on('NodeChange', onChange);
+      editor.on('compositionend', onChange);
     },
     setup: function (_editor) {
       editor = _editor;

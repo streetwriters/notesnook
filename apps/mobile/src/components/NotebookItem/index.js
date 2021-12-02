@@ -124,9 +124,9 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
           }}>
           <Paragraph
             color={colors.accent}
-            size={SIZE.xs}
+            size={SIZE.xs + 1}
             style={{
-              marginRight: 10
+              marginRight: 6
             }}>
             {isTopic ? 'Topic' : 'Notebook'}
           </Paragraph>
@@ -135,20 +135,20 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             <>
               <Paragraph
                 color={colors.icon}
-                size={SIZE.xs}
+                size={SIZE.xs + 1}
                 style={{
                   textAlignVertical: 'center',
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 {'Deleted on ' +
                   new Date(item.dateDeleted).toISOString().slice(0, 10)}
               </Paragraph>
               <Paragraph
                 color={colors.accent}
-                size={SIZE.xs}
+                size={SIZE.xs + 1}
                 style={{
                   textAlignVertical: 'center',
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
@@ -156,18 +156,18 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
           ) : (
             <Paragraph
               color={colors.icon}
-              size={SIZE.xs}
+              size={SIZE.xs + 1}
               style={{
-                marginRight: 10
+                marginRight: 6
               }}>
               {new Date(item.dateCreated).toDateString().substring(4)}
             </Paragraph>
           )}
           <Paragraph
             color={colors.icon}
-            size={SIZE.xs}
+            size={SIZE.xs + 1}
             style={{
-              marginRight: 10
+              marginRight: 6
             }}>
             {item && totalNotes > 1
               ? totalNotes + ' notes'
@@ -178,7 +178,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
 
           {item.pinned ? (
             <Icon
-              style={{marginRight: 10}}
+              style={{marginRight: 6}}
               name="pin"
               size={SIZE.sm}
               style={{

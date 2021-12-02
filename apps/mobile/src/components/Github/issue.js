@@ -1,17 +1,19 @@
-import React, {useRef, useState} from 'react';
-import {Linking, Platform, Text, TextInput, View} from 'react-native';
-import deviceInfoModule from 'react-native-device-info';
-import {useTracked} from '../../provider';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
-import {APP_VERSION} from '../../utils';
-import {db} from '../../utils/database';
-import {eCloseProgressDialog} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import Clipboard from '@react-native-clipboard/clipboard';
+import React, { useRef, useState } from 'react';
+import { Linking, Platform, Text, TextInput, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import PremiumService from '../../services/PremiumService';
+import { APP_VERSION } from '../../utils';
+import { db } from '../../utils/database';
+import { eCloseProgressDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import {presentDialog} from '../Dialog/functions';
+import { presentDialog } from '../Dialog/functions';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 
@@ -20,6 +22,7 @@ export const Issue = () => {
   const colors = state.colors;
   const body = useRef(null);
   const title = useRef(null);
+  const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
 
   const onPress = async () => {
@@ -30,15 +33,21 @@ export const Issue = () => {
     try {
       setLoading(true);
 
-      let issue_url = await db.debug.report(
-        title.current,
-        body.current +
+      let issue_url = await db.debug.report({
+        title: title.current,
+        body:
+          body.current +
           `\n_______________
 **Device information:**
 App version: ${APP_VERSION}
 Platform: ${Platform.OS}
-Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`
-      );
+Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${
+            Platform.constants.Version
+          }
+Pro: ${PremiumService.get()}
+Logged in: ${user ? 'yes' : 'no'}`,
+        userId: user?.id
+      });
       setLoading(false);
       eSendEvent(eCloseProgressDialog);
       await sleep(300);
@@ -55,10 +64,21 @@ Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.consta
               onPress={() => {
                 Linking.openURL(issue_url);
               }}>
-              {issue_url}
-            </Text>
+              {issue_url}.
+            </Text>{' '}
+            Please note that we will respond to your issue on the given link. We
+            recommend that you save it.
           </Text>
         ),
+        positiveText: 'Copy link',
+        positivePress: () => {
+          Clipboard.setString(issue_url);
+          ToastEvent.show({
+            heading: 'Issue url copied!',
+            type: 'success',
+            context: 'global'
+          });
+        },
         negativeText: 'Close'
       });
     } catch (e) {
@@ -141,7 +161,7 @@ For example:
           marginTop: 10,
           textAlign: 'center'
         }}>
-        The information above will be is publically available on{' '}
+        The information above will be publically available at{' '}
         <Text
           onPress={() => {
             Linking.openURL('https://github.com/streetwriters/notesnook');
@@ -152,8 +172,8 @@ For example:
           }}>
           github.com/streetwriters/notesnook.
         </Text>{' '}
-        If you want to ask something general or need some assistance, we would
-        suggest that you{' '}
+        If you want to ask something in general or need some assistance, we
+        would suggest that you{' '}
         <Text
           style={{
             textDecorationLine: 'underline',

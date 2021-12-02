@@ -1,7 +1,9 @@
-- Added issue reporting from within the app. Click on "Report an issue" in settings.
-- Fixed undo manager not updated on cut.
-- Fixed note is not saved when content is directly pasted
-- Fixed editor is empty sometimes when note is opened
-- Other minor performance improvements
+- Add new header for notebook screen & topic
+- Ensure that products are loaded before showing pricing
+- Show notebook & topic on note items
+- Fixed sorting on items in groups
+- Fixed editor losing focus in checklists
+- Fixed cursor jump to end of paragraph on removing new line
+- Minor bug fixes and performance improvements.
 
 Thank you for using Notesnook!

@@ -1,33 +1,41 @@
+
 export const sleep = (duration) =>
   new Promise((resolve) => setTimeout(() => resolve(), duration));
 
 export function timeSince(date) {
   let seconds = Math.floor((new Date() - date) / 1000);
-
+  seconds = seconds  + (86400 * 7 * 4);
   let interval = Math.floor(seconds / 31536000);
 
   if (interval > 0.9) {
-    return interval < 2 ? interval + ' year ago' : interval + ' years ago';
+    return interval < 2 ? interval + 'yr ago' : interval + 'yr ago';
   }
   interval = Math.floor(seconds / 2592000);
   if (interval > 0.9) {
-    return interval < 2 ? interval + ' month ago' : interval + ' months ago';
+    return interval < 2 ? interval + 'mo ago' : interval + 'mo ago';
   }
+
+  interval = Math.floor(seconds / (86400 * 7));
+  if (interval > 0.9) {
+    if (interval === 4) return "1mo ago";
+    return interval < 2 ? interval + 'w ago' : interval + 'w ago';
+  }
+
   interval = Math.floor(seconds / 86400);
   if (interval > 0.9) {
-    return interval < 2 ? interval + ' day ago' : interval + ' days ago';
+    return interval < 2 ? interval + 'd ago' : interval + 'd ago';
   }
   interval = Math.floor(seconds / 3600);
   if (interval > 0.9) {
-    return interval < 2 ? interval + ' hour ago' : interval + ' hours ago';
+    return interval < 2 ? interval + 'h ago' : interval + 'h ago';
   }
   interval = Math.floor(seconds / 60);
   if (interval > 0.9) {
-    return interval < 2 ? interval + ' min ago' : interval + ' min ago';
+    return interval < 2 ? interval + 'm ago' : interval + 'm ago';
   }
   return Math.floor(seconds) < 0
-    ? '0 secs ago'
-    : Math.floor(seconds) + ' secs ago';
+    ? '0s ago'
+    : Math.floor(seconds) + 's ago';
 }
 
 export const timeConverter = (timestamp) => {

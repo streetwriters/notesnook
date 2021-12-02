@@ -27,7 +27,6 @@ import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
 import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
-import {parse} from 'node-html-parser';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -136,14 +135,11 @@ export async function clearTimer(clear) {
 }
 
 export const CHECK_STATUS = `(function() {
-       setTimeout(() => {
         let msg = JSON.stringify({
           data: true,
           type: 'running',
         });
         window.ReactNativeWebView.postMessage(msg)
-
-       },${Platform.OS === 'ios' ? '300' : '1'})
 })();`;
 
 const request_content = `(function() {
@@ -285,27 +281,29 @@ export const loadNote = async item => {
     checkStatus();
   } else {
     if (id === item.id && !item.forced) {
+      console.log('return from here duhh.');
       return;
     }
     eSendEvent('loadingNote', item);
     if (getNote()) {
+      console.log('clearing');
       await clearEditor(true, false, true);
     }
+    console.log('done clearing');
     closingSession = false;
     disableSaving = false;
     noteEdited = false;
     await setNote(item);
     webviewInit = false;
     editing.isFocused = false;
+    console.log('opening note');
     setTimeout(async () => {
-      if (await checkStatus(true)) {
-        requestedReload = true;
-        EditorWebView.current?.reload();
-      } else {
-        eSendEvent('webviewreset');
-      }
+      requestedReload = true;
+      EditorWebView.current?.reload();
     }, 1);
-    useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    setTimeout(() => {
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    }, 300);
   }
 };
 
@@ -323,9 +321,15 @@ const checkStatus = async noreset => {
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
     eSubscribeEvent('webviewOk', onWebviewOk);
-    EditorWebView.current?.injectJavaScript(CHECK_STATUS);
+    setTimeout(
+      () => {
+        EditorWebView.current?.injectJavaScript(CHECK_STATUS);
+      },
+      Platform.OS === 'ios' ? 300 : 1
+    );
 
     webviewTimer = setTimeout(() => {
+      console.log('timeout has ended');
       if (!webviewOK && !noreset) {
         console.log('webview not ok', 'ERROR');
         webviewInit = false;
@@ -411,6 +415,7 @@ export const _onMessage = async evt => {
       if (!requestedReload && getNote()) return;
       requestedReload = false;
       setColors(COLOR_SCHEME);
+      eSendEvent('webviewOk');
       webviewInit = true;
       webviewOK = true;
       if (PremiumService.get()) {
@@ -715,6 +720,18 @@ const loadNoteInEditor = async (keepHistory = true) => {
       }),
     );
     `
+        );
+      } else {
+        post('html', content.data);
+      }
+      if (id) {
+        db.attachments.downloadImages(id);
+      }
+
+      setColors();
+      tiny.call(
+        EditorWebView,
+        tiny.updateDateEdited(timeConverter(note.dateEdited))
       );
     } else {
       console.log('opening in editor');

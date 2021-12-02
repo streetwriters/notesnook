@@ -97,64 +97,31 @@ const NoteItem = ({item, isTrash, tags}) => {
               flexDirection: 'row',
               alignItems: 'center',
               zIndex: 10,
-              elevation: 10
+              elevation: 10,
+              marginBottom:2.5
             }}>
-            {!isTrash && item.notebooks
-              ? item.notebooks?.slice(0, 1)?.map(_item => {
-                  let notebook = db.notebooks.notebook(_item.id);
-                  notebook = notebook?.data;
-
-                  return notebook ? (
-                    <Button
-                      title={notebook.title}
-                      key={_item}
-                      height={20}
-                      icon="book-outline"
-                      type="grayBg"
-                      fontSize={SIZE.xs + 1}
-                      iconSize={SIZE.sm}
-                      textStyle={{
-                        marginRight: 0,
-                        fontWeight: 'normal',
-                        fontFamily: null
-                      }}
-                      style={{
-                        borderRadius: 5,
-                        marginRight: 5,
-                        borderWidth: 0.5,
-                        borderColor: colors.icon,
-                        paddingHorizontal: 6
-                      }}
-                      onPress={() => navigateToNotebook(notebook)}
-                    />
-                  ) : null;
-                })
-              : null}
-            {!isTrash && tags
-              ? tags.slice(0, 2)?.map(item => (
-                  <Button
-                    title={'#' + db.tags.alias(item)}
-                    key={item}
-                    height={20}
-                    textStyle={{
-                      marginRight: 0,
-                      fontWeight: 'normal',
-                      fontFamily: null
-                    }}
-                    type="grayBg"
-                    fontSize={SIZE.xs + 1}
-                    style={{
-                      borderRadius: 5,
-                      marginRight: 5,
-                      borderWidth: 0.5,
-                      borderColor: colors.icon,
-                      paddingHorizontal: 6,
-                      zIndex: 10
-                    }}
-                    onPress={() => navigateToTag(item)}
-                  />
-                ))
-              : null}
+            {getNotebook().map(_item => (
+              <Button
+                title={_item.title}
+                key={_item}
+                height={20}
+                icon="book-outline"
+                type="grayBg"
+                fontSize={SIZE.xs + 1}
+                iconSize={SIZE.sm}
+                textStyle={{
+                  marginRight: 0
+                }}
+                style={{
+                  borderRadius: 5,
+                  marginRight: 5,
+                  borderWidth: 0.5,
+                  borderColor: colors.icon,
+                  paddingHorizontal: 6
+                }}
+                onPress={() => navigateToTopic(_item.topic)}
+              />
+            ))}
           </View>
         )}
 
@@ -189,11 +156,21 @@ const NoteItem = ({item, isTrash, tags}) => {
           }}>
           {!isTrash ? (
             <>
+              {item.conflicted ? (
+                <Icon
+                  name="alert-circle"
+                  style={{
+                    marginRight: 6
+                  }}
+                  size={SIZE.sm}
+                  color={colors.red}
+                />
+              ) : null}
               <TimeSince
                 style={{
                   fontSize: SIZE.xs + 1,
                   color: colors.icon,
-                  marginRight: 10
+                  marginRight: 6
                 }}
                 time={item.dateCreated}
                 updateFrequency={
@@ -201,27 +178,26 @@ const NoteItem = ({item, isTrash, tags}) => {
                 }
               />
 
-              {item.color ? (
+              {/*     {db.attachments?.ofNote(item.id)?.length === 0 ? (
                 <View
-                  key={item}
                   style={{
-                    width: SIZE.xs,
-                    height: SIZE.xs,
-                    borderRadius: 100,
-                    backgroundColor: COLORS_NOTE[item.color.toLowerCase()],
-                    marginRight: -4.5,
-                    marginRight: 10
-                  }}
-                />
-              ) : null}
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    marginRight: 6
+                  }}>
+                  <Icon name="attachment" size={SIZE.md} color={colors.icon} />
+                  <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+                    10
+                  </Paragraph>
+                </View>
+              ) : null} */}
 
               {item.pinned ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="pin"
                   size={SIZE.sm}
                   style={{
-                    marginRight: 5
+                    marginRight: 6
                   }}
                   color={
                     COLORS_NOTE[item.color?.toLowerCase()] || colors.accent
@@ -231,11 +207,10 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.locked ? (
                 <Icon
-                  style={{marginRight: 10}}
                   name="lock"
                   size={SIZE.sm}
                   style={{
-                    marginRight: 10
+                    marginRight: 6
                   }}
                   color={colors.icon}
                 />
@@ -246,35 +221,35 @@ const NoteItem = ({item, isTrash, tags}) => {
                   name="star"
                   size={SIZE.md}
                   style={{
-                    marginRight: 10
+                    marginRight: 6
                   }}
                   color="orange"
                 />
               ) : null}
 
-              {item.conflicted ? (
-                <View
-                  style={{
-                    marginRight: 10,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'space-between'
-                  }}>
-                  <Icon
-                    name="alert-circle"
-                    size={SIZE.xs + 1}
-                    color={colors.red}
-                  />
-                  <Heading
-                    size={SIZE.xs}
-                    style={{
-                      color: colors.red,
-                      marginLeft: 2
-                    }}>
-                    CONFLICTS
-                  </Heading>
-                </View>
-              ) : null}
+              {!isTrash && !compactMode && tags
+                ? tags.slice(0, 3)?.map(item => (
+                    <Button
+                      title={'#' + db.tags.alias(item)}
+                      key={item}
+                      height={20}
+                      type="gray"
+                      textStyle={{
+                        textDecorationLine: 'underline'
+                      }}
+                      hitSlop={{top: 8, bottom: 12, left: 0, right: 0}}
+                      fontSize={SIZE.xs + 1}
+                      style={{
+                        borderRadius: 5,
+                        paddingHorizontal: 2,
+                        marginRight: 4,
+                        zIndex: 10,
+                        maxWidth: tags?.slice(0, 3)?.length > 1 ? 130 : null
+                      }}
+                      onPress={() => navigateToTag(item)}
+                    />
+                  ))
+                : null}
             </>
           ) : (
             <>
@@ -282,7 +257,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.icon}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 Deleted on{' '}
                 {item && item.dateDeleted
@@ -294,7 +269,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 color={colors.accent}
                 size={SIZE.xs}
                 style={{
-                  marginRight: 10
+                  marginRight: 6
                 }}>
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>

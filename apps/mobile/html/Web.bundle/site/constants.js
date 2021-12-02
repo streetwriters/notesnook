@@ -224,8 +224,16 @@ function setTheme() {
     .tox .tox-toolbar__primary {
       background: none !important;
       border-bottom: 1px solid ${pageTheme.colors.nav} !important;
-    }`;
+    }
+
+    ::selection {
+      color: white !important;
+      background: ${pageTheme.colors.accent} !important;
+    }
     
+    
+ 
+    `;
 
   let node2 = `
   .mce-content-body table[data-mce-selected], {
@@ -252,6 +260,24 @@ function setTheme() {
   width: 30px !important;
   z-index: 10000;
   opacity:0.5;
+}
+
+.mce-content-body a {
+  color: ${pageTheme.colors.accent} !important;
+}
+
+.mce-content-body [data-mce-selected="inline-boundary"] {
+  background-color: ${pageTheme.colors.shade} !important;
+}
+
+::selection {
+  color: white !important;
+  background: ${pageTheme.colors.accent} !important;
+}
+  
+
+.mce-content-body a[data-mce-selected] {
+  box-shadow: none !important;
 }
 
 span.attachment {
