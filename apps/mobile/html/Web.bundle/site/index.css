@@ -17,6 +17,8 @@ body {
   resize: none;
   font-size: 25px;
   height: 45x;
+  padding-top:0px;
+  padding-bottom:0px;
 }
 
 #formBox {
@@ -49,9 +51,9 @@ body {
   font-size: 11.5px;
   height: 13px;
   display: flex;
-  padding-left: 4px !important;
+  padding-left: 14px !important;
   justify-content: space-between;
-  margin-top: 5px;
+  margin-top: 0px;
 }
 
 .info-bar a {

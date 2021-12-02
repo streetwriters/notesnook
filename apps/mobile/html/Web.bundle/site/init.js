@@ -292,7 +292,6 @@ function init_tiny(size) {
       });
 
       editor.on('SetContent', function (event) {
-        console.log('content set', event.paste, globalThis.isClearingNoteData);
         if (globalThis.isClearingNoteData) {
           globalThis.isClearingNoteData = false;
           return;
@@ -302,10 +301,6 @@ function init_tiny(size) {
         }, 1000);
         if (!event.paste) {
           reactNativeEventHandler('noteLoaded', true);
-        }
-        if (event.paste) {
-          isLoading = false;
-          onChange(event);
         }
       });
 
