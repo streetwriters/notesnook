@@ -4,8 +4,11 @@ import Field from "../field";
 import Dialog from "./dialog";
 import platform from "platform";
 import { useState } from "react";
-import { db } from "../../common/db";
 import { confirm } from "../../common/dialog-controller";
+import { isUserPremium } from "../../hooks/use-is-user-premium";
+import * as clipboard from "clipboard-polyfill/text";
+import { store as userstore } from "../../stores/user-store";
+import { db } from "../../common/db";
 
 const PLACEHOLDERS = {
   title: "Briefly describe what happened",
@@ -26,7 +29,8 @@ function getDeviceInfo() {
 
   return `App version: ${appVersion}
 OS: ${os}
-Browser: ${browser}`;
+Browser: ${browser}
+Pro: ${isUserPremium()}`;
 }
 const BODY_TEMPLATE = (body) => {
   const info = `**Device information:**\n${getDeviceInfo()}`;
@@ -71,21 +75,12 @@ function IssueDialog(props) {
             const requestData = Object.fromEntries(formData.entries());
             if (!requestData.title.trim() || !requestData.body.trim()) return;
             requestData.body = BODY_TEMPLATE(requestData.body);
-            const url = await db.debug.report(
-              requestData.title,
-              requestData.body
-            );
-            confirm({
-              title: "Thank you for reporting!",
-              message: (
-                <>
-                  You can track your bug report at{" "}
-                  <Text as="a" href={url} sx={{ lineBreak: "anywhere" }}>
-                    {url}
-                  </Text>
-                </>
-              ),
+            const url = await db.debug.report({
+              title: requestData.title,
+              body: requestData.body,
+              userId: userstore.get().user?.id,
             });
+            await showIssueReportedDialog({ url });
           } catch (e) {
             setError(e.message);
           } finally {
@@ -137,3 +132,36 @@ function IssueDialog(props) {
 }
 
 export default IssueDialog;
+
+function showIssueReportedDialog({ url }) {
+  return confirm({
+    title: "Thank you for reporting!",
+    yesAction: () => clipboard.writeText(url),
+    yesText: "Copy link",
+    message: (
+      <>
+        <p>
+          You can track your bug report at{" "}
+          <Text as="a" href={url} sx={{ lineBreak: "anywhere" }}>
+            {url}
+          </Text>
+          .
+        </p>
+        <p>
+          Please note that we will respond to your bug report on the link above.{" "}
+          <b>
+            We recommended that you save the above link for later reference.
+          </b>
+        </p>
+        <p>
+          If your issue is critical (e.g. notes not syncing, crashes etc.),
+          please{" "}
+          <a href="https://discord.com/invite/zQBK97EE22">
+            join our Discord community
+          </a>{" "}
+          for one-to-one support.
+        </p>
+      </>
+    ),
+  });
+}
