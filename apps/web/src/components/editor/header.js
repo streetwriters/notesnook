@@ -18,7 +18,7 @@ function Header() {
     <>
       <TitleBox
         title={title}
-        changeInterval={500}
+        changeInterval={100}
         setTitle={(title) =>
           setSession((state) => {
             state.session.title = title;
