@@ -1,6 +1,8 @@
+import { formatDate } from "notes-core/utils/date";
 import React, { useEffect, useRef } from "react";
 import { Text } from "rebass";
 import { register, format, cancel, render } from "timeago.js";
+import en_short from "timeago.js/lib/lang/en_short";
 
 const shortLocale = [
   ["now", "now"],
@@ -19,6 +21,7 @@ const shortLocale = [
   ["%syr", "in %syr"],
 ];
 register("short", (_n, index) => shortLocale[index]);
+register("en_short", en_short);
 
 function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
   const timeRef = useRef();
@@ -31,7 +34,7 @@ function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
     // if is live
     if (live !== false) {
       // live render
-      element.setAttribute("datetime", toTime(datetime));
+      element.setAttribute("datetime", toDate(datetime).toISOString());
       render(element, locale, opts);
     }
 
@@ -41,7 +44,13 @@ function TimeAgo({ datetime, live, locale, opts, ...restProps }) {
   }, [datetime, live, locale, opts]);
 
   return (
-    <Text ref={timeRef} {...restProps} as="time" dateTime={toTime(datetime)}>
+    <Text
+      ref={timeRef}
+      {...restProps}
+      title={formatDate(datetime)}
+      as="time"
+      dateTime={toDate(datetime).toISOString()}
+    >
       {format(datetime, locale, opts)}
     </Text>
   );
@@ -55,11 +64,11 @@ export default React.memo(TimeAgo);
  * @param input
  * @returns datetime string
  */
-const toTime = (input) => {
+const toDate = (input) => {
   let date = null; // new Date();
   if (input instanceof Date) {
     date = input;
   } else date = new Date(input);
 
-  return date.getTime();
+  return date;
 };
