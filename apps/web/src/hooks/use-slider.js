@@ -1,9 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef } from "react";
 
-export default function useSlider(
-  sliderId,
-  { initialIndex, onSliding, onChange }
-) {
+export default function useSlider(sliderId, { onSliding, onChange }) {
   const ref = useRef(document.getElementById(sliderId));
   const slides = useMemo(() => [], []);
 
@@ -42,7 +39,7 @@ export default function useSlider(
     return () => {
       slider.onscroll = null;
     };
-  }, [ref, slides, initialIndex, onSliding, onChange]);
+  }, [ref, slides, onSliding, onChange]);
 
   const slideToIndex = useCallback(
     (index) => {

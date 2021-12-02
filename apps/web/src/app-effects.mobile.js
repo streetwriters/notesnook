@@ -25,6 +25,7 @@ export default function MobileAppEffects({ sliderId, overlayId, setShow }) {
         overlay.style.opacity = `${percent}%`;
         overlay.style.pointerEvents = "all";
       } else {
+        overlay.style.opacity = "0%";
         overlay.style.pointerEvents = "none";
       }
     },

@@ -58,12 +58,15 @@ function App() {
               scrollSnapType: "x mandatory",
               scrollBehavior: "smooth",
               WebkitOverflowScrolling: "touch",
+              scrollSnapStop: "always",
+              overscrollBehavior: "contain",
             }}
           >
             <Flex
               flexShrink={0}
               sx={{
                 scrollSnapAlign: "start",
+                scrollSnapStop: "always",
               }}
             >
               <SuspenseLoader
@@ -103,6 +106,7 @@ function App() {
                 borderRightWidth: show ? 1 : 0,
                 position: "relative",
                 scrollSnapAlign: "start",
+                scrollSnapStop: "always",
               }}
               flexShrink={0}
             >
@@ -139,6 +143,7 @@ function App() {
               flexShrink={[0, 1]}
               sx={{
                 scrollSnapAlign: "start",
+                scrollSnapStop: "always",
               }}
               flexDirection="column"
             >
