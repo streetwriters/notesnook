@@ -19,11 +19,23 @@ export default class Debug {
     });
   }
 
-  async report(title, body) {
+  /**
+   *
+   * @param {{
+   * title: string,
+   * body: string,
+   * userId: string
+   * }} reportData
+   * @returns {string} link to the github issue
+   */
+  async report(reportData) {
+    if (!reportData) return;
+
+    const { title, body, userId } = reportData;
     const response = await fetch(`${hosts.ISSUES_HOST}/create/notesnook`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, body }),
+      body: JSON.stringify({ title, body, userId }),
     });
     if (!response.ok) return;
     const json = await response.json();
