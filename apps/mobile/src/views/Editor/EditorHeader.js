@@ -1,3 +1,4 @@
+import {EV, EVENTS} from 'notes-core/common';
 import React, {useEffect, useRef} from 'react';
 import {
   BackHandler,
@@ -169,11 +170,28 @@ const EditorHeader = () => {
   useEffect(() => {
     eSubscribeEvent(eOnLoadNote, load);
     eSubscribeEvent(eClearEditor, onCallClear);
+    EV.subscribe(EVENTS.noteRemoved, onNoteRemoved);
     return () => {
+      EV.unsubscribe(EVENTS.noteRemoved, onNoteRemoved);
       eUnSubscribeEvent(eClearEditor, onCallClear);
       eUnSubscribeEvent(eOnLoadNote, load);
     };
   }, []);
+
+  const onNoteRemoved = async id => {
+    try {
+      console.log('NOTE REMOVED', id);
+      await db.notes.remove(id);
+      if (id !== getNote().id) return;
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes,
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Trash,
+        Navigation.routeNames.Notebook
+      ]);
+    } catch (e) {}
+  };
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
@@ -294,11 +312,15 @@ const EditorHeader = () => {
                 name="crown"
                 color={colors.yellow}
                 customStyle={{
-                  marginLeft: 10,
-                  borderRadius: 5
+                  marginLeft: 10
                 }}
                 top={50}
-                onPress={() => {
+                onPress={async () => {
+                  let note = getNote();
+                  clearEditor(true, true, true);
+                  await loadNote(note);
+
+                  return;
                   if (editing.isFocused) {
                     safeKeyboardDismiss();
                     editing.isFocused = true;
@@ -312,8 +334,7 @@ const EditorHeader = () => {
                 name="cloud-upload-outline"
                 color={colors.pri}
                 customStyle={{
-                  marginLeft: 10,
-                  borderRadius: 5
+                  marginLeft: 10
                 }}
                 top={50}
                 onPress={publishNote}
@@ -325,8 +346,7 @@ const EditorHeader = () => {
                 name="attachment"
                 color={colors.pri}
                 customStyle={{
-                  marginLeft: 10,
-                  borderRadius: 5
+                  marginLeft: 10
                 }}
                 top={50}
                 onPress={picker.pick}

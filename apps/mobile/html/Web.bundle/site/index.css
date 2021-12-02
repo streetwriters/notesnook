@@ -1,102 +1,76 @@
 body {
-	margin:0px !important;
-	overflow: visible;
-	font-family:"Open Sans";
+  margin: 0px !important;
+  font-family: 'Open Sans';
 }
 
-#formBox textarea {
-	font-family: "Open Sans";
-	font-weight: 600 !important;
-	background-color: transparent;
-	border: none;
-	width: 100%;
-	outline: none;
-	resize: none;
-	font-size: 32px;
-  }
-  
-  #formBox {
-	margin-block-end: 0px;
-	position: relative;
-  }
-  
-  #titlebar {
-	background-color: transparent;
-	padding-left: 0px;
-	padding-right: 12px;
-	min-height: 45px;
-	display: flex;
-	flex-direction: column;
-	justify-content: flex-end;
-  }
-  #formBox > div,
-  #formBox > textarea {
-	word-wrap: break-word; /* make sure the div and the textarea wrap words in the same way */
-	box-sizing: border-box;
-	width: 100%;
-  }
-  
-  #formBox > textarea {
-	overflow: hidden;
-	position: absolute;
-	height: 100%;
+.app-main {
+  overflow: visible;
+}
 
-	padding-top: 4px;
-    padding-bottom: 5px;
-  }
-  
-  #textCopy {
-	font-family: "Open Sans";
-	font-weight: 600 !important;
-	font-size: 32px;
-	padding-top: 4px;
-    padding-bottom: 5px;
-	padding-right: 0.5em;
-	padding-left: 0.5em;
-  }
-  
-  #formBox > div {
-	min-height: 45px;
-  }
-  
-  .info-bar {
-	font-family: "Open Sans";
-	color: gray;
-	font-size: 11px;
-	height: 15px;
-	display: flex;	
-	padding-left: 14px !important;
-	justify-content: space-between;
-  }
+#formBox input {
+  font-family: 'Open Sans';
+  font-weight: 600 !important;
+  background-color: transparent;
+  border: none;
+  width: 100%;
+  outline: none;
+  resize: none;
+  font-size: 25px;
+  height: 45x;
+}
 
-  .info-bar a {
-	text-decoration: none;
-	color: gray
-  }
-  
-  #titlebar textarea:focus {
-	outline: none;
-  }
-  #infowords {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 0px;
-	border-radius: 5;
-	margin-top: 0;
-  }
-  
-  #infodate {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 5px;
-	margin-top: 0;
-	border-radius: 5;
-  }
-  
-  #infosaved {
-	font-family: "Open Sans";
-	margin-right: 5px;
-	margin-left: 5px;
-	border-radius: 5;
-	margin-top: 0;
-  }
+#formBox {
+  margin-block-end: 0px;
+  position: relative;
+}
+
+#titlebar {
+  background-color: transparent;
+  padding-left: 0px;
+  padding-right: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+#formBox > div,
+#formBox > input {
+  word-wrap: break-word; /* make sure the div and the textarea wrap words in the same way */
+  box-sizing: border-box;
+  width: 100%;
+}
+
+#titlebar input:focus {
+  outline: none;
+}
+
+.info-bar {
+  font-family: 'Open Sans';
+  color: gray;
+  font-size: 11.5px;
+  height: 13px;
+  display: flex;
+  padding-left: 4px !important;
+  justify-content: space-between;
+  margin-top: 5px;
+}
+
+.info-bar a {
+  text-decoration: none;
+  color: gray;
+}
+
+#infowords,
+#infodate,
+#infosaved {
+  font-family: 'Open Sans';
+  margin-right: 5px;
+  margin-left: 0px;
+  border-radius: 5px;
+  margin-top: 0;
+  height: 16px;
+  padding-top: 2.5px;
+}
+
+.visible {
+  display: inline-flex !important;
+}

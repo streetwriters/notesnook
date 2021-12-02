@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, View} from 'react-native';
+import {ActivityIndicator, Platform, Text, View} from 'react-native';
 import * as RNIap from 'react-native-iap';
 import {useTracked} from '../../provider';
 import {useUserStore} from '../../provider/stores';
@@ -13,6 +13,7 @@ import {db} from '../../utils/database';
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
+  eCloseSimpleDialog,
   eOpenLoginDialog
 } from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
@@ -51,10 +52,12 @@ export const PricingPlans = ({
   const [products, setProducts] = useState([]);
   const [offers, setOffers] = useState(null);
   const [buying, setBuying] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const getSkus = async () => {
     try {
-      let products = PremiumService.getProducts();
+      setLoading(true);
+      let products = await PremiumService.getProducts();
       if (products.length > 0) {
         let offers = {
           monthly: products.find(
@@ -70,34 +73,48 @@ export const PricingPlans = ({
         }
         setProducts(products);
       }
+      setLoading(false);
     } catch (e) {
+      setLoading(false);
       console.log('error getting sku', e);
     }
   };
 
-  const getPromo = async productId => {
-    await sleep(500);
-    let products = PremiumService.getProducts();
-    let product = products.find(p => p.productId === productId);
-    if (!product) return;
-    let isMonthly = product.productId.indexOf('.mo') > -1;
-    let cycleText = isMonthly
-      ? promoCyclesMonthly[
-          product.introductoryPriceCyclesAndroid ||
-            product.introductoryPriceNumberOfPeriodsIOS
-        ]
-      : promoCyclesYearly[
-          product.introductoryPriceCyclesAndroid ||
-            product.introductoryPriceNumberOfPeriodsIOS
-        ];
+  const getPromo = async code => {
+    try {
+      let productId;
+      if (code.startsWith('com.streetwriters.notesnook')) {
+        productId = code;
+      } else {
+        productId = await db.offers.getCode(code.split(':')[0], Platform.OS);
+      }
 
-    setProduct({
-      type: 'promo',
-      offerType: isMonthly ? 'monthly' : 'yearly',
-      data: product,
-      cycleText: cycleText,
-      info: 'Pay monthly, cancel anytime'
-    });
+      let products = await PremiumService.getProducts();
+      let product = products.find(p => p.productId === productId);
+      if (!product) return false;
+      let isMonthly = product.productId.indexOf('.mo') > -1;
+      let cycleText = isMonthly
+        ? promoCyclesMonthly[
+            product.introductoryPriceCyclesAndroid ||
+              product.introductoryPriceNumberOfPeriodsIOS
+          ]
+        : promoCyclesYearly[
+            product.introductoryPriceCyclesAndroid ||
+              product.introductoryPriceNumberOfPeriodsIOS
+          ];
+
+      setProduct({
+        type: 'promo',
+        offerType: isMonthly ? 'monthly' : 'yearly',
+        data: product,
+        cycleText: cycleText,
+        info: 'Pay monthly, cancel anytime'
+      });
+      return true;
+    } catch (e) {
+      console.log('PROMOCODE ERROR:', code, e);
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -140,7 +157,17 @@ export const PricingPlans = ({
     }
   };
 
-  return (
+  return loading ? (
+    <View
+      style={{
+        paddingHorizontal: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: 100
+      }}>
+      <ActivityIndicator color={colors.accent} size={25} />
+    </View>
+  ) : (
     <View
       style={{
         paddingHorizontal: 12
@@ -234,23 +261,19 @@ export const PricingPlans = ({
                 positivePress: async value => {
                   if (!value) return;
                   console.log(value);
+                  eSendEvent(eCloseSimpleDialog);
+                  setBuying(true);
                   try {
-                    let productId = await db.offers.getCode(value, Platform.OS);
-                    if (productId) {
-                      getPromo(productId);
-                      ToastEvent.show({
-                        heading: 'Discount applied!',
-                        type: 'success',
-                        context: 'local'
-                      });
-                    } else {
-                      ToastEvent.show({
-                        heading: 'Promo code invalid or expired',
-                        type: 'error',
-                        context: 'local'
-                      });
-                    }
+                    if (!(await getPromo(value)))
+                      throw new Error('Error applying promo code');
+                    ToastEvent.show({
+                      heading: 'Discount applied!',
+                      type: 'success',
+                      context: 'local'
+                    });
+                    setBuying(false);
                   } catch (e) {
+                    setBuying(false);
                     ToastEvent.show({
                       heading: 'Promo code invalid or expired',
                       message: e.message,
@@ -269,32 +292,63 @@ export const PricingPlans = ({
       ) : (
         <View>
           {!user ? (
-            <Button
-              onPress={() => {
-                eSendEvent(eClosePremiumDialog);
-                setTimeout(() => {
-                  eSendEvent(eOpenLoginDialog, 1);
-                }, 400);
-              }}
-              title={'Try free for 14 days'}
-              type="accent"
-              style={{
-                paddingHorizontal: 24,
-                marginTop: 20,
-                marginBottom: 10
-              }}
-            />
+            <>
+              <Button
+                onPress={() => {
+                  eSendEvent(eClosePremiumDialog);
+                  eSendEvent(eCloseProgressDialog);
+                  setTimeout(() => {
+                    eSendEvent(eOpenLoginDialog, 1);
+                  }, 400);
+                }}
+                title={'Try free for 14 days'}
+                type="accent"
+                style={{
+                  paddingHorizontal: 24,
+                  marginTop: 20,
+                  marginBottom: 10
+                }}
+              />
+              {promo &&
+              !promo.promoCode.startsWith('com.streetwriters.notesnook') ? (
+                <Paragraph
+                  size={SIZE.md}
+                  textBreakStrategy="balanced"
+                  style={{
+                    alignSelf: 'center',
+                    justifyContent: 'center',
+                    textAlign: 'center'
+                  }}>
+                  Use promo code{' '}
+                  <Text
+                    style={{
+                      fontFamily: 'OpenSans-SemiBold'
+                    }}>
+                    {promo.promoCode}
+                  </Text>{' '}
+                  at checkout
+                </Paragraph>
+              ) : null}
+            </>
           ) : (
             <>
-              <PricingItem
-                product={product}
+              <Button
                 onPress={() => buySubscription(product.data)}
+                height={40}
+                width="50%"
+                type="accent"
+                title="Subscribe now"
               />
+
               <Button
                 onPress={() => {
                   setProduct(null);
                 }}
+                style={{
+                  marginTop: 5
+                }}
                 height={30}
+                fontSize={13}
                 type="errorShade"
                 title="Cancel promo code"
               />

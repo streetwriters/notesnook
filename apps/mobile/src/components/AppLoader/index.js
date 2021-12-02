@@ -5,6 +5,7 @@ import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import {useTracked} from '../../provider';
 import {
   useFavoriteStore,
+  useMessageStore,
   useNoteStore,
   useSettingStore,
   useUserStore
@@ -23,7 +24,11 @@ import PremiumService from '../../services/PremiumService';
 import {editing} from '../../utils';
 import {COLOR_SCHEME_DARK} from '../../utils/Colors';
 import {db} from '../../utils/database';
-import {eOpenLoginDialog, eOpenRateDialog} from '../../utils/Events';
+import {
+  eOpenAnnouncementDialog,
+  eOpenLoginDialog,
+  eOpenRateDialog
+} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {SIZE} from '../../utils/SizeUtils';
@@ -51,6 +56,7 @@ const AppLoader = ({onLoad}) => {
   const verifyUser = useUserStore(state => state.verifyUser);
   const setVerifyUser = useUserStore(state => state.setVerifyUser);
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const isIntroCompleted = useSettingStore(state => state.isIntroCompleted);
   const pwdInput = useRef();
 
   const load = async value => {
@@ -86,6 +92,7 @@ const AppLoader = ({onLoad}) => {
           eSendEvent(eOpenLoginDialog, 4);
           return;
         }
+
         let settingsStore = useSettingStore.getState();
         if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
           await Backup.checkAndRun();
@@ -93,7 +100,15 @@ const AppLoader = ({onLoad}) => {
         }
         if (await checkForRateAppRequest()) return;
         if (await checkNeedsBackup()) return;
-        PremiumService.getRemainingTrialDaysStatus();
+        if (await PremiumService.getRemainingTrialDaysStatus()) return;
+
+        await useMessageStore.getState().setAnnouncement();
+        if (isIntroCompleted) {
+          let dialogs = useMessageStore.getState().dialogs;
+          if (dialogs.length > 0) {
+            eSendEvent(eOpenAnnouncementDialog, dialogs[0]);
+          }
+        }
       })();
     }
   }, [_loading]);
