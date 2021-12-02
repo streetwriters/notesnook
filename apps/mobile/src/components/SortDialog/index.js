@@ -66,8 +66,10 @@ class SortDialog extends React.Component {
     this.setState({
       groupOptions: _groupOptions
     });
-    Navigation.setRoutesToUpdate([this.props.screen]);
-    eSendEvent('groupOptionsUpdate');
+    setTimeout(() => {
+      Navigation.setRoutesToUpdate([this.props.screen]);
+      eSendEvent('groupOptionsUpdate');
+    }, 1);
   };
 
   render() {
@@ -145,7 +147,11 @@ class SortDialog extends React.Component {
               paddingHorizontal: 12
             }}>
             {this.state.groupOptions.groupBy === 'abc' ? (
-              <Paragraph color={colors.icon}>
+              <Paragraph
+                style={{
+                  height: 40
+                }}
+                color={colors.icon}>
                 No sort options available.
               </Paragraph>
             ) : (
@@ -162,7 +168,6 @@ class SortDialog extends React.Component {
                       : 'checkbox-blank-circle-outline'
                   }
                   textStyle={{
-                    fontWeight: 'normal',
                     color: colors.pri
                   }}
                   fontSize={SIZE.sm}
@@ -183,13 +188,16 @@ class SortDialog extends React.Component {
           </View>
           <View
             style={{
-              paddingHorizontal: 12
+              paddingHorizontal: 0,
+              borderRadius: 0
             }}>
             {Object.keys(GROUP).map((item, index) => (
               <PressableButton
                 key={item}
                 testID={'btn-' + item}
-                type={groupOptions.groupBy === GROUP[item] ? 'shade' : 'gray'}
+                type={
+                  groupOptions.groupBy === GROUP[item] ? 'transparent' : 'gray'
+                }
                 onPress={async () => {
                   let _groupOptions = {
                     ...groupOptions,
@@ -198,6 +206,7 @@ class SortDialog extends React.Component {
 
                   if (item === 'alphabetical') {
                     _groupOptions.sortBy = 'title';
+                    _groupOptions.sortDirection = 'asc';
                   } else {
                     if (this.state.groupOptions.sortBy === 'title') {
                       _groupOptions.sortBy = 'dateEdited';
@@ -219,8 +228,10 @@ class SortDialog extends React.Component {
                 <Paragraph
                   size={SIZE.sm}
                   style={{
-                    fontWeight:
-                      groupOptions.groupBy === GROUP[item] ? 'bold' : 'normal'
+                    fontFamily:
+                      groupOptions.groupBy === GROUP[item]
+                        ? 'OpenSans-SemiBold'
+                        : 'OpenSans-Regular'
                   }}
                   color={
                     groupOptions.groupBy === GROUP[item]
@@ -229,6 +240,7 @@ class SortDialog extends React.Component {
                   }>
                   {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
                 </Paragraph>
+
                 {groupOptions.groupBy === GROUP[item] ? (
                   <Icon color={colors.accent} name="check" size={SIZE.lg} />
                 ) : null}
