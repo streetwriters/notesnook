@@ -152,7 +152,6 @@ class EditorStore extends BaseStore {
 
         this.set((state) => {
           state.session.id = note.id;
-          state.session.title = note.title;
           state.session.isSaving = false;
           state.session.notebooks = note.notebooks;
           state.session.attachments =
