@@ -24,6 +24,7 @@ export default class WorkerStream
    * @param {Uint8Array} chunk
    */
   async write(chunk: Chunk): Promise<void> {
+    if (!chunk.data) return;
     postMessage({ type: `${this.id}:write`, data: chunk }, [chunk.data.buffer]);
   }
 }

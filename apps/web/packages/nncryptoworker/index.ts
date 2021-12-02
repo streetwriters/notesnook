@@ -136,7 +136,7 @@ export class NNCryptoWorker implements INNCrypto {
         const { type } = ev.data;
         if (type === readEventType) {
           const chunk = await stream.read();
-          if (!chunk || !this.worker) return;
+          if (!chunk || !this.worker || !chunk.data) return;
           this.worker.postMessage({ type, data: chunk }, [chunk.data.buffer]);
         } else if (type === writeEventType) {
           const chunk = ev.data.data as Chunk;

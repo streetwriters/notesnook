@@ -66,6 +66,7 @@ export class NNCrypto implements INNCrypto {
       if (!chunk) break;
 
       const { data, final } = chunk;
+      if (!data) break;
 
       const encryptedChunk: Chunk = {
         data: encryptionStream.write(data, final),
@@ -90,6 +91,8 @@ export class NNCrypto implements INNCrypto {
       if (!chunk) break;
 
       const { data, final } = chunk;
+      if (!data) break;
+
       const decryptedChunk: Chunk = {
         data: decryptionStream.read(data),
         final,
