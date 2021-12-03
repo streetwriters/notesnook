@@ -16,8 +16,8 @@ public class MainActivity extends ReactActivity {
     SplashScreen.show(this);
     super.onCreate(null);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      //WebView.setWebContentsDebuggingEnabled(true);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
+      WebView.setWebContentsDebuggingEnabled(true);
     }
 
     try {
