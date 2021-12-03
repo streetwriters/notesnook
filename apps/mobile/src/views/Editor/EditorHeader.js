@@ -297,8 +297,8 @@ const EditorHeader = () => {
               }}
             />
           )}
-          {fullscreen && <View style={{width: 20}} />}
-          {deviceMode !== 'mobile' && <EditorTitle />}
+          {fullscreen? <View style={{width: 20}} /> : null}
+          {deviceMode !== 'mobile' ? <EditorTitle /> : null}
         </View>
         <View
           style={{

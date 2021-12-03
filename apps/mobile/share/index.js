@@ -771,13 +771,13 @@ const Button = ({
         types[type].style,
         style
       ]}>
-      {loading && <ActivityIndicator color={iconColor} />}
+      {loading ? <ActivityIndicator color={iconColor} /> : null}
 
-      {icon && !loading && (
+      {icon && !loading ? (
         <Icon name={icon} size={iconSize} color={iconColor || 'white'} />
-      )}
+      ) : null}
 
-      {title && (
+      {title ? (
         <Text
           style={[
             {
@@ -791,7 +791,7 @@ const Button = ({
           ]}>
           {title}
         </Text>
-      )}
+      ) : null}
     </TouchableOpacity>
   );
 };
