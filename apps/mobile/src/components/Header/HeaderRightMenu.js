@@ -18,7 +18,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
   const menuRef = useRef();
   return (
     <View style={styles.rightBtnContainer}>
-      {currentScreen !== 'Settings' && (
+      {currentScreen !== 'Settings' ? (
         <ActionIcon
           onPress={async () => {
             Navigation.navigate('Search', {
@@ -30,7 +30,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           color={colors.pri}
           customStyle={styles.rightBtn}
         />
-      )}
+      ) : null}
 
       {deviceMode !== 'mobile' ? (
         <Button
@@ -49,7 +49,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
         />
       ) : null}
 
-      {rightButtons && (
+      {rightButtons ? (
         <Menu
           ref={menuRef}
           animationDuration={200}
@@ -85,7 +85,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
             </MenuItem>
           ))}
         </Menu>
-      )}
+      ) : null}
     </View>
   );
 };

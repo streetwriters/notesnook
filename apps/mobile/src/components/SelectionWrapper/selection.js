@@ -40,7 +40,7 @@ export const SelectionIcon = ({setActionStrip, item}) => {
   };
 
   return (
-    selectionMode && (
+    selectionMode ? (
       <View
         style={{
           display: 'flex',
@@ -70,6 +70,6 @@ export const SelectionIcon = ({setActionStrip, item}) => {
             />
           </TouchableOpacity>
       </View>
-    )
+    ) : null
   );
 };

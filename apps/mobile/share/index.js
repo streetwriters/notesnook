@@ -472,7 +472,7 @@ const NotesnookShare = ({quicknote = false}) => {
         </TouchableOpacity>
       )}
 
-      {showSearch && (
+      {showSearch ? (
         <Search
           quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
@@ -481,7 +481,7 @@ const NotesnookShare = ({quicknote = false}) => {
             animate(1, 0);
           }}
         />
-      )}
+      ) : null}
 
       <AnimatedKAV
         enabled={!floating }

@@ -23,7 +23,7 @@ let renderItems = {
 };
 
 const RenderItem = ({item, index}) => {
-  const Item = renderItems[item.itemType || item.type];
+  const Item = renderItems[item.itemType || item.type] || <View/>
 
   return (
     <Item item={item} tags={item.tags ? [...item.tags] : []} index={index} />

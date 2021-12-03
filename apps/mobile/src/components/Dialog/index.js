@@ -106,7 +106,7 @@ export const Dialog = ({context = 'global'}) => {
           />
           <Seperator half />
 
-          {dialogInfo.input && (
+          {dialogInfo.input ? (
             <View
               style={{
                 paddingHorizontal: 12
@@ -125,7 +125,7 @@ export const Dialog = ({context = 'global'}) => {
                 placeholder={dialogInfo.inputPlaceholder}
               />
             </View>
-          )}
+          ) : null}
 
           <DialogButtons
             onPressNegative={onNegativePress}

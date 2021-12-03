@@ -89,11 +89,11 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
         </View>
       </View>
 
-      {notebook.description && (
+      {notebook.description ? (
         <Paragraph size={SIZE.md} color={colors.pri}>
           {notebook.description}
         </Paragraph>
-      )}
+      ) : null}
 
       <Paragraph
         style={{

@@ -862,7 +862,7 @@ export const ActionSheetComponent = ({
               />
             ) : null}
 
-            {note.type === 'note' && (
+            {note.type === 'note' ? (
               <Button
                 onPress={async () => {
                   close();
@@ -883,7 +883,7 @@ export const ActionSheetComponent = ({
                   paddingHorizontal: 12
                 }}
               />
-            )}
+            ) : null}
           </View>
         </View>
       )}

@@ -161,7 +161,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
           />
         )}
 
-        {type === 'topic' && (
+        {type === 'topic' ? (
           <ActionIcon
             onPress={async () => {
               if (selectedItemsList.length > 0) {
@@ -189,7 +189,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             name="minus"
             size={SIZE.xl}
           />
-        )}
+        ) : null}
 
         {screen === 'Favorites' ? (
           <ActionIcon
