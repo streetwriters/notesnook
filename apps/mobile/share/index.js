@@ -56,7 +56,8 @@ function makeHtmlFromUrl(url) {
 
 function makeHtmlFromPlainText(text) {
   if (!text) return '';
-  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text}</p>`;
+
+  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(/(?:\r\n|\r|\n)/g, '<br>')}</p>`;
 }
 
 function getBaseUrl(site) {
