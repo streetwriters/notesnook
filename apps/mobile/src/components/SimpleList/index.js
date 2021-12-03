@@ -23,6 +23,7 @@ let renderItems = {
 };
 
 const RenderItem = ({item, index}) => {
+  if (!item) return <View/>
   const Item = renderItems[item.itemType || item.type] || <View/>
 
   return (

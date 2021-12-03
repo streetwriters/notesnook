@@ -131,13 +131,13 @@ export const Trash = ({route, navigation}) => {
         placeholderText="Deleted notes & notebooks appear here."
       />
 
-      {trash && trash.length !== 0 && (
+      {trash && trash.length !== 0 ? (
         <ContainerBottomButton
           title="Clear all trash"
           onPress={_onPressBottomButton}
           shouldShow={true}
         />
-      )}
+      ) : null}
     </>
   );
 };

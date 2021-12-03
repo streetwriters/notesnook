@@ -269,7 +269,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
       />
       {actions.map(
         item =>
-          item.visible && (
+          item.visible ? (
             <View
               key={item.icon}
               style={{
@@ -292,7 +292,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
                 size={width / 2.8 / actions.length}
               />
             </View>
-          ),
+          ) : null,
       )}
     </Animated.View>
   );
