@@ -4,7 +4,6 @@ export const sleep = (duration) =>
 
 export function timeSince(date) {
   let seconds = Math.floor((new Date() - date) / 1000);
-  seconds = seconds  + (86400 * 7 * 4);
   let interval = Math.floor(seconds / 31536000);
 
   if (interval > 0.9) {
