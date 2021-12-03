@@ -17,7 +17,7 @@ public class MainActivity extends ReactActivity {
     super.onCreate(null);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      WebView.setWebContentsDebuggingEnabled(true);
+      //WebView.setWebContentsDebuggingEnabled(true);
     }
 
     try {
