@@ -39,7 +39,11 @@ export default class Notes extends Collection {
       if (tags && tags.length) {
         for (let i = 0; i < tags.length; ++i) {
           const tag = tags[i];
-          const addedTag = await this._db.tags.add(tag, id);
+          const addedTag = await this._db.tags.add(tag, id).catch(() => void 0);
+          if (!addedTag) {
+            tags.splice(i, 1);
+            continue;
+          }
           if (addedTag.title !== tag) tags[i] = addedTag.title;
         }
       }
