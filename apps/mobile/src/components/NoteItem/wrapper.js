@@ -5,10 +5,11 @@ import { useSelectionStore, useTrashStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
 import { eSendEvent, openVault, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { history } from '../../utils';
+import { editing, history } from '../../utils';
 import { db } from '../../utils/database';
 import { eOnLoadNote, eShowMergeDialog } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
 import { presentDialog } from '../Dialog/functions';
 import SelectionWrapper from '../SelectionWrapper';
 
@@ -17,7 +18,13 @@ export const NoteWrapper = React.memo(({item, index,tags,compactMode}) => {
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
 
   const onPress = async () => {
-   
+    // let diff = !editing.lastClosedTime ? 0 : (editing.lastClosedTime + 800) - Date.now();
+    // console.log('diff:',diff);
+    // if (diff > 0) {
+    //   console.log('sleeping');
+    //   await sleep(diff + 10);
+    // }
+
     let _note = item;
     if (!isTrash) {
       _note = db.notes.note(item.id).data;

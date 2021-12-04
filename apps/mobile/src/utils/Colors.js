@@ -62,6 +62,7 @@ export const COLOR_SCHEME_LIGHT = {
   pri: '#505050',
   sec: '#ffffff',
   light: '#ffffff',
+  transGray: '#00000010',
 };
 export const COLOR_SCHEME_DARK = {
   ...fixedColors,
@@ -74,6 +75,7 @@ export const COLOR_SCHEME_DARK = {
   pri: '#C0C0C0',
   sec: 'black',
   light: '#ffffff',
+  transGray: '#ffffff10',
 };
 
 export function getCurrentColors() {

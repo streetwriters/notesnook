@@ -45,18 +45,24 @@ const getNotes = params => {
   return groupArray(notes, 'notes');
 };
 
+function getAlias(params) {
+  if (!params) return "";
+  let alias =
+    params.current?.type === 'tag'
+      ? db.tags.alias(params.current?.id)
+      : params.current?.type === 'color'
+      ? db.colors.alias(params.current?.id)
+      : params.current?.title;
+  return alias || '';
+}
+
 export const Notes = ({route, navigation}) => {
   const [state] = useTracked();
   const colors = state.colors;
   const params = useRef(route?.params);
   const [notes, setNotes] = useState(getNotes(params.current) || []);
   const loading = useNoteStore(state => state.loading);
-  const alias =
-    params.current?.type === 'tag'
-      ? db.tags.alias(params.current?.id)
-      : params.current?.type === 'color'
-      ? db.colors.alias(params.current?.id)
-      : params.current?.title;
+  const alias = getAlias(params);
 
   const onLoad = () => {
     let _notes = getNotes(params.current);

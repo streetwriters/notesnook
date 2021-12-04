@@ -229,7 +229,7 @@ export const Settings = ({navigation}) => {
 
           <SettingsAppearanceSection />
 
-          {Platform.OS === 'android' && <SettingsGeneralOptions />}
+          {Platform.OS === 'android' ? <SettingsGeneralOptions /> : null}
 
           <SettingsPrivacyAndSecurity />
 

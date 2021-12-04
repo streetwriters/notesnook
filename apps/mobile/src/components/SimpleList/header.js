@@ -40,9 +40,9 @@ export const Header = React.memo(
           justifyContent: 'center',
           alignItems: 'center'
         }}>
-        {messageCard && (
+        {messageCard ? (
           <Card color={COLORS_NOTE[color?.toLowerCase()] || colors.accent} />
-        )}
+        ) : null}
       </View>
     ) : (
       <View

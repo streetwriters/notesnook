@@ -105,7 +105,7 @@ const NoteItem = ({item, isTrash, tags}) => {
           flexGrow: 1,
           flexShrink: 1
         }}>
-        {!compactMode && (
+        {!compactMode ? (
           <View
             style={{
               flexDirection: 'row',
@@ -137,7 +137,7 @@ const NoteItem = ({item, isTrash, tags}) => {
               />
             ))}
           </View>
-        )}
+        ) : null}
 
         <Heading
           numberOfLines={1}

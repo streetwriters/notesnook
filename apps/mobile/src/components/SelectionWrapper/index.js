@@ -67,11 +67,11 @@ const SelectionWrapper = ({
         paddingHorizontal: 12,
         paddingVertical:compactMode ? 8 : 12,
       }}>
-      {actionStrip && (
+      {actionStrip ? (
         <ActionStrip note={item} setActionStrip={setActionStrip} />
-      )}
+      ) : null}
 
-      {item.type === 'note' && <Filler background={background} item={item} />}
+      {item.type === 'note' ? <Filler background={background} item={item} /> : null}
       <SelectionIcon
         setActionStrip={setActionStrip}
         item={item}

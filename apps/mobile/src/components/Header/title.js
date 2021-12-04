@@ -69,12 +69,12 @@ export const Title = ({heading, headerColor, screen, notebook}) => {
             flexWrap: 'wrap'
           }}
           color={headerColor}>
-          {notebook && (
+          {notebook ? (
             <Paragraph numberOfLines={1} size={SIZE.xs + 2}>
               {notebook?.title}
               {'\n'}
             </Paragraph>
-          )}
+          ) : null}
           <Heading color={colors.accent}>
             {heading.slice(0, 1) === '#' ? '#' : null}
           </Heading>

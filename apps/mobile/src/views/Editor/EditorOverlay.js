@@ -10,6 +10,8 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
+import {editing} from '../../utils';
+import {eOnLoadNote} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 
@@ -24,6 +26,7 @@ const EditorOverlay = () => {
   const opacity = useValue(1);
 
   const load = async _loading => {
+    editing.overlay = true;
     clearTimeout(timer);
     clearTimeout(timerError);
     clearTimeout(timerClosing);
@@ -31,6 +34,12 @@ const EditorOverlay = () => {
       opacity.setValue(1);
       setLoading(_loading);
       timerError = setTimeout(() => {
+        if (_loading) {
+          console.log('could not load');
+          let _n = _loading;
+          _n.forced = true;
+          eSendEvent(eOnLoadNote, _n);
+        }
         setError(true);
       }, 4000);
     } else {
@@ -38,6 +47,7 @@ const EditorOverlay = () => {
       clearTimeout(timerError);
       clearTimeout(timerClosing);
       setError(false);
+      editing.overlay = false;
       timing(opacity, {
         toValue: 0,
         duration: 150,
@@ -74,7 +84,7 @@ const EditorOverlay = () => {
         ],
         zIndex: 100
       }}>
-      <View
+      <Animated.View
         style={{
           width: '90%',
           justifyContent: 'center',
@@ -119,7 +129,7 @@ const EditorOverlay = () => {
             {timeConverter(loading.dateEdited)}
           </Paragraph>
         ) : null}
-      </View>
+      </Animated.View>
 
       {error && (
         <View

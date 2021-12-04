@@ -56,7 +56,8 @@ function makeHtmlFromUrl(url) {
 
 function makeHtmlFromPlainText(text) {
   if (!text) return '';
-  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text}</p>`;
+
+  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(/(?:\r\n|\r|\n)/g, '<br>')}</p>`;
 }
 
 function getBaseUrl(site) {
@@ -472,7 +473,7 @@ const NotesnookShare = ({quicknote = false}) => {
         </TouchableOpacity>
       )}
 
-      {showSearch && (
+      {showSearch ? (
         <Search
           quicknote={quicknote}
           getKeyboardHeight={() => keyboardHeight.current}
@@ -481,7 +482,7 @@ const NotesnookShare = ({quicknote = false}) => {
             animate(1, 0);
           }}
         />
-      )}
+      ) : null}
 
       <AnimatedKAV
         enabled={!floating }
@@ -771,13 +772,13 @@ const Button = ({
         types[type].style,
         style
       ]}>
-      {loading && <ActivityIndicator color={iconColor} />}
+      {loading ? <ActivityIndicator color={iconColor} /> : null}
 
-      {icon && !loading && (
+      {icon && !loading ? (
         <Icon name={icon} size={iconSize} color={iconColor || 'white'} />
-      )}
+      ) : null}
 
-      {title && (
+      {title ? (
         <Text
           style={[
             {
@@ -791,7 +792,7 @@ const Button = ({
           ]}>
           {title}
         </Text>
-      )}
+      ) : null}
     </TouchableOpacity>
   );
 };

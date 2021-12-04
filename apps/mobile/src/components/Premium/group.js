@@ -19,12 +19,12 @@ export const Group = ({item, index}) => {
         backgroundColor: index % 2 !== 0 ? colors.bg : colors.nav,
         paddingVertical: 40
       }}>
-      {item?.pro && (
+      {item?.pro ? (
         <ProTag
           size={SIZE.sm}
           background={index % 2 === 0 ? colors.bg : colors.nav}
         />
-      )}
+      ) : null}
       <Heading>{item.title}</Heading>
       <Paragraph size={SIZE.md}>{item.detail}</Paragraph>
 

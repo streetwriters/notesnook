@@ -25,7 +25,7 @@ export const ActionSheetTagsSection = ({item, close}) => {
         }}>
         {note.tags.map(
           (item, index) =>
-            item && <TagItem key={item} tag={item} close={close} />,
+            item ? <TagItem key={item} tag={item} close={close} /> : null,
         )}
       </View>
     </View>

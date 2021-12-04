@@ -80,7 +80,7 @@ export const Button = ({
         flexDirection: 'row',
         ...style
       }}>
-      {loading && <ActivityIndicator color={textColor} size={fontSize + 4} />}
+      {loading ? <ActivityIndicator color={textColor} size={fontSize + 4} /> : null}
       {icon && !loading && iconPosition === 'left' ? (
         <Icon
           name={icon}

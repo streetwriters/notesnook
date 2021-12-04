@@ -42,9 +42,9 @@ const DialogHeader = ({
             }}>
             <Heading size={SIZE.xl}>
               {title}{' '}
-              {titlePart && (
+              {titlePart ? (
                 <Text style={{color: colors.accent}}>{titlePart}</Text>
-              )}
+              ) : null}
             </Heading>
 
             {button ? (

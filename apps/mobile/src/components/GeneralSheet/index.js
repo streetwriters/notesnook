@@ -75,7 +75,7 @@ const GeneralSheet = ({context}) => {
           />
         )}
 
-        {dialogData?.title && <Heading> {dialogData?.title}</Heading>}
+        {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
         {dialogData?.paragraph ? (
           <Paragraph style={{textAlign: 'center'}}>

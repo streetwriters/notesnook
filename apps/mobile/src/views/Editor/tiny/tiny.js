@@ -20,11 +20,14 @@ window.blur();
 `;
 
 const removeMarkdown = `
- tinymce.activeEditor.plugins.textpattern.setPatterns("")
-`;
+if (tinymce && tinymce.activeEditor) {
+  tinymce.activeEditor.plugins.textpattern.setPatterns("")
+}`;
+
 const setMarkdown = `
- tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns)
-`;
+if (tinymce &&  tinymce.activeEditor) {
+  tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns);
+}`;
 
 const keyboardStateChanged = `(function() {
   setTimeout(function() {
@@ -138,8 +141,13 @@ export const nomenu = enabled => `
 const updateTheme = value => `
 (function() {
   let v = ${value}
-  pageTheme.colors = v;
-  setTheme();
+  if (pageTheme) {
+    pageTheme.colors = v;
+  }
+  if (tinymce && tinymce.activeEditor) {
+    setTheme();
+  }
+ 
 })();
 
 `;

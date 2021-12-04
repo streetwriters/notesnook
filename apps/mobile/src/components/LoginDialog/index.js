@@ -190,13 +190,17 @@ const LoginDialog = () => {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
       try {
-        console.log('TOKEN EXPIRED');
-        await db.user.tokenManager.getToken();
+        let res = await db.user.tokenManager.getToken();
+        if (!res) throw new Error('no token found');
+        if (db.user.tokenManager._isTokenExpired(res))
+          throw new Error('token expired');
+        if (!(await Sync.run())) throw new Error('e');
         await MMKV.removeItem('loginSessionHasExpired');
-        Sync.run();
         return;
       } catch (e) {
+        console.log(e);
         let user = await db.user.getUser();
+        if (!user) return;
         email = user.email;
       }
     }
@@ -452,7 +456,7 @@ const LoginDialog = () => {
               paragraphColor="red"
               padding={12}
             />
-            <Seperator/>
+            <Seperator />
             <DialogButtons
               negativeTitle="Cancel"
               onPressNegative={() => {

@@ -84,7 +84,7 @@ const ColorItem = ({value, format}) => {
           alignItems: 'center',
           backgroundColor: selected ? 'rgba(0,0,0,0.1)' : 'transparent'
         }}>
-        {selected && <Icon name="check" size={SIZE.lg} color="white" />}
+        {selected? <Icon name="check" size={SIZE.lg} color="white" /> : null}
       </View>
     </TouchableOpacity>
   );
