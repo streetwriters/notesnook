@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {Platform, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
@@ -7,7 +7,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/database';
-import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
@@ -29,8 +29,8 @@ const navigateToTopic = topic => {
 };
 
 function navigateToTag(item) {
-  let tags = db.tags.all;
-  let _tag = tags.find(t => t.title === item);
+  let _tag = db.tags.tag(item.id);
+  if (!_tag) return;
   let params = {
     ..._tag,
     type: 'tag',
@@ -76,12 +76,10 @@ const NoteItem = ({item, isTrash, tags}) => {
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
-  const allTags = useTagStore(state => state.tags);
 
   function getNotebook() {
-    if (isTrash || !item.notebooks) return [];
+    if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
     let item_notebook = item.notebooks?.slice(0, 1)[0];
-
     notebook = db.notebooks.notebook(item_notebook.id);
 
     if (!notebook) return [];
@@ -98,6 +96,10 @@ const NoteItem = ({item, isTrash, tags}) => {
     ];
   }
 
+  useEffect(() => {
+    console.log('rendering',item.id);
+  })
+
   return (
     <>
       <View
@@ -112,7 +114,7 @@ const NoteItem = ({item, isTrash, tags}) => {
               alignItems: 'center',
               zIndex: 10,
               elevation: 10,
-              marginBottom:2.5
+              marginBottom: 2.5
             }}>
             {getNotebook().map(_item => (
               <Button
@@ -242,27 +244,29 @@ const NoteItem = ({item, isTrash, tags}) => {
               ) : null}
 
               {!isTrash && !compactMode && tags
-                ? tags.slice(0, 3)?.map(item => (
-                    <Button
-                      title={'#' + db.tags.alias(item)}
-                      key={item}
-                      height={20}
-                      type="gray"
-                      textStyle={{
-                        textDecorationLine: 'underline'
-                      }}
-                      hitSlop={{top: 8, bottom: 12, left: 0, right: 0}}
-                      fontSize={SIZE.xs + 1}
-                      style={{
-                        borderRadius: 5,
-                        paddingHorizontal: 2,
-                        marginRight: 4,
-                        zIndex: 10,
-                        maxWidth: tags?.slice(0, 3)?.length > 1 ? 130 : null
-                      }}
-                      onPress={() => navigateToTag(item)}
-                    />
-                  ))
+                ? tags.map(item =>
+                    item.id ? (
+                      <Button
+                        title={'#' + item.alias}
+                        key={item.id}
+                        height={20}
+                        type="gray"
+                        textStyle={{
+                          textDecorationLine: 'underline'
+                        }}
+                        hitSlop={{top: 8, bottom: 12, left: 0, right: 0}}
+                        fontSize={SIZE.xs + 1}
+                        style={{
+                          borderRadius: 5,
+                          paddingHorizontal: 2,
+                          marginRight: 4,
+                          zIndex: 10,
+                          maxWidth: tags.length > 1 ? 130 : null
+                        }}
+                        onPress={() => navigateToTag(item)}
+                      />
+                    ) : null
+                  )
                 : null}
             </>
           ) : (
