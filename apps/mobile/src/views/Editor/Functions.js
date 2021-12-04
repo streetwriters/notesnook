@@ -300,6 +300,7 @@ export const loadNote = async item => {
           : `tinymce.activeEditor.execCommand('mceDirectionLTR');`
       );
     }
+    requestedReload = true;
     updateSessionStatus();
 
     if (!(await checkStatus(true))) {
@@ -343,7 +344,7 @@ export const loadNote = async item => {
       } else {
         EditorWebView.current?.reload();
       }
-    }, 1);
+    }, 50);
     useEditorStore.getState().setCurrentlyEditingNote(item.id);
   }
   loading_note = false;
@@ -522,6 +523,7 @@ export const _onMessage = async evt => {
     case 'content_not_loaded':
       loading_note = false;
       if (message.sessionId !== sessionId) {
+        requestedReload = true;
         updateSessionStatus();
         return;
       }
