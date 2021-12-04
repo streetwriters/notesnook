@@ -5,22 +5,27 @@ import { db } from '../utils/database';
 import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
 import { ToastEvent } from './EventManager';
 
+let retryCount = 0;
 const run = async (context = 'global', forced) => {
+  let result = false;
   const userstore = useUserStore.getState();
-  if (!userstore.user) return;
+  if (!userstore.user) return true;
   userstore.setSyncing(true);
+
   try {
     let res = await doInBackground(async () => {
       try {
         return await db.sync(true, forced);
       } catch (e) {
-        console.log(e.stack)
+        console.log(e.stack);
         return e.message;
       }
     });
 
-    if (!res) return;
-    if (typeof res === "string") throw new Error(res);
+    if (!res) return false;
+    if (typeof res === 'string') throw new Error(res);
+    retryCount = 0;
+    result = true;
     ToastEvent.show({
       heading: 'Sync complete',
       type: 'success',
@@ -28,8 +33,9 @@ const run = async (context = 'global', forced) => {
       context: context
     });
   } catch (e) {
-    if (e.message === "Sync already running") return;
-    if (userstore.user)  {
+    result = false;
+    if (e.message === 'Sync already running') return;
+    if (userstore.user) {
       userstore.setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {
@@ -47,6 +53,7 @@ const run = async (context = 'global', forced) => {
       await updateNoteInEditor();
     }
     userstore.setSyncing(false);
+    return result;
   }
 };
 
