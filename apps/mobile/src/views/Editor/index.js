@@ -112,7 +112,7 @@ const Editor = React.memo(
                     console.log('tinymce is not ready');
                     func();
                   }
-                },10);
+                },5);
               }
               func();
             })();`}
@@ -132,7 +132,7 @@ const Editor = React.memo(
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            source={{uri: "http://192.168.10.6:3000/index.html"}}
+            source={source}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
