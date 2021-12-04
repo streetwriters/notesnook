@@ -113,6 +113,8 @@ export interface MenuStore extends State {
 export interface EditorStore extends State {
     currentEditingNote: string | null,
     setCurrentlyEditingNote: (note: string) => void,
+    sessionId:string,
+    setSessionId:(sessionId:string) => void
 }
 
 

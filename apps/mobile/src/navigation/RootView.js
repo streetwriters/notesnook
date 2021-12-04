@@ -46,6 +46,10 @@ const onChangeTab = async obj => {
       !editing.isRestoringState &&
       (!editing.currentlyEditing || !getNote())
     ) {
+      if (editing.overlay) {
+        editing.overlay = false;
+        return;
+      }
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }

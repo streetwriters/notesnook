@@ -120,6 +120,7 @@ function setTheme() {
     light();
   }
   addStyle();
+
   let css = document.createElement('style');
   css.type = 'text/css';
 
@@ -364,7 +365,7 @@ code {
 }
 
 `;
-
+  if (!tinymce.activeEditor) return;
   let editorHead =
     tinymce.activeEditor.contentDocument.getElementsByTagName('head')[0];
   let css2 = document.createElement('style');

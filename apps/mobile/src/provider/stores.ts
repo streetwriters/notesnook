@@ -275,7 +275,12 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
 
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
-  setCurrentlyEditingNote: note => set({currentEditingNote: note})
+  setCurrentlyEditingNote: note => set({currentEditingNote: note}),
+  sessionId:null,
+  setSessionId:(sessionId) => {
+    console.log(sessionId,'session id');
+    set({sessionId});
+  }
 }));
 
 export const useSearchStore = create<SearchStore>((set, get) => ({

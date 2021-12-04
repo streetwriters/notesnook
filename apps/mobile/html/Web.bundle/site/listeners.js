@@ -16,7 +16,8 @@ function onDomContentLoaded() {
         JSON.stringify({
           visible: event.target.documentElement.scrollTop,
           title: document.getElementById('titleInput').value,
-          type: 'scroll'
+          type: 'scroll',
+          sessionId:sessionId
         })
       
       );
@@ -46,7 +47,8 @@ function attachTitleInputListeners() {
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: 'focus',
-            value: 'title'
+            value: 'title',
+            sessionId:sessionId
           })
         );
       }
@@ -70,7 +72,8 @@ function onTitleChange() {
     }
     let titleMessage = {
       type: 'title',
-      value: titleInput.value
+      value: titleInput.value,
+      sessionId:sessionId
     };
 
     info = document.querySelector(infoBar);
@@ -143,6 +146,7 @@ function attachMessageListener() {
     let message = JSON.parse(data.data);
     let type = message.type;
     let value = message.value;
+    sessionId = message.sessionId;
 
     switch (type) {
       case 'inject':

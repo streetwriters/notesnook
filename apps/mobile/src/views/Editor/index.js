@@ -2,13 +2,14 @@ import React, {useEffect, useState} from 'react';
 import {Platform, ScrollView, TextInput, View} from 'react-native';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
-import {useUserStore} from '../../provider/stores';
+import {useEditorStore, useUserStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
+import { eOnLoadNote } from '../../utils/Events';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
@@ -39,11 +40,12 @@ const CustomView = Platform.OS === 'ios' ? ScrollView : View;
 const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
-
+    const sessionId = useEditorStore(state => state.sessionId);
     const [resetting, setResetting] = useState(false);
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
+    console.log(sessionId, 'updated id');
 
     useEffect(() => {
       if (premiumUser) {
@@ -55,6 +57,7 @@ const Editor = React.memo(
       setResetting(true);
       await sleep(30);
       setResetting(false);
+      eSendEvent(eOnLoadNote, getNote() ? getNote() : {type: 'new'});
       if (!getNote()) {
         await sleep(10);
         eSendEvent('loadingNote', null);
@@ -70,12 +73,6 @@ const Editor = React.memo(
 
     return resetting ? null : (
       <>
-        <TextInput
-          ref={textInput}
-          style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
-          blurOnSubmit={false}
-        />
-
         <CustomView
           style={{
             height: '100%',
@@ -103,6 +100,22 @@ const Editor = React.memo(
             onRenderProcessGone={event => {
               onResetRequested();
             }}
+            injectedJavaScript={`
+            sessionId="${sessionId}";
+            console.log(sessionId);
+            (function() {
+              const func = function() {
+                setTimeout(function() {
+                  if (tinymce) {
+                    init_tiny("calc(100vh - 55px)");
+                  } else {
+                    console.log('tinymce is not ready');
+                    func();
+                  }
+                },10);
+              }
+              func();
+            })();`}
             javaScriptEnabled={true}
             focusable={true}
             keyboardDisplayRequiresUserAction={false}
@@ -113,11 +126,13 @@ const Editor = React.memo(
             bounces={false}
             allowFileAccess={true}
             scalesPageToFit={true}
+            renderLoading={() => <View/>}
+            startInLoadingState
             allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            source={source}
+            source={{uri: "http://192.168.10.6:3000/index.html"}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
@@ -131,3 +146,7 @@ const Editor = React.memo(
 );
 
 export default Editor;
+
+// test uri "http://192.168.10.8:3000/index.html"
+
+

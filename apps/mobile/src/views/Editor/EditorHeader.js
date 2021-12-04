@@ -65,44 +65,55 @@ const EditorHeader = () => {
   const insets = useSafeAreaInsets();
   const handleBack = useRef();
   const keyboardListener = useRef();
+  const closing = useRef(false);
 
   useEffect(() => {
     setColors(colors);
   }, [colors]);
 
   const _onBackPress = async () => {
-    if (deviceMode !== 'mobile' && fullscreen) {
-      eSendEvent(eCloseFullscreenEditor);
-      return;
-    }
+    editing.lastClosedTime = Date.now();
     if (deviceMode === 'mobile') {
-      editing.movedAway = true;
-    }
-    eSendEvent('showTooltip');
-    toolbarRef.current?.scrollTo({
-      x: 0,
-      y: 0,
-      animated: false
-    });
-    editing.isFocused = false;
-    editing.currentlyEditing = false;
-    if (deviceMode !== 'mobile') {
-      if (fullscreen) {
-        eSendEvent(eCloseFullscreenEditor);
-      }
-    } else {
       startClosingSession();
-      if (deviceMode === 'mobile') {
-        tabBarRef.current?.goToPage(0);
+    };
+    setTimeout(async () => {
+      closing.current = true;
+      if (deviceMode !== 'mobile' && fullscreen) {
+        eSendEvent(eCloseFullscreenEditor);
+        return;
       }
-      eSendEvent('historyEvent', {
-        undo: 0,
-        redo: 0
+      if (deviceMode === 'mobile') {
+        editing.movedAway = true;
+      }
+      eSendEvent('showTooltip');
+      toolbarRef.current?.scrollTo({
+        x: 0,
+        y: 0,
+        animated: false
       });
-      useEditorStore.getState().setCurrentlyEditingNote(null);
-      await clearEditor(true, true, false);
-      keyboardListener.current?.remove();
-    }
+      editing.isFocused = false;
+      editing.currentlyEditing = false;
+      editing.focusType = null;
+      safeKeyboardDismiss();
+      if (deviceMode !== 'mobile') {
+        if (fullscreen) {
+          eSendEvent(eCloseFullscreenEditor);
+        }
+      } else {
+        startClosingSession();
+        if (deviceMode === 'mobile') {
+          tabBarRef.current?.goToPage(0);
+        }
+        eSendEvent('historyEvent', {
+          undo: 0,
+          redo: 0
+        });
+        useEditorStore.getState().setCurrentlyEditingNote(null);
+        keyboardListener.current?.remove();
+        await clearEditor(true, true, true);
+      }
+      closing.current = false;
+    }, 1);
   };
 
   const publishNote = async () => {
@@ -211,6 +222,7 @@ const EditorHeader = () => {
   }, [fullscreen]);
 
   const load = async item => {
+    console.log(item.id);
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
       keyboardListener.current = Keyboard.addListener(
@@ -297,7 +309,7 @@ const EditorHeader = () => {
               }}
             />
           )}
-          {fullscreen? <View style={{width: 20}} /> : null}
+          {fullscreen ? <View style={{width: 20}} /> : null}
           {deviceMode !== 'mobile' ? <EditorTitle /> : null}
         </View>
         <View
@@ -316,11 +328,6 @@ const EditorHeader = () => {
                 }}
                 top={50}
                 onPress={async () => {
-                  let note = getNote();
-                  clearEditor(true, true, true);
-                  await loadNote(note);
-
-                  return;
                   if (editing.isFocused) {
                     safeKeyboardDismiss();
                     editing.isFocused = true;
