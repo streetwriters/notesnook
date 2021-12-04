@@ -107,10 +107,11 @@ function errorTransformer(errorJson) {
       switch (error_description) {
         case "invalid_username_or_password":
           return "Username or password incorrect.";
-        case "invalid_grant":
-          return "You token has expired.";
         default:
-          return error;
+          return (
+            error_description ||
+            "Your token has expired. Please create a backup & relogin."
+          );
       }
     }
     default:
