@@ -99,7 +99,11 @@ export const NoteWrapper = React.memo(
     );
   },
   (prev, next) => {
-    
+
+    if (prev.item?.dateEdited !== next.item?.dateEdited) {
+      return false;
+    }
+
     if (
       JSON.stringify(prev.tags) !== JSON.stringify(next.tags)
     ) {
