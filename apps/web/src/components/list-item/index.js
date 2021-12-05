@@ -88,7 +88,7 @@ const ItemSelector = ({ isSelected, toggleSelection }) => {
 
 function ListItem(props) {
   const {
-    colors: { text, primary, background } = {
+    colors: { text, background } = {
       primary: "primary",
       text: "text",
       background: "background",
@@ -158,8 +158,8 @@ function ListItem(props) {
         height: "inherit",
         cursor: "pointer",
         position: "relative",
-        borderLeft: isFocused ? "3px solid" : "none",
-        borderLeftColor: primary,
+        boxShadow: isFocused ? "5px 2px 0px -2px var(--primary) inset" : "none",
+        transition: "box-shadow 200ms ease-in",
         ":hover": {
           backgroundColor: "hover",
         },
