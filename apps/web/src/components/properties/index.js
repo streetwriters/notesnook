@@ -25,7 +25,6 @@ const tools = [
 
 function Properties({ noteId }) {
   const [attachmentsStatus, setAttachmentsStatus] = useState({});
-  const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const color = useStore((store) => store.session.color);
   const notebooks = useStore((store) => store.session.notebooks);
   const attachments = useStore((store) => store.session.attachments);
@@ -80,7 +79,7 @@ function Properties({ noteId }) {
     <>
       <AnimatedFlex
         animate={{
-          x: arePropertiesVisible ? 0 : 800,
+          x: 0,
         }}
         transition={{
           duration: 0.3,
@@ -88,7 +87,7 @@ function Properties({ noteId }) {
           bounceStiffness: 1,
           ease: "easeOut",
         }}
-        initial={false}
+        initial={{ x: 800 }}
         sx={{
           display: "flex",
           position: "absolute",

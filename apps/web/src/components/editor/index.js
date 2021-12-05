@@ -34,7 +34,7 @@ function Editor({ noteId, nonce }) {
   const newSession = useStore((store) => store.newSession);
   const openSession = useStore((store) => store.openSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
-  const updateWordCount = useStore((store) => store.updateWordCount);
+  const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const isMobile = useMobile();
@@ -227,7 +227,7 @@ function Editor({ noteId, nonce }) {
           )}
         </AnimatedFlex>
       </Flex>
-      <Properties noteId={noteId} />
+      {arePropertiesVisible && <Properties noteId={noteId} />}
     </Flex>
   );
 }
