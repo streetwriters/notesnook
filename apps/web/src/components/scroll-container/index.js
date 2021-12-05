@@ -1,78 +1,35 @@
 import React from "react";
-import RSC from "react-scrollbars-custom";
-import { Text } from "rebass";
-import "./style.css";
+import { Box, Text } from "rebass";
+import { Scrollbars } from "rc-scrollbars";
 
-const ScrollContainer = ({
-  children,
-  forwardedRef,
-  onScroll,
-  style,
-  className,
-}) => {
+const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
   return (
-    <RSC
-      className={className}
-      style={style}
-      trackClickBehavior="step"
-      wrapperProps={{
-        style: { right: 0, inset: "0px 1px 0px 0px" },
-      }}
-      trackYProps={{
-        className: "scrollTrackY",
-        style: {
-          height: "100%",
-          width: 8,
-          zIndex: 2,
-          top: 0,
-          opacity: 0,
-          transition: "opacity 150ms linear",
-        },
-      }}
-      scrollerProps={{
-        renderer: (props) => {
-          const {
-            elementRef,
-            onScroll: rscOnScroll,
-            style,
-            ...restProps
-          } = props;
-
-          return (
-            <Text
-              as="span"
-              {...restProps}
-              style={{
-                ...style,
-                marginRight: 0,
-              }}
-              sx={{
-                scrollbarWidth: "none",
-                "::-webkit-scrollbar": { width: 0, height: 0 },
-                msOverflowStyle: "none",
-              }}
-              onScroll={(e) => {
-                if (onScroll) onScroll(e);
-                rscOnScroll(e);
-              }}
-              ref={(ref) => {
-                if (forwardedRef) forwardedRef(ref);
-                elementRef(ref);
-              }}
-            />
-          );
-        },
-      }}
+    <Scrollbars
+      {...props}
+      autoHide
+      ref={(sRef) => forwardedRef && sRef && forwardedRef(sRef.view)}
+      style={{ ...style, overflowY: "hidden" }}
+      renderView={({ style, ...props }) => (
+        <Box {...props} style={{ ...style, inset: "-1px" }} />
+      )}
+      renderThumbVertical={({ style, ...props }) => (
+        <Box
+          {...props}
+          style={{
+            ...style,
+            backgroundColor: "var(--bgSecondaryText)",
+          }}
+        />
+      )}
     >
       {children}
-    </RSC>
+    </Scrollbars>
   );
 };
 export default ScrollContainer;
 
-export const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => (
-  <ScrollContainer
-    {...props}
-    forwardedRef={(scrollbarsRef) => (ref.current = scrollbarsRef)}
-  />
-));
+export const CustomScrollbarsVirtualList = React.forwardRef((props, ref) => {
+  return (
+    <ScrollContainer {...props} forwardedRef={(sRef) => (ref.current = sRef)} />
+  );
+});
