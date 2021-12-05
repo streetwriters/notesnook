@@ -124,7 +124,6 @@ class EditorStore extends BaseStore {
       .then(async (id) => {
         let note = db.notes.note(id)?.data;
         if (!note) {
-          noteStore.refresh();
           this.set((state) => (state.session.isSaving = false));
           return;
         }
@@ -159,7 +158,9 @@ class EditorStore extends BaseStore {
             db.attachments.ofNote(note.id, "files") || [];
         });
 
-        noteStore.refresh();
+        if (note.headline !== session.headline || note.title !== session.title)
+          noteStore.refresh();
+
         if (!oldSession?.id) {
           hashNavigate(`/notes/${id}/edit`, { replace: true });
         }
