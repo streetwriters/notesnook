@@ -47,9 +47,7 @@ export default class Tags extends Collection {
       return;
     }
     await this._db.settings.setAlias(tagId, newName);
-
-    tag.alias = newName;
-    await this._collection.addItem(tag);
+    await this._collection.addItem({ ...tag, alias: newName });
   }
 
   alias(tagId) {
