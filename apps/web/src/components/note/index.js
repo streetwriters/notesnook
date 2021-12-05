@@ -19,16 +19,13 @@ import IconTag from "../icon-tag";
 function Note(props) {
   const { tags, notebook, item, index, context } = props;
   const note = item;
-  const selectedNote = useStore((store) => store.selectedNote);
-  const viewMode = useStore((store) => store.viewMode);
-  const isOpened = selectedNote === note.id;
+  const isOpened = useStore((store) => store.selectedNote === note.id);
+  const isCompact = useStore((store) => store.viewMode === "compact");
 
   const primary = useMemo(() => {
     if (!note.color) return "primary";
     return note.color.toLowerCase();
   }, [note.color]);
-
-  const isCompact = useMemo(() => viewMode === "compact", [viewMode]);
 
   return (
     <ListItem
