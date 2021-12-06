@@ -1,5 +1,5 @@
 {
-  "name": "Notesnook - Private notes app",
+  "name": "Notesnook",
   "description": "Notesnook is a simple and private note taking app that keeps your notes organized and synced on your phone, tablet and computer.",
   "short_name": "Notesnook",
   "shortcuts": [
@@ -110,8 +110,7 @@
   ],
   "prefer_related_applications": true,
   "orientation": "any",
-  "start_url": "/signup",
-  "id": "/signup",
+  "start_url": ".",
   "theme_color": "#01c352",
   "background_color": "#ffffff",
   "display": "standalone",
