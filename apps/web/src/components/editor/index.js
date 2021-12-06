@@ -94,9 +94,12 @@ function Editor({ noteId, nonce }) {
   }, []);
 
   useEffect(() => {
-    if (!sessionId || !editorstore.get().session.contentId) return;
+    if (!sessionId || !editorstore.get().session.contentId) {
+      clearContent();
+      return;
+    }
     setContent();
-  }, [sessionId, setContent]);
+  }, [sessionId, setContent, clearContent]);
 
   useEffect(() => {
     if (!nonce) return;
@@ -167,9 +170,9 @@ function Editor({ noteId, nonce }) {
                 "center",
               ],
             }}
-            maxWidth={isFocusMode ? "min(100%,850px)" : "900px"}
+            maxWidth={isFocusMode ? "min(100%,850px)" : "935px"}
             width="100%"
-            mx={[2, 2, 0]}
+            px={[2, 2, 35]}
             mt={[2, 2, 25]}
           >
             <Header />
