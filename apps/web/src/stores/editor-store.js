@@ -29,7 +29,6 @@ const getDefaultSession = () => {
     context: undefined,
     color: undefined,
     dateEdited: 0,
-    totalWords: 0,
     attachments: [],
     content: {
       type: "tiny",
@@ -65,7 +64,6 @@ class EditorStore extends BaseStore {
         ...note,
         id: undefined, // NOTE: we give a session id only after the note is opened.
         content: note.content,
-        totalWords: state.session.totalWords,
         state: SESSION_STATES.unlocked,
       };
     });
@@ -108,7 +106,6 @@ class EditorStore extends BaseStore {
         ...defaultSession,
         ...note,
         content: content || defaultSession.content,
-        totalWords: state.session.totalWords,
         state: SESSION_STATES.new,
         attachments: db.attachments.ofNote(note.id, "files") || [],
       };
@@ -232,12 +229,6 @@ class EditorStore extends BaseStore {
         (state.arePropertiesVisible =
           toggleState !== undefined ? toggleState : !state.arePropertiesVisible)
     );
-  };
-
-  updateWordCount = (count) => {
-    this.set((state) => {
-      state.session.totalWords = count;
-    });
   };
 
   /**

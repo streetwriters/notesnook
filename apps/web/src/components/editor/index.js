@@ -21,15 +21,22 @@ import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
 import EditorLoading from "./loading";
 import { db } from "../../common/db";
+import { AppEventManager, AppEvents } from "../../common";
+import debounce from "just-debounce-it";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
+
+function updateWordCount(editor) {
+  if (!editor.countWords) return;
+  AppEventManager.publish(AppEvents.UPDATE_WORD_COUNT, editor.countWords());
+}
+const debouncedUpdateWordCount = debounce(updateWordCount, 1000);
 
 function Editor({ noteId, nonce }) {
   const editorRef = useRef();
   const [isEditorLoading, setIsEditorLoading] = useState(true);
   const sessionId = useStore((store) => store.session.id);
   const contentType = useStore((store) => store.session.content?.type);
-  const setSession = useStore((store) => store.setSession);
   const saveSession = useStore((store) => store.saveSession);
   const newSession = useStore((store) => store.newSession);
   const openSession = useStore((store) => store.openSession);
@@ -50,7 +57,6 @@ function Editor({ noteId, nonce }) {
 
   const startSession = useCallback(
     async function startSession(noteId) {
-      console.log("starting session", nonce, noteId);
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId);
@@ -117,7 +123,6 @@ function Editor({ noteId, nonce }) {
     })();
   }, [startSession, noteId, nonce]);
 
-  // if (!isSessionReady) return <EditorLoading />;
   return (
     <Flex
       flexDirection="column"
@@ -200,8 +205,7 @@ function Editor({ noteId, nonce }) {
                     onFocus={() => toggleProperties(false)}
                     onSave={saveSession}
                     sessionId={sessionId}
-                    initialValue={editorstore.get()?.session?.content?.data}
-                    onChange={(content) => {
+                    onChange={(content, editor) => {
                       if (!content || content === "<p><br></pr>") return;
 
                       setSession((state) => {
@@ -210,9 +214,10 @@ function Editor({ noteId, nonce }) {
                           data: content,
                         };
                       });
+
+                      debouncedUpdateWordCount(editor);
                     }}
                     changeInterval={100}
-                    onWordCountChanged={updateWordCount}
                     onInit={(editor) => {
                       editor.focus();
                       setTimeout(() => {

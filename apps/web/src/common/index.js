@@ -142,6 +142,7 @@ export async function verifyAccount() {
 export const AppEventManager = new EventManager();
 export const AppEvents = {
   UPDATE_ATTACHMENT_PROGRESS: "updateAttachmentProgress",
+  UPDATE_WORD_COUNT: "updateWordCount",
 };
 
 export function totalSubscriptionConsumed(user) {

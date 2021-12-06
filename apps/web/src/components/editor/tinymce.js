@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "./editor.css";
 import "@streetwritersco/tinymce-plugins/codeblock/styles.css";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders/styles.css";
-import "tinymce/tinymce";
+import "tinymce/tinymce.js";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import "file-loader?name=static/js/icons/default/icons.js&esModule=false!tinymce/icons/default/icons.min.js";
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -45,7 +45,7 @@ import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import { AppEventManager, AppEvents } from "../../common";
 import { EV, EVENTS } from "notes-core/common";
 import { downloadAttachment } from "../../common/attachments";
-import debounce from "just-debounce";
+import debounce from "just-debounce-it";
 
 const markdownPatterns = [
   { start: "```", replacement: "<pre></pre>" },
@@ -124,17 +124,15 @@ const plugins = {
   pro: "textpattern picker",
 };
 
-const changeEvents = "change input compositionend paste";
+const changeEvents = "change keyup input compositionend paste";
 
 function TinyMCE(props) {
   const {
     changeInterval,
     onChange,
-    onWordCountChanged,
     onSave,
     placeholder,
     simple,
-    initialValue,
     onFocus,
     editorRef,
     onInit,
@@ -142,6 +140,7 @@ function TinyMCE(props) {
   } = props;
   const [oldSkin, newSkin] = useSkin();
   const isUserPremium = useIsUserPremium();
+
   const tinymceRef = editorRef;
   useEffect(() => {
     if (!tinymceRef.current.editor.dom) return;
@@ -188,7 +187,6 @@ function TinyMCE(props) {
       id={sessionId}
       ref={tinymceRef}
       onFocus={onFocus}
-      initialValue={initialValue}
       init={{
         //experimental
         keep_styles: false,
@@ -225,40 +223,46 @@ function TinyMCE(props) {
         imagetools_toolbar:
           "rotateleft rotateright | flipv fliph | alignleft aligncenter alignright",
         init_instance_callback: (editor) => {
-          editor.serializer.addTempAttr("data-progress");
-          clearTimeout(editor.changeTimeout);
           onInit && onInit(editor);
-          console.log("init");
         },
         setup: (editor) => {
-          editor.on("tap", (e) => {
+          function onTap(e) {
             if (
               e.target.classList.contains("mce-content-body") &&
               !e.target.innerText.length > 0
             ) {
               e.preventDefault();
             }
-          });
+          }
 
-          editor.on("ScrollIntoView", (e) => {
-            e.preventDefault();
-            e.elm.scrollIntoView({
-              behavior: "smooth",
-              block: "nearest",
-            });
-          });
-
-          const onEditorChange = debounce(() => {
-            if (onWordCountChanged) onWordCountChanged(editor.countWords());
+          const onEditorChange = debounce((e) => {
+            if (editor.isLoading) {
+              editor.isLoading = false;
+              return;
+            }
 
             if (!editor.getHTML) return;
-
             editor.getHTML().then((html) => {
               onChange(html, editor);
             });
           }, changeInterval);
 
+          function onScrollIntoView(e) {
+            e.preventDefault();
+            e.elm.scrollIntoView({
+              behavior: "smooth",
+              block: "nearest",
+            });
+          }
+
+          editor.on("ScrollIntoView", onScrollIntoView);
+          editor.on("tap", onTap);
           editor.on(changeEvents, onEditorChange);
+          editor.on("remove", () => {
+            editor.off("ScrollIntoView", onScrollIntoView);
+            editor.off("tap", onTap);
+            editor.off(changeEvents, onEditorChange);
+          });
         },
         toolbar_persist: true,
         toolbar_sticky: false,
