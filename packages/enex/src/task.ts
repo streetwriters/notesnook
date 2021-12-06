@@ -10,7 +10,7 @@ import {
 } from "./utils";
 import { HTMLElement } from "node-html-parser";
 
-enum TaskStatus {
+export enum TaskStatus {
   OPEN = "open",
   COMPLETED = "completed",
 }
