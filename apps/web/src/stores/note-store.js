@@ -109,8 +109,9 @@ class NoteStore extends BaseStore {
 
   lock = async (id) => {
     await Vault.lockNote(id);
-    if (editorStore.get().session.id === id) editorStore.clearSession(true);
     this.refresh();
+    if (editorStore.get().session.id === id)
+      await editorStore.openSession(id, true);
   };
 
   setColor = async (id, color) => {
