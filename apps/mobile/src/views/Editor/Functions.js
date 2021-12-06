@@ -110,15 +110,17 @@ async function waitForEvent(event, caller, onend) {
 export async function clearTimer(clear) {
   clearTimeout(timer);
   timer = null;
+  console.log(noteEdited,waitForContent);
   if (waitForContent && noteEdited) {
     await waitForEvent('content_event', () => {
+      console.log('requested content');
       tiny.call(EditorWebView, request_content);
     });
   }
   waitForContent = false;
 
   if (clear) {
-    if (!id || !noteEdited) return;
+    if (!noteEdited) return;
     if (
       (content?.data &&
         typeof content.data === 'string' &&
@@ -433,7 +435,7 @@ export const _onMessage = async evt => {
   switch (message.type) {
     case 'history':
       eSendEvent('historyEvent', message.value);
-      break;
+      break; 
     case 'tiny':
       if (message.sessionId !== sessionId) return;
       if (message.value === '<br>') return;
@@ -596,6 +598,8 @@ export async function clearEditor(
     waitForContent = true;
     await clearTimer(true);
   }
+  console.log(noteEdited,content.data);
+
   disableSaving = true;
   db.fs.cancel(getNote()?.id);
   clearNote();
@@ -712,6 +716,7 @@ export async function saveNote(preventUpdate) {
       }
       locked = _note.locked;
     }
+    console.log('note saved');
 
     let noteData = {
       title,
