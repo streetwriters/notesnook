@@ -42,18 +42,36 @@ export default function AppEffects({ setShow }) {
 
   useEffect(
     function initializeApp() {
+      const userCheckStatusEvent = EV.subscribe(
+        EVENTS.userCheckStatus,
+        async (type) => {
+          if (isUserPremium()) {
+            return { type, result: true };
+          } else {
+            if (type !== CHECK_IDS.databaseSync)
+              await import("./common/dialogcontroller").then((dialogs) =>
+                dialogs.showBuyDialog()
+              );
+            return { type, result: false };
+          }
+        }
+      );
+
       refreshColors();
       refreshMenuPins();
       initNotes();
       (async function () {
         await updateLastSynced();
-        await resetReminders();
-        setIsVaultCreated(await db.vault.exists());
         if (await initUser()) {
           showUpgradeReminderDialogs();
           await sync();
         }
+        await resetReminders();
+        setIsVaultCreated(await db.vault.exists());
       })();
+      return () => {
+        userCheckStatusEvent.unsubscribe();
+      };
     },
     [
       sync,
@@ -68,21 +86,6 @@ export default function AppEffects({ setShow }) {
   );
 
   useEffect(() => {
-    const userCheckStatusEvent = EV.subscribe(
-      EVENTS.userCheckStatus,
-      async (type) => {
-        if (isUserPremium()) {
-          return { type, result: true };
-        } else {
-          if (type !== CHECK_IDS.databaseSync)
-            await import("./common/dialogcontroller").then((dialogs) =>
-              dialogs.showBuyDialog()
-            );
-          return { type, result: false };
-        }
-      }
-    );
-
     const attachmentsLoadingEvent = EV.subscribe(
       EVENTS.attachmentsLoading,
       ({ type, total, current }) => {
@@ -116,7 +119,6 @@ export default function AppEffects({ setShow }) {
 
     registerKeyMap();
     return () => {
-      userCheckStatusEvent.unsubscribe();
       attachmentsLoadingEvent.unsubscribe();
       progressEvent.unsubscribe();
     };
