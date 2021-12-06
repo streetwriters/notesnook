@@ -54,7 +54,7 @@ export class Note implements IEnexElement {
   }
 
   get resources(): Resource[] | undefined {
-    const resourceElements = this.#noteElement.getElementsByTagName("resource");
+    const resourceElements = this.#noteElement.querySelectorAll("resource");
     if (!resourceElements.length) return;
     const resources: Resource[] = [];
     for (let element of resourceElements) {
@@ -64,7 +64,7 @@ export class Note implements IEnexElement {
   }
 
   get tasks(): Task[] | undefined {
-    const taskElements = this.#noteElement.getElementsByTagName("task");
+    const taskElements = this.#noteElement.querySelectorAll("task");
     if (!taskElements.length) return;
     const tasks: Task[] = [];
     for (let element of taskElements) {

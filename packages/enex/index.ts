@@ -40,7 +40,7 @@ export class Enex implements IEnexElement {
   }
 
   get notes(): Note[] {
-    const noteElements = this.#enexElement.getElementsByTagName("note");
+    const noteElements = this.#enexElement.querySelectorAll("note");
     if (noteElements.length <= 0)
       throw new Error("Invalid enex. Enex file contains 0 notes.");
     const notes: Note[] = [];
