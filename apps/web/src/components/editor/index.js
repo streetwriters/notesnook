@@ -14,10 +14,7 @@ import {
   store as editorstore,
 } from "../../stores/editor-store";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { AnimatedFlex } from "../animated";
 import Header from "./header";
-import useMobile from "../../utils/use-mobile";
-import useTablet from "../../utils/use-tablet";
 import Toolbar from "./toolbar";
 import EditorLoading from "./loading";
 import { db } from "../../common/db";
@@ -55,8 +52,6 @@ function Editor({ noteId, nonce }) {
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const init = useStore((store) => store.init);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
-  const isMobile = useMobile();
-  const isTablet = useTablet();
   const isSessionReady = useMemo(
     () => nonce || sessionId || editorRef.current?.editor?.initialized,
     [nonce, sessionId, editorRef]
@@ -162,29 +157,19 @@ function Editor({ noteId, nonce }) {
             minHeight: "39px",
           }}
         />
-        <AnimatedFlex
+        <Flex
           variant="columnFill"
           className="editor"
           sx={{
-            alignSelf: ["stretch", "stretch", "center"],
+            alignSelf: [
+              "stretch",
+              isFocusMode ? "center" : "stretch",
+              "center",
+            ],
           }}
-          animate={{
-            paddingRight:
-              isFocusMode && !isTablet
-                ? "25%"
-                : isTablet || isMobile
-                ? "10px"
-                : "35px",
-            paddingLeft:
-              isFocusMode && !isTablet
-                ? "25%"
-                : isTablet || isMobile
-                ? "10px"
-                : "35px",
-          }}
-          transition={{ duration: 0.3, ease: "easeOut" }}
-          maxWidth={isFocusMode ? "auto" : "935px"}
-          width={["100%", "100%", isFocusMode ? "auto" : "100%"]}
+          maxWidth={isFocusMode ? "min(100%,850px)" : "900px"}
+          width="100%"
+          mx={[2, 2, 0]}
           mt={[2, 2, 25]}
         >
           <Header />
@@ -224,7 +209,7 @@ function Editor({ noteId, nonce }) {
               ) : null}
             </Suspense>
           )}
-        </AnimatedFlex>
+        </Flex>
       </Flex>
       {arePropertiesVisible && <Properties noteId={noteId} />}
     </Flex>
