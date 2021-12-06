@@ -20,7 +20,7 @@ function maskEmail(email) {
 }
 
 function SessionExpiredDialog(props) {
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { onClose, email } = props;
   const [error, setError] = useState();
@@ -30,18 +30,7 @@ function SessionExpiredDialog(props) {
 
   useEffect(() => {
     if (!isAppLoaded) return;
-
-    (async () => {
-      setIsLoading(true);
-      try {
-        const token = await db.user.tokenManager.getToken();
-        if (token) onClose(true);
-      } catch (e) {
-        setError(`Could not refresh access_token. Error: ${e.message}`);
-      } finally {
-        setIsLoading(false);
-      }
-    })();
+    setIsLoading(false);
   }, [onClose, isAppLoaded]);
 
   return (
@@ -75,7 +64,7 @@ function SessionExpiredDialog(props) {
           form: "loginForm",
           type: "submit",
         },
-        text: "Sign in",
+        text: "Refresh session",
         loading: isLoggingIn || isLoading,
         disabled: isLoggingIn || isLoading,
       }}
@@ -104,10 +93,10 @@ function SessionExpiredDialog(props) {
           flexDirection="column"
         >
           <Field
-            required
-            id="email"
+            id="disabled"
             label="Email"
-            name="email-disabled"
+            name="disabled"
+            autoComplete="disabled"
             defaultValue={maskEmail(email)}
             disabled={!!email}
           />
