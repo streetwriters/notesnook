@@ -50,6 +50,11 @@ export class Enex implements IEnexElement {
     return notes;
   }
 
+  get isNotebook(): boolean {
+    const noteElements = this.#enexElement.querySelectorAll("note");
+    return noteElements.length > 1;
+  }
+
   validate() {
     this.exportDate && this.application && this.version && this.notes;
   }
