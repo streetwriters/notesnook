@@ -236,11 +236,6 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
-            if (editor.isLoading) {
-              editor.isLoading = false;
-              return;
-            }
-
             if (!editor.getHTML) return;
             editor.getHTML().then((html) => {
               onChange(html, editor);

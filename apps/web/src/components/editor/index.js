@@ -25,8 +25,6 @@ import { FlexScrollContainer } from "../scroll-container";
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
 function editorSetContent(editor, content) {
-  editor.isLoading = true;
-
   const editorScroll = document.querySelector(".editorScroll");
   if (editorScroll) editorScroll.scrollTop = 0;
 
