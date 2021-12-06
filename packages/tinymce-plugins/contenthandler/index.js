@@ -12,8 +12,7 @@ function register(editor) {
     const body = editor.getBody();
     if (!body) return;
 
-    const html = body.innerHTML;
-    const document = new DOMParser().parseFromString(html, "text/html");
+    const document = body.cloneNode(true);
 
     const elements = document.querySelectorAll(QUERY);
     for (let element of elements) {
@@ -33,7 +32,7 @@ function register(editor) {
         }
       }
     }
-    return document.body.innerHTML;
+    return document.innerHTML;
   };
 
   editor.getText = function () {
@@ -44,11 +43,10 @@ function register(editor) {
   };
 
   editor.countWords = function () {
-    const body = editor.getBody();
-    if (!body) return;
-
-    const text = body.innerText;
+    const text = editor.getText();
+    if (!text) return;
     return countWords(text);
+  };
   };
 }
 
