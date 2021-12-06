@@ -47,6 +47,13 @@ function register(editor) {
     if (!text) return;
     return countWords(text);
   };
+
+  editor.setHTML = function (html) {
+    editorSetContent(editor, html, true);
+  };
+
+  editor.clearContent = function () {
+    editorSetContent(editor, "<p><br></p>", false);
   };
 }
 
@@ -96,4 +103,31 @@ function sanitizeElement(element) {
       element.remove();
     }
   }
+}
+
+function editorSetContent(editor, content, removePlaceholder = true) {
+  const body = editor.getBody();
+  if (!body) return;
+
+  // perf: focus empty editor because apparently tinyMCE parses the whole
+  // HTML on focus (sometimes).
+  body.innerHTML = "";
+  editor.focus();
+
+  if (removePlaceholder) {
+    body.removeAttribute("data-mce-placeholder");
+    body.removeAttribute("aria-placeholder");
+  } else {
+    body.setAttribute("data-mce-placeholder", editor.settings.placeholder);
+    body.setAttribute("aria-placeholder", editor.settings.placeholder);
+  }
+
+  // perf: directly set the HTML content without any parsing or anything.
+  // We probably should pass untrusted content here — so it is up to the
+  // client code to ensure the HTML is clean.
+  body.innerHTML = content;
+
+  editor.undoManager.reset();
+  editor.undoManager.clear();
+  editor.setDirty(false);
 }
