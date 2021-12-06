@@ -16,7 +16,6 @@ jobs:
           persist-credentials: false
         
       - uses: actions/setup-node@master
-      - uses: c-hive/gha-yarn-cache@v1  
       
       - name: Use specific Java version for the builds
         uses: joschi/setup-jdk@v2
@@ -27,19 +26,6 @@ jobs:
       - name: Install node modules
         run: |
           yarn install
-      - name: Cache Gradle Wrapper
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-
-      - name: Cache Gradle Dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-caches-    
           
       - name: Make Gradlew Executable
         run: cd android && chmod +x ./gradlew          

@@ -75,7 +75,7 @@ export const ContainerBottomButton = ({
         ],
       }}>
       <PressableButton
-        testID={notesnook.ids.default.addBtn}
+        testID={notesnook.buttons.add}
         type="accent"
         accentColor={color || 'accent'}
         accentText="light"

@@ -1,8 +1,9 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl} from 'react-native';
+import {FlatList, RefreshControl, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
+import {db} from '../../utils/database';
 import {eScrollEvent} from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
@@ -19,16 +20,30 @@ let renderItems = {
   notebook: NotebookWrapper,
   topic: NotebookWrapper,
   tag: TagItem,
-  section: SectionHeader
+  section: SectionHeader,
+  header: SectionHeader
 };
 
-const RenderItem = ({item, index}) => {
-  if (!item) return <View/>
-  const Item = renderItems[item.itemType || item.type] || <View/>
+const RenderItem = ({item, index}, ...restArgs) => {
+  if (!item) return <View />;
+  const Item = renderItems[item.itemType || item.type] || View;
 
-  return (
-    <Item item={item} tags={item.tags ? [...item.tags] : []} index={index} />
-  );
+  let tags =
+    item.tags
+      ?.slice(0, 3)
+      ?.map(item => {
+        let tag = db.tags.tag(item);
+
+        if (!tag) return null;
+        return {
+          title: tag.title,
+          id: tag.id,
+          alias: tag.alias
+        };
+      })
+      .filter(t => t !== null) || [];
+
+  return <Item item={item} tags={tags} index={index} {...restArgs} />;
 };
 
 const SimpleList = ({
@@ -69,18 +84,15 @@ const SimpleList = ({
   }, [loading]);
 
   const renderItem = React.useCallback(
-    ({item, index}) =>
-      item.type === 'header' ? (
-        <SectionHeader
-          item={item}
-          index={index}
-          color={headerProps.color}
-          title={headerProps.heading}
-          type={screen === 'Notes' ? 'home' : type}
-        />
-      ) : (
-        <RenderItem item={item} index={index} />
-      ),
+    ({item, index}) => (
+      <RenderItem
+        item={item}
+        index={index}
+        color={headerProps.color}
+        title={headerProps.heading}
+        type={screen === 'Notes' ? 'home' : type}
+      />
+    ),
     []
   );
 
@@ -108,7 +120,7 @@ const SimpleList = ({
     width: '100%',
     minHeight: 1,
     minWidth: 1,
-    backgroundColor:colors.bg
+    backgroundColor: colors.bg
   };
 
   const _keyExtractor = item => item.id || item.title;

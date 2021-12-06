@@ -1,9 +1,3 @@
-- Add new header for notebook screen & topic
-- Ensure that products are loaded before showing pricing
-- Show notebook & topic on note items
-- Fixed sorting on items in groups
-- Fixed editor losing focus in checklists
-- Fixed cursor jump to end of paragraph on removing new line
-- Minor bug fixes and performance improvements.
+- Bug fixes and performance improvements
 
 Thank you for using Notesnook!

@@ -1,4 +1,11 @@
 export const notesnook = {
+  editor:{
+    back:"editor.back",
+    id:"editor.id"
+  },
+  buttons:{
+    add:"buttons.add"
+  },
   ids: {
     default: {
       root: 'root',

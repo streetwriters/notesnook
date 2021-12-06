@@ -32,7 +32,7 @@ export const Button = ({
   iconPosition = 'left',
   hitSlop,
   buttonType = {},
-  bold
+  bold,
 }) => {
   const [state] = useTracked();
   const {colors} = state;

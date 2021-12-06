@@ -299,7 +299,7 @@ const EditorHeader = () => {
               }}
               top={50}
               left={50}
-              testID={notesnook.ids.default.header.buttons.back}
+              testID={notesnook.editor.back}
               name="arrow-left"
               color={colors.pri}
               onPress={_onBackPress}
