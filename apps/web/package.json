@@ -11,7 +11,7 @@
     "@mdi/react": "^1.4.0",
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",
-    "@streetwritersco/tinymce-plugins": "file:../notesnook/packages/tinymce-plugins",
+    "@streetwritersco/tinymce-plugins": "^1.4.7",
     "@tinymce/tinymce-react": "^3.13.0",
     "async-mutex": "^0.3.2",
     "axios": "^0.21.4",
