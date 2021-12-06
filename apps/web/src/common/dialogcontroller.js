@@ -14,26 +14,32 @@ import { Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
+import { Mutex } from "async-mutex";
 
+const DialogMutex = new Mutex();
 function showDialog(dialog) {
   const root = document.getElementById("dialogContainer");
 
   if (root) {
-    return new Promise((resolve) => {
-      const perform = (result) => {
-        ReactDOM.unmountComponentAtNode(root);
-        hashNavigate("/", { replace: true });
-        resolve(result);
-      };
-      const PropDialog = dialog(Dialogs, perform);
-      ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
-    });
+    return DialogMutex.runExclusive(
+      () =>
+        new Promise((resolve) => {
+          const perform = (result) => {
+            ReactDOM.unmountComponentAtNode(root);
+            hashNavigate("/", { replace: true });
+            resolve(result);
+          };
+          const PropDialog = dialog(Dialogs, perform);
+          ReactDOM.render(<ThemeProvider>{PropDialog}</ThemeProvider>, root);
+        })
+    );
   }
   return Promise.reject("No element with id 'dialogContainer'");
 }
 
 export function closeOpenedDialog() {
   const root = document.getElementById("dialogContainer");
+  if (!root.childElementCount) return;
   ReactDOM.unmountComponentAtNode(root);
 }
 
