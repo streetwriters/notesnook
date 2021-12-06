@@ -1,11 +1,11 @@
 import { ISO8601DateTime } from "./iso8601datetime";
-import { HTMLElement } from "node-html-parser";
+import { HTMLElement, NodeType } from "node-html-parser";
 
 export function getAsString(
   element: HTMLElement,
   tagName: string
 ): string | null {
-  const tag = element.querySelector(tagName);
+  const tag = findChild(element, tagName);
   if (!tag) return null;
   return tag.textContent.trim();
 }
@@ -14,7 +14,7 @@ export function getAsStringRequired(
   element: HTMLElement,
   tagName: string
 ): string {
-  const tag = element.querySelector(tagName);
+  const tag = findChild(element, tagName);
   if (!tag || !tag.textContent) throw new Error(`${tagName} is required.`);
   return tag.textContent.trim();
 }
@@ -53,4 +53,16 @@ export function getAsDateRequired(element: HTMLElement, tagName: string): Date {
   const date = ISO8601DateTime.toDate(time);
   if (!date) throw new Error(`${tagName} value is an invalid date.`);
   return date;
+}
+
+function findChild(element: HTMLElement, tagName: string): HTMLElement | null {
+  for (let child of element.childNodes) {
+    if (
+      child.nodeType === NodeType.ELEMENT_NODE &&
+      (<HTMLElement>child).tagName.toLowerCase() === tagName.toLowerCase()
+    ) {
+      return <HTMLElement>child;
+    }
+  }
+  return null;
 }
