@@ -85,6 +85,8 @@ const NoteItem = ({item, isTrash, tags}) => {
     if (!notebook) return [];
     let topic = notebook.topics.topic(item_notebook.topics[0])?._topic;
 
+    if (!topic) return [];
+
     notebook = notebook.data;
 
     return [
@@ -95,11 +97,7 @@ const NoteItem = ({item, isTrash, tags}) => {
       }
     ];
   }
-
-  useEffect(() => {
-    console.log('rendering',item.id);
-  })
-
+  
   return (
     <>
       <View

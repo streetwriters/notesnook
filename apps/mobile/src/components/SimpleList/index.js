@@ -29,17 +29,22 @@ const RenderItem = ({item, index}, ...restArgs) => {
   const Item = renderItems[item.itemType || item.type] || View;
 
   let tags =
-    item.tags?.slice(0, 3)?.map(item => {
-      let tag = db.tags.tag(item);
-      return {
-        title:tag.title,
-        id:tag.id,
-        alias:tag.alias
-      }
-    }) || [];
+    item.tags
+      ?.slice(0, 3)
+      ?.map(item => {
+        let tag = db.tags.tag(item);
+
+        if (!tag) return null;
+        return {
+          title: tag.title,
+          id: tag.id,
+          alias: tag.alias
+        };
+      })
+      .filter(t => t !== null) || [];
 
   return <Item item={item} tags={tags} index={index} {...restArgs} />;
-}
+};
 
 const SimpleList = ({
   listData,
