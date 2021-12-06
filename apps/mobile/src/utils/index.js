@@ -16,7 +16,7 @@ import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
 import {SIZE} from './SizeUtils';
 
-export const APP_VERSION = 1690;
+export const APP_VERSION = 1691;
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
