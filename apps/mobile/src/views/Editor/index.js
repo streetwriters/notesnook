@@ -93,7 +93,7 @@ const Editor = React.memo(
           }}>
           <EditorHeader />
           <WebView
-            testID={notesnook.ids.default.editor}
+            testID={notesnook.editor.id}
             ref={EditorWebView}
             onLoad={onLoad}
             scrollEnabled={true}

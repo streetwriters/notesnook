@@ -127,6 +127,7 @@ const SplashScreen = () => {
   return (
     !isIntroCompleted && (
       <Animated.View
+        testID="notesnook.splashscreen"
         style={{
           zIndex: 999,
           ...getElevation(10),

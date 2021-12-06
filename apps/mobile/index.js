@@ -1,12 +1,14 @@
 import 'react-native-gesture-handler';
 import React from 'react';
-import {AppRegistry, Platform} from 'react-native';
+import {AppRegistry, LogBox, Platform} from 'react-native';
 import {name as appName} from './app.json';
 import {enableScreens} from 'react-native-screens';
 import Notifications from './src/services/Notifications';
 import {SafeAreaProvider} from 'react-native-safe-area-context';
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
+
+LogBox.ignoreAllLogs();
 
 let Provider;
 let App;

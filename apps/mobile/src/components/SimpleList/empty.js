@@ -1,6 +1,7 @@
 import React from 'react';
 import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {normalize, SIZE} from '../../utils/SizeUtils';
@@ -64,6 +65,7 @@ export const Empty = ({
             onPress={placeholderData.action}
             title={placeholderData.button}
             icon={placeholderData.buttonIcon || 'plus'}
+            testID={notesnook.buttons.add}
             type="accent"
             fontSize={SIZE.md}
             accentColor="bg"

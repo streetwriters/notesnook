@@ -25,7 +25,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               menu: false
             });
           }}
-          testID={notesnook.ids.default.header.buttons.left}
+          //testID={notesnook.ids.default.header.buttons.left}
           name="magnify"
           color={colors.pri}
           customStyle={styles.rightBtn}
@@ -62,7 +62,7 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               onPress={() => {
                 menuRef.current?.show();
               }}
-              testID={notesnook.ids.default.header.buttons.left}
+              //testID={notesnook.ids.default.header.buttons.left}
               name="dots-vertical"
               color={colors.pri}
               customStyle={styles.rightBtn}
