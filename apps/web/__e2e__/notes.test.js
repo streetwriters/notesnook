@@ -450,7 +450,7 @@ test.describe("run tests independently", () => {
   test(`export note as md`, async () => await exportNote("md"));
   test(`export note as html`, async () => await exportNote("html"));
 
-  test("unlock a note for editing", async () => {
+  test.only("unlock a note for editing", async () => {
     const content = "Edits 1 2 3 ";
 
     const noteSelector = await createNoteAndCheckPresence();
