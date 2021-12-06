@@ -57,7 +57,6 @@ function SessionExpiredDialog(props) {
         </Flex>
       }
       icon={Icon.Login}
-      scrollable
       negativeButton={{
         text: "Sign out",
         disabled: isLoggingIn,

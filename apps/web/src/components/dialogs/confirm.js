@@ -8,7 +8,6 @@ function Confirm(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
-      scrollable
       description={props.subtitle}
       onClose={props.onNo}
       positiveButton={{

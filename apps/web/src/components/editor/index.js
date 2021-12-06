@@ -20,6 +20,7 @@ import EditorLoading from "./loading";
 import { db } from "../../common/db";
 import { AppEventManager, AppEvents } from "../../common";
 import debounce from "just-debounce-it";
+import { FlexScrollContainer } from "../scroll-container";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
@@ -136,81 +137,83 @@ function Editor({ noteId, nonce }) {
         </Flex>
       ) : null}
       <Toolbar />
-      <Flex
-        variant="columnFill"
-        className="editorScroll"
-        flexDirection="column"
-        overflow="hidden"
-        overflowY="auto"
-      >
-        <Flex
-          id="editorToolbar"
-          sx={{
-            bg: "background",
-            position: "sticky",
-            top: 0,
-            zIndex: 2,
-            borderBottom: "1px solid",
-            borderBottomColor: "border",
-            justifyContent: "center",
-            alignItems: "center",
-            minHeight: "39px",
-          }}
-        />
+      <FlexScrollContainer>
         <Flex
           variant="columnFill"
-          className="editor"
-          sx={{
-            alignSelf: [
-              "stretch",
-              isFocusMode ? "center" : "stretch",
-              "center",
-            ],
-          }}
-          maxWidth={isFocusMode ? "min(100%,850px)" : "900px"}
-          width="100%"
-          mx={[2, 2, 0]}
-          mt={[2, 2, 25]}
+          className="editorScroll"
+          flexDirection="column"
+          overflow="hidden"
+          overflowY="auto"
         >
-          <Header />
+          <Flex
+            id="editorToolbar"
+            sx={{
+              bg: "background",
+              position: "sticky",
+              top: 0,
+              zIndex: 2,
+              borderBottom: "1px solid",
+              borderBottomColor: "border",
+              justifyContent: "center",
+              alignItems: "center",
+              minHeight: "39px",
+            }}
+          />
+          <Flex
+            variant="columnFill"
+            className="editor"
+            sx={{
+              alignSelf: [
+                "stretch",
+                isFocusMode ? "center" : "stretch",
+                "center",
+              ],
+            }}
+            maxWidth={isFocusMode ? "min(100%,850px)" : "900px"}
+            width="100%"
+            mx={[2, 2, 0]}
+            mt={[2, 2, 25]}
+          >
+            <Header />
 
-          {isSessionReady && (
-            <Suspense fallback={<div />}>
-              {contentType === "tiny" ? (
-                <>
-                  <ReactMCE
-                    editorRef={editorRef}
-                    onFocus={() => toggleProperties(false)}
-                    onSave={saveSession}
-                    sessionId={sessionId}
-                    onChange={(content, editor) => {
-                      if (!content || content === "<p><br></pr>") return;
+            {isSessionReady && (
+              <Suspense fallback={<div />}>
+                {contentType === "tiny" ? (
+                  <>
+                    <ReactMCE
+                      editorRef={editorRef}
+                      onFocus={() => toggleProperties(false)}
+                      onSave={saveSession}
+                      sessionId={sessionId}
+                      onChange={(content, editor) => {
+                        if (!content || content === "<p><br></pr>") return;
 
-                      editorstore.get().setSessionContent({
-                        type: "tiny",
-                        data: content,
-                      });
+                        editorstore.get().setSessionContent({
+                          type: "tiny",
+                          data: content,
+                        });
 
-                      debouncedUpdateWordCount(editor);
-                    }}
-                    changeInterval={100}
-                    onInit={(editor) => {
-                      if (sessionId && editorstore.get().session.contentId) {
-                        setContent();
-                      } else if (nonce) clearContent();
+                        debouncedUpdateWordCount(editor);
+                      }}
+                      changeInterval={100}
+                      onInit={(editor) => {
+                        if (sessionId && editorstore.get().session.contentId) {
+                          setContent();
+                        } else if (nonce) clearContent();
 
-                      setTimeout(() => {
-                        setIsEditorLoading(false);
-                        // a short delay to make sure toolbar has rendered.
-                      }, 100);
-                    }}
-                  />
-                </>
-              ) : null}
-            </Suspense>
-          )}
+                        setTimeout(() => {
+                          setIsEditorLoading(false);
+                          // a short delay to make sure toolbar has rendered.
+                        }, 100);
+                      }}
+                    />
+                  </>
+                ) : null}
+              </Suspense>
+            )}
+          </Flex>
         </Flex>
-      </Flex>
+      </FlexScrollContainer>
       {arePropertiesVisible && <Properties noteId={noteId} />}
     </Flex>
   );

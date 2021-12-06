@@ -109,7 +109,6 @@ function FeatureDialog(props) {
     <Dialog
       isOpen={true}
       title={feature.title}
-      scrollable
       description={feature.subtitle}
       buttonsAlignment="center"
       positiveButton={{

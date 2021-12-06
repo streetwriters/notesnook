@@ -2,6 +2,7 @@ import { Flex, Text, Button as RebassButton } from "rebass";
 import * as Icon from "../icons";
 import Modal from "react-modal";
 import { useTheme } from "emotion-theming";
+import { FlexScrollContainer } from "../scroll-container";
 
 Modal.setAppElement("#root");
 function Dialog(props) {
@@ -37,6 +38,7 @@ function Dialog(props) {
           right: 0,
           bottom: 0,
           display: "flex",
+          flexDirection: "column",
           justifyContent: "center",
           backgroundColor: undefined,
           padding: 0,
@@ -57,8 +59,9 @@ function Dialog(props) {
         height={["100%", "auto", "auto"]}
         bg="background"
         alignSelf={"center"}
-        overflowY={props.scrollable ? "auto" : "hidden"}
+        overflowY={"hidden"}
         sx={{
+          justifyContent: "stretch",
           position: "relative",
           overflow: "hidden",
           boxShadow: "4px 5px 18px 2px #00000038",
@@ -98,8 +101,8 @@ function Dialog(props) {
             </Text>
           )}
         </Flex>
-        <Flex flexDirection="column" my={1} mx={4}>
-          {props.children}
+        <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1} mx={4}>
+          <FlexScrollContainer>{props.children}</FlexScrollContainer>
         </Flex>
         {(props.positiveButton || props.negativeButton) && (
           <Flex

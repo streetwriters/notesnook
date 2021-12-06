@@ -81,7 +81,6 @@ function ReminderDialog(props) {
       title={reminder.title}
       onClose={props.onClose}
       showClose
-      scrollable
       description={reminder.description}
       alignment="center"
       positiveButton={{

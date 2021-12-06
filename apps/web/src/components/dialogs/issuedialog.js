@@ -46,7 +46,6 @@ function IssueDialog(props) {
     <Dialog
       isOpen={true}
       title={"Report an issue"}
-      scrollable
       description={
         "Let us know if you are facing an issue. We'll do our best to sort it out for you."
       }

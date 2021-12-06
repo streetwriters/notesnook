@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import "./editor.css";
 import "@streetwritersco/tinymce-plugins/codeblock/styles.css";
 import "@streetwritersco/tinymce-plugins/collapsibleheaders/styles.css";
-import "tinymce/tinymce.js";
+import "tinymce/tinymce";
 // eslint-disable-next-line import/no-webpack-loader-syntax
 import "file-loader?name=static/js/icons/default/icons.js&esModule=false!tinymce/icons/default/icons.min.js";
 // eslint-disable-next-line import/no-webpack-loader-syntax
@@ -258,7 +258,8 @@ function TinyMCE(props) {
           editor.on("ScrollIntoView", onScrollIntoView);
           editor.on("tap", onTap);
           editor.on(changeEvents, onEditorChange);
-          editor.on("remove", () => {
+          editor.once("remove", () => {
+            console.log("removing");
             editor.off("ScrollIntoView", onScrollIntoView);
             editor.off("tap", onTap);
             editor.off(changeEvents, onEditorChange);

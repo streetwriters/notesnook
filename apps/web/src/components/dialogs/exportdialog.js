@@ -44,7 +44,6 @@ function ExportDialog(props) {
       icon={props.icon}
       description="You can export your notes as Markdown, HTML, PDF or Text."
       onClose={props.onClose}
-      scrollable
       negativeButton={{
         onClick: props.onClose,
         text: "Cancel",

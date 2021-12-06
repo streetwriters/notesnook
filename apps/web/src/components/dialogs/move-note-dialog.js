@@ -1,5 +1,5 @@
 import React from "react";
-import { Flex, Box, Text } from "rebass";
+import { Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import { db } from "../../common/db";
 import Dialog from "./dialog";
@@ -86,7 +86,7 @@ class MoveDialog extends React.Component {
           onClick: props.onClose,
         }}
       >
-        <Flex flexDirection="column" sx={{ overflowY: "hidden" }}>
+        <Flex flexDirection="column" flex={1} sx={{ overflowY: "hidden" }}>
           <Field
             inputRef={(ref) => (this.inputRef = ref)}
             data-test-id="mnd-new-notebook-title"
@@ -105,14 +105,12 @@ class MoveDialog extends React.Component {
               if (e.key === "Enter") await this.addNotebook(e.target);
             }}
           />
-          <Box
+          <Flex
             mt={1}
+            variant="columnFill"
             sx={{
               borderRadius: "default",
-              borderWidth: 1,
-              borderStyle: "solid",
-              borderColor: "border",
-              overflowY: "auto",
+              border: "1px solid var(--border)",
             }}
           >
             {notebooks.map((notebook, index) => (
@@ -197,7 +195,7 @@ class MoveDialog extends React.Component {
                 </Flex>
               </Flex>
             ))}
-          </Box>
+          </Flex>
         </Flex>
       </Dialog>
     );
