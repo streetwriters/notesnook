@@ -26,6 +26,17 @@ import debounce from "just-debounce-it";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 
+function editorSetContent(editor, content) {
+  editor.isLoading = true;
+
+  const editorScroll = document.querySelector(".editorScroll");
+  if (editorScroll) editorScroll.scrollTop = 0;
+
+  editor.setHTML(content);
+
+  updateWordCount(editor);
+}
+
 function updateWordCount(editor) {
   if (!editor.countWords) return;
   AppEventManager.publish(AppEvents.UPDATE_WORD_COUNT, editor.countWords());
@@ -71,39 +82,21 @@ function Editor({ noteId, nonce }) {
       content: { data },
     } = editorstore.get().session;
     const editor = editorRef.current?.editor;
-    if (!editor) return;
+    if (!editor || !editor.initialized) return;
 
     async function setContents() {
-      if (!editor.initialized) return;
-      editor.setContent(data, { format: "html" });
-
-      editor.undoManager.reset();
-      editor.setDirty(false);
+      editorSetContent(editor, data);
 
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       if (id) await db.attachments.downloadImages(id);
-
-      editor.focus();
     }
-
     setContents();
   }, []);
 
   const clearContent = useCallback(() => {
     const editor = editorRef.current?.editor;
-    console.log(editor);
-    if (!editor) return;
-
-    async function clearContents() {
-      if (!editor.initialized) return;
-      editor.setContent("<p><br/></p>", { format: "html" });
-      editor.undoManager.reset();
-      editor.setDirty(false);
-
-      editor.focus();
-    }
-
-    clearContents();
+    if (!editor || !editor.initialized) return;
+    editor.clearContent();
   }, []);
 
   useEffect(() => {
@@ -208,18 +201,19 @@ function Editor({ noteId, nonce }) {
                     onChange={(content, editor) => {
                       if (!content || content === "<p><br></pr>") return;
 
-                      setSession((state) => {
-                        state.session.content = {
-                          type: "tiny",
-                          data: content,
-                        };
+                      editorstore.get().setSessionContent({
+                        type: "tiny",
+                        data: content,
                       });
 
                       debouncedUpdateWordCount(editor);
                     }}
                     changeInterval={100}
                     onInit={(editor) => {
-                      editor.focus();
+                      if (sessionId && editorstore.get().session.contentId) {
+                        setContent();
+                      } else if (nonce) clearContent();
+
                       setTimeout(() => {
                         setIsEditorLoading(false);
                         // a short delay to make sure toolbar has rendered.
