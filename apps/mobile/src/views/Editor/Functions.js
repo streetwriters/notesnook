@@ -110,7 +110,7 @@ async function waitForEvent(event, caller, onend) {
 export async function clearTimer(clear) {
   clearTimeout(timer);
   timer = null;
-  console.log(noteEdited,waitForContent);
+
   if (waitForContent && noteEdited) {
     await waitForEvent('content_event', () => {
       console.log('requested content');
@@ -118,7 +118,7 @@ export async function clearTimer(clear) {
     });
   }
   waitForContent = false;
-
+  console.log("cleared timer & saving note",content.data);
   if (clear) {
     if (!noteEdited) return;
     if (
@@ -127,6 +127,7 @@ export async function clearTimer(clear) {
         content.data?.trim().length > 0) ||
       (title && title?.trim().length > 0)
     ) {
+      console.log('saving note');
       await saveNote(true);
     }
   }
@@ -435,7 +436,12 @@ export const _onMessage = async evt => {
   switch (message.type) {
     case 'history':
       eSendEvent('historyEvent', message.value);
-      break; 
+      break;
+    case 'noteedited':
+      if (message.sessionId !== sessionId) return;
+      console.log('noteedited');
+      noteEdited = true;
+      break;  
     case 'tiny':
       if (message.sessionId !== sessionId) return;
       if (message.value === '<br>') return;
@@ -530,7 +536,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) {
-        console.log('no note loaded',id);
+        console.log('no note loaded', id);
         return;
       }
       console.log('content not loaded');
@@ -598,7 +604,7 @@ export async function clearEditor(
     waitForContent = true;
     await clearTimer(true);
   }
-  console.log(noteEdited,content.data);
+  console.log(noteEdited, content.data);
 
   disableSaving = true;
   db.fs.cancel(getNote()?.id);
@@ -607,8 +613,10 @@ export async function clearEditor(
     clearTimeout(cTimeout);
     cTimeout = null;
   }
+  sessionId = null;
   let func = async () => {
     try {
+      console.log('reset editor');
       reset && EditorWebView.current?.reload();
       // if (DDS.isTab) {
       //   await waitForEvent('webviewOk');
@@ -699,6 +707,9 @@ async function addToCollection(id) {
 
 export async function saveNote(preventUpdate) {
   if (disableSaving || !noteEdited || (isSaving && !id)) return;
+  if (preventUpdate) {
+    noteEdited = false;
+  };
 
   isSaving = true;
   try {
@@ -716,7 +727,8 @@ export async function saveNote(preventUpdate) {
       }
       locked = _note.locked;
     }
-    console.log('note saved');
+
+    console.log('note saved',preventUpdate,closingSession);
 
     let noteData = {
       title,
@@ -739,11 +751,15 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id) {
-        useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await addToCollection(noteId);
       }
-      await setNoteInEditorAfterSaving(id, noteId);
-      saveCounter++;
+
+      if (!id && !preventUpdate) {
+        useEditorStore.getState().setCurrentlyEditingNote(noteId);
+        await setNoteInEditorAfterSaving(id, noteId);
+        saveCounter++;
+      }
+
     } else {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);

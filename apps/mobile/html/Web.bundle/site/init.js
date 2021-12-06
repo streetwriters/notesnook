@@ -491,8 +491,9 @@ function delay(base = 0) {
   if (prevCount > 70000) return base + 1000;
 }
 
+let noteedited = false;
 const onChange = function (event) {
-  console.log(event.type, event.selectionChange);
+  console.log(event.type,event.selectionChange);
   if (event.type === 'nodechange' && !event.selectionChange) return;
 
   if (isLoading) {
@@ -505,8 +506,13 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0) return;
-  console.log('editor changed', event.selectionChange);
-  reactNativeEventHandler('noteedited');
+  if (event.type !== 'nodechange' && event.type !== 'compositionend') {
+    if (!noteedited) {
+      noteedited = true;
+      reactNativeEventHandler('noteedited');
+    }
+  }
+  
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
@@ -556,7 +562,6 @@ function selectchange() {
   clearTimeout(selectionTimer);
   selectionTimer = null;
   selectionTimer = setTimeout(function () {
-    console.log('selection change called');
     updateCount();
     let formats = Object.keys(editor.formatter.get());
     let currentFormats = {};
