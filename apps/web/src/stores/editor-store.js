@@ -21,7 +21,7 @@ const getDefaultSession = () => {
     state: undefined,
     isSaving: false,
     title: "",
-    id: "",
+    id: undefined,
     pinned: false,
     favorite: false,
     locked: false,

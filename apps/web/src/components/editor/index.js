@@ -43,6 +43,7 @@ function Editor({ noteId, nonce }) {
   const editorRef = useRef();
   const [isEditorLoading, setIsEditorLoading] = useState(true);
   const sessionId = useStore((store) => store.session.id);
+  const contentId = useStore((store) => store.session.contentId);
   const contentType = useStore((store) => store.session.content?.type);
   const saveSession = useStore((store) => store.saveSession);
   const newSession = useStore((store) => store.newSession);
@@ -93,19 +94,30 @@ function Editor({ noteId, nonce }) {
     editor.clearContent();
   }, []);
 
-  useEffect(() => {
-    if (!sessionId || !editorstore.get().session.contentId) {
+  useEffect(
+    function clearSession() {
+      // clearSession makes sessionId && contentId both undefined
+      if (!sessionId && !contentId) clearContent();
+    },
+    [sessionId, contentId, clearContent]
+  );
+
+  useEffect(
+    function openSesion() {
+      if (!contentId) return;
+      setContent();
+    },
+    [sessionId, contentId, setContent, clearContent]
+  );
+
+  useEffect(
+    function newSession() {
+      if (!nonce) return;
+
       clearContent();
-      return;
-    }
-    setContent();
-  }, [sessionId, setContent, clearContent]);
-
-  useEffect(() => {
-    if (!nonce) return;
-
-    clearContent();
-  }, [nonce, clearContent]);
+    },
+    [nonce, clearContent]
+  );
 
   useEffect(() => {
     (async () => {
