@@ -14,11 +14,11 @@ export async function LaunchApp() {
 }
 
 export function elementById(id) {
-  return element(by.id(id));
+  return element(by.id(id)).atIndex(0);
 }
 
 export function elementByText(text) {
-  return element(by.text(text));
+  return element(by.text(text)).atIndex(0)
 }
 
 export async function tapById(id) {

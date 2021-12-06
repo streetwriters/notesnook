@@ -7,7 +7,8 @@ const {
   tapById,
   elementById,
   visibleByText,
-  tapByText
+  tapByText,
+  elementByText
 } = require('./misc.e2e');
 const {sleep} = require('./utils.test');
 
@@ -32,21 +33,20 @@ describe('Basic tests', () => {
   });
 
   it('App should create a note successfully', async () => {
-    await sleep(100);
+    let title = 'Test note description that ';
+    let body =
+      'Test note description that is very long and should not fit in text.';
+
     await tapById(notesnook.buttons.add);
-    await sleep(200);
     await elementById(notesnook.editor.id).tap({
       x: 15,
       y: 15
     });
-    await elementById(notesnook.editor.id).typeText('Test note description that is very long and should not fit in text.');
-    await sleep(200);
+    await elementById(notesnook.editor.id).typeText(body);
     await tapById(notesnook.editor.back);
-    await sleep(300);
-    await visibleByText('Test note description that ');
+    await expect(elementByText(title).atIndex(0)).toBeVisible();
+
     await tapById(notesnook.ids.note.get(1));
     await tapById(notesnook.editor.back);
   });
-
-
 });
