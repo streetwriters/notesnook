@@ -29,6 +29,11 @@ class ListItemIDBuilder {
     return this;
   }
 
+  tag(tag) {
+    this.suffix = `tags-${tag}`;
+    return this;
+  }
+
   locked() {
     this.suffix = "locked";
     return this;

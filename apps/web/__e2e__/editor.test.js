@@ -1,5 +1,6 @@
 const { Page, test, expect } = require("@playwright/test");
 const { createNote, NOTE, getTestId } = require("./utils");
+const { checkNotePresence } = require("./utils/conditions");
 /**
  * @type {Page}
  */

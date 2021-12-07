@@ -134,6 +134,7 @@ function Note(props) {
               {tags?.map((tag) => {
                 return (
                   <Button
+                    data-test-id={`note-${index}-tags-${tag.alias}`}
                     key={tag.id}
                     variant="anchor"
                     mr={1}

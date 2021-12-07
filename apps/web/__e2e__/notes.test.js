@@ -5,6 +5,7 @@
  * TODO: We are still not checking if toast appears on delete/restore or not.
  */
 const { Page, test, expect } = require("@playwright/test");
+
 const {
   getTestId,
   createNote,
@@ -12,6 +13,8 @@ const {
   downloadFile,
   PASSWORD,
   editNote,
+  getEditorTitle,
+  getEditorContent,
 } = require("./utils");
 const {
   navigateTo,
@@ -29,14 +32,20 @@ const {
 } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
+const { LoremIpsum } = require("lorem-ipsum");
+
+/**
+ * @type {Page}
+ */
+var page = null;
 
 async function createNoteAndCheckPresence(note = NOTE, viewId = "home") {
   await createNote(note, "notes");
 
   // make sure the note has saved.
-  await page.waitForTimeout(1000);
+  await page.waitForTimeout(200);
 
-  let noteSelector = await checkNotePresence(viewId);
+  let noteSelector = await checkNotePresence(viewId, 0, note);
 
   await page.click(noteSelector, { button: "left" });
 
@@ -199,11 +208,8 @@ async function exportNote(format) {
 }
 
 test.describe("run tests independently", () => {
-  /**
-   * @type {Page}
-   */
-  global.page = null;
   test.beforeEach(async ({ page: _page, baseURL }) => {
+    page = _page;
     global.page = _page;
     await page.goto(baseURL);
     await page.waitForSelector(getTestId("routeHeader"));
@@ -450,7 +456,7 @@ test.describe("run tests independently", () => {
   test(`export note as md`, async () => await exportNote("md"));
   test(`export note as html`, async () => await exportNote("html"));
 
-  test.only("unlock a note for editing", async () => {
+  test("unlock a note for editing", async () => {
     const content = "Edits 1 2 3 ";
 
     const noteSelector = await createNoteAndCheckPresence();
@@ -472,5 +478,54 @@ test.describe("run tests independently", () => {
     await expect(page.textContent(".mce-content-body")).resolves.toContain(
       `${content}${NOTE.content}`
     );
+  });
+
+  test("creating a new note should clear the editor contents & title", async () => {
+    await createNoteAndCheckPresence();
+
+    await page.click(getTestId("notes-action-button"));
+
+    expect(await getEditorTitle()).toBe("");
+
+    expect(await getEditorContent()).toBe("");
+  });
+});
+
+test.describe("stress tests", () => {
+  test.skip();
+
+  test.beforeEach(async ({ page: _page, baseURL }) => {
+    page = _page;
+    global.page = _page;
+    await page.goto(baseURL);
+    await page.waitForSelector(getTestId("routeHeader"));
+  });
+
+  test("create & verify 100 notes", async ({}, info) => {
+    info.setTimeout(0);
+
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4,
+      },
+      wordsPerSentence: {
+        max: 16,
+        min: 4,
+      },
+    });
+
+    for (let i = 0; i < 100; ++i) {
+      await test.step(`creating test note ${i + 1}`, async () => {
+        const title = lorem.generateSentences(1);
+        const content = lorem.generateSentences(2);
+
+        await createNoteAndCheckPresence({ title, content });
+
+        expect(await getEditorTitle()).toBe(title);
+
+        expect(await getEditorContent()).toBe(content);
+      });
+    }
   });
 });

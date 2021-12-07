@@ -27,7 +27,7 @@ async function createNote(note, actionButtonId) {
 async function editNote(title, content) {
   await page.waitForSelector(".mce-content-body");
 
-  await page.waitForTimeout(1000);
+  // await page.waitForTimeout(1000);
 
   if (title)
     await page.fill(getTestId("editor-title"), title, {
@@ -54,6 +54,16 @@ async function downloadFile(downloadActionSelector, encoding) {
   });
 }
 
+async function getEditorTitle() {
+  return await page.inputValue(getTestId("editor-title"));
+}
+
+async function getEditorContent() {
+  return (await page.innerText(".mce-content-body"))
+    .trim()
+    .replace(/\n+/gm, "\n");
+}
+
 module.exports = {
   NOTE,
   NOTEBOOK,
@@ -62,4 +72,6 @@ module.exports = {
   createNote,
   editNote,
   downloadFile,
+  getEditorTitle,
+  getEditorContent,
 };
