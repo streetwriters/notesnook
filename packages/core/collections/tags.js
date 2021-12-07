@@ -46,6 +46,10 @@ export default class Tags extends Collection {
       console.error(`No tag found. Tag id:`, tagId);
       return;
     }
+
+    newName = this.sanitize(newName);
+    if (!newName) throw new Error("Tag title cannot be empty.");
+
     await this._db.settings.setAlias(tagId, newName);
     await this._collection.addItem({ ...tag, alias: newName });
   }
