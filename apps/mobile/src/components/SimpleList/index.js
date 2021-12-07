@@ -1,19 +1,18 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, RefreshControl, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
-import {db} from '../../utils/database';
-import {eScrollEvent} from '../../utils/Events';
+import { db } from '../../utils/database';
+import { eScrollEvent } from '../../utils/Events';
 import JumpToDialog from '../JumpToDialog';
-import {NotebookWrapper} from '../NotebookItem/wrapper';
-import {NoteWrapper} from '../NoteItem/wrapper';
-import SortDialog from '../SortDialog';
+import { NotebookWrapper } from '../NotebookItem/wrapper';
+import { NoteWrapper } from '../NoteItem/wrapper';
 import TagItem from '../TagItem';
-import {Empty} from './empty';
-import {Footer} from './footer';
-import {Header} from './header';
-import {SectionHeader} from './section-header';
+import { Empty } from './empty';
+import { Footer } from './footer';
+import { Header } from './header';
+import { SectionHeader } from './section-header';
 
 let renderItems = {
   note: NoteWrapper,
