@@ -1,256 +1,200 @@
-import React, {createRef} from 'react';
+import React, {useState} from 'react';
 import {View} from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
 import {db} from '../../utils/database';
-import {eCloseSortDialog, eOpenSortDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
-import Paragraph from '../Typography/Paragraph';
 
-class SortDialog extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      groupOptions: null,
-      visible: false
-    };
-    this.actionSheet = createRef();
-  }
+const Sort = ({type, screen}) => {
+  const [state] = useTracked();
+  const colors = state.colors;
+  const [groupOptions, setGroupOptions] = useState(
+    db.settings.getGroupOptions(type)
+  );
 
-  async open(type) {
-    if (type !== this.props.type) return;
-    this.setState(
-      {
-        visible: true,
-        groupOptions: db.settings.getGroupOptions(this.props.type)
-      },
-      async () => {
-        console.log(this.state.groupOptions);
-        this.actionSheet.current?.setModalVisible(true);
-      }
-    );
-  }
-
-  async close() {
-    this.actionSheet.current?.setModalVisible(false);
-    await sleep(100);
-    this.setState({
-      visible: false
-    });
-  }
-
-  async componentDidMount() {
-    eSubscribeEvent(eOpenSortDialog, this.open.bind(this));
-    eSubscribeEvent(eCloseSortDialog, this.close.bind(this));
-  }
-
-  componentWillUnmount() {
-    eUnSubscribeEvent(eOpenSortDialog, this.open);
-    eUnSubscribeEvent(eCloseSortDialog, this.close);
-  }
-
-  updateGroupOptions = async _groupOptions => {
-    await db.settings.setGroupOptions(this.props.type, _groupOptions);
-    this.setState({
-      groupOptions: _groupOptions
-    });
+  const updateGroupOptions = async _groupOptions => {
+    await db.settings.setGroupOptions(type, _groupOptions);
+    setGroupOptions(_groupOptions);
     setTimeout(() => {
-      Navigation.setRoutesToUpdate([this.props.screen]);
+      Navigation.setRoutesToUpdate([screen]);
       eSendEvent('groupOptionsUpdate');
     }, 1);
   };
 
-  render() {
-    const {colors} = this.props;
-    const {groupOptions, visible} = this.state;
+  const setOrderBy = async () => {
+    let _groupOptions = {
+      ...groupOptions,
+      sortDirection: groupOptions.sortDirection === 'asc' ? 'desc' : 'asc'
+    };
+    await updateGroupOptions(_groupOptions);
+  };
 
-    if (!visible) return null;
-
-    return (
-      <ActionSheetWrapper fwdRef={this.actionSheet}>
-        <View
+  return (
+    <View
+      style={{
+        width: '100%',
+        backgroundColor: colors.bg,
+        justifyContent: 'space-between',
+        borderRadius: 10,
+        paddingTop: 10
+      }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          paddingHorizontal: 12
+        }}>
+        <Heading
+          size={SIZE.xl}
           style={{
-            width: '100%',
-            backgroundColor: colors.bg,
-            justifyContent: 'space-between',
-            borderRadius: 10,
-            paddingTop: 10
+            alignSelf: 'center'
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingHorizontal: 12
-            }}>
-            <Heading
-              size={SIZE.xl}
-              style={{
-                alignSelf: 'center'
-              }}>
-              Sort & Group
-            </Heading>
+          Sort by
+        </Heading>
 
+        <Button
+          title={
+            groupOptions.sortDirection === 'asc'
+              ? groupOptions.groupBy === 'abc'
+                ? 'A - Z'
+                : 'Old - New'
+              : groupOptions.groupBy === 'abc'
+              ? 'Z - A'
+              : 'New - Old'
+          }
+          icon={
+            groupOptions.sortDirection === 'asc'
+              ? 'sort-ascending'
+              : 'sort-descending'
+          }
+          height={25}
+          iconPosition="right"
+          fontSize={SIZE.sm - 1}
+          type="transparent"
+          style={{
+            borderRadius: 100
+          }}
+          onPress={setOrderBy}
+        />
+      </View>
+
+      <Seperator />
+
+      <View
+        style={{
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          flexWrap: 'wrap',
+          borderBottomWidth: 1,
+          borderBottomColor: colors.nav,
+          marginBottom: 12,
+          paddingHorizontal: 12,
+          paddingBottom: 12,
+          alignItems: 'center'
+        }}>
+        {groupOptions.groupBy === 'abc' ? (
+          <Button
+            type={'grayBg'}
+            title="Title"
+            height={45}
+            iconPosition="left"
+            icon={'check'}
+            buttonType={{text: colors.accent}}
+            fontSize={SIZE.sm}
+            iconSize={SIZE.md}
+          />
+        ) : (
+          Object.keys(SORT).map((item, index) => (
             <Button
-              title={
-                groupOptions.sortDirection === 'asc'
-                  ? groupOptions.groupBy === 'abc'
-                    ? 'A - Z'
-                    : 'Oldest - Newest'
-                  : groupOptions.groupBy === 'abc'
-                  ? 'Z - A'
-                  : 'Newest - Oldest'
-              }
-              icon={
-                groupOptions.sortDirection === 'asc'
-                  ? 'sort-ascending'
-                  : 'sort-descending'
-              }
-              height={25}
+              key={item}
+              type={groupOptions.sortBy === item ? 'grayBg' : 'gray'}
+              title={SORT[item]}
+              height={45}
               iconPosition="left"
-              fontSize={SIZE.sm - 1}
-              type="grayBg"
+              icon={groupOptions.sortBy === item ? 'check' : null}
               style={{
-                borderRadius: 100
+                marginRight: 10
               }}
+              buttonType={{
+                text: groupOptions.sortBy === item ? colors.accent : colors.icon
+              }}
+              fontSize={SIZE.sm}
               onPress={async () => {
                 let _groupOptions = {
                   ...groupOptions,
-                  sortDirection:
-                    groupOptions.sortDirection === 'asc' ? 'desc' : 'asc'
+                  sortBy: type === 'trash' ? 'dateDeleted' : item
                 };
-                await this.updateGroupOptions(_groupOptions);
+                await updateGroupOptions(_groupOptions);
               }}
+              iconSize={SIZE.md}
             />
-          </View>
+          ))
+        )}
+      </View>
 
-          <Seperator />
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'space-around',
-              borderBottomWidth: 1,
-              borderBottomColor: colors.nav,
-              marginBottom: 12,
-              paddingHorizontal: 12
-            }}>
-            {this.state.groupOptions.groupBy === 'abc' ? (
-              <Paragraph
-                style={{
-                  height: 40
-                }}
-                color={colors.icon}>
-                No sort options available.
-              </Paragraph>
-            ) : (
-              Object.keys(SORT).map((item, index) => (
-                <Button
-                  key={item}
-                  type={groupOptions.sortBy === item ? 'transparent' : 'gray'}
-                  title={SORT[item]}
-                  height={40}
-                  iconPosition="left"
-                  icon={
-                    groupOptions.sortBy === item
-                      ? 'check-circle-outline'
-                      : 'checkbox-blank-circle-outline'
-                  }
-                  textStyle={{
-                    color: colors.pri
-                  }}
-                  fontSize={SIZE.sm}
-                  style={{
-                    backgroundColor: 'transparent'
-                  }}
-                  onPress={async () => {
-                    let _groupOptions = {
-                      ...groupOptions,
-                      sortBy: this.props.type === 'trash' ? 'dateDeleted' : item
-                    };
-                    await this.updateGroupOptions(_groupOptions);
-                  }}
-                  iconSize={SIZE.lg}
-                />
-              ))
-            )}
-          </View>
-          <View
-            style={{
-              paddingHorizontal: 0,
-              borderRadius: 0
-            }}>
-            {Object.keys(GROUP).map((item, index) => (
-              <PressableButton
-                key={item}
-                testID={'btn-' + item}
-                type={
-                  groupOptions.groupBy === GROUP[item] ? 'transparent' : 'gray'
+      <Heading
+        style={{
+          marginLeft: 12
+        }}
+        size={SIZE.lg}>
+        Group by
+      </Heading>
+
+      <Seperator />
+
+      <View
+        style={{
+          paddingHorizontal: 0,
+          borderRadius: 0,
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          paddingHorizontal: 12
+        }}>
+        {Object.keys(GROUP).map((item, index) => (
+          <Button
+            key={item}
+            testID={'btn-' + item}
+            type={groupOptions.groupBy === GROUP[item] ? 'grayBg' : 'gray'}
+            buttonType={{
+              text:
+                groupOptions.groupBy === GROUP[item]
+                  ? colors.accent
+                  : colors.icon
+            }}
+            onPress={async () => {
+              let _groupOptions = {
+                ...groupOptions,
+                groupBy: GROUP[item]
+              };
+
+              if (item === 'abc') {
+                _groupOptions.sortBy = 'title';
+                _groupOptions.sortDirection = 'asc';
+              } else {
+                if (groupOptions.sortBy === 'title') {
+                  _groupOptions.sortBy = 'dateEdited';
                 }
-                onPress={async () => {
-                  let _groupOptions = {
-                    ...groupOptions,
-                    groupBy: GROUP[item]
-                  };
+              }
+              updateGroupOptions(_groupOptions);
+            }}
+            icon={groupOptions.groupBy === GROUP[item] ? 'check' : null}
+            title={item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
+            style={{
+              paddingHorizontal: 12,
+              marginBottom: 10,
+              marginRight: 10
+            }}
+          />
+        ))}
+      </View>
+    </View>
+  );
+};
 
-                  if (item === 'alphabetical') {
-                    _groupOptions.sortBy = 'title';
-                    _groupOptions.sortDirection = 'asc';
-                  } else {
-                    if (this.state.groupOptions.sortBy === 'title') {
-                      _groupOptions.sortBy = 'dateEdited';
-                    }
-                  }
-
-                  this.updateGroupOptions(_groupOptions);
-                }}
-                customStyle={{
-                  width: '100%',
-                  height: 50,
-                  justifyContent: 'space-between',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  borderRadius: 5,
-                  paddingHorizontal: 12,
-                  marginBottom: 10
-                }}>
-                <Paragraph
-                  size={SIZE.sm}
-                  style={{
-                    fontFamily:
-                      groupOptions.groupBy === GROUP[item]
-                        ? 'OpenSans-SemiBold'
-                        : 'OpenSans-Regular'
-                  }}
-                  color={
-                    groupOptions.groupBy === GROUP[item]
-                      ? colors.accent
-                      : colors.pri
-                  }>
-                  {item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
-                </Paragraph>
-
-                {groupOptions.groupBy === GROUP[item] ? (
-                  <Icon color={colors.accent} name="check" size={SIZE.lg} />
-                ) : null}
-              </PressableButton>
-            ))}
-          </View>
-        </View>
-      </ActionSheetWrapper>
-    );
-  }
-}
-
-export default SortDialog;
+export default Sort;

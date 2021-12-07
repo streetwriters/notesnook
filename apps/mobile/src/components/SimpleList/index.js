@@ -93,6 +93,7 @@ const SimpleList = ({
         color={headerProps.color}
         title={headerProps.heading}
         type={screen === 'Notes' ? 'home' : type}
+        screen={screen}
       />
     ),
     []
@@ -178,12 +179,6 @@ const SimpleList = ({
             )}
           </>
         }
-      />
-
-      <SortDialog
-        screen={screen}
-        type={screen === 'Notes' ? 'home' : type}
-        colors={colors}
       />
       <JumpToDialog
         screen={screen}

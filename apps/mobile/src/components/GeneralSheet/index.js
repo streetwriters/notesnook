@@ -11,7 +11,6 @@ import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-
 const GeneralSheet = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -62,7 +61,13 @@ const GeneralSheet = ({context}) => {
         style={{
           justifyContent: 'center',
           alignItems: 'center',
-          marginBottom: 10,
+          marginBottom:
+            dialogData.noProgress &&
+            dialogData.noIcon &&
+            !dialogData.title &&
+            !dialogData.paragraph
+              ? 0
+              : 10,
           paddingHorizontal: 12
         }}>
         {!dialogData?.noProgress && !dialogData.component ? (
@@ -84,7 +89,9 @@ const GeneralSheet = ({context}) => {
         ) : null}
       </View>
 
-      {typeof dialogData.component === "function" ? dialogData.component(actionSheetRef):dialogData.component}
+      {typeof dialogData.component === 'function'
+        ? dialogData.component(actionSheetRef)
+        : dialogData.component}
 
       {dialogData?.learnMore ? (
         <Paragraph
@@ -100,7 +107,7 @@ const GeneralSheet = ({context}) => {
       <View
         style={{
           paddingHorizontal: 12,
-          marginBottom:dialogData.valueArray ? 12 : 0
+          marginBottom: dialogData.valueArray ? 12 : 0
         }}>
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
@@ -140,7 +147,7 @@ const GeneralSheet = ({context}) => {
         ) : null}
 
         {dialogData?.actionsArray &&
-          dialogData?.actionsArray.map((item,index) => (
+          dialogData?.actionsArray.map((item, index) => (
             <Button
               onPress={item.action}
               key={item.accentText}

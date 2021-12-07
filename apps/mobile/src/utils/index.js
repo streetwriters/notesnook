@@ -80,7 +80,7 @@ export const sortSettings = {
 
 export const GROUP = {
   default: 'default',
-  alphabetical: 'abc',
+  abc: 'abc',
   year: 'year',
   week: 'week',
   month: 'month'
