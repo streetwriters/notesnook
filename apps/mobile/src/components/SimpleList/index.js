@@ -24,7 +24,7 @@ let renderItems = {
   header: SectionHeader
 };
 
-const RenderItem = ({item, index}, ...restArgs) => {
+const RenderItem = ({item, index,...restArgs}) => {
   if (!item) return <View />;
   const Item = renderItems[item.itemType || item.type] || View;
 
@@ -42,7 +42,9 @@ const RenderItem = ({item, index}, ...restArgs) => {
         };
       })
       .filter(t => t !== null) || [];
-
+      if (index == 0) {
+        console.log(restArgs);
+      }
   return <Item item={item} tags={tags} index={index} {...restArgs} />;
 };
 
