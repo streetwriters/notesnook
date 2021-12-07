@@ -1,16 +1,25 @@
 diff --git a/node_modules/react-native-cli-bump-version/lib/index.js b/node_modules/react-native-cli-bump-version/lib/index.js
-index a319832..f400a70 100644
+index a319832..9366079 100644
 --- a/node_modules/react-native-cli-bump-version/lib/index.js
 +++ b/node_modules/react-native-cli-bump-version/lib/index.js
-@@ -23,6 +23,7 @@ const incrementSemVer = (current, type) => {
+@@ -23,9 +23,16 @@ const incrementSemVer = (current, type) => {
      if (type === 'minor') {
          return [major, minor + 1, 0].join('.');
      }
++
++    if (type === "patchup") {
++        let patchVer = parseInt((patch/10 + 1).toFixed(0)) * 10
++        return [major, minor, patchVer].join('.');
++    }
 +    
      if (type === 'patch') {
          return [major, minor, patch + 1].join('.');
      }
-@@ -46,11 +47,23 @@ class BaseFileManager {
++    
+     throw new Error(`'${type}' is not a semver type`);
+ };
+ class BaseFileManager {
+@@ -46,11 +53,27 @@ class BaseFileManager {
      }
  }
  class PBXManager extends BaseFileManager {
@@ -22,11 +31,15 @@ index a319832..f400a70 100644
 -        const nextCode = currentCode + 1;
 +        let nextCode =  currentCode;
 +        if (type === "minor") {
-+            nextCode = parseInt((currentCode/100).toFixed(0)) * 100;
++            nextCode = parseInt(Math.floor((currentCode/100 + 1)).toFixed(0)) * 100;
 +        };
 +
 +        if (type === "major") {
-+            nextCode = parseInt((currentCode/1000).toFixed(0)) * 1000;
++            nextCode = parseInt(Math.floor((currentCode/1000 + 1)).toFixed(0)) * 1000;
++        }
++        
++        if (type ==="patchup") {
++            nextCode = parseInt(Math.floor((currentCode/10 + 1)).toFixed(0)) * 10;
 +        }
 +
 +        if (type ==="patch" || !type) {
@@ -36,7 +49,7 @@ index a319832..f400a70 100644
          this.content = ramda_1.replace(codeRegex, `CURRENT_PROJECT_VERSION = ${nextCode};`, currentFile);
          return {
              current: currentCode,
-@@ -69,12 +82,25 @@ class PBXManager extends BaseFileManager {
+@@ -69,12 +92,29 @@ class PBXManager extends BaseFileManager {
      }
  }
  class BuildGradleManager extends BaseFileManager {
@@ -50,11 +63,15 @@ index a319832..f400a70 100644
 +        let next = current;
 +        
 +        if (type === "minor") {
-+            next = parseInt((current/100).toFixed(0)) * 100;
++            next = parseInt(Math.floor((current/100 + 1)).toFixed(0)) * 100;
 +        };
 +
 +        if (type === "major") {
-+            next = parseInt((current/1000).toFixed(0)) * 1000;
++            next = parseInt(Math.floor((current/1000 + 1)).toFixed(0)) * 1000;
++        }
++
++        if (type ==="patchup") {
++            next = parseInt(Math.floor((current/10 + 1)).toFixed(0)) * 10;
 +        }
 +
 +        if (type === "patch" || !type) {
@@ -64,7 +81,7 @@ index a319832..f400a70 100644
          if (isNaN(next)) {
              throw new Error(`Invalid versionCode version parsed (${versionMatch})`);
          }
-@@ -144,13 +170,13 @@ class ProjectFilesManager {
+@@ -144,13 +184,13 @@ class ProjectFilesManager {
          console.log(success(`package.json: ${packageCurrent} -> ${packageNext}`));
      }
      bumpCodes() {
