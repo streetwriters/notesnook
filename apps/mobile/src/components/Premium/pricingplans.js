@@ -315,7 +315,7 @@ export const PricingPlans = ({
                   marginBottom: 10
                 }}
               />
-              {promo &&
+              {Platform.OS !== "ios" && promo &&
               !promo.promoCode.startsWith('com.streetwriters.notesnook') ? (
                 <Paragraph
                   size={SIZE.md}
