@@ -485,9 +485,7 @@ function setup_tiny(_editor) {
 let prevCount = 0;
 
 function delay(base = 0) {
-  if (prevCount < 1000) return 0;
-  if (prevCount > 1000 && prevCount < 10000) return 10;
-  if (prevCount > 10000 && prevCount < 20000) return base + 200;
+  if (prevCount < 20000) return base + 200;
   if (prevCount > 20000 && prevCount < 40000) return base + 400;
   if (prevCount > 40000 && prevCount < 70000) return base + 600;
   if (prevCount > 70000) return base + 1000;
