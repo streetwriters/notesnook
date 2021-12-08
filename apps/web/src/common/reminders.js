@@ -10,6 +10,7 @@ import { isDesktop } from "../utils/platform";
 import saveFile from "../commands/save-file";
 import { PATHS } from "@notesnook/desktop/paths";
 import { isUserPremium } from "../hooks/use-is-user-premium";
+import { showToast } from "../utils/toast";
 
 export async function shouldAddBackupReminder() {
   if (isIgnored("backup")) return false;
@@ -94,9 +95,11 @@ export async function resetReminders() {
         "backupStorageLocation",
         PATHS.backupsDirectory
       );
-      saveFile(`${directory}/${filename}.${ext}`, data);
-    } else {
-      reminders.push({ type: "backup", priority: "high" });
+      const filePath = `${directory}/${filename}.${ext}`;
+      saveFile(filePath, data);
+      showToast("success", `Backup saved at ${filePath}.`);
+    } else if (isUserPremium()) {
+      await createBackup(true);
     }
   }
   if (await shouldAddLoginReminder()) {

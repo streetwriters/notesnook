@@ -119,11 +119,13 @@ export async function createBackup(save = true) {
   const filename = sanitizeFilename(
     `notesnook-backup-${new Date().toLocaleString("en")}`
   );
-  const ext = "nnbackup";
-  showToast("success", "Backup created!");
 
-  if (!save) return { data, filename, ext };
-  else download(filename, data, ext);
+  const ext = "nnbackup";
+  if (!save) {
+    return { data, filename, ext };
+  } else {
+    download(filename, data, ext);
+  }
 }
 
 export function getTotalNotes(notebook) {
