@@ -123,7 +123,7 @@ function onUndoChange() {
 
 function init_callback(_editor) {
   editor = _editor;
-  console.log('init_call',editor);
+  //console.log('init_call', editor);
   setTheme();
 
   editor.on('SelectionChange', function (e) {
@@ -331,7 +331,7 @@ function init_tiny(size) {
     attachmenthandler_download_attachment: hash => {
       reactNativeEventHandler('attachment_download', hash);
     },
-    custom_undo_redo_levels : 10,
+    custom_undo_redo_levels: 10,
     plugins: plugins,
     toolbar: false,
     keep_styles: false,
@@ -485,7 +485,9 @@ function setup_tiny(_editor) {
 let prevCount = 0;
 
 function delay(base = 0) {
-  if (prevCount < 20000) return base + 200;
+  if (prevCount < 1000) return 0;
+  if (prevCount > 1000 && prevCount < 10000) return 10;
+  if (prevCount > 10000 && prevCount < 20000) return base + 200;
   if (prevCount > 20000 && prevCount < 40000) return base + 400;
   if (prevCount > 40000 && prevCount < 70000) return base + 600;
   if (prevCount > 70000) return base + 1000;
@@ -493,7 +495,7 @@ function delay(base = 0) {
 
 let noteedited = false;
 const onChange = function (event) {
-  console.log(event.type,event.selectionChange);
+  console.log(event.type, event.selectionChange);
   if (event.type === 'nodechange' && !event.selectionChange) return;
 
   if (isLoading) {
@@ -505,14 +507,14 @@ const onChange = function (event) {
     updateCount(0);
   }
 
-  if (prevCount === 0) return;
+  if (prevCount === 0 && event.type !== 'paste') return;
   if (event.type !== 'nodechange' && event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
       reactNativeEventHandler('noteedited');
     }
   }
-  
+
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
@@ -533,6 +535,7 @@ function updateCount(timer = 1000) {
     info = document.querySelector('.info-bar');
     info.querySelector('#infowords').innerText = count + ' words';
     prevCount = count;
+    console.log('timer', 'updating here');
   } else {
     countTimer = setTimeout(function () {
       let count = editor.countWords();
