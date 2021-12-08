@@ -11,7 +11,7 @@ import storage from '../utils/storage';
 import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
-const MS_DAY = 864; //00000;
+const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
 
 async function getDirectoryAndroid() {
