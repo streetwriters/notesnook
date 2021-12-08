@@ -124,7 +124,14 @@ const plugins = {
   pro: "textpattern picker",
 };
 
-const changeEvents = "change input compositionend paste";
+/**
+ * 1. input - called on every change
+ * 2. compositionend - (Android only) called on change
+ * 3. paste - called after content is pasted
+ * We do not include the "change" event here as it is only
+ * invoked after the editor loses focus.
+ */
+const changeEvents = "input compositionend paste";
 
 function TinyMCE(props) {
   const {
@@ -236,7 +243,6 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
-            console.log("onEditorChange", e);
             if (!editor.getHTML) return;
             editor.getHTML().then((html) => {
               onChange(html, editor);
