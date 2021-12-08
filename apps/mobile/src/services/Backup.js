@@ -1,17 +1,17 @@
 const {MMKV} = require('../utils/MMKV');
-import storage from '../utils/storage';
+import {Platform} from 'react-native';
+import FileViewer from 'react-native-file-viewer';
+import * as ScopedStorage from 'react-native-scoped-storage';
+import Share from 'react-native-share';
+import {presentDialog} from '../components/Dialog/functions';
 import {db} from '../utils/database';
+import {eCloseProgressDialog} from '../utils/Events';
+import {sanitizeFilename} from '../utils/filename';
+import storage from '../utils/storage';
 import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
-import {eCloseProgressDialog, eOpenProgressDialog} from '../utils/Events';
-import Share from 'react-native-share';
-import {Platform} from 'react-native';
-import {sanitizeFilename} from '../utils/filename';
-import * as ScopedStorage from 'react-native-scoped-storage';
-import {presentDialog} from '../components/Dialog/functions';
-import FileViewer from 'react-native-file-viewer';
 
-const MS_DAY = 86400000;
+const MS_DAY = 864; //00000;
 const MS_WEEK = MS_DAY * 7;
 
 async function getDirectoryAndroid() {
@@ -47,11 +47,11 @@ async function checkBackupDirExists() {
       presentDialog({
         title: 'Select backup folder',
         paragraph:
-          'Please select the folder where you would like to store backup files.',
+          'Daily backups are turned on. Please select a folder where you would like to store backup files. You can change or disable automatic backups in settings however we highly recommend that you keep them on.',
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },
-        positiveText: 'Open file manager'
+        positiveText: 'Select'
       });
     });
   }
@@ -117,7 +117,7 @@ async function run() {
         context: 'global'
       });
 
-      presentSheet( {
+      presentSheet({
         title: 'Backup complete',
         icon: 'cloud-upload',
         paragraph:
@@ -167,7 +167,7 @@ async function getLastBackupDate() {
 }
 
 async function checkBackupRequired(type) {
-  if (type === 'off') return;
+  if (type === 'off' || type === 'useroff') return;
   let now = Date.now();
   let lastBackupDate = await getLastBackupDate();
   if (!lastBackupDate || lastBackupDate === 'never') {

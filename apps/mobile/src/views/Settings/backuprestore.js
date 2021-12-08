@@ -196,7 +196,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
               {[
                 {
                   title: 'Never',
-                  value: 'off'
+                  value: 'useroff'
                 },
                 {
                   title: 'Daily',
@@ -210,7 +210,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                 <TouchableOpacity
                   activeOpacity={1}
                   onPress={async () => {
-                    if (item.value === 'off') {
+                    if (item.value === 'useroff') {
                       await SettingsService.set('reminder', item.value);
                     } else {
                       await PremiumService.verify(async () => {

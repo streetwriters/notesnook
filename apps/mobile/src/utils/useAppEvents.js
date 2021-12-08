@@ -59,6 +59,7 @@ import {
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import {ProFeatures} from '../components/ResultDialog/pro-features';
+import Backup from '../services/Backup';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -157,8 +158,7 @@ export const useAppEvents = () => {
         Navigation.routeNames.Trash,
         Navigation.routeNames.Notebook
       ]);
-       eSendEvent(eClearEditor, id);
- 
+      eSendEvent(eClearEditor, id);
     } catch (e) {}
   };
 
@@ -204,7 +204,6 @@ export const useAppEvents = () => {
     try {
       if (url.startsWith('https://app.notesnook.com/account/verified')) {
         await onEmailVerified();
-      
       } else {
         return;
       }
@@ -350,6 +349,7 @@ export const useAppEvents = () => {
       }
       if (user) {
         setUser(user);
+
         clearMessage();
         attachIAPListeners();
         await Sync.run();
@@ -390,6 +390,12 @@ export const useAppEvents = () => {
       }
     } finally {
       await PremiumService.setPremiumStatus();
+      if (PremiumService.get()) {
+        if (SettingsService.get().reminder === "off") {
+          await SettingsService.set('reminder', 'daily');
+          sleep(2000).then(() => Backup.checkAndRun());
+        }
+      }
       refValues.current.isUserReady = true;
       if (login) {
         eSendEvent(eCloseProgressDialog);
