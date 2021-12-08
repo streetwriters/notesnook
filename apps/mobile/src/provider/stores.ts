@@ -408,6 +408,7 @@ export function clearAllStores() {
   useNotebookStore.getState().clearNotebooks();
   useTagStore.getState().clearTags();
   useFavoriteStore.getState().clearFavorites();
+  useMenuStore.getState().clearAll();
   useNoteStore.getState().clearNotes();
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clearTrash();
