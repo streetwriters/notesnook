@@ -150,81 +150,73 @@ function Editor({ noteId, nonce }) {
         </Flex>
       ) : null}
       <Toolbar />
-      <FlexScrollContainer>
+      <FlexScrollContainer className="editorScroll">
+        <Flex
+          id="editorToolbar"
+          sx={{
+            bg: "background",
+            position: "sticky",
+            top: 0,
+            zIndex: 2,
+            borderBottom: "1px solid",
+            borderBottomColor: "border",
+            justifyContent: "center",
+            alignItems: "center",
+            minHeight: "39px",
+          }}
+        />
         <Flex
           variant="columnFill"
-          className="editorScroll"
-          flexDirection="column"
-          overflow="hidden"
-          overflowY="auto"
+          className="editor"
+          sx={{
+            alignSelf: [
+              "stretch",
+              isFocusMode ? "center" : "stretch",
+              "center",
+            ],
+          }}
+          maxWidth={isFocusMode ? "min(100%,850px)" : "935px"}
+          width="100%"
+          px={[2, 2, 35]}
+          mt={[2, 2, 25]}
         >
-          <Flex
-            id="editorToolbar"
-            sx={{
-              bg: "background",
-              position: "sticky",
-              top: 0,
-              zIndex: 2,
-              borderBottom: "1px solid",
-              borderBottomColor: "border",
-              justifyContent: "center",
-              alignItems: "center",
-              minHeight: "39px",
-            }}
-          />
-          <Flex
-            variant="columnFill"
-            className="editor"
-            sx={{
-              alignSelf: [
-                "stretch",
-                isFocusMode ? "center" : "stretch",
-                "center",
-              ],
-            }}
-            maxWidth={isFocusMode ? "min(100%,850px)" : "935px"}
-            width="100%"
-            px={[2, 2, 35]}
-            mt={[2, 2, 25]}
-          >
-            <Header />
+          <Header />
 
-            {isSessionReady && (
-              <Suspense fallback={<div />}>
-                {contentType === "tiny" ? (
-                  <>
-                    <ReactMCE
-                      editorRef={editorRef}
-                      onFocus={() => toggleProperties(false)}
-                      onSave={saveSession}
-                      sessionId={sessionId}
-                      onChange={(content, editor) => {
-                        if (!content || content === "<p><br></p>") return;
+          {isSessionReady && (
+            <Suspense fallback={<div />}>
+              {contentType === "tiny" ? (
+                <>
+                  <ReactMCE
+                    editorRef={editorRef}
+                    onFocus={() => toggleProperties(false)}
+                    onSave={saveSession}
+                    sessionId={sessionId}
+                    onChange={(content, editor) => {
+                      if (!content || content === "<p><br></p>") return;
 
-                        editorstore.get().setSessionContent({
-                          type: "tiny",
-                          data: content,
-                        });
+                      editorstore.get().setSessionContent({
+                        type: "tiny",
+                        data: content,
+                      });
 
-                        debouncedUpdateWordCount(editor);
-                      }}
-                      changeInterval={100}
-                      onInit={(editor) => {
-                        if (sessionId && editorstore.get().session.contentId) {
-                          setContent();
-                        } else if (nonce) clearContent();
+                      debouncedUpdateWordCount(editor);
+                    }}
+                    changeInterval={100}
+                    onInit={(editor) => {
+                      if (sessionId && editorstore.get().session.contentId) {
+                        setContent();
+                      } else if (nonce) clearContent();
 
-                        setTimeout(() => {
-                          setIsEditorLoading(false);
-                          // a short delay to make sure toolbar has rendered.
-                        }, 100);
-                      }}
-                    />
-                  </>
-                ) : null}
-              </Suspense>
-            )}
-          </Flex>
+                      setTimeout(() => {
+                        setIsEditorLoading(false);
+                        // a short delay to make sure toolbar has rendered.
+                      }, 100);
+                    }}
+                  />
+                </>
+              ) : null}
+            </Suspense>
+          )}
         </Flex>
       </FlexScrollContainer>
       {arePropertiesVisible && <Properties noteId={noteId} />}

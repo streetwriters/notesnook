@@ -35,6 +35,7 @@ function Toolbar(props) {
 
   useEffect(() => {
     const editorScroll = document.querySelector(".editorScroll");
+    if (!editorScroll) return;
 
     function onScroll(e) {
       const headerOffset = document.querySelector(".editorTitle").scrollHeight;
