@@ -255,7 +255,7 @@ const NotesnookShare = ({quicknote = false}) => {
       webviewRef.current?.injectJavaScript(`document
       .querySelector('.htmldiff_div')
       .setAttribute('contenteditable', 'true');`);
-      webviewRef.current.injectJavaScript(`
+      webviewRef.current?.injectJavaScript(`
       pageTheme.colors = ${theme};
       setTheme();
     `);
