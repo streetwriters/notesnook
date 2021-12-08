@@ -75,14 +75,6 @@ export default class Notes extends Collection {
       note.title = getNoteTitle(note, content);
       note.headline = getNoteHeadline(note, content);
 
-      if (isNoteEmpty(note, content)) {
-        if (oldNote) {
-          EV.publish(EVENTS.noteRemoved, id);
-          await this.remove(id);
-        }
-        return;
-      }
-
       note.contentId = await this._db.content.add({
         noteId: id,
         id: note.contentId,
@@ -275,12 +267,6 @@ export default class Notes extends Collection {
       }
     }
   }
-}
-
-function isNoteEmpty(note, content) {
-  const { title, locked } = note;
-  const isTitleEmpty = !title || !title.trim().length;
-  return !locked && isTitleEmpty && content.isEmpty();
 }
 
 function getNoteHeadline(note, content) {

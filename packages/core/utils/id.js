@@ -1,7 +1,6 @@
-import { hash, SALT_LENGTH, PERSONALIZATION_LENGTH } from "@stablelib/blake2s";
+import { hash, SALT_LENGTH } from "@stablelib/blake2s";
 import SparkMD5 from "spark-md5";
 import { USER_PERSONALIZATION_HASH } from "../common";
-import ObjectID from "./object-id";
 import { randomBytes } from "./random";
 
 export default function () {

@@ -1,17 +1,16 @@
-import showdown from "showdown";
-import { decode, DecodingMode, EntityLevel } from "entities";
+import showdown from "showdown/dist/showdown";
 import dataurl from "../utils/dataurl";
-import { parseHTML } from "../utils/html-parser";
+import { getDummyDocument, parseHTML } from "../utils/html-parser";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
 
 const splitter = /\W+/gm;
-
 class Tiny {
   constructor(data) {
     this.data = data;
     this.text;
+    this.document = parseHTML(data);
   }
 
   toHTML() {
@@ -19,14 +18,13 @@ class Tiny {
   }
 
   toTXT() {
-    return decode(
-      this.data.replace(/<br[^>]*>/gi, "\n").replace(/<[^>]+>/g, ""),
-      { level: EntityLevel.HTML, mode: DecodingMode.Strict }
-    ).trim();
+    return this.document.body
+      ? this.document.body.innerText || this.document.body.textContent
+      : this.document.textContent;
   }
 
   toMD() {
-    return converter.makeMarkdown(this.data);
+    return converter.makeMarkdown(this.data, getDummyDocument());
   }
 
   toTitle() {
@@ -57,8 +55,7 @@ class Tiny {
   }
 
   async insertMedia(getData) {
-    let document = parseHTML(this.data);
-    const attachmentElements = document.querySelectorAll("img");
+    const attachmentElements = this.document.querySelectorAll("img");
     for (var i = 0; i < attachmentElements.length; ++i) {
       const attachment = attachmentElements[i];
       switch (attachment.tagName) {
@@ -76,14 +73,12 @@ class Tiny {
         }
       }
     }
-    return document.outerHTML || document.body.innerHTML;
+    return this.document.outerHTML || this.document.body.innerHTML;
   }
 
   async extractAttachments(store) {
     const attachments = [];
-    let document = parseHTML(this.data);
-
-    const attachmentElements = document.querySelectorAll("img,span");
+    const attachmentElements = this.document.querySelectorAll("img,span");
 
     for (var i = 0; i < attachmentElements.length; ++i) {
       const attachment = attachmentElements[i];
@@ -134,7 +129,10 @@ class Tiny {
         throw e;
       }
     }
-    return { data: document.outerHTML || document.body.innerHTML, attachments };
+    return {
+      data: this.document.outerHTML || this.document.body.innerHTML,
+      attachments,
+    };
   }
 }
 export default Tiny;
@@ -142,13 +140,7 @@ export default Tiny;
 function getHeadlineFromText(text) {
   for (var i = 0; i < text.length; ++i) {
     const char = text[i];
-    const nextChar = text[i + 1];
-    if (
-      char === "\n" ||
-      char === "\t" ||
-      char === "\r" ||
-      (char === "." && nextChar === " ")
-    ) {
+    if (char === "\n" || char === "\t" || char === "\r" || char === ".") {
       if (char === ".") ++i;
       return text.substring(0, i);
     }

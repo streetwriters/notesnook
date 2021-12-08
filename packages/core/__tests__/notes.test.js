@@ -63,7 +63,7 @@ test("get all notes", () =>
 test("note without a title should get title from content", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("Hello This is colorful");
+    expect(note.title).toBe("HelloThis is colorful");
   }));
 
 test("note should get headline from content", () =>
@@ -87,7 +87,7 @@ test("note should get headline from content containing only lists", () =>
     },
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.headline).toBe("Hello I won't be a headline :(Me too.Gold.");
+    expect(note.headline).toBe("Hello I won't be a headline :(Me too.");
   }));
 
 test("note title should allow trailing space", () =>
@@ -125,21 +125,6 @@ test("update note", () =>
     expect(await note.content()).toStrictEqual(noteData.content.data);
     expect(note.data.pinned).toBe(true);
     expect(note.data.favorite).toBe(true);
-  }));
-
-test("updating empty note should delete it", () =>
-  noteTest().then(async ({ db, id }) => {
-    id = await db.notes.add({
-      id,
-      title: "\n",
-      content: {
-        type: TEST_NOTE.content.type,
-        data: "<p><br></p>",
-      },
-    });
-    expect(id).toBeUndefined();
-    let note = db.notes.note(id);
-    expect(note).toBeUndefined();
   }));
 
 test("get favorite notes", () =>
