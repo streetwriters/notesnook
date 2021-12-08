@@ -7,5 +7,5 @@ export const parseHTML =
 
 export function getDummyDocument() {
   const doc = parseHTML("<div></div>");
-  return typeof DOMParser === "undefined" ? doc : doc.body.firstElementChild;
+  return typeof DOMParser === "undefined" ? doc : doc;
 }
