@@ -4,11 +4,11 @@
 
 var APP_VERSION = {
   formatted: format(
-    1690,
+    1610,
     process.env.REACT_APP_GIT_HASH,
     process.env.REACT_APP_PLATFORM
   ),
-  numerical: 1690,
+  numerical: 1610,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
@@ -16,7 +16,7 @@ var APP_VERSION = {
 };
 
 var CACHED_VERSION = undefined;
-
+console.log(process.env);
 function useVersion() {
   // const [version, setVersion] = useState(APP_VERSION);
 
@@ -38,10 +38,8 @@ export default useVersion;
  * @param {"web"|"desktop"} type
  */
 function format(version, hash, type) {
-  const parts = version.toString().split("");
-  return `${parts[0]}.${parts[1]}.${parts[2]}${
-    parts[3] && parts[3] !== "0" ? parts[3] : ""
-  }-${hash}-${type}`;
+  const [major, minor, bugfix0, bugfix1] = version.toString().split("");
+  return `${major}.${minor}.${bugfix0}${bugfix1 || ""}-${hash}-${type}`;
 }
 
 export function getAppVersion() {
