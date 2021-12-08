@@ -68,13 +68,15 @@ export const useAppEvents = () => {
   const setLastSynced = useUserStore(state => state.setLastSynced);
   const setUser = useUserStore(state => state.setUser);
   const setSyncing = useUserStore(state => state.setSyncing);
+  const syncedOnLaunch = useRef(false);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
     isUserReady: false,
     prevState: null,
     showingDialog: false,
-    removeInternetStateListener: null
+    removeInternetStateListener: null,
+    isReconnecting: false
   });
 
   const onMediaDownloaded = ({hash, groupId, src}) => {
@@ -122,9 +124,7 @@ export const useAppEvents = () => {
     );
 
     eSubscribeEvent('userLoggedIn', setCurrentUser);
-    refValues.current.removeInternetStateListener = NetInfo.addEventListener(
-      onInternetStateChanged
-    );
+
     return () => {
       ubsubsodium?.remove();
       eUnSubscribeEvent('userLoggedIn', setCurrentUser);
@@ -178,6 +178,9 @@ export const useAppEvents = () => {
           }
         } catch (e) {}
       })();
+      refValues.current.removeInternetStateListener = NetInfo.addEventListener(
+        onInternetStateChanged
+      );
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
@@ -188,6 +191,7 @@ export const useAppEvents = () => {
   }, [loading]);
 
   const onInternetStateChanged = async state => {
+    if (!syncedOnLaunch.current) return;
     reconnectSSE(state);
   };
 
@@ -270,6 +274,7 @@ export const useAppEvents = () => {
   };
 
   const partialSync = async () => {
+    console.log('SYNC REQUESTED');
     try {
       setSyncing(true);
       let res = await doInBackground(async () => {
@@ -345,6 +350,7 @@ export const useAppEvents = () => {
 
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
+        syncedOnLaunch.current = true;
         return;
       }
       if (user) {
@@ -391,7 +397,7 @@ export const useAppEvents = () => {
     } finally {
       await PremiumService.setPremiumStatus();
       if (PremiumService.get()) {
-        if (SettingsService.get().reminder === "off") {
+        if (SettingsService.get().reminder === 'off') {
           await SettingsService.set('reminder', 'daily');
           sleep(2000).then(() => Backup.checkAndRun());
         }
@@ -400,6 +406,7 @@ export const useAppEvents = () => {
       if (login) {
         eSendEvent(eCloseProgressDialog);
       }
+      syncedOnLaunch.current = true;
     }
   };
 
@@ -490,9 +497,11 @@ export const useAppEvents = () => {
   };
 
   async function reconnectSSE(connection) {
+    if (refValues.current?.isReconnecting) return;
     if (!refValues.current?.isUserReady) {
       return;
     }
+    refValues.current.isReconnecting = true;
     let state = connection;
     try {
       if (!state) {
@@ -511,7 +520,10 @@ export const useAppEvents = () => {
         });
         if (res !== true) throw new Error(res);
       }
-    } catch (e) {}
+      refValues.current.isReconnecting = false;
+    } catch (e) {
+      refValues.current.isReconnecting;
+    }
   }
 
   async function storeAppState() {
