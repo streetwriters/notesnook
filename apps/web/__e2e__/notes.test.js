@@ -39,13 +39,17 @@ const { LoremIpsum } = require("lorem-ipsum");
  */
 var page = null;
 
-async function createNoteAndCheckPresence(note = NOTE, viewId = "home") {
+async function createNoteAndCheckPresence(
+  note = NOTE,
+  viewId = "home",
+  index = 0
+) {
   await createNote(note, "notes");
 
   // make sure the note has saved.
   await page.waitForTimeout(200);
 
-  let noteSelector = await checkNotePresence(viewId, 0, note);
+  let noteSelector = await checkNotePresence(viewId, index, note);
 
   await page.click(noteSelector, { button: "left" });
 
@@ -520,11 +524,63 @@ test.describe("stress tests", () => {
         const title = lorem.generateSentences(1);
         const content = lorem.generateSentences(2);
 
-        await createNoteAndCheckPresence({ title, content });
+        await createNoteAndCheckPresence({ title, content }, "home", 0);
 
         expect(await getEditorTitle()).toBe(title);
 
         expect(await getEditorContent()).toBe(content);
+      });
+    }
+  });
+
+  test("create & switch between 100 notes", async ({ page }, info) => {
+    info.setTimeout(0);
+
+    const lorem = new LoremIpsum({
+      sentencesPerParagraph: {
+        max: 8,
+        min: 4,
+      },
+      wordsPerSentence: {
+        max: 16,
+        min: 4,
+      },
+    });
+
+    const NOTES_COUNT = 100;
+
+    let notes = [];
+    for (let i = 0; i < NOTES_COUNT; ++i) {
+      await test.step(`creating test note ${i + 1}`, async () => {
+        const title = lorem.generateSentences(1);
+        const content = lorem.generateSentences(2);
+
+        await createNoteAndCheckPresence({ title, content }, "home", 0);
+
+        expect(await getEditorTitle()).toBe(title);
+
+        expect(await getEditorContent()).toBe(content);
+
+        notes.push({ title, content });
+      });
+    }
+
+    await page.reload();
+
+    for (let i = NOTES_COUNT - 1; i >= 0; i--) {
+      await test.step(`switching test note ${i + 1}`, async () => {
+        const note = notes[i];
+        let noteSelector = await checkNotePresence(
+          "home",
+          NOTES_COUNT - 1 - i,
+          note
+        );
+
+        await page.click(noteSelector);
+
+        expect(await getEditorTitle()).toBe(note.title);
+
+        expect(await getEditorContent()).toBe(note.content);
       });
     }
   });
