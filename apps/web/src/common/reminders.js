@@ -9,11 +9,15 @@ import { hardNavigate, hashNavigate } from "../navigation";
 import { isDesktop } from "../utils/platform";
 import saveFile from "../commands/save-file";
 import { PATHS } from "@notesnook/desktop/paths";
+import { isUserPremium } from "../hooks/use-is-user-premium";
 
 export async function shouldAddBackupReminder() {
   if (isIgnored("backup")) return false;
 
-  const backupReminderOffset = Config.get("backupReminderOffset", 0);
+  const backupReminderOffset = Config.get(
+    "backupReminderOffset",
+    isUserPremium() ? 1 : 0
+  );
   if (!backupReminderOffset) return false;
 
   const lastBackupTime = await db.backup.lastBackupTime();
