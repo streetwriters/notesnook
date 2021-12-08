@@ -291,7 +291,9 @@ export const PricingPlans = ({
               }}
               title="I have a promo code"
             />
-          ) : null}
+          ) : <View style={{
+            height:15
+          }} />}
         </>
       ) : (
         <View>
