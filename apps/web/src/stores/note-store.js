@@ -69,14 +69,16 @@ class NoteStore extends BaseStore {
   };
 
   delete = async (id) => {
-    await db.notes.delete(id);
-    this.refreshContext();
-    this.refresh();
-    appStore.refreshColors();
-    const { session } = editorStore.get();
-    if (session.id === id) {
-      hashNavigate("/notes/create", { addNonce: true });
+    const { session, clearSession } = editorStore.get();
+    if (session && session.id === id) {
+      await clearSession();
     }
+
+    await db.notes.delete(id);
+
+    this.refresh();
+    appStore.refreshMenuPins();
+    appStore.refreshColors();
   };
 
   pin = async (id) => {

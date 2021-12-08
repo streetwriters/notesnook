@@ -124,7 +124,7 @@ const plugins = {
   pro: "textpattern picker",
 };
 
-const changeEvents = "change keyup input compositionend paste";
+const changeEvents = "change input compositionend paste";
 
 function TinyMCE(props) {
   const {
@@ -236,6 +236,7 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
+            console.log("onEditorChange", e);
             if (!editor.getHTML) return;
             editor.getHTML().then((html) => {
               onChange(html, editor);

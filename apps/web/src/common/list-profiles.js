@@ -76,7 +76,12 @@ export default Profiles;
 
 function getTags(item) {
   let tags = item.tags;
-  if (tags) tags = tags.map((t) => db.tags.tag(t)).slice(0, 3);
+  if (tags)
+    tags = tags.slice(0, 3).reduce((prev, curr) => {
+      const tag = db.tags.tag(curr);
+      if (tag) prev.push(tag);
+      return prev;
+    }, []);
   return tags || [];
 }
 

@@ -48,13 +48,15 @@ async function checkTagPresence(title) {
 async function createNoteAndCheckPresence(title) {
   await createNote(NOTE, "notes");
 
-  await checkNotePresence("notes");
+  const noteSelector = await checkNotePresence("notes");
 
   expect(
     await page.isVisible(
       new List("note").view("notes").grouped().atIndex(0).tag(title).build()
     )
   ).toBe(true);
+
+  return noteSelector;
 }
 
 async function createTagAndCheckPresence(title) {
@@ -198,4 +200,28 @@ test("delete a shortcut of a tag", async ({ page }) => {
   expect(
     await page.isVisible(new Menu("navitem").item("helloworld").build())
   ).toBe(false);
+});
+
+test.only("delete the last note of a tag that is also a shortcut", async ({
+  page,
+}) => {
+  const tagSelector = await createTagAndCheckPresence("helloworld");
+
+  await useContextMenu(tagSelector.build(), async () => {
+    await clickMenuItem("createshortcut");
+  });
+
+  await page.click(tagSelector.build());
+
+  const noteSelector = await createNoteAndCheckPresence("helloworld");
+
+  await useContextMenu(noteSelector, async () => {
+    await clickMenuItem("movetotrash");
+  });
+
+  expect(await page.isVisible(noteSelector)).toBe(false);
+
+  await navigateTo("notes");
+
+  expect(await page.inputValue(getTestId("routeHeader"))).toBe("Notes");
 });

@@ -199,7 +199,7 @@ function Editor({ noteId, nonce }) {
                       onSave={saveSession}
                       sessionId={sessionId}
                       onChange={(content, editor) => {
-                        if (!content || content === "<p><br></pr>") return;
+                        if (!content || content === "<p><br></p>") return;
 
                         editorstore.get().setSessionContent({
                           type: "tiny",
