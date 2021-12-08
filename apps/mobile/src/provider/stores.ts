@@ -240,7 +240,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notebooksListMode: 'normal',
     notesListMode: 'normal',
     devMode: false,
-    notifNotes: false
+    notifNotes: false,
+    pitchBlack:false
   },
   fullscreen: false,
   deviceMode: 'mobile',

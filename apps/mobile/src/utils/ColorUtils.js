@@ -1,6 +1,7 @@
 import { Appearance } from "react-native";
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from "../services/EventManager";
-import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, setAccentColor, setColorScheme } from "./Colors";
+import SettingsService from "../services/SettingsService";
+import { ACCENT, COLOR_SCHEME, COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT, COLOR_SCHEME_PITCH_BLACK, setAccentColor, setColorScheme } from "./Colors";
 import { eThemeUpdated } from "./Events";
 import { MMKV } from "./MMKV";
 
@@ -68,6 +69,7 @@ export async function getColorScheme(useSystemTheme) {
     let theme= await MMKV.getItem('theme');
 
 
+
     if (!accentColor ) {
         await MMKV.setItem('accentColor', ACCENT.color);
         setAccentColor(ACCENT.color);
@@ -77,7 +79,7 @@ export async function getColorScheme(useSystemTheme) {
 
     if (useSystemTheme) {
         Appearance.getColorScheme() === 'dark'
-            ? setColorScheme(COLOR_SCHEME_DARK)
+            ? setColorScheme(SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK)
             : setColorScheme(COLOR_SCHEME_LIGHT);
 
         return COLOR_SCHEME;
@@ -89,7 +91,7 @@ export async function getColorScheme(useSystemTheme) {
     } else {
         theme = JSON.parse(theme);
         theme.night
-            ? setColorScheme(COLOR_SCHEME_DARK)
+            ? setColorScheme(SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK)
             : setColorScheme(COLOR_SCHEME_LIGHT);
     }
     eSendEvent(eThemeUpdated);

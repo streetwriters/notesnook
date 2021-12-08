@@ -40,7 +40,7 @@ const SettingsDeveloperOptions = ({isSheet}) => {
         <SectionHeader
           collapsed={collapsed}
           setCollapsed={setCollapsed}
-          title="Developer Options"
+          title="Developer options"
         />
       )}
 
