@@ -274,7 +274,6 @@ export const useAppEvents = () => {
   };
 
   const partialSync = async () => {
-    console.log('SYNC REQUESTED');
     try {
       setSyncing(true);
       let res = await doInBackground(async () => {
