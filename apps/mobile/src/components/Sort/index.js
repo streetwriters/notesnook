@@ -76,9 +76,13 @@ const Sort = ({type, screen}) => {
           height={25}
           iconPosition="right"
           fontSize={SIZE.sm - 1}
-          type="transparent"
+          type="grayBg"
+          buttonType={{
+            text: colors.accent
+          }}
           style={{
-            borderRadius: 100
+            borderRadius: 100,
+            paddingHorizontal: 6
           }}
           onPress={setOrderBy}
         />
