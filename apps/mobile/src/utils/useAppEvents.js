@@ -464,6 +464,7 @@ export const useAppEvents = () => {
         }
       }
       refValues.current.prevState = 'active';
+      console.log(state,"SETTING VALUE");
       await reconnectSSE();
       await checkIntentState();
       if (getWebviewInit()) {
@@ -541,20 +542,26 @@ export const useAppEvents = () => {
 
   async function checkIntentState() {
     try {
-      let intent = await MMKV.getItem('notesAddedFromIntent');
-      if (intent) {
+      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
+      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();
           await db.notes.init();
         }
-        eSendEvent('webviewreset');
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem('notesAddedFromIntent');
         initialize();
         eSendEvent(refreshNotesPage);
       }
-    } catch (e) {}
+      if (notesAddedFromIntent || shareExtensionOpened) {
+        eSendEvent('webviewreset');
+        MMKV.removeItem('shareExtensionOpened');
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return true;

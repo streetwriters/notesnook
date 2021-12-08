@@ -230,10 +230,14 @@ const NotesnookShare = ({quicknote = false}) => {
   };
 
   useEffect(() => {
+    console.log('setting value in storage');
     loadData();
     useShareStore.getState().restoreAppendNote();
     sleep(50).then(() => {
       animate(1, 0);
+      sleep(500).then(r => {
+        Storage.write('shareExtensionOpened',"opened");
+      });
     });
   }, []);
 
