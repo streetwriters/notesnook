@@ -202,7 +202,7 @@ test("delete a shortcut of a tag", async ({ page }) => {
   ).toBe(false);
 });
 
-test.only("delete the last note of a tag that is also a shortcut", async ({
+test("delete the last note of a tag that is also a shortcut", async ({
   page,
 }) => {
   const tagSelector = await createTagAndCheckPresence("helloworld");
