@@ -174,8 +174,8 @@ export default class Notes extends Collection {
     const tag = this._db[collection].tag(tagId);
     if (!tag || tag.noteIds.length <= 0) return [];
     const array = tag.noteIds.reduce((arr, id) => {
-      const item = this._collection.getItem(id);
-      if (item) arr.push(item);
+      const item = this.note(id);
+      if (item) arr.push(item.data);
       return arr;
     }, []);
     return sort(array).desc((note) => note.dateCreated);
