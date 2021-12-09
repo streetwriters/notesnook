@@ -501,6 +501,10 @@ export const useAppEvents = () => {
     if (!refValues.current?.isUserReady) {
       return;
     }
+    if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+      refValues.current.isReconnecting = false;
+      return;
+    }
     refValues.current.isReconnecting = true;
     let state = connection;
     try {
