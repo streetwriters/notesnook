@@ -654,23 +654,6 @@ const LoginDialog = () => {
               />
             </>
           )}
-
-          {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
-            <TouchableOpacity
-              onPress={() => {
-                if (MODES.sessionExpired === mode) {
-                  sendEmail(true);
-                  return;
-                }
-                setMode(MODES.forgotPassword);
-              }}
-              style={{
-                alignSelf: 'flex-end',
-                marginTop: 2.5
-              }}>
-              <Paragraph color={colors.accent}>Forgot password?</Paragraph>
-            </TouchableOpacity>
-          ) : null} */}
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
