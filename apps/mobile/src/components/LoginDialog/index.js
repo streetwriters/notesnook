@@ -1,18 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  ActivityIndicator,
   ScrollView,
-  Text,
-  TouchableOpacity,
+  Text, TouchableOpacity,
   View
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider/index';
-import {useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider/index';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -20,31 +18,25 @@ import {
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
-import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
-import Sync from '../../services/Sync';
-import {dHeight} from '../../utils';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/database';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/database';
 import {
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenResultDialog
+  eOpenLoginDialog, eOpenResultDialog
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import {Header} from '../SimpleList/header';
-import Heading from '../Typography/Heading';
+import { Header } from '../SimpleList/header';
 import Paragraph from '../Typography/Paragraph';
 
 const MODES = {
@@ -56,7 +48,7 @@ const MODES = {
 };
 
 let email = '';
-let password = '';
+let password = 'Loveyouall@123';
 let confirmPassword;
 let oldPassword;
 
@@ -190,12 +182,13 @@ const LoginDialog = () => {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
       try {
-        let res = await db.user.tokenManager.getToken();
-        if (!res) throw new Error('no token found');
-        if (db.user.tokenManager._isTokenExpired(res))
-          throw new Error('token expired');
-        if (!(await Sync.run())) throw new Error('e');
-        await MMKV.removeItem('loginSessionHasExpired');
+        // let res = await db.user.tokenManager.getToken();
+        // if (!res) throw new Error('no token found');
+        // if (db.user.tokenManager._isTokenExpired(res))
+        //   throw new Error('token expired');
+        // if (!(await Sync.run())) throw new Error('e');
+        // await MMKV.removeItem('loginSessionHasExpired');
+        throw new Error("Error");
         return;
       } catch (e) {
         console.log(e);
@@ -253,9 +246,9 @@ const LoginDialog = () => {
         context: 'local'
       });
       close();
-      eSendEvent('userLoggedIn', true);
-
       await MMKV.removeItem('loginSessionHasExpired');
+      eSendEvent('userLoggedIn', true);
+      console.log("PRESENTING SHEET");
       await sleep(500);
       presentSheet({
         title: 'Syncing your data',
@@ -436,10 +429,12 @@ const LoginDialog = () => {
         setTimeout(() => {
           if (MODES.sessionExpired === mode) {
             _pass.current?.focus();
+            setFocused(true);
             return;
           }
           _email.current?.focus();
-        }, 300);
+          setFocused(true);
+        }, 500);
       }}
       background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
