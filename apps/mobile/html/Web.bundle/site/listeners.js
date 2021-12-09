@@ -156,10 +156,11 @@ function attachMessageListener() {
         isLoading = true;
         globalThis.isClearingNoteData = false;
         tinymce.activeEditor.mode.set('readonly');
-        if (isInvalidValue(value)) {
-          tinymce.activeEditor.setContent('');
-        } else {
+        if (!isInvalidValue(value)) {
           tinymce.activeEditor.setContent(value);
+        } else {
+          globalThis.isClearingNoteData = false;
+          reactNativeEventHandler('noteLoaded', true);
         }
 
         setTimeout(function () {
