@@ -178,6 +178,7 @@ const Input = ({
               validationType === 'email' ? 'email-address' : 'default'
             }
             importantForAutofill="yes"
+            importantForAccessibility="yes"
             returnKeyLabel={returnKeyLabel}
             returnKeyType={returnKeyType}
             keyboardAppearance={colors.night ? 'dark' : 'light'}
