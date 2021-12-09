@@ -1,6 +1,7 @@
 import { render } from "react-dom";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import * as serviceWorker from "./serviceWorkerRegistration";
+import Config from "./utils/config";
 import { isTesting } from "./utils/platform";
 if (process.env.REACT_APP_PLATFORM === "desktop") require("./commands");
 
@@ -17,6 +18,10 @@ const ROUTES = {
     component: () => import("./views/auth"),
     props: { type: "signup" },
   },
+  "/sessionexpired": {
+    component: () => import("./views/auth"),
+    props: { type: "sessionexpired" },
+  },
   "/login": {
     component: () => import("./views/auth"),
     props: { type: "login" },
@@ -29,6 +34,16 @@ const ROUTES = {
 };
 
 function getRoute() {
+  const isSessionExpired = Config.get("sessionExpired", false);
+  if (isSessionExpired) {
+    window.history.replaceState(
+      {},
+      null,
+      makeURL("/sessionexpired", getCurrentHash())
+    );
+    return ROUTES["/sessionexpired"];
+  }
+
   const path = getCurrentPath();
   if (!isTesting() && !shouldSkipInitiation() && !ROUTES[path]) {
     window.history.replaceState({}, null, makeURL("/signup", getCurrentHash()));

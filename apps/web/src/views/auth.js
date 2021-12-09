@@ -12,8 +12,78 @@ import Loader from "../components/loader";
 import Logo from "../assets/logo.svg";
 import LogoDark from "../assets/logo-dark.svg";
 import { useStore as useThemeStore } from "../stores/theme-store";
+import {
+  showLoadingDialog,
+  showLogoutConfirmation,
+} from "../common/dialog-controller";
+import { showToast } from "../utils/toast";
 
 const authTypes = {
+  sessionexpired: {
+    title: "Your session has expired",
+    subtitle: {
+      text: (
+        <Flex bg="shade" p={1} sx={{ borderRadius: "default" }}>
+          <Text as="span" fontSize="body" color="primary">
+            <b>
+              All your local changes are safe and will be synced after you
+              relogin.
+            </b>{" "}
+            Please enter your password to continue.
+          </Text>
+        </Flex>
+      ),
+    },
+    fields: [
+      {
+        id: "email",
+        name: "email",
+        label: "Your account email",
+        defaultValue: (user) => maskEmail(user?.email),
+        disabled: true,
+        autoComplete: "false",
+        type: "email",
+      },
+      {
+        id: "password",
+        name: "password",
+        label: "Enter your password",
+        autoComplete: "current-password",
+        type: "password",
+        autoFocus: true,
+      },
+    ],
+    primaryAction: {
+      text: "Relogin to your account",
+    },
+    secondaryAction: {
+      text: <Text color="error">Logout permanently</Text>,
+      onClick: async () => {
+        if (await showLogoutConfirmation()) {
+          await showLoadingDialog({
+            title: "You are being logged out",
+            action: () => db.user.logout(true),
+          });
+          showToast("success", "You have been logged out.");
+          Config.set("sessionExpired", false);
+          window.location.replace("/login");
+        }
+      },
+    },
+    loading: {
+      title: "Logging you in",
+      text: "Please wait while you are authenticated.",
+    },
+    onSubmit: async (form, onError) => {
+      return await userstore
+        .login(form)
+        .then(async () => {
+          Config.set("sessionExpired", false);
+          redirectToURL(form.redirect || "/");
+        })
+        .catch((e) => onError(e.message));
+    },
+  },
   signup: {
     title: "Create an account",
     subtitle: {
@@ -23,9 +93,30 @@ const authTypes = {
         onClick: () => hardNavigate("/login", getQueryParams()),
       },
     },
-    labels: { email: "Enter email", password: "Set password" },
-    confirmPassword: true,
-    autoComplete: { password: "new-password" },
+    fields: [
+      {
+        id: "email",
+        name: "email",
+        label: "Enter email",
+        autoComplete: "email",
+        type: "email",
+        autoFocus: true,
+      },
+      {
+        id: "password",
+        name: "password",
+        label: "Set password",
+        autoComplete: "new-password",
+        type: "password",
+      },
+      {
+        id: "confirm-password",
+        name: "confirmPassword",
+        label: "Confirm password",
+        autoComplete: "confirm-password",
+        type: "password",
+      },
+    ],
     primaryAction: {
       text: "Create account",
     },
@@ -39,7 +130,7 @@ const authTypes = {
       title: "Creating your account",
       text: "Please wait while we finalize your account.",
     },
-    agreementText: (
+    footer: (
       <>
         By pressing "Create account" button, you agree to our{" "}
         <Text
@@ -85,11 +176,23 @@ const authTypes = {
         onClick: () => hardNavigate("/signup", getQueryParams()),
       },
     },
-    autoComplete: { password: "current-password" },
-    labels: {
-      email: "Enter email",
-      password: "Enter password",
-    },
+    fields: [
+      {
+        type: "email",
+        id: "email",
+        name: "email",
+        label: "Enter email",
+        autoComplete: "email",
+        autoFocus: true,
+      },
+      {
+        type: "password",
+        id: "password",
+        name: "password",
+        label: "Enter password",
+        autoComplete: "current-password",
+      },
+    ],
     primaryAction: {
       text: "Login to your account",
     },
@@ -145,7 +248,7 @@ function Auth(props) {
   const [success, setSuccess] = useState();
   const [isAppLoaded] = useDatabase();
   const [form, setForm] = useState({});
-
+  const [user, setUser] = useState();
   const theme = useThemeStore((store) => store.theme);
 
   const data = authTypes[type];
@@ -161,9 +264,15 @@ function Auth(props) {
     if (!isAppLoaded) return;
     (async () => {
       const user = await db.user.getUser();
-      if (!!user) redirectToURL("/");
+      const isSessionExpired = Config.get("sessionExpired", false);
+      if (user) {
+        if (type === "sessionexpired" && isSessionExpired) setUser(user);
+        else redirectToURL("/");
+      } else if (type === "sessionexpired") {
+        redirectToURL("/");
+      }
     })();
-  }, [isAppLoaded]);
+  }, [isAppLoaded, type]);
 
   return (
     <ThemeProvider>
@@ -225,11 +334,13 @@ function Auth(props) {
             boxShadow: "0px 0px 60px 10px #00000022",
           }}
           onSubmit={async (e) => {
+            console.log(e);
             e.preventDefault();
             setIsSubmitting(true);
             const formData = new FormData(e.target);
             const form = Object.fromEntries(formData.entries());
             form.redirect = redirect;
+            if (user) form.email = user.email;
             setForm(form);
             await data.onSubmit(
               form,
@@ -241,11 +352,7 @@ function Auth(props) {
             );
           }}
         >
-          {!isAppLoaded ? (
-            <>
-              <Loading />
-            </>
-          ) : isSubmitting ? (
+          {isSubmitting ? (
             <>
               <Loader title={data.loading.title} text={data.loading.text} />
             </>
@@ -264,6 +371,7 @@ function Auth(props) {
               <Text
                 variant="body"
                 mt={1}
+                mb={2}
                 textAlign="center"
                 color="fontTertiary"
               >
@@ -282,21 +390,22 @@ function Auth(props) {
                   </Text>
                 )}
               </Text>
-              <Field
-                styles={{
-                  container: { mt: 4 },
-                }}
-                autoFocus
-                data-test-id="email"
-                id="email"
-                required
-                name="email"
-                autoComplete="email"
-                label={data.labels.email}
-                helpText={data.helpTexts?.email}
-                defaultValue={form.email}
-              />
-              {data.labels.password && (
+              {data.fields?.map(({ defaultValue, id, autoFocus, ...rest }) => (
+                <Field
+                  {...rest}
+                  id={id}
+                  key={id}
+                  required
+                  styles={{
+                    container: { mt: 2 },
+                  }}
+                  data-test-id={id}
+                  autoFocus={autoFocus}
+                  defaultValue={defaultValue ? defaultValue(user) : form.email}
+                />
+              ))}
+
+              {/* {data.labels.password && (
                 <Field
                   styles={{
                     container: { mt: 2 },
@@ -326,7 +435,7 @@ function Auth(props) {
                   type="password"
                   defaultValue={form.confirmPassword}
                 />
-              )}
+              )} */}
 
               {/* {data.supportsPasswordRecovery && (
                 <Button
@@ -348,8 +457,13 @@ function Auth(props) {
                 sx={{ borderRadius: "default" }}
                 justifyContent="center"
                 alignItems="center"
+                disabled={!isAppLoaded}
               >
-                {data.primaryAction.text}
+                {isAppLoaded ? (
+                  data.primaryAction.text
+                ) : (
+                  <Loading color="static" />
+                )}
               </Button>
               {data.secondaryAction && (
                 <>
@@ -385,9 +499,9 @@ function Auth(props) {
                   </Text>
                 </Flex>
               )}
-              {data.agreementText && (
+              {data.footer && (
                 <Text mt={2} variant="subBody" textAlign="center">
-                  {data.agreementText}
+                  {data.footer}
                 </Text>
               )}
             </>
@@ -402,4 +516,15 @@ export default Auth;
 function redirectToURL(url) {
   Config.set("skipInitiation", true);
   hardNavigate(url);
+}
+
+function maskEmail(email) {
+  if (!email) return "";
+  const [username, domain] = email.split("@");
+  const maskChars = "*".repeat(
+    username.substring(2, username.length - 2).length
+  );
+  return `${username.substring(0, 2)}${maskChars}${username.substring(
+    username.length - 2
+  )}@${domain}`;
 }

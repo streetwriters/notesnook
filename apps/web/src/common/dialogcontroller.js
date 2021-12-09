@@ -520,15 +520,6 @@ export function showRenameColorDialog(colorId) {
   ));
 }
 
-export function showSessionExpiredDialog(email) {
-  return showDialog((Dialogs, perform) => (
-    <Dialogs.SessionExpiredDialog
-      email={email}
-      onClose={(res) => perform(res)}
-    />
-  ));
-}
-
 export function showFeatureDialog(featureName) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.FeatureDialog

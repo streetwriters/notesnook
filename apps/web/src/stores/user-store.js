@@ -4,7 +4,6 @@ import { store as appStore } from "./app-store";
 import BaseStore from "./index";
 import config from "../utils/config";
 import { EV, EVENTS } from "notes-core/common";
-import { showSessionExpiredDialog } from "../common/dialog-controller";
 import { showAccountLoggedOutNotice } from "../common/dialog-controller";
 import Config from "../utils/config";
 import { onPageVisibilityChanged } from "../utils/page-visibility";
@@ -20,15 +19,8 @@ class UserStore extends BaseStore {
     EV.subscribe(EVENTS.appRefreshRequested, () => appStore.refresh());
 
     EV.subscribe(EVENTS.userSessionExpired, async () => {
-      const user = this.get().user;
-      Config.set("sessionExpired", "true");
-      const loginResult = await showSessionExpiredDialog(user.email);
-      Config.set("sessionExpired", "false");
-      if (!loginResult) {
-        await db.user.logout(false);
-      } else {
-        window.location.reload();
-      }
+      Config.set("sessionExpired", true);
+      window.location.replace("/sessionexpired");
     });
 
     db.user.getUser().then(async (user) => {
@@ -37,11 +29,10 @@ class UserStore extends BaseStore {
         state.user = user;
         state.isLoggedIn = true;
       });
-      if (Config.get("sessionExpired") === "true")
-        EV.publish(EVENTS.userSessionExpired);
+      if (Config.get("sessionExpired")) EV.publish(EVENTS.userSessionExpired);
     });
 
-    if (Config.get("sessionExpired") === "true") return;
+    if (Config.get("sessionExpired")) return;
 
     return db.user.fetchUser().then(async (user) => {
       if (!user) return false;

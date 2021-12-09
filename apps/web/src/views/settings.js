@@ -253,8 +253,6 @@ function Settings(props) {
                 if (await showLogoutConfirmation()) {
                   await showLoadingDialog({
                     title: "You are being logged out",
-                    subtitle:
-                      "Please do NOT close your browser or shut down your PC.",
                     action: () => db.user.logout(true),
                   });
                   showToast("success", "You have been logged out.");

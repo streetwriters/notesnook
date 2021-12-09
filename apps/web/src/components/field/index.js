@@ -123,6 +123,7 @@ function Field(props) {
           <Flex
             onClick={() => {
               const input = document.getElementById(id);
+              if (!input) return;
               input.type = isPasswordVisible ? "password" : "text";
               setIsPasswordVisible((s) => !s);
             }}
