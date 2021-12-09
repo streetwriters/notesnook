@@ -18,6 +18,7 @@ import { loadTrackerScript } from "./utils/analytics";
 import useAnnouncements from "./utils/use-announcements";
 import { showAnnouncementDialog } from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
+import { isTesting } from "./utils/platform";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -137,7 +138,7 @@ export default function AppEffects({ setShow }) {
   }, []);
 
   useEffect(() => {
-    if (!announcements.length) return;
+    if (!announcements.length || isTesting()) return;
     (async () => {
       await showAnnouncementDialog(announcements[0], remove);
     })();

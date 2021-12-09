@@ -160,6 +160,8 @@ export function totalSubscriptionConsumed(user) {
 }
 
 export async function showUpgradeReminderDialogs() {
+  if (isTesting()) return;
+
   const user = userstore.get().user;
   if (!user) return;
 

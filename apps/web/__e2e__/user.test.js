@@ -37,6 +37,22 @@ async function loginUser() {
   expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
 }
 
-test.skip("login user", async () => {
+test.skip();
+
+test("login user", async () => {
   await loginUser();
+});
+
+test("logout user", async () => {
+  await loginUser();
+
+  await page.click(getTestId("navitem-settings"));
+
+  await page.click(getTestId("settings-logout"));
+
+  await page.waitForSelector(getTestId("dialog-yes"));
+
+  await page.click(getTestId("dialog-yes"));
+
+  expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
 });

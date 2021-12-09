@@ -248,6 +248,7 @@ function Settings(props) {
               />
             </Button>
             <Button
+              data-test-id="settings-logout"
               variant="list"
               onClick={async () => {
                 if (await showLogoutConfirmation()) {
