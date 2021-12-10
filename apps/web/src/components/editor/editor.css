@@ -177,3 +177,10 @@
 .mce-content-body a[data-mce-selected] {
   box-shadow: none !important;
 }
+
+/*
+  temporary fix for empty p tags
+*/
+.mce-content-body p:empty {
+  min-height: 22.4px;
+}
