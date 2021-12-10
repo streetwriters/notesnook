@@ -6,6 +6,7 @@ import { db } from "../common/db";
 import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import { hashNavigate } from "../navigation";
+import { qclone } from "qclone";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -155,7 +156,10 @@ class EditorStore extends BaseStore {
             db.attachments.ofNote(note.id, "files") || [];
         });
 
-        if (note.headline !== session.headline || note.title !== session.title)
+        if (
+          note.headline !== oldSession.headline ||
+          note.title !== oldSession.title
+        )
           noteStore.refresh();
 
         if (!oldSession?.id) {
@@ -204,13 +208,13 @@ class EditorStore extends BaseStore {
   };
 
   setSession = (set) => {
-    const oldSession = this.get().session;
+    const oldSession = qclone(this.get().session);
     this.set(set);
-    this.saveSession(oldSession);
+    this.get().saveSession(oldSession);
   };
 
   setSessionContent = (content) => {
-    const oldSession = this.get().session;
+    const oldSession = qclone(this.get().session);
     this.get().session.content = content;
     this.saveSession(oldSession);
   };

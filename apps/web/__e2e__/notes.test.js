@@ -494,7 +494,7 @@ test.describe("run tests independently", () => {
     expect(await getEditorContent()).toBe("");
   });
 
-  test.only("creating a new note should clear the word count", async () => {
+  test("creating a new note should clear the word count", async () => {
     const selector = await createNoteAndCheckPresence();
 
     await page.click(getTestId("notes-action-button"));
@@ -506,6 +506,16 @@ test.describe("run tests independently", () => {
     await expect(page.innerText(getTestId("editor-word-count"))).resolves.toBe(
       "0 words"
     );
+  });
+
+  test.only("creating a new title-only note should add it to the list", async () => {
+    const selector = await createNoteAndCheckPresence();
+
+    await page.click(getTestId("notes-action-button"));
+
+    await page.click(selector);
+
+    await createNoteAndCheckPresence({ title: "Hello World" });
   });
 });
 
