@@ -92,6 +92,7 @@ function Editor({ noteId, nonce }) {
     const editor = editorRef.current?.editor;
     if (!editor || !editor.initialized) return;
     editor.clearContent();
+    updateWordCount(editor);
   }, []);
 
   useEffect(

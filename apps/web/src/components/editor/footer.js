@@ -24,7 +24,9 @@ function EditorFooter() {
   return (
     <Flex alignItems="center">
       <Text variant="subBody" color="bgSecondaryText">
-        {totalWords + " words"}
+        <Text as="span" data-test-id="editor-word-count">
+          {totalWords + " words"}
+        </Text>
         <TextSeperator />
         {timeConverter(dateEdited || Date.now())}
         <TextSeperator />

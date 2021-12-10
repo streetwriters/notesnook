@@ -35,11 +35,15 @@ async function editNote(title, content) {
       force: true,
     });
 
-  await page.waitForTimeout(100);
+  if (content) {
+    await page.waitForTimeout(100);
 
-  await page.focus(".mce-content-body");
+    await page.focus(".mce-content-body");
 
-  await page.type(".mce-content-body", content);
+    await page.type(".mce-content-body", content);
+  }
+
+  await page.waitForTimeout(200);
 }
 
 async function downloadFile(downloadActionSelector, encoding) {

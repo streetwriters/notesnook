@@ -493,6 +493,20 @@ test.describe("run tests independently", () => {
 
     expect(await getEditorContent()).toBe("");
   });
+
+  test.only("creating a new note should clear the word count", async () => {
+    const selector = await createNoteAndCheckPresence();
+
+    await page.click(getTestId("notes-action-button"));
+
+    await page.click(selector);
+
+    await createNote({ title: "Hello World" }, "notes");
+
+    await expect(page.innerText(getTestId("editor-word-count"))).resolves.toBe(
+      "0 words"
+    );
+  });
 });
 
 test.describe("stress tests", () => {
