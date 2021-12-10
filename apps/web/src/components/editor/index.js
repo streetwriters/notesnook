@@ -23,7 +23,7 @@ import debounce from "just-debounce-it";
 import { FlexScrollContainer } from "../scroll-container";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
-
+const EMPTY_CONTENT = "<p><br></p>";
 function editorSetContent(editor, content) {
   const editorScroll = document.querySelector(".editorScroll");
   if (editorScroll) editorScroll.scrollTop = 0;
@@ -71,6 +71,13 @@ function Editor({ noteId, nonce }) {
     [newSession, openSession, nonce]
   );
 
+  const clearContent = useCallback(() => {
+    const editor = editorRef.current?.editor;
+    if (!editor || !editor.initialized) return;
+    editor.clearContent();
+    updateWordCount(editor);
+  }, []);
+
   const setContent = useCallback(() => {
     const {
       id,
@@ -80,20 +87,14 @@ function Editor({ noteId, nonce }) {
     if (!editor || !editor.initialized) return;
 
     async function setContents() {
-      editorSetContent(editor, data);
+      if (data) editorSetContent(editor, data);
+      else clearContent(editor);
 
       editorstore.set((state) => (state.session.state = SESSION_STATES.stale));
       if (id) await db.attachments.downloadImages(id);
     }
     setContents();
-  }, []);
-
-  const clearContent = useCallback(() => {
-    const editor = editorRef.current?.editor;
-    if (!editor || !editor.initialized) return;
-    editor.clearContent();
-    updateWordCount(editor);
-  }, []);
+  }, [clearContent]);
 
   useEffect(
     function clearSession() {
@@ -105,7 +106,9 @@ function Editor({ noteId, nonce }) {
 
   useEffect(
     function openSesion() {
-      if (!contentId) return;
+      // there can be notes that only have a title so we need to
+      // handle that.
+      if (!contentId && !editorstore.get().session.title) return;
       setContent();
     },
     [sessionId, contentId, setContent, clearContent]
@@ -193,7 +196,7 @@ function Editor({ noteId, nonce }) {
                     onSave={saveSession}
                     sessionId={sessionId}
                     onChange={(content, editor) => {
-                      if (!content || content === "<p><br></p>") return;
+                      if (!content || content === EMPTY_CONTENT) return;
 
                       editorstore.get().setSessionContent({
                         type: "tiny",

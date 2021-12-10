@@ -519,7 +519,7 @@ test.describe("run tests independently", () => {
     await createNoteAndCheckPresence({ title: "Hello World" });
   });
 
-  test.only("format changes should get saved", async () => {
+  test("format changes should get saved", async () => {
     const selector = await createNoteAndCheckPresence();
 
     await page.click(getTestId("notes-action-button"));
@@ -537,6 +537,32 @@ test.describe("run tests independently", () => {
     const content = await getEditorContentAsHTML();
 
     expect(content).toMatchSnapshot(`format-changes-should-get-saved.txt`);
+  });
+
+  test("opening an empty titled note should empty out editor contents", async () => {
+    await createNoteAndCheckPresence();
+
+    const onlyTitle = await createNoteAndCheckPresence({
+      title: "Only a title",
+    });
+
+    await page.click(getTestId("notes-action-button"));
+
+    await page.reload();
+
+    const fullNote = await checkNotePresence("home", 1, NOTE);
+
+    await page.click(fullNote);
+
+    await expect(getEditorContent()).resolves.toBe(NOTE.content);
+
+    await expect(getEditorTitle()).resolves.toBe(NOTE.title);
+
+    await page.click(onlyTitle);
+
+    await expect(getEditorTitle()).resolves.toBe("Only a title");
+
+    await expect(getEditorContent()).resolves.toBe("");
   });
 });
 
