@@ -27,8 +27,14 @@ function register(editor) {
           }
           if (!image.src.startsWith("blob:")) continue;
 
-          const datauri = await blobUriToDataUri(image.src);
-          image.src = datauri;
+          try {
+            const datauri = await blobUriToDataUri(image.src);
+            image.src = datauri;
+          } catch (e) {
+            console.error(e);
+            image.remove();
+            continue;
+          }
         }
       }
     }
@@ -65,7 +71,6 @@ function blobUriToDataUri(uri) {
   return new Promise(async (resolve, reject) => {
     const reader = new FileReader();
     reader.onload = function () {
-      blobCache[uri] = reader.result;
       resolve(reader.result);
     };
     reader.onerror = reject;
