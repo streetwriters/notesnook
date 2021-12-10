@@ -18,14 +18,14 @@ const projects = IS_CI
           browserName: "chromium",
         },
       },
-      {
-        name: "Firefox",
-        use: { browserName: "firefox" },
-      },
-      {
-        name: "WebKit",
-        use: { browserName: "webkit" },
-      },
+      // {
+      //   name: "Firefox",
+      //   use: { browserName: "firefox" },
+      // },
+      // {
+      //   name: "WebKit",
+      //   use: { browserName: "webkit" },
+      // },
     ];
 
 module.exports = {
@@ -44,7 +44,7 @@ module.exports = {
   reporter: "list",
   retries: IS_CI ? 3 : 1,
   use: {
-    headless: true,
+    headless: false,
     acceptDownloads: true,
 
     // Artifacts

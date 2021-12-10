@@ -128,10 +128,12 @@ const plugins = {
  * 1. input - called on every change
  * 2. compositionend - (Android only) called on change
  * 3. paste - called after content is pasted
+ * 4. ExecCommand - called after changes such as formatting.
  * We do not include the "change" event here as it is only
  * invoked after the editor loses focus.
  */
-const changeEvents = "input compositionend paste";
+const changeEvents = "input compositionend paste ExecCommand";
+const ignoredCommand = ["mcerepaint", "mcefocus"];
 
 function TinyMCE(props) {
   const {
@@ -243,7 +245,13 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
+            if (
+              e.type === "execcommand" &&
+              ignoredCommand.includes(e.command.toLowerCase())
+            )
+              return;
             if (!editor.getHTML) return;
+
             editor.getHTML().then((html) => {
               onChange(html, editor);
             });

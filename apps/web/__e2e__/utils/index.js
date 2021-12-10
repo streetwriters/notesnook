@@ -68,6 +68,10 @@ async function getEditorContent() {
     .replace(/\n+/gm, "\n");
 }
 
+async function getEditorContentAsHTML() {
+  return await page.innerHTML(".mce-content-body");
+}
+
 module.exports = {
   NOTE,
   NOTEBOOK,
@@ -78,4 +82,5 @@ module.exports = {
   downloadFile,
   getEditorTitle,
   getEditorContent,
+  getEditorContentAsHTML,
 };

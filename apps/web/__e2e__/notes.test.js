@@ -15,6 +15,7 @@ const {
   editNote,
   getEditorTitle,
   getEditorContent,
+  getEditorContentAsHTML,
 } = require("./utils");
 const {
   navigateTo,
@@ -508,7 +509,7 @@ test.describe("run tests independently", () => {
     );
   });
 
-  test.only("creating a new title-only note should add it to the list", async () => {
+  test("creating a new title-only note should add it to the list", async () => {
     const selector = await createNoteAndCheckPresence();
 
     await page.click(getTestId("notes-action-button"));
@@ -516,6 +517,26 @@ test.describe("run tests independently", () => {
     await page.click(selector);
 
     await createNoteAndCheckPresence({ title: "Hello World" });
+  });
+
+  test.only("format changes should get saved", async () => {
+    const selector = await createNoteAndCheckPresence();
+
+    await page.click(getTestId("notes-action-button"));
+
+    await page.click(selector);
+
+    await page.keyboard.press("Control+a");
+
+    await page.click(`#editorToolbar button[title="Bold"]`);
+
+    await page.click(getTestId("notes-action-button"));
+
+    await page.click(selector);
+
+    const content = await getEditorContentAsHTML();
+
+    expect(content).toMatchSnapshot(`format-changes-should-get-saved.txt`);
   });
 });
 
