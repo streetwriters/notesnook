@@ -4,11 +4,11 @@
 
 var APP_VERSION = {
   formatted: format(
-    1610,
+    1611,
     process.env.REACT_APP_GIT_HASH,
     process.env.REACT_APP_PLATFORM
   ),
-  numerical: 1610,
+  numerical: 1611,
   appUpdated: false,
   appUpdateable: false,
   changelog: undefined,
@@ -16,7 +16,6 @@ var APP_VERSION = {
 };
 
 var CACHED_VERSION = undefined;
-console.log(process.env);
 function useVersion() {
   // const [version, setVersion] = useState(APP_VERSION);
 
