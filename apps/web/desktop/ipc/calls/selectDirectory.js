@@ -1,14 +1,16 @@
 const { dialog } = require("electron");
 const { resolvePath } = require("../utils");
 
-module.exports = function (args, win) {
+module.exports = async function (args, win) {
   const { title, buttonLabel, defaultPath } = args;
 
-  const paths = dialog.showOpenDialogSync(win, {
+  const result = await dialog.showOpenDialog(win, {
     title,
     buttonLabel,
     properties: ["openDirectory"],
     defaultPath: resolvePath(defaultPath),
   });
-  return !paths ? undefined : paths[0];
+  if (result.canceled) return;
+
+  return result.filePaths[0];
 };
