@@ -197,7 +197,7 @@ function Editor({ noteId, nonce }) {
                     onSave={saveSession}
                     sessionId={sessionId}
                     onChange={(content, editor) => {
-                      if (!content || content === EMPTY_CONTENT) return;
+                      if (!content) return;
 
                       editorstore.get().setSessionContent({
                         type: "tiny",

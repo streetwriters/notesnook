@@ -266,14 +266,25 @@ function TinyMCE(props) {
             });
           }
 
+          function onKeyUp(e) {
+            if (e.key !== "Backspace") return;
+            if (!editor.getHTML) return;
+
+            editor.getHTML().then((html) => {
+              onChange(html, editor);
+            });
+          }
+
           editor.on("ScrollIntoView", onScrollIntoView);
           editor.on("tap", onTap);
           editor.on(changeEvents, onEditorChange);
+          editor.on("keyup", onKeyUp);
           editor.once("remove", () => {
             console.log("removing");
             editor.off("ScrollIntoView", onScrollIntoView);
             editor.off("tap", onTap);
             editor.off(changeEvents, onEditorChange);
+            editor.off("keyup", onKeyUp);
           });
         },
         toolbar_persist: true,

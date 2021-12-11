@@ -184,3 +184,25 @@ test("focus should not jump to editor while typing in title input", async () => 
 
   await expect(getEditorContent()).resolves.toBe("");
 });
+
+test("select all & backspace should clear all content in editor", async () => {
+  const selector = await createNoteAndCheckPresence();
+
+  await page.focus(".mce-content-body");
+
+  await page.keyboard.press("Shift+End");
+
+  await page.waitForTimeout(500);
+
+  await page.keyboard.press("Backspace");
+
+  await page.waitForTimeout(200);
+
+  await page.click(getTestId("notes-action-button"));
+
+  await page.click(selector);
+
+  await page.waitForSelector(".mce-content-body");
+
+  await expect(getEditorContent()).resolves.toBe("");
+});
