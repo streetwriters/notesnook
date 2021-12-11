@@ -47,9 +47,11 @@ function showItemDeletedToast(item) {
   const messageText = `${noun} deleted successfully!`;
   const undoAction = async () => {
     toast.hide();
-    let trashItem = db.trash.all.find((i) => i.itemId === item.id);
+    let trashItem = db.trash.all.find((i) => i.id === item.id);
+    if (!trashItem) return;
     await db.trash.restore(trashItem.id);
     nbstore.refresh();
+    notestore.refresh();
   };
   let actions = [{ text: "Undo", onClick: undoAction }];
   var toast = showToast("success", messageText, actions);
