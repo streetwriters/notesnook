@@ -138,11 +138,6 @@
   height: 15px !important;
 }
 
-::-moz-selection,
-::selection {
-  background: var(--textSelection);
-}
-
 .mce-content-body code[data-mce-selected="inline-boundary"]:not(pre code) {
   background-color: var(--bgSecondary);
 }
