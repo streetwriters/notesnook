@@ -30,9 +30,10 @@ async function getDirectoryAndroid() {
   return subfolder;
 }
 
-async function checkBackupDirExists() {
+async function checkBackupDirExists(reset=false) {
   if (Platform.OS === 'ios') return true;
   let dir = await MMKV.getItem('backupStorageDir');
+  if (reset) dir = null;
   if (dir) {
     dir = JSON.parse(dir);
     let allDirs = await ScopedStorage.getPersistedUriPermissions();
@@ -43,7 +44,11 @@ async function checkBackupDirExists() {
     dir = exists ? dir : null;
   }
   if (!dir) {
-    dir = await new Promise(resolve => {
+    dir = await new Promise(async resolve => {
+      if (reset) {
+        resolve(await getDirectoryAndroid());
+        return;
+      }
       presentDialog({
         title: 'Select backup folder',
         paragraph:
@@ -203,5 +208,6 @@ export default {
   run,
   checkAndRun,
   getDirectoryAndroid,
-  checkBackupDirExists
+  checkBackupDirExists,
+
 };

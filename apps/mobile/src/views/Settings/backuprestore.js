@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Platform, TouchableOpacity, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Paragraph from '../../components/Typography/Paragraph';
@@ -24,14 +24,26 @@ import {sleep} from '../../utils/TimeUtils';
 import {CustomButton} from './button';
 import {verifyUser} from './functions';
 import SectionHeader from './section-header';
+import * as ScopedStorage from 'react-native-scoped-storage';
 
 const SettingsBackupAndRestore = ({isSheet}) => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
-
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
+  const [backupDir, setBackupDir] = useState(null);
+
+  useEffect(() => {
+    if (!isSheet) {
+      MMKV.getItem('backupStorageDir').then(dir => {
+        if (dir) {
+          setBackupDir(JSON.parse(dir));
+          console.log(dir);
+        }
+      });
+    }
+  }, []);
 
   const optItems = isSheet
     ? []
@@ -93,6 +105,32 @@ const SettingsBackupAndRestore = ({isSheet}) => {
           new: true
         }
       ];
+
+  if (Platform.OS === 'android' && !isSheet) {
+    optItems.push({
+      name: backupDir ? 'Change backups directory' : 'Select backups directory',
+      func: async () => {
+        let dir;
+        try {
+          dir = await Backup.checkBackupDirExists(true);
+          if (!dir) {
+            dir = MMKV.getItem('backupStorageDir');
+            dir = JSON.parse(dir);
+          }
+          setBackupDir(dir);
+        } catch (e) {
+        } finally {
+          if (!dir) {
+            ToastEvent.show({
+              heading: 'No directory selected',
+              type: 'error'
+            });
+          }
+        }
+      },
+      desc: backupDir ? backupDir.path : 'No backup directory selected'
+    });
+  }
 
   const backupItemsList = [
     {
