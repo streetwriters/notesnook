@@ -147,7 +147,10 @@ export const Toast = ({context = 'global'}) => {
   return (
     <Animated.View
       onTouchEnd={() => {
-        hideToastFunc();
+        if (!data.func) {
+          hideToastFunc();
+        }
+       
       }}
       style={{
         width: DDS.isTab ? 400 : '100%',
@@ -245,6 +248,9 @@ export const Toast = ({context = 'global'}) => {
             onPress={data.func}
             title={data.actionText}
             height={30}
+            style={{
+              zIndex:10
+            }}
           />
         ) : null}
       </Animated.View>
