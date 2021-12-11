@@ -110,7 +110,9 @@ function autosize() {
 
 function isInvalidValue(value) {
   return (
+    !value ||
     value === '' ||
+    value.trim() === "" ||
     value === '<p></p>' ||
     value === '<p><br></p>' ||
     value === '<p>&nbsp;</p>'

@@ -400,6 +400,10 @@ function updateSessionStatus() {
   );
 }
 
+function isContentInvalid(content) {
+  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>'
+}
+
 function check_session_status() {
   tiny.call(
     EditorWebView,
@@ -409,7 +413,8 @@ function check_session_status() {
         return;
       }
       editor.getHTML().then(function(value) {
-        let status = value === '' || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>';
+        let status = !value || value === '' || value.trim() === "" || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>';
+        
         window.ReactNativeWebView.postMessage(
           JSON.stringify({
             type: 'content_not_loaded',
@@ -530,16 +535,14 @@ export const _onMessage = async evt => {
       break;
     case 'content_not_loaded':
       loading_note = false;
+      if (isContentInvalid(content.data)) return;
       if (message.sessionId !== sessionId) {
         requestedReload = true;
         updateSessionStatus();
         return;
       }
-      if (!id) {
-        console.log('no note loaded', id);
-        return;
-      }
-      console.log('content not loaded');
+      if (!id) return;
+      console.log('content not loaded',content.data);
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();
