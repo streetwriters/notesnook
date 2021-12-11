@@ -536,7 +536,7 @@ const LoginDialog = () => {
               color={colors.errorText}
             />
             <Paragraph style={{maxWidth: '90%'}} color={colors.errorText}>
-              Please login to your account to access your notes on this device
+              Please log in to your account to access your notes on this device
               and sync them.
             </Paragraph>
           </View>
@@ -735,7 +735,7 @@ const LoginDialog = () => {
             height={50}
           />
 
-          {current.buttonAlt && (
+          {current.buttonAlt && MODES.sessionExpired !== mode  && (
             <Button
               title={current.buttonAlt}
               onPress={current.buttonAltFunc}

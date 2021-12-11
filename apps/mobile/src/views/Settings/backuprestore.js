@@ -54,7 +54,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
             if (!user || !user?.email) {
               ToastEvent.show({
                 heading: 'Login required',
-                message: 'Please login to your account to restore backup',
+                message: 'Please log in to your account to restore backup',
                 type: 'error',
                 context: 'global'
               });
