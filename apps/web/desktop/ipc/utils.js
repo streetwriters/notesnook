@@ -9,6 +9,8 @@ function sendMessageToRenderer(type, payload = {}) {
 }
 
 function resolvePath(_path) {
+  if (path.isAbsolute(_path)) return _path;
+
   return path.join(
     ..._path.split("/").map((segment) => {
       let resolved = segment;
