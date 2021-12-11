@@ -166,7 +166,8 @@ class StatusItem {
 class MenuItem {
   constructor() {
     return {
-      bg: "transparent",
+      variant: "buttons.default",
+      // bg: "transparent",
       py: "8px",
       px: 3,
       borderRadius: 0,

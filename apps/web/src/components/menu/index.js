@@ -46,6 +46,11 @@ function Menu(props) {
             />
           ) : (
             <Button
+              variant="menuitem"
+              color={color || "text"}
+              display="flex"
+              alignItems="center"
+              justifyContent="center"
               title={
                 (disabled && disabled(data) && disableReason) || title(data)
               }
@@ -65,12 +70,6 @@ function Menu(props) {
                   onClick(data, menuItems[index]);
                 }
               }}
-              display="flex"
-              flexDirection="row"
-              alignItems="center"
-              justifyContent="center"
-              variant="menuitem"
-              color={color || "text"}
             >
               {Icon && (
                 <Icon
