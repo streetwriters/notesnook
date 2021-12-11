@@ -251,9 +251,9 @@ async function downloadAttachment(hash, global = true) {
 
     presentSheet({
       title: `File downloaded`,
-      paragraph: `${attachment.metadata.filename} is saved to ${
+      paragraph: `${attachment.metadata.filename} saved to ${
         Platform.OS === 'android'
-          ? 'the selected path'
+          ? 'selected path'
           : 'File Manager/Notesnook/downloads'
       }`,
       noProgress: true,

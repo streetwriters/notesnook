@@ -691,7 +691,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.sm - 1.5} style={{textAlign: 'center'}}>
+      <Paragraph  size={SIZE.xs + 2} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
