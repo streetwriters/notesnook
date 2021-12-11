@@ -105,10 +105,11 @@ function Editor({ noteId, nonce }) {
   );
 
   useEffect(
-    function openSesion() {
+    function openSession() {
+      const { title, nonce } = editorstore.get().session;
       // there can be notes that only have a title so we need to
       // handle that.
-      if (!contentId && !editorstore.get().session.title) return;
+      if (!contentId && (!title || !!nonce)) return;
       setContent();
     },
     [sessionId, contentId, setContent, clearContent]

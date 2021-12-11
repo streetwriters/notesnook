@@ -8,14 +8,12 @@ const { Page, test, expect } = require("@playwright/test");
 
 const {
   getTestId,
-  createNote,
   NOTE,
   downloadFile,
   PASSWORD,
   editNote,
   getEditorTitle,
   getEditorContent,
-  getEditorContentAsHTML,
 } = require("./utils");
 const {
   navigateTo,
@@ -30,6 +28,7 @@ const {
   isPresent,
   isAbsent,
   checkNotePresence,
+  createNoteAndCheckPresence,
 } = require("./utils/conditions");
 const List = require("./utils/listitemidbuilder");
 const Menu = require("./utils/menuitemidbuilder");
@@ -39,23 +38,6 @@ const { LoremIpsum } = require("lorem-ipsum");
  * @type {Page}
  */
 var page = null;
-
-async function createNoteAndCheckPresence(
-  note = NOTE,
-  viewId = "home",
-  index = 0
-) {
-  await createNote(note, "notes");
-
-  // make sure the note has saved.
-  await page.waitForTimeout(200);
-
-  let noteSelector = await checkNotePresence(viewId, index, note);
-
-  await page.click(noteSelector, { button: "left" });
-
-  return noteSelector;
-}
 
 async function deleteNoteAndCheckAbsence(viewId = "home") {
   const noteSelector = await createNoteAndCheckPresence(undefined, viewId);
@@ -483,86 +465,6 @@ test.describe("run tests independently", () => {
     await expect(page.textContent(".mce-content-body")).resolves.toContain(
       `${content}${NOTE.content}`
     );
-  });
-
-  test("creating a new note should clear the editor contents & title", async () => {
-    await createNoteAndCheckPresence();
-
-    await page.click(getTestId("notes-action-button"));
-
-    expect(await getEditorTitle()).toBe("");
-
-    expect(await getEditorContent()).toBe("");
-  });
-
-  test("creating a new note should clear the word count", async () => {
-    const selector = await createNoteAndCheckPresence();
-
-    await page.click(getTestId("notes-action-button"));
-
-    await page.click(selector);
-
-    await createNote({ title: "Hello World" }, "notes");
-
-    await expect(page.innerText(getTestId("editor-word-count"))).resolves.toBe(
-      "0 words"
-    );
-  });
-
-  test("creating a new title-only note should add it to the list", async () => {
-    const selector = await createNoteAndCheckPresence();
-
-    await page.click(getTestId("notes-action-button"));
-
-    await page.click(selector);
-
-    await createNoteAndCheckPresence({ title: "Hello World" });
-  });
-
-  test("format changes should get saved", async () => {
-    const selector = await createNoteAndCheckPresence();
-
-    await page.click(getTestId("notes-action-button"));
-
-    await page.click(selector);
-
-    await page.keyboard.press("Control+a");
-
-    await page.click(`#editorToolbar button[title="Bold"]`);
-
-    await page.click(getTestId("notes-action-button"));
-
-    await page.click(selector);
-
-    const content = await getEditorContentAsHTML();
-
-    expect(content).toMatchSnapshot(`format-changes-should-get-saved.txt`);
-  });
-
-  test("opening an empty titled note should empty out editor contents", async () => {
-    await createNoteAndCheckPresence();
-
-    const onlyTitle = await createNoteAndCheckPresence({
-      title: "Only a title",
-    });
-
-    await page.click(getTestId("notes-action-button"));
-
-    await page.reload();
-
-    const fullNote = await checkNotePresence("home", 1, NOTE);
-
-    await page.click(fullNote);
-
-    await expect(getEditorContent()).resolves.toBe(NOTE.content);
-
-    await expect(getEditorTitle()).resolves.toBe(NOTE.title);
-
-    await page.click(onlyTitle);
-
-    await expect(getEditorTitle()).resolves.toBe("Only a title");
-
-    await expect(getEditorContent()).resolves.toBe("");
   });
 });
 

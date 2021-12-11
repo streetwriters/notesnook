@@ -1,7 +1,7 @@
 /* eslint-disable no-undef */
 
 const { expect } = require("@playwright/test");
-const { getTestId, NOTE } = require(".");
+const { getTestId, NOTE, createNote } = require(".");
 const List = require("./listitemidbuilder");
 
 async function isPresent(selector) {
@@ -42,4 +42,27 @@ async function checkNotePresence(viewId, index = 0, note = NOTE) {
   return noteSelector.build();
 }
 
-module.exports = { isPresent, isAbsent, isToastPresent, checkNotePresence };
+async function createNoteAndCheckPresence(
+  note = NOTE,
+  viewId = "home",
+  index = 0
+) {
+  await createNote(note, "notes");
+
+  // make sure the note has saved.
+  await page.waitForTimeout(200);
+
+  let noteSelector = await checkNotePresence(viewId, index, note);
+
+  await page.click(noteSelector, { button: "left" });
+
+  return noteSelector;
+}
+
+module.exports = {
+  isPresent,
+  isAbsent,
+  isToastPresent,
+  checkNotePresence,
+  createNoteAndCheckPresence,
+};
