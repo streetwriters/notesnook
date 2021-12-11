@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, RefreshControl, View } from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
 import { useTracked } from '../../provider';
 import { eSendEvent } from '../../services/EventManager';
 import Sync from '../../services/Sync';
@@ -133,6 +134,7 @@ const SimpleList = ({
         style={styles}
         keyExtractor={_keyExtractor}
         ref={scrollRef}
+        testID={notesnook.list.id}
         data={_loading ? listData.slice(0, 9) : listData}
         renderItem={renderItem}
         onScroll={_onScroll}

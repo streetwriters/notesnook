@@ -13,7 +13,7 @@ const {
 const {sleep} = require('./utils.test');
 
 beforeAll(async () => {
-  await device.reloadReactNative();
+  await device.launchApp();
 });
 
 describe('Basic tests', () => {
@@ -32,13 +32,14 @@ describe('Basic tests', () => {
     await navigate('Notes');
   });
 
-  it('Create 10 notes', async () => {
-    let numOfnotes = 10;
+  it('Create 3 notes', async () => {
+    let numOfnotes = 3;
 
     for (let i = 0; i < numOfnotes; i++) {
       let title = 'Test note description that ';
       let body =
-        'Test note description that is very long and should not fit in text.' + i;
+        'Test note description that is very long and should not fit in text.' +
+        i;
 
       await tapById(notesnook.buttons.add);
       await elementById(notesnook.editor.id).tap({
@@ -49,11 +50,22 @@ describe('Basic tests', () => {
       await tapById(notesnook.editor.back);
       await expect(elementByText(title).atIndex(0)).toBeVisible();
     }
+  });
 
-    for (let i = 0; i < 10; i++) {
-      await tapById(notesnook.ids.note.get(1));
-      await tapById(notesnook.editor.back);
-    };
+  it('Open and close a note', async () => {
+    await tapById(notesnook.ids.note.get(1));
+    await tapById(notesnook.editor.back);
 
   });
+
+  it('Delete & restore a note', async () => {
+    await tapById(notesnook.listitem.menu);
+    await tapById("icon-Delete");
+    await tapById(notesnook.toast.button);
+    await visibleByText("Test note description that is very long and should not fit in text.2");
+  });
+
+  
+
+
 });

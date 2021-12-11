@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import {Platform, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {useSettingStore, useTagStore} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
@@ -294,6 +295,7 @@ const NoteItem = ({item, isTrash, tags}) => {
         </View>
       </View>
       <ActionIcon
+        testID={notesnook.listitem.menu}
         color={colors.pri}
         name="dots-horizontal"
         size={SIZE.xl}

@@ -3,6 +3,7 @@ import {Keyboard, View} from 'react-native';
 import Animated, {Easing, useValue} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { notesnook } from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
@@ -243,6 +244,7 @@ export const Toast = ({context = 'global'}) => {
 
         {data.func ? (
           <Button
+            testID={notesnook.toast.button}
             fontSize={SIZE.md}
             type={data.type === 'error' ? 'errorShade' : 'transparent'}
             onPress={data.func}

@@ -6,6 +6,15 @@ export const notesnook = {
   buttons:{
     add:"buttons.add"
   },
+  toast: {
+    button:"toast.button"
+  },
+  listitem:{
+    menu:"listitem.menu"
+  },
+  list:{
+    id:"list.id"
+  },
   ids: {
     default: {
       root: 'root',
