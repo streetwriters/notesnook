@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE en-export SYSTEM "http://xml.evernote.com/pub/evernote-export4.dtd">
+<en-export export-date="20210816T233721Z" application="Evernote" version="10.17.6">
+  <note>
+    <title>test - checklist</title>
+    <created>20210714T004736Z</created>
+    <updated>20210716T233704Z</updated>
+    <note-attributes>
+    </note-attributes>
+    <content>
+      <![CDATA[<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"><en-note><ul style=""><li style=""><div><en-todo checked="false" />Checklist item 1</div></li><ul style=""><li style=""><div><en-todo checked="false" />Nested item 1a</div></li><li style=""><div><en-todo checked="true" />Nested item 1b is checked</div></li></ul><li style=""><div><en-todo checked="true" />Checklist item 2 is checked</div></li><ul><li style="--en-checked:false;"><div>Nested unordered 2a</div></li></ul><li style=""><div><en-todo checked="false" />Checklist item 3</div></li><ol><li style="--en-checked:false;"><div>Nested ordered 3a</div></li></ol></ul><div><br /></div><ul><li><div>Unordered list item</div></li><ul style=""><li style=""><div><en-todo checked="false" />Nested checklist item</div></li></ul></ul><div><br /></div><ul style=""><li style=""><div><en-todo checked="false" />Checklist <b>bold</b> <code style="--en-code: true">inline code</code> &amp; <a href="https://example.com?a=1&amp;b=2">link</a></div></li></ul><div><br /></div></en-note>      ]]>
+    </content>
+  </note>
+</en-export>

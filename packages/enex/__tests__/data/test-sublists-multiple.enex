@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE en-export SYSTEM "http://xml.evernote.com/pub/evernote-export3.dtd">
+<en-export export-date="20201017T125928Z" application="Evernote Legacy" version="Evernote Mac 7.14.1 (458325)">
+<note><title>test - sublists - multiple</title><content><![CDATA[<!DOCTYPE en-note SYSTEM "http://xml.evernote.com/pub/enml2.dtd"><en-note><ul><li><div>Level1</div></li><ul><li><div>Level2</div></li><li><div>Level2</div></li></ul><li><div>Level1</div></li><ul><li><div>Level2</div></li><li><div>Level2</div></li><ul><li><div>Level3</div></li></ul></ul><li><div>Level1</div></li><ul><li><div>Level2</div></li><ul><li><div>Level3</div></li></ul><li><div>Level2</div></li></ul></ul><div><br /></div></en-note>]]></content><created>20201017T125613Z</created><updated>20201017T125913Z</updated><note-attributes><latitude>65.96317843319896</latitude><longitude>29.18829748518028</longitude><altitude>260.9804382324219</altitude><author>Martin Hähnel</author><source>desktop.mac</source><reminder-order>0</reminder-order></note-attributes></note>
+</en-export>

@@ -45,8 +45,8 @@ export class Task implements IEnexElement {
     return getAsStringRequired(this.#taskElement, "taskFlag");
   }
 
-  get sortWeight(): number {
-    return getAsNumberRequired(this.#taskElement, "sortWeight");
+  get sortWeight(): string {
+    return getAsStringRequired(this.#taskElement, "sortWeight");
   }
 
   get noteLevelID(): string {

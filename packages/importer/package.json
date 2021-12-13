@@ -2,24 +2,28 @@
   "name": "notesnook-importer",
   "version": "1.0.0",
   "private": "true",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "jest",
+    "test": "tap --ts",
     "start": "index.js"
   },
   "dependencies": {
-    "dayjs": "^1.10.6",
-    "jsdom": "^17.0.0",
-    "showdown": "https://github.com/thecodrr/showdown",
-    "uzip": "^0.20201231.0"
+    "@notesnook/enex": "file:../enex",
+    "fflate": "^0.7.1",
+    "node-html-parser": "github:thecodrr/node-html-parser",
+    "showdown": "github:thecodrr/showdown",
+    "spark-md5": "^3.0.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.15.0",
-    "@babel/preset-env": "^7.15.0",
-    "@types/jest": "^27.0.1",
-    "@types/node": "^12.12.67",
-    "babel-jest": "^27.0.6",
-    "jest": "^27.0.6"
+    "@node-rs/xxhash": "^1.0.1",
+    "@types/node": "^12.20.37",
+    "@types/showdown": "^1.9.4",
+    "@types/spark-md5": "^3.0.2",
+    "@types/tap": "^15.0.5",
+    "fdir": "^5.1.0",
+    "tap": "^15.1.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
   },
   "author": "",
   "license": "MIT"
