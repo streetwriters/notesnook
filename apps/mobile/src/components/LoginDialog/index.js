@@ -43,7 +43,7 @@ const MODES = {
 };
 
 let email = '';
-let password = 'Loveyouall@123';
+let password = '';
 let confirmPassword;
 let oldPassword;
 
