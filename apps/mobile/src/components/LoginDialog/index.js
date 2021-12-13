@@ -730,7 +730,7 @@ const LoginDialog = () => {
             height={50}
           />
 
-          {current.buttonAlt && MODES.sessionExpired !== mode && (
+          {current.buttonAlt ? (
             <Button
               title={current.buttonAlt}
               onPress={current.buttonAltFunc}
@@ -742,7 +742,7 @@ const LoginDialog = () => {
               }}
               height={50}
             />
-          )}
+          ) : null}
         </View>
 
         <View
