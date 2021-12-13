@@ -59,6 +59,7 @@ import {
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import {ProFeatures} from '../components/ResultDialog/pro-features';
+import Backup from '../services/Backup';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -67,13 +68,15 @@ export const useAppEvents = () => {
   const setLastSynced = useUserStore(state => state.setLastSynced);
   const setUser = useUserStore(state => state.setUser);
   const setSyncing = useUserStore(state => state.setSyncing);
+  const syncedOnLaunch = useRef(false);
   const refValues = useRef({
     subsriptionSuccessListener: null,
     subsriptionErrorListener: null,
     isUserReady: false,
     prevState: null,
     showingDialog: false,
-    removeInternetStateListener: null
+    removeInternetStateListener: null,
+    isReconnecting: false
   });
 
   const onMediaDownloaded = ({hash, groupId, src}) => {
@@ -121,9 +124,7 @@ export const useAppEvents = () => {
     );
 
     eSubscribeEvent('userLoggedIn', setCurrentUser);
-    refValues.current.removeInternetStateListener = NetInfo.addEventListener(
-      onInternetStateChanged
-    );
+
     return () => {
       ubsubsodium?.remove();
       eUnSubscribeEvent('userLoggedIn', setCurrentUser);
@@ -157,8 +158,7 @@ export const useAppEvents = () => {
         Navigation.routeNames.Trash,
         Navigation.routeNames.Notebook
       ]);
-       eSendEvent(eClearEditor, id);
- 
+      eSendEvent(eClearEditor, id);
     } catch (e) {}
   };
 
@@ -178,6 +178,9 @@ export const useAppEvents = () => {
           }
         } catch (e) {}
       })();
+      refValues.current.removeInternetStateListener = NetInfo.addEventListener(
+        onInternetStateChanged
+      );
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
@@ -188,6 +191,7 @@ export const useAppEvents = () => {
   }, [loading]);
 
   const onInternetStateChanged = async state => {
+    if (!syncedOnLaunch.current) return;
     reconnectSSE(state);
   };
 
@@ -204,7 +208,6 @@ export const useAppEvents = () => {
     try {
       if (url.startsWith('https://app.notesnook.com/account/verified')) {
         await onEmailVerified();
-      
       } else {
         return;
       }
@@ -346,10 +349,12 @@ export const useAppEvents = () => {
 
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
+        syncedOnLaunch.current = true;
         return;
       }
       if (user) {
         setUser(user);
+
         clearMessage();
         attachIAPListeners();
         await Sync.run();
@@ -390,10 +395,17 @@ export const useAppEvents = () => {
       }
     } finally {
       await PremiumService.setPremiumStatus();
+      if (PremiumService.get()) {
+        if (SettingsService.get().reminder === 'off') {
+          await SettingsService.set('reminder', 'daily');
+          sleep(2000).then(() => Backup.checkAndRun());
+        }
+      }
       refValues.current.isUserReady = true;
       if (login) {
         eSendEvent(eCloseProgressDialog);
       }
+      syncedOnLaunch.current = true;
     }
   };
 
@@ -484,9 +496,15 @@ export const useAppEvents = () => {
   };
 
   async function reconnectSSE(connection) {
+    if (refValues.current?.isReconnecting) return;
     if (!refValues.current?.isUserReady) {
       return;
     }
+    if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
+      refValues.current.isReconnecting = false;
+      return;
+    }
+    refValues.current.isReconnecting = true;
     let state = connection;
     try {
       if (!state) {
@@ -505,7 +523,10 @@ export const useAppEvents = () => {
         });
         if (res !== true) throw new Error(res);
       }
-    } catch (e) {}
+      refValues.current.isReconnecting = false;
+    } catch (e) {
+      refValues.current.isReconnecting;
+    }
   }
 
   async function storeAppState() {
@@ -523,20 +544,26 @@ export const useAppEvents = () => {
 
   async function checkIntentState() {
     try {
-      let intent = await MMKV.getItem('notesAddedFromIntent');
-      if (intent) {
+      let notesAddedFromIntent = await MMKV.getItem('notesAddedFromIntent');
+      let shareExtensionOpened = await MMKV.getItem('shareExtensionOpened');
+      if (notesAddedFromIntent) {
         if (Platform.OS === 'ios') {
           await db.init();
           await db.notes.init();
         }
-        eSendEvent('webviewreset');
         useNoteStore.getState().setNotes();
         eSendEvent(refreshNotesPage);
         MMKV.removeItem('notesAddedFromIntent');
         initialize();
         eSendEvent(refreshNotesPage);
       }
-    } catch (e) {}
+      if (notesAddedFromIntent || shareExtensionOpened) {
+        eSendEvent('webviewreset');
+        MMKV.removeItem('shareExtensionOpened');
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   return true;

@@ -57,7 +57,10 @@ function makeHtmlFromUrl(url) {
 function makeHtmlFromPlainText(text) {
   if (!text) return '';
 
-  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(/(?:\r\n|\r|\n)/g, '<br>')}</p>`;
+  return `<p style="overflow-wrap:anywhere;white-space:pre-wrap" >${text.replace(
+    /(?:\r\n|\r|\n)/g,
+    '<br>'
+  )}</p>`;
 }
 
 function getBaseUrl(site) {
@@ -156,7 +159,6 @@ const NotesnookShare = ({quicknote = false}) => {
   const onKeyboardDidShow = event => {
     let kHeight = event.endCoordinates.height;
     keyboardHeight.current = kHeight;
-  
   };
 
   const onKeyboardDidHide = () => {
@@ -228,10 +230,14 @@ const NotesnookShare = ({quicknote = false}) => {
   };
 
   useEffect(() => {
+    console.log('setting value in storage');
     loadData();
     useShareStore.getState().restoreAppendNote();
     sleep(50).then(() => {
       animate(1, 0);
+      sleep(500).then(r => {
+        Storage.write('shareExtensionOpened',"opened");
+      });
     });
   }, []);
 
@@ -253,9 +259,15 @@ const NotesnookShare = ({quicknote = false}) => {
       webviewRef.current?.injectJavaScript(`document
       .querySelector('.htmldiff_div')
       .setAttribute('contenteditable', 'true');`);
+      webviewRef.current?.injectJavaScript(`
+      pageTheme.colors = ${theme};
+      setTheme();
+    `);
+
     }, 300);
     let theme = {...colors};
     theme.factor = 1;
+
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
   };
 
@@ -485,7 +497,7 @@ const NotesnookShare = ({quicknote = false}) => {
       ) : null}
 
       <AnimatedKAV
-        enabled={!floating }
+        enabled={!floating}
         onLayout={event => {
           if (prevAnimation.current === 0) return;
           translate.setValue(event.nativeEvent.layout.height + 30);
@@ -505,7 +517,7 @@ const NotesnookShare = ({quicknote = false}) => {
         <View
           style={{
             maxHeight: '100%',
-            paddingHorizontal: 12,
+            paddingHorizontal: 12
           }}>
           <ScrollView
             horizontal
@@ -603,7 +615,8 @@ const NotesnookShare = ({quicknote = false}) => {
                   style={{
                     width: '100%',
                     height: '100%',
-                    borderRadius: 10
+                    borderRadius: 10,
+                    backgroundColor:'transparent'
                   }}
                   cacheMode="LOAD_DEFAULT"
                   domStorageEnabled={true}

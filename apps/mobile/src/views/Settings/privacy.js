@@ -172,7 +172,7 @@ const SettingsPrivacyAndSecurity = () => {
       <SectionHeader
         collapsed={collapsed}
         setCollapsed={setCollapsed}
-        title="Privacy & Security"
+        title="Privacy & security"
       />
       {collapsed ? null : (
         <>

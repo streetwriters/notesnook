@@ -240,7 +240,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notebooksListMode: 'normal',
     notesListMode: 'normal',
     devMode: false,
-    notifNotes: false
+    notifNotes: false,
+    pitchBlack:false
   },
   fullscreen: false,
   deviceMode: 'mobile',
@@ -408,6 +409,7 @@ export function clearAllStores() {
   useNotebookStore.getState().clearNotebooks();
   useTagStore.getState().clearTags();
   useFavoriteStore.getState().clearFavorites();
+  useMenuStore.getState().clearAll();
   useNoteStore.getState().clearNotes();
   useMenuStore.getState().clearAll();
   useTrashStore.getState().clearTrash();

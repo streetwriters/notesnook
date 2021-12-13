@@ -78,6 +78,7 @@ export type Settings = {
     notesListMode: "normal" | "compact",
     devMode: boolean,
     notifNotes: boolean
+    pitchBlack:boolean
 
 }
 

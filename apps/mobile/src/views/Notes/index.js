@@ -41,12 +41,11 @@ const getNotes = params => {
   if (!notes) {
     notes = [];
   }
-
-  return groupArray(notes, 'notes');
+  return groupArray(notes, db.settings?.getGroupOptions('notes'));
 };
 
 function getAlias(params) {
-  if (!params) return "";
+  if (!params) return '';
   let alias =
     params.current?.type === 'tag'
       ? db.tags.alias(params.current?.id)

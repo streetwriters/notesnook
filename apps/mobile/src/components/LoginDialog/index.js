@@ -1,11 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {
-  ActivityIndicator,
-  ScrollView,
-  Text,
-  TouchableOpacity,
-  View
-} from 'react-native';
+import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {Button} from '../../components/Button';
 import Seperator from '../../components/Seperator';
@@ -23,15 +17,9 @@ import {
 import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
-import {dHeight} from '../../utils';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
-import {
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  eOpenRecoveryKeyDialog,
-  eOpenResultDialog
-} from '../../utils/Events';
+import {eOpenLoginDialog, eOpenResultDialog} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
@@ -44,7 +32,6 @@ import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import {Header} from '../SimpleList/header';
-import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const MODES = {
@@ -56,7 +43,7 @@ const MODES = {
 };
 
 let email = '';
-let password = '';
+let password = 'Loveyouall@123';
 let confirmPassword;
 let oldPassword;
 
@@ -190,6 +177,7 @@ const LoginDialog = () => {
     setMode(mode ? mode : MODES.login);
     if (mode === MODES.sessionExpired) {
       try {
+        console.log('REQUESTING NEW TOKEN');
         let res = await db.user.tokenManager.getToken();
         if (!res) throw new Error('no token found');
         if (db.user.tokenManager._isTokenExpired(res))
@@ -253,9 +241,9 @@ const LoginDialog = () => {
         context: 'local'
       });
       close();
-      eSendEvent('userLoggedIn', true);
-
       await MMKV.removeItem('loginSessionHasExpired');
+      eSendEvent('userLoggedIn', true);
+      console.log('PRESENTING SHEET');
       await sleep(500);
       presentSheet({
         title: 'Syncing your data',
@@ -436,10 +424,12 @@ const LoginDialog = () => {
         setTimeout(() => {
           if (MODES.sessionExpired === mode) {
             _pass.current?.focus();
+            setFocused(true);
             return;
           }
           _email.current?.focus();
-        }, 300);
+          setFocused(true);
+        }, 500);
       }}
       background={!DDS.isTab ? colors.bg : null}
       transparent={true}>
@@ -541,7 +531,7 @@ const LoginDialog = () => {
               color={colors.errorText}
             />
             <Paragraph style={{maxWidth: '90%'}} color={colors.errorText}>
-              Please login to your account to access your notes on this device
+              Please log in to your account to access your notes on this device
               and sync them.
             </Paragraph>
           </View>
@@ -659,23 +649,6 @@ const LoginDialog = () => {
               />
             </>
           )}
-
-          {/*  {mode === MODES.login || mode === MODES.sessionExpired ? (
-            <TouchableOpacity
-              onPress={() => {
-                if (MODES.sessionExpired === mode) {
-                  sendEmail(true);
-                  return;
-                }
-                setMode(MODES.forgotPassword);
-              }}
-              style={{
-                alignSelf: 'flex-end',
-                marginTop: 2.5
-              }}>
-              <Paragraph color={colors.accent}>Forgot password?</Paragraph>
-            </TouchableOpacity>
-          ) : null} */}
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
@@ -757,7 +730,7 @@ const LoginDialog = () => {
             height={50}
           />
 
-          {current.buttonAlt && (
+          {current.buttonAlt ? (
             <Button
               title={current.buttonAlt}
               onPress={current.buttonAltFunc}
@@ -769,7 +742,7 @@ const LoginDialog = () => {
               }}
               height={50}
             />
-          )}
+          ) : null}
         </View>
 
         <View

@@ -365,12 +365,13 @@ code {
 }
 
 `;
-  if (!tinymce.activeEditor) return;
-  let editorHead =
-    tinymce.activeEditor.contentDocument.getElementsByTagName('head')[0];
-  let css2 = document.createElement('style');
-  css2.appendChild(document.createTextNode(node2));
-  editorHead.appendChild(css2);
+  if (tinymce.activeEditor) {
+    let editorHead =
+      tinymce.activeEditor.contentDocument.getElementsByTagName('head')[0];
+    let css2 = document.createElement('style');
+    css2.appendChild(document.createTextNode(node2));
+    editorHead.appendChild(css2);
+  }
 
   css.appendChild(document.createTextNode(node));
   document.getElementsByTagName('head')[0].appendChild(css);

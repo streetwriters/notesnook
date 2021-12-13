@@ -64,6 +64,20 @@ export const COLOR_SCHEME_LIGHT = {
   light: '#ffffff',
   transGray: '#00000010',
 };
+export const COLOR_SCHEME_PITCH_BLACK = {
+  ...fixedColors,
+  night: true,
+  bg: '#000000',
+  navbg: '#2b2b2b',
+  input: '#2d2d2d',
+  nav: '#1a1a1a',
+  heading: '#E8E8E8',
+  pri: '#C0C0C0',
+  sec: 'black',
+  light: '#ffffff',
+  transGray: '#ffffff10',
+};
+
 export const COLOR_SCHEME_DARK = {
   ...fixedColors,
   night: true,

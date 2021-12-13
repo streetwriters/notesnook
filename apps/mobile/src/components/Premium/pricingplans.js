@@ -68,9 +68,11 @@ export const PricingPlans = ({
           )
         };
         setOffers(offers);
+
         if (promo?.promoCode) {
           getPromo(promo?.promoCode);
         }
+
         setProducts(products);
       }
       setLoading(false);
@@ -247,47 +249,51 @@ export const PricingPlans = ({
             />
           </View>
 
-          <Button
-            height={35}
-            style={{
-              marginTop: 10
-            }}
-            onPress={() => {
-              presentDialog({
-                context: 'local',
-                input: true,
-                inputPlaceholder: 'Enter code',
-                positiveText: 'Apply',
-                positivePress: async value => {
-                  if (!value) return;
-                  console.log(value);
-                  eSendEvent(eCloseSimpleDialog);
-                  setBuying(true);
-                  try {
-                    if (!(await getPromo(value)))
-                      throw new Error('Error applying promo code');
-                    ToastEvent.show({
-                      heading: 'Discount applied!',
-                      type: 'success',
-                      context: 'local'
-                    });
-                    setBuying(false);
-                  } catch (e) {
-                    setBuying(false);
-                    ToastEvent.show({
-                      heading: 'Promo code invalid or expired',
-                      message: e.message,
-                      type: 'error',
-                      context: 'local'
-                    });
-                  }
-                },
-                title: 'Have a promo code?',
-                paragraph: 'Enter your promo code to get a special discount.'
-              });
-            }}
-            title="I have a promo code"
-          />
+          {Platform.OS !== 'ios' ? (
+            <Button
+              height={35}
+              style={{
+                marginTop: 10
+              }}
+              onPress={() => {
+                presentDialog({
+                  context: 'local',
+                  input: true,
+                  inputPlaceholder: 'Enter code',
+                  positiveText: 'Apply',
+                  positivePress: async value => {
+                    if (!value) return;
+                    console.log(value);
+                    eSendEvent(eCloseSimpleDialog);
+                    setBuying(true);
+                    try {
+                      if (!(await getPromo(value)))
+                        throw new Error('Error applying promo code');
+                      ToastEvent.show({
+                        heading: 'Discount applied!',
+                        type: 'success',
+                        context: 'local'
+                      });
+                      setBuying(false);
+                    } catch (e) {
+                      setBuying(false);
+                      ToastEvent.show({
+                        heading: 'Promo code invalid or expired',
+                        message: e.message,
+                        type: 'error',
+                        context: 'local'
+                      });
+                    }
+                  },
+                  title: 'Have a promo code?',
+                  paragraph: 'Enter your promo code to get a special discount.'
+                });
+              }}
+              title="I have a promo code"
+            />
+          ) : <View style={{
+            height:15
+          }} />}
         </>
       ) : (
         <View>
@@ -309,7 +315,7 @@ export const PricingPlans = ({
                   marginBottom: 10
                 }}
               />
-              {promo &&
+              {Platform.OS !== "ios" && promo &&
               !promo.promoCode.startsWith('com.streetwriters.notesnook') ? (
                 <Paragraph
                   size={SIZE.md}

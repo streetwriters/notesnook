@@ -18,13 +18,14 @@ import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
 } from '../../utils/Colors';
 import {hexToRGBA, RGB_Linear_Shade} from '../../utils/ColorUtils';
 import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {pv, SIZE} from '../../utils/SizeUtils';
-import { CustomButton } from './button';
+import {CustomButton} from './button';
 import SectionHeader from './section-header';
 
 const SettingsAppearanceSection = () => {
@@ -68,6 +69,22 @@ const SettingsAppearanceSection = () => {
     }
   };
 
+  const pitchBlack = async () => {
+    await SettingsService.set(
+      'pitchBlack',
+      SettingsService.get().pitchBlack ? false : true
+    );
+    let theme = await MMKV.getStringAsync('theme');
+    if (!theme) return;
+    theme = JSON.parse(theme);
+    if (!theme.night) return;
+    if (SettingsService.get().pitchBlack) {
+      changeColorScheme(COLOR_SCHEME_PITCH_BLACK);
+    } else {
+      changeColorScheme(COLOR_SCHEME_DARK);
+    }
+  };
+
   return (
     <>
       <SectionHeader
@@ -88,7 +105,7 @@ const SettingsAppearanceSection = () => {
               style={{
                 textAlignVertical: 'center'
               }}>
-              Accent Color
+              Accent color
             </Paragraph>
             <Paragraph size={SIZE.sm} color={colors.icon}>
               Change the accent color of the app.
@@ -173,7 +190,7 @@ const SettingsAppearanceSection = () => {
           </ScrollView>
 
           <CustomButton
-            title="System Theme"
+            title="Use system theme"
             tagline="Automatically switch to dark mode when the system theme changes."
             onPress={switchTheme}
             maxWidth="90%"
@@ -190,7 +207,24 @@ const SettingsAppearanceSection = () => {
           />
 
           <CustomButton
-            title="Dark Mode"
+            title="Pitch black"
+            tagline="Save battery while using the app with pitch black dark mode on amoled displays"
+            onPress={pitchBlack}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.pitchBlack}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={pitchBlack}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Dark mode"
             tagline="Switch on dark mode at night to protect your eyes."
             onPress={async () => {
               if (!colors.night) {
@@ -198,7 +232,11 @@ const SettingsAppearanceSection = () => {
                   'theme',
                   JSON.stringify({night: true})
                 );
-                changeColorScheme(COLOR_SCHEME_DARK);
+                changeColorScheme(
+                  SettingsService.get().pitchBlack
+                    ? COLOR_SCHEME_PITCH_BLACK
+                    : COLOR_SCHEME_DARK
+                );
               } else {
                 await MMKV.setStringAsync(
                   'theme',

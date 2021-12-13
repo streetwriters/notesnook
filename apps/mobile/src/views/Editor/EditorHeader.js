@@ -191,16 +191,17 @@ const EditorHeader = () => {
 
   const onNoteRemoved = async id => {
     try {
-      console.log('NOTE REMOVED', id);
-      await db.notes.remove(id);
-      if (id !== getNote().id) return;
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Trash,
-        Navigation.routeNames.Notebook
-      ]);
+      return;
+      // console.log('NOTE REMOVED', id);
+      // await db.notes.remove(id);
+      // if (id !== getNote().id) return;
+      // Navigation.setRoutesToUpdate([
+      //   Navigation.routeNames.Favorites,
+      //   Navigation.routeNames.Notes,
+      //   Navigation.routeNames.NotesPage,
+      //   Navigation.routeNames.Trash,
+      //   Navigation.routeNames.Notebook
+      // ]);
     } catch (e) {}
   };
 

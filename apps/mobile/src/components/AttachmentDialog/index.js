@@ -41,7 +41,7 @@ export const AttachmentDialog = () => {
   const open = item => {
     setNote(item);
     setVisible(true);
-    let _attachments = db.attachments.ofNote(item.id, "files");
+    let _attachments = db.attachments.ofNote(item.id, "all");
     setAttachments(_attachments);
   };
 
@@ -225,6 +225,7 @@ export const Attachment = ({attachment, encryption}) => {
             color={colors.pri}>
             {attachment.metadata.filename}
           </Paragraph>
+      
 
           <Paragraph color={colors.icon} size={SIZE.xs}>
             {formatBytes(attachment.length)}{' '}
@@ -232,6 +233,7 @@ export const Attachment = ({attachment, encryption}) => {
               ? '(' + currentProgress.type + 'ing - tap to cancel)'
               : ''}
           </Paragraph>
+
         </View>
       </View>
 

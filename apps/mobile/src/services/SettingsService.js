@@ -27,7 +27,8 @@ export const defaultSettings = {
   notebooksListMode: 'normal',
   notesListMode: 'normal',
   devMode:false,
-  notifNotes:false
+  notifNotes:false,
+  pitchBlack:false
 };
 
 let settings = {...defaultSettings};

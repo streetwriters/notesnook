@@ -30,6 +30,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
+import SettingsService from "../../services/SettingsService";
 import Sync from '../../services/Sync';
 import { editing } from '../../utils';
 import {
@@ -192,7 +193,7 @@ export const ActionSheetComponent = ({
       func: () => {
         if (!colors.night) {
           MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-          changeColorScheme(COLOR_SCHEME_DARK);
+          changeColorScheme(SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK);
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
           changeColorScheme(COLOR_SCHEME_LIGHT);
@@ -690,7 +691,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.sm - 1.5} style={{textAlign: 'center'}}>
+      <Paragraph  size={SIZE.xs + 2} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>

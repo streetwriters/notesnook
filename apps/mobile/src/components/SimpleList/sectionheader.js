@@ -5,19 +5,21 @@ import {useSettingStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  presentSheet
 } from '../../services/EventManager';
 import SettingsService from '../../services/SettingsService';
-import {GROUP, SORT} from '../../utils';
+import {GROUP} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/database';
-import {eOpenJumpToDialog, eOpenSortDialog} from '../../utils/Events';
+import {eOpenJumpToDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
+import Sort from '../Sort';
 import Heading from '../Typography/Heading';
 
-export const SectionHeader = ({item, index, type, title,color}) => {
+export const SectionHeader = ({item, index, type, color, screen}) => {
   const [state] = useTracked();
   const {colors} = state;
   const {fontScale} = useWindowDimensions();
@@ -73,7 +75,7 @@ export const SectionHeader = ({item, index, type, title,color}) => {
           justifyContent: 'center'
         }}>
         <Heading
-          color={COLORS_NOTE[color?.toLowerCase()] || colors.accent  }
+          color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
           size={SIZE.sm}
           style={{
             minWidth: 60,
@@ -93,7 +95,11 @@ export const SectionHeader = ({item, index, type, title,color}) => {
           <>
             <Button
               onPress={() => {
-                eSendEvent(eOpenSortDialog, type);
+                presentSheet({
+                  noProgress: true,
+                  noIcon: true,
+                  component: <Sort screen={screen} type={type} />
+                });
               }}
               title={groupBy}
               icon={
