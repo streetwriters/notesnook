@@ -401,7 +401,7 @@ function updateSessionStatus() {
 }
 
 function isContentInvalid(content) {
-  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>'
+  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>' || content === `<p><br data-mce-bogus="1"></p>`
 }
 
 function check_session_status() {
@@ -413,7 +413,7 @@ function check_session_status() {
         return;
       }
       editor.getHTML().then(function(value) {
-        let status = !value || value === '' || value.trim() === "" || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>';
+        let status = !value || value === '' || value.trim() === "" || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>' || value === '<p><br data-mce-bogus="1"></p>';
         
         window.ReactNativeWebView.postMessage(
           JSON.stringify({

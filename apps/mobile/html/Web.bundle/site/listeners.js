@@ -11,15 +11,13 @@ function onDomContentLoaded() {
     }
     updateInfoBar();
     scrollTimer = setTimeout(function () {
-
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
           visible: event.target.documentElement.scrollTop,
           title: document.getElementById('titleInput').value,
           type: 'scroll',
-          sessionId:sessionId
+          sessionId: sessionId
         })
-      
       );
     }, 100);
   };
@@ -48,7 +46,7 @@ function attachTitleInputListeners() {
           JSON.stringify({
             type: 'focus',
             value: 'title',
-            sessionId:sessionId
+            sessionId: sessionId
           })
         );
       }
@@ -73,14 +71,14 @@ function onTitleChange() {
     let titleMessage = {
       type: 'title',
       value: titleInput.value,
-      sessionId:sessionId
+      sessionId: sessionId
     };
 
     info = document.querySelector(infoBar);
     if (tinymce.activeEditor) {
       info.querySelector('#infowords').innerText =
         editor.countWords() + ' words';
-      updateInfoBar()
+      updateInfoBar();
     }
 
     if (titleMessage && typeof titleMessage.value === 'string') {
@@ -112,10 +110,11 @@ function isInvalidValue(value) {
   return (
     !value ||
     value === '' ||
-    value.trim() === "" ||
+    value.trim() === '' ||
     value === '<p></p>' ||
     value === '<p><br></p>' ||
-    value === '<p>&nbsp;</p>'
+    value === '<p>&nbsp;</p>' ||
+    value === '<p><br data-mce-bogus="1"></p>'
   );
 }
 
@@ -125,14 +124,13 @@ function updateInfoBar() {
     let element = document.getElementById(id);
     if (!element) return;
     if (element.textContent && element.textContent !== '') {
-     if (!element.classList.contains("visible")) {
+      if (!element.classList.contains('visible')) {
         element.classList.add('visible');
       }
     } else {
-      if (element.classList.contains("visible")) {
+      if (element.classList.contains('visible')) {
         element.classList.remove('visible');
       }
-    
     }
   });
 }
@@ -175,7 +173,7 @@ function attachMessageListener() {
         info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
           editor.countWords() + ' words';
-          updateInfoBar()
+        updateInfoBar();
         break;
       case 'htmldiff':
         document.getElementsByClassName('htmldiff_div')[0].innerHTML = value;
