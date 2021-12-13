@@ -463,7 +463,6 @@ export const useAppEvents = () => {
         }
       }
       refValues.current.prevState = 'active';
-      console.log(state,"SETTING VALUE");
       await reconnectSSE();
       await checkIntentState();
       if (getWebviewInit()) {
