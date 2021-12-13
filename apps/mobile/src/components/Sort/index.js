@@ -5,6 +5,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
 import {db} from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -23,6 +24,7 @@ const Sort = ({type, screen}) => {
     setTimeout(() => {
       Navigation.setRoutesToUpdate([screen]);
       eSendEvent('groupOptionsUpdate');
+      eSendEvent(refreshNotesPage);
     }, 1);
   };
 
