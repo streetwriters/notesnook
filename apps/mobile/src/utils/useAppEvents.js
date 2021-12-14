@@ -354,9 +354,16 @@ export const useAppEvents = () => {
       }
       if (user) {
         setUser(user);
-
         clearMessage();
         attachIAPListeners();
+
+        user = await db.user.fetchUser();
+        if (user.isEmailConfirmed && isUserEmailConfirmed === 'no') {
+          setTimeout(() => {
+            onEmailVerified();
+          }, 1000);
+        }
+
         await Sync.run();
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
@@ -366,21 +373,8 @@ export const useAppEvents = () => {
           MMKV.setItem('isUserEmailConfirmed', 'yes');
         }
 
-        let res = await doInBackground(async () => {
-          try {
-            user = await db.user.fetchUser();
-            if (user.isEmailConfirmed && isUserEmailConfirmed === 'no') {
-              setTimeout(() => {
-                onEmailVerified();
-              }, 1000);
-            }
-            return true;
-          } catch (e) {
-            return e.message;
-          }
-        });
-        if (res !== true) throw new Error(res);
         setUser(user);
+        await db.monographs.init();
       } else {
         setLoginMessage();
       }
@@ -424,6 +418,7 @@ export const useAppEvents = () => {
   };
 
   const onAppStateChanged = async state => {
+    console.log('onAppStateChanged');
     if (state === 'active') {
       updateStatusBarColor();
       if (
@@ -463,7 +458,9 @@ export const useAppEvents = () => {
         }
       }
       refValues.current.prevState = 'active';
+      console.log('reconnect sse');
       await reconnectSSE();
+
       await checkIntentState();
       if (getWebviewInit()) {
         await MMKV.removeItem('appState');
@@ -506,6 +503,7 @@ export const useAppEvents = () => {
     }
     refValues.current.isReconnecting = true;
     let state = connection;
+    console.log('SSE:', 'TRYING TO RECONNECT');
     try {
       if (!state) {
         state = await NetInfo.fetch();
@@ -513,19 +511,11 @@ export const useAppEvents = () => {
 
       let user = await db.user.getUser();
       if (user && state.isConnected && state.isInternetReachable) {
-        let res = await doInBackground(async () => {
-          try {
-            await db.connectSSE();
-            return true;
-          } catch (e) {
-            return e.message;
-          }
-        });
-        if (res !== true) throw new Error(res);
+        await db.connectSSE();
       }
       refValues.current.isReconnecting = false;
     } catch (e) {
-      refValues.current.isReconnecting;
+      refValues.current.isReconnecting = false;
     }
   }
 
