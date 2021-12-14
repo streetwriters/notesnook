@@ -42,7 +42,10 @@ const GeneralSheet = ({context}) => {
     actionSheetRef.current?.setModalVisible(true);
   };
 
-  const close = () => {
+  const close = ctx => {
+    if ((ctx && !context) || (ctx && ctx !== context)) {
+      return;
+    }
     actionSheetRef.current?.setModalVisible(false);
   };
 

@@ -1,9 +1,9 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useSettingStore, useUserStore } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import {
   eSendEvent,
@@ -17,14 +17,13 @@ import {
   eOpenLoginDialog,
   eOpenRestoreDialog
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {CustomButton} from './button';
-import {verifyUser} from './functions';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { CustomButton } from './button';
+import { verifyUser } from './functions';
 import SectionHeader from './section-header';
-import * as ScopedStorage from 'react-native-scoped-storage';
 
 const SettingsBackupAndRestore = ({isSheet}) => {
   const [state] = useTracked();

@@ -1,6 +1,5 @@
-import Clipboard from "@react-native-clipboard/clipboard";
-
-import React, { useEffect, useState } from 'react';
+import Clipboard from '@react-native-clipboard/clipboard';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -9,30 +8,32 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import {FlatList} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
-  useSettingStore, useUserStore
+  useSettingStore,
+  useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
-import SettingsService from "../../services/SettingsService";
+import SettingsService from '../../services/SettingsService';
 import Sync from '../../services/Sync';
-import { editing } from '../../utils';
+import {editing} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -40,7 +41,7 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { db } from '../../utils/database';
+import {db} from '../../utils/database';
 import {
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
@@ -49,19 +50,19 @@ import {
   eOpenTagsDialog,
   refreshNotesPage
 } from '../../utils/Events';
-import { deleteItems, openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
-import { Button } from '../Button';
-import { presentDialog } from '../Dialog/functions';
-import { PressableButton } from '../PressableButton';
+import {deleteItems, openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {presentDialog} from '../Dialog/functions';
+import NoteHistory from '../NoteHistory';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ActionSheetColorsSection } from './ActionSheetColorsSection';
-import { ActionSheetTagsSection } from './ActionSheetTagsSection';
+import {ActionSheetColorsSection} from './ActionSheetColorsSection';
+import {ActionSheetTagsSection} from './ActionSheetTagsSection';
 const w = Dimensions.get('window').width;
-
 
 let htmlToText;
 export const ActionSheetComponent = ({
@@ -193,7 +194,11 @@ export const ActionSheetComponent = ({
       func: () => {
         if (!colors.night) {
           MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-          changeColorScheme(SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK);
+          changeColorScheme(
+            SettingsService.get().pitchBlack
+              ? COLOR_SCHEME_PITCH_BLACK
+              : COLOR_SCHEME_DARK
+          );
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
           changeColorScheme(COLOR_SCHEME_LIGHT);
@@ -547,7 +552,7 @@ export const ActionSheetComponent = ({
       func: async () => {
         close();
         await sleep(300);
-        eSendEvent(eOpenAttachmentsDialog,note);
+        eSendEvent(eOpenAttachmentsDialog, note);
       }
     },
     {
@@ -649,6 +654,20 @@ export const ActionSheetComponent = ({
           positiveType: 'errorShade'
         });
       }
+    },
+    {
+      name: 'History',
+      title: 'History',
+      icon: 'history',
+      func: async () => {
+        close();
+        await sleep(300);
+        presentSheet({
+          noProgress: true,
+          noIcon: true,
+          component: ref => <NoteHistory ref={ref} note={note} />
+        });
+      }
     }
   ];
 
@@ -691,7 +710,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph  size={SIZE.xs + 2} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.xs + 2} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
@@ -831,7 +850,7 @@ export const ActionSheetComponent = ({
                           heading: topic.title,
                           id: topic.id,
                           type: topic.type
-                        }; 
+                        };
                         eSendEvent(refreshNotesPage, params);
                         Navigation.navigate(routeName, params, headerState);
                       }}
@@ -984,13 +1003,13 @@ export const ActionSheetComponent = ({
           style={{
             width: '100%',
             paddingHorizontal: 12,
-            marginTop: 10,
+            marginTop: 10
           }}>
           <Button
             onPress={async () => {
               console.log('copy data');
-              let additionalData = {}
-              if (note.type === "note") {
+              let additionalData = {};
+              if (note.type === 'note') {
                 let content = await db.content.raw(note.contentId);
                 if (content) {
                   content = db.debug.strip(content);
@@ -1004,11 +1023,10 @@ export const ActionSheetComponent = ({
               Clipboard.setString(db.debug.strip(_note));
 
               ToastEvent.show({
-                heading:"Debug data copied!",
-                type:'success',
-                context:'local'
-              })
-              
+                heading: 'Debug data copied!',
+                type: 'success',
+                context: 'local'
+              });
             }}
             fontSize={SIZE.sm}
             title="Copy data"
