@@ -60,6 +60,7 @@ let waitForContent = false;
 let prevNoteContent = null;
 let timerForEditor = null;
 let sessionId = null;
+let historySessionId = null;
 
 export function startClosingSession() {
   closingSession = true;
@@ -118,7 +119,7 @@ export async function clearTimer(clear) {
     });
   }
   waitForContent = false;
-  console.log("cleared timer & saving note",content.data);
+  console.log('cleared timer & saving note', content.data);
   if (clear) {
     if (!noteEdited) return;
     if (
@@ -228,6 +229,7 @@ function clearNote() {
   note = null;
   title = '';
   noteEdited = false;
+  historySessionId = null;
   prevNoteContent = content.data;
   id = null;
   content = {
@@ -401,7 +403,15 @@ function updateSessionStatus() {
 }
 
 function isContentInvalid(content) {
-  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>' || content === `<p><br data-mce-bogus="1"></p>`
+  return (
+    !content ||
+    content === '' ||
+    content.trim() === '' ||
+    content === '<p></p>' ||
+    content === '<p><br></p>' ||
+    content === '<p>&nbsp;</p>' ||
+    content === `<p><br data-mce-bogus="1"></p>`
+  );
 }
 
 function check_session_status() {
@@ -446,7 +456,7 @@ export const _onMessage = async evt => {
       if (message.sessionId !== sessionId) return;
       console.log('noteedited');
       noteEdited = true;
-      break;  
+      break;
     case 'tiny':
       if (message.sessionId !== sessionId) return;
       if (message.value === '<br>') return;
@@ -542,7 +552,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) return;
-      console.log('content not loaded',content.data);
+      console.log('content not loaded', content.data);
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();
@@ -712,7 +722,7 @@ export async function saveNote(preventUpdate) {
   if (disableSaving || !noteEdited || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
-  };
+  }
 
   isSaving = true;
   try {
@@ -731,7 +741,7 @@ export async function saveNote(preventUpdate) {
       locked = _note.locked;
     }
 
-    console.log('note saved',preventUpdate,closingSession);
+    console.log('note saved', preventUpdate, closingSession);
 
     let noteData = {
       title,
@@ -762,7 +772,6 @@ export async function saveNote(preventUpdate) {
         await setNoteInEditorAfterSaving(id, noteId);
         saveCounter++;
       }
-
     } else {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);
@@ -781,8 +790,34 @@ export async function saveNote(preventUpdate) {
       );
       tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
+
+    await updateSessionHistory(id, noteData.content);
   } catch (e) {}
   isSaving = false;
+}
+
+async function updateSessionHistory(id, content) {
+  let note = db.notes.note(id)?.data;
+  if (!note) return;
+  if (!historySessionId) {
+    historySessionId = `${id}_${note.dateEdited}`;
+  }
+
+  if (!historySessionId.includes(id)) {
+    historySessionId = null;
+    return;
+  }
+  if (!note.locked) {
+    console.log('saving session with id: ',historySessionId);
+    await db.noteHistory.add(id, historySessionId, content);
+  } else {
+    let content = await db.content.get(note.contentId);
+
+    await db.noteHistory.add(id, historySessionId, {
+      data: content.data,
+      type: content.type
+    });
+  }
 }
 
 export async function onWebViewLoad(premium, colors) {
