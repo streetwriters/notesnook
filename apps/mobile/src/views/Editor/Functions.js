@@ -552,7 +552,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) return;
-      console.log('content not loaded', content.data);
+      console.log('content not loaded');
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();

@@ -42,9 +42,6 @@ const RenderItem = ({item, index,...restArgs}) => {
         };
       })
       .filter(t => t !== null) || [];
-      if (index == 0) {
-        console.log(restArgs);
-      }
   return <Item item={item} tags={tags} index={index} {...restArgs} />;
 };
 
