@@ -110,8 +110,6 @@ class Database {
 
     await this.migrations.init();
     await this.migrations.migrate();
-
-    this.monographs.init();
   }
 
   disconnectSSE() {
