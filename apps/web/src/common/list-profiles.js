@@ -11,6 +11,7 @@ import {
   MAX_HEIGHTS,
 } from "./height-calculator";
 import { db } from "./db";
+import { getTotalNotes } from ".";
 
 function createProfile(item, itemHeight, estimatedItemHeight) {
   return { item, itemHeight, estimatedItemHeight };
@@ -32,7 +33,9 @@ const NotesProfile = createProfile(
 );
 
 const NotebooksProfile = createProfile(
-  (index, item) => <Notebook index={index} item={item} />,
+  (index, item) => (
+    <Notebook index={index} item={item} totalNotes={getTotalNotes(item)} />
+  ),
   getNotebookHeight,
   MAX_HEIGHTS.notebook
 );

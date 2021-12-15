@@ -49,6 +49,7 @@ function NotebookHeader({ notebook }) {
   useEffect(() => {
     setIsShortcut(menuPins.findIndex((p) => p.id === notebook.id) > -1);
   }, [menuPins, notebook]);
+  const totalNotes = getTotalNotes(notebook);
 
   return (
     <Flex flexDirection="column" mx={2} my={2}>
@@ -92,8 +93,8 @@ function NotebookHeader({ notebook }) {
         </Text>
       )}
       <Text as="em" variant="subBody" mt={2}>
-        {topics.length} {topics.length > 1 ? "topics" : "topic"},{" "}
-        {getTotalNotes(notebook)} {topics.length > 1 ? "notes" : "note"}
+        {topics.length} {topics.length > 1 ? "topics" : "topic"}, {totalNotes}{" "}
+        {totalNotes > 1 ? "notes" : "note"}
       </Text>
     </Flex>
   );

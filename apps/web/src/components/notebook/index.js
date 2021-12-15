@@ -7,12 +7,11 @@ import { showItemDeletedToast, showUnpinnedToast } from "../../common/toasts";
 import { db } from "../../common/db";
 import * as Icon from "../icons";
 import { hashNavigate, navigate } from "../../navigation";
-import { getTotalNotes } from "../../common";
 import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
 
 function Notebook(props) {
-  const { item, index } = props;
+  const { item, index, totalNotes } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
 
@@ -32,7 +31,7 @@ function Notebook(props) {
         isCompact ? (
           <>
             <Text fontSize="subBody" color="fontTertiary">
-              {getTotalNotes(notebook)} Notes
+              {totalNotes} {totalNotes > 1 ? "notes" : "note"}
             </Text>
           </>
         ) : (
@@ -72,7 +71,9 @@ function Notebook(props) {
               <Text as="span" mx={1}>
                 •
               </Text>
-              <Text>{getTotalNotes(notebook)} Notes</Text>
+              <Text>
+                {totalNotes} {totalNotes > 1 ? "notes" : "note"}
+              </Text>
             </Flex>
           </>
         )
@@ -83,11 +84,13 @@ function Notebook(props) {
 export default React.memo(Notebook, (prev, next) => {
   const prevItem = prev.item;
   const nextItem = next.item;
+
   return (
     prevItem.pinned === nextItem.pinned &&
     prevItem.title === nextItem.title &&
     prevItem.description === nextItem.description &&
-    prevItem.topics.length === nextItem.topics.length
+    prevItem.topics.length === nextItem.topics.length &&
+    prev.totalNotes === next.totalNotes
   );
 });
 
