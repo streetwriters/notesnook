@@ -16,7 +16,7 @@ class Settings {
   async init() {
     var settings = await this._db.storage.read("settings");
     this._initSettings(settings);
-    await this._saveSettings();
+    await this._saveSettings(false);
 
     EV.subscribe(EVENTS.userLoggedOut, () => {
       this._initSettings();
