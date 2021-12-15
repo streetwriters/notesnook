@@ -21,7 +21,7 @@ export default class Trash {
   async cleanup() {
     const now = dayjs().unix();
     for (const item of this.all) {
-      if (dayjs(item.dateDeleted).add(7, "days").unix() < now) continue;
+      if (dayjs(item.dateDeleted).add(7, "days").unix() > now) continue;
       await this.delete(item.id);
     }
   }
