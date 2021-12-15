@@ -121,9 +121,6 @@ export default class Attachments extends Collection {
   }
 
   async generateKey() {
-    if (!(await checkIsUserPremium("attachment")))
-      throw new Error("Please upgrade your account to Pro to use attachments.");
-
     await this._getEncryptionKey();
     return await this._db.storage.generateRandomKey();
   }
