@@ -126,14 +126,16 @@ const plugins = {
 
 /**
  * 1. input - called on every change
- * 2. compositionend - (Android only) called on change
- * 3. paste - called after content is pasted
- * 4. ExecCommand - called after changes such as formatting.
- * 5. ObjectResized - called after an image/object has resized
+ * 2. paste - called after content is pasted
+ * 3. ExecCommand - called after changes such as formatting.
+ * 4. ObjectResized - called after an image/object has resized
+ * 5. cut - called when content is cut
+ * 6. Redo - called after redo is done
+ * 7. Undo - called after undo is done
  * We do not include the "change" event here as it is only
  * invoked after the editor loses focus.
  */
-const changeEvents = "input compositionend paste ExecCommand ObjectResized";
+const changeEvents = "input paste ExecCommand ObjectResized cut Redo Undo";
 const ignoredCommand = ["mcerepaint", "mcefocus"];
 
 function TinyMCE(props) {
