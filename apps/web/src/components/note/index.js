@@ -174,7 +174,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
-    JSON.stringify(prevProps.notebook) === JSON.stringify(nextProps.notebook) &&
+    prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
   );
 });

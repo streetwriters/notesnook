@@ -89,15 +89,21 @@ function getTags(item) {
 }
 
 function getNotebook(notebooks, contextType) {
-  if (contextType !== "topic" && notebooks?.length) {
-    const noteNotebook = notebooks[0];
-    const _notebook = db.notebooks.notebook(noteNotebook.id);
-    let notebook = _notebook?.data;
+  if (contextType === "topic" || !notebooks?.length) return;
 
-    const topicId = noteNotebook.topics[0];
-    const topic = _notebook?.topics.topic(topicId);
-    notebook.topic = topic?._topic;
-    return notebook;
-  }
-  return;
+  const noteNotebook = notebooks[0];
+  const topicId = noteNotebook.topics[0];
+
+  const notebook = db.notebooks.notebook(noteNotebook.id)?.data;
+  if (!notebook) return;
+
+  const topic = notebook.topics.find((t) => t.id === topicId);
+  if (!topic) return;
+
+  return {
+    id: notebook.id,
+    title: notebook.title,
+    dateEdited: notebook.dateEdited,
+    topic: { id: topicId, title: topic.title },
+  };
 }
