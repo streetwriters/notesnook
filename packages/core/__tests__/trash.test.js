@@ -1,3 +1,4 @@
+import dayjs from "dayjs";
 import {
   StorageInterface,
   noteTest,
@@ -126,4 +127,30 @@ test("restore a notebook that has deleted notes", () =>
     let notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
     expect(notebook.topics.topic("hello").has(noteId)).toBe(false);
+  }));
+
+test("permanently delete items older than 7 days", () =>
+  databaseTest().then(async (db) => {
+    const sevenDaysEarlier = dayjs().subtract(8, "days").toDate().getTime();
+    const noteId = await db.notes.add(TEST_NOTE);
+    const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
+
+    await db.notebooks.delete(notebookId);
+    await db.notes.delete(noteId);
+
+    await db.notes._collection.updateItem({
+      id: noteId,
+      dateDeleted: sevenDaysEarlier,
+    });
+
+    await db.notebooks._collection.updateItem({
+      id: notebookId,
+      dateDeleted: sevenDaysEarlier,
+    });
+
+    expect(db.trash.all.length).toBe(2);
+
+    await db.trash.cleanup();
+
+    expect(db.trash.all.length).toBe(0);
   }));
