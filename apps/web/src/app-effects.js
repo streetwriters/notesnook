@@ -64,6 +64,7 @@ export default function AppEffects({ setShow }) {
       (async function () {
         await updateLastSynced();
         if (await initUser()) {
+          await db.monographs.init();
           showUpgradeReminderDialogs();
           await sync();
         }
