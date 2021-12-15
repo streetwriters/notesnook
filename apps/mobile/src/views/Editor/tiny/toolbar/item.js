@@ -81,7 +81,6 @@ const ToolbarItem = ({
   }, []);
 
   const onColorChange = async () => {
-    console.log('color change');
     if (/^(dhilitecolor|dforecolor)$/.test(format)) {
       let _color = await MMKV.getItem(format);
       let defColor =
