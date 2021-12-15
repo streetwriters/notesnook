@@ -149,18 +149,18 @@ function init_callback(_editor) {
     reactNativeEventHandler('focus', 'editor');
   });
 
-  editor.on('SetContent', function (event) {
-    if (globalThis.isClearingNoteData) {
-      globalThis.isClearingNoteData = false;
-      return;
-    }
-    setTimeout(function () {
-      editor.undoManager.transact(function () {});
-    }, 1000);
-    if (!event.paste) {
-      reactNativeEventHandler('noteLoaded', true);
-    }
-  });
+  // editor.on('SetContent', function (event) {
+  //   if (globalThis.isClearingNoteData) {
+  //     globalThis.isClearingNoteData = false;
+  //     return;
+  //   }
+  //   setTimeout(function () {
+  //     editor.undoManager.transact(function () {});
+  //   }, 1000);
+  //   if (!event.paste) {
+  //     reactNativeEventHandler('noteLoaded', true);
+  //   }
+  // });
 
   editor.on('NewBlock', function (e) {
     console.log('New Block');
@@ -215,10 +215,13 @@ function init_callback(_editor) {
       block: 'nearest'
     });
   });
-  editor.on('input', onChange);
-  editor.on('keyup', onChange);
-  editor.on('NodeChange', onChange);
-  editor.on('compositionend', onChange);
+
+  editor.on('input ExecCommand ObjectResized Redo Undo', onChange);
+  editor.on('keyup', e => {
+    if (e.key !== 'Backspace') return;
+    if (!editor.getHTML) return;
+    onChange();
+  });
 }
 
 const plugins = [
@@ -493,12 +496,20 @@ function delay(base = 0) {
 
 let noteedited = false;
 const onChange = function (event) {
-  console.log(event.type, event.selectionChange);
-  if (event.type === 'nodechange' && !event.selectionChange) return;
+  // console.log(event.type, event.selectionChange);
+  // if (event.type === 'nodechange' && !event.selectionChange) return;
+
+  if (event.type && event.type.toLowerCase() === 'execcommand') {
+    if (
+      event.command.toLowerCase() === 'mcefocus' ||
+      event.command.toLowerCase() === 'mcerepaint'
+    ) {
+      return;
+    }
+  }
 
   if (isLoading) {
     isLoading = false;
-    return;
   }
 
   if (prevCount === 0) {
@@ -506,7 +517,8 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0 && event.type !== 'paste') return;
-  if (event.type !== 'nodechange' && event.type !== 'compositionend') {
+  console.log(event);
+  if (event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
       reactNativeEventHandler('noteedited');

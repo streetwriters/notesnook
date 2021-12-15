@@ -118,7 +118,6 @@ export async function clearTimer(clear) {
     });
   }
   waitForContent = false;
-  console.log("cleared timer & saving note",content.data);
   if (clear) {
     if (!noteEdited) return;
     if (
@@ -449,22 +448,21 @@ export const _onMessage = async evt => {
       break;  
     case 'tiny':
       if (message.sessionId !== sessionId) return;
-      if (message.value === '<br>') return;
-      if (message.value !== content.data) {
-        if (prevNoteContent && message.value === prevNoteContent) {
-          prevNoteContent = null;
-          noteEdited = false;
-          return;
-        }
-
-        noteEdited = true;
-        lastEditTime = Date.now();
-        content = {
-          type: message.type,
-          data: message.value
-        };
-        onNoteChange();
+      if (prevNoteContent && message.value === prevNoteContent) {
+        prevNoteContent = null;
+        noteEdited = false;
+        return;
       }
+
+      console.log("tiny content recieved");
+
+      noteEdited = true;
+      lastEditTime = Date.now();
+      content = {
+        type: message.type,
+        data: message.value
+      };
+      onNoteChange();
       if (waitForContent) {
         eSendEvent('content_event');
       }
@@ -607,7 +605,6 @@ export async function clearEditor(
     waitForContent = true;
     await clearTimer(true);
   }
-  console.log(noteEdited, content.data);
 
   disableSaving = true;
   db.fs.cancel(getNote()?.id);
