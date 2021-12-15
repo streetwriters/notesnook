@@ -6,7 +6,7 @@ class Collection {
   static async new(db, name, cached = true, deferred = false) {
     const collection = new this(db, name, cached);
 
-    if (!deferred && collection.init) await collection.init();
+    if (!deferred) await collection.init();
     else await collection._collection.indexer.init();
 
     if (collection._collection.clear)
@@ -21,6 +21,7 @@ class Collection {
   async init() {
     if (this.initialized) return;
     await this._collection.init();
+    EV.publish(EVENTS.databaseCollectionInitiated, this.collectionName);
     this.initialized = true;
   }
 
@@ -30,6 +31,7 @@ class Collection {
    */
   constructor(db, name, cached) {
     this._db = db;
+    this.collectionName = name;
     if (cached) this._collection = new CachedCollection(this._db.storage, name);
     else this._collection = new IndexedCollection(this._db.storage, name);
   }

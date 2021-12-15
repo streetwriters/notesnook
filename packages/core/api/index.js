@@ -70,6 +70,15 @@ class Database {
       this.syncer.stopAutoSync();
       this.disconnectSSE();
     });
+    EV.subscribe(EVENTS.databaseCollectionInitiated, async (collectionName) => {
+      switch (collectionName) {
+        case "notes": {
+          await this.monographs.init();
+          await this.trash.init();
+          break;
+        }
+      }
+    });
 
     this.session = new Session(this.storage);
     await this._validate();
@@ -103,7 +112,6 @@ class Database {
 
     this.trash = new Trash(this);
 
-    await this.trash.cleanup();
     await this.settings.init();
     await this.outbox.init();
     await this.user.init();

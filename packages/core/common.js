@@ -43,6 +43,7 @@ export const EVENTS = {
   databaseSyncRequested: "db:syncRequested",
   databaseMigrated: "db:migrated",
   databaseUpdated: "db:updated",
+  databaseCollectionInitiated: "db:collectionInitiated",
   appRefreshRequested: "app:refreshRequested",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
