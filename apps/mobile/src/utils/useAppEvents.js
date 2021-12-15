@@ -374,7 +374,6 @@ export const useAppEvents = () => {
         }
 
         setUser(user);
-        await db.monographs.init();
       } else {
         setLoginMessage();
       }
