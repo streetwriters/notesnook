@@ -30,7 +30,6 @@ export default class Tags extends Collection {
       type: "tag",
       id,
       title: tag.title,
-      alias: tag.title,
       noteIds: setManipulator.union(notes, noteIds),
     };
 
@@ -61,7 +60,7 @@ export default class Tags extends Collection {
       return;
     }
 
-    return tag.alias || this._db.settings.getAlias(tagId) || tag.title;
+    return this._db.settings.getAlias(tagId) || tag.title;
   }
 
   get raw() {
@@ -70,7 +69,6 @@ export default class Tags extends Collection {
 
   get all() {
     return this._collection.getItems(undefined, (item) => {
-      if (item.alias) return item;
       item.alias = this._db.settings.getAlias(item.id) || item.title;
       return item;
     });
