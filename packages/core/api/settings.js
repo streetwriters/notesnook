@@ -42,6 +42,7 @@ class Settings {
         ...this._settings.aliases,
         ...item.aliases,
       };
+      this._settings.dateEdited = Date.now();
     } else {
       this._initSettings(item);
     }
