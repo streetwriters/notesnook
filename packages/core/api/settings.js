@@ -145,6 +145,7 @@ class Settings {
   async _saveSettings(updateDateEdited = true) {
     if (updateDateEdited) this._settings.dateEdited = Date.now();
     await this._db.storage.write("settings", this._settings);
+    EV.publish(EVENTS.databaseUpdated, this._settings);
   }
 }
 export default Settings;
