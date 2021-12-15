@@ -44,7 +44,7 @@ const AccoutLogoutSection = () => {
               Logging out
             </Heading>
             <Paragraph color={colors.icon}>
-              Please wait while log out and clear app data.
+              Please wait while we log out and clear app data.
             </Paragraph>
             <View
               style={{
