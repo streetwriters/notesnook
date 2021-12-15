@@ -154,3 +154,18 @@ test("permanently delete items older than 7 days", () =>
 
     expect(db.trash.all.length).toBe(0);
   }));
+
+test("trash cleanup should not delete items newer than 7 days", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add(TEST_NOTE);
+    const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
+
+    await db.notebooks.delete(notebookId);
+    await db.notes.delete(noteId);
+
+    expect(db.trash.all.length).toBe(2);
+
+    await db.trash.cleanup();
+
+    expect(db.trash.all.length).toBe(2);
+  }));
