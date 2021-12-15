@@ -95,20 +95,22 @@ test("delete a notebook", () =>
     expect(db.notes.note(noteId).notebook).toBeUndefined();
   }));
 
-test("restore a deleted notebook", () =>
+test.only("restore a deleted notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notebooks.notebook(id).topics.topic("hello").add(noteId);
     await db.notebooks.delete(id);
     await db.trash.restore(id);
+
     let notebook = db.notebooks.notebook(id);
     expect(notebook).toBeDefined();
+
     let note = db.notes.note(noteId);
-    const index = note.notebooks.findIndex((n) => n.id === id);
-    expect(note.notebooks[index]).toBeDefined();
-    expect(
-      notebook.topics.topic(note.notebooks[index].topics[0])
-    ).toBeDefined();
+    const noteNotebook = note.notebooks.find((n) => n.id === id);
+    expect(noteNotebook).toBeDefined();
+    expect(noteNotebook.topics.length).toBe(1);
+
+    expect(notebook.topics.topic(noteNotebook.topics[0])).toBeDefined();
   }));
 
 test("restore a notebook that has deleted notes", () =>

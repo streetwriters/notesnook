@@ -94,18 +94,21 @@ export default class Topics {
   }
 
   async delete(...topicIds) {
-    let allTopics = qclone(this.all); //FIXME: make a deep copy
-    for (let i = 0; i < allTopics.length; i++) {
-      let topic = allTopics[i];
+    let allTopics = qclone(this.all);
+
+    for (let topicId of topicIds) {
+      const topic = this.topic(topicId);
       if (!topic) continue;
-      let index = topicIds.findIndex((id) => topic.id === id);
-      let t = this.topic(topic);
-      await t.delete(...topic.notes);
-      await this._db.settings.unpin(topic.id);
-      if (index > -1) {
-        allTopics.splice(i, 1);
-      }
+
+      await topic.delete(...topic._topic.notes);
+      await this._db.settings.unpin(topicId);
+
+      const topicIndex = allTopics.findIndex(
+        (t) => t.id === topicId || t.title === topicId
+      );
+      allTopics.splice(topicIndex, 1);
     }
+
     await this._db.notebooks.add({ id: this._notebookId, topics: allTopics });
   }
 }
