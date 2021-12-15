@@ -16,7 +16,7 @@ export default class Notebooks extends Collection {
 
     if (localNotebook && localNotebook.topics?.length) {
       const lastSyncedTimestamp = await this._db.lastSynced();
-
+      let isChanged = false;
       // merge new and old topics
       // We need to handle 3 cases:
       for (let oldTopic of localNotebook.topics) {
@@ -30,6 +30,7 @@ export default class Notebooks extends Collection {
         // it was newly added or edited so add it to the new notebook.
         if (!newTopic && oldTopic.dateEdited > lastSyncedTimestamp) {
           remoteNotebook.topics.push({ ...oldTopic, dateEdited: Date.now() });
+          isChanged = true;
         }
 
         // CASE 2: if topic exists in new notebook but not in old notebook, it's new.
@@ -44,9 +45,10 @@ export default class Notebooks extends Collection {
             notes: setManipulator.union(oldTopic.notes, newTopic.notes),
             dateEdited: Date.now(),
           };
+          isChanged = true;
         }
       }
-      remoteNotebook.dateEdited = Date.now(); // we update the dateEdited so it can be synced back
+      if (isChanged) remoteNotebook.dateEdited = Date.now(); // we update the dateEdited so it can be synced back
     }
     return await this._collection.addItem(remoteNotebook);
   }
@@ -137,6 +139,7 @@ export default class Notebooks extends Collection {
   async repairReferences() {
     for (let notebook of this.all) {
       const _notebook = this.notebook(notebook);
+      console.log("repairing references", _notebook.data.id);
       for (let topic of notebook.topics) {
         const _topic = _notebook.topics.topic(topic.id);
         await _topic.add(...topic.notes);
