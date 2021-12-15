@@ -28,31 +28,33 @@ export default class Topic {
       let note = this._db.notes.note(noteId);
       if (!note || note.data.deleted) continue;
 
-      let array = note.notebooks || [];
-      const notebookIndex = array.findIndex((nb) => nb.id === this._notebookId);
-      if (notebookIndex === -1) {
-        let notebook = {};
-        notebook.id = this._notebookId;
-        notebook.topics = [topic.id];
-        array.push(notebook);
-      } else {
-        const topicIndex = array[notebookIndex].topics.indexOf(topic.id);
-        if (topicIndex > -1) {
-          if (!this.has(noteId)) topic.notes.push(noteId);
-          continue;
-        }
+      const notebooks = note.notebooks || [];
 
-        array[notebookIndex].topics.push(topic.id);
+      const noteNotebook = notebooks.find((nb) => nb.id === this._notebookId);
+      const noteHasNotebook = !!noteNotebook;
+      if (noteHasNotebook) {
+        // 1 note can be inside multiple topics
+        const noteHasTopic = noteNotebook.topics.indexOf(topic.id) > -1;
+        if (noteHasTopic) continue;
+
+        noteNotebook.topics.push(topic.id);
+      } else {
+        notebooks.push({
+          id: this._notebookId,
+          topics: [topic.id],
+        });
       }
 
       await this._db.notes.add({
         id: noteId,
-        notebooks: array,
+        notebooks,
       });
 
-      if (!this.has(noteId)) topic.notes.push(noteId);
+      if (!this.has(noteId)) {
+        topic.notes.push(noteId);
+        await this._save(topic);
+      }
     }
-    return await this._save(topic);
   }
 
   async delete(...noteIds) {
