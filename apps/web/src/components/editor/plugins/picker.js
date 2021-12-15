@@ -1,7 +1,11 @@
 import Compressor from "compressorjs";
 import { AppEventManager, AppEvents } from "../../../common";
 import { db } from "../../../common/db";
-import { showProgressDialog } from "../../../common/dialog-controller";
+import {
+  showBuyDialog,
+  showProgressDialog,
+} from "../../../common/dialog-controller";
+import { isUserPremium } from "../../../hooks/use-is-user-premium";
 import fs from "../../../interfaces/fs";
 import { formatBytes } from "../../../utils/filename";
 import { showToast } from "../../../utils/toast";
@@ -24,6 +28,11 @@ function register(editor) {
 }
 
 async function insertAttachment(editor, type) {
+  if (!isUserPremium()) {
+    await showBuyDialog();
+    return;
+  }
+
   const selectedFile = await showFilePicker({
     acceptedFileTypes: type || "*/*",
   });
