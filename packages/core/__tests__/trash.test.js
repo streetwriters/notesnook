@@ -95,7 +95,7 @@ test("delete a notebook", () =>
     expect(db.notes.note(noteId).notebook).toBeUndefined();
   }));
 
-test.only("restore a deleted notebook", () =>
+test("restore a deleted notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let noteId = await db.notes.add(TEST_NOTE);
     await db.notebooks.notebook(id).topics.topic("hello").add(noteId);

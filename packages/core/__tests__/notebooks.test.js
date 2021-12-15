@@ -134,6 +134,23 @@ test("merge notebook when local notebook is also edited should merge noteIds too
     expect(notebook.topics.all[0].notes.length).toBe(2);
   }));
 
+test("merging notebook when local notebook is not edited should not update remote notebook dateEdited", () =>
+  notebookTest().then(async ({ db, id }) => {
+    let notebook = db.notebooks.notebook(id);
+
+    let note = await db.notes.add(TEST_NOTE);
+    await db.notes.move(
+      { id: notebook.data.id, topic: notebook.data.topics[0].id },
+      note
+    );
+
+    const newNotebook = { ...notebook.data, remote: true };
+
+    await expect(db.notebooks.merge(newNotebook)).resolves.not.toThrow();
+
+    expect(db.notebooks.notebook(id).dateEdited).toBe(newNotebook.dateEdited);
+  }));
+
 test("merge notebook with topic removed that is edited in the local notebook", () =>
   notebookTest().then(async ({ db, id }) => {
     let notebook = db.notebooks.notebook(id);
