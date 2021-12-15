@@ -280,7 +280,6 @@ function TinyMCE(props) {
           editor.on(changeEvents, onEditorChange);
           editor.on("keyup", onKeyUp);
           editor.once("remove", () => {
-            console.log("removing");
             editor.off("ScrollIntoView", onScrollIntoView);
             editor.off("tap", onTap);
             editor.off(changeEvents, onEditorChange);
