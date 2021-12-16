@@ -3,7 +3,7 @@ import { SUBSCRIPTION_STATUS } from "../common";
 import { db } from "../common/db";
 import Config from "./config";
 import { isUserPremium } from "../hooks/use-is-user-premium";
-import { getAppVersion } from "./useVersion";
+import { appVersion } from "./version";
 
 var CACHED_ANNOUNCEMENTS = [];
 var cancelled = false;
@@ -65,7 +65,7 @@ async function shouldShowAnnouncement(announcement) {
 
   show =
     !announcement.appVersion ||
-    announcement.appVersion === getAppVersion().numerical;
+    announcement.appVersion === appVersion.numerical;
 
   if (!show) return false;
 

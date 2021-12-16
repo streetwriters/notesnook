@@ -1,6 +1,6 @@
 import Config from "./config";
 import { getPlatform } from "./platform";
-import { getAppVersion } from "./useVersion";
+import { appVersion } from "./version";
 
 export function loadTrackerScript() {
   if (Config.get("telemetry") === "false") return;
@@ -68,7 +68,7 @@ export function trackVisit() {
     window.umami.trackView("/");
     trackEvent(
       ANALYTICS_EVENTS.version,
-      `${getAppVersion().formatted}-${getPlatform().toLowerCase()}`
+      `${appVersion.formatted}-${getPlatform().toLowerCase()}`
     );
   }
 }

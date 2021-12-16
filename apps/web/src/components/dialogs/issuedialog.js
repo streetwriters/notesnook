@@ -1,5 +1,5 @@
 import { Flex, Text } from "rebass";
-import { getAppVersion } from "../../utils/useVersion";
+import { appVersion } from "../../utils/version";
 import Field from "../field";
 import Dialog from "./dialog";
 import platform from "platform";
@@ -23,7 +23,7 @@ This is all optional, of course.`,
 };
 
 function getDeviceInfo() {
-  const appVersion = getAppVersion().formatted;
+  const appVersion = appVersion.formatted;
   const os = platform.os;
   const browser = `${platform.name} ${platform.version}`;
 

@@ -25,7 +25,7 @@ import { showLoadingDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import { showPasswordDialog } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
-import useVersion from "../utils/useVersion";
+import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "notes-core/common";
 import { openPaddleDialog } from "../common/checkout";
 import Tip from "../components/tip";
@@ -139,7 +139,6 @@ function Settings(props) {
   const toggleNightMode = useThemeStore((store) => store.toggleNightMode);
   const followSystemTheme = useThemeStore((store) => store.followSystemTheme);
   const [zoomFactor, setZoomFactor] = useZoomFactor();
-  const [, version] = useVersion();
 
   const toggleFollowSystemTheme = useThemeStore(
     (store) => store.toggleFollowSystemTheme
@@ -631,7 +630,7 @@ function Settings(props) {
             <Tip
               sx={{ mt: 2 }}
               text="About"
-              tip={`version ${version.formatted}`}
+              tip={`version ${appVersion.formatted}`}
             />
           </>
         )}

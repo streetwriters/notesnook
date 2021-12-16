@@ -1,9 +1,12 @@
 const { execSync } = require("child_process");
 const { cpus } = require("os");
+const { version } = require("./package.json");
 
 const NUM_CPUS = cpus().length;
 const IS_CI = process.env.CI;
 const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
+const APP_VERSION = version.replaceAll(".", "");
+console.log("App version:", APP_VERSION);
 module.exports = {
   test: {
     TEST_ALL: true,
@@ -14,6 +17,7 @@ module.exports = {
     INLINE_RUNTIME_CHUNK: false,
     DISABLE_ESLINT_PLUGIN: true,
     REACT_APP_GIT_HASH: gitHash,
+    REACT_APP_VERSION: APP_VERSION,
   },
   dev: {
     REACT_APP_CI: "true",
