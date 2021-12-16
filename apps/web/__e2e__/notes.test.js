@@ -14,6 +14,7 @@ const {
   editNote,
   getEditorTitle,
   getEditorContent,
+  isTestAll,
 } = require("./utils");
 const {
   navigateTo,
@@ -469,6 +470,7 @@ test.describe("run tests independently", () => {
 });
 
 test.describe("stress tests", () => {
+  // if (!isTestAll())
   test.skip();
 
   test.beforeEach(async ({ page: _page, baseURL }) => {

@@ -5,6 +5,9 @@ const NUM_CPUS = cpus().length;
 const IS_CI = process.env.CI;
 const gitHash = execSync("git rev-parse --short HEAD").toString().trim();
 module.exports = {
+  test: {
+    TEST_ALL: true,
+  },
   all: {
     UV_THREADPOOL_SIZE: IS_CI ? NUM_CPUS : 2,
     GENERATE_SOURCEMAP: false,

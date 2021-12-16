@@ -72,6 +72,10 @@ async function getEditorContentAsHTML() {
   return await page.innerHTML(".mce-content-body");
 }
 
+function isTestAll() {
+  return process.env.TEST_ALL === "true";
+}
+
 module.exports = {
   NOTE,
   NOTEBOOK,
@@ -83,4 +87,5 @@ module.exports = {
   getEditorTitle,
   getEditorContent,
   getEditorContentAsHTML,
+  isTestAll,
 };

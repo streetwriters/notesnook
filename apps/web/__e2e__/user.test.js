@@ -1,5 +1,5 @@
 const { Page, test, expect } = require("@playwright/test");
-const { getTestId } = require("./utils");
+const { getTestId, isTestAll } = require("./utils");
 const { isAbsent, isPresent } = require("./utils/conditions");
 const dotenv = require("dotenv");
 const path = require("path");
@@ -23,6 +23,8 @@ const USER = {
   password: process.env.USER_PASSWORD,
 };
 
+if (!isTestAll()) test.skip();
+
 async function loginUser() {
   await page.click(getTestId("navitem-login"));
 
@@ -36,8 +38,6 @@ async function loginUser() {
 
   expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
 }
-
-test.skip();
 
 test("login user", async () => {
   await loginUser();
