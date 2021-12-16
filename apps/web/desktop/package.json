@@ -16,8 +16,8 @@
   },
   "devDependencies": {
     "@types/node-fetch": "^2.5.12",
-    "electron": "^15.0.0",
-    "electron-builder": "^22.11.7",
+    "electron": "^16.0.4",
+    "electron-builder": "^22.14.5",
     "electron-builder-notarize": "^1.2.0",
     "electron-reloader": "^1.2.1",
     "esbuild": "^0.13.3",

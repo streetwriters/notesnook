@@ -62,10 +62,10 @@ async function createWindow() {
 
   mainWindow.on("closed", () => {
     mainWindow = null;
+    global.win = null;
   });
 
   nativeTheme.on("updated", () => {
-    console.log("UPDATED", getTheme(), nativeTheme.themeSource);
     if (getTheme() === "system") {
       sendMessageToRenderer(EVENTS.themeChanged, {
         theme: nativeTheme.shouldUseDarkColors ? "dark" : "light",
