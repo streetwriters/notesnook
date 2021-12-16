@@ -400,7 +400,15 @@ function updateSessionStatus() {
 }
 
 function isContentInvalid(content) {
-  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>' || content === `<p><br data-mce-bogus="1"></p>`
+  return (
+    !content ||
+    content === '' ||
+    content.trim() === '' ||
+    content === '<p></p>' ||
+    content === '<p><br></p>' ||
+    content === '<p>&nbsp;</p>' ||
+    content === `<p><br data-mce-bogus="1"></p>`
+  );
 }
 
 function check_session_status() {
@@ -445,7 +453,7 @@ export const _onMessage = async evt => {
       if (message.sessionId !== sessionId) return;
       console.log('noteedited');
       noteEdited = true;
-      break;  
+      break;
     case 'tiny':
       if (message.sessionId !== sessionId) return;
       if (prevNoteContent && message.value === prevNoteContent) {
@@ -454,7 +462,7 @@ export const _onMessage = async evt => {
         return;
       }
 
-      console.log("tiny content recieved");
+      console.log('tiny content recieved');
 
       noteEdited = true;
       lastEditTime = Date.now();
@@ -540,7 +548,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) return;
-      console.log('content not loaded',content.data);
+      console.log('content not loaded', content.data);
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();
@@ -709,7 +717,7 @@ export async function saveNote(preventUpdate) {
   if (disableSaving || !noteEdited || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
-  };
+  }
 
   isSaving = true;
   try {
@@ -728,7 +736,7 @@ export async function saveNote(preventUpdate) {
       locked = _note.locked;
     }
 
-    console.log('note saved',preventUpdate,closingSession);
+    console.log('note saved', preventUpdate, closingSession);
 
     let noteData = {
       title,
@@ -755,11 +763,14 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id && !preventUpdate) {
+        if (!title || title === '') {
+          post('title', db.notes.note(noteId)?.data?.title || '');
+        }
+
         useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await setNoteInEditorAfterSaving(id, noteId);
         saveCounter++;
       }
-
     } else {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);
