@@ -54,7 +54,7 @@ export const Card = ({color}) => {
           marginLeft: 10,
           maxWidth: '70%'
         }}>
-        <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+        <Paragraph color={colors.icon} size={SIZE.xs}>
           {messageBoardState.message}
         </Paragraph>
         <Paragraph

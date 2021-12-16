@@ -70,7 +70,7 @@ export const Title = ({heading, headerColor, screen, notebook}) => {
           }}
           color={headerColor}>
           {notebook ? (
-            <Paragraph numberOfLines={1} size={SIZE.xs + 2}>
+            <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
               {notebook?.title}
               {'\n'}
             </Paragraph>

@@ -366,7 +366,7 @@ export const PricingPlans = ({
       {!user ? (
         <Paragraph
           color={colors.icon}
-          size={SIZE.xs + 1}
+          size={SIZE.xs}
           style={{
             alignSelf: 'center',
             textAlign: 'center',
@@ -374,13 +374,13 @@ export const PricingPlans = ({
           }}>
           Upon signing up, your 14 day free trial of Notesnook Pro will be
           activated automatically.{' '}
-          <Paragraph size={SIZE.xs + 1} style={{fontWeight: 'bold'}}>
+          <Paragraph size={SIZE.xs} style={{fontWeight: 'bold'}}>
             No credit card information is required.
           </Paragraph>{' '}
           Once the free trial period ends, your account will be downgraded to
           basic free account.{' '}
           <Paragraph
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             onPress={() => {
               openLinkInBrowser('https://notesnook.com/#pricing', colors)
                 .catch(e => {})
@@ -401,7 +401,7 @@ export const PricingPlans = ({
           {Platform.OS === 'ios' ? (
             <Paragraph
               textBreakStrategy="balanced"
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               color={colors.icon}
               style={{
                 alignSelf: 'center',
@@ -414,7 +414,7 @@ export const PricingPlans = ({
             </Paragraph>
           ) : (
             <Paragraph
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               color={colors.icon}
               style={{
                 alignSelf: 'center',
@@ -432,7 +432,7 @@ export const PricingPlans = ({
               width: '100%'
             }}>
             <Paragraph
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               color={colors.icon}
               style={{
                 maxWidth: '100%',
@@ -440,7 +440,7 @@ export const PricingPlans = ({
               }}>
               By subscribing, you agree to our{' '}
               <Paragraph
-                size={SIZE.xs + 1}
+                size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser('https://notesnook.com/tos', colors)
                     .catch(e => {})
@@ -456,7 +456,7 @@ export const PricingPlans = ({
               </Paragraph>
               and{' '}
               <Paragraph
-                size={SIZE.xs + 1}
+                size={SIZE.xs}
                 onPress={() => {
                   openLinkInBrowser('https://notesnook.com/privacy', colors)
                     .catch(e => {})

@@ -189,7 +189,7 @@ const PublishNoteDialog = () => {
                     flexShrink: 1
                   }}>
                   <Heading size={SIZE.sm}>Published at:</Heading>
-                  <Paragraph size={SIZE.xs + 1} numberOfLines={1}>
+                  <Paragraph size={SIZE.xs} numberOfLines={1}>
                     {publishUrl}
                   </Paragraph>
                   <Paragraph
@@ -198,7 +198,7 @@ const PublishNoteDialog = () => {
                         await openLinkInBrowser(publishUrl, colors.accent);
                       } catch (e) {}
                     }}
-                    size={SIZE.xs + 1}
+                    size={SIZE.xs}
                     style={{
                       marginTop: 5,
                       color: colors.pri
@@ -349,7 +349,7 @@ const PublishNoteDialog = () => {
 
         <Paragraph
           color={colors.icon}
-          size={SIZE.xs + 1}
+          size={SIZE.xs}
           style={{
             textAlign: 'center',
             marginTop: 5,

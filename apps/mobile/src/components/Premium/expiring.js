@@ -108,7 +108,7 @@ export const Expiring = () => {
                     await sleep(300);
                     eSendEvent(eOpenPremiumDialog, promo);
                   }}
-                  size={SIZE.xs + 2}
+                  size={SIZE.xs + 1}
                   style={{
                     textDecorationLine: 'underline',
                     color: colors.icon,
@@ -161,7 +161,7 @@ export const Expiring = () => {
                       button: 'Continue'
                     });
                   }}
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                   height={30}
                   style={{
                     marginBottom: 10
