@@ -1,11 +1,6 @@
-- Added pitch black theme for amoled devices. Enable it in appearance settings
-- Daily backups will be enabled by default for pro users
-- Now list of attachments will show images
-- You can now change backups directory in settings.
-- Fixed sorting in topics/tags/colors not working
-- Fixed keyboard keeps hiding in empty note 
-- Fixed autocomplete for password managers
-- Fixed share extension theme at night
-- Many other bug fixes and performance improvements
+- Fixed session expiring issues faced by many users
+- Fix numerous issues with syncing between multiple devices
+- Fixed note is saved sometimes when opening editor
+- Improved editor performance
 
 Thank you for using Notesnook!
