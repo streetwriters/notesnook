@@ -60,10 +60,10 @@ test("get all notes", () =>
     expect(db.notes.all.length).toBeGreaterThan(0);
   }));
 
-test("note without a title should get title from content", () =>
+test("note without a title should get a premade title", () =>
   noteTest().then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.title).toBe("HelloThis is colorful");
+    expect(note.title.startsWith("Note ")).toBe(true);
   }));
 
 test("note should get headline from content", () =>
@@ -78,7 +78,7 @@ test("note should get headline from content", () =>
     expect(note.headline).toBe("This is a very colorful existence.");
   }));
 
-test("note should get headline from content containing only lists", () =>
+test("note should not get headline if there is no p tag", () =>
   noteTest({
     ...TEST_NOTE,
     content: {
@@ -87,7 +87,7 @@ test("note should get headline from content containing only lists", () =>
     },
   }).then(async ({ db, id }) => {
     let note = db.notes.note(id);
-    expect(note.headline).toBe("Hello I won't be a headline :(Me too.");
+    expect(note.headline).toBeUndefined();
   }));
 
 test("note title should allow trailing space", () =>

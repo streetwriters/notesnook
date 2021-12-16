@@ -1,6 +1,6 @@
 import showdown from "showdown/dist/showdown";
 import dataurl from "../utils/dataurl";
-import { getDummyDocument, parseHTML } from "../utils/html-parser";
+import { getDummyDocument, getInnerText, parseHTML } from "../utils/html-parser";
 
 var converter = new showdown.Converter();
 converter.setFlavor("original");
@@ -27,18 +27,11 @@ class Tiny {
     return converter.makeMarkdown(this.data, getDummyDocument());
   }
 
-  toTitle() {
-    if (!this.text) {
-      this.text = this.toTXT();
-    }
-    return getTitleFromText(this.text);
-  }
-
   toHeadline() {
-    if (!this.text) {
-      this.text = this.toTXT();
-    }
-    return getHeadlineFromText(this.text);
+    const paragraph = this.document.querySelector("p");
+    if (!paragraph) return;
+
+    return getInnerText(paragraph);
   }
 
   isEmpty() {

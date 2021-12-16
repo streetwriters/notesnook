@@ -9,3 +9,7 @@ export function getDummyDocument() {
   const doc = parseHTML("<div></div>");
   return typeof DOMParser === "undefined" ? doc : doc;
 }
+
+export function getInnerText(element) {
+  return element.innerText || element.textContent;
+}

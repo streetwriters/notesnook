@@ -72,7 +72,6 @@ export default class Notes extends Collection {
 
       let content = getContentFromData(type, data);
       if (!content) throw new Error("Invalid content type.");
-      note.title = getNoteTitle(note, content);
       note.headline = getNoteHeadline(note, content);
 
       note.contentId = await this._db.content.add({
@@ -92,7 +91,7 @@ export default class Notes extends Collection {
       id,
       contentId: note.contentId,
       type: "note",
-      title: note.title,
+      title: getNoteTitle(note, oldNote).replace(/[\r\n\t]+/g, " "),
       headline: note.headline,
       pinned: !!note.pinned,
       locked: !!note.locked,
@@ -274,8 +273,19 @@ function getNoteHeadline(note, content) {
   return content.toHeadline();
 }
 
-function getNoteTitle(note, content) {
-  if (note.title && note.title.trim().length > 0)
-    return note.title.replace(/\r?\n/g, " ");
-  return content.toTitle();
+function getNoteTitle(note, oldNote) {
+  if (note.title && note.title.trim().length > 0) return note.title;
+  else if (oldNote && oldNote.title && oldNote.title.trim().length > 0) {
+    return oldNote.title;
+  }
+
+  return `Note ${new Date().toLocaleString(undefined, {
+    year: "2-digit",
+    month: "2-digit",
+    day: "2-digit",
+    hour12: true,
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  })}`;
 }
