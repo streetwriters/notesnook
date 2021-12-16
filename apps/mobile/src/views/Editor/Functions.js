@@ -118,7 +118,6 @@ export async function clearTimer(clear) {
     });
   }
   waitForContent = false;
-  console.log("cleared timer & saving note",content.data);
   if (clear) {
     if (!noteEdited) return;
     if (
@@ -401,7 +400,15 @@ function updateSessionStatus() {
 }
 
 function isContentInvalid(content) {
-  return !content || content === '' || content.trim() === "" || content === '<p></p>' || content === '<p><br></p>' || content === '<p>&nbsp;</p>' || content === `<p><br data-mce-bogus="1"></p>`
+  return (
+    !content ||
+    content === '' ||
+    content.trim() === '' ||
+    content === '<p></p>' ||
+    content === '<p><br></p>' ||
+    content === '<p>&nbsp;</p>' ||
+    content === `<p><br data-mce-bogus="1"></p>`
+  );
 }
 
 function check_session_status() {
@@ -446,25 +453,24 @@ export const _onMessage = async evt => {
       if (message.sessionId !== sessionId) return;
       console.log('noteedited');
       noteEdited = true;
-      break;  
+      break;
     case 'tiny':
       if (message.sessionId !== sessionId) return;
-      if (message.value === '<br>') return;
-      if (message.value !== content.data) {
-        if (prevNoteContent && message.value === prevNoteContent) {
-          prevNoteContent = null;
-          noteEdited = false;
-          return;
-        }
-
-        noteEdited = true;
-        lastEditTime = Date.now();
-        content = {
-          type: message.type,
-          data: message.value
-        };
-        onNoteChange();
+      if (prevNoteContent && message.value === prevNoteContent) {
+        prevNoteContent = null;
+        noteEdited = false;
+        return;
       }
+
+      console.log('tiny content recieved');
+
+      noteEdited = true;
+      lastEditTime = Date.now();
+      content = {
+        type: message.type,
+        data: message.value
+      };
+      onNoteChange();
       if (waitForContent) {
         eSendEvent('content_event');
       }
@@ -542,7 +548,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) return;
-      console.log('content not loaded',content.data);
+      console.log('content not loaded', content.data);
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();
@@ -607,7 +613,6 @@ export async function clearEditor(
     waitForContent = true;
     await clearTimer(true);
   }
-  console.log(noteEdited, content.data);
 
   disableSaving = true;
   db.fs.cancel(getNote()?.id);
@@ -712,7 +717,7 @@ export async function saveNote(preventUpdate) {
   if (disableSaving || !noteEdited || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
-  };
+  }
 
   isSaving = true;
   try {
@@ -731,7 +736,7 @@ export async function saveNote(preventUpdate) {
       locked = _note.locked;
     }
 
-    console.log('note saved',preventUpdate,closingSession);
+    console.log('note saved', preventUpdate, closingSession);
 
     let noteData = {
       title,
@@ -758,11 +763,14 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id && !preventUpdate) {
+        if (!title || title === '') {
+          post('title', db.notes.note(noteId)?.data?.title || '');
+        }
+
         useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await setNoteInEditorAfterSaving(id, noteId);
         saveCounter++;
       }
-
     } else {
       noteData.contentId = note.contentId;
       await db.vault.save(noteData);

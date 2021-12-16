@@ -342,7 +342,7 @@ const MergeEditor = () => {
                     borderRadius: 100,
                     paddingHorizontal: 12
                   }}
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                 />
               ) : null}
               <View style={{width: 10}} />
@@ -356,7 +356,7 @@ const MergeEditor = () => {
                     borderRadius: 100,
                     paddingHorizontal: 12
                   }}
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                   accentText="light"
                   color={colors.errorText}
                   onPress={onPressDiscardFromPrimaryWebView}
@@ -387,7 +387,7 @@ const MergeEditor = () => {
                       marginLeft: 10
                     }}
                     type="accent"
-                    fontSize={SIZE.xs + 1}
+                    fontSize={SIZE.xs}
                     title={keepContentFrom === 'primary' ? 'Undo' : 'Keep'}
                     onPress={onPressKeepFromPrimaryWebView}
                   />
@@ -473,7 +473,7 @@ const MergeEditor = () => {
                     minWidth: 60
                   }}
                   type="accent"
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                   onPress={onPressSaveCopyFromSecondaryWebView}
                   title="Save a copy"
                 />
@@ -489,7 +489,7 @@ const MergeEditor = () => {
                     paddingHorizontal: 12,
                     minWidth: 60
                   }}
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                   accentColor="red"
                   accentText="light"
                   onPress={onPressDiscardFromSecondaryWebView}
@@ -520,7 +520,7 @@ const MergeEditor = () => {
                       marginLeft: 10
                     }}
                     type="accent"
-                    fontSize={SIZE.xs + 1}
+                    fontSize={SIZE.xs}
                     title={keepContentFrom === 'secondary' ? 'Undo' : 'Keep'}
                     onPress={onPressKeepFromSecondaryWebView}
                   />

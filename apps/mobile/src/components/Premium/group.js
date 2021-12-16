@@ -50,7 +50,7 @@ export const Group = ({item, index}) => {
           style={{
             marginTop: 10
           }}
-          size={SIZE.xs + 1}
+          size={SIZE.xs}
           color={colors.icon}>
           {item.info}
         </Paragraph>

@@ -48,7 +48,7 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
         borderRadius: 10,
         paddingTop: 25
       }}>
-      <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+      <Paragraph color={colors.icon} size={SIZE.xs}>
         {new Date(notebook.dateEdited).toLocaleString()}
       </Paragraph>
       <View
@@ -101,7 +101,7 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
           fontStyle: 'italic',
           fontFamily: null
         }}
-        size={SIZE.xs + 1}
+        size={SIZE.xs}
         color={colors.icon}>
         {notebook.topics.length === 1
           ? '1 topic'

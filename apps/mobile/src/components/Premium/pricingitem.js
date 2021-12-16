@@ -32,7 +32,7 @@ export const PricingItem = ({product, onPress, compact}) => {
               : 'Monthly'}
           </Heading>
           {product?.info && (
-            <Paragraph size={SIZE.xs + 1}>{product.info}</Paragraph>
+            <Paragraph size={SIZE.xs}>{product.info}</Paragraph>
           )}
         </View>
       )}

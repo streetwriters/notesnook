@@ -66,7 +66,7 @@ export const ProFeatures = ({count = 6}) => {
           await sleep(300);
           eSendEvent(eOpenPremiumDialog);
         }}
-        size={SIZE.xs + 2}
+        size={SIZE.xs + 1}
         style={{
           textDecorationLine: 'underline',
           color: colors.icon

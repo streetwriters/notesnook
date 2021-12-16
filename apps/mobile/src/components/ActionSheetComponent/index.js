@@ -691,7 +691,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph  size={SIZE.xs + 2} style={{textAlign: 'center'}}>
+      <Paragraph  size={SIZE.xs + 1} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
@@ -933,7 +933,7 @@ export const ActionSheetComponent = ({
           <Icon
             name="shield-key-outline"
             color={colors.accent}
-            size={SIZE.sm + SIZE.xs + 2}
+            size={SIZE.sm + SIZE.xs + 1}
           />
 
           <View

@@ -66,7 +66,7 @@ const TagItem = React.memo(
           </Heading>
           <Paragraph
             color={colors.icon}
-            size={SIZE.xs + 1}
+            size={SIZE.xs}
             style={{
               marginTop: 5
             }}>
