@@ -28,7 +28,7 @@ const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
 };
 export default ScrollContainer;
 
-export function FlexScrollContainer({ children, className, ...props }) {
+export function FlexScrollContainer({ children, className, style, ...props }) {
   return (
     <Scrollbars
       {...props}
@@ -40,6 +40,7 @@ export function FlexScrollContainer({ children, className, ...props }) {
         display: "flex",
         flexDirection: "column",
         flex: "1 1 auto",
+        ...style,
       }}
       renderView={({ style, ...props }) => (
         <Box

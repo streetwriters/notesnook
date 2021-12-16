@@ -101,8 +101,10 @@ function Dialog(props) {
             </Text>
           )}
         </Flex>
-        <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1} mx={4}>
-          <FlexScrollContainer>{props.children}</FlexScrollContainer>
+        <Flex variant="columnFill" sx={{ overflowY: "hidden" }} my={1}>
+          <FlexScrollContainer style={{ paddingRight: 20, paddingLeft: 20 }}>
+            {props.children}
+          </FlexScrollContainer>
         </Flex>
         {(props.positiveButton || props.negativeButton) && (
           <Flex

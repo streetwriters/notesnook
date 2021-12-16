@@ -96,7 +96,7 @@ class AddNotebookDialog extends React.Component {
         }
         icon={Icon.Notebook}
         positiveButton={{
-          text: props.edit ? "Edit notebook" : "Create notebook",
+          text: props.edit ? "Save" : "Create",
           onClick: () => {
             props.onDone(
               {
