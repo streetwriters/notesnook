@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, View,TouchableOpacity} from 'react-native';
+import {ScrollView, View, TouchableOpacity} from 'react-native';
 import Animated, {Easing, timing} from 'react-native-reanimated';
 import {PressableButton} from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
@@ -11,7 +11,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
+import {editing, getElevation} from '../../../../utils';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import ColorGroup from './colorgroup';
@@ -63,11 +63,11 @@ const Tooltip = () => {
     }
     if (!data) return;
 
-    let time = editing.tooltip === 'table' || data.type === 'table' ? 400 : 100;
+    let time = editing.tooltip === 'table' || data.type === 'table' ? 400 : 110;
 
     if (data && editing.tooltip && editing.tooltip !== data.type) {
       let translate =
-        editing.tooltip === 'table' || data.type === 'table' ? 400 : 70;
+        editing.tooltip === 'table' || data.type === 'table' ? 400 : 80;
       animate(translate, time);
       await sleep(time);
     }
@@ -82,7 +82,7 @@ const Tooltip = () => {
 
   let style = React.useMemo(() => {
     return {
-      borderRadius: 5,
+      borderRadius: 0,
       padding: floating ? 5 : 0,
       position: 'absolute',
       bottom: 50,
@@ -95,7 +95,7 @@ const Tooltip = () => {
       borderColor: floating && colors.nav,
       zIndex: 10,
       marginBottom: 0,
-      paddingHorizontal: 6,
+      paddingHorizontal: 2,
       transform: [
         {
           translateY: translateValue
@@ -114,7 +114,7 @@ const Tooltip = () => {
             flexDirection: 'row',
             width: '100%',
             backgroundColor: colors.bg,
-            marginVertical: 5,
+            marginVertical: 2,
             borderRadius: 5
           }}
           children={props.children}></View>
@@ -123,7 +123,7 @@ const Tooltip = () => {
           style={{
             width: '100%',
             backgroundColor: colors.bg,
-            marginVertical: 5,
+            marginVertical: 2,
             borderRadius: 5,
             paddingHorizontal: 0
           }}
@@ -149,7 +149,7 @@ const Tooltip = () => {
     let rowNumber = Math.floor(index / columnCount);
     let columnNumber = index - rowNumber * columnCount;
 
-    return `${rowNumber  + 1} x ${columnNumber + 1}`;
+    return `${rowNumber + 1} x ${columnNumber + 1}`;
   }
 
   return (
@@ -183,31 +183,8 @@ const Tooltip = () => {
               zIndex: 10
             }}>
             {[
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10,
-              11,
-              12,
-              13,
-              14,
-              15,
-              16,
-              17,
-              18,
-              19,
-              20,
-              21,
-              22,
-              23,
-              24,
-              25
+              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+              20, 21, 22, 23, 24, 25
             ].map((item, index) => (
               <PressableButton
                 key={item.toString()}

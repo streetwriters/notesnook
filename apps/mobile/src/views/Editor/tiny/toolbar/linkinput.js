@@ -121,7 +121,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             ref={inputRef}
             onBlur={onBlur}
             style={{
-              height: normalize(50),
+              height: normalize(40),
               color: colors.pri,
               zIndex: 10,
               flexWrap: 'wrap',
@@ -147,8 +147,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               title="Save"
               onPress={onSubmit}
               height={normalize(40)}
-              fontSize={SIZE.md}
-              style={{paddingHorizontal: 15}}
+              fontSize={SIZE.sm}
+              style={{paddingHorizontal: 6}}
             />
           )}
         </>

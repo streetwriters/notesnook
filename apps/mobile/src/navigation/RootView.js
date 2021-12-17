@@ -214,7 +214,6 @@ const NativeStack = React.memo(
         });
       }
       if (!needsUpdate) {
-        console.log('reposition not needed');
         return;
       }
       setTimeout(() => {

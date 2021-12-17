@@ -324,28 +324,36 @@ const ToolbarItem = ({
     focusEditor(format);
     editing.tooltip = null;
   };
+
+  const isdefaultColorFormat = /^(dhilitecolor|dforecolor)$/.test(format);
+
   return (
-    <View>
+    <View
+      style={{
+        marginHorizontal: 5,
+        marginRight: isdefaultColorFormat ? 0 : 5
+      }}>
       <PressableButton
-        type={selected && !color ? 'shade' : 'transparent'}
-        customOpacity={0.12}
+        type={selected ? 'grayBg' : 'transparent'}
         onLongPress={event => {
           showTooltip(event, fullname, TOOLTIP_POSITIONS.TOP);
         }}
         onPress={e => onPress(e)}
         customStyle={{
-          borderRadius: 0,
+          borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
-          height: normalize(50),
-          minWidth: /^(dhilitecolor|dforecolor)$/.test(format) ? 30 : 60
+          height: isdefaultColorFormat ? normalize(25) : normalize(40),
+          minWidth: isdefaultColorFormat ? 25 : normalize(40),
+          width: isdefaultColorFormat ? 25 : null,
+          overflow: 'hidden'
         }}>
         {premium && !isPro && (
           <Icon
-            size={12}
+            size={7}
             style={{
               position: 'absolute',
-              top: 0,
+              top: 2,
               alignSelf: 'center'
             }}
             name="crown"
@@ -353,14 +361,13 @@ const ToolbarItem = ({
           />
         )}
 
-        {/^(dhilitecolor|dforecolor)$/.test(format) ? (
+        {isdefaultColorFormat ? (
           <View
             style={{
               backgroundColor: color,
-              height: 30,
-              width: 30,
-              marginLeft: 10,
-              borderRadius: 2.5
+              height: 25,
+              width: 25,
+              borderRadius: 5
             }}
           />
         ) : (
@@ -371,7 +378,7 @@ const ToolbarItem = ({
 
             {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format) ? (
               <Heading
-                size={SIZE.md + 2}
+                size={SIZE.md}
                 color={selected ? colors.accent : colors.pri}>
                 {format.slice(0, 1).toUpperCase() + format.slice(1)}
               </Heading>
@@ -383,7 +390,7 @@ const ToolbarItem = ({
               />
             ) : format === 'fontsize' ? (
               <Paragraph
-                size={SIZE.md}
+                size={SIZE.sm}
                 color={selected ? colors.accent : colors.pri}>
                 {formatValue || currentText || '12pt'}
               </Paragraph>
@@ -399,7 +406,7 @@ const ToolbarItem = ({
                         : formatValue
                       : 'OpenSans-Regular'
                 }}
-                size={text.includes('%') ? SIZE.sm : SIZE.md}>
+                size={text.includes('%') ? SIZE.sm : SIZE.sm}>
                 {currentText || text}
               </Paragraph>
             ) : (

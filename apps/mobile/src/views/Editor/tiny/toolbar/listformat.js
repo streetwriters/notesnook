@@ -67,7 +67,7 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
 
           <View
             style={{
-              width: 20,
+              width: 18,
               height: 2,
               backgroundColor: selected ? colors.accent : colors.pri,
             }}
