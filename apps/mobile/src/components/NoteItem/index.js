@@ -248,7 +248,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                       <Button
                         title={'#' + item.alias}
                         key={item.id}
-                        height={20}
+                        height={23}
                         type="gray"
                         textStyle={{
                           textDecorationLine: 'underline'
@@ -257,7 +257,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                         fontSize={SIZE.xs}
                         style={{
                           borderRadius: 5,
-                          paddingHorizontal: 2,
+                          paddingHorizontal: 6,
                           marginRight: 4,
                           zIndex: 10,
                           maxWidth: tags.length > 1 ? 130 : null
