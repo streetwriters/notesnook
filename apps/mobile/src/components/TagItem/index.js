@@ -45,8 +45,6 @@ const TagItem = React.memo(
           height: 80 * fontScale,
           flexDirection: 'row',
           alignItems: 'center',
-          borderBottomWidth: 1.5,
-          borderBottomColor: colors.nav,
           width: '100%',
           justifyContent: 'space-between'
         }}>
