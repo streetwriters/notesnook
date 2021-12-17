@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
 import {ActionIcon} from '../../components/ActionIcon';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView, post} from './Functions';
 import tiny from './tiny/tiny';
 
@@ -26,13 +28,20 @@ const HistoryComponent = () => {
   }, []);
 
   return (
-    <>
+    <View
+      style={{
+        flexDirection: 'row',
+        height: 40,
+        marginRight: 5
+      }}>
       <ActionIcon
         name="undo-variant"
         disabled={!historyState.undo}
         color={colors.pri}
+        size={SIZE.xl}
         customStyle={{
-          marginLeft: 10
+          width: 35,
+          height: 35
         }}
         onPress={() => {
           if (!historyState.undo) return;
@@ -43,12 +52,17 @@ const HistoryComponent = () => {
         name="redo-variant"
         disabled={!historyState.redo}
         color={colors.pri}
+        size={SIZE.xl}
+        customStyle={{
+          width: 35,
+          height: 35
+        }}
         onPress={() => {
           if (!historyState.redo) return;
           tiny.call(EditorWebView, tiny.redo);
         }}
       />
-    </>
+    </View>
   );
 };
 
