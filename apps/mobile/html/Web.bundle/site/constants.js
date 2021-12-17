@@ -137,6 +137,74 @@ function setTheme() {
 	.info-bar {
 	  color:${pageTheme.colors.icon};
 	}
+
+  .tag-bar-parent {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    box-sizing: border-box;
+    padding-right: 12px;
+    padding-left: 12px;
+    margin-bottom: 10px;
+    margin-top: 10px;
+  }
+
+  .tag-bar {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    overflow-x: scroll;
+    overflow-y: hidden;
+  }
+
+  .tag {
+    background-color: ${pageTheme.colors.nav};
+    border-radius: 100px;
+    margin-right: 5px;
+    padding-left: 12px;
+    padding-right: 12px;
+    font-size: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tag:active {
+    background-color: ${pageTheme.colors.transGray} !important;
+    border-width: 2px;
+  }
+
+  .alttagnew {
+    padding-left: 6px !important;
+    padding-right: 12px !important;
+  }
+  .alttagnew svg {
+    padding-right:3px;
+  }
+
+  .newtag {
+    padding-left: 20px;
+    padding-right: 20px;
+    color:${pageTheme.colors.pri}
+  }
+
+  .tag svg {
+    fill: ${pageTheme.colors.accent};
+    width: 20px;
+    height: 20px;
+  }
+
+  .hidden {
+    display: none;
+  }
+
+  .tag p {
+    margin: 0px !important;
+    pointer-events: none;
+    user-select: none;
+    color: ${pageTheme.colors.icon}
+  }
   
 	  #titlebar {
 		display:flex !important;

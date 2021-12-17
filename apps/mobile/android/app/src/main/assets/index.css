@@ -47,7 +47,6 @@ body {
   font-family: 'Open Sans';
   color: gray;
   font-size: 11.5px;
-  height: 13px;
   display: flex;
   padding-left: 4px !important;
   justify-content: space-between;
@@ -61,11 +60,11 @@ body {
 
 #infowords,#infodate,#infosaved {
   font-family: 'Open Sans';
-  margin-right: 5px;
+  margin:0px !important;
+  margin-right: 5px !important;
   margin-left: 0px;
   border-radius: 5px;
   margin-top: 0;
-  height:16px;
   padding-top:2.5px;
 }
 
