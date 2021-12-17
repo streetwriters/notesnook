@@ -1,7 +1,8 @@
 import {createRef} from 'react';
 import {Platform} from 'react-native';
 import {presentDialog} from '../../components/Dialog/functions';
-import {useEditorStore, useMenuStore} from '../../provider/stores';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useEditorStore, useMenuStore, useTagStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
@@ -16,8 +17,10 @@ import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
 import {
   eOnLoadNote,
+  eOpenTagsDialog,
   eShowGetPremium,
-  eShowMergeDialog
+  eShowMergeDialog,
+  refreshNotesPage
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
 import {openLinkInBrowser} from '../../utils/functions';
@@ -25,7 +28,7 @@ import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
-import tiny from './tiny/tiny';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
@@ -273,8 +276,10 @@ export const loadNote = async item => {
     if (getNote()) {
       eSendEvent('loadingNote', item);
       await clearEditor(true, true, true);
+      await sleep(1000);
     }
     eSendEvent('loadingNote');
+    eSendEvent('updateTags');
     closingSession = false;
     disableSaving = false;
     lastEditTime = 0;
@@ -283,6 +288,7 @@ export const loadNote = async item => {
     loading_queue = null;
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
+
     if (Platform.OS === 'android') {
       EditorWebView.current?.requestFocus();
       setTimeout(() => {
@@ -314,6 +320,9 @@ export const loadNote = async item => {
     checkStatus();
   } else {
     if (id === item.id && !item.forced) {
+      console.log('returning from here');
+      closingSession = false;
+      eSendEvent('loadingNote');
       return;
     }
     eSendEvent('loadingNote', item);
@@ -548,7 +557,7 @@ export const _onMessage = async evt => {
         return;
       }
       if (!id) return;
-      console.log('content not loaded', content.data);
+      console.log('content not loaded');
       if (message.value) {
         console.log('reloading');
         await loadNoteInEditor();
@@ -580,6 +589,22 @@ export const _onMessage = async evt => {
       break;
     case 'selectionchange':
       eSendEvent('onSelectionChange', message.value);
+      break;
+    case 'notetag':
+      if (message.value) {
+        let _tag = JSON.parse(message.value);
+        console.log(_tag.title);
+        await db.notes.note(note.id).untag(_tag.title);
+        useTagStore.getState().setTags();
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.Notes,
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Tags
+        ]);
+      }
+      break;
+    case 'newtag':
+      eSendEvent(eOpenTagsDialog, note);
       break;
     default:
       break;
@@ -801,7 +826,7 @@ export async function onWebViewLoad(premium, colors) {
       tiny.call(EditorWebView, tiny.removeMarkdown, true);
     }
   }, 300);
-
+  eSendEvent('updateTags');
   setColors(colors);
 }
 
@@ -851,6 +876,7 @@ export const presentResolveConflictDialog = _note => {
 const loadNoteInEditor = async (keepHistory = true) => {
   if (!webviewInit) return;
   if (note?.id) {
+    eSendEvent('updateTags');
     post('title', title);
     intent = false;
     if (!content || !content.data || content?.data?.length === 0) {
