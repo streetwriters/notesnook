@@ -1,0 +1,59 @@
+{
+  "name": "@notesnook/importer-web",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "@testing-library/jest-dom": "^5.11.4",
+    "@testing-library/react": "^11.1.0",
+    "@testing-library/user-event": "^12.1.10",
+    "@types/color": "^3.0.2",
+    "@types/file-saver": "^2.0.4",
+    "@types/jest": "^26.0.15",
+    "@types/node": "^12.0.0",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/react-dropzone": "^5.1.0",
+    "@types/react-modal": "^3.13.1",
+    "@types/theme-ui": "^0.6.0",
+    "react-scripts": "4.0.3",
+    "typescript": "^4.1.2"
+  },
+  "dependencies": {
+    "@notesnook/importer": "file:../../packages/importer",
+    "color": "^4.1.0",
+    "file-saver": "^2.0.5",
+    "hash-wasm": "^4.9.0",
+    "interweave": "^12.9.0",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "react-dropzone": "^11.4.2",
+    "react-icons": "^4.3.1",
+    "react-modal": "^3.14.4",
+    "react-select": "^5.2.1",
+    "theme-ui": "^0.12.1"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
