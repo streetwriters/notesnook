@@ -16,6 +16,7 @@ import {
 } from './constants';
 import LinkPreview from './linkpreview';
 import validator from 'validator';
+import Input from '../../../../components/Input';
 
 let inputValue = null;
 
@@ -105,19 +106,57 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        maxWidth: '100%',
-        width: '100%',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        flexShrink: 1,
-        paddingHorizontal: 12
+        paddingHorizontal: 6,
+        width: '100%'
       }}>
       {mode === INPUT_MODE.NO_EDIT ? (
         <LinkPreview value={value} setMode={setMode} onSubmit={onSubmit} />
       ) : (
         <>
-          <TextInput
+          <Input
+            fwdRef={inputRef}
+            onSubmit={() => onSubmit(inputValue)}
+            onChangeText={onChangeText}
+            blurOnSubmit={false}
+            onBlurInput={onBlur}
+            defaultValue={value}
+            placeholder="Enter link"
+            buttons={
+              <>
+                {[
+                  {
+                    text: 'Save',
+                    type: 'grayBg',
+                    press: () => onSubmit(inputValue)
+                  }
+                ].map(button => (
+                  <Button
+                    title={button.text}
+                    fontSize={SIZE.xs + 1}
+                    height={28}
+                    width={null}
+                    buttonType={{
+                      text: colors.accent
+                    }}
+                    onPress={button.press}
+                    style={{
+                      flexDirection: 'row',
+                      paddingHorizontal: button.icon ? 6 : 12
+                    }}
+                    icon={button.icon}
+                    type={button.type}
+                  />
+                ))}
+              </>
+            }
+            autoCapitalize="none"
+            autoCorrect={false}
+            returnKeyLabel="Done"
+            returnKeyType="done"
+            fontSize={SIZE.xs + 1}
+            height={40}
+          />
+          {/* <TextInput
             ref={inputRef}
             onBlur={onBlur}
             style={{
@@ -138,11 +177,10 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             onChangeText={onChangeText}
             defaultValue={value}
             blurOnSubmit={false}
-            placeholder="Enter link"
             placeholderTextColor={colors.icon}
-          />
+          /> */}
 
-          {mode === INPUT_MODE.EDITING && (
+          {/* {mode === INPUT_MODE.EDITING && (
             <Button
               title="Save"
               onPress={onSubmit}
@@ -150,7 +188,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
               fontSize={SIZE.sm}
               style={{paddingHorizontal: 6}}
             />
-          )}
+          )} */}
         </>
       )}
     </View>
