@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/enex",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "devDependencies": {
     "@types/node": "^16.11.10",
     "@types/tap": "^15.0.5",

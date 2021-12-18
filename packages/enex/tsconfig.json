@@ -1,5 +1,7 @@
 {
   "compilerOptions": {
+    "outDir": "./dist",
+    "declaration": true,
     /* Visit https://aka.ms/tsconfig.json to read more about this file */
 
     /* Projects */
