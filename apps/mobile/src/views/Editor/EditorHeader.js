@@ -1,5 +1,5 @@
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect, useRef } from 'react';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect, useRef} from 'react';
 import {
   BackHandler,
   InteractionManager,
@@ -7,16 +7,17 @@ import {
   Platform,
   View
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
 import {
   useEditorStore,
-  useSettingStore, useUserStore
+  useSettingStore,
+  useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -24,8 +25,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing, SUBSCRIPTION_STATUS } from '../../utils';
-import { db } from '../../utils/database';
+import {editing, getElevation, SUBSCRIPTION_STATUS} from '../../utils';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -35,20 +36,23 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {SIZE} from '../../utils/SizeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
-  clearTimer, getNote,
+  clearTimer,
+  getNote,
   loadNote,
   setColors,
   startClosingSession
 } from './Functions';
-import { ProgressCircle } from './ProgressCircle';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {ProgressCircle} from './ProgressCircle';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
+import {endSearch} from './tiny/toolbar/commands';
+import {toolbarRef} from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import { useEditorTags } from './useEditorTags';
+import {useEditorTags} from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -64,6 +68,7 @@ const EditorHeader = () => {
   const keyboardListener = useRef();
   const closing = useRef(false);
   const editorTags = useEditorTags();
+  const searchReplace = useEditorStore(state => state.searchReplace);
 
   useEffect(() => {
     setColors(colors);
@@ -315,6 +320,7 @@ const EditorHeader = () => {
             {fullscreen ? <View style={{width: 20}} /> : null}
             {deviceMode !== 'mobile' ? <EditorTitle /> : null}
           </View>
+
           <View
             style={{
               flexDirection: 'row'
@@ -327,8 +333,9 @@ const EditorHeader = () => {
                   name="crown"
                   color={colors.yellow}
                   customStyle={{
-                    marginLeft: 10
+                    marginLeft: 5
                   }}
+                  size={SIZE.lg + 2}
                   top={50}
                   onPress={async () => {
                     if (editing.isFocused) {
@@ -339,13 +346,33 @@ const EditorHeader = () => {
                   }}
                 />
               ) : null}
+              <ActionIcon
+                name="magnify"
+                color={searchReplace ? colors.accent : colors.pri}
+                customStyle={{
+                  marginLeft: 5
+                }}
+                type={searchReplace ? 'grayBg' : 'transparent'}
+                top={50}
+                buttom={10}
+                size={SIZE.lg + 2}
+                onPress={() => {
+                  if (searchReplace) {
+                    endSearch();
+                  } else {
+                    useEditorStore.getState().setSearchReplace(true);
+                  }
+                }}
+              />
+
               {currentlyEditingNote && (
                 <ActionIcon
                   name="cloud-upload-outline"
                   color={colors.pri}
                   customStyle={{
-                    marginLeft: 10
+                    marginLeft: 5
                   }}
+                  size={SIZE.lg + 2}
                   top={50}
                   onPress={publishNote}
                 />
@@ -356,8 +383,9 @@ const EditorHeader = () => {
                   name="attachment"
                   color={colors.pri}
                   customStyle={{
-                    marginLeft: 10
+                    marginLeft: 5
                   }}
+                  size={SIZE.lg + 2}
                   top={50}
                   onPress={picker.pick}
                 />
@@ -368,7 +396,7 @@ const EditorHeader = () => {
                   name="fullscreen"
                   color={colors.pri}
                   customStyle={{
-                    marginLeft: 10
+                    marginLeft: 5
                   }}
                   top={50}
                   onPress={() => {
@@ -382,8 +410,9 @@ const EditorHeader = () => {
                 name="dots-horizontal"
                 color={colors.pri}
                 customStyle={{
-                  marginLeft: 10
+                  marginLeft: 5
                 }}
+                size={SIZE.lg + 2}
                 top={50}
                 right={50}
                 onPress={showActionsheet}
@@ -397,6 +426,5 @@ const EditorHeader = () => {
     </>
   );
 };
-
 
 export default EditorHeader;
