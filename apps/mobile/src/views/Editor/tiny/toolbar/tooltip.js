@@ -14,6 +14,8 @@ import {
 import {editing, getElevation} from '../../../../utils';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 import ColorGroup from './colorgroup';
 import {execCommands} from './commands';
 import {formatSelection, properties} from './constants';
@@ -56,7 +58,7 @@ const Tooltip = () => {
     properties.userBlur = true;
     if (!data) {
       editing.tooltip = null;
-      animate(70, 100);
+      animate(100, 100);
       await sleep(100);
       setGroup(null);
       return;
@@ -67,7 +69,7 @@ const Tooltip = () => {
 
     if (data && editing.tooltip && editing.tooltip !== data.type) {
       let translate =
-        editing.tooltip === 'table' || data.type === 'table' ? 400 : 80;
+        editing.tooltip === 'table' || data.type === 'table' ? 400 : 0;
       animate(translate, time);
       await sleep(time);
     }
@@ -75,6 +77,12 @@ const Tooltip = () => {
     setGroup(data);
     await sleep(5);
     animate(0, time);
+    setTimeout(() => {
+      tiny.call(
+        EditorWebView,
+        `tinyMCE.activeEditor.selection.getNode().scrollIntoView({behavior: 'smooth', block: 'nearest'});`
+      );
+    }, 100);
     if (editing.tooltip !== 'link') {
       properties.pauseSelectionChange = false;
     }
@@ -82,13 +90,15 @@ const Tooltip = () => {
 
   let style = React.useMemo(() => {
     return {
-      borderRadius: 0,
       padding: floating ? 5 : 0,
-      position: 'absolute',
-      bottom: 50,
-      width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '50%' : '100%',
+      borderRadius: floating ? 5 : 0,
+      overflow: 'hidden',
+      display: !group ? 'none' : 'flex',
+      position: floating ? 'absolute' : 'relative',
+      bottom: floating ? 50 : null,
+      width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '100%' : '100%',
       minHeight: normalize(50),
-      backgroundColor: colors.nav,
+      backgroundColor: colors.bg,
       alignSelf: 'center',
       flexDirection: 'row',
       borderWidth: floating ? 1 : 0,
@@ -102,7 +112,7 @@ const Tooltip = () => {
         }
       ]
     };
-  }, [floating, colors.accent, colors.bg, group?.type]);
+  }, [floating, colors.accent, colors.bg, group]);
 
   let ParentElement = props => (
     <Animated.View style={style}>
@@ -121,7 +131,6 @@ const Tooltip = () => {
       ) : (
         <ScrollView
           style={{
-            width: '100%',
             backgroundColor: colors.bg,
             marginVertical: 2,
             borderRadius: 5,
