@@ -353,7 +353,7 @@ const ToolbarItem = ({
             size={7}
             style={{
               position: 'absolute',
-              top: 2,
+              top: 0,
               alignSelf: 'center'
             }}
             name="crown"
@@ -425,7 +425,7 @@ const ToolbarItem = ({
             {type === 'tooltip' && (
               <Icon
                 name="menu-right"
-                size={SIZE.sm}
+                size={SIZE.md}
                 allowFontScaling={false}
                 color={colors.icon}
                 style={{
@@ -435,8 +435,8 @@ const ToolbarItem = ({
                       rotateZ: '-45deg'
                     }
                   ],
-                  top: 0,
-                  right: 0
+                  top: -3.5,
+                  right: -5
                 }}
               />
             )}
