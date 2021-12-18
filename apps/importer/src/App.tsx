@@ -1,4 +1,4 @@
-import { Flex, Link, Text } from "@theme-ui/components";
+import { Flex } from "@theme-ui/components";
 import { ThemeProvider } from "@theme-ui/theme-provider";
 import "./App.css";
 import { ThemeFactory } from "./theme";

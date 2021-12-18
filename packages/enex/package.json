@@ -11,7 +11,8 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "tap --ts "
+    "test": "tap --ts ",
+    "build": "tsc"
   },
   "author": "",
   "license": "ISC",

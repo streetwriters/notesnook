@@ -1,14 +1,14 @@
 {
   "name": "@notesnook/importer",
   "version": "1.0.0",
-  "private": "true",
+  "private": true,
   "main": "dist/index.js",
   "scripts": {
     "test": "tap --ts",
-    "start": "index.js"
+    "build": "tsc"
   },
   "dependencies": {
-    "@notesnook/enex": "file:../../enex",
+    "@notesnook/enex": "file:../enex",
     "fflate": "^0.7.1",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",

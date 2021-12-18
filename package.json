@@ -1,0 +1,37 @@
+{
+  "name": "notesnook",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/streetwriters/notesnook.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/streetwriters/notesnook/issues"
+  },
+  "homepage": "https://github.com/streetwriters/notesnook#readme",
+  "devDependencies": {
+    "@changesets/cli": "^2.18.1",
+    "turbo": "^1.0.19"
+  },
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "turbo": {
+    "baseBranch": "origin/main",
+    "pipeline": {
+      "build": {
+        "dependsOn": [
+          "^build"
+        ]
+      }
+    }
+  }
+}
