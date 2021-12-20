@@ -86,18 +86,16 @@ class NoteStore extends BaseStore {
     if (!note.data.pinned && db.notes.pinned.length >= 3) {
       throw new Error("You cannot pin more than 3 notes.");
     }
-    if (!this._syncEditor(note.id, "pinned", !note.data.pinned)) {
-      await note.pin();
-      this.refresh();
-    }
+    await note.pin();
+    this._syncEditor(note.id, "pinned", !note.data.pinned);
+    this.refresh();
   };
 
   favorite = async (id) => {
     const note = db.notes.note(id);
-    if (!this._syncEditor(note.id, "favorite", !note.data.favorite)) {
-      await note.favorite();
-      this.refresh();
-    }
+    await note.favorite();
+    this._syncEditor(note.id, "favorite", !note.data.favorite);
+    this.refresh();
   };
 
   unlock = async (id) => {
@@ -123,9 +121,8 @@ class NoteStore extends BaseStore {
       if (note.data.color === color) await db.notes.note(id).uncolor();
       else await db.notes.note(id).color(color);
       appStore.refreshColors();
-      if (!this._syncEditor(note.id, "color", db.notes.note(id).data.color)) {
-        this.refresh();
-      }
+      this._syncEditor(note.id, "color", db.notes.note(id).data.color);
+      this.refresh();
     } catch (e) {
       console.error(e);
     }
