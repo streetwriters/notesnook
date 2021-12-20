@@ -12,6 +12,7 @@ export default class Debug {
       tags: item.tags,
       id: item.id,
       contentId: item.contentId,
+      dateModified: item.dateModified,
       dateEdited: item.dateEdited,
       dateDeleted: item.dateDeleted,
       dateCreated: item.dateCreated,

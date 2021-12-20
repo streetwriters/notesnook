@@ -28,7 +28,7 @@ class Settings {
   }
 
   async merge(item) {
-    if (this._settings.dateEdited > (await this._db.lastSynced())) {
+    if (this._settings.dateModified > (await this._db.lastSynced())) {
       this._settings.pins = setManipulator.union(
         this._settings.pins,
         item.pins,
@@ -42,7 +42,7 @@ class Settings {
         ...this._settings.aliases,
         ...item.aliases,
       };
-      this._settings.dateEdited = Date.now();
+      this._settings.dateModified = Date.now();
     } else {
       this._initSettings(item);
     }
@@ -88,7 +88,6 @@ class Settings {
       throw new Error("This item cannot be pinned.");
     if (this.isPinned(data.id)) return;
     this._settings.pins.push({ type, data });
-    this._settings.dateEdited = Date.now();
 
     await this._saveSettings();
   }
@@ -97,7 +96,6 @@ class Settings {
     const index = this._settings.pins.findIndex((i) => i.data.id === id);
     if (index <= -1) return;
     this._settings.pins.splice(index, 1);
-    this._settings.dateEdited = Date.now();
 
     await this._saveSettings();
   }
@@ -136,14 +134,15 @@ class Settings {
       pins: [],
       groupOptions: {},
       aliases: {},
-      dateEdited: 0,
+      dateModified: 0,
       dateCreated: 0,
       ...(settings || {}),
     };
   }
 
-  async _saveSettings(updateDateEdited = true) {
-    if (updateDateEdited) this._settings.dateEdited = Date.now();
+  async _saveSettings(updateDateModified = true) {
+    if (updateDateModified) this._settings.dateModified = Date.now();
+
     await this._db.storage.write("settings", this._settings);
     EV.publish(EVENTS.databaseUpdated, this._settings);
   }

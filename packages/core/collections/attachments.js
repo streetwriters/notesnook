@@ -113,7 +113,7 @@ export default class Attachments extends Collection {
         type: type || "application/octet-stream",
       },
       dateCreated: Date.now(),
-      dateEdited: undefined,
+      dateModified: undefined,
       dateUploaded: undefined,
       dateDeleted: undefined,
     };

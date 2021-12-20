@@ -48,7 +48,7 @@ export default class Notebooks extends Collection {
           isChanged = true;
         }
       }
-      if (isChanged) remoteNotebook.dateEdited = Date.now(); // we update the dateEdited so it can be synced back
+      if (isChanged) remoteNotebook.dateModified = Date.now(); // we update the dateEdited so it can be synced back
     }
     return await this._collection.addItem(remoteNotebook);
   }
@@ -83,10 +83,12 @@ export default class Notebooks extends Collection {
       type: "notebook",
       title: notebook.title,
       description: notebook.description,
-      dateCreated: notebook.dateCreated,
-      dateEdited: notebook.dateEdited,
       pinned: !!notebook.pinned,
       topics: notebook.topics || [],
+
+      dateCreated: notebook.dateCreated,
+      dateModified: notebook.dateModified,
+      dateEdited: Date.now(),
     };
 
     await this._collection.addItem(notebook);

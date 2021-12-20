@@ -68,7 +68,7 @@ export default class Topics {
         notebook.topics.push(topic);
       }
     }
-    return this._db.notebooks._collection.addItem(notebook);
+    return this._db.notebooks.add(notebook);
   }
 
   /**

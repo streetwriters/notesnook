@@ -16,6 +16,7 @@ export default class Content extends Collection {
       content = {
         ...oldContent,
         ...content,
+        dateEdited: content.dateEdited || Date.now(),
       };
     }
 
@@ -28,10 +29,10 @@ export default class Content extends Collection {
         data: content.data || content,
         dateEdited: content.dateEdited,
         dateCreated: content.dateCreated,
+        dateModified: content.dateModified,
         localOnly: !!content.localOnly,
         conflicted: content.conflicted,
         dateResolved: content.dateResolved,
-        persistDateEdited: !!content.persistDateEdited,
       })
     );
     return id;
@@ -143,7 +144,7 @@ export default class Content extends Collection {
     }
 
     if (toAdd.length > 0) {
-      contentItem.dateEdited = Date.now();
+      contentItem.dateModified = Date.now();
     }
     contentItem.data = data;
     return contentItem;

@@ -44,19 +44,11 @@ export default class Notes extends Collection {
     if (!oldNote && !noteArg.content && !noteArg.contentId) return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
-      const {
-        type,
-        data,
-        conflicted,
-        dateEdited,
-        persistDateEdited,
-        dateResolved,
-      } = noteArg.content;
+      const { type, data, conflicted, dateEdited, dateResolved } =
+        noteArg.content;
 
       let content = getContentFromData(type, data);
       if (!content) throw new Error("Invalid content type.");
-      note.headline = getNoteHeadline(note, content);
-
       note.contentId = await this._db.content.add({
         noteId: id,
         id: note.contentId,
@@ -66,26 +58,36 @@ export default class Notes extends Collection {
         dateEdited,
         dateResolved,
         conflicted,
-        persistDateEdited,
       });
+
+      note.headline = getNoteHeadline(note, content);
+      note.dateEdited = Date.now();
     }
+
+    const noteTitle = getNoteTitle(note, oldNote);
+    if (!oldNote || oldNote.title !== noteTitle) note.dateEdited = Date.now();
 
     note = {
       id,
       contentId: note.contentId,
       type: "note",
-      title: getNoteTitle(note, oldNote).replace(/[\r\n\t\v]+/g, " "),
+
+      title: noteTitle,
       headline: note.headline,
-      pinned: !!note.pinned,
-      locked: !!note.locked,
+
+      tags: note.tags || [],
       notebooks: note.notebooks || undefined,
       color: note.color,
-      tags: note.tags || [],
+
+      pinned: !!note.pinned,
+      locked: !!note.locked,
       favorite: !!note.favorite,
-      dateCreated: note.dateCreated,
-      dateEdited: note.dateEdited,
       localOnly: !!note.localOnly,
       conflicted: !!note.conflicted,
+
+      dateCreated: note.dateCreated,
+      dateEdited: note.dateEdited,
+      dateModified: note.dateModified,
     };
 
     await this.merge(note);
@@ -265,19 +267,16 @@ function getNoteHeadline(note, content) {
   return content.toHeadline();
 }
 
+const NEWLINE_STRIP_REGEX = /[\r\n\t\v]+/gm;
 function getNoteTitle(note, oldNote) {
-  if (note.title && note.title.trim().length > 0) return note.title;
-  else if (oldNote && oldNote.title && oldNote.title.trim().length > 0) {
-    return oldNote.title;
+  if (note.title && note.title.trim().length > 0) {
+    return note.title.replace(NEWLINE_STRIP_REGEX, " ");
+  } else if (oldNote && oldNote.title && oldNote.title.trim().length > 0) {
+    return oldNote.title.replace(NEWLINE_STRIP_REGEX, " ");
   }
 
   return `Note ${new Date().toLocaleString(undefined, {
-    year: "2-digit",
-    month: "2-digit",
-    day: "2-digit",
-    hour12: true,
-    hour: "2-digit",
-    minute: "2-digit",
-    second: "2-digit",
+    dateStyle: "short",
+    timeStyle: "short",
   })}`;
 }

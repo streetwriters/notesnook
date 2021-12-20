@@ -36,7 +36,7 @@ class Merger {
   async _mergeItem(remoteItem, get, add) {
     let localItem = await get(remoteItem.id);
     remoteItem = await this._deserialize(remoteItem);
-    if (!localItem || remoteItem.dateEdited > localItem.dateEdited) {
+    if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       await add(remoteItem);
     }
   }
@@ -54,18 +54,19 @@ class Merger {
     if (!localItem) {
       await add(remoteItem);
     } else if (
-      localItem.dateResolved !== remoteItem.dateEdited &&
-      localItem.dateEdited > this._lastSynced
+      localItem.dateResolved !== remoteItem.dateModified &&
+      localItem.dateModified > this._lastSynced
     ) {
       // If time difference between local item's edits & remote item's edits
       // is less than 1 minute, we shouldn't trigger a merge conflict; instead
       // we will keep the most recently changed item.
       const timeDiff =
-        Math.max(remoteItem.dateEdited, localItem.dateEdited) -
-        Math.min(remoteItem.dateEdited, localItem.dateEdited);
+        Math.max(remoteItem.dateModified, localItem.dateModified) -
+        Math.min(remoteItem.dateModified, localItem.dateModified);
       const ONE_MINUTE = 60 * 1000;
       if (timeDiff < ONE_MINUTE) {
-        if (remoteItem.dateEdited > localItem.dateEdited) await add(remoteItem);
+        if (remoteItem.dateModified > localItem.dateModified)
+          await add(remoteItem);
         return;
       }
 
@@ -170,7 +171,7 @@ class Merger {
 
           if (remote.deleted || local.deleted || note.locked) {
             // if note is locked or content is deleted we keep the most recent version.
-            if (remote.dateEdited > local.dateEdited)
+            if (remote.dateModified > local.dateModified)
               await this._db.content.add({ id: local.id, ...remote });
           } else {
             // otherwise we trigger the conflicts

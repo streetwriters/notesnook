@@ -1,20 +1,20 @@
 import { databaseTest } from "./utils";
 
-test("settings' dateEdited should not update on init", () =>
+test("settings' dateModified should not update on init", () =>
   databaseTest().then(async (db) => {
-    const beforeDateEdited = db.settings._settings.dateEdited;
+    const beforeDateModified = db.settings._settings.dateModified;
     await db.settings.init();
-    const afterDateEdited = db.settings._settings.dateEdited;
-    expect(beforeDateEdited).toBe(afterDateEdited);
+    const afterDateModified = db.settings._settings.dateModified;
+    expect(beforeDateModified).toBe(afterDateModified);
   }));
 
-test("settings' dateEdited should update after merge conflict resolve", () =>
+test("settings' dateModified should update after merge conflict resolve", () =>
   databaseTest().then(async (db) => {
     await db.storage.write("lastSynced", 0);
-    const beforeDateEdited = (db.settings._settings.dateEdited = 1);
+    const beforeDateModified = (db.settings._settings.dateModified = 1);
     await db.settings.merge({ pins: [], groupOptions: {}, aliases: {} });
-    const afterDateEdited = db.settings._settings.dateEdited;
-    expect(afterDateEdited).toBeGreaterThan(beforeDateEdited);
+    const afterDateModified = db.settings._settings.dateModified;
+    expect(afterDateModified).toBeGreaterThan(beforeDateModified);
   }));
 
 test("tag alias should update if aliases in settings update", () =>
