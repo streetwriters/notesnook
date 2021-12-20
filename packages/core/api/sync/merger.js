@@ -137,7 +137,7 @@ class Merger {
     await this._mergeArray(
       notes,
       (id) => this._db.notes.note(id),
-      (item) => this._db.notes.add(item)
+      (item) => this._db.notes.merge(item)
     );
 
     await this._mergeArray(

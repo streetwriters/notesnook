@@ -1,55 +1,38 @@
 import Collection from "./collection";
 import Note from "../models/note";
 import getId from "../utils/id";
-import { EV, EVENTS } from "../common";
 import { getContentFromData } from "../content-types";
 import qclone from "qclone/src/qclone";
 import sort from "fast-sort";
 import { deleteItem } from "../utils/array";
 
 export default class Notes extends Collection {
+  async merge(remoteNote) {
+    if (!remoteNote) return;
+    if (remoteNote.deleted) return await this._collection.addItem(remoteNote);
+
+    const id = remoteNote.id;
+    const localNote = this._collection.getItem(id);
+    if (localNote) {
+      if (localNote.color) await this._db.colors.untag(localNote.color, id);
+
+      for (let tag of localNote.tags || []) {
+        await this._db.tags.untag(tag, id);
+      }
+    }
+
+    await this._resolveColorAndTags(remoteNote);
+
+    return await this._collection.addItem(remoteNote);
+  }
+
   async add(noteArg) {
     if (!noteArg) return;
-    if (noteArg.deleted) {
-      await this._collection.addItem(noteArg);
-      return;
-    }
+    if (noteArg.remote)
+      throw new Error("Please use db.notes.merge to merge remote notes.");
 
     let id = noteArg.id || getId();
     let oldNote = this._collection.getItem(id);
-
-    if (noteArg.remote || noteArg.migrated) {
-      const { color, tags } = noteArg;
-
-      if (oldNote) {
-        if (!!oldNote.color && oldNote.color !== color) {
-          await this._db.colors.untag(oldNote.color, id);
-        }
-        if (!!oldNote.tags) {
-          for (let tag of oldNote.tags) {
-            await this._db.tags.untag(tag, id);
-          }
-        }
-      }
-
-      if (color) {
-        await this._db.colors.add(color, id);
-      }
-
-      if (tags && tags.length) {
-        for (let i = 0; i < tags.length; ++i) {
-          const tag = tags[i];
-          const addedTag = await this._db.tags.add(tag, id).catch(() => void 0);
-          if (!addedTag) {
-            tags.splice(i, 1);
-            continue;
-          }
-          if (addedTag.title !== tag) tags[i] = addedTag.title;
-        }
-      }
-
-      return await this._collection.addItem(noteArg);
-    }
 
     let note = {
       ...oldNote,
@@ -91,7 +74,7 @@ export default class Notes extends Collection {
       id,
       contentId: note.contentId,
       type: "note",
-      title: getNoteTitle(note, oldNote).replace(/[\r\n\t]+/g, " "),
+      title: getNoteTitle(note, oldNote).replace(/[\r\n\t\v]+/g, " "),
       headline: note.headline,
       pinned: !!note.pinned,
       locked: !!note.locked,
@@ -105,16 +88,7 @@ export default class Notes extends Collection {
       conflicted: !!note.conflicted,
     };
 
-    if (!oldNote || oldNote.deleted) {
-      if (note.color) await this._db.colors.add(note.color, id);
-
-      for (let tag of note.tags) {
-        if (!tag || !tag.trim()) continue;
-        await this._db.tags.add(tag, id);
-      }
-    }
-
-    await this._collection.addItem(note);
+    await this.merge(note);
     return note.id;
   }
 
@@ -263,6 +237,24 @@ export default class Notes extends Collection {
           await this.add(note);
           continue;
         }
+      }
+    }
+  }
+
+  async _resolveColorAndTags(note) {
+    const { color, tags, id } = note;
+
+    if (color) await this._db.colors.add(color, id);
+
+    if (tags && tags.length) {
+      for (let i = 0; i < tags.length; ++i) {
+        const tag = tags[i];
+        const addedTag = await this._db.tags.add(tag, id).catch(() => void 0);
+        if (!addedTag) {
+          tags.splice(i, 1);
+          continue;
+        }
+        if (addedTag.title !== tag) tags[i] = addedTag.title;
       }
     }
   }

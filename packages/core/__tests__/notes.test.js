@@ -335,16 +335,15 @@ test("repairing notebook references should delete non-existent notebooks", () =>
     expect(note.notebooks.length).toBe(0);
   }));
 
-test("adding a remote note with an invalid tag should clean the tag array", () =>
+test("adding a note with an invalid tag should clean the tag array", () =>
   databaseTest().then(async (db) => {
     await expect(
       db.notes.add({
         ...TEST_NOTE,
         id: "helloworld",
-        remote: true,
         tags: ["/.,"],
       })
-    ).resolves.toBeUndefined();
+    ).resolves.toBe("helloworld");
 
     const note = db.notes.note("helloworld");
     expect(note.tags.length).toBe(0);
