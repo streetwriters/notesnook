@@ -68,6 +68,10 @@ const groupedTest = (type) =>
     expect(grouped.some((i) => i.type === "header")).toBe(true);
   });
 
+function delay(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export {
   databaseTest,
   notebookTest,
@@ -80,4 +84,5 @@ export {
   TEST_NOTEBOOK2,
   TEST_NOTE,
   LONG_TEXT,
+  delay,
 };

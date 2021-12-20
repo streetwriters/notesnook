@@ -1,4 +1,10 @@
-import { notebookTest, noteTest, StorageInterface, TEST_NOTE } from "./utils";
+import {
+  delay,
+  notebookTest,
+  noteTest,
+  StorageInterface,
+  TEST_NOTE,
+} from "./utils";
 
 beforeEach(() => StorageInterface.clear());
 
@@ -144,9 +150,3 @@ test("editing one topic should not update dateEdited of all", () =>
       )
     ).toBe(true);
   }));
-
-function delay(ms) {
-  return new Promise((resolve) => {
-    setTimeout(resolve, ms);
-  });
-}

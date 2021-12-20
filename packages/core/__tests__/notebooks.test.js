@@ -3,6 +3,7 @@ import {
   notebookTest,
   TEST_NOTEBOOK,
   TEST_NOTE,
+  delay,
 } from "./utils";
 import { makeTopic } from "../collections/topics";
 
@@ -172,7 +173,3 @@ test("merge notebook with topic removed that is edited in the local notebook", (
     expect(notebook.topics.has("hello (i exist)")).toBe(true);
     expect(notebook.topics.has("hello")).toBe(false);
   }));
-
-function delay(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
