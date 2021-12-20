@@ -58,8 +58,10 @@ export default class Content extends Collection {
     return this._collection.getItems(ids);
   }
 
-  all() {
-    return this._collection.getItems(this._collection.indexer.indices);
+  async all() {
+    return Object.values(
+      await this._collection.getItems(this._collection.indexer.indices)
+    );
   }
 
   insertMedia(contentItem) {

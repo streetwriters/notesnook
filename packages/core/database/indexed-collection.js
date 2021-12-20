@@ -64,9 +64,6 @@ export default class IndexedCollection {
 
   async getItems(indices) {
     const data = await this.indexer.readMulti(indices);
-    return data.reduce((total, current) => {
-      total.push(current[1]);
-      return total;
-    }, []);
+    return Object.fromEntries(data);
   }
 }
