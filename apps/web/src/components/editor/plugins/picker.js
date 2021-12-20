@@ -85,19 +85,17 @@ async function pickFile(selectedFile) {
         const { hash, type: hashType } = await fs.hashStream(reader);
         reader.releaseLock();
 
-        let output = {};
         if (!db.attachments.exists(hash)) {
-          output = await fs.writeEncryptedFile(selectedFile, key, hash);
+          const output = await fs.writeEncryptedFile(selectedFile, key, hash);
+          await db.attachments.add({
+            ...output,
+            hash,
+            hashType,
+            filename: selectedFile.name,
+            type: selectedFile.type,
+            key,
+          });
         }
-
-        await db.attachments.add({
-          ...output,
-          hash,
-          hashType,
-          filename: selectedFile.name,
-          type: selectedFile.type,
-          key,
-        });
 
         return {
           hash: hash,
@@ -132,19 +130,17 @@ async function pickImage(selectedImage) {
     const { hash, type: hashType } = await fs.hashStream(reader);
     reader.releaseLock();
 
-    var output = {};
     if (!db.attachments.exists(hash)) {
-      output = await fs.writeEncryptedFile(blob, key, hash);
+      const output = await fs.writeEncryptedFile(blob, key, hash);
+      await db.attachments.add({
+        ...output,
+        key,
+        hash,
+        hashType,
+        filename: selectedImage.name,
+        type: selectedImage.type,
+      });
     }
-
-    await db.attachments.add({
-      ...output,
-      key,
-      hash,
-      hashType,
-      filename: selectedImage.name,
-      type: selectedImage.type,
-    });
 
     return {
       hash,
