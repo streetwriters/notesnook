@@ -10,10 +10,10 @@ const attributeMap: Record<string, string> = {
 export type Attachment = {
   hash: string;
   hashType: string;
+  filename: string;
   size: number;
   mime: string;
   data?: Uint8Array;
-  filename?: string;
   width?: number;
   height?: number;
 };

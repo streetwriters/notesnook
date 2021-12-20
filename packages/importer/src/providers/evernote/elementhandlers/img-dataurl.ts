@@ -17,6 +17,7 @@ export class IMGDataurl extends BaseHandler {
       data,
       size: data.length,
       hash: dataHash,
+      filename: dataHash,
       hashType: this.hasher.type,
       mime: dataurl.mime,
       width: getAttribute(element, "width", "number"),

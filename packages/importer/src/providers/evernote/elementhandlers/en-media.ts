@@ -19,7 +19,7 @@ export class ENMedia extends BaseHandler {
     const dataHash = await this.hasher.hash(data);
     const attachment: Attachment = {
       data,
-      filename: resource.attributes?.filename ?? undefined,
+      filename: resource.attributes?.filename || dataHash,
       size: data.length,
       hash: dataHash,
       hashType: this.hasher.type,
