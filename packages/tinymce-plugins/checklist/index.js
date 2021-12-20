@@ -1,8 +1,8 @@
 const { addPluginToPluginManager } = require("../utils");
 
 const CLASS_NAMES = {
-  list: "tox-checklist",
-  checked: "tox-checklist--checked",
+  list: "checklist",
+  checked: "checked",
 };
 const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
 
@@ -10,7 +10,7 @@ const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
-  editor.addCommand("insertChecklist", function () {
+  editor.addCommand("insertChecklist", function() {
     insertChecklist(editor);
   });
 
@@ -19,14 +19,14 @@ function register(editor) {
     active: false,
     tooltip: "Checklist",
     onAction: () => insertChecklist(editor),
-    onSetup: function (api) {
+    onSetup: function(api) {
       return listState(editor, api.setActive);
     },
   });
 
   editor.on(
     "mousedown",
-    function (event) {
+    function(event) {
       var node = event.target;
       var parent = node.parentElement;
       if (
@@ -44,7 +44,7 @@ function register(editor) {
 
   editor.on(
     "touchstart",
-    function (event) {
+    function(event) {
       var node = event.target;
       var parent = node.parentElement;
       if (
@@ -69,7 +69,7 @@ function register(editor) {
 function insertChecklist(editor) {
   const node = editor.selection.getNode();
   if (node.classList.contains(CLASS_NAMES.list)) {
-    editor.undoManager.transact(function () {
+    editor.undoManager.transact(function() {
       editor.execCommand("RemoveList");
     });
   } else {
@@ -81,11 +81,11 @@ function insertChecklist(editor) {
 }
 
 function listState(editor, activate) {
-  var nodeChangeHandler = function (e) {
+  var nodeChangeHandler = function(e) {
     var inList = findUntil(e.parents, isListNode, isTableCellNode);
     if (inList)
       inList =
-        inList.filter(function (list) {
+        inList.filter(function(list) {
           return list.className === CLASS_NAMES.list;
         }).length > 0;
     activate(inList);
@@ -93,7 +93,7 @@ function listState(editor, activate) {
   var parents = editor.dom.getParents(editor.selection.getNode());
   nodeChangeHandler({ parents: parents });
   editor.on("NodeChange", nodeChangeHandler);
-  return function () {
+  return function() {
     return editor.off("NodeChange", nodeChangeHandler);
   };
 }
@@ -113,19 +113,20 @@ function findUntil(xs, pred, until) {
 var isListNode = matchNodeNames(/^(OL|UL|DL)$/);
 var isTableCellNode = matchNodeNames(/^(TH|TD)$/);
 function matchNodeNames(regex) {
-  return function (node) {
+  return function(node) {
     return node && regex.test(node.nodeName);
   };
 }
 
 /**
  * @param {import("tinymce").Editor} editor
- * @param {any} node
+ * @param {HTMLElement} node
  */
 function toggleChecklistItem(editor, node) {
-  editor.undoManager.transact(function () {
-    node.className =
-      node.className === CLASS_NAMES.checked ? "" : CLASS_NAMES.checked;
+  editor.undoManager.transact(function() {
+    const isChecked = node.classList.contains(CLASS_NAMES.checked);
+    if (isChecked) node.classList.remove(CLASS_NAMES.checked);
+    else node.classList.add(CLASS_NAMES.checked);
   });
 }
 
