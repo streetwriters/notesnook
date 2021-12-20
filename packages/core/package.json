@@ -27,6 +27,7 @@
     "async-mutex": "^0.3.2",
     "dayjs": "^1.10.6",
     "fast-sort": "^2.0.1",
+    "fzf": "^0.4.1",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "qclone": "^1.0.4",
     "showdown": "github:thecodrr/showdown",

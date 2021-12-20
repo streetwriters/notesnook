@@ -1,5 +1,4 @@
-import { qclone } from "qclone";
-import { getContentFromData } from "../content-types";
+import { Fzf } from "fzf";
 
 export default class Lookup {
   /**
@@ -11,28 +10,37 @@ export default class Lookup {
   }
 
   async notes(notes, query) {
-    notes = qclone(notes);
     const contents = await this._db.content.multi(
       notes.map((note) => note.contentId || "")
     );
-    return notes.filter((note) => {
-      let content = "";
-      if (!note.locked) {
-        content = contents.find(
-          (content) => !!content && content.id === note.contentId
-        );
-        if (!content) return false;
-        content = getContentFromData(content.type, content.data);
-        content = content.toHTML();
-      }
-      return search(query, note.title) || search(query, content);
-    });
+
+    const items = [];
+    for (let i = 0; i < notes.length; ++i) {
+      const note = notes[i];
+      const item = { note, text: note.title };
+      items.push(item);
+      if (
+        !note.locked &&
+        !!note.contentId &&
+        contents.hasOwnProperty(note.contentId)
+      )
+        item.text += " " + contents[note.contentId]["data"];
+    }
+
+    return new Fzf(items, {
+      selector: (v) => v.text,
+      normalize: false,
+    })
+      .find(query)
+      .map((v) => v.item.note);
   }
 
   notebooks(array, query) {
-    return array.filter(
-      (item) => search(query, item.title) || search(query, item.description)
-    );
+    return new Fzf(array, {
+      selector: (n) => `${n.title} ${n.description}`,
+    })
+      .find(query)
+      .map((v) => v.item);
   }
 
   topics(array, query) {
@@ -48,11 +56,10 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return array.filter((item) => search(query, item.title));
+    return new Fzf(array, {
+      selector: (n) => n.title,
+    })
+      .find(query)
+      .map((v) => v.item);
   }
-}
-
-function search(query, string) {
-  const words = query.toLowerCase().split(" ");
-  return words.some((word) => string.toLowerCase().indexOf(word) > -1);
 }

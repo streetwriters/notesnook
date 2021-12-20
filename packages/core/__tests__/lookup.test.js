@@ -14,7 +14,10 @@ beforeEach(async () => {
   StorageInterface.clear();
 });
 
-const content = { ...TEST_NOTE.content, data: "<p>5</p>" };
+const content = {
+  ...TEST_NOTE.content,
+  data: "<p>hello i am a note of the world</p>",
+};
 
 //TODO
 test("search notes", () =>
@@ -22,7 +25,7 @@ test("search notes", () =>
     content: content,
   }).then(async ({ db }) => {
     await db.notes.add(TEST_NOTE);
-    let filtered = await db.lookup.notes(db.notes.all, "5");
+    let filtered = await db.lookup.notes(db.notes.all, "note of the world");
     expect(filtered.length).toBe(1);
   }));
 
@@ -33,7 +36,7 @@ test("search notes with a locked note", () =>
     const noteId = await db.notes.add(TEST_NOTE);
     await db.vault.create("password");
     await db.vault.add(noteId);
-    let filtered = await db.lookup.notes(db.notes.all, "5");
+    let filtered = await db.lookup.notes(db.notes.all, "note of the world");
     expect(filtered.length).toBe(1);
   }));
 
@@ -42,10 +45,10 @@ test("search notes with an empty note", () =>
     content: content,
   }).then(async ({ db }) => {
     await db.notes.add({
-      title: "hello world",
+      title: "world is a heavy tune",
       content: { type: "tiny", data: "<p><br></p>" },
     });
-    let filtered = await db.lookup.notes(db.notes.all, "hello world");
+    let filtered = await db.lookup.notes(db.notes.all, "heavy tune");
     expect(filtered.length).toBe(1);
   }));
 
