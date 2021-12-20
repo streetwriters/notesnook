@@ -1,8 +1,5 @@
-import React from "react";
 import SelectionOptions from "./selectionoptions";
-import { showToast } from "../utils/toast";
 import download from "../utils/download";
-import { Text } from "rebass";
 import {
   showFeatureDialog,
   showLoadingDialog,

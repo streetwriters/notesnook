@@ -34,7 +34,6 @@ async function writeEncryptedFile(file, key, hash) {
   let offset = 0;
   let encrypted = 0;
   const fileHandle = await streamablefs.createFile(hash, file.size, file.type);
-
   sendAttachmentsProgressEvent("encrypt", hash, 1, 0);
 
   const iv = await crypto.encryptStream(
