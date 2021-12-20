@@ -10,6 +10,7 @@ import AccentItem from "../components/accent-item";
 import accents from "../theme/accents";
 import {
   showEmailVerificationDialog,
+  showImportDialog,
   showIssueDialog,
   showTrackingDetailsDialog,
 } from "../common/dialog-controller";
@@ -126,6 +127,7 @@ function Settings(props) {
   const [groups, setGroups] = useState({
     appearance: false,
     backup: false,
+    importer: false,
     privacy: false,
     developer: false,
     other: true,
@@ -424,20 +426,6 @@ function Settings(props) {
                 tip="Restore data from a backup file"
               />
             </Button>
-            <Button
-              key={"importer"}
-              variant="list"
-              onClick={() => {
-                window.open("https://importer.notesnook.com/", "_blank");
-              }}
-            >
-              <Tip
-                text={"Import from other apps"}
-                tip={
-                  "Import all your notes from other note taking apps with Notesnook Importer."
-                }
-              />
-            </Button>
             <Toggle
               title="Encrypt backups"
               onTip="All backup files will be encrypted"
@@ -481,6 +469,30 @@ function Settings(props) {
                 />
               </Button>
             ) : null}
+          </>
+        )}
+
+        <Header
+          title="Notesnook Importer"
+          isOpen={groups.importer}
+          onClick={() => {
+            setGroups((g) => ({ ...g, importer: !g.importer }));
+          }}
+        />
+        {groups.importer && (
+          <>
+            <Button
+              key={"importer"}
+              variant="list"
+              onClick={() => showImportDialog()}
+            >
+              <Tip
+                text={"Import from ZIP file"}
+                tip={
+                  "Import your notes from other notes apps using Notesnook Importer."
+                }
+              />
+            </Button>
           </>
         )}
 

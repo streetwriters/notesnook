@@ -1,0 +1,101 @@
+import { unzipSync } from "fflate";
+import { db } from "../common/db";
+import FS from "../interfaces/fs";
+
+const textDecoder = new TextDecoder();
+async function getNotesFromImport(files) {
+  let notes = [];
+  for (let file of files) {
+    const unzipped = unzipSync(new Uint8Array(await file.arrayBuffer()));
+
+    let metadata = binaryToJson(unzipped["metadata.json"], undefined);
+    if (!metadata) continue;
+
+    const noteIds = metadata["notes"];
+    if (!noteIds) continue;
+
+    for (let noteId of noteIds) {
+      const path = `${noteId}/note.json`;
+      let note = binaryToJson(files[path]);
+      if (!note) continue;
+
+      const attachments = note.attachments?.slice() || [];
+      note.attachments = [];
+      for (let attachment of attachments) {
+        const attachmentPath = `${noteId}/attachments/${attachment.hash}`;
+        if (!files[attachmentPath]) continue;
+
+        attachment.filename = attachment.filename || attachment.hash;
+        attachment.data = files[attachmentPath];
+
+        note.attachments.push(attachment);
+      }
+
+      notes.push(note);
+    }
+  }
+
+  return notes;
+}
+
+async function importNote(note) {
+  if (note.content.type === "html") note.content.type = "tiny";
+  else throw new Error("Invalid content type: " + note.content.type);
+
+  if (note.attachments) await importAttachments(note.attachments);
+
+  const notebooks = note.notebooks?.slice() || [];
+  note.notebooks = [];
+  const noteId = await db.notes.add(note);
+
+  for (let notebook of notebooks) {
+    await db.notes.move(await importNotebook(notebook), noteId);
+  }
+}
+
+export const Importer = { importNote, getNotesFromImport };
+
+function binaryToJson(binary, def) {
+  if (!binary) return def;
+  return JSON.parse(textDecoder.decode(binary));
+}
+
+async function importAttachments(attachments) {
+  for (let attachment of attachments) {
+    const file = new File([attachment.data.buffer], attachment.filename, {
+      type: attachment.mime,
+    });
+    if (db.attachments.exists(attachment.hash)) continue;
+
+    const key = await db.attachments.generateKey();
+    let output = await FS.writeEncryptedFile(file, key, attachment.hash);
+    await db.attachments.add({
+      ...output,
+      key,
+      hash: attachment.hash,
+      hashType: attachment.hashType,
+      filename: attachment.filename,
+      type: attachment.mime,
+    });
+  }
+}
+
+async function importNotebook(notebook) {
+  let nb = db.notebooks.all.find((nb) => nb.title === notebook.notebook);
+  if (!nb) {
+    const nbId = await db.notebooks.add({
+      title: notebook.notebook,
+      topics: [notebook.topic],
+    });
+    nb = db.notebooks.notebook(nbId).data;
+  }
+
+  let topic = nb?.topics.find((t) => t.title === notebook.topic);
+  if (!topic) {
+    const topics = db.notebooks.notebook(nb).topics;
+    await topics.add(notebook.topic);
+    topic = topics.all.find((t) => t.title === notebook.topic);
+  }
+
+  return { id: nb.id, topic: topic.id };
+}

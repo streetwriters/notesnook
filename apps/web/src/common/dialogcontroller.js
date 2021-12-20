@@ -576,3 +576,9 @@ export function showIssueDialog() {
     />
   ));
 }
+
+export function showImportDialog() {
+  return showDialog((Dialogs, perform) => (
+    <Dialogs.ImportDialog onClose={(res) => perform(res)} />
+  ));
+}

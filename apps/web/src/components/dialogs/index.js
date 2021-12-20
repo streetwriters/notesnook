@@ -3,6 +3,7 @@ import BuyDialog from "./buy-dialog";
 import Confirm from "./confirm";
 import EmailVerificationDialog from "./emailverificationdialog";
 import ExportDialog from "./exportdialog";
+import ImportDialog from "./importdialog";
 import LoadingDialog from "./loadingdialog";
 import ProgressDialog from "./progressdialog";
 import MoveDialog from "./movenotedialog";
@@ -32,5 +33,6 @@ const Dialogs = {
   ReminderDialog,
   AnnouncementDialog,
   IssueDialog,
+  ImportDialog,
 };
 export default Dialogs;
