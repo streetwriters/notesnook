@@ -1,4 +1,4 @@
-import { Fzf } from "fzf";
+import { filter, parse } from "liqe";
 
 export default class Lookup {
   /**
@@ -14,33 +14,20 @@ export default class Lookup {
       notes.map((note) => note.contentId || "")
     );
 
-    const items = [];
-    for (let i = 0; i < notes.length; ++i) {
-      const note = notes[i];
-      const item = { note, text: note.title };
-      items.push(item);
+    return search(notes, query, (note) => {
+      let text = note.title;
       if (
         !note.locked &&
         !!note.contentId &&
         contents.hasOwnProperty(note.contentId)
       )
-        item.text += " " + contents[note.contentId]["data"];
-    }
-
-    return new Fzf(items, {
-      selector: (v) => v.text,
-      normalize: false,
-    })
-      .find(query)
-      .map((v) => v.item.note);
+        text += contents[note.contentId]["data"];
+      return text;
+    });
   }
 
   notebooks(array, query) {
-    return new Fzf(array, {
-      selector: (n) => `${n.title} ${n.description}`,
-    })
-      .find(query)
-      .map((v) => v.item);
+    return search(array, query, (n) => `${n.title} ${n.description}`);
   }
 
   topics(array, query) {
@@ -56,10 +43,19 @@ export default class Lookup {
   }
 
   _byTitle(array, query) {
-    return new Fzf(array, {
-      selector: (n) => n.title,
-    })
-      .find(query)
-      .map((v) => v.item);
+    return search(array, query, (n) => n.title);
+  }
+}
+
+function search(items, query, selector) {
+  try {
+    return filter(
+      parse(`text:"${query.toLowerCase()}"`),
+      items.map((item) => {
+        return { item, text: selector(item).toLowerCase() };
+      })
+    ).map((v) => v.item);
+  } catch (e) {
+    return [];
   }
 }
