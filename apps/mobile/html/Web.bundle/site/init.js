@@ -508,7 +508,7 @@ function scrollSelectionIntoView(event) {
   ) {
     console.log(event);
     clearTimeout(inputKeyTimer);
-    inputKeyTimer = setTimeout(() => {
+    inputKeyTimer = setTimeout(function() {
       let node = editor.selection.getNode();
       if (node) {
         console.log(node, 'scrolling into view');
@@ -621,7 +621,7 @@ function selectchange() {
 
     currentFormats.current = {
       index: range.startOffset,
-      length: range.endOffset - range.startOffset
+      length: range.endOffset - range.startOffset,
     };
 
     currentFormats.fontsize = editor.selection.getNode().style.fontSize;

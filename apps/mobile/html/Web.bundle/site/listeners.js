@@ -64,7 +64,7 @@ function attachTitleInputListeners() {
 let titleTimeout = 0;
 function onTitleChange() {
   clearTimeout(titleTimeout);
-  titleTimeout = setTimeout(() => {
+  titleTimeout = setTimeout(function() {
     if (isLoading) {
       return;
     }
