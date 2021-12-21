@@ -23,6 +23,7 @@ import Offers from "./offers";
 import Attachments from "../collections/attachments";
 import Debug from "./debug";
 import { Mutex } from "async-mutex";
+import NoteHistory from "../collections/note-history";
 
 /**
  * @type {EventSource}
@@ -109,6 +110,8 @@ class Database {
     this.content = await Content.new(this, "content", false);
     /** @type {Attachments} */
     this.attachments = await Attachments.new(this, "attachments");
+    /**@type {NoteHistory} */
+    this.noteHistory = await NoteHistory.new(this,"notehistory");
 
     this.trash = new Trash(this);
 

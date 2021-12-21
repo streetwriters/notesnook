@@ -14,3 +14,12 @@ export default function () {
 export function makeId(text) {
   return SparkMD5.hash(text);
 }
+
+/**
+ *
+ * @param {string} noteId id of a note
+ * @returns {string} An id with postfix of "_index"
+ */
+export function makeSessionContentId(sessionId) {
+  return sessionId + "_content";
+}
