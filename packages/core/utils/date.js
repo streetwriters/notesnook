@@ -12,13 +12,8 @@ export function getWeekGroupFromTimestamp(timestamp) {
 }
 
 export function formatDate(date) {
-  return new Date(date).toLocaleDateString("en", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    hour: "2-digit",
-    hour12: true,
-    minute: "2-digit",
-    second: "2-digit",
+  return new Date(date).toLocaleString(undefined, {
+    dateStyle: "medium",
+    timeStyle: "short",
   });
 }
