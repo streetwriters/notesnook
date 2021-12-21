@@ -20,7 +20,7 @@
     "jsdom": "^16.5.3"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest --forceExit"
   },
   "dependencies": {
     "@stablelib/blake2s": "^1.0.1",
