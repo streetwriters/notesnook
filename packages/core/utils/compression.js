@@ -1,27 +1,24 @@
 import { decode, encode } from "base64-arraybuffer";
-import fflate from "fflate";
-
+import { compressSync, strToU8, strFromU8 } from "fflate";
 
 /**
- * 
+ *
  * @param {string} data
  * @returns {string | null} An object containing compressed data
  */
 export const compress = (data) => {
   try {
-    return encode(fflate.compressSync(fflate.strToU8(data)).buffer)
+    return encode(compressSync(strToU8(data)).buffer);
   } catch (e) {
     return null;
   }
 };
 
 /**
- * 
- * @param {string} compressed 
+ *
+ * @param {string} compressed
  * @returns {string} decompressed string
  */
 export const decompress = (compressed) => {
-  return fflate.strFromU8(
-    fflate.decompressSync(new Uint8Array(decode(compressed)))
-  );
+  return strFromU8(decompressSync(new Uint8Array(decode(compressed))));
 };
