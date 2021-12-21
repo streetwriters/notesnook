@@ -23,11 +23,11 @@ This is all optional, of course.`,
 };
 
 function getDeviceInfo() {
-  const appVersion = appVersion.formatted;
+  const version = appVersion.formatted;
   const os = platform.os;
   const browser = `${platform.name} ${platform.version}`;
 
-  return `App version: ${appVersion}
+  return `App version: ${version}
 OS: ${os}
 Browser: ${browser}
 Pro: ${isUserPremium()}`;
