@@ -94,11 +94,7 @@ function Note(props) {
                   data-test-id={`note-${index}-locked`}
                 />
               )}
-              <TimeAgo
-                live={false}
-                datetime={note.dateCreated}
-                locale="short"
-              />
+              <TimeAgo live={true} datetime={note.dateCreated} locale="short" />
             </>
           ) : (
             <>
@@ -109,7 +105,7 @@ function Note(props) {
               <TimeAgo
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
-                live={false}
+                live={true}
                 datetime={note.dateCreated}
                 mr={1}
               />
