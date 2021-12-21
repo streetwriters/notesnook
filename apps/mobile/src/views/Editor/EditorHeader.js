@@ -335,7 +335,6 @@ const EditorHeader = () => {
                   customStyle={{
                     marginLeft: 5
                   }}
-                  size={SIZE.lg + 2}
                   top={50}
                   onPress={async () => {
                     if (editing.isFocused) {
@@ -355,7 +354,6 @@ const EditorHeader = () => {
                 type={searchReplace ? 'grayBg' : 'transparent'}
                 top={50}
                 buttom={10}
-                size={SIZE.lg + 2}
                 onPress={() => {
                   if (searchReplace) {
                     endSearch();
@@ -372,7 +370,6 @@ const EditorHeader = () => {
                   customStyle={{
                     marginLeft: 5
                   }}
-                  size={SIZE.lg + 2}
                   top={50}
                   onPress={publishNote}
                 />
@@ -385,7 +382,6 @@ const EditorHeader = () => {
                   customStyle={{
                     marginLeft: 5
                   }}
-                  size={SIZE.lg + 2}
                   top={50}
                   onPress={picker.pick}
                 />
@@ -412,7 +408,6 @@ const EditorHeader = () => {
                 customStyle={{
                   marginLeft: 5
                 }}
-                size={SIZE.lg + 2}
                 top={50}
                 right={50}
                 onPress={showActionsheet}
