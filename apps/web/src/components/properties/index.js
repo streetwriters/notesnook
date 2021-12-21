@@ -12,6 +12,7 @@ import IconTag from "../icon-tag";
 import { formatBytes, truncateFilename } from "../../utils/filename";
 import ScrollContainer from "../scroll-container";
 import { downloadAttachment } from "../../common/attachments";
+import { formatDate } from "notes-core/utils/date";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -23,11 +24,23 @@ const tools = [
   { key: "locked", icon: Icon.Unlock, label: "Lock" },
 ];
 
+const metadataItems = [
+  {
+    key: "dateCreated",
+    label: "Created at",
+    value: (date) => formatDate(date),
+  },
+  {
+    key: "dateEdited",
+    label: "Last edited at",
+    value: (date) => formatDate(date),
+  },
+];
+
 function Properties({ noteId }) {
   const [attachmentsStatus, setAttachmentsStatus] = useState({});
-  const color = useStore((store) => store.session.color);
-  const notebooks = useStore((store) => store.session.notebooks);
-  const attachments = useStore((store) => store.session.attachments);
+  const session = useStore((store) => store.session);
+  const { color, notebooks, attachments } = session;
 
   const toggleLocked = useStore((store) => store.toggleLocked);
   const setSession = useStore((store) => store.setSession);
@@ -125,6 +138,25 @@ function Properties({ noteId }) {
                 testId={`properties-${tool.key}`}
               />
             ))}
+            {metadataItems.map((item) => (
+              <Flex
+                key={item.key}
+                alignItems="center"
+                justifyContent="space-between"
+                py={2}
+                px={2}
+                sx={{
+                  borderBottom: "1px solid var(--border)",
+                }}
+              >
+                <Text variant="body" color="fontTertiary">
+                  {item.label}
+                </Text>
+                <Text variant="body" color="fontTertiary">
+                  {item.value(session[item.key])}
+                </Text>
+              </Flex>
+            ))}
             <Flex
               py={2}
               px={2}
@@ -172,7 +204,7 @@ function Properties({ noteId }) {
                 return (
                   <Flex
                     key={notebook.id}
-                    py={2}
+                    py={1}
                     px={2}
                     sx={{
                       borderBottom: "1px solid var(--border)",

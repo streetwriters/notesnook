@@ -1,8 +1,8 @@
+import { formatDate } from "notes-core/utils/date";
 import React, { useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
 import { AppEventManager, AppEvents } from "../../common";
 import { useStore } from "../../stores/editor-store";
-import { timeConverter } from "../../utils/time";
 
 function EditorFooter() {
   const [totalWords, setTotalWords] = useState(0);
@@ -28,7 +28,7 @@ function EditorFooter() {
           {totalWords + " words"}
         </Text>
         <TextSeperator />
-        {timeConverter(dateEdited || Date.now())}
+        {formatDate(dateEdited || Date.now())}
         <TextSeperator />
         {isSaving ? "Saving" : "Saved"}
       </Text>

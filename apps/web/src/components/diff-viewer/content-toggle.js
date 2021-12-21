@@ -1,6 +1,5 @@
-import React from "react";
+import { formatDate } from "notes-core/utils/date";
 import { Flex, Button } from "rebass";
-import { timeConverter } from "../../utils/time";
 
 function ContentToggle(props) {
   const {
@@ -48,7 +47,7 @@ function ContentToggle(props) {
         mt={1}
         sx={{ fontSize: "subBody", color: "fontTertiary" }}
       >
-        {label} | {timeConverter(dateEdited, true)}
+        {label} | {formatDate(dateEdited, true)}
       </Flex>
     </Flex>
   );
