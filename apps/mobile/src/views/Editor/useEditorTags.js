@@ -27,12 +27,9 @@ export const useEditorTags = () => {
     refreshNote();
   }, [currentEditingNote, tags]);
 
-  async function load(data) {
-    if (!data) {
+  function load() {
       if (!note) return;
-
       tiny.call(EditorWebView, renderTags(noteTags));
-    }
   }
 
   useEffect(() => {
@@ -51,7 +48,7 @@ export const useEditorTags = () => {
   }
 
   useEffect(() => {
-    tiny.call(EditorWebView, renderTags(noteTags));
+    load()
   }, [noteTags]);
 
   const hideTagBar = `
