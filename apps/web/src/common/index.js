@@ -110,11 +110,6 @@ export async function createBackup(save = true) {
     action: async () => {
       return await db.backup.export("web", encryptBackups);
     },
-    message: (
-      <Text color="error">
-        Please do NOT close your browser or shut down your PC.
-      </Text>
-    ),
   });
   const filename = sanitizeFilename(
     `notesnook-backup-${new Date().toLocaleString("en")}`
