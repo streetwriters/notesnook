@@ -322,6 +322,16 @@ h6,
 strong {
   font-weight:600 !important;
 }
+
+td > *,
+th > * {
+    margin: 0 !important;
+}
+
+td > * + *,
+th > * + * {
+    margin-top: .75em !important;
+}
 `;
 
 function init_tiny(size) {
