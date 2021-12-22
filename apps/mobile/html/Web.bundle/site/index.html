@@ -13,23 +13,23 @@
 	<div class="app-main">
 		<input id="image-input" accept='image/png, image/gif, image/jpeg, image/bmp, image/x-icon' type="file"
 			name="name" style="display: none;" />
-			<div class="tag-bar-parent hidden">
-				<p class="newtagp" ></p>
-				<div style="margin: 0px !important;margin-left:5px !important;" class="tag newtag">
-					<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
-						width="24" height="24" viewBox="0 0 24 24">
-						<path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
-					</svg>
-					
-				</div>
-				<div class="tag-bar"></div>
+		<div class="tag-bar-parent hidden">
+			<div style="margin: 0px !important;margin-right:5px !important;" class="tag newtag">
+				<p class="newtagp"  ></p>
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+					width="24" height="24" viewBox="0 0 24 24">
+					<path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+				</svg>
+
 			</div>
+			<div class="tag-bar"></div>
+		</div>
 		<div id="titlebar">
 			<div id="formBox">
 				<input maxlength="150" id="titleInput" placeholder="Note title"></input>
 			</div>
-			
-			
+
+
 
 			<div class="info-bar">
 				<div style="display:flex;">
@@ -38,7 +38,7 @@
 					<p style="display:none" id="infosaved"></p>
 				</div>
 			</div>
-			
+
 		</div>
 		<textarea hidden id="tiny_textarea"></textarea>
 	</div>
@@ -74,16 +74,16 @@
 		function renderChildernInNode(data, parent, nodeName, classes) {
 			if (data.length === 0) {
 				let stag = document.querySelector(".newtagp");
-				stag.innerText = " Add a tag"
+				stag.innerText = "Add a tag "
 				if (!stag.parentElement.classList.contains('alttagnew')) {
 					stag.parentElement.classList.add("alttagnew");
 				}
 			} else {
 				let stag = document.querySelector(".newtagp");
-				
+
 				stag.innerText = "";
 				if (stag.parentElement.classList.contains('alttagnew')) {
-				stag.parentElement.classList.remove("alttagnew")
+					stag.parentElement.classList.remove("alttagnew")
 				}
 			}
 			let parentNode = document.querySelector(parent);
