@@ -65,17 +65,15 @@ export default class NoteHistory extends Collection {
   async add(noteId, dateEdited, content) {
     if (!noteId || !dateEdited || !content) return;
     let sessionId = `${noteId}_${dateEdited}`;
-    let exists = await this._collection.exists(sessionId);
+    let oldSession = await this._collection.getItem(sessionId);
     let locked = this._db.notes.note(noteId)?.data?.locked;
 
     let session = {
       id: sessionId,
       sessionContentId: makeSessionContentId(sessionId),
       noteId,
+      dateCreated: oldSession ? oldSession.dateCreated : Date.now(),
     };
-    if (!exists) {
-      session.dateCreated = Date.now();
-    }
 
     if (locked) {
       session.locked = true;
