@@ -15,7 +15,6 @@ import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
-  useEditorStore,
   useMenuStore,
   useSelectionStore,
   useSettingStore,
@@ -34,7 +33,6 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import Sync from '../../services/Sync';
 import {editing} from '../../utils';
 import {
   ACCENT,
@@ -48,22 +46,22 @@ import {
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eOpenPublishNoteDialog,
-  eOpenTagsDialog,
-  refreshNotesPage
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {deleteItems, openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {sleep} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {presentDialog} from '../Dialog/functions';
 import NoteHistory from '../NoteHistory';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ActionSheetColorsSection} from './ActionSheetColorsSection';
-import {ActionSheetTagsSection} from './ActionSheetTagsSection';
+import {ColorTags} from './color-tags';
+import {DateMeta} from './date-meta';
+import {Tags} from './tags';
+import {Topics} from './topics';
 const w = Dimensions.get('window').width;
 
 let htmlToText;
@@ -388,8 +386,9 @@ export const ActionSheetComponent = ({
 
     {
       name: 'Publish',
-      title: 'Publish',
+      title: isPublished ? 'Published' : 'Publish',
       icon: 'cloud-upload-outline',
+      on: isPublished,
       func: async () => {
         if (!user) {
           ToastEvent.show({
@@ -724,6 +723,29 @@ export const ActionSheetComponent = ({
     getRef().current?.handleChildScrollEnd();
   };
 
+  const renderColumnItem = ({item, index}) => (
+    <Button
+      buttonType={{
+        text: item.on
+          ? colors.accent
+          : item.name === 'Delete' || item.name === 'PermDelete'
+          ? colors.errorText
+          : colors.icon
+      }}
+      onPress={item.func}
+      title={item.title}
+      icon={item.icon}
+      type={item.on ? 'shade' : 'gray'}
+      fontSize={SIZE.sm}
+      style={{
+        borderRadius: 0,
+        justifyContent: 'flex-start',
+        alignSelf: 'flex-start',
+        width: '100%'
+      }}
+    />
+  );
+
   return (
     <ScrollView
       nestedScrollEnabled
@@ -760,182 +782,94 @@ export const ActionSheetComponent = ({
       ) : (
         <View
           style={{
-            paddingHorizontal: 12,
-            alignItems: 'center',
             marginTop: 5,
             zIndex: 10
           }}>
-          <Heading
-            style={{
-              maxWidth: '90%',
-              textAlign: 'center'
-            }}
-            size={SIZE.md}>
-            {note.type === 'tag' ? '#' : null}
-            {alias}
-          </Heading>
-
-          {note.headline || note.description ? (
-            <Paragraph
-              numberOfLines={2}
-              style={{
-                width: '90%',
-                textAlign: 'center',
-                maxWidth: '90%'
-              }}>
-              {note.type === 'notebook' && note.description
-                ? note.description
-                : null}
-              {note.type === 'note' && note.headline
-                ? note.headline[item.headline.length - 1] === '\n'
-                  ? note.headline.slice(0, note.headline.length - 1)
-                  : note.headline
-                : null}
-            </Paragraph>
-          ) : null}
-
-          <Paragraph
-            color={colors.icon}
-            size={SIZE.xs}
-            style={{
-              textAlignVertical: 'center',
-              marginTop: 2.5
-            }}>
-            {note.type === 'note' || (note.type === 'tag' && note.dateEdited)
-              ? 'Last edited on ' + timeConverter(note.dateEdited)
-              : null}
-            {note.type !== 'note' &&
-            note.type !== 'tag' &&
-            note.dateCreated &&
-            !note.dateDeleted
-              ? ' Created on ' + timeConverter(note.dateCreated)
-              : null}
-            {note.dateDeleted
-              ? 'Deleted on ' + timeConverter(note.dateDeleted)
-              : null}
-          </Paragraph>
-
-          {hasTags && note ? (
-            <ActionSheetTagsSection
-              close={close}
-              item={note}
-              localRefresh={localRefresh}
-            />
-          ) : null}
-
           <View
             style={{
-              flexDirection: 'row',
-              marginTop: 5,
-              width: '90%',
-              maxWidth: '90%',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
+              paddingHorizontal: 12
             }}>
-            {note.type === 'notebook' &&
-            note &&
-            note.topics &&
-            note.topics.length > 0
-              ? note.topics
-                  .sort((a, b) => a.dateEdited - b.dateEdited)
-                  .slice(0, 6)
-                  .map(topic => (
-                    <Button
-                      key={topic.id}
-                      title={topic.title}
-                      type="gray"
-                      height={30}
-                      onPress={() => {
-                        close();
-                        let routeName = 'NotesPage';
-                        let params = {...topic, menu: false, get: 'topics'};
-                        let headerState = {
-                          heading: topic.title,
-                          id: topic.id,
-                          type: topic.type
-                        };
-                        eSendEvent(refreshNotesPage, params);
-                        Navigation.navigate(routeName, params, headerState);
-                      }}
-                      icon="bookmark-outline"
-                      fontSize={SIZE.sm - 1}
-                      style={{
-                        marginRight: 5,
-                        paddingHorizontal: 0,
-                        paddingHorizontal: 6,
-                        marginTop: 5
-                      }}
-                    />
-                  ))
-              : null}
+            <Heading size={SIZE.lg}>
+              {note.type === 'tag' ? '#' : null}
+              {alias}
+            </Heading>
 
-            {note.type === 'note' && isPublished ? (
-              <Button
-                title="Published"
-                type="shade"
-                height={30}
-                fontSize={SIZE.sm - 1}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
+            {note.headline || note.description ? (
+              <Paragraph numberOfLines={2} color={colors.icon}>
+                {(note.type === 'notebook' || note.itemType === 'notebook') &&
+                note.description
+                  ? note.description
+                  : null}
+                {(note.type === 'note' || note.itemType === 'note') &&
+                note.headline
+                  ? note.headline[item.headline.length - 1] === '\n'
+                    ? note.headline.slice(0, note.headline.length - 1)
+                    : note.headline
+                  : null}
+              </Paragraph>
             ) : null}
 
-            {note.type === 'note' ? (
-              <Button
-                onPress={async () => {
-                  close();
-                  await sleep(300);
-                  eSendEvent(eOpenTagsDialog, note);
-                }}
-                title="Add tags"
-                type="accent"
-                icon="plus"
-                iconPosition="right"
-                height={30}
-                fontSize={SIZE.sm}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
+            {hasTags && note && note.type === 'note' ? (
+              <Tags close={close} item={note} localRefresh={localRefresh} />
             ) : null}
+
+            <Topics item={note} close={close} />
           </View>
+
+          <DateMeta item={note} />
         </View>
       )}
-      {hasColors && note.id ? (
-        <ActionSheetColorsSection close={close} item={note} />
-      ) : null}
+
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderColor: colors.nav
+        }}
+      />
+
+      {hasColors && note.id ? <ColorTags close={close} item={note} /> : null}
+
       {note.id || note.dateCreated ? (
-        <FlatList
-          data={rowItemsData.filter(
-            i => rowItems.indexOf(i.name) > -1 && !i.hidden
+        <>
+          {note.type === 'note' ? (
+            <FlatList
+              data={rowItemsData.filter(
+                i => rowItems.indexOf(i.name) > -1 && !i.hidden
+              )}
+              keyExtractor={item => item.title}
+              numColumns={rowItems.length < 5 ? rowItems.length : 5}
+              style={{
+                marginTop: note.type !== 'note' ? 10 : 0,
+                paddingTop: 10,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.nav
+              }}
+              columnWrapperStyle={{
+                justifyContent: 'flex-start'
+              }}
+              contentContainerStyle={{
+                alignSelf: 'center',
+                width: rowItems.length < 5 ? '100%' : null,
+                paddingLeft: rowItems.length < 5 ? 10 : 0
+              }}
+              renderItem={({item, index}) => _renderRowItem(item)}
+            />
+          ) : (
+            <FlatList
+              data={rowItemsData.filter(
+                i => rowItems.indexOf(i.name) > -1 && !i.hidden
+              )}
+              style={{
+                borderBottomWidth: 1,
+                borderBottomColor: colors.nav
+              }}
+              keyExtractor={item => item.title}
+              renderItem={renderColumnItem}
+            />
           )}
-          keyExtractor={item => item.title}
-          numColumns={rowItems.length < 5 ? rowItems.length : 5}
-          style={{
-            marginTop: note.type !== 'note' ? 10 : 0,
-            borderTopWidth: 1,
-            borderColor: colors.nav,
-            paddingTop: 20
-          }}
-          columnWrapperStyle={{
-            justifyContent: rowItems.length < 5 ? 'space-around' : 'flex-start'
-          }}
-          contentContainerStyle={{
-            alignSelf: 'center',
-            width: rowItems.length < 5 ? '100%' : null
-          }}
-          renderItem={({item, index}) => _renderRowItem(item)}
-        />
+        </>
       ) : null}
+
       {user && lastSynced >= note.dateModified ? (
         <View
           style={{
@@ -947,8 +881,7 @@ export const ActionSheetComponent = ({
             justifyContent: 'flex-start',
             alignSelf: 'center',
             paddingTop: 5,
-            borderTopWidth: 1,
-            borderTopColor: colors.nav
+            marginTop: 10
           }}>
           <Icon
             name="shield-key-outline"
@@ -976,7 +909,7 @@ export const ActionSheetComponent = ({
               }}
               size={SIZE.xs}
               color={colors.pri}>
-              No one can read this note except you.
+              No one can view this {item.itemType || item.type} except you.
             </Paragraph>
           </View>
 
@@ -998,6 +931,7 @@ export const ActionSheetComponent = ({
           />
         </View>
       ) : null}
+
       {settings.devMode ? (
         <View
           style={{

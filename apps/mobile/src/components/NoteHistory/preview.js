@@ -4,7 +4,7 @@ import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
 import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {dHeight} from '../../utils';
+import {dHeight, itemSkus} from '../../utils';
 import {db} from '../../utils/database';
 import {eCloseProgressDialog} from '../../utils/Events';
 import {normalize} from '../../utils/SizeUtils';
@@ -81,7 +81,7 @@ export default function NotePreview({session, content}) {
         height: 600,
         width: '100%'
       }}>
-      <DialogHeader padding={12} title={timeConverter(session.dateEdited)} />
+      <DialogHeader padding={12} title={session.session} />
       <WebView
         ref={webviewRef}
         onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
@@ -112,7 +112,7 @@ export default function NotePreview({session, content}) {
         style={{
           paddingHorizontal: 12
         }}>
-        <Button onPress={restore} title="Restore" type="accent" width="100%" />
+        <Button onPress={restore} title="Restore this version" type="accent" width="100%" />
       </View>
     </View>
   );

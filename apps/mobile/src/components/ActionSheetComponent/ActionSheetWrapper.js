@@ -1,12 +1,13 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import {Platform, View} from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { Toast } from '../Toast';
-import { BouncingView } from './BouncingView';
-import { GetPremium } from './GetPremium';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {COLOR_SCHEME_DARK} from '../../utils/Colors';
+import {Toast} from '../Toast';
+import {BouncingView} from './BouncingView';
+import {GetPremium} from './GetPremium';
 
 const ActionSheetWrapper = ({
   children,
@@ -68,6 +69,7 @@ const ActionSheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
+      overlayColor={'#585858'}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>

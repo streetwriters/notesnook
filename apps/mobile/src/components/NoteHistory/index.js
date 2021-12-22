@@ -5,7 +5,8 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {presentSheet} from '../../services/EventManager';
 import {db} from '../../utils/database';
-import {timeConverter} from '../../utils/TimeUtils';
+import {SIZE} from '../../utils/SizeUtils';
+import {timeConverter, timeSince} from '../../utils/TimeUtils';
 import DialogHeader from '../Dialog/dialog-header';
 import GeneralSheet from '../GeneralSheet';
 import {PressableButton} from '../PressableButton';
@@ -21,10 +22,7 @@ export default function NoteHistory({note, ref}) {
 
   useEffect(() => {
     (async () => {
-      console.log(note.id);
-      console.log(await db.noteHistory.get(note.id));
-
-      setHistory([...(await db.noteHistory.get(note.id))].reverse());
+      setHistory([...(await db.noteHistory.get(note.id))]);
       setLoading(false);
     })();
   }, []);
@@ -33,12 +31,32 @@ export default function NoteHistory({note, ref}) {
     let content = await db.noteHistory.content(item.sessionContentId);
 
     presentSheet({
-      component: <NotePreview session={item} content={content} />,
+      component: (
+        <NotePreview
+          session={{
+            ...item,
+            session: getDate(item.dateCreated, item.dateModified)
+          }}
+          content={content}
+        />
+      ),
       context: 'note_history',
       noProgress: true,
       noIcon: true
     });
   }
+
+  const getDate = (start, end) => {
+    let _start = timeConverter(start);
+    let _end = timeConverter(end + 60000);
+    if (_start === _end) return _start;
+    let final = _end.lastIndexOf(',');
+    let part = _end.slice(0, final + 1);
+    if (_start.includes(part)) {
+      return _start + ' —' + _end.replace(part, '');
+    }
+    return _start + ' — ' + _end;
+  };
 
   const renderItem = useCallback(
     ({item, index}) => (
@@ -46,13 +64,17 @@ export default function NoteHistory({note, ref}) {
         type="grayBg"
         onPress={() => preview(item)}
         customStyle={{
-          justifyContent: 'center',
-          alignItems: 'flex-start',
+          justifyContent: 'space-between',
+          alignItems: 'center',
           paddingHorizontal: 12,
           height: 45,
-          marginBottom: 10
+          marginBottom: 10,
+          flexDirection: 'row'
         }}>
-        <Paragraph>{timeConverter(item.dateEdited)}</Paragraph>
+        <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
+        <Paragraph color={colors.icon} size={SIZE.xs}>
+          {timeSince(item.dateModified)}
+        </Paragraph>
       </PressableButton>
     ),
     []
@@ -92,6 +114,13 @@ export default function NoteHistory({note, ref}) {
         }
         renderItem={renderItem}
       />
+      <Paragraph
+        size={SIZE.xs}
+        style={{
+          alignSelf: 'center'
+        }}>
+        Note version history is local only.
+      </Paragraph>
     </View>
   );
 }

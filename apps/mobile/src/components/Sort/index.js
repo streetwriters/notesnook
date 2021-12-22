@@ -42,8 +42,6 @@ const Sort = ({type, screen}) => {
         width: '100%',
         backgroundColor: colors.bg,
         justifyContent: 'space-between',
-        borderRadius: 10,
-        paddingTop: 10
       }}>
       <View
         style={{
