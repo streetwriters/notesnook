@@ -119,6 +119,7 @@ export default class Vault {
 
     await this._check();
     await this._lockNote({ id: noteId }, this._password);
+    await this._db.noteHistory.clearSessions(noteId);
   }
 
   /**
