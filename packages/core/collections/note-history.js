@@ -24,7 +24,7 @@ export default class NoteHistory extends Collection {
   }
 
   async init() {
-    super.init();
+    await super.init();
 
     /**
      * @type {SessionContent}
