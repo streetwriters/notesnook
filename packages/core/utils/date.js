@@ -11,9 +11,18 @@ export function getWeekGroupFromTimestamp(timestamp) {
   )}`;
 }
 
-export function formatDate(date) {
-  return new Date(date).toLocaleString(undefined, {
+/**
+ *
+ * @param {number} date
+ * @param {Intl.DateTimeFormatOptions} options
+ * @returns
+ */
+export function formatDate(
+  date,
+  options = {
     dateStyle: "medium",
     timeStyle: "short",
-  });
+  }
+) {
+  return new Date(date).toLocaleString(undefined, options);
 }
