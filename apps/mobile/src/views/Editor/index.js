@@ -9,7 +9,7 @@ import {
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
-import { eOnLoadNote } from '../../utils/Events';
+import {eOnLoadNote} from '../../utils/Events';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
@@ -71,14 +71,18 @@ const Editor = React.memo(
       };
     }, []);
 
+    const androidStyle = Platform.OS == 'android' ? {flexGrow: 1, flex: 1} : {};
+
     return resetting ? null : (
       <>
         <CustomView
-          style={{
-            height: '100%',
-            width: '100%',
-            paddingBottom: Platform.OS === 'android' ? normalize(50) + 5 : null
-          }}
+          style={[
+            {
+              width: '100%',
+              backgroundColor: 'transparent'
+            },
+            androidStyle
+          ]}
           bounces={false}
           bouncesZoom={false}
           disableScrollViewPanResponder
@@ -126,13 +130,14 @@ const Editor = React.memo(
             bounces={false}
             allowFileAccess={true}
             scalesPageToFit={true}
-            renderLoading={() => <View/>}
+            renderLoading={() => <View />}
             startInLoadingState
             allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={source}
+            //source={{uri:"http://192.168.10.4:3000/index.html"}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
@@ -148,5 +153,3 @@ const Editor = React.memo(
 export default Editor;
 
 // test uri "http://192.168.10.8:3000/index.html"
-
-

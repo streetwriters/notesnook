@@ -1,4 +1,19 @@
+import { Platform } from 'react-native';
+import { useEditorStore } from '../../../../provider/stores';
+import { EditorWebView, textInput } from '../../Functions';
+import tiny from '../tiny';
 import picker from './picker';
+
+export const endSearch = () => {
+  tiny.call(
+    EditorWebView,
+    `tinymce.activeEditor.plugins.searchreplace.done()`
+  );
+  useEditorStore.getState().setSearchReplace(false);
+  textInput.current?.focus();
+  Platform.OS === 'android' && EditorWebView.current?.requestFocus();
+  tiny.call(EditorWebView, tiny.focusEditor);
+}
 
 export const execCommands = {
   bold: `tinymce.activeEditor.execCommand('Bold');`,

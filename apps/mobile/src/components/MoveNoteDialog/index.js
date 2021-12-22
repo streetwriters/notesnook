@@ -465,7 +465,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                           title="Remove"
                           type="error"
                           height={25}
-                          fontSize={SIZE.xs + 1}
+                          fontSize={SIZE.xs}
                           style={{
                             margin: 1,
                             marginRight: 5,

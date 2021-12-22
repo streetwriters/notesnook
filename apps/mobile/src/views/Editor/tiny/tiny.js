@@ -8,7 +8,7 @@ document.getElementById("titleInput").value = '';
 autosize();
 window.prevContent = "";
 globalThis.isClearingNoteData = true;
-tinymce.activeEditor.setContent('');
+tinymce.activeEditor.setHTML('');
 tinymce.activeEditor.undoManager.clear();
 info = document.querySelector(infoBar);
 info.querySelector('#infosaved').innerText = "";
@@ -90,7 +90,7 @@ const updateSavingState = value => `
 
 export const clearEditor = `
 
-tinymce.activeEditor.setContent("");
+tinymce.activeEditor.setHTML("");
 `;
 const clearTitle = `
     document.getElementById(titleInput).value = '';

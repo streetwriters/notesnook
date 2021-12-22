@@ -14,7 +14,7 @@ import {Menu} from '../components/Menu';
 import {Toast} from '../components/Toast';
 import {NavigatorStack} from './NavigatorStack';
 import {useTracked} from '../provider';
-import {useSettingStore} from '../provider/stores';
+import {useEditorStore, useSettingStore} from '../provider/stores';
 import {DDS} from '../services/DeviceDetection';
 import {
   eSendEvent,
@@ -61,6 +61,7 @@ const onChangeTab = async obj => {
       updateStatusBarColor();
       deactivateKeepAwake();
       eSendEvent(eClearEditor, 'removeHandler');
+      setTimeout(() => useEditorStore.getState().setSearchReplace(false),1);
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
@@ -214,7 +215,6 @@ const NativeStack = React.memo(
         });
       }
       if (!needsUpdate) {
-        console.log('reposition not needed');
         return;
       }
       setTimeout(() => {

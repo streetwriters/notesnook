@@ -62,6 +62,8 @@ export const IMAGE_TOOLTIP_CONFIG = {
 };
 
 export const TOOLBAR_CONFIG = [
+
+  'seperator',
   [
     {
       format: 'bold',
@@ -122,6 +124,7 @@ export const TOOLBAR_CONFIG = [
       ]
     }
   ],
+  'seperator',
   [
     {
       format: 'fontsize',
@@ -210,6 +213,8 @@ export const TOOLBAR_CONFIG = [
       ]
     }
   ],
+
+  'seperator',
   [
     {
       format: 'ol',
@@ -243,6 +248,8 @@ export const TOOLBAR_CONFIG = [
       premium: true
     }
   ],
+
+  'seperator',
   [
     {
       format: 'dhilitecolor',
@@ -282,6 +289,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
 
+  'seperator',
   [
     {
       format: 'blockquote',
@@ -313,6 +321,8 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Inline Code'
     }
   ],
+
+  'seperator',
   [
     {
       format: 'outdent',
@@ -336,6 +346,8 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Subscript'
     }
   ],
+
+  'seperator',
   [
     {
       format: 'table',
@@ -385,6 +397,8 @@ export const TOOLBAR_CONFIG = [
       premium: true
     }
   ],
+
+  'seperator',
   [
     /*  {
       format: 'filepicker',
@@ -407,6 +421,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
 
+  'seperator',
   [
     {
       format: 'ltr',
@@ -419,6 +434,7 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Text Direction RTL'
     }
   ],
+  'seperator',
   [
     {
       format: 'horizontal',
@@ -431,11 +447,11 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Remove Formatting'
     },
-    {
-      format: 'magnify',
-      type: 'format',
-      fullname: 'Search & Replace'
-    },
+    // {
+    //   format: 'magnify',
+    //   type: 'format',
+    //   fullname: 'Search & Replace'
+    // },
     {
       format: 'settings',
       type: 'settings',

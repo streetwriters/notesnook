@@ -93,7 +93,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                     fontFamily: null
                   }}
                   type="grayBg"
-                  fontSize={SIZE.xs + 1}
+                  fontSize={SIZE.xs}
                   icon="bookmark-outline"
                   textStyle={{
                     marginRight: 0
@@ -125,7 +125,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             }}>
             <Paragraph
               color={colors.accent}
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               style={{
                 marginRight: 6
               }}>
@@ -136,7 +136,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
               <>
                 <Paragraph
                   color={colors.icon}
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   style={{
                     textAlignVertical: 'center',
                     marginRight: 6
@@ -146,7 +146,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
                 </Paragraph>
                 <Paragraph
                   color={colors.accent}
-                  size={SIZE.xs + 1}
+                  size={SIZE.xs}
                   style={{
                     textAlignVertical: 'center',
                     marginRight: 6
@@ -157,7 +157,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             ) : (
               <Paragraph
                 color={colors.icon}
-                size={SIZE.xs + 1}
+                size={SIZE.xs}
                 style={{
                   marginRight: 6
                 }}>
@@ -166,7 +166,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             )}
             <Paragraph
               color={colors.icon}
-              size={SIZE.xs + 1}
+              size={SIZE.xs}
               style={{
                 marginRight: 6
               }}>
@@ -180,7 +180,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             {item.pinned ? (
               <Icon
                 style={{marginRight: 6}}
-                name="pin"
+                name="pin-outline"
                 size={SIZE.sm}
                 style={{
                   marginRight: 10,

@@ -234,5 +234,7 @@ export const TOOLBAR_ICONS = {
   imagefloatnone: 'format-float-none',
   'line-break': 'keyboard-return',
   code: 'code-tags',
-  filepicker:'attachment'
+  filepicker:'attachment',
+  undo:'undo-variant',
+  redo:'redo-variant'
 };

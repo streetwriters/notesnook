@@ -15,9 +15,11 @@ import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
 import {
+  useEditorStore,
   useMenuStore,
   useSelectionStore,
   useSettingStore,
+  useTagStore,
   useUserStore
 } from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
@@ -506,6 +508,7 @@ export const ActionSheetComponent = ({
           positivePress: async value => {
             if (!value || value === '' || value.trimStart().length == 0) return;
             await db.tags.rename(note.id, db.tags.sanitize(value));
+            useTagStore.getState().setTags();
             Navigation.setRoutesToUpdate([
               Navigation.routeNames.Notes,
               Navigation.routeNames.NotesPage,
@@ -600,6 +603,7 @@ export const ActionSheetComponent = ({
             paragraph: 'This tag will be removed from all notes.',
             positivePress: async value => {
               await db.tags.remove(note.id);
+              useTagStore.getState().setTags();
               Navigation.setRoutesToUpdate([
                 Navigation.routeNames.Notes,
                 Navigation.routeNames.NotesPage,
@@ -710,7 +714,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph size={SIZE.xs + 2} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.xs + 1} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
@@ -749,7 +753,6 @@ export const ActionSheetComponent = ({
           Keyboard.dismiss();
         }}
       />
-
       {!note || !note.id ? (
         <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
@@ -907,11 +910,9 @@ export const ActionSheetComponent = ({
           </View>
         </View>
       )}
-
       {hasColors && note.id ? (
         <ActionSheetColorsSection close={close} item={note} />
       ) : null}
-
       {note.id || note.dateCreated ? (
         <FlatList
           data={rowItemsData.filter(
@@ -935,24 +936,24 @@ export const ActionSheetComponent = ({
           renderItem={({item, index}) => _renderRowItem(item)}
         />
       ) : null}
-
-      {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
+      {user && lastSynced >= note.dateModified ? (
         <View
           style={{
-            paddingVertical: 10,
-            width: '95%',
-            alignItems: 'flex-start',
+            paddingVertical: 0,
+            width: '100%',
             paddingHorizontal: 12,
+            alignItems: 'center',
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignSelf: 'center',
-            backgroundColor: colors.nav,
-            borderRadius: 5
+            paddingTop: 5,
+            borderTopWidth: 1,
+            borderTopColor: colors.nav
           }}>
           <Icon
             name="shield-key-outline"
             color={colors.accent}
-            size={SIZE.sm + SIZE.xs + 2}
+            size={SIZE.xxxl}
           />
 
           <View
@@ -962,9 +963,9 @@ export const ActionSheetComponent = ({
               flexShrink: 1
             }}>
             <Heading
-              color={colors.accent}
+              color={colors.heading}
+              size={SIZE.xs}
               style={{
-                fontSize: SIZE.sm,
                 flexWrap: 'wrap'
               }}>
               Encrypted and synced
@@ -990,14 +991,13 @@ export const ActionSheetComponent = ({
                 );
               } catch (e) {}
             }}
-            fontSize={SIZE.sm}
+            fontSize={SIZE.xs + 1}
             title="Learn more"
             height={30}
-            type="accent"
+            type="transparent"
           />
         </View>
       ) : null}
-
       {settings.devMode ? (
         <View
           style={{
@@ -1039,7 +1039,6 @@ export const ActionSheetComponent = ({
           />
         </View>
       ) : null}
-
       {DDS.isTab ? (
         <View
           style={{

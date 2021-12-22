@@ -156,7 +156,7 @@ const GeneralSheet = ({context}) => {
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
-              type="accent"
+              type={item.type || "accent"}
               height={50}
               style={{
                 marginBottom: 10

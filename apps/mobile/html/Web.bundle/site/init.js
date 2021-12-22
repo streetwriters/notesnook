@@ -149,21 +149,21 @@ function init_callback(_editor) {
     reactNativeEventHandler('focus', 'editor');
   });
 
-  editor.on('SetContent', function (event) {
-    if (globalThis.isClearingNoteData) {
-      globalThis.isClearingNoteData = false;
-      return;
-    }
-    setTimeout(function () {
-      editor.undoManager.transact(function () {});
-    }, 1000);
-    if (!event.paste) {
-      reactNativeEventHandler('noteLoaded', true);
-    }
-  });
+  // editor.on('SetContent', function (event) {
+  //   if (globalThis.isClearingNoteData) {
+  //     globalThis.isClearingNoteData = false;
+  //     return;
+  //   }
+  //   setTimeout(function () {
+  //     editor.undoManager.transact(function () {});
+  //   }, 1000);
+  //   if (!event.paste) {
+  //     reactNativeEventHandler('noteLoaded', true);
+  //   }
+  // });
 
   editor.on('NewBlock', function (e) {
-    console.log('New Block');
+    console.log('New Block', e);
     const {newBlock} = e;
     let target;
     if (newBlock) {
@@ -208,17 +208,23 @@ function init_callback(_editor) {
       e.preventDefault();
     }
   });
+
   editor.on('ScrollIntoView', function (e) {
     e.preventDefault();
+    console.log(e);
     e.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest'
     });
   });
-  editor.on('input', onChange);
-  editor.on('keyup', onChange);
-  editor.on('NodeChange', onChange);
-  editor.on('compositionend', onChange);
+
+  editor.on('input ExecCommand ObjectResized Redo Undo', onChange);
+  editor.on('keyup', e => {
+    console.log('keyup: ', e);
+    if (e.key !== 'Backspace') return;
+    if (!editor.getHTML) return;
+    onChange();
+  });
 }
 
 const plugins = [
@@ -315,6 +321,16 @@ h5,
 h6,
 strong {
   font-weight:600 !important;
+}
+
+td > *,
+th > * {
+    margin: 0 !important;
+}
+
+td > * + *,
+th > * + * {
+    margin-top: .75em !important;
 }
 `;
 
@@ -491,14 +507,42 @@ function delay(base = 0) {
   if (prevCount > 70000) return base + 1000;
 }
 
+let inputKeyTimer = 0;
+function scrollSelectionIntoView(event) {
+  if (navigator.vendor.match(/apple/i)) return;
+  if (
+    event.type === 'input' &&
+    event.inputType !== 'deleteContentBackward' &&
+    event.data &&
+    event.data.endsWith('\n')
+  ) {
+    console.log(event);
+    clearTimeout(inputKeyTimer);
+    inputKeyTimer = setTimeout(function() {
+      let node = editor.selection.getNode();
+      if (node) {
+        console.log(node, 'scrolling into view');
+        node.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+      }
+    }, 1);
+  }
+}
+
 let noteedited = false;
 const onChange = function (event) {
-  console.log(event.type, event.selectionChange);
-  if (event.type === 'nodechange' && !event.selectionChange) return;
+  if (event.type && event.type.toLowerCase() === 'execcommand') {
+    if (
+      event.command.toLowerCase() === 'mcefocus' ||
+      event.command.toLowerCase() === 'mcerepaint'
+    ) {
+      return;
+    }
+  }
+
+  scrollSelectionIntoView(event);
 
   if (isLoading) {
     isLoading = false;
-    return;
   }
 
   if (prevCount === 0) {
@@ -506,7 +550,8 @@ const onChange = function (event) {
   }
 
   if (prevCount === 0 && event.type !== 'paste') return;
-  if (event.type !== 'nodechange' && event.type !== 'compositionend') {
+  console.log(event);
+  if (event.type !== 'compositionend') {
     if (!noteedited) {
       noteedited = true;
       reactNativeEventHandler('noteedited');
@@ -573,19 +618,20 @@ function selectchange() {
     let node = editor.selection.getNode();
     currentFormats.hilitecolor = getNodeBg(node);
     currentFormats.forecolor = getNodeColor(node);
-
     if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
-      for (var i = 0; i < node.children.length; i++) {
-        let item = editor.selection.getNode().children.item(i);
-        currentFormats.hilitecolor = getNodeBg(item);
-        currentFormats.forecolor = getNodeColor(item);
+      if (!/^(LI|UL|OL|DL|P|DIV)$/.test(node.nodeName)) {
+        for (var i = 0; i < node.children.length; i++) {
+          let item = editor.selection.getNode().children.item(i);
+          currentFormats.hilitecolor = getNodeBg(item);
+          currentFormats.forecolor = getNodeColor(item);
+        }
       }
     }
     let range = editor.selection.getRng();
 
     currentFormats.current = {
       index: range.startOffset,
-      length: range.endOffset - range.startOffset
+      length: range.endOffset - range.startOffset,
     };
 
     currentFormats.fontsize = editor.selection.getNode().style.fontSize;

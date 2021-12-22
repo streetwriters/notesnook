@@ -123,7 +123,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                 height={20}
                 icon="book-outline"
                 type="grayBg"
-                fontSize={SIZE.xs + 1}
+                fontSize={SIZE.xs}
                 iconSize={SIZE.sm}
                 textStyle={{
                   marginRight: 0
@@ -184,7 +184,7 @@ const NoteItem = ({item, isTrash, tags}) => {
               ) : null}
               <TimeSince
                 style={{
-                  fontSize: SIZE.xs + 1,
+                  fontSize: SIZE.xs,
                   color: colors.icon,
                   marginRight: 6
                 }}
@@ -202,7 +202,7 @@ const NoteItem = ({item, isTrash, tags}) => {
                     marginRight: 6
                   }}>
                   <Icon name="attachment" size={SIZE.md} color={colors.icon} />
-                  <Paragraph color={colors.icon} size={SIZE.xs + 1}>
+                  <Paragraph color={colors.icon} size={SIZE.xs}>
                     10
                   </Paragraph>
                 </View>
@@ -210,7 +210,7 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.pinned ? (
                 <Icon
-                  name="pin"
+                  name="pin-outline"
                   size={SIZE.sm}
                   style={{
                     marginRight: 6
@@ -249,16 +249,16 @@ const NoteItem = ({item, isTrash, tags}) => {
                       <Button
                         title={'#' + item.alias}
                         key={item.id}
-                        height={20}
+                        height={23}
                         type="gray"
                         textStyle={{
                           textDecorationLine: 'underline'
                         }}
                         hitSlop={{top: 8, bottom: 12, left: 0, right: 0}}
-                        fontSize={SIZE.xs + 1}
+                        fontSize={SIZE.xs}
                         style={{
                           borderRadius: 5,
-                          paddingHorizontal: 2,
+                          paddingHorizontal: 6,
                           marginRight: 4,
                           zIndex: 10,
                           maxWidth: tags.length > 1 ? 130 : null

@@ -45,11 +45,11 @@ export interface TrashStore extends State {
 
 
 export interface UserStore extends State {
-    user: object,
+    user: Object| null,
     premium: boolean,
     lastSynced: string,
     syncing: boolean,
-    setUser: (user: object) => void,
+    setUser: (user: Object | null) => void,
     setPremium: (premium: boolean) => void,
     setSyncing: (syncing: boolean) => void,
     setLastSynced: (lastSynced: string) => void,
@@ -113,9 +113,11 @@ export interface MenuStore extends State {
 
 export interface EditorStore extends State {
     currentEditingNote: string | null,
-    setCurrentlyEditingNote: (note: string) => void,
-    sessionId:string,
-    setSessionId:(sessionId:string) => void
+    setCurrentlyEditingNote: (note: string | null) => void,
+    sessionId:string | null,
+    setSessionId:(sessionId:string | null) => void,
+    searchReplace:boolean,
+    setSearchReplace:(searchReplace:boolean) => void
 }
 
 
@@ -129,9 +131,9 @@ export interface SearchStore extends State {
 
 
 export interface SelectionStore extends State {
-    selectedItemsList: object[],
+    selectedItemsList: Array<Object>,
     selectionMode: boolean,
-    setAll: (all: object[]) => void,
+    setAll: (all: Array<Object>,) => void,
     setSelectionMode: (mode: boolean) => void,
     setSelectedItem: (item: Item) => void,
     clearSelection: () => void,
@@ -176,7 +178,8 @@ export type Announcement = {
     timestamp: number
     platforms: string[]
     isActive: boolean
-    userTypes: string[]
+    userTypes: string[],
+    appVersion:number
 }
 
 export interface MessageStore extends State {

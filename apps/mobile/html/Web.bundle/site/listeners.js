@@ -64,7 +64,7 @@ function attachTitleInputListeners() {
 let titleTimeout = 0;
 function onTitleChange() {
   clearTimeout(titleTimeout);
-  titleTimeout = setTimeout(() => {
+  titleTimeout = setTimeout(function() {
     if (isLoading) {
       return;
     }
@@ -150,14 +150,19 @@ function attachMessageListener() {
 
     switch (type) {
       case 'inject':
-        tinymce.activeEditor.setContent(value);
+        tinymce.activeEditor.setHTML(value);
         break;
       case 'html':
         isLoading = true;
         globalThis.isClearingNoteData = false;
         tinymce.activeEditor.mode.set('readonly');
         if (!isInvalidValue(value)) {
-          tinymce.activeEditor.setContent(value);
+          tinymce.activeEditor.setHTML(value);
+          reactNativeEventHandler('noteLoaded', true);
+          globalThis.isClearingNoteData = false;
+          setTimeout(function () {
+            tinymce.activeEditor.undoManager.transact(function () {});
+          }, 1000);
         } else {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);

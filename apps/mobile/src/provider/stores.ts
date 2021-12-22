@@ -20,6 +20,7 @@ import {
   UserStore,
   Announcement
 } from './interfaces';
+//@ts-ignore
 import {groupArray} from 'notes-core/utils/grouping';
 import {EditorWebView, post} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
@@ -163,10 +164,10 @@ interface AttachmentStore {
       hash: string;
       recieved: number;
       type: 'upload' | 'download';
-    };
-  };
+    } | null
+  }
   encryptionProgress: number;
-  setEncryptionProgress: (encryptionProgress) => void;
+  setEncryptionProgress: (encryptionProgress:number) => void;
   remove: (hash: string) => void;
   setProgress: (
     sent: number,
@@ -183,6 +184,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
   remove: hash => {
     let _p = get().progress;
+    if (!_p) return;
     _p[hash] = null;
     tiny.call(
       EditorWebView,
@@ -200,6 +202,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   },
   setProgress: (sent, total, hash, recieved, type) => {
     let _p = get().progress;
+    if (!_p) return;
     _p[hash] = {sent, total, hash, recieved, type};
     let progress = {total, hash, loaded: type === 'download' ? recieved : sent};
     tiny.call(
@@ -212,7 +215,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     );
     set({progress: {..._p}});
   },
-  encryptionProgress: null,
+  encryptionProgress: 0,
   setEncryptionProgress: encryptionProgress =>
     set({encryptionProgress: encryptionProgress}),
   loading: {total: 0, current: 0},
@@ -281,7 +284,9 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   setSessionId:(sessionId) => {
     console.log(sessionId,'session id');
     set({sessionId});
-  }
+  },
+  searchReplace:false,
+  setSearchReplace:(searchReplace) => set({searchReplace})
 }));
 
 export const useSearchStore = create<SearchStore>((set, get) => ({
@@ -296,6 +301,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectedItemsList: [],
   selectionMode: false,
   setAll: all => {
+    //@ts-ignore
     history.selectedItemsList = all;
     set({selectedItemsList: all});
   },
@@ -318,6 +324,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       selectedItems.push(item);
     }
     selectedItems = [...new Set(selectedItems)];
+    //@ts-ignore
     history.selectedItemsList = selectedItems;
 
     history.selectionMode =
@@ -416,7 +423,7 @@ export function clearAllStores() {
 
 export const allowedPlatforms = ['all', 'mobile', Platform.OS];
 
-async function shouldShowAnnouncement(announcement) {
+async function shouldShowAnnouncement(announcement:Announcement) {
   if (!announcement) return false;
   let removed = (await MMKV.getStringAsync(announcement.id)) === 'removed';
   if (removed) return false;
@@ -447,7 +454,7 @@ async function shouldShowAnnouncement(announcement) {
       case 'unverified':
         return !PremiumService.getUser()?.isEmailVerified;
       case 'proExpired':
-        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED;
       case 'any':
       default:
         return true;
