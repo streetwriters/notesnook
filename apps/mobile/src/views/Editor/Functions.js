@@ -310,17 +310,11 @@ export const loadNote = async item => {
     }
     requestedReload = true;
     updateSessionStatus();
-
-    if (!(await checkStatus(true))) {
-      console.log('reload editor');
-      EditorWebView.current?.reload();
-    }
-
     tiny.call(EditorWebView, tiny.notLoading);
-    checkStatus();
+    await checkStatus(false);
   } else {
     if (id === item.id && !item.forced) {
-      console.log('returning from here');
+      console.log('note is already opened in editor');
       closingSession = false;
       eSendEvent('loadingNote');
       return;
@@ -350,10 +344,8 @@ export const loadNote = async item => {
     useEditorStore.getState().setSessionId(sessionId);
     setTimeout(async () => {
       requestedReload = true;
-      if (await checkStatus(true)) {
+      if (await checkStatus(false)) {
         updateSessionStatus();
-      } else {
-        EditorWebView.current?.reload();
       }
     }, 50);
     useEditorStore.getState().setCurrentlyEditingNote(item.id);
@@ -365,6 +357,7 @@ export const loadNote = async item => {
 const checkStatus = async noreset => {
   return new Promise(resolve => {
     webviewOK = false;
+    console.log('checking status of webview');
     clearTimeout(webviewTimer);
     webviewTimer = null;
     const onWebviewOk = () => {
@@ -372,6 +365,7 @@ const checkStatus = async noreset => {
       webviewInit = true;
       clearTimeout(webviewTimer);
       webviewTimer = null;
+      console.log('webviewOk:',webviewOK);
       resolve(true);
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
@@ -384,11 +378,13 @@ const checkStatus = async noreset => {
     );
 
     webviewTimer = setTimeout(() => {
+      console.log('webviewOK:', webviewOK, 'Reset blocked:', noreset);
       if (!webviewOK && !noreset) {
         webviewInit = false;
+        console.log('full reset');
         EditorWebView = createRef();
         eSendEvent('webviewreset');
-        resolve(false);
+        resolve(true);
       }
     }, 1000);
   });
@@ -802,9 +798,9 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id && !preventUpdate) {
-        if (!title || title === '') {
-          post('title', db.notes.note(noteId)?.data?.title || '');
-        }
+        // if (!title || title === '') {
+        //   post('title', db.notes.note(noteId)?.data?.title || '');
+        // }
 
         useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await setNoteInEditorAfterSaving(id, noteId);
@@ -831,30 +827,6 @@ export async function saveNote(preventUpdate) {
   } catch (e) {}
   isSaving = false;
 }
-
-// async function updateSessionHistory(id, content) {
-//   let note = db.notes.note(id)?.data;
-//   if (!note) return;
-//   if (!historySessionId) {
-//     historySessionId = `${id}_${note.dateEdited}`;
-//   }
-
-//   if (!historySessionId.includes(id)) {
-//     historySessionId = null;
-//     return;
-//   }
-//   if (!note.locked) {
-//     console.log('saving session with id: ',historySessionId);
-//     await db.noteHistory.add(id, historySessionId, content);
-//   } else {
-//     let content = await db.content.get(note.contentId);
-
-//     await db.noteHistory.add(id, historySessionId, {
-//       data: content.data,
-//       type: content.type
-//     });
-//   }
-// }
 
 export async function onWebViewLoad(premium, colors) {
   setTimeout(() => {

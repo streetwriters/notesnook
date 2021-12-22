@@ -57,7 +57,8 @@ const Editor = React.memo(
       setResetting(true);
       await sleep(30);
       setResetting(false);
-      eSendEvent(eOnLoadNote, getNote() ? getNote() : {type: 'new'});
+      eSendEvent(eOnLoadNote, getNote() ? {...getNote(),forced:true} : {type: 'new'});
+      console.log('resetting editor');
       if (!getNote()) {
         await sleep(10);
         eSendEvent('loadingNote', null);
