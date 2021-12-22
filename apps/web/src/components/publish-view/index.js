@@ -9,6 +9,7 @@ import * as clipboard from "clipboard-polyfill/text";
 import ThemeProvider from "../theme-provider";
 import { showToast } from "../../utils/toast";
 import { EV, EVENTS } from "notes-core/common";
+import { closeOpenedDialog } from "../../common/dialog-controller";
 
 function PublishView(props) {
   const { noteId, position, onClose } = props;
@@ -23,6 +24,18 @@ function PublishView(props) {
   useEffect(() => {
     setPublishId(db.monographs.monograph(noteId));
   }, [noteId]);
+
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("click", onWindowClick);
+    window.addEventListener("blur", onWindowClick);
+
+    return () => {
+      window.removeEventListener("click", onWindowClick);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("blur", onWindowClick);
+    }
+  }, []);
 
   useEffect(() => {
     const attachmentsLoadingEvent = EV.subscribe(
@@ -53,6 +66,9 @@ function PublishView(props) {
       bg="background"
       p={2}
       flexDirection="column"
+      onClick={e => {
+        e.stopPropagation()
+      }}
     >
       <Text variant="body" fontSize="title" fontWeight="bold" color="primary">
         {noteTitle}
@@ -255,4 +271,13 @@ export function showPublishView(noteId, location = "top") {
     });
   }
   return Promise.reject("No element with id 'dialogContainer'");
+}
+
+
+function onKeyDown(event) {
+  if (event.keyCode === 27) closeOpenedDialog();
+}
+
+function onWindowClick() {
+  closeOpenedDialog()
 }
