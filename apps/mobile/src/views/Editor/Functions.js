@@ -1,8 +1,8 @@
-import { createRef } from 'react';
-import { Platform } from 'react-native';
-import { presentDialog } from '../../components/Dialog/functions';
-import { useEditorStore, useMenuStore, useTagStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {createRef} from 'react';
+import {Platform} from 'react-native';
+import {presentDialog} from '../../components/Dialog/functions';
+import {useEditorStore, useMenuStore, useTagStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -10,10 +10,10 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
-import { editing } from '../../utils';
-import { COLORS_NOTE, COLOR_SCHEME } from '../../utils/Colors';
-import { hexToRGBA } from '../../utils/ColorUtils';
-import { db } from '../../utils/database';
+import {editing} from '../../utils';
+import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
+import {hexToRGBA} from '../../utils/ColorUtils';
+import {db} from '../../utils/database';
 import {
   eOnLoadNote,
   eOpenTagsDialog,
@@ -21,13 +21,13 @@ import {
   eShowMergeDialog
 } from '../../utils/Events';
 import filesystem from '../../utils/filesystem';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { tabBarRef } from '../../utils/Refs';
-import { normalize } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {tabBarRef} from '../../utils/Refs';
+import {normalize} from '../../utils/SizeUtils';
+import {sleep, timeConverter} from '../../utils/TimeUtils';
 import tiny from './tiny/tiny';
-import { IMAGE_TOOLTIP_CONFIG } from './tiny/toolbar/config';
+import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -358,7 +358,6 @@ export const loadNote = async item => {
     }, 50);
     useEditorStore.getState().setCurrentlyEditingNote(item.id);
   }
-
 
   loading_note = false;
 };
@@ -729,7 +728,6 @@ async function addToCollection(id) {
     }
     case 'color': {
       await db.notes.note(id).color(editing.actionAfterFirstSave.id);
-
       editing.actionAfterFirstSave = {
         type: null
       };
@@ -766,7 +764,9 @@ export async function saveNote(preventUpdate) {
       locked = _note.locked;
     }
 
-    console.log('note saved', preventUpdate, closingSession);
+    if (!historySessionId) {
+      historySessionId = note?.dateEdited || Date.now();
+    }
 
     let noteData = {
       title,
@@ -774,8 +774,17 @@ export async function saveNote(preventUpdate) {
         data: content.data,
         type: content.type
       },
-      id: id
+      id: id,
+      sessionId: historySessionId
     };
+
+    console.log(
+      'Note Saved:::',
+      'historySessionId:',
+      historySessionId,
+      'preventUpdate',
+      preventUpdate
+    );
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
@@ -819,35 +828,33 @@ export async function saveNote(preventUpdate) {
       );
       tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
-
-    await updateSessionHistory(id, noteData.content);
   } catch (e) {}
   isSaving = false;
 }
 
-async function updateSessionHistory(id, content) {
-  let note = db.notes.note(id)?.data;
-  if (!note) return;
-  if (!historySessionId) {
-    historySessionId = `${id}_${note.dateEdited}`;
-  }
+// async function updateSessionHistory(id, content) {
+//   let note = db.notes.note(id)?.data;
+//   if (!note) return;
+//   if (!historySessionId) {
+//     historySessionId = `${id}_${note.dateEdited}`;
+//   }
 
-  if (!historySessionId.includes(id)) {
-    historySessionId = null;
-    return;
-  }
-  if (!note.locked) {
-    console.log('saving session with id: ',historySessionId);
-    await db.noteHistory.add(id, historySessionId, content);
-  } else {
-    let content = await db.content.get(note.contentId);
+//   if (!historySessionId.includes(id)) {
+//     historySessionId = null;
+//     return;
+//   }
+//   if (!note.locked) {
+//     console.log('saving session with id: ',historySessionId);
+//     await db.noteHistory.add(id, historySessionId, content);
+//   } else {
+//     let content = await db.content.get(note.contentId);
 
-    await db.noteHistory.add(id, historySessionId, {
-      data: content.data,
-      type: content.type
-    });
-  }
-}
+//     await db.noteHistory.add(id, historySessionId, {
+//       data: content.data,
+//       type: content.type
+//     });
+//   }
+// }
 
 export async function onWebViewLoad(premium, colors) {
   setTimeout(() => {
