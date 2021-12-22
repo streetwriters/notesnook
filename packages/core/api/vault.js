@@ -179,13 +179,18 @@ export default class Vault {
   }
 
   /** @private */
-  async _encryptContent(contentId, content, type, password) {
+  async _encryptContent(contentId, sessionId, content, type, password) {
     let encryptedContent = await this._storage.encrypt(
       { password },
       JSON.stringify(content)
     );
 
-    await this._db.content.add({ id: contentId, data: encryptedContent, type });
+    await this._db.content.add({
+      id: contentId,
+      sessionId,
+      data: encryptedContent,
+      type,
+    });
   }
 
   /** @private */
@@ -202,7 +207,7 @@ export default class Vault {
 
   /** @private */
   async _lockNote(note, password) {
-    let { id, content: { type, data } = {}, contentId } = note;
+    let { id, content: { type, data } = {}, contentId, sessionId } = note;
 
     // Case: when note is being newly locked
     if (!data || !type || !contentId) {
@@ -225,7 +230,7 @@ export default class Vault {
       type = content.type;
     }
 
-    await this._encryptContent(contentId, data, type, password);
+    await this._encryptContent(contentId, sessionId, data, type, password);
 
     return await this._db.notes.add({
       id,

@@ -51,6 +51,7 @@ export default class Notes extends Collection {
       if (!content) throw new Error("Invalid content type.");
       note.contentId = await this._db.content.add({
         noteId: id,
+        sessionId: note.sessionId,
         id: note.contentId,
         type,
         data,

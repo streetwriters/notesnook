@@ -21,20 +21,27 @@ export default class Content extends Collection {
     }
 
     const id = content.id || getId();
-    await this._collection.addItem(
-      await this.extractAttachments({
-        noteId: content.noteId,
-        id,
-        type: content.type,
-        data: content.data || content,
-        dateEdited: content.dateEdited,
-        dateCreated: content.dateCreated,
-        dateModified: content.dateModified,
-        localOnly: !!content.localOnly,
-        conflicted: content.conflicted,
-        dateResolved: content.dateResolved,
-      })
-    );
+
+    const contentItem = await this.extractAttachments({
+      noteId: content.noteId,
+      id,
+      type: content.type,
+      data: content.data || content,
+      dateEdited: content.dateEdited,
+      dateCreated: content.dateCreated,
+      dateModified: content.dateModified,
+      localOnly: !!content.localOnly,
+      conflicted: content.conflicted,
+      dateResolved: content.dateResolved,
+    });
+    await this._collection.addItem(contentItem);
+
+    if (content.sessionId) {
+      await this._db.noteHistory.add(contentItem.noteId, content.sessionId, {
+        data: contentItem.data,
+        type: contentItem.type,
+      });
+    }
     return id;
   }
 
