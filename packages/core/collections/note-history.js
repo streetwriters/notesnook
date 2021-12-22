@@ -44,10 +44,10 @@ export default class NoteHistory extends Collection {
   async get(noteId) {
     if (!noteId) return [];
 
-    let indices = await this._collection.indexer.getIndices();
-    let sessionIds = indices.filter((id) => id.includes(noteId));
+    let indices = this._collection.indexer.getIndices();
+    let sessionIds = indices.filter((id) => id.startsWith(noteId));
     if (sessionIds.length === 0) return [];
-    let history = (await this._collection.getItems(sessionIds)) || [];
+    let history = (await this._getSessions(sessionIds)) || [];
 
     return history.sort(function (a, b) {
       return b.dateModified - a.dateModified;
@@ -187,8 +187,11 @@ export default class NoteHistory extends Collection {
   }
 
   async all() {
-    let indices = await this._collection.indexer.getIndices();
-    let items = await this._collection.getItems(indices);
+    return this._getSessions(this._collection.indexer.getIndices());
+  }
+
+  async _getSessions(sessionIds) {
+    let items = await this._collection.getItems(sessionIds);
     return Object.values(items);
   }
 
