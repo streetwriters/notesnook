@@ -61,6 +61,7 @@ let waitForContent = false;
 let prevNoteContent = null;
 let timerForEditor = null;
 let sessionId = null;
+let historySessionId = null;
 
 export function startClosingSession() {
   closingSession = true;
@@ -228,6 +229,7 @@ function clearNote() {
   note = null;
   title = '';
   noteEdited = false;
+  historySessionId = null;
   prevNoteContent = content.data;
   isSaving = false;
   id = null;
@@ -817,8 +819,34 @@ export async function saveNote(preventUpdate) {
       );
       tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
+
+    await updateSessionHistory(id, noteData.content);
   } catch (e) {}
   isSaving = false;
+}
+
+async function updateSessionHistory(id, content) {
+  let note = db.notes.note(id)?.data;
+  if (!note) return;
+  if (!historySessionId) {
+    historySessionId = `${id}_${note.dateEdited}`;
+  }
+
+  if (!historySessionId.includes(id)) {
+    historySessionId = null;
+    return;
+  }
+  if (!note.locked) {
+    console.log('saving session with id: ',historySessionId);
+    await db.noteHistory.add(id, historySessionId, content);
+  } else {
+    let content = await db.content.get(note.contentId);
+
+    await db.noteHistory.add(id, historySessionId, {
+      data: content.data,
+      type: content.type
+    });
+  }
 }
 
 export async function onWebViewLoad(premium, colors) {

@@ -67,6 +67,7 @@ const showActionSheet = (item, isTrash) => {
           'Vault',
           'Delete',
           'RemoveTopic',
+          "History",
           ...android
         ]
   );

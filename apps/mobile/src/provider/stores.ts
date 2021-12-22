@@ -381,7 +381,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       set({announcements: []});
     } finally {
       let all = await getFiltered(announcements);
-      console.log("all", all)
       set({
         announcements: all.filter(a => a.type === 'inline'),
         dialogs: all.filter(a => a.type === 'dialog')

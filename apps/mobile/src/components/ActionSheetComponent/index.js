@@ -1,5 +1,4 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-
 import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
@@ -29,6 +28,7 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
@@ -58,6 +58,7 @@ import {SIZE} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {Button} from '../Button';
 import {presentDialog} from '../Dialog/functions';
+import NoteHistory from '../NoteHistory';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -655,6 +656,20 @@ export const ActionSheetComponent = ({
             });
           },
           positiveType: 'errorShade'
+        });
+      }
+    },
+    {
+      name: 'History',
+      title: 'History',
+      icon: 'history',
+      func: async () => {
+        close();
+        await sleep(300);
+        presentSheet({
+          noProgress: true,
+          noIcon: true,
+          component: ref => <NoteHistory ref={ref} note={note} />
         });
       }
     }
