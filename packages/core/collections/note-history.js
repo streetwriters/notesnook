@@ -92,7 +92,7 @@ export default class NoteHistory extends Collection {
     let history = await this.get(noteId);
     if (history.length === 0 || history.length < limit) return;
     history.sort(function (a, b) {
-      return a.dateEdited - b.dateEdited;
+      return a.dateModified - b.dateModified;
     });
     let deleteCount = history.length - limit;
 
