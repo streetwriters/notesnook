@@ -52,7 +52,7 @@ export const EVENTS = {
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
 };
 
-export const CURRENT_DATABASE_VERSION = 5.2;
+export const CURRENT_DATABASE_VERSION = 5.3;
 
 export function setUserPersonalizationBytes(userSalt) {
   USER_PERSONALIZATION_HASH = new Uint8Array(

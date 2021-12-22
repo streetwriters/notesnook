@@ -72,6 +72,8 @@ describe.each([["v5.2", v52Backup]])(
         await db.backup.import(JSON.stringify(data));
 
         expect(db.settings.raw.id).toBeDefined();
+        expect(db.settings.raw.dateModified).toBeDefined();
+        expect(db.settings.raw.dateEdited).toBeUndefined();
 
         expect(
           db.notes.all.every((v) => {
@@ -80,21 +82,31 @@ describe.each([["v5.2", v52Backup]])(
             const hasTopicsInAllNotebooks =
               !v.notebooks ||
               v.notebooks.every((nb) => !!nb.id && !!nb.topics && !nb.topic);
+            const hasDateModified = v.dateModified > 0;
             return (
               doesNotHaveContent &&
               !v.notebook &&
               hasTopicsInAllNotebooks &&
-              doesNotHaveColors
+              doesNotHaveColors &&
+              hasDateModified
             );
           })
         ).toBeTruthy();
 
-        expect(db.notebooks.all.every((v) => v.title != null)).toBeTruthy();
+        expect(
+          db.notebooks.all.every((v) => v.title != null && v.dateModified > 0)
+        ).toBeTruthy();
+
+        expect(
+          db.attachments.all.every((v) => v.dateModified > 0 && !v.dateEdited)
+        ).toBeTruthy();
 
         const allContent = await db.content.all();
         expect(
           allContent.every((v) => v.type === "tiny" || v.deleted)
         ).toBeTruthy();
+        expect(allContent.every((v) => !v.persistDateEdited)).toBeTruthy();
+        expect(allContent.every((v) => v.dateModified > 0)).toBeTruthy();
       });
     });
 
@@ -105,6 +117,7 @@ describe.each([["v5.2", v52Backup]])(
         verifyIndex(data, db, "notes", "notes");
         verifyIndex(data, db, "notebooks", "notebooks");
         verifyIndex(data, db, "content", "content");
+        verifyIndex(data, db, "attachments", "attachments");
         // verifyIndex(data, db, "trash", "trash");
       });
     });

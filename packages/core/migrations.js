@@ -1,32 +1,16 @@
 export const migrations = {
-  4: {
-    note: function (item) {
-      if (item.notebooks && item.notebooks.every((n) => !n.id)) {
-        item.notebooks = undefined;
-      }
-      return migrations["4.1"].note(item);
-    },
-  },
-  4.1: {
-    note: function (item) {
-      return migrations["4.2"].note(item);
-    },
-  },
-  4.2: {
-    note: function (item) {
-      if (item.notebooks) {
-        item.notebooks = item.notebooks.map((nb) => {
-          return { id: nb.id, topics: nb.topics || [nb.topic] };
-        });
-      }
-      item.migrated = true;
-      return item;
-    },
-  },
-  4.3: {},
   5.0: {},
   5.1: {},
   5.2: {
+    note: replaceDateEditedWithDateModified(),
+    notebook: replaceDateEditedWithDateModified(),
+    tag: replaceDateEditedWithDateModified(true),
+    attachment: replaceDateEditedWithDateModified(true),
+    trash: replaceDateEditedWithDateModified(),
+    tiny: replaceDateEditedWithDateModified(),
+    settings: replaceDateEditedWithDateModified(true),
+  },
+  5.3: {
     note: false,
     notebook: false,
     tag: false,
@@ -36,3 +20,12 @@ export const migrations = {
     settings: false,
   },
 };
+
+function replaceDateEditedWithDateModified(removeDateEditedProperty = false) {
+  return function (item) {
+    item.dateModified = item.dateEdited;
+    if (removeDateEditedProperty) delete item.dateEdited;
+    delete item.persistDateEdited;
+    return item;
+  };
+}
