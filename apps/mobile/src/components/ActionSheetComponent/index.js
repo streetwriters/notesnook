@@ -840,9 +840,7 @@ export const ActionSheetComponent = ({
               numColumns={rowItems.length < 5 ? rowItems.length : 5}
               style={{
                 marginTop: note.type !== 'note' ? 10 : 0,
-                paddingTop: 10,
-                borderBottomWidth: 1,
-                borderBottomColor: colors.nav
+                paddingTop: 10
               }}
               columnWrapperStyle={{
                 justifyContent: 'flex-start'
@@ -859,10 +857,6 @@ export const ActionSheetComponent = ({
               data={rowItemsData.filter(
                 i => rowItems.indexOf(i.name) > -1 && !i.hidden
               )}
-              style={{
-                borderBottomWidth: 1,
-                borderBottomColor: colors.nav
-              }}
               keyExtractor={item => item.title}
               renderItem={renderColumnItem}
             />
@@ -880,8 +874,10 @@ export const ActionSheetComponent = ({
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignSelf: 'center',
-            paddingTop: 5,
-            marginTop: 10
+            paddingTop: 10,
+            marginTop: 10,
+            borderTopWidth: 1,
+            borderTopColor: colors.nav
           }}>
           <Icon
             name="shield-key-outline"

@@ -28,13 +28,13 @@ export const Topics = ({item, close}) => {
       key={topic.id}
       title={topic.title}
       type="grayBg"
-      buttonType={{
-        text: colors.accent
-      }}
+      // buttonType={{
+      //   text: colors.accent
+      // }}
       height={30}
       onPress={open}
       icon="bookmark-outline"
-      fontSize={SIZE.sm}
+      fontSize={SIZE.xs + 1}
       style={{
         marginRight: 5,
         paddingHorizontal: 0,

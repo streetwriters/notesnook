@@ -25,9 +25,6 @@ export const Tags = ({item, close}) => {
           flexWrap: 'wrap',
           alignItems: 'center'
         }}>
-        {item.tags.map((item, index) =>
-          item ? <TagItem key={item} tag={item} close={close} /> : null
-        )}
         <Button
           onPress={async () => {
             close();
@@ -42,15 +39,17 @@ export const Tags = ({item, close}) => {
           icon="plus"
           iconPosition="right"
           height={30}
-          fontSize={SIZE.sm}
+          fontSize={SIZE.xs + 1}
           style={{
-            margin: 1,
             marginRight: 5,
             paddingHorizontal: 0,
             borderRadius: 100,
             paddingHorizontal: 8
           }}
         />
+        {item.tags.map((item, index) =>
+          item ? <TagItem key={item} tag={item} close={close} /> : null
+        )}
       </View>
     </View>
   ) : null;
@@ -90,12 +89,12 @@ const TagItem = ({tag, close}) => {
     <Button
       onPress={onPress}
       title={'#' + tag}
-      buttonType={{
-        text: colors.accent
-      }}
+      // buttonType={{
+      //   text: colors.accent
+      // }}
       type="grayBg"
       height={30}
-      fontSize={SIZE.sm}
+      fontSize={SIZE.xs + 1}
       style={style}
     />
   );
