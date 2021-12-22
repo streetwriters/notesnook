@@ -180,7 +180,7 @@ export const NotebookItem = ({item, isTopic = false, notebookID, isTrash}) => {
             {item.pinned ? (
               <Icon
                 style={{marginRight: 6}}
-                name="pin"
+                name="pin-outline"
                 size={SIZE.sm}
                 style={{
                   marginRight: 10,

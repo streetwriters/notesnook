@@ -209,7 +209,7 @@ const NoteItem = ({item, isTrash, tags}) => {
 
               {item.pinned ? (
                 <Icon
-                  name="pin"
+                  name="pin-outline"
                   size={SIZE.sm}
                   style={{
                     marginRight: 6
