@@ -111,7 +111,7 @@ class Database {
     /** @type {Attachments} */
     this.attachments = await Attachments.new(this, "attachments");
     /**@type {NoteHistory} */
-    this.noteHistory = await NoteHistory.new(this,"notehistory");
+    this.noteHistory = await NoteHistory.new(this, "notehistory", false);
 
     this.trash = new Trash(this);
 
