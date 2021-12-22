@@ -1,6 +1,6 @@
 import { makeSessionContentId, makeSessionId } from "../utils/id";
 import Collection from "./collection";
-import ContentHistory from "./contenthistory";
+import SessionContent from "./session-content";
 /**
  * @typedef Session
  * @property {string} id
@@ -27,11 +27,11 @@ export default class NoteHistory extends Collection {
     super.init();
 
     /**
-     * @type {ContentHistory}
+     * @type {SessionContent}
      */
-    this.contentHistory = await ContentHistory.new(
+    this.sessionContent = await SessionContent.new(
       this._db,
-      "contenthistory",
+      "sessioncontent",
       false
     );
   }
@@ -80,7 +80,7 @@ export default class NoteHistory extends Collection {
     }
 
     await this._collection.addItem(session);
-    await this.contentHistory.add(sessionId, content, session.locked);
+    await this.sessionContent.add(sessionId, content, session.locked);
     await this._cleanup(noteId);
 
     return session;
@@ -106,9 +106,9 @@ export default class NoteHistory extends Collection {
    *
    * @returns {Promise<Content>}
    */
-  async content(sessionId) {
+  content(sessionId) {
     if (!sessionId) return;
-    return await this.contentHistory.get(sessionId);
+    return this.sessionContent.get(sessionId);
   }
 
   /**
@@ -120,7 +120,7 @@ export default class NoteHistory extends Collection {
     /**
      * @type {Session}
      */
-    let session = this._collection.getItem(sessionId);
+    let session = await this._collection.getItem(sessionId);
     await this._remove(session);
   }
 
@@ -142,7 +142,7 @@ export default class NoteHistory extends Collection {
    */
   async _remove(session) {
     await this._collection.deleteItem(session.id);
-    await this.contentHistory.remove(session.sessionContentId);
+    await this.sessionContent.remove(session.sessionContentId);
   }
 
   /**
@@ -154,7 +154,7 @@ export default class NoteHistory extends Collection {
      * @type {Session}
      */
     let session = await this._collection.getItem(sessionId);
-    let content = await this.contentHistory.get(session.sessionContentId);
+    let content = await this.sessionContent.get(session.sessionContentId);
     let note = this._db.notes.note(session.noteId).data;
     if (session.locked) {
       await this._db.content.add({
@@ -180,7 +180,7 @@ export default class NoteHistory extends Collection {
   async serialize() {
     return JSON.stringify({
       sessions: await this.all(),
-      sessionContents: await this.contentHistory.all(),
+      sessionContents: await this.sessionContent.all(),
     });
   }
 
@@ -206,7 +206,7 @@ export default class NoteHistory extends Collection {
       );
       if (sessionContent) {
         await this._collection.addItem(session);
-        await this.contentHistory._collection.addItem(sessionContent);
+        await this.sessionContent._collection.addItem(sessionContent);
       }
     }
   }
