@@ -6,7 +6,7 @@ import SessionContent from "./session-content";
  * @property {string} id
  * @property {string} noteId
  * @property {string} sessionContentId
- * @property {string} dateEdited
+ * @property {string} dateModified
  * @property {string} dateCreated
  * @property {boolean} locked
  */
@@ -106,16 +106,20 @@ export default class NoteHistory extends Collection {
    *
    * @returns {Promise<Content>}
    */
-  content(sessionId) {
+  async content(sessionId) {
     if (!sessionId) return;
-    return this.sessionContent.get(sessionId);
+    /**
+     * @type {Session}
+     */
+    let session = await this._collection.getItem(sessionId);
+    return await this.sessionContent.get(session.sessionContentId);
   }
 
   /**
    * Remove a session from storage
    * @param {string} sessionId
    */
-  async removeSession(sessionId) {
+  async remove(sessionId) {
     if (!sessionId) return;
     /**
      * @type {Session}
@@ -207,6 +211,7 @@ export default class NoteHistory extends Collection {
       let sessionContent = deserialized.sessionContents.find((v) =>
         v.id.includes(session.id)
       );
+
       if (sessionContent) {
         await this._collection.addItem(session);
         await this.sessionContent._collection.addItem(sessionContent);

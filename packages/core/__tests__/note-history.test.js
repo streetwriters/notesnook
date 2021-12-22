@@ -1,5 +1,10 @@
-import { compress, decompress } from "../utils/compression";
-import { databaseTest, noteTest, StorageInterface, TEST_NOTE } from "./utils";
+import {
+  databaseTest,
+  delay,
+  noteTest,
+  StorageInterface,
+  TEST_NOTE,
+} from "./utils";
 
 beforeEach(async () => {
   StorageInterface.clear();
@@ -16,153 +21,184 @@ async function sessionTest(db, noteId) {
   return session;
 }
 
-test("History of note should be created", async () => {
-  let { db, id } = await noteTest();
-  let session = await sessionTest(db, id);
-  let content = {
-    data: await db.notes.note(id).content(),
-    type: "tiny",
-  };
+test("new history session should be automatically created on note save", () =>
+  noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    const sessions = await db.noteHistory.get(id);
+    expect(sessions).toHaveLength(1);
+    await expect(db.noteHistory.content(sessions[0].id)).resolves.toMatchObject(
+      TEST_NOTE.content
+    );
+  }));
 
-  let sessionContent = await db.noteHistory.content(session.sessionContentId);
-  expect(sessionContent).toMatchObject(content);
-});
-
-test("Multiple sessions of the same note should be created", async () => {
-  let { db, id } = await noteTest();
-  await sessionTest(db, id);
-
-  let nextContent = {
-    data: (await db.notes.note(id).content().data) + "teststring",
-    type: "tiny",
-  };
-
-  await db.notes.add({
-    id: id,
-    content: nextContent,
-  });
-  let note = db.notes.note(id).data;
-  await db.noteHistory.add(id, note.dateEdited, nextContent);
-
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(2);
-});
-
-test("Session should be removed if greater than the version limit", async () => {
-  let { db, id } = await noteTest();
-  await sessionTest(db, id);
-
-  let nextContent = {
-    data: (await db.notes.note(id).content().data) + "teststring",
-    type: "tiny",
-  };
-
-  await db.notes.add({
-    id: id,
-    content: nextContent,
-  });
-  let note = db.notes.note(id).data;
-  await db.noteHistory.add(id, note.dateEdited, nextContent);
-
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(2);
-  await db.noteHistory._cleanup(id, 1);
-  history = await db.noteHistory.get(id);
-  expect(history.length).toBe(1);
-  let content = await db.noteHistory.content(history[0].sessionContentId);
-  expect(content.data).toBe(nextContent.data);
-});
-
-test("Session should update if a sessionId is same", async () => {
-  let { db, id } = await noteTest();
-  await sessionTest(db, id);
-  let content = {
-    data: await db.notes.note(id).content(),
-    type: "tiny",
-  };
-  let note = db.notes.note(id).data;
-  let nextContent = {
-    data: content.data + "teststring",
-    type: "tiny",
-  };
-
-  await db.notes.add({
-    id: id,
-    content: nextContent,
-  });
-  let session = await db.noteHistory.add(id, note.dateEdited, nextContent);
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(1);
-
-  let sessionContent = await db.noteHistory.content(session.sessionContentId);
-  expect(sessionContent.data).toBe(nextContent.data);
-});
-
-test("History of note should be restored", async () => {
-  let { db, id } = await noteTest();
-  let session = await sessionTest(db, id);
-  let prevContent = {
-    data: await db.notes.note(id).content(),
-    type: "tiny",
-  };
-
-  await db.notes.add({
-    id: id,
-    content: {
-      data: "<p></p>",
+test("editing the same note should create multiple history sessions", () =>
+  noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    let editedContent = {
+      data: TEST_NOTE.content.data + "<p>Some new content</p>",
       type: "tiny",
-    },
-  });
-  await db.noteHistory.restore(session.id);
-  let nextContent = await db.notes.note(id).content();
-  expect(nextContent).toBe(prevContent.data);
-});
+    };
 
-test("Session should not be created if values are falsy", async () => {
-  let db = await databaseTest();
-  let session = await db.noteHistory.add(null, null, null);
-  expect(session).toBeFalsy();
-});
+    await db.notes.add({
+      id: id,
+      content: editedContent,
+      sessionId: Date.now() + 10000,
+    });
 
-test("Should return empty array if no history available", async () => {
-  let { db, id } = await noteTest();
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(0);
-});
+    const sessions = await db.noteHistory.get(id);
+    expect(sessions).toHaveLength(2);
 
-test("Session history of a given sessionId should be removed", async () => {
-  let { db, id } = await noteTest();
-  let session = await sessionTest(db, id);
-  await db.noteHistory.removeSession(session.id);
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(0);
-});
+    await expect(db.noteHistory.content(sessions[0].id)).resolves.toMatchObject(
+      editedContent
+    );
+    await expect(db.noteHistory.content(sessions[1].id)).resolves.toMatchObject(
+      TEST_NOTE.content
+    );
+  }));
 
-test("All sessions of a note should be cleared", async () => {
-  let { db, id } = await noteTest();
-  await sessionTest(db, id);
+test("restoring an old session should replace note's content", () =>
+  noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    let editedContent = {
+      data: TEST_NOTE.content.data + "<p>Some new content</p>",
+      type: "tiny",
+    };
 
-  await db.noteHistory.clearSessions(id);
+    await db.notes.add({
+      id: id,
+      content: editedContent,
+      sessionId: Date.now() + 10000,
+    });
 
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(0);
-});
+    const [_, firstVersion] = await db.noteHistory.get(id);
+    await db.noteHistory.restore(firstVersion.id);
 
-test("Sessions should be serialized and deserialized", async () => {
-  let { db, id } = await noteTest();
-  await sessionTest(db, id);
-  let json = await db.noteHistory.serialize();
-  await db.noteHistory.clearSessions(id);
-  await db.noteHistory.deserialize(json);
+    await expect(db.notes.note(id).content()).resolves.toBe(
+      TEST_NOTE.content.data
+    );
+  }));
 
-  let history = await db.noteHistory.get(id);
-  expect(history.length).toBe(1);
-  let content = await db.noteHistory.content(history[0].id);
-  expect(content).toBeTruthy();
-});
+test("date created of session should not change on edit", () =>
+  noteTest({ ...TEST_NOTE, sessionId: "session" }).then(async ({ db, id }) => {
+    const [{ dateCreated, dateModified }] = await db.noteHistory.get(id);
 
-test("String should compress and decompress", () => {
-  let compressed = compress(TEST_NOTE.content.data);
-  let decompressed = decompress(compressed);
-  expect(decompressed).toBe(TEST_NOTE.content.data);
-});
+    let editedContent = {
+      data: TEST_NOTE.content.data + "<p>Some new content</p>",
+      type: "tiny",
+    };
+
+    await delay(1000);
+
+    await db.notes.add({
+      id: id,
+      content: editedContent,
+      sessionId: "session",
+    });
+
+    const [{ dateCreated: newDateCreated, dateModified: newDateModified }] =
+      await db.noteHistory.get(id);
+    expect(newDateCreated).toBe(dateCreated);
+    expect(newDateModified).toBeGreaterThan(dateModified);
+  }));
+
+test("serialized session data should get deserialized", () =>
+  noteTest({ ...TEST_NOTE, sessionId: "session" }).then(async ({ db, id }) => {
+    let json = await db.noteHistory.serialize();
+
+    await db.noteHistory.clearSessions(id);
+    await db.noteHistory.deserialize(json);
+
+    let history = await db.noteHistory.get(id);
+    expect(history.length).toBe(1);
+
+    let content = await db.noteHistory.content(history[0].id);
+    expect(content).toMatchObject(TEST_NOTE.content);
+  }));
+
+test("clear a note's sessions", () =>
+  noteTest({ ...TEST_NOTE, sessionId: "session" }).then(async ({ db, id }) => {
+    await db.noteHistory.clearSessions(id);
+
+    let history = await db.noteHistory.get(id);
+    expect(history.length).toBe(0);
+  }));
+
+test("remove a single session by sessionId", () =>
+  noteTest({ ...TEST_NOTE, sessionId: "iamasession" }).then(
+    async ({ db, id }) => {
+      const [{ id: sessionId }] = await db.noteHistory.get(id);
+
+      await db.noteHistory.remove(sessionId);
+      let history = await db.noteHistory.get(sessionId);
+      expect(history.length).toBe(0);
+    }
+  ));
+
+test("return empty array if no history available", () =>
+  noteTest().then(async ({ db, id }) => {
+    let history = await db.noteHistory.get(id);
+    expect(history.length).toBe(0);
+  }));
+
+test("session should not be added to history if values are null or undefined", () =>
+  noteTest().then(async ({ db }) => {
+    let history = await db.noteHistory.add();
+    expect(history).toBeUndefined();
+  }));
+
+test("auto clear sessions if they exceed the limit", () =>
+  noteTest({ ...TEST_NOTE, sessionId: Date.now() }).then(async ({ db, id }) => {
+    let editedContent = {
+      data: TEST_NOTE.content.data + "<p>Some new content</p>",
+      type: "tiny",
+    };
+
+    await db.notes.add({
+      id: id,
+      content: editedContent,
+      sessionId: Date.now() + 10000,
+    });
+
+    let sessions = await db.noteHistory.get(id);
+    expect(sessions).toHaveLength(2);
+
+    await db.noteHistory._cleanup(id, 1);
+
+    sessions = await db.noteHistory.get(id);
+    expect(await db.noteHistory.get(id)).toHaveLength(1);
+
+    const content = await db.noteHistory.content(sessions[0].id);
+    expect(content.data).toBe(editedContent.data);
+  }));
+
+test("save a locked note should add a locked session to note history", () =>
+  noteTest().then(async ({ db, id }) => {
+    await db.vault.create("password");
+    await db.vault.add(id);
+
+    const note = db.notes.note(id).data;
+    const editedContent = { type: "tiny", data: "<p>hello world</p>" };
+    await db.vault.save({
+      ...note,
+      content: editedContent,
+      sessionId: "lockedsession",
+    });
+
+    const sessions = await db.noteHistory.get(id);
+    expect(sessions).toHaveLength(1);
+
+    const lockedContent = await db.noteHistory.content(sessions[0].id);
+    const unlockedContent = await db.vault.decryptContent(
+      lockedContent,
+      "password"
+    );
+    expect(unlockedContent).toMatchObject(editedContent);
+  }));
+
+test("locking an old note should clear its history", () =>
+  noteTest({ ...TEST_NOTE, sessionId: "notesession" }).then(
+    async ({ db, id }) => {
+      await db.vault.create("password");
+      await db.vault.add(id);
+
+      const sessions = await db.noteHistory.get(id);
+      expect(sessions).toHaveLength(0);
+    }
+  ));
