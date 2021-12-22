@@ -375,7 +375,7 @@ const EditorHeader = () => {
                 />
               )}
 
-              {currentlyEditingNote && (
+           
                 <ActionIcon
                   name="attachment"
                   color={colors.pri}
@@ -385,7 +385,6 @@ const EditorHeader = () => {
                   top={50}
                   onPress={picker.pick}
                 />
-              )}
 
               {deviceMode !== 'mobile' && !fullscreen ? (
                 <ActionIcon
