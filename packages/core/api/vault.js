@@ -193,10 +193,7 @@ export default class Vault {
     });
   }
 
-  /** @private */
-  async _decryptContent(contentId, password) {
-    let encryptedContent = await this._db.content.raw(contentId, false);
-
+  async decryptContent(encryptedContent, password) {
     let decryptedContent = await this._storage.decrypt(
       { password },
       encryptedContent.data
@@ -244,7 +241,8 @@ export default class Vault {
 
   /** @private */
   async _unlockNote(note, password, perm = false) {
-    let content = await this._decryptContent(note.contentId, password);
+    let encryptedContent = await this._db.content.raw(note.contentId);
+    let content = await this.decryptContent(encryptedContent, password);
 
     if (perm) {
       await this._db.notes.add({
