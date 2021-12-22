@@ -238,6 +238,7 @@ export default class Vault {
       headline: "",
       title: note.title,
       favorite: note.favorite,
+      dateEdited: Date.now(),
     });
   }
 
