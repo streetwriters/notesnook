@@ -49,7 +49,9 @@ export default class NoteHistory extends Collection {
     if (sessionIds.length === 0) return [];
     let history = (await this._collection.getItems(sessionIds)) || [];
 
-    return history;
+    return history.sort(function (a, b) {
+      return b.dateModified - a.dateModified;
+    });
   }
 
   /**
