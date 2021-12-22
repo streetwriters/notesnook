@@ -1,5 +1,5 @@
 import { decode, encode } from "base64-arraybuffer";
-import { compressSync, strToU8, strFromU8 } from "fflate";
+import { compressSync, decompressSync, strToU8, strFromU8 } from "fflate";
 
 /**
  *
