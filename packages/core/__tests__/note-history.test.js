@@ -5,18 +5,13 @@ beforeEach(async () => {
   StorageInterface.clear();
 });
 
-
 async function sessionTest(db, noteId) {
   let note = await db.notes.note(noteId).data;
   let content = {
     data: await db.notes.note(noteId).content(),
     type: "tiny",
   };
-  let session = await db.noteHistory.add(
-    noteId,
-    note.dateEdited,
-    content
-  );
+  let session = await db.noteHistory.add(noteId, note.dateEdited, content);
 
   return session;
 }
@@ -53,7 +48,6 @@ test("Multiple sessions of the same note should be created", async () => {
   expect(history.length).toBe(2);
 });
 
-
 test("Session should be removed if greater than the version limit", async () => {
   let { db, id } = await noteTest();
   await sessionTest(db, id);
@@ -72,15 +66,12 @@ test("Session should be removed if greater than the version limit", async () => 
 
   let history = await db.noteHistory.get(id);
   expect(history.length).toBe(2);
-  await db.noteHistory._cleanup(id,1);
+  await db.noteHistory._cleanup(id, 1);
   history = await db.noteHistory.get(id);
   expect(history.length).toBe(1);
   let content = await db.noteHistory.content(history[0].sessionContentId);
   expect(content.data).toBe(nextContent.data);
-
 });
-
-
 
 test("Session should update if a sessionId is same", async () => {
   let { db, id } = await noteTest();
@@ -99,11 +90,7 @@ test("Session should update if a sessionId is same", async () => {
     id: id,
     content: nextContent,
   });
-  let session = await db.noteHistory.add(
-    id,
-    note.dateEdited,
-    nextContent
-  );
+  let session = await db.noteHistory.add(id, note.dateEdited, nextContent);
   let history = await db.noteHistory.get(id);
   expect(history.length).toBe(1);
 
