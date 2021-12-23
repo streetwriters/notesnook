@@ -93,7 +93,7 @@ const Tooltip = () => {
       padding: floating ? 5 : 0,
       borderRadius: floating ? 5 : 0,
       overflow: 'hidden',
-      display: !group ? 'none' : 'flex',
+      display: !group || !group.type ? 'none' : 'flex',
       position: floating ? 'absolute' : 'relative',
       bottom: floating ? 50 : null,
       width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '100%' : '100%',
