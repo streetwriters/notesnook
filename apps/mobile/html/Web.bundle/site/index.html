@@ -13,14 +13,13 @@
 	<div class="app-main">
 		<input id="image-input" accept='image/png, image/gif, image/jpeg, image/bmp, image/x-icon' type="file"
 			name="name" style="display: none;" />
-		<div class="tag-bar-parent hidden">
-			<div style="margin: 0px !important;margin-right:5px !important;" class="tag newtag">
-				<p class="newtagp"  ></p>
+		<div class="tag-bar-parent hidden noselect">
+			<div style="margin: 0px !important;margin-right:5px !important;" class="newtag">
+				<p class="newtagp noselect"></p>
 				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
 					width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
 				</svg>
-
 			</div>
 			<div class="tag-bar"></div>
 		</div>
@@ -28,8 +27,6 @@
 			<div id="formBox">
 				<input maxlength="150" id="titleInput" placeholder="Note title"></input>
 			</div>
-
-
 
 			<div class="info-bar">
 				<div style="display:flex;">
@@ -57,18 +54,36 @@
 		attachMessageListener()
 	</script>
 	<script>
-		document.querySelector(".newtag").onclick = function () {
-			reactNativeEventHandler("newtag", "new");
+
+		function pressHandler(tag, action) {
+			let time = 0;
+			document.querySelector(tag).ontouchstart = function (event) {
+				event.preventDefault();
+				time = Date.now();
+			}
+			document.querySelector(tag).ontouchmove = function (event) {
+				event.preventDefault();
+			}
+
+			document.querySelector(tag).ontouchend = function (event) {
+				event.preventDefault();
+				let diff = Date.now() - time;
+				if (diff < 300) {
+					action();
+				};
+			}
+
 		}
+
+		pressHandler('.newtag', function () {
+			reactNativeEventHandler("newtag", "new");
+		})
+
 		function clearNode(selector) {
 			let node = document.querySelector(selector);
 			if (node) {
 				node.innerHTML = "";
 			}
-		}
-		function onClick(event) {
-			event.preventDefault();
-			reactNativeEventHandler("notetag", event.target.dataset.tag);
 		}
 
 		function renderChildernInNode(data, parent, nodeName, classes) {
@@ -80,7 +95,6 @@
 				}
 			} else {
 				let stag = document.querySelector(".newtagp");
-
 				stag.innerText = "";
 				if (stag.parentElement.classList.contains('alttagnew')) {
 					stag.parentElement.classList.remove("alttagnew")
@@ -96,7 +110,9 @@
 				for (var i = 0; i < classes.length; i++) {
 					childNode.classList.add(classes[i]);
 				}
-				childNode.ontouchend = onClick;
+				pressHandler(".tag", function () {
+					reactNativeEventHandler("notetag", event.target.dataset.tag);
+				})
 				parentNode.appendChild(childNode);
 			})
 		}

@@ -62,7 +62,7 @@ export const useEditorTags = () => {
       clearNode(".tag-bar");
       toggleNode(".tag-bar-parent","show")
       let items = ${JSON.stringify(tags)};
-      renderChildernInNode(items, ".tag-bar", "div", ["tag"]);
+      renderChildernInNode(items, ".tag-bar", "div", ["tag","noselect"]);
     })();`;
 
   return [];

@@ -170,14 +170,28 @@ function setTheme() {
     align-items: center;
   }
 
-  .tag:active {
+  .newtag {
+    background-color: ${pageTheme.colors.nav};
+    border-radius: 100px;
+    margin-right: 5px;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    font-size: 12px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+  }
+
+  .tag:active,
+  .tag:focus,
+  .pressed {
     background-color: ${pageTheme.colors.transGray} !important;
     border-width: 2px;
   }
 
   .alttagnew {
-    padding-left: 6px !important;
-    padding-right: 12px !important;
+    padding-left: 12px !important;
+    padding-right: 6px !important;
   }
   .alttagnew svg {
     padding-right:3px;
@@ -189,7 +203,8 @@ function setTheme() {
     color:${pageTheme.colors.pri}
   }
 
-  .tag svg {
+  .tag svg,
+  .newtag svg {
     fill: ${pageTheme.colors.accent};
     width: 20px;
     height: 20px;
