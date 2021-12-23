@@ -798,9 +798,10 @@ export async function saveNote(preventUpdate) {
       }
 
       if (!id && !preventUpdate) {
-        // if (!title || title === '') {
-        //   post('title', db.notes.note(noteId)?.data?.title || '');
-        // }
+        if (!title || title === '') {
+          console.log('posting title now');
+          post('titleplaceholder', db.notes.note(noteId)?.data?.title || '');
+        }
 
         useEditorStore.getState().setCurrentlyEditingNote(noteId);
         await setNoteInEditorAfterSaving(id, noteId);

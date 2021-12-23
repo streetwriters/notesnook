@@ -64,7 +64,7 @@ function attachTitleInputListeners() {
 let titleTimeout = 0;
 function onTitleChange() {
   clearTimeout(titleTimeout);
-  titleTimeout = setTimeout(function() {
+  titleTimeout = setTimeout(function () {
     if (isLoading) {
       return;
     }
@@ -192,6 +192,9 @@ function attachMessageListener() {
         break;
       case 'title':
         document.getElementById('titleInput').value = value;
+        break;
+      case 'titleplaceholder':
+        document.getElementById('titleInput').placeholder = value;
         break;
       default:
         break;
