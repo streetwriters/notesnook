@@ -183,6 +183,7 @@ const Sort = ({type, screen}) => {
               } else {
                 if (groupOptions.sortBy === 'title') {
                   _groupOptions.sortBy = 'dateEdited';
+                  _groupOptions.sortDirection = 'desc';
                 }
               }
               updateGroupOptions(_groupOptions);
