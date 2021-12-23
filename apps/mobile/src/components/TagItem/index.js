@@ -42,8 +42,8 @@ const TagItem = React.memo(
         opacity={1}
         customStyle={{
           paddingHorizontal: 12,
-          height: 80 * fontScale,
           flexDirection: 'row',
+          paddingVertical:12,
           alignItems: 'center',
           width: '100%',
           justifyContent: 'space-between'
