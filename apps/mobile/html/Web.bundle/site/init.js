@@ -604,7 +604,7 @@ function getNodeBg(element) {
 }
 
 let selectionTimer = null;
-function selectchange() {
+function selectchange(requestvalue) {
   clearTimeout(selectionTimer);
   selectionTimer = null;
   selectionTimer = setTimeout(function () {
@@ -631,8 +631,12 @@ function selectchange() {
 
     currentFormats.current = {
       index: range.startOffset,
-      length: range.endOffset - range.startOffset
+      length: range.endOffset - range.startOffset,
     };
+
+    if (requestvalue) {
+      currentFormats.current.value = editor.selection.getContent()
+    }
 
     currentFormats.fontsize = editor.selection.getNode().style.fontSize;
 
@@ -684,5 +688,5 @@ function selectchange() {
     }
     currentFormats.node = editor.selection.getNode().nodeName;
     reactNativeEventHandler('selectionchange', currentFormats);
-  }, 50);
+  },requestvalue ? 0 : 50);
 }

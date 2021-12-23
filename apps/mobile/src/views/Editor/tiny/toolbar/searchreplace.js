@@ -6,6 +6,7 @@ import {useTracked} from '../../../../provider';
 import {useSettingStore} from '../../../../provider/stores';
 import {showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
 import {SIZE} from '../../../../utils/SizeUtils';
+import { sleep } from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 import {endSearch} from './commands';
@@ -28,9 +29,18 @@ const SearcReplace = () => {
     replace: null
   });
 
-  useEffect(() => {
+  async function searchWithSelection() {
+    tiny.call(EditorWebView,`selectchange(true)`);
+    await sleep(100);
     values.current.find = properties.selection?.current?.value;
+    findRef.current?.setNativeProps({
+      text:values.current.find
+    })
     find();
+  }
+
+  useEffect(() => {
+    searchWithSelection();
     setTimeout(() => {
       findRef.current?.focus();
     }, 300);
