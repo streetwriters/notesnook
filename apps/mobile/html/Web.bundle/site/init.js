@@ -501,9 +501,9 @@ function setup_tiny(_editor) {
 let prevCount = 0;
 
 function delay(base = 0) {
-  if (prevCount < 20000) return base + 200;
-  if (prevCount > 20000 && prevCount < 40000) return base + 400;
-  if (prevCount > 40000 && prevCount < 70000) return base + 600;
+  if (prevCount < 20000) return base + 100;
+  if (prevCount > 20000 && prevCount < 40000) return base + 250;
+  if (prevCount > 40000 && prevCount < 70000) return base + 500;
   if (prevCount > 70000) return base + 1000;
 }
 
@@ -518,7 +518,7 @@ function scrollSelectionIntoView(event) {
   ) {
     console.log(event);
     clearTimeout(inputKeyTimer);
-    inputKeyTimer = setTimeout(function() {
+    inputKeyTimer = setTimeout(function () {
       let node = editor.selection.getNode();
       if (node) {
         console.log(node, 'scrolling into view');
@@ -631,7 +631,7 @@ function selectchange() {
 
     currentFormats.current = {
       index: range.startOffset,
-      length: range.endOffset - range.startOffset,
+      length: range.endOffset - range.startOffset
     };
 
     currentFormats.fontsize = editor.selection.getNode().style.fontSize;
@@ -684,5 +684,5 @@ function selectchange() {
     }
     currentFormats.node = editor.selection.getNode().nodeName;
     reactNativeEventHandler('selectionchange', currentFormats);
-  }, 300);
+  }, 50);
 }
