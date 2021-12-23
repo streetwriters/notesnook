@@ -10,6 +10,11 @@ export default class Tags extends Collection {
     return tagItem;
   }
 
+  async merge(tag) {
+    if (!tag.migrated) return;
+    await this._collection.addItem(tag);
+  }
+
   async add(tagId, ...noteIds) {
     tagId = this.sanitize(tagId);
     if (!tagId) throw new Error("Tag title cannot be empty.");
@@ -109,6 +114,7 @@ export default class Tags extends Collection {
 
   sanitize(tag) {
     if (!tag) return;
+    console.trace("santizing:", tag);
     let sanitized = tag.toLocaleLowerCase();
     sanitized = sanitized.replace(
       /[+!@#$%^&*()+\{\}\]\[:;'"<>?\/\.\s=,]+/g,
