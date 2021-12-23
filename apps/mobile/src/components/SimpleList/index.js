@@ -24,9 +24,12 @@ let renderItems = {
   header: SectionHeader
 };
 
-const RenderItem = ({item, index, ...restArgs}) => {
+const RenderItem = ({item, index, type, ...restArgs}) => {
   if (!item) return <View />;
   const Item = renderItems[item.itemType || item.type] || View;
+  const groupOptions = db.settings?.getGroupOptions(type);
+  const dateBy =
+    groupOptions.sortBy !== 'title' ? groupOptions.sortBy : 'dateEdited';
 
   let tags =
     item.tags
@@ -42,7 +45,16 @@ const RenderItem = ({item, index, ...restArgs}) => {
         };
       })
       .filter(t => t !== null) || [];
-  return <Item item={item} tags={tags} index={index} {...restArgs} />;
+  return (
+    <Item
+      item={item}
+      tags={tags}
+      dateBy={dateBy}
+      index={index}
+      type={type}
+      {...restArgs}
+    />
+  );
 };
 
 const SimpleList = ({

@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {Platform, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {useSettingStore, useTagStore} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
@@ -67,17 +67,18 @@ const showActionSheet = (item, isTrash) => {
           'Vault',
           'Delete',
           'RemoveTopic',
-          "History",
+          'History',
           ...android
         ]
   );
 };
 
-const NoteItem = ({item, isTrash, tags}) => {
+const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
+  const attachmentCount = db.attachments?.ofNote(item.id)?.length || 0;
 
   function getNotebook() {
     if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
@@ -99,7 +100,7 @@ const NoteItem = ({item, isTrash, tags}) => {
       }
     ];
   }
-  
+
   return (
     <>
       <View
@@ -188,13 +189,13 @@ const NoteItem = ({item, isTrash, tags}) => {
                   color: colors.icon,
                   marginRight: 6
                 }}
-                time={item.dateCreated}
+                time={item[dateBy]}
                 updateFrequency={
-                  Date.now() - item.dateCreated < 60000 ? 2000 : 60000
+                  Date.now() - item[dateBy] < 60000 ? 2000 : 60000
                 }
               />
 
-              {/*     {db.attachments?.ofNote(item.id)?.length === 0 ? (
+              {attachmentCount > 0 ? (
                 <View
                   style={{
                     flexDirection: 'row',
@@ -203,10 +204,10 @@ const NoteItem = ({item, isTrash, tags}) => {
                   }}>
                   <Icon name="attachment" size={SIZE.md} color={colors.icon} />
                   <Paragraph color={colors.icon} size={SIZE.xs}>
-                    10
+                    {attachmentCount}
                   </Paragraph>
                 </View>
-              ) : null} */}
+              ) : null}
 
               {item.pinned ? (
                 <Icon

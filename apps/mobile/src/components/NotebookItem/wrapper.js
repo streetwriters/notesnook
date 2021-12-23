@@ -8,7 +8,7 @@ import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
 import SelectionWrapper from '../SelectionWrapper';
 
 export const NotebookWrapper = React.memo(
-  ({item, index}) => {
+  ({item, index,dateBy}) => {
     const isTrash = item.type === 'trash';
     const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
 
@@ -51,6 +51,7 @@ export const NotebookWrapper = React.memo(
         <NotebookItem
           isTopic={item.type === 'topic'}
           item={item}
+          dateBy={dateBy}
           index={index}
           isTrash={isTrash}
         />
@@ -58,6 +59,10 @@ export const NotebookWrapper = React.memo(
     );
   },
   (prev, next) => {
+    if (prev.dateBy !== next.dateBy ) {
+      return false;
+    }
+
     if (prev.item?.dateEdited !== next.item?.dateEdited) {
       return false;
     }
