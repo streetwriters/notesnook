@@ -9,6 +9,7 @@ import {SIZE} from '../../../../utils/SizeUtils';
 import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 import {endSearch} from './commands';
+import {properties} from './constants';
 
 const SearcReplace = () => {
   const [state] = useTracked();
@@ -28,6 +29,8 @@ const SearcReplace = () => {
   });
 
   useEffect(() => {
+    values.current.find = properties.selection?.current?.value;
+    find();
     setTimeout(() => {
       findRef.current?.focus();
     }, 300);
@@ -41,13 +44,20 @@ const SearcReplace = () => {
     );
   }
 
+  useEffect(() => {
+    find();
+  }, [config.matchCase, config.matchWholeWord]);
+
   function replace(all = false) {
     if (!values.current?.replace) return;
     tiny.call(
       EditorWebView,
-      `tinymce.activeEditor.plugins.searchreplace.replace("${
-        values.current?.replace
-      }",true${all ? ',true' : ''})`
+      `tinymce.activeEditor.undoManager.transact(function () {
+        tinymce.activeEditor.plugins.searchreplace.replace("${
+          values.current?.replace
+        }",true${all ? ',true' : ''});
+      });
+      `
     );
   }
 
@@ -139,7 +149,7 @@ const SearcReplace = () => {
     {
       text: 'Replace',
       type: 'grayBg',
-      press: replace
+      press: () => replace()
     },
     {
       text: 'Replace all',
@@ -194,6 +204,9 @@ const SearcReplace = () => {
           onChangeText={value => {
             values.current.find = value;
           }}
+          defaultValue={
+            values.current?.find || properties.selection?.current?.value
+          }
           onFocusInput={() => setFocusType(1)}
           onSubmit={find}
           blurOnSubmit={false}
@@ -239,6 +252,7 @@ const SearcReplace = () => {
               onChangeText={value => {
                 values.current.replace = value;
               }}
+              defaultValue={values.current?.replace}
               blurOnSubmit={false}
               buttons={
                 <>
