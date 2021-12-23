@@ -83,6 +83,21 @@ class AddNotebookDialog extends React.Component {
     });
   }
 
+  createNotebook() {
+    this.props.onDone(
+      {
+        title: this.title,
+        description: this.description,
+        topics: this.state.topics.map((topic) => {
+          if (topic.id) return topic;
+          return topic.title;
+        }),
+        id: this.id,
+      },
+      this.deletedTopics
+    );
+  }
+
   render() {
     const props = this.props;
     return (
@@ -98,18 +113,7 @@ class AddNotebookDialog extends React.Component {
         positiveButton={{
           text: props.edit ? "Save" : "Create",
           onClick: () => {
-            props.onDone(
-              {
-                title: this.title,
-                description: this.description,
-                topics: this.state.topics.map((topic) => {
-                  if (topic.id) return topic;
-                  return topic.title;
-                }),
-                id: this.id,
-              },
-              this.deletedTopics
-            );
+            this.createNotebook();
           },
         }}
         onClose={props.onClose}
@@ -125,6 +129,11 @@ class AddNotebookDialog extends React.Component {
             name="title"
             id="title"
             onChange={(e) => (this.title = e.target.value)}
+            onKeyUp={(e) => {
+              if (e.key === "Enter") {
+                this.createNotebook();
+              }
+            }}
           />
           <Field
             data-test-id="and-description"
@@ -162,7 +171,7 @@ class AddNotebookDialog extends React.Component {
               });
             }}
             onKeyUp={(e) => {
-              if (e.nativeEvent.key === "Enter") {
+              if (e.key === "Enter") {
                 if (this.state.isEditting) {
                   this.doneEditingTopic();
                 } else {
