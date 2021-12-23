@@ -357,6 +357,12 @@ function getDialogData(type) {
           "All locked notes will be re-encrypted with the new password.",
         positiveButtonText: "Change password",
       };
+    case "ask_vault_password":
+      return {
+        title: "Unlock vault",
+        subtitle: "Please enter your vault password to continue.",
+        positiveButtonText: "Unlock",
+      };
     case "change_account_password":
       return {
         title: "Change account password",

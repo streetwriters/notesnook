@@ -13,6 +13,7 @@ import { formatBytes, truncateFilename } from "../../utils/filename";
 import ScrollContainer from "../scroll-container";
 import { downloadAttachment } from "../../common/attachments";
 import { formatDate } from "notes-core/utils/date";
+import Vault from "../../common/vault";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -39,15 +40,23 @@ const metadataItems = [
 
 function Properties({ noteId }) {
   const [attachmentsStatus, setAttachmentsStatus] = useState({});
-  const session = useStore((store) => store.session);
-  const { color, notebooks, attachments } = session;
+  const [versionHistory, setVersionHistory] = useState([]);
 
   const toggleLocked = useStore((store) => store.toggleLocked);
   const setSession = useStore((store) => store.setSession);
-  const sessionId = useStore((store) => store.session.id);
+  const openPreviewSession = useStore((store) => store.openPreviewSession);
   const setColor = useStore((store) => store.setColor);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const isFocusMode = useAppStore((store) => store.isFocusMode);
+
+  const session = useStore((store) => store.session);
+  const {
+    id: sessionId,
+    color,
+    notebooks,
+    attachments,
+    readonly: isReadonly,
+  } = session;
 
   const changeState = useCallback(
     function changeState(prop, value) {
@@ -86,6 +95,15 @@ function Properties({ noteId }) {
       event.unsubscribe();
     };
   }, [attachments]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+
+    (async () => {
+      const history = await db.noteHistory.get(sessionId);
+      setVersionHistory(history);
+    })();
+  }, [sessionId]);
 
   if (isFocusMode || !sessionId) return null;
   return (
@@ -129,15 +147,19 @@ function Properties({ noteId }) {
               />
             }
           >
-            {tools.map((tool, _) => (
-              <Toggle
-                {...tool}
-                key={tool.key}
-                toggleKey={tool.key}
-                onToggle={(state) => changeState(tool.key, state)}
-                testId={`properties-${tool.key}`}
-              />
-            ))}
+            {!isReadonly && (
+              <>
+                {tools.map((tool, _) => (
+                  <Toggle
+                    {...tool}
+                    key={tool.key}
+                    toggleKey={tool.key}
+                    onToggle={(state) => changeState(tool.key, state)}
+                    testId={`properties-${tool.key}`}
+                  />
+                ))}
+              </>
+            )}
             {metadataItems.map((item) => (
               <Flex
                 key={item.key}
@@ -157,38 +179,42 @@ function Properties({ noteId }) {
                 </Text>
               </Flex>
             ))}
-            <Flex
-              py={2}
-              px={2}
-              sx={{
-                cursor: "pointer",
-              }}
-              justifyContent="center"
-            >
-              {COLORS.map((label) => (
+            {!isReadonly && (
+              <>
                 <Flex
-                  key={label}
-                  justifyContent="space-between"
-                  alignItems="center"
-                  onClick={() => setColor(label)}
+                  py={2}
+                  px={2}
                   sx={{
                     cursor: "pointer",
-                    position: "relative",
                   }}
-                  data-test-id={`properties-${label}`}
+                  justifyContent="center"
                 >
-                  <Icon.Circle size={35} color={label.toLowerCase()} />
-                  {label.toLowerCase() === color?.toLowerCase() && (
-                    <Icon.Checkmark
-                      color="static"
-                      size={18}
-                      sx={{ position: "absolute", left: "8px" }}
-                      data-test-id={`properties-${label}-check`}
-                    />
-                  )}
+                  {COLORS.map((label) => (
+                    <Flex
+                      key={label}
+                      justifyContent="space-between"
+                      alignItems="center"
+                      onClick={() => setColor(label)}
+                      sx={{
+                        cursor: "pointer",
+                        position: "relative",
+                      }}
+                      data-test-id={`properties-${label}`}
+                    >
+                      <Icon.Circle size={35} color={label.toLowerCase()} />
+                      {label.toLowerCase() === color?.toLowerCase() && (
+                        <Icon.Checkmark
+                          color="static"
+                          size={18}
+                          sx={{ position: "absolute", left: "8px" }}
+                          data-test-id={`properties-${label}-check`}
+                        />
+                      )}
+                    </Flex>
+                  ))}
                 </Flex>
-              ))}
-            </Flex>
+              </>
+            )}
           </Card>
           {!!notebooks?.length && (
             <Card title="Referenced In">
@@ -346,6 +372,75 @@ function Properties({ noteId }) {
               })}
             </Card>
           )}
+          <Card
+            title="Previous Sessions"
+            subtitle={"Your session history is local only."}
+          >
+            {versionHistory.map((session, index) => {
+              const fromDate = formatDate(session.dateCreated, {
+                dateStyle: "short",
+              });
+              const toDate = formatDate(session.dateModified, {
+                dateStyle: "short",
+              });
+              const fromTime = formatDate(session.dateCreated, {
+                timeStyle: "short",
+              });
+              const toTime = formatDate(session.dateModified, {
+                timeStyle: "short",
+              });
+              const label = `${fromDate}, ${fromTime} — ${
+                fromDate !== toDate ? `${toDate}, ` : ""
+              }${toTime}`;
+
+              return (
+                <Flex
+                  data-test-id={`session-${index}`}
+                  py={1}
+                  px={2}
+                  sx={{
+                    cursor: "pointer",
+                    ":hover": {
+                      bg: "hover",
+                    },
+                  }}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  title="Click to preview"
+                  onClick={async () => {
+                    toggleProperties(false);
+                    const content = await db.noteHistory.content(session.id);
+
+                    if (session.locked) {
+                      await Vault.askPassword(async (password) => {
+                        try {
+                          const decryptedContent =
+                            await db.vault.decryptContent(content, password);
+                          openPreviewSession({
+                            content: decryptedContent,
+                            dateCreated: session.dateCreated,
+                            dateEdited: session.dateModified,
+                          });
+                          return true;
+                        } catch (e) {
+                          return false;
+                        }
+                      });
+                    } else {
+                      openPreviewSession({
+                        content,
+                        dateCreated: session.dateCreated,
+                        dateEdited: session.dateModified,
+                      });
+                    }
+                  }}
+                >
+                  <Text variant={"body"}>{label}</Text>
+                  {session.locked && <Icon.Lock size={14} />}
+                </Flex>
+              );
+            })}
+          </Card>
         </ScrollContainer>
       </AnimatedFlex>
     </>
@@ -353,7 +448,7 @@ function Properties({ noteId }) {
 }
 export default React.memo(Properties);
 
-function Card({ title, button, children }) {
+function Card({ title, subtitle, button, children }) {
   return (
     <Flex
       flexDirection="column"
@@ -361,12 +456,15 @@ function Card({ title, button, children }) {
         borderRadius: "default",
       }}
     >
-      <Flex mx={2} my={2} alignItems="center">
+      <Flex mx={2} mt={2} alignItems="center">
         {button}
-        <Text variant="subtitle" fontSize="subtitle" color="fontTertiary">
-          {title}
-        </Text>
+        <Text variant="subtitle">{title}</Text>
       </Flex>
+      {subtitle && (
+        <Text variant="subBody" mb={1} mx={2}>
+          {subtitle}
+        </Text>
+      )}
       {children}
     </Flex>
   );

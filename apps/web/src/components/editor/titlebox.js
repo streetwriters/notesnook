@@ -4,7 +4,7 @@ import { Input } from "@rebass/forms";
 
 var changeTimeout;
 function TitleBox(props) {
-  const { title, setTitle, changeInterval, shouldFocus } = props;
+  const { title, setTitle, changeInterval, shouldFocus, readonly } = props;
 
   const [height, setHeight] = useState(0);
   const inputRef = useRef();
@@ -60,6 +60,7 @@ function TitleBox(props) {
         as="textarea"
         width="100%"
         minHeight={[30, 30, 60]}
+        readOnly={readonly}
         p={0}
         sx={{
           height,
@@ -89,6 +90,7 @@ function TitleBox(props) {
 export default React.memo(TitleBox, (prevProps, nextProps) => {
   return (
     prevProps.shouldFocus === nextProps.shouldFocus &&
-    prevProps.title === nextProps.title
+    prevProps.title === nextProps.title &&
+    prevProps.readonly === nextProps.readonly
   );
 });

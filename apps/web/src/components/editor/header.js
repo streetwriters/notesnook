@@ -7,7 +7,7 @@ import { Button, Flex, Text } from "rebass";
 import IconTag from "../icon-tag";
 import { db } from "../../common/db";
 
-function Header() {
+function Header({ readonly }) {
   const title = useStore((store) => store.session.title);
   const id = useStore((store) => store.session.id);
   const tags = useStore((store) => store.session.tags);
@@ -17,6 +17,7 @@ function Header() {
   return (
     <>
       <TitleBox
+        readonly={readonly}
         title={title}
         changeInterval={100}
         setTitle={(title) =>
@@ -26,7 +27,7 @@ function Header() {
         }
       />
 
-      {id && (
+      {!readonly && id && (
         <Flex alignItems="center" flexWrap="wrap" sx={{ lineHeight: 2.5 }}>
           {tags.map((tag) => (
             <IconTag

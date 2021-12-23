@@ -88,5 +88,11 @@ class Vault {
         .then((result) => result && lock(resolve));
     });
   }
+
+  static askPassword(action) {
+    return showPasswordDialog("ask_vault_password", ({ password }) => {
+      return action(password);
+    });
+  }
 }
 export default Vault;

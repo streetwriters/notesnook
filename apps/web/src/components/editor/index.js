@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Flex } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import Properties from "../properties";
 import {
   useStore,
@@ -21,6 +21,7 @@ import { db } from "../../common/db";
 import { AppEventManager, AppEvents } from "../../common";
 import debounce from "just-debounce-it";
 import { FlexScrollContainer } from "../scroll-container";
+import { formatDate } from "notes-core/utils/date";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
 const EMPTY_CONTENT = "<p><br></p>";
@@ -43,11 +44,14 @@ function Editor({ noteId, nonce }) {
   const editorRef = useRef();
   const [isEditorLoading, setIsEditorLoading] = useState(true);
   const sessionId = useStore((store) => store.session.id);
+  const sessionState = useStore((store) => store.session.state);
+  const isReadonly = useStore((store) => store.session.readonly);
   const contentId = useStore((store) => store.session.contentId);
   const contentType = useStore((store) => store.session.content?.type);
   const saveSession = useStore((store) => store.saveSession);
   const newSession = useStore((store) => store.newSession);
   const openSession = useStore((store) => store.openSession);
+  const closePreviewSession = useStore((store) => store.closePreviewSession);
   const toggleProperties = useStore((store) => store.toggleProperties);
   const arePropertiesVisible = useStore((store) => store.arePropertiesVisible);
   const init = useStore((store) => store.init);
@@ -63,6 +67,7 @@ function Editor({ noteId, nonce }) {
 
   const startSession = useCallback(
     async function startSession(noteId) {
+      console.log("starting session");
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId);
@@ -96,6 +101,34 @@ function Editor({ noteId, nonce }) {
     setContents();
   }, [clearContent]);
 
+  const enabledPreviewMode = useCallback(() => {
+    const editor = editorRef.current?.editor;
+    editor.mode.set("readonly");
+  }, []);
+
+  const disablePreviewMode = useCallback(
+    async (cancelled) => {
+      const {
+        content,
+        oldContent,
+        oldDateEdited,
+        oldSessionId,
+        oldDateCreated,
+      } = editorstore.get().session;
+
+      closePreviewSession({
+        dateCreated: oldDateCreated,
+        dateEdited: cancelled ? oldDateEdited : Date.now(),
+        sessionId: cancelled ? oldSessionId : Date.now(),
+        content: cancelled ? oldContent : content,
+      });
+      if (cancelled) setContent();
+
+      editorRef.current?.editor?.mode.set("design");
+    },
+    [closePreviewSession, setContent]
+  );
+
   useEffect(
     function clearSession() {
       // clearSession makes sessionId && contentId both undefined
@@ -112,7 +145,17 @@ function Editor({ noteId, nonce }) {
       if (!contentId && (!title || !!nonce)) return;
       setContent();
     },
-    [sessionId, contentId, setContent, clearContent]
+    [sessionId, contentId, setContent]
+  );
+
+  useEffect(
+    function openPreviewSession() {
+      if (!isReadonly || sessionState !== SESSION_STATES.new) return;
+
+      setContent();
+      enabledPreviewMode();
+    },
+    [isReadonly, sessionState, setContent, enabledPreviewMode]
   );
 
   useEffect(
@@ -170,6 +213,22 @@ function Editor({ noteId, nonce }) {
             minHeight: "39px",
           }}
         />
+        {isReadonly && (
+          <Notice
+            title={"Readonly mode"}
+            subtitle={`You are previewing note version edited from ${formatDate(
+              editorstore.get().session.dateCreated
+            )} to ${formatDate(editorstore.get().session.dateEdited)}.`}
+            onCancel={() => disablePreviewMode(true)}
+            action={{
+              text: "Restore this version",
+              onClick: async () => {
+                await editorstore.get().saveSession();
+                await disablePreviewMode(false);
+              },
+            }}
+          />
+        )}
         <Flex
           variant="columnFill"
           className="editor"
@@ -185,7 +244,7 @@ function Editor({ noteId, nonce }) {
           px={[2, 2, 35]}
           mt={[2, 2, 25]}
         >
-          <Header />
+          <Header readonly={isReadonly} />
 
           {isSessionReady && (
             <Suspense fallback={<div />}>
@@ -229,3 +288,41 @@ function Editor({ noteId, nonce }) {
   );
 }
 export default Editor;
+
+function Notice({ title, subtitle, onCancel, action }) {
+  return (
+    <Flex
+      bg="bgSecondary"
+      p={2}
+      justifyContent={"space-between"}
+      alignItems={"center"}
+    >
+      <Flex flexDirection={"column"} mr={4}>
+        <Text variant={"subtitle"}>{title}</Text>
+        <Text variant={"body"}>{subtitle}</Text>
+      </Flex>
+      <Flex>
+        {onCancel && (
+          <Button
+            data-test-id="editor-notice-cancel"
+            variant={"secondary"}
+            mr={1}
+            px={4}
+            onClick={onCancel}
+          >
+            Cancel
+          </Button>
+        )}
+        {action && (
+          <Button
+            data-test-id="editor-notice-action"
+            px={4}
+            onClick={action.onClick}
+          >
+            {action.text}
+          </Button>
+        )}
+      </Flex>
+    </Flex>
+  );
+}
