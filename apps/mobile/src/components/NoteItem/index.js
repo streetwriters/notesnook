@@ -78,7 +78,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
-  const attachmentCount = db.attachments?.ofNote(item.id)?.length || 0;
+  const attachmentCount = db.attachments?.ofNote(item.id,'all')?.length || 0;
 
   function getNotebook() {
     if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
