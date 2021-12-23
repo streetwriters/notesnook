@@ -3,11 +3,11 @@ const { addPluginToPluginManager } = require("../utils");
 function register(editor) {
   setupUI(editor);
 
-  editor.addCommand("mceAttachImage", function (image) {
+  editor.addCommand("mceAttachImage", function(image) {
     insertImage(editor, image);
   });
 
-  editor.addCommand("mceAttachFile", function (file) {
+  editor.addCommand("mceAttachFile", function(file) {
     insertFile(editor, file);
   });
 
@@ -16,7 +16,7 @@ function register(editor) {
    * because calling execCommand forces the editor to steal
    * the focus. There is currently no way around that.
    */
-  editor._replaceImage = async function (image) {
+  editor._replaceImage = async function(image) {
     const { hash, src } = image;
     const elements = editor.dom.doc.querySelectorAll(
       `img[data-hash="${hash}"]`
@@ -36,7 +36,7 @@ function register(editor) {
     }
   };
 
-  editor._updateAttachmentProgress = function (progressState) {
+  editor._updateAttachmentProgress = function(progressState) {
     const { hash, total, loaded } = progressState;
     const elements = editor.dom.doc.querySelectorAll(
       `span.attachment[data-hash="${hash}"]`
@@ -80,11 +80,12 @@ function setupUI(editor) {
       editor.undoManager.transact(() => {
         editor.execCommand("Delete");
       });
+      notifyEditorChange();
     },
   });
 
   editor.ui.registry.addContextToolbar("attachment-selection", {
-    predicate: function (node) {
+    predicate: function(node) {
       return node.nodeName !== "IMG" && node.classList.contains("attachment");
     },
     items: "download delete",
@@ -107,6 +108,7 @@ async function insertImage(editor, image) {
     editor.insertContent(content);
     editor.execCommand("mceInsertNewLine");
   });
+  notifyEditorChange();
 }
 
 async function insertFile(editor, file) {
@@ -125,6 +127,7 @@ async function insertFile(editor, file) {
   editor.undoManager.transact(() => {
     editor.insertContent(content);
   });
+  notifyEditorChange();
 }
 
 function formatBytes(bytes, decimals = 2) {
@@ -148,4 +151,8 @@ async function dataUriToBlob(uri) {
 
   const response = await fetch(uri);
   return await response.blob();
+}
+
+function notifyEditorChange() {
+  editor.fire("input");
 }
