@@ -28,7 +28,7 @@ export default function NoteHistory({note, ref}) {
   }, []);
 
   async function preview(item) {
-    let content = await db.noteHistory.content(item.sessionContentId);
+    let content = await db.noteHistory.content(item.id);
 
     presentSheet({
       component: (

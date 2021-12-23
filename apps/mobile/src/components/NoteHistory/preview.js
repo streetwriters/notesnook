@@ -1,16 +1,15 @@
-import React, {useRef} from 'react';
-import {View} from 'react-native';
+import React, { useRef } from 'react';
+import { View } from 'react-native';
 import WebView from 'react-native-webview';
-import {useTracked} from '../../provider';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useEditorStore } from '../../provider/stores';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {dHeight, itemSkus} from '../../utils';
-import {db} from '../../utils/database';
-import {eCloseProgressDialog} from '../../utils/Events';
-import {normalize} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
-import {sourceUri} from '../../views/Editor/Functions';
-import {Button} from '../Button';
+import { db } from '../../utils/database';
+import { eCloseProgressDialog, eOnLoadNote } from '../../utils/Events';
+import { normalize } from '../../utils/SizeUtils';
+import { getNote, sourceUri } from '../../views/Editor/Functions';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 
 export default function NotePreview({session, content}) {
@@ -24,6 +23,7 @@ export default function NotePreview({session, content}) {
       content,
       'placeholder.svg'
     );
+
     console.log(preview, 'preview');
     postMessage('htmldiff', preview?.data);
     let theme = {...colors};
@@ -62,6 +62,11 @@ export default function NotePreview({session, content}) {
 
   async function restore() {
     await db.noteHistory.restore(session.id);
+    if (useEditorStore.getState()?.currentEditingNote === session?.noteId) {
+      if (getNote()) {
+        eSendEvent(eOnLoadNote, {...getNote(), forced: true});
+      }
+    }
     eSendEvent(eCloseProgressDialog, 'note_history');
     eSendEvent(eCloseProgressDialog);
     Navigation.setRoutesToUpdate([
@@ -69,6 +74,7 @@ export default function NotePreview({session, content}) {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Notes
     ]);
+
     ToastEvent.show({
       heading: 'Note restored successfully',
       type: 'success'
@@ -112,7 +118,12 @@ export default function NotePreview({session, content}) {
         style={{
           paddingHorizontal: 12
         }}>
-        <Button onPress={restore} title="Restore this version" type="accent" width="100%" />
+        <Button
+          onPress={restore}
+          title="Restore this version"
+          type="accent"
+          width="100%"
+        />
       </View>
     </View>
   );

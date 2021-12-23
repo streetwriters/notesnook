@@ -42,6 +42,7 @@ import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
   clearTimer,
+  EditorWebView,
   getNote,
   loadNote,
   setColors,
@@ -177,6 +178,7 @@ const EditorHeader = () => {
       'Pin',
       'Favorite',
       'Publish',
+      'History',
       ...android
     ]);
   };
@@ -337,6 +339,8 @@ const EditorHeader = () => {
                   }}
                   top={50}
                   onPress={async () => {
+                  EditorWebView.current?.reload();
+                  return;
                     if (editing.isFocused) {
                       safeKeyboardDismiss();
                       editing.isFocused = true;
