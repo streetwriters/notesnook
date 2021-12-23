@@ -198,7 +198,10 @@ function Editor({ noteId, nonce }) {
         </Flex>
       ) : null}
       <Toolbar />
-      <FlexScrollContainer className="editorScroll">
+      <FlexScrollContainer
+        className="editorScroll"
+        viewStyle={{ display: "flex", flexDirection: "column" }}
+      >
         <Flex
           id="editorToolbar"
           sx={{

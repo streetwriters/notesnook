@@ -28,7 +28,13 @@ const ScrollContainer = ({ children, style, forwardedRef, ...props }) => {
 };
 export default ScrollContainer;
 
-export function FlexScrollContainer({ children, className, style, ...props }) {
+export function FlexScrollContainer({
+  children,
+  className,
+  style,
+  viewStyle,
+  ...props
+}) {
   return (
     <Scrollbars
       {...props}
@@ -50,6 +56,7 @@ export function FlexScrollContainer({ children, className, style, ...props }) {
             overflow: "scroll",
             position: "relative",
             flex: "1 1 auto",
+            ...viewStyle,
           }}
           sx={{
             scrollbarWidth: "none",
