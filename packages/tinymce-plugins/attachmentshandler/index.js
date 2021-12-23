@@ -80,7 +80,7 @@ function setupUI(editor) {
       editor.undoManager.transact(() => {
         editor.execCommand("Delete");
       });
-      notifyEditorChange();
+      notifyEditorChange(editor);
     },
   });
 
@@ -108,7 +108,7 @@ async function insertImage(editor, image) {
     editor.insertContent(content);
     editor.execCommand("mceInsertNewLine");
   });
-  notifyEditorChange();
+  notifyEditorChange(editor);
 }
 
 async function insertFile(editor, file) {
@@ -127,7 +127,7 @@ async function insertFile(editor, file) {
   editor.undoManager.transact(() => {
     editor.insertContent(content);
   });
-  notifyEditorChange();
+  notifyEditorChange(editor);
 }
 
 function formatBytes(bytes, decimals = 2) {
@@ -153,6 +153,6 @@ async function dataUriToBlob(uri) {
   return await response.blob();
 }
 
-function notifyEditorChange() {
+function notifyEditorChange(editor) {
   editor.fire("input");
 }
