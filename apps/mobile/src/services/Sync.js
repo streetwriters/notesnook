@@ -1,15 +1,18 @@
 import NetInfo from '@react-native-community/netinfo';
-import { initialize, useUserStore } from '../provider/stores';
-import { doInBackground } from '../utils';
-import { db } from '../utils/database';
-import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
-import { ToastEvent } from './EventManager';
+import {initialize, useUserStore} from '../provider/stores';
+import {doInBackground} from '../utils';
+import {db} from '../utils/database';
+import {getNote, updateNoteInEditor} from '../views/Editor/Functions';
+import {ToastEvent} from './EventManager';
 
 let retryCount = 0;
 const run = async (context = 'global', forced) => {
   let result = false;
   const userstore = useUserStore.getState();
-  if (!userstore.user) return true;
+  if (!userstore.user) {
+    initialize();
+    return true;
+  }
   userstore.setSyncing(true);
 
   try {
@@ -22,7 +25,10 @@ const run = async (context = 'global', forced) => {
       }
     });
 
-    if (!res) return false;
+    if (!res) {
+      initialize();
+      return false;
+    }
     if (typeof res === 'string') throw new Error(res);
     retryCount = 0;
     result = true;
@@ -34,8 +40,7 @@ const run = async (context = 'global', forced) => {
     });
   } catch (e) {
     result = false;
-    if (e.message === 'Sync already running') return;
-    if (userstore.user) {
+    if (e.message !== 'Sync already running' && userstore.user) {
       userstore.setSyncing(false);
       let status = await NetInfo.fetch();
       if (status.isConnected && status.isInternetReachable) {

@@ -1,11 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, View} from 'react-native';
+import {FlatList, RefreshControl, RefreshControlComponent, View} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {db} from '../../utils/database';
 import {eScrollEvent} from '../../utils/Events';
+import {sleep} from '../../utils/TimeUtils';
 import JumpToDialog from '../JumpToDialog';
 import {NotebookWrapper} from '../NotebookItem/wrapper';
 import {NoteWrapper} from '../NoteItem/wrapper';
@@ -60,8 +61,6 @@ const RenderItem = ({item, index, type, ...restArgs}) => {
 const SimpleList = ({
   listData,
   type,
-  customRefresh,
-  customRefreshing,
   refreshCallback,
   placeholderData,
   loading,
@@ -75,7 +74,8 @@ const SimpleList = ({
   const {colors} = state;
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  const refreshing = false;
+  //const refreshing = false;
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     let timeout = null;
@@ -109,7 +109,9 @@ const SimpleList = ({
   );
 
   const _onRefresh = async () => {
+    setRefreshing(true);
     await Sync.run();
+    setRefreshing(false);
     if (refreshCallback) {
       refreshCallback();
     }
@@ -151,15 +153,10 @@ const SimpleList = ({
         maxToRenderPerBatch={10}
         refreshControl={
           <RefreshControl
-            style={{
-              opacity: 0,
-              elevation: 0
-            }}
             tintColor={colors.accent}
             colors={[colors.accent]}
-            progressViewOffset={150}
-            onRefresh={customRefresh ? customRefresh : _onRefresh}
-            refreshing={customRefresh ? customRefreshing : refreshing}
+            onRefresh={_onRefresh}
+            refreshing={refreshing}
           />
         }
         ListEmptyComponent={
