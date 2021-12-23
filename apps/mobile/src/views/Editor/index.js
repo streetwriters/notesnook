@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {Platform, ScrollView, TextInput, View} from 'react-native';
+import {Platform, View} from 'react-native';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useEditorStore, useUserStore} from '../../provider/stores';
@@ -10,7 +10,6 @@ import {
 } from '../../services/EventManager';
 import {getCurrentColors} from '../../utils/Colors';
 import {eOnLoadNote} from '../../utils/Events';
-import {normalize} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
@@ -18,7 +17,6 @@ import {
   getNote,
   onWebViewLoad,
   sourceUri,
-  textInput,
   _onMessage,
   _onShouldStartLoadWithRequest
 } from './Functions';
@@ -35,8 +33,6 @@ const style = {
   backgroundColor: 'transparent'
 };
 
-const CustomView = Platform.OS === 'ios' ? ScrollView : View;
-
 const Editor = React.memo(
   () => {
     const premiumUser = useUserStore(state => state.premium);
@@ -45,7 +41,6 @@ const Editor = React.memo(
     const onLoad = async () => {
       await onWebViewLoad(premiumUser, getCurrentColors());
     };
-    console.log(sessionId, 'updated id');
 
     useEffect(() => {
       if (premiumUser) {
@@ -57,7 +52,10 @@ const Editor = React.memo(
       setResetting(true);
       await sleep(30);
       setResetting(false);
-      eSendEvent(eOnLoadNote, getNote() ? {...getNote(),forced:true} : {type: 'new'});
+      eSendEvent(
+        eOnLoadNote,
+        getNote() ? {...getNote(), forced: true} : {type: 'new'}
+      );
       console.log('resetting editor');
       if (!getNote()) {
         await sleep(10);
@@ -72,36 +70,20 @@ const Editor = React.memo(
       };
     }, []);
 
-    const androidStyle = Platform.OS == 'android' ? {flexGrow: 1, flex: 1} : {};
-
     return resetting ? null : (
       <>
-        <CustomView
-          style={[
-            {
-              width: '100%',
-              backgroundColor: 'transparent'
-            },
-            androidStyle
-          ]}
-          bounces={false}
-          bouncesZoom={false}
-          disableScrollViewPanResponder
-          keyboardDismissMode="none"
-          keyboardShouldPersistTaps="always"
-          showsVerticalScrollIndicator={false}
-          scrollEnabled={false}
-          nestedScrollEnabled
-          contentContainerStyle={{
+        <View
+          style={{
             width: '100%',
-            height: '100%'
+            backgroundColor: 'transparent',
+            flexGrow: 1,
+            flex: 1
           }}>
           <EditorHeader />
           <WebView
             testID={notesnook.editor.id}
             ref={EditorWebView}
             onLoad={onLoad}
-            scrollEnabled={true}
             onRenderProcessGone={event => {
               onResetRequested();
             }}
@@ -137,13 +119,13 @@ const Editor = React.memo(
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            source={source}
-            //source={{uri:"http://192.168.10.4:3000/index.html"}}
+            //source={source}
+            source={{uri:"http://192.168.10.13:5000/index.html"}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}
           />
-        </CustomView>
+        </View>
         <EditorToolbar />
       </>
     );
