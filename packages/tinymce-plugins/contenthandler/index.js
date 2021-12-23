@@ -8,7 +8,7 @@ function register(editor) {
    * TinyMCE getContent is extremely slow. We have to circumvent it and
    * use the Browser's native DOMParser.
    */
-  editor.getHTML = async function () {
+  editor.getHTML = async function() {
     const body = editor.getBody();
     if (!body) return;
 
@@ -41,24 +41,24 @@ function register(editor) {
     return document.innerHTML;
   };
 
-  editor.getText = function () {
+  editor.getText = function() {
     const body = editor.getBody();
     if (!body) return;
 
     return body.innerText;
   };
 
-  editor.countWords = function () {
+  editor.countWords = function() {
     const text = editor.getText();
     if (!text) return;
     return countWords(text);
   };
 
-  editor.setHTML = function (html) {
+  editor.setHTML = function(html) {
     editorSetContent(editor, html, true);
   };
 
-  editor.clearContent = function () {
+  editor.clearContent = function() {
     editorSetContent(editor, "<p><br></p>", false);
   };
 }
@@ -70,7 +70,7 @@ function register(editor) {
 function blobUriToDataUri(uri) {
   return new Promise(async (resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = function () {
+    reader.onload = function() {
       resolve(reader.result);
     };
     reader.onerror = reject;
@@ -114,10 +114,7 @@ function editorSetContent(editor, content, removePlaceholder = true) {
   const body = editor.getBody();
   if (!body) return;
 
-  // perf: focus empty editor because apparently tinyMCE parses the whole
-  // HTML on focus (sometimes).
   body.innerHTML = "";
-  editor.focus();
 
   if (removePlaceholder) {
     body.removeAttribute("data-mce-placeholder");
@@ -135,4 +132,6 @@ function editorSetContent(editor, content, removePlaceholder = true) {
   editor.undoManager.reset();
   editor.undoManager.clear();
   editor.setDirty(false);
+
+  editor.focus();
 }
