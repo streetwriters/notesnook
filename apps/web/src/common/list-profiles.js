@@ -25,6 +25,7 @@ const NotesProfile = createProfile(
       item={item}
       tags={getTags(item)}
       notebook={getNotebook(item.notebooks, context?.type)}
+      attachments={getAttachmentsCount(item.id)}
       context={context}
     />
   ),
@@ -106,4 +107,8 @@ function getNotebook(notebooks, contextType) {
     dateEdited: notebook.dateEdited,
     topic: { id: topicId, title: topic.title },
   };
+}
+
+function getAttachmentsCount(noteId) {
+  return db.attachments.ofNote(noteId, "all").length;
 }

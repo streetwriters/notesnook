@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { Button, Flex } from "rebass";
+import { Button, Flex, Text } from "rebass";
 import * as Icon from "../icons";
 import TimeAgo from "../time-ago";
 import ListItem from "../list-item";
@@ -17,7 +17,7 @@ import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
 
 function Note(props) {
-  const { tags, notebook, item, index, context } = props;
+  const { tags, notebook, item, index, context, attachments } = props;
   const note = item;
   const isOpened = useStore((store) => store.selectedNote === note.id);
   const isCompact = useStore((store) => store.viewMode === "compact");
@@ -110,6 +110,13 @@ function Note(props) {
                 mr={1}
               />
 
+              {attachments > 0 && (
+                <Flex mr={1}>
+                  <Icon.Attachment size={16} color="fontTertiary" />
+                  <Text ml={"2px"}>{attachments}</Text>
+                </Flex>
+              )}
+
               {note.pinned && !props.context && (
                 <Icon.Pin size={13} color={primary} sx={{ mr: 1 }} />
               )}
@@ -170,6 +177,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
     prevItem.locked === nextItem.locked &&
     prevItem.conflicted === nextItem.conflicted &&
     prevItem.color === nextItem.color &&
+    prevProps.attachments === nextProps.attachments &&
     prevProps.notebook?.dateEdited === nextProps.notebook?.dateEdited &&
     JSON.stringify(prevProps.tags) === JSON.stringify(nextProps.tags)
   );

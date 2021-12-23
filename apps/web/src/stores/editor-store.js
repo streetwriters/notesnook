@@ -186,12 +186,12 @@ class EditorStore extends BaseStore {
           noteStore.setSelectedNote(id);
         }
 
+        const attachments = db.attachments.ofNote(note.id, "all");
         this.set((state) => {
           state.session.id = note.id;
           state.session.isSaving = false;
           state.session.notebooks = note.notebooks;
-          state.session.attachments =
-            db.attachments.ofNote(note.id, "all") || [];
+          state.session.attachments = attachments;
         });
 
         if (!oldSession) {
@@ -200,6 +200,7 @@ class EditorStore extends BaseStore {
         }
 
         if (
+          attachments?.length !== oldSession.attachments.length ||
           note.headline !== oldSession.headline ||
           note.title !== oldSession.title
         )
