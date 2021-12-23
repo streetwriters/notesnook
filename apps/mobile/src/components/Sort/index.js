@@ -5,7 +5,7 @@ import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
 import {db} from '../../utils/database';
-import { refreshNotesPage } from '../../utils/Events';
+import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -41,7 +41,7 @@ const Sort = ({type, screen}) => {
       style={{
         width: '100%',
         backgroundColor: colors.bg,
-        justifyContent: 'space-between',
+        justifyContent: 'space-between'
       }}>
       <View
         style={{
@@ -119,11 +119,12 @@ const Sort = ({type, screen}) => {
               key={item}
               type={groupOptions.sortBy === item ? 'grayBg' : 'gray'}
               title={SORT[item]}
-              height={45}
+              height={40}
               iconPosition="left"
               icon={groupOptions.sortBy === item ? 'check' : null}
               style={{
-                marginRight: 10
+                marginRight: 10,
+                paddingHorizontal: 8
               }}
               buttonType={{
                 text: groupOptions.sortBy === item ? colors.accent : colors.icon
@@ -188,10 +189,11 @@ const Sort = ({type, screen}) => {
               }
               updateGroupOptions(_groupOptions);
             }}
+            height={40}
             icon={groupOptions.groupBy === GROUP[item] ? 'check' : null}
             title={item.slice(0, 1).toUpperCase() + item.slice(1, item.length)}
             style={{
-              paddingHorizontal: 12,
+              paddingHorizontal: 8,
               marginBottom: 10,
               marginRight: 10
             }}
