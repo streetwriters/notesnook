@@ -25,6 +25,7 @@ import {groupArray} from 'notes-core/utils/grouping';
 import {EditorWebView, post} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
+import {endSearch} from '../views/Editor/tiny/toolbar/commands';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -289,13 +290,19 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   searchReplace: false,
   searchSelection: null,
   setSearchReplace: searchReplace => {
-    set({searchReplace});
     if (!searchReplace) {
-      set({searchSelection: null});
+      set({searchSelection: null, searchReplace: false});
       return;
     }
     let func = (value: string) => {
-      set({searchSelection: value});
+      console.log("setSearchReplace:", value, value.length);
+      if ((!value || value.trim() === '') && get().searchReplace) {
+        endSearch();
+        return;
+      }
+
+      set({searchSelection: value, searchReplace: true});
+
       eUnSubscribeEvent('selectionvalue', func);
     };
     eSubscribeEvent('selectionvalue', func);
