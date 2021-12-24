@@ -73,9 +73,9 @@ test("pressing ctrl + A inside code block doesn't select anything outside", asyn
 
   await page.keyboard.press("Control+A");
 
-  expect(await page.screenshot("#mytextarea_ifr")).toMatchSnapshot(
-    "code-select-all.png"
-  );
+  expect(
+    await page.screenshot("#mytextarea_ifr")
+  ).toMatchSnapshot("code-select-all.png", { threshold: 99 });
 });
 
 test("toggle a code block into a paragraph", async ({ page }) => {

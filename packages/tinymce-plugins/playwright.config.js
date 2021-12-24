@@ -33,7 +33,7 @@ module.exports = {
   reporter: "list",
   retries: IS_CI ? 3 : 0,
   use: {
-    headless: false,
+    headless: true,
     acceptDownloads: true,
 
     // Artifacts

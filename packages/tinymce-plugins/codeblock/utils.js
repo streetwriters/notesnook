@@ -12,19 +12,7 @@ function createCodeBlock(content) {
 }
 
 function isCodeBlock(node) {
-  return node.nodeName === TAGNAME;
-}
-
-function isInsideCodeBlock(element) {
-  let elem = element;
-  while (elem.tagName !== TAGNAME && !!elem.parentElement) {
-    elem = elem.parentElement;
-    if (elem.classList.contains("mce-content-body")) {
-      elem = undefined;
-      break;
-    }
-  }
-  return elem && elem.tagName === TAGNAME;
+  return node.closest(TAGNAME);
 }
 
 function newlineToBR(html) {
@@ -33,7 +21,6 @@ function newlineToBR(html) {
 
 module.exports = {
   newlineToBR,
-  isInsideCodeBlock,
   createCodeBlock,
   isCodeBlock,
   TAGNAME,

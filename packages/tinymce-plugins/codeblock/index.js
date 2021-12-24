@@ -3,16 +3,8 @@ const {
   getCharacterRange,
   moveCaretTo,
   getCurrentLine,
-  getPreviousLine,
 } = require("../utils");
-const {
-  createCodeBlock,
-  isCodeBlock,
-  state,
-  isInsideCodeBlock,
-  newlineToBR,
-  brToNewline,
-} = require("./utils");
+const { createCodeBlock, isCodeBlock, state, newlineToBR } = require("./utils");
 const { addCodeBlockToolbar, refreshHighlighting } = require("./toolbar");
 
 const TAB = `\u00A0\u00A0`;
@@ -27,24 +19,24 @@ var handlersRegistered = false;
 function register(editor) {
   addCodeBlockToolbar(editor);
 
-  editor.addCommand("mceInsertCodeBlock", function (api, args) {
+  editor.addCommand("mceInsertCodeBlock", function(api, args) {
     toggleCodeBlock(editor, api, args);
   });
 
   editor.ui.registry.addToggleButton("codeblock", {
     icon: "code-sample",
     tooltip: "Codeblock",
-    onAction: function (api) {
+    onAction: function(api) {
       return toggleCodeBlock(editor, api);
     },
     onSetup: (api) => {
       function onNodeChanged(event) {
         const element = event.element;
-        let isActive = isInsideCodeBlock(element);
+        let isActive = isCodeBlock(element);
         api.setActive(isActive);
       }
       editor.on("NodeChange", onNodeChanged);
-      return function () {
+      return function() {
         editor.off("NodeChange", onNodeChanged);
       };
     },
@@ -56,11 +48,11 @@ function register(editor) {
   }
 }
 
-var toggleCodeBlock = function (editor, api, type) {
+var toggleCodeBlock = function(editor, api, type) {
   const node = editor.selection.getNode();
-  const isCodeBlock =
-    (api && api.isActive && api.isActive()) || isInsideCodeBlock(node);
-  if (isCodeBlock) {
+  const isCodeBlockActive =
+    (api && api.isActive && api.isActive()) || isCodeBlock(node);
+  if (isCodeBlockActive) {
     var content = editor.selection.getContent({ format: "text" });
     if (content.length > 0) {
       console.log(content);
@@ -82,7 +74,7 @@ var toggleCodeBlock = function (editor, api, type) {
 };
 
 function insertCodeBlock(editor, content) {
-  editor.undoManager.transact(function () {
+  editor.undoManager.transact(function() {
     const pre = createCodeBlock(content);
     editor.dom.setAttrib(pre, "data-mce-id", "__mcenew");
     editor.focus();
@@ -99,7 +91,7 @@ function insertCodeBlock(editor, content) {
 }
 
 function blurCodeBlock(editor, block, content = "<br>") {
-  editor.undoManager.transact(function () {
+  editor.undoManager.transact(function() {
     const p = document.createElement("p");
     p.innerHTML = newlineToBR(content).trim();
     editor.focus();
@@ -120,7 +112,7 @@ var isCreatingCodeBlock = false;
  * @param {import("tinymce").Editor} editor
  * @returns
  */
-var registerHandlers = function (editor) {
+var registerHandlers = function(editor) {
   // A simple hack to handle the ``` markdown text pattern
   // This acts as a "command" for us. Whenever, TinyMCE adds
   // <pre></pre> we override it and insert our own modified
@@ -136,25 +128,38 @@ var registerHandlers = function (editor) {
   function onBeforeExecCommand(e) {
     const node = editor.selection.getNode();
 
-    // override pasting: by default the pasted code
-    // is stripped of all newlines; i.e. it is pasted
-    // as a single line.
-    if (
-      isCodeBlock(node) &&
-      e.command === "mceInsertContent" &&
-      e.value &&
-      e.value.paste
-    ) {
-      e.value.content = e.value.content
-        .replace(/<p>/gm, "")
-        .replace(/<\/p>|<br \/>/gm, "\n");
-    }
+    switch (e.command) {
+      // override select all: we want to only select the code inside the
+      // code block.
+      case "SelectAll":
+        if (isCodeBlock(node)) {
+          e.preventDefault();
+          editor.selection.select(state.activeBlock, true);
+          return;
+        }
+        break;
 
-    // TextPattern plugin by default adds a new line for the replacement patterns,
-    // but we don't want to add a new line so we override it.
-    if (isCreatingCodeBlock && e.command === "mceInsertNewLine") {
-      e.preventDefault();
-      isCreatingCodeBlock = false;
+      // override pasting: by default the pasted code
+      // is stripped of all newlines; i.e. it is pasted
+      // as a single line.
+      case "mceInsertContent":
+        if (isCodeBlock(node) && e.value && e.value.paste) {
+          e.value.content = e.value.content
+            .replace(/<p>/gm, "")
+            .replace(/<\/p>|<br \/>/gm, "\n");
+          return;
+        }
+        break;
+
+      // TextPattern plugin by default adds a new line for the replacement patterns,
+      // but we don't want to add a new line so we override it.
+      case "mceInsertNewLine":
+        if (isCreatingCodeBlock) {
+          e.preventDefault();
+          isCreatingCodeBlock = false;
+          return;
+        }
+        break;
     }
   }
 
@@ -170,14 +175,7 @@ var registerHandlers = function (editor) {
       editor.undoManager.transact(() => {
         handleTab(e, node);
       });
-    } else if (e.ctrlKey && e.code === "KeyA") {
-      e.preventDefault();
-      handleCtrlA(node);
     }
-  }
-
-  function handleCtrlA(node) {
-    editor.selection.select(node, true);
   }
 
   function handleTab(e, node) {
@@ -250,14 +248,14 @@ var registerHandlers = function (editor) {
     const currentLine = getCurrentLine(node);
     const indent =
       (currentLine.length - currentLine.trimStart().length) / TAB_LENGTH;
-    editor.insertContent(TAB.repeat(indent));
+    setTimeout(() => editor.insertContent(TAB.repeat(indent)), 0);
   }
 
   editor.on("BeforeExecCommand", onBeforeExecCommand);
   editor.on("BeforeSetContent", onBeforeSetContent);
   editor.on("keydown", onKeyDown);
   editor.on("keyup", onKeyUp);
-  return function () {
+  return function() {
     editor.off("BeforeExecCommand", onBeforeExecCommand);
     editor.off("BeforeSetContent", onBeforeSetContent);
     editor.off("keydown", onKeyDown);
@@ -304,10 +302,10 @@ module.exports = { processPastedContent };
 // leading edge, instead of the trailing.
 function debounce(func, wait, immediate) {
   var timeout;
-  return function () {
+  return function() {
     var context = this,
       args = arguments;
-    var later = function () {
+    var later = function() {
       timeout = null;
       if (!immediate) func.apply(context, args);
     };
