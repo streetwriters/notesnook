@@ -21,6 +21,7 @@ export const ATTRIBUTES = {
     "data-mce-style",
     "data-mce-type",
     "data-progress",
+    "data-mce-active",
   ],
   elementDelete: ["data-mce-bogus", "data-mce-bookmark"],
 };

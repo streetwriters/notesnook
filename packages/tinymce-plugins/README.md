@@ -31,6 +31,7 @@ import "@streetwritersco/tinymce-plugins/<plugin-name>";
 8. Blockescape (for easily escaping from blockquote and other block elements)
 9. Attachments handler (used internally by [Notesnook](https://app.notesnook.com/) for attachments)
 10. Content handler (used internally by [Notesnook](https://app.notesnook.com/) to get html content & count words fast).
+11. Bettertable (augments the default TinyMCE table adding row/cell selection, cell-only select all).
 
 ### Overrides
 
