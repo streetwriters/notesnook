@@ -1,7 +1,7 @@
 {
   "name": "@streetwritersco/tinymce-plugins",
   "private": false,
-  "version": "1.4.15",
+  "version": "1.5.0",
   "description": "All the custom made or modified plugins for TinyMCE used in Notesnook & other apps maintained by Streetwriters team.",
   "main": "index.js",
   "scripts": {
@@ -22,7 +22,7 @@
     "tinymce": "^5"
   },
   "devDependencies": {
-    "@playwright/test": "^1.16.0",
+    "@playwright/test": "^1.17.1",
     "@types/node": "^16.11.6",
     "serve": "^12.0.1"
   },
