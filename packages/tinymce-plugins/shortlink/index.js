@@ -12,12 +12,12 @@
  * Version: 5.6.2 (2020-12-08)
  */
 
-(function () {
+(function() {
   var global = tinymce.util.Tools.resolve("tinymce.PluginManager");
 
   var global$1 = tinymce.util.Tools.resolve("tinymce.util.VK");
 
-  var typeOf = function (x) {
+  var typeOf = function(x) {
     var t = typeof x;
     if (x === null) {
       return "null";
@@ -39,18 +39,18 @@
       return t;
     }
   };
-  var isType = function (type) {
-    return function (value) {
+  var isType = function(type) {
+    return function(value) {
       return typeOf(value) === type;
     };
   };
-  var isSimpleType = function (type) {
-    return function (value) {
+  var isSimpleType = function(type) {
+    return function(value) {
       return typeof value === type;
     };
   };
-  var eq = function (t) {
-    return function (a) {
+  var eq = function(t) {
+    return function(a) {
       return t === a;
     };
   };
@@ -58,7 +58,7 @@
   var isNull = eq(null);
   var isBoolean = isSimpleType("boolean");
 
-  var assumeExternalTargets = function (editor) {
+  var assumeExternalTargets = function(editor) {
     var externalTargets = editor.getParam(
       "link_assume_external_targets",
       false
@@ -73,22 +73,22 @@
     }
     return 0;
   };
-  var hasContextToolbar = function (editor) {
+  var hasContextToolbar = function(editor) {
     return editor.getParam("link_context_toolbar", false, "boolean");
   };
-  var getDefaultLinkTarget = function (editor) {
+  var getDefaultLinkTarget = function(editor) {
     return editor.getParam("default_link_target");
   };
-  var allowUnsafeLinkTarget = function (editor) {
+  var allowUnsafeLinkTarget = function(editor) {
     return editor.getParam("allow_unsafe_link_target", false, "boolean");
   };
 
-  var appendClickRemove = function (link, evt) {
+  var appendClickRemove = function(link, evt) {
     document.body.appendChild(link);
     link.dispatchEvent(evt);
     document.body.removeChild(link);
   };
-  var open = function (url) {
+  var open = function(url) {
     var link = document.createElement("a");
     link.target = "_blank";
     link.href = url;
@@ -114,7 +114,7 @@
     appendClickRemove(link, evt);
   };
 
-  var __assign = function () {
+  var __assign = function() {
     __assign =
       Object.assign ||
       function __assign(t) {
@@ -128,30 +128,30 @@
     return __assign.apply(this, arguments);
   };
 
-  var noop = function () {};
-  var constant = function (value) {
-    return function () {
+  var noop = function() {};
+  var constant = function(value) {
+    return function() {
       return value;
     };
   };
   var never = constant(false);
   var always = constant(true);
 
-  var none = function () {
+  var none = function() {
     return NONE;
   };
-  var NONE = (function () {
-    var eq = function (o) {
+  var NONE = (function() {
+    var eq = function(o) {
       return o.isNone();
     };
-    var call = function (thunk) {
+    var call = function(thunk) {
       return thunk();
     };
-    var id = function (n) {
+    var id = function(n) {
       return n;
     };
     var me = {
-      fold: function (n, _s) {
+      fold: function(n, _s) {
         return n();
       },
       is: never,
@@ -159,7 +159,7 @@
       isNone: always,
       getOr: id,
       getOrThunk: call,
-      getOrDie: function (msg) {
+      getOrDie: function(msg) {
         throw new Error(msg || "error: getOrDie called on none.");
       },
       getOrNull: constant(null),
@@ -174,26 +174,26 @@
       filter: none,
       equals: eq,
       equals_: eq,
-      toArray: function () {
+      toArray: function() {
         return [];
       },
       toString: constant("none()"),
     };
     return me;
   })();
-  var some = function (a) {
+  var some = function(a) {
     var constant_a = constant(a);
-    var self = function () {
+    var self = function() {
       return me;
     };
-    var bind = function (f) {
+    var bind = function(f) {
       return f(a);
     };
     var me = {
-      fold: function (n, s) {
+      fold: function(n, s) {
         return s(a);
       },
-      is: function (v) {
+      is: function(v) {
         return a === v;
       },
       isSome: always,
@@ -205,36 +205,36 @@
       getOrUndefined: constant_a,
       or: self,
       orThunk: self,
-      map: function (f) {
+      map: function(f) {
         return some(f(a));
       },
-      each: function (f) {
+      each: function(f) {
         f(a);
       },
       bind: bind,
       exists: bind,
       forall: bind,
-      filter: function (f) {
+      filter: function(f) {
         return f(a) ? me : NONE;
       },
-      toArray: function () {
+      toArray: function() {
         return [a];
       },
-      toString: function () {
+      toString: function() {
         return "some(" + a + ")";
       },
-      equals: function (o) {
+      equals: function(o) {
         return o.is(a);
       },
-      equals_: function (o, elementEq) {
-        return o.fold(never, function (b) {
+      equals_: function(o, elementEq) {
+        return o.fold(never, function(b) {
           return elementEq(a, b);
         });
       },
     };
     return me;
   };
-  var from = function (value) {
+  var from = function(value) {
     return value === null || value === undefined ? NONE : some(value);
   };
   var Optional = {
@@ -243,14 +243,14 @@
     from: from,
   };
 
-  var each = function (xs, f) {
+  var each = function(xs, f) {
     for (var i = 0, len = xs.length; i < len; i++) {
       var x = xs[i];
       f(x, i);
     }
   };
-  var foldl = function (xs, f, acc) {
-    each(xs, function (x) {
+  var foldl = function(xs, f, acc) {
+    each(xs, function(x) {
       acc = f(acc, x);
     });
     return acc;
@@ -258,7 +258,7 @@
 
   var keys = Object.keys;
   var hasOwnProperty = Object.hasOwnProperty;
-  var each$1 = function (obj, f) {
+  var each$1 = function(obj, f) {
     var props = keys(obj);
     for (var k = 0, len = props.length; k < len; k++) {
       var i = props[k];
@@ -266,24 +266,24 @@
       f(x, i);
     }
   };
-  var objAcc = function (r) {
-    return function (x, i) {
+  var objAcc = function(r) {
+    return function(x, i) {
       r[i] = x;
     };
   };
-  var internalFilter = function (obj, pred, onTrue, onFalse) {
+  var internalFilter = function(obj, pred, onTrue, onFalse) {
     var r = {};
-    each$1(obj, function (x, i) {
+    each$1(obj, function(x, i) {
       (pred(x, i) ? onTrue : onFalse)(x, i);
     });
     return r;
   };
-  var filter = function (obj, pred) {
+  var filter = function(obj, pred) {
     var t = {};
     internalFilter(obj, pred, objAcc(t), noop);
     return t;
   };
-  var has = function (obj, key) {
+  var has = function(obj, key) {
     return hasOwnProperty.call(obj, key);
   };
 
@@ -291,13 +291,13 @@
 
   var global$3 = tinymce.util.Tools.resolve("tinymce.util.Tools");
 
-  var isAnchor = function (elm) {
+  var isAnchor = function(elm) {
     return elm && elm.nodeName.toLowerCase() === "a";
   };
-  var isLink = function (elm) {
+  var isLink = function(elm) {
     return isAnchor(elm) && !!getHref(elm);
   };
-  var collectNodesInRange = function (rng, predicate) {
+  var collectNodesInRange = function(rng, predicate) {
     if (rng.collapsed) {
       return [];
     } else {
@@ -314,35 +314,35 @@
       return elements;
     }
   };
-  var hasProtocol = function (url) {
+  var hasProtocol = function(url) {
     return /^\w+:/i.test(url);
   };
-  var getHref = function (elm) {
+  var getHref = function(elm) {
     var href = elm.getAttribute("data-mce-href");
     return href ? href : elm.getAttribute("href");
   };
-  var applyRelTargetRules = function (rel, isUnsafe) {
+  var applyRelTargetRules = function(rel, isUnsafe) {
     var rules = ["noopener"];
     var rels = rel ? rel.split(/\s+/) : [];
-    var toString = function (rels) {
+    var toString = function(rels) {
       return global$3.trim(rels.sort().join(" "));
     };
-    var addTargetRules = function (rels) {
+    var addTargetRules = function(rels) {
       rels = removeTargetRules(rels);
       return rels.length > 0 ? rels.concat(rules) : rules;
     };
-    var removeTargetRules = function (rels) {
-      return rels.filter(function (val) {
+    var removeTargetRules = function(rels) {
+      return rels.filter(function(val) {
         return global$3.inArray(rules, val) === -1;
       });
     };
     var newRels = isUnsafe ? addTargetRules(rels) : removeTargetRules(rels);
     return newRels.length > 0 ? toString(newRels) : "";
   };
-  var trimCaretContainers = function (text) {
+  var trimCaretContainers = function(text) {
     return text.replace(/\uFEFF/g, "");
   };
-  var getAnchorElement = function (editor, selectedElm) {
+  var getAnchorElement = function(editor, selectedElm) {
     selectedElm = selectedElm || editor.selection.getNode();
     if (isImageFigure(selectedElm)) {
       return editor.dom.select("a[href]", selectedElm)[0];
@@ -350,21 +350,21 @@
       return editor.dom.getParent(selectedElm, "a[href]");
     }
   };
-  var getAnchorText = function (selection, anchorElm) {
+  var getAnchorText = function(selection, anchorElm) {
     var text = anchorElm
       ? anchorElm.innerText || anchorElm.textContent
       : selection.getContent({ format: "text" });
     return trimCaretContainers(text);
   };
-  var hasLinks = function (elements) {
+  var hasLinks = function(elements) {
     return global$3.grep(elements, isLink).length > 0;
   };
-  var hasLinksInSelection = function (rng) {
+  var hasLinksInSelection = function(rng) {
     return collectNodesInRange(rng, isLink).length > 0;
   };
-  var isOnlyTextSelected = function (editor) {
+  var isOnlyTextSelected = function(editor) {
     var inlineTextElements = editor.schema.getTextInlineElements();
-    var isElement = function (elm) {
+    var isElement = function(elm) {
       return (
         elm.nodeType === 1 &&
         !isAnchor(elm) &&
@@ -374,14 +374,14 @@
     var elements = collectNodesInRange(editor.selection.getRng(), isElement);
     return elements.length === 0;
   };
-  var isImageFigure = function (elm) {
+  var isImageFigure = function(elm) {
     return elm && elm.nodeName === "FIGURE" && /\bimage\b/i.test(elm.className);
   };
-  var getLinkAttrs = function (data) {
+  var getLinkAttrs = function(data) {
     return foldl(
       ["title", "rel", "class", "target"],
-      function (acc, key) {
-        data[key].each(function (value) {
+      function(acc, key) {
+        data[key].each(function(value) {
           acc[key] = value.length > 0 ? value : null;
         });
         return acc;
@@ -389,7 +389,7 @@
       { href: data.href }
     );
   };
-  var handleExternalTargets = function (href, assumeExternalTargets) {
+  var handleExternalTargets = function(href, assumeExternalTargets) {
     if (
       (assumeExternalTargets === "http" || assumeExternalTargets === "https") &&
       !hasProtocol(href)
@@ -398,7 +398,7 @@
     }
     return href;
   };
-  var applyLinkOverrides = function (editor, linkAttrs) {
+  var applyLinkOverrides = function(editor, linkAttrs) {
     var newLinkAttrs = __assign({}, linkAttrs);
     if (allowUnsafeLinkTarget(editor) === false) {
       var newRel = applyRelTargetRules(
@@ -416,8 +416,8 @@
     );
     return newLinkAttrs;
   };
-  var updateLink = function (editor, anchorElm, text, linkAttrs) {
-    text.each(function (text) {
+  var updateLink = function(editor, anchorElm, text, linkAttrs) {
+    text.each(function(text) {
       if (anchorElm.hasOwnProperty("innerText")) {
         anchorElm.innerText = text;
       } else {
@@ -427,15 +427,15 @@
     editor.dom.setAttribs(anchorElm, linkAttrs);
     editor.selection.select(anchorElm);
   };
-  var createLink = function (editor, selectedElm, text, linkAttrs) {
+  var createLink = function(editor, selectedElm, text, linkAttrs) {
     if (isImageFigure(selectedElm)) {
       linkImageFigure(editor, selectedElm, linkAttrs);
     } else {
       text.fold(
-        function () {
+        function() {
           editor.execCommand("mceInsertLink", false, linkAttrs);
         },
-        function (text) {
+        function(text) {
           editor.insertContent(
             editor.dom.createHTML("a", linkAttrs, editor.dom.encode(text))
           );
@@ -443,11 +443,11 @@
       );
     }
   };
-  var linkDomMutation = function (editor, attachState, data) {
+  var linkDomMutation = function(editor, attachState, data) {
     var selectedElm = editor.selection.getNode();
     var anchorElm = getAnchorElement(editor, selectedElm);
     var linkAttrs = applyLinkOverrides(editor, getLinkAttrs(data));
-    editor.undoManager.transact(function () {
+    editor.undoManager.transact(function() {
       if (data.href === attachState.href) {
         attachState.attach();
       }
@@ -459,7 +459,7 @@
       }
     });
   };
-  var unlinkSelection = function (editor) {
+  var unlinkSelection = function(editor) {
     var dom = editor.dom,
       selection = editor.selection;
     var bookmark = selection.getBookmark();
@@ -481,11 +481,11 @@
       rng.setEndAfter(endAnchorElm);
     }
     selection.setRng(rng);
-    editor.execCommand("unlink");
+    setImmediate(() => editor.execCommand("unlink"));
     selection.moveToBookmark(bookmark);
   };
-  var unlinkDomMutation = function (editor) {
-    editor.undoManager.transact(function () {
+  var unlinkDomMutation = function(editor) {
+    editor.undoManager.transact(function() {
       var node = editor.selection.getNode();
       if (isImageFigure(node)) {
         unlinkImageFigure(editor, node);
@@ -495,7 +495,7 @@
       editor.focus();
     });
   };
-  var unwrapOptions = function (data) {
+  var unwrapOptions = function(data) {
     var cls = data.class,
       href = data.href,
       rel = data.rel,
@@ -511,22 +511,22 @@
         text: text.getOrNull(),
         title: title.getOrNull(),
       },
-      function (v, _k) {
+      function(v, _k) {
         return isNull(v) === false;
       }
     );
   };
-  var link = function (editor, attachState, data) {
+  var link = function(editor, attachState, data) {
     editor.hasPlugin("rtc", true)
       ? editor.execCommand("createlink", false, unwrapOptions(data))
       : linkDomMutation(editor, attachState, data);
   };
-  var unlink = function (editor) {
+  var unlink = function(editor) {
     editor.hasPlugin("rtc", true)
       ? editor.execCommand("unlink")
       : unlinkDomMutation(editor);
   };
-  var unlinkImageFigure = function (editor, fig) {
+  var unlinkImageFigure = function(editor, fig) {
     var img = editor.dom.select("img", fig)[0];
     if (img) {
       var a = editor.dom.getParents(img, "a[href]", fig)[0];
@@ -536,7 +536,7 @@
       }
     }
   };
-  var linkImageFigure = function (editor, fig, attrs) {
+  var linkImageFigure = function(editor, fig, attrs) {
     var img = editor.dom.select("img", fig)[0];
     if (img) {
       var a = editor.dom.create("a", attrs);
@@ -545,13 +545,13 @@
     }
   };
 
-  var getLink = function (editor, elm) {
+  var getLink = function(editor, elm) {
     return editor.dom.getParent(elm, "a[href]");
   };
-  var getSelectedLink = function (editor) {
+  var getSelectedLink = function(editor) {
     return getLink(editor, editor.selection.getStart());
   };
-  var hasOnlyAltModifier = function (e) {
+  var hasOnlyAltModifier = function(e) {
     return (
       e.altKey === true &&
       e.shiftKey === false &&
@@ -559,7 +559,7 @@
       e.metaKey === false
     );
   };
-  var gotoLink = function (editor, a) {
+  var gotoLink = function(editor, a) {
     if (a) {
       var href = getHref(a);
       if (/^#/.test(href)) {
@@ -572,25 +572,25 @@
       }
     }
   };
-  var openDialog = function (editor) {
-    return function () {
+  var openDialog = function(editor) {
+    return function() {
       editor.fire("contexttoolbar-show", { toolbarKey: "quicklink" });
     };
   };
-  var gotoSelectedLink = function (editor) {
-    return function () {
+  var gotoSelectedLink = function(editor) {
+    return function() {
       gotoLink(editor, getSelectedLink(editor));
     };
   };
-  var setupGotoLinks = function (editor) {
-    editor.on("click", function (e) {
+  var setupGotoLinks = function(editor) {
+    editor.on("click", function(e) {
       var link = getLink(editor, e.target);
       if (link && global$1.metaKeyPressed(e)) {
         e.preventDefault();
         gotoLink(editor, link);
       }
     });
-    editor.on("keydown", function (e) {
+    editor.on("keydown", function(e) {
       var link = getSelectedLink(editor);
       if (link && e.keyCode === 13 && hasOnlyAltModifier(e)) {
         e.preventDefault();
@@ -598,15 +598,15 @@
       }
     });
   };
-  var toggleState = function (editor, toggler) {
+  var toggleState = function(editor, toggler) {
     editor.on("NodeChange", toggler);
-    return function () {
+    return function() {
       return editor.off("NodeChange", toggler);
     };
   };
-  var toggleActiveState = function (editor) {
-    return function (api) {
-      return toggleState(editor, function () {
+  var toggleActiveState = function(editor) {
+    return function(api) {
+      return toggleState(editor, function() {
         api.setActive(
           !editor.mode.isReadOnly() &&
             getAnchorElement(editor, editor.selection.getNode()) !== null
@@ -614,9 +614,9 @@
       });
     };
   };
-  var toggleEnabledState = function (editor) {
-    return function (api) {
-      var updateState = function () {
+  var toggleEnabledState = function(editor) {
+    return function(api) {
+      var updateState = function() {
         return api.setDisabled(
           getAnchorElement(editor, editor.selection.getNode()) === null
         );
@@ -625,34 +625,34 @@
       return toggleState(editor, updateState);
     };
   };
-  var toggleUnlinkState = function (editor) {
-    return function (api) {
-      var hasLinks$1 = function (parents) {
+  var toggleUnlinkState = function(editor) {
+    return function(api) {
+      var hasLinks$1 = function(parents) {
         return (
           hasLinks(parents) || hasLinksInSelection(editor.selection.getRng())
         );
       };
       var parents = editor.dom.getParents(editor.selection.getStart());
       api.setDisabled(!hasLinks$1(parents));
-      return toggleState(editor, function (e) {
+      return toggleState(editor, function(e) {
         return api.setDisabled(!hasLinks$1(e.parents));
       });
     };
   };
 
-  var register = function (editor) {
-    editor.addCommand("mceLink", function () {
+  var register = function(editor) {
+    editor.addCommand("mceLink", function() {
       openDialog(editor)();
     });
   };
 
-  var setup = function (editor) {
-    editor.addShortcut("Meta+K", "", function () {
+  var setup = function(editor) {
+    editor.addShortcut("Meta+K", "", function() {
       editor.execCommand("mceLink");
     });
   };
 
-  var setupButtons = function (editor) {
+  var setupButtons = function(editor) {
     editor.ui.registry.addToggleButton("link", {
       icon: "link",
       tooltip: "Insert/edit link",
@@ -668,13 +668,13 @@
     editor.ui.registry.addButton("unlink", {
       icon: "unlink",
       tooltip: "Remove link",
-      onAction: function () {
+      onAction: function() {
         return unlink(editor);
       },
       onSetup: toggleUnlinkState(editor),
     });
   };
-  var setupMenuItems = function (editor) {
+  var setupMenuItems = function(editor) {
     editor.ui.registry.addMenuItem("openlink", {
       text: "Open link",
       icon: "new-tab",
@@ -690,26 +690,26 @@
     editor.ui.registry.addMenuItem("unlink", {
       icon: "unlink",
       text: "Remove link",
-      onAction: function () {
+      onAction: function() {
         return unlink(editor);
       },
       onSetup: toggleUnlinkState(editor),
     });
   };
-  var setupContextMenu = function (editor) {
+  var setupContextMenu = function(editor) {
     var inLink = "link unlink openlink";
     var noLink = "link";
     editor.ui.registry.addContextMenu("link", {
-      update: function (element) {
+      update: function(element) {
         return hasLinks(editor.dom.getParents(element, "a")) ? inLink : noLink;
       },
     });
   };
-  var setupContextToolbars = function (editor) {
-    var collapseSelectionToEnd = function (editor) {
+  var setupContextToolbars = function(editor) {
+    var collapseSelectionToEnd = function(editor) {
       editor.selection.collapse(false);
     };
-    var onSetupLink = function (buttonApi) {
+    var onSetupLink = function(buttonApi) {
       var node = editor.selection.getNode();
       buttonApi.setDisabled(!getAnchorElement(editor, node));
       return noop;
@@ -722,10 +722,10 @@
         onSetup: toggleActiveState(editor),
       },
       label: "Link",
-      predicate: function (node) {
+      predicate: function(node) {
         return !!getAnchorElement(editor, node) && hasContextToolbar(editor);
       },
-      initValue: function () {
+      initValue: function() {
         var elm = getAnchorElement(editor);
         return !!elm ? getHref(elm) : "";
       },
@@ -735,12 +735,12 @@
           icon: "link",
           tooltip: "Link",
           primary: true,
-          onSetup: function (buttonApi) {
+          onSetup: function(buttonApi) {
             var node = editor.selection.getNode();
             buttonApi.setActive(!!getAnchorElement(editor, node));
             return toggleActiveState(editor)(buttonApi);
           },
-          onAction: function (formApi) {
+          onAction: function(formApi) {
             var anchor = getAnchorElement(editor);
             var value = formApi.getValue();
             if (!anchor) {
@@ -751,7 +751,7 @@
               var onlyText = isOnlyTextSelected(editor);
               var text = onlyText
                 ? Optional.some(getAnchorText(editor.selection, anchor))
-                    .filter(function (t) {
+                    .filter(function(t) {
                       return t.length > 0;
                     })
                     .or(Optional.from(value))
@@ -766,7 +766,7 @@
               });
               formApi.hide();
             } else {
-              editor.undoManager.transact(function () {
+              editor.undoManager.transact(function() {
                 editor.dom.setAttrib(anchor, "href", value);
                 collapseSelectionToEnd(editor);
                 formApi.hide();
@@ -779,7 +779,7 @@
           icon: "unlink",
           tooltip: "Remove link",
           onSetup: onSetupLink,
-          onAction: function (formApi) {
+          onAction: function(formApi) {
             unlink(editor);
             formApi.hide();
           },
@@ -789,7 +789,7 @@
           icon: "new-tab",
           tooltip: "Open link",
           onSetup: onSetupLink,
-          onAction: function (formApi) {
+          onAction: function(formApi) {
             gotoSelectedLink(editor)();
             formApi.hide();
           },
@@ -799,7 +799,7 @@
   };
 
   function Plugin() {
-    global.add("shortlink", function (editor) {
+    global.add("shortlink", function(editor) {
       setupButtons(editor);
       setupMenuItems(editor);
       setupContextMenu(editor);
