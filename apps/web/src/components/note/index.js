@@ -112,7 +112,7 @@ function Note(props) {
 
               {attachments > 0 && (
                 <Flex mr={1}>
-                  <Icon.Attachment size={16} color="fontTertiary" />
+                  <Icon.Attachment size={13} color="fontTertiary" />
                   <Text ml={"2px"}>{attachments}</Text>
                 </Flex>
               )}
