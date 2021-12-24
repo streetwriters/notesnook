@@ -11,7 +11,7 @@ class DarkColorSchemeFactory {
       accent: "#000",
       bgSecondary: "#2b2b2b",
       bgSecondaryText: "#A1A1A1",
-      border: "#2b2b2b",
+      border: "#3b3b3b",
       hover: "#3b3b3b",
       fontSecondary: "#000",
       fontTertiary: "#A1A1A1",

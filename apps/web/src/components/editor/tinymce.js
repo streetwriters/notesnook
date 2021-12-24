@@ -32,6 +32,7 @@ import "@streetwritersco/tinymce-plugins/shortcuts";
 import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import "@streetwritersco/tinymce-plugins/attachmentshandler";
 import "@streetwritersco/tinymce-plugins/contenthandler";
+import "@streetwritersco/tinymce-plugins/bettertable";
 import "./plugins/picker";
 import "./plugins/icons";
 import "./plugins/attachmentshandler.css";
@@ -120,7 +121,7 @@ const plugins = {
   default:
     "importcss searchreplace autolink directionality media table hr advlist lists imagetools noneditable autoresize",
   custom:
-    "contenthandler icons blockescape keyboardquirks collapsibleheaders shortlink paste codeblock inlinecode checklist attachmentshandler",
+    "bettertable contenthandler icons blockescape keyboardquirks collapsibleheaders shortlink paste codeblock inlinecode checklist attachmentshandler",
   pro: "textpattern picker",
 };
 
@@ -139,7 +140,7 @@ const plugins = {
  */
 const changeEvents =
   "input paste ExecCommand ObjectResized cut Redo Undo NewBlock ListMutation";
-const ignoredCommand = ["mcerepaint", "mcefocus"];
+const ignoredCommand = ["mcerepaint", "mcefocus", "selectall"];
 
 function TinyMCE(props) {
   const {
@@ -251,7 +252,6 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
-            console.log(e);
             if (
               e.type === "execcommand" &&
               ignoredCommand.includes(e.command.toLowerCase())
@@ -308,6 +308,7 @@ function TinyMCE(props) {
         attachmenthandler_download_attachment: async (hash) => {
           await downloadAttachment(hash);
         },
+        table_tab_navigation: true,
       }}
       onBeforeExecCommand={async (command) => {
         const isPremiumCommand = premiumCommands.some((cmd) => {

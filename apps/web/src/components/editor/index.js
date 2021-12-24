@@ -67,7 +67,6 @@ function Editor({ noteId, nonce }) {
 
   const startSession = useCallback(
     async function startSession(noteId) {
-      console.log("starting session");
       if (noteId === 0) newSession(nonce);
       else if (noteId) {
         await openSession(noteId);
