@@ -132,10 +132,13 @@ const plugins = {
  * 5. cut - called when content is cut
  * 6. Redo - called after redo is done
  * 7. Undo - called after undo is done
+ * 8. NewBlock - called when a new block is created (e.g. new list item)
+ * 9. ListMutation - called when a list is toggled
  * We do not include the "change" event here as it is only
  * invoked after the editor loses focus.
  */
-const changeEvents = "input paste ExecCommand ObjectResized cut Redo Undo";
+const changeEvents =
+  "input paste ExecCommand ObjectResized cut Redo Undo NewBlock ListMutation";
 const ignoredCommand = ["mcerepaint", "mcefocus"];
 
 function TinyMCE(props) {
@@ -248,6 +251,7 @@ function TinyMCE(props) {
           }
 
           const onEditorChange = debounce((e) => {
+            console.log(e);
             if (
               e.type === "execcommand" &&
               ignoredCommand.includes(e.command.toLowerCase())

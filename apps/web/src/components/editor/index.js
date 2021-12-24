@@ -24,7 +24,7 @@ import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
 
 const ReactMCE = React.lazy(() => import("./tinymce"));
-const EMPTY_CONTENT = "<p><br></p>";
+// const EMPTY_CONTENT = "<p><br></p>";
 function editorSetContent(editor, content) {
   const editorScroll = document.querySelector(".editorScroll");
   if (editorScroll) editorScroll.scrollTop = 0;
