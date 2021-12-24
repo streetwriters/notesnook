@@ -14,6 +14,7 @@ import ScrollContainer from "../scroll-container";
 import { downloadAttachment } from "../../common/attachments";
 import { formatDate } from "notes-core/utils/date";
 import Vault from "../../common/vault";
+import TimeAgo from "../time-ago";
 
 const tools = [
   { key: "pinned", icon: Icon.Pin, label: "Pin" },
@@ -277,7 +278,10 @@ function Properties({ noteId }) {
             </Card>
           )}
           {attachments.length > 0 && (
-            <Card title="Attachments">
+            <Card
+              title="Attachments"
+              subtitle={`${attachments.length} attachments`}
+            >
               {attachments.map((attachment) => {
                 const attachmentStatus =
                   attachmentsStatus[attachment.metadata.hash];
@@ -436,7 +440,14 @@ function Properties({ noteId }) {
                   }}
                 >
                   <Text variant={"body"}>{label}</Text>
-                  {session.locked && <Icon.Lock size={14} />}
+                  <Flex sx={{ fontSize: "subBody", color: "fontTertiary" }}>
+                    {session.locked && <Icon.Lock size={14} />}
+                    <TimeAgo
+                      live
+                      datetime={session.dateModified}
+                      locale={"en_short"}
+                    />
+                  </Flex>
                 </Flex>
               );
             })}
