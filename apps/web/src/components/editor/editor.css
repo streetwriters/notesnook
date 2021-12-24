@@ -314,3 +314,37 @@ table[data-mce-selected] {
   border: 2px solid var(--dimPrimary) !important;
   background-color: var(--shade);
 }
+
+/** CONTEXT TOOLBAR */
+
+.tox .tox-pop__dialog {
+  border: 1px solid var(--border) !important;
+  border-radius: 5px !important;
+  box-shadow: none !important;
+}
+
+.tox .tox-pop.tox-pop--bottom::after {
+  content: unset !important;
+}
+.tox .tox-pop.tox-pop--bottom::before {
+  content: unset !important;
+}
+
+.tox-toolbar {
+  margin: 0px !important;
+}
+
+.tox-toolbar__group {
+  padding: 0px !important;
+  padding-right: 10px !important;
+}
+
+.tox-toolbar__group:last-child {
+  padding-right: 0px !important;
+}
+
+.tox .tox-tbtn:not(.tox-tbtn--select) {
+  height: auto !important;
+  padding: 5px 0px 5px 0px !important;
+  margin: 0px !important;
+}

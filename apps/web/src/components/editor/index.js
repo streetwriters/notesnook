@@ -212,6 +212,7 @@ function Editor({ noteId, nonce }) {
             borderBottomColor: "border",
             justifyContent: "center",
             alignItems: "center",
+            py: 1,
           }}
         />
         {isReadonly && (
