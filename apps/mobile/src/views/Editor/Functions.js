@@ -452,6 +452,10 @@ export const _onMessage = async evt => {
   }
 
   switch (message.type) {
+    case 'selectionvalue':
+      eSendEvent('selectionvalue',message.value);
+      console.log(message.value);
+      break;
     case 'history':
       eSendEvent('historyEvent', message.value);
       break;

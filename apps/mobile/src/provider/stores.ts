@@ -24,6 +24,7 @@ import {
 import {groupArray} from 'notes-core/utils/grouping';
 import {EditorWebView, post} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -164,10 +165,10 @@ interface AttachmentStore {
       hash: string;
       recieved: number;
       type: 'upload' | 'download';
-    } | null
-  }
+    } | null;
+  };
   encryptionProgress: number;
-  setEncryptionProgress: (encryptionProgress:number) => void;
+  setEncryptionProgress: (encryptionProgress: number) => void;
   remove: (hash: string) => void;
   setProgress: (
     sent: number,
@@ -244,7 +245,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notesListMode: 'normal',
     devMode: false,
     notifNotes: false,
-    pitchBlack:false
+    pitchBlack: false
   },
   fullscreen: false,
   deviceMode: 'mobile',
@@ -280,13 +281,33 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
   setCurrentlyEditingNote: note => set({currentEditingNote: note}),
-  sessionId:null,
-  setSessionId:(sessionId) => {
-    console.log(sessionId,'session id');
+  sessionId: null,
+  setSessionId: sessionId => {
+    console.log(sessionId, 'session id');
     set({sessionId});
   },
-  searchReplace:false,
-  setSearchReplace:(searchReplace) => set({searchReplace})
+  searchReplace: false,
+  searchSelection: null,
+  setSearchReplace: searchReplace => {
+    set({searchReplace});
+    if (!searchReplace) {
+      set({searchSelection: null});
+      return;
+    }
+    let func = (value: string) => {
+      set({searchSelection: value});
+      eUnSubscribeEvent('selectionvalue', func);
+    };
+    eSubscribeEvent('selectionvalue', func);
+    tiny.call(
+      EditorWebView,
+      `(function() {
+      if (editor) {
+        reactNativeEventHandler('selectionvalue',editor.selection.getContent());
+      }
+    })();`
+    );
+  }
 }));
 
 export const useSearchStore = create<SearchStore>((set, get) => ({
@@ -377,7 +398,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log("ERROR",e);
+      console.log('ERROR', e);
       set({announcements: []});
     } finally {
       let all = await getFiltered(announcements);
@@ -423,7 +444,7 @@ export function clearAllStores() {
 
 export const allowedPlatforms = ['all', 'mobile', Platform.OS];
 
-async function shouldShowAnnouncement(announcement:Announcement) {
+async function shouldShowAnnouncement(announcement: Announcement) {
   if (!announcement) return false;
   let removed = (await MMKV.getStringAsync(announcement.id)) === 'removed';
   if (removed) return false;
@@ -454,7 +475,10 @@ async function shouldShowAnnouncement(announcement:Announcement) {
       case 'unverified':
         return !PremiumService.getUser()?.isEmailVerified;
       case 'proExpired':
-        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED;
+        return (
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+        );
       case 'any':
       default:
         return true;

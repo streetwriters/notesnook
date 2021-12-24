@@ -5,6 +5,7 @@ import {
   InteractionManager,
   Keyboard,
   Platform,
+  Vibration,
   View
 } from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
@@ -339,8 +340,8 @@ const EditorHeader = () => {
                   }}
                   top={50}
                   onPress={async () => {
-                  EditorWebView.current?.reload();
-                  return;
+                    EditorWebView.current?.reload();
+                    return;
                     if (editing.isFocused) {
                       safeKeyboardDismiss();
                       editing.isFocused = true;
@@ -358,12 +359,14 @@ const EditorHeader = () => {
                 type={searchReplace ? 'grayBg' : 'transparent'}
                 top={50}
                 buttom={10}
-                onPress={() => {
+                onLongPress={() => {
                   if (searchReplace) {
                     endSearch();
-                  } else {
-                    useEditorStore.getState().setSearchReplace(true);
+                    Vibration.vibrate(5, false);
                   }
+                }}
+                onPress={() => {
+                  useEditorStore.getState().setSearchReplace(true);
                 }}
               />
 
@@ -379,16 +382,15 @@ const EditorHeader = () => {
                 />
               )}
 
-           
-                <ActionIcon
-                  name="attachment"
-                  color={colors.pri}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={picker.pick}
-                />
+              <ActionIcon
+                name="attachment"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 5
+                }}
+                top={50}
+                onPress={picker.pick}
+              />
 
               {deviceMode !== 'mobile' && !fullscreen ? (
                 <ActionIcon

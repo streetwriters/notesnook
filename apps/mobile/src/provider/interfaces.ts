@@ -117,7 +117,8 @@ export interface EditorStore extends State {
     sessionId:string | null,
     setSessionId:(sessionId:string | null) => void,
     searchReplace:boolean,
-    setSearchReplace:(searchReplace:boolean) => void
+    setSearchReplace:(searchReplace:boolean) => void,
+    searchSelection:string | null
 }
 
 

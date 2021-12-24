@@ -3,10 +3,14 @@ import {View} from 'react-native';
 import {Button} from '../../../../components/Button';
 import Input from '../../../../components/Input';
 import {useTracked} from '../../../../provider';
-import {useSettingStore} from '../../../../provider/stores';
+import {useEditorStore, useSettingStore} from '../../../../provider/stores';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent
+} from '../../../../services/EventManager';
 import {showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
 import {SIZE} from '../../../../utils/SizeUtils';
-import { sleep } from '../../../../utils/TimeUtils';
+import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
 import tiny from '../tiny';
 import {endSearch} from './commands';
@@ -19,6 +23,7 @@ const SearcReplace = () => {
   const [enableReplace, setEnableReplace] = useState(false);
   const [menu, setMenu] = useState(false);
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const searchSelection = useEditorStore(state => state.searchSelection);
   const findRef = useRef();
   const [config, setConfig] = useState({
     matchCase: false,
@@ -30,17 +35,18 @@ const SearcReplace = () => {
   });
 
   async function searchWithSelection() {
-    tiny.call(EditorWebView,`selectchange(true)`);
-    await sleep(100);
-    values.current.find = properties.selection?.current?.value;
+    values.current.find = searchSelection;
     findRef.current?.setNativeProps({
-      text:values.current.find
-    })
+      text: searchSelection
+    });
     find();
   }
 
   useEffect(() => {
     searchWithSelection();
+  }, [searchSelection]);
+
+  useEffect(() => {
     setTimeout(() => {
       findRef.current?.focus();
     }, 300);
