@@ -68,7 +68,12 @@ class Settings {
     return (
       this._settings.groupOptions[key] || {
         groupBy: "default",
-        sortBy: "dateEdited",
+        sortBy:
+          key === "trash"
+            ? "dateDeleted"
+            : key === "tags"
+            ? "dateCreated"
+            : "dateEdited",
         sortDirection: "desc",
       }
     );
