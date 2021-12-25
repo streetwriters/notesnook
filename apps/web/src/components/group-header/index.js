@@ -27,10 +27,22 @@ const menuItems = [
   {
     key: "sortBy:dateCreated",
     title: () => "Sort by date created",
+    show: (type) => type !== "trash",
   },
   {
     key: "sortBy:dateEdited",
     title: () => "Sort by date edited",
+    show: (type) => type !== "trash" && type !== "tags",
+  },
+  {
+    key: "sortBy:dateDeleted",
+    title: () => "Sort by date deleted",
+    show: (type) => type === "trash",
+  },
+  {
+    key: "sortBy:dateModified",
+    title: () => "Sort by date modified",
+    show: (type) => type === "tags",
   },
   {
     key: "sortBy:title",
@@ -55,22 +67,31 @@ function changeGroupOptions({ groupOptions, type, refresh }, { key: itemKey }) {
   refresh();
 }
 
-const getMenuItems = (groupOptions) => {
-  return menuItems.map((item) => {
-    if (item.type === "seperator") return item;
-    let [key, value] = item.key.split(":");
+const getMenuItems = (groupOptions, type) => {
+  return menuItems.reduce((items, item) => {
+    switch (item.type) {
+      case "seperator":
+        items.push(item);
+        break;
+      default: {
+        let [key, value] = item.key.split(":");
 
-    item.checked = groupOptions[key] === value;
+        item.checked = groupOptions[key] === value;
 
-    if (key === "sortBy") {
-      if (value === "title")
-        item.disabled = () => groupOptions.groupBy !== "abc";
-      else item.disabled = () => groupOptions.groupBy === "abc";
+        if (key === "sortBy") {
+          if (value === "title")
+            item.disabled = () => groupOptions.groupBy !== "abc";
+          else item.disabled = () => groupOptions.groupBy === "abc";
+        }
+
+        item.onClick = changeGroupOptions;
+        if (!item.show || item.show(type)) items.push(item);
+        break;
+      }
     }
 
-    item.onClick = changeGroupOptions;
-    return item;
-  });
+    return items;
+  }, []);
 };
 
 function GroupHeader(props) {
@@ -151,7 +172,7 @@ function GroupHeader(props) {
               const groupOptions = db.settings.getGroupOptions(type);
               setGroupOptions(groupOptions);
 
-              const items = getMenuItems(groupOptions);
+              const items = getMenuItems(groupOptions, type);
               openContextMenu(e, items, {
                 title: "Group & sort",
                 groupOptions,
