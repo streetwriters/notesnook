@@ -2,38 +2,37 @@ import {
   activateKeepAwake,
   deactivateKeepAwake
 } from '@sayem314/react-native-keep-awake';
-import React, {useEffect, useRef} from 'react';
-import {View} from 'react-native';
-import Animated, {useValue} from 'react-native-reanimated';
-import {notesnook} from '../../e2e/test.ids';
-import ContextMenu from '../components/ContextMenu';
+import React, { useEffect, useRef } from 'react';
+import { View } from 'react-native';
+import Animated, { useValue } from 'react-native-reanimated';
+import { notesnook } from '../../e2e/test.ids';
 import CustomTabs from '../components/CustomTabs';
-import {DialogManager} from '../components/DialogManager';
-import {DummyText} from '../components/DummyText';
-import {Menu} from '../components/Menu';
-import {Toast} from '../components/Toast';
-import {NavigatorStack} from './NavigatorStack';
-import {useTracked} from '../provider';
-import {useEditorStore, useSettingStore} from '../provider/stores';
-import {DDS} from '../services/DeviceDetection';
+import { DialogManager } from '../components/DialogManager';
+import { DummyText } from '../components/DummyText';
+import { Menu } from '../components/Menu';
+import { Toast } from '../components/Toast';
+import { useTracked } from '../provider';
+import { useEditorStore, useSettingStore } from '../provider/stores';
+import { DDS } from '../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../services/EventManager';
-import {editing, setWidthHeight} from '../utils';
-import {updateStatusBarColor} from '../utils/Colors';
+import { editing, setWidthHeight } from '../utils';
+import { updateStatusBarColor } from '../utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
 } from '../utils/Events';
-import {editorRef, tabBarRef} from '../utils/Refs';
-import {sleep} from '../utils/TimeUtils';
-import {EditorWrapper} from '../views/Editor/EditorWrapper';
-import {EditorWebView, getNote} from '../views/Editor/Functions';
+import { editorRef, tabBarRef } from '../utils/Refs';
+import { sleep } from '../utils/TimeUtils';
+import { EditorWrapper } from '../views/Editor/EditorWrapper';
+import { EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
+import { NavigatorStack } from './NavigatorStack';
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
@@ -81,7 +80,6 @@ export const RootView = React.memo(
       <>
         <NativeStack />
         <Toast />
-        <ContextMenu />
         <DummyText />
         <DialogManager />
       </>
