@@ -85,6 +85,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
         });
         return;
       }
+      console.log('format:',format,'value:',inputValue);
       properties.userBlur = true;
       formatSelection(execCommands[format](inputValue));
     }

@@ -55,6 +55,7 @@ const Tooltip = () => {
   }, []);
 
   const show = async data => {
+    console.log(data);
     properties.userBlur = true;
     if (!data) {
       editing.tooltip = null;
@@ -74,7 +75,9 @@ const Tooltip = () => {
       await sleep(time);
     }
     editing.tooltip = data.title;
-    data.type = data.title;
+    if (!data.type) {
+      data.type = data.title;
+    }
     setGroup(data);
     await sleep(5);
     animate(0, time);
@@ -88,7 +91,8 @@ const Tooltip = () => {
       properties.pauseSelectionChange = false;
     }
   };
-  
+  console.log(group?.type);
+
   let style = {
     padding: floating ? 5 : 0,
     borderRadius: floating ? 5 : 0,
