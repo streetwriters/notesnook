@@ -4,6 +4,7 @@ import * as Icon from "../icons";
 import Dialog from "./dialog";
 import { qclone } from "qclone";
 import Field from "../field";
+import { showToast } from "../../utils/toast";
 
 class AddNotebookDialog extends React.Component {
   title = "";
@@ -84,18 +85,19 @@ class AddNotebookDialog extends React.Component {
   }
 
   createNotebook() {
-    this.props.onDone(
-      {
-        title: this.title,
-        description: this.description,
-        topics: this.state.topics.map((topic) => {
-          if (topic.id) return topic;
-          return topic.title;
-        }),
-        id: this.id,
-      },
-      this.deletedTopics
-    );
+    if (!this.title.trim())
+      return showToast("error", "Notebook title cannot be empty.");
+
+    const notebook = {
+      title: this.title,
+      description: this.description,
+      topics: this.state.topics.map((topic) => {
+        if (topic.id) return topic;
+        return topic.title;
+      }),
+      id: this.id,
+    };
+    this.props.onDone(notebook, this.deletedTopics);
   }
 
   render() {
