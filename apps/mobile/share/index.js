@@ -290,6 +290,7 @@ const NotesnookShare = ({quicknote = false}) => {
     await db.init();
     await db.notes.init();
 
+
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert('The note you are trying to append to has been deleted.');
@@ -304,11 +305,13 @@ const NotesnookShare = ({quicknote = false}) => {
           data: raw.data + '\n' + content,
           type: 'tiny'
         },
-        id: appendNote.id
+        id: appendNote.id,
+        sessionId:Date.now()
       };
     } else {
       _note = {...note};
       _note.content.data = content;
+      _note.sessionId = Date.now();
     }
     await db.notes.add(_note);
     await Storage.write('notesAddedFromIntent', 'added');
