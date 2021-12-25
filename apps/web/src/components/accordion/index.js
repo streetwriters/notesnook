@@ -8,6 +8,7 @@ export default function Accordion({
   sx,
   color,
   isClosed = true,
+  testId,
   ...restProps
 }) {
   const [isContentHidden, setIsContentHidden] = useState();
@@ -30,6 +31,7 @@ export default function Accordion({
         onClick={() => {
           setIsContentHidden((state) => !state);
         }}
+        data-test-id={testId}
       >
         <Text variant="subtitle" sx={{ color }}>
           {title}

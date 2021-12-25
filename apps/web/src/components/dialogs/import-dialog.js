@@ -127,6 +127,7 @@ function ImportDialog(props) {
               <Flex
                 {...getRootProps()}
                 flexDirection="column"
+                data-test-id="import-dialog-select-files"
                 sx={{
                   justifyContent: "center",
                   alignItems: "center",
@@ -173,10 +174,15 @@ function ImportDialog(props) {
             </Accordion>
 
             {files.length > 0 && (
-              <Accordion title={`${notes.length} notes found`} sx={{ mt: 1 }}>
+              <Accordion
+                title={`${notes.length} notes found`}
+                sx={{ mt: 1 }}
+                testId={"importer-dialog-notes"}
+              >
                 <Flex flexDirection="column" mt={1}>
                   {notes.map((note, i) => (
                     <Flex
+                      data-test-id={`note-${i}`}
                       p={1}
                       sx={{
                         ":hover": { bg: "hover" },

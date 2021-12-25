@@ -475,6 +475,7 @@ function Settings(props) {
         <Header
           title="Notesnook Importer"
           isOpen={groups.importer}
+          testId="settings-importer"
           onClick={() => {
             setGroups((g) => ({ ...g, importer: !g.importer }));
           }}
@@ -483,6 +484,7 @@ function Settings(props) {
           <>
             <Button
               key={"importer"}
+              data-test-id="settings-importer-import"
               variant="list"
               onClick={() => showImportDialog()}
             >
@@ -906,9 +908,10 @@ function AccountStatusContainer(props) {
 }
 
 function Header(props) {
-  const { title, isOpen, onClick } = props;
+  const { title, isOpen, testId, onClick } = props;
   return (
     <Flex
+      data-test-id={testId}
       sx={{ borderBottom: "1px solid var(--border)", cursor: "pointer" }}
       // mt={2}
       py={2}

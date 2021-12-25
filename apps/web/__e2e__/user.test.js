@@ -56,3 +56,31 @@ test("logout user", async () => {
 
   expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
 });
+
+test("login user & import notes", async () => {
+  await loginUser();
+
+  await page.click(getTestId("navitem-settings"));
+
+  await page.click(getTestId("settings-importer"));
+
+  await page.click(getTestId("settings-importer-import"));
+
+  const [fileChooser] = await Promise.all([
+    page.waitForEvent("filechooser"),
+    page.click(getTestId("import-dialog-select-files")),
+  ]);
+
+  await fileChooser.setFiles(path.join(__dirname, "data", "importer-data.zip"));
+
+  await page.click(getTestId("importer-dialog-notes"));
+
+  let titles = [];
+  for (let i = 0; i < 6; ++i) {
+    const noteId = getTestId(`note-${i}`);
+    const text = await page.innerText(noteId);
+    titles.push(text);
+  }
+
+  expect(titles.join("\n")).toMatchSnapshot("importer-notes-titles.txt");
+});
