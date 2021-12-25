@@ -168,7 +168,7 @@ class EditorStore extends BaseStore {
           if (oldSession?.tags?.length !== session.tags.length)
             tagStore.refresh();
 
-          if (oldSession?.color !== session.color) appStore.refreshColors();
+          if (oldSession?.color !== session.color) appStore.refreshNavItems();
 
           if (!oldSession?.context) break storeSync;
 
@@ -308,7 +308,7 @@ class EditorStore extends BaseStore {
 
     if (index > -1) {
       await note.untag(value);
-      appStore.refreshMenuPins();
+      appStore.refreshNavItems();
     } else {
       await note.tag(value);
     }

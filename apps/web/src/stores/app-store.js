@@ -31,16 +31,14 @@ class AppStore extends BaseStore {
     notebookStore.refresh();
     trashStore.refresh();
     tagStore.refresh();
-    this.refreshColors();
-    this.refreshMenuPins();
+    this.refreshNavItems();
   };
 
-  refreshColors = () => {
-    this.set((state) => (state.colors = db.colors.all));
-  };
-
-  refreshMenuPins = () => {
-    this.set((state) => (state.menuPins = db.settings.pins));
+  refreshNavItems = () => {
+    this.set((state) => {
+      state.menuPins = db.settings.pins;
+      state.colors = db.colors.all;
+    });
   };
 
   toggleFocusMode = () => {
@@ -105,14 +103,14 @@ class AppStore extends BaseStore {
   pinItemToMenu = async (item) => {
     if (db.settings.isPinned(item.id)) {
       await db.settings.unpin(item.id);
-      this.refreshMenuPins();
+      this.refreshNavItems();
       showToast("success", `Shortcut removed!`);
     } else {
       await db.settings.pin(item.type, {
         id: item.id,
         notebookId: item.notebookId,
       });
-      this.refreshMenuPins();
+      this.refreshNavItems();
       showToast("success", `Shortcut created!`);
     }
 

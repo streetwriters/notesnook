@@ -77,8 +77,7 @@ class NoteStore extends BaseStore {
     await db.notes.delete(id);
 
     this.refresh();
-    appStore.refreshMenuPins();
-    appStore.refreshColors();
+    appStore.refreshNavItems();
   };
 
   pin = async (id) => {
@@ -120,7 +119,7 @@ class NoteStore extends BaseStore {
       if (!note) return;
       if (note.data.color === color) await db.notes.note(id).uncolor();
       else await db.notes.note(id).color(color);
-      appStore.refreshColors();
+      appStore.refreshNavItems();
       this._syncEditor(note.id, "color", db.notes.note(id).data.color);
       this.refresh();
     } catch (e) {

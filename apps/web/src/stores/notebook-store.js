@@ -30,7 +30,7 @@ class NotebookStore extends BaseStore {
   delete = async (id) => {
     await db.notebooks.delete(id);
     this.refresh();
-    appStore.refreshMenuPins();
+    appStore.refreshNavItems();
     noteStore.refresh();
   };
 

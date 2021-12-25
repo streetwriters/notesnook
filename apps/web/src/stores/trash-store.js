@@ -31,7 +31,7 @@ class TrashStore extends BaseStore {
   restore = (id) => {
     return db.trash.restore(id).then(() => {
       this.refresh();
-      appStore.refreshColors();
+      appStore.refreshNavItems();
       notestore.refresh();
     });
   };

@@ -76,7 +76,7 @@ function NavigationMenu(props) {
   const isFocusMode = useAppStore((store) => store.isFocusMode);
   const colors = useAppStore((store) => store.colors);
   const pins = useAppStore((store) => store.menuPins);
-  const refreshMenuPins = useAppStore((store) => store.refreshMenuPins);
+  const refreshNavItems = useAppStore((store) => store.refreshNavItems);
   const isSyncing = useAppStore((store) => store.syncStatus === "syncing");
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const sync = useAppStore((store) => store.sync);
@@ -189,7 +189,7 @@ function NavigationMenu(props) {
                   title: () => "Remove shortcut",
                   onClick: async ({ pin }) => {
                     await db.settings.unpin(pin.id);
-                    refreshMenuPins();
+                    refreshNavItems();
                   },
                 },
               ],

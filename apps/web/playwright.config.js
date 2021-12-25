@@ -33,7 +33,7 @@ module.exports = {
     command: "npm run debug",
     port: 3000,
     timeout: 60 * 1000,
-    reuseExistingServer: false, //!IS_CI,
+    reuseExistingServer: true, //!IS_CI,
   },
   // Look for test files in thcleare "tests" directory, relative to this configuration file
   testDir: "__e2e__",

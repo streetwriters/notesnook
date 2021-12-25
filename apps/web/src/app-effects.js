@@ -26,9 +26,8 @@ if (process.env.NODE_ENV === "production") {
 }
 
 export default function AppEffects({ setShow }) {
-  const refreshColors = useStore((store) => store.refreshColors);
+  const refreshNavItems = useStore((store) => store.refreshNavItems);
   const sync = useStore((store) => store.sync);
-  const refreshMenuPins = useStore((store) => store.refreshMenuPins);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
   const setProcessingStatus = useStore((store) => store.setProcessingStatus);
   const isFocusMode = useStore((store) => store.isFocusMode);
@@ -58,8 +57,7 @@ export default function AppEffects({ setShow }) {
         }
       );
 
-      refreshColors();
-      refreshMenuPins();
+      refreshNavItems();
       initNotes();
       (async function () {
         await updateLastSynced();
@@ -77,8 +75,7 @@ export default function AppEffects({ setShow }) {
     [
       sync,
       updateLastSynced,
-      refreshColors,
-      refreshMenuPins,
+      refreshNavItems,
       initUser,
       initNotes,
       addReminder,

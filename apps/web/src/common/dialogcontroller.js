@@ -66,7 +66,7 @@ export function showEditNotebookDialog(notebookId) {
 
         notebookStore.refresh();
         noteStore.refresh();
-        appStore.refreshMenuPins();
+        appStore.refreshNavItems();
 
         showToast("success", "Notebook edited successfully!");
         perform(true);
@@ -519,7 +519,7 @@ export function showRenameColorDialog(colorId) {
         if (!title) return;
         await db.colors.rename(colorId, title);
         showToast("success", "Color renamed!");
-        appStore.refreshColors();
+        appStore.refreshNavItems();
         perform(true);
       }}
     />
