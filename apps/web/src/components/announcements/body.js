@@ -6,7 +6,10 @@ import {
   Text as RebassText,
 } from "rebass";
 import { allowedPlatforms } from "../../utils/use-announcements";
-import { showBuyDialog } from "../../common/dialog-controller";
+import {
+  closeOpenedDialog,
+  showBuyDialog,
+} from "../../common/dialog-controller";
 import { ANALYTICS_EVENTS, trackEvent } from "../../utils/analytics";
 import * as Icon from "../icons";
 
@@ -225,6 +228,7 @@ function CalltoAction({ action, index }) {
         },
       }}
       onClick={async () => {
+        closeOpenedDialog();
         trackEvent(ANALYTICS_EVENTS.announcementCta, action.data);
         switch (action.type) {
           case "link":
