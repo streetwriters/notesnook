@@ -185,7 +185,7 @@ async function exportNote(format) {
   // date created & date edited remain fixed.
   await page.evaluate(() => {
     // eslint-disable-next-line no-extend-native
-    Date.prototype.toLocaleDateString = () => "xxx";
+    Date.prototype.toLocaleString = () => "xxx";
   });
 
   const output = await downloadFile(
