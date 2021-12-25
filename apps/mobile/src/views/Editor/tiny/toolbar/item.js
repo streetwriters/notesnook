@@ -1,35 +1,25 @@
-import React, {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
-import {View, TouchableOpacity} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {PressableButton} from '../../../../components/PressableButton';
+import { PressableButton } from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
-import {useTracked} from '../../../../provider';
-import {useUserStore} from '../../../../provider/stores';
+import { useTracked } from '../../../../provider';
+import { useUserStore } from '../../../../provider/stores';
 import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  eSendEvent,
-  ToastEvent
+  eSendEvent, eSubscribeEvent,
+  eUnSubscribeEvent, ToastEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
-import {editing, showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
-import {db} from '../../../../utils/database';
-import {eShowGetPremium} from '../../../../utils/Events';
-import {MMKV} from '../../../../utils/mmkv';
-import {normalize, SIZE} from '../../../../utils/SizeUtils';
-import {sleep} from '../../../../utils/TimeUtils';
-import {EditorWebView} from '../../Functions';
-import tiny, {safeKeyboardDismiss} from '../tiny';
-import {execCommands} from './commands';
+import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
+import { db } from '../../../../utils/database';
+import { MMKV } from '../../../../utils/mmkv';
+import { normalize, SIZE } from '../../../../utils/SizeUtils';
+import tiny, { safeKeyboardDismiss } from '../tiny';
+import { execCommands } from './commands';
 import {
-  focusEditor,
-  formatSelection,
-  properties,
-  TOOLBAR_ICONS,
-  rgbToHex,
-  font_names
+  focusEditor, font_names, formatSelection,
+  properties, rgbToHex, TOOLBAR_ICONS
 } from './constants';
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';

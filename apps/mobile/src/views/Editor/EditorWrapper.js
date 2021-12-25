@@ -10,7 +10,7 @@ import {PanGestureHandler, State} from 'react-native-gesture-handler';
 import Animated, {Easing} from 'react-native-reanimated';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Editor from '.';
-import {GetPremium} from '../../components/ActionSheetComponent/GetPremium';
+import {PremiumToast} from '../../components/Premium/premium-toast';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {useNoteStore, useSettingStore} from '../../provider/stores';
@@ -119,7 +119,7 @@ export const EditorWrapper = ({width, dimensions}) => {
           width: '100%',
           height: '100%'
         }}>
-        <GetPremium context="editor" offset={50 + insets.top} />
+        <PremiumToast context="editor" offset={50 + insets.top} />
         <View
           style={{
             position: 'absolute',

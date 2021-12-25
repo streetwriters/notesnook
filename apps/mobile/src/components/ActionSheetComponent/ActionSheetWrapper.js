@@ -1,13 +1,12 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {COLOR_SCHEME_DARK} from '../../utils/Colors';
-import {Toast} from '../Toast';
-import {BouncingView} from './BouncingView';
-import {GetPremium} from './GetPremium';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { PremiumToast } from '../Premium/premium-toast';
+import { Toast } from '../Toast';
+import { BouncingView } from './BouncingView';
 
 const ActionSheetWrapper = ({
   children,
@@ -74,7 +73,7 @@ const ActionSheetWrapper = ({
       ExtraOverlayComponent={
         <>
           <Toast context="local" />
-          <GetPremium
+          <PremiumToast
             context="sheet"
             close={() => fwdRef?.current?.hide()}
             offset={50}

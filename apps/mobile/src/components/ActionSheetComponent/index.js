@@ -114,7 +114,6 @@ export const ActionSheetComponent = ({
 
   function checkNotifPinned() {
     let pinned = Notifications.getPinnedNotes();
-    console.log(pinned);
     if (!pinned) {
       setNotifPinned(null);
       return;
@@ -129,7 +128,6 @@ export const ActionSheetComponent = ({
   }
 
   const onUpdate = async type => {
-    console.log('update', type);
     if (type === 'unpin') {
       await sleep(1000);
 
@@ -937,7 +935,6 @@ export const ActionSheetComponent = ({
           }}>
           <Button
             onPress={async () => {
-              console.log('copy data');
               let additionalData = {};
               if (note.type === 'note') {
                 let content = await db.content.raw(note.contentId);
@@ -947,7 +944,6 @@ export const ActionSheetComponent = ({
                 }
               }
               additionalData.lastSynced = await db.lastSynced();
-              console.log(_note);
               let _note = {...note};
               _note.additionalData = additionalData;
               Clipboard.setString(db.debug.strip(_note));
