@@ -8,7 +8,6 @@ import Animated, { useValue } from 'react-native-reanimated';
 import { notesnook } from '../../e2e/test.ids';
 import CustomTabs from '../components/CustomTabs';
 import { DialogManager } from '../components/DialogManager';
-import { DummyText } from '../components/DummyText';
 import { Menu } from '../components/Menu';
 import { Toast } from '../components/Toast';
 import { useTracked } from '../provider';
@@ -80,7 +79,6 @@ export const RootView = React.memo(
       <>
         <NativeStack />
         <Toast />
-        <DummyText />
         <DialogManager />
       </>
     );

@@ -1,20 +1,18 @@
-import {createRef} from 'react';
-import {Dimensions, Image, NativeModules, Platform} from 'react-native';
+import { createRef } from 'react';
+import { Dimensions, NativeModules, Platform } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import {
   beginBackgroundTask,
   endBackgroundTask
 } from 'react-native-begin-background-task';
 import RNTooltips from 'react-native-tooltips';
-import {dummyRef} from '../components/DummyText';
-import {useSettingStore} from '../provider/stores';
-import {eSendEvent} from '../services/EventManager';
+import { useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
-import {eOpenPremiumDialog, refreshNotesPage} from './Events';
-import {MMKV} from './mmkv';
-import {tabBarRef} from './Refs';
-import {SIZE} from './SizeUtils';
+import { refreshNotesPage } from './Events';
+import { MMKV } from './mmkv';
+import { tabBarRef } from './Refs';
 
 export const APP_VERSION = 1694;
 
@@ -114,36 +112,6 @@ export const history = {
   selectedItemsList: [],
   selectionMode: false
 };
-
-export async function showContext(event, title) {
-  event._targetInst.ref.current?.measureInWindow((x, y, w, h) => {
-    dummyRef.current.setNativeProps({
-      style: {
-        fontSize: SIZE.sm
-      }
-    });
-    dummyRef.current?.measure((xt, yt, wt, ht) => {
-      let xVal;
-      let yVal;
-
-      if (x > dWidth / 50) {
-        xVal = x - (w + (wt * title.length - 40));
-      } else {
-        xVal = x + (w + (wt * title.length - 40));
-      }
-
-      yVal = y + h / 2 + 10;
-
-      eSendEvent('showContextMenu', {
-        location: {
-          x: xVal,
-          y: yVal
-        },
-        title: title
-      });
-    });
-  });
-}
 
 export const bgTaskOptions = {
   taskName: 'notesnookSync',
