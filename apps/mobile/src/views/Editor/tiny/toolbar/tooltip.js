@@ -74,6 +74,7 @@ const Tooltip = () => {
       await sleep(time);
     }
     editing.tooltip = data.title;
+    data.type = data.title;
     setGroup(data);
     await sleep(5);
     animate(0, time);
@@ -87,32 +88,30 @@ const Tooltip = () => {
       properties.pauseSelectionChange = false;
     }
   };
-
-  let style = React.useMemo(() => {
-    return {
-      padding: floating ? 5 : 0,
-      borderRadius: floating ? 5 : 0,
-      overflow: 'hidden',
-      display: !group || !group.type ? 'none' : 'flex',
-      position: floating ? 'absolute' : 'relative',
-      bottom: floating ? 50 : null,
-      width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '100%' : '100%',
-      minHeight: normalize(50),
-      backgroundColor: colors.bg,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      borderWidth: floating ? 1 : 0,
-      borderColor: floating && colors.nav,
-      zIndex: 10,
-      marginBottom: 0,
-      paddingHorizontal: 2,
-      transform: [
-        {
-          translateY: translateValue
-        }
-      ]
-    };
-  }, [floating, colors.accent, colors.bg, group]);
+  
+  let style = {
+    padding: floating ? 5 : 0,
+    borderRadius: floating ? 5 : 0,
+    overflow: 'hidden',
+    display: !group || !group?.type ? 'none' : 'flex',
+    position: floating ? 'absolute' : 'relative',
+    bottom: floating ? 50 : null,
+    width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '100%' : '100%',
+    minHeight: normalize(50),
+    backgroundColor: colors.bg,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    borderWidth: floating ? 1 : 0,
+    borderColor: floating && colors.nav,
+    zIndex: 10,
+    marginBottom: 0,
+    paddingHorizontal: 2,
+    transform: [
+      {
+        translateY: translateValue
+      }
+    ]
+  };
 
   let ParentElement = props => (
     <Animated.View style={style}>
