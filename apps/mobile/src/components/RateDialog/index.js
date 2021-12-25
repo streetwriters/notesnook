@@ -4,7 +4,7 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
@@ -37,7 +37,7 @@ const RateDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       centered={false}
       fwdRef={actionSheetRef}
       onClose={async () => {
@@ -117,7 +117,7 @@ const RateDialog = () => {
           />
         </View>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

@@ -17,7 +17,7 @@ import {
 import filesystem from '../../utils/filesystem';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import DialogHeader from '../Dialog/dialog-header';
 import GeneralSheet from '../GeneralSheet';
 import Paragraph from '../Typography/Paragraph';
@@ -57,7 +57,7 @@ export const AttachmentDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       centered={false}
       fwdRef={actionSheetRef}
       onClose={async () => {
@@ -107,7 +107,7 @@ export const AttachmentDialog = () => {
           {'  '}All attachments are end-to-end encrypted.
         </Paragraph>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

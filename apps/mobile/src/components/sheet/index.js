@@ -1,14 +1,14 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import {Platform, View} from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { PremiumToast } from '../Premium/premium-toast';
-import { Toast } from '../Toast';
-import { BouncingView } from './BouncingView';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {PremiumToast} from '../Premium/premium-toast';
+import {Toast} from '../Toast';
+import {BouncingView} from '../Transitions/bouncing-view';
 
-const ActionSheetWrapper = ({
+const SheetWrapper = ({
   children,
   fwdRef,
   gestureEnabled = true,
@@ -48,7 +48,6 @@ const ActionSheetWrapper = ({
   };
 
   const _onClose = async () => {
-    //await reFocusEditor();
     if (onClose) {
       onClose();
     }
@@ -96,4 +95,4 @@ const ActionSheetWrapper = ({
   );
 };
 
-export default ActionSheetWrapper;
+export default SheetWrapper;

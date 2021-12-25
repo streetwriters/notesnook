@@ -10,7 +10,7 @@ import Exporter from '../../services/Exporter';
 import { getElevation } from '../../utils';
 import { ph, pv, SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import { PressableButton } from '../PressableButton';
@@ -132,7 +132,7 @@ const ExportDialog = () => {
   ];
 
   return !visible ? null : (
-    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={close} visible={true}>
+    <SheetWrapper fwdRef={actionSheetRef} onClose={close} visible={true}>
       <View>
         <View
           style={{
@@ -269,7 +269,7 @@ const ExportDialog = () => {
           </View>
         </View>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

@@ -2,7 +2,7 @@ import React, {createRef, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import ActionSheetWrapper from '../../components/ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../../components/sheet';
 import {Button} from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
@@ -161,7 +161,7 @@ export const EditorSettings = () => {
 
   return (
     visible && (
-      <ActionSheetWrapper
+      <SheetWrapper
         fwdRef={actionSheetRef}
         onClose={() => {
           setVisible(false);
@@ -209,7 +209,7 @@ export const EditorSettings = () => {
             <SettingsButton {...item} />
           ))}
         </View>
-      </ActionSheetWrapper>
+      </SheetWrapper>
     )
   );
 };

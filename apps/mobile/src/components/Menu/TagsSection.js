@@ -12,7 +12,7 @@ import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
 import {normalize, SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import {Button} from '../Button';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import {PressableButton} from '../PressableButton';
@@ -126,7 +126,7 @@ const PinItem = ({item, index, onPress}) => {
   return (
     <>
       {visible && (
-        <ActionSheetWrapper
+        <SheetWrapper
           onClose={() => {
             setVisible(false);
           }}
@@ -149,7 +149,7 @@ const PinItem = ({item, index, onPress}) => {
               marginBottom: 30
             }}
           />
-        </ActionSheetWrapper>
+        </SheetWrapper>
       )}
       <PressableButton
         type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}

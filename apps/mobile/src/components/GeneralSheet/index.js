@@ -6,7 +6,7 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -50,7 +50,7 @@ const GeneralSheet = ({context}) => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={dialogData?.noProgress}
       closeOnTouchBackdrop={dialogData?.noProgress}
@@ -166,7 +166,7 @@ const GeneralSheet = ({context}) => {
             />
           ))}
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

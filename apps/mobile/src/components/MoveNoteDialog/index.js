@@ -17,7 +17,7 @@ import {getTotalNotes} from '../../utils';
 import {db} from '../../utils/database';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
@@ -68,9 +68,9 @@ const MoveNoteDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
+    <SheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
       <MoveNoteComponent close={close} note={note} setNote={update} />
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

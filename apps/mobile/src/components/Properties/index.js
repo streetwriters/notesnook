@@ -65,7 +65,7 @@ import {Topics} from './topics';
 const w = Dimensions.get('window').width;
 
 let htmlToText;
-export const ActionSheetComponent = ({
+export const Properties = ({
   close = () => {},
   item,
   hasColors = false,

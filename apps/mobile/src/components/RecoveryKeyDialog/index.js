@@ -16,7 +16,7 @@ import {sanitizeFilename} from '../../utils/filename';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
@@ -185,7 +185,7 @@ class RecoveryKeyDialog extends React.Component {
     const {colors} = this.props;
     if (!this.state.visible) return null;
     return (
-      <ActionSheetWrapper
+      <SheetWrapper
         closeOnTouchBackdrop={false}
         gestureEnabled={false}
         onOpen={this.onOpen}
@@ -317,7 +317,7 @@ class RecoveryKeyDialog extends React.Component {
             onPress={this.close}
           />
         </View>
-      </ActionSheetWrapper>
+      </SheetWrapper>
     );
   }
 }

@@ -21,8 +21,8 @@ import {
   eThemeUpdated
 } from '../../utils/Events';
 import { EditorSettings } from '../../views/Editor/EditorSettings';
-import { ActionSheetComponent } from '../ActionSheetComponent';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import { Properties } from '../Properties';
+import SheetWrapper from '../sheet';
 import { AddNotebookDialog } from '../AddNotebookDialog';
 import { AddTopicDialog } from '../AddTopicDialog';
 import { AnnouncementDialog } from '../Announcements';
@@ -237,7 +237,7 @@ export class DialogManager extends Component {
     return (
       <>
         {!this.state.actionSheetVisible ? null : (
-          <ActionSheetWrapper
+          <SheetWrapper
             fwdRef={this.actionSheet}
             onClose={() => {
               eSendEvent(eShowGetPremium, null);
@@ -246,15 +246,11 @@ export class DialogManager extends Component {
                 actionSheetVisible: false
               });
             }}>
-            <ActionSheetComponent
+            <Properties
               item={item}
-              setWillRefresh={value => {
-                this.willRefresh = true;
-              }}
               getRef={() => this.actionSheet}
               hasColors={actionSheetData.colors}
               hasTags={actionSheetData.colors}
-              overlayColor="rgba(0,0,0,0.3)"
               rowItems={actionSheetData.rowItems}
               columnItems={actionSheetData.columnItems}
               close={value => {
@@ -264,7 +260,7 @@ export class DialogManager extends Component {
                 this.actionSheet.current?.setModalVisible();
               }}
             />
-          </ActionSheetWrapper>
+          </SheetWrapper>
         )}
         <Dialog context="global" />
         <AddTopicDialog

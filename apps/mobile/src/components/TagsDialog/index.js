@@ -8,7 +8,7 @@ import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {eCloseTagsDialog, eOpenTagsDialog, refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
@@ -117,7 +117,7 @@ const TagsDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       centered={false}
       fwdRef={actionSheetRef}
       onOpen={async () => {
@@ -203,7 +203,7 @@ const TagsDialog = () => {
           ))}
         </ScrollView>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

@@ -25,7 +25,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../sheet';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
@@ -410,7 +410,7 @@ const LoginDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       fwdRef={actionSheetRef}
       animation={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={false}
@@ -755,7 +755,7 @@ const LoginDialog = () => {
           }}
         />
       </ScrollView>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 
