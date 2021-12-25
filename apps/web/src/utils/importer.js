@@ -6,9 +6,9 @@ const textDecoder = new TextDecoder();
 async function getNotesFromImport(files) {
   let notes = [];
   for (let file of files) {
-    const unzipped = unzipSync(new Uint8Array(await file.arrayBuffer()));
+    const unzippedFiles = unzipSync(new Uint8Array(await file.arrayBuffer()));
 
-    let metadata = binaryToJson(unzipped["metadata.json"], undefined);
+    let metadata = binaryToJson(unzippedFiles["metadata.json"], undefined);
     if (!metadata) continue;
 
     const noteIds = metadata["notes"];
@@ -16,17 +16,17 @@ async function getNotesFromImport(files) {
 
     for (let noteId of noteIds) {
       const path = `${noteId}/note.json`;
-      let note = binaryToJson(files[path]);
+      let note = binaryToJson(unzippedFiles[path]);
       if (!note) continue;
 
       const attachments = note.attachments?.slice() || [];
       note.attachments = [];
       for (let attachment of attachments) {
         const attachmentPath = `${noteId}/attachments/${attachment.hash}`;
-        if (!files[attachmentPath]) continue;
+        if (!unzippedFiles[attachmentPath]) continue;
 
         attachment.filename = attachment.filename || attachment.hash;
-        attachment.data = files[attachmentPath];
+        attachment.data = unzippedFiles[attachmentPath];
 
         note.attachments.push(attachment);
       }
