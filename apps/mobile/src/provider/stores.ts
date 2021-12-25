@@ -2,7 +2,8 @@ import {Platform} from 'react-native';
 import {Dimensions} from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import {APP_VERSION, history, SUBSCRIPTION_STATUS} from '../utils';
+import {history, SUBSCRIPTION_STATUS} from '../utils';
+import { APP_VERSION } from "../../version";
 import {db} from '../utils/database';
 import {MMKV} from '../utils/mmkv';
 import {

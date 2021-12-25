@@ -13,7 +13,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {APP_VERSION, InteractionManager} from '../../utils';
+import {InteractionManager} from '../../utils';
+import { APP_VERSION } from "../../../version";
 import {db} from '../../utils/database';
 import {eScrollEvent, eUpdateSearchState} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';

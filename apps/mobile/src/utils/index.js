@@ -14,8 +14,6 @@ import { refreshNotesPage } from './Events';
 import { MMKV } from './mmkv';
 import { tabBarRef } from './Refs';
 
-export const APP_VERSION = 1694;
-
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
 });
