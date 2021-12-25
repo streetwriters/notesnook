@@ -63,9 +63,10 @@ async function handleResponse(response) {
 
 async function request(url, token, method) {
   return handleResponse(
-    await fetch(url, {
+    await fetchWithTimeout(url, {
       method,
       headers: getAuthorizationHeader(token),
+      timeout: 20 * 1000,
     })
   );
 }
@@ -78,13 +79,14 @@ async function bodyRequest(
   contentType = "application/x-www-form-urlencoded"
 ) {
   return handleResponse(
-    await fetch(url, {
+    await fetchWithTimeout(url, {
       method,
       body: transformer(data, contentType),
       headers: {
         ...getAuthorizationHeader(token),
         "Content-Type": contentType,
       },
+      timeout: 20 * 1000,
     })
   );
 }
@@ -113,5 +115,29 @@ function errorTransformer(errorJson) {
     }
     default:
       return error_description || error;
+  }
+}
+
+/**
+ *
+ * @param {RequestInfo} resource
+ * @param {RequestInit} options
+ * @returns
+ */
+async function fetchWithTimeout(resource, options = {}) {
+  try {
+    const { timeout = 8000 } = options;
+
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    const response = await fetch(resource, {
+      ...options,
+      signal: controller.signal,
+    });
+    clearTimeout(id);
+    return response;
+  } catch (e) {
+    if (e.name === "AbortError") throw new Error("Request timed out.");
+    throw e;
   }
 }
