@@ -50,8 +50,8 @@ export const ColorTags = ({item, close}) => {
         key={color.value}
         onPress={() => changeColor(color)}
         customStyle={{
-          width: DDS.isTab ? width / 9 : dWidth / 9,
-          height: DDS.isTab ? width / 9 : dWidth / 9,
+          width: DDS.isTab ? width / 10 : dWidth / 9,
+          height: DDS.isTab ? width / 10 : dWidth / 9,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center'

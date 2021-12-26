@@ -673,7 +673,10 @@ export const Properties = ({
   ];
 
   let width = dimensions.width > 600 ? 600 : 500;
-  let columnItemWidth = DDS.isTab ? (width - 24) / 5 : (w - 24) / 5;
+  let columnItemsCount = DDS.isLargeTablet() ? 7 : 5;
+  let columnItemWidth = DDS.isTab
+    ? (width - 24) / columnItemsCount
+    : (w - 24) / columnItemsCount;
 
   const _renderRowItem = rowItem => (
     <View
@@ -700,7 +703,7 @@ export const Properties = ({
         }}>
         <Icon
           name={rowItem.icon}
-          size={DDS.isTab ? SIZE.xl : SIZE.lg}
+          size={DDS.isTab ? SIZE.xxl : SIZE.lg}
           color={
             rowItem.on
               ? colors.accent
@@ -835,7 +838,9 @@ export const Properties = ({
                 i => rowItems.indexOf(i.name) > -1 && !i.hidden
               )}
               keyExtractor={item => item.title}
-              numColumns={rowItems.length < 5 ? rowItems.length : 5}
+              numColumns={
+                rowItems.length < 5 ? rowItems.length : columnItemsCount
+              }
               style={{
                 marginTop: note.type !== 'note' ? 10 : 0,
                 paddingTop: 10
