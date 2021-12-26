@@ -25,7 +25,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
@@ -668,7 +668,7 @@ const LoginDialog = () => {
                 autoCapitalize="none"
                 returnKeyLabel="Done"
                 returnKeyType="done"
-                autoCorrect="none"
+                autoCorrect={false}
                 customValidator={() => password}
                 secureTextEntry
                 placeholder="Confirm password"
