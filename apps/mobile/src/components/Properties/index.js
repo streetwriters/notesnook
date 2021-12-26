@@ -731,7 +731,7 @@ export const Properties = ({
           ? colors.accent
           : item.name === 'Delete' || item.name === 'PermDelete'
           ? colors.errorText
-          : colors.icon
+          : colors.pri
       }}
       onPress={item.func}
       title={item.title}
@@ -798,15 +798,11 @@ export const Properties = ({
             {note.headline || note.description ? (
               <Paragraph numberOfLines={2} color={colors.icon}>
                 {(note.type === 'notebook' || note.itemType === 'notebook') &&
-                note.description
+                note?.description
                   ? note.description
                   : null}
                 {(note.type === 'note' || note.itemType === 'note') &&
-                note.headline
-                  ? note.headline[item.headline.length - 1] === '\n'
-                    ? note.headline.slice(0, note.headline.length - 1)
-                    : note.headline
-                  : null}
+                note?.headline ? note.headline : null}
               </Paragraph>
             ) : null}
 
