@@ -17,7 +17,7 @@ import {
 import filesystem from '../../utils/filesystem';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import DialogHeader from '../Dialog/dialog-header';
 import GeneralSheet from '../GeneralSheet';
 import Paragraph from '../Typography/Paragraph';

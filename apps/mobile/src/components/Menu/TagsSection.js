@@ -12,7 +12,7 @@ import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
 import {normalize, SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import {PressableButton} from '../PressableButton';

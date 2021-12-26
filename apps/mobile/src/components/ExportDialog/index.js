@@ -10,7 +10,7 @@ import Exporter from '../../services/Exporter';
 import { getElevation } from '../../utils';
 import { ph, pv, SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import { PressableButton } from '../PressableButton';

@@ -15,7 +15,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';

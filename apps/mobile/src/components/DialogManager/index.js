@@ -22,7 +22,7 @@ import {
 } from '../../utils/Events';
 import { EditorSettings } from '../../views/Editor/EditorSettings';
 import { Properties } from '../Properties';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import { AddNotebookDialog } from '../AddNotebookDialog';
 import { AddTopicDialog } from '../AddTopicDialog';
 import { AnnouncementDialog } from '../Announcements';

@@ -17,7 +17,7 @@ import {
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';

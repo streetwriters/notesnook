@@ -17,7 +17,7 @@ import {getTotalNotes} from '../../utils';
 import {db} from '../../utils/database';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';

@@ -16,7 +16,7 @@ import {sanitizeFilename} from '../../utils/filename';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';

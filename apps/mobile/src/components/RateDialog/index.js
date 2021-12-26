@@ -4,7 +4,7 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';

@@ -10,7 +10,7 @@ import {db} from '../../utils/database';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';

@@ -6,7 +6,7 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';

@@ -8,7 +8,7 @@ import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {eCloseTagsDialog, eOpenTagsDialog, refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../sheet';
+import SheetWrapper from '../Sheet';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';

@@ -2,7 +2,7 @@ import React, {createRef, useEffect, useRef, useState} from 'react';
 import {View} from 'react-native';
 import Menu, {MenuItem} from 'react-native-reanimated-material-menu';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import SheetWrapper from '../../components/sheet';
+import SheetWrapper from '../../components/Sheet';
 import {Button} from '../../components/Button';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
