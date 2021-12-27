@@ -1,5 +1,26 @@
 /* eslint-disable no-undef */
 const fs = require("fs");
+const dotenv = require("dotenv");
+const path = require("path");
+
+dotenv.config({ path: path.join(__dirname, ".env.local") });
+
+const USER = {
+  email: process.env.USER_EMAIL,
+  password: process.env.USER_PASSWORD,
+};
+
+async function loginUser(user = USER) {
+  await page.click(getTestId("navitem-login"));
+
+  await page.fill(getTestId("email"), user.email);
+
+  await page.fill(getTestId("password"), user.password);
+
+  await page.click(getTestId("submitButton"));
+
+  await page.waitForSelector(getTestId("navitem-sync"));
+}
 
 const NOTEBOOK = {
   title: "Test notebook 1",
@@ -88,4 +109,5 @@ module.exports = {
   getEditorContent,
   getEditorContentAsHTML,
   isTestAll,
+  loginUser,
 };
