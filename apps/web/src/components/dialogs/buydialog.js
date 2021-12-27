@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Text, Flex, Button, Box } from "rebass";
 import * as Icon from "../icons";
 import { useStore as useUserStore } from "../../stores/user-store";
@@ -260,7 +260,7 @@ function BuyDialog(props) {
   const user = useUserStore((store) => store.user);
   const isLoggedIn = useUserStore((store) => store.isLoggedIn);
   const [selectedPlan, setSelectedPlan] = useState();
-  const [discount, setDiscount] = useState({ isApplyingCoupon: false });
+  const [discount, setDiscount] = useState();
   const theme = useTheme();
 
   useEffect(() => {
@@ -271,14 +271,24 @@ function BuyDialog(props) {
     if (!plan) return;
     (async function () {
       const product = await getPlan(plan);
-      setDiscount({ isApplyingCoupon: true });
-      console.log(product);
+      setDiscount({ isApplyingCoupon: !!couponCode });
       setSelectedPlan({
         ...productToPlan(product),
         coupon: couponCode,
       });
     })();
   }, [plan, couponCode]);
+
+  const onCheckoutLoaded = useCallback((data) => {
+    setSelectedPlan((plan) => {
+      const pricingInfo = getPricingInfoFromCheckout(plan, data);
+      if (plan.country !== pricingInfo.country) {
+        return { ...plan, ...pricingInfo };
+      }
+      setDiscount(pricingInfo);
+      return plan;
+    });
+  }, []);
 
   return (
     <Modal
@@ -362,11 +372,19 @@ function BuyDialog(props) {
             selectedPlan ? (
               <SelectedPlan
                 plan={{ ...selectedPlan, ...discount }}
-                onPlanChangeRequest={() => setSelectedPlan()}
+                onPlanChangeRequest={() => {
+                  setSelectedPlan();
+                  setDiscount();
+                }}
                 isPlanChangeable={!plan}
                 onCouponApplied={(coupon) => {
-                  setDiscount({ isApplyingCoupon: true });
-                  setSelectedPlan((plan) => ({ ...plan, coupon }));
+                  setDiscount({
+                    isApplyingCoupon: true,
+                  });
+                  setSelectedPlan((plan) => ({
+                    ...plan,
+                    coupon,
+                  }));
                 }}
               />
             ) : plan ? (
@@ -385,15 +403,10 @@ function BuyDialog(props) {
           selectedPlan ? (
             <Checkout
               user={user}
-              plan={selectedPlan}
-              onCheckoutLoaded={(data) => {
-                const pricingInfo = getPricingInfoFromCheckout(
-                  selectedPlan,
-                  data
-                );
-                console.log(pricingInfo, selectedPlan.coupon);
-                setDiscount(pricingInfo);
-              }}
+              planId={selectedPlan.key}
+              coupon={selectedPlan.coupon}
+              country={selectedPlan.country}
+              onCheckoutLoaded={onCheckoutLoaded}
             />
           ) : plan ? null : (
             <FeaturesList />
@@ -506,22 +519,22 @@ function FeaturesList() {
   );
 }
 
-function Checkout({ user, plan, onCheckoutLoaded }) {
-  const [isLoading, setIsLoading] = useState(true);
+function Checkout({ user, planId, coupon, country, onCheckoutLoaded }) {
+  const [isLoaded, setIsLoaded] = useState(false);
   useEffect(() => {
     (async () => {
-      setIsLoading(true);
+      setIsLoaded(false);
       await inlineCheckout({
         user,
-        plan: plan.key,
-        coupon: plan.coupon,
-        country: plan.country,
+        plan: planId,
+        coupon,
+        country,
         onCheckoutLoaded,
       });
-      setIsLoading(false);
+      setIsLoaded(true);
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [plan, user]);
+  }, [planId, coupon]);
 
   return (
     <Flex
@@ -531,12 +544,12 @@ function Checkout({ user, plan, onCheckoutLoaded }) {
       padding={40}
       flexShrink={[0, 0, 1]}
       overflowY={["hidden", "hidden", "auto"]}
-      alignItems={"center"}
+      alignItems={isLoaded ? "stretch" : "center"}
     >
-      {isLoading ? (
+      {!isLoaded ? (
         <Loader
           title={
-            plan.isApplyingCoupon
+            coupon
               ? "Applying coupon code. Please wait..."
               : "Loading checkout. Please wait..."
           }
@@ -545,7 +558,7 @@ function Checkout({ user, plan, onCheckoutLoaded }) {
       <Box
         flex={1}
         className="checkout-container"
-        display={isLoading ? "none" : "block"}
+        display={!isLoaded ? "none" : "block"}
       />
     </Flex>
   );
@@ -588,6 +601,7 @@ function PlansList({ selectedPlan, onPlanChanged }) {
   return plans.map((plan) => (
     <Button
       disabled={isLoading}
+      data-test-id={`checkout-plan-${plan.key}`}
       variant="tool"
       display="flex"
       textAlign="start"
@@ -670,7 +684,7 @@ function SelectedPlan({
     const couponInput = document.getElementById("coupon");
     couponInput.value = plan.coupon ? plan.coupon : couponInput.value;
   }, [plan.coupon]);
-  console.log(plan);
+
   return (
     <>
       {plan.key === "monthly" ? (
@@ -681,13 +695,20 @@ function SelectedPlan({
       <Text variant="heading" textAlign="center" mt={4}>
         Notesnook Pro
       </Text>
-      <Text variant="body" fontSize="subheading" textAlign="center" mt={1}>
+      <Text
+        data-test-id="checkout-plan-title"
+        variant="body"
+        fontSize="subheading"
+        textAlign="center"
+        mt={1}
+      >
         {plan.title}
       </Text>
       <Field
         variant={plan.isInvalidCoupon ? "error" : "input"}
         sx={{ alignSelf: "stretch", my: 2 }}
         styles={{ input: { fontSize: "body" } }}
+        data-test-id="checkout-coupon-code"
         id="coupon"
         name="coupon"
         placeholder="Coupon code"
@@ -718,10 +739,18 @@ function SelectedPlan({
         period={plan.key}
         subtotal={plan.price}
         discountedPrice={plan.discount || 0.0}
+        tax={plan.tax || 0.0}
+        recurringTax={plan.recurringTax || 0.0}
         isRecurringDiscount={plan.isRecurringDiscount}
       />
       {isPlanChangeable && (
-        <Button variant="secondary" mt={4} px={4} onClick={onPlanChangeRequest}>
+        <Button
+          data-test-id="checkout-plan-change"
+          variant="secondary"
+          mt={4}
+          px={4}
+          onClick={onPlanChangeRequest}
+        >
           Change plan
         </Button>
       )}
@@ -734,6 +763,8 @@ function CheckoutPricing({
   period,
   subtotal,
   discountedPrice,
+  tax,
+  recurringTax,
   isRecurringDiscount,
 }) {
   const fields = [
@@ -741,6 +772,12 @@ function CheckoutPricing({
       key: "subtotal",
       label: "Subtotal",
       value: formatPrice(currency, subtotal.toFixed(2)),
+    },
+    {
+      key: "tax",
+      label: "Sales tax",
+      color: "error",
+      value: formatPrice(currency, tax.toFixed(2), null),
     },
     {
       key: "discount",
@@ -754,7 +791,9 @@ function CheckoutPricing({
       ),
     },
   ];
-
+  const currentTotal = (subtotal + tax - discountedPrice).toFixed(2);
+  const recurringTotal = (subtotal + recurringTax).toFixed(2);
+  const isDiscounted = isRecurringDiscount || discountedPrice <= 0;
   return (
     <>
       {fields.map((field) => (
@@ -768,6 +807,7 @@ function CheckoutPricing({
             {field.label}
           </Text>
           <Text
+            data-test-id={`checkout-price-${field.key}`}
             variant="body"
             fontSize="subtitle"
             color={field.color || "text"}
@@ -780,16 +820,18 @@ function CheckoutPricing({
         <Text variant="body" fontSize="heading">
           Total
         </Text>
-        <Text variant="body" fontSize="heading" color={"text"} textAlign="end">
-          {formatPrice(
-            currency,
-            subtotal - discountedPrice,
-            isRecurringDiscount || discountedPrice <= 0 ? period : "null"
-          )}
+        <Text
+          data-test-id={`checkout-price-total`}
+          variant="body"
+          fontSize="heading"
+          color={"text"}
+          textAlign="end"
+        >
+          {formatPrice(currency, currentTotal, isDiscounted ? period : "null")}
           <Text fontSize="body">
-            {isRecurringDiscount || discountedPrice <= 0
+            {isDiscounted
               ? ""
-              : `then ${formatPrice(currency, subtotal, period)}`}
+              : `then ${formatPrice(currency, recurringTotal, period)}`}
           </Text>
         </Text>
       </Flex>
@@ -808,28 +850,45 @@ function formatPeriod(period) {
 }
 
 function getPricingInfoFromCheckout(plan, eventData) {
-  const { checkout } = eventData;
+  const {
+    checkout,
+    user: { country },
+  } = eventData;
   const { prices, recurring_prices, coupon } = checkout;
-  const price = parseFloat(prices.customer.total);
-  const recurringPrice = parseFloat(recurring_prices.customer.total);
+  const { currency, total, total_tax } = prices.customer;
 
+  const couponCode = coupon.coupon_code ? coupon.coupon_code : undefined;
+  const price = parseFloat(total);
+  const recurringPrice = parseFloat(recurring_prices.customer.total);
+  const tax = parseFloat(total_tax);
+  const recurringTax = parseFloat(recurring_prices.customer.total_tax);
+  const isCouponApplied = !!couponCode;
+
+  const isCurrencyChanged = plan.currency !== currency;
   return {
-    price: plan.price,
-    discount: plan.price - price,
-    coupon: coupon.coupon_code,
-    isRecurringDiscount: coupon.coupon_code && price === recurringPrice,
-    isInvalidCoupon: !!plan.coupon !== !!coupon.coupon_code,
+    country,
+    currency,
+    price: isCurrencyChanged ? price : plan.price,
+    tax,
+    recurringTax,
+    discount: isCouponApplied ? plan.price - price : 0,
+    coupon: couponCode,
+    isRecurringDiscount: couponCode && price === recurringPrice,
+    isInvalidCoupon: plan.coupon && plan.coupon !== couponCode,
   };
 }
 
 function productToPlan(product) {
   return {
     key: `${product.subscription.interval}ly`,
-    country: product.customer_country,
+    // country: product.customer_country,
     currency: product.currency,
     price: product.price.net,
     id: product.product_id,
     title: product.subscription.interval === "month" ? "Monthly" : "Yearly",
     subtitle: `Pay once a ${product.subscription.interval}.`,
+
+    tax: product.price.tax,
+    recurringTax: product.subscription.price.tax,
   };
 }

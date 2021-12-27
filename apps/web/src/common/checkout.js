@@ -46,14 +46,12 @@ function loadPaddle(eventCallback) {
 function inlineCheckout({ user, plan, coupon, country, onCheckoutLoaded }) {
   return new Promise(async (resolve) => {
     await loadPaddle((e) => {
-      console.log("E", e);
       const data = e.eventData;
       switch (e.event) {
         case "Checkout.Loaded":
-          onCheckoutLoaded && onCheckoutLoaded(data);
-          resolve();
-          break;
+        case "Checkout.Location.Submit":
         case "Checkout.Coupon.Applied":
+        case "Checkout.Coupon.Remove":
           onCheckoutLoaded && onCheckoutLoaded(data);
           resolve();
           break;
@@ -65,11 +63,11 @@ function inlineCheckout({ user, plan, coupon, country, onCheckoutLoaded }) {
     const { Paddle } = window;
     if (!Paddle) return;
 
-    // if (coupon) {
-    //   trackEvent(ANALYTICS_EVENTS.offerClaimed, `[${coupon}] redeemed!`);
-    // } else {
-    //   trackEvent(ANALYTICS_EVENTS.checkoutStarted, `Checkout requested`);
-    // }
+    if (coupon) {
+      trackEvent(ANALYTICS_EVENTS.offerClaimed, `[${coupon}] redeemed!`);
+    } else {
+      trackEvent(ANALYTICS_EVENTS.checkoutStarted, `Checkout requested`);
+    }
 
     Paddle.Checkout.open({
       frameTarget: "checkout-container",
