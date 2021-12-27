@@ -228,15 +228,17 @@ function init_callback(_editor) {
 }
 
 const plugins = [
-  'checklist advlist autolink textpattern hr lists link noneditable image',
+  'checklist advlist autolink textpattern hr lists link noneditable image bettertable',
   'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
 const content_style = `
-body: {
+body {
   font-family:"Open Sans";
+  overflow-x: hidden !important;
 }
+
 .mce-content-body h2::before,
 h3::before,
 h4::before,
@@ -302,17 +304,7 @@ iframe {
   max-width:100% !important;
   background-color:transparent !important;
 }
-table {
-  display: block !important;
-  overflow-x: auto !important;
-  white-space: nowrap  !important;
-  max-width:100% !important;
-  width:100% !important;
-  height:auto !important;
-}
-td {
-  min-width:10vw !important;
-}
+
 h1,
 h2,
 h3,
@@ -321,16 +313,6 @@ h5,
 h6,
 strong {
   font-weight:600 !important;
-}
-
-td > *,
-th > * {
-    margin: 0 !important;
-}
-
-td > * + *,
-th > * + * {
-    margin-top: .75em !important;
 }
 `;
 
@@ -368,6 +350,9 @@ function init_tiny(size) {
       'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
+    table_responsive_width:false,
+    table_sizing_mode:"fixed",
+    table_column_resizing:"resizetable",
     resize: true,
     mobile: {
       resize: false,
