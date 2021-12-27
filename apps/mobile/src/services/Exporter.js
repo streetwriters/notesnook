@@ -55,6 +55,33 @@ td {
   border-width:0.5px;
   border-style:solid;
 }
+
+td,
+th {
+  min-width: 120px !important;
+}
+
+td>*,
+th>* {
+  margin: 0 !important;
+}
+
+td>*+*,
+th>*+* {
+  margin-top: 0.75em !important;
+}
+
+tr:nth-child(even) {
+  background-color: "#f0f0f0"
+}
+
+td,
+th {
+  padding: 5px !important;
+  border: 1px solid #DCDCDC !important;
+  border-left: none !important;
+  border-top: none !important;
+}
 </style>`;
 
 async function saveToPDF(note) {
