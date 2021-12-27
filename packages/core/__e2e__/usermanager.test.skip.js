@@ -1,5 +1,3 @@
-const fetch = require("node-fetch");
-window.fetch = fetch;
 import UserManager from "../api/user-manager";
 import DB from "../api";
 import StorageInterface from "../__mocks__/storage.mock";
