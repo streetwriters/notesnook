@@ -249,6 +249,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notifNotes: false,
     pitchBlack: false
   },
+  sheetKeyboardHandler:true,
   fullscreen: false,
   deviceMode: 'mobile',
   dimensions: {width, height},
@@ -259,7 +260,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setDeviceMode: mode => set({deviceMode: mode}),
   setDimensions: dimensions => set({dimensions: dimensions}),
   setAppLoading: appLoading => set({appLoading}),
-  setIntroCompleted: isIntroCompleted => set({isIntroCompleted})
+  setIntroCompleted: isIntroCompleted => set({isIntroCompleted}),
+  setSheetKeyboardHandler:(sheetKeyboardHandler) => set({sheetKeyboardHandler})
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({

@@ -38,10 +38,10 @@ export const Tags = ({item, close}) => {
           type="grayBg"
           icon="plus"
           iconPosition="right"
-          height={30}
+          height={25}
           fontSize={SIZE.xs + 1}
           style={{
-            marginRight: 5,
+            marginRight:5,
             paddingHorizontal: 0,
             borderRadius: 100,
             paddingHorizontal: 8
@@ -93,7 +93,7 @@ const TagItem = ({tag, close}) => {
       //   text: colors.accent
       // }}
       type="grayBg"
-      height={30}
+      height={25}
       fontSize={SIZE.xs + 1}
       style={style}
     />

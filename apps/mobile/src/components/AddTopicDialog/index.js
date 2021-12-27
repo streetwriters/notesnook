@@ -116,11 +116,11 @@ export class AddTopicDialog extends React.Component {
         <DialogContainer>
           <DialogHeader
             icon="book-outline"
-            title={this.toEdit ? 'Edit Topic' : 'New Topic'}
+            title={this.toEdit ? 'Edit topic' : 'New topic'}
             paragraph={
               this.toEdit
                 ? 'Edit title of the topic'
-                : 'Create a new topic in ' + this.notebook.title
+                : 'Add a new topic in ' + this.notebook.title
             }
             padding={12}
           />
@@ -136,7 +136,7 @@ export class AddTopicDialog extends React.Component {
               }}
               blurOnSubmit={false}
               defaultValue={this.toEdit ? this.toEdit.title : null}
-              placeholder="Enter title of topic"
+              placeholder="Enter title"
               onSubmit={() => this.addNewTopic()}
               returnKeyLabel="Done"
               returnKeyType="done"
@@ -144,7 +144,7 @@ export class AddTopicDialog extends React.Component {
           </View>
 
           <DialogButtons
-            positiveTitle={this.toEdit ? 'Save' : 'Create'}
+            positiveTitle={this.toEdit ? 'Save' : 'Add'}
             onPressNegative={() => this.close()}
             onPressPositive={() => this.addNewTopic()}
             loading={this.state.loading}

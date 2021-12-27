@@ -21,6 +21,7 @@ const SheetWrapper = ({
   const [state] = useTracked();
   const {colors} = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const sheetKeyboardHandler = useSettingStore(state => state.sheetKeyboardHandler);
   const largeTablet = deviceMode === 'tablet';
   const smallTablet = deviceMode === 'smallTablet';
   const dimensions = useSettingStore(state => state.dimensions);
@@ -63,6 +64,7 @@ const SheetWrapper = ({
       onPositionChanged={onHasReachedTop}
       closeOnTouchBackdrop={closeOnTouchBackdrop}
       keyboardMode={keyboardMode}
+      keyboardHandlerEnabled={sheetKeyboardHandler}
       closeOnPressBack={closeOnTouchBackdrop}
       indicatorColor={colors.nav}
       onOpen={_onOpen}

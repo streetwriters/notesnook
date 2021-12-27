@@ -43,10 +43,12 @@ import {
 } from '../../utils/Colors';
 import {db} from '../../utils/database';
 import {
+  eOnNewTopicAdded,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eOpenPublishNoteDialog
+  eOpenPublishNoteDialog,
+  refreshNotesPage
 } from '../../utils/Events';
 import {deleteItems, openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
@@ -60,6 +62,7 @@ import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ColorTags} from './color-tags';
 import {DateMeta} from './date-meta';
+import Notebooks from './notebooks';
 import {Tags} from './tags';
 import {Topics} from './topics';
 const w = Dimensions.get('window').width;
@@ -802,7 +805,9 @@ export const Properties = ({
                   ? note.description
                   : null}
                 {(note.type === 'note' || note.itemType === 'note') &&
-                note?.headline ? note.headline : null}
+                note?.headline
+                  ? note.headline
+                  : null}
               </Paragraph>
             ) : null}
 
@@ -812,6 +817,10 @@ export const Properties = ({
 
             <Topics item={note} close={close} />
           </View>
+
+          {note && note.type === 'note' ? (
+            <Notebooks note={note} close={close} />
+          ) : null}
 
           <DateMeta item={note} />
         </View>

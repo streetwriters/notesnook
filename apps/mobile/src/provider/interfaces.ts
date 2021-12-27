@@ -99,7 +99,9 @@ export interface SettingStore extends State {
     appLoading: boolean
     setAppLoading: (appLoading: boolean) => void
     isIntroCompleted: boolean
-    setIntroCompleted: (isIntroCompleted: boolean) => void
+    setIntroCompleted: (isIntroCompleted: boolean) => void,
+    setSheetKeyboardHandler:(sheetKeyboardHandler:boolean) => void,
+    sheetKeyboardHandler:boolean
 }
 
 export interface MenuStore extends State {
