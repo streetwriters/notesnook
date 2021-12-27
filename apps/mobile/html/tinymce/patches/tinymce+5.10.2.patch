@@ -1,0 +1,33 @@
+diff --git a/node_modules/tinymce/plugins/table/plugin.js b/node_modules/tinymce/plugins/table/plugin.js
+index e41249b..fb25fc5 100644
+--- a/node_modules/tinymce/plugins/table/plugin.js
++++ b/node_modules/tinymce/plugins/table/plugin.js
+@@ -1875,7 +1875,8 @@
+     var remove$5 = function (element) {
+       var dom = element.dom;
+       if (dom.parentNode !== null) {
+-        dom.parentNode.removeChild(dom);
++        if (dom.parentNode.classList.contains("table-container")) dom.parentNode.remove();
++        else dom.parentNode.removeChild(dom);
+       }
+     };
+     var unwrap = function (wrapper) {
+@@ -7259,7 +7260,9 @@
+       editor.undoManager.ignore(function () {
+         var table = render(rows, columns, rowHeaders, colHeaders, getTableHeaderType(editor), options);
+         set$2(table, 'data-mce-id', '__mce');
++        set$2(table, "contenteditable", "true");
+         var html = getOuter(table);
++        html = `<div class="table-container" contenteditable="false">${html}</div><p><br data-mce-bogus="1"/></p>`;
+         editor.insertContent(html);
+         editor.addVisual();
+       });
+@@ -9575,7 +9578,7 @@
+     var rootElements = [
+       'table',
+       'li',
+-      'dl'
++      'dl',
+     ];
+     var handle$1 = function (event, editor, cellSelection) {
+       if (event.keyCode === global$1.TAB) {
