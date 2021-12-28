@@ -1,0 +1,8 @@
+input: .
+output: .retype
+url: docs.notesnook.com
+branding:
+  title: Notesnook
+  label: Docs
+footer:
+  copyright: "&copy; Copyright {{ 2021 }} Streetwriters LLC. All rights reserved."
