@@ -1,5 +1,6 @@
 const { execSync } = require("child_process");
 const fs = require("fs");
+const path = require("path");
 const { JSDOM } = require("jsdom");
 const generateRobot = require("./generateRobot");
 const generateSitemap = require("./generateSitemap");
@@ -43,7 +44,7 @@ function createTrackerScript(document) {
   return script;
 }
 
-(function () {
+(function() {
   const output = buildDocs();
   if (!output.includes("0 errors")) {
     console.error(output);
@@ -51,7 +52,7 @@ function createTrackerScript(document) {
   }
   console.log("Docs generated!");
 
-  const outputPath = output.split("\n")[2].trim().substring(8).trim();
+  const outputPath = /Output: (.*$)/gm.exec(output)[1];
 
   console.log(`Documentation output path:`, outputPath);
 
