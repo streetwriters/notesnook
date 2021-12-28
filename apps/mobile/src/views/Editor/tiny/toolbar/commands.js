@@ -89,11 +89,14 @@ export const execCommands = {
   pre: `
     tinymce.activeEditor.execCommand('mceInsertCodeBlock')
   `,
+  tablecellprops:`tableCellNodeOptions()`,
   tableprops: "tinymce.activeEditor.execCommand('mceTableProps');",
   tabledelete: "tinymce.activeEditor.execCommand('mceTableDelete');",
   tablesplitcell: "tinymce.activeEditor.execCommand('mceTableSplitCells');",
   tablemergecell: "tinymce.activeEditor.execCommand('mceTableMergeCells');",
-  tablerowprops: "tinymce.activeEditor.execCommand('mceTableRowProps');",
+  tablerowprops: `tableRowNodeOptions()`,
+  tableinsertrowbefore:`tinymce.activeEditor.execCommand('mceTableInsertRowBefore');`,
+  tableinsertcolbefore:`tinymce.activeEditor.execCommand('mceTableInsertColBefore');`,
   imageResize25: () => setImageSize(0.25),
   imageResize50: () => setImageSize(0.5),
   imageResize100: () => setImageSize(1),

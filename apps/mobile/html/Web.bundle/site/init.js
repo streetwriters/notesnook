@@ -316,6 +316,49 @@ strong {
 }
 `;
 
+function tableCellNodeOptions() {
+  let node = findNodeParent('td');
+  if (!node) {
+    node = findNodeParent('th');
+  }
+  if (!node) return;
+  let properties = {
+    width: node.style.width,
+    height: node.style.height,
+    backgroundColor: node.style.backgroundColor,
+    cellType: tinymce.activeEditor.queryCommandValue('mceTableCellType'),
+    colType: tinymce.activeEditor.queryCommandValue('mceTableColType')
+  };
+  reactNativeEventHandler('tablecelloptions', properties);
+}
+
+function findNodeParent(nodeName) {
+  let node = editor.selection.getNode();
+  console.log('finding node', node);
+  let levels = 5;
+  for (let i = 0; i < levels; i++) {
+    if (!node) return;
+    if (node.nodeName.toLowerCase() === nodeName) {
+      return node;
+    } else {
+      node = node.parentNode;
+    }
+  }
+  return null;
+}
+
+function tableRowNodeOptions() {
+  let node = findNodeParent('tr');
+
+  if (node) {
+    let properties = {
+      backgroundColor: node.style.backgroundColor,
+      rowType: tinymce.activeEditor.queryCommandValue('mceTableRowType')
+    };
+    reactNativeEventHandler('tablerowoptions', properties);
+  }
+}
+
 function init_tiny(size) {
   loadFontSize();
   console.log('init tinymce');
@@ -344,15 +387,14 @@ function init_tiny(size) {
     content_style: content_style,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
-    table_toolbar:
-      'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+    table_toolbar: 'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
     imagetools_toolbar:
       'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
-    table_responsive_width:false,
-    table_sizing_mode:"fixed",
-    table_column_resizing:"resizetable",
+    table_responsive_width: false,
+    table_sizing_mode: 'fixed',
+    table_column_resizing: 'resizetable',
     resize: true,
     mobile: {
       resize: false,
@@ -429,16 +471,40 @@ function setup_tiny(_editor) {
     tooltip: 'Image properties',
     onAction: function () {
       reactNativeEventHandler('imageoptions');
-    },
-    onclick: function () {
-      reactNativeEventHandler('imageoptions');
+    }
+  });
+
+  editor.ui.registry.addButton('tableconfig', {
+    icon: 'more-drawer',
+    tooltip: 'Table properties',
+    onAction: function (e) {
+      console.log(e, 'event');
+      reactNativeEventHandler('tableconfig');
+    }
+  });
+
+  editor.ui.registry.addButton('trowprops', {
+    icon: 'table-row-properties',
+    tooltip: 'Row properties',
+    onAction: function (e) {
+      tableRowNodeOptions()
+      editor.blur();
+    }
+  });
+
+  editor.ui.registry.addButton('tcellprops', {
+    icon: 'table-cell-properties',
+    tooltip: 'Cell properties',
+    onAction: function (e) {
+      tableCellNodeOptions()
+      editor.blur();
     }
   });
 
   editor.ui.registry.addButton('imagedownload', {
     icon: 'save',
     tooltip: 'Download image',
-    onAction: function () {
+    onAction: function (e) {
       let node = tinymce.activeEditor.selection.getNode();
       if (node.tagName === 'IMG' && node.dataset && node.dataset.hash) {
         window.ReactNativeWebView.postMessage(
@@ -449,8 +515,7 @@ function setup_tiny(_editor) {
           })
         );
       }
-    },
-    onclick: function () {}
+    }
   });
 
   editor.ui.registry.addButton('imagepreview', {
@@ -478,8 +543,7 @@ function setup_tiny(_editor) {
         );
         xhr.send();
       }
-    },
-    onclick: function () {}
+    }
   });
 }
 
@@ -616,7 +680,7 @@ function selectchange() {
 
     currentFormats.current = {
       index: range.startOffset,
-      length: range.endOffset - range.startOffset,
+      length: range.endOffset - range.startOffset
     };
 
     currentFormats.fontsize = editor.selection.getNode().style.fontSize;
@@ -669,5 +733,5 @@ function selectchange() {
     }
     currentFormats.node = editor.selection.getNode().nodeName;
     reactNativeEventHandler('selectionchange', currentFormats);
-  },50);
+  }, 50);
 }

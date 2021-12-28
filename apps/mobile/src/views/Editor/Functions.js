@@ -1,4 +1,4 @@
-import {createRef} from 'react';
+import React, {createRef} from 'react';
 import {Platform} from 'react-native';
 import {presentDialog} from '../../components/Dialog/functions';
 import {useEditorStore, useMenuStore, useTagStore} from '../../provider/stores';
@@ -6,7 +6,8 @@ import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  presentSheet
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -26,8 +27,10 @@ import {MMKV} from '../../utils/mmkv';
 import {tabBarRef} from '../../utils/Refs';
 import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
+import {TableCellProperties} from './TableCellProperties';
+import {TableRowProperties} from './TableRowProperties';
 import tiny from './tiny/tiny';
-import {IMAGE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
+import {IMAGE_TOOLTIP_CONFIG, TABLE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -365,7 +368,7 @@ const checkStatus = async noreset => {
       webviewInit = true;
       clearTimeout(webviewTimer);
       webviewTimer = null;
-      console.log('webviewOk:',webviewOK);
+      console.log('webviewOk:', webviewOK);
       resolve(true);
       eUnSubscribeEvent('webviewOk', onWebviewOk);
     };
@@ -452,8 +455,29 @@ export const _onMessage = async evt => {
   }
 
   switch (message.type) {
+    case 'tableconfig':
+      showTableOptionsTooltip();
+      break;
+    case 'tablecelloptions':
+      console.log(message.value);
+      eSendEvent('updatecell', message.value);
+      presentSheet({
+        noIcon: true,
+        noProgress: true,
+        component: <TableCellProperties data={message.value} />
+      });
+      break;
+    case 'tablerowoptions':
+      console.log("tablerowoptions", message.value);
+      eSendEvent('updaterow', message.value);
+      presentSheet({
+        noIcon: true,
+        noProgress: true,
+        component: <TableRowProperties data={message.value} />
+      });
+      break;
     case 'selectionvalue':
-      eSendEvent('selectionvalue',message.value);
+      eSendEvent('selectionvalue', message.value);
       console.log(message.value);
       break;
     case 'history':
@@ -615,6 +639,12 @@ export const _onMessage = async evt => {
 function showImageOptionsTooltip() {
   editing.tooltip = 'imageoptions';
   eSendEvent('showTooltip', IMAGE_TOOLTIP_CONFIG);
+}
+
+function showTableOptionsTooltip() {
+  editing.tooltip = 'tableconfig';
+  console.log('showTooltip');
+  eSendEvent('showTooltip', TABLE_TOOLTIP_CONFIG);
 }
 
 function onNoteChange() {

@@ -125,6 +125,7 @@ export const font_names = Platform.select({
 });
 
 export const editor_colors = [
+  '',
   '#000000',
   '#e60000',
   '#ff9900',
@@ -220,12 +221,19 @@ export const TOOLBAR_ICONS = {
   table: 'table-plus',
   settings: 'cog-outline',
   magnify: 'magnify',
-  tableprops: 'table-settings',
+  //tableprops: 'table-settings',
+  tablecellprops: 'table-column',
   tabledelete: 'table-remove',
   tablesplitcell: 'table-split-cell',
   tablemergecell: 'table-merge-cells',
   tablerowprops: 'table-row',
-  tablecolumnprops: 'table-column',
+  tableinsertrowbefore: 'table-row-plus-before',
+  tableinsertrowafter: 'table-row-plus-after',
+  tabledeleterow: 'table-row-remove',
+  tableinsertcolbefore: 'table-column-plus-before',
+  tableinsertcolafter: 'table-column-plus-after',
+  tabledeletecol: 'table-column-remove',
+  //tablecolumnprops: 'table-column',
   tableconfig: 'table-cog',
   imagepreview: 'fullscreen',
   removeimage: 'delete',
@@ -234,7 +242,7 @@ export const TOOLBAR_ICONS = {
   imagefloatnone: 'format-float-none',
   'line-break': 'keyboard-return',
   code: 'code-tags',
-  filepicker:'attachment',
-  undo:'undo-variant',
-  redo:'redo-variant'
+  filepicker: 'attachment',
+  undo: 'undo-variant',
+  redo: 'redo-variant'
 };

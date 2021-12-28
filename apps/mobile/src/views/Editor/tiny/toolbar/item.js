@@ -8,7 +8,7 @@ import { useTracked } from '../../../../provider';
 import { useUserStore } from '../../../../provider/stores';
 import {
   eSendEvent, eSubscribeEvent,
-  eUnSubscribeEvent, ToastEvent
+  eUnSubscribeEvent, presentSheet, ToastEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
@@ -23,6 +23,7 @@ import {
 } from './constants';
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';
+import { Table } from './table';
 
 const ToolbarItem = ({
   format,
@@ -201,6 +202,8 @@ const ToolbarItem = ({
     checkForChanges(data);
   };
 
+  
+
   const onPress = async event => {
     if (premium && !isPro) {
       let user = await db.user.getUser();
@@ -215,6 +218,15 @@ const ToolbarItem = ({
       }
       return;
     }
+
+    if (format === 'table') {
+      presentSheet({
+        noProgress:true,
+        noIcon:true,
+        component:<Table/>
+      })
+    }
+
     if (type === 'settings') {
       if (editing.isFocused) {
         safeKeyboardDismiss();
