@@ -1,5 +1,6 @@
 const ATTRIBUTE_DELETE_FILTERS = [
   "[data-mce-selected]",
+  "[data-mce-active]",
   "[data-mce-src]",
   "[data-mce-style]",
   "[data-mce-type]",
