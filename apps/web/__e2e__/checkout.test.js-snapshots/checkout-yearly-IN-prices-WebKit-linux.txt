@@ -1,0 +1,4 @@
+subtotal: ₹4510
+tax: ₹690
+discount: ₹0
+total: ₹5190/yr

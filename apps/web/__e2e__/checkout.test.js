@@ -3,6 +3,7 @@ const { getTestId, isTestAll, loginUser } = require("./utils");
 const { isAbsent, isPresent } = require("./utils/conditions");
 const path = require("path");
 
+test.setTimeout(45 * 1000);
 /**
  * @type {Page}
  */
@@ -36,6 +37,17 @@ async function getPrices() {
   return prices;
 }
 
+/**
+ *
+ * @param {string} prices
+ */
+function roundOffPrices(prices) {
+  return prices.replaceAll(/(\d+.\d+)/gm, (str, price) => {
+    price = parseFloat(price);
+    return isNaN(price) ? 0 : Math.ceil(Math.round(price) / 10) * 10;
+  });
+}
+
 async function getPaddleFrame(selector = "inlineComplianceBarContainer") {
   await page.waitForSelector(`.checkout-container iframe`);
 
@@ -50,7 +62,8 @@ async function getPaddleFrame(selector = "inlineComplianceBarContainer") {
 async function changeCountry(paddleFrame, countryCode, pinCode) {
   await paddleFrame.selectOption(
     getPaddleTestId("countriesSelect"),
-    countryCode
+    countryCode,
+    { force: true }
   );
 
   if (pinCode)
@@ -58,7 +71,26 @@ async function changeCountry(paddleFrame, countryCode, pinCode) {
 
   await paddleFrame.click(getPaddleTestId("locationFormSubmitButton"));
 
-  await page.waitForTimeout(1000);
+  await paddleFrame.waitForSelector(
+    getPaddleTestId("inlineComplianceBarContainer")
+  );
+}
+
+async function forEachPlan(action) {
+  for (let i = 0; i < plans.length; ++i) {
+    const plan = plans[i];
+
+    const planTestId = getTestId(`checkout-plan-${plan.key}`);
+    await page.isEnabled(planTestId, { timeout: 10000 });
+
+    await page.click(planTestId);
+
+    await action(plan);
+
+    if (i < plans.length - 1) {
+      await page.click(getTestId("checkout-plan-change"));
+    }
+  }
 }
 
 test("change plans", async ({ page }) => {
@@ -66,16 +98,11 @@ test("change plans", async ({ page }) => {
 
   await page.goto("/#/buy/");
 
-  for (let plan of plans) {
-    const planTestId = getTestId(`checkout-plan-${plan.key}`);
-    await page.click(planTestId);
-
+  await forEachPlan(async (plan) => {
     await expect(
       page.innerText(getTestId("checkout-plan-title"))
     ).resolves.toBe(plan.title);
-
-    await page.click(getTestId("checkout-plan-change"));
-  }
+  });
 });
 
 test("confirm plan prices", async ({ page }) => {
@@ -83,16 +110,10 @@ test("confirm plan prices", async ({ page }) => {
 
   await page.goto("/#/buy/");
 
-  for (let plan of plans) {
-    const planTestId = getTestId(`checkout-plan-${plan.key}`);
-    await page.click(planTestId);
-
-    expect((await getPrices()).join("\n")).toMatchSnapshot(
-      `checkout-${plan.key}-prices.txt`
-    );
-
-    await page.click(getTestId("checkout-plan-change"));
-  }
+  await forEachPlan(async (plan) => {
+    const prices = roundOffPrices((await getPrices()).join("\n"));
+    expect(prices).toMatchSnapshot(`checkout-${plan.key}-prices.txt`);
+  });
 });
 
 test("changing locale should show localized prices", async ({ page }) => {
@@ -100,22 +121,14 @@ test("changing locale should show localized prices", async ({ page }) => {
 
   await page.goto("/#/buy/");
 
-  for (let plan of plans) {
-    const planTestId = getTestId(`checkout-plan-${plan.key}`);
-    await page.click(planTestId);
-
+  await forEachPlan(async (plan) => {
     const paddleFrame = await getPaddleFrame();
 
     await changeCountry(paddleFrame, "IN", "110001");
 
-    const prices = await getPrices();
-
-    expect(prices.join("\n")).toMatchSnapshot(
-      `checkout-${plan.key}-IN-prices.txt`
-    );
-
-    await page.click(getTestId("checkout-plan-change"));
-  }
+    const prices = roundOffPrices((await getPrices()).join("\n"));
+    expect(prices).toMatchSnapshot(`checkout-${plan.key}-IN-prices.txt`);
+  });
 });
 
 test("applying coupon should change discount & total price", async ({ page }, {
@@ -127,12 +140,7 @@ test("applying coupon should change discount & total price", async ({ page }, {
 
   await page.goto("/#/buy/");
 
-  for (let plan of plans) {
-    const planTestId = getTestId(`checkout-plan-${plan.key}`);
-    await page.isEnabled(planTestId, { timeout: 10000 });
-
-    await page.click(planTestId);
-
+  await forEachPlan(async (plan) => {
     await getPaddleFrame();
 
     await page.fill(getTestId("checkout-coupon-code"), plan.coupon);
@@ -140,16 +148,12 @@ test("applying coupon should change discount & total price", async ({ page }, {
 
     await getPaddleFrame();
 
-    const prices = await getPrices();
+    const prices = roundOffPrices((await getPrices()).join("\n"));
 
-    expect(prices.join("\n")).toMatchSnapshot(
+    expect(prices).toMatchSnapshot(
       `checkout-${plan.key}-discounted-prices.txt`
     );
-
-    await page.click(getTestId("checkout-plan-change"));
-
-    await page.waitForTimeout(1000);
-  }
+  });
 });
 
 test("apply coupon through url", async ({ page }) => {
@@ -160,9 +164,8 @@ test("apply coupon through url", async ({ page }) => {
 
     await getPaddleFrame();
 
-    const prices = await getPrices();
-
-    expect(prices.join("\n")).toMatchSnapshot(
+    const prices = roundOffPrices((await getPrices()).join("\n"));
+    expect(prices).toMatchSnapshot(
       `checkout-${plan.key}-discounted-prices.txt`
     );
   }
@@ -177,31 +180,19 @@ test("apply coupon after changing country", async ({ page }, {
 
   await page.goto("/#/buy/");
 
-  for (let plan of plans) {
-    const planTestId = getTestId(`checkout-plan-${plan.key}`);
-    await page.isEnabled(planTestId, { timeout: 10000 });
-
-    await page.click(planTestId);
-
+  await forEachPlan(async (plan) => {
     const paddleFrame = await getPaddleFrame();
 
     await changeCountry(paddleFrame, "IN", "110001");
-
-    await page.waitForTimeout(2000); // TODO unreliable
 
     await page.fill(getTestId("checkout-coupon-code"), plan.coupon);
     await page.press(getTestId("checkout-coupon-code"), "Enter");
 
     await getPaddleFrame();
 
-    const prices = await getPrices();
-
-    expect(prices.join("\n")).toMatchSnapshot(
+    const prices = roundOffPrices((await getPrices()).join("\n"));
+    expect(prices).toMatchSnapshot(
       `checkout-${plan.key}-IN-discounted-prices.txt`
     );
-
-    await page.click(getTestId("checkout-plan-change"));
-
-    await page.waitForTimeout(1000);
-  }
+  });
 });

@@ -1,0 +1,5 @@
+subtotal: ₹410
+tax: ₹40
+discount: -₹210
+total: ₹240
+then ₹470/mo

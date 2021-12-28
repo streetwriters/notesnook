@@ -63,6 +63,9 @@ function inlineCheckout({ user, plan, coupon, country, onCheckoutLoaded }) {
     const { Paddle } = window;
     if (!Paddle) return;
 
+    const container = document.getElementsByClassName("checkout-container")[0];
+    if (!container) return;
+
     if (coupon) {
       trackEvent(ANALYTICS_EVENTS.offerClaimed, `[${coupon}] redeemed!`);
     } else {
