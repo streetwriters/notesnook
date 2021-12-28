@@ -309,6 +309,13 @@ function TinyMCE(props) {
           await downloadAttachment(hash);
         },
         table_tab_navigation: true,
+        table_responsive_width: false,
+        table_column_resizing: "resizetable",
+        table_sizing_mode: "fixed",
+        table_advtab: false,
+        table_cell_advtab: false,
+        table_row_advtab: false,
+        table_col_advtab: false,
       }}
       onBeforeExecCommand={async (command) => {
         const isPremiumCommand = premiumCommands.some((cmd) => {

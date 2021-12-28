@@ -75,6 +75,7 @@
   height: 100%;
   padding-bottom: 150px;
   margin: 0px !important;
+  overflow-x: hidden;
 }
 
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
@@ -218,15 +219,15 @@ table[data-mce-selected] {
   border-top: none !important;
 }
 
-.mce-content-body td:last-child {
+.mce-content-body tbody td:last-child {
   border-right: none !important;
 }
 
-.mce-content-body tr:last-child td {
+.mce-content-body tbody tr:last-child td {
   border-bottom: none !important;
 }
 
-.mce-content-body tr:nth-child(even) {
+.mce-content-body tbody tr:nth-child(even) {
   background-color: var(--bgSecondary);
 }
 
@@ -264,19 +265,17 @@ table[data-mce-selected] {
   background-color: var(--shade);
 }
 
-.mce-content-body table[data-mce-selected] tbody tr[data-mce-active] {
+.mce-content-body table[data-mce-selected] tr[data-mce-active] {
   background-color: var(--shade);
   /* color: var(--static); */
 }
 
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   td:not([data-mce-active]),
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   th:not([data-mce-active]) {
   border-bottom: 1px solid var(--dimPrimary) !important;
@@ -285,12 +284,10 @@ table[data-mce-selected] {
 
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   td:not([data-mce-active]):first-child,
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   th:not([data-mce-active]):first-child {
   border-left: 1px solid var(--dimPrimary) !important;
@@ -298,21 +295,23 @@ table[data-mce-selected] {
 
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   td:not([data-mce-active]):last-child,
 .mce-content-body
   table[data-mce-selected]
-  tbody
   tr[data-mce-active]
   th:not([data-mce-active]):last-child {
   border-right: 1px solid var(--dimPrimary) !important;
 }
 
-.mce-content-body table[data-mce-selected] tbody td[data-mce-active],
-.mce-content-body table[data-mce-selected] tbody th[data-mce-active] {
+.mce-content-body table[data-mce-selected] td[data-mce-active],
+.mce-content-body table[data-mce-selected] th[data-mce-active] {
   border: 2px solid var(--dimPrimary) !important;
   background-color: var(--shade);
+}
+
+table thead {
+  font-weight: bold !important;
 }
 
 /** CONTEXT TOOLBAR */
@@ -347,4 +346,19 @@ table[data-mce-selected] {
   height: auto !important;
   padding: 5px 0px 5px 0px !important;
   margin: 0px !important;
+}
+
+.tox-menu {
+  min-width: 150px !important;
+}
+
+.ephox-snooker-resizer-bar {
+  background-color: var(--dimPrimary) !important;
+}
+
+.ephox-snooker-resizer-cols.ephox-snooker-resizer-bar {
+  transition: opacity 300ms 500ms;
+}
+.ephox-snooker-resizer-cols.ephox-snooker-resizer-bar:hover {
+  opacity: 0.2 !important;
 }
