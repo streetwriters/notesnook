@@ -1,7 +1,5 @@
 const { Page, test, expect } = require("@playwright/test");
 const { getTestId, isTestAll, loginUser } = require("./utils");
-const { isAbsent, isPresent } = require("./utils/conditions");
-const path = require("path");
 
 test.setTimeout(45 * 1000);
 /**
@@ -16,7 +14,7 @@ test.beforeEach(async ({ page: _page, baseURL }) => {
   await page.waitForSelector(getTestId("routeHeader"));
 });
 
-// if (!isTestAll()) test.skip();
+if (!isTestAll()) test.skip();
 
 const plans = [
   { key: "monthly", title: "Monthly", coupon: "INTRO50" },
