@@ -1,4 +1,4 @@
-const { addPluginToPluginManager } = require("../utils");
+const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 const CLASS_NAMES = {
   list: "checklist",
@@ -127,6 +127,7 @@ function toggleChecklistItem(editor, node) {
     const isChecked = node.classList.contains(CLASS_NAMES.checked);
     if (isChecked) node.classList.remove(CLASS_NAMES.checked);
     else node.classList.add(CLASS_NAMES.checked);
+    notifyEditorChange(editor, isChecked ? "checkItem" : "uncheckItem");
   });
 }
 

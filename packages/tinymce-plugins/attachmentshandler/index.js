@@ -1,4 +1,4 @@
-const { addPluginToPluginManager } = require("../utils");
+const { addPluginToPluginManager, notifyEditorChange } = require("../utils");
 
 function register(editor) {
   setupUI(editor);
@@ -151,10 +151,4 @@ async function dataUriToBlob(uri) {
 
   const response = await fetch(uri);
   return await response.blob();
-}
-
-function notifyEditorChange(editor, type) {
-  setTimeout(() => {
-    editor.fire("input", { inputType: type });
-  }, 0);
 }

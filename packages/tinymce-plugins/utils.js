@@ -93,6 +93,12 @@ function getWindow() {
   return globalThis.tinymce.activeEditor.contentWindow;
 }
 
+function notifyEditorChange(editor, type) {
+  setTimeout(() => {
+    editor.fire("input", { inputType: type });
+  }, 0);
+}
+
 module.exports = {
   getCurrentLine,
   getPreviousLine,
@@ -102,4 +108,5 @@ module.exports = {
   getNextCharacter,
   getPreviousCharacter,
   addPluginToPluginManager,
+  notifyEditorChange,
 };
