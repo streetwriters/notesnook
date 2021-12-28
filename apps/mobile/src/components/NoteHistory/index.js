@@ -1,10 +1,11 @@
 import React, {useCallback, useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {Text, View} from 'react-native';
 import {FlatList} from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {presentSheet} from '../../services/EventManager';
 import {db} from '../../utils/database';
+import { openLinkInBrowser } from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {timeConverter, timeSince} from '../../utils/TimeUtils';
 import DialogHeader from '../Dialog/dialog-header';
@@ -109,17 +110,27 @@ export default function NoteHistory({note, ref}) {
               height: 200
             }}>
             <Icon name="history" size={60} color={colors.icon} />
-            <Paragraph color={colors.icon}>No note history found.</Paragraph>
+            <Paragraph color={colors.icon}>
+              No note history found on this device.
+            </Paragraph>
           </View>
         }
         renderItem={renderItem}
       />
       <Paragraph
         size={SIZE.xs}
+        color={colors.icon}
         style={{
           alignSelf: 'center'
         }}>
-        Note version history is local only.
+        Note version history is local only.{' '}
+        <Text 
+        onPress={() => {
+          openLinkInBrowser("https://docs.notesnook.com/versionhistory",colors);
+        }}
+        style={{color: colors.accent, textDecorationLine: 'underline'}}>
+          Learn how this works.
+        </Text>
       </Paragraph>
     </View>
   );
