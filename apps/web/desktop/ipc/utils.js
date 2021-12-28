@@ -5,7 +5,7 @@ const path = require("path");
 function sendMessageToRenderer(type, payload = {}) {
   const message = { type, ...payload };
   logger.info("Sending message to renderer", message);
-  global.win.webContents.send("fromMain", message);
+  if (global.win) global.win.webContents.send("fromMain", message);
 }
 
 function resolvePath(_path) {
