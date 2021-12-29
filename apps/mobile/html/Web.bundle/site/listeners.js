@@ -155,7 +155,7 @@ function attachMessageListener() {
       case 'html':
         isLoading = true;
         globalThis.isClearingNoteData = false;
-        // tinymce.activeEditor.mode.set('readonly');
+        tinymce.activeEditor.mode.set('readonly');
         if (!isInvalidValue(value)) {
           tinymce.activeEditor.setHTML(value);
           reactNativeEventHandler('noteLoaded', true);
@@ -167,14 +167,14 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
+        setTimeout(function () {
+          document.activeElement.blur();
+          window.blur();
+          tinymce.activeEditor.mode.set('design');
+          document.activeElement.blur();
+          window.blur();
+        }, 300);
 
-        // setTimeout(function () {
-        //   document.activeElement.blur();
-        //   window.blur();
-        //   tinymce.activeEditor.mode.set('design');
-        //   document.activeElement.blur();
-        //   window.blur();
-        // }, 300);
         info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
           editor.countWords() + ' words';
