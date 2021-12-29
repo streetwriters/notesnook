@@ -52,6 +52,10 @@ export default class Note {
     return this._note.dateEdited;
   }
 
+  get dateModified() {
+    return this._note.dateModified;
+  }
+
   /**
    *
    * @param {"html"|"md"|"txt"} format - Format to export into

@@ -33,6 +33,10 @@ export default class Notebook {
     return this._notebook.dateEdited;
   }
 
+  get dateModified() {
+    return this._notebook.dateModified;
+  }
+
   _toggle(prop) {
     return this._db.notebooks.add({
       id: this._notebook.id,

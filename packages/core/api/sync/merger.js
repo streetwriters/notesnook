@@ -150,7 +150,7 @@ class Merger {
     await this._mergeArrayWithConflicts(content, (item) =>
       this._mergeItemWithConflicts(
         item,
-        (id) => this._db.content.raw(id, false),
+        (id) => this._db.content.raw(id),
         (item) => this._db.content.add(item),
         async (local, remote) => {
           let note = this._db.notes.note(local.noteId);
