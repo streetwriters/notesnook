@@ -119,12 +119,14 @@ describe.each([
       ).toBeTruthy();
 
       const tableContent = allContent.find((a) => a.data.includes("<table"));
-      if (tableContent)
+      if (tableContent) {
+        console.log(tableContent.data);
         expect(
-          tableContent.data.includes(
+          tableContent.data.startsWith(
             `<div class="table-container" contenteditable="false">`
           )
         );
+      }
     });
   });
 

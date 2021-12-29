@@ -53,7 +53,7 @@ export const EVENTS = {
   vaultLocked: "vault:locked",
 };
 
-export const CURRENT_DATABASE_VERSION = 5.3;
+export const CURRENT_DATABASE_VERSION = 5.4;
 
 export function setUserPersonalizationBytes(userSalt) {
   USER_PERSONALIZATION_HASH = new Uint8Array(

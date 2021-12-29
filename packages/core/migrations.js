@@ -1,4 +1,5 @@
 import { parseHTML } from "./utils/html-parser";
+import { decodeHTML5 } from "entities";
 
 export const migrations = {
   5.0: {},
@@ -20,6 +21,13 @@ export const migrations = {
     settings: replaceDateEditedWithDateModified(true),
   },
   5.3: {
+    tiny: (item) => {
+      if (!item.data || item.data.iv) return item;
+      item.data = decodeWrappedTableHtml(item.data);
+      return item;
+    },
+  },
+  5.4: {
     note: false,
     notebook: false,
     tag: false,
@@ -44,9 +52,11 @@ function wrapTablesWithDiv(html) {
   const tables = document.getElementsByTagName("table");
   for (let table of tables) {
     table.setAttribute("contenteditable", "true");
-    table.replaceWith(
-      `<div class="table-container" contenteditable="false">${table.outerHTML}</div>`
-    );
+    const div = document.createElement("div");
+    div.setAttribute("contenteditable", "false");
+    div.innerHTML = table.outerHTML;
+    div.classList.add("table-container");
+    table.replaceWith(div);
   }
   return document.outerHTML || document.body.innerHTML;
 }
@@ -64,4 +74,15 @@ function removeToxClassFromChecklist(html) {
       item.classList.replace("tox-checklist", "checklist");
   }
   return document.outerHTML || document.body.innerHTML;
+}
+
+const regex = /&lt;div class="table-container".*&lt;\/table&gt;&lt;\/div&gt;/gm;
+function decodeWrappedTableHtml(html) {
+  return html.replaceAll(
+    /&lt;div class="table-container".*\/div&gt;$/gm,
+    (match) => {
+      const html = decodeHTML5(match);
+      return html;
+    }
+  );
 }
