@@ -150,6 +150,7 @@ export default class Vault {
    */
   async save(note) {
     if (!note) return;
+    await this._check();
     // roll over erase timer
     this._startEraser();
     return await this._lockNote(note, this._password);
