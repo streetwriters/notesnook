@@ -7,7 +7,8 @@ import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
-  presentSheet
+  presentSheet,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -459,6 +460,13 @@ export const _onMessage = async evt => {
   }
 
   switch (message.type) {
+    case 'tinyerror':
+      ToastEvent.show({
+        heading: 'An error occured',
+        message: message.value,
+        type: 'error'
+      });
+      break;
     case 'tableconfig':
       showTableOptionsTooltip();
       break;

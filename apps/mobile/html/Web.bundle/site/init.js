@@ -195,7 +195,9 @@ function init_callback(_editor) {
         collapseElement(target);
         editor.getHTML().then(function (html) {
           reactNativeEventHandler('tiny', html);
-        });
+        }).catch(function(e) {
+          reactNativeEventHandler('tinyerror', e.message);
+        })
       });
     }
   });
@@ -612,7 +614,10 @@ const onChange = function (event) {
   changeTimer = setTimeout(function () {
     editor.getHTML().then(function (html) {
       reactNativeEventHandler('tiny', html);
-    });
+    }).catch(function(e) {
+      reactNativeEventHandler('tinyerror', e.message);
+    })
+
     onUndoChange();
     selectchange();
   }, delay());
