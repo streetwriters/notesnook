@@ -33,10 +33,10 @@ function Unlock(props) {
       const note = await db.vault.open(noteId, password);
       openLockedSession(note);
     } catch (e) {
-      if (e === "ciphertext cannot be decrypted using that key") {
+      if (e.message.includes("ciphertext cannot be decrypted using that key")) {
         setIsWrong(true);
       } else {
-        showToast("error", "Cannnot unlock note: " + e);
+        showToast("error", "Cannot unlock note: " + e);
         console.error(e);
       }
     } finally {

@@ -48,6 +48,11 @@ class EditorStore extends BaseStore {
     EV.subscribe(EVENTS.userLoggedOut, () => {
       hashNavigate("/notes/create", { replace: true, addNonce: true });
     });
+
+    EV.subscribe(EVENTS.vaultLocked, () => {
+      const { id, locked } = this.get().session;
+      if (locked) hashNavigate(`/notes/${id}/unlock`, { replace: true });
+    });
   };
 
   refresh = async () => {
