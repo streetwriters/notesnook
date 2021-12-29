@@ -120,6 +120,7 @@ export default class Vault {
 
   async clear(password) {
     if (await this.unlock(password)) {
+      await this._db.notes.init();
       for (var note of this._db.notes.locked) {
         await this._unlockNote(note, password, true);
       }
@@ -128,6 +129,7 @@ export default class Vault {
 
   async delete(deleteAllLockedNotes = false) {
     if (deleteAllLockedNotes) {
+      await this._db.notes.init();
       await this._db.notes.remove(
         ...this._db.notes.locked.map((note) => note.id)
       );
