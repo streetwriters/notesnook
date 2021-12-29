@@ -16,6 +16,7 @@ import {COLORS_NOTE, COLOR_SCHEME} from '../../utils/Colors';
 import {hexToRGBA} from '../../utils/ColorUtils';
 import {db} from '../../utils/database';
 import {
+  eClearEditor,
   eOnLoadNote,
   eOpenTagsDialog,
   eShowGetPremium,
@@ -30,7 +31,10 @@ import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {TableCellProperties} from './TableCellProperties';
 import {TableRowProperties} from './TableRowProperties';
 import tiny from './tiny/tiny';
-import {IMAGE_TOOLTIP_CONFIG, TABLE_TOOLTIP_CONFIG} from './tiny/toolbar/config';
+import {
+  IMAGE_TOOLTIP_CONFIG,
+  TABLE_TOOLTIP_CONFIG
+} from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -468,7 +472,7 @@ export const _onMessage = async evt => {
       });
       break;
     case 'tablerowoptions':
-      console.log("tablerowoptions", message.value);
+      console.log('tablerowoptions', message.value);
       eSendEvent('updaterow', message.value);
       presentSheet({
         noIcon: true,
@@ -859,7 +863,36 @@ export async function saveNote(preventUpdate) {
       );
       tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
-  } catch (e) {}
+  } catch (e) {
+    if (e.message === 'ERR_VAULT_LOCKED') {
+      console.log(e);
+      presentDialog({
+        input: true,
+        inputPlaceholder: 'Enter vault password',
+        title: 'Unlock note',
+        paragraph: 'To save note, unlock it',
+        positiveText: 'Unlock',
+        positivePress: async password => {
+          if (password && password.trim()) {
+            try {
+              await db.vault.unlock(password);
+              await saveNote();
+            } catch (e) {
+              console.log(e);
+              return false;
+            }
+          } else {
+            return false;
+          }
+        },
+        negativeText: 'Cancel',
+        onClose: () => {
+          noteEdited = false;
+          eSendEvent(eClearEditor);
+        }
+      });
+    }
+  }
   isSaving = false;
 }
 
