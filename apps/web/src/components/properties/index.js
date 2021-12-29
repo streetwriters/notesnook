@@ -30,16 +30,16 @@ const metadataItems = [
   {
     key: "dateCreated",
     label: "Created at",
-    value: (date) => formatDate(date),
+    value: (date) => formatDate(date || Date.now()),
   },
   {
     key: "dateEdited",
     label: "Last edited at",
-    value: (date) => formatDate(date),
+    value: (date) => (date ? formatDate(date) : "-"),
   },
 ];
 
-function Properties({ noteId }) {
+function Properties() {
   const [attachmentsStatus, setAttachmentsStatus] = useState({});
   const [versionHistory, setVersionHistory] = useState([]);
 
