@@ -81,15 +81,40 @@ export default class Vault {
 
   async changePassword(oldPassword, newPassword) {
     if (await this.unlock(oldPassword)) {
-      const lockedNotes = this._db.notes.locked;
-      for (var note of lockedNotes) {
-        await this._unlockNote(note, oldPassword, true);
+      await this._db.notes.init();
+
+      const contentItems = [];
+      for (const note of this._db.notes.locked) {
+        try {
+          let encryptedContent = await this._db.content.raw(note.contentId);
+          let content = await this.decryptContent(
+            encryptedContent,
+            oldPassword
+          );
+          contentItems.push({
+            ...content,
+            id: note.contentId,
+            noteId: note.id,
+          });
+        } catch (e) {
+          throw new Error(
+            `Could not decrypt content of note ${note.id}. Error: ${e.message}`
+          );
+        }
       }
+
+      for (const content of contentItems) {
+        await this._encryptContent(
+          content.id,
+          null,
+          content.data,
+          content.type,
+          newPassword
+        );
+      }
+
       await this._storage.remove("vaultKey");
       await this.create(newPassword);
-      for (var note of lockedNotes) {
-        await this._lockNote(note, newPassword);
-      }
     }
   }
 
