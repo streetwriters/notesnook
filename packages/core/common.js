@@ -50,6 +50,7 @@ export const EVENTS = {
   attachmentsLoading: "attachments:loading",
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
+  vaultLocked: "vault:locked",
 };
 
 export const CURRENT_DATABASE_VERSION = 5.3;

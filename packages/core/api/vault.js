@@ -18,6 +18,7 @@ export default class Vault {
     clearTimeout(ERASER_TIMEOUT);
     ERASER_TIMEOUT = setTimeout(() => {
       this._password = null;
+      EV.publish(EVENTS.vaultLocked);
     }, ERASE_TIME);
   }
 
