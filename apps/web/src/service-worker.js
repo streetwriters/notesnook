@@ -72,4 +72,5 @@ self.addEventListener("message", (event) => {
 
 // Any other custom service worker logic can go here.
 const VERSION = process.env.REACT_APP_VERSION;
-console.log("App version:", VERSION);
+const HASH = process.env.REACT_APP_GIT_HASH;
+console.log("App version:", VERSION, HASH);
