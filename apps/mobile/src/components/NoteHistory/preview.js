@@ -1,16 +1,18 @@
-import React, { useRef } from 'react';
-import { View } from 'react-native';
+import React, {useRef} from 'react';
+import {Alert, View} from 'react-native';
 import WebView from 'react-native-webview';
-import { useTracked } from '../../provider';
-import { useEditorStore } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import {useTracked} from '../../provider';
+import {useEditorStore} from '../../provider/stores';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/database';
-import { eCloseProgressDialog, eOnLoadNote } from '../../utils/Events';
-import { normalize } from '../../utils/SizeUtils';
-import { getNote, sourceUri } from '../../views/Editor/Functions';
-import { Button } from '../Button';
+import {db} from '../../utils/database';
+import {eCloseProgressDialog, eOnLoadNote} from '../../utils/Events';
+import {normalize} from '../../utils/SizeUtils';
+import {getNote, sourceUri} from '../../views/Editor/Functions';
+import { ActionIcon } from '../ActionIcon';
+import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
+import Paragraph from '../Typography/Paragraph';
 
 export default function NotePreview({session, content}) {
   const [state] = useTracked();
@@ -18,7 +20,6 @@ export default function NotePreview({session, content}) {
   const webviewRef = useRef();
 
   const onLoad = async () => {
-    console.log(content);
     let preview = await db.content.insertPlaceholders(
       content,
       'placeholder.svg'
@@ -84,35 +85,49 @@ export default function NotePreview({session, content}) {
   return (
     <View
       style={{
-        height: 600,
+        height:session.locked ? null : 600,
         width: '100%'
       }}>
       <DialogHeader padding={12} title={session.session} />
-      <WebView
-        ref={webviewRef}
-        onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
-        onLoad={onLoad}
-        style={{
-          width: '100%',
-          height: '100%',
-          backgroundColor: 'transparent'
-        }}
-        cacheMode="LOAD_DEFAULT"
-        domStorageEnabled={true}
-        scrollEnabled={true}
-        bounces={false}
-        allowFileAccess={true}
-        scalesPageToFit={true}
-        allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
-        allowFileAccessFromFileURLs={true}
-        allowUniversalAccessFromFileURLs={true}
-        originWhitelist={['*']}
-        javaScriptEnabled={true}
-        cacheEnabled={true}
-        source={{
-          uri: sourceUri + 'plaineditor.html'
-        }}
-      />
+      {!session.locked ? (
+        <WebView
+          ref={webviewRef}
+          onShouldStartLoadWithRequest={_onShouldStartLoadWithRequest}
+          onLoad={onLoad}
+          style={{
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'transparent'
+          }}
+          cacheMode="LOAD_DEFAULT"
+          domStorageEnabled={true}
+          scrollEnabled={true}
+          bounces={false}
+          allowFileAccess={true}
+          scalesPageToFit={true}
+          allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
+          allowFileAccessFromFileURLs={true}
+          allowUniversalAccessFromFileURLs={true}
+          originWhitelist={['*']}
+          javaScriptEnabled={true}
+          cacheEnabled={true}
+          source={{
+            uri: sourceUri + 'plaineditor.html'
+          }}
+        />
+      ) : (
+        <View
+          style={{
+            width: '100%',
+            height: 100,
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}>
+          <Paragraph
+          color={colors.icon}
+          >Preview not available, content is encrypted.</Paragraph>
+        </View>
+      )}
 
       <View
         style={{
