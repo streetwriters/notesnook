@@ -35,6 +35,7 @@ export class GoogleKeep implements IProvider {
     ".3gp",
     ".jpeg",
     ".jpg",
+    ".gif",
     ".png",
     ".html",
     ".txt",
