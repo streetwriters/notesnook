@@ -1,0 +1,118 @@
+diff --git a/node_modules/react-native-cli-bump-version/lib/index.js b/node_modules/react-native-cli-bump-version/lib/index.js
+index a319832..be566b1 100644
+--- a/node_modules/react-native-cli-bump-version/lib/index.js
++++ b/node_modules/react-native-cli-bump-version/lib/index.js
+@@ -23,9 +23,17 @@ const incrementSemVer = (current, type) => {
+     if (type === 'minor') {
+         return [major, minor + 1, 0].join('.');
+     }
++
++    if (type === "patchup") {
++        let patchVer = parseInt((patch/10 + 1).toFixed(0)) * 10
++        return [major, minor, patchVer].join('.');
++    }
++    
+     if (type === 'patch') {
+-        return [major, minor, patch + 1].join('.');
++        let patchV = patch < 10 ? Math.floor((patch/10)) * 10 + 10 : patch + 1;
++        return [major, minor, patchV].join('.');
+     }
++    
+     throw new Error(`'${type}' is not a semver type`);
+ };
+ class BaseFileManager {
+@@ -46,11 +54,29 @@ class BaseFileManager {
+     }
+ }
+ class PBXManager extends BaseFileManager {
+-    bumpProjectVersion() {
++    bumpProjectVersion(type) {
+         const currentFile = this.read();
+         const codeRegex = /CURRENT_PROJECT_VERSION = (\d+);/g;
+         const currentCode = ramda_1.pipe(matchFirst(codeRegex), parseDecimal)(currentFile);
+-        const nextCode = currentCode + 1;
++        let nextCode =  currentCode;
++        if (type === "minor") {
++            nextCode = parseInt(Math.floor((currentCode/100 + 1)).toFixed(0)) * 100;
++        };
++
++        if (type === "major") {
++            nextCode = parseInt(Math.floor((currentCode/1000 + 1)).toFixed(0)) * 1000;
++        }
++        
++        if (type ==="patchup") {
++            nextCode = parseInt(Math.floor((currentCode/10 + 1)).toFixed(0)) * 10;
++        }
++
++        if (type ==="patch" || !type) {
++            let patchVer = parseInt((currentCode).toString().slice(2));
++            nextCode =  patchVer < 10 ? Math.floor((currentCode/10)) * 10 + 10 : currentCode + 1;
++
++        }
++
+         this.content = ramda_1.replace(codeRegex, `CURRENT_PROJECT_VERSION = ${nextCode};`, currentFile);
+         return {
+             current: currentCode,
+@@ -69,12 +95,30 @@ class PBXManager extends BaseFileManager {
+     }
+ }
+ class BuildGradleManager extends BaseFileManager {
+-    bumpCode() {
++    bumpCode(type) {
+         const currentFile = this.read();
+         const codeExp = /versionCode (\d+)/;
+         const versionMatch = matchFirst(codeExp, currentFile);
+         const current = parseDecimal(versionMatch);
+-        const next = current + 1;
++        let next = current;
++        
++        if (type === "minor") {
++            next = parseInt(Math.floor((current/100 + 1)).toFixed(0)) * 100;
++        };
++
++        if (type === "major") {
++            next = parseInt(Math.floor((current/1000 + 1)).toFixed(0)) * 1000;
++        }
++
++        if (type ==="patchup") {
++            next = parseInt(Math.floor((current/10 + 1)).toFixed(0)) * 10;
++        }
++
++        if (type === "patch" || !type) {
++            let patchVer = parseInt((current).toString().slice(2));
++            next =  patchVer < 10 ? Math.floor((current/10)) * 10 + 10 : current + 1;
++        }
++
+         if (isNaN(next)) {
+             throw new Error(`Invalid versionCode version parsed (${versionMatch})`);
+         }
+@@ -144,13 +188,13 @@ class ProjectFilesManager {
+         console.log(success(`package.json: ${packageCurrent} -> ${packageNext}`));
+     }
+     bumpCodes() {
+-        const { skipCodeFor } = this.configs;
++        const { skipCodeFor,type } = this.configs;
+         if (!skipCodeFor.includes('ios')) {
+-            const { next: pbxNext, current: pbxCurrent } = this.pbx.bumpProjectVersion();
++            const { next: pbxNext, current: pbxCurrent } = this.pbx.bumpProjectVersion(type);
+             console.log(success(`iOS project.pbxproj code: ${pbxCurrent} -> ${pbxNext}`));
+         }
+         if (!skipCodeFor.includes('android')) {
+-            const { next: gradleNext, current: gradleCurrent } = this.buildGradle.bumpCode();
++            const { next: gradleNext, current: gradleCurrent } = this.buildGradle.bumpCode(type);
+             console.log(success(`Android build.gradle code: ${gradleCurrent} -> ${gradleNext}`));
+         }
+     }
+diff --git a/node_modules/react-native-cli-bump-version/src/index.ts b/node_modules/react-native-cli-bump-version/src/index.ts
+index 906180f..d12406e 100644
+--- a/node_modules/react-native-cli-bump-version/src/index.ts
++++ b/node_modules/react-native-cli-bump-version/src/index.ts
+@@ -41,7 +41,7 @@ const incrementSemVer = (current: string, type: SemVer | undefined) => {
+     if (type === 'minor') {
+         return [major, minor + 1, 0].join('.')
+     }
+-
++    console.log(patch);
+     if (type === 'patch') {
+         return [major, minor, patch + 1].join('.')
+     }

@@ -26,6 +26,10 @@ export const Trash = ({route, navigation}) => {
         setTrash();
       });
     });
+
+    console.log(trash);
+    if (trash.length === 0) setTrash();
+
     updateSearch();
     ranAfterInteractions = false;
   };

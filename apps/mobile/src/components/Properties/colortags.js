@@ -13,13 +13,13 @@ import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 
-export const ActionSheetColorsSection = ({item, close}) => {
+export const ColorTags = ({item, close}) => {
   const [note, setNote] = useState(item);
   const setColorNotes = useMenuStore(state => state.setColorNotes);
   const dimensions = useSettingStore(state => state.dimensions);
   let width = dimensions.width > 600 ? 600 : 500;
 
-  const changeColor = async (color) => {
+  const changeColor = async color => {
     if (note.color === color.name) {
       await db.notes.note(note.id).uncolor();
     } else {
@@ -34,7 +34,7 @@ export const ActionSheetColorsSection = ({item, close}) => {
       Navigation.routeNames.Notes
     ]);
     eSendEvent(refreshNotesPage);
-  }
+  };
 
   const _renderColor = c => {
     const color = {
@@ -50,8 +50,8 @@ export const ActionSheetColorsSection = ({item, close}) => {
         key={color.value}
         onPress={() => changeColor(color)}
         customStyle={{
-          width: DDS.isTab ? width / 9 : dWidth / 9,
-          height: DDS.isTab ? width / 9 : dWidth / 9,
+          width: DDS.isTab ? width / 10 : dWidth / 9,
+          height: DDS.isTab ? width / 10 : dWidth / 9,
           borderRadius: 100,
           justifyContent: 'center',
           alignItems: 'center'

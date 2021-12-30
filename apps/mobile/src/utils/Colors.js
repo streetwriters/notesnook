@@ -63,6 +63,7 @@ export const COLOR_SCHEME_LIGHT = {
   sec: '#ffffff',
   light: '#ffffff',
   transGray: '#00000010',
+  border:"#E8E8E8"
 };
 export const COLOR_SCHEME_PITCH_BLACK = {
   ...fixedColors,
@@ -76,6 +77,7 @@ export const COLOR_SCHEME_PITCH_BLACK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
+  border:"#383838"
 };
 
 export const COLOR_SCHEME_DARK = {
@@ -90,6 +92,7 @@ export const COLOR_SCHEME_DARK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
+  border:"#383838"
 };
 
 export function getCurrentColors() {

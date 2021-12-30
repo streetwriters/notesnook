@@ -64,14 +64,11 @@ function routeNeedsUpdate(routeName, callback) {
  * @param {array} routes
  */
 function setRoutesToUpdate(routes) {
-  console.log(currentScreen, 'current');
   if (routes.indexOf(currentScreen) > -1) {
-    console.log('updating screen', currentScreen);
     if (
       currentScreen === routeNames.NotesPage ||
       currentScreen === routeNames.Notebook
     ) {
-      console.log(currentScreen, 'CURRENT');
       eSendEvent(
         currentScreen === routeNames.NotesPage
           ? refreshNotesPage

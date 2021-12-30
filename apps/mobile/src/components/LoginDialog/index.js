@@ -25,7 +25,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
 import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
@@ -410,7 +410,7 @@ const LoginDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       fwdRef={actionSheetRef}
       animation={DDS.isTab ? 'fade' : 'slide'}
       statusBarTranslucent={false}
@@ -586,6 +586,7 @@ const LoginDialog = () => {
               returnKeyType="next"
               autoCompleteType="email"
               validationType="email"
+              autoCorrect={false}
               autoCapitalize="none"
               errorMessage="Email is invalid"
               placeholder="Email"
@@ -611,6 +612,7 @@ const LoginDialog = () => {
               secureTextEntry
               autoCompleteType="password"
               autoCapitalize="none"
+              autoCorrect={false}
               placeholder="Current password"
               onSubmit={() => {
                 if (mode === MODES.signup) {
@@ -635,6 +637,7 @@ const LoginDialog = () => {
                 secureTextEntry
                 autoCompleteType="password"
                 autoCapitalize="none"
+                autoCorrect={false}
                 placeholder="Password"
                 returnKeyLabel={mode === MODES.signup ? 'Next' : 'Login'}
                 returnKeyType={mode === MODES.signup ? 'next' : 'done'}
@@ -665,6 +668,7 @@ const LoginDialog = () => {
                 autoCapitalize="none"
                 returnKeyLabel="Done"
                 returnKeyType="done"
+                autoCorrect={false}
                 customValidator={() => password}
                 secureTextEntry
                 placeholder="Confirm password"
@@ -751,7 +755,7 @@ const LoginDialog = () => {
           }}
         />
       </ScrollView>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

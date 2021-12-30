@@ -5,7 +5,7 @@ import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import { APP_VERSION } from '../../utils';
+import { APP_VERSION } from "../../../version";
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';

@@ -1,6 +1,11 @@
-- Fixed session expiring issues faced by many users
-- Fix numerous issues with syncing between multiple devices
-- Fixed note is saved sometimes when opening editor
-- Improved editor performance
+- Note history — from this version, each session will be saved locally all the way back to the first edit.
+- Better tables support in editor
+- Editor toolbar is now more compact and improved
+- Mobile optimized search/replace in editor
+- You can now view/manage note tags in editor
+- Improved note properties ui & ux
+- Results in search are more reliable now
+- Add attachment count on notes
+- Many other ui and performance improvements
 
 Thank you for using Notesnook!

@@ -12,12 +12,13 @@ import {formatSelection, properties, rgbToHex} from './constants';
 import {execCommands} from './commands';
 import {MMKV} from '../../../../utils/mmkv';
 
-const ColorItem = ({value, format}) => {
+const ColorItem = ({value, format, onCustomPress, checked}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [selected, setSelected] = useState(false);
 
   useEffect(() => {
+    if (onCustomPress) return;
     eSubscribeEvent('onSelectionChange', onSelectionChange);
     return () => {
       eUnSubscribeEvent('onSelectionChange', onSelectionChange);
@@ -25,6 +26,7 @@ const ColorItem = ({value, format}) => {
   }, [selected]);
 
   useEffect(() => {
+    if (onCustomPress) return;
     onSelectionChange(properties.selection);
   }, []);
 
@@ -52,8 +54,12 @@ const ColorItem = ({value, format}) => {
   };
 
   const onPress = async () => {
+    if (onCustomPress) {
+      onCustomPress(value);
+      return;
+    }
     if (selected) {
-      formatSelection(format, null);
+      formatSelection(execCommands[format](''));
       await MMKV.removeItem(`d${format}`);
     } else {
       formatSelection(execCommands[format](value));
@@ -62,29 +68,35 @@ const ColorItem = ({value, format}) => {
     eSendEvent('onColorChange');
   };
 
+  const isNil = value === '';
+  const isChecked = value !== '' && (selected || checked);
+
   return (
     <TouchableOpacity
       onPress={onPress}
       activeOpacity={0.8}
       style={{
-        backgroundColor: value,
+        backgroundColor: isNil ? 'transparent' : value,
         borderWidth: 1,
         borderColor: colors.nav,
         borderRadius: 5,
         height: normalize(40),
         width: normalize(40),
-        marginRight: 5
+        marginRight: 5,
+        overflow:'hidden'
       }}>
       <View
         style={{
-          height: 40,
-          width: 40,
+          height: "100%",
+          width:"100%",
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: selected ? 'rgba(0,0,0,0.1)' : 'transparent'
+          backgroundColor: isChecked ? 'rgba(0,0,0,0.1)' : 'transparent'
         }}>
-        {selected? <Icon name="check" size={SIZE.lg} color="white" /> : null}
+        {isNil ? <Icon color="red" size={SIZE.lg} name="close" /> : null}
+
+        {isChecked ? <Icon name="check" size={SIZE.lg} color="white" /> : null}
       </View>
     </TouchableOpacity>
   );

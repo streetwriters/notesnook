@@ -3,16 +3,17 @@ import {ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {useTagStore} from '../../provider/stores';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
-import {eCloseTagsDialog, eOpenTagsDialog} from '../../utils/Events';
+import {eCloseTagsDialog, eOpenTagsDialog, refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 import Heading from '../Typography/Heading';
+import { sleep } from '../../utils/TimeUtils';
 const TagsDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -95,7 +96,6 @@ const TagsDialog = () => {
       text: '',
     });
     try {
-    
       await db.notes.note(note.id).tag(tag);
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
@@ -117,9 +117,13 @@ const TagsDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       centered={false}
       fwdRef={actionSheetRef}
+      onOpen={async () => {
+        await sleep(300);
+        inputRef.current?.focus();
+      }}
       onClose={async () => {
         setQuery(null);
         setVisible(false);
@@ -199,7 +203,7 @@ const TagsDialog = () => {
           ))}
         </ScrollView>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 
@@ -222,7 +226,6 @@ const TagItem = ({tag, note, setNote}) => {
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
     } catch (e) {}
-
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,

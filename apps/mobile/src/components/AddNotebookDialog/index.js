@@ -10,7 +10,7 @@ import {db} from '../../utils/database';
 import {ph, pv, SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
 import {ActionIcon} from '../ActionIcon';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
@@ -254,7 +254,7 @@ export class AddNotebookDialog extends React.Component {
     const {topics, visible, topicInputFocused} = this.state;
     if (!visible) return null;
     return (
-      <ActionSheetWrapper
+      <SheetWrapper
         onOpen={async () => {
           this.topicsToDelete = [];
           await sleep(300);
@@ -408,7 +408,7 @@ export class AddNotebookDialog extends React.Component {
         </View>
 
         <Toast context="local" />
-      </ActionSheetWrapper>
+      </SheetWrapper>
     );
   }
 }

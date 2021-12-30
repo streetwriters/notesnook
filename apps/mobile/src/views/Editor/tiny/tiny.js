@@ -178,7 +178,10 @@ function call(webview, func, noqueue) {
 }
 
 export function safeKeyboardDismiss() {
+  console.log('keyboard state', editing.keyboardState)
+  if (!editing.keyboardState) return;
   if (Platform.OS === "android") {
+    
     textInput.current?.focus();
     textInput.current?.blur();
   } else {

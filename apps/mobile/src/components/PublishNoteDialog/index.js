@@ -17,7 +17,7 @@ import {
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
@@ -129,7 +129,7 @@ const PublishNoteDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       centered={false}
       fwdRef={actionSheetRef}
       closeOnTouchBackdrop={!publishing}
@@ -366,7 +366,7 @@ const PublishNoteDialog = () => {
           Learn more about Notesnook Monograph
         </Paragraph>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

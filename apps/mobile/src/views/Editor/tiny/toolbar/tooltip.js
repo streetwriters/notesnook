@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import {ScrollView, View,TouchableOpacity} from 'react-native';
+import {ScrollView, View, TouchableOpacity} from 'react-native';
 import Animated, {Easing, timing} from 'react-native-reanimated';
 import {PressableButton} from '../../../../components/PressableButton';
 import Heading from '../../../../components/Typography/Heading';
@@ -11,9 +11,11 @@ import {
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
+import {editing, getElevation} from '../../../../utils';
 import {normalize, SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
+import {EditorWebView} from '../../Functions';
+import tiny from '../tiny';
 import ColorGroup from './colorgroup';
 import {execCommands} from './commands';
 import {formatSelection, properties} from './constants';
@@ -53,56 +55,67 @@ const Tooltip = () => {
   }, []);
 
   const show = async data => {
+    console.log(data);
     properties.userBlur = true;
     if (!data) {
       editing.tooltip = null;
-      animate(70, 100);
+      animate(100, 100);
       await sleep(100);
       setGroup(null);
       return;
     }
     if (!data) return;
 
-    let time = editing.tooltip === 'table' || data.type === 'table' ? 400 : 100;
+    let time = editing.tooltip === 'table' || data.type === 'table' ? 400 : 110;
 
     if (data && editing.tooltip && editing.tooltip !== data.type) {
       let translate =
-        editing.tooltip === 'table' || data.type === 'table' ? 400 : 70;
+        editing.tooltip === 'table' || data.type === 'table' ? 400 : 0;
       animate(translate, time);
       await sleep(time);
     }
     editing.tooltip = data.title;
+    if (!data.type) {
+      data.type = data.title;
+    }
     setGroup(data);
     await sleep(5);
     animate(0, time);
+    setTimeout(() => {
+      tiny.call(
+        EditorWebView,
+        `tinyMCE.activeEditor.selection.getNode().scrollIntoView({behavior: 'smooth', block: 'nearest'});`
+      );
+    }, 100);
     if (editing.tooltip !== 'link') {
       properties.pauseSelectionChange = false;
     }
   };
+  console.log(group?.type);
 
-  let style = React.useMemo(() => {
-    return {
-      borderRadius: 5,
-      padding: floating ? 5 : 0,
-      position: 'absolute',
-      bottom: 50,
-      width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '50%' : '100%',
-      minHeight: normalize(50),
-      backgroundColor: colors.nav,
-      alignSelf: 'center',
-      flexDirection: 'row',
-      borderWidth: floating ? 1 : 0,
-      borderColor: floating && colors.nav,
-      zIndex: 10,
-      marginBottom: 0,
-      paddingHorizontal: 6,
-      transform: [
-        {
-          translateY: translateValue
-        }
-      ]
-    };
-  }, [floating, colors.accent, colors.bg, group?.type]);
+  let style = {
+    padding: floating ? 5 : 0,
+    borderRadius: floating ? 5 : 0,
+    overflow: 'hidden',
+    display: !group || !group?.type ? 'none' : 'flex',
+    position: floating ? 'absolute' : 'relative',
+    bottom: floating ? 50 : null,
+    width: group?.type === 'table' ? 45 * 5 + 15 : floating ? '100%' : '100%',
+    minHeight: normalize(50),
+    backgroundColor: colors.bg,
+    alignSelf: 'center',
+    flexDirection: 'row',
+    borderWidth: floating ? 1 : 0,
+    borderColor: floating && colors.nav,
+    zIndex: 10,
+    marginBottom: 0,
+    paddingHorizontal: 2,
+    transform: [
+      {
+        translateY: translateValue
+      }
+    ]
+  };
 
   let ParentElement = props => (
     <Animated.View style={style}>
@@ -114,16 +127,15 @@ const Tooltip = () => {
             flexDirection: 'row',
             width: '100%',
             backgroundColor: colors.bg,
-            marginVertical: 5,
+            marginVertical: 2,
             borderRadius: 5
           }}
           children={props.children}></View>
       ) : (
         <ScrollView
           style={{
-            width: '100%',
             backgroundColor: colors.bg,
-            marginVertical: 5,
+            marginVertical: 2,
             borderRadius: 5,
             paddingHorizontal: 0
           }}
@@ -149,7 +161,7 @@ const Tooltip = () => {
     let rowNumber = Math.floor(index / columnCount);
     let columnNumber = index - rowNumber * columnCount;
 
-    return `${rowNumber  + 1} x ${columnNumber + 1}`;
+    return `${rowNumber + 1} x ${columnNumber + 1}`;
   }
 
   return (
@@ -183,31 +195,8 @@ const Tooltip = () => {
               zIndex: 10
             }}>
             {[
-              1,
-              2,
-              3,
-              4,
-              5,
-              6,
-              7,
-              8,
-              9,
-              10,
-              11,
-              12,
-              13,
-              14,
-              15,
-              16,
-              17,
-              18,
-              19,
-              20,
-              21,
-              22,
-              23,
-              24,
-              25
+              1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+              20, 21, 22, 23, 24, 25
             ].map((item, index) => (
               <PressableButton
                 key={item.toString()}

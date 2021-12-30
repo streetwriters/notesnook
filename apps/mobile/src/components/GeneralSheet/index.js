@@ -6,7 +6,7 @@ import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -42,12 +42,15 @@ const GeneralSheet = ({context}) => {
     actionSheetRef.current?.setModalVisible(true);
   };
 
-  const close = () => {
+  const close = ctx => {
+    if ((ctx && !context) || (ctx && ctx !== context)) {
+      return;
+    }
     actionSheetRef.current?.setModalVisible(false);
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={dialogData?.noProgress}
       closeOnTouchBackdrop={dialogData?.noProgress}
@@ -153,7 +156,7 @@ const GeneralSheet = ({context}) => {
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
-              type="accent"
+              type={item.type || "accent"}
               height={50}
               style={{
                 marginBottom: 10
@@ -163,7 +166,7 @@ const GeneralSheet = ({context}) => {
             />
           ))}
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

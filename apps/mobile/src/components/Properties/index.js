@@ -1,6 +1,5 @@
-import Clipboard from "@react-native-clipboard/clipboard";
-
-import React, { useEffect, useState } from 'react';
+import Clipboard from '@react-native-clipboard/clipboard';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -9,30 +8,32 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import {FlatList} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
-  useSettingStore, useUserStore
+  useSettingStore,
+  useTagStore,
+  useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault,
+  presentSheet,
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
-import SettingsService from "../../services/SettingsService";
-import Sync from '../../services/Sync';
-import { editing } from '../../utils';
+import SettingsService from '../../services/SettingsService';
+import {editing} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -40,31 +41,34 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { db } from '../../utils/database';
+import {db} from '../../utils/database';
 import {
+  eOnNewTopicAdded,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog,
-  eOpenTagsDialog,
   refreshNotesPage
 } from '../../utils/Events';
-import { deleteItems, openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep, timeConverter } from '../../utils/TimeUtils';
-import { Button } from '../Button';
-import { presentDialog } from '../Dialog/functions';
-import { PressableButton } from '../PressableButton';
+import {deleteItems, openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {presentDialog} from '../Dialog/functions';
+import NoteHistory from '../NoteHistory';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ActionSheetColorsSection } from './ActionSheetColorsSection';
-import { ActionSheetTagsSection } from './ActionSheetTagsSection';
+import {ColorTags} from './color-tags';
+import {DateMeta} from './date-meta';
+import Notebooks from './notebooks';
+import {Tags} from './tags';
+import {Topics} from './topics';
 const w = Dimensions.get('window').width;
 
-
 let htmlToText;
-export const ActionSheetComponent = ({
+export const Properties = ({
   close = () => {},
   item,
   hasColors = false,
@@ -113,7 +117,6 @@ export const ActionSheetComponent = ({
 
   function checkNotifPinned() {
     let pinned = Notifications.getPinnedNotes();
-    console.log(pinned);
     if (!pinned) {
       setNotifPinned(null);
       return;
@@ -128,7 +131,6 @@ export const ActionSheetComponent = ({
   }
 
   const onUpdate = async type => {
-    console.log('update', type);
     if (type === 'unpin') {
       await sleep(1000);
 
@@ -193,7 +195,11 @@ export const ActionSheetComponent = ({
       func: () => {
         if (!colors.night) {
           MMKV.setStringAsync('theme', JSON.stringify({night: true}));
-          changeColorScheme(SettingsService.get().pitchBlack ? COLOR_SCHEME_PITCH_BLACK : COLOR_SCHEME_DARK);
+          changeColorScheme(
+            SettingsService.get().pitchBlack
+              ? COLOR_SCHEME_PITCH_BLACK
+              : COLOR_SCHEME_DARK
+          );
         } else {
           MMKV.setStringAsync('theme', JSON.stringify({night: false}));
           changeColorScheme(COLOR_SCHEME_LIGHT);
@@ -381,8 +387,9 @@ export const ActionSheetComponent = ({
 
     {
       name: 'Publish',
-      title: 'Publish',
+      title: isPublished ? 'Published' : 'Publish',
       icon: 'cloud-upload-outline',
+      on: isPublished,
       func: async () => {
         if (!user) {
           ToastEvent.show({
@@ -501,6 +508,7 @@ export const ActionSheetComponent = ({
           positivePress: async value => {
             if (!value || value === '' || value.trimStart().length == 0) return;
             await db.tags.rename(note.id, db.tags.sanitize(value));
+            useTagStore.getState().setTags();
             Navigation.setRoutesToUpdate([
               Navigation.routeNames.Notes,
               Navigation.routeNames.NotesPage,
@@ -547,7 +555,7 @@ export const ActionSheetComponent = ({
       func: async () => {
         close();
         await sleep(300);
-        eSendEvent(eOpenAttachmentsDialog,note);
+        eSendEvent(eOpenAttachmentsDialog, note);
       }
     },
     {
@@ -595,6 +603,7 @@ export const ActionSheetComponent = ({
             paragraph: 'This tag will be removed from all notes.',
             positivePress: async value => {
               await db.tags.remove(note.id);
+              useTagStore.getState().setTags();
               Navigation.setRoutesToUpdate([
                 Navigation.routeNames.Notes,
                 Navigation.routeNames.NotesPage,
@@ -649,11 +658,28 @@ export const ActionSheetComponent = ({
           positiveType: 'errorShade'
         });
       }
+    },
+    {
+      name: 'History',
+      title: 'History',
+      icon: 'history',
+      func: async () => {
+        close();
+        await sleep(300);
+        presentSheet({
+          noProgress: true,
+          noIcon: true,
+          component: ref => <NoteHistory ref={ref} note={note} />
+        });
+      }
     }
   ];
 
   let width = dimensions.width > 600 ? 600 : 500;
-  let columnItemWidth = DDS.isTab ? (width - 24) / 5 : (w - 24) / 5;
+  let columnItemsCount = DDS.isLargeTablet() ? 7 : 5;
+  let columnItemWidth = DDS.isTab
+    ? (width - 24) / columnItemsCount
+    : (w - 24) / columnItemsCount;
 
   const _renderRowItem = rowItem => (
     <View
@@ -680,7 +706,7 @@ export const ActionSheetComponent = ({
         }}>
         <Icon
           name={rowItem.icon}
-          size={DDS.isTab ? SIZE.xl : SIZE.lg}
+          size={DDS.isTab ? SIZE.xxl : SIZE.lg}
           color={
             rowItem.on
               ? colors.accent
@@ -691,7 +717,7 @@ export const ActionSheetComponent = ({
         />
       </PressableButton>
 
-      <Paragraph  size={SIZE.xs + 1} style={{textAlign: 'center'}}>
+      <Paragraph size={SIZE.xs + 1} style={{textAlign: 'center'}}>
         {rowItem.title}
       </Paragraph>
     </View>
@@ -700,6 +726,29 @@ export const ActionSheetComponent = ({
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
   };
+
+  const renderColumnItem = ({item, index}) => (
+    <Button
+      buttonType={{
+        text: item.on
+          ? colors.accent
+          : item.name === 'Delete' || item.name === 'PermDelete'
+          ? colors.errorText
+          : colors.pri
+      }}
+      onPress={item.func}
+      title={item.title}
+      icon={item.icon}
+      type={item.on ? 'shade' : 'gray'}
+      fontSize={SIZE.sm}
+      style={{
+        borderRadius: 0,
+        justifyContent: 'flex-start',
+        alignSelf: 'flex-start',
+        width: '100%'
+      }}
+    />
+  );
 
   return (
     <ScrollView
@@ -730,7 +779,6 @@ export const ActionSheetComponent = ({
           Keyboard.dismiss();
         }}
       />
-
       {!note || !note.id ? (
         <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
@@ -738,202 +786,111 @@ export const ActionSheetComponent = ({
       ) : (
         <View
           style={{
-            paddingHorizontal: 12,
-            alignItems: 'center',
             marginTop: 5,
             zIndex: 10
           }}>
-          <Heading
-            style={{
-              maxWidth: '90%',
-              textAlign: 'center'
-            }}
-            size={SIZE.md}>
-            {note.type === 'tag' ? '#' : null}
-            {alias}
-          </Heading>
-
-          {note.headline || note.description ? (
-            <Paragraph
-              numberOfLines={2}
-              style={{
-                width: '90%',
-                textAlign: 'center',
-                maxWidth: '90%'
-              }}>
-              {note.type === 'notebook' && note.description
-                ? note.description
-                : null}
-              {note.type === 'note' && note.headline
-                ? note.headline[item.headline.length - 1] === '\n'
-                  ? note.headline.slice(0, note.headline.length - 1)
-                  : note.headline
-                : null}
-            </Paragraph>
-          ) : null}
-
-          <Paragraph
-            color={colors.icon}
-            size={SIZE.xs}
-            style={{
-              textAlignVertical: 'center',
-              marginTop: 2.5
-            }}>
-            {note.type === 'note' || (note.type === 'tag' && note.dateEdited)
-              ? 'Last edited on ' + timeConverter(note.dateEdited)
-              : null}
-            {note.type !== 'note' &&
-            note.type !== 'tag' &&
-            note.dateCreated &&
-            !note.dateDeleted
-              ? ' Created on ' + timeConverter(note.dateCreated)
-              : null}
-            {note.dateDeleted
-              ? 'Deleted on ' + timeConverter(note.dateDeleted)
-              : null}
-          </Paragraph>
-
-          {hasTags && note ? (
-            <ActionSheetTagsSection
-              close={close}
-              item={note}
-              localRefresh={localRefresh}
-            />
-          ) : null}
-
           <View
             style={{
-              flexDirection: 'row',
-              marginTop: 5,
-              width: '90%',
-              maxWidth: '90%',
-              flexWrap: 'wrap',
-              justifyContent: 'center'
+              paddingHorizontal: 12
             }}>
-            {note.type === 'notebook' &&
-            note &&
-            note.topics &&
-            note.topics.length > 0
-              ? note.topics
-                  .sort((a, b) => a.dateEdited - b.dateEdited)
-                  .slice(0, 6)
-                  .map(topic => (
-                    <Button
-                      key={topic.id}
-                      title={topic.title}
-                      type="gray"
-                      height={30}
-                      onPress={() => {
-                        close();
-                        let routeName = 'NotesPage';
-                        let params = {...topic, menu: false, get: 'topics'};
-                        let headerState = {
-                          heading: topic.title,
-                          id: topic.id,
-                          type: topic.type
-                        }; 
-                        eSendEvent(refreshNotesPage, params);
-                        Navigation.navigate(routeName, params, headerState);
-                      }}
-                      icon="bookmark-outline"
-                      fontSize={SIZE.sm - 1}
-                      style={{
-                        marginRight: 5,
-                        paddingHorizontal: 0,
-                        paddingHorizontal: 6,
-                        marginTop: 5
-                      }}
-                    />
-                  ))
-              : null}
+            <Heading size={SIZE.lg}>
+              {note.type === 'tag' ? '#' : null}
+              {alias}
+            </Heading>
 
-            {note.type === 'note' && isPublished ? (
-              <Button
-                title="Published"
-                type="shade"
-                height={30}
-                fontSize={SIZE.sm - 1}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
+            {note.headline || note.description ? (
+              <Paragraph numberOfLines={2} color={colors.icon}>
+                {(note.type === 'notebook' || note.itemType === 'notebook') &&
+                note?.description
+                  ? note.description
+                  : null}
+                {(note.type === 'note' || note.itemType === 'note') &&
+                note?.headline
+                  ? note.headline
+                  : null}
+              </Paragraph>
             ) : null}
 
-            {note.type === 'note' ? (
-              <Button
-                onPress={async () => {
-                  close();
-                  await sleep(300);
-                  eSendEvent(eOpenTagsDialog, note);
-                }}
-                title="Add tags"
-                type="accent"
-                icon="plus"
-                iconPosition="right"
-                height={30}
-                fontSize={SIZE.sm}
-                style={{
-                  margin: 1,
-                  marginRight: 5,
-                  paddingHorizontal: 0,
-                  borderRadius: 100,
-                  paddingHorizontal: 12
-                }}
-              />
+            {hasTags && note && note.type === 'note' ? (
+              <Tags close={close} item={note} localRefresh={localRefresh} />
             ) : null}
+
+            <Topics item={note} close={close} />
           </View>
+
+          {note && note.type === 'note' ? (
+            <Notebooks note={note} close={close} />
+          ) : null}
+
+          <DateMeta item={note} />
         </View>
       )}
 
-      {hasColors && note.id ? (
-        <ActionSheetColorsSection close={close} item={note} />
-      ) : null}
+      <View
+        style={{
+          borderTopWidth: 1,
+          borderColor: colors.nav
+        }}
+      />
+
+      {hasColors && note.id ? <ColorTags close={close} item={note} /> : null}
 
       {note.id || note.dateCreated ? (
-        <FlatList
-          data={rowItemsData.filter(
-            i => rowItems.indexOf(i.name) > -1 && !i.hidden
+        <>
+          {note.type === 'note' ? (
+            <FlatList
+              data={rowItemsData.filter(
+                i => rowItems.indexOf(i.name) > -1 && !i.hidden
+              )}
+              keyExtractor={item => item.title}
+              numColumns={
+                rowItems.length < 5 ? rowItems.length : columnItemsCount
+              }
+              style={{
+                marginTop: note.type !== 'note' ? 10 : 0,
+                paddingTop: 10
+              }}
+              columnWrapperStyle={{
+                justifyContent: 'flex-start'
+              }}
+              contentContainerStyle={{
+                alignSelf: 'center',
+                width: rowItems.length < 5 ? '100%' : null,
+                paddingLeft: rowItems.length < 5 ? 10 : 0
+              }}
+              renderItem={({item, index}) => _renderRowItem(item)}
+            />
+          ) : (
+            <FlatList
+              data={rowItemsData.filter(
+                i => rowItems.indexOf(i.name) > -1 && !i.hidden
+              )}
+              keyExtractor={item => item.title}
+              renderItem={renderColumnItem}
+            />
           )}
-          keyExtractor={item => item.title}
-          numColumns={rowItems.length < 5 ? rowItems.length : 5}
-          style={{
-            marginTop: note.type !== 'note' ? 10 : 0,
-            borderTopWidth: 1,
-            borderColor: colors.nav,
-            paddingTop: 20
-          }}
-          columnWrapperStyle={{
-            justifyContent: rowItems.length < 5 ? 'space-around' : 'flex-start'
-          }}
-          contentContainerStyle={{
-            alignSelf: 'center',
-            width: rowItems.length < 5 ? '100%' : null
-          }}
-          renderItem={({item, index}) => _renderRowItem(item)}
-        />
+        </>
       ) : null}
 
-      {note.type === 'note' && user && lastSynced >= note.dateEdited ? (
+      {user && lastSynced >= note.dateModified ? (
         <View
           style={{
-            paddingVertical: 10,
-            width: '95%',
-            alignItems: 'flex-start',
+            paddingVertical: 0,
+            width: '100%',
             paddingHorizontal: 12,
+            alignItems: 'center',
             flexDirection: 'row',
             justifyContent: 'flex-start',
             alignSelf: 'center',
-            backgroundColor: colors.nav,
-            borderRadius: 5
+            paddingTop: 10,
+            marginTop: 10,
+            borderTopWidth: 1,
+            borderTopColor: colors.nav
           }}>
           <Icon
             name="shield-key-outline"
             color={colors.accent}
-            size={SIZE.sm + SIZE.xs + 1}
+            size={SIZE.xxxl}
           />
 
           <View
@@ -943,9 +900,9 @@ export const ActionSheetComponent = ({
               flexShrink: 1
             }}>
             <Heading
-              color={colors.accent}
+              color={colors.heading}
+              size={SIZE.xs}
               style={{
-                fontSize: SIZE.sm,
                 flexWrap: 'wrap'
               }}>
               Encrypted and synced
@@ -956,7 +913,7 @@ export const ActionSheetComponent = ({
               }}
               size={SIZE.xs}
               color={colors.pri}>
-              No one can read this note except you.
+              No one can view this {item.itemType || item.type} except you.
             </Paragraph>
           </View>
 
@@ -971,10 +928,10 @@ export const ActionSheetComponent = ({
                 );
               } catch (e) {}
             }}
-            fontSize={SIZE.sm}
+            fontSize={SIZE.xs + 1}
             title="Learn more"
             height={30}
-            type="accent"
+            type="transparent"
           />
         </View>
       ) : null}
@@ -984,13 +941,12 @@ export const ActionSheetComponent = ({
           style={{
             width: '100%',
             paddingHorizontal: 12,
-            marginTop: 10,
+            marginTop: 10
           }}>
           <Button
             onPress={async () => {
-              console.log('copy data');
-              let additionalData = {}
-              if (note.type === "note") {
+              let additionalData = {};
+              if (note.type === 'note') {
                 let content = await db.content.raw(note.contentId);
                 if (content) {
                   content = db.debug.strip(content);
@@ -998,17 +954,15 @@ export const ActionSheetComponent = ({
                 }
               }
               additionalData.lastSynced = await db.lastSynced();
-              console.log(_note);
               let _note = {...note};
               _note.additionalData = additionalData;
               Clipboard.setString(db.debug.strip(_note));
 
               ToastEvent.show({
-                heading:"Debug data copied!",
-                type:'success',
-                context:'local'
-              })
-              
+                heading: 'Debug data copied!',
+                type: 'success',
+                context: 'local'
+              });
             }}
             fontSize={SIZE.sm}
             title="Copy data"
@@ -1021,7 +975,6 @@ export const ActionSheetComponent = ({
           />
         </View>
       ) : null}
-
       {DDS.isTab ? (
         <View
           style={{

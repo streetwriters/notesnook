@@ -15,7 +15,7 @@ import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
@@ -60,7 +60,7 @@ const RestoreDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper
+    <SheetWrapper
       fwdRef={actionSheetRef}
       gestureEnabled={!restoring}
       closeOnTouchBackdrop={!restoring}
@@ -70,7 +70,7 @@ const RestoreDialog = () => {
         restoring={restoring}
         setRestoring={setRestoring}
       />
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

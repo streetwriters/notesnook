@@ -2,7 +2,8 @@ import {Platform} from 'react-native';
 import {Dimensions} from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
-import {APP_VERSION, history, SUBSCRIPTION_STATUS} from '../utils';
+import {history, SUBSCRIPTION_STATUS} from '../utils';
+import { APP_VERSION } from "../../version";
 import {db} from '../utils/database';
 import {MMKV} from '../utils/mmkv';
 import {
@@ -20,9 +21,12 @@ import {
   UserStore,
   Announcement
 } from './interfaces';
+//@ts-ignore
 import {groupArray} from 'notes-core/utils/grouping';
 import {EditorWebView, post} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
+import {endSearch} from '../views/Editor/tiny/toolbar/commands';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -163,10 +167,10 @@ interface AttachmentStore {
       hash: string;
       recieved: number;
       type: 'upload' | 'download';
-    };
+    } | null;
   };
   encryptionProgress: number;
-  setEncryptionProgress: (encryptionProgress) => void;
+  setEncryptionProgress: (encryptionProgress: number) => void;
   remove: (hash: string) => void;
   setProgress: (
     sent: number,
@@ -183,6 +187,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   progress: {},
   remove: hash => {
     let _p = get().progress;
+    if (!_p) return;
     _p[hash] = null;
     tiny.call(
       EditorWebView,
@@ -200,6 +205,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
   },
   setProgress: (sent, total, hash, recieved, type) => {
     let _p = get().progress;
+    if (!_p) return;
     _p[hash] = {sent, total, hash, recieved, type};
     let progress = {total, hash, loaded: type === 'download' ? recieved : sent};
     tiny.call(
@@ -212,7 +218,7 @@ export const useAttachmentStore = create<AttachmentStore>((set, get) => ({
     );
     set({progress: {..._p}});
   },
-  encryptionProgress: null,
+  encryptionProgress: 0,
   setEncryptionProgress: encryptionProgress =>
     set({encryptionProgress: encryptionProgress}),
   loading: {total: 0, current: 0},
@@ -241,8 +247,9 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notesListMode: 'normal',
     devMode: false,
     notifNotes: false,
-    pitchBlack:false
+    pitchBlack: false
   },
+  sheetKeyboardHandler:true,
   fullscreen: false,
   deviceMode: 'mobile',
   dimensions: {width, height},
@@ -253,7 +260,8 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setDeviceMode: mode => set({deviceMode: mode}),
   setDimensions: dimensions => set({dimensions: dimensions}),
   setAppLoading: appLoading => set({appLoading}),
-  setIntroCompleted: isIntroCompleted => set({isIntroCompleted})
+  setIntroCompleted: isIntroCompleted => set({isIntroCompleted}),
+  setSheetKeyboardHandler:(sheetKeyboardHandler) => set({sheetKeyboardHandler})
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -277,10 +285,38 @@ export const useMenuStore = create<MenuStore>((set, get) => ({
 export const useEditorStore = create<EditorStore>((set, get) => ({
   currentEditingNote: null,
   setCurrentlyEditingNote: note => set({currentEditingNote: note}),
-  sessionId:null,
-  setSessionId:(sessionId) => {
-    console.log(sessionId,'session id');
+  sessionId: null,
+  setSessionId: sessionId => {
+    console.log(sessionId, 'session id');
     set({sessionId});
+  },
+  searchReplace: false,
+  searchSelection: null,
+  setSearchReplace: searchReplace => {
+    if (!searchReplace) {
+      set({searchSelection: null, searchReplace: false});
+      return;
+    }
+    let func = (value: string) => {
+      console.log("setSearchReplace:", value, value.length);
+      if ((!value || value.trim() === '') && get().searchReplace) {
+        endSearch();
+        return;
+      }
+
+      set({searchSelection: value, searchReplace: true});
+
+      eUnSubscribeEvent('selectionvalue', func);
+    };
+    eSubscribeEvent('selectionvalue', func);
+    tiny.call(
+      EditorWebView,
+      `(function() {
+      if (editor) {
+        reactNativeEventHandler('selectionvalue',editor.selection.getContent());
+      }
+    })();`
+    );
   }
 }));
 
@@ -296,6 +332,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   selectedItemsList: [],
   selectionMode: false,
   setAll: all => {
+    //@ts-ignore
     history.selectedItemsList = all;
     set({selectedItemsList: all});
   },
@@ -318,6 +355,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       selectedItems.push(item);
     }
     selectedItems = [...new Set(selectedItems)];
+    //@ts-ignore
     history.selectedItemsList = selectedItems;
 
     history.selectionMode =
@@ -370,11 +408,10 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
         announcements = [];
       }
     } catch (e) {
-      console.log("ERROR",e);
+      console.log('ERROR', e);
       set({announcements: []});
     } finally {
       let all = await getFiltered(announcements);
-      console.log("all", all)
       set({
         announcements: all.filter(a => a.type === 'inline'),
         dialogs: all.filter(a => a.type === 'dialog')
@@ -417,7 +454,7 @@ export function clearAllStores() {
 
 export const allowedPlatforms = ['all', 'mobile', Platform.OS];
 
-async function shouldShowAnnouncement(announcement) {
+async function shouldShowAnnouncement(announcement: Announcement) {
   if (!announcement) return false;
   let removed = (await MMKV.getStringAsync(announcement.id)) === 'removed';
   if (removed) return false;
@@ -448,7 +485,10 @@ async function shouldShowAnnouncement(announcement) {
       case 'unverified':
         return !PremiumService.getUser()?.isEmailVerified;
       case 'proExpired':
-        return subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED || subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELED;
+        return (
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_EXPIRED ||
+          subStatus === SUBSCRIPTION_STATUS.PREMIUM_CANCELLED
+        );
       case 'any':
       default:
         return true;

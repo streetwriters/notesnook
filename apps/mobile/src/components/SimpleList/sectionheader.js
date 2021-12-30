@@ -39,7 +39,6 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
     : groupBy.slice(0, 1).toUpperCase() + groupBy.slice(1, groupBy.length);
 
   const onUpdate = () => {
-    console.log(groupOptions);
     setGroupOptions({...db.settings?.getGroupOptions(type)});
   };
 

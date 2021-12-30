@@ -6,6 +6,45 @@ import {
   editor_colors
 } from './constants';
 
+export const TABLE_TOOLTIP_CONFIG = {
+  type: 'tableconfig',
+  title: 'tableconfig',
+  pageX: 0,
+  default: null,
+  data: [
+    {
+      format: 'tableinsertrowbefore',
+      type: 'format',
+      fullname: 'Insert row before',
+      premium: false
+    },
+    {
+      format: 'tableinsertcolbefore',
+      type: 'format',
+      fullname: 'Insert column before',
+      premium: false
+    },
+    {
+      format: 'tablesplitcell',
+      type: 'format',
+      fullname: 'Split Cell',
+      premium: false
+    },
+    {
+      format: 'tablemergecell',
+      type: 'format',
+      fullname: 'Merge Cell',
+      premium: false
+    },
+    {
+      format: 'tabledelete',
+      type: 'format',
+      fullname: 'Delete table',
+      premium: false
+    }
+  ]
+};
+
 export const IMAGE_TOOLTIP_CONFIG = {
   data: [
     {
@@ -62,6 +101,7 @@ export const IMAGE_TOOLTIP_CONFIG = {
 };
 
 export const TOOLBAR_CONFIG = [
+  'seperator',
   [
     {
       format: 'bold',
@@ -122,6 +162,7 @@ export const TOOLBAR_CONFIG = [
       ]
     }
   ],
+  'seperator',
   [
     {
       format: 'fontsize',
@@ -210,6 +251,8 @@ export const TOOLBAR_CONFIG = [
       ]
     }
   ],
+
+  'seperator',
   [
     {
       format: 'ol',
@@ -243,6 +286,8 @@ export const TOOLBAR_CONFIG = [
       premium: true
     }
   ],
+
+  'seperator',
   [
     {
       format: 'dhilitecolor',
@@ -282,6 +327,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
 
+  'seperator',
   [
     {
       format: 'blockquote',
@@ -313,6 +359,8 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Inline Code'
     }
   ],
+
+  'seperator',
   [
     {
       format: 'outdent',
@@ -336,68 +384,15 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Subscript'
     }
   ],
+  'seperator',
   [
     {
       format: 'table',
-      type: 'tooltip',
+      type: 'sheet',
       fullname: 'Table',
       groupType: 'table',
       premium: true
     },
-    {
-      format: 'tableconfig',
-      type: 'tooltip',
-      fullname: 'Table',
-      groupType: 'tableconfig',
-      group: [
-        {
-          format: 'tableprops',
-          type: 'format',
-          fullname: 'Table Settings',
-          premium: true
-        },
-        {
-          format: 'tablerowprops',
-          type: 'format',
-          fullname: 'Table Row Settings',
-          premium: true
-        },
-        {
-          format: 'tablesplitcell',
-          type: 'format',
-          fullname: 'Table Split Cell',
-          premium: true
-        },
-        {
-          format: 'tablemergecell',
-          type: 'format',
-          fullname: 'Table Merge Cell',
-          premium: true
-        }
-      ],
-      premium: true
-    },
-
-    {
-      format: 'tabledelete',
-      type: 'format',
-      fullname: 'Remove Table',
-      premium: true
-    }
-  ],
-  [
-    /*  {
-      format: 'filepicker',
-      type: 'format',
-      fullname: 'Attach file',
-      premium: true
-    },
-    {
-      format: 'image',
-      type: 'format',
-      fullname: 'Image',
-      premium: true
-    }, */
     {
       format: 'video',
       type: 'format',
@@ -407,6 +402,7 @@ export const TOOLBAR_CONFIG = [
     }
   ],
 
+  'seperator',
   [
     {
       format: 'ltr',
@@ -419,6 +415,7 @@ export const TOOLBAR_CONFIG = [
       fullname: 'Text Direction RTL'
     }
   ],
+  'seperator',
   [
     {
       format: 'horizontal',
@@ -431,11 +428,11 @@ export const TOOLBAR_CONFIG = [
       type: 'format',
       fullname: 'Remove Formatting'
     },
-    {
-      format: 'magnify',
-      type: 'format',
-      fullname: 'Search & Replace'
-    },
+    // {
+    //   format: 'magnify',
+    //   type: 'format',
+    //   fullname: 'Search & Replace'
+    // },
     {
       format: 'settings',
       type: 'settings',

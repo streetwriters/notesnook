@@ -1,14 +1,14 @@
 import React from 'react';
-import { Platform, View } from 'react-native';
+import {Platform, View} from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { Toast } from '../Toast';
-import { BouncingView } from './BouncingView';
-import { GetPremium } from './GetPremium';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {PremiumToast} from '../Premium/premium-toast';
+import {Toast} from '../Toast';
+import {BouncingView} from '../Transitions/bouncing-view';
 
-const ActionSheetWrapper = ({
+const SheetWrapper = ({
   children,
   fwdRef,
   gestureEnabled = true,
@@ -21,6 +21,7 @@ const ActionSheetWrapper = ({
   const [state] = useTracked();
   const {colors} = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
+  const sheetKeyboardHandler = useSettingStore(state => state.sheetKeyboardHandler);
   const largeTablet = deviceMode === 'tablet';
   const smallTablet = deviceMode === 'smallTablet';
   const dimensions = useSettingStore(state => state.dimensions);
@@ -48,7 +49,6 @@ const ActionSheetWrapper = ({
   };
 
   const _onClose = async () => {
-    //await reFocusEditor();
     if (onClose) {
       onClose();
     }
@@ -64,15 +64,17 @@ const ActionSheetWrapper = ({
       onPositionChanged={onHasReachedTop}
       closeOnTouchBackdrop={closeOnTouchBackdrop}
       keyboardMode={keyboardMode}
+      keyboardHandlerEnabled={sheetKeyboardHandler}
       closeOnPressBack={closeOnTouchBackdrop}
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
+      overlayColor={'#585858'}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
           <Toast context="local" />
-          <GetPremium
+          <PremiumToast
             context="sheet"
             close={() => fwdRef?.current?.hide()}
             offset={50}
@@ -95,4 +97,4 @@ const ActionSheetWrapper = ({
   );
 };
 
-export default ActionSheetWrapper;
+export default SheetWrapper;

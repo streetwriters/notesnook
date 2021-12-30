@@ -64,7 +64,7 @@ function attachTitleInputListeners() {
 let titleTimeout = 0;
 function onTitleChange() {
   clearTimeout(titleTimeout);
-  titleTimeout = setTimeout(() => {
+  titleTimeout = setTimeout(function () {
     if (isLoading) {
       return;
     }
@@ -167,7 +167,6 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
-
         setTimeout(function () {
           document.activeElement.blur();
           window.blur();
@@ -175,6 +174,7 @@ function attachMessageListener() {
           document.activeElement.blur();
           window.blur();
         }, 300);
+
         info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
           editor.countWords() + ' words';
@@ -192,6 +192,9 @@ function attachMessageListener() {
         break;
       case 'title':
         document.getElementById('titleInput').value = value;
+        break;
+      case 'titleplaceholder':
+        document.getElementById('titleInput').placeholder = value;
         break;
       default:
         break;

@@ -1,19 +1,19 @@
-import React, {Fragment, useEffect, useRef, useState} from 'react';
-import {Platform, StyleSheet, View} from 'react-native';
+import React, { Fragment, useEffect, useRef, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {ToastEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { ToastEvent } from '../../services/EventManager';
 import Exporter from '../../services/Exporter';
-import {getElevation} from '../../utils';
-import {ph, pv, SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import {Button} from '../Button';
+import { getElevation } from '../../utils';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import SheetWrapper from '../Sheet';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -25,7 +25,6 @@ const {
 const {
   eOpenExportDialog,
   eCloseExportDialog,
-  eShowGetPremium
 } = require('../../utils/Events');
 
 const ExportDialog = () => {
@@ -133,7 +132,7 @@ const ExportDialog = () => {
   ];
 
   return !visible ? null : (
-    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={close} visible={true}>
+    <SheetWrapper fwdRef={actionSheetRef} onClose={close} visible={true}>
       <View>
         <View
           style={{
@@ -270,7 +269,7 @@ const ExportDialog = () => {
           </View>
         </View>
       </View>
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 

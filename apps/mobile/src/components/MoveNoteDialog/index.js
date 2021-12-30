@@ -5,24 +5,28 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {useNotebookStore, useSelectionStore} from '../../provider/stores';
+import {useNotebookStore, useSelectionStore, useSettingStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
   sendNoteEditedEvent,
-  ToastEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {getTotalNotes} from '../../utils';
 import {db} from '../../utils/database';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
+import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import Input from '../Input';
+import {ActionIcon} from '../ActionIcon';
+import {Dialog} from '../Dialog';
+import {presentDialog} from '../Dialog/functions';
 
 let newNotebookTitle = null;
 let newTopicTitle = null;
@@ -59,7 +63,7 @@ const MoveNoteDialog = () => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Notebook,
-      Navigation.routeNames.Notebooks,
+      Navigation.routeNames.Notebooks
     ]);
   };
 
@@ -68,9 +72,9 @@ const MoveNoteDialog = () => {
   };
 
   return !visible ? null : (
-    <ActionSheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
+    <SheetWrapper fwdRef={actionSheetRef} onClose={_onClose}>
       <MoveNoteComponent close={close} note={note} setNote={update} />
-    </ActionSheetWrapper>
+    </SheetWrapper>
   );
 };
 
@@ -81,47 +85,50 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   const {colors} = state;
 
   const notebooks = useNotebookStore(state =>
-    state.notebooks.filter(n => n.type === 'notebook'),
+    state.notebooks.filter(n => n.type === 'notebook')
   );
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
-
   const [expanded, setExpanded] = useState('');
   const [notebookInputFocused, setNotebookInputFocused] = useState(false);
-  const [topicInputFocused, setTopicInputFocused] = useState(false);
   const [noteExists, setNoteExists] = useState([]);
   const addNewNotebook = async () => {
     if (!newNotebookTitle || newNotebookTitle.trim().length === 0)
       return ToastEvent.show({
         heading: 'Notebook title is required',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
 
-    await db.notebooks.add({
+    let id = await db.notebooks.add({
       title: newNotebookTitle,
       description: null,
       topics: [],
-      id: null,
+      id: null
     });
+    console.log("added notebook id",id);
+    setExpanded(id);
+    openAddTopicDialog(db.notebooks.notebook(id).data);
     notebookInput.current?.clear();
     notebookInput.current?.blur();
     setNotebooks();
+    updateNoteExists();
   };
 
-  const addNewTopic = async () => {
-    if (!newTopicTitle || newTopicTitle.trim().length === 0) {
-      return ToastEvent.show({
+  const addNewTopic = async (value,item) => {
+    if (!value || value.trim().length === 0) {
+      ToastEvent.show({
         heading: 'Topic title is required',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
+      return false;
     }
-    await db.notebooks.notebook(expanded).topics.add(newTopicTitle);
+    console.log(item.id);
+    await db.notebooks.notebook(item.id).topics.add(value);
     setNotebooks();
-    topicInput.current?.clear();
-    topicInput.current?.blur();
-    newTopicTitle = null;
+    updateNoteExists();
+    return true;
   };
 
   const handlePress = async (item, index) => {
@@ -136,10 +143,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes,
+          Navigation.routeNames.Notes
         ]);
       }
       setNotebooks();
+      updateNoteExists();
 
       return;
     }
@@ -150,9 +158,9 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     await db.notes.move(
       {
         topic: item.id,
-        id: item.notebookId,
+        id: item.notebookId
       },
-      ...noteIds,
+      ...noteIds
     );
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
@@ -160,16 +168,21 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
+        Navigation.routeNames.Notes
       ]);
     }
     setNotebooks();
+    updateNoteExists();
   };
 
   useEffect(() => {
+    updateNoteExists();
+  }, []);
+
+  const updateNoteExists = () => {
     if (!note?.id) return;
     let ids = [];
-
+    let notebooks = db.notebooks.all;
     for (let i = 0; i < notebooks.length; i++) {
       if (notebooks[i].topics) {
         for (let t = 0; t < notebooks[i].topics.length; t++) {
@@ -180,16 +193,32 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       }
     }
     setNoteExists(ids);
-  }, []);
+  };
+
+  const openAddTopicDialog = item => {
+    presentDialog({
+      context: 'move_note',
+      input: true,
+      inputPlaceholder: 'Enter title',
+      title: 'New topic',
+      paragraph: 'Add a new topic in ' + item.title,
+      positiveText: 'Add',
+      positivePress: value => {
+        return addNewTopic(value,item);
+      }
+    });
+
+  };
 
   return (
     <>
+      <Dialog context="move_note" />
       <View>
         <TouchableOpacity
           style={{
             width: '100%',
             height: '100%',
-            position: 'absolute',
+            position: 'absolute'
           }}
           onPress={() => {
             Keyboard.dismiss();
@@ -199,7 +228,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           style={{
             paddingHorizontal: 12,
             flexDirection: 'row',
-            justifyContent: 'space-between',
+            justifyContent: 'space-between'
           }}>
           <DialogHeader
             title="Add to notebook"
@@ -224,94 +253,66 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           ListFooterComponent={
             <View
               style={{
-                height: 100,
+                height: 100
               }}
             />
           }
           ListHeaderComponent={
             <View
               style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginBottom: 10,
                 width: '100%',
-                borderBottomWidth: 1,
-                borderColor: colors.nav,
-                paddingHorizontal: 12,
+                marginTop: 10
               }}>
-              <TextInput
-                ref={notebookInput}
+              <Input
+                fwdRef={notebookInput}
                 onChangeText={value => {
                   newNotebookTitle = value;
                 }}
                 testID={notesnook.ids.dialogs.addTo.addNotebook}
                 blurOnSubmit={false}
-                onFocus={() => {
+                onFocusInput={() => {
                   setNotebookInputFocused(true);
                 }}
-                onBlur={() => {
+                onBlurInput={() => {
                   setNotebookInputFocused(false);
                 }}
-                onSubmitEditing={addNewNotebook}
-                style={[
-                  {
-                    color: colors.pri,
-                    width: '90%',
-                    maxWidth: '90%',
-                    paddingHorizontal: 0,
-                    borderRadius: 5,
-                    minHeight: 45,
-                    fontSize: SIZE.md,
-                    fontFamily: 'OpenSans-Regular',
-                    padding: pv - 2,
-                  },
-                ]}
+                button={{
+                  icon: 'check',
+                  color: notebookInputFocused ? colors.accent : colors.icon
+                }}
+                onSubmit={addNewNotebook}
                 placeholder="Create a new notebook"
-                placeholderTextColor={colors.icon}
               />
-              <TouchableOpacity
-                onPress={addNewNotebook}
-                testID={notesnook.ids.dialogs.addTo.addNotebook}
-                style={[
-                  {
-                    borderRadius: 5,
-                    minHeight: 45,
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                  },
-                ]}>
-                <Icon
-                  name="plus"
-                  size={SIZE.lg}
-                  color={notebookInputFocused ? colors.accent : colors.icon}
-                />
-              </TouchableOpacity>
             </View>
           }
+          style={{
+            paddingHorizontal: 12
+          }}
           renderItem={({item, index}) => (
             <View
               style={{
-                height: expanded === item.id ? null : 60,
+                borderWidth: 1,
+                borderColor: expanded ? colors.nav : 'transparent',
+                borderRadius: 6,
+                overflow: 'hidden',
+                marginBottom: 10
               }}>
               <PressableButton
                 onPress={() => {
+                  if (!item.topics || item.topics.length === 0) {
+                    setExpanded(item.id);
+                    openAddTopicDialog(item);
+                    return;
+                  }
                   setExpanded(item.id === expanded ? null : item.id);
-                  setTopicInputFocused(false);
                   setNotebookInputFocused(false);
                 }}
-                type="gray"
+                type="grayBg"
                 customStyle={{
                   height: 50,
                   width: '100%',
-                  borderRadius: 0,
-                  alignItems: 'flex-start',
-                  marginBottom: 5,
-                  borderBottomWidth: 1,
-                  borderBottomColor:
-                    noteExists.indexOf(item.id) > -1
-                      ? colors.accent
-                      : colors.nav,
+                  borderRadius: 5,
+                  alignItems: 'flex-start'
                 }}>
                 <View
                   style={{
@@ -320,7 +321,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     justifyContent: 'space-between',
                     flexDirection: 'row',
                     alignItems: 'center',
-                    paddingHorizontal: 12,
+                    paddingHorizontal: 12
                   }}>
                   <View>
                     <Heading
@@ -338,13 +339,20 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                           : item.topics.length + ' topics'}
                       </Paragraph>
                     ) : null}
-
                   </View>
 
-                  <Icon
-                    name={expanded === item.id ? 'chevron-up' : 'chevron-down'}
-                    color={colors.pri}
-                    size={SIZE.lg}
+                  <ActionIcon
+                    name={expanded === item.id ? 'plus' : 'chevron-down'}
+                    color={expanded === item.id ? colors.accent : colors.pri}
+                    size={SIZE.xl}
+                    onPress={() => {
+                      if (expanded !== item.id) {
+                        setExpanded(item.id);
+                        return;
+                      }
+                      setExpanded(item.id);
+                      openAddTopicDialog(item);
+                    }}
                   />
                 </View>
               </PressableButton>
@@ -365,77 +373,10 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     actionSheetRef.current?.handleChildScrollEnd();
                   }}
                   style={{
-                    width: '90%',
+                    width: '100%',
                     alignSelf: 'flex-end',
-                    maxHeight: 500,
+                    maxHeight: 500
                   }}
-                  ListHeaderComponent={
-                    <View>
-                      <View
-                        style={{
-                          flexDirection: 'row',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
-                          width: '100%',
-                          alignSelf: 'flex-end',
-                          marginBottom: 5,
-                          marginTop: 5,
-                          borderBottomWidth: 1,
-                          paddingHorizontal: 12,
-                          borderColor: colors.nav,
-                        }}>
-                        <TextInput
-                          ref={topicInput}
-                          onChangeText={value => {
-                            newTopicTitle = value;
-                          }}
-                          testID={notesnook.ids.dialogs.addTo.addTopic}
-                          blurOnSubmit={false}
-                          onFocus={() => {
-                            setTopicInputFocused(true);
-                          }}
-                          onBlur={() => {
-                            setTopicInputFocused(false);
-                          }}
-                          onSubmitEditing={addNewTopic}
-                          style={[
-                            {
-                              color: colors.pri,
-                              width: '90%',
-                              maxWidth: '90%',
-                              paddingHorizontal: 0,
-                              borderRadius: 5,
-                              height: 40,
-                              fontSize: SIZE.sm,
-                              padding: pv - 2,
-                              fontFamily: 'OpenSans-Regular',
-                            },
-                          ]}
-                          placeholder="Add a topic"
-                          placeholderTextColor={colors.icon}
-                        />
-                        <TouchableOpacity
-                          onPress={addNewTopic}
-                          testID={notesnook.ids.dialogs.addTo.btnTopic}
-                          style={[
-                            {
-                              borderRadius: 5,
-                              height: 40,
-                              justifyContent: 'center',
-                              alignItems: 'center',
-                            },
-                          ]}>
-                          <Icon
-                            name="plus"
-                            size={SIZE.lg}
-                            color={
-                              topicInputFocused ? colors.accent : colors.icon
-                            }
-                          />
-                        </TouchableOpacity>
-                      </View>
-                    </View>
-                  }
                   renderItem={({item, index}) => (
                     <PressableButton
                       onPress={() => handlePress(item, index)}
@@ -443,13 +384,13 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       customStyle={{
                         height: 50,
                         borderTopWidth: index === 0 ? 0 : 1,
-                        borderTopColor: colors.nav,
+                        borderTopColor: index === 0 ? null : colors.nav,
                         width: '100%',
                         borderRadius: 0,
                         alignItems: 'center',
                         flexDirection: 'row',
                         paddingHorizontal: 12,
-                        justifyContent: 'space-between',
+                        justifyContent: 'space-between'
                       }}>
                       <View>
                         <Paragraph color={colors.heading}>
@@ -462,17 +403,14 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                       {note && item.notes.indexOf(note.id) > -1 ? (
                         <Button
                           onPress={() => handlePress(item, index)}
-                          title="Remove"
-                          type="error"
-                          height={25}
-                          fontSize={SIZE.xs}
+                          icon="check"
+                          iconColor={colors.accent}
+                          iconSize={SIZE.lg}
+                          height={35}
+                          width={35}
                           style={{
-                            margin: 1,
-                            marginRight: 5,
-                            paddingHorizontal: 0,
-                            paddingVertical: 2.5,
                             borderRadius: 100,
-                            paddingHorizontal: 12,
+                            paddingHorizontal: 0
                           }}
                         />
                       ) : null}

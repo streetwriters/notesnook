@@ -1,20 +1,21 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { FlatList, View } from 'react-native';
+import React, {useEffect, useRef, useState} from 'react';
+import {FlatList, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { useTracked } from '../../provider';
-import { useMenuStore, useNoteStore } from '../../provider/stores';
+import {useTracked} from '../../provider';
+import {useMenuStore, useNoteStore} from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/database';
-import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
-import { normalize, SIZE } from '../../utils/SizeUtils';
-import ActionSheetWrapper from '../ActionSheetComponent/ActionSheetWrapper';
-import { Button } from '../Button';
-import { PressableButton } from '../PressableButton';
+import {db} from '../../utils/database';
+import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
+import {normalize, SIZE} from '../../utils/SizeUtils';
+import SheetWrapper from '../Sheet';
+import {Button} from '../Button';
+import {ActionSheetEvent} from '../DialogManager/recievers';
+import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -125,7 +126,7 @@ const PinItem = ({item, index, onPress}) => {
   return (
     <>
       {visible && (
-        <ActionSheetWrapper
+        <SheetWrapper
           onClose={() => {
             setVisible(false);
           }}
@@ -148,13 +149,24 @@ const PinItem = ({item, index, onPress}) => {
               marginBottom: 30
             }}
           />
-        </ActionSheetWrapper>
+        </SheetWrapper>
       )}
       <PressableButton
         type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}
         onLongPress={() => {
-          setVisible(!visible);
-          fwdRef.current?.show();
+          let rowItems = [];
+          if (item.type === 'tag') {
+            rowItems = ['Add Shortcut', 'Delete', 'Rename Tag'];
+            ActionSheetEvent(item, false, false, rowItems);
+          } else if (item.type === 'notebook' || item.type === 'topic') {
+            rowItems =
+              item.type === 'topic'
+                ? ['Edit Topic', 'Add Shortcut', 'Delete']
+                : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
+            ActionSheetEvent(item, false, false, rowItems, {
+              notebookID: item.notebookId
+            });
+          }
         }}
         onPress={() => onPress(item)}
         customStyle={{

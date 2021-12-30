@@ -1,24 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { View } from 'react-native';
-import Animated, { Easing } from 'react-native-reanimated';
-import { useTracked } from '../../provider';
-import { DDS } from '../../services/DeviceDetection';
+import React, {useEffect, useState} from 'react';
+import {View} from 'react-native';
+import Animated, {Easing} from 'react-native-reanimated';
+import {useTracked} from '../../provider';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import { dWidth, editing, getElevation } from '../../utils';
+import {dWidth, editing, getElevation} from '../../utils';
 import {
   eCloseActionSheet,
   eOpenPremiumDialog,
   eShowGetPremium
 } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { EditorWebView } from '../../views/Editor/Functions';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorWebView} from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import { Button } from '../Button';
+import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -27,14 +27,14 @@ export const opacityPrem = new Animated.Value(0);
 let timer = null;
 let currentMsg = {
   title: '',
-  desc: '',
+  desc: ''
 };
-export const GetPremium = ({close, context = 'global', offset = 0}) => {
+export const PremiumToast = ({close, context = 'global', offset = 0}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [msg, setMsg] = useState(currentMsg);
 
-  const open = (event) => {
+  const open = event => {
     if (!event) {
       if (timer !== null) {
         clearTimeout(timer);
@@ -42,7 +42,7 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       }
       currentMsg = {
         title: '',
-        desc: '',
+        desc: ''
       };
       setMsg(currentMsg);
       opacityPrem.setValue(0);
@@ -59,30 +59,30 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
       translatePrem.setValue(-dWidth);
       currentMsg = {
         title: event.title,
-        desc: event.desc,
+        desc: event.desc
       };
       setMsg(currentMsg);
       opacityPrem.setValue(1);
       Animated.timing(opacityPrem, {
         toValue: 1,
         duration: 300,
-        easing: Easing.inOut(Easing.ease),
+        easing: Easing.inOut(Easing.ease)
       }).start();
       Animated.timing(translatePrem, {
         toValue: 0,
         duration: 300,
-        easing: Easing.inOut(Easing.ease),
+        easing: Easing.inOut(Easing.ease)
       }).start();
 
       let timer = setTimeout(async () => {
         Animated.timing(opacityPrem, {
           toValue: -0,
           duration: 150,
-          easing: Easing.inOut(Easing.ease),
+          easing: Easing.inOut(Easing.ease)
         }).start();
         currentMsg = {
           title: '',
-          desc: '',
+          desc: ''
         };
         await sleep(150);
         setMsg(currentMsg);
@@ -114,41 +114,49 @@ export const GetPremium = ({close, context = 'global', offset = 0}) => {
     <Animated.View
       style={{
         position: 'absolute',
-        backgroundColor: colors.accent,
+        backgroundColor: colors.nav,
         zIndex: 999,
         ...getElevation(10),
         padding: 12,
-        paddingVertical: 20,
-        borderRadius: 5,
+        borderRadius: 10,
         flexDirection: 'row',
         alignSelf: 'center',
         justifyContent: 'space-between',
         top: offset,
         opacity: opacityPrem,
-        maxWidth: DDS.isLargeTablet() ? 400 : '100%',
+        maxWidth: DDS.isLargeTablet() ? 400 : '98%',
         transform: [
           {
-            translateY: translatePrem,
-          },
-        ],
+            translateY: translatePrem
+          }
+        ]
       }}>
       <View
         style={{
-          width: '75%',
-          maxWidth: '75%',
-          paddingRight: 6,
-          justifyContent: 'center',
+          flexShrink: 1,
+          flexGrow: 1,
+          paddingRight: 6
         }}>
-        <Heading color="white" size={SIZE.md}>
+        <Heading
+          style={{
+            flexWrap: 'wrap'
+          }}
+          color={colors.accent}
+          size={SIZE.md}>
           {msg.title}
         </Heading>
 
-        <Paragraph style={{margin: 0}} size={SIZE.sm} color="white">
+        <Paragraph
+          style={{
+            flexWrap: 'wrap'
+          }}
+          size={SIZE.sm}
+          color={colors.pri}>
           {msg.desc}
         </Paragraph>
       </View>
 
-      <Button onPress={onPress} width={80} title="Get Now" type="inverted" />
+      <Button onPress={onPress} title="Get Now" type="accent" />
     </Animated.View>
   );
 };

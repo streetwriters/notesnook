@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -7,8 +7,9 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
+import {useSettingStore} from '../../provider/stores';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
-import { BouncingView } from '../ActionSheetComponent/BouncingView';
+import {BouncingView} from '../Transitions/bouncing-view';
 
 const BaseDialog = ({
   visible,
@@ -26,6 +27,14 @@ const BaseDialog = ({
 }) => {
   const floating = useIsFloatingKeyboard();
 
+  useEffect(() => {
+
+    return () => {
+      useSettingStore.getState().setSheetKeyboardHandler(true);
+    }
+
+  },[])
+
   return (
     <Modal
       visible={visible}
@@ -35,10 +44,14 @@ const BaseDialog = ({
       onShow={() => {
         if (onShow) {
           onShow();
+          useSettingStore.getState().setSheetKeyboardHandler(false);
         }
       }}
       animationType={animation}
-      onRequestClose={onRequestClose}>
+      onRequestClose={() => {
+        useSettingStore.getState().setSheetKeyboardHandler(true);
+        onRequestClose && onRequestClose();
+      }}>
       <SafeAreaView
         style={{
           backgroundColor: background

@@ -13,11 +13,21 @@
 	<div class="app-main">
 		<input id="image-input" accept='image/png, image/gif, image/jpeg, image/bmp, image/x-icon' type="file"
 			name="name" style="display: none;" />
+		<div class="tag-bar-parent hidden noselect">
+			<div style="margin: 0px !important;margin-right:5px !important;" class="newtag">
+				<p class="newtagp noselect"></p>
+				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+					width="24" height="24" viewBox="0 0 24 24">
+					<path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+				</svg>
+			</div>
+			<div class="tag-bar"></div>
+		</div>
 		<div id="titlebar">
 			<div id="formBox">
-				<input maxlength="150" id="titleInput"
-					placeholder="Note title"></input>
+				<input maxlength="150" id="titleInput" placeholder="Note title"></input>
 			</div>
+
 			<div class="info-bar">
 				<div style="display:flex;">
 					<p id="infowords"></p>
@@ -25,6 +35,7 @@
 					<p style="display:none" id="infosaved"></p>
 				</div>
 			</div>
+
 		</div>
 		<textarea hidden id="tiny_textarea"></textarea>
 	</div>
@@ -41,6 +52,84 @@
 	<script src="./init.js"></script>
 	<script>
 		attachMessageListener()
+	</script>
+	<script>
+
+		function pressHandler(tag, action, node) {
+			let time = 0;
+			let _node = node || document.querySelector(tag);
+
+			_node.ontouchstart = function (event) {
+				event.preventDefault();
+				time = Date.now();
+			}
+			_node.ontouchmove = function (event) {
+				event.preventDefault();
+			}
+
+			_node.ontouchend = function (event) {
+				event.preventDefault();
+				let diff = Date.now() - time;
+				if (diff < 300) {
+					action();
+				};
+			}
+
+		}
+
+		pressHandler('.newtag', function () {
+			reactNativeEventHandler("newtag", "new");
+		})
+
+		function clearNode(selector) {
+			let node = document.querySelector(selector);
+			if (node) {
+				node.innerHTML = "";
+			}
+		}
+
+		function renderChildernInNode(data, parent, nodeName, classes) {
+			if (data.length === 0) {
+				let stag = document.querySelector(".newtagp");
+				stag.innerText = "Add a tag "
+				if (!stag.parentElement.classList.contains('alttagnew')) {
+					stag.parentElement.classList.add("alttagnew");
+				}
+			} else {
+				let stag = document.querySelector(".newtagp");
+				stag.innerText = "";
+				if (stag.parentElement.classList.contains('alttagnew')) {
+					stag.parentElement.classList.remove("alttagnew")
+				}
+			}
+			let parentNode = document.querySelector(parent);
+			data.forEach(function (item) {
+				let childNode = document.createElement(nodeName);
+				let pNode = document.createElement('p');
+				pNode.innerText = "#" + item.alias
+				childNode.appendChild(pNode);
+				childNode.dataset.tag = JSON.stringify(item);
+				for (var i = 0; i < classes.length; i++) {
+					childNode.classList.add(classes[i]);
+				}
+				pressHandler(null, function () {
+					reactNativeEventHandler("notetag", event.target.dataset.tag);
+				}, childNode);
+				parentNode.appendChild(childNode);
+			})
+		}
+		function toggleNode(selector = "p", value) {
+			let node = document.querySelector(selector);
+			if (value === "hide" && !node.classList.contains('hidden')) {
+				node.classList.add('hidden');
+				return;
+			}
+			if (value === "show" && node.classList.contains('hidden')) {
+				node.classList.remove('hidden');
+			}
+
+		}
+
 	</script>
 
 </body>

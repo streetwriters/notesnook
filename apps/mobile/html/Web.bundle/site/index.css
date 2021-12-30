@@ -49,7 +49,6 @@ body {
   font-family: 'Open Sans';
   color: gray;
   font-size: 11.5px;
-  height: 13px;
   display: flex;
   padding-left: 14px !important;
   justify-content: space-between;
@@ -65,14 +64,24 @@ body {
 #infodate,
 #infosaved {
   font-family: 'Open Sans';
-  margin-right: 5px;
-  margin-left: 0px;
   border-radius: 5px;
+  margin:0px !important;
   margin-top: 0;
-  height: 16px;
+  margin-right: 5px !important;
+  margin-left: 0px;
   padding-top: 2.5px;
 }
 
 .visible {
   display: inline-flex !important;
+}
+
+.noselect {
+  -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Old versions of Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome, Edge, Opera and Firefox */
 }

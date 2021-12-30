@@ -40,7 +40,10 @@ const Input = ({
   returnKeyType,
   returnKeyLabel,
   autoCompleteType,
-  onFocusInput
+  onFocusInput,
+  buttons,
+  marginRight,
+  autoCorrect=true
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -136,8 +139,9 @@ const Input = ({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexGrow: 1,
-    height: 50,
-    paddingHorizontal: 12
+    height: height || 50,
+    paddingHorizontal: 12,
+    paddingRight:buttons || button || secureTextEntry || error ? 6 : 12
   };
 
   const textStyle = {
@@ -147,7 +151,7 @@ const Input = ({
     paddingVertical: 0,
     paddingBottom: 2.5,
     flexGrow: 1,
-    height: 50,
+    height: height || 50,
     fontFamily:"OpenSans-Regular"
   };
 
@@ -159,7 +163,8 @@ const Input = ({
           height: height,
           marginBottom: marginBottom,
           flexGrow: 1,
-          maxHeight: height
+          maxHeight: height,
+          marginRight:marginRight
         }}>
         <TouchableOpacity
           disabled={!loading}
@@ -173,6 +178,7 @@ const Input = ({
             defaultValue={defaultValue}
             autoCapitalize={autoCapitalize}
             onChangeText={onChange}
+            autoCorrect={autoCorrect}
             onBlur={onBlur}
             keyboardType={
               validationType === 'email' ? 'email-address' : 'default'
@@ -196,7 +202,7 @@ const Input = ({
             style={{
               flexDirection: 'row',
               justifyContent: 'center',
-              height: 35,
+              height: 35 > height ? height : 35,
               alignItems: 'center'
             }}>
             {secureTextEntry && (
@@ -216,6 +222,8 @@ const Input = ({
                 color={secureEntry ? colors.icon : colors.accent}
               />
             )}
+
+            {buttons}
 
             {button && (
               <ActionIcon

@@ -119,6 +119,8 @@ const modes = {
 
 const NotesnookShare = ({quicknote = false}) => {
   const colors = useShareStore(state => state.colors);
+  const accent = useShareStore(state => state.accent);
+
   const appendNote = useShareStore(state => state.appendNote);
   const [note, setNote] = useState({...defaultNote});
   const [loadingIntent, setLoadingIntent] = useState(true);
@@ -166,6 +168,7 @@ const NotesnookShare = ({quicknote = false}) => {
   };
 
   useEffect(() => {
+    useShareStore.getState().setAccent();
     let keyboardWillChangeFrame = Keyboard.addListener(
       'keyboardWillChangeFrame',
       onKeyboardWillChangeFrame
@@ -236,7 +239,7 @@ const NotesnookShare = ({quicknote = false}) => {
     sleep(50).then(() => {
       animate(1, 0);
       sleep(500).then(r => {
-        Storage.write('shareExtensionOpened',"opened");
+        Storage.write('shareExtensionOpened', 'opened');
       });
     });
   }, []);
@@ -263,7 +266,6 @@ const NotesnookShare = ({quicknote = false}) => {
       pageTheme.colors = ${theme};
       setTheme();
     `);
-
     }, 300);
     let theme = {...colors};
     theme.factor = 1;
@@ -288,6 +290,7 @@ const NotesnookShare = ({quicknote = false}) => {
     await db.init();
     await db.notes.init();
 
+
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert('The note you are trying to append to has been deleted.');
@@ -302,11 +305,13 @@ const NotesnookShare = ({quicknote = false}) => {
           data: raw.data + '\n' + content,
           type: 'tiny'
         },
-        id: appendNote.id
+        id: appendNote.id,
+        sessionId:Date.now()
       };
     } else {
       _note = {...note};
       _note.content.data = content;
+      _note.sessionId = Date.now();
     }
     await db.notes.add(_note);
     await Storage.write('notesAddedFromIntent', 'added');
@@ -446,7 +451,7 @@ const NotesnookShare = ({quicknote = false}) => {
           <Button
             type="action"
             icon="check"
-            iconColor={colors.accent}
+            iconColor={accent.color}
             onPress={onPress}
             style={{
               width: 50,
@@ -532,7 +537,7 @@ const NotesnookShare = ({quicknote = false}) => {
               flexDirection: 'row'
             }}>
             <Button
-              color={appendNote ? colors.nav : colors.accent}
+              color={appendNote ? colors.nav : accent.color}
               onPress={() => {
                 useShareStore.getState().setAppendNote(null);
               }}
@@ -549,7 +554,7 @@ const NotesnookShare = ({quicknote = false}) => {
             />
 
             <Button
-              color={!appendNote ? colors.nav : colors.accent}
+              color={!appendNote ? colors.nav : accent.color}
               onPress={() => {
                 setShowSearch(true);
                 animate(1, 1000);
@@ -575,7 +580,7 @@ const NotesnookShare = ({quicknote = false}) => {
             }}>
             {!quicknote ? (
               <Button
-                color={colors.accent}
+                color={accent.color}
                 onPress={onPress}
                 loading={loading || loadingIntent}
                 icon="check"
@@ -616,7 +621,7 @@ const NotesnookShare = ({quicknote = false}) => {
                     width: '100%',
                     height: '100%',
                     borderRadius: 10,
-                    backgroundColor:'transparent'
+                    backgroundColor: 'transparent'
                   }}
                   cacheMode="LOAD_DEFAULT"
                   domStorageEnabled={true}
@@ -658,7 +663,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   This shared note will be appended to{' '}
                   <Text
                     style={{
-                      color: colors.accent,
+                      color: accent.color,
                       fontFamily: 'OpenSans-SemiBold'
                     }}>
                     "{appendNote.title}"
@@ -681,8 +686,8 @@ const NotesnookShare = ({quicknote = false}) => {
                     onPress={() => changeMode(2)}
                     title={modes[2].title}
                     iconSize={18}
-                    iconColor={mode == 2 ? colors.accent : colors.icon}
-                    textColor={mode == 2 ? colors.accent : colors.icon}
+                    iconColor={mode == 2 ? accent.color : colors.icon}
+                    textColor={mode == 2 ? accent.color : colors.icon}
                     type="rounded"
                     style={{paddingHorizontal: 12}}
                   />
@@ -693,8 +698,8 @@ const NotesnookShare = ({quicknote = false}) => {
                   onPress={() => changeMode(1)}
                   title={modes[1].title}
                   iconSize={18}
-                  iconColor={mode == 1 ? colors.accent : colors.icon}
-                  textColor={mode == 1 ? colors.accent : colors.icon}
+                  iconColor={mode == 1 ? accent.color : colors.icon}
+                  textColor={mode == 1 ? accent.color : colors.icon}
                   type="rounded"
                   style={{paddingHorizontal: 12}}
                 />

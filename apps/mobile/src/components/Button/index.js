@@ -33,6 +33,7 @@ export const Button = ({
   hitSlop,
   buttonType = {},
   bold,
+  iconColor
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -53,7 +54,7 @@ export const Button = ({
       onPress={onPress}
       onLongPress={event => {
         if (onLongPress) {
-          onLongPress();
+          onLongPress(event);
           return;
         }
         if (tooltipText) {
@@ -87,7 +88,8 @@ export const Button = ({
           style={{
             marginRight: 0
           }}
-          color={buttonType.text || textColor}
+
+          color={iconColor || buttonType.text || textColor}
           size={iconSize}
         />
       ) : null}
@@ -114,7 +116,7 @@ export const Button = ({
           style={{
             marginLeft: 0
           }}
-          color={textColor}
+          color={iconColor || buttonType.text || textColor}
           size={iconSize}
         />
       ) : null}

@@ -163,7 +163,7 @@ function init_callback(_editor) {
   // });
 
   editor.on('NewBlock', function (e) {
-    console.log('New Block');
+    console.log('New Block', e);
     const {newBlock} = e;
     let target;
     if (newBlock) {
@@ -195,7 +195,9 @@ function init_callback(_editor) {
         collapseElement(target);
         editor.getHTML().then(function (html) {
           reactNativeEventHandler('tiny', html);
-        });
+        }).catch(function(e) {
+          reactNativeEventHandler('tinyerror', e.message);
+        })
       });
     }
   });
@@ -208,8 +210,10 @@ function init_callback(_editor) {
       e.preventDefault();
     }
   });
+
   editor.on('ScrollIntoView', function (e) {
     e.preventDefault();
+    console.log(e);
     e.elm.scrollIntoView({
       behavior: 'smooth',
       block: 'nearest'
@@ -218,6 +222,7 @@ function init_callback(_editor) {
 
   editor.on('input ExecCommand ObjectResized Redo Undo', onChange);
   editor.on('keyup', e => {
+    console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
     if (!editor.getHTML) return;
     onChange();
@@ -225,15 +230,17 @@ function init_callback(_editor) {
 }
 
 const plugins = [
-  'checklist advlist autolink textpattern hr lists link noneditable image',
+  'checklist advlist autolink textpattern hr lists link noneditable image bettertable',
   'searchreplace codeblock inlinecode keyboardquirks attachmentshandler',
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
 const content_style = `
-body: {
+body {
   font-family:"Open Sans";
+  overflow-x: hidden !important;
 }
+
 .mce-content-body h2::before,
 h3::before,
 h4::before,
@@ -299,17 +306,7 @@ iframe {
   max-width:100% !important;
   background-color:transparent !important;
 }
-table {
-  display: block !important;
-  overflow-x: auto !important;
-  white-space: nowrap  !important;
-  max-width:100% !important;
-  width:100% !important;
-  height:auto !important;
-}
-td {
-  min-width:10vw !important;
-}
+
 h1,
 h2,
 h3,
@@ -320,6 +317,49 @@ strong {
   font-weight:600 !important;
 }
 `;
+
+function tableCellNodeOptions() {
+  let node = findNodeParent('td');
+  if (!node) {
+    node = findNodeParent('th');
+  }
+  if (!node) return;
+  let properties = {
+    width: node.style.width,
+    height: node.style.height,
+    backgroundColor: node.style.backgroundColor,
+    cellType: tinymce.activeEditor.queryCommandValue('mceTableCellType'),
+    colType: tinymce.activeEditor.queryCommandValue('mceTableColType')
+  };
+  reactNativeEventHandler('tablecelloptions', properties);
+}
+
+function findNodeParent(nodeName) {
+  let node = editor.selection.getNode();
+  console.log('finding node', node);
+  let levels = 5;
+  for (let i = 0; i < levels; i++) {
+    if (!node) return;
+    if (node.nodeName.toLowerCase() === nodeName) {
+      return node;
+    } else {
+      node = node.parentNode;
+    }
+  }
+  return null;
+}
+
+function tableRowNodeOptions() {
+  let node = findNodeParent('tr');
+
+  if (node) {
+    let properties = {
+      backgroundColor: node.style.backgroundColor,
+      rowType: tinymce.activeEditor.queryCommandValue('mceTableRowType')
+    };
+    reactNativeEventHandler('tablerowoptions', properties);
+  }
+}
 
 function init_tiny(size) {
   loadFontSize();
@@ -349,12 +389,14 @@ function init_tiny(size) {
     content_style: content_style,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
-    table_toolbar:
-      'tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol',
+    table_toolbar: 'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
     imagetools_toolbar:
       'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
     object_resizing: true,
+    table_responsive_width: false,
+    table_sizing_mode: 'fixed',
+    table_column_resizing: 'resizetable',
     resize: true,
     mobile: {
       resize: false,
@@ -431,16 +473,40 @@ function setup_tiny(_editor) {
     tooltip: 'Image properties',
     onAction: function () {
       reactNativeEventHandler('imageoptions');
-    },
-    onclick: function () {
-      reactNativeEventHandler('imageoptions');
+    }
+  });
+
+  editor.ui.registry.addButton('tableconfig', {
+    icon: 'more-drawer',
+    tooltip: 'Table properties',
+    onAction: function (e) {
+      console.log(e, 'event');
+      reactNativeEventHandler('tableconfig');
+    }
+  });
+
+  editor.ui.registry.addButton('trowprops', {
+    icon: 'table-row-properties',
+    tooltip: 'Row properties',
+    onAction: function (e) {
+      tableRowNodeOptions()
+      editor.blur();
+    }
+  });
+
+  editor.ui.registry.addButton('tcellprops', {
+    icon: 'table-cell-properties',
+    tooltip: 'Cell properties',
+    onAction: function (e) {
+      tableCellNodeOptions()
+      editor.blur();
     }
   });
 
   editor.ui.registry.addButton('imagedownload', {
     icon: 'save',
     tooltip: 'Download image',
-    onAction: function () {
+    onAction: function (e) {
       let node = tinymce.activeEditor.selection.getNode();
       if (node.tagName === 'IMG' && node.dataset && node.dataset.hash) {
         window.ReactNativeWebView.postMessage(
@@ -451,8 +517,7 @@ function setup_tiny(_editor) {
           })
         );
       }
-    },
-    onclick: function () {}
+    }
   });
 
   editor.ui.registry.addButton('imagepreview', {
@@ -480,25 +545,42 @@ function setup_tiny(_editor) {
         );
         xhr.send();
       }
-    },
-    onclick: function () {}
+    }
   });
 }
 
 let prevCount = 0;
 
 function delay(base = 0) {
-  if (prevCount < 20000) return base + 200;
-  if (prevCount > 20000 && prevCount < 40000) return base + 400;
-  if (prevCount > 40000 && prevCount < 70000) return base + 600;
+  if (prevCount < 20000) return base + 100;
+  if (prevCount > 20000 && prevCount < 40000) return base + 250;
+  if (prevCount > 40000 && prevCount < 70000) return base + 500;
   if (prevCount > 70000) return base + 1000;
+}
+
+let inputKeyTimer = 0;
+function scrollSelectionIntoView(event) {
+  if (navigator.vendor.match(/apple/i)) return;
+  if (
+    event.type === 'input' &&
+    event.inputType !== 'deleteContentBackward' &&
+    event.data &&
+    event.data.endsWith('\n')
+  ) {
+    console.log(event);
+    clearTimeout(inputKeyTimer);
+    inputKeyTimer = setTimeout(function () {
+      let node = editor.selection.getNode();
+      if (node) {
+        console.log(node, 'scrolling into view');
+        node.scrollIntoView({behavior: 'smooth', block: 'nearest'});
+      }
+    }, 1);
+  }
 }
 
 let noteedited = false;
 const onChange = function (event) {
-  // console.log(event.type, event.selectionChange);
-  // if (event.type === 'nodechange' && !event.selectionChange) return;
-
   if (event.type && event.type.toLowerCase() === 'execcommand') {
     if (
       event.command.toLowerCase() === 'mcefocus' ||
@@ -507,6 +589,8 @@ const onChange = function (event) {
       return;
     }
   }
+
+  scrollSelectionIntoView(event);
 
   if (isLoading) {
     isLoading = false;
@@ -530,7 +614,10 @@ const onChange = function (event) {
   changeTimer = setTimeout(function () {
     editor.getHTML().then(function (html) {
       reactNativeEventHandler('tiny', html);
-    });
+    }).catch(function(e) {
+      reactNativeEventHandler('tinyerror', e.message);
+    })
+
     onUndoChange();
     selectchange();
   }, delay());
@@ -585,12 +672,13 @@ function selectchange() {
     let node = editor.selection.getNode();
     currentFormats.hilitecolor = getNodeBg(node);
     currentFormats.forecolor = getNodeColor(node);
-
     if (!currentFormats.hilitecolor || !currentFormats.forecolor) {
-      for (var i = 0; i < node.children.length; i++) {
-        let item = editor.selection.getNode().children.item(i);
-        currentFormats.hilitecolor = getNodeBg(item);
-        currentFormats.forecolor = getNodeColor(item);
+      if (!/^(LI|UL|OL|DL|P|DIV)$/.test(node.nodeName)) {
+        for (var i = 0; i < node.children.length; i++) {
+          let item = editor.selection.getNode().children.item(i);
+          currentFormats.hilitecolor = getNodeBg(item);
+          currentFormats.forecolor = getNodeColor(item);
+        }
       }
     }
     let range = editor.selection.getRng();
@@ -650,5 +738,5 @@ function selectchange() {
     }
     currentFormats.node = editor.selection.getNode().nodeName;
     reactNativeEventHandler('selectionchange', currentFormats);
-  }, 300);
+  }, 50);
 }

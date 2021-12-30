@@ -11,12 +11,10 @@ import {SIZE} from '../../../../utils/SizeUtils';
 import {INPUT_MODE, properties, reFocusEditor} from './constants';
 
 let prevLink = {};
-let prevHeight = 50;
 const LinkPreview = ({setMode, value, onSubmit}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [link, setLink] = useState(prevLink.value === value ? prevLink : {});
-  const [height, setHeight] = useState(prevHeight);
 
   useEffect(() => {
     console.log('previewing', value);
@@ -43,13 +41,14 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
     return imageLink ? (
       <Image
         style={{
-          width: height,
-          height: height,
+          width: 35,
+          height: 35,
           borderRadius: 5,
           marginVertical: 5,
           borderWidth: 1,
           borderColor: colors.nav,
-          backgroundColor: colors.nav
+          backgroundColor: colors.nav,
+          marginRight: 5
         }}
         resizeMode="contain"
         source={{uri: imageLink}}
@@ -65,8 +64,8 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         }}>
         <Image
           style={{
-            width: height,
-            height: height
+            width: 35,
+            height: 35
           }}
           resizeMode="center"
           source={{uri: faviconLink}}
@@ -75,15 +74,15 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
     ) : (
       <View
         style={{
-          width: height,
-          height: height,
+          width: 35,
+          height: 35,
           marginVertical: 5,
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: colors.shade,
           borderRadius: 5
         }}>
-        <Icon size={height - 4} color={colors.accent} name="web" />
+        <Icon size={35} color={colors.accent} name="web" />
       </View>
     );
   };
@@ -100,10 +99,6 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   const renderText = (name, title, description) => {
     return (
       <View
-        onLayout={e => {
-          prevHeight = e.nativeEvent.layout.height;
-          e.nativeEvent && setHeight(prevHeight);
-        }}
         style={{
           flex: 1
         }}>
@@ -134,7 +129,12 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   };
 
   return (
-    <>
+    <View
+      style={{
+        flexDirection: 'row',
+        width: '100%',
+        alignItems: 'center'
+      }}>
       {renderImage(link.image, link.favicon)}
       {renderText(link.name, link.title, link.description)}
 
@@ -167,11 +167,11 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
             height: 40
           }}
           name="pencil"
-          size={SIZE.xl}
+          size={SIZE.xl - 4}
           color={colors.pri}
         />
       </View>
-    </>
+    </View>
   );
 };
 
