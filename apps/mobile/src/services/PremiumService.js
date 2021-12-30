@@ -72,6 +72,7 @@ async function getProducts() {
 }
 
 function get() {
+  return true;
   return SUBSCRIPTION_STATUS.BASIC !== premiumStatus;
 }
 

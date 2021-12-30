@@ -448,7 +448,7 @@ const TopicItem = ({item, index, colors, onPress, onDelete}) => {
           }
         ]}
         defaultValue={item}
-        placeholderTextColor={colors.icon}
+        placeholderTextColor={colors.placeholder}
       />
 
       <View

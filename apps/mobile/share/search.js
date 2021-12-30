@@ -134,7 +134,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
         <TextInput
           ref={inputRef}
           placeholder="Search for a note"
-          placeholderTextColor={colors.icon}
+          placeholderTextColor={colors.placeholder}
           style={{
             fontSize: 15,
             fontFamily: 'OpenSans-Regular',

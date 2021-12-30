@@ -116,7 +116,7 @@ Logged in: ${user ? 'yes' : 'no'}`,
           fontSize: SIZE.md,
           color:colors.heading,
         }}
-        placeholderTextColor={colors.icon}
+        placeholderTextColor={colors.placeholder}
       />
 
       <TextInput
@@ -140,7 +140,7 @@ For example:
           marginBottom: 2.5,
           color:colors.pri
         }}
-        placeholderTextColor={colors.icon}
+        placeholderTextColor={colors.placeholder}
       />
       <Paragraph
         size={SIZE.xs}

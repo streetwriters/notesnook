@@ -54,6 +54,8 @@ const SheetWrapper = ({
     }
   };
 
+  console.log('Sheet keyboard handler',sheetKeyboardHandler)
+
   return (
     <ActionSheet
       ref={fwdRef}

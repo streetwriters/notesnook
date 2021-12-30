@@ -178,7 +178,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             onChangeText={onChangeText}
             defaultValue={value}
             blurOnSubmit={false}
-            placeholderTextColor={colors.icon}
+            placeholderTextColor={colors.placeholder}
           /> */}
 
           {/* {mode === INPUT_MODE.EDITING && (

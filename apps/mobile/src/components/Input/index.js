@@ -194,7 +194,7 @@ const Input = ({
             style={textStyle}
             secureTextEntry={secureTextEntry && secureEntry}
             placeholder={placeholder}
-            placeholderTextColor={colors.icon}
+            placeholderTextColor={colors.placeholder}
             autoCompleteType={autoCompleteType}
           />
 
