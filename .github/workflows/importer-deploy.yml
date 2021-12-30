@@ -29,10 +29,11 @@ jobs:
       - run: |
           npm i
           npx turbo run build
+          mv ./apps/importer/build/ ./apps/importer/public_html/
 
       - uses: blbecker/rsync-deploy@v1.0
         with:
-          source_dir: ./apps/importer/build/*
+          source_dir: ./apps/importer/public_html/
           destination_path: ${{ secrets.REMOTE_IMPORTER_PATH }}
           destination_host: ${{ secrets.REMOTE_HOST }}
           deployment_user: ${{ secrets.REMOTE_USER }}
