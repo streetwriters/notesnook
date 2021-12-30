@@ -676,6 +676,7 @@ export async function clearEditor(
   immediate = false
 ) {
   try {
+    console.log("closing session: ",closingSession);
     closingSession = true;
     tiny.call(EditorWebView, tiny.isLoading);
     if (clear) {
@@ -694,6 +695,7 @@ export async function clearEditor(
     let func = async () => {
       try {
         console.log('reset editor');
+        await sleep(300);
         reset && EditorWebView.current?.reload();
         // if (DDS.isTab) {
         //   await waitForEvent('webviewOk');

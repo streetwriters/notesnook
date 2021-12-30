@@ -38,6 +38,7 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
 import { EditorTitle } from './EditorTitle';
 import {
   clearEditor,
