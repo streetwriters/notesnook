@@ -1,6 +1,6 @@
 {
   "name": "@notesnook/importer-web",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "devDependencies": {
     "@testing-library/jest-dom": "^5.11.4",
@@ -15,6 +15,7 @@
     "@types/react-dropzone": "^5.1.0",
     "@types/react-modal": "^3.13.1",
     "@types/theme-ui": "^0.6.0",
+    "env-cmd": "^10.1.0",
     "react-scripts": "4.0.3",
     "typescript": "^4.1.2"
   },
@@ -33,8 +34,8 @@
     "theme-ui": "^0.12.1"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
+    "start": "env-cmd -e all react-scripts start",
+    "build": "env-cmd -e all,release react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

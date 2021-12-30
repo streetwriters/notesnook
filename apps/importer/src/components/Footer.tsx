@@ -1,4 +1,5 @@
 import { Flex, Text } from "@theme-ui/components";
+import { appVersion } from "../utils/version";
 
 export function Footer() {
   return (
@@ -13,7 +14,7 @@ export function Footer() {
         justifyContent: "center",
       }}
     >
-      <Text variant="body">Notesnook Importer</Text>
+      <Text variant="body">Notesnook Importer (v{appVersion})</Text>
       <Text variant="subBody">© 2021 Streetwriters LLC</Text>
     </Flex>
   );
