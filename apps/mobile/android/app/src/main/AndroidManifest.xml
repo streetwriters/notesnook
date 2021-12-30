@@ -44,9 +44,9 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
             <intent-filter android:label="Notesnook">
                 <action android:name="android.intent.action.VIEW" />
-
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
@@ -54,6 +54,15 @@
                     android:host="app.notesnook.com"
                     android:scheme="https" />
             </intent-filter>
+
+            <intent-filter android:label="Notesnook">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="com.streetwriters.notesnook" />
+            </intent-filter>
+
         </activity>
         <activity android:name="com.facebook.react.devsupport.DevSettingsActivity" />
         <activity
