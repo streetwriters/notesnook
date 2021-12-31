@@ -23,7 +23,8 @@ const BaseDialog = ({
   centered = true,
   bottom = false,
   background = null,
-  animated = true
+  animated = true,
+  bounce
 }) => {
   const floating = useIsFloatingKeyboard();
 
@@ -66,6 +67,7 @@ const BaseDialog = ({
           <BouncingView
             duration={400}
             animated={animated}
+            initialScale={bounce ? 0.9 : 1}
             style={[
               styles.backdrop,
               {

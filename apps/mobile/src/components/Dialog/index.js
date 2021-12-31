@@ -88,13 +88,14 @@ export const Dialog = ({context = 'global'}) => {
     visible && (
       <BaseDialog
         statusBarTranslucent={false}
+        bounce={!dialogInfo.input}
         onShow={async () => {
           if (dialogInfo.input) {
             
             inputRef.current?.setNativeProps({
               text:dialogInfo.defaultValue
             });
-            await sleep(100);
+            await sleep(300);
             inputRef.current?.focus();
           }
         }}

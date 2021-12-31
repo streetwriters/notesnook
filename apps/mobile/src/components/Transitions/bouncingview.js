@@ -6,7 +6,7 @@ export const BouncingView = ({
   style,
   duration = 600,
   animated = true,
-  initialScale = 0.8
+  initialScale = 0.9
 }) => {
   const scale = Animated.useValue(!animated ? 1 : initialScale);
 
