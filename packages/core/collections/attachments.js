@@ -1,13 +1,7 @@
 import Collection from "./collection";
 import id from "../utils/id";
 import { deleteItem, hasItem } from "../utils/array";
-import hosts from "../utils/constants";
-import {
-  checkIsUserPremium,
-  EV,
-  EVENTS,
-  sendAttachmentsProgressEvent,
-} from "../common";
+import { EV, EVENTS, sendAttachmentsProgressEvent } from "../common";
 import dataurl from "../utils/dataurl";
 import dayjs from "dayjs";
 import setManipulator from "../utils/set";
@@ -91,8 +85,12 @@ export default class Attachments extends Collection {
       !chunkSize ||
       !key
     ) {
-      console.error("Attachment invalid:", attachment);
-      throw new Error("Could not add attachment: all properties are required.");
+      console.error(
+        "Attachment is invalid because all properties are required:",
+        attachment
+      );
+      // throw new Error("Could not add attachment: all properties are required.");
+      return;
     }
 
     const encryptedKey = await this._encryptKey(key);
