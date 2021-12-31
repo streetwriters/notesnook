@@ -78,11 +78,8 @@ function removeToxClassFromChecklist(html) {
 
 const regex = /&lt;div class="table-container".*&lt;\/table&gt;&lt;\/div&gt;/gm;
 function decodeWrappedTableHtml(html) {
-  return html.replaceAll(
-    /&lt;div class="table-container".*\/div&gt;$/gm,
-    (match) => {
-      const html = decodeHTML5(match);
-      return html;
-    }
-  );
+  return html.replaceAll(regex, (match) => {
+    const html = decodeHTML5(match);
+    return html;
+  });
 }
