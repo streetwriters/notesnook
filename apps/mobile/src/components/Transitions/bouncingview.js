@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Animated, {Easing, timing} from 'react-native-reanimated';
 
 export const BouncingView = ({
@@ -6,7 +6,7 @@ export const BouncingView = ({
   style,
   duration = 600,
   animated = true,
-  initialScale = 0.9
+  initialScale = 0.8
 }) => {
   const scale = Animated.useValue(!animated ? 1 : initialScale);
 
