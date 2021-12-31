@@ -27,7 +27,7 @@ const Tooltip = () => {
     return () => {
       eUnSubscribeEvent('showTooltip', show);
     };
-  }, []);
+  }, [group]);
 
   const show = async data => {
     properties.userBlur = true;
