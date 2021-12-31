@@ -83,7 +83,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
       style={{
         width: '100%',
         height: 50 + insets.top,
-        paddingTop: insets.top,
+        paddingTop: Platform.OS === 'android' ? insets.top : null,
         backgroundColor: colors.bg,
         justifyContent: 'space-between',
         alignItems: 'center',
