@@ -303,9 +303,9 @@ export const loadNote = async item => {
         textInput.current?.focus();
         EditorWebView.current?.requestFocus();
         tiny.call(EditorWebView, tiny.focusEditor);
-      }, 150);
+      }, 200);
     } else {
-      await sleep(150);
+      await sleep(200);
       tiny.call(EditorWebView, tiny.focusEditor);
     }
     if (EDITOR_SETTINGS) {

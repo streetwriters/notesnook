@@ -45,7 +45,7 @@ export const deleteItems = async item => {
 
     await db.notes.delete(...ids);
 
-    layoutmanager.withAnimation(150);
+    //layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
       Navigation.routeNames.NotesPage
@@ -58,7 +58,7 @@ export const deleteItems = async item => {
       await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
     }
 
-    layoutmanager.withAnimation(150);
+    // layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notebook
@@ -74,7 +74,7 @@ export const deleteItems = async item => {
     let ids = notebooks.map(i => i.id);
     await db.notebooks.delete(...ids);
 
-    layoutmanager.withAnimation(150);
+    //layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notes
@@ -100,7 +100,7 @@ export const deleteItems = async item => {
         }
         await db.trash.restore(...ids);
 
-        layoutmanager.withAnimation(150);
+        //layoutmanager.withAnimation(150);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.Notes,
