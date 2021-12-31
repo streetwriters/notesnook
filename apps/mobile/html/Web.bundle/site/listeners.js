@@ -167,14 +167,7 @@ function attachMessageListener() {
           globalThis.isClearingNoteData = false;
           reactNativeEventHandler('noteLoaded', true);
         }
-        setTimeout(function () {
-          document.activeElement.blur();
-          window.blur();
-          tinymce.activeEditor.mode.set('design');
-          document.activeElement.blur();
-          window.blur();
-        }, 300);
-
+        tinymce.activeEditor.mode.set('design');
         info = document.querySelector(infoBar);
         info.querySelector('#infowords').innerText =
           editor.countWords() + ' words';
