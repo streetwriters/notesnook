@@ -220,13 +220,14 @@ function Settings(props) {
                 tip="In case you lose your password, you can recover your data using your recovery key."
               />
             </Button>
-            {/* <Button
+            <Button
               variant="list"
+              data-test-id="settings-change-password"
               onClick={async () => {
                 const result = await showPasswordDialog(
                   "change_account_password",
                   (data) => {
-                    return db.user.resetPassword(
+                    return db.user.changePassword(
                       data.oldPassword,
                       data.newPassword
                     );
@@ -241,7 +242,7 @@ function Settings(props) {
                 text="Change account password"
                 tip="Set a new password for your account"
               />
-            </Button> */}
+            </Button>
             <Button variant="list" onClick={() => sync(true, true)}>
               <Tip
                 text="Having problems with syncing?"

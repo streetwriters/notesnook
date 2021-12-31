@@ -74,6 +74,7 @@ function PasswordDialog(props) {
         {isChangePasswordDialog ? (
           <Field
             required
+            data-test-id="dialog-new-password"
             label="New password"
             type="password"
             autoComplete="new-password"
