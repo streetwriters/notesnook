@@ -4,6 +4,7 @@ import ActionSheet from 'react-native-actions-sheet';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {useTracked} from '../../provider';
 import {useSettingStore} from '../../provider/stores';
+import layoutmanager from '../../utils/layout-manager';
 import {PremiumToast} from '../Premium/premium-toast';
 import {Toast} from '../Toast';
 import {BouncingView} from '../Transitions/bouncing-view';
@@ -25,6 +26,8 @@ const SheetWrapper = ({
   const largeTablet = deviceMode === 'tablet';
   const smallTablet = deviceMode === 'smallTablet';
   const dimensions = useSettingStore(state => state.dimensions);
+  const pitchBlack = useSettingStore(state => state.settings.pitchBlack);
+
   const insets = useSafeAreaInsets();
 
   let width = dimensions.width > 600 ? 600 : 500;
@@ -71,7 +74,7 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
-      overlayColor={'#585858'}
+      overlayColor={pitchBlack? '#585858' : colors.nav}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
