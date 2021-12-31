@@ -25,6 +25,7 @@ export const DateMeta = ({item}) => {
   const renderItem = key =>
     key.startsWith('date') && key !== 'dateModified' ? (
       <View
+        key={key}
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
