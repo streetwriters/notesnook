@@ -2,6 +2,7 @@ import { migrations } from "../../migrations";
 import { areAllEmpty } from "./utils";
 import SparkMD5 from "spark-md5";
 import setManipulator from "../../utils/set";
+import { CURRENT_DATABASE_VERSION } from "../../common";
 
 class Merger {
   /**
@@ -18,6 +19,14 @@ class Merger {
 
     let type = deserialized.type;
     if (!type && deserialized.data) type = "tiny";
+
+    if (!migrations[version]) {
+      throw new Error(
+        version > CURRENT_DATABASE_VERSION
+          ? `Cannot migrate item to v${version}. Please update your client to the latest version.`
+          : `Could not migrate item to v${version}. Please report this bug to the developers.`
+      );
+    }
 
     const migrate = migrations[version][type];
     if (migrate) return migrate(deserialized);
