@@ -9,8 +9,8 @@ export const endSearch = () => {
     EditorWebView,
     `tinymce.activeEditor.plugins.searchreplace.done()`
   );
-  useEditorStore.getState().setSearchReplace(false);
   textInput.current?.focus();
+  useEditorStore.getState().setSearchReplace(false);
   Platform.OS === 'android' && EditorWebView.current?.requestFocus();
   tiny.call(EditorWebView, tiny.focusEditor);
 }
