@@ -79,6 +79,17 @@ class UserManager {
     await http.get(`${constants.AUTH_HOST}/account/sessions`, token);
   }
 
+  async clearSessions(all = false) {
+    const token = await this.tokenManager.getToken();
+    if (!token) return;
+    const { access_token, refresh_token } = token;
+    await http.post(
+      `${constants.AUTH_HOST}/account/sessions/clear?all=${all}`,
+      { refresh_token },
+      access_token
+    );
+  }
+
   async logout(revoke = true, reason) {
     try {
       if (revoke) await this.tokenManager.revokeToken();
