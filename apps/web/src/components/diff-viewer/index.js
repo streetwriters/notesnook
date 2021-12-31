@@ -52,21 +52,22 @@ function DiffViewer(props) {
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
-    async ({ toKeep, toCopy, toKeepDateEdited, dateResolved }) => {
+    async ({ toKeep, toCopy, toKeepDateModified, dateResolved }) => {
       if (!conflictedNote) return;
-
-      const toKeepContent = {
-        data: toKeep,
-        type: "tiny",
-        dateEdited: toKeepDateEdited,
-        dateResolved,
-        persistDateEdited: true,
-      };
 
       await db.notes.add({
         id: conflictedNote.id,
-        content: toKeepContent,
         conflicted: false,
+      });
+
+      await db.content.add({
+        id: conflictedNote.contentId,
+        data: toKeep,
+        type: "tiny",
+        dateModified: toKeepDateModified,
+        dateResolved,
+        conflicted: false,
+        sessionId: Date.now(),
       });
 
       if (toCopy) {
@@ -115,7 +116,7 @@ function DiffViewer(props) {
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
-          dateEdited: content.dateEdited,
+          toKeepDateModified: content.dateModified,
         });
 
       content.conflicted = await db.content.insertPlaceholders(
@@ -279,8 +280,8 @@ function DiffViewer(props) {
                 resolveConflict({
                   toKeep: remoteContent.data,
                   toCopy: saveCopy ? localContent.data : null,
-                  toKeepDateEdited: localContent.dateEdited,
-                  dateResolved: remoteContent.dateEdited,
+                  toKeepDateModified: localContent.dateModified,
+                  dateResolved: remoteContent.dateModified,
                 });
               }}
               sx={{
@@ -321,8 +322,8 @@ function DiffViewer(props) {
                 resolveConflict({
                   toKeep: localContent.data,
                   toCopy: saveCopy ? remoteContent.data : null,
-                  toKeepDateEdited: remoteContent.dateEdited,
-                  dateResolved: remoteContent.dateEdited,
+                  toKeepDateModified: remoteContent.dateModified,
+                  dateResolved: remoteContent.dateModified,
                 });
               }}
               label="Incoming note"
