@@ -3,26 +3,17 @@ import {ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {useTagStore} from '../../provider/stores';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
-import {
-  eCloseTagsDialog,
-  eOpenTagsDialog,
-  refreshNotesPage
-} from '../../utils/Events';
+import {eCloseTagsDialog, eOpenTagsDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../Sheet';
+import {sleep} from '../../utils/TimeUtils';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
-import Paragraph from '../Typography/Paragraph';
+import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
-import {sleep} from '../../utils/TimeUtils';
-import layoutmanager from '../../utils/layout-manager';
+import Paragraph from '../Typography/Paragraph';
 const TagsDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -45,7 +36,9 @@ const TagsDialog = () => {
 
   useEffect(() => {
     if (visible) {
-      sortTags();
+      setTimeout(() => {
+        sortTags();
+      }, 1);
     }
   }, [allTags, note, query]);
 
@@ -58,7 +51,6 @@ const TagsDialog = () => {
     }
 
     if (!note || !note.tags) {
-      layoutmanager.withAnimation(150);
       setTags(_tags);
       return;
     }
@@ -72,7 +64,6 @@ const TagsDialog = () => {
     }
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
     let combinedTags = [...noteTags, ..._tags];
-    //layoutmanager.withAnimation(combinedTags.length === 0 ? 50 : 150);
     setTags(combinedTags);
   };
 
@@ -105,7 +96,6 @@ const TagsDialog = () => {
     }
 
     let tag = _query;
-    layoutmanager.withSpringAnimation(300);
     setNote({...note, tags: note.tags ? [...note.tags, tag] : [tag]});
     setQuery(null);
     inputRef.current?.setNativeProps({
@@ -114,7 +104,7 @@ const TagsDialog = () => {
     try {
       await db.notes.note(note.id).tag(tag);
       useTagStore.getState().setTags();
-      //setNote(db.notes.note(note.id).data);
+      setNote(db.notes.note(note.id).data);
     } catch (e) {
       ToastEvent.show({
         heading: 'Cannot add tag',
@@ -159,7 +149,6 @@ const TagsDialog = () => {
           fwdRef={inputRef}
           autoCapitalize="none"
           onChangeText={v => {
-            layoutmanager.withSpringAnimation(400);
             setQuery(db.tags.sanitize(v));
           }}
           onSubmit={onSubmit}
@@ -193,7 +182,7 @@ const TagsDialog = () => {
               <Icon name="plus" color={colors.light} size={SIZE.lg} />
             </PressableButton>
           ) : null}
-          {!query && (!tags || tags.length === 0) ? (
+          {!allTags || allTags.length === 0 ? (
             <View
               style={{
                 width: '100%',
@@ -240,23 +229,16 @@ const TagItem = ({tag, note, setNote}) => {
       } else {
         await db.notes.note(note.id).tag(tag.title);
       }
-
-      setNote({
-        ...note,
-        tags: note.tags.slice(tag.title)
-      });
-     
+      useTagStore.getState().setTags();
+      setNote(db.notes.note(note.id).data);
     } catch (e) {}
     setTimeout(() => {
-      layoutmanager.withAnimation(150);
-      useTagStore.getState().setTags();
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Notes
       ]);
     }, 1);
-   
   };
 
   return (
