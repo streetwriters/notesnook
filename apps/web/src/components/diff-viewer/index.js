@@ -52,11 +52,12 @@ function DiffViewer(props) {
   const [htmlDiff, setHtmlDiff] = useState({});
 
   const resolveConflict = useCallback(
-    async ({ toKeep, toCopy, toKeepDateModified, dateResolved }) => {
+    async ({ toKeep, toCopy, toKeepDateEdited, dateResolved }) => {
       if (!conflictedNote) return;
 
       await db.notes.add({
         id: conflictedNote.id,
+        dateEdited: toKeepDateEdited,
         conflicted: false,
       });
 
@@ -64,7 +65,6 @@ function DiffViewer(props) {
         id: conflictedNote.contentId,
         data: toKeep,
         type: "tiny",
-        dateModified: toKeepDateModified,
         dateResolved,
         conflicted: false,
         sessionId: Date.now(),
@@ -116,7 +116,7 @@ function DiffViewer(props) {
       if (!content.conflicted)
         return resolveConflict({
           toKeep: content.data,
-          toKeepDateModified: content.dateModified,
+          toKeepDateEdited: content.dateEdited,
         });
 
       content.conflicted = await db.content.insertPlaceholders(
@@ -280,7 +280,7 @@ function DiffViewer(props) {
                 resolveConflict({
                   toKeep: remoteContent.data,
                   toCopy: saveCopy ? localContent.data : null,
-                  toKeepDateModified: localContent.dateModified,
+                  toKeepDateEdited: localContent.dateEdited,
                   dateResolved: remoteContent.dateModified,
                 });
               }}
@@ -322,7 +322,7 @@ function DiffViewer(props) {
                 resolveConflict({
                   toKeep: localContent.data,
                   toCopy: saveCopy ? remoteContent.data : null,
-                  toKeepDateModified: remoteContent.dateModified,
+                  toKeepDateEdited: remoteContent.dateEdited,
                   dateResolved: remoteContent.dateModified,
                 });
               }}
