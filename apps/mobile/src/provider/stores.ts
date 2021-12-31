@@ -1,4 +1,4 @@
-import {LayoutAnimation, Platform} from 'react-native';
+import {LayoutAnimation, Platform, UIManager} from 'react-native';
 import {Dimensions} from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
@@ -340,6 +340,8 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     if (!mode) {
       history.selectedItemsList = [];
       history.selectionMode = false;
+    } else {
+      history.selectionMode = true;
     }
     console.log('call set selection mode');
     if (mode !== get().selectionMode) {
@@ -365,22 +367,15 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
     console.log('called selected items');
-    if (get().selectionMode !== history.selectionMode) {
-      layoutmanager.withSpringAnimation(500);
-    }
-
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
     });
   },
-  clearSelection: () => {
+  clearSelection: (noanimation) => {
     history.selectedItemsList = [];
     history.selectionMode = false;
     console.log('called clear selection');
-    if (get().selectionMode !== history.selectionMode) {
-      layoutmanager.withSpringAnimation(500);
-    }
     set({selectionMode: false, selectedItemsList: []});
   }
 }));

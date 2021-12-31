@@ -118,7 +118,7 @@ export const deleteItems = async item => {
   }
   history.selectedItemsList = [];
   Navigation.setRoutesToUpdate([Navigation.routeNames.Trash]);
-  useSelectionStore.getState().clearSelection();
+  useSelectionStore.getState().clearSelection(true);
   useMenuStore.getState().setMenuPins();
   useMenuStore.getState().setColorNotes();
 };

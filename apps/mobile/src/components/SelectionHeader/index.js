@@ -37,7 +37,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites
       ]);
-      setSelectionMode(false);
       clearSelection();
     }
   };
@@ -57,7 +56,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         Navigation.routeNames.Favorites,
         Navigation.routeNames.Trash
       ]);
-      setSelectionMode(false);
       clearSelection();
       ToastEvent.show({
         heading: 'Restore successful',
@@ -68,7 +66,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
 
   const onBackPress = () => {
     layoutmanager.withSpringAnimation(500);
-    setSelectionMode(false);
     clearSelection();
     return true;
   };
@@ -113,7 +110,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
           type="grayBg"
           onPress={() => {
             setSelectionMode(!selectionMode);
-            clearSelection();
           }}
           size={SIZE.xl}
           color={colors.icon}
@@ -130,11 +126,9 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             flexDirection: 'row',
             alignItems: 'center'
           }}>
-          {Platform.OS === 'android' ? (
-            <Heading size={SIZE.md} color={colors.accent}>
-              {selectedItemsList.length + ' Selected'}
-            </Heading>
-          ) : null}
+          <Heading size={SIZE.md} color={colors.accent}>
+            {selectedItemsList.length + ' Selected'}
+          </Heading>
         </View>
       </View>
       <View
@@ -194,7 +188,6 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
                   Navigation.routeNames.Notebook,
                   Navigation.routeNames.Notebooks
                 ]);
-                setSelectionMode(false);
                 clearSelection();
               }
             }}

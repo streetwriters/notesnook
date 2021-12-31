@@ -218,7 +218,7 @@ export const Properties = ({
       icon: 'book-outline',
       func: () => {
         close();
-        clearSelection();
+        clearSelection(true);
         setSelectedItem(note);
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);

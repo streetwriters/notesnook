@@ -29,7 +29,7 @@ export const NavigatorStack = React.memo(
     const settings = useSettingStore(state => state.settings);
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
-        clearSelection();
+        clearSelection(true);
       }
       eSendEvent('navigate');
     });

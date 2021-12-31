@@ -73,6 +73,7 @@ const SelectionWrapper = ({
 
       {item.type === 'note' ? <Filler background={background} item={item} /> : null}
       <SelectionIcon
+        compactMode={compactMode}
         setActionStrip={setActionStrip}
         item={item}
         onLongPress={onLongPress}

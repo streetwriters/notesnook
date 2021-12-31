@@ -140,7 +140,7 @@ export interface SelectionStore extends State {
     setAll: (all: Array<Object>,) => void,
     setSelectionMode: (mode: boolean) => void,
     setSelectedItem: (item: Item) => void,
-    clearSelection: () => void,
+    clearSelection: (noanimation:boolean) => void,
 }
 
 export type Message = {

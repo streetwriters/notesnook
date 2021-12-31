@@ -6,7 +6,7 @@ import {Actions} from '../../provider/Actions';
 import {useSelectionStore} from '../../provider/stores';
 import {SIZE} from '../../utils/SizeUtils';
 
-export const SelectionIcon = ({setActionStrip, item}) => {
+export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -44,7 +44,7 @@ export const SelectionIcon = ({setActionStrip, item}) => {
         display: 'flex',
         opacity: 1,
         width: '10%',
-        height: 70,
+        height:compactMode ? 40 : 70,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.bg,
