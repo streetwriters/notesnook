@@ -3,6 +3,7 @@ import {
   KeyboardAvoidingView,
   LayoutAnimation,
   Platform,
+  SafeAreaView,
   TextInput,
   View
 } from 'react-native';
@@ -33,27 +34,33 @@ export const EditorWrapper = ({width, dimensions}) => {
         height: '100%',
         backgroundColor: state.colors.bg,
         borderLeftWidth: 1,
-        borderLeftColor: DDS.isTab ? colors.nav : 'transparent',
-        paddingTop: Platform.OS === 'ios' ? insets.top : 0,
-        paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0
+        borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
+        // paddingTop: Platform.OS === 'ios' ? insets.top : 0,
+        // paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0
       }}>
-      <KeyboardAvoidingView
-        behavior="padding"
+      <SafeAreaView
         style={{
-          width:'100%',
-          height:'100%'
-        }}
-        enabled={!floating && Platform.OS === 'ios'}>
-        <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
-        <TextInput
-          key="input"
-          ref={textInput}
-          style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
-          blurOnSubmit={false}
-        />
-        {loading ? null : <Editor key="editor" />}
-        <EditorOverlay key="overlay" />
-      </KeyboardAvoidingView>
+          width: '100%',
+          height: '100%'
+        }}>
+        <KeyboardAvoidingView
+          behavior="padding"
+          style={{
+            width: '100%',
+            height: '100%'
+          }}
+          enabled={!floating && Platform.OS === 'ios'}>
+          <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
+          <TextInput
+            key="input"
+            ref={textInput}
+            style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
+            blurOnSubmit={false}
+          />
+          {loading ? null : <Editor key="editor" />}
+          <EditorOverlay key="overlay" />
+        </KeyboardAvoidingView>
+      </SafeAreaView>
     </View>
   );
 };

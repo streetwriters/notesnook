@@ -193,11 +193,14 @@ function init_callback(_editor) {
           target.classList.add(COLLAPSED_KEY);
         }
         collapseElement(target);
-        editor.getHTML().then(function (html) {
-          reactNativeEventHandler('tiny', html);
-        }).catch(function(e) {
-          reactNativeEventHandler('tinyerror', e.message);
-        })
+        editor
+          .getHTML()
+          .then(function (html) {
+            reactNativeEventHandler('tiny', html);
+          })
+          .catch(function (e) {
+            reactNativeEventHandler('tinyerror', e.message);
+          });
       });
     }
   });
@@ -235,12 +238,18 @@ const plugins = [
   'media imagetools table paste wordcount autoresize directionality blockescape contenthandler'
 ];
 
+let isSafari = navigator.vendor.match(/apple/i);
+
 const content_style = `
 body {
   font-family:"Open Sans";
   overflow-x: hidden !important;
-  margin-left:12px !important;
-  margin-right:12px !important;
+  ${
+    isSafari
+      ? `margin-left:12px !important;
+margin-right:12px !important;`
+      : ''
+  } 
 }
 
 .mce-content-body h2::before,
@@ -391,7 +400,8 @@ function init_tiny(size) {
     content_style: content_style,
     browser_spellcheck: true,
     autoresize_bottom_margin: 120,
-    table_toolbar: 'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
+    table_toolbar:
+      'tcellprops trowprops | tableinsertrowafter tableinsertcolafter tabledeleterow tabledeletecol | tableconfig',
     imagetools_toolbar:
       'imagedownload | rotateleft rotateright flipv fliph | imageopts ',
     placeholder: 'Start writing your note here',
@@ -491,7 +501,7 @@ function setup_tiny(_editor) {
     icon: 'table-row-properties',
     tooltip: 'Row properties',
     onAction: function (e) {
-      tableRowNodeOptions()
+      tableRowNodeOptions();
       editor.blur();
     }
   });
@@ -500,7 +510,7 @@ function setup_tiny(_editor) {
     icon: 'table-cell-properties',
     tooltip: 'Cell properties',
     onAction: function (e) {
-      tableCellNodeOptions()
+      tableCellNodeOptions();
       editor.blur();
     }
   });
@@ -614,11 +624,14 @@ const onChange = function (event) {
   clearTimeout(changeTimer);
   changeTimer = null;
   changeTimer = setTimeout(function () {
-    editor.getHTML().then(function (html) {
-      reactNativeEventHandler('tiny', html);
-    }).catch(function(e) {
-      reactNativeEventHandler('tinyerror', e.message);
-    })
+    editor
+      .getHTML()
+      .then(function (html) {
+        reactNativeEventHandler('tiny', html);
+      })
+      .catch(function (e) {
+        reactNativeEventHandler('tinyerror', e.message);
+      });
 
     onUndoChange();
     selectchange();

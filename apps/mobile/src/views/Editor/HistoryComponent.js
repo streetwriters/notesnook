@@ -1,11 +1,11 @@
 import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import {Platform, View} from 'react-native';
 import {ActionIcon} from '../../components/ActionIcon';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView, post} from './Functions';
-import tiny from './tiny/tiny';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
 
 const HistoryComponent = () => {
   const [state] = useTracked();
@@ -14,6 +14,7 @@ const HistoryComponent = () => {
     undo: false,
     redo: false
   });
+  
 
   const onHistoryChange = data => {
     setHistoryState(data);
@@ -62,6 +63,23 @@ const HistoryComponent = () => {
           tiny.call(EditorWebView, tiny.redo);
         }}
       />
+{/* 
+      {Platform.OS === 'ios' ? (
+        <ActionIcon
+          name="keyboard-close"
+          disabled={!historyState.undo}
+          color={colors.pri}
+          size={SIZE.lg}
+          customStyle={{
+            width: 35,
+            height: 35
+          }}
+          onPress={() => {
+            safeKeyboardDismiss();
+          }}
+        />
+      ) : null} */}
+
     </View>
   );
 };
