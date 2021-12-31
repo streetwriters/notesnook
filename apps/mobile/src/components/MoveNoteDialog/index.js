@@ -89,9 +89,11 @@ const MoveNoteComponent = ({close, note, setNote}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  const notebooks = useNotebookStore(state =>
-    state.notebooks.filter(n => n.type === 'notebook')
+  const nbs = useNotebookStore(state =>
+    state.notebooks.filter(n => n?.type === 'notebook')
   );
+  let notebooks = [...db.notebooks.all];
+
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
   const [expanded, setExpanded] = useState('');
@@ -146,7 +148,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       if (note && note.id) {
         setNote({...db.notes.note(note.id).data});
         requestAnimationFrame(() => {
-          layoutmanager.withSpringAnimation(500);
+          //layoutmanager.withSpringAnimation(500);
           Navigation.setRoutesToUpdate([
             Navigation.routeNames.NotesPage,
             Navigation.routeNames.Favorites,
@@ -173,7 +175,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
       requestAnimationFrame(() => {
-        layoutmanager.withSpringAnimation(500);
+        //layoutmanager.withSpringAnimation(500);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.NotesPage,
           Navigation.routeNames.Favorites,
