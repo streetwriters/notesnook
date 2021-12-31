@@ -342,8 +342,6 @@ const EditorHeader = () => {
                   }}
                   top={50}
                   onPress={async () => {
-                    EditorWebView.current?.reload();
-                    return;
                     if (editing.isFocused) {
                       safeKeyboardDismiss();
                       editing.isFocused = true;
