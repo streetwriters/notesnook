@@ -5,6 +5,7 @@ import { Actions } from '../provider/Actions';
 import { useSettingStore } from '../provider/stores';
 import { AndroidModule } from '../utils';
 import { getColorScheme } from '../utils/ColorUtils';
+import layoutmanager from '../utils/layout-manager';
 import { MMKV } from '../utils/mmkv';
 import { scale, updateSize } from '../utils/SizeUtils';
 import Notifications from './Notifications';
@@ -28,7 +29,8 @@ export const defaultSettings = {
   notesListMode: 'normal',
   devMode:false,
   notifNotes:false,
-  pitchBlack:false
+  pitchBlack:false,
+  reduceAnimations:false
 };
 
 let settings = {...defaultSettings};

@@ -85,6 +85,13 @@ const SettingsAppearanceSection = () => {
     }
   };
 
+  const reduceAnimations = async () => {
+    await SettingsService.set(
+      'reduceAnimations',
+      SettingsService.get().reduceAnimations ? false : true
+    );
+  };
+
   return (
     <>
       <SectionHeader
@@ -219,6 +226,23 @@ const SettingsAppearanceSection = () => {
                 size="small"
                 animationSpeed={150}
                 onToggle={pitchBlack}
+              />
+            }
+          />
+
+          <CustomButton
+            title="Reduce animations"
+            tagline="Enable this to reduce animations in the app."
+            onPress={reduceAnimations}
+            maxWidth="90%"
+            customComponent={
+              <ToggleSwitch
+                isOn={settings.reduceAnimations}
+                onColor={colors.accent}
+                offColor={colors.icon}
+                size="small"
+                animationSpeed={150}
+                onToggle={reduceAnimations}
               />
             }
           />
