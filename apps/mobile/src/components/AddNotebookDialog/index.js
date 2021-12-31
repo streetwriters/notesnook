@@ -367,6 +367,8 @@ export class AddNotebookDialog extends React.Component {
             onMomentumScrollEnd={() => {
               this.actionSheetRef.current?.handleChildScrollEnd();
             }}
+            keyboardShouldPersistTaps="always"
+            keyboardDismissMode="none"
             ListFooterComponent={<View style={{height:50}} />}
             renderItem={({item, index}) => (
               <TopicItem
@@ -400,12 +402,14 @@ export class AddNotebookDialog extends React.Component {
             type="accent"
             onPress={this.addNewNotebook}
           />
-          <View
+
+          {/* <View
           style={{
             height:35
           }}
-          />
+          /> */}
         </View>
+        
 
         <Toast context="local" />
       </SheetWrapper>
