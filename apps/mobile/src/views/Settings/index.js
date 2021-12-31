@@ -39,7 +39,7 @@ export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
   const [version, setVersion] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   let pageIsLoaded = false;
@@ -71,7 +71,6 @@ export const Settings = ({navigation}) => {
 
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
-      setLoading(false);
       navigation.addListener('focus', onFocus);
       db.version()
         .then(ver => {

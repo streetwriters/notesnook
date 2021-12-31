@@ -1,9 +1,9 @@
-import {Platform} from 'react-native';
+import {LayoutAnimation, Platform} from 'react-native';
 import {Dimensions} from 'react-native';
 import create from 'zustand';
 import PremiumService from '../services/PremiumService';
 import {history, SUBSCRIPTION_STATUS} from '../utils';
-import { APP_VERSION } from "../../version";
+import {APP_VERSION} from '../../version';
 import {db} from '../utils/database';
 import {MMKV} from '../utils/mmkv';
 import {
@@ -27,6 +27,7 @@ import {EditorWebView, post} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../services/EventManager';
 import {endSearch} from '../views/Editor/tiny/toolbar/commands';
+import layoutmanager from '../utils/layout-manager';
 
 export const useNoteStore = create<NoteStore>((set, get) => ({
   notes: [],
@@ -247,9 +248,10 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     notesListMode: 'normal',
     devMode: false,
     notifNotes: false,
-    pitchBlack: false
+    pitchBlack: false,
+    reduceAnimations:false
   },
-  sheetKeyboardHandler:true,
+  sheetKeyboardHandler: true,
   fullscreen: false,
   deviceMode: 'mobile',
   dimensions: {width, height},
@@ -261,7 +263,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
   setDimensions: dimensions => set({dimensions: dimensions}),
   setAppLoading: appLoading => set({appLoading}),
   setIntroCompleted: isIntroCompleted => set({isIntroCompleted}),
-  setSheetKeyboardHandler:(sheetKeyboardHandler) => set({sheetKeyboardHandler})
+  setSheetKeyboardHandler: sheetKeyboardHandler => set({sheetKeyboardHandler})
 }));
 
 export const useMenuStore = create<MenuStore>((set, get) => ({
@@ -298,15 +300,13 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
       return;
     }
     let func = (value: string) => {
-      console.log("setSearchReplace:", value, value.length);
+      eUnSubscribeEvent('selectionvalue', func);
+      console.log('setSearchReplace:', value, value.length);
       if ((!value || value.trim() === '') && get().searchReplace) {
         endSearch();
         return;
       }
-
       set({searchSelection: value, searchReplace: true});
-
-      eUnSubscribeEvent('selectionvalue', func);
     };
     eSubscribeEvent('selectionvalue', func);
     tiny.call(
@@ -341,6 +341,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       history.selectedItemsList = [];
       history.selectionMode = false;
     }
+    layoutmanager.withSpringAnimation(500);
     set({
       selectionMode: mode,
       selectedItemsList: mode ? get().selectedItemsList : []
@@ -360,7 +361,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
 
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
-
+      layoutmanager.withSpringAnimation(500);
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
@@ -369,6 +370,7 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   clearSelection: () => {
     history.selectedItemsList = [];
     history.selectionMode = false;
+    layoutmanager.withSpringAnimation(500);
     set({selectionMode: false, selectedItemsList: []});
   }
 }));
@@ -382,7 +384,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     data: {},
     icon: 'account-outline'
   },
-  setMessage: message => set({message: {...message}}),
+  setMessage: message => {
+    setTimeout(() => {
+      layoutmanager.withAnimation();
+      set({message: {...message}});
+    }, 1);
+  },
   announcements: [],
   remove: async id => {
     MMKV.setStringAsync(id, 'removed');
@@ -396,7 +403,6 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       dialogsCopy.splice(dialogIndex, 1);
       inlineCopy.splice(index, 1);
     }
-
     set({announcements: inlineCopy, dialogs: dialogsCopy});
   },
   dialogs: [],
@@ -412,10 +418,16 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
       set({announcements: []});
     } finally {
       let all = await getFiltered(announcements);
-      set({
-        announcements: all.filter(a => a.type === 'inline'),
-        dialogs: all.filter(a => a.type === 'dialog')
-      });
+
+      setTimeout(() => {
+        if (all.filter(a => a.type === 'inline').length !== 0) {
+          layoutmanager.withAnimation();
+        }
+        set({
+          announcements: all.filter(a => a.type === 'inline'),
+          dialogs: all.filter(a => a.type === 'dialog')
+        });
+      }, 1);
     }
   }
 }));

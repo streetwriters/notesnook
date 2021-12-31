@@ -10,6 +10,7 @@ import {dWidth} from '../../utils';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
+import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {PressableButton} from '../PressableButton';
 
@@ -26,6 +27,7 @@ export const ColorTags = ({item, close}) => {
       await db.notes.note(note.id).color(color.name);
     }
     let _note = db.notes.note(note.id).data;
+    layoutmanager.withAnimation(200);
     setNote({..._note});
     setColorNotes();
     Navigation.setRoutesToUpdate([

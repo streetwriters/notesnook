@@ -6,6 +6,7 @@ import {eSendEvent, ToastEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import {db} from './database';
 import {eClearEditor} from './Events';
+import layoutmanager from './layout-manager';
 
 export const deleteItems = async item => {
   if (item && db.monographs.isPublished(item.id)) {
@@ -43,6 +44,8 @@ export const deleteItems = async item => {
       .filter(n => n !== null);
 
     await db.notes.delete(...ids);
+
+    layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notes,
       Navigation.routeNames.NotesPage
@@ -54,6 +57,8 @@ export const deleteItems = async item => {
       let it = topics[i];
       await db.notebooks.notebook(it.notebookId).topics.delete(it.id);
     }
+
+    layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notebook
@@ -68,6 +73,8 @@ export const deleteItems = async item => {
   if (notebooks?.length > 0) {
     let ids = notebooks.map(i => i.id);
     await db.notebooks.delete(...ids);
+
+    layoutmanager.withAnimation(150);
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.Notebooks,
       Navigation.routeNames.Notes
@@ -92,6 +99,8 @@ export const deleteItems = async item => {
           ids.push(trashItem.id);
         }
         await db.trash.restore(...ids);
+
+        layoutmanager.withAnimation(150);
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notebooks,
           Navigation.routeNames.Notes,

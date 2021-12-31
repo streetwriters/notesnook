@@ -73,12 +73,13 @@ export type Settings = {
     screenshotMode?: boolean,
     privacyScreen?: boolean,
     appLockMode?: string,
-    telemetry: boolean,
-    notebooksListMode: "normal" | "compact",
-    notesListMode: "normal" | "compact",
-    devMode: boolean,
-    notifNotes: boolean
-    pitchBlack:boolean
+    telemetry?: boolean,
+    notebooksListMode?: "normal" | "compact",
+    notesListMode?: "normal" | "compact",
+    devMode?: boolean,
+    notifNotes?: boolean
+    pitchBlack?:boolean, 
+    reduceAnimations?:boolean
 
 }
 

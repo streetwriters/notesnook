@@ -5,7 +5,11 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import {useNotebookStore, useSelectionStore, useSettingStore} from '../../provider/stores';
+import {
+  useNotebookStore,
+  useSelectionStore,
+  useSettingStore
+} from '../../provider/stores';
 import {
   eSubscribeEvent,
   eUnSubscribeEvent,
@@ -13,7 +17,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getTotalNotes} from '../../utils';
+import {getTotalNotes, InteractionManager} from '../../utils';
 import {db} from '../../utils/database';
 import {eOpenMoveNoteDialog} from '../../utils/Events';
 import {pv, SIZE} from '../../utils/SizeUtils';
@@ -27,6 +31,7 @@ import Input from '../Input';
 import {ActionIcon} from '../ActionIcon';
 import {Dialog} from '../Dialog';
 import {presentDialog} from '../Dialog/functions';
+import layoutmanager from '../../utils/layout-manager';
 
 let newNotebookTitle = null;
 let newTopicTitle = null;
@@ -106,7 +111,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       topics: [],
       id: null
     });
-    console.log("added notebook id",id);
+    console.log('added notebook id', id);
     setExpanded(id);
     openAddTopicDialog(db.notebooks.notebook(id).data);
     notebookInput.current?.clear();
@@ -115,7 +120,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     updateNoteExists();
   };
 
-  const addNewTopic = async (value,item) => {
+  const addNewTopic = async (value, item) => {
     if (!value || value.trim().length === 0) {
       ToastEvent.show({
         heading: 'Topic title is required',
@@ -140,11 +145,14 @@ const MoveNoteComponent = ({close, note, setNote}) => {
 
       if (note && note.id) {
         setNote({...db.notes.note(note.id).data});
-        Navigation.setRoutesToUpdate([
-          Navigation.routeNames.NotesPage,
-          Navigation.routeNames.Favorites,
-          Navigation.routeNames.Notes
-        ]);
+        requestAnimationFrame(() => {
+          layoutmanager.withSpringAnimation(500);
+          Navigation.setRoutesToUpdate([
+            Navigation.routeNames.NotesPage,
+            Navigation.routeNames.Favorites,
+            Navigation.routeNames.Notes
+          ]);
+        });
       }
       setNotebooks();
       updateNoteExists();
@@ -164,12 +172,14 @@ const MoveNoteComponent = ({close, note, setNote}) => {
     );
     if (note && note.id) {
       setNote({...db.notes.note(note.id).data});
-
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes
-      ]);
+      requestAnimationFrame(() => {
+        layoutmanager.withSpringAnimation(500);
+        Navigation.setRoutesToUpdate([
+          Navigation.routeNames.NotesPage,
+          Navigation.routeNames.Favorites,
+          Navigation.routeNames.Notes
+        ]);
+      });
     }
     setNotebooks();
     updateNoteExists();
@@ -204,10 +214,9 @@ const MoveNoteComponent = ({close, note, setNote}) => {
       paragraph: 'Add a new topic in ' + item.title,
       positiveText: 'Add',
       positivePress: value => {
-        return addNewTopic(value,item);
+        return addNewTopic(value, item);
       }
     });
-
   };
 
   return (
@@ -232,7 +241,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
           }}>
           <DialogHeader
             title="Add to notebook"
-            paragraph={`Add your notes in notebooks to find them easily.`}
+            paragraph={`Add your notes to notebooks to find them easily.`}
           />
         </View>
 
@@ -304,6 +313,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                     openAddTopicDialog(item);
                     return;
                   }
+                  layoutmanager.withAnimation(200);
                   setExpanded(item.id === expanded ? null : item.id);
                   setNotebookInputFocused(false);
                 }}
@@ -350,6 +360,7 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                         setExpanded(item.id);
                         return;
                       }
+                      layoutmanager.withAnimation(200);
                       setExpanded(item.id);
                       openAddTopicDialog(item);
                     }}

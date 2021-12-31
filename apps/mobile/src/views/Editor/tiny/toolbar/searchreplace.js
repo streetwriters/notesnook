@@ -9,6 +9,7 @@ import {
   eUnSubscribeEvent
 } from '../../../../services/EventManager';
 import {showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
+import layoutmanager from '../../../../utils/layout-manager';
 import {SIZE} from '../../../../utils/SizeUtils';
 import {sleep} from '../../../../utils/TimeUtils';
 import {EditorWebView} from '../../Functions';
@@ -113,7 +114,10 @@ const SearcReplace = () => {
     {
       icon: 'chevron-left',
       type: 'gray',
-      press: () => setMenu(false),
+      press: () => {
+        layoutmanager.withAnimation(150);
+        setMenu(false);
+      },
       fullname: 'Go back'
     },
     {
@@ -156,7 +160,10 @@ const SearcReplace = () => {
         {
           icon: 'dots-vertical',
           type: 'gray',
-          press: () => setMenu(true),
+          press: () => {
+            layoutmanager.withAnimation(150);
+            setMenu(true);
+          },
           fullname: 'Show options'
         }
       ];
@@ -198,6 +205,7 @@ const SearcReplace = () => {
         }}
         iconColor={enableReplace ? colors.accent : colors.icon}
         onPress={() => {
+          layoutmanager.withSpringAnimation(500);
           if (enableReplace) {
             if (focusType === 2) {
               findRef.current?.focus();
