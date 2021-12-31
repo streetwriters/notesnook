@@ -44,11 +44,11 @@ export default class Notes extends Collection {
     if (!oldNote && !noteArg.content && !noteArg.contentId) return;
 
     if (noteArg.content && noteArg.content.data && noteArg.content.type) {
-      const { type, data, conflicted, dateEdited, dateResolved } =
-        noteArg.content;
+      const { type, data } = noteArg.content;
 
       let content = getContentFromData(type, data);
       if (!content) throw new Error("Invalid content type.");
+
       note.contentId = await this._db.content.add({
         noteId: id,
         sessionId: note.sessionId,
@@ -56,9 +56,6 @@ export default class Notes extends Collection {
         type,
         data,
         localOnly: !!note.localOnly,
-        dateEdited,
-        dateResolved,
-        conflicted,
       });
 
       note.headline = getNoteHeadline(note, content);
