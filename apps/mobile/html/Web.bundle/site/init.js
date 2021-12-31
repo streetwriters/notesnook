@@ -239,6 +239,8 @@ const content_style = `
 body {
   font-family:"Open Sans";
   overflow-x: hidden !important;
+  margin-left:12px !important;
+  margin-right:12px !important;
 }
 
 .mce-content-body h2::before,
