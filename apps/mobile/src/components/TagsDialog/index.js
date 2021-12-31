@@ -70,6 +70,7 @@ const TagsDialog = () => {
   const open = item => {
     setNote(item);
     useTagStore.getState().setTags();
+    sortTags();
     setVisible(true);
   };
 
