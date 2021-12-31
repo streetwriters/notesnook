@@ -85,7 +85,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
         });
         return;
       }
-      console.log('format:',format,'value:',inputValue);
+      console.log('format:', format, 'value:', inputValue);
       properties.userBlur = true;
       formatSelection(execCommands[format](inputValue));
     }
@@ -155,41 +155,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
             returnKeyLabel="Done"
             returnKeyType="done"
             fontSize={SIZE.xs + 1}
-            height={40}
+            height={45}
           />
-          {/* <TextInput
-            ref={inputRef}
-            onBlur={onBlur}
-            style={{
-              height: normalize(40),
-              color: colors.pri,
-              zIndex: 10,
-              flexWrap: 'wrap',
-              fontSize: SIZE.sm,
-              flexShrink: 1,
-              minWidth: '80%',
-              fontFamily: 'OpenSans-Regular'
-            }}
-            autoCapitalize="none"
-            autoCorrect={false}
-            returnKeyLabel="Done"
-            returnKeyType="done"
-            onSubmitEditing={() => onSubmit(inputValue)}
-            onChangeText={onChangeText}
-            defaultValue={value}
-            blurOnSubmit={false}
-            placeholderTextColor={colors.placeholder}
-          /> */}
-
-          {/* {mode === INPUT_MODE.EDITING && (
-            <Button
-              title="Save"
-              onPress={onSubmit}
-              height={normalize(40)}
-              fontSize={SIZE.sm}
-              style={{paddingHorizontal: 6}}
-            />
-          )} */}
         </>
       )}
     </View>
