@@ -1,3 +1,5 @@
+import { EV, EVENTS } from "../common";
+
 function get(url, token) {
   return request(url, token, "GET");
 }
@@ -42,6 +44,11 @@ function transformer(data, type) {
   }
 }
 
+/**
+ *
+ * @param {Response} response
+ * @returns
+ */
 async function handleResponse(response) {
   const contentType = response.headers.get("content-type");
   if (contentType && contentType.includes("application/json")) {
@@ -54,7 +61,10 @@ async function handleResponse(response) {
     if (response.status === 429) throw new Error("You are being rate limited.");
 
     if (response.ok) return await response.text();
-    else
+    else if (response.status === 401) {
+      EV.publish(EVENTS.refreshToken, response.url);
+      throw new Error("Unauthorized.");
+    } else
       throw new Error(
         `Request failed with status code: ${response.status} ${response.statusText}.`
       );

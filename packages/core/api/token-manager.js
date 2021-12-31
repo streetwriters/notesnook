@@ -18,6 +18,11 @@ class TokenManager {
   constructor(storage) {
     this._storage = storage;
     this._refreshTokenMutex = withTimeout(new Mutex(), 10 * 1000);
+    EV.subscribe(EVENTS.refreshToken, async (url) => {
+      if (url && url.includes(ENDPOINTS.token)) return;
+
+      await this._refreshToken(true);
+    });
   }
 
   async getToken(renew = true, forceRenew = false) {
@@ -37,17 +42,11 @@ class TokenManager {
   }
 
   async getAccessToken(forceRenew = false) {
-    try {
+    return await getSafeToken(async () => {
       const token = await this.getToken(true, forceRenew);
       if (!token) return;
       return token.access_token;
-    } catch (e) {
-      console.error("Error getting access token:", e);
-      if (e.message === "invalid_grant" || e.message === "invalid_client") {
-        EV.publish(EVENTS.userSessionExpired);
-      }
-      throw e;
-    }
+    }, "Error getting access token:");
   }
 
   async _refreshToken(forceRenew = false) {
@@ -59,15 +58,20 @@ class TokenManager {
 
       const { refresh_token, scope } = token;
       if (!refresh_token || !scope) return;
-      await this.saveToken(
-        await http.post(`${constants.AUTH_HOST}${ENDPOINTS.token}`, {
-          refresh_token,
-          grant_type: "refresh_token",
-          scope: scope,
-          client_id: "notesnook",
-        })
-      );
-      EV.publish(EVENTS.tokenRefreshed);
+
+      await getSafeToken(async () => {
+        const refreshTokenResponse = await await http.post(
+          `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+          {
+            refresh_token,
+            grant_type: "refresh_token",
+            scope: scope,
+            client_id: "notesnook",
+          }
+        );
+        await this.saveToken(refreshTokenResponse);
+        EV.publish(EVENTS.tokenRefreshed);
+      }, "Error getting refresh token:");
     });
   }
 
@@ -99,3 +103,15 @@ class TokenManager {
   }
 }
 export default TokenManager;
+
+async function getSafeToken(action, errorMessage) {
+  try {
+    return await action();
+  } catch (e) {
+    console.error(errorMessage, e);
+    if (e.message === "invalid_grant" || e.message === "invalid_client") {
+      EV.publish(EVENTS.userSessionExpired);
+    }
+    throw e;
+  }
+}
