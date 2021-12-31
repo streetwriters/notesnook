@@ -343,10 +343,6 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     } else {
       history.selectionMode = true;
     }
-    console.log('call set selection mode');
-    if (mode !== get().selectionMode) {
-      layoutmanager.withSpringAnimation(500);
-    }
     set({
       selectionMode: mode,
       selectedItemsList: mode ? get().selectedItemsList : []
@@ -363,10 +359,8 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
     selectedItems = [...new Set(selectedItems)];
     //@ts-ignore
     history.selectedItemsList = selectedItems;
-
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
-    console.log('called selected items');
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
@@ -375,7 +369,6 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   clearSelection: (noanimation) => {
     history.selectedItemsList = [];
     history.selectionMode = false;
-    console.log('called clear selection');
     set({selectionMode: false, selectedItemsList: []});
   }
 }));
