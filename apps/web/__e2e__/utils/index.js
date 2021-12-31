@@ -98,6 +98,7 @@ function isTestAll() {
 }
 
 module.exports = {
+  USER,
   NOTE,
   NOTEBOOK,
   PASSWORD,

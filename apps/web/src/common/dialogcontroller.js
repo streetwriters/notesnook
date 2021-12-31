@@ -10,7 +10,7 @@ import { store as editorStore } from "../stores/editor-store";
 import { store as noteStore } from "../stores/note-store";
 import { db } from "./db";
 import { showToast } from "../utils/toast";
-import { Flex, Text } from "rebass";
+import { Box, Flex, Text } from "rebass";
 import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
@@ -366,8 +366,23 @@ function getDialogData(type) {
     case "change_account_password":
       return {
         title: "Change account password",
-        subtitle:
-          "All your data will be re-encrypted and synced with the new password.",
+        subtitle: (
+          <>
+            All your data will be re-encrypted and synced with the new password.
+            <Box mt={1} p={1} bg="errorBg" color="error">
+              <Text as="p" my={0}>
+                It is recommended that you <b>log out from all other devices</b>{" "}
+                before continuing.
+              </Text>
+              <Text as="p" my={0} mt={1}>
+                If this process is interrupted, there is a high chance of data
+                corruption so{" "}
+                <b>please do NOT shut down your device or close your browser</b>{" "}
+                until this process completes.
+              </Text>
+            </Box>
+          </>
+        ),
         positiveButtonText: "Change password",
       };
     case "verify_account":

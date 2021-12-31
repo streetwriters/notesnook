@@ -197,7 +197,7 @@ function SyncStatus() {
       return (
         <>
           <Checkmark size={12} color="success" />
-          <Text variant="subBody" ml={1}>
+          <Text data-test-id="sync-status-success" variant="subBody" ml={1}>
             Sync completed
           </Text>
         </>

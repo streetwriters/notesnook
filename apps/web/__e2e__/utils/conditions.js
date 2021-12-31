@@ -14,9 +14,9 @@ async function isPresent(selector) {
   }
 }
 
-async function isAbsent(selector) {
+async function isAbsent(selector, timeout = 10000) {
   try {
-    await page.waitForSelector(selector, { state: "detached", timeout: 10000 });
+    await page.waitForSelector(selector, { state: "detached", timeout });
     return true;
   } catch (e) {
     console.log(e);
