@@ -111,7 +111,7 @@ const Tooltip = () => {
 
   return !group || !group?.type ? null : (
     <ParentElement>
-      {!group.data && isInputTooltip ? (
+      {isInputTooltip ? (
         <ToolbarLinkInput
           format={group.type}
           setVisible={() => {
