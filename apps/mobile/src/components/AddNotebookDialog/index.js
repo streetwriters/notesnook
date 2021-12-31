@@ -1,6 +1,13 @@
 import React, {createRef} from 'react';
-import {Keyboard, StyleSheet, TouchableOpacity, View,TextInput} from 'react-native';
-import {FlatList, ScrollView, } from 'react-native-gesture-handler';
+import {
+  Keyboard,
+  StyleSheet,
+  TouchableOpacity,
+  View,
+  TextInput,
+  Platform
+} from 'react-native';
+import {FlatList, ScrollView} from 'react-native-gesture-handler';
 import {notesnook} from '../../../e2e/test.ids';
 import {useMenuStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
@@ -368,8 +375,8 @@ export class AddNotebookDialog extends React.Component {
               this.actionSheetRef.current?.handleChildScrollEnd();
             }}
             keyboardShouldPersistTaps="always"
-            keyboardDismissMode="none"
-            ListFooterComponent={<View style={{height:50}} />}
+            keyboardDismissMode="interactive"
+            ListFooterComponent={<View style={{height: 50}} />}
             renderItem={({item, index}) => (
               <TopicItem
                 item={item}
@@ -402,14 +409,15 @@ export class AddNotebookDialog extends React.Component {
             type="accent"
             onPress={this.addNewNotebook}
           />
-
-          {/* <View
-          style={{
-            height:35
-          }}
-          /> */}
+{/* 
+          {Platform.OS === 'ios'  && (
+            <View
+              style={{
+                height: 40
+              }}
+            />
+          )} */}
         </View>
-        
 
         <Toast context="local" />
       </SheetWrapper>
