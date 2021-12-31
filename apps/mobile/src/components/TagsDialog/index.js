@@ -44,7 +44,9 @@ const TagsDialog = () => {
   }, []);
 
   useEffect(() => {
-    sortTags();
+    if (visible) {
+      sortTags();
+    }
   }, [allTags, note, query]);
 
   const sortTags = () => {

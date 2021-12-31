@@ -33,8 +33,10 @@ const Tooltip = () => {
     properties.userBlur = true;
     if (!data) {
       editing.tooltip = null;
-      layoutmanager.withAnimation(150);
-      setGroup(null);
+      if (group) {
+        layoutmanager.withAnimation(150);
+        setGroup(null);
+      }
       return;
     }
     if (!data) return;

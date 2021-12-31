@@ -74,7 +74,7 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
-      overlayColor={pitchBlack? '#585858' : colors.nav}
+      overlayColor={pitchBlack? '#585858' : "#000000"}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>

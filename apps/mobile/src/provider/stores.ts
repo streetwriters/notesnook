@@ -249,7 +249,7 @@ export const useSettingStore = create<SettingStore>((set, get) => ({
     devMode: false,
     notifNotes: false,
     pitchBlack: false,
-    reduceAnimations:false
+    reduceAnimations: false
   },
   sheetKeyboardHandler: true,
   fullscreen: false,
@@ -341,7 +341,10 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
       history.selectedItemsList = [];
       history.selectionMode = false;
     }
-    layoutmanager.withSpringAnimation(500);
+    console.log('call set selection mode');
+    if (mode !== get().selectionMode) {
+      layoutmanager.withSpringAnimation(500);
+    }
     set({
       selectionMode: mode,
       selectedItemsList: mode ? get().selectedItemsList : []
@@ -361,7 +364,11 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
 
     history.selectionMode =
       selectedItems.length > 0 ? get().selectionMode : false;
+    console.log('called selected items');
+    if (get().selectionMode !== history.selectionMode) {
       layoutmanager.withSpringAnimation(500);
+    }
+
     set({
       selectedItemsList: selectedItems,
       selectionMode: history.selectionMode
@@ -370,7 +377,10 @@ export const useSelectionStore = create<SelectionStore>((set, get) => ({
   clearSelection: () => {
     history.selectedItemsList = [];
     history.selectionMode = false;
-    layoutmanager.withSpringAnimation(500);
+    console.log('called clear selection');
+    if (get().selectionMode !== history.selectionMode) {
+      layoutmanager.withSpringAnimation(500);
+    }
     set({selectionMode: false, selectedItemsList: []});
   }
 }));
@@ -385,8 +395,12 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
     icon: 'account-outline'
   },
   setMessage: message => {
+    console.log('setting message');
     setTimeout(() => {
-      layoutmanager.withAnimation();
+      if (get().message.visible || message.visible) {
+        layoutmanager.withAnimation();
+      }
+
       set({message: {...message}});
     }, 1);
   },
@@ -421,6 +435,7 @@ export const useMessageStore = create<MessageStore>((set, get) => ({
 
       setTimeout(() => {
         if (all.filter(a => a.type === 'inline').length !== 0) {
+          console.log('with setAnnouncement ');
           layoutmanager.withAnimation();
         }
         set({
