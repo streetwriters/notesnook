@@ -2,6 +2,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/Container';
+import { useTracked } from '../provider';
 import { useSelectionStore, useSettingStore } from '../provider/stores';
 import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
@@ -21,6 +22,8 @@ const Stack = createNativeStackNavigator();
 
 export const NavigatorStack = React.memo(
   () => {
+    const [state, dispatch] = useTracked();
+    const {colors} = state;
     const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
     const settings = useSettingStore(state => state.settings);
@@ -59,7 +62,10 @@ export const NavigatorStack = React.memo(
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                animation:"none"
+                animation:"none",
+                contentStyle:{
+                  backgroundColor:colors.bg
+                }
               }}>
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
