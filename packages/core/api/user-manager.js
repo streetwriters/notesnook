@@ -23,9 +23,11 @@ class UserManager {
   /**
    *
    * @param {import("../database/storage").default} storage
+   * @param {import("../api/index").default} db
    */
-  constructor(storage) {
+  constructor(storage, db) {
     this._storage = storage;
+    this._db = db;
     this.tokenManager = new TokenManager(storage);
   }
 
@@ -98,6 +100,19 @@ class UserManager {
     return this._storage.read("user");
   }
 
+  async updateUser(user) {
+    if (!user) return;
+
+    let token = await this.tokenManager.getAccessToken();
+    await http.patch.json(
+      `${constants.API_HOST}${ENDPOINTS.user}`,
+      user,
+      token
+    );
+
+    await this.setUser(user);
+  }
+
   async deleteUser(password) {
     let token = await this.tokenManager.getAccessToken();
     if (!token) return;
@@ -167,21 +182,12 @@ class UserManager {
 
       if (!user.attachmentsKey) {
         const key = await this._storage.generateRandomKey();
-        const encryptedKey = await this._storage.encrypt(
+        user.attachmentsKey = await this._storage.encrypt(
           userEncryptionKey,
           JSON.stringify(key)
         );
 
-        user.attachmentsKey = encryptedKey;
-
-        let token = await this.tokenManager.getAccessToken();
-        await http.patch.json(
-          `${constants.API_HOST}${ENDPOINTS.user}`,
-          user,
-          token
-        );
-
-        await this.setUser(user);
+        await this.updateUser(user);
         return key;
       }
 
@@ -229,45 +235,62 @@ class UserManager {
 
   async _updatePassword(type, data) {
     let token = await this.tokenManager.getAccessToken();
-    if (!token) return;
+    if (!token) throw new Error("You are not logged in.");
 
-    // we hash the passwords beforehand
-    const { email, salt } = await this.getUser();
-    var hashedData = {};
-    if (data.old_password)
-      hashedData.old_password = await this._storage.hash(
-        data.old_password,
-        email
+    let user = await this.getUser();
+    if (!user) throw new Error("You are not logged in.");
+
+    const { new_password, old_password } = data;
+    if (old_password && !(await this.verifyPassword(old_password)))
+      throw new Error("Incorrect old password.");
+
+    const attachmentsKey = await this.getAttachmentsKey();
+
+    await this._db.outbox.add(type, data, async () => {
+      // we hash the passwords beforehand
+      const { email, salt } = await this.getUser();
+      var hashedData = {
+        old_password: undefined,
+        new_password: undefined,
+      };
+
+      if (old_password)
+        hashedData.old_password = await this._storage.hash(old_password, email);
+      if (new_password)
+        hashedData.new_password = await this._storage.hash(new_password, email);
+
+      await this._db.sync(true, true);
+
+      await this._storage.deriveCryptoKey(`_uk_@${email}`, {
+        password: data.new_password,
+        salt,
+      });
+
+      if (attachmentsKey) {
+        const userEncryptionKey = await this.getEncryptionKey();
+        if (!userEncryptionKey) return;
+        user.attachmentsKey = await this._storage.encrypt(
+          userEncryptionKey,
+          JSON.stringify(attachmentsKey)
+        );
+        await this.updateUser(user);
+      }
+
+      await this._db.sync(false, true);
+
+      await http.patch(
+        `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
+        {
+          type,
+          ...hashedData,
+        },
+        token
       );
-    if (data.new_password)
-      hashedData.new_password = await this._storage.hash(
-        data.new_password,
-        email
-      );
 
-    await http.patch(
-      `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
-      {
-        type,
-        ...hashedData,
-      },
-      token
-    );
-    // TODO
-    // await this._db.outbox.add(
-    //   type,
-    //   { newPassword: data.new_password },
-    //   async () => {
-    //     await this._db.sync(true);
+      if (type !== "change_password")
+        await this.logout(true, "Password Changed");
+    });
 
-    //     await this._storage.deriveCryptoKey(`_uk_@${email}`, {
-    //       password: data.new_password,
-    //       salt,
-    //     });
-
-    //     await this._db.sync(false, true);
-    //   }
-    // );
     return true;
   }
 }

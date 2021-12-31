@@ -16,14 +16,8 @@ class Outbox {
       switch (id) {
         case "reset_password":
         case "change_password":
-          const key = await this._db.user.getEncryptionKey();
-          const { email } = await this._db.user.getUser();
-          await this._db.storage.deriveCryptoKey(`_uk_@${email}`, {
-            password: data.newPassword,
-            salt: key.salt,
-          });
-          await this._db.sync(false, true);
-          await this.delete(id);
+          if (await this._db.user._updatePassword(id, data))
+            await this.delete(id);
           break;
       }
     }

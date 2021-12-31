@@ -84,7 +84,7 @@ class Database {
     this.session = new Session(this.storage);
     await this._validate();
 
-    this.user = new UserManager(this.storage);
+    this.user = new UserManager(this.storage, this);
     this.syncer = new Sync(this);
     this.vault = new Vault(this);
     this.conflicts = new Conflicts(this);
