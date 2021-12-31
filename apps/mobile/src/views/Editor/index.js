@@ -1,5 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, View} from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
 import WebView from 'react-native-webview';
 import {notesnook} from '../../../e2e/test.ids';
 import {useEditorStore, useUserStore} from '../../provider/stores';
@@ -115,6 +116,7 @@ const Editor = React.memo(
             scalesPageToFit={true}
             renderLoading={() => <View />}
             startInLoadingState
+            hideKeyboardAccessoryView={true}
             allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}

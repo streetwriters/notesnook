@@ -392,7 +392,7 @@ const ToolbarItem = ({
               />
             ) : format === 'fontsize' ? (
               <Paragraph
-                size={SIZE.sm - 1}
+                size={13}
                 color={selected ? colors.accent : colors.pri}>
                 {formatValue || currentText || '12pt'}
               </Paragraph>
@@ -408,7 +408,7 @@ const ToolbarItem = ({
                         : formatValue
                       : 'OpenSans-Regular'
                 }}
-                size={SIZE.sm - 1}>
+                size={13}>
                 {currentText || text}
               </Paragraph>
             ) : (

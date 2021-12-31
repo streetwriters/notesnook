@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
-import {ActionIcon} from '../../components/ActionIcon';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {SIZE} from '../../utils/SizeUtils';
-import {EditorWebView, post} from './Functions';
-import tiny, {safeKeyboardDismiss} from './tiny/tiny';
+import React, { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
+import { ActionIcon } from '../../components/ActionIcon';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { SIZE } from '../../utils/SizeUtils';
+import { useKeyboard } from '../../utils/use-keyboard';
+import { EditorWebView } from './Functions';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 
 const HistoryComponent = () => {
   const [state] = useTracked();
@@ -14,7 +15,7 @@ const HistoryComponent = () => {
     undo: false,
     redo: false
   });
-  
+  const keyboard = useKeyboard();
 
   const onHistoryChange = data => {
     setHistoryState(data);
@@ -35,6 +36,21 @@ const HistoryComponent = () => {
         height: 40,
         marginRight: 5
       }}>
+      {Platform.OS === 'ios' && keyboard.keyboardShown ? (
+        <ActionIcon
+          name="keyboard-close"
+          color={colors.pri}
+          size={SIZE.lg}
+          customStyle={{
+            width: 35,
+            height: 35
+          }}
+          onPress={() => {
+            safeKeyboardDismiss();
+          }}
+        />
+      ) : null}
+
       <ActionIcon
         name="undo-variant"
         disabled={!historyState.undo}
@@ -63,23 +79,6 @@ const HistoryComponent = () => {
           tiny.call(EditorWebView, tiny.redo);
         }}
       />
-{/* 
-      {Platform.OS === 'ios' ? (
-        <ActionIcon
-          name="keyboard-close"
-          disabled={!historyState.undo}
-          color={colors.pri}
-          size={SIZE.lg}
-          customStyle={{
-            width: 35,
-            height: 35
-          }}
-          onPress={() => {
-            safeKeyboardDismiss();
-          }}
-        />
-      ) : null} */}
-
     </View>
   );
 };
