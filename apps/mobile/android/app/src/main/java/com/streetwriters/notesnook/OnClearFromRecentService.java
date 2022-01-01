@@ -25,9 +25,15 @@ public class OnClearFromRecentService extends Service {
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        MMKV mmkv = MMKV.mmkvWithID("default",MMKV.SINGLE_PROCESS_MODE);
-        mmkv.removeValueForKey("appState");
-        stopSelf();
+        try {
+            MMKV.initialize(getApplicationContext());
+            MMKV mmkv = MMKV.mmkvWithID("default",MMKV.SINGLE_PROCESS_MODE);
+            mmkv.removeValueForKey("appState");
+            stopSelf();
+        } catch (Exception e) {
+
+        }
+
         //System.exit(0);
     }
 }
