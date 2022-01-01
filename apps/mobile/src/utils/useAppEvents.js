@@ -32,14 +32,15 @@ import {
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
+  setRecoveryKeyMessage
 } from '../services/Message';
 import Navigation from '../services/Navigation';
 import PremiumService from '../services/PremiumService';
 import SettingsService from '../services/SettingsService';
 import Sync from '../services/Sync';
 import {doInBackground, editing} from '.';
-import { APP_VERSION } from "../../version";
+import {APP_VERSION} from '../../version';
 import {updateStatusBarColor} from './Colors';
 import {db} from './database';
 import {
@@ -365,6 +366,15 @@ export const useAppEvents = () => {
           }, 1000);
         }
 
+        if (user.isEmailConfirmed) {
+          let hasSavedRecoveryKey = await MMKV.getItem(
+            'userHasSavedRecoveryKey'
+          );
+          if (!hasSavedRecoveryKey) {
+            setRecoveryKeyMessage();
+          }
+        }
+
         await Sync.run();
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
@@ -380,6 +390,14 @@ export const useAppEvents = () => {
       }
     } catch (e) {
       let user = await db.user.getUser();
+
+      if (user?.isEmailConfirmed) {
+        let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
+        if (!hasSavedRecoveryKey) {
+          setRecoveryKeyMessage();
+        }
+      }
+
       if (user && !user.isEmailConfirmed) {
         setEmailVerifyMessage();
       } else if (!user) {

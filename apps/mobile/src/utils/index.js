@@ -282,6 +282,11 @@ export const BUTTON_TYPES = {
     text: 'icon',
     selected: 'nav'
   },
+  grayAccent: {
+    primary: 'nav',
+    text: 'accent',
+    selected: 'nav'
+  },
   accent: (themeColor, text) => ({
     primary: themeColor,
     text: text,

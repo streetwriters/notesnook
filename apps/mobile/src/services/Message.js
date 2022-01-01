@@ -1,7 +1,36 @@
-import { useMessageStore } from '../provider/stores';
-import { eOpenLoginDialog } from '../utils/Events';
-import { eSendEvent } from './EventManager';
+import {useMessageStore} from '../provider/stores';
+import {eOpenLoginDialog, eOpenRecoveryKeyDialog} from '../utils/Events';
+import {eSendEvent} from './EventManager';
 import PremiumService from './PremiumService';
+import {verifyUser} from '../views/Settings/functions';
+import {MMKV} from '../utils/mmkv';
+
+const recoveryKeyMessage = {
+  visible: true,
+  message: 'Keep your data safe if you lose password',
+  actionText: 'Save your account recovery key',
+  onPress: () => {
+    verifyUser(
+      null,
+      () => {
+        eSendEvent(eOpenRecoveryKeyDialog);
+      },
+      true,
+      async () => {
+        await MMKV.setItem('userHasSavedRecoveryKey', 'true');
+        clearMessage();
+      },
+      'I have saved my key already'
+    );
+  },
+  data: {},
+  icon: 'key',
+  type: 'normal'
+};
+
+export function setRecoveryKeyMessage() {
+  useMessageStore.getState().setMessage(recoveryKeyMessage);
+}
 
 const loginMessage = {
   visible: true,
@@ -12,7 +41,7 @@ const loginMessage = {
   },
   data: {},
   icon: 'account-outline',
-  type: 'normal',
+  type: 'normal'
 };
 
 export function setLoginMessage() {
@@ -28,7 +57,7 @@ const emailMessage = {
   },
   data: {},
   icon: 'email',
-  type: 'normal',
+  type: 'normal'
 };
 
 export function setEmailVerifyMessage() {
@@ -41,7 +70,7 @@ const noMessage = {
   actionText: '',
   onPress: null,
   data: {},
-  icon: 'account-outline',
+  icon: 'account-outline'
 };
 
 export function clearMessage() {

@@ -31,7 +31,8 @@ export const Dialog = ({context = 'global'}) => {
     paragraphColor: colors.pri,
     input: false,
     inputPlaceholder: 'Enter some text',
-    defaultValue: ''
+    defaultValue: '',
+    disableBackdropClosing:false
   });
 
   useEffect(() => {
@@ -89,6 +90,7 @@ export const Dialog = ({context = 'global'}) => {
       <BaseDialog
         statusBarTranslucent={false}
         bounce={!dialogInfo.input}
+        closeOnTouch={!dialogInfo.disableBackdropClosing}
         onShow={async () => {
           if (dialogInfo.input) {
             
