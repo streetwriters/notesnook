@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Platform, TouchableOpacity, View } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import {Platform, TouchableOpacity, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Paragraph from '../../components/Typography/Paragraph';
-import { useTracked } from '../../provider';
-import { useSettingStore, useUserStore } from '../../provider/stores';
+import {useTracked} from '../../provider';
+import {useSettingStore, useUserStore} from '../../provider/stores';
 import Backup from '../../services/Backup';
 import {
   eSendEvent,
@@ -17,12 +17,12 @@ import {
   eOpenLoginDialog,
   eOpenRestoreDialog
 } from '../../utils/Events';
-import { openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { CustomButton } from './button';
-import { verifyUser } from './functions';
+import {openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {CustomButton} from './button';
+import {verifyUser} from './functions';
 import SectionHeader from './section-header';
 
 const SettingsBackupAndRestore = ({isSheet}) => {
@@ -127,7 +127,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
           }
         }
       },
-      desc: backupDir ? backupDir.path : 'No backup directory selected'
+      desc: backupDir ? backupDir.name : 'No backup directory selected'
     });
   }
 
@@ -199,36 +199,30 @@ const SettingsBackupAndRestore = ({isSheet}) => {
             style={{
               width: '100%',
               marginHorizontal: 0,
-              flexDirection: 'row',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              height: 50,
-              paddingHorizontal: 12
+              paddingHorizontal: 12,
+              flexShrink: 1,
+              paddingVertical:10,
             }}>
-            <View
+            <Paragraph
+              size={SIZE.md}
               style={{
-                maxWidth: '60%'
+                textAlignVertical: 'center',
+                maxWidth: '100%'
               }}>
-              <Paragraph
-                size={SIZE.md}
-                style={{
-                  textAlignVertical: 'center',
-                  maxWidth: '100%'
-                }}>
-                Automatic backups
-              </Paragraph>
-              <Paragraph color={colors.icon} size={SIZE.sm}>
-                Backup your data automatically.
-              </Paragraph>
-            </View>
+              Automatic backups
+            </Paragraph>
+            <Paragraph color={colors.icon} size={SIZE.sm}>
+              Backup your data once every week or daily automatically.
+            </Paragraph>
 
             <View
               style={{
                 flexDirection: 'row',
-                overflow: 'hidden',
                 borderRadius: 5,
-                justifyContent: 'center',
-                alignItems: 'center'
+                overflow: 'hidden',
+                marginTop: 5,
+                flexShrink: 1,
+                width: 210
               }}>
               {[
                 {
@@ -243,7 +237,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                   title: 'Weekly',
                   value: 'weekly'
                 }
-              ].map(item => (
+              ].map((item, index) => (
                 <TouchableOpacity
                   activeOpacity={1}
                   onPress={async () => {
@@ -271,14 +265,16 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                         : colors.nav,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: 50,
-                    height: 20
+                    width: 70,
+                    height: 25,
+                    borderRightWidth: index !== 2 ? 1 : 0,
+                    borderRightColor: colors.border
                   }}>
                   <Paragraph
                     color={
                       settings.reminder === item.value ? 'white' : colors.icon
                     }
-                    size={SIZE.xs}>
+                    size={SIZE.xs + 1}>
                     {item.title}
                   </Paragraph>
                 </TouchableOpacity>

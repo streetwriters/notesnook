@@ -45,7 +45,8 @@ export const CustomButton = ({
 		  </Paragraph>
 		  <Paragraph
 			style={{
-			  flexWrap: 'wrap'
+			  flexWrap: 'wrap',
+			  paddingRight:10
 			}}
 			size={SIZE.sm}
 			color={colors.icon}>

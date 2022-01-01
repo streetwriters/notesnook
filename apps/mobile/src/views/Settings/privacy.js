@@ -179,7 +179,7 @@ const SettingsPrivacyAndSecurity = () => {
           <CustomButton
             key="telemetry"
             title="Enable telemetry"
-            tagline="Usage data & crash reports will be sent to us (no 3rd party involved) for analytics. All data is anonymous as mentioned in our privacy policy."
+            tagline="Usage data & crash reports will be sent to us for analytics (no 3rd party involved). All data is anonymous as mentioned in our privacy policy."
             onPress={() => {
               SettingsService.set('telemetry', !settings.telemetry);
             }}
