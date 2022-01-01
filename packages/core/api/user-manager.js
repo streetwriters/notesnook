@@ -245,35 +245,26 @@ class UserManager {
   }
 
   async _updatePassword(type, data) {
-    let token = await this.tokenManager.getAccessToken();
-    if (!token) throw new Error("You are not logged in.");
+    const token = await this.tokenManager.getAccessToken();
+    const user = await this.getUser();
+    if (!token || !user) throw new Error("You are not logged in.");
 
-    let user = await this.getUser();
-    if (!user) throw new Error("You are not logged in.");
+    const { email, salt } = user;
 
-    const { new_password, old_password } = data;
+    let { new_password, old_password } = data;
     if (old_password && !(await this.verifyPassword(old_password)))
       throw new Error("Incorrect old password.");
 
+    if (!new_password) throw new Error("New password is required.");
+
     const attachmentsKey = await this.getAttachmentsKey();
+    data.encryptionKey ||= await this.getEncryptionKey();
 
     await this._db.outbox.add(type, data, async () => {
-      // we hash the passwords beforehand
-      const { email, salt } = await this.getUser();
-      var hashedData = {
-        old_password: undefined,
-        new_password: undefined,
-      };
-
-      if (old_password)
-        hashedData.old_password = await this._storage.hash(old_password, email);
-      if (new_password)
-        hashedData.new_password = await this._storage.hash(new_password, email);
-
       await this._db.sync(true, true);
 
       await this._storage.deriveCryptoKey(`_uk_@${email}`, {
-        password: data.new_password,
+        password: new_password,
         salt,
       });
 
@@ -289,11 +280,17 @@ class UserManager {
 
       await this._db.sync(false, true);
 
+      if (old_password)
+        old_password = await this._storage.hash(old_password, email);
+      if (new_password)
+        new_password = await this._storage.hash(new_password, email);
+
       await http.patch(
         `${constants.AUTH_HOST}${ENDPOINTS.patchUser}`,
         {
           type,
-          ...hashedData,
+          old_password,
+          new_password,
         },
         token
       );
