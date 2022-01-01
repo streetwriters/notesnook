@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
   KeyboardAvoidingView,
   Modal,
@@ -25,17 +25,15 @@ const BaseDialog = ({
   background = null,
   animated = true,
   bounce,
-  closeOnTouch=true
+  closeOnTouch = true
 }) => {
   const floating = useIsFloatingKeyboard();
 
   useEffect(() => {
-
     return () => {
       useSettingStore.getState().setSheetKeyboardHandler(true);
-    }
-
-  },[])
+    };
+  }, []);
 
   return (
     <Modal
@@ -51,7 +49,7 @@ const BaseDialog = ({
       }}
       animationType={animation}
       onRequestClose={() => {
-        if (!closeOnTouch) return null
+        if (!closeOnTouch) return null;
         useSettingStore.getState().setSheetKeyboardHandler(true);
         onRequestClose && onRequestClose();
       }}>
