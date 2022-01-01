@@ -12,7 +12,7 @@ export const Filler = ({item, background}) => {
 
   const color = 'gray';
 
-  return (
+  return currentEditingNote === item.id ? (
     <View
       style={{
         position: 'absolute',
@@ -25,5 +25,5 @@ export const Filler = ({item, background}) => {
        
         
     </View>
-  );
+  ) : null
 };

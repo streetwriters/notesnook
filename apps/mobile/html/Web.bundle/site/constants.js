@@ -588,7 +588,7 @@ th {
   background-color: ${pageTheme.colors.shade};
 }
 
-.mce-content-body table[data-mce-selected] tbody tr[data-mce-active] {
+.mce-content-body table[data-mce-selected] tr[data-mce-active] {
   background-color: ${pageTheme.colors.shade};
   /* color: var(--static); */
 }
@@ -627,8 +627,8 @@ th {
   border-right: 1px solid ${pageTheme.colors.accent + 'B3'} !important;
 }
 
-.mce-content-body table[data-mce-selected] tbody td[data-mce-active],
-.mce-content-body table[data-mce-selected] tbody th[data-mce-active] {
+.mce-content-body table[data-mce-selected] td[data-mce-active],
+.mce-content-body table[data-mce-selected] th[data-mce-active] {
   border: 2px solid ${pageTheme.colors.accent + 'B3'} !important;
   background-color: ${pageTheme.colors.shade};
 }

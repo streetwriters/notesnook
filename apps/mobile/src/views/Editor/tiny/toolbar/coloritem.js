@@ -16,6 +16,8 @@ const ColorItem = ({value, format, onCustomPress, checked}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [selected, setSelected] = useState(false);
+  const isChecked = value !== '' && (selected || checked);
+  const isNil = value === '';
 
   useEffect(() => {
     if (onCustomPress) return;
@@ -67,9 +69,6 @@ const ColorItem = ({value, format, onCustomPress, checked}) => {
     }
     eSendEvent('onColorChange');
   };
-
-  const isNil = value === '';
-  const isChecked = value !== '' && (selected || checked);
 
   return (
     <TouchableOpacity

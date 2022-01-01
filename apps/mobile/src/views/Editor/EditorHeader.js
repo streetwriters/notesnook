@@ -1,5 +1,5 @@
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect, useRef } from 'react';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect, useRef} from 'react';
 import {
   BackHandler,
   InteractionManager,
@@ -8,17 +8,17 @@ import {
   Vibration,
   View
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { ActionSheetEvent } from '../../components/DialogManager/recievers';
-import { useTracked } from '../../provider';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import {useTracked} from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -26,8 +26,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing, SUBSCRIPTION_STATUS } from '../../utils';
-import { db } from '../../utils/database';
+import {editing, SUBSCRIPTION_STATUS} from '../../utils';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -37,8 +37,9 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {sleep} from '../../utils/TimeUtils';
+import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
   clearTimer,
@@ -48,12 +49,12 @@ import {
   setColors,
   startClosingSession
 } from './Functions';
-import { ProgressCircle } from './ProgressCircle';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
-import { endSearch } from './tiny/toolbar/commands';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {ProgressCircle} from './ProgressCircle';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
+import {endSearch} from './tiny/toolbar/commands';
+import {toolbarRef} from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import { useEditorTags } from './useEditorTags';
+import {useEditorTags} from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -112,7 +113,9 @@ const EditorHeader = () => {
           undo: 0,
           redo: 0
         });
-        useEditorStore.getState().setCurrentlyEditingNote(null);
+        setTimeout(() => {
+          useEditorStore.getState().setCurrentlyEditingNote(null);
+        }, 1);
         keyboardListener.current?.remove();
         await clearEditor(true, true, true);
       }
@@ -339,8 +342,6 @@ const EditorHeader = () => {
                   }}
                   top={50}
                   onPress={async () => {
-                    EditorWebView.current?.reload();
-                    return;
                     if (editing.isFocused) {
                       safeKeyboardDismiss();
                       editing.isFocused = true;

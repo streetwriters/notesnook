@@ -22,7 +22,7 @@ import {
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import {editing} from '../../utils';
-import {COLOR_SCHEME_DARK} from '../../utils/Colors';
+import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../../utils/Colors';
 import {db} from '../../utils/database';
 import {
   eOpenAnnouncementDialog,
@@ -321,7 +321,9 @@ const AppLoader = ({onLoad}) => {
               flexDirection: 'row',
               width: 100
             }}>
-            <AnimatedProgress fill={colors.accent} current={4} total={4} />
+            <AnimatedProgress style={{
+              backgroundColor:Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.nav : COLOR_SCHEME_LIGHT.nav
+            }} fill={colors.accent} current={4} total={4} />
           </View>
         )}
       </Animated.View>

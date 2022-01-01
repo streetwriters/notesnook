@@ -113,12 +113,14 @@ const EditorOverlay = () => {
           />
         </View>
 
-        <Heading
-          textBreakStrategy="balanced"
-          style={{textAlign: 'center', marginBottom: 5}}
-          size={SIZE.lg}>
-          {loading?.title ? loading.title : 'Loading editor'}
-        </Heading>
+        {loading?.title ? (
+          <Heading
+            textBreakStrategy="balanced"
+            style={{textAlign: 'center', marginBottom: 5}}
+            size={SIZE.lg}>
+            {loading.title}
+          </Heading>
+        ) : null}
 
         {loading?.dateEdited ? (
           <Paragraph

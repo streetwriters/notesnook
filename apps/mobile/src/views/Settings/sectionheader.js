@@ -6,6 +6,7 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
+import layoutmanager from '../../utils/layout-manager';
 import { SIZE } from '../../utils/SizeUtils';
 
 const SectionHeader = ({title, collapsed, setCollapsed}) => {
@@ -16,6 +17,7 @@ const SectionHeader = ({title, collapsed, setCollapsed}) => {
     <TouchableOpacity
       activeOpacity={0.9}
       onPress={() => {
+        layoutmanager.withAnimation(200);
         setCollapsed(!collapsed);
       }}
       style={{

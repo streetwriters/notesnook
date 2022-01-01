@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react';
-import { BackHandler, View } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTracked } from '../../provider';
-import { useSelectionStore } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import React, {useEffect} from 'react';
+import {BackHandler, View} from 'react-native';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {useTracked} from '../../provider';
+import {useSelectionStore} from '../../provider/stores';
+import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { db } from '../../utils/database';
-import {
-  eOpenMoveNoteDialog, refreshNotesPage
-} from '../../utils/Events';
-import { deleteItems } from '../../utils/functions';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { presentDialog } from '../Dialog/functions';
+import SearchService from '../../services/SearchService';
+import {db} from '../../utils/database';
+import {eOpenMoveNoteDialog, refreshNotesPage} from '../../utils/Events';
+import {deleteItems} from '../../utils/functions';
+import layoutmanager from '../../utils/layout-manager';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {presentDialog} from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 
 export const SelectionHeader = React.memo(({screen, type, extras}) => {
@@ -35,9 +35,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
       Navigation.setRoutesToUpdate([
         Navigation.routeNames.Notes,
         Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Favorites
       ]);
-      setSelectionMode(false);
       clearSelection();
     }
   };
@@ -55,19 +54,18 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         Navigation.routeNames.Notebooks,
         Navigation.routeNames.NotesPage,
         Navigation.routeNames.Favorites,
-        Navigation.routeNames.Trash,
+        Navigation.routeNames.Trash
       ]);
-      setSelectionMode(false);
       clearSelection();
       ToastEvent.show({
         heading: 'Restore successful',
-        type: 'success',
+        type: 'success'
       });
     }
   };
 
   const onBackPress = () => {
-    setSelectionMode(false);
+    layoutmanager.withSpringAnimation(500);
     clearSelection();
     return true;
   };
@@ -85,22 +83,20 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
       style={{
         width: '100%',
         height: 50 + insets.top,
-        paddingTop: insets.top,
-        backgroundColor: colors.accent,
-        justifyContent: 'center',
+        paddingTop: Platform.OS === 'android' ? insets.top : null,
+        backgroundColor: colors.bg,
+        justifyContent: 'space-between',
         alignItems: 'center',
         flexDirection: 'row',
         zIndex: 999,
-        paddingHorizontal: 12,
+        paddingHorizontal: 12
       }}>
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-start',
           alignItems: 'center',
-          position: 'absolute',
-          left: 12,
-          paddingTop: insets.top,
+          borderRadius: 100
         }}>
         <ActionIcon
           customStyle={{
@@ -109,39 +105,53 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             height: 40,
             width: 40,
             borderRadius: 100,
-            marginLeft: -5,
-            marginRight: 25,
+            marginRight: 10
           }}
+          type="grayBg"
           onPress={() => {
             setSelectionMode(!selectionMode);
-            clearSelection();
           }}
-          color={colors.light}
+          size={SIZE.xl}
+          color={colors.icon}
           name="close"
         />
 
-        {Platform.OS === 'android' ? (
-          <Heading color={colors.light}>
+        <View
+          style={{
+            backgroundColor: colors.nav,
+            height: 40,
+            borderRadius: 100,
+            paddingHorizontal: 16,
+            justifyContent: 'center',
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+          <Heading size={SIZE.md} color={colors.accent}>
             {selectedItemsList.length + ' Selected'}
           </Heading>
-        ) : null}
+        </View>
       </View>
-
-      {Platform.OS !== 'android' ? (
-        <Heading color={colors.light}>
-          {selectedItemsList.length + ' Selected'}
-        </Heading>
-      ) : null}
-
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-start',
-          alignItems: 'center',
-          position: 'absolute',
-          right: 12,
-          paddingTop: insets.top,
+          alignItems: 'center'
         }}>
+        {/* <ActionIcon
+          onPress={async () => {
+            // await sleep(100);
+            // eSendEvent(eOpenMoveNoteDialog);
+            useSelectionStore.getState().setAll([...SearchService.getSearchInformation().data]);
+
+          }}
+          customStyle={{
+            marginLeft: 10
+          }}
+          color={colors.pri}
+          name="select-all"
+          size={SIZE.xl}
+        /> */}
+
         {screen === 'Trash' ||
         screen === 'Notebooks' ||
         screen === 'Notebook' ||
@@ -153,9 +163,9 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
               eSendEvent(eOpenMoveNoteDialog);
             }}
             customStyle={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
-            color={colors.light}
+            color={colors.pri}
             name="plus"
             size={SIZE.xl}
           />
@@ -176,16 +186,15 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
                   Navigation.routeNames.Favorites,
                   Navigation.routeNames.Notes,
                   Navigation.routeNames.Notebook,
-                  Navigation.routeNames.Notebooks,
+                  Navigation.routeNames.Notebooks
                 ]);
-                setSelectionMode(false);
                 clearSelection();
               }
             }}
             customStyle={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
-            color={colors.light}
+            color={colors.pri}
             name="minus"
             size={SIZE.xl}
           />
@@ -195,9 +204,9 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
           <ActionIcon
             onPress={addToFavorite}
             customStyle={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
-            color={colors.light}
+            color={colors.pri}
             name="star-off"
             size={SIZE.xl}
           />
@@ -206,7 +215,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         {screen === 'Trash' ? null : (
           <ActionIcon
             customStyle={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
             onPress={async () => {
               presentDialog({
@@ -221,12 +230,12 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
                 positivePress: () => {
                   deleteItems();
                 },
-                positiveType:"errorShade"
+                positiveType: 'errorShade'
               });
 
               return;
             }}
-            color={colors.light}
+            color={colors.pri}
             name="delete"
             size={SIZE.xl}
           />
@@ -235,9 +244,9 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         {screen === 'Trash' ? (
           <ActionIcon
             customStyle={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
-            color={colors.light}
+            color={colors.pri}
             onPress={restoreItem}
             name="delete-restore"
             size={SIZE.xl - 3}

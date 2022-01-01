@@ -240,7 +240,7 @@ export const ActionStrip = ({note, setActionStrip}) => {
       }}
       style={{
         position: 'absolute',
-        zIndex: 10,
+        zIndex: 20,
         width: '102%',
         height: '100%',
         flexDirection: 'row',

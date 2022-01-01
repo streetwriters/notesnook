@@ -16,7 +16,6 @@ import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
 import {dHeight} from '../../utils';
 import {db} from '../../utils/database';
-import diff from '../../utils/differ';
 import {
   eApplyChanges,
   eShowMergeDialog,
@@ -131,16 +130,20 @@ const MergeEditor = () => {
         : null;
 
     await db.notes.add({
-      content: {
-        data: content.data,
-        type: content.type,
-        dateEdited: content.dateEdited,
-        remote: true,
-        dateResolved: secondaryData.dateEdited
-      },
       id: note.id,
+      conflicted: false,
+      dateEdited: content.dateEdited
+    });
+
+    await db.content.add({
+      id: note.contentId,
+      data: content.data,
+      type: content.type,
+      dateResolved: secondaryData.dateModified,
+      sessionId: Date.now(),
       conflicted: false
     });
+
     if (keepCopy) {
       await db.notes.add({
         content: {
@@ -220,7 +223,6 @@ const MergeEditor = () => {
   };
 
   const close = () => {
-
     db.fs.cancel(primaryData?.noteId);
 
     EV.unsubscribe(EVENTS.mediaAttachmentDownloaded, onMediaLoaded);
@@ -275,7 +277,7 @@ const MergeEditor = () => {
                 paragraph="Apply selected changes to note?"
                 padding={12}
               />
-              <Seperator/>
+              <Seperator />
               <DialogButtons
                 positiveTitle="Apply"
                 negativeTitle="Cancel"

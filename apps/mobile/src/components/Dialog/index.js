@@ -88,9 +88,14 @@ export const Dialog = ({context = 'global'}) => {
     visible && (
       <BaseDialog
         statusBarTranslucent={false}
+        bounce={!dialogInfo.input}
         onShow={async () => {
           if (dialogInfo.input) {
-            await sleep(100);
+            
+            inputRef.current?.setNativeProps({
+              text:dialogInfo.defaultValue
+            });
+            await sleep(300);
             inputRef.current?.focus();
           }
         }}
@@ -118,7 +123,7 @@ export const Dialog = ({context = 'global'}) => {
                   setInputValue(value);
                 }}
                 secureTextEntry={dialogInfo.secureTextEntry}
-                defaultValue={dialogInfo.defaultValue}
+                //defaultValue={dialogInfo.defaultValue}
                 onSubmit={onPressPositive}
                 returnKeyLabel="Done"
                 returnKeyType="done"

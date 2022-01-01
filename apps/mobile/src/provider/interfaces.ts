@@ -73,12 +73,13 @@ export type Settings = {
     screenshotMode?: boolean,
     privacyScreen?: boolean,
     appLockMode?: string,
-    telemetry: boolean,
-    notebooksListMode: "normal" | "compact",
-    notesListMode: "normal" | "compact",
-    devMode: boolean,
-    notifNotes: boolean
-    pitchBlack:boolean
+    telemetry?: boolean,
+    notebooksListMode?: "normal" | "compact",
+    notesListMode?: "normal" | "compact",
+    devMode?: boolean,
+    notifNotes?: boolean
+    pitchBlack?:boolean, 
+    reduceAnimations?:boolean
 
 }
 
@@ -139,7 +140,7 @@ export interface SelectionStore extends State {
     setAll: (all: Array<Object>,) => void,
     setSelectionMode: (mode: boolean) => void,
     setSelectedItem: (item: Item) => void,
-    clearSelection: () => void,
+    clearSelection: (noanimation:boolean) => void,
 }
 
 export type Message = {

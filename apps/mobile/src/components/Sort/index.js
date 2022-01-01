@@ -6,6 +6,7 @@ import Navigation from '../../services/Navigation';
 import {GROUP, SORT} from '../../utils';
 import {db} from '../../utils/database';
 import {refreshNotesPage} from '../../utils/Events';
+import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {Button} from '../Button';
 import Seperator from '../Seperator';
@@ -19,7 +20,10 @@ const Sort = ({type, screen}) => {
   );
 
   const updateGroupOptions = async _groupOptions => {
+
     await db.settings.setGroupOptions(type, _groupOptions);
+
+    layoutmanager.withSpringAnimation(600);
     setGroupOptions(_groupOptions);
     setTimeout(() => {
       Navigation.setRoutesToUpdate([screen]);

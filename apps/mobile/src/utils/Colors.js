@@ -63,7 +63,8 @@ export const COLOR_SCHEME_LIGHT = {
   sec: '#ffffff',
   light: '#ffffff',
   transGray: '#00000010',
-  border:"#E8E8E8"
+  border:"#E8E8E8",
+  placeholder:"#a9a9a9"
 };
 export const COLOR_SCHEME_PITCH_BLACK = {
   ...fixedColors,
@@ -77,7 +78,8 @@ export const COLOR_SCHEME_PITCH_BLACK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
-  border:"#383838"
+  border:"#383838",
+  placeholder:"#404040"
 };
 
 export const COLOR_SCHEME_DARK = {
@@ -92,7 +94,8 @@ export const COLOR_SCHEME_DARK = {
   sec: 'black',
   light: '#ffffff',
   transGray: '#ffffff10',
-  border:"#383838"
+  border:"#383838",
+  placeholder:"#404040"
 };
 
 export function getCurrentColors() {

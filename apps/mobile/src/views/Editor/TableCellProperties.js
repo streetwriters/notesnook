@@ -8,11 +8,12 @@ import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView} from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
-import {editor_colors} from './tiny/toolbar/constants';
+import {editor_colors, rgbToHex} from './tiny/toolbar/constants';
 
 export const TableCellProperties = ({data}) => {
   const [state] = useTracked();
@@ -21,6 +22,7 @@ export const TableCellProperties = ({data}) => {
   console.log(data);
 
   const onUpdateCell = data => {
+    layoutmanager.withSpringAnimation(500);
     setCellOptions(data);
   };
 
@@ -213,8 +215,7 @@ export const TableCellProperties = ({data}) => {
           title="Body"
         />
       </View>
-
-      <Heading size={SIZE.md}>Cell background color</Heading>
+      <Heading size={SIZE.md}>Cell background color(${cellOptions.backgroundColor})</Heading>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -225,7 +226,8 @@ export const TableCellProperties = ({data}) => {
         {editor_colors.map(item => (
           <ColorItem
             value={item}
-            checked={item === cellOptions.backgroundColor}
+            key={item}
+            checked={item === (rgbToHex(cellOptions.backgroundColor))}
             onCustomPress={color => {
               tiny.call(
                 EditorWebView,

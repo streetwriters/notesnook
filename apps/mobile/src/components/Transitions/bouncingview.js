@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState} from 'react';
 import Animated, {Easing, timing} from 'react-native-reanimated';
 
 export const BouncingView = ({

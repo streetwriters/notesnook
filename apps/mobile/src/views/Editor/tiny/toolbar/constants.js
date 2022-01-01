@@ -54,6 +54,7 @@ function trim(str) {
 }
 
 export function rgbToHex(color) {
+  if (color.startsWith("#")) return color;
   if (!color.startsWith('rgba')) {
     color = '' + color;
     if (!color || color.indexOf('rgb') < 0) {

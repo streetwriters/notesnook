@@ -3,17 +3,17 @@ import {ScrollView, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {useTagStore} from '../../provider/stores';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
-import {eCloseTagsDialog, eOpenTagsDialog, refreshNotesPage} from '../../utils/Events';
+import {eCloseTagsDialog, eOpenTagsDialog} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
-import SheetWrapper from '../Sheet';
+import {sleep} from '../../utils/TimeUtils';
 import Input from '../Input';
 import {PressableButton} from '../PressableButton';
-import Paragraph from '../Typography/Paragraph';
+import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
-import { sleep } from '../../utils/TimeUtils';
+import Paragraph from '../Typography/Paragraph';
 const TagsDialog = () => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -35,7 +35,11 @@ const TagsDialog = () => {
   }, []);
 
   useEffect(() => {
-    sortTags();
+    if (visible) {
+      setTimeout(() => {
+        sortTags();
+      }, 1);
+    }
   }, [allTags, note, query]);
 
   const sortTags = () => {
@@ -59,12 +63,14 @@ const TagsDialog = () => {
       }
     }
     noteTags = noteTags.sort((a, b) => a.title.localeCompare(b.title));
-    setTags([...noteTags, ..._tags]);
+    let combinedTags = [...noteTags, ..._tags];
+    setTags(combinedTags);
   };
 
   const open = item => {
     setNote(item);
     useTagStore.getState().setTags();
+    sortTags();
     setVisible(true);
   };
 
@@ -85,34 +91,34 @@ const TagsDialog = () => {
       ToastEvent.show({
         heading: 'Tag field is empty',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
       return;
     }
 
     let tag = _query;
     setNote({...note, tags: note.tags ? [...note.tags, tag] : [tag]});
+    setQuery(null);
     inputRef.current?.setNativeProps({
-      text: '',
+      text: ''
     });
     try {
       await db.notes.note(note.id).tag(tag);
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
-      setQuery(null);
     } catch (e) {
       ToastEvent.show({
         heading: 'Cannot add tag',
         type: 'error',
         message: e.message,
-        context: 'local',
+        context: 'local'
       });
     }
 
     Navigation.setRoutesToUpdate([
       Navigation.routeNames.NotesPage,
       Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes,
+      Navigation.routeNames.Notes
     ]);
   };
 
@@ -133,13 +139,13 @@ const TagsDialog = () => {
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12,
-          minHeight: '60%',
+          minHeight: '60%'
         }}>
         <Input
           button={{
             icon: 'magnify',
             color: colors.accent,
-            size: SIZE.lg,
+            size: SIZE.lg
           }}
           fwdRef={inputRef}
           autoCapitalize="none"
@@ -167,7 +173,7 @@ const TagsDialog = () => {
                 flexDirection: 'row',
                 marginVertical: 5,
                 justifyContent: 'space-between',
-                padding: 12,
+                padding: 12
               }}
               onPress={onSubmit}
               type="accent">
@@ -177,13 +183,13 @@ const TagsDialog = () => {
               <Icon name="plus" color={colors.light} size={SIZE.lg} />
             </PressableButton>
           ) : null}
-          {!tags || tags.length === 0 ? (
+          {!allTags || allTags.length === 0 ? (
             <View
               style={{
                 width: '100%',
                 height: 200,
                 justifyContent: 'center',
-                alignItems: 'center',
+                alignItems: 'center'
               }}>
               <Heading size={50} color={colors.icon}>
                 #
@@ -193,6 +199,7 @@ const TagsDialog = () => {
               </Paragraph>
             </View>
           ) : null}
+
           {tags.map(item => (
             <TagItem
               key={item.title}
@@ -226,11 +233,13 @@ const TagItem = ({tag, note, setNote}) => {
       useTagStore.getState().setTags();
       setNote(db.notes.note(note.id).data);
     } catch (e) {}
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.NotesPage,
-      Navigation.routeNames.Favorites,
-      Navigation.routeNames.Notes,
-    ]);
+    setTimeout(() => {
+      Navigation.setRoutesToUpdate([
+        Navigation.routeNames.NotesPage,
+        Navigation.routeNames.Favorites,
+        Navigation.routeNames.Notes
+      ]);
+    }, 1);
   };
 
   return (
@@ -239,7 +248,7 @@ const TagItem = ({tag, note, setNote}) => {
         flexDirection: 'row',
         marginVertical: 5,
         justifyContent: 'space-between',
-        padding: 12,
+        padding: 12
       }}
       onPress={onPress}
       type={

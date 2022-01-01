@@ -5,11 +5,12 @@ import {Button} from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import {useTracked} from '../../provider';
 import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView} from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
-import {editor_colors} from './tiny/toolbar/constants';
+import {editor_colors, rgbToHex} from './tiny/toolbar/constants';
 
 export const TableRowProperties = ({data}) => {
   const [state] = useTracked();
@@ -18,6 +19,7 @@ export const TableRowProperties = ({data}) => {
   console.log(data);
 
   const onUpdateRow = data => {
+    layoutmanager.withSpringAnimation(500);
     setRowOptions(data);
   };
 
@@ -102,7 +104,8 @@ export const TableRowProperties = ({data}) => {
         {editor_colors.map(item => (
           <ColorItem
             value={item}
-            checked={item === rowOptions.backgroundColor}
+            key={item}
+            checked={item === rgbToHex(rowOptions.backgroundColor)}
             onCustomPress={color => {
               tiny.call(
                 EditorWebView,
@@ -138,7 +141,7 @@ export const TableRowProperties = ({data}) => {
         {editor_colors.map(item => (
           <ColorItem
             value={item}
-            checked={item === rowOptions.backgroundColor}
+            key={item}
             onCustomPress={color => {
               tiny.call(
                 EditorWebView,

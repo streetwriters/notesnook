@@ -1,14 +1,15 @@
-import 'react-native-gesture-handler';
 import React from 'react';
-import {AppRegistry, LogBox, Platform} from 'react-native';
-import {name as appName} from './app.json';
-import {enableScreens} from 'react-native-screens';
+import { AppRegistry, LayoutAnimation, LogBox, Platform, UIManager } from 'react-native';
+import 'react-native-gesture-handler';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { enableScreens } from 'react-native-screens';
+import { name as appName } from './app.json';
 import Notifications from './src/services/Notifications';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
+UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
 
-LogBox.ignoreAllLogs();
+//LogBox.ignoreAllLogs();
 
 let Provider;
 let App;

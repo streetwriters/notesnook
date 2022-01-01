@@ -3,10 +3,10 @@ import {TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {useTracked} from '../../provider';
 import {Actions} from '../../provider/Actions';
-import { useSelectionStore } from '../../provider/stores';
+import {useSelectionStore} from '../../provider/stores';
 import {SIZE} from '../../utils/SizeUtils';
 
-export const SelectionIcon = ({setActionStrip, item}) => {
+export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -15,12 +15,11 @@ export const SelectionIcon = ({setActionStrip, item}) => {
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const [selected, setSelected] = useState(false);
 
-
   useEffect(() => {
     if (selectionMode) {
       setActionStrip(false);
       let exists = selectedItemsList.filter(
-        (o) => o.dateCreated === item.dateCreated,
+        o => o.dateCreated === item.dateCreated
       );
 
       if (exists[0]) {
@@ -39,37 +38,37 @@ export const SelectionIcon = ({setActionStrip, item}) => {
     setSelectedItem(item);
   };
 
-  return (
-    selectionMode ? (
-      <View
+  return selectionMode ? (
+    <View
+      style={{
+        display: 'flex',
+        opacity: 1,
+        width: '10%',
+        height:compactMode ? 40 : 70,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: colors.bg,
+        borderRadius: 5,
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: selected ? colors.accent : colors.border
+      }}>
+      <TouchableOpacity
+        activeOpacity={1}
+        onPress={onPress}
         style={{
-          display: 'flex',
-          opacity: 1,
-          width: "10%",
-          height: 70,
           justifyContent: 'center',
           alignItems: 'center',
-          paddingRight: 8,
+          height: 70
         }}>
-        <TouchableOpacity
-            activeOpacity={1}
-            onPress={onPress}
-            style={{
-              justifyContent: 'center',
-              alignItems: 'center',
-              height: 70,
-            }}>
-            <Icon
-              size={SIZE.lg}
-              color={selected ? colors.accent : colors.icon}
-              name={
-                selected
-                  ? 'check-circle-outline'
-                  : 'checkbox-blank-circle-outline'
-              }
-            />
-          </TouchableOpacity>
-      </View>
-    ) : null
-  );
+        {selected && (
+          <Icon
+            size={SIZE.xl}
+            color={selected ? colors.accent : colors.icon}
+            name="check"
+          />
+        )}
+      </TouchableOpacity>
+    </View>
+  ) : null;
 };

@@ -92,7 +92,7 @@ export const Trash = ({route, navigation}) => {
       positivePress: async () => {
         await db.trash.clear();
         useTrashStore.getState().setTrash();
-        useSelectionStore.getState().clearSelection();
+        useSelectionStore.getState().clearSelection(true);
         ToastEvent.show({
           heading: 'Trash cleared',
           message:

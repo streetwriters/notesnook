@@ -113,8 +113,10 @@ Logged in: ${user ? 'yes' : 'no'}`,
           padding: 12,
           fontFamily: 'OpenSans-Regular',
           marginBottom: 10,
-          fontSize: SIZE.md
+          fontSize: SIZE.md,
+          color:colors.heading,
         }}
+        placeholderTextColor={colors.placeholder}
       />
 
       <TextInput
@@ -135,8 +137,10 @@ For example:
           fontFamily: 'OpenSans-Regular',
           maxHeight: 200,
           fontSize: SIZE.sm,
-          marginBottom: 2.5
+          marginBottom: 2.5,
+          color:colors.pri
         }}
+        placeholderTextColor={colors.placeholder}
       />
       <Paragraph
         size={SIZE.xs}

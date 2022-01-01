@@ -51,6 +51,7 @@ import {
   refreshNotesPage
 } from '../../utils/Events';
 import {deleteItems, openLinkInBrowser} from '../../utils/functions';
+import layoutmanager from '../../utils/layout-manager';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
@@ -217,7 +218,7 @@ export const Properties = ({
       icon: 'book-outline',
       func: () => {
         close();
-        clearSelection();
+        clearSelection(true);
         setSelectedItem(note);
         setTimeout(() => {
           eSendEvent(eOpenMoveNoteDialog, note);

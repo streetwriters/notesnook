@@ -119,7 +119,8 @@ export const bgTaskOptions = {
     name: 'ic_stat_name',
     type: 'drawable'
   },
-  color: '#ffffff'
+  color: '#ffffff',
+  linkingURI:"com.streetwriters.notesnook://launch"
 };
 
 export async function doInBackground(cb) {

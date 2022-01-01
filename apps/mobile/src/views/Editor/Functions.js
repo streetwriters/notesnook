@@ -274,6 +274,7 @@ export const loadNote = async item => {
   if (closingSession) {
     eSendEvent('loadingNote', item);
     await waitForEvent('session_ended');
+    await sleep(100);
   }
 
   closingSession = true;
@@ -303,9 +304,9 @@ export const loadNote = async item => {
         textInput.current?.focus();
         EditorWebView.current?.requestFocus();
         tiny.call(EditorWebView, tiny.focusEditor);
-      }, 150);
+      }, 200);
     } else {
-      await sleep(150);
+      await sleep(200);
       tiny.call(EditorWebView, tiny.focusEditor);
     }
     if (EDITOR_SETTINGS) {
@@ -319,6 +320,7 @@ export const loadNote = async item => {
     requestedReload = true;
     updateSessionStatus();
     tiny.call(EditorWebView, tiny.notLoading);
+
     await checkStatus(false);
   } else {
     if (id === item.id && !item.forced) {
@@ -676,6 +678,7 @@ export async function clearEditor(
   immediate = false
 ) {
   try {
+    console.log('closing session: ', closingSession);
     closingSession = true;
     tiny.call(EditorWebView, tiny.isLoading);
     if (clear) {
@@ -693,13 +696,9 @@ export async function clearEditor(
     sessionId = null;
     let func = async () => {
       try {
-        console.log('reset editor');
+        console.log('reset editor', closingSession);
         reset && EditorWebView.current?.reload();
-        // if (DDS.isTab) {
-        //   await waitForEvent('webviewOk');
-        // } else {
-        //   await sleep(1000);
-        // }
+        await waitForEvent('resetcomplete');
         editing.focusType = null;
         eSendEvent('historyEvent', {
           undo: 0,
@@ -905,6 +904,7 @@ export async function saveNote(preventUpdate) {
 }
 
 export async function onWebViewLoad(premium, colors) {
+  eSendEvent('resetcomplete');
   setTimeout(() => {
     if (premium) {
       tiny.call(EditorWebView, tiny.setMarkdown, true);

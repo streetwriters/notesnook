@@ -66,6 +66,7 @@ export const EditorTitle = () => {
           padding: 0
         }}
         placeholder="Note title"
+        placeholderTextColor={colors.placeholder}
         onChangeText={text => {
           setTitle(text);
           post('title', text);

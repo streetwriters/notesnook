@@ -72,6 +72,16 @@ body {
   padding-top: 2.5px;
 }
 
+#infoempty {
+  font-family: 'Open Sans';
+  border-radius: 5px;
+  margin:0px !important;
+  margin-top: 0;
+  margin-right: 0px !important;
+  margin-left: 0px;
+  padding-top: 2.5px;
+}
+
 .visible {
   display: inline-flex !important;
 }

@@ -62,7 +62,7 @@ export const SearchInput = props => {
         }}
         enablesReturnKeyAutomatically
         placeholder="Type a keyword"
-        placeholderTextColor={colors.icon}
+        placeholderTextColor={colors.placeholder}
       />
     </View>
   );
