@@ -54,7 +54,7 @@ const TagsProfile = createProfile(
 );
 
 const TopicsProfile = createProfile(
-  (index, item, context) => (
+  (index, item, _type, context) => (
     <Topic
       index={index}
       item={item}
