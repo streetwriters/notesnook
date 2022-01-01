@@ -75,7 +75,7 @@
   height: 100%;
   padding-bottom: 150px;
   margin: 0px !important;
-  overflow-x: hidden;
+  /* overflow-x: hidden; */
 }
 
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
