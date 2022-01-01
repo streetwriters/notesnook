@@ -258,7 +258,7 @@ class UserManager {
     if (!new_password) throw new Error("New password is required.");
 
     const attachmentsKey = await this.getAttachmentsKey();
-    data.encryptionKey ||= await this.getEncryptionKey();
+    data.encryptionKey = data.encryptionKey || await this.getEncryptionKey();
 
     await this._db.outbox.add(type, data, async () => {
       await this._db.sync(true, true);

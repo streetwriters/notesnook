@@ -120,7 +120,6 @@ describe.each([
 
       const tableContent = allContent.find((a) => a.data.includes("<table"));
       if (tableContent) {
-        console.log(tableContent.data);
         expect(
           tableContent.data.startsWith(
             `<div class="table-container" contenteditable="false">`
