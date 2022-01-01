@@ -133,6 +133,6 @@ function getDate(item, groupType) {
     case "dateDeleted":
       return item.dateDeleted;
     default:
-      return undefined;
+      return item.dateCreated;
   }
 }
