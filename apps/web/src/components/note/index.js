@@ -17,7 +17,7 @@ import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
 
 function Note(props) {
-  const { tags, notebook, item, index, context, attachments } = props;
+  const { tags, notebook, item, index, context, attachments, date } = props;
   const note = item;
   const isOpened = useStore((store) => store.selectedNote === note.id);
   const isCompact = useStore((store) => store.viewMode === "compact");
@@ -94,7 +94,7 @@ function Note(props) {
                   data-test-id={`note-${index}-locked`}
                 />
               )}
-              <TimeAgo live={true} datetime={note.dateCreated} locale="short" />
+              <TimeAgo live={true} datetime={date} locale="short" />
             </>
           ) : (
             <>
@@ -106,7 +106,7 @@ function Note(props) {
                 sx={{ flexShrink: 0 }}
                 locale="en_short"
                 live={true}
-                datetime={note.dateCreated}
+                datetime={date}
                 mr={1}
               />
 
@@ -170,6 +170,7 @@ export default React.memo(Note, function (prevProps, nextProps) {
   const prevItem = prevProps.item;
   const nextItem = nextProps.item;
   return (
+    prevProps.date === nextProps.date &&
     prevItem.pinned === nextItem.pinned &&
     prevItem.favorite === nextItem.favorite &&
     prevItem.headline === nextItem.headline &&

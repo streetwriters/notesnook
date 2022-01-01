@@ -11,7 +11,7 @@ import IconTag from "../icon-tag";
 import { showToast } from "../../utils/toast";
 
 function Notebook(props) {
-  const { item, index, totalNotes } = props;
+  const { item, index, totalNotes, date } = props;
   const notebook = item;
   const isCompact = useStore((store) => store.viewMode === "compact");
 
@@ -63,10 +63,8 @@ function Notebook(props) {
               <Text as="span" mx={1}>
                 •
               </Text>
-              {new Date(notebook.dateCreated).toLocaleDateString("en", {
-                month: "long",
-                day: "2-digit",
-                year: "numeric",
+              {new Date(date).toLocaleDateString("en", {
+                dateStyle: "medium",
               })}
               <Text as="span" mx={1}>
                 •
@@ -86,6 +84,7 @@ export default React.memo(Notebook, (prev, next) => {
   const nextItem = next.item;
 
   return (
+    prev.date === next.date &&
     prevItem.pinned === nextItem.pinned &&
     prevItem.title === nextItem.title &&
     prevItem.description === nextItem.description &&

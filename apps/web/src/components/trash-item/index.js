@@ -9,7 +9,7 @@ import { toTitleCase } from "../../utils/string";
 import { showToast } from "../../utils/toast";
 import { showPermanentDeleteToast } from "../../common/toasts";
 
-function TrashItem({ item, index }) {
+function TrashItem({ item, index, date }) {
   return (
     <ListItem
       selectable
@@ -19,10 +19,7 @@ function TrashItem({ item, index }) {
       index={index}
       footer={
         <Flex mt={1} sx={{ fontSize: "subBody", color: "fontTertiary" }}>
-          <TimeAgo
-            live={true}
-            datetime={item.dateDeleted || item.dateCreated}
-          />
+          <TimeAgo live={true} datetime={date} />
           <Text as="span" mx={1}>
             •
           </Text>

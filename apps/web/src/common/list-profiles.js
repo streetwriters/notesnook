@@ -18,7 +18,7 @@ function createProfile(item, itemHeight, estimatedItemHeight) {
 }
 
 const NotesProfile = createProfile(
-  (index, item, context) => (
+  (index, item, type, context) => (
     <Note
       index={index}
       pinnable={!context}
@@ -26,6 +26,7 @@ const NotesProfile = createProfile(
       tags={getTags(item)}
       notebook={getNotebook(item.notebooks, context?.type)}
       attachments={getAttachmentsCount(item.id)}
+      date={getDate(item, type)}
       context={context}
     />
   ),
@@ -34,8 +35,13 @@ const NotesProfile = createProfile(
 );
 
 const NotebooksProfile = createProfile(
-  (index, item) => (
-    <Notebook index={index} item={item} totalNotes={getTotalNotes(item)} />
+  (index, item, type) => (
+    <Notebook
+      index={index}
+      item={item}
+      totalNotes={getTotalNotes(item)}
+      date={getDate(item, type)}
+    />
   ),
   getNotebookHeight,
   MAX_HEIGHTS.notebook
@@ -60,7 +66,9 @@ const TopicsProfile = createProfile(
 );
 
 const TrashProfile = createProfile(
-  (index, item) => <TrashItem index={index} item={item} />,
+  (index, item, type) => (
+    <TrashItem index={index} item={item} date={getDate(item, type)} />
+  ),
   (item) => {
     if (item.itemType === "note") return getNoteHeight(item);
     else if (item.itemType === "notebook") return getNotebookHeight(item);
@@ -111,4 +119,20 @@ function getNotebook(notebooks, contextType) {
 
 function getAttachmentsCount(noteId) {
   return db.attachments.ofNote(noteId, "all").length;
+}
+
+function getDate(item, groupType) {
+  const sortBy = db.settings.getGroupOptions(groupType).sortBy;
+  switch (sortBy) {
+    case "dateEdited":
+      return item.dateEdited;
+    case "dateCreated":
+      return item.dateCreated;
+    case "dateModified":
+      return item.dateModified;
+    case "dateDeleted":
+      return item.dateDeleted;
+    default:
+      return undefined;
+  }
 }

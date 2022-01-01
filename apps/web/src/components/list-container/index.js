@@ -83,7 +83,7 @@ function ListContainer(props) {
                       />
                     );
                   default:
-                    return profile.item(index, item, context);
+                    return profile.item(index, item, groupType, context);
                 }
               }}
             />
