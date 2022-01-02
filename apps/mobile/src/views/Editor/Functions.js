@@ -222,7 +222,8 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
-
+    data = await db.content.insertPlaceholders(data,"placeholder.svg");
+    
     if (!data) {
       content.data = '';
       content.type = 'tiny';
