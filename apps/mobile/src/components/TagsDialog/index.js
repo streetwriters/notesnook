@@ -36,11 +36,10 @@ const TagsDialog = () => {
 
   useEffect(() => {
     if (visible) {
-      setTimeout(() => {
+      console.log('sorting tags')
         sortTags();
-      }, 1);
     }
-  }, [allTags, note, query]);
+  }, [allTags, note, query,visible]);
 
   const sortTags = () => {
     let _tags = [...allTags];
