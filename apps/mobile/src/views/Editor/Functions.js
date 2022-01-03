@@ -222,8 +222,8 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
-    data = await db.content.insertPlaceholders(data,"placeholder.svg");
-    
+    data = await db.content.insertPlaceholders(data, 'placeholder.svg');
+
     if (!data) {
       content.data = '';
       content.type = 'tiny';
@@ -275,7 +275,7 @@ export const loadNote = async item => {
   if (closingSession) {
     eSendEvent('loadingNote', item);
     await waitForEvent('session_ended');
-    await sleep(100);
+    await sleep(300);
   }
 
   closingSession = true;
@@ -292,13 +292,13 @@ export const loadNote = async item => {
     eSendEvent('updateTags');
     closingSession = false;
     disableSaving = false;
-    lastEditTime = 0;
+    lasstEditTime = 0;
     clearNote();
     noteEdited = false;
     loading_queue = null;
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
-
+    await checkStatus(false);
     if (Platform.OS === 'android') {
       EditorWebView.current?.requestFocus();
       setTimeout(() => {
@@ -321,8 +321,6 @@ export const loadNote = async item => {
     requestedReload = true;
     updateSessionStatus();
     tiny.call(EditorWebView, tiny.notLoading);
-
-    await checkStatus(false);
   } else {
     if (id === item.id && !item.forced) {
       console.log('note is already opened in editor');
@@ -353,13 +351,13 @@ export const loadNote = async item => {
     }
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
-    setTimeout(async () => {
-      requestedReload = true;
-      if (await checkStatus(false)) {
-        updateSessionStatus();
-      }
-    }, 50);
-    useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    requestedReload = true;
+    if (await checkStatus(false)) {
+      updateSessionStatus();
+    }
+    setTimeout(() => {
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    }, 1);
   }
 
   loading_note = false;
@@ -901,9 +899,9 @@ export async function saveNote(preventUpdate) {
     }
     console.log(e);
     ToastEvent.show({
-      heading:"Error saving note",
-      message:e.message,
-      type:"error"
+      heading: 'Error saving note',
+      message: e.message,
+      type: 'error'
     });
   }
   isSaving = false;
