@@ -99,6 +99,7 @@ export default function NotePreview({session, content}) {
             height: '100%',
             backgroundColor: 'transparent'
           }}
+          nestedScrollEnabled
           cacheMode="LOAD_DEFAULT"
           domStorageEnabled={true}
           scrollEnabled={true}
