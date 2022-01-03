@@ -13,7 +13,7 @@ const USER = {
 async function loginUser(user = USER, navigate = true) {
   if (navigate) await page.click(getTestId("navitem-login"));
 
-  await page.fill(getTestId("email"), user.email);
+  if (user.email) await page.fill(getTestId("email"), user.email);
 
   await page.fill(getTestId("password"), user.password);
 
