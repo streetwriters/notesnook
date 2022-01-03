@@ -151,6 +151,8 @@ const SimpleList = ({
         onScroll={_onScroll}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="interactive"
         refreshControl={
           <RefreshControl
             tintColor={colors.accent}
