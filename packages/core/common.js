@@ -52,6 +52,7 @@ export const EVENTS = {
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",
   vaultLocked: "vault:locked",
+  systemTimeInvalid: "system:invalidTime",
 };
 
 export const CURRENT_DATABASE_VERSION = 5.4;

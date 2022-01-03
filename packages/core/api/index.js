@@ -156,13 +156,21 @@ class Database {
         try {
           var { type, data } = JSON.parse(event.data);
           data = JSON.parse(data);
-          // console.log(type, data);
         } catch (e) {
           console.log("SSE: Unsupported message. Message = ", event.data);
           return;
         }
 
         switch (type) {
+          case "heartbeat":
+            const { t } = data;
+            const serverTime = new Date(t).getTime();
+            const localTime = Date.now();
+            const diff = localTime - serverTime;
+            const DIFFERENCE_THRESHOLD = 10 * 1000;
+            if (Math.abs(diff) > DIFFERENCE_THRESHOLD)
+              EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
+            break;
           case "upgrade":
             const user = await this.user.getUser();
             user.subscription = data;
