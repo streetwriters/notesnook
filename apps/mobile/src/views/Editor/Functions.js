@@ -461,11 +461,10 @@ export const _onMessage = async evt => {
   } catch (e) {
     return;
   }
-
   switch (message.type) {
     case 'tinyerror':
       ToastEvent.show({
-        heading: 'An error occured',
+        heading: 'Error saving note',
         message: message.value,
         type: 'error'
       });
@@ -900,6 +899,12 @@ export async function saveNote(preventUpdate) {
         }
       });
     }
+    console.log(e);
+    ToastEvent.show({
+      heading:"Error saving note",
+      message:e.message,
+      type:"error"
+    });
   }
   isSaving = false;
 }
