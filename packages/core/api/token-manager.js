@@ -18,11 +18,6 @@ class TokenManager {
   constructor(storage) {
     this._storage = storage;
     this._refreshTokenMutex = withTimeout(new Mutex(), 10 * 1000);
-    EV.subscribe(EVENTS.refreshToken, async (url) => {
-      if (url && url.includes(ENDPOINTS.token)) return;
-
-      await this._refreshToken(true);
-    });
   }
 
   async getToken(renew = true, forceRenew = false) {

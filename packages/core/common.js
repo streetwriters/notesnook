@@ -47,7 +47,7 @@ export const EVENTS = {
   appRefreshRequested: "app:refreshRequested",
   noteRemoved: "note:removed",
   tokenRefreshed: "token:refreshed",
-  refreshToken: "token:refresh",
+  logoutUser: "user:logout",
   attachmentsLoading: "attachments:loading",
   attachmentDeleted: "attachment:deleted",
   mediaAttachmentDownloaded: "attachments:mediaDownloaded",

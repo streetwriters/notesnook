@@ -62,7 +62,7 @@ async function handleResponse(response) {
 
     if (response.ok) return await response.text();
     else if (response.status === 401) {
-      EV.publish(EVENTS.refreshToken, response.url);
+      EV.publish(EVENTS.logoutUser, `401 unauthorized.`);
       throw new Error("Unauthorized.");
     } else
       throw new Error(
