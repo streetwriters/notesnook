@@ -34,9 +34,12 @@ class Merger {
   }
 
   async _deserialize(item, migrate = true) {
-    const deserialized = JSON.parse(
-      await this._db.storage.decrypt(this.key, item)
-    );
+    const decrypted = await this._db.storage.decrypt(this.key, item);
+    if (!decrypted) {
+      throw new Error("Decrypted item cannot be undefined.");
+    }
+
+    const deserialized = JSON.parse(decrypted);
     deserialized.remote = true;
     if (!migrate) return deserialized;
     return this._migrate(deserialized, item.v);
@@ -111,6 +114,11 @@ class Merger {
 
     if (synced || areAllEmpty(serverResponse)) return false;
     this.key = await this._db.user.getEncryptionKey();
+
+    if (!this.key.key || !this.key.salt) {
+      await this._db.user.logout(true, "User encryption key not generated.");
+      throw new Error("User encryption key not generated. Please relogin.");
+    }
 
     if (vaultKey) {
       await this._db.vault._setKey(await this._deserialize(vaultKey, false));
