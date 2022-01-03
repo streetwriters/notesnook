@@ -12,7 +12,7 @@ import {HeaderRightMenu} from './HeaderRightMenu';
 import {Title} from './title';
 
 export const Header = React.memo(
-  ({root, title, screen, isBack, color, action, rightButtons,notebook}) => {
+  ({root, title, screen, isBack, color, action, rightButtons, notebook}) => {
     const [state] = useTracked();
     const {colors} = state;
     const insets = useSafeAreaInsets();
@@ -44,49 +44,26 @@ export const Header = React.memo(
             overflow: 'hidden',
             borderBottomWidth: 1,
             borderBottomColor: hide ? 'transparent' : colors.nav,
-            justifyContent: 'space-between',
+            justifyContent: 'space-between'
           }
         ]}>
         <View style={styles.leftBtnContainer}>
           <HeaderLeftMenu headerMenuState={!isBack} currentScreen={screen} />
 
-          {screen !== 'Search' ? (
-            <Title
-              notebook={notebook}
-              headerColor={color}
-              heading={title}
-              screen={screen}
-              root={root}
-            />
-          ) : null}
+          <Title
+            notebook={notebook}
+            headerColor={color}
+            heading={title}
+            screen={screen}
+            root={root}
+          />
         </View>
 
-        {screen === 'Search' ? (
-          <>
-            <View
-              style={{
-                width: '80%'
-              }}>
-              <SearchInput />
-            </View>
-            <View style={[styles.rightBtnContainer]}>
-              <ActionIcon
-                onPress={() => {
-                  SearchService.search();
-                }}
-                name="magnify"
-                color={colors.pri}
-                style={styles.rightBtn}
-              />
-            </View>
-          </>
-        ) : (
-          <HeaderRightMenu
-            rightButtons={rightButtons}
-            action={action}
-            currentScreen={screen}
-          />
-        )}
+        <HeaderRightMenu
+          rightButtons={rightButtons}
+          action={action}
+          currentScreen={screen}
+        />
       </View>
     );
   },

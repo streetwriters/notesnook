@@ -460,12 +460,15 @@ code {
 .checklist > li::before {
   content: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cg%20id%3D%22checklist-unchecked%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Crect%20id%3D%22Rectangle%22%20width%3D%2215%22%20height%3D%2215%22%20x%3D%22.5%22%20y%3D%22.5%22%20fill-rule%3D%22nonzero%22%20stroke%3D%22%234C4C4C%22%20rx%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E%0A');
   cursor: pointer;
-  height: 1em;
-  margin-left: -1.5em;
+  height: 1.1em;
+  margin-left: -2.5em;
   margin-top: 0.125em;
   position: absolute;
-  width: 1em;
+  width: 1.5em;
+  padding-left: 1em;
 }
+
+
 
 .tox-checklist li.tox-checklist--checked::before,
 .checklist li.checked::before {
