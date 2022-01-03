@@ -235,6 +235,7 @@ function Settings(props) {
                 );
                 if (result) {
                   await showToast("success", "Account password changed!");
+                  await db.user.clearSessions();
                 }
               }}
             >
