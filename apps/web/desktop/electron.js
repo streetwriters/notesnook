@@ -1,4 +1,4 @@
-const { app, BrowserWindow, nativeTheme } = require("electron");
+const { app, BrowserWindow, nativeTheme, shell } = require("electron");
 const path = require("path");
 const os = require("os");
 const { isDevelopment } = require("./utils");
@@ -42,7 +42,7 @@ async function createWindow() {
       nodeIntegration: false, //true,
       enableRemoteModule: false,
       contextIsolation: true,
-      nativeWindowOpen: true,
+      nativeWindowOpen: false,
       spellcheck: false,
       preload: __dirname + "/preload.js",
     },
@@ -63,6 +63,14 @@ async function createWindow() {
   mainWindow.on("closed", () => {
     mainWindow = null;
     global.win = null;
+  });
+
+  mainWindow.webContents.setWindowOpenHandler((details) => {
+    if (details.frameName === "_blank") {
+      shell.openExternal(details.url);
+      return { action: "deny" };
+    }
+    return { action: "allow" };
   });
 
   nativeTheme.on("updated", () => {
