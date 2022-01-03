@@ -10,8 +10,10 @@ import {Button} from '../Button';
 export const Topics = ({item, close}) => {
   const [state] = useTracked();
   const {colors} = state;
-  const open = () => {
+
+  const open = (topic) => {
     close();
+
     let routeName = 'NotesPage';
     let params = {...topic, menu: false, get: 'topics'};
     let headerState = {
@@ -32,7 +34,7 @@ export const Topics = ({item, close}) => {
       //   text: colors.accent
       // }}
       height={30}
-      onPress={open}
+      onPress={() => open(topic)}
       icon="bookmark-outline"
       fontSize={SIZE.xs + 1}
       style={{
