@@ -294,9 +294,6 @@ class UserManager {
         },
         token
       );
-
-      if (type !== "change_password")
-        await this.logout(true, "Password Changed");
     });
 
     return true;
