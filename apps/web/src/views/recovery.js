@@ -400,7 +400,8 @@ function FinalStep() {
     })();
   }, [isSessionExpired]);
 
-  if (!isReady) return <Loader title={"Finalizing. Please wait..."} />;
+  if (!isReady && !isSessionExpired)
+    return <Loader title={"Finalizing. Please wait..."} />;
   return (
     <Step
       heading="Account password changed"

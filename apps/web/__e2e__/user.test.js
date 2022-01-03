@@ -28,6 +28,13 @@ async function logoutUser() {
   expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
 }
 
+async function forceExpireSession() {
+  await page.evaluate(() => {
+    window.localStorage.setItem("sessionExpired", "true");
+  });
+  await page.reload();
+}
+
 test("login user", async () => {
   await loginUser();
 
@@ -132,6 +139,65 @@ test("reset user password", async ({ page, browserName }) => {
     await page.click(getTestId("step-finish"));
 
     await loginUser({ email, password: newPassword }, false);
+
+    await page.waitForSelector(getTestId("sync-status-success"));
+
+    await logoutUser();
+
+    const cPassword = currentPassword;
+    currentPassword = newPassword;
+    newPassword = cPassword;
+
+    const cKey = currentKey;
+    currentKey = newKey;
+    newKey = cKey;
+  }
+});
+
+test("reset user password after session expiry", async ({
+  page,
+  browserName,
+}) => {
+  test.setTimeout(2 * 60 * 1000);
+  test.skip(browserName !== "chromium", "Cannot run in parallel.");
+
+  let currentPassword = "";
+  let currentKey = "";
+
+  let newPassword = USER.password;
+  let newKey = "";
+
+  let email = USER.email;
+
+  for (let i = 0; i <= 1; ++i) {
+    await loginUser({ email, password: currentPassword });
+
+    await forceExpireSession();
+
+    await page.click(getTestId("auth-forgot-password"));
+
+    await page.click(getTestId("submitButton"));
+
+    await page.waitForSelector(getTestId("step-backup-data"));
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-new-password"));
+
+    await page.fill(getTestId("new_password"), newPassword);
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-finished"));
+
+    const actualRecoveryKey = await page.innerText(
+      getTestId("new-recovery-key")
+    );
+    expect(actualRecoveryKey).toBe(newKey);
+
+    await page.click(getTestId("step-finish"));
+
+    await loginUser({ password: newPassword }, false);
 
     await page.waitForSelector(getTestId("sync-status-success"));
 
