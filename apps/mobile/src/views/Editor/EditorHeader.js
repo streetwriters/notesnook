@@ -311,7 +311,7 @@ const EditorHeader = () => {
                   Navigation.popToTop();
                 }}
                 top={50}
-                left={50}
+                left={12}
                 testID={notesnook.editor.back}
                 name="arrow-left"
                 color={colors.pri}
