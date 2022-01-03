@@ -10,8 +10,8 @@ const USER = {
   password: process.env.USER_PASSWORD,
 };
 
-async function loginUser(user = USER) {
-  await page.click(getTestId("navitem-login"));
+async function loginUser(user = USER, navigate = true) {
+  if (navigate) await page.click(getTestId("navitem-login"));
 
   await page.fill(getTestId("email"), user.email);
 

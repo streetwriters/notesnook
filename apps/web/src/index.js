@@ -26,16 +26,19 @@ const ROUTES = {
     component: () => import("./views/auth"),
     props: { type: "login" },
   },
-  // "/recover": {
-  //   component: () => import("./views/auth"),
-  //   props: { type: "recover" },
-  // },
+  "/recover": {
+    component: () => import("./views/auth"),
+    props: { type: "recover" },
+  },
   default: { component: () => import("./app"), props: {} },
 };
 
+const sessionExpiryExceptions = ["/recover", "/account/recovery"];
+
 function getRoute() {
+  const path = getCurrentPath();
   const isSessionExpired = Config.get("sessionExpired", false);
-  if (isSessionExpired) {
+  if (isSessionExpired && !sessionExpiryExceptions.includes(path)) {
     window.history.replaceState(
       {},
       null,
@@ -44,7 +47,6 @@ function getRoute() {
     return ROUTES["/sessionexpired"];
   }
 
-  const path = getCurrentPath();
   if (!isTesting() && !shouldSkipInitiation() && !ROUTES[path]) {
     window.history.replaceState({}, null, makeURL("/signup", getCurrentHash()));
     return ROUTES["/signup"];

@@ -17,6 +17,7 @@ import {
   showLogoutConfirmation,
 } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
+import { isTesting } from "../utils/platform";
 
 const authTypes = {
   sessionexpired: {
@@ -74,6 +75,7 @@ const authTypes = {
       title: "Logging you in",
       text: "Please wait while you are authenticated.",
     },
+    supportsPasswordRecovery: true,
     onSubmit: async (form, onError) => {
       return await userstore
         .login(form)
@@ -184,6 +186,7 @@ const authTypes = {
         label: "Enter email",
         autoComplete: "email",
         autoFocus: true,
+        defaultValue: (_user, form) => form.email,
       },
       {
         type: "password",
@@ -191,6 +194,7 @@ const authTypes = {
         name: "password",
         label: "Enter password",
         autoComplete: "current-password",
+        defaultValue: (_user, form) => form.password,
       },
     ],
     primaryAction: {
@@ -210,34 +214,49 @@ const authTypes = {
         .catch((e) => onError(e.message));
     },
   },
-  // recover: {
-  //   resetOnNavigate: false,
-  //   title: "Recover your account",
-  //   subtitle: {
-  //     text: "Remember your password?",
-  //     action: {
-  //       text: "Log in",
-  //       onClick: () => hardNavigate("/login", getQueryParams()),
-  //     },
-  //   },
-  //   helpTexts: {
-  //     email:
-  //       "Enter your Notesnook account email so we can send you instructions on how to recover your account.",
-  //   },
-  //   labels: { email: "Email address" },
-  //   primaryAction: {
-  //     text: "Recover account",
-  //     loadingText: "Sending recovery email...",
-  //   },
-  //   onSubmit: async (form, onError, onSuccess) => {
-  //     return await db.user
-  //       .recoverAccount(form.email.toLowerCase())
-  //       .then(async () =>
-  //         onSuccess("Recovery email sent. Please check your inbox (and spam).")
-  //       )
-  //       .catch((e) => onError(e.message));
-  //   },
-  // },
+  recover: {
+    resetOnNavigate: false,
+    title: "Recover your account",
+    subtitle: {
+      text: "Remember your password?",
+      action: {
+        text: "Log in",
+        onClick: () => hardNavigate("/login", getQueryParams()),
+      },
+    },
+    fields: [
+      {
+        type: "email",
+        id: "email",
+        name: "email",
+        label: "Enter your account email",
+        autoComplete: "email",
+        helpText:
+          "You will receive instructions on how to recover your account on this email",
+        autoFocus: true,
+        defaultValue: (user, form) => form?.email || user?.email,
+      },
+    ],
+    primaryAction: {
+      text: "Send recovery email",
+    },
+    loading: {
+      title: "Sending recovery email",
+      text: "Please wait while we send you recovery instructions",
+    },
+    onSubmit: async (form, onError, onSuccess) => {
+      return await db.user
+        .recoverAccount(form.email.toLowerCase())
+        .then(async (url) => {
+          if (isTesting()) return redirectToURL(url);
+
+          onSuccess(
+            "Recovery email sent. Please check your inbox (and spam folder)."
+          );
+        })
+        .catch((e) => onError(e.message));
+    },
+  },
 };
 
 function Auth(props) {
@@ -266,7 +285,11 @@ function Auth(props) {
       const user = await db.user.getUser();
       const isSessionExpired = Config.get("sessionExpired", false);
       if (user) {
-        if (type === "sessionexpired" && isSessionExpired) setUser(user);
+        if (
+          (type === "recover" || type === "sessionexpired") &&
+          isSessionExpired
+        )
+          setUser(user);
         else redirectToURL("/");
       } else if (type === "sessionexpired") {
         redirectToURL("/");
@@ -348,7 +371,10 @@ function Auth(props) {
                 setIsSubmitting(false);
                 setError(error);
               },
-              setSuccess
+              (message) => {
+                setSuccess(message);
+                setIsSubmitting(false);
+              }
             );
           }}
         >
@@ -390,6 +416,14 @@ function Auth(props) {
                   </Text>
                 )}
               </Text>
+              {success && (
+                <Flex bg="shade" p={1} mt={2} sx={{ borderRadius: "default" }}>
+                  <CheckCircle size={15} color="primary" />
+                  <Text variant="error" color="primary" ml={1}>
+                    {success}
+                  </Text>
+                </Flex>
+              )}
               {data.fields?.map(({ defaultValue, id, autoFocus, ...rest }) => (
                 <Field
                   {...rest}
@@ -401,53 +435,21 @@ function Auth(props) {
                   }}
                   data-test-id={id}
                   autoFocus={autoFocus}
-                  defaultValue={defaultValue ? defaultValue(user) : form.email}
+                  defaultValue={defaultValue && defaultValue(user, form)}
                 />
               ))}
-
-              {/* {data.labels.password && (
-                <Field
-                  styles={{
-                    container: { mt: 2 },
-                  }}
-                  data-test-id="password"
-                  id="password"
-                  required
-                  name="password"
-                  autoComplete={data.autoComplete?.password}
-                  label={data.labels.password}
-                  type="password"
-                  defaultValue={form.password}
-                />
-              )}
-
-              {data.confirmPassword && (
-                <Field
-                  styles={{
-                    container: { mt: 2 },
-                  }}
-                  data-test-id="confirm-password"
-                  id="confirmPassword"
-                  required
-                  name="confirmPassword"
-                  autoComplete="confirm-password"
-                  label="Confirm your password"
-                  type="password"
-                  defaultValue={form.confirmPassword}
-                />
-              )} */}
-
-              {/* {data.supportsPasswordRecovery && (
+              {data.supportsPasswordRecovery && (
                 <Button
                   type="button"
                   alignSelf="start"
-                  mt={2}
+                  data-test-id="auth-forgot-password"
+                  mt={1}
                   variant="anchor"
                   onClick={() => hardNavigate("/recover", getQueryParams())}
                 >
                   Forgot password?
                 </Button>
-              )}*/}
+              )}
               <Button
                 data-test-id="submitButton"
                 display="flex"
@@ -491,14 +493,7 @@ function Auth(props) {
                   </Text>
                 </Flex>
               )}
-              {success && (
-                <Flex bg="shade" p={1} mt={2} sx={{ borderRadius: "default" }}>
-                  <CheckCircle size={15} color="primary" />
-                  <Text variant="error" color="primary" ml={1}>
-                    {success}
-                  </Text>
-                </Flex>
-              )}
+
               {data.footer && (
                 <Text mt={2} variant="subBody" textAlign="center">
                   {data.footer}

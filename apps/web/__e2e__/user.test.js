@@ -16,15 +16,7 @@ test.beforeEach(async ({ page: _page, baseURL }) => {
 
 if (!isTestAll()) test.skip();
 
-test("login user", async () => {
-  await loginUser();
-
-  expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
-});
-
-test("logout user", async () => {
-  await loginUser();
-
+async function logoutUser() {
   await page.click(getTestId("navitem-settings"));
 
   await page.click(getTestId("settings-logout"));
@@ -34,9 +26,20 @@ test("logout user", async () => {
   await page.click(getTestId("dialog-yes"));
 
   expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
+}
+
+test("login user", async () => {
+  await loginUser();
+
+  expect(await isPresent(getTestId("navitem-sync"))).toBe(true);
 });
 
-test.only("login user and change password repeatedly", async ({
+test("logout user", async () => {
+  await loginUser();
+  await logoutUser();
+});
+
+test("login user and change password repeatedly", async ({
   page,
   browserName,
 }) => {
@@ -72,18 +75,74 @@ test.only("login user and change password repeatedly", async ({
 
         expect(await isAbsent(getTestId("dialog-yes"), 60 * 1000)).toBe(true);
 
-        await page.click(getTestId("settings-logout"));
-
-        await page.waitForSelector(getTestId("dialog-yes"));
-
-        await page.click(getTestId("dialog-yes"));
-
-        expect(await isAbsent(getTestId("navitem-sync"))).toBe(true);
+        await logoutUser();
 
         const cPassword = currentPassword;
         currentPassword = newPassword;
         newPassword = cPassword;
       }
     );
+  }
+});
+
+test("reset user password", async ({ page, browserName }) => {
+  test.setTimeout(2 * 60 * 1000);
+  test.skip(browserName !== "chromium", "Cannot run in parallel.");
+
+  let newPassword = "";
+  let newKey = "";
+
+  let currentPassword = USER.password;
+  let currentKey = "";
+
+  let email = USER.email;
+
+  for (let i = 0; i <= 1; ++i) {
+    await page.click(getTestId("navitem-login"));
+
+    await page.click(getTestId("auth-forgot-password"));
+
+    await page.fill(getTestId("email"), email);
+
+    await page.click(getTestId("submitButton"));
+
+    await page.waitForSelector(getTestId("step-recovery-key"));
+
+    await page.fill(getTestId("recovery_key"), currentKey);
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-backup-data"));
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-new-password"));
+
+    await page.fill(getTestId("new_password"), newPassword);
+
+    await page.click(getTestId("step-next"));
+
+    await page.waitForSelector(getTestId("step-finished"));
+
+    const actualRecoveryKey = await page.innerText(
+      getTestId("new-recovery-key")
+    );
+    expect(actualRecoveryKey).toBe(newKey);
+
+    await page.click(getTestId("step-finish"));
+
+    await loginUser({ email, password: newPassword }, false);
+
+    await page.waitForSelector(getTestId("sync-status-success"));
+
+    await logoutUser();
+
+    const cPassword = currentPassword;
+    currentPassword = newPassword;
+    newPassword = cPassword;
+
+    const cKey = currentKey;
+    currentKey = newKey;
+    newKey = cKey;
   }
 });
