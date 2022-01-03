@@ -15,6 +15,7 @@ import * as Icon from "../components/icons";
 import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
 import { Mutex } from "async-mutex";
+import { formatDate } from "notes-core/utils/date";
 
 const DialogMutex = new Mutex();
 function showDialog(dialog) {
@@ -595,5 +596,27 @@ export function showIssueDialog() {
 export function showImportDialog() {
   return showDialog((Dialogs, perform) => (
     <Dialogs.ImportDialog onClose={(res) => perform(res)} />
+  ));
+}
+
+export function showInvalidSystemTimeDialog({ serverTime, localTime }) {
+  return showDialog((Dialogs) => (
+    <Dialogs.Confirm
+      title={"Your system clock is out of sync"}
+      subtitle={
+        "Please correct your system date & time and reload the app to avoid syncing issues."
+      }
+      message={
+        <>
+          Server time:{" "}
+          {formatDate(serverTime, { dateStyle: "medium", timeStyle: "medium" })}
+          <br />
+          Local time:{" "}
+          {formatDate(localTime, { dateStyle: "medium", timeStyle: "medium" })}
+        </>
+      }
+      yesText="Reload app"
+      onYes={() => window.location.reload()}
+    />
   ));
 }

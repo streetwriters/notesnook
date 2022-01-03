@@ -16,7 +16,10 @@ import { registerKeyMap } from "./common/key-map";
 import { isUserPremium } from "./hooks/use-is-user-premium";
 import { loadTrackerScript } from "./utils/analytics";
 import useAnnouncements from "./utils/use-announcements";
-import { showAnnouncementDialog } from "./common/dialog-controller";
+import {
+  showAnnouncementDialog,
+  showInvalidSystemTimeDialog,
+} from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
 
@@ -84,6 +87,13 @@ export default function AppEffects({ setShow }) {
   );
 
   useEffect(() => {
+    const systemTimeInvalidEvent = EV.subscribe(
+      EVENTS.systemTimeInvalid,
+      async ({ serverTime, localTime }) => {
+        await showInvalidSystemTimeDialog({ serverTime, localTime });
+      }
+    );
+
     const attachmentsLoadingEvent = EV.subscribe(
       EVENTS.attachmentsLoading,
       ({ type, total, current }) => {
@@ -119,6 +129,7 @@ export default function AppEffects({ setShow }) {
     return () => {
       attachmentsLoadingEvent.unsubscribe();
       progressEvent.unsubscribe();
+      systemTimeInvalidEvent.unsubscribe();
     };
   }, [setProcessingStatus]);
 

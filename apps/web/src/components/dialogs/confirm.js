@@ -10,16 +10,18 @@ function Confirm(props) {
       icon={props.icon}
       description={props.subtitle}
       onClose={props.onNo}
-      positiveButton={{
-        text: props.yesText,
-        onClick: props.onYes,
-        autoFocus: !!props.yesText,
-      }}
+      positiveButton={
+        props.yesText && {
+          text: props.yesText,
+          onClick: props.onYes,
+          autoFocus: !!props.yesText,
+        }
+      }
       negativeButton={
         props.noText && { text: props.noText, onClick: props.onNo }
       }
     >
-      <Box>
+      <Box pb={!props.noText && !props.yesText ? 2 : 0}>
         <Text as="span" variant="body">
           {props.message}
         </Text>
