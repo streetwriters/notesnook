@@ -723,8 +723,13 @@ function selectchange() {
         currentFormats.fontsize = '8pt';
       }
     }
+
     if (node.nodeName === 'A') {
       currentFormats.link = node.getAttribute('href');
+    }
+    let isLinkNode = node.closest('a');
+    if (isLinkNode) {
+      currentFormats.link = isLinkNode.getAttribute('href');
     }
 
     currentFormats.fontname = editor.selection.getNode().style.fontFamily;
