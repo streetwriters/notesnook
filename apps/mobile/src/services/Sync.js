@@ -32,12 +32,6 @@ const run = async (context = 'global', forced) => {
     if (typeof res === 'string') throw new Error(res);
     retryCount = 0;
     result = true;
-    ToastEvent.show({
-      heading: 'Sync complete',
-      type: 'success',
-      message: 'All your notes are encrypted and synced!',
-      context: context
-    });
   } catch (e) {
     result = false;
     if (e.message !== 'Sync already running' && userstore.user) {

@@ -1,7 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, RefreshControlComponent, View} from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  RefreshControlComponent,
+  View
+} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {db} from '../../utils/database';
@@ -76,6 +82,7 @@ const SimpleList = ({
   const [_loading, _setLoading] = useState(true);
   //const refreshing = false;
   const [refreshing, setRefreshing] = useState(false);
+  const syncing = useUserStore(state => state.syncing);
 
   useEffect(() => {
     let timeout = null;
@@ -158,7 +165,7 @@ const SimpleList = ({
             tintColor={colors.accent}
             colors={[colors.accent]}
             onRefresh={_onRefresh}
-            refreshing={refreshing}
+            refreshing={refreshing || syncing}
           />
         }
         ListEmptyComponent={
