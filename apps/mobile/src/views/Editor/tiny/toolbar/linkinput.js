@@ -15,7 +15,9 @@ import {
   properties
 } from './constants';
 import LinkPreview from './linkpreview';
-import validator from 'validator';
+import isURL from 'validator/lib/isURL';
+import isEmail from 'validator/lib/isEmail';
+import isMobilePhone from "validator/lib/isMobilePhone";
 import Input from '../../../../components/Input';
 
 let inputValue = null;
@@ -76,8 +78,8 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       formatSelection(execCommands.unlink);
       setVisible(false);
     } else {
-      if (!inputValue.includes('://')) inputValue = 'https://' + inputValue;
-      if (!validator.isURL(inputValue)) {
+
+      if (!isURL(inputValue) || !isEmail(inputValue) || !isMobilePhone(inputValue)) {
         ToastEvent.show({
           heading: 'Invalid url',
           message: 'Please enter a valid url',
