@@ -9,6 +9,9 @@ import {useTracked} from '../../../../provider';
 import {openLinkInBrowser} from '../../../../utils/functions';
 import {SIZE} from '../../../../utils/SizeUtils';
 import {INPUT_MODE, properties, reFocusEditor} from './constants';
+import validator from 'validator';
+import { ToastEvent } from '../../../../services/EventManager';
+
 
 let prevLink = {};
 const LinkPreview = ({setMode, value, onSubmit}) => {
@@ -88,12 +91,21 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   };
 
   const openLink = () => {
-    openLinkInBrowser(value, colors)
-      .catch(e => {})
-      .then(async r => {
-        console.log('closed browser now');
-        await reFocusEditor();
+    
+    if (validator.isURL(value)) {
+      openLinkInBrowser(value, colors)
+        .catch(e => {})
+        .then(async r => {
+          console.log('closed browser now');
+          await reFocusEditor();
+        });
+    } else {
+      ToastEvent.show({
+        heading:"Url not valid",
+        message:value,
+        type:'error'
       });
+    }
   };
 
   const renderText = (name, title, description) => {
