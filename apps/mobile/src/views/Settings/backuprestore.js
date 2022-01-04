@@ -1,6 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {Platform, TouchableOpacity, View} from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
+import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
 import {useSettingStore, useUserStore} from '../../provider/stores';
@@ -201,7 +202,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
               marginHorizontal: 0,
               paddingHorizontal: 12,
               flexShrink: 1,
-              paddingVertical:10,
+              paddingVertical: 10
             }}>
             <Paragraph
               size={SIZE.md}
@@ -214,15 +215,14 @@ const SettingsBackupAndRestore = ({isSheet}) => {
             <Paragraph color={colors.icon} size={SIZE.sm}>
               Backup your data once every week or daily automatically.
             </Paragraph>
-
+            <Seperator half />
             <View
               style={{
                 flexDirection: 'row',
                 borderRadius: 5,
                 overflow: 'hidden',
-                marginTop: 5,
                 flexShrink: 1,
-                width: 210
+                width: '100%'
               }}>
               {[
                 {
@@ -236,10 +236,14 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                 {
                   title: 'Weekly',
                   value: 'weekly'
+                },
+                {
+                  title: 'Monthly',
+                  value: 'monthly'
                 }
               ].map((item, index) => (
                 <TouchableOpacity
-                  activeOpacity={1}
+                  activeOpacity={0.9}
                   onPress={async () => {
                     if (item.value === 'useroff') {
                       await SettingsService.set('reminder', item.value);
@@ -265,16 +269,16 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                         : colors.nav,
                     justifyContent: 'center',
                     alignItems: 'center',
-                    width: 70,
-                    height: 25,
-                    borderRightWidth: index !== 2 ? 1 : 0,
+                    width: '25%',
+                    height: 35,
+                    borderRightWidth: index !== 3 ? 1 : 0,
                     borderRightColor: colors.border
                   }}>
                   <Paragraph
                     color={
                       settings.reminder === item.value ? 'white' : colors.icon
                     }
-                    size={SIZE.xs + 1}>
+                    size={SIZE.sm - 1}>
                     {item.title}
                   </Paragraph>
                 </TouchableOpacity>
