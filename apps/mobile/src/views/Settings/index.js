@@ -13,7 +13,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {InteractionManager} from '../../utils';
+import {InteractionManager, STORE_LINK} from '../../utils';
 import { APP_VERSION } from "../../../version";
 import {db} from '../../utils/database';
 import {eScrollEvent, eUpdateSearchState} from '../../utils/Events';
@@ -278,11 +278,7 @@ export const Settings = ({navigation}) => {
                   }`}
                   onPress={async () => {
                     try {
-                      await Linking.openURL(
-                        Platform.OS === 'ios'
-                          ? 'https://bit.ly/notesnook-ios'
-                          : 'https://bit.ly/notesnook-and'
-                      );
+                      await Linking.openURL(STORE_LINK);
                     } catch (e) {}
                   }}
                 />
