@@ -14,7 +14,7 @@ import {
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {InteractionManager, STORE_LINK} from '../../utils';
-import { APP_VERSION } from "../../../version";
+import {APP_VERSION} from '../../../version';
 import {db} from '../../utils/database';
 import {eScrollEvent, eUpdateSearchState} from '../../utils/Events';
 import {openLinkInBrowser} from '../../utils/functions';
@@ -27,21 +27,20 @@ import AccoutLogoutSection from './logout';
 import SettingsPrivacyAndSecurity from './privacy';
 import SectionHeader from './section-header';
 import SettingsUserSection from './user-section';
+import {Update} from '../../components/Update';
+import {checkVersion} from 'react-native-check-version';
 
 const format = ver => {
   let parts = ver.toString().split('');
 
-  return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith("0")? parts[2]?.slice(1) : parts[2]}${
-
-    parts[3] === '0' ? '' : parts[3]
-  } `;
+  return `v${parts[0]}.${parts[1]}.${
+    parts[2]?.startsWith('0') ? parts[2]?.slice(1) : parts[2]
+  }${parts[3] === '0' ? '' : parts[3]} `;
 };
 
 export const Settings = ({navigation}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
-  const [version, setVersion] = useState(null);
-  const [loading, setLoading] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
   let pageIsLoaded = false;
@@ -71,15 +70,34 @@ export const Settings = ({navigation}) => {
     );
   }, []);
 
+  // const checkAppUpdateAvailable = async () => {
+  //   try {
+  //     const version = await checkVersion();
+  //     if (!version.needsUpdate) {
+  //       ToastEvent.show({
+  //         heading: 'You are on the latest version',
+  //         type: 'success'
+  //       });
+  //       return false;
+  //     }
+  //     presentSheet({
+  //       noIcon: true,
+  //       noProgess: true,
+  //       component: ref => <Update version={version} fwdRef={ref} />
+  //     });
+  //     return true;
+  //   } catch (e) {
+  //     ToastEvent.show({
+  //       heading: 'You are on the latest version',
+  //       type: 'success'
+  //     });
+  //     return false;
+  //   }
+  // };
+
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
       navigation.addListener('focus', onFocus);
-      db.version()
-        .then(ver => {
-          console.log(ver, 'VERSION');
-          setVersion(ver);
-        })
-        .catch(e => console.log(e, 'VER'));
     });
 
     return () => {
@@ -106,26 +124,6 @@ export const Settings = ({navigation}) => {
         } catch (e) {}
       },
       desc: 'Read our privacy policy'
-    },
-    {
-      name: 'Check for updates',
-      func: async () => {
-        if (!version) return;
-        if (version.mobile <= APP_VERSION) {
-          ToastEvent.show({
-            heading: 'No new updates',
-            type: 'success',
-            message: 'You are using the latest version'
-          });
-          return;
-        }
-        eSendEvent('updateDialog', version);
-      },
-
-      desc:
-        version?.mobile > APP_VERSION
-          ? 'New update available.'
-          : 'You are using the latest version'
     },
     {
       name: `Report an issue`,
