@@ -9,6 +9,7 @@ import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import { STORE_LINK } from '../../utils';
 
 const RateDialog = () => {
   const [visible, setVisible] = useState(false);
@@ -64,12 +65,7 @@ const RateDialog = () => {
         <Seperator half />
         <Button
           onPress={async () => {
-            await Linking.openURL(
-              Platform.OS === 'ios'
-                ? 'https://bit.ly/notesnook-ios'
-                : 'https://bit.ly/notesnook-and'
-            );
-
+            await Linking.openURL(STORE_LINK);
             await MMKV.setItem('askForRating', 'completed');
             setVisible(false);
           }}
