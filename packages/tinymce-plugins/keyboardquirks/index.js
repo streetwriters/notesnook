@@ -162,7 +162,6 @@ function androidGboardEnterKeyQuirk(editor) {
       }
       sibling = parentElement.nextElementSibling;
       if (!sibling) return;
-      sibling.innerHTML = "<br>";
       editor.selection.setCursorLocation(sibling, 0);
     }
   });
