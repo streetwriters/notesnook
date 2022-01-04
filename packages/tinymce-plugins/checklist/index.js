@@ -4,13 +4,14 @@ const CLASS_NAMES = {
   list: "checklist",
   checked: "checked",
 };
+
 const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
 
 /**
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
-  editor.addCommand("insertChecklist", function() {
+  editor.addCommand("insertChecklist", function () {
     insertChecklist(editor);
   });
 
@@ -19,16 +20,17 @@ function register(editor) {
     active: false,
     tooltip: "Checklist",
     onAction: () => insertChecklist(editor),
-    onSetup: function(api) {
+    onSetup: function (api) {
       return listState(editor, api.setActive);
     },
   });
 
   editor.on(
     "mousedown",
-    function(event) {
+    function (event) {
       var node = event.target;
       var parent = node.parentElement;
+
       if (
         event.offsetX > 0 ||
         parent.className !== CLASS_NAMES.list ||
@@ -42,25 +44,49 @@ function register(editor) {
     { capture: true, passive: false }
   );
 
-  editor.on(
-    "touchstart",
-    function(event) {
-      var node = event.target;
-      var parent = node.parentElement;
-      if (
-        event.targetTouches.length > 0 ||
-        event.targetTouches[0].clientX > 45 ||
-        parent.className !== CLASS_NAMES.list ||
-        node.nodeName !== "LI"
-      ) {
-        return;
+  let shouldCancelNextTouchEndEvent = false;
+  const onTouchStartEnd = function (event) {
+    if (event.type === "touchend") {
+      if (shouldCancelNextTouchEndEvent) {
+        event.preventDefault();
+        shouldCancelNextTouchEndEvent = false;
       }
-      event.preventDefault();
+      return;
+    }
 
+    if (event.targetTouches.length !== 1) return;
+
+    let xPos = event.targetTouches[0].clientX;
+
+    if (xPos > 55) return;
+
+    let node = event.target;
+    let parent = node.parentElement;
+
+    if (node.nodeName !== "LI") {
+      let yPos = event.targetTouches[0].clientY;
+      let elements = editor.dom.doc.elementsFromPoint(55, yPos);
+
+      if (!elements || elements.length === 0) return;
+      node = elements[0];
+      parent = node.parentElement;
+    }
+
+    if (
+      node.nodeName === "LI" &&
+      parent &&
+      parent.className === CLASS_NAMES.list
+    ) {
+      shouldCancelNextTouchEndEvent = true;
+      event.preventDefault();
       toggleChecklistItem(editor, node);
-    },
-    { capture: true, passive: false }
-  );
+    }
+  };
+
+  editor.on("touchstart touchend", onTouchStartEnd, {
+    capture: true,
+    passive: false,
+  });
 }
 
 /**
@@ -69,7 +95,7 @@ function register(editor) {
 function insertChecklist(editor) {
   const node = editor.selection.getNode();
   if (node.classList.contains(CLASS_NAMES.list)) {
-    editor.undoManager.transact(function() {
+    editor.undoManager.transact(function () {
       editor.execCommand("RemoveList");
     });
   } else {
@@ -81,11 +107,11 @@ function insertChecklist(editor) {
 }
 
 function listState(editor, activate) {
-  var nodeChangeHandler = function(e) {
+  var nodeChangeHandler = function (e) {
     var inList = findUntil(e.parents, isListNode, isTableCellNode);
     if (inList)
       inList =
-        inList.filter(function(list) {
+        inList.filter(function (list) {
           return list.className === CLASS_NAMES.list;
         }).length > 0;
     activate(inList);
@@ -93,7 +119,7 @@ function listState(editor, activate) {
   var parents = editor.dom.getParents(editor.selection.getNode());
   nodeChangeHandler({ parents: parents });
   editor.on("NodeChange", nodeChangeHandler);
-  return function() {
+  return function () {
     return editor.off("NodeChange", nodeChangeHandler);
   };
 }
@@ -113,7 +139,7 @@ function findUntil(xs, pred, until) {
 var isListNode = matchNodeNames(/^(OL|UL|DL)$/);
 var isTableCellNode = matchNodeNames(/^(TH|TD)$/);
 function matchNodeNames(regex) {
-  return function(node) {
+  return function (node) {
     return node && regex.test(node.nodeName);
   };
 }
@@ -123,7 +149,7 @@ function matchNodeNames(regex) {
  * @param {HTMLElement} node
  */
 function toggleChecklistItem(editor, node) {
-  editor.undoManager.transact(function() {
+  editor.undoManager.transact(function () {
     const isChecked = node.classList.contains(CLASS_NAMES.checked);
     if (isChecked) node.classList.remove(CLASS_NAMES.checked);
     else node.classList.add(CLASS_NAMES.checked);
