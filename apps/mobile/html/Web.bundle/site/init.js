@@ -227,7 +227,7 @@ function init_callback(_editor) {
   editor.on('keyup', e => {
     console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
-    onChange();
+    onChange(e);
   });
 }
 
