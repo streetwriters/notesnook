@@ -123,12 +123,12 @@ const AccoutLogoutSection = () => {
                 let verified = await db.user.verifyPassword(value);
                 if (verified) {
                   setLoading(true);
-                  await sleep(10);
-                  await db.user.deleteUser(passwordValue.current);
+                  await db.user.deleteUser(value);
                   await BiometricService.resetCredentials();
                   await Storage.write('introCompleted', 'true');
                   setLoading(false);
                 } else {
+                  setLoading(false);
                   ToastEvent.show({
                     heading: 'Incorrect password',
                     message: 'The account password you entered is incorrect',
@@ -137,6 +137,8 @@ const AccoutLogoutSection = () => {
                   });
                 }
               } catch (e) {
+                console.log(e);
+                setLoading(false);
                 ToastEvent.show({
                   heading: 'Failed to delete account',
                   message: e.message,
