@@ -12,6 +12,23 @@ function register(editor) {
 }
 
 /**
+ * => Detected & tested on:
+ * All platforms
+ *
+ * => Quirk details:
+ * This is not a quirk per-se — simply a limitation in most editors.
+ * The first line is not backspace-able/deletable which is not an
+ * issue on most platforms that have forward delete. However, on macOS
+ * and mobile devices there is no way to forward delete which makes it
+ * impossible to delete the first line without moving the cursor to
+ * the second line and backspacing from there. A minor annoyance but an
+ * annoyance still.
+ *
+ * => How the fix works:
+ * The fix just detects if we are on the first line and if the first line
+ * is empty whenever backspace/delete key is pressed. If true, we remove
+ * the first line otherwise ignore it.
+ *
  * @param {import("tinymce").Editor} editor
  */
 function firstLineBackspaceQuirk(editor) {
