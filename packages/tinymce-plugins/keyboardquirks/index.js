@@ -5,9 +5,27 @@ const ZERO_WIDTH_NOBREAK_SPACE = 65279;
  * @param {import("tinymce").Editor} editor
  */
 function register(editor) {
+  firstLineBackspaceQuirk(editor);
   androidBackspaceKeyQuirk(editor);
   androidGboardEnterKeyQuirk(editor);
   androidSwiftKeyFormattingQuirk(editor);
+}
+
+/**
+ * @param {import("tinymce").Editor} editor
+ */
+function firstLineBackspaceQuirk(editor) {
+  editor.on("keydown", (e) => {
+    if (e.key !== "Backspace" && e.key !== "Delete") return;
+
+    const selectionStartElement = editor.selection.getStart(true);
+    if (
+      selectionStartElement === editor.getBody().firstElementChild &&
+      !selectionStartElement.textContent.trim()
+    ) {
+      selectionStartElement.remove();
+    }
+  });
 }
 
 /**
