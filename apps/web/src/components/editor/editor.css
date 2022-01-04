@@ -78,6 +78,10 @@
   /* overflow-x: hidden; */
 }
 
+.mce-content-body * {
+  font-family: inherit;
+}
+
 .mce-content-body:not([dir="rtl"])[data-mce-placeholder]:not(.mce-visualblocks)::before {
   left: 0px !important;
 }
