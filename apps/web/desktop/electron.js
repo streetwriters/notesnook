@@ -42,7 +42,7 @@ async function createWindow() {
       nodeIntegration: false, //true,
       enableRemoteModule: false,
       contextIsolation: true,
-      nativeWindowOpen: false,
+      nativeWindowOpen: true,
       spellcheck: false,
       preload: __dirname + "/preload.js",
     },
@@ -66,11 +66,8 @@ async function createWindow() {
   });
 
   mainWindow.webContents.setWindowOpenHandler((details) => {
-    if (details.frameName === "_blank") {
-      shell.openExternal(details.url);
-      return { action: "deny" };
-    }
-    return { action: "allow" };
+    shell.openExternal(details.url);
+    return { action: "deny" };
   });
 
   nativeTheme.on("updated", () => {
