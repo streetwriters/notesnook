@@ -1,13 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {TextInput, View} from 'react-native';
-import {Button} from '../../../../components/Button';
-import {useTracked} from '../../../../provider';
-import {eSendEvent, ToastEvent} from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
-import {normalize, SIZE} from '../../../../utils/SizeUtils';
-import {EditorWebView} from '../../Functions';
+import React, { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
+import isEmail from 'validator/lib/isEmail';
+import isMobilePhone from "validator/lib/isMobilePhone";
+import isURL from 'validator/lib/isURL';
+import { Button } from '../../../../components/Button';
+import Input from '../../../../components/Input';
+import { useTracked } from '../../../../provider';
+import { eSendEvent, ToastEvent } from '../../../../services/EventManager';
+import { editing } from '../../../../utils';
+import { SIZE } from '../../../../utils/SizeUtils';
+import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
-import {execCommands} from './commands';
+import { execCommands } from './commands';
 import {
   focusEditor,
   formatSelection,
@@ -15,10 +19,6 @@ import {
   properties
 } from './constants';
 import LinkPreview from './linkpreview';
-import isURL from 'validator/lib/isURL';
-import isEmail from 'validator/lib/isEmail';
-import isMobilePhone from "validator/lib/isMobilePhone";
-import Input from '../../../../components/Input';
 
 let inputValue = null;
 
@@ -55,13 +55,17 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
         }, 1000);
       }
       inputRef.current?.focus();
-      return;
     } else {
       if (properties.pauseSelectionChange) {
         setTimeout(() => {
           properties.pauseSelectionChange = false;
         }, 1000);
       }
+    }
+
+    return () => {
+      tiny.call(EditorWebView, tiny.restoreRange);
+      tiny.call(EditorWebView, tiny.clearRange);
     }
   }, [mode]);
 
@@ -79,7 +83,7 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       setVisible(false);
     } else {
 
-      if (!isURL(inputValue) || !isEmail(inputValue) || !isMobilePhone(inputValue)) {
+      if (!isURL(inputValue) && !isEmail(inputValue) && !isMobilePhone(inputValue)) {
         ToastEvent.show({
           heading: 'Invalid url',
           message: 'Please enter a valid url',
@@ -89,11 +93,14 @@ const ToolbarLinkInput = ({format, value, setVisible}) => {
       }
       console.log('format:', format, 'value:', inputValue);
       properties.userBlur = true;
+      tiny.call(EditorWebView, tiny.restoreRange);
+      tiny.call(EditorWebView, tiny.clearRange);
       formatSelection(execCommands[format](inputValue));
     }
 
     editing.tooltip = null;
     setMode(INPUT_MODE.NO_EDIT);
+    
     focusEditor(format, false);
     properties.userBlur = false;
   };
