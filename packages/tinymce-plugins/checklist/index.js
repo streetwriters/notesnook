@@ -4,6 +4,7 @@ const CLASS_NAMES = {
   list: "checklist",
   checked: "checked",
 };
+
 const EMPTY_CHECKLIST_HTML = `<ul class="${CLASS_NAMES.list}"><li></li></ul>`;
 
 /**
@@ -29,6 +30,8 @@ function register(editor) {
     function(event) {
       var node = event.target;
       var parent = node.parentElement;
+
+
       if (
         event.offsetX > 0 ||
         parent.className !== CLASS_NAMES.list ||
@@ -42,25 +45,48 @@ function register(editor) {
     { capture: true, passive: false }
   );
 
+  let shouldCancelNextTouchEndEvent =  false;
+  const onTouchStartEnd = function(event) {
+    if (event.type === "touchend") {
+      if (shouldCancelNextTouchEndEvent) {
+        event.preventDefault();
+        shouldCancelNextTouchEndEvent = false;
+      }
+      return;
+    }
+
+    let xPos = event.targetTouches[0].clientX;
+
+    if (event.targetTouches.length !== 1 || xPos > 55 ) return;
+
+    let node = event.target;
+    let parent = node.parentElement;
+
+    if (node.nodeName !== "LI") {
+      let yPos = event.targetTouches[0].clientY;
+      node = editor.dom.doc.elementsFromPoint(55,yPos)[0];
+      parent = node.parentElement;
+    }
+
+    if (node.nodeName === "LI" && parent && parent.className === CLASS_NAMES.list) {
+      shouldCancelNextTouchEndEvent = true;
+      event.preventDefault();
+      toggleChecklistItem(editor, node);
+    }
+  }
+
   editor.on(
     "touchstart",
-    function(event) {
-      var node = event.target;
-      var parent = node.parentElement;
-      if (
-        event.targetTouches.length > 0 ||
-        event.targetTouches[0].clientX > 45 ||
-        parent.className !== CLASS_NAMES.list ||
-        node.nodeName !== "LI"
-      ) {
-        return;
-      }
-      event.preventDefault();
-
-      toggleChecklistItem(editor, node);
-    },
+    onTouchStartEnd,
     { capture: true, passive: false }
   );
+  
+  editor.on(
+    "touchend",
+    onTouchStartEnd,
+    { capture: true, passive: false }
+  );
+
 }
 
 /**
