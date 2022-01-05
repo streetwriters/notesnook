@@ -164,6 +164,7 @@ const SimpleList = ({
           <RefreshControl
             tintColor={colors.accent}
             colors={[colors.accent]}
+            progressBackgroundColor={colors.nav}
             onRefresh={_onRefresh}
             refreshing={refreshing || syncing}
           />
