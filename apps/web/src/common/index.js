@@ -11,7 +11,6 @@ import { hashNavigate, getCurrentHash } from "../navigation";
 import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
 import { isTesting } from "../utils/platform";
-import EventManager from "notes-core/utils/eventmanager";
 import { store as userstore } from "../stores/user-store";
 
 export const COLORS = [
@@ -132,12 +131,6 @@ export async function verifyAccount() {
     return db.user.verifyPassword(password);
   });
 }
-
-export const AppEventManager = new EventManager();
-export const AppEvents = {
-  UPDATE_ATTACHMENT_PROGRESS: "updateAttachmentProgress",
-  UPDATE_WORD_COUNT: "updateWordCount",
-};
 
 export function totalSubscriptionConsumed(user) {
   if (!user) return 0;

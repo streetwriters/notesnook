@@ -4,12 +4,8 @@ import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
 import { resetReminders } from "./common/reminders";
-import {
-  AppEventManager,
-  AppEvents,
-  introduceFeatures,
-  showUpgradeReminderDialogs,
-} from "./common";
+import { introduceFeatures, showUpgradeReminderDialogs } from "./common";
+import { AppEventManager, AppEvents } from "./common/app-events";
 import { db } from "./common/db";
 import { CHECK_IDS, EV, EVENTS } from "notes-core/common";
 import { registerKeyMap } from "./common/key-map";

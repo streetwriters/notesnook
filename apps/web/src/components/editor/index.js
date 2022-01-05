@@ -18,7 +18,7 @@ import Header from "./header";
 import Toolbar from "./toolbar";
 import EditorLoading from "./loading";
 import { db } from "../../common/db";
-import { AppEventManager, AppEvents } from "../../common";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 import debounce from "just-debounce-it";
 import { FlexScrollContainer } from "../scroll-container";
 import { formatDate } from "notes-core/utils/date";
