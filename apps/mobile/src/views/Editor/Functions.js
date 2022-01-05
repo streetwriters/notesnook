@@ -67,7 +67,6 @@ let disableSaving = false;
 let isSaving = false;
 let waitForContent = false;
 let prevNoteContent = null;
-let timerForEditor = null;
 let sessionId = null;
 let historySessionId = null;
 
