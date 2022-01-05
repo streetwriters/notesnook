@@ -9,7 +9,8 @@ import {Button} from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { STORE_LINK } from '../../utils';
+import {STORE_LINK} from '../../utils';
+import {clearMessage} from '../../services/Message';
 
 const RateDialog = () => {
   const [visible, setVisible] = useState(false);
@@ -49,6 +50,7 @@ const RateDialog = () => {
           })
         );
         setVisible(false);
+        clearMessage();
       }}>
       <View
         style={{
@@ -68,6 +70,7 @@ const RateDialog = () => {
             await Linking.openURL(STORE_LINK);
             await MMKV.setItem('askForRating', 'completed');
             setVisible(false);
+            clearMessage();
           }}
           fontSize={SIZE.md}
           width="100%"
@@ -88,6 +91,7 @@ const RateDialog = () => {
             onPress={async () => {
               await MMKV.setItem('askForRating', 'never');
               setVisible(false);
+              clearMessage();
             }}
             fontSize={SIZE.md}
             type="error"
@@ -104,6 +108,7 @@ const RateDialog = () => {
                 })
               );
               setVisible(false);
+              clearMessage();
             }}
             fontSize={SIZE.md}
             width="48%"

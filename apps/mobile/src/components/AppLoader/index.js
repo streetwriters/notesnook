@@ -43,6 +43,7 @@ import Paragraph from '../Typography/Paragraph';
 import {checkVersion} from 'react-native-check-version';
 import {Placeholder, SvgToPngView} from '../ListPlaceholders';
 import {Update} from '../Update';
+import {setRateAppMessage} from '../../services/Message';
 
 let passwordValue = null;
 let didVerifyUser = false;
@@ -126,7 +127,7 @@ const AppLoader = ({onLoad}) => {
       presentSheet({
         noIcon: true,
         noProgess: true,
-        component:(ref) => <Update version={version} fwdRef={ref} />
+        component: ref => <Update version={version} fwdRef={ref} />
       });
 
       return true;
@@ -161,7 +162,9 @@ const AppLoader = ({onLoad}) => {
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
       if (askForRating?.timestamp < Date.now()) {
-        eSendEvent(eOpenRateDialog);
+        if (!useMessageStore.getState().message.visible) {
+          setRateAppMessage();
+        }
         return true;
       }
     }

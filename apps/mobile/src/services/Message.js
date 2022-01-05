@@ -1,9 +1,32 @@
 import {useMessageStore} from '../provider/stores';
-import {eOpenLoginDialog, eOpenRecoveryKeyDialog} from '../utils/Events';
+import {
+  eOpenLoginDialog,
+  eOpenRateDialog,
+  eOpenRecoveryKeyDialog
+} from '../utils/Events';
 import {eSendEvent} from './EventManager';
 import PremiumService from './PremiumService';
 import {verifyUser} from '../views/Settings/functions';
 import {MMKV} from '../utils/mmkv';
+import {Platform} from 'react-native';
+
+const rateAppMessage = {
+  visible: true,
+  message: 'We would love to know what you think',
+  actionText:
+    'Rate Notesnook on ' +
+    `${Platform.OS === 'ios' ? 'App store' : 'Play store'}`,
+  onPress: () => {
+    eSendEvent(eOpenRateDialog);
+  },
+  data: {},
+  icon: 'star',
+  type: 'normal'
+};
+
+export function setRateAppMessage() {
+  useMessageStore.getState().setMessage(rateAppMessage);
+}
 
 const recoveryKeyMessage = {
   visible: true,
