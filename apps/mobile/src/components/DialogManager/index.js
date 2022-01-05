@@ -21,8 +21,6 @@ import {
   eThemeUpdated
 } from '../../utils/Events';
 import { EditorSettings } from '../../views/Editor/EditorSettings';
-import { Properties } from '../Properties';
-import SheetWrapper from '../Sheet';
 import { AddNotebookDialog } from '../AddNotebookDialog';
 import { AddTopicDialog } from '../AddTopicDialog';
 import { AnnouncementDialog } from '../Announcements';
@@ -36,13 +34,14 @@ import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
 import PremiumDialog from '../Premium';
 import { Expiring } from '../Premium/expiring';
+import { Properties } from '../Properties';
 import PublishNoteDialog from '../PublishNoteDialog';
 import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
 import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
+import SheetWrapper from '../Sheet';
 import TagsDialog from '../TagsDialog';
-import { UpdateDialog } from '../UpdateDialog';
 import { VaultDialog } from '../VaultDialog';
 
 export class DialogManager extends Component {
@@ -290,7 +289,6 @@ export class DialogManager extends Component {
         <ResultDialog />
         <VaultDialog colors={colors} />
         <MoveNoteDialog colors={colors} />
-        <UpdateDialog />
         <RateDialog />
         <ImagePreview />
         <EditorSettings />

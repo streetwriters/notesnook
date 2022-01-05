@@ -1,6 +1,6 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect, useRef} from 'react';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect, useRef } from 'react';
 import {
   Appearance,
   AppState,
@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
+import { enabled } from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
+import { doInBackground, editing } from '.';
+import { ProFeatures } from '../components/ResultDialog/pro-features';
 import {
   clearAllStores,
   initialize,
@@ -21,6 +23,7 @@ import {
   useNoteStore,
   useUserStore
 } from '../provider/stores';
+import Backup from '../services/Backup';
 import BiometricService from '../services/BiometricService';
 import {
   eSendEvent,
@@ -39,20 +42,6 @@ import Navigation from '../services/Navigation';
 import PremiumService from '../services/PremiumService';
 import SettingsService from '../services/SettingsService';
 import Sync from '../services/Sync';
-import {doInBackground, editing} from '.';
-import {APP_VERSION} from '../../version';
-import {updateStatusBarColor} from './Colors';
-import {db} from './database';
-import {
-  eClearEditor,
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  refreshNotesPage
-} from './Events';
-import {MMKV} from './mmkv';
-import Storage from './storage';
-import {sleep} from './TimeUtils';
 import {
   EditorWebView,
   getNote,
@@ -60,8 +49,16 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {ProFeatures} from '../components/ResultDialog/pro-features';
-import Backup from '../services/Backup';
+import { updateStatusBarColor } from './Colors';
+import { db } from './database';
+import {
+  eClearEditor,
+  eCloseProgressDialog,
+  eOpenLoginDialog, refreshNotesPage
+} from './Events';
+import { MMKV } from './mmkv';
+import Storage from './storage';
+import { sleep } from './TimeUtils';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -174,10 +171,6 @@ export const useAppEvents = () => {
             await onEmailVerified();
           }
           await setCurrentUser();
-          let version = await db.version();
-          if (version.mobile > APP_VERSION) {
-            eSendEvent('updateDialog', ver);
-          }
         } catch (e) {}
       })();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
