@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useStore, store } from "./stores/app-store";
+import { useStore } from "./stores/app-store";
 import { useStore as useUserStore } from "./stores/user-store";
 import { useStore as useNotesStore } from "./stores/note-store";
 import { useStore as useThemeStore } from "./stores/theme-store";
@@ -18,6 +18,7 @@ import {
 } from "./common/dialog-controller";
 import useSystemTheme from "./utils/use-system-theme";
 import { isTesting } from "./utils/platform";
+import { updateStatus, removeStatus } from "./hooks/use-status";
 
 if (process.env.NODE_ENV === "production") {
   loadTrackerScript();
@@ -28,7 +29,6 @@ export default function AppEffects({ setShow }) {
   const refreshNavItems = useStore((store) => store.refreshNavItems);
   const sync = useStore((store) => store.sync);
   const updateLastSynced = useStore((store) => store.updateLastSynced);
-  const setProcessingStatus = useStore((store) => store.setProcessingStatus);
   const isFocusMode = useStore((store) => store.isFocusMode);
   const addReminder = useStore((store) => store.addReminder);
   const initUser = useUserStore((store) => store.init);
@@ -95,13 +95,15 @@ export default function AppEffects({ setShow }) {
       ({ type, total, current }) => {
         const [key, status] = getProcessingStatusFromType(type);
 
-        if (current === total) setProcessingStatus(key);
-        else
-          setProcessingStatus(
+        if (current === total) {
+          removeStatus(key);
+        } else {
+          updateStatus({
             key,
-            `${status} attachments (${current}/${total})`,
-            0
-          );
+            status: `${status} attachments (${current}/${total})`,
+            progress: 0,
+          });
+        }
       }
     );
 
@@ -111,13 +113,12 @@ export default function AppEffects({ setShow }) {
         const [key] = getProcessingStatusFromType(type);
         if (!key) return;
 
-        const processingStatus = store.get().processingStatuses[key];
-        if (!processingStatus) return;
-        const { status } = processingStatus;
         const percent = Math.round((loaded / total) * 100);
 
-        if (loaded === total) setProcessingStatus(key, status, 100);
-        else setProcessingStatus(key, status, percent);
+        updateStatus({
+          key,
+          progress: loaded === total ? 100 : percent,
+        });
       }
     );
 
@@ -127,7 +128,7 @@ export default function AppEffects({ setShow }) {
       progressEvent.unsubscribe();
       systemTimeInvalidEvent.unsubscribe();
     };
-  }, [setProcessingStatus]);
+  }, []);
 
   useEffect(() => {
     setShow(!isFocusMode);
