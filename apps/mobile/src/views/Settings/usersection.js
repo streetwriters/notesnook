@@ -24,6 +24,7 @@ import {
 } from '../../utils';
 import {
   eCloseProgressDialog,
+  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/Events';
@@ -81,10 +82,6 @@ const SettingsUserSection = () => {
 
   return (
     <>
-      {messageBoardState && messageBoardState?.visible && (
-        <Card color={colors.accent} />
-      )}
-
       {user ? (
         <>
           <View
@@ -282,13 +279,13 @@ const SettingsUserSection = () => {
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
             },
-            /*  {
-				name: 'Change password',
-				func: async () => {
-				  eSendEvent(eOpenLoginDialog, 3);
-				},
-				desc: 'Setup a new password for your account.'
-			  }, */
+            {
+              name: 'Change password',
+              func: async () => {
+                eSendEvent(eOpenLoginDialog, 3);
+              },
+              desc: 'Setup a new password for your account.'
+            },
             {
               name: 'Having problems with syncing?',
               func: async () => {

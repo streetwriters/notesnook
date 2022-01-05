@@ -652,6 +652,22 @@ const LoginDialog = () => {
               />
             </>
           )}
+
+          {mode === MODES.login || mode === MODES.sessionExpired ? (
+            <Button
+              title="Forgot password?"
+              style={{
+                alignSelf:'flex-end',
+                height:30,
+              }}
+              onPress={() => {
+                if (MODES.sessionExpired === mode) {
+                  sendEmail(true);
+                  return;
+                }
+                setMode(MODES.forgotPassword);
+              }}/>
+          ) : null}
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
