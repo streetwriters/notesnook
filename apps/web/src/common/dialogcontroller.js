@@ -115,6 +115,7 @@ export function confirm({
   yesText,
   noText,
   yesAction,
+  width,
 }) {
   return showDialog((Dialogs, perform) => (
     <Dialogs.Confirm
@@ -122,6 +123,7 @@ export function confirm({
       subtitle={subtitle}
       message={message}
       yesText={yesText}
+      width={width}
       noText={noText}
       onNo={() => perform(false)}
       onYes={() => {
