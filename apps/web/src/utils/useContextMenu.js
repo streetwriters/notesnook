@@ -1,12 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 
-var isOpening = false;
-
+var currentEvent = undefined;
 function closeMenu() {
-  if (isOpening) {
-    isOpening = false;
-    return;
-  }
   window.dispatchEvent(
     new CustomEvent("globalcontextmenu", { detail: { state: "close" } })
   );
@@ -23,7 +18,13 @@ function onKeyDown(event) {
   if (event.keyCode === 27) closeMenu();
 }
 
-function onWindowClick() {
+function onWindowClick(event) {
+  if (
+    event === currentEvent.nativeEvent ||
+    event.target === currentEvent.target
+  )
+    return;
+
   closeMenu();
 }
 
@@ -35,9 +36,7 @@ function openMenu(e) {
     closeMenu();
     return;
   }
-  if (e.type === "click") {
-    isOpening = true;
-  }
+  currentEvent = e;
 
   menu.style.display = "block";
 
@@ -66,7 +65,6 @@ function openMenu(e) {
   window.addEventListener("keydown", onKeyDown);
   window.addEventListener("click", onWindowClick);
   window.addEventListener("blur", onWindowClick);
-  isOpening = false;
 }
 
 function getPosition(e) {
@@ -119,7 +117,7 @@ function useContextMenu() {
 }
 
 export function useOpenContextMenu() {
-  return useCallback((event, items, data, withClick) => {
+  return useCallback((event, items, data) => {
     window.dispatchEvent(
       new CustomEvent("globalcontextmenu", {
         detail: {
@@ -127,7 +125,6 @@ export function useOpenContextMenu() {
           items,
           data,
           internalEvent: event,
-          withClick,
         },
       })
     );
