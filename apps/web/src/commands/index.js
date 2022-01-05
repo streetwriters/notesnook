@@ -1,7 +1,5 @@
-import EventManager from "notes-core/utils/eventmanager";
+import { AppEventManager } from "../common/app-events";
 import { isDesktop } from "../utils/platform";
-
-export const ElectronEventManager = new EventManager();
 
 export function invokeCommand(type, payload = {}) {
   if (!isDesktop()) return;
@@ -16,6 +14,6 @@ if (isDesktop()) {
   window.api.receive("fromMain", (args) => {
     console.log(args);
     const { type } = args;
-    ElectronEventManager.publish(type, args);
+    AppEventManager.publish(type, args);
   });
 }
