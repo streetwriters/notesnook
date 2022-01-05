@@ -77,7 +77,7 @@ export const SearchBar = () => {
           type: 'error'
         });
       }
-    }, 500);
+    }, 300);
   };
 
   return (
