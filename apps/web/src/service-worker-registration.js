@@ -121,10 +121,13 @@ function checkValidServiceWorker(swUrl, config) {
         registerValidSW(swUrl, config);
       }
     })
-    .catch(() => {
+    .catch((e) => {
       console.log(
         "No internet connection found. App is running in offline mode."
       );
+      if (config && config.onError) {
+        config.onError(e);
+      }
     });
 }
 
