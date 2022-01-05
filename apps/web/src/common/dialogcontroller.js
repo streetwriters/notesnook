@@ -16,6 +16,10 @@ import Config from "../utils/config";
 import Dialogs from "../components/dialogs";
 import { Mutex } from "async-mutex";
 import { formatDate } from "notes-core/utils/date";
+import downloadUpdate from "../commands/download-update";
+import installUpdate from "../commands/install-update";
+import { getChangelog } from "../utils/version";
+import { isDesktop } from "../utils/platform";
 
 const DialogMutex = new Mutex();
 function showDialog(dialog) {
@@ -228,34 +232,6 @@ export function showAppUpdatedNotice(version) {
       </Flex>
     ),
     yesText: `Yay!`,
-  });
-}
-
-export function showAppAvailableNotice(version) {
-  return confirm({
-    title: `New version available`,
-    message: (
-      <Flex
-        flexDirection="column"
-        bg="bgSecondary"
-        p={1}
-        sx={{ borderRadius: "default" }}
-      >
-        <Text variant="title">v{version.formatted} changelog:</Text>
-        <Text
-          overflow="auto"
-          as="pre"
-          fontFamily="monospace"
-          variant="body"
-          mt={1}
-          sx={{ overflow: "auto" }}
-        >
-          {version.changelog || "No change log."}
-        </Text>
-      </Flex>
-    ),
-    yesText: `Update now`,
-    yesAction: () => window.location.reload(),
   });
 }
 
@@ -621,4 +597,57 @@ export function showInvalidSystemTimeDialog({ serverTime, localTime }) {
       onYes={() => window.location.reload()}
     />
   ));
+}
+
+export function showUpdateAvailableNotice({ changelog, version }) {
+  return showUpdateDialog({
+    title: `New version available`,
+    subtitle: `v${version} is available for download`,
+    changelog,
+    action: { text: `Update now`, onClick: () => downloadUpdate() },
+  });
+}
+
+export async function showUpdateReadyNotice({ version }) {
+  const changelog = isDesktop() ? null : await getChangelog(version);
+  return await showUpdateDialog({
+    title: `Update ready for installation`,
+    subtitle: `v${version} is ready to be installed.`,
+    changelog,
+    action: {
+      text: "Install now",
+      onClick: () => installUpdate(),
+    },
+  });
+}
+
+function showUpdateDialog({ title, subtitle, changelog, action }) {
+  return confirm({
+    title,
+    subtitle,
+    message: changelog && (
+      <Flex flexDirection="column" sx={{ borderRadius: "default" }}>
+        <Text
+          as="div"
+          overflow="auto"
+          variant="body"
+          sx={{ overflow: "auto", fontFamily: "body" }}
+          css={`
+            h2 {
+              font-size: 1.2em;
+              font-weight: 600;
+            }
+            h3 {
+              font-size: 1em;
+              font-weight: 600;
+            }
+          `}
+          dangerouslySetInnerHTML={{ __html: changelog }}
+        ></Text>
+      </Flex>
+    ),
+    width: "500px",
+    yesText: action.text,
+    yesAction: action.onClick,
+  });
 }

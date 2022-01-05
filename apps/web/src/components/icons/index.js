@@ -125,6 +125,8 @@ import {
   mdiBugOutline,
   mdiLinkVariant,
   mdiLinkVariantOff,
+  mdiNetworkOffOutline,
+  mdiCheckNetworkOutline,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -317,3 +319,5 @@ export const Timebomb = createIcon(mdiBomb);
 export const Issue = createIcon(mdiBugOutline);
 export const ShortcutLink = createIcon(mdiLinkVariant);
 export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);
+export const Offline = createIcon(mdiNetworkOffOutline);
+export const Online = createIcon(mdiCheckNetworkOutline);
