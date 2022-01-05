@@ -43,7 +43,7 @@ import { useStore as useThemeStore } from "../../stores/theme-store";
 import { isTablet } from "../../utils/dimensions";
 import { showToast } from "../../utils/toast";
 import { useIsUserPremium } from "../../hooks/use-is-user-premium";
-import { AppEventManager, AppEvents } from "../../common";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 import { EV, EVENTS } from "notes-core/common";
 import { downloadAttachment } from "../../common/attachments";
 import debounce from "just-debounce-it";

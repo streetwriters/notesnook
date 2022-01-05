@@ -1,7 +1,7 @@
 import { formatDate } from "notes-core/utils/date";
 import React, { useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
-import { AppEventManager, AppEvents } from "../../common";
+import { AppEventManager, AppEvents } from "../../common/app-events";
 import { useStore } from "../../stores/editor-store";
 
 function EditorFooter() {

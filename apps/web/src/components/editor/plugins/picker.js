@@ -1,5 +1,5 @@
 import Compressor from "compressorjs";
-import { AppEventManager, AppEvents } from "../../../common";
+import { AppEventManager, AppEvents } from "../../../common/app-events";
 import { db } from "../../../common/db";
 import {
   showBuyDialog,
