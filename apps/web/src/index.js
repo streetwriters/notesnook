@@ -1,6 +1,7 @@
 import { EVENTS } from "@notesnook/desktop/events";
 import { render } from "react-dom";
 import { AppEventManager } from "./common/app-events";
+import { showInstallNotice } from "./components/installnotice";
 import { updateStatus } from "./hooks/use-status";
 import { getCurrentHash, getCurrentPath, makeURL } from "./navigation";
 import * as serviceWorker from "./serviceWorkerRegistration";
@@ -96,6 +97,7 @@ if (process.env.REACT_APP_PLATFORM !== "desktop") {
       });
     },
   });
+  window.addEventListener("beforeinstallprompt", () => showInstallNotice());
 } else serviceWorker.unregister();
 
 function shouldSkipInitiation() {
