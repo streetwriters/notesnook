@@ -9,6 +9,7 @@ import {db} from '../../utils/database';
 import {eCloseProgressDialog, eOnLoadNote} from '../../utils/Events';
 import {normalize} from '../../utils/SizeUtils';
 import {getNote, sourceUri} from '../../views/Editor/Functions';
+import tiny from '../../views/Editor/tiny/tiny';
 import { ActionIcon } from '../ActionIcon';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
@@ -25,11 +26,20 @@ export default function NotePreview({session, content}) {
       'placeholder.svg'
     );
 
-    console.log(preview, 'preview');
-    postMessage('htmldiff', preview?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage('theme', JSON.stringify(theme));
+
+    webviewRef.current?.injectJavaScript(`
+    (function() {
+        let v = ${JSON.stringify(theme)}
+        if (pageTheme) {
+          pageTheme.colors = v;
+        }
+        setTheme()
+    })();
+    `);
+
+    postMessage('htmldiff', preview?.data);
   };
 
   function postMessage(type, value = null) {
@@ -99,8 +109,10 @@ export default function NotePreview({session, content}) {
             height: '100%',
             backgroundColor: 'transparent'
           }}
+          onError={e => {
+            console.log(e);
+          }}
           nestedScrollEnabled
-          cacheMode="LOAD_DEFAULT"
           domStorageEnabled={true}
           scrollEnabled={true}
           bounces={false}
@@ -111,9 +123,11 @@ export default function NotePreview({session, content}) {
           allowUniversalAccessFromFileURLs={true}
           originWhitelist={['*']}
           javaScriptEnabled={true}
+          cacheMode="LOAD_DEFAULT"
           cacheEnabled={true}
           source={{
-            uri: sourceUri + 'plaineditor.html'
+            uri:"http://192.168.10.13:3000/plaineditor.html"
+            //uri: sourceUri + 'plaineditor.html'
           }}
         />
       ) : (

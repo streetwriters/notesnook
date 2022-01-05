@@ -109,7 +109,7 @@ const Editor = React.memo(
             (function() {
               const func = function() {
                 setTimeout(function() {
-                  if (tinymce) {
+                  if (globalThis.tinymce) {
                     init_tiny("calc(100vh - 55px)");
                   } else {
                     console.log('tinymce is not ready');
@@ -136,8 +136,8 @@ const Editor = React.memo(
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            source={source}
-            //source={{uri: 'http://192.168.10.13:3000/index.html'}}
+            //source={source}
+            source={{uri: 'http://192.168.10.13:3000/index.html'}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}

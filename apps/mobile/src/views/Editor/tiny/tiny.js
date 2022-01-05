@@ -20,12 +20,12 @@ window.blur();
 `;
 
 const removeMarkdown = `
-if (tinymce && tinymce.activeEditor) {
+if (globalThis.tinymce && tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns("")
 }`;
 
 const setMarkdown = `
-if (tinymce &&  tinymce.activeEditor) {
+if (globalThis.tinymce &&  tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns);
 }`;
 
@@ -144,7 +144,7 @@ const updateTheme = value => `
   if (pageTheme) {
     pageTheme.colors = v;
   }
-  if (tinymce && tinymce.activeEditor) {
+  if (globalThis.tinymce && tinymce.activeEditor) {
     setTheme();
   }
  
