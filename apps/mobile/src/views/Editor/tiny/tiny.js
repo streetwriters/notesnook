@@ -54,7 +54,7 @@ const pre = `(function() {
       });
     });
     tinymce.activeEditor.selection.setRng(rng, true);
-    tinymce.activeEditor.nodeChanged();
+    tinymce.activeEditor.fire("input");
   };
 
   let node = tinymce.activeEditor.selection.getNode();
