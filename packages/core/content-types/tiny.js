@@ -1,4 +1,4 @@
-import showdown from "showdown/dist/showdown";
+import showdown from "showdown";
 import dataurl from "../utils/dataurl";
 import { getDummyDocument, getInnerText, parseHTML } from "../utils/html-parser";
 
