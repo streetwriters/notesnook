@@ -3,6 +3,8 @@ import SettingsService from '../services/SettingsService';
 const {LayoutAnimation} = require('react-native');
 
 function withAnimation(duration = 300) {
+
+  return;
   // try {
   //   throw new Error('error withAnimation')
   // } catch(e) {
@@ -21,7 +23,7 @@ function withSpringAnimation(duration = 300) {
   // } catch(e) {
   //   console.log(e.stack);
   // }
-  
+  return;
   console.log('reduce withSpringAnimation: ',SettingsService.get().reduceAnimations)
   if (SettingsService.get().reduceAnimations) return;
   LayoutAnimation.configureNext({
