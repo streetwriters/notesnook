@@ -8,6 +8,7 @@ function Confirm(props) {
       isOpen={true}
       title={props.title}
       icon={props.icon}
+      width={props.width}
       description={props.subtitle}
       onClose={props.onNo}
       positiveButton={
