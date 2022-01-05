@@ -1,20 +1,19 @@
-import React, {useEffect, useState} from 'react';
-import {AppState, Platform, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {notesnook} from '../../../e2e/test.ids';
-import {useEditorStore, useUserStore} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useEditorStore, useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
-import {eOnLoadNote} from '../../utils/Events';
+import { getCurrentColors } from '../../utils/Colors';
+import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
-  checkStatus,
   disableEditing,
   EditorWebView,
   getNote,
@@ -136,8 +135,7 @@ const Editor = React.memo(
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
-            //source={source}
-            source={{uri: 'http://192.168.10.13:3000/index.html'}}
+            source={source}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}

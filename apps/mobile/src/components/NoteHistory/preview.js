@@ -128,8 +128,7 @@ export default function NotePreview({session, content}) {
           cacheMode="LOAD_DEFAULT"
           cacheEnabled={true}
           source={{
-            uri: 'http://192.168.10.13:3000/plaineditor.html'
-            //uri: sourceUri + 'plaineditor.html'
+            uri: sourceUri + 'plaineditor.html'
           }}
         />
       ) : (
