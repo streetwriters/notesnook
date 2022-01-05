@@ -65,12 +65,23 @@ registerRoute(
 // This allows the web app to trigger skipWaiting via
 // registration.waiting.postMessage({type: 'SKIP_WAITING'})
 self.addEventListener("message", (event) => {
-  if (event.data && event.data.type === "SKIP_WAITING") {
-    self.skipWaiting();
+  const { data } = event;
+  if (!data) return;
+
+  switch (data.type) {
+    case "SKIP_WAITING":
+      self.skipWaiting();
+      break;
+    case "GET_VERSION":
+      const VERSION = process.env.REACT_APP_VERSION;
+      const HASH = process.env.REACT_APP_GIT_HASH;
+      event.source.postMessage({
+        type: data.type,
+        version: VERSION,
+        hash: HASH,
+      });
+      break;
+    default:
+      break;
   }
 });
-
-// Any other custom service worker logic can go here.
-const VERSION = process.env.REACT_APP_VERSION;
-const HASH = process.env.REACT_APP_GIT_HASH;
-console.log("App version:", VERSION, HASH);
