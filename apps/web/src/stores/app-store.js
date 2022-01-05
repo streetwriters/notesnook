@@ -16,7 +16,6 @@ class AppStore extends BaseStore {
   isFocusMode = false;
   isEditorOpen = false;
   isVaultCreated = false;
-  processingStatuses = {};
   syncStatus = "synced";
   colors = [];
   globalMenu = { items: [], data: {} };
@@ -63,13 +62,6 @@ class AppStore extends BaseStore {
 
   setIsVaultCreated = (toggleState) => {
     this.set((state) => (state.isVaultCreated = toggleState));
-  };
-
-  setProcessingStatus = (key, status, progress) => {
-    this.set((state) => {
-      if (!status) delete state.processingStatuses[key];
-      else state.processingStatuses[key] = { key, status, progress };
-    });
   };
 
   /**

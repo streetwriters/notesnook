@@ -14,6 +14,7 @@ import {
 import { showExportDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
 import { hashNavigate } from "../navigation";
+import { removeStatus, updateStatus } from "../hooks/use-status";
 
 function createOption(key, title, icon, onClick) {
   return {
@@ -23,7 +24,7 @@ function createOption(key, title, icon, onClick) {
     onClick: async () => {
       await onClick.call(this, selectionStore.get());
       selectionStore.toggleSelectionMode(false);
-      appStore.setProcessingStatus(key);
+      removeStatus(key);
     },
   };
 }
@@ -47,7 +48,7 @@ const DeleteOption = createOption(
     const statusText = `${
       item.dateDeleted ? `Permanently deleting` : `Deleting`
     } ${state.selectedItems.length} items...`;
-    appStore.setProcessingStatus("deleteOption", statusText);
+    updateStatus({ key: "deleteOption", status: statusText });
 
     var isAnyNoteOpened = false;
     const items = state.selectedItems.map((item) => {
@@ -86,10 +87,10 @@ const UnfavoriteOption = createOption(
   "Unfavorite",
   Icon.Star,
   function (state) {
-    appStore.setProcessingStatus(
-      "unfavoriteOption",
-      `Unfavoriting ${state.selectedItems.length} notes...`
-    );
+    updateStatus({
+      key: "unfavoriteOption",
+      status: `Unfavoriting ${state.selectedItems.length} notes...`,
+    });
 
     // we know only notes can be favorited
     state.selectedItems.forEach(async (item) => {
@@ -105,10 +106,10 @@ const AddToNotebookOption = createOption(
   "Add to notebook(s)",
   Icon.AddToNotebook,
   async function (state) {
-    appStore.setProcessingStatus(
-      "atnOption",
-      `Adding ${state.selectedItems.length} notes to notebooks...`
-    );
+    updateStatus({
+      key: "atnOption",
+      status: `Adding ${state.selectedItems.length} notes to notebooks...`,
+    });
 
     const items = state.selectedItems.map((item) => item.id);
     await showMoveNoteDialog(items);
@@ -121,10 +122,10 @@ const ExportOption = createOption(
   "Export",
   Icon.Export,
   async function (state) {
-    appStore.setProcessingStatus(
-      "exportOption",
-      `Exporting ${state.selectedItems.length} notes...`
-    );
+    updateStatus({
+      key: "exportOption",
+      status: `Exporting ${state.selectedItems.length} notes...`,
+    });
 
     const items = state.selectedItems.map((item) => item.id);
     if (await showExportDialog(items)) {
@@ -138,10 +139,10 @@ const RestoreOption = createOption(
   "Restore",
   Icon.Restore,
   async function (state) {
-    appStore.setProcessingStatus(
-      "restoreOption",
-      `Restoring ${state.selectedItems.length} items...`
-    );
+    updateStatus({
+      key: "restoreOption",
+      status: `Restoring ${state.selectedItems.length} items...`,
+    });
 
     const items = state.selectedItems.map((item) => item.id);
     await db.trash.restore(...items);

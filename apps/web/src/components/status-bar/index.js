@@ -18,15 +18,14 @@ import useAutoUpdater from "../../hooks/use-auto-updater";
 import downloadUpdate from "../../commands/download-update";
 import installUpdate from "../../commands/install-update";
 import checkForUpdate from "../../commands/check-for-update";
-import { showIssueDialog } from "../../common/dialog-controller";
+import useStatus from "../../hooks/use-status";
+import { getIconFromAlias } from "../icons/resolver";
 
 function StatusBar() {
   const user = useUserStore((state) => state.user);
   const sync = useAppStore((state) => state.sync);
   const isLoggedIn = useUserStore((state) => state.isLoggedIn);
-  const processingStatuses = useAppStore((state) =>
-    Object.values(state.processingStatuses)
-  );
+  const statuses = useStatus();
   const updateStatus = useAutoUpdater();
 
   return (
@@ -94,14 +93,17 @@ function StatusBar() {
             Report an issue
           </Text>
         </Button>
-        {processingStatuses?.map(({ key, status, progress }) => (
-          <Flex key={key} ml={1} alignItems="center" justifyContent="center">
-            <Loading size={12} />
-            <Text variant="subBody" color="bgSecondaryText" ml={1}>
-              {progress ? `${progress}% ${status}` : status}
-            </Text>
-          </Flex>
-        ))}
+        {statuses?.map(({ key, status, progress, icon }) => {
+          const Icon = getIconFromAlias(icon);
+          return (
+            <Flex key={key} ml={1} alignItems="center" justifyContent="center">
+              {Icon ? <Icon size={12} /> : <Loading size={12} />}
+              <Text variant="subBody" color="bgSecondaryText" ml={1}>
+                {progress ? `${progress}% ${status}` : status}
+              </Text>
+            </Flex>
+          );
+        })}
 
         {updateStatus && (
           <Button
