@@ -16,7 +16,7 @@ import SettingsService from './SettingsService';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
-let pinned = [];
+let pinned:PushNotificationDeliveredObject[] = [];
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === 'notesnook_note_input') return;
@@ -125,7 +125,7 @@ function remove(tag: string, id: string) {
   });
 }
 
-function pinQuickNote(launch) {
+function pinQuickNote(launch:boolean) {
   get().then(items => {
     let notif = items.filter(i => i.tag === 'notesnook_note_input');
     if (notif && launch) {
