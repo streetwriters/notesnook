@@ -15,6 +15,7 @@ import {sleep} from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   checkStatus,
+  disableEditing,
   EditorWebView,
   getNote,
   onWebViewLoad,
@@ -50,7 +51,7 @@ const Editor = React.memo(
       }
     }, [premiumUser]);
 
-    const onResetRequested = async noload => {
+    const onResetRequested = async preventSave => {
       if (!getNote()) {
         eSendEvent('loadingNote', null);
       }
@@ -61,7 +62,12 @@ const Editor = React.memo(
         console.log('Editor out of bounds');
         return;
       }
+      if (preventSave) {
+        disableEditing();
+      }
+
       if (getNote()) {
+
         eSendEvent(
           eOnLoadNote,
           {...getNote(), forced: true}
@@ -131,7 +137,7 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={source}
-            //source={{uri: 'http://192.168.10.7:3000/index.html'}}
+            //source={{uri: 'http://192.168.10.13:3000/index.html'}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}

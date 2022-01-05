@@ -180,6 +180,11 @@ export function setNoteOnly(n) {
   note = n;
 }
 
+export function disableEditing() {
+  noteEdited = false;
+  disableSaving = true;
+}
+
 export const textInput = createRef();
 
 export function post(type, value = null) {
