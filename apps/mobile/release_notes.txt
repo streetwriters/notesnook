@@ -1,11 +1,10 @@
-- Note history — from this version, each session will be saved locally all the way back to the first edit.
-- Better tables support in editor
-- Editor toolbar is now more compact and improved
-- Mobile optimized search/replace in editor
-- You can now view/manage note tags in editor
-- Improved note properties ui & ux
-- Results in search are more reliable now
-- Add attachment count on notes
-- Many other ui and performance improvements
+- Fix image placeholders not loading in editor
+- Fix crash when navigating to topic from notebook properties
+- Fix navigating to search not working on iOS
+- Hide locked notes from Share Menu
+- Fix checking/uncheck checklist item changes selection 
+- Add monthly backup option
+- Fixed links & URL validation in editor
+- Improved UX for rate app to be less intrusive
 
 Thank you for using Notesnook!
