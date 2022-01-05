@@ -53,6 +53,7 @@
     "react-virtualized-auto-sizer": "^1.0.4",
     "react-virtuoso": "^1.9.3",
     "rebass": "^4.0.7",
+    "showdown": "github:thecodrr/showdown",
     "streamablefs": "file:packages/streamablefs",
     "timeago.js": "^4.0.2",
     "tinymce": "^5.10.2",

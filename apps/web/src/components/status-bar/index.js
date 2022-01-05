@@ -15,9 +15,12 @@ import { useStore as useAppStore } from "../../stores/app-store";
 import TimeAgo from "../time-ago";
 import { hardNavigate, hashNavigate, navigate } from "../../navigation";
 import useAutoUpdater from "../../hooks/use-auto-updater";
-import downloadUpdate from "../../commands/download-update";
 import installUpdate from "../../commands/install-update";
 import checkForUpdate from "../../commands/check-for-update";
+import {
+  showIssueDialog,
+  showUpdateAvailableNotice,
+} from "../../common/dialog-controller";
 import useStatus from "../../hooks/use-status";
 import { getIconFromAlias } from "../icons/resolver";
 
@@ -109,9 +112,9 @@ function StatusBar() {
           <Button
             variant="statusitem"
             display="flex"
-            onClick={() => {
+            onClick={async () => {
               if (updateStatus.type === "available") {
-                downloadUpdate();
+                await showUpdateAvailableNotice(updateStatus);
               } else if (updateStatus.type === "completed") {
                 installUpdate();
               } else {

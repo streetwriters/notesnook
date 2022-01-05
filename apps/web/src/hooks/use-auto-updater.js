@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { AppEventManager } from "../common/app-events";
 import { EVENTS } from "@notesnook/desktop/events";
-import { isDesktop } from "../utils/platform";
+import {
+  showUpdateAvailableNotice,
+  showUpdateReadyNotice,
+} from "../common/dialog-controller";
 import checkForUpdate from "../commands/check-for-update";
+import { isDesktop } from "../utils/platform";
 
 var checkingForUpdateTimeout = 0;
 export default function useAutoUpdater() {
@@ -22,15 +26,25 @@ export default function useAutoUpdater() {
     }
 
     function updateAvailable(info) {
-      changeStatus({ type: "available", version: info.version });
+      changeStatus({
+        type: "available",
+        version: info.version,
+        changelog: info.releaseNotes,
+      });
+      showUpdateAvailableNotice({
+        changelog: info.releaseNotes,
+        version: info.version,
+      });
     }
 
     function updateNotAvailable() {
-      changeStatus({ type: "updated" });
+      if (isDesktop()) changeStatus({ type: "updated" });
+      else changeStatus();
     }
 
     function updateDownloadCompleted(info) {
       changeStatus({ type: "completed", version: info.version });
+      showUpdateReadyNotice({ version: info.version });
     }
 
     function updateDownloadProgress(progressInfo) {
@@ -58,9 +72,8 @@ export default function useAutoUpdater() {
       updateDownloadProgress
     );
 
-    if (isDesktop()) {
-      checkingForUpdate();
-      checkForUpdate();
+    checkingForUpdate();
+    checkForUpdate();
 
     return () => {
       checkingForUpdateEvent.unsubscribe();
