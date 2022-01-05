@@ -653,7 +653,7 @@ const LoginDialog = () => {
             </>
           )}
 
-          {mode === MODES.login || mode === MODES.sessionExpired ? (
+          {/* {mode === MODES.login || mode === MODES.sessionExpired ? (
             <Button
               title="Forgot password?"
               style={{
@@ -667,7 +667,8 @@ const LoginDialog = () => {
                 }
                 setMode(MODES.forgotPassword);
               }}/>
-          ) : null}
+          ) : null} */}
+          
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
