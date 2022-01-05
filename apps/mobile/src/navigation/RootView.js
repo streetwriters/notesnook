@@ -29,7 +29,7 @@ import {
 import { editorRef, tabBarRef } from '../utils/Refs';
 import { sleep } from '../utils/TimeUtils';
 import { EditorWrapper } from '../views/Editor/EditorWrapper';
-import { EditorWebView, getNote } from '../views/Editor/Functions';
+import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
 import { NavigatorStack } from './NavigatorStack';
 let layoutTimer = null;
@@ -285,8 +285,8 @@ const NativeStack = React.memo(
     const widths = {
       mobile: {
         a: dimensions.width * 0.75,
-        b: dimensions.width,
-        c: dimensions.width
+        b: dimensions.width - 1,
+        c: dimensions.width + 1
       },
       smallTablet: {
         a: valueLimiter(dimensions.width * 0.3, 300, 350),
@@ -353,6 +353,11 @@ const NativeStack = React.memo(
             widths={widths[deviceMode]}
             style={{
               zIndex: 1
+            }}
+            onDrawerStateChange={state => {
+              if (state === false) {
+                checkStatus();
+              }
             }}
             initialIndex={
               deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1

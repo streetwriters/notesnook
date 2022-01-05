@@ -158,6 +158,7 @@ export const CHECK_STATUS = `(function() {
 
 const request_content = `(function() {
   if (window.ReactNativeWebView) {
+    if (!editor) return;
     editor.getHTML().then(function(html) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
@@ -167,7 +168,7 @@ const request_content = `(function() {
           sessionId:sessionId
         })
       );
-    })
+    }).catch(console.log)
   }
 })();`;
 
@@ -363,7 +364,7 @@ export const loadNote = async item => {
   loading_note = false;
 };
 
-const checkStatus = async noreset => {
+export const checkStatus = async noreset => {
   return new Promise(resolve => {
     webviewOK = false;
     console.log('checking status of webview');
@@ -402,15 +403,15 @@ const checkStatus = async noreset => {
 function updateSessionStatus() {
   tiny.call(
     EditorWebView,
-    `(function() {
-    sessionId = "${sessionId}";
+    `(function () {
+    sessionId = '${sessionId}';
     let msg = JSON.stringify({
       data: true,
       type: 'status',
-      sessionId:sessionId
+      sessionId: sessionId
     });
-    window.ReactNativeWebView.postMessage(msg)
-})();`
+    window.ReactNativeWebView.postMessage(msg);
+  })();`
   );
 }
 
@@ -429,24 +430,30 @@ function isContentInvalid(content) {
 function check_session_status() {
   tiny.call(
     EditorWebView,
-    `(function() {
-    if (window.ReactNativeWebView) {
-      if (!editor) {
-        return;
+    `(function () {
+      if (window.ReactNativeWebView) {
+        if (!editor) return;
+    
+        editor.getHTML().then(function (value) {
+          let status =
+            !value ||
+            value === '' ||
+            value.trim() === '' ||
+            value === '<p></p>' ||
+            value === '<p><br></p>' ||
+            value === '<p>&nbsp;</p>' ||
+            value === '<p><br data-mce-bogus="1"></p>';
+    
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'content_not_loaded',
+              value: status,
+              sessionId: sessionId
+            })
+          );
+        }).catch(console.log)
       }
-      editor.getHTML().then(function(value) {
-        let status = !value || value === '' || value.trim() === "" || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>' || value === '<p><br data-mce-bogus="1"></p>';
-        
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: 'content_not_loaded',
-            value:status,
-            sessionId:sessionId
-          })
-        );
-      })
-    }
-  })();`
+    })();`
   );
 }
 
