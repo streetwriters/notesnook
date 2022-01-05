@@ -5,6 +5,12 @@ export function toTitleCase(str) {
   return str[0].toUpperCase() + str.substring(1);
 }
 
+export function toCamelCase(str) {
+  return str.replaceAll(/-(.{1})/gm, (_str, letter) => {
+    return letter.toUpperCase();
+  });
+}
+
 /**
  *
  * @param {String} str
