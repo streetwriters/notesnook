@@ -178,6 +178,7 @@ function init_callback(_editor) {
       target.classList.remove(COLLAPSED_KEY);
       collapseElement(target);
     }
+    onChange(e);
   });
 
   editor.on('touchstart mousedown', function (e) {
@@ -228,7 +229,7 @@ function init_callback(_editor) {
     });
   });
 
-  editor.on('input ExecCommand ObjectResized Redo Undo', onChange);
+  editor.on('input ExecCommand ObjectResized Redo Undo ListMutation', onChange);
   editor.on('keyup', function (e) {
     console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
