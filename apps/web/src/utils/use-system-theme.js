@@ -1,6 +1,6 @@
 import { EVENTS } from "@notesnook/desktop/events";
 import { useEffect, useState } from "react";
-import { ElectronEventManager } from "../commands";
+import { AppEventManager } from "../common/app-events";
 import useMediaQuery from "./use-media-query";
 
 function useSystemTheme() {
@@ -15,9 +15,9 @@ function useSystemTheme() {
     function onThemeChanged({ theme }) {
       setSystemTheme(theme);
     }
-    ElectronEventManager.subscribe(EVENTS.themeChanged, onThemeChanged);
+    AppEventManager.subscribe(EVENTS.themeChanged, onThemeChanged);
     return () => {
-      ElectronEventManager.unsubscribe(EVENTS.themeChanged, onThemeChanged);
+      AppEventManager.unsubscribe(EVENTS.themeChanged, onThemeChanged);
     };
   }, []);
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { ElectronEventManager } from "../commands";
+import { AppEventManager } from "../common/app-events";
 import { EVENTS } from "@notesnook/desktop/events";
 import { isDesktop } from "../utils/platform";
 import checkForUpdate from "../commands/check-for-update";
@@ -37,17 +37,23 @@ export default function useAutoUpdater() {
       changeStatus({ type: "downloading", progress: progressInfo.percent });
     }
 
-    ElectronEventManager.subscribe(EVENTS.checkingForUpdate, checkingForUpdate);
-    ElectronEventManager.subscribe(EVENTS.updateAvailable, updateAvailable);
-    ElectronEventManager.subscribe(
+    const checkingForUpdateEvent = AppEventManager.subscribe(
+      EVENTS.checkingForUpdate,
+      checkingForUpdate
+    );
+    const updateAvailableEvent = AppEventManager.subscribe(
+      EVENTS.updateAvailable,
+      updateAvailable
+    );
+    const updateNotAvailableEvent = AppEventManager.subscribe(
       EVENTS.updateNotAvailable,
       updateNotAvailable
     );
-    ElectronEventManager.subscribe(
+    const updateCompletedEvent = AppEventManager.subscribe(
       EVENTS.updateDownloadCompleted,
       updateDownloadCompleted
     );
-    ElectronEventManager.subscribe(
+    const updateProgressEvent = AppEventManager.subscribe(
       EVENTS.updateDownloadProgress,
       updateDownloadProgress
     );
@@ -55,10 +61,13 @@ export default function useAutoUpdater() {
     if (isDesktop()) {
       checkingForUpdate();
       checkForUpdate();
-    }
 
     return () => {
-      ElectronEventManager.unsubscribeAll();
+      checkingForUpdateEvent.unsubscribe();
+      updateAvailableEvent.unsubscribe();
+      updateNotAvailableEvent.unsubscribe();
+      updateCompletedEvent.unsubscribe();
+      updateProgressEvent.unsubscribe();
     };
   }, []);
 
