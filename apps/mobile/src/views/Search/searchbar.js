@@ -49,8 +49,8 @@ export const SearchBar = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  });
-
+  },[]);
+  
   const onChangeText = value => {
     setValue(value);
     search(value);

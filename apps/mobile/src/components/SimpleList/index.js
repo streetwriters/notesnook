@@ -80,8 +80,6 @@ const SimpleList = ({
   const {colors} = state;
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  //const refreshing = false;
-  const [refreshing, setRefreshing] = useState(false);
   const syncing = useUserStore(state => state.syncing);
 
   useEffect(() => {
@@ -116,9 +114,7 @@ const SimpleList = ({
   );
 
   const _onRefresh = async () => {
-    setRefreshing(true);
     await Sync.run();
-    setRefreshing(false);
     if (refreshCallback) {
       refreshCallback();
     }
@@ -166,7 +162,7 @@ const SimpleList = ({
             colors={[colors.accent]}
             progressBackgroundColor={colors.nav}
             onRefresh={_onRefresh}
-            refreshing={refreshing || syncing}
+            refreshing={syncing}
           />
         }
         ListEmptyComponent={
