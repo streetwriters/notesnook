@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import { hashNavigate } from "../navigation";
+import { hardNavigate, hashNavigate } from "../navigation";
 import ThemeProvider from "../components/theme-provider";
 import { qclone } from "qclone";
 import { store as notebookStore } from "../stores/notebook-store";
@@ -203,9 +203,11 @@ export function showLogoutConfirmation() {
 
 export function showAccountLoggedOutNotice(reason) {
   return confirm({
-    title: reason,
-    message: `You were logged out`,
-    yesText: `Okay`,
+    title: "You were logged out",
+    message: reason,
+    noText: "Okay",
+    yesText: `Relogin`,
+    yesAction: () => hardNavigate("/login"),
   });
 }
 
