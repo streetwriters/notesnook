@@ -15,17 +15,16 @@ class PremiumDialog extends React.Component {
   }
 
   componentDidMount() {
-    eSubscribeEvent(eOpenPremiumDialog, this.open);
-    eSubscribeEvent(eClosePremiumDialog, this.close);
+    eSubscribeEvent(eOpenPremiumDialog, this.open.bind(this));
+    eSubscribeEvent(eClosePremiumDialog, this.close.bind(this));
   }
 
   componentWillUnmount() {
-    eUnSubscribeEvent(eOpenPremiumDialog, this.open);
-    eUnSubscribeEvent(eClosePremiumDialog, this.close);
+    eUnSubscribeEvent(eOpenPremiumDialog, this.open.bind(this));
+    eUnSubscribeEvent(eClosePremiumDialog, this.close.bind(this));
   }
 
   open(promoInfo) {
-    console.log(promoInfo);
     this.setState({
       visible: true,
       promo: promoInfo
