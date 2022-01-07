@@ -1,5 +1,10 @@
 import React, {createRef} from 'react';
-import {View} from 'react-native';
+import {Keyboard, LayoutAnimation, UIManager, View} from 'react-native';
+import {
+  Transition,
+  Transitioning,
+  TransitioningView
+} from 'react-native-reanimated';
 import {useMenuStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
@@ -27,6 +32,7 @@ export class AddTopicDialog extends React.Component {
       loading: false
     };
 
+    this.ref = createRef();
     this.title;
     this.titleRef = createRef();
     this.notebook = null;
@@ -109,9 +115,12 @@ export class AddTopicDialog extends React.Component {
               text: this.toEdit.title
             });
           }
+
+          this.ref.current?.animateNextTransition();
           await sleep(300);
           this.titleRef.current?.focus();
         }}
+        bounce={false}
         statusBarTranslucent={false}
         visible={true}
         onRequestClose={this.close}>

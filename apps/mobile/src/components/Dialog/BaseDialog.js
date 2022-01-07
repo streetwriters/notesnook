@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -24,7 +25,7 @@ const BaseDialog = ({
   bottom = false,
   background = null,
   animated = true,
-  bounce,
+  bounce = true,
   closeOnTouch = true
 }) => {
   const floating = useIsFloatingKeyboard();
