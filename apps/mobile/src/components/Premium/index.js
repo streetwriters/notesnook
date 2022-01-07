@@ -15,21 +15,21 @@ class PremiumDialog extends React.Component {
   }
 
   componentDidMount() {
-    eSubscribeEvent(eOpenPremiumDialog, this.open.bind(this));
-    eSubscribeEvent(eClosePremiumDialog, this.close.bind(this));
+    eSubscribeEvent(eOpenPremiumDialog, this.open);
+    eSubscribeEvent(eClosePremiumDialog, this.close);
   }
 
   componentWillUnmount() {
-    eUnSubscribeEvent(eOpenPremiumDialog, this.open.bind(this));
-    eUnSubscribeEvent(eClosePremiumDialog, this.close.bind(this));
+    eUnSubscribeEvent(eOpenPremiumDialog, this.open);
+    eUnSubscribeEvent(eClosePremiumDialog, this.close);
   }
 
-  open(promoInfo) {
+  open = promoInfo => {
     this.setState({
       visible: true,
       promo: promoInfo
     });
-  }
+  };
 
   close = () => {
     this.setState({
@@ -47,6 +47,7 @@ class PremiumDialog extends React.Component {
   render() {
     return !this.state.visible ? null : (
       <BaseDialog
+        bounce
         background={this.props.colors.bg}
         onRequestClose={this.onClose}>
         <Component
