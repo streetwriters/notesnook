@@ -29,6 +29,7 @@ import NoteHistory from "../collections/note-history";
  * @type {EventSource}
  */
 var NNEventSource;
+const DIFFERENCE_THRESHOLD = 20 * 1000;
 class Database {
   /**
    *
@@ -41,6 +42,7 @@ class Database {
      */
     this.evtSource = null;
     this.sseMutex = new Mutex();
+    this.lastHeartbeat = undefined; // { local: 0, server: 0 };
 
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
@@ -166,10 +168,26 @@ class Database {
             const { t } = data;
             const serverTime = new Date(t).getTime();
             const localTime = Date.now();
-            const diff = localTime - serverTime;
-            const DIFFERENCE_THRESHOLD = 10 * 1000;
+
+            if (!this.lastHeartbeat) {
+              this.lastHeartbeat = { local: localTime, server: serverTime };
+              break;
+            }
+
+            const timeElapsed = {
+              local: localTime - this.lastHeartbeat.local,
+              server: serverTime - this.lastHeartbeat.server,
+            };
+            const travelTime = timeElapsed.local - timeElapsed.server;
+            const actualTime = localTime - travelTime;
+
+            const diff = actualTime - serverTime;
+
             if (Math.abs(diff) > DIFFERENCE_THRESHOLD)
               EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
+
+            this.lastHeartbeat.local = localTime;
+            this.lastHeartbeat.server = serverTime;
             break;
           case "upgrade":
             const user = await this.user.getUser();
