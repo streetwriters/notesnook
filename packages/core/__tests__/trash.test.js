@@ -16,16 +16,24 @@ test("trash should be empty", () =>
   }));
 
 test("permanently delete a note", () =>
-  noteTest().then(async ({ db, id }) => {
-    const note = db.notes.note(id);
-    await db.notes.delete(id);
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add({...TEST_NOTE,sessionId:Date.now()});
+    const note = db.notes.note(noteId);
+
+    let sessions = await db.noteHistory.get(noteId);
+    expect(sessions.length).toBe(1);
+
+    await db.notes.delete(noteId);
     expect(db.trash.all.length).toBe(1);
     expect(await note.content()).toBeDefined();
     await db.trash.delete(db.trash.all[0].id);
     expect(db.trash.all.length).toBe(0);
     const content = await db.content.raw(note.data.contentId);
     expect(content.deleted).toBe(true);
-  }));
+
+    sessions = await db.noteHistory.get(noteId);
+    expect(sessions.length).toBe(0);
+}));
 
 test("restore a deleted note that was in a notebook", () =>
   noteTest().then(async ({ db, id }) => {
@@ -168,4 +176,31 @@ test("trash cleanup should not delete items newer than 7 days", () =>
     await db.trash.cleanup();
 
     expect(db.trash.all.length).toBe(2);
+  }));
+
+test("clear trash should delete note content", () =>
+  databaseTest().then(async (db) => {
+    const noteId = await db.notes.add({ ...TEST_NOTE, sessionId: Date.now() });
+
+    const notebookId = await db.notebooks.add(TEST_NOTEBOOK);
+
+    let sessions = await db.noteHistory.get(noteId);
+    expect(sessions.length).toBe(1);
+
+    let note = { ...db.notes.note(noteId).data };
+
+    await db.notebooks.delete(notebookId);
+    await db.notes.delete(noteId);
+
+    expect(db.trash.all.length).toBe(2);
+
+    await db.trash.clear();
+
+    expect(db.trash.all.length).toBe(0);
+
+    const content = await db.content.raw(note.contentId);
+    expect(content.deleted).toBe(true);
+
+    sessions = await db.noteHistory.get(note.id);
+    expect(sessions.length).toBe(0);
   }));

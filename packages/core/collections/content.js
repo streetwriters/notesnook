@@ -156,4 +156,23 @@ export default class Content extends Collection {
     contentItem.data = data;
     return contentItem;
   }
+
+  async cleanup() {
+    const indices = this._collection.indexer.indices;
+    await this._db.notes.init();
+    const notes = this._db.notes._collection.getRaw();
+    if (!notes.length && indices.length > 0) return [];
+    let ids = [];
+    for (let contentId of indices) {
+      const noteIndex = notes.findIndex((note) => note.contentId === contentId);
+      const isOrphaned = noteIndex === -1;
+      if (isOrphaned) {
+        ids.push(contentId);
+        await this._collection.deleteItem(contentId);
+      } else if (notes[noteIndex].localOnly) {
+        ids.push(contentId);
+      }
+    }
+    return ids;
+  }
 }
