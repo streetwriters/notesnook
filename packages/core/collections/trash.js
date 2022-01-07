@@ -66,6 +66,7 @@ export default class Trash {
       if (!item) continue;
       if (item.itemType === "note") {
         await this._db.content.remove(item.contentId);
+        await this._db.noteHistory.clearSessions(id);
       }
       await collection.removeItem(id);
     }
@@ -124,8 +125,7 @@ export default class Trash {
 
   async clear() {
     for (let item of this.all) {
-      const collectionName = collectionNameFromItem(item);
-      await this.collections[collectionName]._collection.removeItem(item.id);
+      await this.delete(item.id);
     }
   }
 }

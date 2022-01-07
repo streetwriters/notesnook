@@ -1,4 +1,4 @@
-import { makeSessionContentId, makeSessionId } from "../utils/id";
+import { makeSessionContentId } from "../utils/id";
 import Collection from "./collection";
 import SessionContent from "./session-content";
 /**
