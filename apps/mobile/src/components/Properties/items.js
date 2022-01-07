@@ -11,12 +11,12 @@ import {PressableButton} from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 import {useActions} from './use-actions';
 
-export const Items = ({item, rowItems, close}) => {
+export const Items = ({item, buttons, close}) => {
   const [state] = useTracked();
   const {colors} = state;
   const dimensions = useSettingStore(state => state.dimensions);
-  const actions= useActions({item, close});
-  const data = actions.filter(i => rowItems.indexOf(i.name) > -1 && !i.hidden);
+  const actions = useActions({item, close});
+  const data = actions.filter(i => buttons.indexOf(i.name) > -1 && !i.hidden);
 
   let width = dimensions.width > 600 ? 600 : dimensions.width;
   let columnItemsCount = DDS.isLargeTablet() ? 7 : 5;
@@ -93,7 +93,7 @@ export const Items = ({item, rowItems, close}) => {
     <FlatList
       data={data}
       keyExtractor={item => item.title}
-      numColumns={rowItems.length < 5 ? rowItems.length : columnItemsCount}
+      numColumns={buttons.length < 5 ? buttons.length : columnItemsCount}
       style={{
         marginTop: item.type !== 'note' ? 10 : 0,
         paddingTop: 10
@@ -103,8 +103,8 @@ export const Items = ({item, rowItems, close}) => {
       }}
       contentContainerStyle={{
         alignSelf: 'center',
-        width: rowItems.length < 5 ? '100%' : null,
-        paddingLeft: rowItems.length < 5 ? 10 : 0
+        width: buttons.length < 5 ? '100%' : null,
+        paddingLeft: buttons.length < 5 ? 10 : 0
       }}
       renderItem={_renderRowItem}
     />

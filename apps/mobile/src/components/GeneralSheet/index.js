@@ -15,10 +15,7 @@ const GeneralSheet = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
-  const [dialogData, setDialogData] = useState({
-    title: 'Loading',
-    paragraph: 'Loading tagline'
-  });
+  const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();
   useEffect(() => {
     eSubscribeEvent(eOpenProgressDialog, open);
@@ -52,10 +49,10 @@ const GeneralSheet = ({context}) => {
   return !visible ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={dialogData?.noProgress}
-      closeOnTouchBackdrop={dialogData?.noProgress}
+      gestureEnabled={!dialogData.progress}
+      closeOnTouchBackdrop={!dialogData.progress}
       onClose={() => {
-        if (dialogData.noProgress) {
+        if (!dialogData.progress) {
           setVisible(false);
           setDialogData(null);
         }
@@ -65,23 +62,31 @@ const GeneralSheet = ({context}) => {
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom:
-            dialogData.noProgress &&
-            dialogData.noIcon &&
+            !dialogData.progress &&
+            !dialogData.icon &&
             !dialogData.title &&
             !dialogData.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
         }}>
-        {!dialogData?.noProgress && !dialogData.component ? (
-          <ActivityIndicator size={50} color={colors.accent} />
-        ) : dialogData?.noIcon ? null : (
+        {dialogData?.progress ? (
+          <ActivityIndicator
+            style={{
+              marginTop: 15
+            }}
+            size={50}
+            color={colors.accent}
+          />
+        ) : null}
+
+        {dialogData?.icon ? (
           <Icon
             color={colors[dialogData.iconColor] || colors.accent}
-            name={dialogData.icon || 'check'}
+            name={dialogData.icon}
             size={50}
           />
-        )}
+        ) : null}
 
         {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
@@ -93,7 +98,7 @@ const GeneralSheet = ({context}) => {
       </View>
 
       {typeof dialogData.component === 'function'
-        ? dialogData.component(actionSheetRef)
+        ? dialogData.component(actionSheetRef, close)
         : dialogData.component}
 
       {dialogData?.learnMore ? (
@@ -156,7 +161,7 @@ const GeneralSheet = ({context}) => {
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
-              type={item.type || "accent"}
+              type={item.type || 'accent'}
               height={50}
               style={{
                 marginBottom: 10

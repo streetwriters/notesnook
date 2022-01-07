@@ -129,7 +129,6 @@ export const Settings = ({navigation}) => {
       name: `Report an issue`,
       func: async () => {
         presentSheet({
-          noIcon: true,
           component: <Issue />
         });
       },
@@ -151,7 +150,6 @@ export const Settings = ({navigation}) => {
             'Get early access to new features',
             'Meet other people using Notesnook'
           ],
-          noProgress: true,
           icon: 'discord',
           action: async () => {
             try {

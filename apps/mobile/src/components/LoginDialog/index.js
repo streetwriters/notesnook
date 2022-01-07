@@ -248,7 +248,7 @@ const LoginDialog = () => {
       presentSheet({
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
-        noProgress: false
+        progress:true
       });
     } catch (e) {
       setLoading(false);

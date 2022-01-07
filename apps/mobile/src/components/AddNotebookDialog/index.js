@@ -1,28 +1,33 @@
-import React, {createRef} from 'react';
+import React, { createRef } from 'react';
 import {
   Keyboard,
-  StyleSheet,
-  TouchableOpacity,
-  View,
-  TextInput,
-  Platform
+  StyleSheet, TextInput, TouchableOpacity,
+  View
 } from 'react-native';
-import {FlatList, ScrollView} from 'react-native-gesture-handler';
-import {notesnook} from '../../../e2e/test.ids';
-import {useMenuStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {ToastEvent} from '../../services/EventManager';
+import { FlatList } from 'react-native-gesture-handler';
+import { notesnook } from '../../../e2e/test.ids';
+import { useMenuStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import {
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  ToastEvent
+} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {ph, pv, SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { db } from '../../utils/database';
+import {
+  eCloseAddNotebookDialog,
+  eOpenAddNotebookDialog
+} from '../../utils/Events';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import SheetWrapper from '../Sheet';
+import { Toast } from '../Toast';
 
 let refs = [];
 
@@ -30,6 +35,7 @@ export class AddNotebookDialog extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      notebook: null,
       visible: false,
       topics: [],
       description: null,
@@ -58,26 +64,37 @@ export class AddNotebookDialog extends React.Component {
     this.actionSheetRef = createRef();
   }
 
-  open = () => {
-    console.log('opening called');
+  componentDidMount() {
+    eSubscribeEvent(eOpenAddNotebookDialog, this.open);
+    eSubscribeEvent(eCloseAddNotebookDialog, this.close);
+  }
+
+  componentWillUnmount() {
+    eUnSubscribeEvent(eOpenAddNotebookDialog, this.open);
+    eUnSubscribeEvent(eCloseAddNotebookDialog, this.close);
+  }
+
+  open = notebook => {
     refs = [];
-    let {toEdit} = this.props;
-    if (toEdit && toEdit.type === 'notebook') {
+
+    if (notebook) {
       let topicsList = [];
-      toEdit.topics.forEach((item, index) => {
+      notebook.topics.forEach((item, index) => {
         topicsList.push(item.title);
       });
-      this.id = toEdit.id;
-      this.title = toEdit.title;
-      this.description = toEdit.description;
+      this.id = notebook.id;
+      this.title = notebook.title;
+      this.description = notebook.description;
 
       this.setState({
         topics: [...topicsList],
-        visible: true
+        visible: true,
+        notebook: notebook
       });
     } else {
       this.setState({
-        visible: true
+        visible: true,
+        notebook:null
       });
     }
     sleep(100).then(r => {
@@ -102,7 +119,7 @@ export class AddNotebookDialog extends React.Component {
     let prevTopics = topics;
     refs = [];
     prevTopics.splice(index, 1);
-    let edit = this.props.toEdit;
+    let edit = this.state.notebook;
     if (edit && edit.id) {
       let topicToDelete = edit.topics[index];
 
@@ -128,8 +145,7 @@ export class AddNotebookDialog extends React.Component {
     this.setState({
       loading: true
     });
-    let {topics} = this.state;
-    let edit = this.props.toEdit;
+    let {topics, notebook} = this.state;
 
     if (!this.title || this.title?.trim().length === 0) {
       ToastEvent.show({
@@ -142,12 +158,8 @@ export class AddNotebookDialog extends React.Component {
       });
       return;
     }
-
-    let id = edit && edit.id ? edit.id : null;
-
-    let toEdit;
-    if (id) {
-      toEdit = db.notebooks.notebook(edit.id).data;
+    if (notesnook) {
+      toEdit = db.notebooks.notebook(notebook.id).data;
     }
 
     let prevTopics = [...topics];
@@ -160,7 +172,7 @@ export class AddNotebookDialog extends React.Component {
         this.currentInputValue = null;
       }
     }
-    if (id) {
+    if (notesnook) {
       if (this.topicsToDelete?.length > 0) {
         await db.notebooks
           .notebook(toEdit.id)
@@ -171,11 +183,10 @@ export class AddNotebookDialog extends React.Component {
       await db.notebooks.add({
         title: this.title,
         description: this.description,
-        id: id
+        id: notebook.id
       });
 
       let nextTopics = toEdit.topics.map((topic, index) => {
-        //if (index === 0) return topic;
         let copy = {...topic};
         copy.title = prevTopics[index];
         return copy;
@@ -187,13 +198,12 @@ export class AddNotebookDialog extends React.Component {
         }
       });
 
-      await db.notebooks.notebook(id).topics.add(...nextTopics);
+      await db.notebooks.notebook(toEdit.id).topics.add(...nextTopics);
     } else {
       await db.notebooks.add({
         title: this.title,
         description: this.description,
-        topics: prevTopics,
-        id: id
+        topics: prevTopics
       });
     }
     useMenuStore.getState().setMenuPins();
@@ -257,15 +267,15 @@ export class AddNotebookDialog extends React.Component {
   };
 
   render() {
-    const {colors, toEdit} = this.props;
-    const {topics, visible, topicInputFocused} = this.state;
+    const {colors} = this.props;
+    const {topics, visible, topicInputFocused, notebook} = this.state;
     if (!visible) return null;
     return (
       <SheetWrapper
         onOpen={async () => {
           this.topicsToDelete = [];
           await sleep(300);
-          this.props.toEdit?.type !== 'notebook' && this.titleRef?.focus();
+          !this.state.notebook && this.titleRef?.focus();
         }}
         fwdRef={this.actionSheetRef}
         onClose={() => {
@@ -275,7 +285,8 @@ export class AddNotebookDialog extends React.Component {
             topics: [],
             descFocused: false,
             titleFocused: false,
-            editTopic: false
+            editTopic: false,
+            notesnook: null
           });
         }}
         statusBarTranslucent={false}
@@ -298,10 +309,12 @@ export class AddNotebookDialog extends React.Component {
           />
           <DialogHeader
             title={
-              toEdit && toEdit.dateCreated ? 'Edit Notebook' : 'New Notebook'
+              notebook && notebook.dateCreated
+                ? 'Edit Notebook'
+                : 'New Notebook'
             }
             paragraph={
-              toEdit && toEdit.dateCreated
+              notebook && notebook.dateCreated
                 ? 'You are editing ' + this.title + ' notebook.'
                 : 'Notebooks are the best way to organize your notes.'
             }
@@ -320,7 +333,7 @@ export class AddNotebookDialog extends React.Component {
             }}
             returnKeyLabel="Next"
             returnKeyType="next"
-            defaultValue={toEdit ? toEdit.title : null}
+            defaultValue={notebook ? notebook.title : null}
           />
 
           <Input
@@ -335,7 +348,7 @@ export class AddNotebookDialog extends React.Component {
             }}
             returnKeyLabel="Next"
             returnKeyType="next"
-            defaultValue={toEdit ? toEdit.description : null}
+            defaultValue={notebook ? notebook.description : null}
           />
 
           <Input
@@ -404,12 +417,14 @@ export class AddNotebookDialog extends React.Component {
             height={50}
             fontSize={SIZE.md}
             title={
-              toEdit && toEdit.dateCreated ? 'Save changes' : 'Create notebook'
+              notebook && notebook.dateCreated
+                ? 'Save changes'
+                : 'Create notebook'
             }
             type="accent"
             onPress={this.addNewNotebook}
           />
-{/* 
+          {/* 
           {Platform.OS === 'ios'  && (
             <View
               style={{

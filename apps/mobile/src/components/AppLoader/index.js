@@ -125,8 +125,6 @@ const AppLoader = ({onLoad}) => {
       if (!version.needsUpdate) return false;
 
       presentSheet({
-        noIcon: true,
-        noProgess: true,
         component: ref => <Update version={version} fwdRef={ref} />
       });
 
@@ -183,8 +181,6 @@ const AppLoader = ({onLoad}) => {
         presentSheet({
           title: 'Backup & restore',
           paragraph: 'Please enable automatic backups to keep your data safe',
-          noProgress: true,
-          noIcon: true,
           component: <SettingsBackupAndRestore isSheet={true} />
         });
 

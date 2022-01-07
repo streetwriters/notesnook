@@ -31,8 +31,6 @@ export const Component = ({close, promo, getRef}) => {
       presentSheet({
         context: 'pricing_plans',
         component: <PricingPlans marginTop={1} promo={promo} />,
-        noIcon: true,
-        noProgress: true
       });
     } else {
       close();

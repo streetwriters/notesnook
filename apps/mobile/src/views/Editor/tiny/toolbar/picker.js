@@ -27,7 +27,6 @@ const showEncryptionSheet = file => {
   presentSheet({
     title: 'Encrypting attachment',
     paragraph: 'Please wait while we encrypt file for upload',
-    nowarn: true,
     icon: 'attachment',
     component: (
       <View
@@ -222,8 +221,6 @@ const pick = async () => {
     editing.isFocused = true;
   }
   presentSheet({
-    noProgress: true,
-    noIcon: true,
     actionsArray: [
       {
         action: async () => {

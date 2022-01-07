@@ -1,4 +1,6 @@
 import React, {createRef} from 'react';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eClosePremiumDialog, eOpenPremiumDialog} from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
 import {Component} from './component';
 
@@ -10,6 +12,16 @@ class PremiumDialog extends React.Component {
       promo: null
     };
     this.actionSheetRef = createRef();
+  }
+
+  componentDidMount() {
+    eSubscribeEvent(eOpenPremiumDialog, this.open);
+    eSubscribeEvent(eClosePremiumDialog, this.close);
+  }
+
+  componentWillUnmount() {
+    eUnSubscribeEvent(eOpenPremiumDialog, this.open);
+    eUnSubscribeEvent(eClosePremiumDialog, this.close);
   }
 
   open(promoInfo) {

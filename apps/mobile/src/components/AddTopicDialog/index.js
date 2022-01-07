@@ -1,6 +1,5 @@
 import React, {createRef} from 'react';
 import {View} from 'react-native';
-import {Actions} from '../../provider/Actions';
 import {useMenuStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
@@ -15,7 +14,6 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
@@ -92,7 +90,6 @@ export class AddTopicDialog extends React.Component {
     });
   };
   close = () => {
-    this.props.close();
     this.title = null;
     this.notebook = null;
     this.toEdit = null;
@@ -107,6 +104,11 @@ export class AddTopicDialog extends React.Component {
     return (
       <BaseDialog
         onShow={async () => {
+          if (this.toEdit) {
+            this.titleRef.current?.setNativeProps({
+              text: this.toEdit.title
+            });
+          }
           await sleep(300);
           this.titleRef.current?.focus();
         }}
@@ -135,7 +137,6 @@ export class AddTopicDialog extends React.Component {
                 this.title = value;
               }}
               blurOnSubmit={false}
-              defaultValue={this.toEdit ? this.toEdit.title : null}
               placeholder="Enter title"
               onSubmit={() => this.addNewTopic()}
               returnKeyLabel="Done"

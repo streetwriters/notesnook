@@ -95,8 +95,6 @@ export const SectionHeader = ({item, index, type, color, screen}) => {
             <Button
               onPress={() => {
                 presentSheet({
-                  noProgress: true,
-                  noIcon: true,
                   component: <Sort screen={screen} type={type} />
                 });
               }}

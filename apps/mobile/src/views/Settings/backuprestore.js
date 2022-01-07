@@ -79,7 +79,6 @@ const SettingsBackupAndRestore = ({isSheet}) => {
             presentSheet({
               title: 'Notesnook Importer',
               icon: 'import',
-              noProgress: true,
               action: async () => {
                 try {
                   await openLinkInBrowser(

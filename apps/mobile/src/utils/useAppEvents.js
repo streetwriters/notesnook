@@ -221,7 +221,6 @@ export const useAppEvents = () => {
     presentSheet({
       title: 'Email confirmed!',
       paragraph: message,
-      noProgress: true,
       component: (
         <View
           style={{
@@ -263,7 +262,6 @@ export const useAppEvents = () => {
         },
         icon: 'check',
         actionText: 'Continue',
-        noProgress: true
       });
     }
     await PremiumService.setPremiumStatus();
@@ -316,7 +314,6 @@ export const useAppEvents = () => {
       },
       icon: 'logout',
       actionText: 'Login',
-      noProgress: true
     });
 
     setTimeout(() => {

@@ -259,7 +259,6 @@ async function downloadAttachment(hash, global = true) {
           ? 'selected path'
           : 'File Manager/Notesnook/downloads'
       }`,
-      noProgress: true,
       icon: 'download',
       context: global ? null : attachment.metadata.hash,
       component: (

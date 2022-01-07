@@ -248,7 +248,6 @@ const SettingsUserSection = () => {
                       paragraph:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
-                      noProgress: true
                     });
                   }}
                   style={{
@@ -323,7 +322,6 @@ const SettingsUserSection = () => {
                   },
                   icon: 'information-outline',
                   actionText: 'Verify',
-                  noProgress: true
                 });
               },
               desc: 'Verify your subscription to Notesnook Pro'

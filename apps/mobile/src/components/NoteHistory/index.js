@@ -42,8 +42,6 @@ export default function NoteHistory({note, ref}) {
         />
       ),
       context: 'note_history',
-      noProgress: true,
-      noIcon: true
     });
   }
 

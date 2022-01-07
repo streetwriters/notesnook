@@ -2,9 +2,9 @@ import React from 'react';
 import {ScrollView, View} from 'react-native';
 import {useTracked} from '../../provider';
 import {DDS} from '../../services/DeviceDetection';
+import {presentSheet} from '../../services/EventManager';
 import {db} from '../../utils/database';
 import {SIZE} from '../../utils/SizeUtils';
-import {ActionSheetEvent} from '../DialogManager/recievers';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import {ColorTags} from './color-tags';
@@ -16,7 +16,7 @@ import {Synced} from './synced';
 import {Tags} from './tags';
 import {Topics} from './topics';
 
-export const Properties = ({close = () => {}, item, rowItems = [], getRef}) => {
+export const Properties = ({close = () => {}, item, buttons = [], getRef}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
@@ -97,7 +97,7 @@ export const Properties = ({close = () => {}, item, rowItems = [], getRef}) => {
 
       {item.type === 'note' ? <ColorTags close={close} item={item} /> : null}
 
-      <Items item={item} rowItems={rowItems} close={close} />
+      <Items item={item} buttons={buttons} close={close} />
       <Synced item={item} close={close} />
       <DevMode item={item} />
 
@@ -148,5 +148,17 @@ Properties.present = (item, buttons = []) => {
       props.push(['Add Shortcut', 'Delete', 'Rename Tag']);
       break;
   }
-  ActionSheetEvent(...props);
+
+  presentSheet({
+    component: (ref, close) => (
+      <Properties
+        close={() => {
+          close();
+        }}
+        getRef={() => ref}
+        item={props[0]}
+        buttons={props[1]}
+      />
+    )
+  });
 };

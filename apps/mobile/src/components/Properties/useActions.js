@@ -32,6 +32,8 @@ import {
 } from '../../utils/Colors';
 import {db} from '../../utils/database';
 import {
+  eOpenAddNotebookDialog,
+  eOpenAddTopicDialog,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
@@ -282,7 +284,16 @@ export const useActions = ({close = () => {}, item}) => {
   async function addToVault() {
     if (!item.id) return;
     if (item.locked) {
-      close('unlock');
+      close();
+      await sleep(300);
+      openVault({
+        item: item,
+        novault: true,
+        locked: true,
+        permanant: true,
+        title: 'Unlock note',
+        description: 'Remove note from the vault.'
+      });
       return;
     }
     try {
@@ -297,15 +308,25 @@ export const useActions = ({close = () => {}, item}) => {
         ]);
       }
     } catch (e) {
+      close();
+      await sleep(300);
       switch (e.message) {
         case db.vault.ERRORS.noVault:
-          close('novault');
+          openVault({
+            item: item,
+            novault: false,
+            title: 'Create vault',
+            description: 'Set a password to create a vault and lock note.'
+          });
           break;
         case db.vault.ERRORS.vaultLocked:
-          close('locked');
-          break;
-        case db.vault.ERRORS.wrongPassword:
-          close();
+          openVault({
+            item: item,
+            novault: true,
+            locked: true,
+            title: 'Lock note',
+            description: 'Give access to vault to lock this note.'
+          });
           break;
       }
     }
@@ -455,8 +476,6 @@ export const useActions = ({close = () => {}, item}) => {
     close();
     await sleep(300);
     presentSheet({
-      noProgress: true,
-      noIcon: true,
       component: ref => <NoteHistory ref={ref} note={item} />
     });
   }
@@ -523,13 +542,24 @@ export const useActions = ({close = () => {}, item}) => {
       name: 'Edit Notebook',
       title: 'Edit notebook',
       icon: 'square-edit-outline',
-      func: () => close('notebook')
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAddNotebookDialog, item);
+      }
     },
     {
       name: 'Edit Topic',
       title: 'Edit topic',
       icon: 'square-edit-outline',
-      func: () => close('topic')
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenAddTopicDialog, {
+          notebookId: item.notebookId,
+          toEdit: item
+        });
+      }
     },
     {
       name: 'Copy',
@@ -592,7 +622,11 @@ export const useActions = ({close = () => {}, item}) => {
       name: 'Export',
       title: 'Export',
       icon: 'export',
-      func: () => close('export')
+      func: async () => {
+        close();
+        await sleep(300);
+        eSendEvent(eOpenExportDialog, [item]);
+      }
     },
     {
       name: 'RemoveTopic',
@@ -625,5 +659,5 @@ export const useActions = ({close = () => {}, item}) => {
     }
   ];
 
-  return actions
+  return actions;
 };

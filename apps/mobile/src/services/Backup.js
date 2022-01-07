@@ -74,7 +74,8 @@ async function run() {
   presentSheet({
     title: 'Backing up your data',
     paragraph:
-      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
+      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+    progress:true
   });
   let backup;
   let error;
@@ -128,7 +129,6 @@ async function run() {
         icon: 'cloud-upload',
         paragraph:
           'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
-        noProgress: true,
         actionText: 'Share backup',
         actionsArray: [
           {

@@ -485,8 +485,6 @@ export const _onMessage = async evt => {
       console.log(message.value);
       eSendEvent('updatecell', message.value);
       presentSheet({
-        noIcon: true,
-        noProgress: true,
         component: <TableCellProperties data={message.value} />
       });
       break;
@@ -494,8 +492,6 @@ export const _onMessage = async evt => {
       console.log('tablerowoptions', message.value);
       eSendEvent('updaterow', message.value);
       presentSheet({
-        noIcon: true,
-        noProgress: true,
         component: <TableRowProperties data={message.value} />
       });
       break;

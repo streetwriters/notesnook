@@ -36,16 +36,12 @@ export const Cta = ({actions, style = {}, color, inline}) => {
               text: item.title
             }}
           />
-        ),
-        noIcon: true,
-        noProgress: true
+        )
       });
     } else if (item.type === 'backup') {
       presentSheet({
         title: 'Backup & restore',
         paragraph: 'Please enable automatic backups to keep your data safe',
-        noProgress: true,
-        noIcon: true,
         component: <SettingsBackupAndRestore isSheet={true} />
       });
     }
