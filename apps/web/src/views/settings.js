@@ -268,28 +268,6 @@ function Settings(props) {
                 tip="Log out of your account and clear all data."
               />
             </Button>
-            <Button
-              variant="list"
-              onClick={async () => {
-                return showPasswordDialog(
-                  "delete_account",
-                  async ({ password }) => {
-                    await db.user.deleteUser(password);
-                    return true;
-                  }
-                );
-              }}
-              sx={{ ":hover": { borderColor: "error" } }}
-              bg="errorBg"
-              mx={-2}
-              px={2}
-            >
-              <Tip
-                color="error"
-                text="Delete account"
-                tip="Permanently delete account and logout from all devices."
-              />
-            </Button>
           </>
         )}
         <Header
@@ -650,6 +628,48 @@ function Settings(props) {
             />
           </>
         )}
+        <Flex
+          flexDirection={"column"}
+          sx={{ border: "2px solid var(--error)", borderRadius: "default" }}
+          p={1}
+          my={2}
+        >
+          <Text variant={"body"} fontWeight={"bold"} color="error">
+            DANGER ZONE
+          </Text>
+          <Button
+            variant="list"
+            onClick={async () => {
+              await db.user.clearSessions();
+              await showToast(
+                "success",
+                "You have been logged out from all other devices."
+              );
+            }}
+          >
+            <Tip
+              text="Logout from all other devices"
+              tip="Force logout from all other logged in devices."
+            />
+          </Button>
+          <Button
+            variant="list"
+            onClick={async () => {
+              return showPasswordDialog(
+                "delete_account",
+                async ({ password }) => {
+                  await db.user.deleteUser(password);
+                  return true;
+                }
+              );
+            }}
+          >
+            <Tip
+              text="Delete account"
+              tip="Permanently delete account and logout from all devices."
+            />
+          </Button>
+        </Flex>
       </Flex>
     </ScrollContainer>
   );
@@ -884,6 +904,7 @@ function AccountStatusContainer(props) {
       bg={bg}
       flexDirection="column"
       p={2}
+      mt={1}
       sx={{ borderRadius: "default", border: "1px solid var(--border)" }}
     >
       <Flex flex="1" justifyContent="space-between">
