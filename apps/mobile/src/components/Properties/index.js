@@ -1,5 +1,5 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import { FlatList } from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
@@ -21,7 +21,7 @@ import {
   useTagStore,
   useUserStore
 } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -33,7 +33,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import {editing} from '../../utils';
+import { editing } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -41,31 +41,28 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
-  eOnNewTopicAdded,
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
-  eOpenPublishNoteDialog,
-  refreshNotesPage
+  eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {deleteItems, openLinkInBrowser} from '../../utils/functions';
-import layoutmanager from '../../utils/layout-manager';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
-import {presentDialog} from '../Dialog/functions';
+import { deleteItems, openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
+import { presentDialog } from '../Dialog/functions';
 import NoteHistory from '../NoteHistory';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {ColorTags} from './color-tags';
-import {DateMeta} from './date-meta';
+import { ColorTags } from './color-tags';
+import { DateMeta } from './date-meta';
 import Notebooks from './notebooks';
-import {Tags} from './tags';
-import {Topics} from './topics';
+import { Tags } from './tags';
+import { Topics } from './topics';
 const w = Dimensions.get('window').width;
 
 let htmlToText;
@@ -110,7 +107,6 @@ export const Properties = ({
   useEffect(() => {
     if (item.id === null) return;
     checkNotifPinned();
-    setNote({...item});
     if (item.type !== 'note') {
       setIsPinnedToMenu(db.settings.isPinned(note.id));
     }
