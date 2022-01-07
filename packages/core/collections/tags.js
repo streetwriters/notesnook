@@ -65,7 +65,7 @@ export default class Tags extends Collection {
       return;
     }
 
-    return this._db.settings.getAlias(tagId) || tag.title;
+    return this._db.settings.getAlias(tag.id) || tag.title;
   }
 
   get raw() {
