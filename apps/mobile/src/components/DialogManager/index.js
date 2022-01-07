@@ -1,11 +1,11 @@
-import React, { Component, createRef } from 'react';
+import React, {Component, createRef} from 'react';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   openVault
 } from '../../services/EventManager';
-import { getCurrentColors } from '../../utils/Colors';
+import {getCurrentColors} from '../../utils/Colors';
 import {
   eCloseActionSheet,
   eCloseAddNotebookDialog,
@@ -20,12 +20,12 @@ import {
   eShowGetPremium,
   eThemeUpdated
 } from '../../utils/Events';
-import { EditorSettings } from '../../views/Editor/EditorSettings';
-import { AddNotebookDialog } from '../AddNotebookDialog';
-import { AddTopicDialog } from '../AddTopicDialog';
-import { AnnouncementDialog } from '../Announcements';
-import { AttachmentDialog } from '../AttachmentDialog';
-import { Dialog } from '../Dialog';
+import {EditorSettings} from '../../views/Editor/EditorSettings';
+import {AddNotebookDialog} from '../AddNotebookDialog';
+import {AddTopicDialog} from '../AddTopicDialog';
+import {AnnouncementDialog} from '../Announcements';
+import {AttachmentDialog} from '../AttachmentDialog';
+import {Dialog} from '../Dialog';
 import ExportDialog from '../ExportDialog';
 import GeneralSheet from '../GeneralSheet';
 import ImagePreview from '../ImagePreview';
@@ -33,8 +33,8 @@ import LoginDialog from '../LoginDialog';
 import MergeEditor from '../MergeEditor';
 import MoveNoteDialog from '../MoveNoteDialog';
 import PremiumDialog from '../Premium';
-import { Expiring } from '../Premium/expiring';
-import { Properties } from '../Properties';
+import {Expiring} from '../Premium/expiring';
+import {Properties} from '../Properties';
 import PublishNoteDialog from '../PublishNoteDialog';
 import RateDialog from '../RateDialog';
 import RecoveryKeyDialog from '../RecoveryKeyDialog';
@@ -42,7 +42,7 @@ import RestoreDialog from '../RestoreDialog';
 import ResultDialog from '../ResultDialog';
 import SheetWrapper from '../Sheet';
 import TagsDialog from '../TagsDialog';
-import { VaultDialog } from '../VaultDialog';
+import {VaultDialog} from '../VaultDialog';
 
 export class DialogManager extends Component {
   constructor(props) {
@@ -53,12 +53,7 @@ export class DialogManager extends Component {
       item: {},
       actionSheetVisible: false,
       colors: getCurrentColors(),
-      actionSheetData: {
-        colors: false,
-        tags: false,
-        rowItems: [],
-        columnItems: []
-      },
+      actionSheetButtons: [],
       simpleDialog: {
         title: '',
         paragraph: '',
@@ -80,7 +75,7 @@ export class DialogManager extends Component {
   _showActionSheet = data => {
     this.setState(
       {
-        actionSheetData: data,
+        actionSheetButtons: data.buttons,
         item: data.item ? data.item : {},
         actionSheetVisible: true
       },
@@ -232,7 +227,7 @@ export class DialogManager extends Component {
   };
 
   render() {
-    let {actionSheetData, item, simpleDialog, colors} = this.state;
+    let {actionSheetButtons, item, colors} = this.state;
     return (
       <>
         {!this.state.actionSheetVisible ? null : (
@@ -248,10 +243,7 @@ export class DialogManager extends Component {
             <Properties
               item={item}
               getRef={() => this.actionSheet}
-              hasColors={actionSheetData.colors}
-              hasTags={actionSheetData.colors}
-              rowItems={actionSheetData.rowItems}
-              columnItems={actionSheetData.columnItems}
+              rowItems={actionSheetButtons}
               close={value => {
                 if (value) {
                   this.show = value;
@@ -295,8 +287,8 @@ export class DialogManager extends Component {
         <PublishNoteDialog />
         <TagsDialog />
         <AttachmentDialog />
-        <Expiring/>
-        <AnnouncementDialog/>
+        <Expiring />
+        <AnnouncementDialog />
       </>
     );
   }

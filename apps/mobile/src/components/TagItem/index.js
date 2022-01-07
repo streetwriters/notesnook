@@ -10,6 +10,7 @@ import {refreshNotesPage} from '../../utils/Events';
 import {SIZE} from '../../utils/SizeUtils';
 import {ActionIcon} from '../ActionIcon';
 import {ActionSheetEvent} from '../DialogManager/recievers';
+import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -81,8 +82,7 @@ const TagItem = React.memo(
           name="dots-horizontal"
           size={SIZE.xl}
           onPress={() => {
-            let rowItems = ['Add Shortcut', 'Delete', 'Rename Tag'];
-            ActionSheetEvent(item, false, false, rowItems);
+            Properties.present(item);
           }}
           testID={notesnook.ids.tag.menu}
           customStyle={{

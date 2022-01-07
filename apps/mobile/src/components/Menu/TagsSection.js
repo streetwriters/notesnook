@@ -19,6 +19,7 @@ import {PressableButton} from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import { Properties } from '../Properties';
 
 export const TagsSection = () => {
   const menuPins = useMenuStore(state => state.menuPins);
@@ -154,19 +155,7 @@ const PinItem = ({item, index, onPress}) => {
       <PressableButton
         type={headerTextState?.id === item.id ? 'grayBg' : 'gray'}
         onLongPress={() => {
-          let rowItems = [];
-          if (item.type === 'tag') {
-            rowItems = ['Add Shortcut', 'Delete', 'Rename Tag'];
-            ActionSheetEvent(item, false, false, rowItems);
-          } else if (item.type === 'notebook' || item.type === 'topic') {
-            rowItems =
-              item.type === 'topic'
-                ? ['Edit Topic', 'Add Shortcut', 'Delete']
-                : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
-            ActionSheetEvent(item, false, false, rowItems, {
-              notebookID: item.notebookId
-            });
-          }
+          Properties.present(item);
         }}
         onPress={() => onPress(item)}
         customStyle={{

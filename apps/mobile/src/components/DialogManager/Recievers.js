@@ -8,24 +8,13 @@ import {
   eOpenActionSheet,
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
-  eOpenMoveNoteDialog,
+  eOpenMoveNoteDialog
 } from '../../utils/Events';
 
-export const ActionSheetEvent = (
-  item,
-  colors,
-  tags,
-  rowItems,
-  columnItems,
-  extraData,
-) => {
+export const ActionSheetEvent = (item, buttons) => {
   eSendEvent(eOpenActionSheet, {
     item,
-    colors,
-    tags,
-    rowItems,
-    columnItems,
-    extraData,
+    buttons
   });
 };
 export const ActionSheetHideEvent = () => {

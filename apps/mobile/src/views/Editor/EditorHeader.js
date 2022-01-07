@@ -12,6 +12,7 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import {notesnook} from '../../../e2e/test.ids';
 import {ActionIcon} from '../../components/ActionIcon';
 import {ActionSheetEvent} from '../../components/DialogManager/recievers';
+import { Properties } from '../../components/Properties';
 import {useTracked} from '../../provider';
 import {
   useEditorStore,
@@ -168,22 +169,7 @@ const EditorHeader = () => {
       safeKeyboardDismiss();
       editing.isFocused = true;
     }
-    let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
-    ActionSheetEvent(note, true, true, [
-      'Add to notebook',
-      'Share',
-      'Export',
-      'Delete',
-      'Copy',
-      'Dark Mode',
-      'Add to Vault',
-      'Attachments',
-      'Pin',
-      'Favorite',
-      'Publish',
-      'History',
-      ...android
-    ]);
+    Properties.present(note, ['Dark Mode']);
   };
 
   useEffect(() => {
