@@ -6,7 +6,6 @@ import ListItem from "../list-item";
 import { showMoveNoteDialog } from "../../common/dialog-controller";
 import { store, useStore } from "../../stores/note-store";
 import { db } from "../../common/db";
-import Colors from "../menu/colors";
 import { showExportDialog } from "../../common/dialog-controller";
 import { showItemDeletedToast } from "../../common/toasts";
 import { showUnpinnedToast } from "../../common/toasts";
@@ -15,6 +14,7 @@ import { hashNavigate, navigate } from "../../navigation";
 import { showPublishView } from "../publish-view";
 import Vault from "../../common/vault";
 import IconTag from "../icon-tag";
+import { COLORS } from "../../common";
 
 function Note(props) {
   const { tags, notebook, item, index, context, attachments, date } = props;
@@ -195,30 +195,6 @@ const pin = (note) => {
 
 const menuItems = [
   {
-    key: "colors",
-    title: () => "Colors",
-    component: ({ data }) => <Colors note={data.note} />,
-  },
-  {
-    key: "publish",
-    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
-    disableReason: "You cannot publish a locked note.",
-    icon: Icon.Publish,
-    title: ({ note }) =>
-      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
-    onClick: async ({ note }) => {
-      await showPublishView(note.id, "bottom");
-    },
-  },
-  {
-    key: "addtonotebook",
-    title: () => "Add to notebook(s)",
-    icon: Icon.AddToNotebook,
-    onClick: async ({ note }) => {
-      await showMoveNoteDialog([note.id]);
-    },
-  },
-  {
     key: "pin",
     title: ({ note }) => (note.pinned ? "Unpin" : "Pin"),
     icon: Icon.Pin,
@@ -233,8 +209,46 @@ const menuItems = [
     onClick: ({ note }) => store.favorite(note),
   },
   {
+    key: "addtonotebook",
+    title: "Add to notebook(s)",
+    icon: Icon.AddToNotebook,
+    onClick: async ({ note }) => {
+      await showMoveNoteDialog([note.id]);
+    },
+  },
+  {
+    key: "colors",
+    title: "Assign color",
+    icon: Icon.Colors,
+    items: COLORS.map((label) => ({
+      key: label,
+      title: db.colors.alias(label.toLowerCase()) || label.toLowerCase(),
+      icon: Icon.Circle,
+      iconColor: label.toLowerCase(),
+      checked: ({ note }) => {
+        return note.color === label.toLowerCase();
+      },
+      onClick: ({ note }) => {
+        const { id } = note;
+        store.setColor(id, label.toLowerCase());
+      },
+    })),
+  },
+
+  {
+    key: "publish",
+    disabled: ({ note }) => !db.monographs.isPublished(note.id) && note.locked,
+    disableReason: "You cannot publish a locked note.",
+    icon: Icon.Publish,
+    title: ({ note }) =>
+      db.monographs.isPublished(note.id) ? "Unpublish" : "Publish",
+    onClick: async ({ note }) => {
+      await showPublishView(note.id, "bottom");
+    },
+  },
+  {
     key: "export",
-    title: () => "Export",
+    title: "Export",
     icon: Icon.Export,
     onClick: async ({ note }) => {
       if (note.locked) {
@@ -262,10 +276,12 @@ const menuItems = [
     },
     isPro: true,
   },
+
   {
     key: "movetotrash",
-    title: () => "Move to trash",
+    title: "Move to trash",
     color: "red",
+    iconColor: "red",
     icon: Icon.Trash,
     disabled: ({ note }) => db.monographs.isPublished(note.id),
     disableReason: "Please unpublish this note to move it to trash",
@@ -282,7 +298,7 @@ const topicNoteMenuItems = [
   ...menuItems,
   {
     key: "removefromtopic",
-    title: () => "Remove from topic",
+    title: "Remove from topic",
     icon: Icon.TopicRemove,
     color: "red",
     onClick: async ({ note, context }) => {

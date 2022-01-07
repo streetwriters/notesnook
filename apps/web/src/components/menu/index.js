@@ -1,147 +1,131 @@
 import { useAnimation } from "framer-motion";
-import { Check } from "../icons";
-import React, { useEffect, useMemo } from "react";
+import { Check, ChevronRight, Pro } from "../icons";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Flex, Box, Text, Button } from "rebass";
-import { useIsUserPremium } from "../../hooks/use-is-user-premium";
 import useMobile from "../../utils/use-mobile";
 import { AnimatedFlex } from "../animated";
 
-function Menu(props) {
-  const { menuItems, data, closeMenu, id, style, sx, state } = props;
-  const isUserPremium = useIsUserPremium();
+function useMenuFocus(items) {
+  const [focusIndex, setFocusIndex] = useState(-1);
+  const [isSubmenuOpen, setIsSubmenuOpen] = useState(false);
+
+  const onKeyDown = useCallback(
+    (e) => {
+      const isSeperator = (i) => items && items[i]?.type === "seperator";
+      const moveDown = (i) => (i < items.length - 1 ? ++i : 0);
+      const moveUp = (i) => (i > 0 ? --i : items.length - 1);
+      const hasSubmenu = (i) => items && items[i]?.hasSubmenu;
+      const openSubmenu = (index) => {
+        if (!hasSubmenu(index)) return;
+        setIsSubmenuOpen(true);
+      };
+
+      const closeSubmenu = (index) => {
+        if (!hasSubmenu(index)) return;
+        setIsSubmenuOpen(false);
+      };
+
+      setFocusIndex((i) => {
+        let nextIndex = i;
+
+        switch (e.key) {
+          case "ArrowUp":
+            if (isSubmenuOpen) break;
+            nextIndex = moveUp(i);
+            if (isSeperator(nextIndex)) nextIndex = moveUp(nextIndex);
+            break;
+          case "ArrowDown":
+            if (isSubmenuOpen) break;
+            nextIndex = moveDown(i);
+            if (isSeperator(nextIndex)) nextIndex = moveDown(nextIndex);
+            break;
+          case "ArrowRight":
+            openSubmenu(i);
+            break;
+          case "ArrowLeft":
+            closeSubmenu(i);
+            break;
+          default:
+            break;
+        }
+
+        return nextIndex;
+      });
+    },
+    [items, isSubmenuOpen]
+  );
+
+  useEffect(() => {
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [onKeyDown]);
+
+  return [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen];
+}
+
+function Menu({ items, data, closeMenu }) {
   const isMobile = useMobile();
+  const [focusIndex, setFocusIndex, isSubmenuOpen, setIsSubmenuOpen] =
+    useMenuFocus(items);
+
   const Container = useMemo(
     () => (isMobile ? MobileMenuContainer : MenuContainer),
     [isMobile]
   );
 
   return (
-    <Container id={id} title={data?.title} style={style} sx={sx} state={state}>
-      {menuItems.map(
-        (
-          {
-            title,
-            key,
-            onClick,
-            component: Component,
-            color,
-            isPro,
-            isNew,
-            disabled,
-            disableReason,
-            checked,
-            icon: Icon,
-            type,
-          },
-          index
-        ) =>
-          type === "seperator" ? (
-            <Box
-              key={key}
-              width="95%"
-              height="0.5px"
-              bg="border"
-              my={2}
-              alignSelf="center"
-            />
-          ) : (
-            <Button
-              variant="menuitem"
-              color={color || "text"}
-              display="flex"
-              alignItems="center"
-              justifyContent="center"
-              title={
-                (disabled && disabled(data) && disableReason) || title(data)
-              }
-              disabled={disabled && disabled(data)}
-              data-test-id={`menuitem-${title(data)
-                .split(" ")
-                .join("")
-                .toLowerCase()}`}
-              key={key}
-              onClick={async (e) => {
-                e.stopPropagation();
-                if (closeMenu) {
-                  closeMenu();
-                }
-
-                if (!Component) {
-                  onClick(data, menuItems[index]);
-                }
-              }}
-            >
-              {Icon && (
-                <Icon
-                  color={color || "text"}
-                  size={15}
-                  sx={{ mr: 2, ml: -1 }}
-                />
-              )}
-              {Component ? (
-                <Component data={data} />
-              ) : (
-                <Text
-                  as="span"
-                  textAlign="left"
-                  fontFamily="body"
-                  fontSize="menu"
-                  flex={1}
-                >
-                  {title(data)}
-                </Text>
-              )}
-              {isPro && !isUserPremium && (
-                <Text
-                  fontSize="subBody"
-                  bg="primary"
-                  color="static"
-                  px={1}
-                  sx={{ borderRadius: "default" }}
-                >
-                  Pro
-                </Text>
-              )}
-              {isNew && (
-                <Text
-                  fontSize="subBody"
-                  bg="primary"
-                  color="static"
-                  px={1}
-                  sx={{ borderRadius: "default" }}
-                >
-                  NEW
-                </Text>
-              )}
-              {checked && <Check size={14} />}
-            </Button>
-          )
-      )}
+    <Container title={data?.title}>
+      {items.map((item, index) => (
+        <MenuItem
+          key={item.key}
+          index={index}
+          item={item}
+          data={data}
+          onClose={closeMenu}
+          isFocused={focusIndex === index}
+          isSubmenuOpen={focusIndex === index && isSubmenuOpen}
+          onHover={() => {
+            setFocusIndex(index);
+            setIsSubmenuOpen((state) => {
+              return item.items?.length ? true : state ? false : state;
+            });
+          }}
+        />
+      ))}
     </Container>
   );
 }
-export default React.memo(Menu, (prev, next) => {
-  return prev.state === next.state;
-});
+export default React.memo(Menu);
 
-function MenuContainer({ id, style, sx, title, children }) {
+function MenuContainer({ title, children }) {
   return (
     <Flex
-      id={id}
+      as="ul"
+      tabIndex={-1}
       bg="background"
       py={1}
-      style={style}
+      flexDirection={"column"}
       sx={{
         position: "relative",
-        width: "11em",
+        listStyle: "none",
+        padding: 0,
+        margin: 0,
         borderRadius: "default",
-        boxShadow: "0px 10px 10px 0px #00000022",
-        border: "1px solid",
-        borderColor: "border",
-        ...sx,
+        boxShadow: "0px 0px 10px 0px #00000022",
+        border: "1px solid var(--border)",
+        minWidth: 200,
+        maxWidth: 500,
       }}
     >
-      <Flex flexDirection="column" width="100%">
+      {title && (
         <Text
           fontFamily="body"
           fontSize="subtitle"
@@ -150,10 +134,10 @@ function MenuContainer({ id, style, sx, title, children }) {
           px={3}
           sx={{ borderBottom: "1px solid", borderBottomColor: "border" }}
         >
-          {title || "Properties"}
+          {title}
         </Text>
-        {children}
-      </Flex>
+      )}
+      {children}
     </Flex>
   );
 }
@@ -212,6 +196,115 @@ function MobileMenuContainer({ style, id, state, title, children }) {
           {children}
         </Flex>
       </AnimatedFlex>
+    </Flex>
+  );
+}
+
+function MenuItem({ item, data, isFocused, isSubmenuOpen, onClose, onHover }) {
+  const {
+    title,
+    key,
+    onClick,
+    color,
+    items,
+    icon: Icon,
+    iconColor,
+    type,
+    tooltip,
+    isDisabled,
+    isChecked,
+    hasSubmenu,
+    isPremium,
+  } = item;
+  const itemRef = useRef();
+
+  useEffect(() => {
+    if (isFocused) itemRef.current?.focus();
+  }, [isFocused]);
+
+  const onAction = useCallback(
+    (e) => {
+      e.stopPropagation();
+      if (onClose) onClose();
+      onClick(data, item);
+    },
+    [onClick, onClose, item, data]
+  );
+
+  if (type === "seperator")
+    return (
+      <Box
+        as="li"
+        key={key}
+        width="95%"
+        height="0.5px"
+        bg="border"
+        my={2}
+        alignSelf="center"
+      />
+    );
+
+  return (
+    <Flex
+      as="li"
+      flexDirection={"column"}
+      flex={1}
+      sx={{ position: "relative" }}
+      onMouseOver={onHover}
+    >
+      <Button
+        data-test-id={`menuitem-${title.split(" ").join("").toLowerCase()}`}
+        key={key}
+        ref={itemRef}
+        tabIndex={-1}
+        variant="menuitem"
+        display="flex"
+        alignItems={"center"}
+        justifyContent={"space-between"}
+        title={tooltip}
+        disabled={isDisabled}
+        onClick={onAction}
+        onKeyUp={(e) => {
+          if (e.key === "Enter") onAction(e);
+        }}
+        sx={{
+          bg: isFocused ? "hover" : "transparent",
+        }}
+      >
+        <Flex>
+          {Icon && (
+            <Icon color={iconColor || "text"} size={15} sx={{ mr: 2 }} />
+          )}
+          <Text
+            as="span"
+            fontFamily="body"
+            fontSize="menu"
+            color={color || "text"}
+          >
+            {title}
+          </Text>
+          {isPremium && <Pro size={14} color="primary" sx={{ ml: 1 }} />}
+        </Flex>
+        <Flex>
+          {isChecked && <Check size={14} />}
+          {hasSubmenu && <ChevronRight size={14} />}
+        </Flex>
+      </Button>
+      {hasSubmenu && isSubmenuOpen && (
+        <Flex
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: itemRef.current?.offsetWidth,
+          }}
+        >
+          <Menu
+            items={items}
+            onClose={onClose}
+            data={{ ...data, parent: item, title: undefined }}
+          />
+        </Flex>
+      )}
     </Flex>
   );
 }

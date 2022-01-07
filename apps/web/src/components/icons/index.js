@@ -127,6 +127,12 @@ import {
   mdiLinkVariantOff,
   mdiNetworkOffOutline,
   mdiCheckNetworkOutline,
+  mdiSort,
+  mdiOrderAlphabeticalAscending,
+  mdiOrderAlphabeticalDescending,
+  mdiOrderNumericDescending,
+  mdiOrderNumericAscending,
+  mdiSelectGroup,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -149,7 +155,7 @@ function Icon({ title, name, size = 24, color = "icon", stroke, rotate }) {
 }
 
 function createIcon(name, rotate = false) {
-  return function (props) {
+  return function NNIcon(props) {
     const [isHovering, setIsHovering] = useState();
     return (
       <AnimatedFlex
@@ -267,6 +273,7 @@ export const Fullscreen = createIcon(mdiFullscreen);
 export const ExitFullscreen = createIcon(mdiFullscreenExit);
 export const Announcement = createIcon(mdiBullhorn);
 export const Publish = createIcon(mdiCloudUploadOutline);
+export const Colors = createIcon(mdiPaletteOutline);
 export const Published = createIcon(mdiCloudCheckOutline);
 export const Copy = createIcon(mdiContentCopy);
 export const Select = createIcon(mdiCheckboxMultipleMarkedCircleOutline);
@@ -321,3 +328,10 @@ export const ShortcutLink = createIcon(mdiLinkVariant);
 export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);
 export const Offline = createIcon(mdiNetworkOffOutline);
 export const Online = createIcon(mdiCheckNetworkOutline);
+
+export const SortBy = createIcon(mdiSort);
+export const GroupBy = createIcon(mdiSelectGroup);
+export const OrderAtoZ = createIcon(mdiOrderAlphabeticalAscending);
+export const OrderZtoA = createIcon(mdiOrderAlphabeticalDescending);
+export const OrderOldestNewest = createIcon(mdiOrderNumericDescending);
+export const OrderNewestOldest = createIcon(mdiOrderNumericAscending);

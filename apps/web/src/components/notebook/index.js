@@ -104,7 +104,7 @@ const pin = (notebook) => {
 
 const menuItems = [
   {
-    title: () => "Edit",
+    title: "Edit",
     icon: Icon.NotebookEdit,
     onClick: ({ notebook }) => hashNavigate(`/notebooks/${notebook.id}/edit`),
   },
@@ -122,7 +122,7 @@ const menuItems = [
     onClick: ({ notebook }) => appStore.pinItemToMenu(notebook),
   },
   {
-    title: () => "Move to trash",
+    title: "Move to trash",
     color: "red",
     icon: Icon.Trash,
     onClick: async ({ notebook }) => {

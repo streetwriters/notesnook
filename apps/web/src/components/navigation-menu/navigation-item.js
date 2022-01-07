@@ -1,7 +1,6 @@
-import React from "react";
 import { Button, Text } from "rebass";
 import { useStore as useAppStore } from "../../stores/app-store";
-import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import useMobile from "../../utils/use-mobile";
 import useTablet from "../../utils/use-tablet";
 import * as Icons from "../icons";
@@ -9,9 +8,9 @@ import * as Icons from "../icons";
 function NavigationItem(props) {
   const { icon: Icon, color, title, isLoading, isShortcut, isNew } = props;
   const toggleSideMenu = useAppStore((store) => store.toggleSideMenu);
+  const { openMenu } = useMenuTrigger();
   const isMobile = useMobile();
   const isTablet = useTablet();
-  const openContextMenu = useOpenContextMenu();
 
   return (
     <Button
@@ -29,9 +28,10 @@ function NavigationItem(props) {
       }}
       label={title}
       title={title}
-      onContextMenu={(event) => {
+      onContextMenu={(e) => {
         if (!props.menu) return;
-        openContextMenu(event, props.menu.items, props.menu.extraData, false);
+        e.preventDefault();
+        openMenu(props.menu.items, props.menu.extraData, false);
       }}
       onClick={() => {
         if (isMobile) toggleSideMenu(false);

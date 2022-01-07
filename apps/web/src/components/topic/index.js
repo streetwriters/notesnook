@@ -58,7 +58,7 @@ const generalTopicMenuItems = [
 const menuItems = [
   {
     key: "edit",
-    title: () => "Edit",
+    title: "Edit",
     icon: Icon.Edit,
     onClick: ({ topic }) =>
       hashNavigate(`/notebooks/${topic.notebookId}/topics/${topic.id}/edit`),
@@ -66,7 +66,7 @@ const menuItems = [
   ...generalTopicMenuItems,
   {
     key: "delete",
-    title: () => "Delete",
+    title: "Delete",
     icon: Icon.Trash,
     color: "red",
     onClick: async ({ topic }) => {

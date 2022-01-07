@@ -5,7 +5,7 @@ import {
   store as selectionStore,
   useStore as useSelectionStore,
 } from "../../stores/selection-store";
-import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import { SELECTION_OPTIONS_MAP } from "../../common";
 import Config from "../../utils/config";
 import { db } from "../../common/db";
@@ -102,8 +102,7 @@ function ListItem(props) {
   const isSelected =
     selectedItems.findIndex((item) => props.item.id === item.id) > -1;
   const selectItem = useSelectionStore((store) => store.selectItem);
-
-  const openContextMenu = useOpenContextMenu();
+  const { isOpen: isContextMenuOpen, openMenu } = useMenuTrigger();
 
   const toggleSelection = useCallback(
     function toggleSelection() {
@@ -147,10 +146,14 @@ function ListItem(props) {
 
   return (
     <Flex
-      bg={isSelected ? "bgSecondary" : background}
-      onContextMenu={(e) =>
-        openContextMenu(e, menuItems, props.menu?.extraData, false)
-      }
+      bg={isSelected || isContextMenuOpen ? "bgSecondary" : background}
+      onContextMenu={(e) => {
+        e.preventDefault();
+        openMenu(menuItems, {
+          title: props.item.title,
+          ...props.menu?.extraData,
+        });
+      }}
       p={2}
       py={isCompact ? 1 : 2}
       tabIndex={0}

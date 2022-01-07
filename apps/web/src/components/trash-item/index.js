@@ -34,7 +34,7 @@ export default TrashItem;
 
 const menuItems = [
   {
-    title: () => "Restore",
+    title: "Restore",
     icon: Icon.Restore,
     onClick: ({ item }) => {
       store.restore(item.id);
@@ -47,7 +47,7 @@ const menuItems = [
     },
   },
   {
-    title: () => "Delete",
+    title: "Delete",
     icon: Icon.DeleteForver,
     color: "red",
     onClick: ({ item }) => {

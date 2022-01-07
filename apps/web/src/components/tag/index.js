@@ -11,7 +11,7 @@ import { showToast } from "../../utils/toast";
 
 const menuItems = [
   {
-    title: () => "Rename tag",
+    title: "Rename tag",
     icon: Icon.Edit,
     onClick: ({ tag }) => {
       hashNavigate(`/tags/${tag.id}/edit`);
@@ -25,7 +25,7 @@ const menuItems = [
   },
   {
     color: "error",
-    title: () => "Delete",
+    title: "Delete",
     icon: Icon.DeleteForver,
     onClick: async ({ tag }) => {
       if (tag.noteIds.includes(editorStore.get().session.id))

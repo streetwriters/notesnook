@@ -1,9 +1,10 @@
 import { Button, Flex } from "rebass";
-import { useOpenContextMenu } from "../../utils/useContextMenu";
+import { useMenuTrigger } from "../../hooks/use-menu";
 import { ChevronDown } from "../icons";
 
 export default function DropdownButton({ title, options }) {
-  const openContextMenu = useOpenContextMenu();
+  const { openMenu } = useMenuTrigger();
+
   if (!options || !options.length) return null;
   return (
     <Flex>
@@ -20,9 +21,7 @@ export default function DropdownButton({ title, options }) {
             borderBottomLeftRadius: 0,
             borderTopLeftRadius: 0,
           }}
-          onClick={(event) =>
-            openContextMenu(event, options.slice(1), { title })
-          }
+          onClick={() => openMenu(options.slice(1), { title })}
         >
           <ChevronDown color="static" size={18} />
         </Button>
