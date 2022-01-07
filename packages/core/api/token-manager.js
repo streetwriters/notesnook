@@ -54,19 +54,17 @@ class TokenManager {
       const { refresh_token, scope } = token;
       if (!refresh_token || !scope) return;
 
-      await getSafeToken(async () => {
-        const refreshTokenResponse = await await http.post(
-          `${constants.AUTH_HOST}${ENDPOINTS.token}`,
-          {
-            refresh_token,
-            grant_type: "refresh_token",
-            scope: scope,
-            client_id: "notesnook",
-          }
-        );
-        await this.saveToken(refreshTokenResponse);
-        EV.publish(EVENTS.tokenRefreshed);
-      }, "Error getting refresh token:");
+      const refreshTokenResponse = await await http.post(
+        `${constants.AUTH_HOST}${ENDPOINTS.token}`,
+        {
+          refresh_token,
+          grant_type: "refresh_token",
+          scope: scope,
+          client_id: "notesnook",
+        }
+      );
+      await this.saveToken(refreshTokenResponse);
+      EV.publish(EVENTS.tokenRefreshed);
     });
   }
 

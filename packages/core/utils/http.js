@@ -61,11 +61,10 @@ async function handleResponse(response) {
     if (response.status === 429) throw new Error("You are being rate limited.");
 
     if (response.ok) return await response.text();
-    // else if (response.status === 401) {
-    //   EV.publish(EVENTS.logoutUser, `401 unauthorized.`);
-    //   throw new Error("Unauthorized.");
-    // }
-    else
+    else if (response.status === 401) {
+      EV.publish(EVENTS.userUnauthorized, response.url);
+      throw new Error("Unauthorized.");
+    } else
       throw new Error(
         `Request failed with status code: ${response.status} ${response.statusText}.`
       );

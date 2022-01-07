@@ -30,8 +30,16 @@ class UserManager {
     this._db = db;
     this.tokenManager = new TokenManager(storage);
 
-    EV.subscribe(EVENTS.logoutUser, async (reason) => {
-      await this.logout(true, reason);
+    EV.subscribe(EVENTS.userUnauthorized, async (url) => {
+      if (url.includes("/connect/token")) return;
+      try {
+        await this.tokenManager._refreshToken(true);
+      } catch (e) {
+        await this.logout(
+          false,
+          `Your token has been revoked. Error: ${e.message}.`
+        );
+      }
     });
   }
 
