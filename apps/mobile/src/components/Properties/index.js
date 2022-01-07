@@ -1,5 +1,5 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, { useEffect, useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import {
   Dimensions,
   Keyboard,
@@ -8,12 +8,12 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import {FlatList} from 'react-native-gesture-handler';
 import Share from 'react-native-share';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { Actions } from '../../provider/Actions';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {Actions} from '../../provider/Actions';
 import {
   useMenuStore,
   useSelectionStore,
@@ -21,7 +21,7 @@ import {
   useTagStore,
   useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -33,7 +33,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import { editing } from '../../utils';
+import {editing} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -41,28 +41,30 @@ import {
   COLOR_SCHEME_LIGHT,
   setColorScheme
 } from '../../utils/Colors';
-import { db } from '../../utils/database';
+import {db} from '../../utils/database';
 import {
   eOpenAttachmentsDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import { deleteItems, openLinkInBrowser } from '../../utils/functions';
-import { MMKV } from '../../utils/mmkv';
-import { SIZE } from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import { Button } from '../Button';
-import { presentDialog } from '../Dialog/functions';
+import {deleteItems, openLinkInBrowser} from '../../utils/functions';
+import {MMKV} from '../../utils/mmkv';
+import {SIZE} from '../../utils/SizeUtils';
+import {sleep} from '../../utils/TimeUtils';
+import {Button} from '../Button';
+import {presentDialog} from '../Dialog/functions';
 import NoteHistory from '../NoteHistory';
-import { PressableButton } from '../PressableButton';
+import {PressableButton} from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import { ColorTags } from './color-tags';
-import { DateMeta } from './date-meta';
+import {ColorTags} from './color-tags';
+import {DateMeta} from './date-meta';
+import { DevMode } from './dev-mode';
 import Notebooks from './notebooks';
-import { Tags } from './tags';
-import { Topics } from './topics';
+import {Synced} from './synced';
+import {Tags} from './tags';
+import {Topics} from './topics';
 const w = Dimensions.get('window').width;
 
 let htmlToText;
@@ -84,10 +86,8 @@ export const Properties = ({
   );
   const [note, setNote] = useState(item);
   const user = useUserStore(state => state.user);
-  const lastSynced = useUserStore(state => state.lastSynced);
   const [notifPinned, setNotifPinned] = useState(null);
   const dimensions = useSettingStore(state => state.dimensions);
-  const settings = useSettingStore(state => state.settings);
   const alias =
     note.type === 'tag'
       ? db.tags.alias(note.id)
@@ -95,9 +95,8 @@ export const Properties = ({
       ? db.colors.alias(note.id)
       : note.title;
 
-  const refreshing = false;
-  const isPublished = db.monographs.isPublished(note.id);
-  const noteInTopic =
+  const isPublished =item.type === "note" && db.monographs.isPublished(note.id);
+  const noteInTopic = item.type === "note" &&
     editing.actionAfterFirstSave.type === 'topic' &&
     db.notebooks
       .notebook(editing.actionAfterFirstSave.notebook)
@@ -766,16 +765,6 @@ export const Properties = ({
         borderBottomRightRadius: DDS.isLargeTablet() ? 10 : 1,
         borderBottomLeftRadius: DDS.isLargeTablet() ? 10 : 1
       }}>
-      <TouchableOpacity
-        style={{
-          width: '100%',
-          height: '100%',
-          position: 'absolute'
-        }}
-        onPress={() => {
-          Keyboard.dismiss();
-        }}
-      />
       {!note || !note.id ? (
         <Paragraph style={{marginVertical: 10, alignSelf: 'center'}}>
           Start writing to save your note.
@@ -832,7 +821,7 @@ export const Properties = ({
 
       {hasColors && note.id ? <ColorTags close={close} item={note} /> : null}
 
-      {note.id || note.dateCreated ? (
+      {note.id ? (
         <>
           {note.type === 'note' ? (
             <FlatList
@@ -869,109 +858,11 @@ export const Properties = ({
         </>
       ) : null}
 
-      {user && lastSynced >= note.dateModified ? (
-        <View
-          style={{
-            paddingVertical: 0,
-            width: '100%',
-            paddingHorizontal: 12,
-            alignItems: 'center',
-            flexDirection: 'row',
-            justifyContent: 'flex-start',
-            alignSelf: 'center',
-            paddingTop: 10,
-            marginTop: 10,
-            borderTopWidth: 1,
-            borderTopColor: colors.nav
-          }}>
-          <Icon
-            name="shield-key-outline"
-            color={colors.accent}
-            size={SIZE.xxxl}
-          />
+      <Synced item={item} close={close} />
 
-          <View
-            style={{
-              flex: 1,
-              marginLeft: 5,
-              flexShrink: 1
-            }}>
-            <Heading
-              color={colors.heading}
-              size={SIZE.xs}
-              style={{
-                flexWrap: 'wrap'
-              }}>
-              Encrypted and synced
-            </Heading>
-            <Paragraph
-              style={{
-                flexWrap: 'wrap'
-              }}
-              size={SIZE.xs}
-              color={colors.pri}>
-              No one can view this {item.itemType || item.type} except you.
-            </Paragraph>
-          </View>
+      <DevMode item={item}/>
 
-          <Button
-            onPress={async () => {
-              try {
-                close();
-                await sleep(300);
-                await openLinkInBrowser(
-                  'https://docs.notesnook.com/how-is-my-data-encrypted/',
-                  colors
-                );
-              } catch (e) {}
-            }}
-            fontSize={SIZE.xs + 1}
-            title="Learn more"
-            height={30}
-            type="transparent"
-          />
-        </View>
-      ) : null}
 
-      {settings.devMode ? (
-        <View
-          style={{
-            width: '100%',
-            paddingHorizontal: 12,
-            marginTop: 10
-          }}>
-          <Button
-            onPress={async () => {
-              let additionalData = {};
-              if (note.type === 'note') {
-                let content = await db.content.raw(note.contentId);
-                if (content) {
-                  content = db.debug.strip(content);
-                  additionalData.content = content;
-                }
-              }
-              additionalData.lastSynced = await db.lastSynced();
-              let _note = {...note};
-              _note.additionalData = additionalData;
-              Clipboard.setString(db.debug.strip(_note));
-
-              ToastEvent.show({
-                heading: 'Debug data copied!',
-                type: 'success',
-                context: 'local'
-              });
-            }}
-            fontSize={SIZE.sm}
-            title="Copy data"
-            icon="clipboard"
-            height={30}
-            type="warn"
-            style={{
-              alignSelf: 'flex-end'
-            }}
-          />
-        </View>
-      ) : null}
       {DDS.isTab ? (
         <View
           style={{
