@@ -95,6 +95,7 @@ function ListContainer(props) {
           testId={`${props.type}-action-button`}
           onClick={props.button.onClick}
           sx={{
+            display: ["block", "block", "none"],
             alignSelf: "end",
             borderRadius: 100,
             p: 0,
