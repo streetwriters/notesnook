@@ -1,10 +1,8 @@
-- Fix image placeholders not loading in editor
-- Fix crash when navigating to topic from notebook properties
-- Fix navigating to search not working on iOS
+- Added password recovery and password changing
+- Fix table cell and row properties not showing properly
+- Fixed homepage changing does not work
 - Hide locked notes from Share Menu
 - Fix checking/uncheck checklist item changes selection 
-- Add monthly backup option
 - Fixed links & URL validation in editor
-- Improved UX for rate app to be less intrusive
 
 Thank you for using Notesnook!
