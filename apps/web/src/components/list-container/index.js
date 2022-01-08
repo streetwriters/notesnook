@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { Flex } from "rebass";
-import Button from "../button";
+import { Flex, Button } from "rebass";
 import * as Icon from "../icons";
 import { Virtuoso } from "react-virtuoso";
 import { useStore as useSelectionStore } from "../../stores/selection-store";
@@ -94,11 +93,20 @@ function ListContainer(props) {
         <Button
           variant="primary"
           testId={`${props.type}-action-button`}
-          Icon={props.button.icon || Icon.Plus}
-          content={props.button.content}
           onClick={props.button.onClick}
-          show={props.button.show}
-        />
+          sx={{
+            alignSelf: "end",
+            borderRadius: 100,
+            p: 0,
+            m: 0,
+            mb: 2,
+            mr: 2,
+            width: 45,
+            height: 45,
+          }}
+        >
+          <Icon.Plus color="static" />
+        </Button>
       )}
     </Flex>
   );
