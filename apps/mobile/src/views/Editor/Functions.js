@@ -31,7 +31,7 @@ import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {TableCellProperties} from './TableCellProperties';
 import {TableRowProperties} from './TableRowProperties';
-import tiny from './tiny/tiny';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import {
   IMAGE_TOOLTIP_CONFIG,
   TABLE_TOOLTIP_CONFIG
@@ -482,15 +482,17 @@ export const _onMessage = async evt => {
       showTableOptionsTooltip();
       break;
     case 'tablecelloptions':
-      console.log(message.value);
       eSendEvent('updatecell', message.value);
+      safeKeyboardDismiss();
+      await sleep(100);
       presentSheet({
         component: <TableCellProperties data={message.value} />
       });
       break;
     case 'tablerowoptions':
-      console.log('tablerowoptions', message.value);
       eSendEvent('updaterow', message.value);
+      safeKeyboardDismiss();
+      await sleep(100);
       presentSheet({
         component: <TableRowProperties data={message.value} />
       });
