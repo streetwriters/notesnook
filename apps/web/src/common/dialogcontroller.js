@@ -183,6 +183,16 @@ export function showLogoutConfirmation() {
   });
 }
 
+export function showClearSessionsConfirmation() {
+  return confirm({
+    title: `Logout from other devices?`,
+    message:
+      "All other logged-in devices will be forced to logout stopping sync. Use with care lest you lose important notes.",
+    yesText: `Yes`,
+    noText: "No",
+  });
+}
+
 // export function showAccountDeletedNotice() {
 //   return confirm(Icon.Logout, {
 //     title: `Account deleted`,

@@ -13,18 +13,19 @@ import {
   showImportDialog,
   showIssueDialog,
   showTrackingDetailsDialog,
+  showClearSessionsConfirmation,
+  showLogoutConfirmation,
+  showRecoveryKeyDialog,
+  showLoadingDialog,
+  showBuyDialog,
+  showPasswordDialog,
 } from "../common/dialog-controller";
-import { showLogoutConfirmation } from "../common/dialog-controller";
 import { createBackup, SUBSCRIPTION_STATUS, verifyAccount } from "../common";
 import { db } from "../common/db";
 import { usePersistentState } from "../utils/hooks";
 import dayjs from "dayjs";
-import { showRecoveryKeyDialog } from "../common/dialog-controller";
-import { showBuyDialog } from "../common/dialog-controller";
 import ScrollContainer from "../components/scroll-container";
-import { showLoadingDialog } from "../common/dialog-controller";
 import { showToast } from "../utils/toast";
-import { showPasswordDialog } from "../common/dialog-controller";
 import { hardNavigate, hashNavigate } from "../navigation";
 import { appVersion } from "../utils/version";
 import { CHECK_IDS } from "notes-core/common";
@@ -640,6 +641,8 @@ function Settings(props) {
           <Button
             variant="list"
             onClick={async () => {
+              if (!(await showClearSessionsConfirmation())) return;
+
               await db.user.clearSessions();
               await showToast(
                 "success",
