@@ -8,6 +8,7 @@ import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, presentSheet} from '../.
 import { editing } from '../../utils';
 import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import {EditorWebView} from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
@@ -170,7 +171,7 @@ export const TableRowProperties = ({data}) => {
   );
 };
 TableRowProperties.isPresented = false;
-TableRowProperties.present = data => {
+TableRowProperties.present = async data => {
   eSendEvent('updatecell', data);
   if (TableRowProperties.isPresented) return;
   let refocus = false;
@@ -179,6 +180,7 @@ TableRowProperties.present = data => {
     tiny.call(EditorWebView,tiny.blur);
     refocus = true;
   }
+  await sleep(100)
   TableRowProperties.isPresented = true;
   presentSheet({
     component: <TableRowProperties data={data} />,
