@@ -20,12 +20,13 @@ export const Properties = ({close = () => {}, item, buttons = [], getRef}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
 
-  const alias =
-    item.type === 'tag'
+  const alias = item
+    ? item.type === 'tag'
       ? db.tags.alias(item.id)
       : item.type === 'color'
       ? db.colors.alias(item.id)
-      : item.title;
+      : item.title
+    : null;
 
   const onScrollEnd = () => {
     getRef().current?.handleChildScrollEnd();
@@ -113,8 +114,10 @@ export const Properties = ({close = () => {}, item, buttons = [], getRef}) => {
 };
 
 Properties.present = (item, buttons = []) => {
-  let type = item.type;
+  if (!item) return;
+  let type = item?.type;
   let props = [item];
+
   switch (type) {
     case 'trash':
       props.push(['PermDelete', 'Restore']);
