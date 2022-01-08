@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
   AppState,
   KeyboardAvoidingView,
@@ -14,6 +14,7 @@ import {PremiumToast} from '../../components/Premium/premium-toast';
 import {useTracked} from '../../provider';
 import {useNoteStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
+import {editing} from '../../utils';
 import {editorRef} from '../../utils/Refs';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
@@ -29,8 +30,9 @@ export const EditorWrapper = ({width, dimensions}) => {
 
   const onAppStateChanged = async state => {
     if (state === 'active') {
-      console.log('ACTIVE STATE');
-      await checkStatus(false);
+      if (!editing.movedAway) {
+        await checkStatus(false);
+      }
     }
   };
 

@@ -285,8 +285,8 @@ const NativeStack = React.memo(
     const widths = {
       mobile: {
         a: dimensions.width * 0.75,
-        b: dimensions.width - 1,
-        c: dimensions.width + 1
+        b: dimensions.width,
+        c: dimensions.width
       },
       smallTablet: {
         a: valueLimiter(dimensions.width * 0.3, 300, 350),
@@ -353,11 +353,6 @@ const NativeStack = React.memo(
             widths={widths[deviceMode]}
             style={{
               zIndex: 1
-            }}
-            onDrawerStateChange={state => {
-              if (state === false) {
-                checkStatus();
-              }
             }}
             initialIndex={
               deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1

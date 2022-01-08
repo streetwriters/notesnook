@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html style="margin-left:1px;">
+<html">
 
 <head>
 	<meta name="viewport" content="width=device-width, initial-scale=1,maximum-scale=1.0">
@@ -16,7 +16,7 @@
 		<div class="tag-bar-parent hidden noselect">
 			<div style="margin: 0px !important;margin-right:5px !important;" class="newtag">
 				<p class="newtagp noselect"></p>
-				<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
+				<svg class="addsvg" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"
 					width="24" height="24" viewBox="0 0 24 24">
 					<path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
 				</svg>
@@ -64,9 +64,9 @@
 				event.preventDefault();
 				time = Date.now();
 			}
-			_node.ontouchmove = function (event) {
-				event.preventDefault();
-			}
+			// _node.ontouchmove = function (event) {
+			// 	event.preventDefault();
+			// }
 
 			_node.ontouchend = function (event) {
 				event.preventDefault();
@@ -77,8 +77,17 @@
 			}
 
 		}
-
+		
+		pressHandler('.tag-bar-parent', function () {
+			
+		})
 		pressHandler('.newtag', function () {
+			reactNativeEventHandler("newtag", "new");
+		})
+		pressHandler('.newtagp', function () {
+			reactNativeEventHandler("newtag", "new");
+		})
+		pressHandler('.addsvg', function () {
 			reactNativeEventHandler("newtag", "new");
 		})
 
