@@ -289,7 +289,8 @@ const MoveNoteComponent = ({close, note, setNote}) => {
                 }}
                 button={{
                   icon: 'check',
-                  color: notebookInputFocused ? colors.accent : colors.icon
+                  color: notebookInputFocused ? colors.accent : colors.icon,
+                  onPress:addNewNotebook
                 }}
                 onSubmit={addNewNotebook}
                 placeholder="Create a new notebook"

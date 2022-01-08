@@ -76,7 +76,6 @@ export default class CustomTabs extends Component {
 
   closeDrawer = () => {
     if (this.page === 0) {
-      console.log('CLOSING DRAWER');
       this.goToIndex(1);
       this.currentDrawerState = false;
       this.props.onDrawerStateChange &&
