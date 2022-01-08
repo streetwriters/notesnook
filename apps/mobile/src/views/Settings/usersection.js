@@ -288,7 +288,14 @@ const SettingsUserSection = () => {
             {
               name: 'Having problems with syncing?',
               func: async () => {
+                presentSheet({
+                  title: 'Syncing your data',
+                  paragraph: 'Please wait while we sync all your data.',
+                  progress:true
+                });
                 await Sync.run('global', true);
+                eSendEvent(eCloseProgressDialog);
+
               },
               desc: 'Try force sync to resolve issues with syncing.'
             },
