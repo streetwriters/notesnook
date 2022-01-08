@@ -158,7 +158,8 @@ export class AddNotebookDialog extends React.Component {
       });
       return;
     }
-    if (notesnook) {
+    let toEdit = null;
+    if (notebook) {
       toEdit = db.notebooks.notebook(notebook.id).data;
     }
 
@@ -172,7 +173,8 @@ export class AddNotebookDialog extends React.Component {
         this.currentInputValue = null;
       }
     }
-    if (notesnook) {
+
+    if (notebook) {
       if (this.topicsToDelete?.length > 0) {
         await db.notebooks
           .notebook(toEdit.id)
@@ -203,7 +205,8 @@ export class AddNotebookDialog extends React.Component {
       await db.notebooks.add({
         title: this.title,
         description: this.description,
-        topics: prevTopics
+        topics: prevTopics,
+        id:null
       });
     }
     useMenuStore.getState().setMenuPins();
@@ -286,7 +289,7 @@ export class AddNotebookDialog extends React.Component {
             descFocused: false,
             titleFocused: false,
             editTopic: false,
-            notesnook: null
+            notebook: null
           });
         }}
         statusBarTranslucent={false}
