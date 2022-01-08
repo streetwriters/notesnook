@@ -33,7 +33,7 @@ import "@streetwritersco/tinymce-plugins/keyboardquirks";
 import "@streetwritersco/tinymce-plugins/attachmentshandler";
 import "@streetwritersco/tinymce-plugins/contenthandler";
 import "@streetwritersco/tinymce-plugins/bettertable";
-import "./plugins/picker";
+import { attachFile } from "./plugins/picker";
 import "./plugins/icons";
 import "./plugins/attachmentshandler.css";
 import "@streetwritersco/tinymce-plugins/blockescape";
@@ -203,6 +203,10 @@ function TinyMCE(props) {
       id={sessionId}
       ref={tinymceRef}
       onFocus={onFocus}
+      onDrop={(e,editor) => {
+        for (let file of e.dataTransfer.files) {
+          attachFile(editor, file) 
+      }}}
       init={{
         //experimental
         keep_styles: false,

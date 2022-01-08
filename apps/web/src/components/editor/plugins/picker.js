@@ -36,6 +36,15 @@ async function insertAttachment(editor, type) {
   const selectedFile = await showFilePicker({
     acceptedFileTypes: type || "*/*",
   });
+
+  attachFile(editor,selectedFile);
+}
+
+export async function attachFile(editor, selectedFile) {
+  if (!isUserPremium()) {
+    await showBuyDialog();
+    return;
+  }
   if (selectedFile.type.startsWith("image/")) {
     const image = await pickImage(selectedFile);
     editor.execCommand("mceAttachImage", image);
