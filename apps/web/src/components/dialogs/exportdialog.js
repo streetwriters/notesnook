@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { Flex, Button, Text } from "rebass";
 import * as Icon from "../icons";
 import Dialog from "./dialog";
-import download from "../../utils/download";
 import { zip } from "../../utils/zip";
 import { db } from "../../common/db";
+import FileSaver from "file-saver";
 
 const formats = [
   {
@@ -92,10 +92,13 @@ function ExportDialog(props) {
                     }
                     if (!files.length) return false;
                     if (files.length === 1) {
-                      download(files[0].filename, files[0].content, format);
+                      FileSaver.saveAs(
+                        files[0].content,
+                        `${files[0].filename}.${format}`
+                      );
                     } else {
                       const zipped = await zip(files, format);
-                      download("notes", zipped, "zip");
+                      FileSaver.saveAs(new Blob([zipped.buffer]), "notes.zip");
                     }
 
                     setProgress();

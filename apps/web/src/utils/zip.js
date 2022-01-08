@@ -8,7 +8,7 @@ async function zip(files, format) {
       file.content
     );
   });
-  const uzip = await import("uzip");
-  return uzip.encode(obj);
+  const { zipSync } = await import("fflate");
+  return zipSync(obj);
 }
 export { zip };

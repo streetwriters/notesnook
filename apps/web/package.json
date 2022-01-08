@@ -57,7 +57,6 @@
     "streamablefs": "file:packages/streamablefs",
     "timeago.js": "^4.0.2",
     "tinymce": "^5.10.2",
-    "uzip": "^0.20201231.0",
     "web-streams-polyfill": "^3.1.1",
     "wouter": "^2.7.3",
     "zustand": "^3.3.1"

@@ -1,5 +1,4 @@
 import SelectionOptions from "./selectionoptions";
-import download from "../utils/download";
 import {
   showFeatureDialog,
   showLoadingDialog,
@@ -12,6 +11,7 @@ import { db } from "./db";
 import { sanitizeFilename } from "../utils/filename";
 import { isTesting } from "../utils/platform";
 import { store as userstore } from "../stores/user-store";
+import FileSaver from "file-saver";
 
 export const COLORS = [
   "Red",
@@ -115,7 +115,7 @@ export async function createBackup(save = true) {
   if (!save) {
     return { data, filename, ext };
   } else {
-    download(filename, data, ext);
+    FileSaver.saveAs(data, `${filename}.${ext}`);
   }
 }
 

@@ -3,10 +3,10 @@ import { Text, Flex, Button } from "rebass";
 import Dialog from "./dialog";
 import { db } from "../../common/db";
 import Logo from "../../assets/notesnook-logo.png";
-import download from "../../utils/download";
 import * as clipboard from "clipboard-polyfill/text";
 import { Suspense } from "react";
 import Config from "../../utils/config";
+import FileSaver from "file-saver";
 
 const QRCode = React.lazy(() => import("../../re-exports/react-qrcode-logo"));
 
@@ -97,7 +97,10 @@ function RecoveryKeyDialog(props) {
                 onClick={async () => {
                   const qrcode = document.getElementById("react-qrcode-logo");
                   qrcode.toBlob((blob) => {
-                    download(`${email}-notesnook-recoverykey`, blob, "png");
+                    FileSaver.saveAs(
+                      blob,
+                      `${email}-notesnook-recoverykey.png`
+                    );
                   });
                 }}
               >
@@ -108,7 +111,7 @@ function RecoveryKeyDialog(props) {
                 mt={1}
                 fontSize="body"
                 onClick={() => {
-                  download(`${email}-notesnook-recoverykey`, key, "txt");
+                  FileSaver.saveAs(key, `${email}-notesnook-recoverykey.txt`);
                 }}
               >
                 Download file
