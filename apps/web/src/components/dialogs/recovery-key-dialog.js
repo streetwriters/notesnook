@@ -111,7 +111,10 @@ function RecoveryKeyDialog(props) {
                 mt={1}
                 fontSize="body"
                 onClick={() => {
-                  FileSaver.saveAs(key, `${email}-notesnook-recoverykey.txt`);
+                  FileSaver.saveAs(
+                    new Blob([Buffer.from(key)]),
+                    `${email}-notesnook-recoverykey.txt`
+                  );
                 }}
               >
                 Download file

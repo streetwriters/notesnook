@@ -115,7 +115,7 @@ export async function createBackup(save = true) {
   if (!save) {
     return { data, filename, ext };
   } else {
-    FileSaver.saveAs(data, `${filename}.${ext}`);
+    FileSaver.saveAs(new Blob([Buffer.from(data)]), `${filename}.${ext}`);
   }
 }
 

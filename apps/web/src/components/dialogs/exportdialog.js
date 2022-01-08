@@ -87,13 +87,18 @@ function ExportDialog(props) {
                       setProgress(index++);
                       const note = db.notes.note(noteId);
                       const content = await note.export(format);
+
                       if (!content) continue;
-                      files.push({ filename: note.title, content });
+                      files.push({
+                        filename: note.title,
+                        content,
+                      });
                     }
+
                     if (!files.length) return false;
                     if (files.length === 1) {
                       FileSaver.saveAs(
-                        files[0].content,
+                        new Blob([Buffer.from(files[0].content)]),
                         `${files[0].filename}.${format}`
                       );
                     } else {
