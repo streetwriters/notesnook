@@ -3,6 +3,7 @@ import { Platform, View } from 'react-native';
 import { ActionIcon } from '../../components/ActionIcon';
 import { useTracked } from '../../provider';
 import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { editing } from '../../utils';
 import { SIZE } from '../../utils/SizeUtils';
 import { useKeyboard } from '../../utils/use-keyboard';
 import { EditorWebView } from './Functions';
@@ -16,6 +17,7 @@ const HistoryComponent = () => {
     redo: false
   });
   const keyboard = useKeyboard();
+  editing.keyboardState = keyboard.keyboardShown;
 
   const onHistoryChange = data => {
     setHistoryState(data);
@@ -23,7 +25,6 @@ const HistoryComponent = () => {
 
   useEffect(() => {
     eSubscribeEvent('historyEvent', onHistoryChange);
-
     return () => {
       eUnSubscribeEvent('historyEvent', onHistoryChange);
     };
@@ -46,6 +47,7 @@ const HistoryComponent = () => {
             height: 35
           }}
           onPress={() => {
+            editing.keyboardState = true;
             safeKeyboardDismiss();
           }}
         />

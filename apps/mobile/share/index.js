@@ -21,7 +21,6 @@ import {useSafeAreaInsets} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
-import validator from 'validator';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -33,6 +32,7 @@ import Storage from '../src/utils/storage';
 import {sleep} from '../src/utils/TimeUtils';
 import {Search} from './search';
 import {useShareStore} from './store';
+import isURL from 'validator/lib/isURL';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -220,7 +220,7 @@ const NotesnookShare = ({quicknote = false}) => {
       for (item of data) {
         if (item.type === 'text') {
           setRawData(item);
-          if (validator.isURL(item.value)) {
+          if (isURL(item.value)) {
             note = await showLinkPreview(note, item.value);
           } else {
             note.content.data = makeHtmlFromPlainText(item.value);
@@ -371,7 +371,7 @@ const NotesnookShare = ({quicknote = false}) => {
           return {...note};
         });
       } else {
-        let html = validator.isURL(rawData.value)
+        let html = isURL(rawData.value)
           ? makeHtmlFromUrl(rawData.value)
           : makeHtmlFromPlainText(rawData.value);
         setNote(note => {
@@ -679,7 +679,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   paddingRight: 80,
                   alignItems: 'center'
                 }}>
-                {rawData.value && validator.isURL(rawData.value) ? (
+                {rawData.value && isURL(rawData.value) ? (
                   <Button
                     color={mode == 2 ? colors.shade : colors.nav}
                     icon={modes[2].icon}

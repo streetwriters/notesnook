@@ -120,7 +120,7 @@ function isInvalidValue(value) {
 
 function updateInfoBar() {
   let ids = ['infodate', 'infosaved'];
-  ids.forEach(id => {
+  ids.forEach(function(id) {
     let element = document.getElementById(id);
     if (!element) return;
     if (element.textContent && element.textContent !== '') {

@@ -248,7 +248,7 @@ const LoginDialog = () => {
       presentSheet({
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
-        noProgress: false
+        progress:true
       });
     } catch (e) {
       setLoading(false);
@@ -310,7 +310,7 @@ const LoginDialog = () => {
     setLoading(true);
     setStatus('Creating Account');
     try {
-      await db.user.signup(email, password);
+      await db.user.signup(email.toLowerCase(), password);
       let user = await db.user.getUser();
       setStatus('Setting Crenditials');
       setUser(user);
@@ -350,11 +350,11 @@ const LoginDialog = () => {
         throw new Error('Please wait before requesting another email');
       }
       !nostatus && setStatus('Password Recovery Email Sent!');
-      await db.user.recoverAccount(email);
+      await db.user.recoverAccount(email.toLowerCase());
       await MMKV.setItem('lastRecoveryEmailTime', JSON.stringify(Date.now()));
       ToastEvent.show({
         heading: `Check your email to reset password`,
-        message: `Recovery email has been sent to ${email}`,
+        message: `Recovery email has been sent to ${email.toLowerCase()}`,
         type: 'success',
         context: 'local',
         duration: 7000
@@ -652,6 +652,23 @@ const LoginDialog = () => {
               />
             </>
           )}
+
+          {mode === MODES.login || mode === MODES.sessionExpired ? (
+            <Button
+              title="Forgot password?"
+              style={{
+                alignSelf:'flex-end',
+                height:30,
+              }}
+              onPress={() => {
+                if (MODES.sessionExpired === mode) {
+                  sendEmail(true);
+                  return;
+                }
+                setMode(MODES.forgotPassword);
+              }}/>
+          ) : null}
+          
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>

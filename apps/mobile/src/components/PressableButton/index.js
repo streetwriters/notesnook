@@ -8,7 +8,7 @@ import { br } from '../../utils/SizeUtils';
 /**
  *
  * @typedef {Object} buttonTypes
- * @property {"transparent" | "gray" | "grayBg" | "accent" | "inverted" | "shade"} type type of button
+ * @property {"transparent" | "gray" | "grayBg" | "accent" | "inverted" | "shade" | "grayAccent"} type type of button
  *
  *@param {buttonTypes} type
  *

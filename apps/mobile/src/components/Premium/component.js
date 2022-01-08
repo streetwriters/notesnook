@@ -31,8 +31,6 @@ export const Component = ({close, promo, getRef}) => {
       presentSheet({
         context: 'pricing_plans',
         component: <PricingPlans marginTop={1} promo={promo} />,
-        noIcon: true,
-        noProgress: true
       });
     } else {
       close();
@@ -88,6 +86,7 @@ export const Component = ({close, promo, getRef}) => {
         keyboardShouldPersistTaps="always"
         onScroll={onScroll}>
         <View
+          key="top-banner"
           style={{
             width: '100%',
             alignItems: 'center',
@@ -102,6 +101,7 @@ export const Component = ({close, promo, getRef}) => {
         </View>
 
         <Heading
+          key="heading"
           size={SIZE.lg}
           style={{
             alignSelf: 'center',
@@ -113,6 +113,7 @@ export const Component = ({close, promo, getRef}) => {
           </Heading>
         </Heading>
         <Paragraph
+          key="description"
           size={SIZE.md}
           style={{
             paddingHorizontal: 12,
@@ -125,6 +126,7 @@ export const Component = ({close, promo, getRef}) => {
         </Paragraph>
 
         <Button
+          key="calltoaction"
           onPress={onPress}
           title={
             promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'
@@ -136,13 +138,14 @@ export const Component = ({close, promo, getRef}) => {
           }}
         />
 
-        <Seperator />
+        <Seperator key="seperator" />
 
         {features.map((item, index) => (
-          <Group item={item} index={index} />
+          <Group key={item.title} item={item} index={index} />
         ))}
 
         <View
+          key="plans"
           style={{
             paddingHorizontal: 12
           }}>

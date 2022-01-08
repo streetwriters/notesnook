@@ -24,6 +24,8 @@ import Paragraph from '../Typography/Paragraph';
 import FileViewer from 'react-native-file-viewer';
 
 import * as ScopedStorage from 'react-native-scoped-storage';
+import {MMKV} from '../../utils/mmkv';
+import {clearMessage} from '../../services/Message';
 
 let RNFetchBlob;
 
@@ -73,12 +75,14 @@ class RecoveryKeyDialog extends React.Component {
         visible: false
       });
     });
-    if (this.signup) {
-      this.signup = false;
-      setTimeout(() => {
-        eSendEvent(eOpenResultDialog);
-      }, 500);
-    }
+    MMKV.setItem('userHasSavedRecoveryKey', 'true');
+    clearMessage();
+    // if (this.signup) {
+    //   this.signup = false;
+    //   setTimeout(() => {
+    //     eSendEvent(eOpenResultDialog);
+    //   }, 500);
+    // }
   };
   async componentDidMount() {
     eSubscribeEvent(eOpenRecoveryKeyDialog, this.open);
@@ -91,7 +95,7 @@ class RecoveryKeyDialog extends React.Component {
   saveQRCODE = async () => {
     this.svg.current?.toDataURL(async data => {
       try {
-        let path = await Storage.checkAndCreateDir('/');
+        let path;
         RNFetchBlob = require('rn-fetch-blob').default;
         let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode';
         fileName = sanitizeFilename(fileName, {replacement: '_'});
@@ -105,6 +109,7 @@ class RecoveryKeyDialog extends React.Component {
             'base64'
           );
         } else {
+          path = await Storage.checkAndCreateDir('/');
           await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
         }
         ToastEvent.show({
@@ -120,14 +125,14 @@ class RecoveryKeyDialog extends React.Component {
 
   saveToTextFile = async () => {
     try {
-      let path = await Storage.checkAndCreateDir('/');
+      let path;
       let fileName = 'nn_' + this.user?.email + '_recovery_key';
       fileName = sanitizeFilename(fileName, {replacement: '_'});
       fileName = fileName + '.txt';
 
       RNFetchBlob = require('rn-fetch-blob').default;
       if (Platform.OS === 'android') {
-       let file = await ScopedStorage.createDocument(
+        let file = await ScopedStorage.createDocument(
           fileName,
           'text/plain',
           this.state.key,
@@ -136,6 +141,7 @@ class RecoveryKeyDialog extends React.Component {
         if (!file) return;
         path = file.uri;
       } else {
+        path = await Storage.checkAndCreateDir('/');
         await RNFetchBlob.fs.writeFile(path + fileName, this.state.key, 'utf8');
         path = path + fileName;
       }
@@ -200,48 +206,31 @@ class RecoveryKeyDialog extends React.Component {
             paddingTop: 10
           }}>
           <DialogHeader
-            title="Your data recovery key"
+            title="Save account recovery key"
             paragraph="If you forget your password, you can recover your
             data and reset your password only using this recovery key."
           />
 
           <View
             style={{
-              backgroundColor: colors.nav,
               borderRadius: 5,
-              padding: 10,
+              padding: 12,
               marginTop: 10
             }}>
             <Paragraph
-              color={colors.icon}
+              color={colors.pri}
               size={SIZE.sm}
               numberOfLines={2}
+              selectable
               style={{
                 width: '100%',
                 maxWidth: '100%',
                 paddingRight: 10,
-                marginBottom: 10,
-                textAlign: 'center'
+                textAlign: 'center',
+                textDecorationLine: 'underline'
               }}>
               {this.state.key}
             </Paragraph>
-
-            <Button
-              onPress={() => {
-                Clipboard.setString(this.state.key);
-                ToastEvent.show({
-                  heading: 'Recovery key copied!',
-                  type: 'success',
-                  context: 'local'
-                });
-              }}
-              icon="content-copy"
-              title="Copy to clipboard"
-              width="100%"
-              type="gray"
-              fontSize={SIZE.md}
-              height={50}
-            />
           </View>
           <Seperator />
 
@@ -268,11 +257,29 @@ class RecoveryKeyDialog extends React.Component {
           </View>
 
           <Button
+            onPress={() => {
+              Clipboard.setString(this.state.key);
+              ToastEvent.show({
+                heading: 'Recovery key copied!',
+                type: 'success',
+                context: 'local'
+              });
+            }}
+            icon="content-copy"
+            title="Copy to clipboard"
+            width="100%"
+            type="grayAccent"
+            fontSize={SIZE.md}
+            height={50}
+          />
+          <Seperator />
+          <Button
             title="Save QR-Code to gallery"
             onPress={this.saveQRCODE}
             width="100%"
-            type="accent"
+            type="grayAccent"
             fontSize={SIZE.md}
+            icon="qrcode"
             height={50}
           />
           <Seperator />
@@ -280,7 +287,8 @@ class RecoveryKeyDialog extends React.Component {
             onPress={this.saveToTextFile}
             title="Save to text file"
             width="100%"
-            type="accent"
+            type="grayAccent"
+            icon="text"
             fontSize={SIZE.md}
             height={50}
           />
@@ -290,7 +298,8 @@ class RecoveryKeyDialog extends React.Component {
             onPress={this.shareFile}
             title="Share to Cloud"
             width="100%"
-            type="accent"
+            type="grayAccent"
+            icon="cloud"
             fontSize={SIZE.md}
             height={50}
           />

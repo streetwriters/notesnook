@@ -14,6 +14,8 @@ import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
 import {enabled} from 'react-native-privacy-snapshot';
 import SplashScreen from 'react-native-splash-screen';
+import {doInBackground, editing} from '.';
+import {ProFeatures} from '../components/ResultDialog/pro-features';
 import {
   clearAllStores,
   initialize,
@@ -21,6 +23,7 @@ import {
   useNoteStore,
   useUserStore
 } from '../provider/stores';
+import Backup from '../services/Backup';
 import BiometricService from '../services/BiometricService';
 import {
   eSendEvent,
@@ -32,26 +35,13 @@ import {
 import {
   clearMessage,
   setEmailVerifyMessage,
-  setLoginMessage
+  setLoginMessage,
+  setRecoveryKeyMessage
 } from '../services/Message';
 import Navigation from '../services/Navigation';
 import PremiumService from '../services/PremiumService';
 import SettingsService from '../services/SettingsService';
 import Sync from '../services/Sync';
-import {doInBackground, editing} from '.';
-import { APP_VERSION } from "../../version";
-import {updateStatusBarColor} from './Colors';
-import {db} from './database';
-import {
-  eClearEditor,
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  eOpenProgressDialog,
-  refreshNotesPage
-} from './Events';
-import {MMKV} from './mmkv';
-import Storage from './storage';
-import {sleep} from './TimeUtils';
 import {
   EditorWebView,
   getNote,
@@ -59,8 +49,17 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {ProFeatures} from '../components/ResultDialog/pro-features';
-import Backup from '../services/Backup';
+import {updateStatusBarColor} from './Colors';
+import {db} from './database';
+import {
+  eClearEditor,
+  eCloseProgressDialog,
+  eOpenLoginDialog,
+  refreshNotesPage
+} from './Events';
+import {MMKV} from './mmkv';
+import Storage from './storage';
+import {sleep} from './TimeUtils';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -173,10 +172,6 @@ export const useAppEvents = () => {
             await onEmailVerified();
           }
           await setCurrentUser();
-          let version = await db.version();
-          if (version.mobile > APP_VERSION) {
-            eSendEvent('updateDialog', ver);
-          }
         } catch (e) {}
       })();
       refValues.current.removeInternetStateListener = NetInfo.addEventListener(
@@ -226,7 +221,6 @@ export const useAppEvents = () => {
     presentSheet({
       title: 'Email confirmed!',
       paragraph: message,
-      noProgress: true,
       component: (
         <View
           style={{
@@ -268,7 +262,6 @@ export const useAppEvents = () => {
         },
         icon: 'check',
         actionText: 'Continue',
-        noProgress: true
       });
     }
     await PremiumService.setPremiumStatus();
@@ -321,7 +314,6 @@ export const useAppEvents = () => {
       },
       icon: 'logout',
       actionText: 'Login',
-      noProgress: true
     });
 
     setTimeout(() => {
@@ -365,6 +357,15 @@ export const useAppEvents = () => {
           }, 1000);
         }
 
+        if (user.isEmailConfirmed) {
+          let hasSavedRecoveryKey = await MMKV.getItem(
+            'userHasSavedRecoveryKey'
+          );
+          if (!hasSavedRecoveryKey) {
+            setRecoveryKeyMessage();
+          }
+        }
+
         await Sync.run();
         if (!user.isEmailConfirmed) {
           setEmailVerifyMessage();
@@ -380,6 +381,14 @@ export const useAppEvents = () => {
       }
     } catch (e) {
       let user = await db.user.getUser();
+
+      if (user?.isEmailConfirmed) {
+        let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
+        if (!hasSavedRecoveryKey) {
+          setRecoveryKeyMessage();
+        }
+      }
+
       if (user && !user.isEmailConfirmed) {
         setEmailVerifyMessage();
       } else if (!user) {
@@ -548,7 +557,7 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
-        eSendEvent('webviewreset');
+        eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }
     } catch (e) {

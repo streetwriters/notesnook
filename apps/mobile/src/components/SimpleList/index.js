@@ -1,7 +1,13 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, RefreshControl, RefreshControlComponent, View} from 'react-native';
+import {
+  FlatList,
+  RefreshControl,
+  RefreshControlComponent,
+  View
+} from 'react-native';
 import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
+import {useUserStore} from '../../provider/stores';
 import {eSendEvent} from '../../services/EventManager';
 import Sync from '../../services/Sync';
 import {db} from '../../utils/database';
@@ -74,8 +80,7 @@ const SimpleList = ({
   const {colors} = state;
   const scrollRef = useRef();
   const [_loading, _setLoading] = useState(true);
-  //const refreshing = false;
-  const [refreshing, setRefreshing] = useState(false);
+  const syncing = useUserStore(state => state.syncing);
 
   useEffect(() => {
     let timeout = null;
@@ -109,9 +114,7 @@ const SimpleList = ({
   );
 
   const _onRefresh = async () => {
-    setRefreshing(true);
     await Sync.run();
-    setRefreshing(false);
     if (refreshCallback) {
       refreshCallback();
     }
@@ -151,12 +154,15 @@ const SimpleList = ({
         onScroll={_onScroll}
         initialNumToRender={10}
         maxToRenderPerBatch={10}
+        keyboardShouldPersistTaps="always"
+        keyboardDismissMode="interactive"
         refreshControl={
           <RefreshControl
             tintColor={colors.accent}
             colors={[colors.accent]}
+            progressBackgroundColor={colors.nav}
             onRefresh={_onRefresh}
-            refreshing={refreshing}
+            refreshing={syncing}
           />
         }
         ListEmptyComponent={

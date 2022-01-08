@@ -64,15 +64,22 @@ export default class CustomTabs extends Component {
     if (this.page === 0) {
       if (this.scrollOffset === 0) {
         this.goToIndex(1);
+        this.currentDrawerState = false;
       } else {
+        this.currentDrawerState = true;
         this.goToIndex(0);
       }
+      this.props.onDrawerStateChange &&
+        this.props.onDrawerStateChange(this.currentDrawerState);
     }
   };
 
   closeDrawer = () => {
     if (this.page === 0) {
       this.goToIndex(1);
+      this.currentDrawerState = false;
+      this.props.onDrawerStateChange &&
+        this.props.onDrawerStateChange(this.currentDrawerState);
     }
   };
 
@@ -169,7 +176,7 @@ export default class CustomTabs extends Component {
     if (this.page !== page) {
       this.props.onChangeTab({i: page, from: this.page});
       this.page = page;
-    } 
+    }
   };
 
   keyExtractor = (item, index) => item;
@@ -192,10 +199,11 @@ export default class CustomTabs extends Component {
       this.nextPage = 0;
     }
 
-    let drawerState = page === 0 && this.scrollOffset < 10;
+    let drawerState = page === 0 && this.scrollOffset < 150;
     if (drawerState !== this.currentDrawerState) {
       this.currentDrawerState = drawerState;
-      this.props.onDrawerStateChange(this.currentDrawerState);
+      this.props.onDrawerStateChange &&
+        this.props.onDrawerStateChange(this.currentDrawerState);
     }
     this.props.toggleOverlay(
       Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10)
@@ -216,6 +224,9 @@ export default class CustomTabs extends Component {
       let px = event.nativeEvent.pageX;
       if (px > width * 0.75 || (DDS.isSmallTab && px > this.props.widths.a)) {
         this.goToIndex(1);
+        this.currentDrawerState = false;
+        this.props.onDrawerStateChange &&
+          this.props.onDrawerStateChange(this.currentDrawerState);
       }
     }
   };
@@ -248,7 +259,7 @@ export default class CustomTabs extends Component {
           alwaysBounceHorizontal={false}
           scrollToOverflowEnabled={false}
           scrollsToTop={false}
-          scrollEventThrottle={2}
+          scrollEventThrottle={10}
           directionalLockEnabled
           overScrollMode="never"
           maxToRenderPerBatch={100}

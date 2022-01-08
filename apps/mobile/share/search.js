@@ -32,6 +32,9 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
       : useSafeAreaInsets();
 
   const onSelectItem = async item => {
+    if (item.locked) {
+      return;
+    }
     setAppendNote(item);
     close();
   };
@@ -70,7 +73,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
     }, 300);
   }, []);
 
-  const renderItem = ({item, index}) => (
+  const renderItem = ({item, index}) => !item.locked ? (
     <TouchableOpacity
       activeOpacity={0.7}
       onPress={() => onSelectItem(item)}
@@ -98,7 +101,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
         {item.headline}
       </Text>
     </TouchableOpacity>
-  );
+  ) : null
 
   let extra = quicknote
     ? {

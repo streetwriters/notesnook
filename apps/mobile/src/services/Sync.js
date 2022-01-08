@@ -1,3 +1,4 @@
+import Clipboard from '@react-native-clipboard/clipboard';
 import NetInfo from '@react-native-community/netinfo';
 import {initialize, useUserStore} from '../provider/stores';
 import {doInBackground} from '../utils';
@@ -14,13 +15,13 @@ const run = async (context = 'global', forced) => {
     return true;
   }
   userstore.setSyncing(true);
-
+  let errorStack = null;
   try {
     let res = await doInBackground(async () => {
       try {
         return await db.sync(true, forced);
       } catch (e) {
-        console.log(e.stack);
+        errorStack = e.stack;
         return e.message;
       }
     });
@@ -32,12 +33,6 @@ const run = async (context = 'global', forced) => {
     if (typeof res === 'string') throw new Error(res);
     retryCount = 0;
     result = true;
-    ToastEvent.show({
-      heading: 'Sync complete',
-      type: 'success',
-      message: 'All your notes are encrypted and synced!',
-      context: context
-    });
   } catch (e) {
     result = false;
     if (e.message !== 'Sync already running' && userstore.user) {
@@ -47,7 +42,18 @@ const run = async (context = 'global', forced) => {
         ToastEvent.show({
           heading: 'Sync failed',
           message: e.message,
-          context: context
+          context: context,
+          actionText: 'Copy log',
+          func: () => {
+            if (errorStack) {
+              Clipboard.setString(errorStack);
+              ToastEvent.show({
+                heading: 'Logs copied!',
+                type: 'success',
+                context: 'global'
+              });
+            }
+          }
         });
       }
     }

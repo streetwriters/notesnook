@@ -27,7 +27,6 @@ const showEncryptionSheet = file => {
   presentSheet({
     title: 'Encrypting attachment',
     paragraph: 'Please wait while we encrypt file for upload',
-    nowarn: true,
     icon: 'attachment',
     component: (
       <View
@@ -131,7 +130,7 @@ const file = async () => {
       editor.undoManager.transact(function() {
         tinymce.activeEditor.execCommand('mceAttachFile',file);
         setTimeout(function() {
-          tinymce.activeEditor.nodeChanged({selectionChange:true})
+          tinymce.activeEditor.fire("input");
         },100)
        }); 
   
@@ -222,8 +221,6 @@ const pick = async () => {
     editing.isFocused = true;
   }
   presentSheet({
-    noProgress: true,
-    noIcon: true,
     actionsArray: [
       {
         action: async () => {
@@ -294,7 +291,7 @@ const handleImageResponse = async response => {
     editor.undoManager.transact(function() {
       tinymce.activeEditor.execCommand('mceAttachImage',image);
       setTimeout(function() {
-        tinymce.activeEditor.nodeChanged({selectionChange:true})
+        tinymce.activeEditor.fire("input");
       },100)
      }); 
 	  })();

@@ -230,7 +230,7 @@ const SettingsAppearanceSection = () => {
             }
           />
 
-          <CustomButton
+          {/* <CustomButton
             title="Reduce animations"
             tagline="Enable this to reduce animations in the app."
             onPress={reduceAnimations}
@@ -245,7 +245,7 @@ const SettingsAppearanceSection = () => {
                 onToggle={reduceAnimations}
               />
             }
-          />
+          /> */}
 
           <CustomButton
             title="Dark mode"

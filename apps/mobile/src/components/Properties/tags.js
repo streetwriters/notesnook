@@ -56,8 +56,6 @@ export const Tags = ({item, close}) => {
 };
 
 const TagItem = ({tag, close}) => {
-  const [state] = useTracked();
-  const {colors} = state;
   const onPress = async () => {
     let tags = db.tags.all;
     let _tag = tags.find(t => t.title === tag);

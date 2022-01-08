@@ -181,7 +181,6 @@ const showVerifyEmailDialog = () => {
       }
     },
     actionText: 'Resend Confirmation Link',
-    noProgress: true
   });
 };
 
@@ -360,8 +359,6 @@ const sheet = (context, promo) => {
         <PricingPlans compact heading={false} promo={promo} />
       </>
     ),
-    noIcon: true,
-    noProgress: true
   });
 };
 

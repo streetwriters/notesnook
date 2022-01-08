@@ -1,22 +1,27 @@
-import { createRef } from 'react';
-import { Dimensions, NativeModules, Platform } from 'react-native';
+import {createRef} from 'react';
+import {Dimensions, NativeModules, Platform} from 'react-native';
 import BackgroundService from 'react-native-background-actions';
 import {
   beginBackgroundTask,
   endBackgroundTask
 } from 'react-native-begin-background-task';
 import RNTooltips from 'react-native-tooltips';
-import { useSettingStore } from '../provider/stores';
-import { eSendEvent } from '../services/EventManager';
+import {useSettingStore} from '../provider/stores';
+import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
-import { refreshNotesPage } from './Events';
-import { MMKV } from './mmkv';
-import { tabBarRef } from './Refs';
+import {refreshNotesPage} from './Events';
+import {MMKV} from './mmkv';
+import {tabBarRef} from './Refs';
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
 });
+
+export const STORE_LINK =
+  Platform.OS === 'ios'
+    ? 'https://apps.apple.com/us/app/notesnook/id1544027013'
+    : 'https://play.google.com/store/apps/details?id=com.streetwriters.notesnook';
 
 const imgNames = [
   'favorites',
@@ -120,7 +125,7 @@ export const bgTaskOptions = {
     type: 'drawable'
   },
   color: '#ffffff',
-  linkingURI:"com.streetwriters.notesnook://launch"
+  linkingURI: 'com.streetwriters.notesnook://launch'
 };
 
 export async function doInBackground(cb) {
@@ -280,6 +285,11 @@ export const BUTTON_TYPES = {
   grayBg: {
     primary: 'nav',
     text: 'icon',
+    selected: 'nav'
+  },
+  grayAccent: {
+    primary: 'nav',
+    text: 'accent',
     selected: 'nav'
   },
   accent: (themeColor, text) => ({

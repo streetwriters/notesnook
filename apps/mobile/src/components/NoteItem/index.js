@@ -14,6 +14,7 @@ import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import {TimeSince} from '../Menu/TimeSince';
+import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -46,31 +47,8 @@ function navigateToTag(item) {
   });
 }
 
-const showActionSheet = (item, isTrash) => {
-  let note = isTrash ? item : db.notes.note(item?.id)?.data;
-  let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
-  ActionSheetEvent(
-    note ? note : item,
-    isTrash ? false : true,
-    isTrash ? false : true,
-    isTrash
-      ? ['PermDelete', 'Restore']
-      : [
-          'Add to notebook',
-          'Share',
-          'Export',
-          'Copy',
-          'Publish',
-          'Pin',
-          'Favorite',
-          'Attachments',
-          'Vault',
-          'Delete',
-          'RemoveTopic',
-          'History',
-          ...android
-        ]
-  );
+const showActionSheet = (item) => {
+  Properties.present(item);
 };
 
 const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {

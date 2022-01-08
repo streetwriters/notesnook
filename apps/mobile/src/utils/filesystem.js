@@ -93,9 +93,11 @@ async function uploadFile(filename, data, cancelToken) {
       });
     cancelToken.cancel = request.cancel;
     let response = await request;
-    console.log(response.info().status);
+
     let status = response.info().status;
-    let result = status >= 200 && status < 300;
+    let text = await response.text();
+
+    let result = status >= 200 && status < 300 && text.length === 0
     useAttachmentStore.getState().remove(filename);
     if (result) {
       let attachment = db.attachments.attachment(filename);
@@ -146,6 +148,7 @@ async function downloadFile(filename, data, cancelToken) {
     
     cancelToken.cancel = request.cancel;
     let response = await request;
+    
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
@@ -256,7 +259,6 @@ async function downloadAttachment(hash, global = true) {
           ? 'selected path'
           : 'File Manager/Notesnook/downloads'
       }`,
-      noProgress: true,
       icon: 'download',
       context: global ? null : attachment.metadata.hash,
       component: (

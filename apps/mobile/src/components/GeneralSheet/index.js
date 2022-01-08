@@ -10,16 +10,21 @@ import SheetWrapper from '../Sheet';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import tiny from '../../views/Editor/tiny/tiny';
+import {EditorWebView} from '../../views/Editor/Functions';
+import {editing} from '../../utils';
+import {reFocusEditor} from '../../views/Editor/tiny/toolbar/constants';
 
 const GeneralSheet = ({context}) => {
   const [state] = useTracked();
   const {colors} = state;
   const [visible, setVisible] = useState(false);
-  const [dialogData, setDialogData] = useState({
-    title: 'Loading',
-    paragraph: 'Loading tagline'
-  });
+  const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();
+  const editor = useRef({
+    refocus: false
+  });
+
   useEffect(() => {
     eSubscribeEvent(eOpenProgressDialog, open);
     eSubscribeEvent(eCloseProgressDialog, close);
@@ -38,9 +43,34 @@ const GeneralSheet = ({context}) => {
     }
     setDialogData(data);
     setVisible(true);
-    await sleep(1);
-    actionSheetRef.current?.setModalVisible(true);
+    if (data.editor) {
+      editor.current.refocus = false;
+      if (editing.keyboardState) {
+        tiny.call(EditorWebView, tiny.cacheRange);
+        tiny.call(EditorWebView, tiny.blur);
+        console.log('here');
+        editor.current.refocus = true;
+      }
+    }
   };
+
+  useEffect(() => {
+    (async () => {
+      if (visible) {
+        if (dialogData.editor) await sleep(100);
+        actionSheetRef.current?.setModalVisible(true);
+        return;
+      } else {
+        if (editor.current.refocus) {
+          editing.isFocused = true;
+          await reFocusEditor();
+          tiny.call(EditorWebView, tiny.restoreRange);
+          tiny.call(EditorWebView, tiny.clearRange);
+          editor.current.refocus = false;
+        }
+      }
+    })();
+  }, [visible]);
 
   const close = ctx => {
     if ((ctx && !context) || (ctx && ctx !== context)) {
@@ -52,10 +82,11 @@ const GeneralSheet = ({context}) => {
   return !visible ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={dialogData?.noProgress}
-      closeOnTouchBackdrop={dialogData?.noProgress}
+      gestureEnabled={!dialogData.progress}
+      closeOnTouchBackdrop={!dialogData.progress}
       onClose={() => {
-        if (dialogData.noProgress) {
+        dialogData.onClose && dialogData.onClose();
+        if (!dialogData.progress) {
           setVisible(false);
           setDialogData(null);
         }
@@ -65,23 +96,31 @@ const GeneralSheet = ({context}) => {
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom:
-            dialogData.noProgress &&
-            dialogData.noIcon &&
+            !dialogData.progress &&
+            !dialogData.icon &&
             !dialogData.title &&
             !dialogData.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
         }}>
-        {!dialogData?.noProgress && !dialogData.component ? (
-          <ActivityIndicator size={50} color={colors.accent} />
-        ) : dialogData?.noIcon ? null : (
+        {dialogData?.progress ? (
+          <ActivityIndicator
+            style={{
+              marginTop: 15
+            }}
+            size={50}
+            color={colors.accent}
+          />
+        ) : null}
+
+        {dialogData?.icon ? (
           <Icon
             color={colors[dialogData.iconColor] || colors.accent}
-            name={dialogData.icon || 'check'}
+            name={dialogData.icon}
             size={50}
           />
-        )}
+        ) : null}
 
         {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
@@ -93,7 +132,7 @@ const GeneralSheet = ({context}) => {
       </View>
 
       {typeof dialogData.component === 'function'
-        ? dialogData.component(actionSheetRef)
+        ? dialogData.component(actionSheetRef, close)
         : dialogData.component}
 
       {dialogData?.learnMore ? (
@@ -156,7 +195,7 @@ const GeneralSheet = ({context}) => {
               key={item.accentText}
               title={item.actionText}
               icon={item.icon && item.icon}
-              type={item.type || "accent"}
+              type={item.type || 'accent'}
               height={50}
               style={{
                 marginBottom: 10

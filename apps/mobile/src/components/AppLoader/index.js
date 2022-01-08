@@ -1,5 +1,5 @@
 import React, {useEffect, useRef, useState} from 'react';
-import {Appearance, Platform, SafeAreaView, View} from 'react-native';
+import {Appearance, Linking, Platform, SafeAreaView, View} from 'react-native';
 import Animated, {Easing} from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import {useTracked} from '../../provider';
@@ -21,7 +21,7 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {editing} from '../../utils';
+import {editing, STORE_LINK} from '../../utils';
 import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../../utils/Colors';
 import {db} from '../../utils/database';
 import {
@@ -40,6 +40,10 @@ import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
+import {checkVersion} from 'react-native-check-version';
+import {Placeholder, SvgToPngView} from '../ListPlaceholders';
+import {Update} from '../Update';
+import {setRateAppMessage} from '../../services/Message';
 
 let passwordValue = null;
 let didVerifyUser = false;
@@ -93,6 +97,8 @@ const AppLoader = ({onLoad}) => {
           return;
         }
 
+        if (await checkAppUpdateAvailable()) return;
+
         let settingsStore = useSettingStore.getState();
         if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
           await Backup.checkAndRun();
@@ -112,6 +118,21 @@ const AppLoader = ({onLoad}) => {
       })();
     }
   }, [_loading]);
+
+  const checkAppUpdateAvailable = async () => {
+    try {
+      const version = await checkVersion();
+      if (!version.needsUpdate) return false;
+
+      presentSheet({
+        component: ref => <Update version={version} fwdRef={ref} />
+      });
+
+      return true;
+    } catch (e) {
+      return false;
+    }
+  };
 
   const restoreEditorState = async () => {
     let appState = await MMKV.getItem('appState');
@@ -139,7 +160,9 @@ const AppLoader = ({onLoad}) => {
     if (askForRating !== 'never' || askForRating !== 'completed') {
       askForRating = JSON.parse(askForRating);
       if (askForRating?.timestamp < Date.now()) {
-        eSendEvent(eOpenRateDialog);
+        if (!useMessageStore.getState().message.visible) {
+          setRateAppMessage();
+        }
         return true;
       }
     }
@@ -158,8 +181,6 @@ const AppLoader = ({onLoad}) => {
         presentSheet({
           title: 'Backup & restore',
           paragraph: 'Please enable automatic backups to keep your data safe',
-          noProgress: true,
-          noIcon: true,
           component: <SettingsBackupAndRestore isSheet={true} />
         });
 
@@ -321,9 +342,17 @@ const AppLoader = ({onLoad}) => {
               flexDirection: 'row',
               width: 100
             }}>
-            <AnimatedProgress style={{
-              backgroundColor:Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.nav : COLOR_SCHEME_LIGHT.nav
-            }} fill={colors.accent} current={4} total={4} />
+            <AnimatedProgress
+              style={{
+                backgroundColor:
+                  Appearance.getColorScheme() === 'dark'
+                    ? COLOR_SCHEME_DARK.nav
+                    : COLOR_SCHEME_LIGHT.nav
+              }}
+              fill={colors.accent}
+              current={4}
+              total={4}
+            />
           </View>
         )}
       </Animated.View>

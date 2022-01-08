@@ -3,7 +3,7 @@ import {ToastEvent} from '../../services/EventManager';
 import {db} from '../../utils/database';
 import {sleep} from '../../utils/TimeUtils';
 
-export async function verifyUser(context, onsuccess) {
+export async function verifyUser(context, onsuccess,disableBackdropClosing,onclose,closeText) {
   presentDialog({
     context: context,
     title: "Verify it's you",
@@ -12,6 +12,9 @@ export async function verifyUser(context, onsuccess) {
     paragraph: 'Please enter your account password',
     positiveText: 'Verify',
     secureTextEntry: true,
+    disableBackdropClosing:disableBackdropClosing,
+    onClose:onclose,
+    negativeText:closeText || "Cancel",
     positivePress: async value => {
       try {
         let verified = await db.user.verifyPassword(value);

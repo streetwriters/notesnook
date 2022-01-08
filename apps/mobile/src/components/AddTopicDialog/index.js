@@ -1,6 +1,10 @@
 import React, {createRef} from 'react';
-import {View} from 'react-native';
-import {Actions} from '../../provider/Actions';
+import {Keyboard, LayoutAnimation, UIManager, View} from 'react-native';
+import {
+  Transition,
+  Transitioning,
+  TransitioningView
+} from 'react-native-reanimated';
 import {useMenuStore} from '../../provider/stores';
 import {
   eSubscribeEvent,
@@ -15,7 +19,6 @@ import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
-import {updateEvent} from '../DialogManager/recievers';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import {Toast} from '../Toast';
@@ -29,6 +32,7 @@ export class AddTopicDialog extends React.Component {
       loading: false
     };
 
+    this.ref = createRef();
     this.title;
     this.titleRef = createRef();
     this.notebook = null;
@@ -92,7 +96,6 @@ export class AddTopicDialog extends React.Component {
     });
   };
   close = () => {
-    this.props.close();
     this.title = null;
     this.notebook = null;
     this.toEdit = null;
@@ -107,9 +110,17 @@ export class AddTopicDialog extends React.Component {
     return (
       <BaseDialog
         onShow={async () => {
+          if (this.toEdit) {
+            this.titleRef.current?.setNativeProps({
+              text: this.toEdit.title
+            });
+          }
+
+          this.ref.current?.animateNextTransition();
           await sleep(300);
           this.titleRef.current?.focus();
         }}
+        bounce={false}
         statusBarTranslucent={false}
         visible={true}
         onRequestClose={this.close}>
@@ -135,7 +146,6 @@ export class AddTopicDialog extends React.Component {
                 this.title = value;
               }}
               blurOnSubmit={false}
-              defaultValue={this.toEdit ? this.toEdit.title : null}
               placeholder="Enter title"
               onSubmit={() => this.addNewTopic()}
               returnKeyLabel="Done"

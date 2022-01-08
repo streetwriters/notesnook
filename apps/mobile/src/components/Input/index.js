@@ -43,7 +43,8 @@ const Input = ({
   onFocusInput,
   buttons,
   marginRight,
-  autoCorrect=true
+  autoCorrect=true,
+  buttonLeft
 }) => {
   const [state] = useTracked();
   const colors = state.colors;
@@ -171,6 +172,10 @@ const Input = ({
           onPress={onPress}
           activeOpacity={1}
           style={style}>
+            {
+              buttonLeft && buttonLeft
+            }
+
           <TextInput
             ref={fwdRef}
             testID={testID}

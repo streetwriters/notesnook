@@ -1,19 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
-import { TextInput } from 'react-native-gesture-handler';
+import React, { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {notesnook} from '../../../e2e/test.ids';
-import {useEditorStore, useUserStore} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useEditorStore, useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
-import {eOnLoadNote} from '../../utils/Events';
-import {sleep} from '../../utils/TimeUtils';
+import { getCurrentColors } from '../../utils/Colors';
+import { eOnLoadNote } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
+  disableEditing,
   EditorWebView,
   getNote,
   onWebViewLoad,
@@ -49,19 +50,29 @@ const Editor = React.memo(
       }
     }, [premiumUser]);
 
-    const onResetRequested = async noload => {
-      setResetting(true);
-      await sleep(30);
-      setResetting(false);
-      eSendEvent(
-        eOnLoadNote,
-        getNote() ? {...getNote(), forced: true} : {type: 'new'}
-      );
-      console.log('resetting editor');
+    const onResetRequested = async preventSave => {
       if (!getNote()) {
-        await sleep(10);
         eSendEvent('loadingNote', null);
       }
+      setResetting(true);
+      await sleep(10);
+      setResetting(false);
+      if (tabBarRef.current?.scrollOffset === 0 ) {
+        console.log('Editor out of bounds');
+        return;
+      }
+      if (preventSave) {
+        disableEditing();
+      }
+
+      if (getNote()) {
+
+        eSendEvent(
+          eOnLoadNote,
+          {...getNote(), forced: true}
+        );
+      }
+      console.log('resetting editor');
     };
 
     useEffect(() => {
@@ -78,7 +89,7 @@ const Editor = React.memo(
             width: '100%',
             backgroundColor: 'transparent',
             flexGrow: 1,
-            flex: 1
+            flex: 1,
           }}>
           <EditorHeader />
           <WebView
@@ -88,13 +99,16 @@ const Editor = React.memo(
             onRenderProcessGone={event => {
               onResetRequested();
             }}
+            onError={event => {
+              onResetRequested();
+            }}
             injectedJavaScript={`
             sessionId="${sessionId}";
             console.log(sessionId);
             (function() {
               const func = function() {
                 setTimeout(function() {
-                  if (tinymce) {
+                  if (globalThis.tinymce) {
                     init_tiny("calc(100vh - 55px)");
                   } else {
                     console.log('tinymce is not ready');
@@ -122,7 +136,6 @@ const Editor = React.memo(
             allowUniversalAccessFromFileURLs={true}
             originWhitelist={['*']}
             source={source}
-            // source={{uri:"http://192.168.10.4:3000/index.html"}}
             style={style}
             autoManageStatusBarEnabled={false}
             onMessage={_onMessage}

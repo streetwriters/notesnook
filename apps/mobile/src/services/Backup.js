@@ -13,6 +13,7 @@ import SettingsService from './SettingsService';
 
 const MS_DAY = 86400000;
 const MS_WEEK = MS_DAY * 7;
+const MONTH = MS_DAY * 30;
 
 async function getDirectoryAndroid() {
   let folder = await ScopedStorage.openDocumentTree(true);
@@ -30,7 +31,7 @@ async function getDirectoryAndroid() {
   return subfolder;
 }
 
-async function checkBackupDirExists(reset=false) {
+async function checkBackupDirExists(reset = false) {
   if (Platform.OS === 'ios') return true;
   let dir = await MMKV.getItem('backupStorageDir');
   if (reset) dir = null;
@@ -52,7 +53,7 @@ async function checkBackupDirExists(reset=false) {
       presentDialog({
         title: 'Select backup folder',
         paragraph:
-          'Daily backups are turned on. Please select a folder where you would like to store backup files. You can change or disable automatic backups in settings however we highly recommend that you keep them on.',
+          'Please select a folder where you would like to store backup files. You can change or disable automatic backups in settings however we highly recommend that you keep them on.',
         positivePress: async () => {
           resolve(await getDirectoryAndroid());
         },
@@ -73,7 +74,8 @@ async function run() {
   presentSheet({
     title: 'Backing up your data',
     paragraph:
-      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder"
+      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+    progress:true
   });
   let backup;
   let error;
@@ -127,7 +129,6 @@ async function run() {
         icon: 'cloud-upload',
         paragraph:
           'Share your backup to your cloud storage such as Dropbox or Google Drive so you do not lose it.',
-        noProgress: true,
         actionText: 'Share backup',
         actionsArray: [
           {
@@ -186,6 +187,9 @@ async function checkBackupRequired(type) {
   } else if (type === 'weekly' && lastBackupDate + MS_WEEK < now) {
     console.log('weekly');
     return true;
+  } else if (type === 'monthly' && lastBackupDate + MONTH < now) {
+    console.log('monthly');
+    return true;
   } else {
     console.log('no need', lastBackupDate);
     return false;
@@ -208,6 +212,5 @@ export default {
   run,
   checkAndRun,
   getDirectoryAndroid,
-  checkBackupDirExists,
-
+  checkBackupDirExists
 };

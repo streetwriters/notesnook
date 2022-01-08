@@ -1,5 +1,5 @@
 import React, {useRef} from 'react';
-import {Alert, View} from 'react-native';
+import {Alert, Platform, View} from 'react-native';
 import WebView from 'react-native-webview';
 import {useTracked} from '../../provider';
 import {useEditorStore} from '../../provider/stores';
@@ -7,9 +7,11 @@ import {eSendEvent, ToastEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import {db} from '../../utils/database';
 import {eCloseProgressDialog, eOnLoadNote} from '../../utils/Events';
+import {openLinkInBrowser} from '../../utils/functions';
 import {normalize} from '../../utils/SizeUtils';
 import {getNote, sourceUri} from '../../views/Editor/Functions';
-import { ActionIcon } from '../ActionIcon';
+import tiny from '../../views/Editor/tiny/tiny';
+import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Paragraph from '../Typography/Paragraph';
@@ -25,11 +27,20 @@ export default function NotePreview({session, content}) {
       'placeholder.svg'
     );
 
-    console.log(preview, 'preview');
-    postMessage('htmldiff', preview?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage('theme', JSON.stringify(theme));
+
+    webviewRef.current?.injectJavaScript(`
+    (function() {
+        let v = ${JSON.stringify(theme)}
+        if (pageTheme) {
+          pageTheme.colors = v;
+        }
+        setTheme()
+    })();
+    `);
+
+    postMessage('htmldiff', preview?.data);
   };
 
   function postMessage(type, value = null) {
@@ -41,7 +52,8 @@ export default function NotePreview({session, content}) {
   }
 
   const _onShouldStartLoadWithRequest = request => {
-    if (request.url.includes('http')) {
+    if (request.url.includes('https')) {
+      if (Platform.OS === 'ios' && !request.isTopFrame) return;
       openLinkInBrowser(request.url, colors)
         .catch(e =>
           ToastEvent.show({
@@ -85,7 +97,7 @@ export default function NotePreview({session, content}) {
   return (
     <View
       style={{
-        height:session.locked ? null : 600,
+        height: session.locked ? null : 600,
         width: '100%'
       }}>
       <DialogHeader padding={12} title={session.session} />
@@ -99,7 +111,10 @@ export default function NotePreview({session, content}) {
             height: '100%',
             backgroundColor: 'transparent'
           }}
-          cacheMode="LOAD_DEFAULT"
+          onError={e => {
+            console.log(e);
+          }}
+          nestedScrollEnabled
           domStorageEnabled={true}
           scrollEnabled={true}
           bounces={false}
@@ -110,6 +125,7 @@ export default function NotePreview({session, content}) {
           allowUniversalAccessFromFileURLs={true}
           originWhitelist={['*']}
           javaScriptEnabled={true}
+          cacheMode="LOAD_DEFAULT"
           cacheEnabled={true}
           source={{
             uri: sourceUri + 'plaineditor.html'
@@ -123,9 +139,9 @@ export default function NotePreview({session, content}) {
             justifyContent: 'center',
             alignItems: 'center'
           }}>
-          <Paragraph
-          color={colors.icon}
-          >Preview not available, content is encrypted.</Paragraph>
+          <Paragraph color={colors.icon}>
+            Preview not available, content is encrypted.
+          </Paragraph>
         </View>
       )}
 

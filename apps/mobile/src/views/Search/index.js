@@ -1,23 +1,22 @@
 import React, {useCallback, useEffect} from 'react';
 import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import { useSearchStore } from '../../provider/stores';
+import {useSearchStore} from '../../provider/stores';
 import SearchService from '../../services/SearchService';
 import {inputRef} from '../../utils/Refs';
 import {sleep} from '../../utils/TimeUtils';
+import {SearchBar} from './search-bar';
 
 export const Search = ({route, navigation}) => {
   const [state, dispatch] = useTracked();
-  
+
   const searchResults = useSearchStore(state => state.searchResults);
   const searching = useSearchStore(state => state.searching);
   const searchStatus = useSearchStore(state => state.searchStatus);
   const setSearchResults = useSearchStore(state => state.setSearchResults);
-  const setSearchStatus = useSearchStore(state => state.setSearchStatus)
+  const setSearchStatus = useSearchStore(state => state.setSearchStatus);
 
   const onFocus = useCallback(() => {
     sleep(300).then(() => inputRef.current?.focus());
@@ -27,7 +26,7 @@ export const Search = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     return () => {
       setSearchResults([]);
-      setSearchStatus(false,null);
+      setSearchStatus(false, null);
       navigation.removeListener('focus', onFocus);
     };
   }, []);
@@ -36,7 +35,7 @@ export const Search = ({route, navigation}) => {
     <>
       <SelectionHeader screen="Search" />
       <ContainerTopSection>
-        <Header title="Search" isBack={true} screen="Search" />
+        <SearchBar />
       </ContainerTopSection>
       <SimpleList
         listData={searchResults}
@@ -55,7 +54,7 @@ export const Search = ({route, navigation}) => {
               SearchService.getSearchInformation().title
             }`,
           button: null,
-          loading: 'Searching...',
+          loading: 'Searching...'
         }}
       />
     </>

@@ -1,8 +1,8 @@
-import validator from 'validator';
+import isEmail from 'validator/lib/isEmail';
 
 export function validateEmail(email) {
   if (email && email.length > 0) {
-    return validator.isEmail(email)
+    return isEmail(email)
   } else {
     return false;
   }

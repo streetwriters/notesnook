@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, {useEffect} from 'react';
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -24,17 +25,16 @@ const BaseDialog = ({
   bottom = false,
   background = null,
   animated = true,
-  bounce
+  bounce = true,
+  closeOnTouch = true
 }) => {
   const floating = useIsFloatingKeyboard();
 
   useEffect(() => {
-
     return () => {
       useSettingStore.getState().setSheetKeyboardHandler(true);
-    }
-
-  },[])
+    };
+  }, []);
 
   return (
     <Modal
@@ -50,6 +50,7 @@ const BaseDialog = ({
       }}
       animationType={animation}
       onRequestClose={() => {
+        if (!closeOnTouch) return null;
         useSettingStore.getState().setSheetKeyboardHandler(true);
         onRequestClose && onRequestClose();
       }}>
@@ -79,7 +80,7 @@ const BaseDialog = ({
               }
             ]}>
             <TouchableOpacity
-              onPress={onRequestClose}
+              onPress={closeOnTouch ? onRequestClose : null}
               style={styles.overlayButton}
             />
             {premium}

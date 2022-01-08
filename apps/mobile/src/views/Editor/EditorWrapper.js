@@ -1,5 +1,6 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import {
+  AppState,
   KeyboardAvoidingView,
   LayoutAnimation,
   Platform,
@@ -13,10 +14,11 @@ import {PremiumToast} from '../../components/Premium/premium-toast';
 import {useTracked} from '../../provider';
 import {useNoteStore, useSettingStore} from '../../provider/stores';
 import {DDS} from '../../services/DeviceDetection';
+import {editing} from '../../utils';
 import {editorRef} from '../../utils/Refs';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
 import EditorOverlay from './EditorOverlay';
-import {textInput} from './Functions';
+import {checkStatus, textInput} from './Functions';
 
 export const EditorWrapper = ({width, dimensions}) => {
   const [state] = useTracked();
@@ -26,6 +28,22 @@ export const EditorWrapper = ({width, dimensions}) => {
   const insets = useSafeAreaInsets();
   const floating = useIsFloatingKeyboard();
 
+  const onAppStateChanged = async state => {
+    if (state === 'active') {
+      if (!editing.movedAway) {
+        await checkStatus(false);
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (loading) return;
+    AppState.addEventListener('change', onAppStateChanged);
+    return () => {
+      AppState.removeEventListener('change', onAppStateChanged);
+    };
+  }, [loading]);
+
   return (
     <View
       ref={editorRef}
@@ -33,7 +51,7 @@ export const EditorWrapper = ({width, dimensions}) => {
         width: width[deviceMode].c,
         height: '100%',
         backgroundColor: state.colors.bg,
-        borderLeftWidth: 1,
+        borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
         // paddingTop: Platform.OS === 'ios' ? insets.top : 0,
         // paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0

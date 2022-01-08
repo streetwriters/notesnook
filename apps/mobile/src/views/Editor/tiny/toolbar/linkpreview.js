@@ -1,6 +1,6 @@
 import {getLinkPreview} from 'link-preview-js';
 import React, {useEffect, useState} from 'react';
-import {Image, ScrollView, TouchableOpacity, View} from 'react-native';
+import {Image, Linking, ScrollView, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {ActionIcon} from '../../../../components/ActionIcon';
 import Heading from '../../../../components/Typography/Heading';
@@ -9,6 +9,10 @@ import {useTracked} from '../../../../provider';
 import {openLinkInBrowser} from '../../../../utils/functions';
 import {SIZE} from '../../../../utils/SizeUtils';
 import {INPUT_MODE, properties, reFocusEditor} from './constants';
+import isEmail from 'validator/lib/isEmail';
+import isURL from 'validator/lib/isURL';
+import isMobilePhone from "validator/lib/isMobilePhone";
+import { ToastEvent } from '../../../../services/EventManager';
 
 let prevLink = {};
 const LinkPreview = ({setMode, value, onSubmit}) => {
@@ -88,12 +92,36 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   };
 
   const openLink = () => {
-    openLinkInBrowser(value, colors)
-      .catch(e => {})
-      .then(async r => {
-        console.log('closed browser now');
-        await reFocusEditor();
+
+    if (value.startsWith("mailto:") || value.startsWith("tel:") ||  value.startsWith("sms:")) {
+      Linking.openURL(value).catch(console.log);
+      return;
+    }
+
+    if (isEmail(value)) {
+      Linking.openURL(`mailto:${value}`).catch(console.log);
+      return;
+    }
+
+    if (isMobilePhone(value)) {
+      Linking.openURL(`tel:${value}`).catch(console.log);
+      return;
+    }
+
+    if (isURL(value)) {
+      openLinkInBrowser(value, colors)
+        .catch(e => {})
+        .then(async r => {
+          console.log('closed browser now');
+          await reFocusEditor();
+        });
+    } else {
+      ToastEvent.show({
+        heading:"Url not valid",
+        message:value,
+        type:'error'
       });
+    }
   };
 
   const renderText = (name, title, description) => {

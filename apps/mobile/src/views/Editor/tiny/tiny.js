@@ -20,12 +20,12 @@ window.blur();
 `;
 
 const removeMarkdown = `
-if (tinymce && tinymce.activeEditor) {
+if (globalThis.tinymce && tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns("")
 }`;
 
 const setMarkdown = `
-if (tinymce &&  tinymce.activeEditor) {
+if (globalThis.tinymce &&  tinymce.activeEditor) {
   tinymce.activeEditor.plugins.textpattern.setPatterns(markdownPatterns);
 }`;
 
@@ -54,7 +54,7 @@ const pre = `(function() {
       });
     });
     tinymce.activeEditor.selection.setRng(rng, true);
-    tinymce.activeEditor.nodeChanged();
+    tinymce.activeEditor.fire("input");
   };
 
   let node = tinymce.activeEditor.selection.getNode();
@@ -144,7 +144,7 @@ const updateTheme = value => `
   if (pageTheme) {
     pageTheme.colors = v;
   }
-  if (tinymce && tinymce.activeEditor) {
+  if (globalThis.tinymce && tinymce.activeEditor) {
     setTheme();
   }
  

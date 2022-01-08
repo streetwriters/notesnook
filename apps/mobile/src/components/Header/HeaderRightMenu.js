@@ -25,10 +25,9 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               menu: false
             });
           }}
-          //testID={notesnook.ids.default.header.buttons.left}
           name="magnify"
           color={colors.pri}
-          customStyle={styles.rightBtn}
+          customStyle={[styles.rightBtn]}
         />
       ) : null}
 

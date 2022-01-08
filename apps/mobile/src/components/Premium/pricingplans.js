@@ -151,7 +151,6 @@ export const PricingPlans = ({
         },
         icon: 'check',
         actionText: 'Continue',
-        noProgress: true
       });
     } catch (e) {
       setBuying(false);

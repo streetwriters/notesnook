@@ -1,4 +1,6 @@
 import React, {createRef} from 'react';
+import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eClosePremiumDialog, eOpenPremiumDialog} from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
 import {Component} from './component';
 
@@ -12,13 +14,22 @@ class PremiumDialog extends React.Component {
     this.actionSheetRef = createRef();
   }
 
-  open(promoInfo) {
-    console.log(promoInfo);
+  componentDidMount() {
+    eSubscribeEvent(eOpenPremiumDialog, this.open);
+    eSubscribeEvent(eClosePremiumDialog, this.close);
+  }
+
+  componentWillUnmount() {
+    eUnSubscribeEvent(eOpenPremiumDialog, this.open);
+    eUnSubscribeEvent(eClosePremiumDialog, this.close);
+  }
+
+  open = promoInfo => {
     this.setState({
       visible: true,
       promo: promoInfo
     });
-  }
+  };
 
   close = () => {
     this.setState({
@@ -36,6 +47,7 @@ class PremiumDialog extends React.Component {
   render() {
     return !this.state.visible ? null : (
       <BaseDialog
+        bounce
         background={this.props.colors.bg}
         onRequestClose={this.onClose}>
         <Component

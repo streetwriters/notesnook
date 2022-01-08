@@ -221,8 +221,6 @@ const ToolbarItem = ({
 
     if (format === 'table') {
       presentSheet({
-        noProgress:true,
-        noIcon:true,
         component:<Table/>
       })
     }

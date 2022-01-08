@@ -1,32 +1,33 @@
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import {NavigationContainer} from '@react-navigation/native';
+import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/Container';
-import { useTracked } from '../provider';
-import { useSelectionStore, useSettingStore } from '../provider/stores';
-import { eSendEvent } from '../services/EventManager';
+import {useTracked} from '../provider';
+import {useSelectionStore, useSettingStore} from '../provider/stores';
+import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import { history } from '../utils';
-import { rootNavigatorRef } from '../utils/Refs';
+import {history} from '../utils';
+import {MMKV} from '../utils/mmkv';
+import {rootNavigatorRef} from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import { Search } from '../views/Search';
+import {Search} from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
 
 const Stack = createNativeStackNavigator();
-
+let homepage = 'Notes';
 export const NavigatorStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
     const {colors} = state;
     const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
-    const settings = useSettingStore(state => state.settings);
+
     const onStateChange = React.useCallback(() => {
       if (history.selectionMode) {
         clearSelection(true);
@@ -35,20 +36,25 @@ export const NavigatorStack = React.memo(
     });
 
     React.useEffect(() => {
-      if (!render) {
+      (async () => {
+        let settings = await MMKV.getItem('appSettings');
+        if (settings) {
+          settings = JSON.parse(settings);
+          homepage = settings.homepage;
+        }
         setRender(true);
         Navigation.setHeaderState(
           settings.homepage,
           {
-            menu: true,
+            menu: true
           },
           {
             heading: settings.homepage,
-            id: settings.homepage.toLowerCase() + '_navigation',
-          },
+            id: settings.homepage.toLowerCase() + '_navigation'
+          }
         );
-      }
-    }, [settings]);
+      })();
+    }, []);
 
     return (
       <Container root={true}>
@@ -58,13 +64,13 @@ export const NavigatorStack = React.memo(
           ref={rootNavigatorRef}>
           {render ? (
             <Stack.Navigator
-              initialRouteName={settings.homepage}
+              initialRouteName={homepage}
               screenOptions={{
                 headerShown: false,
                 gestureEnabled: false,
-                animation:"none",
-                contentStyle:{
-                  backgroundColor:colors.bg
+                animation: 'none',
+                contentStyle: {
+                  backgroundColor: colors.bg
                 }
               }}>
               <Stack.Screen name="Notes" component={Home} />
@@ -82,5 +88,5 @@ export const NavigatorStack = React.memo(
       </Container>
     );
   },
-  () => true,
+  () => true
 );

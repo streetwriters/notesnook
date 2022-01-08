@@ -24,6 +24,7 @@ import {
 } from '../../utils';
 import {
   eCloseProgressDialog,
+  eOpenLoginDialog,
   eOpenPremiumDialog,
   eOpenRecoveryKeyDialog
 } from '../../utils/Events';
@@ -81,10 +82,6 @@ const SettingsUserSection = () => {
 
   return (
     <>
-      {messageBoardState && messageBoardState?.visible && (
-        <Card color={colors.accent} />
-      )}
-
       {user ? (
         <>
           <View
@@ -251,7 +248,6 @@ const SettingsUserSection = () => {
                       paragraph:
                         SUBSCRIPTION_PROVIDER[user?.subscription?.provider]
                           .desc,
-                      noProgress: true
                     });
                   }}
                   style={{
@@ -282,17 +278,24 @@ const SettingsUserSection = () => {
               },
               desc: 'Recover your data using the recovery key if your password is lost.'
             },
-            /*  {
-				name: 'Change password',
-				func: async () => {
-				  eSendEvent(eOpenLoginDialog, 3);
-				},
-				desc: 'Setup a new password for your account.'
-			  }, */
+            {
+              name: 'Change password',
+              func: async () => {
+                eSendEvent(eOpenLoginDialog, 3);
+              },
+              desc: 'Setup a new password for your account.'
+            },
             {
               name: 'Having problems with syncing?',
               func: async () => {
+                presentSheet({
+                  title: 'Syncing your data',
+                  paragraph: 'Please wait while we sync all your data.',
+                  progress:true
+                });
                 await Sync.run('global', true);
+                eSendEvent(eCloseProgressDialog);
+
               },
               desc: 'Try force sync to resolve issues with syncing.'
             },
@@ -326,7 +329,6 @@ const SettingsUserSection = () => {
                   },
                   icon: 'information-outline',
                   actionText: 'Verify',
-                  noProgress: true
                 });
               },
               desc: 'Verify your subscription to Notesnook Pro'

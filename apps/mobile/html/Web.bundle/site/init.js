@@ -29,7 +29,12 @@ function loadSettings() {
 
 function changeDirection(rtl) {
   loadSettings();
-  EDITOR_SETTINGS.directionality = rtl ? 'rtl' : 'ltr';
+  EDITOR_SETTINGS.directionality = 'ltr';
+
+  if (rtl) {
+    EDITOR_SETTINGS.directionality = 'rtl';
+  }
+
   localStorage.setItem('editorSettings', JSON.stringify(EDITOR_SETTINGS));
   if (rtl) {
     tinymce.activeEditor.execCommand('mceDirectionRTL');
@@ -173,6 +178,7 @@ function init_callback(_editor) {
       target.classList.remove(COLLAPSED_KEY);
       collapseElement(target);
     }
+    onChange(e);
   });
 
   editor.on('touchstart mousedown', function (e) {
@@ -223,12 +229,11 @@ function init_callback(_editor) {
     });
   });
 
-  editor.on('input ExecCommand ObjectResized Redo Undo', onChange);
-  editor.on('keyup', e => {
+  editor.on('input ExecCommand ObjectResized Redo Undo ListMutation', onChange);
+  editor.on('keyup', function (e) {
     console.log('keyup: ', e);
     if (e.key !== 'Backspace') return;
-    if (!editor.getHTML) return;
-    onChange();
+    onChange(e);
   });
 }
 
@@ -240,16 +245,18 @@ const plugins = [
 
 let isSafari = navigator.vendor.match(/apple/i);
 
+let margins = '';
+
+if (isSafari) {
+  margins = `margin-left:12px !important;
+margin-right:12px !important;`;
+}
+
 const content_style = `
 body {
   font-family:"Open Sans";
   overflow-x: hidden !important;
-  ${
-    isSafari
-      ? `margin-left:12px !important;
-margin-right:12px !important;`
-      : ''
-  } 
+  ${margins} 
 }
 
 .mce-content-body h2::before,
@@ -382,7 +389,7 @@ function init_tiny(size) {
     directionality: EDITOR_SETTINGS.directionality,
     skin_url: 'dist/skins/notesnook',
     content_css: 'dist/skins/notesnook',
-    attachmenthandler_download_attachment: hash => {
+    attachmenthandler_download_attachment: function (hash) {
       reactNativeEventHandler('attachment_download', hash);
     },
     custom_undo_redo_levels: 10,
@@ -724,8 +731,13 @@ function selectchange() {
         currentFormats.fontsize = '8pt';
       }
     }
+
     if (node.nodeName === 'A') {
       currentFormats.link = node.getAttribute('href');
+    }
+    let isLinkNode = node.closest('a');
+    if (isLinkNode) {
+      currentFormats.link = isLinkNode.getAttribute('href');
     }
 
     currentFormats.fontname = editor.selection.getNode().style.fontFamily;

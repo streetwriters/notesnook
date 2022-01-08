@@ -31,11 +31,12 @@ import {normalize} from '../../utils/SizeUtils';
 import {sleep, timeConverter} from '../../utils/TimeUtils';
 import {TableCellProperties} from './TableCellProperties';
 import {TableRowProperties} from './TableRowProperties';
-import tiny from './tiny/tiny';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
 import {
   IMAGE_TOOLTIP_CONFIG,
   TABLE_TOOLTIP_CONFIG
 } from './tiny/toolbar/config';
+import { focusEditor, reFocusEditor } from './tiny/toolbar/constants';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -67,7 +68,6 @@ let disableSaving = false;
 let isSaving = false;
 let waitForContent = false;
 let prevNoteContent = null;
-let timerForEditor = null;
 let sessionId = null;
 let historySessionId = null;
 
@@ -158,6 +158,7 @@ export const CHECK_STATUS = `(function() {
 
 const request_content = `(function() {
   if (window.ReactNativeWebView) {
+    if (!editor) return;
     editor.getHTML().then(function(html) {
       window.ReactNativeWebView.postMessage(
         JSON.stringify({
@@ -167,7 +168,7 @@ const request_content = `(function() {
           sessionId:sessionId
         })
       );
-    })
+    }).catch(console.log)
   }
 })();`;
 
@@ -177,6 +178,11 @@ export function getNote() {
 
 export function setNoteOnly(n) {
   note = n;
+}
+
+export function disableEditing() {
+  noteEdited = false;
+  disableSaving = true;
 }
 
 export const textInput = createRef();
@@ -222,6 +228,7 @@ async function setNote(item) {
     content.type = note.content.type;
   } else {
     let data = await db.content.raw(note.contentId);
+    data = await db.content.insertPlaceholders(data, 'placeholder.svg');
 
     if (!data) {
       content.data = '';
@@ -274,7 +281,7 @@ export const loadNote = async item => {
   if (closingSession) {
     eSendEvent('loadingNote', item);
     await waitForEvent('session_ended');
-    await sleep(100);
+    await sleep(300);
   }
 
   closingSession = true;
@@ -291,13 +298,13 @@ export const loadNote = async item => {
     eSendEvent('updateTags');
     closingSession = false;
     disableSaving = false;
-    lastEditTime = 0;
+    lasstEditTime = 0;
     clearNote();
     noteEdited = false;
     loading_queue = null;
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
-
+    await checkStatus(false);
     if (Platform.OS === 'android') {
       EditorWebView.current?.requestFocus();
       setTimeout(() => {
@@ -320,8 +327,6 @@ export const loadNote = async item => {
     requestedReload = true;
     updateSessionStatus();
     tiny.call(EditorWebView, tiny.notLoading);
-
-    await checkStatus(false);
   } else {
     if (id === item.id && !item.forced) {
       console.log('note is already opened in editor');
@@ -352,19 +357,19 @@ export const loadNote = async item => {
     }
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
-    setTimeout(async () => {
-      requestedReload = true;
-      if (await checkStatus(false)) {
-        updateSessionStatus();
-      }
-    }, 50);
-    useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    requestedReload = true;
+    if (await checkStatus(false)) {
+      updateSessionStatus();
+    }
+    setTimeout(() => {
+      useEditorStore.getState().setCurrentlyEditingNote(item.id);
+    }, 1);
   }
 
   loading_note = false;
 };
 
-const checkStatus = async noreset => {
+export const checkStatus = async noreset => {
   return new Promise(resolve => {
     webviewOK = false;
     console.log('checking status of webview');
@@ -403,15 +408,15 @@ const checkStatus = async noreset => {
 function updateSessionStatus() {
   tiny.call(
     EditorWebView,
-    `(function() {
-    sessionId = "${sessionId}";
+    `(function () {
+    sessionId = '${sessionId}';
     let msg = JSON.stringify({
       data: true,
       type: 'status',
-      sessionId:sessionId
+      sessionId: sessionId
     });
-    window.ReactNativeWebView.postMessage(msg)
-})();`
+    window.ReactNativeWebView.postMessage(msg);
+  })();`
   );
 }
 
@@ -430,24 +435,30 @@ function isContentInvalid(content) {
 function check_session_status() {
   tiny.call(
     EditorWebView,
-    `(function() {
-    if (window.ReactNativeWebView) {
-      if (!editor) {
-        return;
+    `(function () {
+      if (window.ReactNativeWebView) {
+        if (!editor) return;
+    
+        editor.getHTML().then(function (value) {
+          let status =
+            !value ||
+            value === '' ||
+            value.trim() === '' ||
+            value === '<p></p>' ||
+            value === '<p><br></p>' ||
+            value === '<p>&nbsp;</p>' ||
+            value === '<p><br data-mce-bogus="1"></p>';
+    
+          window.ReactNativeWebView.postMessage(
+            JSON.stringify({
+              type: 'content_not_loaded',
+              value: status,
+              sessionId: sessionId
+            })
+          );
+        }).catch(console.log)
       }
-      editor.getHTML().then(function(value) {
-        let status = !value || value === '' || value.trim() === "" || value === '<p></p>' || value === '<p><br></p>' || value === '<p>&nbsp;</p>' || value === '<p><br data-mce-bogus="1"></p>';
-        
-        window.ReactNativeWebView.postMessage(
-          JSON.stringify({
-            type: 'content_not_loaded',
-            value:status,
-            sessionId:sessionId
-          })
-        );
-      })
-    }
-  })();`
+    })();`
   );
 }
 
@@ -460,11 +471,10 @@ export const _onMessage = async evt => {
   } catch (e) {
     return;
   }
-
   switch (message.type) {
     case 'tinyerror':
       ToastEvent.show({
-        heading: 'An error occured',
+        heading: 'Error saving note',
         message: message.value,
         type: 'error'
       });
@@ -473,22 +483,10 @@ export const _onMessage = async evt => {
       showTableOptionsTooltip();
       break;
     case 'tablecelloptions':
-      console.log(message.value);
-      eSendEvent('updatecell', message.value);
-      presentSheet({
-        noIcon: true,
-        noProgress: true,
-        component: <TableCellProperties data={message.value} />
-      });
+      TableCellProperties.present(message.value);
       break;
     case 'tablerowoptions':
-      console.log('tablerowoptions', message.value);
-      eSendEvent('updaterow', message.value);
-      presentSheet({
-        noIcon: true,
-        noProgress: true,
-        component: <TableRowProperties data={message.value} />
-      });
+      TableRowProperties.present(message.value);
       break;
     case 'selectionvalue':
       eSendEvent('selectionvalue', message.value);
@@ -899,6 +897,12 @@ export async function saveNote(preventUpdate) {
         }
       });
     }
+    console.log(e);
+    ToastEvent.show({
+      heading: 'Error saving note',
+      message: e.message,
+      type: 'error'
+    });
   }
   isSaving = false;
 }

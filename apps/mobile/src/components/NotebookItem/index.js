@@ -1,17 +1,18 @@
 import React from 'react';
-import { View } from 'react-native';
+import {View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import { notesnook } from '../../../e2e/test.ids';
-import { useTracked } from '../../provider';
-import { useSettingStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
+import {notesnook} from '../../../e2e/test.ids';
+import {useTracked} from '../../provider';
+import {useSettingStore} from '../../provider/stores';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { getTotalNotes, history } from '../../utils';
-import { refreshNotesPage } from '../../utils/Events';
-import { SIZE } from '../../utils/SizeUtils';
-import { ActionIcon } from '../ActionIcon';
-import { Button } from '../Button';
-import { ActionSheetEvent } from '../DialogManager/recievers';
+import {getTotalNotes, history} from '../../utils';
+import {refreshNotesPage} from '../../utils/Events';
+import {SIZE} from '../../utils/SizeUtils';
+import {ActionIcon} from '../ActionIcon';
+import {Button} from '../Button';
+import {ActionSheetEvent} from '../DialogManager/recievers';
+import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -29,15 +30,7 @@ export const NotebookItem = ({
   const topics = item.topics?.slice(0, 3) || [];
   const totalNotes = getTotalNotes(item);
   const showActionSheet = () => {
-    let rowItems =
-      item.type === 'topic'
-        ? ['Edit Topic', 'Add Shortcut', 'Delete']
-        : ['Edit Notebook', 'Pin', 'Add Shortcut', 'Delete'];
-    rowItems = isTrash ? ['Restore', 'PermDelete'] : rowItems;
-
-    ActionSheetEvent(item, false, false, rowItems, {
-      notebookID: notebookID
-    });
+    Properties.present(item);
   };
 
   const navigateToTopic = topic => {

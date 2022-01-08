@@ -1,5 +1,5 @@
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect, useRef} from 'react';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect, useRef } from 'react';
 import {
   BackHandler,
   InteractionManager,
@@ -8,17 +8,17 @@ import {
   Vibration,
   View
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
-import {ActionSheetEvent} from '../../components/DialogManager/recievers';
-import {useTracked} from '../../provider';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
+import { Properties } from '../../components/Properties';
+import { useTracked } from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -26,8 +26,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing, SUBSCRIPTION_STATUS} from '../../utils';
-import {db} from '../../utils/database';
+import { editing, SUBSCRIPTION_STATUS } from '../../utils';
+import { db } from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -37,24 +37,21 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorTitle} from './EditorTitle';
+import { tabBarRef } from '../../utils/Refs';
+import { EditorTitle } from './EditorTitle';
 import {
   clearEditor,
-  clearTimer,
-  EditorWebView,
-  getNote,
+  clearTimer, getNote,
   loadNote,
   setColors,
   startClosingSession
 } from './Functions';
-import {ProgressCircle} from './ProgressCircle';
-import tiny, {safeKeyboardDismiss} from './tiny/tiny';
-import {endSearch} from './tiny/toolbar/commands';
-import {toolbarRef} from './tiny/toolbar/constants';
+import { ProgressCircle } from './ProgressCircle';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { endSearch } from './tiny/toolbar/commands';
+import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import {useEditorTags} from './useEditorTags';
+import { useEditorTags } from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -164,26 +161,23 @@ const EditorHeader = () => {
 
   const showActionsheet = async () => {
     let note = getNote() && db.notes.note(getNote().id).data;
+
+    if (!note) {
+      ToastEvent.show({
+        heading: 'Start writing to create a new note',
+        type: 'success',
+        context: 'global'
+      });
+
+      return;
+    }
+
     if (editing.isFocused || editing.keyboardState) {
       safeKeyboardDismiss();
       editing.isFocused = true;
     }
-    let android = Platform.OS === 'android' ? ['PinToNotif'] : [];
-    ActionSheetEvent(note, true, true, [
-      'Add to notebook',
-      'Share',
-      'Export',
-      'Delete',
-      'Copy',
-      'Dark Mode',
-      'Add to Vault',
-      'Attachments',
-      'Pin',
-      'Favorite',
-      'Publish',
-      'History',
-      ...android
-    ]);
+
+    Properties.present(note, ['Dark Mode']);
   };
 
   useEffect(() => {
@@ -311,7 +305,7 @@ const EditorHeader = () => {
                   Navigation.popToTop();
                 }}
                 top={50}
-                left={50}
+                left={12}
                 testID={notesnook.editor.back}
                 name="arrow-left"
                 color={colors.pri}
