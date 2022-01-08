@@ -7,7 +7,13 @@ import {PressableButton} from '../../components/PressableButton';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  presentSheet
+} from '../../services/EventManager';
+import { editing } from '../../utils';
 import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView} from './Functions';
@@ -215,7 +221,9 @@ export const TableCellProperties = ({data}) => {
           title="Body"
         />
       </View>
-      <Heading size={SIZE.md}>Cell background color(${cellOptions.backgroundColor})</Heading>
+      <Heading size={SIZE.md}>
+        Cell background color(${cellOptions.backgroundColor})
+      </Heading>
       <ScrollView
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -227,7 +235,7 @@ export const TableCellProperties = ({data}) => {
           <ColorItem
             value={item}
             key={item}
-            checked={item === (rgbToHex(cellOptions.backgroundColor))}
+            checked={item === rgbToHex(cellOptions.backgroundColor)}
             onCustomPress={color => {
               tiny.call(
                 EditorWebView,
@@ -244,4 +252,26 @@ export const TableCellProperties = ({data}) => {
       </ScrollView>
     </View>
   );
+};
+TableCellProperties.isPresented = false;
+TableCellProperties.present = data => {
+  eSendEvent('updaterow', data);
+ if (TableCellProperties.isPresented) return;
+  let refocus = false;
+  if (editing.keyboardState) {
+    tiny.call(EditorWebView, tiny.cacheRange);
+    tiny.call(EditorWebView, tiny.blur);
+    refocus = true;
+  }
+  TableCellProperties.isPresented = true;
+  presentSheet({
+    component: <TableCellProperties data={data} />,
+    onClose: () => {
+      TableCellProperties.isPresented = false;
+      if (!refocus) return;
+      tiny.call(EditorWebView, tiny.focusEditor);
+      tiny.call(EditorWebView, tiny.restoreRange);
+      tiny.call(EditorWebView, tiny.clearRange);
+    }
+  });
 };

@@ -36,6 +36,7 @@ import {
   IMAGE_TOOLTIP_CONFIG,
   TABLE_TOOLTIP_CONFIG
 } from './tiny/toolbar/config';
+import { focusEditor, reFocusEditor } from './tiny/toolbar/constants';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
@@ -482,20 +483,10 @@ export const _onMessage = async evt => {
       showTableOptionsTooltip();
       break;
     case 'tablecelloptions':
-      eSendEvent('updatecell', message.value);
-      safeKeyboardDismiss();
-      await sleep(100);
-      presentSheet({
-        component: <TableCellProperties data={message.value} />
-      });
+      TableCellProperties.present(message.value);
       break;
     case 'tablerowoptions':
-      eSendEvent('updaterow', message.value);
-      safeKeyboardDismiss();
-      await sleep(100);
-      presentSheet({
-        component: <TableRowProperties data={message.value} />
-      });
+      TableRowProperties.present(message.value);
       break;
     case 'selectionvalue':
       eSendEvent('selectionvalue', message.value);

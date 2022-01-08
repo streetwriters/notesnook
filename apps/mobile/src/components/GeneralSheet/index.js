@@ -52,6 +52,7 @@ const GeneralSheet = ({context}) => {
       gestureEnabled={!dialogData.progress}
       closeOnTouchBackdrop={!dialogData.progress}
       onClose={() => {
+        dialogData.onClose && dialogData.onClose();
         if (!dialogData.progress) {
           setVisible(false);
           setDialogData(null);

@@ -4,7 +4,8 @@ import {ScrollView} from 'react-native-gesture-handler';
 import {Button} from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, presentSheet} from '../../services/EventManager';
+import { editing } from '../../utils';
 import layoutmanager from '../../utils/layout-manager';
 import {SIZE} from '../../utils/SizeUtils';
 import {EditorWebView} from './Functions';
@@ -167,4 +168,26 @@ export const TableRowProperties = ({data}) => {
       </ScrollView>
     </View>
   );
+};
+TableRowProperties.isPresented = false;
+TableRowProperties.present = data => {
+  eSendEvent('updatecell', data);
+  if (TableRowProperties.isPresented) return;
+  let refocus = false;
+  if (editing.keyboardState) {
+    tiny.call(EditorWebView,tiny.cacheRange);
+    tiny.call(EditorWebView,tiny.blur);
+    refocus = true;
+  }
+  TableRowProperties.isPresented = true;
+  presentSheet({
+    component: <TableRowProperties data={data} />,
+    onClose: () => {
+      TableRowProperties.isPresented = false;
+      if (!refocus) return;
+      tiny.call(EditorWebView,tiny.focusEditor);
+      tiny.call(EditorWebView,tiny.restoreRange);
+      tiny.call(EditorWebView,tiny.clearRange);
+    }
+  });
 };
