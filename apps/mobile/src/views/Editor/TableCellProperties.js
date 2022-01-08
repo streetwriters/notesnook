@@ -1,26 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {ActionIcon} from '../../components/ActionIcon';
-import {Button} from '../../components/Button';
-import {PressableButton} from '../../components/PressableButton';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { ActionIcon } from '../../components/ActionIcon';
+import { Button } from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent,
   presentSheet
 } from '../../services/EventManager';
-import { editing } from '../../utils';
 import layoutmanager from '../../utils/layout-manager';
-import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import {EditorWebView} from './Functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { EditorWebView } from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
-import {editor_colors, rgbToHex} from './tiny/toolbar/constants';
+import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
 export const TableCellProperties = ({data}) => {
   const [state] = useTracked();
@@ -256,24 +253,14 @@ export const TableCellProperties = ({data}) => {
 };
 TableCellProperties.isPresented = false;
 TableCellProperties.present = async data => {
-  eSendEvent('updaterow', data);
- if (TableCellProperties.isPresented) return;
-  let refocus = false;
-  if (editing.keyboardState) {
-    tiny.call(EditorWebView, tiny.cacheRange);
-    tiny.call(EditorWebView, tiny.blur);
-    refocus = true;
-  }
-  await sleep(100)
+  eSendEvent('updatecell', data);
+  if (TableCellProperties.isPresented) return;
   TableCellProperties.isPresented = true;
   presentSheet({
     component: <TableCellProperties data={data} />,
     onClose: () => {
       TableCellProperties.isPresented = false;
-      if (!refocus) return;
-      tiny.call(EditorWebView, tiny.focusEditor);
-      tiny.call(EditorWebView, tiny.restoreRange);
-      tiny.call(EditorWebView, tiny.clearRange);
-    }
+    },
+    editor:true
   });
 };

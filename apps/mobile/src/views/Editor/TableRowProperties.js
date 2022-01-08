@@ -1,18 +1,21 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {ScrollView} from 'react-native-gesture-handler';
-import {Button} from '../../components/Button';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { ScrollView } from 'react-native-gesture-handler';
+import { Button } from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
-import {useTracked} from '../../provider';
-import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent, presentSheet} from '../../services/EventManager';
-import { editing } from '../../utils';
+import { useTracked } from '../../provider';
+import {
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  presentSheet
+} from '../../services/EventManager';
 import layoutmanager from '../../utils/layout-manager';
-import {SIZE} from '../../utils/SizeUtils';
-import { sleep } from '../../utils/TimeUtils';
-import {EditorWebView} from './Functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { EditorWebView } from './Functions';
 import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
-import {editor_colors, rgbToHex} from './tiny/toolbar/constants';
+import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
 export const TableRowProperties = ({data}) => {
   const [state] = useTracked();
@@ -172,24 +175,15 @@ export const TableRowProperties = ({data}) => {
 };
 TableRowProperties.isPresented = false;
 TableRowProperties.present = async data => {
-  eSendEvent('updatecell', data);
+  eSendEvent('updaterow', data);
   if (TableRowProperties.isPresented) return;
-  let refocus = false;
-  if (editing.keyboardState) {
-    tiny.call(EditorWebView,tiny.cacheRange);
-    tiny.call(EditorWebView,tiny.blur);
-    refocus = true;
-  }
-  await sleep(100)
+
   TableRowProperties.isPresented = true;
   presentSheet({
     component: <TableRowProperties data={data} />,
     onClose: () => {
       TableRowProperties.isPresented = false;
-      if (!refocus) return;
-      tiny.call(EditorWebView,tiny.focusEditor);
-      tiny.call(EditorWebView,tiny.restoreRange);
-      tiny.call(EditorWebView,tiny.clearRange);
-    }
+    },
+    editor: true
   });
 };
