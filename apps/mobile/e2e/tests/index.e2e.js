@@ -51,7 +51,7 @@ describe('Basic tests', () => {
   });
 
   it('Delete & restore a note', async () => {
-    await LaunchApp();
+    await prepare();
     await createNote();
     await tapById(notesnook.listitem.menu);
     await tapById('icon-Delete');
