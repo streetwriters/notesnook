@@ -3,6 +3,7 @@ import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import showdown from 'showdown';
+import { toTXT } from '../utils';
 import { db } from '../utils/database';
 import { sanitizeFilename } from '../utils/filename';
 import Storage from '../utils/storage';
@@ -335,8 +336,7 @@ async function saveToText(note) {
     path = file.uri;
   }
 
-  let text = await db.notes.note(note.id).export('txt');
-
+  let text = await toTXT(note);
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
 
   let fileUri;
