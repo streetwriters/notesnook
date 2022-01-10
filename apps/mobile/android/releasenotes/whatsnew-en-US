@@ -1,5 +1,8 @@
-- Fixed export nbutton in note properties not working
 - App will now ask for password when restoring an encrypted backup
+- Improved search & query of tags
+- Locked notes can be opened now even if account has no vault.
 - Fixed sync stops working after uploading an attachment
+- Fixed export nbutton in note properties not working
+- Fixed properties do not open in app sometimes
 
 Thank you for using Notesnook!
