@@ -6,7 +6,7 @@ const ATTRIBUTE_DELETE_FILTERS = [
   "[data-mce-type]",
   "[data-progress]",
 ];
-const ELEMENT_DELETE_FILTERS = ["[data-mce-bogus]"];
+const ELEMENT_DELETE_FILTERS = [];
 const ELEMENT_MODIFY_FILTERS = ["img[src]"];
 
 export const QUERY = [
@@ -24,5 +24,5 @@ export const ATTRIBUTES = {
     "data-progress",
     "data-mce-active",
   ],
-  elementDelete: ["data-mce-bogus", "data-mce-bookmark"],
+  elementDelete: ["data-mce-bookmark"],
 };

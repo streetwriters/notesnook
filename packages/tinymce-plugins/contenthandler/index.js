@@ -109,9 +109,6 @@ function sanitizeElement(element) {
     if (ATTRIBUTES.strip.indexOf(attr.name) > -1)
       element.removeAttribute(attr.name);
     else if (ATTRIBUTES.elementDelete.indexOf(attr.name) > -1) {
-      // do not touch br[data-mce-bogus]
-      if (attr.name === "data-mce-bogus" && element.tagName === "BR") continue;
-
       element.remove();
     }
   }
