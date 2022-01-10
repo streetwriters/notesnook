@@ -77,10 +77,22 @@ const MergeEditor = () => {
     postMessage(primaryWebView, 'htmldiff', content.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage(primaryWebView, 'theme', JSON.stringify(theme));
+
+    primaryWebView.current?.injectJavaScript(`
+    (function() {
+      let v = ${JSON.stringify(theme)}
+      if (pageTheme) {
+        pageTheme.colors = v;
+      }
+      
+      setTheme();
+  
+  })();
+    `);
   };
 
   const onSecondaryWebViewLoad = async () => {
+    if (!secondaryData) return;
     let content = await db.content.insertPlaceholders(
       secondaryData,
       'placeholder.svg'
@@ -88,7 +100,15 @@ const MergeEditor = () => {
     postMessage(secondaryWebView, 'htmldiff', content?.data);
     let theme = {...colors};
     theme.factor = normalize(1);
-    postMessage(secondaryWebView, 'theme', JSON.stringify(theme));
+    secondaryWebView.current?.injectJavaScript(`
+    (function() {
+        let v = ${JSON.stringify(theme)}
+        if (pageTheme) {
+          pageTheme.colors = v;
+        }
+        setTheme();
+    })();
+    `);
   };
 
   function postMessage(webview, type, value = null) {
