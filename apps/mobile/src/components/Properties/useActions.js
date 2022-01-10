@@ -22,7 +22,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import {editing} from '../../utils';
+import {editing, toTXT} from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -46,7 +46,6 @@ import {sleep} from '../../utils/TimeUtils';
 import {presentDialog} from '../Dialog/functions';
 import NoteHistory from '../NoteHistory';
 
-let htmlToText;
 export const useActions = ({close = () => {}, item}) => {
   const [state, dispatch] = useTracked();
   const {colors} = state;
@@ -181,16 +180,11 @@ export const useActions = ({close = () => {}, item}) => {
       return;
     }
     if (item.locked) return;
-    let text = await db.notes.note(item.id).content();
-    htmlToText = htmlToText || require('html-to-text');
-    text = htmlToText.convert(text, {
-      selectors: [{selector: 'img', format: 'skip'}]
-    });
     Notifications.present({
       title: item.title,
       message: item.headline,
       subtitle: item.headline,
-      bigText: text,
+      bigText: await toTXT(item),
       ongoing: true,
       actions: ['UNPIN'],
       tag: item.id
@@ -223,6 +217,8 @@ export const useActions = ({close = () => {}, item}) => {
 
   async function copyContent() {
     if (item.locked) {
+      close();
+      await sleep(300);
       openVault({
         copyNote: true,
         novault: true,
@@ -232,13 +228,7 @@ export const useActions = ({close = () => {}, item}) => {
         description: 'Unlock note to copy to clipboard.'
       });
     } else {
-      let text = await db.notes.note(item.id).content();
-      htmlToText = htmlToText || require('html-to-text');
-      text = htmlToText.convert(text, {
-        selectors: [{selector: 'img', format: 'skip'}]
-      });
-      text = `${item.title}\n \n ${text}`;
-      Clipboard.setString(text);
+      Clipboard.setString(await toTXT(item));
       ToastEvent.show({
         heading: 'Note copied to clipboard',
         type: 'success',
@@ -380,6 +370,7 @@ export const useActions = ({close = () => {}, item}) => {
   async function shareNote() {
     if (item.locked) {
       close();
+      await sleep(300);
       openVault({
         item: item,
         novault: true,
@@ -389,12 +380,10 @@ export const useActions = ({close = () => {}, item}) => {
         description: 'Unlock note to share it.'
       });
     } else {
-      let text = await db.notes.note(item.id).export('txt');
-      let m = `${item.title}\n \n ${text}`;
       Share.open({
         title: 'Share note to',
         failOnCancel: false,
-        message: m
+        message: await toTXT(item)
       });
     }
   }
