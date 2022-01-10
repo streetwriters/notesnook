@@ -35,6 +35,7 @@ import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
   eOpenAttachmentsDialog,
+  eOpenExportDialog,
   eOpenLoginDialog,
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
@@ -486,6 +487,12 @@ export const useActions = ({close = () => {}, item}) => {
     eSendEvent(eOpenAttachmentsDialog, item);
   }
 
+  async function exportNote() {
+    close();
+    await sleep(300);
+    eSendEvent(eOpenExportDialog, [item]);
+  }
+
   const actions = [
     {
       name: 'Dark Mode',
@@ -622,11 +629,7 @@ export const useActions = ({close = () => {}, item}) => {
       name: 'Export',
       title: 'Export',
       icon: 'export',
-      func: async () => {
-        close();
-        await sleep(300);
-        eSendEvent(eOpenExportDialog, [item]);
-      }
+      func: exportNote
     },
     {
       name: 'RemoveTopic',
