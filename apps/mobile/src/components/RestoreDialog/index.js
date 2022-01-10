@@ -132,7 +132,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
           }
         );
       } else {
-        await restoreBackup(backup, value);
+        await restoreBackup(backup);
         close();
       }
     } catch (e) {
@@ -244,8 +244,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     setRestoring(false);
     initialize();
     ToastEvent.show({
-      heading: 'Restore successful',
-      message: 'Your backup data has been restored successfully.',
+      heading: 'Backup restored successfully.',
       type: 'success',
       context: 'global'
     });
