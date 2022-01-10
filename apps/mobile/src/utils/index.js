@@ -10,6 +10,7 @@ import {useSettingStore} from '../provider/stores';
 import {eSendEvent} from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
+import { db } from './database';
 import {refreshNotesPage} from './Events';
 import {MMKV} from './mmkv';
 import {tabBarRef} from './Refs';
@@ -333,13 +334,23 @@ export const BUTTON_TYPES = {
   }
 };
 
-let he;
-export function toTXT(html) {
-  let text = html.replace(/<br[^>]*>/gi, '\n').replace(/<[^>]+>/g, '');
-  if (!he) {
-    he = require('he');
+let htmlToText;
+export async function toTXT(note) {
+  let text;
+  if (note.locked) {
+    text = note.content.data;
+  } else {
+    text = await db.notes.note(note.id).content();
   }
-  return he.decode(text);
+  console.log(text);
+  
+  htmlToText = htmlToText || require('html-to-text');
+  console.log(htmlToText);
+  text = htmlToText.convert(text, {
+    selectors: [{selector: 'img', format: 'skip'}]
+  });
+  text = `${note.title}\n \n ${text}`;
+  return text;
 }
 
 export const TOOLTIP_POSITIONS = {
