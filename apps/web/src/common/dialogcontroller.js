@@ -354,6 +354,13 @@ function getDialogData(type) {
         subtitle: "Please enter your vault password to continue.",
         positiveButtonText: "Unlock",
       };
+    case "ask_backup_password":
+      return {
+        title: "Encrypted backup",
+        subtitle:
+          "Please enter the password to decrypt and restore this backup.",
+        positiveButtonText: "Restore",
+      };
     case "change_account_password":
       return {
         title: "Change account password",

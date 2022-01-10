@@ -369,7 +369,7 @@ function Settings(props) {
               type="file"
               id="restore-backup"
               hidden
-              accept=".nnbackup,text/plain,application/json"
+              accept=".nnbackup,application/json"
             />
             <Button
               variant="list"
@@ -380,18 +380,29 @@ function Settings(props) {
                       "You must be logged in to restore backups."
                     );
 
-                  const backupData = JSON.stringify(await importBackup());
-                  const error = await showLoadingDialog({
-                    title: "Restoring backup",
-                    subtitle:
-                      "Please do NOT close your browser or shut down your PC.",
-                    action: () => db.backup.import(backupData),
-                  });
-                  if (!error) {
-                    await showToast("success", "Backup restored!");
+                  const backup = await importBackup();
+
+                  async function restore(password) {
+                    await db.backup.import(backup, password);
                     await refreshApp();
+                    showToast("success", "Backup restored!");
+                  }
+
+                  if (backup.data.iv && backup.data.salt) {
+                    await showPasswordDialog(
+                      "ask_backup_password",
+                      async ({ password }) => {
+                        const error = await restore(password);
+                        return !error;
+                      }
+                    );
                   } else {
-                    throw new Error(error);
+                    await showLoadingDialog({
+                      title: "Restoring backup",
+                      subtitle:
+                        "Please do NOT close your browser or shut down your PC until the process completes.",
+                      action: restore,
+                    });
                   }
                 } catch (e) {
                   console.error(e);

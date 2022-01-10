@@ -203,10 +203,11 @@ function TinyMCE(props) {
       id={sessionId}
       ref={tinymceRef}
       onFocus={onFocus}
-      onDrop={(e,editor) => {
+      onDrop={(e, editor) => {
         for (let file of e.dataTransfer.files) {
-          attachFile(editor, file) 
-      }}}
+          attachFile(editor, file);
+        }
+      }}
       init={{
         //experimental
         keep_styles: false,
