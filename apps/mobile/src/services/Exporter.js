@@ -78,9 +78,6 @@ iframe {
   margin-right: -1.5em;
 }
 
-
-
-
 /* TABLE */
 
 .mce-content-body table {
@@ -103,8 +100,8 @@ thead tr td,
 tbody tr td,
 thead tr th,
 tbody tr th {
-  border-left: none !important;
-  border-top: none !important;
+  border-left: 1px solid #e8e8e8 !important;
+  border-top: 1px solid #e8e8e8 !important;
 }
 
 tfoot tr td,
