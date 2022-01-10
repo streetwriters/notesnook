@@ -189,6 +189,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
 
               {item.pinned ? (
                 <Icon
+                  testID="icon-pinned"
                   name="pin-outline"
                   size={SIZE.sm}
                   style={{
@@ -213,6 +214,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
 
               {item.favorite ? (
                 <Icon
+                  testID="icon-star"
                   name="star"
                   size={SIZE.md}
                   style={{

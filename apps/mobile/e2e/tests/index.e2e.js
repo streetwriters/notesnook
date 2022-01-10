@@ -1,6 +1,3 @@
-const {beforeEach} = require('detox');
-const detox = require('detox');
-const {beforeAll, test, describe} = require('jest-circus');
 const {notesnook} = require('../test.ids');
 const {
   LaunchApp,
@@ -11,12 +8,39 @@ const {
   tapByText,
   elementByText,
   createNote,
-  prepare
+  prepare,
+  visibleById
 } = require('./misc.e2e');
 
 describe('Basic tests', () => {
+  it('Favorite and unfavorite a note', async () => {
+    await prepare();
+    let note = await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Favorite');
+    await visibleById('icon-star');
+    await navigate('Favorites');
+    await visibleByText(note.body);
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Favorite');
+    await expect(element(by.text(note.body))).not.toBeVisible();
+    await navigate('Notes');
+  });
+
+  it('Pin and upin a note', async () => {
+    await prepare();
+    await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Pin');
+    await visibleByText('Pinned');
+    await visibleById('icon-pinned');
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Pin');
+    expect(element(by.id('icon-pinned'))).not.toBeVisible();
+  });
+
   it('App should launch successfully & hide welcome screen', async () => {
-    await LaunchApp();
+    await prepare();
   });
 
   it('Basic navigation should work', async () => {

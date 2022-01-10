@@ -51,6 +51,8 @@ export async function createNote() {
   await tapById(notesnook.editor.back);
   await sleep(500);
   await expect(element(by.text(body))).toBeVisible();
+
+  return {title,body};
 }
 
 export async function navigate(screen) {
@@ -60,7 +62,16 @@ export async function navigate(screen) {
   await elementByText(screen).tap();
 }
 
+const testvars = {
+  isFirstTest:true
+}
+
 export async function prepare() {
+  if (testvars.isFirstTest) {
+    console.log("Launching App Directly without reset");
+    testvars.isFirstTest = false;
+    return await LaunchApp();
+  }
   await device.reverseTcpPort(8081);
   await device.uninstallApp();
   await device.installApp();
