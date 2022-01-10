@@ -1,8 +1,5 @@
-- Added password recovery and password changing
-- Fix table cell and row properties not showing properly
-- Fixed homepage changing does not work
-- Hide locked notes from Share Menu
-- Fix checking/uncheck checklist item changes selection 
-- Fixed links & URL validation in editor
+- Fixed export nbutton in note properties not working
+- App will now ask for password when restoring an encrypted backup
+- Fixed sync stops working after uploading an attachment
 
 Thank you for using Notesnook!

@@ -1,7 +1,7 @@
 import React from 'react';
 import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
 import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
+import {notesnook} from '../../../e2e/test.ids';
 import {useTracked} from '../../provider';
 import {COLORS_NOTE} from '../../utils/Colors';
 import {normalize, SIZE} from '../../utils/SizeUtils';
@@ -17,7 +17,7 @@ export const Empty = ({
   absolute,
   headerProps,
   type,
-  screen,
+  screen
 }) => {
   const [state] = useTracked();
   const {colors} = state;
@@ -32,19 +32,17 @@ export const Empty = ({
           position: absolute ? 'absolute' : 'relative',
           zIndex: absolute ? 10 : null,
           height: height - 250 - insets.top,
-          width: '100%',
-        },
+          width: '100%'
+        }
       ]}>
       <View
         style={{
           flexGrow: 1,
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'center'
         }}>
         <Placeholder
-          color={
-            COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
-          }
+          color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
           w={normalize(150)}
           h={normalize(150)}
           type={screen === 'Favorites' ? 'favorites' : type}
@@ -54,7 +52,7 @@ export const Empty = ({
           textBreakStrategy="balanced"
           style={{
             textAlign: 'center',
-            width: '80%',
+            width: '80%'
           }}
           color={colors.icon}>
           {loading ? placeholderData.loading : placeholderData.paragraph}
@@ -77,11 +75,20 @@ export const Empty = ({
           />
         ) : loading ? (
           <ActivityIndicator
+            style={{
+              height: 35
+            }}
             color={
               COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
             }
           />
-        ) : null}
+        ) : (
+          <View
+            style={{
+              height: 35
+            }}
+          />
+        )}
       </View>
     </View>
   );
