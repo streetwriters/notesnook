@@ -135,17 +135,6 @@ const GeneralSheet = ({context}) => {
         ? dialogData.component(actionSheetRef, close)
         : dialogData.component}
 
-      {dialogData?.learnMore ? (
-        <Paragraph
-          style={{
-            alignSelf: 'center'
-          }}
-          onPress={dialogData.learnMorePress}
-          color={colors.icon}>
-          <Icon color={colors.icon} name="information-outline" size={14} />{' '}
-          {dialogData.learnMore}
-        </Paragraph>
-      ) : null}
       <View
         style={{
           paddingHorizontal: 12,
@@ -204,6 +193,25 @@ const GeneralSheet = ({context}) => {
               fontSize={SIZE.md}
             />
           ))}
+
+        {dialogData?.learnMore ? (
+          <Paragraph
+            style={{
+              alignSelf: 'center',
+              marginTop: 10,
+              textDecorationLine:"underline"
+            }}
+            size={SIZE.xs}
+            onPress={dialogData.learnMorePress}
+            color={colors.icon}>
+            <Icon
+              color={colors.icon}
+              name="information-outline"
+              size={SIZE.xs}
+            />{' '}
+            {dialogData.learnMore}
+          </Paragraph>
+        ) : null}
       </View>
     </SheetWrapper>
   );
