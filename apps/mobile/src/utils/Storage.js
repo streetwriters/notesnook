@@ -177,7 +177,7 @@ async function hash(password, email) {
 
 async function generateCryptoKey(password,salt) {
   try {
-    let credentials = await Sodium.deriveKey(password, undefined);
+    let credentials = await Sodium.deriveKey(password, salt);
     return credentials;
   } catch (e) {
     console.log('generateCryptoKey: ', e)

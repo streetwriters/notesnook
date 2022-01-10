@@ -21,6 +21,10 @@ import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 import * as ScopedStorage from 'react-native-scoped-storage';
+import {Dialog} from '../Dialog';
+import {verifyUser} from '../../views/Settings/functions';
+import {presentDialog} from '../Dialog/functions';
+import {Toast} from '../Toast';
 
 const actionSheetRef = createRef();
 let RNFetchBlob;
@@ -47,7 +51,10 @@ const RestoreDialog = () => {
       showIsWorking();
       return;
     }
-    setVisible(false);
+    actionSheetRef.current?.setModalVisible(false);
+    setTimeout(() => {
+      setVisible(false);
+    }, 300);
   };
 
   const showIsWorking = () => {
@@ -70,6 +77,7 @@ const RestoreDialog = () => {
         restoring={restoring}
         setRestoring={setRestoring}
       />
+      <Toast context="local" />
     </SheetWrapper>
   );
 };
@@ -100,25 +108,64 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
       } else {
         backup = await RNFetchBlob.fs.readFile(prefix + item.path, 'utf8');
       }
-      await db.backup.import(backup);
-      setRestoring(false);
-      initialize();
-      ToastEvent.show({
-        heading: 'Restore successful',
-        message: 'Your backup data has been restored successfully.',
-        type: 'success',
-        context: 'global'
-      });
-      close();
+      backup = JSON.parse(backup);
+      console.log('backup encrypted:', backup.data.iv && backup.data.salt);
+
+      if (backup.data.iv && backup.data.salt) {
+        withPassword(
+          async value => {
+            try {
+              console.log('password for backup:', value);
+              await restoreBackup(backup, value);
+              close();
+              setRestoring(false);
+              return true;
+            } catch (e) {
+              backupError(e);
+              console.log('return false');
+              return false;
+            }
+          },
+          () => {
+            console.log('closed');
+            setRestoring(false);
+          }
+        );
+      } else {
+        await restoreBackup(backup, value);
+        close();
+      }
     } catch (e) {
       setRestoring(false);
-      ToastEvent.show({
-        heading: 'Restore failed',
-        message: e.message,
-        type: 'error',
-        context: 'local'
-      });
+      backupError(e);
     }
+  };
+
+  const withPassword = (onsubmit, onclose = () => {}) => {
+    presentDialog({
+      context: 'local',
+      title: 'Encrypted backup',
+      input: true,
+      inputPlaceholder: 'Password',
+      paragraph: 'Please enter password of this backup file to restore it',
+      positiveText: 'Restore',
+      secureTextEntry: true,
+      onClose: onclose,
+      negativeText: 'Cancel',
+      positivePress: async password => {
+        try {
+          return await onsubmit(password);
+        } catch (e) {
+          ToastEvent.show({
+            heading: 'Failed to backup data',
+            message: e.message,
+            type: 'error',
+            context: 'global'
+          });
+          return false;
+        }
+      }
+    });
   };
 
   const checkBackups = async () => {
@@ -191,6 +238,30 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     </View>
   );
 
+  const restoreBackup = async (backup, password) => {
+    console.log(password, 'password');
+    await db.backup.import(backup, password);
+    setRestoring(false);
+    initialize();
+    ToastEvent.show({
+      heading: 'Restore successful',
+      message: 'Your backup data has been restored successfully.',
+      type: 'success',
+      context: 'global'
+    });
+  };
+
+  const backupError = e => {
+    ToastEvent.show({
+      heading: 'Restore failed',
+      message:
+        e.message ||
+        'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
+      type: 'error',
+      context: 'local'
+    });
+  };
+
   const button = {
     title: 'Restore from files',
     onPress: () => {
@@ -206,29 +277,36 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             .then(async r => {
               try {
                 let backup = await r.json();
-                //console.log(backup);
-                await db.backup.import(JSON.stringify(backup));
-                setRestoring(false);
-                initialize();
-
-                ToastEvent.show({
-                  heading: 'Restore successful',
-                  message: 'Your backup data has been restored successfully.',
-                  type: 'success',
-                  context: 'global'
-                });
-                actionSheetRef.current?.hide();
+                console.log(
+                  'backup encrypted:',
+                  backup.data.iv && backup.data.salt
+                );
+                if (backup.data.iv && backup.data.salt) {
+                  withPassword(
+                    async value => {
+                      try {
+                        await restoreBackup(backup, value);
+                        setRestoring(false);
+                        close();
+                        return true;
+                      } catch (e) {
+                        backupError(e);
+                        setRestoring(false);
+                        return false;
+                      }
+                    },
+                    () => {
+                      console.log('closed');
+                      setRestoring(false);
+                    }
+                  );
+                } else {
+                  await restoreBackup(backup);
+                  close();
+                }
               } catch (e) {
-                console.log(e);
                 setRestoring(false);
-                ToastEvent.show({
-                  heading: 'Restore failed',
-                  message:
-                    e.message ||
-                    'The selected backup data file is invalid. You must select a *.nnbackup file to restore.',
-                  type: 'error',
-                  context: 'local'
-                });
+                backupError(e);
               }
             })
             .catch(console.log);
@@ -240,6 +318,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
   return (
     <>
       <View>
+        <Dialog context="local" />
         <View
           style={{
             flexDirection: 'row',
