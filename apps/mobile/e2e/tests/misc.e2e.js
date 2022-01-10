@@ -18,7 +18,7 @@ export function elementById(id) {
 }
 
 export function elementByText(text) {
-  return element(by.text(text)).atIndex(0)
+  return element(by.text(text)).atIndex(0);
 }
 
 export async function tapById(id) {
@@ -37,9 +37,33 @@ export async function visibleById(id) {
   await expect(elementById(id)).toBeVisible();
 }
 
+export async function createNote() {
+  let title = 'Test note description that ';
+  let body =
+    'Test note description that is very long and should not fit in text.';
+
+  await tapById(notesnook.buttons.add);
+  await elementById(notesnook.editor.id).tap({
+    x: 15,
+    y: 15
+  });
+  await elementById(notesnook.editor.id).typeText(body);
+  await tapById(notesnook.editor.back);
+  await sleep(500);
+  await expect(element(by.text(body))).toBeVisible();
+}
+
 export async function navigate(screen) {
   let menu = elementById(notesnook.ids.default.header.buttons.left);
   await menu.tap();
   await sleep(100);
   await elementByText(screen).tap();
+}
+
+export async function prepare() {
+  await device.reverseTcpPort(8081);
+  await device.uninstallApp();
+  await device.installApp();
+  await device.launchApp({newInstance: true});
+  await LaunchApp();
 }

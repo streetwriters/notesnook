@@ -1,5 +1,6 @@
+const {beforeEach} = require('detox');
 const detox = require('detox');
-const {beforeAll, test} = require('jest-circus');
+const {beforeAll, test, describe} = require('jest-circus');
 const {notesnook} = require('../test.ids');
 const {
   LaunchApp,
@@ -8,13 +9,10 @@ const {
   elementById,
   visibleByText,
   tapByText,
-  elementByText
+  elementByText,
+  createNote,
+  prepare
 } = require('./misc.e2e');
-const {sleep} = require('./utils.test');
-
-beforeAll(async () => {
-  await device.launchApp();
-});
 
 describe('Basic tests', () => {
   it('App should launch successfully & hide welcome screen', async () => {
@@ -22,7 +20,7 @@ describe('Basic tests', () => {
   });
 
   it('Basic navigation should work', async () => {
-    await sleep(500);
+    await prepare();
     await navigate('Notebooks');
     await navigate('Favorites');
     await navigate('Trash');
@@ -32,40 +30,34 @@ describe('Basic tests', () => {
     await navigate('Notes');
   });
 
-  it('Create 3 notes', async () => {
-    let numOfnotes = 3;
-
-    for (let i = 0; i < numOfnotes; i++) {
-      let title = 'Test note description that ';
-      let body =
-        'Test note description that is very long and should not fit in text.' +
-        i;
-
-      await tapById(notesnook.buttons.add);
-      await elementById(notesnook.editor.id).tap({
-        x: 15,
-        y: 15
-      });
-      await elementById(notesnook.editor.id).typeText(body);
-      await tapById(notesnook.editor.back);
-      await expect(elementByText(title).atIndex(0)).toBeVisible();
-    }
+  it('Create a note in editor', async () => {
+    await prepare();
+    await createNote();
   });
 
   it('Open and close a note', async () => {
+    await prepare();
+    await createNote();
     await tapById(notesnook.ids.note.get(1));
     await tapById(notesnook.editor.back);
+  });
 
+  it('Export note dialog should show', async () => {
+    await prepare();
+    await createNote();
+    await tapById(notesnook.listitem.menu);
+    await tapById('icon-Export');
+    await visibleByText('PDF');
   });
 
   it('Delete & restore a note', async () => {
+    await LaunchApp();
+    await createNote();
     await tapById(notesnook.listitem.menu);
-    await tapById("icon-Delete");
+    await tapById('icon-Delete');
     await tapById(notesnook.toast.button);
-    await visibleByText("Test note description that is very long and should not fit in text.2");
+    await visibleByText(
+      'Test note description that is very long and should not fit in text.'
+    );
   });
-
-  
-
-
 });
