@@ -629,50 +629,52 @@ function Settings(props) {
             />
           </>
         )}
-        <Flex
-          flexDirection={"column"}
-          sx={{ border: "2px solid var(--error)", borderRadius: "default" }}
-          p={1}
-          my={2}
-        >
-          <Text variant={"body"} fontWeight={"bold"} color="error">
-            DANGER ZONE
-          </Text>
-          <Button
-            variant="list"
-            onClick={async () => {
-              if (!(await showClearSessionsConfirmation())) return;
+        {isLoggedIn && (
+          <Flex
+            flexDirection={"column"}
+            sx={{ border: "2px solid var(--error)", borderRadius: "default" }}
+            p={1}
+            my={2}
+          >
+            <Text variant={"body"} fontWeight={"bold"} color="error">
+              DANGER ZONE
+            </Text>
+            <Button
+              variant="list"
+              onClick={async () => {
+                if (!(await showClearSessionsConfirmation())) return;
 
-              await db.user.clearSessions();
-              await showToast(
-                "success",
-                "You have been logged out from all other devices."
-              );
-            }}
-          >
-            <Tip
-              text="Logout from all other devices"
-              tip="Force logout from all other logged in devices."
-            />
-          </Button>
-          <Button
-            variant="list"
-            onClick={async () => {
-              return showPasswordDialog(
-                "delete_account",
-                async ({ password }) => {
-                  await db.user.deleteUser(password);
-                  return true;
-                }
-              );
-            }}
-          >
-            <Tip
-              text="Delete account"
-              tip="Permanently delete account and logout from all devices."
-            />
-          </Button>
-        </Flex>
+                await db.user.clearSessions();
+                await showToast(
+                  "success",
+                  "You have been logged out from all other devices."
+                );
+              }}
+            >
+              <Tip
+                text="Logout from all other devices"
+                tip="Force logout from all other logged in devices."
+              />
+            </Button>
+            <Button
+              variant="list"
+              onClick={async () => {
+                return showPasswordDialog(
+                  "delete_account",
+                  async ({ password }) => {
+                    await db.user.deleteUser(password);
+                    return true;
+                  }
+                );
+              }}
+            >
+              <Tip
+                text="Delete account"
+                tip="Permanently delete account and logout from all devices."
+              />
+            </Button>
+          </Flex>
+        )}
       </Flex>
     </ScrollContainer>
   );
