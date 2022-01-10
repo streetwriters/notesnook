@@ -33,6 +33,7 @@ import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import {Header} from '../SimpleList/header';
 import Paragraph from '../Typography/Paragraph';
+import {ActionIcon} from '../ActionIcon';
 
 const MODES = {
   login: 0,
@@ -248,7 +249,7 @@ const LoginDialog = () => {
       presentSheet({
         title: 'Syncing your data',
         paragraph: 'Please wait while we sync all your data.',
-        progress:true
+        progress: true
       });
     } catch (e) {
       setLoading(false);
@@ -657,8 +658,8 @@ const LoginDialog = () => {
             <Button
               title="Forgot password?"
               style={{
-                alignSelf:'flex-end',
-                height:30,
+                alignSelf: 'flex-end',
+                height: 30
               }}
               onPress={() => {
                 if (MODES.sessionExpired === mode) {
@@ -666,9 +667,10 @@ const LoginDialog = () => {
                   return;
                 }
                 setMode(MODES.forgotPassword);
-              }}/>
+              }}
+            />
           ) : null}
-          
+
           <Seperator />
           {mode !== MODES.signup && mode !== MODES.changePassword ? null : (
             <>
@@ -763,6 +765,31 @@ const LoginDialog = () => {
               }}
               height={50}
             />
+          ) : null}
+
+          {loading && mode === MODES.changePassword ? (
+            <View
+              style={{
+                backgroundColor: colors.warningBg,
+                width: '100%',
+                borderRadius: 10,
+                marginTop: 10,
+                padding: 12,
+                flexDirection: 'row',
+                alignItems: 'center',
+                flexShrink: 1
+              }}>
+              <ActionIcon name="alert" color={colors.warningText} />
+              <Paragraph
+                style={{
+                  flexShrink: 1,
+                  marginLeft: 5
+                }}
+                color={colors.warningText}>
+                Do not close the app or move it to background while we change
+                your password.
+              </Paragraph>
+            </View>
           ) : null}
         </View>
 
