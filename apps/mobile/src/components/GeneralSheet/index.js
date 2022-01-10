@@ -32,7 +32,7 @@ const GeneralSheet = ({context}) => {
       eUnSubscribeEvent(eOpenProgressDialog, open);
       eUnSubscribeEvent(eCloseProgressDialog, close);
     };
-  }, []);
+  }, [visible]);
 
   const open = async data => {
     if (
@@ -41,6 +41,11 @@ const GeneralSheet = ({context}) => {
     ) {
       return;
     }
+    if (visible || dialogData) {
+      setDialogData(null);
+      setVisible(false);
+      await sleep(300);
+    }
     setDialogData(data);
     setVisible(true);
     if (data.editor) {
@@ -48,7 +53,6 @@ const GeneralSheet = ({context}) => {
       if (editing.keyboardState) {
         tiny.call(EditorWebView, tiny.cacheRange);
         tiny.call(EditorWebView, tiny.blur);
-        console.log('here');
         editor.current.refocus = true;
       }
     }
@@ -86,10 +90,8 @@ const GeneralSheet = ({context}) => {
       closeOnTouchBackdrop={!dialogData.progress}
       onClose={() => {
         dialogData.onClose && dialogData.onClose();
-        if (!dialogData.progress) {
-          setVisible(false);
-          setDialogData(null);
-        }
+        setVisible(false);
+        setDialogData(null);
       }}>
       <View
         style={{
@@ -199,7 +201,7 @@ const GeneralSheet = ({context}) => {
             style={{
               alignSelf: 'center',
               marginTop: 10,
-              textDecorationLine:"underline"
+              textDecorationLine: 'underline'
             }}
             size={SIZE.xs}
             onPress={dialogData.learnMorePress}
