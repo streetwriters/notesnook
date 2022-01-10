@@ -1,9 +1,10 @@
-- App will now ask for password when restoring an encrypted backup
+- App will ask for password to restore an encrypted backup
 - Improved search & query of tags
+- Improved codeblock and table ui in editor & exports
 - Locked notes can be opened now even if account has no vault.
+- Fixed theme not loading properly in merge conflict dialog
 - Fixed sync stops working after uploading an attachment
 - Fixed export nbutton in note properties not working
 - Fixed properties do not open in app sometimes
-
 
 Thank you for using Notesnook!
