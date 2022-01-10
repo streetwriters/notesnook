@@ -165,7 +165,7 @@ const TagsDialog = () => {
           onMomentumScrollEnd={() => {
             actionSheetRef.current?.handleChildScrollEnd();
           }}>
-          {query ? (
+          {query && query !== tags[0]?.title ? (
             <PressableButton
               key={'query_item'}
               customStyle={{

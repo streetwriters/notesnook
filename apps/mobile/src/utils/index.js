@@ -342,10 +342,7 @@ export async function toTXT(note) {
   } else {
     text = await db.notes.note(note.id).content();
   }
-  console.log(text);
-  
   htmlToText = htmlToText || require('html-to-text');
-  console.log(htmlToText);
   text = htmlToText.convert(text, {
     selectors: [{selector: 'img', format: 'skip'}]
   });
