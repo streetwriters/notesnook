@@ -61,22 +61,39 @@ export default class Backup {
 
   /**
    *
-   * @param {string} data the backup data
+   * @param {any} backup the backup data
    */
-  async import(data, key) {
-    if (!data) return;
-
-    let backup = JSON.parse(data);
+  async import(backup, password) {
+    if (!backup) return;
 
     if (!this._validate(backup)) throw new Error("Invalid backup.");
 
     backup = this._migrateBackup(backup);
 
     let db = backup.data;
-    //check if we have encrypted data
-    if (db.salt && db.iv) {
-      if (!key) key = await this._db.user.getEncryptionKey();
-      backup.data = JSON.parse(await this._db.storage.decrypt(key, db));
+    const isEncrypted = db.salt && db.iv && db.cipher;
+    if (isEncrypted) {
+      if (!password)
+        throw new Error(
+          "Please provide a password to decrypt this backup & restore it."
+        );
+
+      const key = await this._db.storage.generateCryptoKey(password, db.salt);
+      if (!key)
+        throw new Error("Could not generate encryption key for backup.");
+
+      try {
+        const decrypted = await this._db.storage.decrypt(key, db);
+        backup.data = JSON.parse(decrypted);
+      } catch (e) {
+        if (
+          e.message.includes("ciphertext cannot be decrypted") ||
+          e.message === "FAILURE"
+        )
+          throw new Error("Incorrect password.");
+
+        throw new Error(`Could not decrypt backup: ${e.message}`);
+      }
     } else if (!this._verify(backup))
       throw new Error("Backup file has been tempered, aborting...");
 

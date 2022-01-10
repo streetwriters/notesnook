@@ -49,6 +49,10 @@ export default class Storage {
     return this.storage.getCryptoKey(name);
   }
 
+  generateCryptoKey(password, salt) {
+    return this.storage.generateCryptoKey(password, salt);
+  }
+
   async generateRandomKey() {
     const passwordBytes = randomBytes(124);
     const password = passwordBytes.toString("base64");
