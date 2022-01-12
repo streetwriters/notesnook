@@ -282,6 +282,13 @@ const MergeEditor = () => {
       onRequestClose={() => {
         close();
       }}
+      supportedOrientations={[
+        'portrait',
+        'portrait-upside-down',
+        'landscape',
+        'landscape-left',
+        'landscape-right'
+      ]}
       visible={true}>
       <SafeAreaView
         style={{

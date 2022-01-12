@@ -42,6 +42,13 @@ const BaseDialog = ({
       transparent={true}
       animated
       statusBarTranslucent={statusBarTranslucent}
+      supportedOrientations={[
+        'portrait',
+        'portrait-upside-down',
+        'landscape',
+        'landscape-left',
+        'landscape-right'
+      ]}
       onShow={() => {
         if (onShow) {
           onShow();
