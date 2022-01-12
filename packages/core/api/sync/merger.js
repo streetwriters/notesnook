@@ -46,8 +46,9 @@ class Merger {
   }
 
   async _mergeItem(remoteItem, get, add) {
-    let localItem = await get(remoteItem.id);
     remoteItem = await this._deserialize(remoteItem);
+    let localItem = await get(remoteItem.id);
+
     if (!localItem || remoteItem.dateModified > localItem.dateModified) {
       await add(remoteItem);
     }
@@ -61,8 +62,8 @@ class Merger {
   }
 
   async _mergeItemWithConflicts(remoteItem, get, add, markAsConflicted) {
-    let localItem = await get(remoteItem.id);
     remoteItem = await this._deserialize(remoteItem);
+    let localItem = await get(remoteItem.id);
 
     if (!localItem) {
       await add(remoteItem);
