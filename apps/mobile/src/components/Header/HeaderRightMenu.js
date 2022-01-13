@@ -25,9 +25,10 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               menu: false
             });
           }}
+
           name="magnify"
           color={colors.pri}
-          customStyle={[styles.rightBtn]}
+          customStyle={styles.rightBtn}
         />
       ) : null}
 
@@ -37,13 +38,21 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           testID={notesnook.ids.default.addBtn}
           icon={currentScreen === 'Trash' ? 'delete' : 'plus'}
           iconSize={SIZE.xl}
-          type="accent"
+          type="shade"
+          hitSlop={{
+            top:10,
+            right:10,
+            bottom:10,
+            left:0
+          }}
           style={{
             marginLeft: 10,
-            width: 40,
-            height: 40,
-            borderRadius: 100,
-            paddingHorizontal: 0
+            width: 32,
+            height: 32,
+            borderRadius: 5,
+            paddingHorizontal: 0,
+            borderWidth:1,
+            borderColor:colors.accent
           }}
         />
       ) : null}
