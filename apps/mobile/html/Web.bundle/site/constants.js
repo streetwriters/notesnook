@@ -732,7 +732,7 @@ th {
   }
 
   .hidden {
-    opacity:1
+    opacity:1;
   }
 
   .tag p {
