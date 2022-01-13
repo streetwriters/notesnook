@@ -120,7 +120,7 @@ function isInvalidValue(value) {
 
 function updateInfoBar() {
   let ids = ['infodate', 'infosaved'];
-  ids.forEach(function(id) {
+  ids.forEach(function (id) {
     let element = document.getElementById(id);
     if (!element) return;
     if (element.textContent && element.textContent !== '') {
@@ -158,7 +158,21 @@ function attachMessageListener() {
         tinymce.activeEditor.mode.set('readonly');
         if (!isInvalidValue(value)) {
           tinymce.activeEditor.setHTML(value);
-          reactNativeEventHandler('noteLoaded', true);
+          let timeout = 0;
+          if (value.length > 400000) {
+            timeout = 900;
+          }else if (value.length > 300000) {
+            timeout = 600;
+          } else if (value.length > 200000) {
+            timeout = 450;
+          } else if (value.length > 100000) {
+            timeout = 300;
+          } else if (value.length > 50000) {
+            timeout = 150;
+          }
+          setTimeout(() => {
+            reactNativeEventHandler('noteLoaded', true);
+          }, timeout);
           globalThis.isClearingNoteData = false;
           setTimeout(function () {
             tinymce.activeEditor.undoManager.transact(function () {});

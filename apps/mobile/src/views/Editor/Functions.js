@@ -475,7 +475,6 @@ export const _onMessage = async evt => {
       break;
     case 'selectionvalue':
       eSendEvent('selectionvalue', message.value);
-      console.log(message.value);
       break;
     case 'history':
       eSendEvent('historyEvent', message.value);
