@@ -1,10 +1,6 @@
-- App will ask for password to restore an encrypted backup
-- Improved search & query of tags
-- Improved codeblock and table ui in editor & exports
-- Locked notes can be opened now with no vault
-- Fixed theme not loading in merge conflict dialog
-- Fixed sync stops working after uploading an attachment
-- Fixed export from note properties not working
-- Fixed properties not opening in app
+- Fixed a crash when trying to upload an image
+- Fixed issue in attachments that are downloaded before upload is complete
+- Fixed jitter when creating a new note in editor
+- Improved content loading and saving note in editor to be more reliable
 
 Thank you for using Notesnook!
