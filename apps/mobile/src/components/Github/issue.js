@@ -16,6 +16,7 @@ import DialogHeader from '../Dialog/dialog-header';
 import { presentDialog } from '../Dialog/functions';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
+import deviceInfoModule from 'react-native-device-info';
 
 export const Issue = () => {
   const [state, dispatch] = useTracked();
@@ -30,6 +31,7 @@ export const Issue = () => {
     if (!title.current || !body.current) return;
     if (title.current?.trim() === '' || body.current?.trim().length === 0)
       return;
+      
     try {
       setLoading(true);
 
@@ -41,8 +43,8 @@ export const Issue = () => {
 **Device information:**
 App version: ${APP_VERSION}
 Platform: ${Platform.OS}
-Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${
-            Platform.constants.Version
+Model: ${Platform.constants.Brand || ""}-${Platform.constants.Model|| ""}-${
+            Platform.constants.Version || ""
           }
 Pro: ${PremiumService.get()}
 Logged in: ${user ? 'yes' : 'no'}`,
