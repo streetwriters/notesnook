@@ -290,6 +290,7 @@ export const useEditorStore = create<EditorStore>((set, get) => ({
   sessionId: null,
   setSessionId: sessionId => {
     console.log(sessionId, 'session id');
+    tiny.call(EditorWebView,`sessionId="${sessionId}";`);
     set({sessionId});
   },
   searchReplace: false,

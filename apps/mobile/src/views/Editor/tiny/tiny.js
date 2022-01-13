@@ -2,21 +2,27 @@ import {Platform} from 'react-native';
 import {editing} from '../../../utils';
 import {EditorWebView, getWebviewInit, post, textInput} from '../Functions';
 
-const reset = `
-isLoading = true;
+const reset =(id) => `
+sessionId = null;
 document.getElementById("titleInput").value = '';
-autosize();
-window.prevContent = "";
-globalThis.isClearingNoteData = true;
-tinymce.activeEditor.setHTML('');
+document.getElementById("titleInput").placeholder = "Note title";
+tinymce.activeEditor.mode.set('readonly');
+tinymce.activeEditor.clearContent();
+tinymce.activeEditor.setHTML("<p><br/></p>");
+editor.dom.setAttrib(editor.dom.doc.body, 'data-mce-placeholder', 'Start writing your note here');
+editor.dom.setAttrib(editor.dom.doc.body, 'aria-placeholder', 'Start writing your note here');
+renderChildernInNode([], ".tag-bar");
 tinymce.activeEditor.undoManager.clear();
-info = document.querySelector(infoBar);
-info.querySelector('#infosaved').innerText = "";
-info.querySelector('#infodate').innerText = "";
-info.querySelector('#infowords').innerText = ""
-updateInfoBar()
+document.querySelector('#infosaved').innerText = "";
+document.querySelector('#infodate').innerText = "";
+document.querySelector('#infowords').innerText = "0 words"
+updateInfoBar();
+reactNativeEventHandler('resetcomplete');
+tinymce.activeEditor.mode.set('design');
 document.activeElement.blur();
 window.blur();
+toggleNode(".tag-bar-parent","hide"); 
+clearNode(".tag-bar");
 `;
 
 const removeMarkdown = `

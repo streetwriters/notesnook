@@ -48,13 +48,12 @@ export const EditorTitle = () => {
     <Animated.View
       style={{
         opacity: opacityVal,
-        maxWidth: '100%',
         paddingLeft: 0,
         transform: [
           {
             translateY: translateY
           }
-        ]
+        ],
       }}>
       <TextInput
         defaultValue={title}
@@ -62,8 +61,9 @@ export const EditorTitle = () => {
           fontFamily: 'OpenSans-SemiBold',
           fontSize: SIZE.xl,
           color: colors.heading,
-          maxWidth: '100%',
-          padding: 0
+          padding: 0,
+          flexShrink:1,
+          flexWrap:'wrap'
         }}
         placeholder="Note title"
         placeholderTextColor={colors.placeholder}

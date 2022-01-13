@@ -62,9 +62,8 @@ const file = async () => {
     if (Platform.OS == 'ios') {
       options.copyTo = 'cachesDirectory';
     }
-
+    console.log('generate key for attachment');
     let key = await db.attachments.generateKey();
-
     console.log('generated key for attachments: ', key);
     let file;
     try {

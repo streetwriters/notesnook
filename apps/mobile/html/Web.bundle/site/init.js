@@ -603,7 +603,9 @@ const onChange = function (event) {
   if (event.type && event.type.toLowerCase() === 'execcommand') {
     if (
       event.command.toLowerCase() === 'mcefocus' ||
-      event.command.toLowerCase() === 'mcerepaint'
+      event.command.toLowerCase() === 'mcerepaint' ||
+      event.command.toLowerCase() === 'mcedirectionrtl' ||
+      event.command.toLowerCase() === 'mcedirectionltr'
     ) {
       return;
     }

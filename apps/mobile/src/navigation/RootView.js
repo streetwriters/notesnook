@@ -51,7 +51,10 @@ const onChangeTab = async obj => {
       eSendEvent(eOnLoadNote, {type: 'new'});
       editing.currentlyEditing = true;
     }
-    sleep(1000).then(() => {
+    if (getNote()) {
+      await checkStatus();
+    }
+     sleep(1000).then(() => {
       updateStatusBarColor();
     });
   } else {

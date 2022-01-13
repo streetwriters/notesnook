@@ -1,5 +1,5 @@
-import { EV, EVENTS } from 'notes-core/common';
-import React, { useEffect, useRef } from 'react';
+import {EV, EVENTS} from 'notes-core/common';
+import React, {useEffect, useRef} from 'react';
 import {
   BackHandler,
   InteractionManager,
@@ -8,17 +8,17 @@ import {
   Vibration,
   View
 } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { notesnook } from '../../../e2e/test.ids';
-import { ActionIcon } from '../../components/ActionIcon';
-import { Properties } from '../../components/Properties';
-import { useTracked } from '../../provider';
+import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import {notesnook} from '../../../e2e/test.ids';
+import {ActionIcon} from '../../components/ActionIcon';
+import {Properties} from '../../components/Properties';
+import {useTracked} from '../../provider';
 import {
   useEditorStore,
   useSettingStore,
   useUserStore
 } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
+import {DDS} from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -26,8 +26,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import { editing, SUBSCRIPTION_STATUS } from '../../utils';
-import { db } from '../../utils/database';
+import {editing, SUBSCRIPTION_STATUS} from '../../utils';
+import {db} from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -37,21 +37,22 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { EditorTitle } from './EditorTitle';
+import {tabBarRef} from '../../utils/Refs';
+import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
-  clearTimer, getNote,
+  clearTimer,
+  getNote,
   loadNote,
   setColors,
   startClosingSession
 } from './Functions';
-import { ProgressCircle } from './ProgressCircle';
-import tiny, { safeKeyboardDismiss } from './tiny/tiny';
-import { endSearch } from './tiny/toolbar/commands';
-import { toolbarRef } from './tiny/toolbar/constants';
+import {ProgressCircle} from './ProgressCircle';
+import tiny, {safeKeyboardDismiss} from './tiny/tiny';
+import {endSearch} from './tiny/toolbar/commands';
+import {toolbarRef} from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import { useEditorTags } from './useEditorTags';
+import {useEditorTags} from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
@@ -114,7 +115,7 @@ const EditorHeader = () => {
           useEditorStore.getState().setCurrentlyEditingNote(null);
         }, 1);
         keyboardListener.current?.remove();
-        await clearEditor(true, true, true);
+        await clearEditor();
       }
       closing.current = false;
     }, 1);
@@ -216,7 +217,6 @@ const EditorHeader = () => {
     }
 
     return () => {
-      clearTimer();
       if (handleBack.current) {
         handleBack.current.remove();
         handleBack.current = null;
@@ -278,143 +278,137 @@ const EditorHeader = () => {
       <View
         style={{
           width: '100%',
-          position: 'relative',
           backgroundColor: colors.bg,
-          right: 0,
           marginTop: Platform.OS === 'ios' ? 0 : insets.top,
-          zIndex: 10
+          flexDirection: 'row',
+          paddingHorizontal: 12,
+          height: 50,
+          justifyContent:'space-between'
+          
         }}>
         <View
           style={{
             flexDirection: 'row',
-            paddingHorizontal: 12,
-            width: '100%',
-            height: 50,
-            justifyContent: 'space-between',
-            alignItems: 'center'
+            alignItems: 'center',
+            flexGrow: 1,
+            flexShrink: 1
           }}>
-          <View
-            style={{
-              flexDirection: 'row',
-              alignItems: 'center'
-            }}>
-            {deviceMode !== 'mobile' && !fullscreen ? null : (
+          {deviceMode !== 'mobile' && !fullscreen ? null : (
+            <ActionIcon
+              onLongPress={async () => {
+                await _onBackPress();
+                Navigation.popToTop();
+              }}
+              top={50}
+              left={12}
+              testID={notesnook.editor.back}
+              name="arrow-left"
+              color={colors.pri}
+              onPress={_onBackPress}
+              bottom={5}
+              customStyle={{
+                marginLeft: -5
+              }}
+            />
+          )}
+          {fullscreen ? <View style={{width: 20}} /> : null}
+          {deviceMode !== 'mobile' ? <EditorTitle /> : null}
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+          }}>
+          <>
+            {!user ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
+            user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
               <ActionIcon
-                onLongPress={async () => {
-                  await _onBackPress();
-                  Navigation.popToTop();
+                name="crown"
+                color={colors.yellow}
+                customStyle={{
+                  marginLeft: 5
                 }}
                 top={50}
-                left={12}
-                testID={notesnook.editor.back}
-                name="arrow-left"
-                color={colors.pri}
-                onPress={_onBackPress}
-                bottom={5}
-                customStyle={{
-                  marginLeft: -5
+                onPress={async () => {
+                  if (editing.isFocused) {
+                    safeKeyboardDismiss();
+                    editing.isFocused = true;
+                  }
+                  eSendEvent(eOpenPremiumDialog);
                 }}
+              />
+            ) : null}
+            <ActionIcon
+              name="magnify"
+              color={searchReplace ? colors.accent : colors.pri}
+              customStyle={{
+                marginLeft: 5
+              }}
+              type={searchReplace ? 'grayBg' : 'transparent'}
+              top={50}
+              buttom={10}
+              onLongPress={() => {
+                if (searchReplace) {
+                  endSearch();
+                  Vibration.vibrate(5, false);
+                }
+              }}
+              onPress={() => {
+                useEditorStore.getState().setSearchReplace(true);
+              }}
+            />
+
+            {currentlyEditingNote && (
+              <ActionIcon
+                name="cloud-upload-outline"
+                color={colors.pri}
+                customStyle={{
+                  marginLeft: 5
+                }}
+                top={50}
+                onPress={publishNote}
               />
             )}
-            {fullscreen ? <View style={{width: 20}} /> : null}
-            {deviceMode !== 'mobile' ? <EditorTitle /> : null}
-          </View>
 
-          <View
-            style={{
-              flexDirection: 'row'
-            }}>
-            <>
-              {!user ||
-              user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
-              user?.subscription.type === SUBSCRIPTION_STATUS.TRIAL ? (
-                <ActionIcon
-                  name="crown"
-                  color={colors.yellow}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={async () => {
-                    if (editing.isFocused) {
-                      safeKeyboardDismiss();
-                      editing.isFocused = true;
-                    }
-                    eSendEvent(eOpenPremiumDialog);
-                  }}
-                />
-              ) : null}
+            <ActionIcon
+              name="attachment"
+              color={colors.pri}
+              customStyle={{
+                marginLeft: 5
+              }}
+              top={50}
+              onPress={picker.pick}
+            />
+
+            {deviceMode !== 'mobile' && !fullscreen ? (
               <ActionIcon
-                name="magnify"
-                color={searchReplace ? colors.accent : colors.pri}
+                name="fullscreen"
+                color={colors.pri}
                 customStyle={{
                   marginLeft: 5
                 }}
-                type={searchReplace ? 'grayBg' : 'transparent'}
                 top={50}
-                buttom={10}
-                onLongPress={() => {
-                  if (searchReplace) {
-                    endSearch();
-                    Vibration.vibrate(5, false);
-                  }
-                }}
                 onPress={() => {
-                  useEditorStore.getState().setSearchReplace(true);
+                  eSendEvent(eOpenFullscreenEditor);
+                  editing.isFullscreen = true;
                 }}
               />
+            ) : null}
 
-              {currentlyEditingNote && (
-                <ActionIcon
-                  name="cloud-upload-outline"
-                  color={colors.pri}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={publishNote}
-                />
-              )}
+            <ActionIcon
+              name="dots-horizontal"
+              color={colors.pri}
+              customStyle={{
+                marginLeft: 5
+              }}
+              top={50}
+              right={50}
+              onPress={showActionsheet}
+            />
 
-              <ActionIcon
-                name="attachment"
-                color={colors.pri}
-                customStyle={{
-                  marginLeft: 5
-                }}
-                top={50}
-                onPress={picker.pick}
-              />
-
-              {deviceMode !== 'mobile' && !fullscreen ? (
-                <ActionIcon
-                  name="fullscreen"
-                  color={colors.pri}
-                  customStyle={{
-                    marginLeft: 5
-                  }}
-                  top={50}
-                  onPress={() => {
-                    eSendEvent(eOpenFullscreenEditor);
-                    editing.isFullscreen = true;
-                  }}
-                />
-              ) : null}
-
-              <ActionIcon
-                name="dots-horizontal"
-                color={colors.pri}
-                customStyle={{
-                  marginLeft: 5
-                }}
-                top={50}
-                right={50}
-                onPress={showActionsheet}
-              />
-
-              <ProgressCircle />
-            </>
-          </View>
+            <ProgressCircle />
+          </>
         </View>
       </View>
     </>

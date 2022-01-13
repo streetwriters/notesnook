@@ -557,6 +557,7 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
+        eSendEvent("loadingNote",getNote());
         eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }

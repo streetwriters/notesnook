@@ -44,7 +44,7 @@ export const Header = React.memo(
             overflow: 'hidden',
             borderBottomWidth: 1,
             borderBottomColor: hide ? 'transparent' : colors.nav,
-            justifyContent: 'space-between'
+            justifyContent: 'space-between',
           }
         ]}>
         <View style={styles.leftBtnContainer}>
