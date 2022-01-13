@@ -13,10 +13,10 @@ import {PressableButton} from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
 import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import {eSendEvent, eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
-import {EditorWebView} from './Functions';
+import {EditorWebView, getNote} from './Functions';
 import tiny from './tiny/tiny';
 import ToggleSwitch from 'toggle-switch-react-native';
 
@@ -136,13 +136,16 @@ export const EditorSettings = () => {
       id: 'rtlDirection',
       type: 'boolean',
       enabled: settings.directionality === 'rtl',
-      onPress: () => {
+      onPress: async () => {
         tiny.call(
           EditorWebView,
           `
           changeDirection(${settings.directionality === 'rtl' ? false : true})
         `,
         );
+        eSendEvent('loadingNote',getNote());
+        await sleep(100);
+        EditorWebView.current?.reload();
       },
     },
   ];
