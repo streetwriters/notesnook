@@ -343,6 +343,11 @@ export const loadNote = async item => {
 
       return;
     }
+    tiny.call(
+      EditorWebView,
+      `toggleNode(".tag-bar-parent","show"); 
+    clearNode(".tag-bar")`
+    );
     makeSessionId(item);
     useEditorStore.getState().setSessionId(sessionId);
     webviewInit = true;
@@ -629,6 +634,12 @@ export const _onMessage = async evt => {
       }
       break;
     case 'newtag':
+      if (!getNote()) {
+        ToastEvent.show({
+          heading:"Create a note first"
+        });
+        return;
+      }
       eSendEvent(eOpenTagsDialog, note);
       break;
     default:
