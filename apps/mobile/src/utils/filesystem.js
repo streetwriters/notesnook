@@ -18,7 +18,7 @@ async function readEncrypted(filename, key, cipherData) {
     if (!exists) {
       return false;
     }
-   
+
     let output = await Sodium.decryptFile(
       key,
       {
@@ -96,8 +96,7 @@ async function uploadFile(filename, data, cancelToken) {
 
     let status = response.info().status;
     let text = await response.text();
-
-    let result = status >= 200 && status < 300 && text.length === 0
+    let result = status >= 200 && status < 300 && text.length === 0;
     useAttachmentStore.getState().remove(filename);
     if (result) {
       let attachment = db.attachments.attachment(filename);
@@ -115,6 +114,28 @@ async function uploadFile(filename, data, cancelToken) {
   }
 }
 
+function valueFromXml(code, xml) {
+  if (!xml.includes(code)) return `Unknown ${code}`;
+  return xml.slice(
+    xml.indexOf(`<${code}>`) + code.length + 2,
+    xml.indexOf(`</${code}>`)
+  );
+}
+
+async function fileCheck(response, totalSize) {
+  if (totalSize < 1000) {
+    let text = await response.text();
+    console.log(text);
+    if (text.startsWith('<?xml')) {
+      let errorJson = {
+        Code: valueFromXml('Code', text),
+        Message: valueFromXml('Message', text)
+      };
+      throw new Error(`${errorJson.Code}: ${errorJson.Message}`);
+    }
+  }
+}
+
 async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
   let {url, headers, metadata} = data;
@@ -124,16 +145,17 @@ async function downloadFile(filename, data, cancelToken) {
   try {
     let exists = await RNFetchBlob.fs.exists(path);
     if (exists) {
+      console.log(await RNFetchBlob.fs.readFile(path, 'utf8'));
       console.log('file is downloaded');
       return true;
     }
-    console.log('downloading again');
+
     let res = await fetch(url, {
       method: 'GET',
       headers
     });
     const downloadUrl = await res.text();
-    console.log(downloadUrl);
+    let totalSize = 0;
     let request = RNFetchBlob.config({
       path: path,
       IOSBackgroundTask: true
@@ -143,16 +165,23 @@ async function downloadFile(filename, data, cancelToken) {
         useAttachmentStore
           .getState()
           .setProgress(0, total, filename, recieved, 'download');
+        totalSize = total;
         console.log('downloading: ', recieved, total);
       });
-    
+
     cancelToken.cancel = request.cancel;
     let response = await request;
-    
+    await fileCheck(response, totalSize);
     let status = response.info().status;
     useAttachmentStore.getState().remove(filename);
     return status >= 200 && status < 300;
   } catch (e) {
+    ToastEvent.show({
+      heading: 'Error downloading file',
+      message: e.message,
+      type: 'error'
+    });
+
     useAttachmentStore.getState().remove(filename);
     RNFetchBlob.fs.unlink(path).catch(console.log);
     console.log('download file error: ', e, url, headers);
@@ -205,6 +234,7 @@ async function downloadAttachment(hash, global = true) {
     console.log('attachment not found');
     return;
   }
+
   let folder = {};
   if (Platform.OS === 'android') {
     folder = await ScopedStorage.openDocumentTree(false);
@@ -222,6 +252,7 @@ async function downloadAttachment(hash, global = true) {
       !(await RNFetchBlob.fs.exists(`${cacheDir}/${attachment.metadata.hash}`))
     )
       return;
+
     let key = await db.attachments.decryptKey(attachment.key);
     console.log('attachment key', key);
     let info = {
@@ -243,9 +274,16 @@ async function downloadAttachment(hash, global = true) {
       message: attachment.metadata.filename + ' downloaded',
       type: 'success'
     });
-    RNFetchBlob.fs
-      .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
-      .catch(console.log);
+
+    if (attachment.dateUploaded) {
+      console.log(
+        'Deleting attachment after download',
+        attachment.dateUploaded
+      );
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .catch(console.log);
+    }
 
     if (Platform.OS === 'ios') {
       fileUri = folder.uri + `/${attachment.metadata.filename}`;
@@ -272,6 +310,12 @@ async function downloadAttachment(hash, global = true) {
     return fileUri;
   } catch (e) {
     console.log('download attachment error: ', e);
+    if (attachment.dateUploaded) {
+      console.log('Deleting attachment on error', attachment.dateUploaded);
+      RNFetchBlob.fs
+        .unlink(RNFetchBlob.fs.dirs.CacheDir + `/${attachment.metadata.hash}`)
+        .catch(console.log);
+    }
     useAttachmentStore.getState().remove(attachment.metadata.hash);
   }
 }
