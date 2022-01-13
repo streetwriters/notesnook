@@ -1,10 +1,9 @@
-import { Platform } from 'react-native';
+import {Platform} from 'react-native';
 import 'react-native-get-random-values';
 import * as Keychain from 'react-native-keychain';
-import { generateSecureRandom } from 'react-native-securerandom';
+import {generateSecureRandom} from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
-import { MMKV } from './mmkv';
-
+import {MMKV} from './mmkv';
 
 let RNFetchBlob;
 async function read(key) {
@@ -14,7 +13,7 @@ async function read(key) {
   if (!data) return null;
   try {
     return JSON.parse(data);
-  } catch(e) {
+  } catch (e) {
     return data;
   }
 }
@@ -22,7 +21,7 @@ async function read(key) {
 async function write(key, data) {
   return await MMKV.setItem(
     key,
-    typeof data === 'string' ? data : JSON.stringify(data),
+    typeof data === 'string' ? data : JSON.stringify(data)
   );
 }
 
@@ -54,18 +53,19 @@ async function clear() {
 }
 
 async function encrypt(password, data) {
-  if (!password.password && !password.key) return undefined
-  if (password.password && password.password === "" && !password.key) return undefined
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === '' && !password.key)
+    return undefined;
 
   let message = {
     type: 'plain',
-    data: data,
+    data: data
   };
   let result = await Sodium.encrypt(password, message);
 
   return {
     ...result,
-    alg: getAlgorithm(7),
+    alg: getAlgorithm(7)
   };
 }
 
@@ -74,8 +74,9 @@ function getAlgorithm(base64Variant) {
 }
 
 async function decrypt(password, data) {
-  if (!password.password && !password.key) return undefined
-  if (password.password && password.password === "" && !password.key) return undefined
+  if (!password.password && !password.key) return undefined;
+  if (password.password && password.password === '' && !password.key)
+    return undefined;
   let _data = {...data};
   _data.output = 'plain';
   return await Sodium.decrypt(password, _data);
@@ -89,15 +90,15 @@ function parseAlgorithm(alg) {
     kdfAlgorithm: kdf,
     compressionAlgorithm: compressionAlg,
     isCompress: compressed === '1',
-    base64_variant: base64variant,
+    base64_variant: base64variant
   };
 }
 
 let CRYPT_CONFIG = Platform.select({
   ios: {
-    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
   },
-  android: {},
+  android: {}
 });
 
 async function deriveCryptoKey(name, data) {
@@ -107,7 +108,7 @@ async function deriveCryptoKey(name, data) {
       'notesnook',
       name,
       credentials.key,
-      CRYPT_CONFIG,
+      CRYPT_CONFIG
     );
     return credentials.key;
   } catch (e) {}
@@ -118,7 +119,7 @@ async function getCryptoKey(name) {
     if (await Keychain.hasInternetCredentials('notesnook')) {
       let credentials = await Keychain.getInternetCredentials(
         'notesnook',
-        CRYPT_CONFIG,
+        CRYPT_CONFIG
       );
       return credentials.password;
     } else {
@@ -143,9 +144,9 @@ async function getRandomBytes(length) {
 }
 
 async function requestPermission() {
-  if (Platform.OS === "ios") return true;
+  if (Platform.OS === 'ios') return true;
 
-  return true
+  return true;
 }
 async function checkAndCreateDir(path) {
   if (!RNFetchBlob) {
@@ -171,19 +172,18 @@ async function checkAndCreateDir(path) {
 }
 
 async function hash(password, email) {
-  let result =  await Sodium.hashPassword(password, email);
-  return result
+  let result = await Sodium.hashPassword(password, email);
+  return result;
 }
 
-async function generateCryptoKey(password,salt) {
+async function generateCryptoKey(password, salt) {
   try {
-    let credentials = await Sodium.deriveKey(password, salt);
+    let credentials = await Sodium.deriveKey(password, salt || null);
     return credentials;
   } catch (e) {
-    console.log('generateCryptoKey: ', e)
+    console.log('generateCryptoKey: ', e);
   }
 }
-
 
 export default {
   read,
