@@ -31,9 +31,9 @@ export type TokenVaultItem = {
   password: string;
 };
 
-export type BackupType = {
+export type SNBackup = {
   version: string;
-  items: StandardnotesNote[];
+  items: SNBackupItem[];
 };
 
 export const editors: {
@@ -76,7 +76,7 @@ export const editors: {
   },
 };
 
-export type StandardnotesNote = {
+export type SNBackupItem = {
   uuid: string;
   content_type: ContentTypes;
   content: {

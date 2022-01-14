@@ -9,12 +9,12 @@ import {
   ProviderSettings,
 } from "../provider";
 import {
-  BackupType,
   editors,
   EditorType,
   SpreadSheet,
-  StandardnotesNote,
+  SNBackupItem,
   TokenVaultItem,
+  SNBackup,
 } from "./types";
 
 const converter = new showdown.Converter();
@@ -25,8 +25,8 @@ export class StandardNotes implements IProvider {
   public name = "StandardNotes";
 
   getContentType(
-    item: StandardnotesNote,
-    components: StandardnotesNote[]
+    item: SNBackupItem,
+    components: SNBackupItem[]
   ): EditorType {
     let componentData =
       item.content.appData["org.standardnotes.sn.components"] || {};
@@ -53,7 +53,7 @@ export class StandardNotes implements IProvider {
     };
   }
 
-  getTags(item: StandardnotesNote, tags: StandardnotesNote[]): string[] {
+  getTags(item: SNBackupItem, tags: SNBackupItem[]): string[] {
     if (!item.content.references || item.content.references.length === 0)
       return [];
     let references = item.content.references;
@@ -90,7 +90,7 @@ export class StandardNotes implements IProvider {
     );
   }
 
-  parseContent(item: StandardnotesNote): Content {
+  parseContent(item: SNBackupItem): Content {
     const data = item.content.text;
     const editorType = item.content.editorType;
     switch (editorType.type) {
@@ -198,7 +198,7 @@ export class StandardNotes implements IProvider {
     return iterate(this, files, (file, notes) => {
       if (file.name !== "Standard Notes Backup and Import File.txt")
         return Promise.resolve(true);
-      let data: BackupType = <BackupType>JSON.parse(file.text);
+      let data: SNBackup = <SNBackup>JSON.parse(file.text);
       const components = data.items.filter(
         (item) => item.content_type === "SN|Component"
       );
