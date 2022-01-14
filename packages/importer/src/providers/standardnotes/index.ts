@@ -6,15 +6,11 @@ import {
   IProvider,
   iterate,
   ProviderResult,
-  ProviderSettings,
+  ProviderSettings
 } from "../provider";
+import { editors } from "./constants";
 import {
-  editors,
-  EditorType,
-  SpreadSheet,
-  SNBackupItem,
-  TokenVaultItem,
-  SNBackup,
+  EditorType, SNBackup, SNBackupItem, SpreadSheet, TokenVaultItem
 } from "./types";
 
 const converter = new showdown.Converter();
@@ -24,10 +20,7 @@ export class StandardNotes implements IProvider {
   public version = "1.0.0";
   public name = "StandardNotes";
 
-  getContentType(
-    item: SNBackupItem,
-    components: SNBackupItem[]
-  ): EditorType {
+  getContentType(item: SNBackupItem, components: SNBackupItem[]): EditorType {
     let componentData =
       item.content.appData["org.standardnotes.sn.components"] || {};
     let editorId = Object.keys(componentData).pop();
