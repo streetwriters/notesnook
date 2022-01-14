@@ -38,8 +38,8 @@ export type TokenVaultItem = {
 };
 
 export type SNBackup = {
-  version: string;
-  items: SNBackupItem[];
+  version?: string;
+  items?: SNBackupItem[];
 };
 
 export type SNBackupItem = {
