@@ -1,4 +1,10 @@
-export type ContentTypes = "Note" | "Tag" | "SN|SmartTag" | "SN|Component";
+
+export enum ContentTypes {
+  Note = "Note",
+  Tag = "Tag",
+  SmartTag = "SN|SmartTag",
+  Component = "SN|Component" 
+}
 
 export type EditorType = {
   type: "code" | "html" | "text" | "json" | "markdown";
