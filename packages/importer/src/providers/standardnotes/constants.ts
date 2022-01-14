@@ -38,3 +38,5 @@ export const editors: {
       type: "markdown",
     },
   };
+
+  export const SNBackupVersion = "004";

@@ -10,7 +10,7 @@ exports[`__tests__/providers.test.ts TAP > evernote 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > evernote-packed-hash 1`] = `
-ba69300c9c493e48
+c0024ed1faa465cf
 `
 
 exports[`__tests__/providers.test.ts TAP > html 1`] = `
@@ -18,7 +18,7 @@ exports[`__tests__/providers.test.ts TAP > html 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > html-packed-hash 1`] = `
-92e84dcfe0bb6672
+e5b54a6c078eee68
 `
 
 exports[`__tests__/providers.test.ts TAP > keep 1`] = `
@@ -26,7 +26,7 @@ exports[`__tests__/providers.test.ts TAP > keep 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > keep-packed-hash 1`] = `
-4e47d3239a078fb6
+f258eb52b1e529f4
 `
 
 exports[`__tests__/providers.test.ts TAP > md 1`] = `
@@ -34,7 +34,7 @@ exports[`__tests__/providers.test.ts TAP > md 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > md-packed-hash 1`] = `
-96e0c0b9fa81aeea
+510b9b4308a1a356
 `
 
 exports[`__tests__/providers.test.ts TAP > simplenote 1`] = `
@@ -42,7 +42,7 @@ exports[`__tests__/providers.test.ts TAP > simplenote 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > simplenote-packed-hash 1`] = `
-aef7375d7e243f1e
+9bdfba2d6d868ff2
 `
 
 exports[`__tests__/providers.test.ts TAP > standardnotes 1`] = `
@@ -50,5 +50,5 @@ exports[`__tests__/providers.test.ts TAP > standardnotes 1`] = `
 `
 
 exports[`__tests__/providers.test.ts TAP > standardnotes-packed-hash 1`] = `
-3ddf564b8fc60436
+37f65372c956b828
 `

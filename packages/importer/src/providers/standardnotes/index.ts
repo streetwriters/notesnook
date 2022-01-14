@@ -2,15 +2,21 @@ import hljs from "highlight.js";
 import showdown from "showdown";
 import { Content, ContentType, Note } from "../../models/note";
 import { File } from "../../utils/file";
+import { TransformError } from "../../utils/transformerror";
 import {
   IProvider,
   iterate,
   ProviderResult,
-  ProviderSettings
+  ProviderSettings,
 } from "../provider";
-import { editors } from "./constants";
+import { editors, SNBackupVersion } from "./constants";
 import {
-  EditorType, SNBackup, SNBackupItem, SpreadSheet, TokenVaultItem
+  ContentTypes,
+  EditorType,
+  SNBackup,
+  SNBackupItem,
+  SpreadSheet,
+  TokenVaultItem,
 } from "./types";
 
 const converter = new showdown.Converter();
@@ -19,6 +25,62 @@ export class StandardNotes implements IProvider {
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";
   public name = "StandardNotes";
+
+  async process(
+    files: File[],
+    settings: ProviderSettings
+  ): Promise<ProviderResult> {
+    return iterate(this, files, (file, notes, errors) => {
+      if (file.name !== "Standard Notes Backup and Import File.txt")
+        return Promise.resolve(true);
+      let data: SNBackup = <SNBackup>JSON.parse(file.text);
+      if (!data.items) {
+        errors.push(new TransformError("Backup file is invalid", file));
+        return Promise.resolve(true);
+      }
+
+      if (data.version !== SNBackupVersion) {
+        errors.push(
+          new TransformError("Backup version is not supported.", file)
+        );
+        return Promise.resolve(true);
+      }
+
+      const components: SNBackupItem[] = [];
+      const tags: SNBackupItem[] = [];
+      const snNotes: SNBackupItem[] = [];
+
+      data.items?.forEach((item) => {
+        let contentType = item.content_type;
+        switch (contentType) {
+          case ContentTypes.Note:
+            snNotes.push(item);
+          case ContentTypes.Component:
+            components.push(item);
+            break;
+          case ContentTypes.SmartTag:
+          case ContentTypes.Tag:
+            tags.push(item);
+        }
+      });
+
+      for (let item of snNotes) {
+        let type = this.getContentType(item, components);
+        item.content.editorType = type;
+        let note: Note = {
+          title: item.content.title,
+          dateCreated: item.created_at_timestamp,
+          dateEdited: item.updated_at_timestamp || item.created_at_timestamp,
+          pinned: item.content.appData["org.standardnotes.sn"]?.pinned,
+          tags: this.getTags(item, tags),
+          content: this.parseContent(item),
+        };
+        notes.push(note);
+      }
+
+      return Promise.resolve(true);
+    });
+  }
 
   getContentType(item: SNBackupItem, components: SNBackupItem[]): EditorType {
     let componentData =
@@ -182,40 +244,5 @@ export class StandardNotes implements IProvider {
           type: ContentType.HTML,
         };
     }
-  }
-
-  async process(
-    files: File[],
-    settings: ProviderSettings
-  ): Promise<ProviderResult> {
-    return iterate(this, files, (file, notes) => {
-      if (file.name !== "Standard Notes Backup and Import File.txt")
-        return Promise.resolve(true);
-      let data: SNBackup = <SNBackup>JSON.parse(file.text);
-      const components = data.items.filter(
-        (item) => item.content_type === "SN|Component"
-      );
-      const tags = data.items.filter(
-        (item) =>
-          item.content_type === "Tag" || item.content_type === "SN|SmartTag"
-      );
-      const snNotes = data.items.filter((item) => item.content_type === "Note");
-
-      for (let item of snNotes) {
-        let type = this.getContentType(item, components);
-        item.content.editorType = type;
-        let note: Note = {
-          title: item.content.title,
-          dateCreated: item.created_at_timestamp,
-          dateEdited: item.updated_at_timestamp || item.created_at_timestamp,
-          pinned: item.content.appData["org.standardnotes.sn"]?.pinned,
-          tags: this.getTags(item, tags),
-          content: this.parseContent(item),
-        };
-        notes.push(note);
-      }
-
-      return Promise.resolve(true);
-    });
   }
 }
