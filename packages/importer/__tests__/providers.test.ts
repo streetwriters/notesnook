@@ -19,7 +19,7 @@ for (let provider of ProviderFactory.getAvailableProviders()) {
     `transform ${provider} files to notesnook importer compatible format`,
     async () => {
       const output = await transform(files, <Providers>provider, settings);
-      output.forEach((n) => {
+      output.notes.forEach((n) => {
         n.attachments?.forEach((a) => {
           a.data = undefined;
         });
@@ -32,7 +32,7 @@ for (let provider of ProviderFactory.getAvailableProviders()) {
     `transform & pack ${provider} files to notesnook importer compatible format`,
     async () => {
       const output = pack(
-        await transform(files, <Providers>provider, settings)
+        (await transform(files, <Providers>provider, settings)).notes
       );
       tap.matchSnapshot(await hasher.hash(output), `${provider}-packed-hash`);
     }

@@ -1,3 +1,4 @@
+import { StandardNotes } from './standardnotes';
 import { Evernote } from "./evernote";
 import { Markdown } from "./md";
 import { HTML } from "./html";
@@ -11,6 +12,7 @@ const providerMap = {
   html: HTML,
   keep: GoogleKeep,
   simplenote: Simplenote,
+  standardnotes:StandardNotes
 };
 export type Providers = keyof typeof providerMap;
 
