@@ -1,5 +1,5 @@
 input: .
-output: .public_html
+output: public_html
 url: https://docs.notesnook.com
 branding:
   title: Notesnook
