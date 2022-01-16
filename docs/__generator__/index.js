@@ -46,13 +46,14 @@ function createTrackerScript(document) {
 
 (function() {
   const output = buildDocs();
+  console.log(output)
   if (!output.includes("0 errors")) {
     console.error(output);
     return;
   }
   console.log("Docs generated!");
 
-  const outputPath = /Output: (.*$)/gm.exec(output)[1];
+  const outputPath = /OUTPUT: (.*$)/gm.exec(output)[1];
 
   console.log(`Documentation output path:`, outputPath);
 
