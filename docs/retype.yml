@@ -1,0 +1,22 @@
+input: .
+output: .public_html
+url: https://docs.notesnook.com
+branding:
+  title: Notesnook
+  label: Docs
+  colors:
+    label:
+      text: "#ffffff"
+      background: "#00C853"
+
+exclude:
+  - "*node_modules/"
+  - "*__generator__/"
+favicon: favicon.png
+meta:
+  title: " | Notesnook Docs"
+edit:
+  repo: "https://github.com/streetwriters/notesnook"
+  base: "docs"
+footer:
+  copyright: "&copy; Copyright {{ year }} [Streetwriters LLC](https://streetwriters.co/). All rights reserved."
