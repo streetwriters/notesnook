@@ -1,6 +1,6 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
-import {getLinkPreview} from 'link-preview-js';
+import { getLinkPreview } from '../src/utils/linkpreview';
 import React, {useEffect, useRef, useState} from 'react';
 import {ScrollView} from 'react-native';
 import {
@@ -67,27 +67,28 @@ function getBaseUrl(site) {
   var url = site.split('/').slice(0, 3).join('/');
   return url;
 }
-
-async function absolutifyImgs(html, site) {
-  let parser = require('jsdom-jscore-rn').html();
-  parser.body.innerHTML = html;
+function absolutifyImgs(html, site) {
+  let {parse} = require('node-html-parser');
+  let parser = parse(html);
 
   let images = parser.querySelectorAll('img');
   for (var i = 0; i < images.length; i++) {
     let img = images[i];
     let url = getBaseUrl(site);
-    if (img.src.startsWith('/')) {
-      if (img.src.startsWith('//')) {
-        img.src = img.src.replace('//', 'https://');
+    let src = img.getAttribute('src');
+    if (src.startsWith('/')) {
+      if (src.startsWith('//')) {
+        src = src.replace('//', 'https://');
       } else {
-        img.src = url + img.src;
+        src = url + src;
       }
     }
-    if (img.src.startsWith('data:')) {
-      img.src = '';
+    if (src.startsWith('data:')) {
+      src = '';
     }
+    img.setAttribute('src', src);
   }
-  return parser.body.innerHTML;
+  return parser.outerHTML;
 }
 
 let defaultNote = {
@@ -197,7 +198,7 @@ const NotesnookShare = ({quicknote = false}) => {
     _note.content.data = makeHtmlFromUrl(link);
     try {
       let preview = await getLinkPreview(link);
-      _note.title = preview.siteName || preview.title;
+      _note.title = preview.title;
     } catch (e) {
       console.log(e);
     }
@@ -290,7 +291,6 @@ const NotesnookShare = ({quicknote = false}) => {
     await db.init();
     await db.notes.init();
 
-
     if (appendNote && !db.notes.note(appendNote.id)) {
       useShareStore.getState().setAppendNote(null);
       Alert.alert('The note you are trying to append to has been deleted.');
@@ -306,7 +306,7 @@ const NotesnookShare = ({quicknote = false}) => {
           type: 'tiny'
         },
         id: appendNote.id,
-        sessionId:Date.now()
+        sessionId: Date.now()
       };
     } else {
       _note = {...note};

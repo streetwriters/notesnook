@@ -1,19 +1,20 @@
-import React, { useCallback, useEffect } from 'react';
-import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
-import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
-import { Header } from '../../components/Header/index';
+import React, {useCallback, useEffect} from 'react';
+import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
+import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import {Header} from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useNoteStore } from '../../provider/stores';
-import { DDS } from '../../services/DeviceDetection';
-import { eSendEvent } from '../../services/EventManager';
+import {useNoteStore} from '../../provider/stores';
+import {DDS} from '../../services/DeviceDetection';
+import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import { editing, InteractionManager, scrollRef } from '../../utils';
-import { db } from '../../utils/database';
-import { eOnLoadNote } from '../../utils/Events';
-import { tabBarRef } from '../../utils/Refs';
-import { getNote } from '../Editor/Functions';
+import {editing, InteractionManager, scrollRef} from '../../utils';
+import {db} from '../../utils/database';
+import {eOnLoadNote} from '../../utils/Events';
+import {getLinkPreview} from '../../utils/linkpreview';
+import {tabBarRef} from '../../utils/Refs';
+import {getNote} from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
   const notes = useNoteStore(state => state.notes);
@@ -31,12 +32,12 @@ export const Home = ({navigation}) => {
     Navigation.setHeaderState(
       'Notes',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Notes',
-        id: 'notes_navigation',
-      },
+        id: 'notes_navigation'
+      }
     );
   }, []);
 
@@ -74,16 +75,23 @@ export const Home = ({navigation}) => {
       placeholder: 'Type a keyword to search in notes',
       data: db?.notes?.all,
       type: 'notes',
-      title: 'Notes',
+      title: 'Notes'
     });
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
+    getLinkPreview('https://google.com')
+      .then(r => {
+        console.log(r);
+      })
+      .catch(console.log);
+    return;
+
     if (!DDS.isTab) {
       if (getNote()) {
-       eSendEvent(eOnLoadNote, {type: 'new'});
-       editing.currentlyEditing = true;
-       editing.movedAway = false;
+        eSendEvent(eOnLoadNote, {type: 'new'});
+        editing.currentlyEditing = true;
+        editing.movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {
@@ -113,7 +121,7 @@ export const Home = ({navigation}) => {
         loading={loading}
         sortMenuButton={true}
         headerProps={{
-          heading: 'Notes',
+          heading: 'Notes'
         }}
         placeholderText={`Notes you write appear here`}
         jumpToDialog={true}
@@ -122,7 +130,7 @@ export const Home = ({navigation}) => {
           paragraph: 'You have not added any notes yet.',
           button: 'Add your first note',
           action: _onPressBottomButton,
-          loading: 'Loading your notes.',
+          loading: 'Loading your notes.'
         }}
       />
 

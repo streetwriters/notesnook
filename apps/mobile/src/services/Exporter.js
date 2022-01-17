@@ -1,13 +1,13 @@
-import { Platform } from 'react-native';
+import { decode } from 'entities';
+import {Platform} from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import showdown from 'showdown';
-import { toTXT } from '../utils';
-import { db } from '../utils/database';
-import { sanitizeFilename } from '../utils/filename';
+import {toTXT} from '../utils';
+import {db} from '../utils/database';
+import {sanitizeFilename} from '../utils/filename';
 import Storage from '../utils/storage';
-
 
 const defaultStyle = `<style>
 .img_size_one {
@@ -324,8 +324,7 @@ async function saveToPDF(note) {
   Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/PDF/'));
 
   let html = await db.notes.note(note).export('html');
-  let he = require('he');
-  html = he.decode(html);
+  html = decode(html);
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
   let html3 = html;
   if (html.indexOf('<head>') > -1) {
@@ -382,16 +381,7 @@ async function saveToMarkdown(note) {
     path = file.uri;
   }
 
-
-  let converter = new showdown.Converter();
-  converter.setFlavor('original');
-  let jsdom = require('jsdom-jscore-rn');
-  let dom = jsdom.html();
-  let content = await db.notes.note(note.id).content();
-  let markdown = converter.makeMarkdown(content, dom);
-
-  markdown = await db.notes.note(note.id).export('md', markdown);
-
+  let markdown = await db.notes.note(note.id).export('md', markdown);
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
 
   let fileUri;

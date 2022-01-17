@@ -1,4 +1,3 @@
-import {getLinkPreview} from 'link-preview-js';
 import React, {useEffect, useState} from 'react';
 import {Image, Linking, ScrollView, TouchableOpacity, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -11,8 +10,9 @@ import {SIZE} from '../../../../utils/SizeUtils';
 import {INPUT_MODE, properties, reFocusEditor} from './constants';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
-import isMobilePhone from "validator/lib/isMobilePhone";
-import { ToastEvent } from '../../../../services/EventManager';
+import isMobilePhone from 'validator/lib/isMobilePhone';
+import {ToastEvent} from '../../../../services/EventManager';
+import {getLinkPreview} from '../../../../utils/linkpreview';
 
 let prevLink = {};
 const LinkPreview = ({setMode, value, onSubmit}) => {
@@ -25,17 +25,14 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
     if (value && prevLink.value !== value) {
       getLinkPreview(value)
         .then(r => {
-          if (r.contentType?.includes('text/html')) {
-            prevLink = {
-              value: value,
-              name: r.siteName,
-              title: r.title,
-              description: r.description,
-              image: r.images[0],
-              favicon: r.favicons[0]
-            };
-            setLink(prevLink);
-          }
+          prevLink = {
+            value: value,
+            name: r.siteName,
+            title: r.title,
+            description: r.description,
+            image: r.image
+          };
+          setLink(prevLink);
         })
         .catch(e => console.log);
     }
@@ -92,8 +89,11 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
   };
 
   const openLink = () => {
-
-    if (value.startsWith("mailto:") || value.startsWith("tel:") ||  value.startsWith("sms:")) {
+    if (
+      value.startsWith('mailto:') ||
+      value.startsWith('tel:') ||
+      value.startsWith('sms:')
+    ) {
       Linking.openURL(value).catch(console.log);
       return;
     }
@@ -117,9 +117,9 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         });
     } else {
       ToastEvent.show({
-        heading:"Url not valid",
-        message:value,
-        type:'error'
+        heading: 'Url not valid',
+        message: value,
+        type: 'error'
       });
     }
   };
