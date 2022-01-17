@@ -43,6 +43,7 @@ function encrypt(password, data) {
 function decrypt(key, data) {
   if (
     !key ||
+    !data.key ||
     key.password === data.key.password ||
     key.key.password === data.key.password
   )
@@ -62,8 +63,8 @@ async function hash(password, userId) {
   return password;
 }
 
-async function generateCryptoKey(password) {
-  return password;
+async function generateCryptoKey(password, salt) {
+  return { password, salt };
 }
 
 module.exports = {
