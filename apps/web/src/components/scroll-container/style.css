@@ -1,10 +1,11 @@
-.ScrollbarsCustom:hover .ScrollbarsCustom-Track,
-.ScrollbarsCustom:active .ScrollbarsCustom-Track,
-.ScrollbarsCustom:focus .ScrollbarsCustom-Track,
-.ScrollbarsCustom:focus-within .ScrollbarsCustom-Track {
+.rc-scrollbars-view:hover ~ .rc-scrollbars-track {
   opacity: 1 !important;
 }
 
-.ScrollbarsCustom-Thumb.ScrollbarsCustom-ThumbY {
-  background-color: var(--bgSecondaryText) !important;
+.rc-scrollbars-thumb-v {
+  min-height: 30px !important;
+}
+
+.rc-scrollbars-thumb-h {
+  min-width: 15px !important;
 }
