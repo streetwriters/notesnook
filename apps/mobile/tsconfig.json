@@ -1,17 +1,24 @@
 {
-    "compilerOptions": {
-      "target": "esnext",                       
-      "module": "commonjs",                     
-      "lib": ["es2017"],                        
-      "allowJs": true,
-      "jsx": "react-native","noEmit": true,
-      "isolatedModules": true,"strict": true,
-      "moduleResolution": "node",
-      "allowSyntheticDefaultImports": true,
-      "esModuleInterop": true,
-      "skipLibCheck": false },
-    "exclude": [
-      "node_modules", "babel.config.js", "metro.config.js", "jest.config.js"
-    ]
-  }
-  
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "commonjs",
+    "lib": ["es2017"],
+    "allowJs": true,
+    "baseUrl": "./",
+    "jsx": "react-native",
+    "noEmit": true,
+    "isolatedModules": true,
+    "strict": true,
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "skipLibCheck": false
+  },
+  "include": ["./node_modules/notes-core"],
+  "exclude": [
+    "node_modules",
+    "babel.config.js",
+    "metro.config.js",
+    "jest.config.js"
+  ]
+}
