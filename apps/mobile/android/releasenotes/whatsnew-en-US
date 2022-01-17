@@ -1,6 +1,3 @@
-- Fixed a crash when trying to upload an image
-- Fixed issue in attachments that are downloaded before upload is complete
-- Fixed jitter when creating a new note in editor
-- Improved content loading and saving note in editor to be more reliable
+- This release fixes an issue in which app would go blank on running manual backup or selecting backup directory for automatic backups.
 
 Thank you for using Notesnook!
