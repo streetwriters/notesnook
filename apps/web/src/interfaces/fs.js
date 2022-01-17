@@ -343,9 +343,13 @@ function exists(filename) {
   return streamablefs.exists(filename);
 }
 
-async function saveFile(filename, { key, iv, name, type }) {
+async function saveFile(filename, fileMetadata) {
+  if (!fileMetadata) return false;
+
   const fileHandle = await streamablefs.readFile(filename);
   if (!fileHandle) return false;
+
+  const { key, iv, name, type, isUploaded } = fileMetadata;
 
   const blobParts = [];
   const reader = fileHandle.getReader();
@@ -366,7 +370,8 @@ async function saveFile(filename, { key, iv, name, type }) {
     filename
   );
   saveAs(new Blob(blobParts, { type }), name);
-  await streamablefs.deleteFile(filename);
+
+  if (isUploaded) await streamablefs.deleteFile(filename);
 }
 
 async function deleteFile(filename, requestOptions) {
