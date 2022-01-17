@@ -30,6 +30,7 @@ import NoteHistory from "../collections/note-history";
  */
 var NNEventSource;
 const DIFFERENCE_THRESHOLD = 20 * 1000;
+const MAX_TIME_ERROR_FAILURES = 5;
 class Database {
   /**
    *
@@ -43,6 +44,7 @@ class Database {
     this.evtSource = null;
     this.sseMutex = new Mutex();
     this.lastHeartbeat = undefined; // { local: 0, server: 0 };
+    this.timeErrorFailures = 0;
 
     this.storage = new Storage(storage);
     this.fs = new FileStorage(fs, storage);
@@ -165,8 +167,7 @@ class Database {
 
         switch (type) {
           case "heartbeat":
-            const { t } = data;
-            const serverTime = new Date(t).getTime();
+            const { t: serverTime } = data;
             const localTime = Date.now();
 
             if (!this.lastHeartbeat) {
@@ -183,8 +184,13 @@ class Database {
 
             const diff = actualTime - serverTime;
 
-            if (Math.abs(diff) > DIFFERENCE_THRESHOLD)
-              EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
+            // Fail several times consecutively before raising an error. This is done to root out
+            // false positives.
+            if (Math.abs(diff) > DIFFERENCE_THRESHOLD) {
+              if (this.timeErrorFailures >= MAX_TIME_ERROR_FAILURES) {
+                EV.publish(EVENTS.systemTimeInvalid, { serverTime, localTime });
+              } else this.timeErrorFailures++;
+            } else this.timeErrorFailures = 0;
 
             this.lastHeartbeat.local = localTime;
             this.lastHeartbeat.server = serverTime;
