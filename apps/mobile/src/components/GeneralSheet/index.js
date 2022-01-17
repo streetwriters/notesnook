@@ -1,19 +1,19 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eCloseProgressDialog, eOpenProgressDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { editing } from '../../utils';
+import { eCloseProgressDialog, eOpenProgressDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView } from '../../views/Editor/Functions';
+import tiny from '../../views/Editor/tiny/tiny';
+import { reFocusEditor } from '../../views/Editor/tiny/toolbar/constants';
+import { Button } from '../Button';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import tiny from '../../views/Editor/tiny/tiny';
-import {EditorWebView} from '../../views/Editor/Functions';
-import {editing} from '../../utils';
-import {reFocusEditor} from '../../views/Editor/tiny/toolbar/constants';
 
 const GeneralSheet = ({context}) => {
   const [state] = useTracked();
@@ -41,11 +41,10 @@ const GeneralSheet = ({context}) => {
     ) {
       return;
     }
-    console.log(data);
     if (visible || dialogData) {
       setDialogData(null);
       setVisible(false);
-      await sleep(300);
+      await sleep(500);
     }
     setDialogData(data);
     setVisible(true);
@@ -61,7 +60,7 @@ const GeneralSheet = ({context}) => {
 
   useEffect(() => {
     (async () => {
-      if (visible) {
+      if (visible && dialogData) {
         if (dialogData.editor) await sleep(100);
         actionSheetRef.current?.setModalVisible(true);
         return;
@@ -75,7 +74,7 @@ const GeneralSheet = ({context}) => {
         }
       }
     })();
-  }, [visible]);
+  }, [visible, dialogData]);
 
   const close = ctx => {
     if ((ctx && !context) || (ctx && ctx !== context)) {
