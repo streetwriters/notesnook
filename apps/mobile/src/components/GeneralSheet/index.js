@@ -41,6 +41,7 @@ const GeneralSheet = ({context}) => {
     ) {
       return;
     }
+    console.log(data);
     if (visible || dialogData) {
       setDialogData(null);
       setVisible(false);
@@ -83,11 +84,11 @@ const GeneralSheet = ({context}) => {
     actionSheetRef.current?.setModalVisible(false);
   };
 
-  return !visible ? null : (
+  return !visible || !dialogData ? null : (
     <SheetWrapper
       fwdRef={actionSheetRef}
-      gestureEnabled={!dialogData.progress}
-      closeOnTouchBackdrop={!dialogData.progress}
+      gestureEnabled={!dialogData?.progress}
+      closeOnTouchBackdrop={!dialogData?.progress}
       onClose={() => {
         dialogData.onClose && dialogData.onClose();
         setVisible(false);
