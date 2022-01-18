@@ -1,4 +1,6 @@
 import { EV, EVENTS } from "../common";
+import { getServerNameFromHost } from "./constants";
+import { extractHostname } from "./hostname";
 
 function get(url, token) {
   return request(url, token, "GET");
@@ -73,7 +75,7 @@ async function handleResponse(response) {
 
 async function request(url, token, method) {
   return handleResponse(
-    await fetch(url, {
+    await fetchWrapped(url, {
       method,
       headers: getAuthorizationHeader(token),
     })
@@ -88,7 +90,7 @@ async function bodyRequest(
   contentType = "application/x-www-form-urlencoded"
 ) {
   return handleResponse(
-    await fetch(url, {
+    await fetchWrapped(url, {
       method,
       body: transformer(data, contentType),
       headers: {
@@ -123,6 +125,27 @@ function errorTransformer(errorJson) {
     }
     default:
       return error_description || error;
+  }
+}
+
+/**
+ *
+ * @param {RequestInfo} input
+ * @param {RequestInit} init
+ */
+async function fetchWrapped(input, init) {
+  try {
+    const response = await fetch(input, init);
+    return response;
+  } catch (e) {
+    const host = extractHostname(input);
+    const serverName = getServerNameFromHost(host);
+    if (serverName)
+      throw new Error(
+        `${serverName} is not responding. Please check your internet connection. If the problem persists, feel free email us at support@streetwriters.co. (Reference error: ${e.message})`
+      );
+
+    throw e;
   }
 }
 

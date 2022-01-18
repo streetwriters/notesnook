@@ -1,3 +1,5 @@
+import { extractHostname } from "./hostname";
+
 const hosts = {
   API_HOST:
     process.env.NODE_ENV === "production"
@@ -22,3 +24,16 @@ const hosts = {
 };
 
 export default hosts;
+
+export const getServerNameFromHost = (host) => {
+  const names = {
+    [extractHostname(hosts.API_HOST)]: "Notesnook Sync Server",
+    [extractHostname(hosts.AUTH_HOST)]: "Authentication Server",
+    [extractHostname(hosts.SSE_HOST)]: "Eventing Server",
+    [extractHostname(hosts.SUBSCRIPTIONS_HOST)]:
+      "Subscriptions Management Server",
+    [extractHostname(hosts.ISSUES_HOST)]: "Bug Reporting Server",
+  };
+  console.log(names, host);
+  return names[host];
+};
