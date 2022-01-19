@@ -27,8 +27,6 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          npm i
-          npx turbo run build
           cd packages/enex
-      - name: Run tests
-        run: npm run test
+          npm i
+          npm run test
