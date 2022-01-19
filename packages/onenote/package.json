@@ -1,0 +1,18 @@
+{
+  "name": "@notesnook/onenote",
+  "version": "1.0.0",
+  "description": "Export all your data from OneNote into JSON.",
+  "main": "index.js",
+  "devDependencies": {
+    "@types/node": "^16.11.10",
+    "@types/tap": "^15.0.5",
+    "tap": "^15.1.2",
+    "ts-node": "^10.4.0",
+    "typescript": "^4.5.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
