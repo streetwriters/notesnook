@@ -38,6 +38,7 @@ import {
   eOpenPublishNoteDialog
 } from '../../utils/Events';
 import {tabBarRef} from '../../utils/Refs';
+import umami from '../../utils/umami';
 import {EditorTitle} from './EditorTitle';
 import {
   clearEditor,
@@ -335,6 +336,7 @@ const EditorHeader = () => {
                     safeKeyboardDismiss();
                     editing.isFocused = true;
                   }
+                  umami.pageView("/pro-screen","/editor")
                   eSendEvent(eOpenPremiumDialog);
                 }}
               />

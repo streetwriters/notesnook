@@ -27,6 +27,7 @@ import { MMKV } from '../../utils/mmkv';
 import { tabBarRef } from '../../utils/Refs';
 import { normalize } from '../../utils/SizeUtils';
 import { sleep, timeConverter } from '../../utils/TimeUtils';
+import umami from '../../utils/umami';
 import { TableCellProperties } from './TableCellProperties';
 import { TableRowProperties } from './TableRowProperties';
 import tiny from './tiny/tiny';
@@ -269,7 +270,7 @@ export const loadNote = async item => {
       eSendEvent('loadingNote', item);
       await clearEditor();
     }
-
+    umami.pageView('/first-note', '/welcome/home');
     clearNote();
     eSendEvent('loadingNote');
     eSendEvent('updateTags');

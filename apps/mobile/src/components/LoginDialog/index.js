@@ -34,6 +34,7 @@ import Input from '../Input';
 import {Header} from '../SimpleList/header';
 import Paragraph from '../Typography/Paragraph';
 import {ActionIcon} from '../ActionIcon';
+import umami from '../../utils/umami';
 
 const MODES = {
   login: 0,
@@ -319,6 +320,7 @@ const LoginDialog = () => {
       clearMessage();
       setEmailVerifyMessage();
       close();
+      umami.pageView('/account-created', '/welcome/signup');
       await sleep(300);
       eSendEvent(eOpenResultDialog);
     } catch (e) {

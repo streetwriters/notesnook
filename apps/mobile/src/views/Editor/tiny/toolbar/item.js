@@ -15,6 +15,7 @@ import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import { db } from '../../../../utils/database';
 import { MMKV } from '../../../../utils/mmkv';
 import { normalize, SIZE } from '../../../../utils/SizeUtils';
+import umami from '../../../../utils/umami';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 import { execCommands } from './commands';
 import {
@@ -214,6 +215,7 @@ const ToolbarItem = ({
       if (user && !isPro && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
       } else {
+        umami.pageView("/pro-sheet","/editor/editor-toolbar")
         PremiumService.sheet();
       }
       return;

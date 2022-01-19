@@ -9,6 +9,7 @@ import PremiumService from './PremiumService';
 import {verifyUser} from '../views/Settings/functions';
 import {MMKV} from '../utils/mmkv';
 import {Platform} from 'react-native';
+import umami from '../utils/umami';
 
 const rateAppMessage = {
   visible: true,
@@ -60,6 +61,7 @@ const loginMessage = {
   message: 'You are not logged in',
   actionText: 'Login to encrypt and sync notes',
   onPress: () => {
+    umami.pageView('/signup', '/welcome/home');
     eSendEvent(eOpenLoginDialog);
   },
   data: {},

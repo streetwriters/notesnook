@@ -19,6 +19,7 @@ import {
 import {eOpenPremiumDialog} from '../../utils/Events';
 import {MenuItemsList, SUBSCRIPTION_STATUS} from '../../utils/index';
 import {MMKV} from '../../utils/mmkv';
+import umami from '../../utils/umami';
 import {ColorSection} from './ColorSection';
 import {MenuListItem} from './MenuListItem';
 import {TagsSection} from './TagsSection';
@@ -65,6 +66,7 @@ export const Menu = React.memo(
       name: 'Notesnook Pro',
       icon: 'crown',
       func: () => {
+        umami.pageView("/pro-screen","/sidemenu");
         eSendEvent(eOpenPremiumDialog);
       }
     };

@@ -32,7 +32,7 @@ let databaseHasLoaded = false;
 async function loadDefaultNotes() {
   try {
     return true;
- /*    const isCreated = await MMKV.getItem('defaultNoteCreated');
+    /*    const isCreated = await MMKV.getItem('defaultNoteCreated');
     if (isCreated) return;
     const notes = await http.get(
       'https://app.notesnook.com/notes/index_v14.json'
@@ -124,7 +124,7 @@ const App = () => {
         await loadDatabase();
         useUserStore.getState().setUser(await db.user.getUser());
         if (SettingsService.get().telemetry) {
-          Tracker.record('50bf361f-dba0-41f1-9570-93906249a6d3');
+          Tracker.record('3c6890ce-8410-49d5-8831-15fb2eb28a21');
         }
       } catch (e) {
       } finally {

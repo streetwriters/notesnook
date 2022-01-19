@@ -19,6 +19,7 @@ import {
 import {openLinkInBrowser} from '../../utils/functions';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import umami from '../../utils/umami';
 import {Button} from '../Button';
 import {Dialog} from '../Dialog';
 import BaseDialog from '../Dialog/base-dialog';
@@ -131,6 +132,10 @@ export const PricingPlans = ({
         setBuying(false);
         return;
       }
+      umami.pageView(
+        '/iap-native',
+        `${compact ? 'pro-sheet' : 'pro-screen'}/pro-plans`
+      );
       await RNIap.requestSubscription(
         product?.productId,
         false,
@@ -150,7 +155,7 @@ export const PricingPlans = ({
           eSendEvent(eCloseProgressDialog);
         },
         icon: 'check',
-        actionText: 'Continue',
+        actionText: 'Continue'
       });
     } catch (e) {
       setBuying(false);
@@ -290,9 +295,13 @@ export const PricingPlans = ({
               }}
               title="I have a promo code"
             />
-          ) : <View style={{
-            height:15
-          }} />}
+          ) : (
+            <View
+              style={{
+                height: 15
+              }}
+            />
+          )}
         </>
       ) : (
         <View>
@@ -314,7 +323,8 @@ export const PricingPlans = ({
                   marginBottom: 10
                 }}
               />
-              {Platform.OS !== "ios" && promo &&
+              {Platform.OS !== 'ios' &&
+              promo &&
               !promo.promoCode.startsWith('com.streetwriters.notesnook') ? (
                 <Paragraph
                   size={SIZE.md}

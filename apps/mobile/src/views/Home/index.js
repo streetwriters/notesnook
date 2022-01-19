@@ -12,7 +12,6 @@ import SearchService from '../../services/SearchService';
 import {editing, InteractionManager, scrollRef} from '../../utils';
 import {db} from '../../utils/database';
 import {eOnLoadNote} from '../../utils/Events';
-import {getLinkPreview} from '../../utils/linkpreview';
 import {tabBarRef} from '../../utils/Refs';
 import {getNote} from '../Editor/Functions';
 
@@ -80,13 +79,6 @@ export const Home = ({navigation}) => {
   };
 
   const _onPressBottomButton = React.useCallback(async () => {
-    getLinkPreview('https://google.com')
-      .then(r => {
-        console.log(r);
-      })
-      .catch(console.log);
-    return;
-
     if (!DDS.isTab) {
       if (getNote()) {
         eSendEvent(eOnLoadNote, {type: 'new'});

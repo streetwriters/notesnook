@@ -22,6 +22,7 @@ import {openLinkInBrowser} from '../../utils/functions';
 import {MMKV} from '../../utils/mmkv';
 import {SIZE} from '../../utils/SizeUtils';
 import {sleep} from '../../utils/TimeUtils';
+import umami from '../../utils/umami';
 import {Button} from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -99,6 +100,7 @@ const SplashScreen = () => {
 
   useEffect(() => {
     if (!isIntroCompleted) {
+      umami.pageView('/welcome', '', []);
       setTimeout(() => {
         timing(opacity, {
           toValue: 1,
@@ -202,11 +204,12 @@ const SplashScreen = () => {
                     await MMKV.setItem('introCompleted', 'true');
                     await sleep(300);
                     eSendEvent(eOpenLoginDialog, 1);
+                    umami.pageView('/signup', '/welcome');
                   }
                 }}
                 style={{
                   paddingHorizontal: 24,
-                  alignSelf:'center' 
+                  alignSelf: 'center'
                 }}
                 type="accent"
                 title={isNext ? 'Next' : 'Sign up'}
@@ -220,17 +223,18 @@ const SplashScreen = () => {
                   onPress={async () => {
                     await hide();
                     await MMKV.setItem('introCompleted', 'true');
+                    umami.pageView('/home', '/welcome');
                   }}
                   style={{
                     paddingHorizontal: 24,
-                    alignSelf:'center',
+                    alignSelf: 'center',
                     marginTop: 10
                   }}
                   type="grayBg"
                   buttonType={{
                     color: '#808080',
                     selected: '#808080',
-                    opacity: 0.15,
+                    opacity: 0.15
                   }}
                   title="I want to try the app first"
                 />
