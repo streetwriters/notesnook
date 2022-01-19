@@ -1,3 +1,4 @@
-- This release fixes an issue in which app would go blank on running manual backup or selecting backup directory for automatic backups.
+- Fixed note headline would show invalid characters
+- Bug fixes and performance improvements
 
 Thank you for using Notesnook!
