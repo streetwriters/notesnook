@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/enex",
   "private": false,
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A fully tested type-safe Evernote .enex parser used in Notesnook Importer.",
   "main": "dist/index.js",
   "devDependencies": {
