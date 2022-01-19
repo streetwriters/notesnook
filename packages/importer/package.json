@@ -1,8 +1,9 @@
 {
   "name": "@notesnook/importer",
+  "private": false,
   "version": "1.0.0",
-  "private": true,
   "main": "dist/index.js",
+  "description": "Convert notes from various note taking apps into a simple & standard format.",
   "scripts": {
     "test": "tap --ts --no-check-coverage --no-coverage",
     "build": "tsc"
@@ -25,6 +26,10 @@
     "ts-node": "^10.4.0",
     "typescript": "^4.5.2"
   },
-  "author": "",
-  "license": "MIT"
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streetwriters/notesnook.git",
+    "directory": "packages/importer"
+  }
 }
