@@ -1,4 +1,5 @@
 import { parse } from "node-html-parser";
+import { decodeHTML5 } from "entities";
 
 export const parseHTML =
   typeof DOMParser === "undefined"
@@ -11,5 +12,5 @@ export function getDummyDocument() {
 }
 
 export function getInnerText(element) {
-  return element.innerText || element.textContent;
+  return decodeHTML5(element.innerText || element.textContent);
 }
