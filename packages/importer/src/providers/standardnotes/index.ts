@@ -190,38 +190,37 @@ export class StandardNotes implements IProvider {
           let spreadsheet = <SpreadSheet>JSON.parse(data);
           let html = ``;
           for (let sheet of spreadsheet.sheets) {
-            if (sheet.rows.length > 0) {
-              let maxCols =
-                this.maxIndexItem(
-                  sheet.rows.map((row) => {
-                    return this.maxIndexItem(row.cells);
-                  })
-                ).index + 1;
+            if (!sheet.rows || sheet.rows.length === 0) continue;
+            let maxCols =
+              this.maxIndexItem(
+                sheet.rows.map((row) => {
+                  return this.maxIndexItem(row.cells);
+                })
+              ).index + 1;
 
-              let maxRows = this.maxIndexItem(sheet.rows).index + 1;
-              let rows = [];
+            let maxRows = this.maxIndexItem(sheet.rows).index + 1;
+            let rows = [];
 
-              for (let i = 0; i < maxRows; i++) {
-                let rowAtIndex = sheet.rows.find((row) => row.index === i);
-                // create an empty row to fill index
-                if (!rowAtIndex) rowAtIndex = { index: i, cells: [] };
-                let cells = [];
-                for (let col = 0; col < maxCols; col++) {
-                  let cellAtCol = rowAtIndex.cells.find(
-                    (cell) => cell.index === col
-                  );
-                  // create an empty cell to fill index
-                  if (!cellAtCol) cellAtCol = { value: "", index: col };
-                  cells.push(`<td>${cellAtCol.value || ""}</td>`);
-                }
-                rows.push(`<tr>
+            for (let i = 0; i < maxRows; i++) {
+              let rowAtIndex = sheet.rows.find((row) => row.index === i);
+              // create an empty row to fill index
+              if (!rowAtIndex) rowAtIndex = { index: i, cells: [] };
+              let cells = [];
+              for (let col = 0; col < maxCols; col++) {
+                let cellAtCol = rowAtIndex.cells.find(
+                  (cell) => cell.index === col
+                );
+                // create an empty cell to fill index
+                if (!cellAtCol) cellAtCol = { value: "", index: col };
+                cells.push(`<td>${cellAtCol.value || ""}</td>`);
+              }
+              rows.push(`<tr>
                 ${cells.join("")}
                 </tr>`);
-              }
-
-              let table = buildTableWithRows(rows.join(""));
-              html = html + table;
             }
+
+            let table = buildTableWithRows(rows.join(""));
+            html = html + table;
           }
           return {
             type: ContentType.HTML,
