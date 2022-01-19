@@ -18,6 +18,7 @@ import {
   SpreadSheet,
   TokenVaultItem,
 } from "./types";
+import { buildTableWithRows } from "../../utils/tablebuilder";
 
 const converter = new showdown.Converter();
 export class StandardNotes implements IProvider {
@@ -123,17 +124,6 @@ export class StandardNotes implements IProvider {
     return noteTags;
   }
 
-  buildTableWithRows(rows: string) {
-    return `<div class="table-container">
-    <table>
-      <tbody>
-        ${rows}
-      </tbody>
-    </table>
-  </div>
-  <p><br data-mce-bogus="1"/></p>`;
-  }
-
   /**
    * Find object in array with maximum index
    * @param array
@@ -181,7 +171,7 @@ export class StandardNotes implements IProvider {
 
           let html = `
           ${tokens.map((token) =>
-            this.buildTableWithRows(
+            buildTableWithRows(
               Object.keys(token)
                 .map(
                   (key) => `<tr>
@@ -229,7 +219,7 @@ export class StandardNotes implements IProvider {
                 </tr>`);
               }
 
-              let table = this.buildTableWithRows(rows.join(""));
+              let table = buildTableWithRows(rows.join(""));
               html = html + table;
             }
           }
