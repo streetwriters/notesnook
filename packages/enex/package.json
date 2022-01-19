@@ -19,7 +19,7 @@
   "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
   "license": "MIT",
   "dependencies": {
-    "node-html-parser": "^5.2.0"
+    "node-html-parser": "github:thecodrr/node-html-parser"
   },
   "repository": {
     "type": "git",
