@@ -13,7 +13,7 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "tap --ts ",
+    "test": "tap --ts --no-check-coverage --no-coverage",
     "build": "tsc"
   },
   "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
