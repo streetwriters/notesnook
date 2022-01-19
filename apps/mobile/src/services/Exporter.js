@@ -1,4 +1,4 @@
-import { decode } from 'entities';
+import { decode, EntityLevel } from 'entities';
 import {Platform} from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
@@ -324,7 +324,9 @@ async function saveToPDF(note) {
   Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/PDF/'));
 
   let html = await db.notes.note(note).export('html');
-  html = decode(html);
+  html = decode(html,{
+    level:EntityLevel.HTML
+  });
   let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
   let html3 = html;
   if (html.indexOf('<head>') > -1) {

@@ -1,5 +1,5 @@
 import {Image} from 'react-native';
-import {decode} from 'entities';
+import {decode, EntityLevel} from 'entities';
 export interface PreviewData {
   description?: string;
   image?: PreviewDataImage;
@@ -39,7 +39,9 @@ export const getActualImageUrl = (baseUrl: string, imageUrl?: string) => {
 export const getHtmlEntitiesDecodedText = (text?: string) => {
   const actualText = text?.trim();
   if (!actualText) return;
-  return decode(actualText);
+  return decode(actualText,{
+    level:EntityLevel.HTML
+  });
 };
 
 export const getContent = (left: string, right: string, type: string) => {

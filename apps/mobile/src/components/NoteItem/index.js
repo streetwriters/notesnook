@@ -1,3 +1,4 @@
+import {decode, EntityLevel} from 'entities';
 import React, {useEffect} from 'react';
 import {Platform, View} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -14,7 +15,7 @@ import {ActionIcon} from '../ActionIcon';
 import {Button} from '../Button';
 import {ActionSheetEvent} from '../DialogManager/recievers';
 import {TimeSince} from '../Menu/TimeSince';
-import { Properties } from '../Properties';
+import {Properties} from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -47,7 +48,7 @@ function navigateToTag(item) {
   });
 }
 
-const showActionSheet = (item) => {
+const showActionSheet = item => {
   Properties.present(item);
 };
 
@@ -56,7 +57,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notesListMode === 'compact';
-  const attachmentCount = db.attachments?.ofNote(item.id,'all')?.length || 0;
+  const attachmentCount = db.attachments?.ofNote(item.id, 'all')?.length || 0;
 
   function getNotebook() {
     if (isTrash || !item.notebooks || item.notebooks.length < 1) return [];
@@ -136,7 +137,9 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
               flexWrap: 'wrap'
             }}
             numberOfLines={2}>
-            {item.headline}
+            {decode(item.headline, {
+              level: EntityLevel.HTML
+            })}
           </Paragraph>
         ) : null}
 

@@ -666,7 +666,11 @@ function onNoteChange(wait = 300) {
   _sid = sessionId;
   let params = [title, id, content.data, content.type, sessionId];
   timer = setTimeout(() => {
-    console.log('saving note', params[1], _sid, sessionId);
+    //console.log('saving note', params[1], _sid, sessionId);
+    if (!params[1]) {
+      console.log('update id to',id);
+      params[1] = id;
+    }
     saveNote(...params, _sid !== sessionId);
   }, wait);
 }
@@ -771,27 +775,27 @@ async function addToCollection(id) {
 
 export async function saveNote(
   title,
-  id,
+  _id,
   data,
   type,
   sessionId,
   preventUpdate
 ) {
-  console.log(disableSaving, isSaving, id);
+  console.log("saving note:", disableSaving, isSaving, _id,id);
   if (disableSaving || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
   }
   isSaving = true;
   try {
-    if (id && !db.notes.note(id)) {
+    if (_id && !db.notes.note(_id)) {
       clearNote();
       useEditorStore.getState().setCurrentlyEditingNote(null);
       return;
     }
     let locked = false;
-    if (id) {
-      let _note = db.notes.note(id).data;
+    if (_id) {
+      let _note = db.notes.note(_id).data;
       if (_note.conflicted) {
         presentResolveConflictDialog(_note);
         return;
@@ -820,7 +824,7 @@ export async function saveNote(
         data: data,
         type: type
       },
-      id: id,
+      id: _id,
       sessionId: isContentInvalid(data) ? null : sessionId
     };
 
@@ -834,7 +838,8 @@ export async function saveNote(
 
     if (!locked) {
       let noteId = await db.notes.add(noteData);
-      if (!id || saveCounter < 3) {
+      id = noteId;
+      if (!_id || saveCounter < 3) {
         Navigation.setRoutesToUpdate([
           Navigation.routeNames.Notes,
           Navigation.routeNames.Favorites,
@@ -842,20 +847,18 @@ export async function saveNote(
           Navigation.routeNames.Notebook
         ]);
       }
-
-      if (!id) {
+      if (!_id) {
         await addToCollection(noteId);
       }
 
-      if (!id && !preventUpdate) {
+      if (!_id && !preventUpdate) {
         if (!title || title === '') {
           console.log('posting title now');
           post('titleplaceholder', db.notes.note(noteId)?.data?.title || '');
         }
 
-        await setNoteInEditorAfterSaving(id, noteId);
+        await setNoteInEditorAfterSaving(_id, noteId);
         saveCounter++;
-        id = noteId;
         setTimeout(() => {
           useEditorStore.getState().setCurrentlyEditingNote(noteId);
         });
@@ -872,7 +875,7 @@ export async function saveNote(
       ]);
 
       lastEditTime = n + 10;
-      let n = db.notes.note(id)?.data?.dateEdited;
+      let n = db.notes.note(_id)?.data?.dateEdited;
       tiny.call(
         EditorWebView,
         tiny.updateDateEdited(n ? timeConverter(n) : '')
