@@ -22,7 +22,7 @@ export class Resource implements IEnexElement {
   get data(): string {
     const data = getAsString(this.#resourceElement, "data");
     if (!data) throw new Error("data is required.");
-    return data.replace(`\s+`, "");
+    return data.replace(/\s+/gm, "");
   }
 
   get mime(): MimeTypes {
