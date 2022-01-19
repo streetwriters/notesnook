@@ -8,6 +8,7 @@ import {db} from '../utils/database';
 import {eCloseProgressDialog} from '../utils/Events';
 import {sanitizeFilename} from '../utils/filename';
 import storage from '../utils/storage';
+import {sleep} from '../utils/TimeUtils';
 import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
 import SettingsService from './SettingsService';
 
@@ -75,7 +76,7 @@ async function run() {
     title: 'Backing up your data',
     paragraph:
       "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
-    progress:true
+    progress: true
   });
   let backup;
   let error;
@@ -123,7 +124,7 @@ async function run() {
         type: 'success',
         context: 'global'
       });
-
+      await sleep(300);
       presentSheet({
         title: 'Backup complete',
         icon: 'cloud-upload',
@@ -154,9 +155,11 @@ async function run() {
       return backupFilePath;
     } catch (e) {
       console.log('backup error: ', e);
+      await sleep(300);
       eSendEvent(eCloseProgressDialog);
     }
   } else {
+    await sleep(300);
     eSendEvent(eCloseProgressDialog);
     ToastEvent.show({
       heading: 'Backup failed',
