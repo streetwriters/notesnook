@@ -18,7 +18,12 @@ import {
   SpreadSheet,
   TokenVaultItem,
 } from "./types";
-import { buildTableWithRows } from "../../utils/tablebuilder";
+import {
+  buildCell,
+  buildRow,
+  buildTableWithRows,
+} from "../../utils/tablebuilder";
+import { buildCodeBlock } from "../../utils//codebuilder";
 
 const converter = new showdown.Converter();
 export class StandardNotes implements IProvider {
@@ -158,9 +163,7 @@ export class StandardNotes implements IProvider {
         let language = editorType.language || "plaintext";
         if (language === "htmlmixed") language = "html";
         let code = hljs.highlightAuto(data, [language]);
-        let html = `<pre class="hljs language-${language}">
-          ${code.value}
-        </pre>`;
+        let html = buildCodeBlock(code.value, language);
         return {
           type: ContentType.HTML,
           data: html,
@@ -170,18 +173,15 @@ export class StandardNotes implements IProvider {
           let tokens = <TokenVaultItem[]>JSON.parse(data);
 
           let html = `
-          ${tokens.map((token) =>
+          ${tokens.map((token) => {
+            let keys = Object.keys(token);
+
             buildTableWithRows(
-              Object.keys(token)
-                .map(
-                  (key) => `<tr>
-              <th style="width:130px" >${key}</th>
-              <td>${token[key] || ""}</td>
-            </tr>`
-                )
-                .join("")
-            )
-          )}`;
+              keys.map((key) =>
+                buildRow([buildCell(key, "th"), buildCell(token[key])])
+              )
+            );
+          })}`;
           return {
             data: html,
             type: ContentType.HTML,
@@ -212,14 +212,12 @@ export class StandardNotes implements IProvider {
                 );
                 // create an empty cell to fill index
                 if (!cellAtCol) cellAtCol = { value: "", index: col };
-                cells.push(`<td>${cellAtCol.value || ""}</td>`);
+                cells.push(buildCell(cellAtCol.value));
               }
-              rows.push(`<tr>
-                ${cells.join("")}
-                </tr>`);
+              rows.push(buildRow(cells));
             }
 
-            let table = buildTableWithRows(rows.join(""));
+            let table = buildTableWithRows(rows);
             html = html + table;
           }
           return {
