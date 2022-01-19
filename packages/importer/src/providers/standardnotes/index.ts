@@ -155,7 +155,7 @@ export class StandardNotes implements IProvider {
           type: ContentType.HTML,
         };
       case "code":
-        let language = editorType.mode || "plaintext";
+        let language = editorType.language || "plaintext";
         if (language === "htmlmixed") language = "html";
         let code = hljs.highlightAuto(data, [language]);
         let html = `<pre class="hljs language-${language}">

@@ -9,7 +9,7 @@ export enum ContentTypes {
 export type EditorType = {
   type: "code" | "html" | "text" | "json" | "markdown";
   jsonFormat?: "table" | "token";
-  mode?: string;
+  language?: string;
 };
 
 export type SpreadSheet = {
