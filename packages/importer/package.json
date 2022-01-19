@@ -4,11 +4,11 @@
   "private": true,
   "main": "dist/index.js",
   "scripts": {
-    "test": "tap --ts",
+    "test": "tap --ts --no-check-coverage --no-coverage",
     "build": "tsc"
   },
   "dependencies": {
-    "@notesnook/enex": "file:../enex",
+    "@notesnook/enex": "^1.0.2",
     "fflate": "^0.7.1",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",
