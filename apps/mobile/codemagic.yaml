@@ -24,7 +24,7 @@ workflows:
         scripts:
             - name: Install npm dependencies
               script: |
-                yarn install
+                yarn install --network-concurrency 1
             - name: Install CocoaPods dependencies
               script: |
                 cd ios && pod install
