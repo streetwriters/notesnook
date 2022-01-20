@@ -1,6 +1,8 @@
 {
   "name": "@notesnook/enex",
-  "version": "1.0.0",
+  "private": false,
+  "version": "1.0.2",
+  "description": "A fully tested type-safe Evernote .enex parser used in Notesnook Importer.",
   "main": "dist/index.js",
   "devDependencies": {
     "@types/node": "^16.11.10",
@@ -11,13 +13,17 @@
     "typescript": "^4.5.2"
   },
   "scripts": {
-    "test": "tap --ts ",
+    "test": "tap --ts --no-check-coverage --no-coverage",
     "build": "tsc"
   },
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Abdullah Atta <abdullahatta@streetwriters.co>",
+  "license": "MIT",
   "dependencies": {
-    "node-html-parser": "^5.1.0"
+    "node-html-parser": "github:thecodrr/node-html-parser"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/streetwriters/notesnook.git",
+    "directory": "packages/enex"
   }
 }

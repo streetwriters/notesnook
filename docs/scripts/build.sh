@@ -1,6 +1,6 @@
 echo "Installing retype"
 
-dotnet tool install --global retypeapp --version 1.7.0
+dotnet tool install --global retypeapp
 
 echo -n "Changing directory..."
 

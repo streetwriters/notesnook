@@ -4,9 +4,14 @@ import { getFiles } from "./utils";
 import { xxh64 } from "@node-rs/xxhash";
 import { IHasher } from "../src/utils/hasher";
 import { ProviderFactory, Providers } from "../src/providers/providerfactory";
+import { unzipSync } from "fflate";
 
 const hasher: IHasher = {
-  hash: async (data) => xxh64(data).toString(16),
+  hash: async (data) => {
+    if (data instanceof Uint8Array)
+      return xxh64(Buffer.from(data.buffer)).toString(16);
+    return xxh64(data).toString(16);
+  },
   type: "xxh64",
 };
 
@@ -34,7 +39,8 @@ for (let provider of ProviderFactory.getAvailableProviders()) {
       const output = pack(
         (await transform(files, <Providers>provider, settings)).notes
       );
-      tap.matchSnapshot(await hasher.hash(output), `${provider}-packed-hash`);
+      const unzipped = unzipSync(output);
+      tap.matchSnapshot(Object.keys(unzipped), `${provider}-packed`);
     }
   );
 }
