@@ -2,8 +2,9 @@
 
 Supported providers:
 
-- [x] Evernote
-- [x] Simplenote
-- [x] Google Keep
-- [x] HTML
-- [x] Markdown/Text
+1. Evernote
+2. Simplenote
+3. Google Keep
+4. HTML
+5. Markdown/Text
+6. Standard Notes
