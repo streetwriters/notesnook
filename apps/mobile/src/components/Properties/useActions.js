@@ -28,6 +28,7 @@ import {
   COLOR_SCHEME,
   COLOR_SCHEME_DARK,
   COLOR_SCHEME_LIGHT,
+  COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
 } from '../../utils/Colors';
 import {db} from '../../utils/database';
