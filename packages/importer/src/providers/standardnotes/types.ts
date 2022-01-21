@@ -13,7 +13,7 @@ enum ProtocolVersion {
   V004 = "004"
 }
 const ComponentDataDomain = 'org.standardnotes.sn.components';
-const DefaultAppDomain = "org.standaardnotes.sn";
+const DefaultAppDomain = "org.standardnotes.sn";
 
 type SNBackupItem<TContentType extends ContentType, TContent> = RawPayload & {
   content_type: TContentType;
