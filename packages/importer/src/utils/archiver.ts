@@ -29,6 +29,7 @@ export function unpack(files: IFile[], root?: string): File[] {
         const root = path.basename(file.name, false);
         extracted.push(...unpack(unzip(file), root));
       } catch (e) {
+        console.error(e);
         continue;
       }
     } else {

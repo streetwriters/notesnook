@@ -1,11 +1,13 @@
-import Color from "color";
+import { colord } from "colord";
 import { StaticColors } from "./static";
 
 export class DarkColorScheme {
-  static construct(accent: Color) {
+  static construct(accent: string) {
     return {
-      primary: accent.hex().toString(),
-      placeholder: Color("#ffffff").alpha(0.6).hex().toString(),
+      primary: colord(accent).toHex(),
+      placeholder: colord("#ffffff")
+        .alpha(0.6)
+        .toHex(),
       background: "#1f1f1f",
       bgTransparent: "#1f1f1f99",
       accent: "#000",

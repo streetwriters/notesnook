@@ -1,11 +1,17 @@
-import type Color from "color";
+import { colord } from "colord";
 
 export class StaticColors {
-  static construct(accent: Color) {
+  static construct(accent: string) {
     return {
-      shade: accent.alpha(0.1).rgb().toString(),
-      textSelection: accent.alpha(0.2).rgb().toString(),
-      dimPrimary: accent.alpha(0.7).rgb().toString(),
+      shade: colord(accent)
+        .alpha(0.1)
+        .toRgbString(),
+      textSelection: colord(accent)
+        .alpha(0.2)
+        .toRgbString(),
+      dimPrimary: colord(accent)
+        .alpha(0.7)
+        .toRgbString(),
       transparent: "transparent",
       static: "white",
       error: "#E53935",
