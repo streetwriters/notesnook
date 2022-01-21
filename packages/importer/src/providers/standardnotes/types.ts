@@ -1,75 +1,50 @@
+import type { AppDataField, BackupFile } from "@standardnotes/snjs";
+import { ComponentArea, EditorFeatureDescription, NoteType } from "@standardnotes/features";
+import { ContentType } from "@standardnotes/common";
+import type { RawPayload } from "@standardnotes/snjs/dist/@types/protocol/payloads/generator";
+import type { NoteContent } from "@standardnotes/snjs/dist/@types/models/app/note";
+import type { TagContent } from "@standardnotes/snjs/dist/@types/models/app/tag";
+import type { ComponentContent } from "@standardnotes/snjs/dist/@types/models/app/component";
 
-export enum ContentTypes {
-  Note = "Note",
-  Tag = "Tag",
-  SmartTag = "SN|SmartTag",
-  Component = "SN|Component" 
+enum ProtocolVersion {
+  V001 = "001",
+  V002 = "002",
+  V003 = "003",
+  V004 = "004"
 }
+const ComponentDataDomain = 'org.standardnotes.sn.components';
+const DefaultAppDomain = "org.standaardnotes.sn";
 
-export type EditorType = {
-  type: "code" | "html" | "text" | "json" | "markdown";
-  jsonFormat?: "table" | "token";
+type SNBackupItem<TContentType extends ContentType, TContent> = RawPayload & {
+  content_type: TContentType;
+  content: TContent & {
+    appData: {
+      [DefaultAppDomain]?: Record<AppDataField, any>;
+      [ComponentDataDomain]?: Record<string, any | null | undefined>;
+    };
+  };
+};
+
+export type SNNote = SNBackupItem<ContentType.Note, NoteContent>;
+export type SNComponent = SNBackupItem<ContentType.Component, ComponentContent>;
+export type SNTag = SNBackupItem<ContentType.Tag, TagContent>;
+export type SNBackup = {
+  items: RawPayload[];
+} & BackupFile;
+export type EditorDescription = Pick<
+  EditorFeatureDescription,
+  "note_type" | "file_type"
+> & {
   language?: string;
 };
+export type CodeEditorComponentData = { mode?: string };
 
-export type SpreadSheet = {
-  sheets: { rows: Row[] }[];
+export type Spreadsheet = {
+  sheets: kendo.ui.SpreadsheetSheet[];
 };
 
-export interface Row {
-  index: number;
-  cells: Cell[];
-}
-
-export interface Cell {
-  value: number | string;
-  index: number;
-  format?: string;
-  bold?: boolean;
-}
-
-export type TokenVaultItem = {
-  [name: string]: string;
-  service: string;
-  account: string;
-  secret: string;
-  notes: string;
-  password: string;
-};
-
-export type SNBackup = {
-  version?: string;
-  items?: SNBackupItem[];
-};
-
-export type SNBackupItem = {
-  uuid: string;
-  content_type: ContentTypes;
-  content: {
-    title: string;
-    text: string;
-    name: string;
-    editorType: EditorType;
-    references: {
-      uuid: string;
-      content_type: string;
-    }[];
-    appData: {
-      "org.standardnotes.sn": {
-        client_updated_at: string;
-        pinned: boolean;
-        prefersPlainEditor: boolean;
-        archived?: boolean;
-        defaultEditor?: boolean;
-      };
-      "org.standardnotes.sn.components": { [name: string]: string };
-    };
-    preview_html: string;
-    preview_plain: string;
-  };
-  created_at: string;
-  updated_at: string;
-  created_at_timestamp: number;
-  updated_at_timestamp: number;
-  duplicate_of: null;
+export {
+  DefaultAppDomain, ComponentDataDomain, ProtocolVersion,
+  ContentType,
+  ComponentArea, NoteType
 };

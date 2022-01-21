@@ -1,7 +1,7 @@
 {
   "name": "@notesnook/importer",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.1.0",
   "main": "dist/index.js",
   "description": "Convert notes from various note taking apps into a simple & standard format.",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@notesnook/enex": "^1.0.2",
-    "fflate": "^0.7.1",
+    "fflate": "^0.7.3",
     "highlight.js": "^11.4.0",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",
@@ -18,7 +18,9 @@
   },
   "devDependencies": {
     "@node-rs/xxhash": "^1.0.1",
-    "@types/node": "^12.20.37",
+    "@standardnotes/snjs": "^2.41.0",
+    "@types/kendo-ui": "^2022.1.0",
+    "@types/node": "^12.20.42",
     "@types/showdown": "^1.9.4",
     "@types/spark-md5": "^3.0.2",
     "@types/tap": "^15.0.5",

@@ -9,122 +9,128 @@ import {
   ProviderResult,
   ProviderSettings,
 } from "../provider";
-import { editors, SNBackupVersion } from "./constants";
 import {
-  ContentTypes,
-  EditorType,
+  SNNote,
+  SNComponent,
+  SNTag,
   SNBackup,
-  SNBackupItem,
-  SpreadSheet,
-  TokenVaultItem,
+  ProtocolVersion,
+  ContentType as SNItemType,
+  DefaultAppDomain,
+  ComponentDataDomain,
+  ComponentArea,
+  EditorDescription,
+  NoteType,
+  CodeEditorComponentData,
+  Spreadsheet,
 } from "./types";
-import {
-  buildCell,
-  buildRow,
-  buildTableWithRows,
-} from "../../utils/tablebuilder";
-import { buildCodeBlock } from "../../utils//codebuilder";
+import { buildCodeblock, buildTable, Cell, Row } from "../../utils/domutils";
 
 const converter = new showdown.Converter();
+converter.setFlavor("github");
+const defaultEditorDescription = (item: SNNote): EditorDescription => {
+  const isHtml =
+    item.content.text.includes("<") && item.content.text.includes("</");
+  return {
+    file_type: isHtml ? "html" : "txt",
+    note_type: isHtml ? NoteType.RichText : NoteType.Markdown,
+  };
+};
+
 export class StandardNotes implements IProvider {
   public supportedExtensions = [".txt"];
   public validExtensions = [...this.supportedExtensions];
   public version = "1.0.0";
-  public name = "StandardNotes";
+  public name = "Standard Notes";
 
   async process(
     files: File[],
-    settings: ProviderSettings
+    _settings: ProviderSettings
   ): Promise<ProviderResult> {
-    return iterate(this, files, (file, notes, errors) => {
+    return iterate(this, files, async (file, notes, errors) => {
       if (file.name !== "Standard Notes Backup and Import File.txt")
-        return Promise.resolve(true);
+        return false;
+
       let data: SNBackup = <SNBackup>JSON.parse(file.text);
       if (!data.items) {
-        errors.push(new TransformError("Backup file is invalid", file));
-        return Promise.resolve(true);
+        errors.push(new TransformError("Invalid backup file.", file));
+        return false;
       }
 
-      if (data.version !== SNBackupVersion) {
+      if (data.version !== ProtocolVersion.V004) {
         errors.push(
-          new TransformError("Backup version is not supported.", file)
+          new TransformError(
+            `Unsupported backup file version: ${data.version}.`,
+            file
+          )
         );
-        return Promise.resolve(true);
+        return false;
       }
 
-      const components: SNBackupItem[] = [];
-      const tags: SNBackupItem[] = [];
-      const snNotes: SNBackupItem[] = [];
+      const components: SNComponent[] = [];
+      const tags: SNTag[] = [];
+      const snnotes: SNNote[] = [];
 
-      data.items?.forEach((item) => {
-        let contentType = item.content_type;
-        switch (contentType) {
-          case ContentTypes.Note:
-            snNotes.push(item);
-          case ContentTypes.Component:
-            components.push(item);
+      data.items.forEach((item) => {
+        switch (item.content_type) {
+          case SNItemType.Note:
+            snnotes.push(<SNNote>item);
+          case SNItemType.Component:
+            components.push(<SNComponent>item);
             break;
-          case ContentTypes.SmartTag:
-          case ContentTypes.Tag:
-            tags.push(item);
+          case SNItemType.Tag:
+            tags.push(<SNTag>item);
         }
       });
 
-      for (let item of snNotes) {
-        let type = this.getContentType(item, components);
-        item.content.editorType = type;
+      for (let item of snnotes) {
         let note: Note = {
           title: item.content.title,
           dateCreated: item.created_at_timestamp,
           dateEdited: item.updated_at_timestamp || item.created_at_timestamp,
-          pinned: item.content.appData["org.standardnotes.sn"]?.pinned,
+          pinned: <boolean>item.content.appData[DefaultAppDomain]?.pinned,
           tags: this.getTags(item, tags),
-          content: this.parseContent(item),
+          content: this.parseContent(item, components),
         };
         notes.push(note);
       }
 
-      return Promise.resolve(true);
+      return true;
     });
   }
 
-  getContentType(item: SNBackupItem, components: SNBackupItem[]): EditorType {
-    let componentData =
-      item.content.appData["org.standardnotes.sn.components"] || {};
-    let editorId = Object.keys(componentData).pop();
-    if (editorId) {
-      let editor = components.find((component) => component.uuid === editorId);
-      if (editor) {
-        let contentType = {
-          ...editors[editor.content.name],
-        };
-        if (contentType.type === "code") {
-          //@ts-ignore
-          contentType.mode = componentData[editorId].mode;
-        }
+  getEditor(item: SNNote, components: SNComponent[]): EditorDescription {
+    let componentData = item.content.appData[ComponentDataDomain] || {};
+    let componentId = Object.keys(componentData).pop();
+    if (!componentId) return defaultEditorDescription(item);
 
-        return contentType;
-      }
+    let component = components.find(
+      (c) =>
+        c.uuid === componentId &&
+        (c.content.area === ComponentArea.Editor ||
+          c.content.area === ComponentArea.EditorStack)
+    );
+    if (!component) return defaultEditorDescription(item);
+    const editor = <EditorDescription>component.content.package_info;
+    if (
+      editor.note_type === NoteType.Code &&
+      Boolean(componentData[componentId])
+    ) {
+      editor.language = (<CodeEditorComponentData>(
+        componentData[componentId]
+      )).mode;
     }
-    return {
-      type:
-        item.content.text.includes("<") && item.content.text.includes("</")
-          ? "html"
-          : "text",
-    };
+    return editor;
   }
 
-  getTags(item: SNBackupItem, tags: SNBackupItem[]): string[] {
-    if (!item.content.references || item.content.references.length === 0)
-      return [];
-    let references = item.content.references;
+  getTags(item: SNNote, tags: SNTag[]): string[] {
+    if (!item.content.references || !item.content.references.length) return [];
 
-    let noteTags = [];
-    for (let reference of references) {
+    let noteTags: string[] = [];
+    for (let reference of item.content.references) {
       let tag = tags.find((tag) => tag.uuid === reference.uuid);
-      if (tag && tag.content.name && tag.content.name.trim() !== "") {
-        noteTags.push(tag.content.name);
-      }
+      if (!tag) continue;
+      noteTags.push(tag.content.title);
     }
     return noteTags;
   }
@@ -134,97 +140,86 @@ export class StandardNotes implements IProvider {
    * @param array
    * @returns
    */
-  maxIndexItem(array: any[]) {
-    return array.reduce((prev, current) =>
-      prev.index > current.index ? prev : current
-    );
+  maxIndexItem<T extends { index?: number }>(array: T[]): T {
+    return array.sort((a, b) => (b.index || 0) - (a.index || 0))[0];
   }
 
-  parseContent(item: SNBackupItem): Content {
+  parseContent(item: SNNote, components: SNComponent[]): Content {
+    let editor = this.getEditor(item, components);
+
     const data = item.content.text;
-    const editorType = item.content.editorType;
-    switch (editorType.type) {
-      case "text":
-        return {
-          data: converter.makeHtml(data),
-          type: ContentType.HTML,
-        };
-      case "html":
+    switch (editor.note_type) {
+      case NoteType.RichText:
         return {
           data: data,
           type: ContentType.HTML,
         };
-      case "markdown":
-        return {
-          data: converter.makeHtml(data),
-          type: ContentType.HTML,
-        };
-      case "code":
-        let language = editorType.language || "plaintext";
+      case NoteType.Code: {
+        let language = editor.language || "plaintext";
         if (language === "htmlmixed") language = "html";
+        else if (language === "markdown")
+          return { type: ContentType.HTML, data: converter.makeHtml(data) };
+
         let code = hljs.highlightAuto(data, [language]);
-        let html = buildCodeBlock(code.value, language);
+        let html = buildCodeblock(code.value, language);
         return {
           type: ContentType.HTML,
           data: html,
         };
-      case "json":
-        if (editorType.jsonFormat === "token") {
-          let tokens = <TokenVaultItem[]>JSON.parse(data);
+      }
+      case NoteType.Spreadsheet: {
+        let spreadsheet = <Spreadsheet>JSON.parse(data);
+        let html = ``;
 
-          let html = `
-          ${tokens.map((token) => {
-            let keys = Object.keys(token);
+        for (let sheet of spreadsheet.sheets) {
+          if (!sheet.rows || sheet.rows.length === 0) continue;
 
-            buildTableWithRows(
-              keys.map((key) =>
-                buildRow([buildCell(key, "th"), buildCell(token[key])])
-              )
-            );
-          })}`;
-          return {
-            data: html,
-            type: ContentType.HTML,
-          };
-        } else {
-          let spreadsheet = <SpreadSheet>JSON.parse(data);
-          let html = ``;
-          for (let sheet of spreadsheet.sheets) {
-            if (!sheet.rows || sheet.rows.length === 0) continue;
-            let maxCols =
-              this.maxIndexItem(
-                sheet.rows.map((row) => {
-                  return this.maxIndexItem(row.cells);
-                })
-              ).index + 1;
+          let lastCell = this.maxIndexItem(
+            sheet.rows.map((row) => this.maxIndexItem(row.cells || []))
+          );
+          let lastRow = this.maxIndexItem(sheet.rows);
+          let [maxColumns, maxRows] = [lastCell.index || 0, lastRow.index || 0];
 
-            let maxRows = this.maxIndexItem(sheet.rows).index + 1;
-            let rows = [];
+          let rows: Row[] = [];
+          for (let i = 0; i <= maxRows; i++) {
+            let row = sheet.rows.find(({ index }) => index === i);
+            let cells: Cell[] = [];
 
-            for (let i = 0; i < maxRows; i++) {
-              let rowAtIndex = sheet.rows.find((row) => row.index === i);
-              // create an empty row to fill index
-              if (!rowAtIndex) rowAtIndex = { index: i, cells: [] };
-              let cells = [];
-              for (let col = 0; col < maxCols; col++) {
-                let cellAtCol = rowAtIndex.cells.find(
-                  (cell) => cell.index === col
-                );
-                // create an empty cell to fill index
-                if (!cellAtCol) cellAtCol = { value: "", index: col };
-                cells.push(buildCell(cellAtCol.value));
-              }
-              rows.push(buildRow(cells));
+            for (let col = 0; col <= maxColumns; col++) {
+              let cell = row?.cells?.find(({ index }) => index === col);
+              cells.push({ type: "td", value: cell?.value?.toString() || "" });
             }
-
-            let table = buildTableWithRows(rows);
-            html = html + table;
+            rows.push({ cells });
           }
-          return {
-            type: ContentType.HTML,
-            data: html,
-          };
+
+          html += buildTable(rows);
         }
+        return {
+          type: ContentType.HTML,
+          data: html,
+        };
+      }
+      case NoteType.Authentication: {
+        let tokens = <any[]>JSON.parse(data);
+        let html = tokens
+          .map((token) =>
+            buildTable(
+              Object.keys(token).map((key) => ({
+                cells: [
+                  { type: "th", value: key },
+                  { type: "td", value: token[key] },
+                ],
+              }))
+            )
+          )
+          .join("\n");
+        return {
+          data: html,
+          type: ContentType.HTML,
+        };
+      }
+      case NoteType.Task:
+      case NoteType.Markdown:
       default:
         return {
           data: converter.makeHtml(data),
