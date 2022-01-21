@@ -34,12 +34,14 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           };
           setLink(prevLink);
         })
-        .catch(e => console.log);
+        .catch(e => {
+          console.log(e);
+        });
     }
   }, [value]);
 
-  const renderImage = (imageLink, faviconLink) => {
-    return imageLink ? (
+  const renderImage = image => {
+    return image ? (
       <Image
         style={{
           width: 35,
@@ -52,26 +54,8 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           marginRight: 5
         }}
         resizeMode="contain"
-        source={{uri: imageLink}}
+        source={{uri: image}}
       />
-    ) : faviconLink ? (
-      <View
-        style={{
-          borderColor: colors.nav,
-          backgroundColor: colors.nav,
-          borderWidth: 1,
-          marginVertical: 5,
-          borderRadius: 5
-        }}>
-        <Image
-          style={{
-            width: 35,
-            height: 35
-          }}
-          resizeMode="center"
-          source={{uri: faviconLink}}
-        />
-      </View>
     ) : (
       <View
         style={{
@@ -80,7 +64,7 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           marginVertical: 5,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: colors.shade,
+          backgroundColor: colors.nav,
           borderRadius: 5
         }}>
         <Icon size={35} color={colors.accent} name="web" />
@@ -163,7 +147,7 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         width: '100%',
         alignItems: 'center'
       }}>
-      {renderImage(link.image, link.favicon)}
+      {renderImage(link.image)}
       {renderText(link.name, link.title, link.description)}
 
       <View

@@ -4,7 +4,7 @@ import { getStyle } from './functions';
 
 
 export const Photo = ({src, style = {}}) => {
-  return (
+  return src ?(
     <Image
       source={{uri: src}}
       resizeMode="cover"
@@ -15,5 +15,5 @@ export const Photo = ({src, style = {}}) => {
         ...getStyle(style)
       }}
     />
-  );
+  ) : null
 };
