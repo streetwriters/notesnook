@@ -53,7 +53,7 @@ RCTBridge *bridge;
   
   self.window.rootViewController = navController;
   [self.window makeKeyAndVisible];
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; 
+  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:(RCTRootView *) navController.view];
   
   return YES;
 }
