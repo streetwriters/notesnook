@@ -52,7 +52,13 @@ const showActionSheet = item => {
   Properties.present(item);
 };
 
-const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
+const NoteItem = ({
+  item,
+  isTrash,
+  tags,
+  dateBy = 'dateCreated',
+  noOpen = false
+}) => {
   const [state] = useTracked();
   const {colors} = state;
   const settings = useSettingStore(state => state.settings);
@@ -284,7 +290,7 @@ const NoteItem = ({item, isTrash, tags, dateBy = 'dateCreated'}) => {
         color={colors.pri}
         name="dots-horizontal"
         size={SIZE.xl}
-        onPress={() => showActionSheet(item, isTrash)}
+        onPress={() => !noOpen && showActionSheet(item, isTrash)}
         customStyle={{
           justifyContent: 'center',
           height: 35,
