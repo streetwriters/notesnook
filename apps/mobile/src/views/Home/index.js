@@ -1,19 +1,19 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {Header} from '../../components/Header/index';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { Header } from '../../components/Header/index';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useNoteStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent} from '../../services/EventManager';
+import { useNoteStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {editing, InteractionManager, scrollRef} from '../../utils';
-import {db} from '../../utils/database';
-import {eOnLoadNote} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {getNote} from '../Editor/Functions';
+import { editing, InteractionManager, scrollRef } from '../../utils';
+import { db } from '../../utils/database';
+import { eOnLoadNote } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
+import { getNote } from '../Editor/Functions';
 
 export const Home = ({navigation}) => {
   const notes = useNoteStore(state => state.notes);

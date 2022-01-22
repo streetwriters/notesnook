@@ -1,8 +1,8 @@
-import React, {Component} from 'react';
-import {Appearance, SafeAreaView} from 'react-native';
-import SplashScreen from 'react-native-splash-screen';
+import React, { Component } from 'react';
+import { Appearance, SafeAreaView } from 'react-native';
+import RNBootSplash from "react-native-bootsplash";
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../src/utils/Colors';
 import NotesnookShare from './index';
-import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../src/utils/Colors';
 
 export default class QuickNoteIOS extends Component {
   constructor(props, context) {
@@ -17,7 +17,7 @@ export default class QuickNoteIOS extends Component {
   }
 
   componentDidMount() {
-    SplashScreen.hide();
+    RNBootSplash.hide({fade:true})
   }
 
   render() {

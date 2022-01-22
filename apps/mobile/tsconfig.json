@@ -14,7 +14,7 @@
     "esModuleInterop": true,
     "skipLibCheck": false
   },
-  "include": ["./node_modules/notes-core"],
+  "include": ["./node_modules/notes-core","."],
   "exclude": [
     "node_modules",
     "babel.config.js",

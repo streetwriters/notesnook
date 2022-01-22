@@ -6,14 +6,15 @@ import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
 import android.webkit.WebView;
-import org.devio.rn.splashscreen.SplashScreen;
+import com.facebook.react.ReactActivityDelegate;
+import com.zoontek.rnbootsplash.RNBootSplash; 
+import com.zoontek.rnbars.RNBars; // <- add this necessary import
 
 public class MainActivity extends ReactActivity {
 
 
   @Override
     protected void onCreate(Bundle savedInstanceState) {
-    SplashScreen.show(this);
     super.onCreate(null);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
@@ -27,7 +28,20 @@ public class MainActivity extends ReactActivity {
     }
 
   }
+  
 
+    @Override
+  protected ReactActivityDelegate createReactActivityDelegate() {
+    return new ReactActivityDelegate(this, getMainComponentName()) {
+
+      @Override
+      protected void loadApp(String appKey) {
+        RNBootSplash.init(MainActivity.this);
+        RNBars.init(MainActivity.this, "dark-content");
+        super.loadApp(appKey);
+      }
+    };
+  }
 
 @Override
 public void onNewIntent(Intent intent) {

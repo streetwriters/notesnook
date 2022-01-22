@@ -1,20 +1,14 @@
-import http from 'notes-core/utils/http';
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import Orientation from 'react-native-orientation';
-import {SafeAreaProvider} from 'react-native-safe-area-context';
-import SplashScreen from 'react-native-splash-screen';
-import {useAppEvents} from './src/utils/use-app-events';
-import {RootView} from './src/navigation/RootView';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppLoader from './src/components/AppLoader';
-import {useTracked} from './src/provider';
+import { RootView } from './src/navigation/RootView';
+import { useTracked } from './src/provider';
 import {
-  initialize,
-  useMessageStore,
-  useNoteStore,
-  useSettingStore,
+  initialize, useSettingStore,
   useUserStore
 } from './src/provider/stores';
-import {DDS} from './src/services/DeviceDetection';
+import { DDS } from './src/services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -22,41 +16,19 @@ import {
 } from './src/services/EventManager';
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
-import {Tracker} from './src/utils';
-import {db} from './src/utils/database';
-import {eDispatchAction} from './src/utils/Events';
-import {MMKV} from './src/utils/mmkv';
+import { Tracker } from './src/utils';
+import { db } from './src/utils/database';
+import { eDispatchAction } from './src/utils/Events';
+import { MMKV } from './src/utils/mmkv';
+import { useAppEvents } from './src/utils/use-app-events';
+import RNBootSplash from "react-native-bootsplash";
 
 let databaseHasLoaded = false;
 
-async function loadDefaultNotes() {
-  try {
-    return true;
-    /*    const isCreated = await MMKV.getItem('defaultNoteCreated');
-    if (isCreated) return;
-    const notes = await http.get(
-      'https://app.notesnook.com/notes/index_v14.json'
-    );
-    if (!notes) return;
-    for (let note of notes) {
-      const content = await http.get(note.mobileContent);
-      await db.notes.add({
-        title: note.title,
-        headline: note.headline,
-        localOnly: true,
-        content: {type: 'tiny', data: content}
-      });
-    }
-    await MMKV.setItem('defaultNoteCreated', 'yes');
-    useNoteStore.getState().setNotes(); */
-  } catch (e) {}
-}
-
 const loadDatabase = async () => {
-  SplashScreen.hide();
+  RNBootSplash.hide({fade:true})
   await db.init();
   Notifications.get();
-  //loadDefaultNotes();
   await checkFirstLaunch();
 };
 

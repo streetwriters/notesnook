@@ -23,7 +23,7 @@
       "build": "cd android && ./gradlew assembleDebug assembleAndroidTest -DtestBuildType=debug && cd ..",
       "type": "android.attached",
       "device": {
-        "adbName": "192.168.10.3:5555",
+        "adbName": "192.168.10.2:5555",
         "adbNameAlt":"LMG710ULM3d3678f0"
       }
     },

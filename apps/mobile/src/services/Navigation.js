@@ -1,10 +1,8 @@
-import {DrawerActions, StackActions} from '@react-navigation/native';
-import {updateEvent} from '../components/DialogManager/recievers';
-import {Actions} from '../provider/Actions';
+import { StackActions } from '@react-navigation/native';
 import { useFavoriteStore, useNotebookStore, useNoteStore, useTagStore, useTrashStore } from '../provider/stores';
-import {eOnNewTopicAdded, refreshNotesPage} from '../utils/Events';
-import {rootNavigatorRef, sideMenuRef, tabBarRef} from '../utils/Refs';
-import {eSendEvent} from './EventManager';
+import { eOnNewTopicAdded, refreshNotesPage } from '../utils/Events';
+import { rootNavigatorRef, tabBarRef } from '../utils/Refs';
+import { eSendEvent } from './EventManager';
 import SettingsService from './SettingsService';
 
 let currentScreen = 'Notes';

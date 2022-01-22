@@ -2,36 +2,37 @@ import {
   activateKeepAwake,
   deactivateKeepAwake
 } from '@sayem314/react-native-keep-awake';
-import React, { useEffect, useRef } from 'react';
-import { View } from 'react-native';
-import Animated, { useValue } from 'react-native-reanimated';
-import { notesnook } from '../../e2e/test.ids';
+import React, {useEffect, useRef} from 'react';
+import {View} from 'react-native';
+import {StatusBar} from 'react-native-bars';
+import Animated, {useValue} from 'react-native-reanimated';
+import {notesnook} from '../../e2e/test.ids';
 import CustomTabs from '../components/CustomTabs';
-import { DialogManager } from '../components/DialogManager';
-import { Menu } from '../components/Menu';
-import { Toast } from '../components/Toast';
-import { useTracked } from '../provider';
-import { useEditorStore, useSettingStore } from '../provider/stores';
-import { DDS } from '../services/DeviceDetection';
+import {DialogManager} from '../components/DialogManager';
+import {Menu} from '../components/Menu';
+import {Toast} from '../components/Toast';
+import {useTracked} from '../provider';
+import {useEditorStore, useSettingStore} from '../provider/stores';
+import {DDS} from '../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
   eUnSubscribeEvent
 } from '../services/EventManager';
-import { editing, setWidthHeight } from '../utils';
-import { updateStatusBarColor } from '../utils/Colors';
+import {editing, setWidthHeight} from '../utils';
+import {updateStatusBarColor} from '../utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
 } from '../utils/Events';
-import { editorRef, tabBarRef } from '../utils/Refs';
-import { sleep } from '../utils/TimeUtils';
-import { EditorWrapper } from '../views/Editor/EditorWrapper';
-import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
+import {editorRef, tabBarRef} from '../utils/Refs';
+import {sleep} from '../utils/TimeUtils';
+import {EditorWrapper} from '../views/Editor/EditorWrapper';
+import {checkStatus, EditorWebView, getNote} from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import { NavigatorStack } from './NavigatorStack';
+import {NavigatorStack} from './NavigatorStack';
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
@@ -54,7 +55,7 @@ const onChangeTab = async obj => {
     if (getNote()) {
       await checkStatus();
     }
-     sleep(1000).then(() => {
+    sleep(1000).then(() => {
       updateStatusBarColor();
     });
   } else {
@@ -62,7 +63,7 @@ const onChangeTab = async obj => {
       updateStatusBarColor();
       deactivateKeepAwake();
       eSendEvent(eClearEditor, 'removeHandler');
-      setTimeout(() => useEditorStore.getState().setSearchReplace(false),1);
+      setTimeout(() => useEditorStore.getState().setSearchReplace(false), 1);
       if (getNote()?.locked) {
         eSendEvent(eClearEditor);
       }
@@ -305,6 +306,9 @@ const NativeStack = React.memo(
 
     const listItems = [
       <View
+        onLayout={() => {
+          tabBarRef.current?.goToIndex(1,false);
+        }}
         style={{
           height: '100%',
           width: fullscreen ? 0 : widths[deviceMode].a
@@ -340,6 +344,7 @@ const NativeStack = React.memo(
       <EditorWrapper width={widths} dimensions={dimensions} />
     ];
 
+
     return (
       <View
         onLayout={_onLayout}
@@ -349,6 +354,10 @@ const NativeStack = React.memo(
           height: '100%',
           backgroundColor: colors.bg
         }}>
+        <StatusBar
+          animated="true"
+          barStyle={colors.night ? 'light-content' : 'dark-content'}
+        />
         {deviceMode ? (
           <CustomTabs
             ref={tabBarRef}

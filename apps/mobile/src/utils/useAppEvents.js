@@ -1,6 +1,6 @@
 import NetInfo from '@react-native-community/netinfo';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect, useRef} from 'react';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect, useRef } from 'react';
 import {
   Appearance,
   AppState,
@@ -12,10 +12,9 @@ import {
 } from 'react-native';
 import RNExitApp from 'react-native-exit-app';
 import * as RNIap from 'react-native-iap';
-import {enabled} from 'react-native-privacy-snapshot';
-import SplashScreen from 'react-native-splash-screen';
-import {doInBackground, editing} from '.';
-import {ProFeatures} from '../components/ResultDialog/pro-features';
+import { enabled } from 'react-native-privacy-snapshot';
+import { doInBackground, editing } from '.';
+import { ProFeatures } from '../components/ResultDialog/pro-features';
 import {
   clearAllStores,
   initialize,
@@ -49,17 +48,17 @@ import {
   updateNoteInEditor
 } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {updateStatusBarColor} from './Colors';
-import {db} from './database';
+import { updateStatusBarColor } from './Colors';
+import { db } from './database';
 import {
   eClearEditor,
   eCloseProgressDialog,
   eOpenLoginDialog,
   refreshNotesPage
 } from './Events';
-import {MMKV} from './mmkv';
+import { MMKV } from './mmkv';
 import Storage from './storage';
-import {sleep} from './TimeUtils';
+import { sleep } from './TimeUtils';
 
 const SodiumEventEmitter = new NativeEventEmitter(NativeModules.Sodium);
 
@@ -261,7 +260,7 @@ export const useAppEvents = () => {
           eSendEvent(eCloseProgressDialog);
         },
         icon: 'check',
-        actionText: 'Continue',
+        actionText: 'Continue'
       });
     }
     await PremiumService.setPremiumStatus();
@@ -313,7 +312,7 @@ export const useAppEvents = () => {
         eSendEvent(eOpenLoginDialog);
       },
       icon: 'logout',
-      actionText: 'Login',
+      actionText: 'Login'
     });
 
     setTimeout(() => {
@@ -444,22 +443,13 @@ export const useAppEvents = () => {
         ) {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';
-          if (Platform.OS === 'android') {
-            SplashScreen.show();
-          } else {
-            eSendEvent('load_overlay', 'hide');
-          }
-
+          eSendEvent('load_overlay', 'hide');
           let result = await BiometricService.validateUser(
             'Unlock to access your notes'
           );
           if (result) {
             refValues.current.showingDialog = false;
-            if (Platform.OS === 'android') {
-              SplashScreen.hide();
-            } else {
-              eSendEvent('load_overlay', 'show');
-            }
+            eSendEvent('load_overlay', 'show');
           } else {
             RNExitApp.exitApp();
             return;
@@ -557,7 +547,7 @@ export const useAppEvents = () => {
         eSendEvent(refreshNotesPage);
       }
       if (notesAddedFromIntent || shareExtensionOpened) {
-        eSendEvent("loadingNote",getNote());
+        eSendEvent('loadingNote', getNote());
         eSendEvent('webviewreset', true);
         MMKV.removeItem('shareExtensionOpened');
       }
