@@ -7,13 +7,13 @@ All of these plugins are being used in [Notesnook](https://notesnook.com/) in pr
 ## Installation
 
 ```
-yarn add @streetwritersco/tinymce-plugins
+yarn add @streetwriters/tinymce-plugins
 ```
 
 ### Usage
 
 ```jsx
-import "@streetwritersco/tinymce-plugins/<plugin-name>";
+import "@streetwriters/tinymce-plugins/<plugin-name>";
 ```
 
 ## Plugins
