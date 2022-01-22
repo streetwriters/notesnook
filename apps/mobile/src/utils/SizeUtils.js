@@ -1,8 +1,8 @@
-import {Dimensions, PixelRatio, Platform} from 'react-native';
-import {DDS} from '../services/DeviceDetection';
+import { Dimensions, PixelRatio, Platform } from 'react-native';
+import { DDS } from '../services/DeviceDetection';
 
 export const scale = {
-  fontScale: 1,
+  fontScale: 1
 };
 let windowSize = Dimensions.get('window');
 let adjustedWidth = windowSize.width * PixelRatio.get();
@@ -13,13 +13,12 @@ export const getDeviceSize = () => {
   let deviceWidthInInches = adjustedWidth / dpi;
   let deviceHeightInInches = adjustedHeight / dpi;
   let diagonalSize = Math.sqrt(
-    Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
+    Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2)
   );
-  return Platform.isPad? diagonalSize + 2 : diagonalSize;
+  return Platform.isPad ? diagonalSize + 2 : diagonalSize;
 };
 
-const getDpi = (pd) => {
-
+const getDpi = pd => {
   return 160 * pd;
 };
 const correction = (size, multiplier) => {
@@ -47,7 +46,7 @@ const correction = (size, multiplier) => {
     return size;
   }
 };
-export const normalize = (size) => {
+export const normalize = size => {
   let pd = pixelDensity;
   if (pd === 1 || pd < 1) {
     return correction(size, 0.82);
@@ -64,12 +63,12 @@ export const normalize = (size) => {
 export const SIZE = {
   xxs: normalize(10.5) * scale.fontScale,
   xs: normalize(12) * scale.fontScale,
-  sm: normalize(14.5)  * scale.fontScale,
+  sm: normalize(14.5) * scale.fontScale,
   md: normalize(16) * scale.fontScale,
   lg: normalize(22) * scale.fontScale,
   xl: normalize(24) * scale.fontScale,
   xxl: normalize(28) * scale.fontScale,
-  xxxl: normalize(32) * scale.fontScale,
+  xxxl: normalize(32) * scale.fontScale
 };
 
 export function updateSize() {
@@ -89,4 +88,3 @@ export const br = 5; // border radius
 export var ph = normalize(10); // padding horizontal
 export var pv = normalize(10); // padding vertical
 export const opacity = 0.5; // active opacity
-

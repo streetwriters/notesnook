@@ -76,13 +76,13 @@ export const eSwitchNightMode = '537';
 
 export const eStartSyncer = '538';
 
-export const eSetModalNavigator = '539'
+export const eSetModalNavigator = '539';
 
-export const eOpenPremiumDialog = '540'
+export const eOpenPremiumDialog = '540';
 
-export const eClosePremiumDialog = '541'
+export const eClosePremiumDialog = '541';
 
-export const eResetApp = '542'
+export const eResetApp = '542';
 
 export const eOpenExportDialog = '543';
 
@@ -137,4 +137,4 @@ export const eCloseAttachmentDialog = '601';
 export const eOpenTrialEndingDialog = '602';
 
 export const eOpenAnnouncementDialog = '603';
-export const eCloseAnnouncementDialog = '604'
+export const eCloseAnnouncementDialog = '604';

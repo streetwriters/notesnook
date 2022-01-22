@@ -1,8 +1,8 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Appearance, Linking, Platform, SafeAreaView, View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { useEffect, useRef, useState } from 'react';
+import { Appearance, Linking, Platform, SafeAreaView, View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
-import {useTracked} from '../../provider';
+import { useTracked } from '../../provider';
 import {
   useFavoriteStore,
   useMessageStore,
@@ -12,7 +12,7 @@ import {
 } from '../../provider/stores';
 import Backup from '../../services/Backup';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -21,34 +21,30 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {editing, STORE_LINK} from '../../utils';
-import {COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {
-  eOpenAnnouncementDialog,
-  eOpenLoginDialog,
-  eOpenRateDialog
-} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {tabBarRef} from '../../utils/Refs';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { editing, STORE_LINK } from '../../utils';
+import { COLOR_SCHEME_DARK, COLOR_SCHEME_LIGHT } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { eOpenAnnouncementDialog, eOpenLoginDialog, eOpenRateDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { tabBarRef } from '../../utils/Refs';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import SettingsBackupAndRestore from '../../views/Settings/backup-restore';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import SplashScreen from '../SplashScreen';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {checkVersion} from 'react-native-check-version';
-import {Placeholder, SvgToPngView} from '../ListPlaceholders';
-import {Update} from '../Update';
-import {setRateAppMessage} from '../../services/Message';
+import { checkVersion } from 'react-native-check-version';
+import { Placeholder, SvgToPngView } from '../ListPlaceholders';
+import { Update } from '../Update';
+import { setRateAppMessage } from '../../services/Message';
 
 let passwordValue = null;
 let didVerifyUser = false;
 const opacityV = new Animated.Value(1);
-const AppLoader = ({onLoad}) => {
+const AppLoader = ({ onLoad }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const [loading, setLoading] = useState(true);
@@ -172,10 +168,7 @@ const AppLoader = ({onLoad}) => {
   const checkNeedsBackup = async () => {
     let settingsStore = useSettingStore.getState();
     let askForBackup = await MMKV.getItem('askForBackup');
-    if (
-      settingsStore.settings.reminder === 'off' ||
-      !settingsStore.settings.reminder
-    ) {
+    if (settingsStore.settings.reminder === 'off' || !settingsStore.settings.reminder) {
       askForBackup = JSON.parse(askForBackup);
       if (askForBackup?.timestamp < Date.now()) {
         presentSheet({
@@ -215,10 +208,7 @@ const AppLoader = ({onLoad}) => {
       });
       return;
     }
-    let verified = await BiometricService.validateUser(
-      'Unlock to access your notes',
-      ''
-    );
+    let verified = await BiometricService.validateUser('Unlock to access your notes', '');
     if (verified) {
       didVerifyUser = true;
       setVerifyUser(false);
@@ -241,46 +231,40 @@ const AppLoader = ({onLoad}) => {
   return loading ? (
     <Animated.View
       style={{
-        backgroundColor:
-          Appearance.getColorScheme() === 'dark'
-            ? COLOR_SCHEME_DARK.bg
-            : colors.bg,
+        backgroundColor: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.bg : colors.bg,
         width: '100%',
         height: '100%',
         position: 'absolute',
         zIndex: 999,
         borderRadius: 10
-      }}>
+      }}
+    >
       <Animated.View
         style={{
           backgroundColor:
-            Appearance.getColorScheme() === 'dark'
-              ? COLOR_SCHEME_DARK.bg
-              : colors.bg,
+            Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK.bg : colors.bg,
           width: '100%',
           height: '100%',
           justifyContent: 'center',
           alignItems: 'center',
           borderRadius: 10,
           opacity: opacityV
-        }}>
+        }}
+      >
         {verifyUser ? (
           <SafeAreaView
             style={{
               flex: 1,
               justifyContent: 'center',
-              width:
-                deviceMode !== 'mobile'
-                  ? '50%'
-                  : Platform.OS == 'ios'
-                  ? '95%'
-                  : '100%',
+              width: deviceMode !== 'mobile' ? '50%' : Platform.OS == 'ios' ? '95%' : '100%',
               paddingHorizontal: 12
-            }}>
+            }}
+          >
             <Heading
               style={{
                 alignSelf: 'center'
-              }}>
+              }}
+            >
               Verify your identity
             </Heading>
 
@@ -289,9 +273,10 @@ const AppLoader = ({onLoad}) => {
                 <Paragraph
                   style={{
                     alignSelf: 'center'
-                  }}>
-                  To keep your notes secure, please enter password of the
-                  account you are logged in to.
+                  }}
+                >
+                  To keep your notes secure, please enter password of the account you are logged in
+                  to.
                 </Paragraph>
                 <Seperator />
                 <Input
@@ -317,9 +302,9 @@ const AppLoader = ({onLoad}) => {
                 <Paragraph
                   style={{
                     alignSelf: 'center'
-                  }}>
-                  To keep your notes secure, please unlock app the with
-                  biometrics.
+                  }}
+                >
+                  To keep your notes secure, please unlock app the with biometrics.
                 </Paragraph>
                 <Seperator />
               </>
@@ -341,7 +326,8 @@ const AppLoader = ({onLoad}) => {
               height: 10,
               flexDirection: 'row',
               width: 100
-            }}>
+            }}
+          >
             <AnimatedProgress
               style={{
                 backgroundColor:

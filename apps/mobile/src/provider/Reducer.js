@@ -5,11 +5,11 @@ export const reducer = (state, action) => {
     case Actions.THEME: {
       return {
         ...state,
-        colors: action.colors,
+        colors: action.colors
       };
     }
     default:
-      return state
-      //throw new Error('unknown action type');
+      return state;
+    //throw new Error('unknown action type');
   }
 };

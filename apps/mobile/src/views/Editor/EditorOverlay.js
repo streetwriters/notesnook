@@ -1,26 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
-import {Button} from '../../components/Button';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { Button } from '../../components/Button';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
-import {editing} from '../../utils';
-import {eOnLoadNote} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { editing } from '../../utils';
+import { eOnLoadNote } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 
 let timer = null;
 let timerError = null;
 let timerClosing = null;
 const EditorOverlay = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [loading, setLoading] = useState(null);
   const [error, setError] = useState(false);
   const opacity = useValue(1);
@@ -83,7 +79,8 @@ const EditorOverlay = () => {
           }
         ],
         zIndex: 100
-      }}>
+      }}
+    >
       <Animated.View
         style={{
           width: '90%',
@@ -92,7 +89,8 @@ const EditorOverlay = () => {
           backgroundColor: colors.bg,
           borderRadius: 5,
           paddingVertical: 20
-        }}>
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
@@ -102,7 +100,8 @@ const EditorOverlay = () => {
             borderRadius: 5,
             overflow: 'hidden',
             backgroundColor: colors.nav
-          }}>
+          }}
+        >
           <Animated.View
             style={{
               height: 10,
@@ -116,8 +115,9 @@ const EditorOverlay = () => {
         {loading?.title ? (
           <Heading
             textBreakStrategy="balanced"
-            style={{textAlign: 'center', marginBottom: 5}}
-            size={SIZE.lg}>
+            style={{ textAlign: 'center', marginBottom: 5 }}
+            size={SIZE.lg}
+          >
             {loading.title}
           </Heading>
         ) : null}
@@ -125,9 +125,10 @@ const EditorOverlay = () => {
         {loading?.dateEdited ? (
           <Paragraph
             textBreakStrategy="balanced"
-            style={{textAlign: 'center'}}
+            style={{ textAlign: 'center' }}
             color={colors.icon}
-            size={SIZE.sm}>
+            size={SIZE.sm}
+          >
             {timeConverter(loading.dateEdited)}
           </Paragraph>
         ) : null}
@@ -138,7 +139,8 @@ const EditorOverlay = () => {
           style={{
             position: 'absolute',
             bottom: 25
-          }}>
+          }}
+        >
           <Button
             type="errorShade"
             style={{
@@ -158,9 +160,9 @@ const EditorOverlay = () => {
               textAlign: 'center',
               maxWidth: '100%',
               marginTop: 5
-            }}>
-            If the editor fails to load even after reloading. Try restarting the
-            app.
+            }}
+          >
+            If the editor fails to load even after reloading. Try restarting the app.
           </Paragraph>
         </View>
       )}

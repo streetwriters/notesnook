@@ -1,16 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Dimensions, Image, View} from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
-import {SafeAreaView} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {dHeight, getElevation} from '../../utils';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Dimensions, Image, View } from 'react-native';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { dHeight, getElevation } from '../../utils';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import umami from '../../utils/umami';
-import {Button} from '../Button';
-import {SvgToPngView} from '../ListPlaceholders';
+import { Button } from '../Button';
+import { SvgToPngView } from '../ListPlaceholders';
 import MovableView from '../Transitions/movableview';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -21,7 +21,7 @@ const SVG_Z = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.487 113.
 
 const SplashScreen = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const isIntroCompleted = false; //useSettingStore(state => state.isIntroCompleted);
   const setIntroCompleted = useSettingStore(state => state.setIntroCompleted);
   const opacity = useValue(0);
@@ -71,20 +71,23 @@ const SplashScreen = () => {
               translateY: translateY2
             }
           ]
-        }}>
+        }}
+      >
         <SafeAreaView
           style={{
             width: '100%',
             height: '100%',
             marginTop: 25
-          }}>
+          }}
+        >
           <View
             style={{
               width: '100%',
               height: '100%',
               justifyContent: 'center',
               alignItems: 'center'
-            }}>
+            }}
+          >
             <Image
               source={require('../../assets/images/notesnook-logo-png.png')}
               style={{
@@ -100,7 +103,8 @@ const SplashScreen = () => {
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 75
-              }}>
+              }}
+            >
               <SvgToPngView width={200} height={200} src={SVG_D} />
               <View
                 style={{
@@ -108,12 +112,12 @@ const SplashScreen = () => {
                   marginBottom: 20,
                   maxWidth: '80%',
                   opacity: 0.8
-                }}>
+                }}
+              >
                 <Heading>Safe & encrypted notes</Heading>
                 <Paragraph
-                  size={
-                    SIZE.md + 4
-                  }>{`Write with freedom.\nNever compromise on\nprivacy again.`}</Paragraph>
+                  size={SIZE.md + 4}
+                >{`Write with freedom.\nNever compromise on\nprivacy again.`}</Paragraph>
               </View>
             </View>
 
@@ -123,7 +127,8 @@ const SplashScreen = () => {
                 zIndex: 20,
                 position: 'absolute',
                 bottom: 80
-              }}>
+              }}
+            >
               <Button
                 fontSize={SIZE.md}
                 height={45}
@@ -149,7 +154,8 @@ const SplashScreen = () => {
                 position: 'absolute',
                 bottom: -100,
                 zIndex: -1
-              }}>
+              }}
+            >
               <SvgToPngView
                 width={Dimensions.get('window').width}
                 height={Dimensions.get('window').width}

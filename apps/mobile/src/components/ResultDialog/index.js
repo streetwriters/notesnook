@@ -15,16 +15,14 @@ import { ProFeatures } from './pro-features';
 
 const ResultDialog = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState({
     title: 'Thank you for signing up!',
-    paragraph:
-      'Try out all features of Notesnook free for 7 days. No limitations. No commitments.',
+    paragraph: 'Try out all features of Notesnook free for 7 days. No limitations. No commitments.',
     button: 'Start taking notes'
   });
   useEffect(() => {
-
     eSubscribeEvent(eOpenResultDialog, open);
     eSubscribeEvent(eCloseResultDialog, close);
     return () => {
@@ -56,7 +54,8 @@ const ResultDialog = () => {
           paddingTop: 20,
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <Heading
           size={SIZE.lg}
           textBreakStrategy="balanced"
@@ -67,7 +66,8 @@ const ResultDialog = () => {
             maxWidth: '100%',
             marginBottom: 10,
             paddingHorizontal: 12
-          }}>
+          }}
+        >
           {dialogData.title}
         </Heading>
 
@@ -79,7 +79,8 @@ const ResultDialog = () => {
             textAlign: 'center',
             maxWidth: '80%',
             lineHeight: SIZE.sm + 5
-          }}>
+          }}
+        >
           {dialogData.paragraph}
         </Paragraph>
 
@@ -90,7 +91,8 @@ const ResultDialog = () => {
             paddingHorizontal: 12,
             alignItems: 'center',
             width: '100%'
-          }}>
+          }}
+        >
           <ProFeatures count={4} />
         </View>
 
@@ -102,7 +104,8 @@ const ResultDialog = () => {
             borderBottomRightRadius: 10,
             borderBottomLeftRadius: 10,
             paddingVertical: 10
-          }}>
+          }}
+        >
           <Button
             title={dialogData.button}
             width={null}

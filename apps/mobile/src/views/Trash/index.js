@@ -7,14 +7,13 @@ import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import { useSelectionStore, useTrashStore } from '../../provider/stores';
-import { eSendEvent, ToastEvent } from '../../services/EventManager';
+import { ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import { eScrollEvent } from '../../utils/Events';
 
-export const Trash = ({route, navigation}) => {
+export const Trash = ({ route, navigation }) => {
   const trash = useTrashStore(state => state.trash);
   const setTrash = useTrashStore(state => state.setTrash);
   let pageIsLoaded = false;
@@ -46,12 +45,12 @@ export const Trash = ({route, navigation}) => {
     Navigation.setHeaderState(
       'Trash',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Trash',
-        id: 'trash_navigation',
-      },
+        id: 'trash_navigation'
+      }
     );
   }, []);
 
@@ -79,7 +78,7 @@ export const Trash = ({route, navigation}) => {
       placeholder: 'Search in trash',
       data: trash,
       type: 'trash',
-      title: 'Trash',
+      title: 'Trash'
     });
   };
 
@@ -95,13 +94,12 @@ export const Trash = ({route, navigation}) => {
         useSelectionStore.getState().clearSelection(true);
         ToastEvent.show({
           heading: 'Trash cleared',
-          message:
-            'All notes and notebooks in the trash have been removed permanantly.',
+          message: 'All notes and notebooks in the trash have been removed permanantly.',
           type: 'success',
-          context: 'local',
+          context: 'local'
         });
       },
-      positiveType: 'errorShade',
+      positiveType: 'errorShade'
     });
   };
 
@@ -109,12 +107,7 @@ export const Trash = ({route, navigation}) => {
     <>
       <SelectionHeader screen="Trash" />
       <ContainerTopSection>
-        <Header
-          title="Trash"
-          isBack={false}
-          screen="Trash"
-          action={_onPressBottomButton}
-        />
+        <Header title="Trash" isBack={false} screen="Trash" action={_onPressBottomButton} />
       </ContainerTopSection>
       <SimpleList
         listData={trash}
@@ -123,13 +116,12 @@ export const Trash = ({route, navigation}) => {
         focused={() => navigation.isFocused()}
         placeholderData={{
           heading: 'Trash',
-          paragraph:
-            'Items in the trash will be permanently deleted after 7 days.',
+          paragraph: 'Items in the trash will be permanently deleted after 7 days.',
           button: null,
-          loading: 'Loading trash items',
+          loading: 'Loading trash items'
         }}
         headerProps={{
-          heading: 'Trash',
+          heading: 'Trash'
         }}
         placeholder={<Placeholder type="trash" />}
         placeholderText="Deleted notes & notebooks appear here."

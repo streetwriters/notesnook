@@ -1,7 +1,7 @@
-import {NativeEventEmitter, NativeModules, Platform} from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 
-const NativeEventSource = Platform.OS === "ios"? null : NativeModules.EventSource;
-const EventEmitter = Platform.OS === "ios"? null :  new NativeEventEmitter(NativeEventSource);
+const NativeEventSource = Platform.OS === 'ios' ? null : NativeModules.EventSource;
+const EventEmitter = Platform.OS === 'ios' ? null : new NativeEventEmitter(NativeEventSource);
 
 export default class EventSource {
   constructor(url, options) {
@@ -28,9 +28,9 @@ export default class EventSource {
       this.onopen();
     });
 
-   this.message = EventEmitter.addListener("message", (ev) => {
-      const {message} = ev;
-      const eventData = {data: message};
+    this.message = EventEmitter.addListener('message', ev => {
+      const { message } = ev;
+      const eventData = { data: message };
       this.onmessage(eventData);
     });
   }

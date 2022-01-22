@@ -5,17 +5,11 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import Sodium from 'react-native-sodium';
 import RNFetchBlob from 'rn-fetch-blob';
 import { Attachment } from '../../../../components/AttachmentDialog';
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from '../../../../services/EventManager';
+import { eSendEvent, presentSheet, ToastEvent } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import { editing } from '../../../../utils';
 import { db } from '../../../../utils/database';
-import {
-  eCloseProgressDialog
-} from '../../../../utils/Events';
+import { eCloseProgressDialog } from '../../../../utils/Events';
 import { sleep } from '../../../../utils/TimeUtils';
 import { EditorWebView, getNote } from '../../Functions';
 import tiny, { safeKeyboardDismiss } from '../tiny';
@@ -32,7 +26,8 @@ const showEncryptionSheet = file => {
       <View
         style={{
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         <Attachment
           attachment={{
             metadata: {
@@ -315,7 +310,7 @@ async function attachFile(uri, hash, type, filename) {
       encryptionInfo.size = encryptionInfo.length;
       encryptionInfo.key = key;
     } else {
-      encryptionInfo = {hash: hash};
+      encryptionInfo = { hash: hash };
     }
     await db.attachments.add(encryptionInfo, getNote()?.id);
     if (Platform.OS === 'ios') await RNFetchBlob.fs.unlink(uri);

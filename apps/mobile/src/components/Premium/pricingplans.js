@@ -1,32 +1,28 @@
-import React, {useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, Text, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, Text, View } from 'react-native';
 import * as RNIap from 'react-native-iap';
-import {useTracked} from '../../provider';
-import {useUserStore} from '../../provider/stores';
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
   eClosePremiumDialog,
   eCloseProgressDialog,
   eCloseSimpleDialog,
   eOpenLoginDialog
 } from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import umami from '../../utils/umami';
-import {Button} from '../Button';
-import {Dialog} from '../Dialog';
+import { Button } from '../Button';
+import { Dialog } from '../Dialog';
 import BaseDialog from '../Dialog/base-dialog';
-import {presentDialog} from '../Dialog/functions';
+import { presentDialog } from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {PricingItem} from './pricing-item';
+import { PricingItem } from './pricing-item';
 
 const promoCyclesMonthly = {
   1: 'first month',
@@ -40,12 +36,7 @@ const promoCyclesYearly = {
   3: 'first 3 years'
 };
 
-export const PricingPlans = ({
-  promo,
-  marginTop,
-  heading = true,
-  compact = false
-}) => {
+export const PricingPlans = ({ promo, marginTop, heading = true, compact = false }) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const user = useUserStore(state => state.user);
@@ -61,12 +52,8 @@ export const PricingPlans = ({
       let products = await PremiumService.getProducts();
       if (products.length > 0) {
         let offers = {
-          monthly: products.find(
-            p => p.productId === 'com.streetwriters.notesnook.sub.mo'
-          ),
-          yearly: products.find(
-            p => p.productId === 'com.streetwriters.notesnook.sub.yr'
-          )
+          monthly: products.find(p => p.productId === 'com.streetwriters.notesnook.sub.mo'),
+          yearly: products.find(p => p.productId === 'com.streetwriters.notesnook.sub.yr')
         };
         setOffers(offers);
 
@@ -98,12 +85,10 @@ export const PricingPlans = ({
       let isMonthly = product.productId.indexOf('.mo') > -1;
       let cycleText = isMonthly
         ? promoCyclesMonthly[
-            product.introductoryPriceCyclesAndroid ||
-              product.introductoryPriceNumberOfPeriodsIOS
+            product.introductoryPriceCyclesAndroid || product.introductoryPriceNumberOfPeriodsIOS
           ]
         : promoCyclesYearly[
-            product.introductoryPriceCyclesAndroid ||
-              product.introductoryPriceNumberOfPeriodsIOS
+            product.introductoryPriceCyclesAndroid || product.introductoryPriceNumberOfPeriodsIOS
           ];
 
       setProduct({
@@ -132,18 +117,8 @@ export const PricingPlans = ({
         setBuying(false);
         return;
       }
-      umami.pageView(
-        '/iap-native',
-        `${compact ? 'pro-sheet' : 'pro-screen'}/pro-plans`
-      );
-      await RNIap.requestSubscription(
-        product?.productId,
-        false,
-        null,
-        null,
-        null,
-        user.id
-      );
+      umami.pageView('/iap-native', `${compact ? 'pro-sheet' : 'pro-screen'}/pro-plans`);
+      await RNIap.requestSubscription(product?.productId, false, null, null, null, user.id);
       setBuying(false);
       eSendEvent(eCloseProgressDialog);
       eSendEvent(eClosePremiumDialog);
@@ -170,14 +145,16 @@ export const PricingPlans = ({
         justifyContent: 'center',
         alignItems: 'center',
         height: 100
-      }}>
+      }}
+    >
       <ActivityIndicator color={colors.accent} size={25} />
     </View>
   ) : (
     <View
       style={{
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       {buying ? (
         <BaseDialog statusBarTranslucent centered>
           <ActivityIndicator size={50} color="white" />
@@ -190,14 +167,16 @@ export const PricingPlans = ({
             alignSelf: 'center',
             textAlign: 'center'
           }}
-          size={SIZE.lg - 4}>
+          size={SIZE.lg - 4}
+        >
           {product.data.introductoryPrice}
           <Paragraph
             style={{
               textDecorationLine: 'line-through',
               color: colors.icon
             }}
-            size={SIZE.sm}>
+            size={SIZE.sm}
+          >
             ({product.data.localizedPrice})
           </Paragraph>{' '}
           for {product.cycleText}
@@ -212,7 +191,8 @@ export const PricingPlans = ({
                 alignSelf: 'center',
                 marginTop: marginTop || 20,
                 marginBottom: 20
-              }}>
+              }}
+            >
               Choose a plan
             </Heading>
           ) : null}
@@ -222,7 +202,8 @@ export const PricingPlans = ({
               flexDirection: !compact ? 'column' : 'row',
               flexWrap: 'wrap',
               justifyContent: 'space-around'
-            }}>
+            }}
+          >
             <PricingItem
               onPress={() => buySubscription(offers?.monthly)}
               compact={compact}
@@ -271,8 +252,7 @@ export const PricingPlans = ({
                     eSendEvent(eCloseSimpleDialog);
                     setBuying(true);
                     try {
-                      if (!(await getPromo(value)))
-                        throw new Error('Error applying promo code');
+                      if (!(await getPromo(value))) throw new Error('Error applying promo code');
                       ToastEvent.show({
                         heading: 'Discount applied!',
                         type: 'success',
@@ -333,12 +313,14 @@ export const PricingPlans = ({
                     alignSelf: 'center',
                     justifyContent: 'center',
                     textAlign: 'center'
-                  }}>
+                  }}
+                >
                   Use promo code{' '}
                   <Text
                     style={{
                       fontFamily: 'OpenSans-SemiBold'
-                    }}>
+                    }}
+                  >
                     {promo.promoCode}
                   </Text>{' '}
                   at checkout
@@ -380,14 +362,13 @@ export const PricingPlans = ({
             alignSelf: 'center',
             textAlign: 'center',
             marginTop: 10
-          }}>
-          Upon signing up, your 14 day free trial of Notesnook Pro will be
-          activated automatically.{' '}
-          <Paragraph size={SIZE.xs} style={{fontWeight: 'bold'}}>
+          }}
+        >
+          Upon signing up, your 14 day free trial of Notesnook Pro will be activated automatically.{' '}
+          <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
             No credit card information is required.
           </Paragraph>{' '}
-          Once the free trial period ends, your account will be downgraded to
-          basic free account.{' '}
+          Once the free trial period ends, your account will be downgraded to basic free account.{' '}
           <Paragraph
             size={SIZE.xs}
             onPress={() => {
@@ -398,9 +379,9 @@ export const PricingPlans = ({
                 });
             }}
             color={colors.accent}
-            style={{fontWeight: 'bold', textDecorationLine: 'underline'}}>
-            Visit our website to learn what is included in the basic free
-            account.
+            style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}
+          >
+            Visit our website to learn what is included in the basic free account.
           </Paragraph>
         </Paragraph>
       ) : null}
@@ -416,10 +397,11 @@ export const PricingPlans = ({
                 alignSelf: 'center',
                 marginTop: 10,
                 textAlign: 'center'
-              }}>
-              By subscribing, you will be charged to your iTunes Account for the
-              selected plan. Subscriptions will automatically renew unless
-              cancelled within 24-hours before the end of the current period.
+              }}
+            >
+              By subscribing, you will be charged to your iTunes Account for the selected plan.
+              Subscriptions will automatically renew unless cancelled within 24-hours before the end
+              of the current period.
             </Paragraph>
           ) : (
             <Paragraph
@@ -429,24 +411,26 @@ export const PricingPlans = ({
                 alignSelf: 'center',
                 marginTop: 10,
                 textAlign: 'center'
-              }}>
-              By subscribing, your will be charged on your Google Account, and
-              your subscription will automatically renew until you cancel prior
-              to the end of the then current period.
+              }}
+            >
+              By subscribing, your will be charged on your Google Account, and your subscription
+              will automatically renew until you cancel prior to the end of the then current period.
             </Paragraph>
           )}
 
           <View
             style={{
               width: '100%'
-            }}>
+            }}
+          >
             <Paragraph
               size={SIZE.xs}
               color={colors.icon}
               style={{
                 maxWidth: '100%',
                 textAlign: 'center'
-              }}>
+              }}
+            >
               By subscribing, you agree to our{' '}
               <Paragraph
                 size={SIZE.xs}
@@ -460,7 +444,8 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: 'underline'
                 }}
-                color={colors.accent}>
+                color={colors.accent}
+              >
                 Terms of Service{' '}
               </Paragraph>
               and{' '}
@@ -476,7 +461,8 @@ export const PricingPlans = ({
                 style={{
                   textDecorationLine: 'underline'
                 }}
-                color={colors.accent}>
+                color={colors.accent}
+              >
                 Privacy Policy.
               </Paragraph>
             </Paragraph>

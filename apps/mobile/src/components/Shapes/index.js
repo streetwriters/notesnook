@@ -1,7 +1,7 @@
 import React from 'react';
 import { Dimensions, StyleSheet, View } from 'react-native';
 
-const Circle = ({size, color, position}) => {
+const Circle = ({ size, color, position }) => {
   let style = {
     wrapper: {
       flexDirection: 'row',
@@ -21,7 +21,7 @@ const Circle = ({size, color, position}) => {
   );
 };
 
-const Donut = ({size, color, position}) => {
+const Donut = ({ size, color, position }) => {
   let style = {
     wrapper: {
       flexDirection: 'row',
@@ -42,7 +42,7 @@ const Donut = ({size, color, position}) => {
   );
 };
 
-const Triangle = ({size, color, position}) => {
+const Triangle = ({ size, color, position }) => {
   let style = {
     wrapper: {
       flexDirection: 'row',
@@ -59,7 +59,7 @@ const Triangle = ({size, color, position}) => {
       borderLeftColor: 'transparent',
       borderRightColor: 'transparent',
       borderBottomColor: color,
-      transform: [{rotate: '180deg'}]
+      transform: [{ rotate: '180deg' }]
     }
   };
   return (
@@ -69,7 +69,7 @@ const Triangle = ({size, color, position}) => {
   );
 };
 
-const DiamondNarrow = ({size, color, position}) => {
+const DiamondNarrow = ({ size, color, position }) => {
   let style = {
     wrapper: {
       flexDirection: 'row',
@@ -111,7 +111,7 @@ const DiamondNarrow = ({size, color, position}) => {
   );
 };
 
-const CutDiamond = ({size, color, position}) => {
+const CutDiamond = ({ size, color, position }) => {
   let style = {
     wrapper: {
       flexDirection: 'row',
@@ -153,25 +153,16 @@ const CutDiamond = ({size, color, position}) => {
   );
 };
 
-
-
-const Shapes = ({
-  primaryColor,
-  secondaryColor,
-  height,
-  figures,
-  borderRadius,
-  style
-}) => {
+const Shapes = ({ primaryColor, secondaryColor, height, figures, borderRadius, style }) => {
   const config = {
     primaryColor: primaryColor || '#416DF8',
     secondaryColor: secondaryColor || '#2F53D5',
     height: Dimensions.get('window').height / (height || 3.5),
     sizefigure: 100,
     figures: figures || [
-      {name: 'circle', position: 'center', size: 60},
-      {name: 'donut', position: 'flex-start', axis: 'top', size: 80},
-      {name: 'circle', position: 'center', axis: 'right', size: 100}
+      { name: 'circle', position: 'center', size: 60 },
+      { name: 'donut', position: 'flex-start', axis: 'top', size: 80 },
+      { name: 'circle', position: 'center', axis: 'right', size: 100 }
     ],
     borderRadius: borderRadius !== undefined ? borderRadius : 30
   };
@@ -204,32 +195,17 @@ const Shapes = ({
 
       if (e.name === 'circle') {
         arrFigures.push(
-          <Circle
-            key={i}
-            size={sizefigure}
-            color={config.secondaryColor}
-            position={position}
-          />
+          <Circle key={i} size={sizefigure} color={config.secondaryColor} position={position} />
         );
       }
       if (e.name === 'donut') {
         arrFigures.push(
-          <Donut
-            key={i}
-            size={sizefigure}
-            color={config.secondaryColor}
-            position={position}
-          />
+          <Donut key={i} size={sizefigure} color={config.secondaryColor} position={position} />
         );
       }
       if (e.name === 'triangle') {
         arrFigures.push(
-          <Triangle
-            key={i}
-            size={sizefigure}
-            color={config.secondaryColor}
-            position={position}
-          />
+          <Triangle key={i} size={sizefigure} color={config.secondaryColor} position={position} />
         );
       }
       if (e.name === 'diamondNarrow') {
@@ -244,12 +220,7 @@ const Shapes = ({
       }
       if (e.name === 'cutDiamond') {
         arrFigures.push(
-          <CutDiamond
-            key={i}
-            size={sizefigure}
-            color={config.secondaryColor}
-            position={position}
-          />
+          <CutDiamond key={i} size={sizefigure} color={config.secondaryColor} position={position} />
         );
       }
     });
@@ -266,7 +237,8 @@ const Shapes = ({
         borderBottomLeftRadius: config.borderRadius,
         borderBottomRightRadius: config.borderRadius,
         ...style
-      }}>
+      }}
+    >
       <>{buildFigures()}</>
     </View>
   );
@@ -284,4 +256,3 @@ const styles = StyleSheet.create({
 });
 
 export { Shapes };
-

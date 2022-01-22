@@ -1,20 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {eOnNewTopicAdded, eScrollEvent} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import { eOnNewTopicAdded, eScrollEvent } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Title = ({heading, headerColor, screen, notebook}) => {
+export const Title = ({ heading, headerColor, screen, notebook }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [hide, setHide] = useState(screen === 'Notebook' ? true : false);
 
   const onScroll = data => {
@@ -59,7 +55,8 @@ export const Title = ({heading, headerColor, screen, notebook}) => {
         opacity: 1,
         flexShrink: 1,
         flexDirection: 'row'
-      }}>
+      }}
+    >
       {!hide ? (
         <Heading
           onPress={navigateToNotebook}
@@ -68,16 +65,15 @@ export const Title = ({heading, headerColor, screen, notebook}) => {
           style={{
             flexWrap: 'wrap'
           }}
-          color={headerColor}>
+          color={headerColor}
+        >
           {notebook ? (
             <Paragraph numberOfLines={1} size={SIZE.xs + 1}>
               {notebook?.title}
               {'\n'}
             </Paragraph>
           ) : null}
-          <Heading color={colors.accent}>
-            {heading.slice(0, 1) === '#' ? '#' : null}
-          </Heading>
+          <Heading color={colors.accent}>{heading.slice(0, 1) === '#' ? '#' : null}</Heading>
           {heading.slice(0, 1) === '#' ? heading.slice(1) : heading}
         </Heading>
       ) : null}

@@ -11,9 +11,9 @@ import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { eScrollEvent } from '../../utils/Events';
 
-export const Tags = ({route, navigation}) => {
+export const Tags = ({ route, navigation }) => {
   const tags = useTagStore(state => state.tags);
-  const setTags = useTagStore(state =>state.setTags);
+  const setTags = useTagStore(state => state.setTags);
   let ranAfterInteractions = false;
 
   const runAfterInteractions = () => {
@@ -34,12 +34,12 @@ export const Tags = ({route, navigation}) => {
     Navigation.setHeaderState(
       'Tags',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Tags',
-        id: 'tags_navigation',
-      },
+        id: 'tags_navigation'
+      }
     );
   }, []);
 
@@ -62,7 +62,7 @@ export const Tags = ({route, navigation}) => {
       placeholder: 'Search in tags',
       data: tags,
       type: 'tags',
-      title: 'Tags',
+      title: 'Tags'
     });
   };
 
@@ -76,7 +76,7 @@ export const Tags = ({route, navigation}) => {
         listData={tags}
         type="tags"
         headerProps={{
-          heading: 'Tags',
+          heading: 'Tags'
         }}
         screen="Tags"
         focused={() => navigation.isFocused()}
@@ -84,7 +84,7 @@ export const Tags = ({route, navigation}) => {
           heading: 'Your tags',
           paragraph: 'You have not created any tags for your notes yet.',
           button: null,
-          loading: 'Loading your tags.',
+          loading: 'Loading your tags.'
         }}
         placeholder={<Placeholder type="tags" />}
         placeholderText="Tags added to notes appear here"

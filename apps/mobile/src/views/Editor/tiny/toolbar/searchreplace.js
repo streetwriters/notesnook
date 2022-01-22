@@ -1,25 +1,22 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
-import {Button} from '../../../../components/Button';
+import React, { useEffect, useRef, useState } from 'react';
+import { View } from 'react-native';
+import { Button } from '../../../../components/Button';
 import Input from '../../../../components/Input';
-import {useTracked} from '../../../../provider';
-import {useEditorStore, useSettingStore} from '../../../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../../../services/EventManager';
-import {showTooltip, TOOLTIP_POSITIONS} from '../../../../utils';
+import { useTracked } from '../../../../provider';
+import { useEditorStore, useSettingStore } from '../../../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
+import { showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
-import {SIZE} from '../../../../utils/SizeUtils';
-import {sleep} from '../../../../utils/TimeUtils';
-import {EditorWebView} from '../../Functions';
+import { SIZE } from '../../../../utils/SizeUtils';
+import { sleep } from '../../../../utils/TimeUtils';
+import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
-import {endSearch} from './commands';
-import {properties} from './constants';
+import { endSearch } from './commands';
+import { properties } from './constants';
 
 const SearcReplace = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [focusType, setFocusType] = useState(0);
   const [enableReplace, setEnableReplace] = useState(false);
   const [menu, setMenu] = useState(false);
@@ -70,26 +67,20 @@ const SearcReplace = () => {
     tiny.call(
       EditorWebView,
       `tinymce.activeEditor.undoManager.transact(function () {
-        tinymce.activeEditor.plugins.searchreplace.replace("${
-          values.current?.replace
-        }",true${all ? ',true' : ''});
+        tinymce.activeEditor.plugins.searchreplace.replace("${values.current?.replace}",true${
+        all ? ',true' : ''
+      });
       });
       `
     );
   }
 
   function next() {
-    tiny.call(
-      EditorWebView,
-      `tinymce.activeEditor.plugins.searchreplace.next()`
-    );
+    tiny.call(EditorWebView, `tinymce.activeEditor.plugins.searchreplace.next()`);
   }
 
   function prev() {
-    tiny.call(
-      EditorWebView,
-      `tinymce.activeEditor.plugins.searchreplace.prev()`
-    );
+    tiny.call(EditorWebView, `tinymce.activeEditor.plugins.searchreplace.prev()`);
   }
 
   function done() {
@@ -99,14 +90,14 @@ const SearcReplace = () => {
   function toggleMatchCase() {
     setConfig(c => {
       c.matchCase = !c.matchCase;
-      return {...c};
+      return { ...c };
     });
   }
 
   function toggleMatchWholeWord() {
     setConfig(c => {
       c.matchWholeWord = !c.matchWholeWord;
-      return {...c};
+      return { ...c };
     });
   }
 
@@ -194,7 +185,8 @@ const SearcReplace = () => {
         borderTopLeftRadius: 10,
         flexDirection: 'row',
         alignItems: 'center'
-      }}>
+      }}
+    >
       <Button
         height="93%"
         iconSize={SIZE.md + 4}
@@ -222,15 +214,14 @@ const SearcReplace = () => {
           flexGrow: 1,
           flexDirection: deviceMode !== 'mobile' ? 'row' : 'column',
           flexShrink: 1
-        }}>
+        }}
+      >
         <Input
           fwdRef={findRef}
           onChangeText={value => {
             values.current.find = value;
           }}
-          defaultValue={
-            values.current?.find || properties.selection?.current?.value
-          }
+          defaultValue={values.current?.find || properties.selection?.current?.value}
           onFocusInput={() => setFocusType(1)}
           onSubmit={find}
           blurOnSubmit={false}
@@ -240,6 +231,7 @@ const SearcReplace = () => {
             <>
               {searchButtons.map(button => (
                 <Button
+                  key={button.text}
                   title={button.text}
                   fontSize={SIZE.xs}
                   height={28}
@@ -282,6 +274,7 @@ const SearcReplace = () => {
                 <>
                   {replaceButtons.map(button => (
                     <Button
+                      key={button.text}
                       title={button.text}
                       fontSize={SIZE.xs + 1}
                       height={28}

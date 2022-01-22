@@ -1,13 +1,13 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Heading from '../../../../components/Typography/Heading';
-import {useTracked} from '../../../../provider';
+import { useTracked } from '../../../../provider';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Paragraph from '../../../../components/Typography/Paragraph';
-const ToolbarListFormat = ({selected, formatValue, format}) => {
+const ToolbarListFormat = ({ selected, formatValue, format }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const ordered_lists = {
     default: ['1.', '2.', '3.'],
     'lower-alpha': ['a.', 'b.', 'c.'],
@@ -29,7 +29,8 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
             alignItems: 'center',
             marginBottom: format === 'ol' ? 0 : 1,
             marginTop: format === 'ol' || format === 'cl' ? 0 : 1
-          }}>
+          }}
+        >
           {format === 'ol' ? (
             <Heading
               style={{
@@ -37,7 +38,8 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
                 height: 7
               }}
               color={selected && colors.accent}
-              size={6}>
+              size={6}
+            >
               {item}
             </Heading>
           ) : format === 'cl' ? (
@@ -55,11 +57,7 @@ const ToolbarListFormat = ({selected, formatValue, format}) => {
               style={{
                 borderRadius: formatValue === 'square' ? 0 : 100,
                 backgroundColor:
-                  formatValue !== 'circle'
-                    ? selected
-                      ? colors.accent
-                      : colors.pri
-                    : null,
+                  formatValue !== 'circle' ? (selected ? colors.accent : colors.pri) : null,
                 borderWidth: formatValue === 'circle' ? 0.5 : 0,
                 width: 4,
                 height: 4,

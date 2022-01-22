@@ -1,25 +1,25 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Text, View} from 'react-native';
-import {FlatList} from 'react-native-gesture-handler';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Text, View } from 'react-native';
+import { FlatList } from 'react-native-gesture-handler';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {presentSheet} from '../../services/EventManager';
-import {db} from '../../utils/database';
+import { useTracked } from '../../provider';
+import { presentSheet } from '../../services/EventManager';
+import { db } from '../../utils/database';
 import { openLinkInBrowser } from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {timeConverter, timeSince} from '../../utils/TimeUtils';
+import { SIZE } from '../../utils/SizeUtils';
+import { timeConverter, timeSince } from '../../utils/TimeUtils';
 import DialogHeader from '../Dialog/dialog-header';
 import GeneralSheet from '../GeneralSheet';
-import {PressableButton} from '../PressableButton';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 import NotePreview from './preview';
 
-export default function NoteHistory({note, ref}) {
+export default function NoteHistory({ note, ref }) {
   const [history, setHistory] = useState([]);
   const [loading, setLoading] = useState(true);
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   useEffect(() => {
     (async () => {
@@ -41,7 +41,7 @@ export default function NoteHistory({note, ref}) {
           content={content}
         />
       ),
-      context: 'note_history',
+      context: 'note_history'
     });
   }
 
@@ -58,7 +58,7 @@ export default function NoteHistory({note, ref}) {
   };
 
   const renderItem = useCallback(
-    ({item, index}) => (
+    ({ item, index }) => (
       <PressableButton
         type="grayBg"
         onPress={() => preview(item)}
@@ -69,7 +69,8 @@ export default function NoteHistory({note, ref}) {
           height: 45,
           marginBottom: 10,
           flexDirection: 'row'
-        }}>
+        }}
+      >
         <Paragraph>{getDate(item.dateCreated, item.dateModified)}</Paragraph>
         <Paragraph color={colors.icon} size={SIZE.xs}>
           {timeSince(item.dateModified)}
@@ -106,11 +107,10 @@ export default function NoteHistory({note, ref}) {
               justifyContent: 'center',
               alignItems: 'center',
               height: 200
-            }}>
+            }}
+          >
             <Icon name="history" size={60} color={colors.icon} />
-            <Paragraph color={colors.icon}>
-              No note history found on this device.
-            </Paragraph>
+            <Paragraph color={colors.icon}>No note history found on this device.</Paragraph>
           </View>
         }
         renderItem={renderItem}
@@ -120,13 +120,15 @@ export default function NoteHistory({note, ref}) {
         color={colors.icon}
         style={{
           alignSelf: 'center'
-        }}>
-        Note version history is local only.{' '}
-        <Text 
-        onPress={() => {
-          openLinkInBrowser("https://docs.notesnook.com/versionhistory",colors);
         }}
-        style={{color: colors.accent, textDecorationLine: 'underline'}}>
+      >
+        Note version history is local only.{' '}
+        <Text
+          onPress={() => {
+            openLinkInBrowser('https://docs.notesnook.com/versionhistory', colors);
+          }}
+          style={{ color: colors.accent, textDecorationLine: 'underline' }}
+        >
           Learn how this works.
         </Text>
       </Paragraph>

@@ -1,5 +1,11 @@
 import { StackActions } from '@react-navigation/native';
-import { useFavoriteStore, useNotebookStore, useNoteStore, useTagStore, useTrashStore } from '../provider/stores';
+import {
+  useFavoriteStore,
+  useNotebookStore,
+  useNoteStore,
+  useTagStore,
+  useTrashStore
+} from '../provider/stores';
 import { eOnNewTopicAdded, refreshNotesPage } from '../utils/Events';
 import { rootNavigatorRef, tabBarRef } from '../utils/Refs';
 import { eSendEvent } from './EventManager';
@@ -20,7 +26,7 @@ let headerState = {
   heading: 'Notes',
   color: null,
   verticalMenu: true,
-  currentScreen: 'Notes',
+  currentScreen: 'Notes'
 };
 
 const routeNames = {
@@ -30,7 +36,7 @@ const routeNames = {
   NotesPage: 'NotesPage',
   Tags: 'Tags',
   Favorites: 'Favorites',
-  Trash: 'Trash',
+  Trash: 'Trash'
 };
 
 let routesToUpdate = [];
@@ -63,18 +69,11 @@ function routeNeedsUpdate(routeName, callback) {
  */
 function setRoutesToUpdate(routes) {
   if (routes.indexOf(currentScreen) > -1) {
-    if (
-      currentScreen === routeNames.NotesPage ||
-      currentScreen === routeNames.Notebook
-    ) {
-      eSendEvent(
-        currentScreen === routeNames.NotesPage
-          ? refreshNotesPage
-          : eOnNewTopicAdded,
-      );
+    if (currentScreen === routeNames.NotesPage || currentScreen === routeNames.Notebook) {
+      eSendEvent(currentScreen === routeNames.NotesPage ? refreshNotesPage : eOnNewTopicAdded);
     } else {
       if (currentScreen === routeNames.Notes) {
-        useNoteStore.getState().setNotes()
+        useNoteStore.getState().setNotes();
       } else if (currentScreen === routeNames.Notebooks) {
         useNotebookStore.getState().setNotebooks();
       } else if (currentScreen === routeNames.Favorites) {
@@ -128,7 +127,7 @@ function setHeaderState(name, params, item) {
   headerState.currentScreen = name;
   headerState.verticalMenu = params.menu;
   if (headerState) {
-    eSendEvent('onHeaderStateChange', {id: headerState.id});
+    eSendEvent('onHeaderStateChange', { id: headerState.id });
   }
 }
 
@@ -152,12 +151,12 @@ function popToTop() {
   setHeaderState(
     SettingsService.get().homepage,
     {
-      menu: true,
+      menu: true
     },
     {
       heading: SettingsService.get().homepage,
-      id: SettingsService.get().homepage.toLocaleLowerCase() + '_navigation',
-    },
+      id: SettingsService.get().homepage.toLocaleLowerCase() + '_navigation'
+    }
   );
 }
 
@@ -183,5 +182,5 @@ export default {
   routeNeedsUpdate,
   routeNames,
   getHomeLoaded,
-  setHomeLoaded,
+  setHomeLoaded
 };

@@ -1,27 +1,27 @@
-import React, {useState} from 'react';
-import {ScrollView, View} from 'react-native';
-import {LAUNCH_ROCKET} from '../../assets/images/assets';
-import {useTracked} from '../../provider';
-import {useUserStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSendEvent, presentSheet} from '../../services/EventManager';
-import {getElevation} from '../../utils';
-import {eOpenLoginDialog} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
+import React, { useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { LAUNCH_ROCKET } from '../../assets/images/assets';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, presentSheet } from '../../services/EventManager';
+import { getElevation } from '../../utils';
+import { eOpenLoginDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
 import umami from '../../utils/umami';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import GeneralSheet from '../GeneralSheet';
-import {SvgToPngView} from '../ListPlaceholders';
+import { SvgToPngView } from '../ListPlaceholders';
 import Seperator from '../Seperator';
-import {Toast} from '../Toast';
+import { Toast } from '../Toast';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {features} from './features';
-import {Group} from './group';
-import {PricingPlans} from './pricing-plans';
+import { features } from './features';
+import { Group } from './group';
+import { PricingPlans } from './pricing-plans';
 
-export const Component = ({close, promo, getRef}) => {
+export const Component = ({ close, promo, getRef }) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const user = useUserStore(state => state.user);
@@ -63,7 +63,8 @@ export const Component = ({close, promo, getRef}) => {
         justifyContent: 'space-between',
         borderRadius: 10,
         maxHeight: '100%'
-      }}>
+      }}
+    >
       <GeneralSheet context="pricing_plans" />
       <ActionIcon
         onPress={() => {
@@ -87,7 +88,8 @@ export const Component = ({close, promo, getRef}) => {
         }}
         keyboardDismissMode="none"
         keyboardShouldPersistTaps="always"
-        onScroll={onScroll}>
+        onScroll={onScroll}
+      >
         <View
           key="top-banner"
           style={{
@@ -95,12 +97,9 @@ export const Component = ({close, promo, getRef}) => {
             alignItems: 'center',
             height: 400,
             justifyContent: 'center'
-          }}>
-          <SvgToPngView
-            width={350}
-            height={350}
-            src={LAUNCH_ROCKET(colors.accent)}
-          />
+          }}
+        >
+          <SvgToPngView width={350} height={350} src={LAUNCH_ROCKET(colors.accent)} />
         </View>
 
         <Heading
@@ -109,7 +108,8 @@ export const Component = ({close, promo, getRef}) => {
           style={{
             alignSelf: 'center',
             paddingTop: 20
-          }}>
+          }}
+        >
           Notesnook{' '}
           <Heading size={SIZE.lg} color={colors.accent}>
             Pro
@@ -124,16 +124,15 @@ export const Component = ({close, promo, getRef}) => {
             alignSelf: 'center',
             paddingBottom: 20,
             width: '90%'
-          }}>
+          }}
+        >
           Ready to take the next step on your private note taking journey?
         </Paragraph>
 
         <Button
           key="calltoaction"
           onPress={onPress}
-          title={
-            promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'
-          }
+          title={promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'}
           type="accent"
           style={{
             paddingHorizontal: 24,
@@ -151,7 +150,8 @@ export const Component = ({close, promo, getRef}) => {
           key="plans"
           style={{
             paddingHorizontal: 12
-          }}>
+          }}
+        >
           <PricingPlans promo={promo} />
         </View>
       </ScrollView>
@@ -159,9 +159,7 @@ export const Component = ({close, promo, getRef}) => {
       {floatingButton ? (
         <Button
           onPress={onPress}
-          title={
-            promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'
-          }
+          title={promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'}
           type="accent"
           style={{
             paddingHorizontal: 24,

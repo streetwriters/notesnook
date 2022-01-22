@@ -15,7 +15,7 @@ import { eOnLoadNote } from '../../utils/Events';
 import { tabBarRef } from '../../utils/Refs';
 import { getNote } from '../Editor/Functions';
 
-export const Home = ({navigation}) => {
+export const Home = ({ navigation }) => {
   const notes = useNoteStore(state => state.notes);
   const setNotes = useNoteStore(state => state.setNotes);
   const loading = useNoteStore(state => state.loading);
@@ -81,13 +81,13 @@ export const Home = ({navigation}) => {
   const _onPressBottomButton = React.useCallback(async () => {
     if (!DDS.isTab) {
       if (getNote()) {
-        eSendEvent(eOnLoadNote, {type: 'new'});
+        eSendEvent(eOnLoadNote, { type: 'new' });
         editing.currentlyEditing = true;
         editing.movedAway = false;
       }
       tabBarRef.current?.goToPage(1);
     } else {
-      eSendEvent(eOnLoadNote, {type: 'new'});
+      eSendEvent(eOnLoadNote, { type: 'new' });
     }
   }, []);
 
@@ -95,12 +95,7 @@ export const Home = ({navigation}) => {
     <>
       <SelectionHeader screen="Notes" />
       <ContainerTopSection>
-        <Header
-          title="Notes"
-          isBack={false}
-          screen="Notes"
-          action={_onPressBottomButton}
-        />
+        <Header title="Notes" isBack={false} screen="Notes" action={_onPressBottomButton} />
       </ContainerTopSection>
 
       <SimpleList
@@ -127,10 +122,7 @@ export const Home = ({navigation}) => {
       />
 
       {!notes || notes.length === 0 ? null : (
-        <ContainerBottomButton
-          title="Create a new note"
-          onPress={_onPressBottomButton}
-        />
+        <ContainerBottomButton title="Create a new note" onPress={_onPressBottomButton} />
       )}
     </>
   );

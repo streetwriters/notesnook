@@ -7,7 +7,7 @@ import { db } from '../../utils/database';
 import { SIZE } from '../../utils/SizeUtils';
 import { Button } from '../Button';
 
-export const DevMode = ({item}) => {
+export const DevMode = ({ item }) => {
   const settings = useSettingStore(state => state.settings);
 
   return settings.devMode ? (
@@ -16,7 +16,8 @@ export const DevMode = ({item}) => {
         width: '100%',
         paddingHorizontal: 12,
         marginTop: 10
-      }}>
+      }}
+    >
       <Button
         onPress={async () => {
           let additionalData = {};
@@ -28,7 +29,7 @@ export const DevMode = ({item}) => {
             }
           }
           additionalData.lastSynced = await db.lastSynced();
-          let _note = {...item};
+          let _note = { ...item };
           _note.additionalData = additionalData;
           Clipboard.setString(db.debug.strip(_note));
 

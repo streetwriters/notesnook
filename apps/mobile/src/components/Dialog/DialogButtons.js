@@ -1,11 +1,11 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Paragraph from '../Typography/Paragraph';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
+import { notesnook } from '../../../e2e/test.ids';
 
 const DialogButtons = ({
   onPressPositive,
@@ -17,29 +17,31 @@ const DialogButtons = ({
   positiveType
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
-    <View style={[styles.container,{
-      backgroundColor:colors.nav,
-      height:60,
-      borderBottomRightRadius:10,
-      borderBottomLeftRadius:10,
-      paddingHorizontal:12
-    }]}>
+    <View
+      style={[
+        styles.container,
+        {
+          backgroundColor: colors.nav,
+          height: 60,
+          borderBottomRightRadius: 10,
+          borderBottomLeftRadius: 10,
+          paddingHorizontal: 12
+        }
+      ]}
+    >
       {loading ? (
         <ActivityIndicator color={colors.accent} size={SIZE.lg} />
       ) : doneText ? (
         <View
           style={{
             flexDirection: 'row',
-            alignItems: 'center',
-          }}>
-          <Icon
-            color={colors.accent}
-            name="check-circle-outline"
-            size={SIZE.md}
-          />
+            alignItems: 'center'
+          }}
+        >
+          <Icon color={colors.accent} name="check-circle-outline" size={SIZE.md} />
           <Paragraph color={colors.accent}>{' ' + doneText}</Paragraph>
         </View>
       ) : (
@@ -49,8 +51,9 @@ const DialogButtons = ({
       <View
         style={{
           flexDirection: 'row',
-          alignItems: 'center',
-        }}>
+          alignItems: 'center'
+        }}
+      >
         <Button
           onPress={onPressNegative}
           fontSize={SIZE.md}
@@ -65,10 +68,10 @@ const DialogButtons = ({
             fontSize={SIZE.md}
             testID={notesnook.ids.default.dialog.yes}
             style={{
-              marginLeft: 10,
+              marginLeft: 10
             }}
             bold
-            type={positiveType || "transparent"}
+            type={positiveType || 'transparent'}
             title={positiveTitle}
           />
         ) : null}
@@ -84,6 +87,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    marginTop: 10,
-  },
+    marginTop: 10
+  }
 });

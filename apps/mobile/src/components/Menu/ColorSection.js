@@ -1,19 +1,15 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useMenuStore, useNoteStore} from '../../provider/stores';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useMenuStore, useNoteStore } from '../../provider/stores';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {presentDialog} from '../Dialog/functions';
-import {PressableButton} from '../PressableButton';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { db } from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { presentDialog } from '../Dialog/functions';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -28,14 +24,12 @@ export const ColorSection = () => {
     }
   }, [loading]);
 
-  return colorNotes.map((item, index) => (
-    <ColorItem key={item.id} item={item} index={index} />
-  ));
+  return colorNotes.map((item, index) => <ColorItem key={item.id} item={item} index={index} />);
 };
 
-const ColorItem = ({item, index}) => {
+const ColorItem = ({ item, index }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const setColorNotes = useMenuStore(state => state.setColorNotes);
   const [headerTextState, setHeaderTextState] = useState(null);
   const alias = db.colors.alias(item.id);
@@ -83,17 +77,15 @@ const ColorItem = ({item, index}) => {
         if (!value || value.trim().length === 0) return;
         await db.colors.rename(item.id, value);
         setColorNotes();
-        console.log('color updated')
+        console.log('color updated');
       },
-      positiveText:"Rename"
+      positiveText: 'Rename'
     });
   };
 
   return (
     <PressableButton
-      customColor={
-        headerTextState?.id === item.id ? 'rgba(0,0,0,0.04)' : 'transparent'
-      }
+      customColor={headerTextState?.id === item.id ? 'rgba(0,0,0,0.04)' : 'transparent'}
       onLongPress={onLongPress}
       customSelectedColor={COLORS_NOTE[item.title.toLowerCase()]}
       customAlpha={!colors.night ? -0.02 : 0.02}
@@ -109,18 +101,21 @@ const ColorItem = ({item, index}) => {
         alignItems: 'center',
         height: normalize(50),
         marginBottom: 5
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <View
           style={{
             width: 30,
             justifyContent: 'center',
             alignItems: 'flex-start'
-          }}>
+          }}
+        >
           <View
             style={{
               width: SIZE.lg - 2,

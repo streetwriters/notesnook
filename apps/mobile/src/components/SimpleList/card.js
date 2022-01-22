@@ -1,15 +1,15 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useMessageStore, useSelectionStore} from '../../provider/stores';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {SIZE} from '../../utils/SizeUtils';
-import {PressableButton} from '../PressableButton';
+import { useTracked } from '../../provider';
+import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { SIZE } from '../../utils/SizeUtils';
+import { PressableButton } from '../PressableButton';
 import Paragraph from '../Typography/Paragraph';
 
-export const Card = ({color}) => {
-  const [state,] = useTracked();
+export const Card = ({ color }) => {
+  const [state] = useTracked();
   const colors = state.colors;
   color = color ? color : colors.accent;
 
@@ -27,8 +27,9 @@ export const Card = ({color}) => {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'flex-start',
-        paddingHorizontal: 0,
-      }}>
+        paddingHorizontal: 0
+      }}
+    >
       <View
         style={{
           width: 40,
@@ -41,7 +42,8 @@ export const Card = ({color}) => {
           borderRadius: 100,
           alignItems: 'center',
           justifyContent: 'center'
-        }}>
+        }}
+      >
         <Icon
           size={SIZE.lg}
           color={messageBoardState.type === 'error' ? colors.errorText : color}
@@ -53,7 +55,8 @@ export const Card = ({color}) => {
         style={{
           marginLeft: 10,
           maxWidth: '70%'
-        }}>
+        }}
+      >
         <Paragraph color={colors.icon} size={SIZE.xs}>
           {messageBoardState.message}
         </Paragraph>
@@ -61,7 +64,8 @@ export const Card = ({color}) => {
           style={{
             maxWidth: '100%'
           }}
-          color={colors.heading}>
+          color={colors.heading}
+        >
           {messageBoardState.actionText}
         </Paragraph>
       </View>
@@ -74,7 +78,8 @@ export const Card = ({color}) => {
           alignItems: 'center',
           position: 'absolute',
           right: 6
-        }}>
+        }}
+      >
         <Icon
           name="chevron-right"
           color={messageBoardState.type === 'error' ? colors.red : color}

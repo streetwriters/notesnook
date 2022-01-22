@@ -1,4 +1,4 @@
-import {Dimensions, PixelRatio, Platform} from 'react-native';
+import { Dimensions, PixelRatio, Platform } from 'react-native';
 import DeviceInfo from 'react-native-device-info';
 
 let windowSize = Dimensions.get('window');
@@ -39,7 +39,7 @@ export class DeviceDetectionService {
     let deviceWidthInInches = this.adjustedWidth / dpi;
     let deviceHeightInInches = this.adjustedHeight / dpi;
     let diagonalSize = Math.sqrt(
-      Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2),
+      Math.pow(deviceWidthInInches, 2) + Math.pow(deviceHeightInInches, 2)
     );
     return Platform.isPad ? diagonalSize + 2 : diagonalSize;
   };
@@ -58,11 +58,7 @@ export class DeviceDetectionService {
       this.isTab = true;
       this.isPhone = false;
       this.isSmallTab = true;
-    } else if (
-      DeviceInfo.isTablet() &&
-      orientation === 'LANDSCAPE' &&
-      deviceSize > 9
-    ) {
+    } else if (DeviceInfo.isTablet() && orientation === 'LANDSCAPE' && deviceSize > 9) {
       //console.log('large tab tab')
       //console.log('setting large tablet');
       this.isTab = true;

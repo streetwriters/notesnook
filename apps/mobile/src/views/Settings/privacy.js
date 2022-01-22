@@ -1,34 +1,30 @@
-import React, {useCallback, useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
-import {enabled} from 'react-native-privacy-snapshot';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
+import { enabled } from 'react-native-privacy-snapshot';
 import ToggleSwitch from 'toggle-switch-react-native';
 import BaseDialog from '../../components/Dialog/base-dialog';
 import DialogButtons from '../../components/Dialog/dialog-buttons';
 import DialogContainer from '../../components/Dialog/dialog-container';
 import DialogHeader from '../../components/Dialog/dialog-header';
-import {PressableButton} from '../../components/PressableButton';
+import { PressableButton } from '../../components/PressableButton';
 import Seperator from '../../components/Seperator';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useSettingStore, useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  openVault
-} from '../../services/EventManager';
+import { eSubscribeEvent, eUnSubscribeEvent, openVault } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
-import {AndroidModule, InteractionManager} from '../../utils';
-import {db} from '../../utils/database';
-import {SIZE} from '../../utils/SizeUtils';
+import { AndroidModule, InteractionManager } from '../../utils';
+import { db } from '../../utils/database';
+import { SIZE } from '../../utils/SizeUtils';
 import { CustomButton } from './button';
 import SectionHeader from './section-header';
 
 const SettingsPrivacyAndSecurity = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
   const [appLockVisible, setAppLockVisible] = useState(false);
@@ -102,7 +98,8 @@ const SettingsPrivacyAndSecurity = () => {
           onRequestClose={() => {
             setAppLockVisible(false);
           }}
-          visible={true}>
+          visible={true}
+        >
           <DialogContainer height={450}>
             <DialogHeader
               title="App lock mode"
@@ -113,14 +110,12 @@ const SettingsPrivacyAndSecurity = () => {
             <View
               style={{
                 paddingHorizontal: 12
-              }}>
+              }}
+            >
               {modes.map(item => (
                 <PressableButton
-                  type={
-                    settings.appLockMode === item.value
-                      ? 'grayBg'
-                      : 'transparent'
-                  }
+                  key={item.title}
+                  type={settings.appLockMode === item.value ? 'grayBg' : 'transparent'}
                   onPress={() => {
                     SettingsService.set('appLockMode', item.value);
                   }}
@@ -134,25 +129,20 @@ const SettingsPrivacyAndSecurity = () => {
                   }}
                   style={{
                     marginBottom: 10
-                  }}>
+                  }}
+                >
                   <Heading
-                    color={
-                      settings.appLockMode === item.value
-                        ? colors.accent
-                        : colors.pri
-                    }
-                    style={{maxWidth: '95%'}}
-                    size={SIZE.md}>
+                    color={settings.appLockMode === item.value ? colors.accent : colors.pri}
+                    style={{ maxWidth: '95%' }}
+                    size={SIZE.md}
+                  >
                     {item.title}
                   </Heading>
                   <Paragraph
-                    color={
-                      settings.appLockMode === item.value
-                        ? colors.accent
-                        : colors.icon
-                    }
-                    style={{maxWidth: '95%'}}
-                    size={SIZE.sm}>
+                    color={settings.appLockMode === item.value ? colors.accent : colors.icon}
+                    style={{ maxWidth: '95%' }}
+                    size={SIZE.sm}
+                  >
                     {item.desc}
                   </Paragraph>
                 </PressableButton>
@@ -169,11 +159,7 @@ const SettingsPrivacyAndSecurity = () => {
         </BaseDialog>
       )}
 
-      <SectionHeader
-        collapsed={collapsed}
-        setCollapsed={setCollapsed}
-        title="Privacy & security"
-      />
+      <SectionHeader collapsed={collapsed} setCollapsed={setCollapsed} title="Privacy & security" />
       {collapsed ? null : (
         <>
           <CustomButton
@@ -218,9 +204,7 @@ const SettingsPrivacyAndSecurity = () => {
                 size="small"
                 animationSpeed={150}
                 onToggle={isOn => {
-                  Platform.OS === 'android'
-                    ? AndroidModule.setSecureMode(isOn)
-                    : enabled(true);
+                  Platform.OS === 'android' ? AndroidModule.setSecureMode(isOn) : enabled(true);
                   SettingsService.set('privacyScreen', isOn);
                 }}
               />
@@ -300,8 +284,7 @@ const SettingsPrivacyAndSecurity = () => {
                     deleteVault: true,
                     novault: true,
                     title: 'Delete vault',
-                    description:
-                      'Enter your account password to delete your vault.'
+                    description: 'Enter your account password to delete your vault.'
                   });
                 }}
               />
@@ -317,8 +300,7 @@ const SettingsPrivacyAndSecurity = () => {
                     item: {},
                     novault: false,
                     title: 'Create vault',
-                    description:
-                      'Set a password to create vault and lock notes.'
+                    description: 'Set a password to create vault and lock notes.'
                   });
                 });
               }}
@@ -329,6 +311,5 @@ const SettingsPrivacyAndSecurity = () => {
     </>
   );
 };
-
 
 export default SettingsPrivacyAndSecurity;

@@ -1,8 +1,8 @@
-import {Platform} from 'react-native';
-import {editing} from '../../../utils';
-import {EditorWebView, getWebviewInit, post, textInput} from '../Functions';
+import { Platform } from 'react-native';
+import { editing } from '../../../utils';
+import { EditorWebView, getWebviewInit, post, textInput } from '../Functions';
 
-const reset =(id) => `
+const reset = id => `
 sessionId = null;
 document.getElementById("titleInput").value = '';
 document.getElementById("titleInput").placeholder = "Note title";
@@ -184,16 +184,14 @@ function call(webview, func, noqueue) {
 }
 
 export function safeKeyboardDismiss() {
-  console.log('keyboard state', editing.keyboardState)
+  console.log('keyboard state', editing.keyboardState);
   if (!editing.keyboardState) return;
-  if (Platform.OS === "android") {
-    
+  if (Platform.OS === 'android') {
     textInput.current?.focus();
     textInput.current?.blur();
   } else {
-    call(EditorWebView,blur);
+    call(EditorWebView, blur);
   }
-
 }
 
 const undo = `

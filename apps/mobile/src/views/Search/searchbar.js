@@ -1,25 +1,20 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {View} from 'react-native';
-import {TextInput} from 'react-native-gesture-handler';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {ActionIcon} from '../../components/ActionIcon';
-import {useTracked} from '../../provider';
-import {useSearchStore} from '../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import React, { useEffect, useRef, useState } from 'react';
+import { Platform, View } from 'react-native';
+import { TextInput } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { ActionIcon } from '../../components/ActionIcon';
+import { useTracked } from '../../provider';
+import { useSearchStore } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {eScrollEvent} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { eScrollEvent } from '../../utils/Events';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 
 export const SearchBar = () => {
   const [state] = useTracked();
   const colors = state.colors;
-  const [focused, setFocused] = useState(false);
   const [value, setValue] = useState(null);
   const inputRef = useRef();
   const setSearchResults = useSearchStore(state => state.setSearchResults);
@@ -49,8 +44,8 @@ export const SearchBar = () => {
     return () => {
       eUnSubscribeEvent(eScrollEvent, onScroll);
     };
-  },[]);
-  
+  }, []);
+
   const onChangeText = value => {
     setValue(value);
     search(value);
@@ -93,7 +88,8 @@ export const SearchBar = () => {
         marginTop: Platform.OS === 'android' ? insets.top + 5 : 5,
         borderBottomWidth: 1,
         borderBottomColor: colors.nav
-      }}>
+      }}
+    >
       <ActionIcon
         name="arrow-left"
         size={SIZE.xl}

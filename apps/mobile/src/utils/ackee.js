@@ -1,8 +1,8 @@
-import {AppState, Platform} from 'react-native';
+import { AppState, Platform } from 'react-native';
 
 const platform = {
   osName: Platform.OS,
-  osVersion: Platform.Version,
+  osVersion: Platform.Version
 };
 
 const isBrowser = typeof window !== 'undefined';
@@ -82,11 +82,11 @@ export const attributes = function (detailed = false) {
     siteLocation: 'com.streetwriters.notesnook',
     siteReferrer: '',
     source: source(),
-    osName: platform.osName,
+    osName: platform.osName
   };
 
   return {
-    ...defaultData,
+    ...defaultData
   };
 };
 
@@ -109,8 +109,8 @@ const createRecordBody = function (domainId, input) {
 		`,
     variables: {
       domainId,
-      input,
-    },
+      input
+    }
   };
 };
 
@@ -129,8 +129,8 @@ const updateRecordBody = function (recordId) {
 			}
 		`,
     variables: {
-      recordId,
-    },
+      recordId
+    }
   };
 };
 
@@ -153,8 +153,8 @@ const createActionBody = function (eventId, input) {
 		`,
     variables: {
       eventId,
-      input,
-    },
+      input
+    }
   };
 };
 
@@ -175,8 +175,8 @@ const updateActionBody = function (actionId, input) {
 		`,
     variables: {
       actionId,
-      input,
-    },
+      input
+    }
   };
 };
 
@@ -246,10 +246,10 @@ export const create = function (server, opts) {
 
   // Fake instance when Ackee ignores you
   const fakeInstance = {
-    record: () => ({stop: noop}),
-    updateRecord: () => ({stop: noop}),
+    record: () => ({ stop: noop }),
+    updateRecord: () => ({ stop: noop }),
     action: noop,
-    updateAction: noop,
+    updateAction: noop
   };
 
   if (opts.ignoreLocalhost === true && isLocalhost() === true) {
@@ -289,7 +289,7 @@ export const create = function (server, opts) {
       }
     });
 
-    return {stop};
+    return { stop };
   };
 
   // Updates a record very x seconds to track the duration of the visit
@@ -302,7 +302,7 @@ export const create = function (server, opts) {
 
     if (isFakeId(recordId) === true) {
       console.warn('Ackee ignores you because this is your own site');
-      return {stop};
+      return { stop };
     }
 
     const interval = setInterval(() => {
@@ -316,7 +316,7 @@ export const create = function (server, opts) {
       send(url, updateRecordBody(recordId), opts);
     }, 15000);
 
-    return {stop};
+    return { stop };
   };
 
   // Creates a new action on the server
@@ -348,6 +348,6 @@ export const create = function (server, opts) {
     record: _record,
     updateRecord: _updateRecord,
     action: _action,
-    updateAction: _updateAction,
+    updateAction: _updateAction
   };
 };

@@ -1,24 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
-import {dWidth, editing, getElevation} from '../../utils';
-import {
-  eCloseActionSheet,
-  eOpenPremiumDialog,
-  eShowGetPremium
-} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {EditorWebView} from '../../views/Editor/Functions';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { dWidth, editing, getElevation } from '../../utils';
+import { eCloseActionSheet, eOpenPremiumDialog, eShowGetPremium } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { EditorWebView } from '../../views/Editor/Functions';
 import tiny from '../../views/Editor/tiny/tiny';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -29,9 +21,9 @@ let currentMsg = {
   title: '',
   desc: ''
 };
-export const PremiumToast = ({close, context = 'global', offset = 0}) => {
+export const PremiumToast = ({ close, context = 'global', offset = 0 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [msg, setMsg] = useState(currentMsg);
 
   const open = event => {
@@ -130,19 +122,22 @@ export const PremiumToast = ({close, context = 'global', offset = 0}) => {
             translateY: translatePrem
           }
         ]
-      }}>
+      }}
+    >
       <View
         style={{
           flexShrink: 1,
           flexGrow: 1,
           paddingRight: 6
-        }}>
+        }}
+      >
         <Heading
           style={{
             flexWrap: 'wrap'
           }}
           color={colors.accent}
-          size={SIZE.md}>
+          size={SIZE.md}
+        >
           {msg.title}
         </Heading>
 
@@ -151,7 +146,8 @@ export const PremiumToast = ({close, context = 'global', offset = 0}) => {
             flexWrap: 'wrap'
           }}
           size={SIZE.sm}
-          color={colors.pri}>
+          color={colors.pri}
+        >
           {msg.desc}
         </Paragraph>
       </View>

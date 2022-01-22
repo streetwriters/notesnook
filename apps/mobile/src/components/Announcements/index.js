@@ -1,15 +1,12 @@
-import React, {useEffect, useState} from 'react';
-import {FlatList, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useMessageStore} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {
-  eCloseAnnouncementDialog,
-  eOpenAnnouncementDialog
-} from '../../utils/Events';
+import React, { useEffect, useState } from 'react';
+import { FlatList, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useMessageStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eCloseAnnouncementDialog, eOpenAnnouncementDialog } from '../../utils/Events';
 import BaseDialog from '../Dialog/base-dialog';
-import {allowedOnPlatform, renderItem} from './functions';
+import { allowedOnPlatform, renderItem } from './functions';
 
 export const AnnouncementDialog = () => {
   const [state] = useTracked();
@@ -46,7 +43,8 @@ export const AnnouncementDialog = () => {
       centered={false}
       bottom={true}
       onRequestClose={close}
-      visible={visible}>
+      visible={visible}
+    >
       <View
         style={{
           width: DDS.isTab ? 600 : '100%',
@@ -55,7 +53,8 @@ export const AnnouncementDialog = () => {
           borderRadius: DDS.isTab ? 10 : 0,
           overflow: 'hidden',
           marginBottom: DDS.isTab ? 20 : 0
-        }}>
+        }}
+      >
         <FlatList
           style={{
             width: '100%'

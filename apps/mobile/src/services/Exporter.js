@@ -1,12 +1,12 @@
 import { decode, EntityLevel } from 'entities';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import RNHTMLtoPDF from 'react-native-html-to-pdf-lite';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import RNFetchBlob from 'rn-fetch-blob';
 import showdown from 'showdown';
-import {toTXT} from '../utils';
-import {db} from '../utils/database';
-import {sanitizeFilename} from '../utils/filename';
+import { toTXT } from '../utils';
+import { db } from '../utils/database';
+import { sanitizeFilename } from '../utils/filename';
 import Storage from '../utils/storage';
 
 const defaultStyle = `<style>
@@ -14,7 +14,7 @@ const defaultStyle = `<style>
   width:100%;
 }
 .img_size_two {
-  width:50%; 
+  width:50%;
 }
 .img_size_three {
   width:25%;
@@ -324,10 +324,10 @@ async function saveToPDF(note) {
   Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/PDF/'));
 
   let html = await db.notes.note(note).export('html');
-  html = decode(html,{
-    level:EntityLevel.HTML
+  html = decode(html, {
+    level: EntityLevel.HTML
   });
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
   let html3 = html;
   if (html.indexOf('<head>') > -1) {
     let html1 = html.substring(0, html.indexOf('<head>') + 6);
@@ -374,9 +374,7 @@ async function saveToPDF(note) {
 }
 
 async function saveToMarkdown(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Markdown/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Markdown/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
@@ -384,7 +382,7 @@ async function saveToMarkdown(note) {
   }
 
   let markdown = await db.notes.note(note.id).export('md', markdown);
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;
   if (Platform.OS === 'android') {
@@ -411,9 +409,7 @@ async function saveToMarkdown(note) {
 }
 
 async function saveToText(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Text/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Text/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
@@ -421,7 +417,7 @@ async function saveToText(note) {
   }
 
   let text = await toTXT(note);
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
 
   let fileUri;
   if (Platform.OS === 'android') {
@@ -448,9 +444,7 @@ async function saveToText(note) {
 }
 
 async function saveToHTML(note) {
-  let path =
-    Platform.OS === 'ios' &&
-    (await Storage.checkAndCreateDir('/exported/Html/'));
+  let path = Platform.OS === 'ios' && (await Storage.checkAndCreateDir('/exported/Html/'));
   if (Platform.OS === 'android') {
     let file = await ScopedStorage.openDocumentTree(true);
     if (!file) return;
@@ -458,7 +452,7 @@ async function saveToHTML(note) {
   }
 
   let html = await db.notes.note(note.id).export('html');
-  let fileName = sanitizeFilename(note.title + Date.now(), {replacement: '_'});
+  let fileName = sanitizeFilename(note.title + Date.now(), { replacement: '_' });
   let html3 = html;
   if (html.indexOf('<head>') > -1) {
     let html1 = html.substring(0, html.indexOf('<head>') + 6);

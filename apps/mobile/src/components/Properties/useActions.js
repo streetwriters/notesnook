@@ -1,16 +1,11 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import React, {useEffect, useState} from 'react';
-import {Platform} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform } from 'react-native';
 import Share from 'react-native-share';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {
-  useMenuStore,
-  useSelectionStore,
-  useTagStore,
-  useUserStore
-} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { useMenuStore, useSelectionStore, useTagStore, useUserStore } from '../../provider/stores';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -22,7 +17,7 @@ import {
 import Navigation from '../../services/Navigation';
 import Notifications from '../../services/Notifications';
 import SettingsService from '../../services/SettingsService';
-import {editing, toTXT} from '../../utils';
+import { editing, toTXT } from '../../utils';
 import {
   ACCENT,
   COLOR_SCHEME,
@@ -31,7 +26,7 @@ import {
   COLOR_SCHEME_PITCH_BLACK,
   setColorScheme
 } from '../../utils/Colors';
-import {db} from '../../utils/database';
+import { db } from '../../utils/database';
 import {
   eOpenAddNotebookDialog,
   eOpenAddTopicDialog,
@@ -41,21 +36,19 @@ import {
   eOpenMoveNoteDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {sleep} from '../../utils/TimeUtils';
-import {presentDialog} from '../Dialog/functions';
+import { deleteItems } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { sleep } from '../../utils/TimeUtils';
+import { presentDialog } from '../Dialog/functions';
 import NoteHistory from '../NoteHistory';
 
-export const useActions = ({close = () => {}, item}) => {
+export const useActions = ({ close = () => {}, item }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const clearSelection = useSelectionStore(state => state.clearSelection);
   const setSelectedItem = useSelectionStore(state => state.setSelectedItem);
   const setMenuPins = useMenuStore(state => state.setMenuPins);
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(item.id)
-  );
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(item.id));
 
   const user = useUserStore(state => state.user);
   const [notifPinned, setNotifPinned] = useState(null);
@@ -66,8 +59,7 @@ export const useActions = ({close = () => {}, item}) => {
       ? db.colors.alias(item.id)
       : item.title;
 
-  const isPublished =
-    item.type === 'note' && db.monographs.isPublished(item.id);
+  const isPublished = item.type === 'note' && db.monographs.isPublished(item.id);
   const noteInTopic =
     item.type === 'note' &&
     editing.actionAfterFirstSave.type === 'topic' &&
@@ -117,19 +109,19 @@ export const useActions = ({close = () => {}, item}) => {
 
   function changeColorScheme(colors = COLOR_SCHEME, accent = ACCENT) {
     let newColors = setColorScheme(colors, accent);
-    dispatch({type: Actions.THEME, colors: newColors});
+    dispatch({ type: Actions.THEME, colors: newColors });
   }
 
   function switchTheme() {
     if (!colors.night) {
-      MMKV.setStringAsync('theme', JSON.stringify({night: true}));
+      MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
       let nextTheme = SettingsService.get().pitchBlack
         ? COLOR_SCHEME_PITCH_BLACK
         : COLOR_SCHEME_DARK;
       changeColorScheme(nextTheme);
       return;
     }
-    MMKV.setStringAsync('theme', JSON.stringify({night: false}));
+    MMKV.setStringAsync('theme', JSON.stringify({ night: false }));
     changeColorScheme(COLOR_SCHEME_LIGHT);
   }
 
@@ -165,10 +157,7 @@ export const useActions = ({close = () => {}, item}) => {
       return;
     }
     await db[`${type}s`][type](item.id).pin();
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
   }
 
   async function pinToNotifications() {
@@ -206,12 +195,9 @@ export const useActions = ({close = () => {}, item}) => {
       Navigation.routeNames.Favorites,
       Navigation.routeNames.Trash
     ]);
-    type = item.type === 'trash' ? item.itemType : item.type;
+    let type = item.type === 'trash' ? item.itemType : item.type;
     ToastEvent.show({
-      heading:
-        type === 'note'
-          ? 'Note restored from trash'
-          : 'Notebook restored from trash',
+      heading: type === 'note' ? 'Note restored from trash' : 'Notebook restored from trash',
       type: 'success'
     });
   }
@@ -337,7 +323,7 @@ export const useActions = ({close = () => {}, item}) => {
             notebookId: item.notebookId
           });
         } else {
-          await db.settings.pin(item.type, {id: item.id});
+          await db.settings.pin(item.type, { id: item.id });
         }
       }
       setIsPinnedToMenu(db.settings.isPinned(item.id));
@@ -526,10 +512,7 @@ export const useActions = ({close = () => {}, item}) => {
     },
     {
       name: 'PinToNotif',
-      title:
-        notifPinned !== null
-          ? 'Unpin from Notifications'
-          : 'Pin to Notifications',
+      title: notifPinned !== null ? 'Unpin from Notifications' : 'Pin to Notifications',
       icon: 'bell',
       on: notifPinned !== null,
       func: pinToNotifications
@@ -631,9 +614,7 @@ export const useActions = ({close = () => {}, item}) => {
     {
       name: 'Delete',
       title:
-        item.type !== 'notebook' && item.type !== 'note'
-          ? 'Delete ' + item.type
-          : 'Move to trash',
+        item.type !== 'notebook' && item.type !== 'note' ? 'Delete ' + item.type : 'Move to trash',
       icon: 'delete-outline',
       type: 'error',
       func: deleteItem

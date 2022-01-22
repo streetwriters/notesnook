@@ -1,11 +1,11 @@
 import React from 'react';
-import {View} from 'react-native';
-import {useTracked} from '../../../../provider';
+import { View } from 'react-native';
+import { useTracked } from '../../../../provider';
 import ToolbarItem from './item';
 
-const ToolbarGroup = ({group}) => {
+const ToolbarGroup = ({ group }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <View
@@ -15,7 +15,8 @@ const ToolbarGroup = ({group}) => {
         alignItems: 'center',
         marginHorizontal: 3,
         overflow: 'hidden'
-      }}>
+      }}
+    >
       {group.map(item => (
         <ToolbarItem
           key={item.format}

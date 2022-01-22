@@ -1,24 +1,24 @@
-import React, {useEffect} from 'react';
-import {BackHandler, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {useSelectionStore} from '../../provider/stores';
-import {eSendEvent, ToastEvent} from '../../services/EventManager';
+import React, { useEffect } from 'react';
+import { BackHandler, Platform, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSelectionStore } from '../../provider/stores';
+import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {db} from '../../utils/database';
-import {eOpenMoveNoteDialog, refreshNotesPage} from '../../utils/Events';
-import {deleteItems} from '../../utils/functions';
+import { db } from '../../utils/database';
+import { eOpenMoveNoteDialog, refreshNotesPage } from '../../utils/Events';
+import { deleteItems } from '../../utils/functions';
 import layoutmanager from '../../utils/layout-manager';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {presentDialog} from '../Dialog/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { presentDialog } from '../Dialog/functions';
 import Heading from '../Typography/Heading';
 
-export const SelectionHeader = React.memo(({screen, type, extras}) => {
+export const SelectionHeader = React.memo(({ screen, type, extras }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
@@ -90,14 +90,16 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
         flexDirection: 'row',
         zIndex: 999,
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'flex-start',
           alignItems: 'center',
           borderRadius: 100
-        }}>
+        }}
+      >
         <ActionIcon
           customStyle={{
             justifyContent: 'center',
@@ -125,7 +127,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             justifyContent: 'center',
             flexDirection: 'row',
             alignItems: 'center'
-          }}>
+          }}
+        >
           <Heading size={SIZE.md} color={colors.accent}>
             {selectedItemsList.length + ' Selected'}
           </Heading>
@@ -136,7 +139,8 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
           flexDirection: 'row',
           justifyContent: 'flex-start',
           alignItems: 'center'
-        }}>
+        }}
+      >
         {/* <ActionIcon
           onPress={async () => {
             // await sleep(100);
@@ -219,9 +223,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
             }}
             onPress={async () => {
               presentDialog({
-                title: `Delete ${
-                  selectedItemsList.length > 1 ? 'items' : 'item'
-                }`,
+                title: `Delete ${selectedItemsList.length > 1 ? 'items' : 'item'}`,
                 paragraph: `Are you sure you want to delete ${
                   selectedItemsList.length > 1 ? 'these items?' : 'this item?'
                 }`,
@@ -256,5 +258,7 @@ export const SelectionHeader = React.memo(({screen, type, extras}) => {
     </View>
   );
 });
+
+SelectionHeader.displayName = 'SelectionHeader';
 
 export default SelectionHeader;

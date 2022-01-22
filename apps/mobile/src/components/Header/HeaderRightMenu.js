@@ -11,9 +11,9 @@ import { sleep } from '../../utils/TimeUtils';
 import { ActionIcon } from '../ActionIcon';
 import { Button } from '../Button';
 
-export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
+export const HeaderRightMenu = ({ currentScreen, action, rightButtons }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
   const menuRef = useRef();
   return (
@@ -25,7 +25,6 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               menu: false
             });
           }}
-
           name="magnify"
           color={colors.pri}
           customStyle={styles.rightBtn}
@@ -40,10 +39,10 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
           iconSize={SIZE.xl}
           type="shade"
           hitSlop={{
-            top:10,
-            right:10,
-            bottom:10,
-            left:0
+            top: 10,
+            right: 10,
+            bottom: 10,
+            left: 0
           }}
           style={{
             marginLeft: 10,
@@ -51,8 +50,8 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
             height: 32,
             borderRadius: 5,
             paddingHorizontal: 0,
-            borderWidth:1,
-            borderColor:colors.accent
+            borderWidth: 1,
+            borderColor: colors.accent
           }}
         />
       ) : null}
@@ -75,7 +74,8 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               color={colors.pri}
               customStyle={styles.rightBtn}
             />
-          }>
+          }
+        >
           {rightButtons.map((item, index) => (
             <MenuItem
               key={item.title}
@@ -87,7 +87,8 @@ export const HeaderRightMenu = ({currentScreen, action, rightButtons}) => {
               textStyle={{
                 fontSize: SIZE.md,
                 color: colors.pri
-              }}>
+              }}
+            >
               <Icon name={item.icon} size={SIZE.md} />
               {'  ' + item.title}
             </MenuItem>

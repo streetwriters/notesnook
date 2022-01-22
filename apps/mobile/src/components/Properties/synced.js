@@ -1,18 +1,18 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useUserStore} from '../../provider/stores';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { useTracked } from '../../provider';
+import { useUserStore } from '../../provider/stores';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Synced = ({item, close}) => {
+export const Synced = ({ item, close }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const user = useUserStore(state => state.user);
   const lastSynced = useUserStore(state => state.lastSynced);
 
@@ -30,7 +30,8 @@ export const Synced = ({item, close}) => {
         marginTop: 10,
         borderTopWidth: 1,
         borderTopColor: colors.nav
-      }}>
+      }}
+    >
       <Icon name="shield-key-outline" color={colors.accent} size={SIZE.xxxl} />
 
       <View
@@ -38,13 +39,15 @@ export const Synced = ({item, close}) => {
           flex: 1,
           marginLeft: 5,
           flexShrink: 1
-        }}>
+        }}
+      >
         <Heading
           color={colors.heading}
           size={SIZE.xs}
           style={{
             flexWrap: 'wrap'
-          }}>
+          }}
+        >
           Encrypted and synced
         </Heading>
         <Paragraph
@@ -52,7 +55,8 @@ export const Synced = ({item, close}) => {
             flexWrap: 'wrap'
           }}
           size={SIZE.xs}
-          color={colors.pri}>
+          color={colors.pri}
+        >
           No one can view this {item.itemType || item.type} except you.
         </Paragraph>
       </View>
@@ -62,10 +66,7 @@ export const Synced = ({item, close}) => {
           try {
             close();
             await sleep(300);
-            await openLinkInBrowser(
-              'https://docs.notesnook.com/how-is-my-data-encrypted/',
-              colors
-            );
+            await openLinkInBrowser('https://docs.notesnook.com/how-is-my-data-encrypted/', colors);
           } catch (e) {}
         }}
         fontSize={SIZE.xs + 1}

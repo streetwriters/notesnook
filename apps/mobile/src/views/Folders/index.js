@@ -1,21 +1,16 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerBottomButton} from '../../components/Container/ContainerBottomButton';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
-import {AddNotebookEvent} from '../../components/DialogManager/recievers';
-import {Header} from '../../components/Header';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerBottomButton } from '../../components/Container/ContainerBottomButton';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
+import { AddNotebookEvent } from '../../components/DialogManager/recievers';
+import { Header } from '../../components/Header';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
 import { useNotebookStore } from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
-import {InteractionManager} from '../../utils';
-import {db} from '../../utils/database';
-import {eScrollEvent} from '../../utils/Events';
+import { InteractionManager } from '../../utils';
 
-export const Folders = ({route, navigation}) => {
+export const Folders = ({ navigation }) => {
   const notebooks = useNotebookStore(state => state.notebooks);
   const setNotebooks = useNotebookStore(state => state.setNotebooks);
   let ranAfterInteractions = false;
@@ -24,12 +19,12 @@ export const Folders = ({route, navigation}) => {
     Navigation.setHeaderState(
       'Notebooks',
       {
-        menu: true,
+        menu: true
       },
       {
         heading: 'Notebooks',
-        id: 'notebooks_navigation',
-      },
+        id: 'notebooks_navigation'
+      }
     );
     if (!ranAfterInteractions) {
       ranAfterInteractions = true;
@@ -40,7 +35,7 @@ export const Folders = ({route, navigation}) => {
   const runAfterInteractions = () => {
     InteractionManager.runAfterInteractions(() => {
       Navigation.routeNeedsUpdate('Notebooks', () => {
-        setNotebooks()
+        setNotebooks();
       });
     });
     updateSearch();
@@ -51,7 +46,6 @@ export const Folders = ({route, navigation}) => {
     navigation.addListener('focus', onFocus);
     return () => {
       ranAfterInteractions = false;
-      pageIsLoaded = false;
       navigation.removeListener('focus', onFocus);
     };
   }, []);
@@ -67,7 +61,7 @@ export const Folders = ({route, navigation}) => {
       placeholder: 'Type a keyword to search in notebooks',
       data: notebooks,
       type: 'notebooks',
-      title: 'Notebooks',
+      title: 'Notebooks'
     });
   }, []);
 
@@ -77,12 +71,7 @@ export const Folders = ({route, navigation}) => {
     <>
       <SelectionHeader screen="Notebooks" />
       <ContainerTopSection>
-        <Header
-          title="Notebooks"
-          isBack={false}
-          screen="Notebooks"
-          action={_onPressBottomButton}
-        />
+        <Header title="Notebooks" isBack={false} screen="Notebooks" action={_onPressBottomButton} />
       </ContainerTopSection>
       <SimpleList
         listData={notebooks}
@@ -94,18 +83,15 @@ export const Folders = ({route, navigation}) => {
           paragraph: 'You have not added any notebooks yet.',
           button: 'Add a notebook',
           action: _onPressBottomButton,
-          loading: 'Loading your notebooks',
+          loading: 'Loading your notebooks'
         }}
         headerProps={{
-          heading: 'Notebooks',
+          heading: 'Notebooks'
         }}
       />
 
       {!notebooks || notebooks.length === 0 ? null : (
-        <ContainerBottomButton
-          title="Create a new notebook"
-          onPress={_onPressBottomButton}
-        />
+        <ContainerBottomButton title="Create a new notebook" onPress={_onPressBottomButton} />
       )}
     </>
   );

@@ -1,24 +1,13 @@
-import {EV, EVENTS} from 'notes-core/common';
-import React, {useEffect, useRef} from 'react';
-import {
-  BackHandler,
-  InteractionManager,
-  Keyboard,
-  Platform,
-  Vibration,
-  View
-} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {ActionIcon} from '../../components/ActionIcon';
-import {Properties} from '../../components/Properties';
-import {useTracked} from '../../provider';
-import {
-  useEditorStore,
-  useSettingStore,
-  useUserStore
-} from '../../provider/stores';
-import {DDS} from '../../services/DeviceDetection';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { useEffect, useRef } from 'react';
+import { BackHandler, InteractionManager, Keyboard, Platform, Vibration, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { ActionIcon } from '../../components/ActionIcon';
+import { Properties } from '../../components/Properties';
+import { useTracked } from '../../provider';
+import { useEditorStore, useSettingStore, useUserStore } from '../../provider/stores';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -26,8 +15,8 @@ import {
   ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {editing, SUBSCRIPTION_STATUS} from '../../utils';
-import {db} from '../../utils/database';
+import { editing, SUBSCRIPTION_STATUS } from '../../utils';
+import { db } from '../../utils/database';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
@@ -37,9 +26,9 @@ import {
   eOpenPremiumDialog,
   eOpenPublishNoteDialog
 } from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
+import { tabBarRef } from '../../utils/Refs';
 import umami from '../../utils/umami';
-import {EditorTitle} from './EditorTitle';
+import { EditorTitle } from './EditorTitle';
 import {
   clearEditor,
   clearTimer,
@@ -48,20 +37,18 @@ import {
   setColors,
   startClosingSession
 } from './Functions';
-import {ProgressCircle} from './ProgressCircle';
-import tiny, {safeKeyboardDismiss} from './tiny/tiny';
-import {endSearch} from './tiny/toolbar/commands';
-import {toolbarRef} from './tiny/toolbar/constants';
+import { ProgressCircle } from './ProgressCircle';
+import tiny, { safeKeyboardDismiss } from './tiny/tiny';
+import { endSearch } from './tiny/toolbar/commands';
+import { toolbarRef } from './tiny/toolbar/constants';
 import picker from './tiny/toolbar/picker';
-import {useEditorTags} from './useEditorTags';
+import { useEditorTags } from './useEditorTags';
 
 const EditorHeader = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
-  const currentlyEditingNote = useEditorStore(
-    state => state.currentEditingNote
-  );
+  const currentlyEditingNote = useEditorStore(state => state.currentEditingNote);
   const fullscreen = useSettingStore(state => state.fullscreen);
   const user = useUserStore(state => state.user);
   const insets = useSafeAreaInsets();
@@ -194,27 +181,24 @@ const EditorHeader = () => {
   }, []);
 
   const onNoteRemoved = async id => {
-    try {
-      return;
-      // console.log('NOTE REMOVED', id);
-      // await db.notes.remove(id);
-      // if (id !== getNote().id) return;
-      // Navigation.setRoutesToUpdate([
-      //   Navigation.routeNames.Favorites,
-      //   Navigation.routeNames.Notes,
-      //   Navigation.routeNames.NotesPage,
-      //   Navigation.routeNames.Trash,
-      //   Navigation.routeNames.Notebook
-      // ]);
-    } catch (e) {}
+    // try {
+    //   return;
+    //   // console.log('NOTE REMOVED', id);
+    //   // await db.notes.remove(id);
+    //   // if (id !== getNote().id) return;
+    //   // Navigation.setRoutesToUpdate([
+    //   //   Navigation.routeNames.Favorites,
+    //   //   Navigation.routeNames.Notes,
+    //   //   Navigation.routeNames.NotesPage,
+    //   //   Navigation.routeNames.Trash,
+    //   //   Navigation.routeNames.Notebook
+    //   // ]);
+    // } catch (e) {}
   };
 
   useEffect(() => {
     if (fullscreen && DDS.isTab) {
-      handleBack.current = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onBackPress
-      );
+      handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onBackPress);
     }
 
     return () => {
@@ -229,10 +213,7 @@ const EditorHeader = () => {
     console.log(item.id);
     await loadNote(item);
     InteractionManager.runAfterInteractions(() => {
-      keyboardListener.current = Keyboard.addListener(
-        'keyboardDidShow',
-        tiny.onKeyboardShow
-      );
+      keyboardListener.current = Keyboard.addListener('keyboardDidShow', tiny.onKeyboardShow);
       if (!DDS.isTab) {
         handleBack.current = BackHandler.addEventListener(
           'hardwareBackPress',
@@ -256,10 +237,7 @@ const EditorHeader = () => {
         handleBack.current = null;
       }
 
-      handleBack.current = BackHandler.addEventListener(
-        'hardwareBackPress',
-        _onHardwareBackPress
-      );
+      handleBack.current = BackHandler.addEventListener('hardwareBackPress', _onHardwareBackPress);
       return;
     }
     if (editing.currentlyEditing) {
@@ -284,16 +262,17 @@ const EditorHeader = () => {
           flexDirection: 'row',
           paddingHorizontal: 12,
           height: 50,
-          justifyContent:'space-between'
-          
-        }}>
+          justifyContent: 'space-between'
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
             flexShrink: 1
-          }}>
+          }}
+        >
           {deviceMode !== 'mobile' && !fullscreen ? null : (
             <ActionIcon
               onLongPress={async () => {
@@ -312,14 +291,15 @@ const EditorHeader = () => {
               }}
             />
           )}
-          {fullscreen ? <View style={{width: 20}} /> : null}
+          {fullscreen ? <View style={{ width: 20 }} /> : null}
           {deviceMode !== 'mobile' ? <EditorTitle /> : null}
         </View>
 
         <View
           style={{
-            flexDirection: 'row',
-          }}>
+            flexDirection: 'row'
+          }}
+        >
           <>
             {!user ||
             user?.subscription.type === SUBSCRIPTION_STATUS.BASIC ||
@@ -336,7 +316,7 @@ const EditorHeader = () => {
                     safeKeyboardDismiss();
                     editing.isFocused = true;
                   }
-                  umami.pageView("/pro-screen","/editor")
+                  umami.pageView('/pro-screen', '/editor');
                   eSendEvent(eOpenPremiumDialog);
                 }}
               />

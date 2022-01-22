@@ -18,18 +18,12 @@ import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} = require('../../services/EventManager');
-const {
-  eOpenExportDialog,
-  eCloseExportDialog,
-} = require('../../utils/Events');
+const { eSubscribeEvent, eUnSubscribeEvent } = require('../../services/EventManager');
+const { eOpenExportDialog, eCloseExportDialog } = require('../../utils/Events');
 
 const ExportDialog = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const [visible, setVisible] = useState(false);
   const actionSheetRef = useRef();
@@ -75,9 +69,7 @@ const ExportDialog = () => {
     }
     setDoneText(
       `Note exported successfully! You can find the exported note in ${
-        Platform.OS === 'ios'
-          ? 'Files Manager/Notesnook'
-          : `Storage/Notesnook/exported/${name}`
+        Platform.OS === 'ios' ? 'Files Manager/Notesnook' : `Storage/Notesnook/exported/${name}`
       }.`
     );
 
@@ -137,13 +129,12 @@ const ExportDialog = () => {
         <View
           style={{
             paddingHorizontal: 12
-          }}>
+          }}
+        >
           <DialogHeader
             icon="export"
             title="Export Note"
-            paragraph={
-              'All exports are saved in Notesnook/exported folder in phone storage'
-            }
+            paragraph={'All exports are saved in Notesnook/exported folder in phone storage'}
           />
         </View>
 
@@ -163,7 +154,8 @@ const ExportDialog = () => {
                   justifyContent: 'flex-start',
                   borderRadius: 0,
                   paddingHorizontal: 12
-                }}>
+                }}
+              >
                 <View
                   style={{
                     backgroundColor: colors.shade,
@@ -172,24 +164,19 @@ const ExportDialog = () => {
                     width: 60,
                     justifyContent: 'center',
                     alignItems: 'center'
-                  }}>
-                  <Icon
-                    name={item.icon}
-                    color={colors.accent}
-                    size={SIZE.xxxl + 10}
-                  />
+                  }}
+                >
+                  <Icon name={item.icon} color={colors.accent} size={SIZE.xxxl + 10} />
                 </View>
                 <View
                   style={{
                     flexShrink: 1
-                  }}>
-                  <Heading style={{marginLeft: 10}} size={SIZE.md}>
+                  }}
+                >
+                  <Heading style={{ marginLeft: 10 }} size={SIZE.md}>
                     {item.title}
                   </Heading>
-                  <Paragraph
-                    style={{marginLeft: 10}}
-                    size={SIZE.sm}
-                    color={colors.icon}>
+                  <Paragraph style={{ marginLeft: 10 }} size={SIZE.sm} color={colors.icon}>
                     {item.desc}
                   </Paragraph>
                 </View>
@@ -202,7 +189,8 @@ const ExportDialog = () => {
               width: '100%',
               paddingHorizontal: 12,
               marginTop: 10
-            }}>
+            }}
+          >
             {complete && (
               <>
                 <Button
@@ -259,13 +247,12 @@ const ExportDialog = () => {
                   marginTop: 5
                 }}
                 color={colors.icon}
-                size={SIZE.xs}>
+                size={SIZE.xs}
+              >
                 {'Note exported as ' + result.fileName}
               </Paragraph>
             )}
-            {exporting && !complete && (
-              <Button loading={true} height={50} width="100%" />
-            )}
+            {exporting && !complete && <Button loading={true} height={50} width="100%" />}
           </View>
         </View>
       </View>

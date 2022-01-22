@@ -7,7 +7,7 @@ const useIsFloatingKeyboard = () => {
   const [floating, setFloating] = useState(false);
 
   useEffect(() => {
-    const onKeyboardWillChangeFrame = (event) => {
+    const onKeyboardWillChangeFrame = event => {
       setFloating(event.endCoordinates.width !== windowWidth);
     };
 
@@ -20,4 +20,4 @@ const useIsFloatingKeyboard = () => {
   return floating;
 };
 
-export default useIsFloatingKeyboard
+export default useIsFloatingKeyboard;

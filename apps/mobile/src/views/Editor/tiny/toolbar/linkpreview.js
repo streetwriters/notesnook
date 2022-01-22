@@ -1,23 +1,23 @@
-import React, {useEffect, useState} from 'react';
-import {Image, Linking, ScrollView, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Image, Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {ActionIcon} from '../../../../components/ActionIcon';
+import { ActionIcon } from '../../../../components/ActionIcon';
 import Heading from '../../../../components/Typography/Heading';
 import Paragraph from '../../../../components/Typography/Paragraph';
-import {useTracked} from '../../../../provider';
-import {openLinkInBrowser} from '../../../../utils/functions';
-import {SIZE} from '../../../../utils/SizeUtils';
-import {INPUT_MODE, properties, reFocusEditor} from './constants';
+import { useTracked } from '../../../../provider';
+import { openLinkInBrowser } from '../../../../utils/functions';
+import { SIZE } from '../../../../utils/SizeUtils';
+import { INPUT_MODE, properties, reFocusEditor } from './constants';
 import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import isMobilePhone from 'validator/lib/isMobilePhone';
-import {ToastEvent} from '../../../../services/EventManager';
-import {getLinkPreview} from '../../../../utils/linkpreview';
+import { ToastEvent } from '../../../../services/EventManager';
+import { getLinkPreview } from '../../../../utils/linkpreview';
 
 let prevLink = {};
-const LinkPreview = ({setMode, value, onSubmit}) => {
+const LinkPreview = ({ setMode, value, onSubmit }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [link, setLink] = useState(prevLink.value === value ? prevLink : {});
 
   useEffect(() => {
@@ -54,7 +54,7 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           marginRight: 5
         }}
         resizeMode="contain"
-        source={{uri: image}}
+        source={{ uri: image }}
       />
     ) : (
       <View
@@ -66,18 +66,15 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
           alignItems: 'center',
           backgroundColor: colors.nav,
           borderRadius: 5
-        }}>
+        }}
+      >
         <Icon size={35} color={colors.accent} name="web" />
       </View>
     );
   };
 
   const openLink = () => {
-    if (
-      value.startsWith('mailto:') ||
-      value.startsWith('tel:') ||
-      value.startsWith('sms:')
-    ) {
+    if (value.startsWith('mailto:') || value.startsWith('tel:') || value.startsWith('sms:')) {
       Linking.openURL(value).catch(console.log);
       return;
     }
@@ -113,25 +110,28 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
       <View
         style={{
           flex: 1
-        }}>
+        }}
+      >
         <TouchableOpacity onPress={openLink} activeOpacity={1}>
           <ScrollView
             style={{
               marginRight: 10
             }}
             horizontal
-            showsHorizontalScrollIndicator={false}>
-            <Heading numberOfLines={1} style={{paddingLeft: 5}} size={SIZE.sm}>
+            showsHorizontalScrollIndicator={false}
+          >
+            <Heading numberOfLines={1} style={{ paddingLeft: 5 }} size={SIZE.sm}>
               {name ? name + ': ' + title : title ? title : 'Web Link'}
             </Heading>
           </ScrollView>
 
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <Paragraph
-              style={{flexWrap: 'wrap', paddingLeft: 5}}
+              style={{ flexWrap: 'wrap', paddingLeft: 5 }}
               numberOfLines={1}
               color={colors.icon}
-              size={SIZE.xs}>
+              size={SIZE.xs}
+            >
               {description ? description : link?.value ? link.value : value}
             </Paragraph>
           </ScrollView>
@@ -146,7 +146,8 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         flexDirection: 'row',
         width: '100%',
         alignItems: 'center'
-      }}>
+      }}
+    >
       {renderImage(link.image)}
       {renderText(link.name, link.title, link.description)}
 
@@ -154,7 +155,8 @@ const LinkPreview = ({setMode, value, onSubmit}) => {
         style={{
           flexDirection: 'row',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <ActionIcon
           onPress={() => {
             onSubmit('clear');

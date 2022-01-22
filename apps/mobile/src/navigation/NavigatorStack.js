@@ -1,20 +1,20 @@
-import {NavigationContainer} from '@react-navigation/native';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import * as React from 'react';
 import Container from '../components/Container';
-import {useTracked} from '../provider';
-import {useSelectionStore, useSettingStore} from '../provider/stores';
-import {eSendEvent} from '../services/EventManager';
+import { useTracked } from '../provider';
+import { useSelectionStore, useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import {history} from '../utils';
-import {MMKV} from '../utils/mmkv';
-import {rootNavigatorRef} from '../utils/Refs';
+import { history } from '../utils';
+import { MMKV } from '../utils/mmkv';
+import { rootNavigatorRef } from '../utils/Refs';
 import Favorites from '../views/Favorites';
 import Folders from '../views/Folders';
 import Home from '../views/Home';
 import Notebook from '../views/Notebook';
 import Notes from '../views/Notes';
-import {Search} from '../views/Search';
+import { Search } from '../views/Search';
 import Settings from '../views/Settings';
 import Tags from '../views/Tags';
 import Trash from '../views/Trash';
@@ -24,7 +24,7 @@ let homepage = 'Notes';
 export const NavigatorStack = React.memo(
   () => {
     const [state, dispatch] = useTracked();
-    const {colors} = state;
+    const { colors } = state;
     const [render, setRender] = React.useState(false);
     const clearSelection = useSelectionStore(state => state.clearSelection);
 
@@ -61,7 +61,8 @@ export const NavigatorStack = React.memo(
         <NavigationContainer
           onStateChange={onStateChange}
           independent={true}
-          ref={rootNavigatorRef}>
+          ref={rootNavigatorRef}
+        >
           {render ? (
             <Stack.Navigator
               initialRouteName={homepage}
@@ -72,7 +73,8 @@ export const NavigatorStack = React.memo(
                 contentStyle: {
                   backgroundColor: colors.bg
                 }
-              }}>
+              }}
+            >
               <Stack.Screen name="Notes" component={Home} />
               <Stack.Screen name="Notebooks" component={Folders} />
               <Stack.Screen name="Favorites" component={Favorites} />

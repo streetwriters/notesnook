@@ -1,18 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, View } from 'react-native';
 import WebView from 'react-native-webview';
-import {notesnook} from '../../../e2e/test.ids';
-import {useEditorStore, useUserStore} from '../../provider/stores';
+import { notesnook } from '../../../e2e/test.ids';
+import { useEditorStore, useUserStore } from '../../provider/stores';
 import { DDS } from '../../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
-import {getCurrentColors} from '../../utils/Colors';
-import {eOnLoadNote} from '../../utils/Events';
-import {tabBarRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { getCurrentColors } from '../../utils/Colors';
+import { eOnLoadNote } from '../../utils/Events';
+import { tabBarRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
 import EditorHeader from './EditorHeader';
 import {
   disableEditing,
@@ -26,7 +22,7 @@ import {
 import tiny from './tiny/tiny';
 import EditorToolbar from './tiny/toolbar';
 
-const source = {uri: sourceUri + 'index.html'};
+const source = { uri: sourceUri + 'index.html' };
 
 const style = {
   height: '100%',
@@ -67,7 +63,7 @@ const Editor = React.memo(
       }
 
       if (getNote()) {
-        eSendEvent(eOnLoadNote, {...getNote(), forced: true});
+        eSendEvent(eOnLoadNote, { ...getNote(), forced: true });
       }
       console.log('resetting editor');
     };
@@ -87,7 +83,8 @@ const Editor = React.memo(
             backgroundColor: 'transparent',
             flexGrow: 1,
             flex: 1
-          }}>
+          }}
+        >
           <EditorHeader />
           <WebView
             testID={notesnook.editor.id}

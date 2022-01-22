@@ -1,19 +1,16 @@
-import {createRef} from 'react';
-import {Dimensions, NativeModules, Platform} from 'react-native';
+import { createRef } from 'react';
+import { Dimensions, NativeModules, Platform } from 'react-native';
 import BackgroundService from 'react-native-background-actions';
-import {
-  beginBackgroundTask,
-  endBackgroundTask
-} from 'react-native-begin-background-task';
+import { beginBackgroundTask, endBackgroundTask } from 'react-native-begin-background-task';
 import RNTooltips from 'react-native-tooltips';
-import {useSettingStore} from '../provider/stores';
-import {eSendEvent} from '../services/EventManager';
+import { useSettingStore } from '../provider/stores';
+import { eSendEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
 import * as ackeeTracker from './ackee';
 import { db } from './database';
-import {refreshNotesPage} from './Events';
-import {MMKV} from './mmkv';
-import {tabBarRef} from './Refs';
+import { refreshNotesPage } from './Events';
+import { MMKV } from './mmkv';
+import { tabBarRef } from './Refs';
 
 export const Tracker = ackeeTracker.create('https://sa.streetwriters.co', {
   ignoreLocalhost: true
@@ -53,7 +50,7 @@ export const InteractionManager = {
 };
 
 export async function setSetting(settings, name, value) {
-  let s = {...settings};
+  let s = { ...settings };
   s[name] = value;
   await MMKV.setStringAsync('appSettings', JSON.stringify(s));
   useSettingStore.getState().setSettings(s);
@@ -66,7 +63,7 @@ export const getElevation = elevation => {
   return {
     elevation,
     shadowColor: 'black',
-    shadowOffset: {width: 0.3 * elevation, height: 0.5 * elevation},
+    shadowOffset: { width: 0.3 * elevation, height: 0.5 * elevation },
     shadowOpacity: 0.2,
     shadowRadius: 0.7 * elevation
   };
@@ -141,6 +138,7 @@ export async function doInBackground(cb) {
       return e.message;
     }
   } else {
+    // eslint-disable-next-line no-async-promise-executor
     return new Promise(async (res, rej) => {
       try {
         await BackgroundService.start(async () => {
@@ -344,7 +342,7 @@ export async function toTXT(note) {
   }
   htmlToText = htmlToText || require('html-to-text');
   text = htmlToText.convert(text, {
-    selectors: [{selector: 'img', format: 'skip'}]
+    selectors: [{ selector: 'img', format: 'skip' }]
   });
   text = `${note.title}\n \n ${text}`;
   return text;

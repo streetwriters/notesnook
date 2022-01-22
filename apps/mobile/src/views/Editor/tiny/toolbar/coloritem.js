@@ -1,20 +1,16 @@
-import React, {useEffect, useState} from 'react';
-import {View, TouchableOpacity} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, TouchableOpacity } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../../../services/EventManager';
-import {normalize, SIZE} from '../../../../utils/SizeUtils';
-import {formatSelection, properties, rgbToHex} from './constants';
-import {execCommands} from './commands';
-import {MMKV} from '../../../../utils/mmkv';
+import { useTracked } from '../../../../provider';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
+import { normalize, SIZE } from '../../../../utils/SizeUtils';
+import { formatSelection, properties, rgbToHex } from './constants';
+import { execCommands } from './commands';
+import { MMKV } from '../../../../utils/mmkv';
 
-const ColorItem = ({value, format, onCustomPress, checked}) => {
+const ColorItem = ({ value, format, onCustomPress, checked }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [selected, setSelected] = useState(false);
   const isChecked = value !== '' && (selected || checked);
   const isNil = value === '';
@@ -82,17 +78,19 @@ const ColorItem = ({value, format, onCustomPress, checked}) => {
         height: normalize(40),
         width: normalize(40),
         marginRight: 5,
-        overflow:'hidden'
-      }}>
+        overflow: 'hidden'
+      }}
+    >
       <View
         style={{
-          height: "100%",
-          width:"100%",
+          height: '100%',
+          width: '100%',
           borderRadius: 5,
           justifyContent: 'center',
           alignItems: 'center',
           backgroundColor: isChecked ? 'rgba(0,0,0,0.1)' : 'transparent'
-        }}>
+        }}
+      >
         {isNil ? <Icon color="red" size={SIZE.lg} name="close" /> : null}
 
         {isChecked ? <Icon name="check" size={SIZE.lg} color="white" /> : null}

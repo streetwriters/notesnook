@@ -1,15 +1,15 @@
-const {MMKV} = require('../utils/MMKV');
-import {Platform} from 'react-native';
+const { MMKV } = require('../utils/MMKV');
+import { Platform } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import * as ScopedStorage from 'react-native-scoped-storage';
 import Share from 'react-native-share';
-import {presentDialog} from '../components/Dialog/functions';
-import {db} from '../utils/database';
-import {eCloseProgressDialog} from '../utils/Events';
-import {sanitizeFilename} from '../utils/filename';
+import { presentDialog } from '../components/Dialog/functions';
+import { db } from '../utils/database';
+import { eCloseProgressDialog } from '../utils/Events';
+import { sanitizeFilename } from '../utils/filename';
 import storage from '../utils/storage';
-import {sleep} from '../utils/TimeUtils';
-import {eSendEvent, presentSheet, ToastEvent} from './EventManager';
+import { sleep } from '../utils/TimeUtils';
+import { eSendEvent, presentSheet, ToastEvent } from './EventManager';
 import SettingsService from './SettingsService';
 
 const MS_DAY = 86400000;
@@ -21,10 +21,7 @@ async function getDirectoryAndroid() {
   if (!folder) return null;
   let subfolder;
   if (folder.name !== 'Notesnook backups') {
-    subfolder = await ScopedStorage.createDirectory(
-      folder.uri,
-      'Notesnook backups'
-    );
+    subfolder = await ScopedStorage.createDirectory(folder.uri, 'Notesnook backups');
   } else {
     subfolder = folder;
   }
@@ -46,6 +43,7 @@ async function checkBackupDirExists(reset = false) {
     dir = exists ? dir : null;
   }
   if (!dir) {
+    // eslint-disable-next-line no-async-promise-executor
     dir = await new Promise(async resolve => {
       if (reset) {
         resolve(await getDirectoryAndroid());
@@ -74,17 +72,13 @@ async function run() {
   RNFetchBlob = require('rn-fetch-blob').default;
   presentSheet({
     title: 'Backing up your data',
-    paragraph:
-      "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
+    paragraph: "All your backups are stored in 'Phone Storage/Notesnook/backups/' folder",
     progress: true
   });
   let backup;
   let error;
   try {
-    backup = await db.backup.export(
-      'mobile',
-      SettingsService.get().encryptedBackup
-    );
+    backup = await db.backup.export('mobile', SettingsService.get().encryptedBackup);
   } catch (e) {
     error = true;
   }
@@ -92,7 +86,7 @@ async function run() {
   if (!error) {
     try {
       let backupName = 'notesnook_backup_' + Date.now();
-      backupName = sanitizeFilename(backupName, {replacement: '_'});
+      backupName = sanitizeFilename(backupName, { replacement: '_' });
       backupName = backupName + '.nnbackup';
       let path;
       let backupFilePath;

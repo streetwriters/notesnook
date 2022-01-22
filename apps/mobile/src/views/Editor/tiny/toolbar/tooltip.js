@@ -1,23 +1,20 @@
-import React, {useEffect, useState} from 'react';
-import {ScrollView, View} from 'react-native';
-import {useTracked} from '../../../../provider';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../../../services/EventManager';
-import {editing} from '../../../../utils';
+import React, { useEffect, useState } from 'react';
+import { ScrollView, View } from 'react-native';
+import { useTracked } from '../../../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../../../services/EventManager';
+import { editing } from '../../../../utils';
 import layoutmanager from '../../../../utils/layout-manager';
-import {normalize} from '../../../../utils/SizeUtils';
-import {EditorWebView} from '../../Functions';
+import { normalize } from '../../../../utils/SizeUtils';
+import { EditorWebView } from '../../Functions';
 import tiny from '../tiny';
 import ColorGroup from './colorgroup';
-import {properties} from './constants';
+import { properties } from './constants';
 import ToolbarItem from './item';
 import ToolbarLinkInput from './linkinput';
 
 const Tooltip = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [group, setGroup] = useState(null);
   const isColorGroup = /^(hilitecolor|forecolor|)$/.test(group?.type);
   const isInputTooltip = /^(link|video|)$/.test(group?.type);
@@ -83,7 +80,9 @@ const Tooltip = () => {
             marginVertical: 2,
             borderRadius: 5
           }}
-          children={props.children}></View>
+        >
+          {props.children}
+        </View>
       ) : (
         <ScrollView
           style={{
@@ -103,8 +102,9 @@ const Tooltip = () => {
             flexDirection: 'row',
             minWidth: '100%'
           }}
-          children={props.children}
-        />
+        >
+          {props.children}
+        </ScrollView>
       )}
     </View>
   );

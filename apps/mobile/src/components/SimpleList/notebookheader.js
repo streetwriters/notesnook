@@ -1,22 +1,20 @@
-import React, {useState} from 'react';
-import {Platform, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useMenuStore} from '../../provider/stores';
-import {ToastEvent} from '../../services/EventManager';
-import {getTotalNotes} from '../../utils';
-import {db} from '../../utils/database';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import React, { useState } from 'react';
+import { Platform, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useMenuStore } from '../../provider/stores';
+import { ToastEvent } from '../../services/EventManager';
+import { getTotalNotes } from '../../utils';
+import { db } from '../../utils/database';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
+export const NotebookHeader = ({ notebook, onPress, onEditNotebook }) => {
   const [state] = useTracked();
-  const {colors} = state;
-  const [isPinnedToMenu, setIsPinnedToMenu] = useState(
-    db.settings.isPinned(notebook.id)
-  );
+  const { colors } = state;
+  const [isPinnedToMenu, setIsPinnedToMenu] = useState(db.settings.isPinned(notebook.id));
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const totalNotes = getTotalNotes(notebook);
 
@@ -25,7 +23,7 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
       if (isPinnedToMenu) {
         await db.settings.unpin(notebook.id);
       } else {
-        await db.settings.pin(notebook.type, {id: notebook.id});
+        await db.settings.pin(notebook.type, { id: notebook.id });
         ToastEvent.show({
           heading: 'Shortcut created',
           type: 'success'
@@ -47,7 +45,8 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
         alignSelf: 'center',
         borderRadius: 10,
         paddingTop: 25
-      }}>
+      }}
+    >
       <Paragraph color={colors.icon} size={SIZE.xs}>
         {new Date(notebook.dateEdited).toLocaleString()}
       </Paragraph>
@@ -56,13 +55,15 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <Heading size={SIZE.xxl}>{notebook.title}</Heading>
 
         <View
           style={{
             flexDirection: 'row'
-          }}>
+          }}
+        >
           <ActionIcon
             name={isPinnedToMenu ? 'link-variant-off' : 'link-variant'}
             onPress={onPinNotebook}
@@ -102,10 +103,10 @@ export const NotebookHeader = ({notebook, onPress, onEditNotebook}) => {
           fontFamily: null
         }}
         size={SIZE.xs}
-        color={colors.icon}>
-        {notebook.topics.length === 1
-          ? '1 topic'
-          : `${notebook.topics.length} topics`}, {notebook && totalNotes > 1
+        color={colors.icon}
+      >
+        {notebook.topics.length === 1 ? '1 topic' : `${notebook.topics.length} topics`},{' '}
+        {notebook && totalNotes > 1
           ? totalNotes + ' notes'
           : totalNotes === 1
           ? totalNotes + ' note'

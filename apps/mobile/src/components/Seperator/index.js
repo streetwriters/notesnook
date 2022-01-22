@@ -1,15 +1,15 @@
 import React from 'react';
-import { View} from 'react-native';
+import { View } from 'react-native';
 
-const Seperator = ({half = false}) => {
+const Seperator = ({ half = false }) => {
   return (
     <View
       style={{
-        width: half ? 7.5 :15,
-        height: half ? 7.5 : 15,
+        width: half ? 7.5 : 15,
+        height: half ? 7.5 : 15
       }}
     />
   );
 };
 
-export default Seperator
+export default Seperator;

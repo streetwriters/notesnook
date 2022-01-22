@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import Animated, {Easing, timing} from 'react-native-reanimated';
+import React, { useEffect, useState } from 'react';
+import Animated, { Easing, timing } from 'react-native-reanimated';
 
 export const BouncingView = ({
   children,
@@ -35,7 +35,8 @@ export const BouncingView = ({
           ]
         },
         style
-      ]}>
+      ]}
+    >
       {children}
     </Animated.View>
   );

@@ -10,11 +10,10 @@ import ToolbarGroup from './group';
 import SearcReplace from './searchreplace';
 import Tooltip from './tooltip';
 
-
 const EditorToolbar = React.memo(
   () => {
     const [state] = useTracked();
-    const {colors} = state;
+    const { colors } = state;
     const config = TOOLBAR_CONFIG;
     const searchReplace = useEditorStore(state => state.searchReplace);
 
@@ -32,7 +31,8 @@ const EditorToolbar = React.memo(
             width: '100%',
             minHeight: normalize(50),
             position: 'relative'
-          }}>
+          }}
+        >
           {searchReplace ? (
             <SearcReplace />
           ) : (
@@ -56,7 +56,8 @@ const EditorToolbar = React.memo(
                 horizontal={true}
                 showsHorizontalScrollIndicator={false}
                 showsVerticalScrollIndicator={false}
-                bounces={false}>
+                bounces={false}
+              >
                 <HistoryComponent />
                 {config.map((item, index) =>
                   typeof item !== 'string' ? (

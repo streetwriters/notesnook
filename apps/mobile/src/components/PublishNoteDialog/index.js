@@ -1,31 +1,24 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ActivityIndicator, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Clipboard from '@react-native-clipboard/clipboard';
-import {useTracked} from '../../provider';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {
-  eClosePublishNoteDialog,
-  eOpenPublishNoteDialog
-} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
+import { db } from '../../utils/database';
+import { eClosePublishNoteDialog, eOpenPublishNoteDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {useAttachmentStore} from '../../provider/stores';
-import {editing} from '../../utils';
+import { useAttachmentStore } from '../../provider/stores';
+import { editing } from '../../utils';
 
 let passwordValue = null;
 const PublishNoteDialog = () => {
@@ -39,8 +32,7 @@ const PublishNoteDialog = () => {
   const [note, setNote] = useState(null);
   const [publishing, setPublishing] = useState(false);
   const publishUrl =
-    note &&
-    `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
+    note && `https://monograph.notesnook.com/${db?.monographs.monograph(note?.id)}`;
   const isPublished = note && db?.monographs.isPublished(note?.id);
   const pwdInput = useRef();
 
@@ -137,13 +129,15 @@ const PublishNoteDialog = () => {
       onClose={async () => {
         passwordValue = null;
         setVisible(false);
-      }}>
+      }}
+    >
       <View
         style={{
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         <DialogHeader
           title={note.title}
           paragraph={`Anyone with the link${
@@ -158,17 +152,16 @@ const PublishNoteDialog = () => {
               alignContent: 'center',
               height: 150,
               width: '100%'
-            }}>
+            }}
+          >
             <ActivityIndicator size={25} color={colors.accent} />
             <Paragraph
               style={{
                 textAlign: 'center'
-              }}>
+              }}
+            >
               Please wait...
-              {loading &&
-                `\nDownloading attachments (${
-                  loading?.current / loading?.total
-                })`}
+              {loading && `\nDownloading attachments (${loading?.current / loading?.total})`}
             </Paragraph>
           </View>
         ) : (
@@ -182,12 +175,14 @@ const PublishNoteDialog = () => {
                   backgroundColor: colors.nav,
                   padding: 12,
                   borderRadius: 5
-                }}>
+                }}
+              >
                 <View
                   style={{
                     width: '100%',
                     flexShrink: 1
-                  }}>
+                  }}
+                >
                   <Heading size={SIZE.sm}>Published at:</Heading>
                   <Paragraph size={SIZE.xs} numberOfLines={1}>
                     {publishUrl}
@@ -202,9 +197,9 @@ const PublishNoteDialog = () => {
                     style={{
                       marginTop: 5,
                       color: colors.pri
-                    }}>
-                    <Icon color={colors.accent} name="open-in-new" /> Open in
-                    browser
+                    }}
+                  >
+                    <Icon color={colors.accent} name="open-in-new" /> Open in browser
                   </Paragraph>
                 </View>
 
@@ -235,7 +230,8 @@ const PublishNoteDialog = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 marginBottom: 10
-              }}>
+              }}
+            >
               <ActionIcon
                 onPress={() => {
                   if (publishing) return;
@@ -243,22 +239,18 @@ const PublishNoteDialog = () => {
                 }}
                 color={isLocked ? colors.accent : colors.icon}
                 size={SIZE.lg}
-                name={
-                  isLocked
-                    ? 'check-circle-outline'
-                    : 'checkbox-blank-circle-outline'
-                }
+                name={isLocked ? 'check-circle-outline' : 'checkbox-blank-circle-outline'}
               />
 
               <View
                 style={{
                   width: '100%',
                   flexShrink: 1
-                }}>
+                }}
+              >
                 <Heading size={SIZE.md}>Password protection</Heading>
                 <Paragraph>
-                  Published note can only be viewed by someone with the
-                  password.
+                  Published note can only be viewed by someone with the password.
                 </Paragraph>
               </View>
             </TouchableOpacity>
@@ -271,29 +263,26 @@ const PublishNoteDialog = () => {
               style={{
                 flexDirection: 'row',
                 alignItems: 'center'
-              }}>
+              }}
+            >
               <ActionIcon
                 onPress={() => {
                   setSelfDestruct(!selfDestruct);
                 }}
                 color={selfDestruct ? colors.accent : colors.icon}
                 size={SIZE.lg}
-                name={
-                  selfDestruct
-                    ? 'check-circle-outline'
-                    : 'checkbox-blank-circle-outline'
-                }
+                name={selfDestruct ? 'check-circle-outline' : 'checkbox-blank-circle-outline'}
               />
 
               <View
                 style={{
                   width: '100%',
                   flexShrink: 1
-                }}>
+                }}
+              >
                 <Heading size={SIZE.md}>Self destruct</Heading>
                 <Paragraph>
-                  Published note link will be automatically deleted once it is
-                  viewed by someone.
+                  Published note link will be automatically deleted once it is viewed by someone.
                 </Paragraph>
               </View>
             </TouchableOpacity>
@@ -303,7 +292,8 @@ const PublishNoteDialog = () => {
                 width: '100%',
                 alignSelf: 'center',
                 marginTop: 10
-              }}>
+              }}
+            >
               {isLocked ? (
                 <>
                   <Input
@@ -357,12 +347,10 @@ const PublishNoteDialog = () => {
           }}
           onPress={async () => {
             try {
-              await openLinkInBrowser(
-                'https://docs.notesnook.com/monographs/',
-                colors.accent
-              );
+              await openLinkInBrowser('https://docs.notesnook.com/monographs/', colors.accent);
             } catch (e) {}
-          }}>
+          }}
+        >
           Learn more about Notesnook Monograph
         </Paragraph>
       </View>

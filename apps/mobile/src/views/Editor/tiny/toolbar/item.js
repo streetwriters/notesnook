@@ -7,8 +7,11 @@ import Paragraph from '../../../../components/Typography/Paragraph';
 import { useTracked } from '../../../../provider';
 import { useUserStore } from '../../../../provider/stores';
 import {
-  eSendEvent, eSubscribeEvent,
-  eUnSubscribeEvent, presentSheet, ToastEvent
+  eSendEvent,
+  eSubscribeEvent,
+  eUnSubscribeEvent,
+  presentSheet,
+  ToastEvent
 } from '../../../../services/EventManager';
 import PremiumService from '../../../../services/PremiumService';
 import { editing, showTooltip, TOOLTIP_POSITIONS } from '../../../../utils';
@@ -19,8 +22,12 @@ import umami from '../../../../utils/umami';
 import tiny, { safeKeyboardDismiss } from '../tiny';
 import { execCommands } from './commands';
 import {
-  focusEditor, font_names, formatSelection,
-  properties, rgbToHex, TOOLBAR_ICONS
+  focusEditor,
+  font_names,
+  formatSelection,
+  properties,
+  rgbToHex,
+  TOOLBAR_ICONS
 } from './constants';
 import ToolbarItemPin from './itempin';
 import ToolbarListFormat from './listformat';
@@ -42,7 +49,7 @@ const ToolbarItem = ({
   fullname
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [selected, setSelected] = useState(false);
   const [icon, setIcon] = useState(valueIcon);
   const [color, setColor] = useState(null);
@@ -75,8 +82,7 @@ const ToolbarItem = ({
   const onColorChange = async () => {
     if (/^(dhilitecolor|dforecolor)$/.test(format)) {
       let _color = await MMKV.getItem(format);
-      let defColor =
-        format === 'dhilitecolor' ? colors.accent + '60' : colors.accent;
+      let defColor = format === 'dhilitecolor' ? colors.accent + '60' : colors.accent;
       setColor(_color || defColor);
     }
   };
@@ -136,10 +142,7 @@ const ToolbarItem = ({
       }
 
       if (
-        (format === 'fontsize' ||
-          format === 'ul' ||
-          format === 'ol' ||
-          format === 'fontname') &&
+        (format === 'fontsize' || format === 'ul' || format === 'ol' || format === 'fontname') &&
         data[format] !== '' &&
         formatValue === data[format]
       ) {
@@ -174,12 +177,7 @@ const ToolbarItem = ({
         setSelected(false);
         return;
       }
-      if (
-        format === 'fontsize' ||
-        format === 'fontname' ||
-        format === 'ol' ||
-        format === 'ul'
-      ) {
+      if (format === 'fontsize' || format === 'fontname' || format === 'ol' || format === 'ul') {
         setSelected(false);
         return;
       }
@@ -203,8 +201,6 @@ const ToolbarItem = ({
     checkForChanges(data);
   };
 
-  
-
   const onPress = async event => {
     if (premium && !isPro) {
       let user = await db.user.getUser();
@@ -215,7 +211,7 @@ const ToolbarItem = ({
       if (user && !isPro && !user.isEmailConfirmed) {
         PremiumService.showVerifyEmailDialog();
       } else {
-        umami.pageView("/pro-sheet","/editor/editor-toolbar")
+        umami.pageView('/pro-sheet', '/editor/editor-toolbar');
         PremiumService.sheet();
       }
       return;
@@ -223,8 +219,8 @@ const ToolbarItem = ({
 
     if (format === 'table') {
       presentSheet({
-        component:<Table/>
-      })
+        component: <Table />
+      });
     }
 
     if (type === 'settings') {
@@ -257,7 +253,7 @@ const ToolbarItem = ({
     }
 
     if (format === 'link' || format === 'video') {
-      pauseSelectionChange = true;
+      properties.pauseSelectionChange = true;
       formatSelection(`current_selection_range = editor.selection.getRng();`);
     }
 
@@ -334,7 +330,8 @@ const ToolbarItem = ({
       style={{
         marginHorizontal: 5,
         marginRight: isdefaultColorFormat ? 0 : 5
-      }}>
+      }}
+    >
       <PressableButton
         type={selected ? 'grayBg' : 'transparent'}
         onLongPress={event => {
@@ -349,7 +346,8 @@ const ToolbarItem = ({
           minWidth: isdefaultColorFormat ? 25 : normalize(40),
           width: isdefaultColorFormat ? 25 : null,
           overflow: 'hidden'
-        }}>
+        }}
+      >
         {premium && !isPro && (
           <Icon
             size={7}
@@ -374,14 +372,10 @@ const ToolbarItem = ({
           />
         ) : (
           <>
-            {type === 'tooltip' && (
-              <ToolbarItemPin format={format} color={selected && color} />
-            )}
+            {type === 'tooltip' && <ToolbarItemPin format={format} color={selected && color} />}
 
             {/^(h1|h2|h3|h4|h5|h6|p)$/.test(format) ? (
-              <Heading
-                size={SIZE.md}
-                color={selected ? colors.accent : colors.pri}>
+              <Heading size={SIZE.md} color={selected ? colors.accent : colors.pri}>
                 {format.slice(0, 1).toUpperCase() + format.slice(1)}
               </Heading>
             ) : /^(ol|ul|cl)$/.test(format) ? (
@@ -391,9 +385,7 @@ const ToolbarItem = ({
                 formatValue={formatValue || icon || 'default'}
               />
             ) : format === 'fontsize' ? (
-              <Paragraph
-                size={13}
-                color={selected ? colors.accent : colors.pri}>
+              <Paragraph size={13} color={selected ? colors.accent : colors.pri}>
                 {formatValue || currentText || '12pt'}
               </Paragraph>
             ) : text && groupFormat !== 'header' ? (
@@ -408,7 +400,8 @@ const ToolbarItem = ({
                         : formatValue
                       : 'OpenSans-Regular'
                 }}
-                size={13}>
+                size={13}
+              >
                 {currentText || text}
               </Paragraph>
             ) : (
