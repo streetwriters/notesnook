@@ -9,14 +9,14 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@notesnook/enex": "^1.0.2",
+    "@notesnook/enex": "^1.0.3",
+    "@standardnotes/common": "^1.8.0",
+    "@standardnotes/features": "^1.25.0",
     "fflate": "^0.7.3",
     "highlight.js": "^11.4.0",
     "node-html-parser": "github:thecodrr/node-html-parser",
     "showdown": "github:thecodrr/showdown",
-    "spark-md5": "^3.0.2",
-    "@standardnotes/common": "^1.8.0",
-    "@standardnotes/features": "^1.25.0"
+    "spark-md5": "^3.0.2"
   },
   "devDependencies": {
     "@node-rs/xxhash": "^1.0.1",
