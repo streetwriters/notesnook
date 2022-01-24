@@ -110,6 +110,7 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
     }
 
     if (isURL(value)) {
+      value = value.indexOf('://') === -1 ? 'http://' + value : value;
       openLinkInBrowser(value, colors)
         .catch(console.log)
         .then(async () => {

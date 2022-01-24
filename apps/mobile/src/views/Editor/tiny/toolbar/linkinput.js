@@ -83,6 +83,9 @@ const ToolbarLinkInput = ({ format, value, setVisible }) => {
         });
         return;
       }
+      if (isURL(inputValue)) {
+        inputValue = inputValue.indexOf('://') === -1 ? 'http://' + inputValue : inputValue;
+      }
       console.log('format:', format, 'value:', inputValue);
       properties.userBlur = true;
       tiny.call(EditorWebView, tiny.restoreRange);
