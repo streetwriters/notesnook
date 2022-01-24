@@ -71,9 +71,9 @@ async function uploadFile(filename, data, cancelToken) {
       method: 'PUT',
       headers
     });
-    if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`)
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`);
     const uploadUrl = await res.text();
-    if (!uploadUrl) throw new Error("Unable to resolve upload url");
+    if (!uploadUrl) throw new Error('Unable to resolve upload url');
 
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
@@ -134,7 +134,7 @@ async function fileCheck(response, totalSize) {
 
 async function downloadFile(filename, data, cancelToken) {
   if (!data) return false;
-  let { url, headers, metadata } = data;
+  let { url, headers } = data;
 
   console.log('downloading file: ', filename, url);
   let path = `${cacheDir}/${filename}`;
@@ -150,10 +150,10 @@ async function downloadFile(filename, data, cancelToken) {
       method: 'GET',
       headers
     });
-    if (!res.ok) throw new Error(`${res.status}: Unable to resolve download url`)
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve download url`);
     const downloadUrl = await res.text();
 
-    if (!downloadUrl) throw new Error("Unable to resolve download url")
+    if (!downloadUrl) throw new Error('Unable to resolve download url');
     let totalSize = 0;
     let request = RNFetchBlob.config({
       path: path,
@@ -234,7 +234,7 @@ async function downloadAttachment(hash, global = true) {
 
   let folder = {};
   if (Platform.OS === 'android') {
-    folder = await ScopedStorage.openDocumentTree(false);
+    folder = await ScopedStorage.openDocumentTree();
     if (!folder) return;
   } else {
     folder.uri = await Storage.checkAndCreateDir('/downloads/');

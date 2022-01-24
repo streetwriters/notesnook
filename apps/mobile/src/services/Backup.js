@@ -151,6 +151,12 @@ async function run() {
       console.log('backup error: ', e);
       await sleep(300);
       eSendEvent(eCloseProgressDialog);
+      ToastEvent.show({
+        heading: 'Backup failed',
+        message: e.message,
+        type: 'error',
+        context: 'global'
+      });
     }
   } else {
     await sleep(300);
@@ -158,7 +164,7 @@ async function run() {
     ToastEvent.show({
       heading: 'Backup failed',
       type: 'error',
-      context: 'local'
+      context: 'global'
     });
 
     return null;
