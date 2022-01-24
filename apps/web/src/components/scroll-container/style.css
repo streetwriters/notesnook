@@ -1,11 +1,3 @@
 .rc-scrollbars-view:hover ~ .rc-scrollbars-track {
   opacity: 1 !important;
 }
-
-.rc-scrollbars-thumb-v {
-  min-height: 30px !important;
-}
-
-.rc-scrollbars-thumb-h {
-  min-width: 15px !important;
-}
