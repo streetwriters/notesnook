@@ -48,7 +48,7 @@ import {
   mdiThemeLightDark,
   mdiCheckCircle,
   mdiLanguageMarkdownOutline,
-  mdiFilePdfOutline,
+  mdiFilePdfBox,
   mdiLanguageHtml5,
   mdiFormatTitle,
   mdiAlertCircle,
@@ -56,7 +56,6 @@ import {
   mdiToggleSwitchOffOutline,
   mdiToggleSwitchOutline,
   mdiBackupRestore,
-  mdiCurrencyUsdCircleOutline,
   mdiPencil,
   mdiUndoVariant,
   mdiRedoVariant,
@@ -127,6 +126,9 @@ import {
   mdiLinkVariantOff,
   mdiNetworkOffOutline,
   mdiCheckNetworkOutline,
+  mdiContentSaveCheckOutline,
+  mdiContentSaveAlertOutline,
+  mdiCurrencyUsd,
 } from "@mdi/js";
 import { useTheme } from "emotion-theming";
 import { AnimatedFlex } from "../animated";
@@ -240,7 +242,7 @@ export const CheckCircle = createIcon(mdiCheckCircle);
 export const CheckCircleOutline = createIcon(mdiCheckCircleOutline);
 export const Properties = createIcon(mdiDotsVertical);
 export const Markdown = createIcon(mdiLanguageMarkdownOutline);
-export const PDF = createIcon(mdiFilePdfOutline);
+export const PDF = createIcon(mdiFilePdfBox);
 export const Attachment = createIcon(mdiAttachment);
 export const Write = createIcon(mdiPencilOutline);
 export const HTML = createIcon(mdiLanguageHtml5);
@@ -252,7 +254,7 @@ export const Info = createIcon(mdiInformation);
 export const ToggleUnchecked = createIcon(mdiToggleSwitchOffOutline);
 export const ToggleChecked = createIcon(mdiToggleSwitchOutline);
 export const Backup = createIcon(mdiBackupRestore);
-export const Buy = createIcon(mdiCurrencyUsdCircleOutline);
+export const Buy = createIcon(mdiCurrencyUsd);
 export const Edit = createIcon(mdiPencil);
 export const Undo = createIcon(mdiUndoVariant);
 export const Redo = createIcon(mdiRedoVariant);
@@ -321,3 +323,6 @@ export const ShortcutLink = createIcon(mdiLinkVariant);
 export const RemoveShortcutLink = createIcon(mdiLinkVariantOff);
 export const Offline = createIcon(mdiNetworkOffOutline);
 export const Online = createIcon(mdiCheckNetworkOutline);
+
+export const Saved = createIcon(mdiContentSaveCheckOutline);
+export const NotSaved = createIcon(mdiContentSaveAlertOutline);

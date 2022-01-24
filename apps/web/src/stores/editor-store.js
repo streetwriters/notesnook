@@ -7,6 +7,7 @@ import BaseStore from ".";
 import { EV, EVENTS } from "notes-core/common";
 import { hashNavigate } from "../navigation";
 import { qclone } from "qclone";
+import { Mutex } from "async-mutex";
 
 const SESSION_STATES = {
   stale: "stale",
@@ -19,11 +20,11 @@ const SESSION_STATES = {
 const getDefaultSession = (sessionId = Date.now()) => {
   return {
     readonly: false,
+    state: undefined,
+    saveState: 1, // -1 = not saved, 0 = saving, 1 = saved
     sessionId,
     contentId: undefined,
     notebooks: undefined,
-    state: undefined,
-    isSaving: false,
     title: "",
     id: undefined,
     pinned: false,
@@ -40,6 +41,7 @@ const getDefaultSession = (sessionId = Date.now()) => {
     },
   };
 };
+const savingMutex = new Mutex();
 class EditorStore extends BaseStore {
   session = getDefaultSession();
   arePropertiesVisible = false;
@@ -156,71 +158,70 @@ class EditorStore extends BaseStore {
   };
 
   saveSession = (oldSession) => {
-    const session = this.get().session;
-    if (session.isSaving) return; // avoid multiple in-queue saves; only save one time.
-    if (session.state === SESSION_STATES.preview) return; // do not allow saving of preview-only content
+    return savingMutex.runExclusive(() => {
+      const session = this.get().session;
+      if (session.readonly) return; // do not allow saving of readonly session
+      this.setSaveState(0);
+      return this._saveFn()(session)
+        .then(async (id) => {
+          let note = db.notes.note(id)?.data;
+          if (!note) return;
 
-    this.set((state) => (state.session.isSaving = true));
-    return this._saveFn()(session)
-      .then(async (id) => {
-        let note = db.notes.note(id)?.data;
-        if (!note) {
-          this.set((state) => (state.session.isSaving = false));
-          return;
-        }
-        /* eslint-disable */
-        storeSync: {
-          if (oldSession?.tags?.length !== session.tags.length)
-            tagStore.refresh();
+          /* eslint-disable */
+          storeSync: {
+            if (oldSession?.tags?.length !== session.tags.length)
+              tagStore.refresh();
 
-          if (oldSession?.color !== session.color) appStore.refreshNavItems();
+            if (oldSession?.color !== session.color) appStore.refreshNavItems();
 
-          if (!oldSession?.context) break storeSync;
+            if (!oldSession?.context) break storeSync;
 
-          const { type, value } = oldSession.context;
-          if (type === "topic") await db.notes.move(value, id);
-          else if (type === "color") await db.notes.note(id).color(value);
-          else if (type === "tag") await db.notes.note(id).tag(value);
+            const { type, value } = oldSession.context;
+            if (type === "topic") await db.notes.move(value, id);
+            else if (type === "color") await db.notes.note(id).color(value);
+            else if (type === "tag") await db.notes.note(id).tag(value);
 
-          // update the note.
-          note = db.notes.note(id)?.data;
-        }
-        /* eslint-enable */
+            // update the note.
+            note = db.notes.note(id)?.data;
+          }
+          /* eslint-enable */
 
-        if (!this.get().session.id) {
-          noteStore.setSelectedNote(id);
-        }
+          if (!this.get().session.id) {
+            noteStore.setSelectedNote(id);
+          }
 
-        const attachments = db.attachments.ofNote(note.id, "all");
-        this.set((state) => {
-          state.session.id = note.id;
-          state.session.isSaving = false;
-          state.session.notebooks = note.notebooks;
-          state.session.attachments = attachments;
+          const attachments = db.attachments.ofNote(note.id, "all");
+          this.set((state) => {
+            state.session.id = note.id;
+            state.session.notebooks = note.notebooks;
+            state.session.attachments = attachments;
+            state.session.saveState = 1;
+          });
+
+          if (!oldSession) {
+            noteStore.refresh();
+            return;
+          }
+
+          if (
+            attachments?.length !== oldSession.attachments.length ||
+            note.headline !== oldSession.headline ||
+            note.title !== oldSession.title
+          )
+            noteStore.refresh();
+
+          if (!oldSession.id) {
+            hashNavigate(`/notes/${id}/edit`, { replace: true });
+          }
+        })
+        .catch((err) => {
+          this.setSaveState(-1);
+          console.error(err);
+          if (session.locked) {
+            hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
+          }
         });
-
-        if (!oldSession) {
-          noteStore.refresh();
-          return;
-        }
-
-        if (
-          attachments?.length !== oldSession.attachments.length ||
-          note.headline !== oldSession.headline ||
-          note.title !== oldSession.title
-        )
-          noteStore.refresh();
-
-        if (!oldSession.id) {
-          hashNavigate(`/notes/${id}/edit`, { replace: true });
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-        if (session.locked) {
-          hashNavigate(`/notes/${session.id}/unlock`, { replace: true });
-        }
-      });
+    });
   };
 
   newSession = async (nonce) => {
@@ -280,6 +281,12 @@ class EditorStore extends BaseStore {
 
   setTag = (tag) => {
     return this._setTag(tag);
+  };
+
+  setSaveState = (saveState) => {
+    return this.set((state) => {
+      state.session.saveState = saveState;
+    });
   };
 
   toggleProperties = (toggleState) => {

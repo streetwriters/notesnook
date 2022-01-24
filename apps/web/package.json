@@ -7,7 +7,7 @@
   "homepage": "https://notesnook.com/",
   "repository": "https://github.com/streetwriters/notesnook",
   "dependencies": {
-    "@mdi/js": "^5.9.55",
+    "@mdi/js": "^6.5.95",
     "@mdi/react": "^1.4.0",
     "@notesnook/desktop": "file:desktop",
     "@rebass/forms": "^4.0.6",

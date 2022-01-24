@@ -1,14 +1,23 @@
 import { formatDate } from "notes-core/utils/date";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Flex, Text } from "rebass";
 import { AppEventManager, AppEvents } from "../../common/app-events";
 import { useStore } from "../../stores/editor-store";
+import { Loading, Saved, NotSaved } from "../icons";
+
+const SAVE_STATE_ICON_MAP = {
+  "-1": NotSaved,
+  0: Loading,
+  1: Saved,
+};
 
 function EditorFooter() {
   const [totalWords, setTotalWords] = useState(0);
   const dateEdited = useStore((store) => store.session.dateEdited);
   const id = useStore((store) => store.session.id);
-  const isSaving = useStore((store) => store.session.isSaving);
+  const SaveStateIcon = useStore(
+    (store) => SAVE_STATE_ICON_MAP[store.session.saveState]
+  );
 
   useEffect(() => {
     const updateWordCountEvent = AppEventManager.subscribe(
@@ -23,24 +32,19 @@ function EditorFooter() {
   if (!id) return null;
   return (
     <Flex alignItems="center">
-      <Text variant="subBody" color="bgSecondaryText">
-        <Text as="span" data-test-id="editor-word-count">
-          {totalWords + " words"}
-        </Text>
-        <TextSeperator />
-        {formatDate(dateEdited || Date.now())}
-        <TextSeperator />
-        {isSaving ? "Saving" : "Saved"}
+      <Text
+        data-test-id="editor-word-count"
+        variant="subBody"
+        color="bgSecondaryText"
+        mr={2}
+      >
+        {totalWords + " words"}
       </Text>
+      <Text variant="subBody" color="bgSecondaryText" mr={2}>
+        {formatDate(dateEdited || Date.now())}
+      </Text>
+      <SaveStateIcon size={13} color="bgSecondaryText" />
     </Flex>
   );
 }
 export default EditorFooter;
-
-const TextSeperator = () => {
-  return (
-    <Text as="span" mx={1}>
-      •
-    </Text>
-  );
-};
