@@ -1,28 +1,21 @@
 import React from 'react';
-import {ActivityIndicator, useWindowDimensions, View} from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {COLORS_NOTE} from '../../utils/Colors';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {Placeholder} from '../ListPlaceholders';
+import { ActivityIndicator, useWindowDimensions, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { COLORS_NOTE } from '../../utils/Colors';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { Placeholder } from '../ListPlaceholders';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const Empty = ({
-  loading = true,
-  placeholderData,
-  absolute,
-  headerProps,
-  type,
-  screen
-}) => {
+export const Empty = ({ loading = true, placeholderData, absolute, headerProps, type, screen }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const insets = useSafeAreaInsets();
-  const {height} = useWindowDimensions();
+  const { height } = useWindowDimensions();
 
   return (
     <View
@@ -34,13 +27,15 @@ export const Empty = ({
           height: height - 250 - insets.top,
           width: '100%'
         }
-      ]}>
+      ]}
+    >
       <View
         style={{
           flexGrow: 1,
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <Placeholder
           color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
           w={normalize(150)}
@@ -54,7 +49,8 @@ export const Empty = ({
             textAlign: 'center',
             width: '80%'
           }}
-          color={colors.icon}>
+          color={colors.icon}
+        >
           {loading ? placeholderData.loading : placeholderData.paragraph}
         </Paragraph>
         <Seperator />
@@ -68,9 +64,7 @@ export const Empty = ({
             fontSize={SIZE.md}
             accentColor="bg"
             accentText={
-              COLORS_NOTE[headerProps.color?.toLowerCase()]
-                ? headerProps.color
-                : 'accent'
+              COLORS_NOTE[headerProps.color?.toLowerCase()] ? headerProps.color : 'accent'
             }
           />
         ) : loading ? (
@@ -78,9 +72,7 @@ export const Empty = ({
             style={{
               height: 35
             }}
-            color={
-              COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent
-            }
+            color={COLORS_NOTE[headerProps.color?.toLowerCase()] || colors.accent}
           />
         ) : (
           <View

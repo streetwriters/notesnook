@@ -26,7 +26,7 @@ export const Header = React.memo(
     height
   }) => {
     const [state] = useTracked();
-    const {colors} = state;
+    const { colors } = state;
     const announcements = useMessageStore(state => state.announcements);
 
     return announcements.length !== 0 && !noAnnouncement ? (
@@ -39,16 +39,16 @@ export const Header = React.memo(
           width: '100%',
           justifyContent: 'center',
           alignItems: 'center'
-        }}>
-        {messageCard ? (
-          <Card color={COLORS_NOTE[color?.toLowerCase()] || colors.accent} />
-        ) : null}
+        }}
+      >
+        {messageCard ? <Card color={COLORS_NOTE[color?.toLowerCase()] || colors.accent} /> : null}
       </View>
     ) : (
       <View
         style={{
           width: '100%'
-        }}>
+        }}
+      >
         <View
           style={{
             minHeight: height || 195,
@@ -59,14 +59,16 @@ export const Header = React.memo(
             backgroundColor: COLORS_NOTE[color?.toLowerCase()]
               ? hexToRGBA(COLORS_NOTE[color?.toLowerCase()], 0.15)
               : color || colors.shade
-          }}>
+          }}
+        >
           <View
             style={{
               right: 0,
               paddingRight: 12,
               bottom: 0,
               position: 'absolute'
-            }}>
+            }}
+          >
             <Placeholder
               color={COLORS_NOTE[color?.toLowerCase()] || colors.accent}
               w={normalize(150)}
@@ -78,10 +80,9 @@ export const Header = React.memo(
           <View
             style={{
               marginTop: 15
-            }}>
-            <Heading
-              style={{marginBottom: paragraph ? 0 : 0}}
-              size={SIZE.xxxl * 1.2}>
+            }}
+          >
+            <Heading style={{ marginBottom: paragraph ? 0 : 0 }} size={SIZE.xxxl * 1.2}>
               <Heading size={SIZE.xxxl * 1.2} color={colors.accent}>
                 {title.slice(0, 1) === '#' ? '#' : null}
               </Heading>
@@ -112,3 +113,5 @@ export const Header = React.memo(
     );
   }
 );
+
+Header.displayName = 'Header';

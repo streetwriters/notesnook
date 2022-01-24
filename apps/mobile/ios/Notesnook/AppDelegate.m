@@ -39,12 +39,14 @@ RCTBridge *bridge;
                                                initialProperties:nil];
     shareView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
     shareViewController.view = shareView;
+    [RNBootSplash initWithStoryboard:@"BootSplash" rootView:shareView];
   } else {
     RCTRootView *rootView = [[RCTRootView alloc] initWithBridge:bridge
                                                      moduleName:@"Notesnook"                                      initialProperties:nil];
     
     rootView.backgroundColor = [[UIColor alloc] initWithRed:1.0f green:1.0f blue:1.0f alpha:1];
     rootViewController.view = rootView;
+    [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView];
   }
   
   
@@ -53,7 +55,7 @@ RCTBridge *bridge;
   
   self.window.rootViewController = navController;
   [self.window makeKeyAndVisible];
-  [RNBootSplash initWithStoryboard:@"BootSplash" rootView:rootView]; 
+  
   
   return YES;
 }

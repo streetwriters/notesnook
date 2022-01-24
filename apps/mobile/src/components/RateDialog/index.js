@@ -1,16 +1,16 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Linking, Platform, View} from 'react-native';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {eCloseRateDialog, eOpenRateDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import React, { useEffect, useRef, useState } from 'react';
+import { Linking, Platform, View } from 'react-native';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { eCloseRateDialog, eOpenRateDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-import {STORE_LINK} from '../../utils';
-import {clearMessage} from '../../services/Message';
+import { STORE_LINK } from '../../utils';
+import { clearMessage } from '../../services/Message';
 
 const RateDialog = () => {
   const [visible, setVisible] = useState(false);
@@ -51,17 +51,19 @@ const RateDialog = () => {
         );
         setVisible(false);
         clearMessage();
-      }}>
+      }}
+    >
       <View
         style={{
           width: '100%',
           alignSelf: 'center',
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         <Heading>Do you enjoy using Notesnook?</Heading>
         <Paragraph size={SIZE.md}>
-          It took us a year to bring Notesnook to life. Share your experience
-          and suggestions to help us improve it.
+          It took us a year to bring Notesnook to life. Share your experience and suggestions to
+          help us improve it.
         </Paragraph>
 
         <Seperator half />
@@ -86,7 +88,8 @@ const RateDialog = () => {
             paddingTop: 12,
             width: '100%',
             alignSelf: 'center'
-          }}>
+          }}
+        >
           <Button
             onPress={async () => {
               await MMKV.setItem('askForRating', 'never');

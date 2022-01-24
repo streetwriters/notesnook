@@ -1,12 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView, Text, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ScrollView, Text, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Button} from '../../components/Button';
+import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import {useTracked} from '../../provider/index';
-import {useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider/index';
+import { useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
-import {DDS} from '../../services/DeviceDetection';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
@@ -14,26 +14,26 @@ import {
   presentSheet,
   ToastEvent
 } from '../../services/EventManager';
-import {clearMessage, setEmailVerifyMessage} from '../../services/Message';
+import { clearMessage, setEmailVerifyMessage } from '../../services/Message';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
-import {hexToRGBA} from '../../utils/ColorUtils';
-import {db} from '../../utils/database';
-import {eOpenLoginDialog, eOpenResultDialog} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import { hexToRGBA } from '../../utils/ColorUtils';
+import { db } from '../../utils/database';
+import { eOpenLoginDialog, eOpenResultDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import SheetWrapper from '../Sheet';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
 import DialogHeader from '../Dialog/dialog-header';
 import Input from '../Input';
-import {Header} from '../SimpleList/header';
+import { Header } from '../SimpleList/header';
 import Paragraph from '../Typography/Paragraph';
-import {ActionIcon} from '../ActionIcon';
+import { ActionIcon } from '../ActionIcon';
 import umami from '../../utils/umami';
 
 const MODES = {
@@ -145,8 +145,7 @@ const LoginDialog = () => {
       buttonFunc: () => changePassword(),
       headerParagraph: 'login to your account',
       showForgotButton: false,
-      loading:
-        'Please wait while we change your password and encrypt your data.',
+      loading: 'Please wait while we change your password and encrypt your data.',
       showLoader: true,
       buttonAlt: null
     },
@@ -182,8 +181,7 @@ const LoginDialog = () => {
         console.log('REQUESTING NEW TOKEN');
         let res = await db.user.tokenManager.getToken();
         if (!res) throw new Error('no token found');
-        if (db.user.tokenManager._isTokenExpired(res))
-          throw new Error('token expired');
+        if (db.user.tokenManager._isTokenExpired(res)) throw new Error('token expired');
         if (!(await Sync.run())) throw new Error('e');
         await MMKV.removeItem('loginSessionHasExpired');
         return;
@@ -279,8 +277,7 @@ const LoginDialog = () => {
     if (error) {
       ToastEvent.show({
         heading: 'Invalid signup information',
-        message:
-          'Some or all information provided is invalid. Resolve all errors and try again.',
+        message: 'Some or all information provided is invalid. Resolve all errors and try again.',
         type: 'error',
         context: 'local'
       });
@@ -346,10 +343,7 @@ const LoginDialog = () => {
     }
     try {
       let lastRecoveryEmailTime = await MMKV.getItem('lastRecoveryEmailTime');
-      if (
-        lastRecoveryEmailTime &&
-        Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3
-      ) {
+      if (lastRecoveryEmailTime && Date.now() - JSON.parse(lastRecoveryEmailTime) < 60000 * 3) {
         throw new Error('Please wait before requesting another email');
       }
       !nostatus && setStatus('Password Recovery Email Sent!');
@@ -435,13 +429,15 @@ const LoginDialog = () => {
         }, 500);
       }}
       background={!DDS.isTab ? colors.bg : null}
-      transparent={true}>
+      transparent={true}
+    >
       {confirm && (
         <BaseDialog
           onRequestClose={() => {
             setConfirm(false);
           }}
-          visible>
+          visible
+        >
           <DialogContainer>
             <DialogHeader
               title="Logout"
@@ -506,7 +502,8 @@ const LoginDialog = () => {
           backgroundColor: colors.bg,
           zIndex: 10,
           minHeight: DDS.isTab ? '50%' : '85%'
-        }}>
+        }}
+      >
         <Header
           color="transparent"
           type="login"
@@ -526,16 +523,16 @@ const LoginDialog = () => {
               flexDirection: 'row',
               alignItems: 'center',
               backgroundColor: hexToRGBA(colors.red, 0.2)
-            }}>
+            }}
+          >
             <Icon
               size={20}
-              style={{marginRight: 10}}
+              style={{ marginRight: 10 }}
               name="information"
               color={colors.errorText}
             />
-            <Paragraph style={{maxWidth: '90%'}} color={colors.errorText}>
-              Please log in to your account to access your notes on this device
-              and sync them.
+            <Paragraph style={{ maxWidth: '90%' }} color={colors.errorText}>
+              Please log in to your account to access your notes on this device and sync them.
             </Paragraph>
           </View>
         )}
@@ -550,19 +547,13 @@ const LoginDialog = () => {
               marginTop: 10,
               flexDirection: 'row',
               alignItems: 'center'
-            }}>
-            <Icon
-              size={20}
-              style={{marginRight: 10}}
-              name="information"
-              color={colors.accent}
-            />
-            <Paragraph style={{maxWidth: '90%'}} color={colors.accent}>
+            }}
+          >
+            <Icon size={20} style={{ marginRight: 10 }} name="information" color={colors.accent} />
+            <Paragraph style={{ maxWidth: '90%' }} color={colors.accent}>
               When you sign up, your{' '}
-              <Text style={{fontWeight: 'bold'}}>
-                14 day free trial of Notesnook Pro
-              </Text>{' '}
-              will be activated.
+              <Text style={{ fontWeight: 'bold' }}>14 day free trial of Notesnook Pro</Text> will be
+              activated.
             </Paragraph>
           </View>
         )}
@@ -572,7 +563,8 @@ const LoginDialog = () => {
             paddingHorizontal: 12,
             paddingTop: 12,
             width: focused ? '100%' : '99.9%'
-          }}>
+          }}
+        >
           {mode === MODES.changePassword ? null : (
             <Input
               fwdRef={_email}
@@ -710,12 +702,14 @@ const LoginDialog = () => {
                   flexDirection: 'row',
                   width: '100%',
                   alignItems: 'center'
-                }}>
+                }}
+              >
                 <Paragraph
                   size={11}
                   style={{
                     maxWidth: '90%'
-                  }}>
+                  }}
+                >
                   By signing up you agree to our{' '}
                   <Paragraph
                     size={11}
@@ -724,7 +718,8 @@ const LoginDialog = () => {
                         .catch(e => {})
                         .then(r => {});
                     }}
-                    color={colors.accent}>
+                    color={colors.accent}
+                  >
                     terms of service{' '}
                   </Paragraph>
                   and{' '}
@@ -735,7 +730,8 @@ const LoginDialog = () => {
                         .catch(e => {})
                         .then(r => {});
                     }}
-                    color={colors.accent}>
+                    color={colors.accent}
+                  >
                     privacy policy.
                   </Paragraph>
                 </Paragraph>
@@ -780,16 +776,17 @@ const LoginDialog = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 flexShrink: 1
-              }}>
+              }}
+            >
               <ActionIcon name="alert" color={colors.warningText} />
               <Paragraph
                 style={{
                   flexShrink: 1,
                   marginLeft: 5
                 }}
-                color={colors.warningText}>
-                Do not close the app or move it to background while we change
-                your password.
+                color={colors.warningText}
+              >
+                Do not close the app or move it to background while we change your password.
               </Paragraph>
             </View>
           ) : null}

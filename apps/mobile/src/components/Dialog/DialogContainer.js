@@ -4,8 +4,8 @@ import { useTracked } from '../../provider';
 import { DDS } from '../../services/DeviceDetection';
 import { getElevation } from '../../utils';
 
-const DialogContainer = ({width, height, ...restProps}) => {
-  const [state,] = useTracked();
+const DialogContainer = ({ width, height, ...restProps }) => {
+  const [state] = useTracked();
   const colors = state.colors;
 
   return (
@@ -17,7 +17,7 @@ const DialogContainer = ({width, height, ...restProps}) => {
         maxHeight: height || 450,
         borderRadius: 10,
         backgroundColor: colors.bg,
-        paddingTop: 12,
+        paddingTop: 12
       }}
     />
   );

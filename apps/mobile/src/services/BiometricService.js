@@ -1,15 +1,15 @@
 import FingerprintScanner from 'react-native-fingerprint-scanner';
 import Storage from '../utils/storage';
-import {ToastEvent} from './EventManager';
+import { ToastEvent } from './EventManager';
 import * as Keychain from 'react-native-keychain';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import { MMKV } from '../utils/mmkv';
 
 const CRYPT_CONFIG = Platform.select({
   ios: {
-    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
   },
-  android: {},
+  android: {}
 });
 
 async function isBiometryAvailable() {
@@ -32,12 +32,7 @@ async function isFingerprintAuthEnabled() {
 }
 
 async function storeCredentials(password) {
-  await Keychain.setInternetCredentials(
-    'nn_vault',
-    'notesnookvault',
-    password,
-    CRYPT_CONFIG,
-  );
+  await Keychain.setInternetCredentials('nn_vault', 'notesnookvault', password, CRYPT_CONFIG);
 }
 
 async function resetCredentials() {
@@ -54,14 +49,14 @@ async function getCredentials(title, description) {
       Platform.select({
         ios: {
           fallbackEnabled: true,
-          description: description,
+          description: description
         },
         android: {
           title: title,
           description: description,
-          deviceCredentialAllowed: true,
-        },
-      }),
+          deviceCredentialAllowed: true
+        }
+      })
     );
     FingerprintScanner.release();
     return await Keychain.getInternetCredentials('nn_vault', CRYPT_CONFIG);
@@ -71,21 +66,21 @@ async function getCredentials(title, description) {
       heading: 'Authentication with biometrics failed.',
       message: 'Tap "Biometric Unlock" to try again.',
       type: 'error',
-      context: 'local',
+      context: 'local'
     };
     if (e.name === 'DeviceLocked') {
       message = {
         heading: 'Biometrics authentication failed.',
         message: 'Wait 30 seconds to try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       };
     } else if (e.name === 'UserFallback') {
       message = {
         heading: 'Authentication cancelled by user.',
         message: 'Tap "Biometric Unlock" to try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       };
     }
 
@@ -100,14 +95,14 @@ async function validateUser(title, description) {
       Platform.select({
         ios: {
           fallbackEnabled: true,
-          description: title,
+          description: title
         },
         android: {
           title: title,
           description: description,
-          deviceCredentialAllowed: true,
-        },
-      }),
+          deviceCredentialAllowed: true
+        }
+      })
     );
     FingerprintScanner.release();
     return true;
@@ -118,14 +113,14 @@ async function validateUser(title, description) {
         heading: 'Biometrics authentication failed.',
         message: 'Wait 30 seconds to try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     } else {
       ToastEvent.show({
         heading: 'Authentication failed.',
         message: 'Tap to try again.',
         type: 'error',
-        context: 'local',
+        context: 'local'
       });
     }
     return false;
@@ -140,5 +135,5 @@ export default {
   getCredentials,
   storeCredentials,
   hasInternetCredentials,
-  validateUser,
+  validateUser
 };

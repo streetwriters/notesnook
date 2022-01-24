@@ -1,38 +1,31 @@
-import {
-  activateKeepAwake,
-  deactivateKeepAwake
-} from '@sayem314/react-native-keep-awake';
-import React, {useEffect, useRef} from 'react';
-import {View} from 'react-native';
-import {StatusBar} from 'react-native-bars';
-import Animated, {useValue} from 'react-native-reanimated';
-import {notesnook} from '../../e2e/test.ids';
+import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
+import React, { useEffect, useRef } from 'react';
+import { View } from 'react-native';
+import { StatusBar } from 'react-native-bars';
+import Animated, { useValue } from 'react-native-reanimated';
+import { notesnook } from '../../e2e/test.ids';
 import CustomTabs from '../components/CustomTabs';
-import {DialogManager} from '../components/DialogManager';
-import {Menu} from '../components/Menu';
-import {Toast} from '../components/Toast';
-import {useTracked} from '../provider';
-import {useEditorStore, useSettingStore} from '../provider/stores';
-import {DDS} from '../services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../services/EventManager';
-import {editing, setWidthHeight} from '../utils';
-import {updateStatusBarColor} from '../utils/Colors';
+import { DialogManager } from '../components/DialogManager';
+import { Menu } from '../components/Menu';
+import { Toast } from '../components/Toast';
+import { useTracked } from '../provider';
+import { useEditorStore, useSettingStore } from '../provider/stores';
+import { DDS } from '../services/DeviceDetection';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../services/EventManager';
+import { editing, setWidthHeight } from '../utils';
+import { updateStatusBarColor } from '../utils/Colors';
 import {
   eClearEditor,
   eCloseFullscreenEditor,
   eOnLoadNote,
   eOpenFullscreenEditor
 } from '../utils/Events';
-import {editorRef, tabBarRef} from '../utils/Refs';
-import {sleep} from '../utils/TimeUtils';
-import {EditorWrapper} from '../views/Editor/EditorWrapper';
-import {checkStatus, EditorWebView, getNote} from '../views/Editor/Functions';
+import { editorRef, tabBarRef } from '../utils/Refs';
+import { sleep } from '../utils/TimeUtils';
+import { EditorWrapper } from '../views/Editor/EditorWrapper';
+import { checkStatus, EditorWebView, getNote } from '../views/Editor/Functions';
 import tiny from '../views/Editor/tiny/tiny';
-import {NavigatorStack} from './NavigatorStack';
+import { NavigatorStack } from './NavigatorStack';
 let layoutTimer = null;
 
 const onChangeTab = async obj => {
@@ -41,15 +34,12 @@ const onChangeTab = async obj => {
     activateKeepAwake();
     eSendEvent('navigate');
     eSendEvent(eClearEditor, 'addHandler');
-    if (
-      !editing.isRestoringState &&
-      (!editing.currentlyEditing || !getNote())
-    ) {
+    if (!editing.isRestoringState && (!editing.currentlyEditing || !getNote())) {
       if (editing.overlay) {
         editing.overlay = false;
         return;
       }
-      eSendEvent(eOnLoadNote, {type: 'new'});
+      eSendEvent(eOnLoadNote, { type: 'new' });
       editing.currentlyEditing = true;
     }
     if (getNote()) {
@@ -93,7 +83,7 @@ export const RootView = React.memo(
 const NativeStack = React.memo(
   () => {
     const [state] = useTracked();
-    const {colors} = state;
+    const { colors } = state;
 
     const deviceMode = useSettingStore(state => state.deviceMode);
     const setFullscreen = useSettingStore(state => state.setFullscreen);
@@ -112,9 +102,7 @@ const NativeStack = React.memo(
           width: dimensions.width,
           zIndex: 999,
           paddingHorizontal:
-            deviceMode === 'smallTablet'
-              ? dimensions.width * 0
-              : dimensions.width * 0.15
+            deviceMode === 'smallTablet' ? dimensions.width * 0 : dimensions.width * 0.15
         }
       });
     };
@@ -125,8 +113,7 @@ const NativeStack = React.memo(
         style: {
           width:
             deviceMode === 'smallTablet'
-              ? dimensions.width -
-                valueLimiter(dimensions.width * 0.4, 300, 450)
+              ? dimensions.width - valueLimiter(dimensions.width * 0.4, 300, 450)
               : dimensions.width * 0.55,
           zIndex: null,
           paddingHorizontal: 0
@@ -156,7 +143,6 @@ const NativeStack = React.memo(
         layoutTimer = null;
       }
       let size = event?.nativeEvent?.layout;
-      updatedDimensions = size;
       if (!size || (size.width === dimensions.width && deviceMode !== null)) {
         DDS.setSize(size);
         setDeviceMode(deviceMode, size);
@@ -195,8 +181,7 @@ const NativeStack = React.memo(
           style: {
             width: size.width,
             zIndex: 999,
-            paddingHorizontal:
-              current === 'smallTablet' ? size.width * 0 : size.width * 0.15
+            paddingHorizontal: current === 'smallTablet' ? size.width * 0 : size.width * 0.15
           }
         });
       } else {
@@ -272,12 +257,8 @@ const NativeStack = React.memo(
       },
       smallTablet: {
         a: fullscreen ? 0 : valueLimiter(dimensions.width * 0.3, 300, 350),
-        b: fullscreen
-          ? 0
-          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
-        c: fullscreen
-          ? 0
-          : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
+        b: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350),
+        c: fullscreen ? 0 : dimensions.width + valueLimiter(dimensions.width * 0.3, 300, 350)
       },
       tablet: {
         a: 0,
@@ -306,20 +287,24 @@ const NativeStack = React.memo(
 
     const listItems = [
       <View
+        key="1"
         onLayout={() => {
-          tabBarRef.current?.goToIndex(1,false);
+          tabBarRef.current?.goToIndex(1, false);
         }}
         style={{
           height: '100%',
           width: fullscreen ? 0 : widths[deviceMode].a
-        }}>
+        }}
+      >
         <Menu />
       </View>,
       <View
+        key="2"
         style={{
           height: '100%',
           width: fullscreen ? 0 : widths[deviceMode].b
-        }}>
+        }}
+      >
         {deviceMode === 'mobile' ? (
           <Animated.View
             style={{
@@ -341,9 +326,8 @@ const NativeStack = React.memo(
 
         <NavigatorStack />
       </View>,
-      <EditorWrapper width={widths} dimensions={dimensions} />
+      <EditorWrapper key="3" width={widths} dimensions={dimensions} />
     ];
-
 
     return (
       <View
@@ -353,11 +337,9 @@ const NativeStack = React.memo(
           width: '100%',
           height: '100%',
           backgroundColor: colors.bg
-        }}>
-        <StatusBar
-          animated="true"
-          barStyle={colors.night ? 'light-content' : 'dark-content'}
-        />
+        }}
+      >
+        <StatusBar animated="true" barStyle={colors.night ? 'light-content' : 'dark-content'} />
         {deviceMode ? (
           <CustomTabs
             ref={tabBarRef}
@@ -366,9 +348,7 @@ const NativeStack = React.memo(
             style={{
               zIndex: 1
             }}
-            initialIndex={
-              deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1
-            }
+            initialIndex={deviceMode === 'smallTablet' || deviceMode === 'tablet' ? 0 : 1}
             toggleOverlay={toggleView}
             offsets={offsets[deviceMode]}
             items={listItems}

@@ -1,36 +1,29 @@
 import KeepAwake from '@sayem314/react-native-keep-awake';
-import {EV, EVENTS} from 'notes-core/common';
-import React, {createRef, useEffect, useState} from 'react';
-import {Modal, SafeAreaView, Text, View} from 'react-native';
+import { EV, EVENTS } from 'notes-core/common';
+import React, { createRef, useEffect, useState } from 'react';
+import { Modal, Platform, SafeAreaView, Text, View } from 'react-native';
 import Animated from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import WebView from 'react-native-webview';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent
+  eUnSubscribeEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import Sync from '../../services/Sync';
-import {dHeight} from '../../utils';
-import {db} from '../../utils/database';
-import {
-  eApplyChanges,
-  eShowMergeDialog,
-  refreshNotesPage
-} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {timeConverter} from '../../utils/TimeUtils';
-import {
-  getNote,
-  sourceUri,
-  updateNoteInEditor
-} from '../../views/Editor/Functions';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
+import { dHeight } from '../../utils';
+import { db } from '../../utils/database';
+import { eApplyChanges, eShowMergeDialog, refreshNotesPage } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { timeConverter } from '../../utils/TimeUtils';
+import { getNote, sourceUri, updateNoteInEditor } from '../../views/Editor/Functions';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
 import BaseDialog from '../Dialog/base-dialog';
 import DialogButtons from '../Dialog/dialog-buttons';
 import DialogContainer from '../Dialog/dialog-container';
@@ -44,7 +37,7 @@ let note = null;
 let primaryData = null;
 let secondaryData = null;
 
-function onMediaLoaded({hash, src}) {
+function onMediaLoaded({ hash, src }) {
   console.log('on media download complete');
   let inject = `
   (function(){
@@ -58,7 +51,7 @@ function onMediaLoaded({hash, src}) {
 
 const MergeEditor = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [primary, setPrimary] = useState(true);
   const [secondary, setSecondary] = useState(true);
@@ -70,12 +63,9 @@ const MergeEditor = () => {
   const insets = useSafeAreaInsets();
 
   const onPrimaryWebViewLoad = async () => {
-    let content = await db.content.insertPlaceholders(
-      primaryData,
-      'placeholder.svg'
-    );
+    let content = await db.content.insertPlaceholders(primaryData, 'placeholder.svg');
     postMessage(primaryWebView, 'htmldiff', content.data);
-    let theme = {...colors};
+    let theme = { ...colors };
     theme.factor = normalize(1);
 
     primaryWebView.current?.injectJavaScript(`
@@ -93,12 +83,9 @@ const MergeEditor = () => {
 
   const onSecondaryWebViewLoad = async () => {
     if (!secondaryData) return;
-    let content = await db.content.insertPlaceholders(
-      secondaryData,
-      'placeholder.svg'
-    );
+    let content = await db.content.insertPlaceholders(secondaryData, 'placeholder.svg');
     postMessage(secondaryWebView, 'htmldiff', content?.data);
-    let theme = {...colors};
+    let theme = { ...colors };
     theme.factor = normalize(1);
     secondaryWebView.current?.injectJavaScript(`
     (function() {
@@ -143,11 +130,7 @@ const MergeEditor = () => {
   const applyChanges = async () => {
     let content = keepContentFrom === 'primary' ? primaryData : secondaryData;
     let keepCopy =
-      copyToSave === 'primary'
-        ? primaryData
-        : copyToSave === 'secondary'
-        ? secondaryData
-        : null;
+      copyToSave === 'primary' ? primaryData : copyToSave === 'secondary' ? secondaryData : null;
 
     await db.notes.add({
       id: note.id,
@@ -255,8 +238,6 @@ const MergeEditor = () => {
     setDialogVisible(false);
     primaryData = null;
     secondaryData = null;
-    primaryText = null;
-    secondaryText = null;
     note = null;
   };
 
@@ -289,12 +270,14 @@ const MergeEditor = () => {
         'landscape-left',
         'landscape-right'
       ]}
-      visible={true}>
+      visible={true}
+    >
       <SafeAreaView
         style={{
           backgroundColor: colors.bg,
           paddingTop: insets.top
-        }}>
+        }}
+      >
         <KeepAwake />
         {dialogVisible && (
           <BaseDialog visible={true}>
@@ -320,7 +303,8 @@ const MergeEditor = () => {
             height: '100%',
             width: '100%',
             backgroundColor: DDS.isLargeTablet() ? 'rgba(0,0,0,0.3)' : null
-          }}>
+          }}
+        >
           <View
             style={{
               width: '100%',
@@ -330,26 +314,19 @@ const MergeEditor = () => {
               alignItems: 'center',
               paddingHorizontal: 12,
               paddingLeft: 6
-            }}>
+            }}
+          >
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flexShrink: 1
-              }}>
-              <ActionIcon
-                onPress={close}
-                color={colors.pri}
-                name="arrow-left"
-              />
-              <Paragraph
-                style={{flexWrap: 'wrap'}}
-                color={colors.icon}
-                size={SIZE.xs}>
-                <Text style={{color: colors.accent, fontWeight: 'bold'}}>
-                  (This Device)
-                </Text>
+              }}
+            >
+              <ActionIcon onPress={close} color={colors.pri} name="arrow-left" />
+              <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
+                <Text style={{ color: colors.accent, fontWeight: 'bold' }}>(This Device)</Text>
                 {'\n'}
                 {timeConverter(primaryData?.dateEdited)}
               </Paragraph>
@@ -360,7 +337,8 @@ const MergeEditor = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-end'
-              }}>
+              }}
+            >
               {keepContentFrom === 'secondary' ? (
                 <Button
                   onPress={onPressSaveCopyFromPrimaryWebView}
@@ -374,7 +352,7 @@ const MergeEditor = () => {
                   fontSize={SIZE.xs}
                 />
               ) : null}
-              <View style={{width: 10}} />
+              <View style={{ width: 10 }} />
               {keepContentFrom === 'secondary' ? (
                 <Button
                   title="Discard"
@@ -431,7 +409,8 @@ const MergeEditor = () => {
               backgroundColor: colors.bg,
               borderBottomWidth: 1,
               borderBottomColor: colors.nav
-            }}>
+            }}
+          >
             <WebView
               onLoad={onPrimaryWebViewLoad}
               ref={primaryWebView}
@@ -467,21 +446,18 @@ const MergeEditor = () => {
               justifyContent: 'space-between',
               alignItems: 'center',
               paddingHorizontal: 12
-            }}>
+            }}
+          >
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'space-between',
                 flexShrink: 1
-              }}>
-              <Paragraph
-                style={{flexWrap: 'wrap'}}
-                color={colors.icon}
-                size={SIZE.xs}>
-                <Text style={{color: 'red', fontWeight: 'bold'}}>
-                  (Incoming)
-                </Text>
+              }}
+            >
+              <Paragraph style={{ flexWrap: 'wrap' }} color={colors.icon} size={SIZE.xs}>
+                <Text style={{ color: 'red', fontWeight: 'bold' }}>(Incoming)</Text>
                 {'\n'}
                 {timeConverter(secondaryData?.dateEdited)}
               </Paragraph>
@@ -492,7 +468,8 @@ const MergeEditor = () => {
                 flexDirection: 'row',
                 alignItems: 'center',
                 justifyContent: 'flex-end'
-              }}>
+              }}
+            >
               {keepContentFrom === 'primary' ? (
                 <Button
                   height={30}
@@ -507,7 +484,7 @@ const MergeEditor = () => {
                   title="Save a copy"
                 />
               ) : null}
-              <View style={{width: 10}} />
+              <View style={{ width: 10 }} />
               {keepContentFrom === 'primary' ? (
                 <Button
                   title="Discard"
@@ -563,7 +540,8 @@ const MergeEditor = () => {
               height: dHeight / 2 - (50 + insets.top / 2),
               backgroundColor: colors.bg,
               borderRadius: 10
-            }}>
+            }}
+          >
             <WebView
               onLoad={onSecondaryWebViewLoad}
               ref={secondaryWebView}

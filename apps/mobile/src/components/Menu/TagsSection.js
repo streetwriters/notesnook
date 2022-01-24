@@ -1,21 +1,17 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {FlatList, View} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { FlatList, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {useMenuStore, useNoteStore} from '../../provider/stores';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { useMenuStore, useNoteStore } from '../../provider/stores';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {eOnNewTopicAdded, refreshNotesPage} from '../../utils/Events';
-import {normalize, SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/database';
+import { eOnNewTopicAdded, refreshNotesPage } from '../../utils/Events';
+import { normalize, SIZE } from '../../utils/SizeUtils';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
-import {ActionSheetEvent} from '../DialogManager/recievers';
-import {PressableButton} from '../PressableButton';
+import { Button } from '../Button';
+import { ActionSheetEvent } from '../DialogManager/recievers';
+import { PressableButton } from '../PressableButton';
 import Seperator from '../Seperator';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
@@ -60,7 +56,7 @@ export const TagsSection = () => {
         type: item.type
       });
     } else {
-      params = {...item, menu: true, get: 'topics'};
+      params = { ...item, menu: true, get: 'topics' };
       eSendEvent(refreshNotesPage, params);
       Navigation.navigate('NotesPage', params, {
         heading: item.title,
@@ -75,7 +71,8 @@ export const TagsSection = () => {
     <View
       style={{
         flexGrow: 1
-      }}>
+      }}
+    >
       <FlatList
         data={menuPins}
         style={{
@@ -85,17 +82,15 @@ export const TagsSection = () => {
           flexGrow: 1
         }}
         keyExtractor={(item, index) => item.id}
-        renderItem={({item, index}) => (
-          <PinItem item={item} index={index} onPress={onPress} />
-        )}
+        renderItem={({ item, index }) => <PinItem item={item} index={index} onPress={onPress} />}
       />
     </View>
   );
 };
 
-const PinItem = ({item, index, onPress}) => {
+const PinItem = ({ item, index, onPress }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const setMenuPins = useMenuStore(state => state.setMenuPins);
   const alias = item.type === 'tag' ? db.tags.alias(item.title) : item.title;
   const [visible, setVisible] = useState(false);
@@ -133,7 +128,8 @@ const PinItem = ({item, index, onPress}) => {
           }}
           gestureEnabled={false}
           fwdRef={fwdRef}
-          visible={true}>
+          visible={true}
+        >
           <Seperator />
           <Button
             title="Remove Shortcut"
@@ -168,19 +164,22 @@ const PinItem = ({item, index, onPress}) => {
           alignItems: 'center',
           height: normalize(50),
           marginBottom: 5
-        }}>
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
             flex: 1
-          }}>
+          }}
+        >
           <View
             style={{
               width: 30,
               justifyContent: 'center'
-            }}>
+            }}
+          >
             <Icon color={color} size={SIZE.lg - 2} name={icons[item.type]} />
             <Icon
               style={{
@@ -198,14 +197,16 @@ const PinItem = ({item, index, onPress}) => {
               alignItems: 'flex-start',
               flexGrow: 1,
               flex: 1
-            }}>
+            }}
+          >
             {headerTextState?.id === item.id ? (
               <Heading
                 style={{
                   flexWrap: 'wrap'
                 }}
                 color={colors.heading}
-                size={SIZE.md}>
+                size={SIZE.md}
+              >
                 {alias}
               </Heading>
             ) : (

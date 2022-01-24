@@ -15,9 +15,9 @@ import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const GeneralSheet = ({context}) => {
+const GeneralSheet = ({ context }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [dialogData, setDialogData] = useState(null);
   const actionSheetRef = useRef();
@@ -35,10 +35,7 @@ const GeneralSheet = ({context}) => {
   }, [visible]);
 
   const open = async data => {
-    if (
-      (data.context && !context) ||
-      (data.context && data.context !== context)
-    ) {
+    if ((data.context && !context) || (data.context && data.context !== context)) {
       return;
     }
     if (visible || dialogData) {
@@ -92,20 +89,19 @@ const GeneralSheet = ({context}) => {
         dialogData.onClose && dialogData.onClose();
         setVisible(false);
         setDialogData(null);
-      }}>
+      }}
+    >
       <View
         style={{
           justifyContent: 'center',
           alignItems: 'center',
           marginBottom:
-            !dialogData.progress &&
-            !dialogData.icon &&
-            !dialogData.title &&
-            !dialogData.paragraph
+            !dialogData.progress && !dialogData.icon && !dialogData.title && !dialogData.paragraph
               ? 0
               : 10,
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         {dialogData?.progress ? (
           <ActivityIndicator
             style={{
@@ -127,9 +123,7 @@ const GeneralSheet = ({context}) => {
         {dialogData?.title ? <Heading> {dialogData?.title}</Heading> : null}
 
         {dialogData?.paragraph ? (
-          <Paragraph style={{textAlign: 'center'}}>
-            {dialogData?.paragraph}
-          </Paragraph>
+          <Paragraph style={{ textAlign: 'center' }}>{dialogData?.paragraph}</Paragraph>
         ) : null}
       </View>
 
@@ -141,14 +135,15 @@ const GeneralSheet = ({context}) => {
         style={{
           paddingHorizontal: 12,
           marginBottom: dialogData.valueArray ? 12 : 0
-        }}>
+        }}
+      >
         {dialogData.valueArray &&
           dialogData.valueArray.map(v => (
             <Button
               title={v}
               type="gray"
               key={v}
-              textStyle={{fontWeight: 'normal'}}
+              textStyle={{ fontWeight: 'normal' }}
               fontSize={SIZE.sm}
               icon="check"
               width="100%"
@@ -163,7 +158,8 @@ const GeneralSheet = ({context}) => {
       <View
         style={{
           paddingHorizontal: 12
-        }}>
+        }}
+      >
         {dialogData?.action ? (
           <Button
             onPress={dialogData.action}
@@ -171,7 +167,6 @@ const GeneralSheet = ({context}) => {
             title={dialogData.actionText}
             accentColor={dialogData.iconColor || 'accent'}
             accentText="light"
-            fontSize={SIZE.lg}
             type="accent"
             height={50}
             width="100%"
@@ -205,12 +200,9 @@ const GeneralSheet = ({context}) => {
             }}
             size={SIZE.xs}
             onPress={dialogData.learnMorePress}
-            color={colors.icon}>
-            <Icon
-              color={colors.icon}
-              name="information-outline"
-              size={SIZE.xs}
-            />{' '}
+            color={colors.icon}
+          >
+            <Icon color={colors.icon} name="information-outline" size={SIZE.xs} />{' '}
             {dialogData.learnMore}
           </Paragraph>
         ) : null}

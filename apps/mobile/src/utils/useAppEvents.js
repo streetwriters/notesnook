@@ -50,12 +50,7 @@ import {
 import tiny from '../views/Editor/tiny/tiny';
 import { updateStatusBarColor } from './Colors';
 import { db } from './database';
-import {
-  eClearEditor,
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  refreshNotesPage
-} from './Events';
+import { eClearEditor, eCloseProgressDialog, eOpenLoginDialog, refreshNotesPage } from './Events';
 import { MMKV } from './mmkv';
 import Storage from './storage';
 import { sleep } from './TimeUtils';
@@ -78,13 +73,13 @@ export const useAppEvents = () => {
     isReconnecting: false
   });
 
-  const onMediaDownloaded = ({hash, groupId, src}) => {
+  const onMediaDownloaded = ({ hash, groupId, src }) => {
     if (groupId?.startsWith('monograph')) return;
     tiny.call(
       EditorWebView,
       `
         (function(){
-          let image = ${JSON.stringify({hash, src})};
+          let image = ${JSON.stringify({ hash, src })};
           tinymce.activeEditor._replaceImage(image);
         })();
         `
@@ -92,16 +87,12 @@ export const useAppEvents = () => {
   };
 
   const onLoadingAttachment = data => {
-    useAttachmentStore
-      .getState()
-      .setLoading(data.total === data.current ? null : data);
+    useAttachmentStore.getState().setLoading(data.total === data.current ? null : data);
   };
 
-  const onSodiumProgress = ({total, progress}) => {
+  const onSodiumProgress = ({ total, progress }) => {
     console.log('encryption progress: ', (progress / total).toFixed(2));
-    useAttachmentStore
-      .getState()
-      .setEncryptionProgress((progress / total).toFixed(2));
+    useAttachmentStore.getState().setEncryptionProgress((progress / total).toFixed(2));
   };
 
   useEffect(() => {
@@ -117,10 +108,7 @@ export const useAppEvents = () => {
     EV.subscribe(EVENTS.mediaAttachmentDownloaded, onMediaDownloaded);
     EV.subscribe(EVENTS.attachmentsLoading, onLoadingAttachment);
 
-    let ubsubsodium = SodiumEventEmitter.addListener(
-      'onSodiumProgress',
-      onSodiumProgress
-    );
+    let ubsubsodium = SodiumEventEmitter.addListener('onSodiumProgress', onSodiumProgress);
 
     eSubscribeEvent('userLoggedIn', setCurrentUser);
 
@@ -147,19 +135,19 @@ export const useAppEvents = () => {
     eSendEvent(eOpenLoginDialog, 4);
   };
 
-  const onNoteRemoved = async id => {
-    try {
-      await db.notes.remove(id);
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Favorites,
-        Navigation.routeNames.Notes,
-        Navigation.routeNames.NotesPage,
-        Navigation.routeNames.Trash,
-        Navigation.routeNames.Notebook
-      ]);
-      eSendEvent(eClearEditor, id);
-    } catch (e) {}
-  };
+  // const onNoteRemoved = async id => {
+  //   try {
+  //     await db.notes.remove(id);
+  //     Navigation.setRoutesToUpdate([
+  //       Navigation.routeNames.Favorites,
+  //       Navigation.routeNames.Notes,
+  //       Navigation.routeNames.NotesPage,
+  //       Navigation.routeNames.Trash,
+  //       Navigation.routeNames.Notebook
+  //     ]);
+  //     eSendEvent(eClearEditor, id);
+  //   } catch (e) {}
+  // };
 
   useEffect(() => {
     if (!loading) {
@@ -173,9 +161,8 @@ export const useAppEvents = () => {
           await setCurrentUser();
         } catch (e) {}
       })();
-      refValues.current.removeInternetStateListener = NetInfo.addEventListener(
-        onInternetStateChanged
-      );
+      refValues.current.removeInternetStateListener =
+        NetInfo.addEventListener(onInternetStateChanged);
     }
     return () => {
       refValues.current?.removeInternetStateListener &&
@@ -215,8 +202,7 @@ export const useAppEvents = () => {
     if (!user) return;
     MMKV.setItem('isUserEmailConfirmed', 'yes');
     await PremiumService.setPremiumStatus();
-    let message =
-      'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
+    let message = 'You have been rewarded 7 more days of free trial. Enjoy using Notesnook!';
     presentSheet({
       title: 'Email confirmed!',
       paragraph: message,
@@ -226,7 +212,8 @@ export const useAppEvents = () => {
             paddingHorizontal: 12,
             paddingBottom: 15,
             alignItems: 'center'
-          }}>
+          }}
+        >
           <ProFeatures />
         </View>
       )
@@ -320,7 +307,7 @@ export const useAppEvents = () => {
     }, 1000);
   };
 
-  unsubIAP = () => {
+  const unsubIAP = () => {
     if (refValues.current?.subsriptionSuccessListener) {
       refValues.current.subsriptionSuccessListener?.remove();
       refValues.current.subsriptionSuccessListener = null;
@@ -335,9 +322,7 @@ export const useAppEvents = () => {
     try {
       let user = await db.user.getUser();
 
-      let isUserEmailConfirmed = await MMKV.getStringAsync(
-        'isUserEmailConfirmed'
-      );
+      let isUserEmailConfirmed = await MMKV.getStringAsync('isUserEmailConfirmed');
 
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
         setUser(user);
@@ -357,9 +342,7 @@ export const useAppEvents = () => {
         }
 
         if (user.isEmailConfirmed) {
-          let hasSavedRecoveryKey = await MMKV.getItem(
-            'userHasSavedRecoveryKey'
-          );
+          let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
           if (!hasSavedRecoveryKey) {
             setRecoveryKeyMessage();
           }
@@ -437,16 +420,11 @@ export const useAppEvents = () => {
       }
 
       if (SettingsService.get().appLockMode === 'background') {
-        if (
-          refValues.current?.prevState === 'background' &&
-          !refValues.current?.showingDialog
-        ) {
+        if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';
           eSendEvent('load_overlay', 'hide');
-          let result = await BiometricService.validateUser(
-            'Unlock to access your notes'
-          );
+          let result = await BiometricService.validateUser('Unlock to access your notes');
           if (result) {
             refValues.current.showingDialog = false;
             eSendEvent('load_overlay', 'show');
@@ -475,10 +453,7 @@ export const useAppEvents = () => {
       }
     } else {
       refValues.current.prevState = 'background';
-      if (
-        getNote()?.locked &&
-        SettingsService.get().appLockMode === 'background'
-      ) {
+      if (getNote()?.locked && SettingsService.get().appLockMode === 'background') {
         eSendEvent(eClearEditor);
       }
       await storeAppState();

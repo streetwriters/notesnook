@@ -33,10 +33,7 @@ export class DialogManager extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
-    return (
-      JSON.stringify(nextProps) !== JSON.stringify(this.props) ||
-      nextState !== this.state
-    );
+    return JSON.stringify(nextProps) !== JSON.stringify(this.props) || nextState !== this.state;
   }
 
   onThemeChange = () => {
@@ -54,7 +51,7 @@ export class DialogManager extends Component {
   }
 
   render() {
-    let {colors} = this.state;
+    let { colors } = this.state;
     return (
       <>
         <Dialog context="global" />

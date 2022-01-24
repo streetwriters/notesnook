@@ -7,9 +7,9 @@ import Navigation from '../../services/Navigation';
 import { SIZE } from '../../utils/SizeUtils';
 import { ActionIcon } from '../ActionIcon';
 
-export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
+export const HeaderLeftMenu = ({ currentScreen, headerMenuState }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
 
   const onLeftButtonPress = () => {
@@ -20,12 +20,9 @@ export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
     Navigation.goBack();
   };
 
-
   return (
     <>
-      {deviceMode !== "tablet"  ||
-      currentScreen === 'Search' ||
-      !headerMenuState ? (
+      {deviceMode !== 'tablet' || currentScreen === 'Search' || !headerMenuState ? (
         <ActionIcon
           testID={notesnook.ids.default.header.buttons.left}
           customStyle={{
@@ -35,11 +32,11 @@ export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
             width: 40,
             borderRadius: 100,
             marginLeft: -5,
-            marginRight:DDS.isLargeTablet()? 10 : 25,
+            marginRight: DDS.isLargeTablet() ? 10 : 25
           }}
           left={40}
           top={40}
-          right={DDS.isLargeTablet()? 10 : 25}
+          right={DDS.isLargeTablet() ? 10 : 25}
           onPress={onLeftButtonPress}
           onLongPress={() => {
             Navigation.popToTop();
@@ -47,7 +44,7 @@ export const HeaderLeftMenu = ({currentScreen,headerMenuState}) => {
           name={!headerMenuState ? 'arrow-left' : 'menu'}
           color={colors.pri}
           iconStyle={{
-            marginLeft: !headerMenuState ? -5 : 0,
+            marginLeft: !headerMenuState ? -5 : 0
           }}
         />
       ) : undefined}

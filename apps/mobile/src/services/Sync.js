@@ -1,10 +1,10 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import NetInfo from '@react-native-community/netinfo';
-import {initialize, useUserStore} from '../provider/stores';
-import {doInBackground} from '../utils';
-import {db} from '../utils/database';
-import {getNote, updateNoteInEditor} from '../views/Editor/Functions';
-import {ToastEvent} from './EventManager';
+import { initialize, useUserStore } from '../provider/stores';
+import { doInBackground } from '../utils';
+import { db } from '../utils/database';
+import { getNote, updateNoteInEditor } from '../views/Editor/Functions';
+import { ToastEvent } from './EventManager';
 
 let retryCount = 0;
 const run = async (context = 'global', forced) => {
@@ -64,8 +64,8 @@ const run = async (context = 'global', forced) => {
       await updateNoteInEditor();
     }
     userstore.setSyncing(false);
-    return result;
   }
+  return result;
 };
 
 export default {

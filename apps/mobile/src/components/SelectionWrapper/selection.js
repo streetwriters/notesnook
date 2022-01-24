@@ -1,14 +1,14 @@
-import React, {useEffect, useState} from 'react';
-import {TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {Actions} from '../../provider/Actions';
-import {useSelectionStore} from '../../provider/stores';
-import {SIZE} from '../../utils/SizeUtils';
+import { useTracked } from '../../provider';
+import { Actions } from '../../provider/Actions';
+import { useSelectionStore } from '../../provider/stores';
+import { SIZE } from '../../utils/SizeUtils';
 
-export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
+export const SelectionIcon = ({ setActionStrip, item, compactMode }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   const selectionMode = useSelectionStore(state => state.selectionMode);
   const selectedItemsList = useSelectionStore(state => state.selectedItemsList);
@@ -18,9 +18,7 @@ export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
   useEffect(() => {
     if (selectionMode) {
       setActionStrip(false);
-      let exists = selectedItemsList.filter(
-        o => o.dateCreated === item.dateCreated
-      );
+      let exists = selectedItemsList.filter(o => o.dateCreated === item.dateCreated);
 
       if (exists[0]) {
         if (!selected) {
@@ -34,7 +32,7 @@ export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
     }
   }, [selectedItemsList, item.id]);
 
-  onPress = () => {
+  const onPress = () => {
     setSelectedItem(item);
   };
 
@@ -44,7 +42,7 @@ export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
         display: 'flex',
         opacity: 1,
         width: '10%',
-        height:compactMode ? 40 : 70,
+        height: compactMode ? 40 : 70,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: colors.bg,
@@ -52,7 +50,8 @@ export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
         marginRight: 10,
         borderWidth: 1,
         borderColor: selected ? colors.accent : colors.border
-      }}>
+      }}
+    >
       <TouchableOpacity
         activeOpacity={1}
         onPress={onPress}
@@ -60,13 +59,10 @@ export const SelectionIcon = ({setActionStrip, item,compactMode}) => {
           justifyContent: 'center',
           alignItems: 'center',
           height: 70
-        }}>
+        }}
+      >
         {selected && (
-          <Icon
-            size={SIZE.xl}
-            color={selected ? colors.accent : colors.icon}
-            name="check"
-          />
+          <Icon size={SIZE.xl} color={selected ? colors.accent : colors.icon} name="check" />
         )}
       </TouchableOpacity>
     </View>

@@ -4,7 +4,7 @@ import {
   eOnNoteEdited,
   eOpenProgressDialog,
   eOpenVaultDialog,
-  eShowToast,
+  eShowToast
 } from '../utils/Events';
 const eventManager = new EventManager();
 
@@ -40,7 +40,7 @@ export const eSendEvent = (eventName, data) => {
  * @param {vaultType} data
  */
 
-export const openVault = (data) => {
+export const openVault = data => {
   eSendEvent(eOpenVaultDialog, data);
 };
 
@@ -57,7 +57,7 @@ export function sendNoteEditedEvent(data) {
 }
 
 export function presentSheet(data) {
-  eSendEvent(eOpenProgressDialog,data);
+  eSendEvent(eOpenProgressDialog, data);
 }
 
 export const ToastEvent = {
@@ -73,7 +73,7 @@ export const ToastEvent = {
    *
    * @param {event} data
    */
-  show: (data) =>
+  show: data =>
     eSendEvent(eShowToast, {
       heading: data.heading,
       message: data.message,
@@ -81,9 +81,9 @@ export const ToastEvent = {
       context: data.context || 'global',
       duration: data.duration || 3000,
       func: data.func || null,
-      actionText: data.actionText || null,
+      actionText: data.actionText || null
     }),
-  hide: () => eSendEvent(eHideToast),
+  hide: () => eSendEvent(eHideToast)
 };
 
 /*

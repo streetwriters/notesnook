@@ -5,7 +5,7 @@ import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
 import { eSendEvent, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import { APP_VERSION } from "../../../version";
+import { APP_VERSION } from '../../../version';
 import { db } from '../../utils/database';
 import { eCloseProgressDialog } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';
@@ -29,9 +29,8 @@ export const Issue = () => {
   const onPress = async () => {
     if (loading) return;
     if (!title.current || !body.current) return;
-    if (title.current?.trim() === '' || body.current?.trim().length === 0)
-      return;
-      
+    if (title.current?.trim() === '' || body.current?.trim().length === 0) return;
+
     try {
       setLoading(true);
 
@@ -43,8 +42,8 @@ export const Issue = () => {
 **Device information:**
 App version: ${APP_VERSION}
 Platform: ${Platform.OS}
-Model: ${Platform.constants.Brand || ""}-${Platform.constants.Model|| ""}-${
-            Platform.constants.Version || ""
+Model: ${Platform.constants.Brand || ''}-${Platform.constants.Model || ''}-${
+            Platform.constants.Version || ''
           }
 Pro: ${PremiumService.get()}
 Logged in: ${user ? 'yes' : 'no'}`,
@@ -65,11 +64,12 @@ Logged in: ${user ? 'yes' : 'no'}`,
               }}
               onPress={() => {
                 Linking.openURL(issue_url);
-              }}>
+              }}
+            >
               {issue_url}.
             </Text>{' '}
-            Please note that we will respond to your issue on the given link. We
-            recommend that you save it.
+            Please note that we will respond to your issue on the given link. We recommend that you
+            save it.
           </Text>
         ),
         positiveText: 'Copy link',
@@ -97,7 +97,8 @@ Logged in: ${user ? 'yes' : 'no'}`,
     <View
       style={{
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       <DialogHeader
         title="Report issue"
         paragraph="Let us know if you have faced any issue/bug while using Notesnook."
@@ -116,7 +117,7 @@ Logged in: ${user ? 'yes' : 'no'}`,
           fontFamily: 'OpenSans-Regular',
           marginBottom: 10,
           fontSize: SIZE.md,
-          color:colors.heading,
+          color: colors.heading
         }}
         placeholderTextColor={colors.placeholder}
       />
@@ -140,15 +141,14 @@ For example:
           maxHeight: 200,
           fontSize: SIZE.sm,
           marginBottom: 2.5,
-          color:colors.pri
+          color: colors.pri
         }}
         placeholderTextColor={colors.placeholder}
       />
       <Paragraph
         size={SIZE.xs}
-        color={
-          colors.icon
-        }>{`App version: ${APP_VERSION} Platform: ${Platform.OS} Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
+        color={colors.icon}
+      >{`App version: ${APP_VERSION} Platform: ${Platform.OS} Model: ${Platform.constants.Brand}-${Platform.constants.Model}-${Platform.constants.Version}`}</Paragraph>
 
       <Seperator />
       <Button
@@ -166,7 +166,8 @@ For example:
         style={{
           marginTop: 10,
           textAlign: 'center'
-        }}>
+        }}
+      >
         The information above will be publically available at{' '}
         <Text
           onPress={() => {
@@ -175,11 +176,11 @@ For example:
           style={{
             textDecorationLine: 'underline',
             color: colors.accent
-          }}>
+          }}
+        >
           github.com/streetwriters/notesnook.
         </Text>{' '}
-        If you want to ask something in general or need some assistance, we
-        would suggest that you{' '}
+        If you want to ask something in general or need some assistance, we would suggest that you{' '}
         <Text
           style={{
             textDecorationLine: 'underline',
@@ -189,7 +190,8 @@ For example:
             try {
               await openLinkInBrowser('https://discord.gg/zQBK97EE22', colors);
             } catch (e) {}
-          }}>
+          }}
+        >
           join our community on Discord.
         </Text>
       </Paragraph>

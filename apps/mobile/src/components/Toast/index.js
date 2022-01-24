@@ -1,23 +1,23 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {Keyboard, View} from 'react-native';
-import Animated, {Easing, useValue} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import React, { useEffect, useRef, useState } from 'react';
+import { Keyboard, View } from 'react-native';
+import Animated, { Easing, useValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {DDS} from '../../services/DeviceDetection';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
-import {dHeight, getElevation} from '../../utils';
-import {eHideToast, eShowToast} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {Button} from '../Button';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { DDS } from '../../services/DeviceDetection';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
+import { dHeight, getElevation } from '../../utils';
+import { eHideToast, eShowToast } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { Button } from '../Button';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
-const {timing} = Animated;
+const { timing } = Animated;
 
 let toastMessages = [];
-export const Toast = ({context = 'global'}) => {
+export const Toast = ({ context = 'global' }) => {
   const [state, dispatch] = useTracked();
   const colors = state.colors;
   const [keyboard, setKeyboard] = useState(false);
@@ -181,7 +181,8 @@ export const Toast = ({context = 'global'}) => {
             translateY: toastTranslate
           }
         ]
-      }}>
+      }}
+    >
       <Animated.View
         activeOpacity={0.8}
         style={{
@@ -201,14 +202,16 @@ export const Toast = ({context = 'global'}) => {
           flexDirection: 'row',
           alignItems: 'center',
           width: '95%'
-        }}>
+        }}
+      >
         <View
           style={{
             flexDirection: 'row',
             alignItems: 'center',
             flexGrow: 1,
             flex: 1
-          }}>
+          }}
+        >
           <View
             style={{
               height: 30,
@@ -216,7 +219,8 @@ export const Toast = ({context = 'global'}) => {
               justifyContent: 'center',
               alignItems: 'center',
               marginRight: 10
-            }}>
+            }}
+          >
             <Icon
               name={data?.type === 'success' ? 'check' : 'close'}
               size={SIZE.lg}
@@ -228,14 +232,16 @@ export const Toast = ({context = 'global'}) => {
             style={{
               flexGrow: 1,
               paddingRight: 25
-            }}>
+            }}
+          >
             {data?.heading ? (
               <Heading
                 color={colors.pri}
                 size={SIZE.md}
                 onPress={() => {
                   hideToastFunc();
-                }}>
+                }}
+              >
                 {data.heading}
               </Heading>
             ) : null}
@@ -249,7 +255,8 @@ export const Toast = ({context = 'global'}) => {
                 }}
                 onPress={() => {
                   hideToastFunc();
-                }}>
+                }}
+              >
                 {data.message}
               </Paragraph>
             ) : null}

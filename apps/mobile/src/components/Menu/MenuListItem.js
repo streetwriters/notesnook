@@ -1,23 +1,22 @@
-import React, {useEffect, useState} from 'react';
-import {View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSubscribeEvent, eUnSubscribeEvent} from '../../services/EventManager';
+import { useTracked } from '../../provider';
+import { eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getElevation} from '../../utils';
-import {normalize, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
-import {PressableButton} from '../PressableButton';
+import { getElevation } from '../../utils';
+import { normalize, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
+import { PressableButton } from '../PressableButton';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 import ToggleSwitch from 'toggle-switch-react-native';
 
-export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
+export const MenuListItem = ({ item, index, noTextMode, testID, rightBtn }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [headerTextState, setHeaderTextState] = useState(null);
-  let isFocused =
-    headerTextState?.id === item.name.toLowerCase() + '_navigation';
+  let isFocused = headerTextState?.id === item.name.toLowerCase() + '_navigation';
 
   const _onPress = event => {
     if (item.func) {
@@ -70,12 +69,14 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
         alignItems: 'center',
         height: normalize(50),
         marginBottom: 5
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <Icon
           style={{
             width: 30,
@@ -83,13 +84,7 @@ export const MenuListItem = ({item, index, noTextMode, testID, rightBtn}) => {
             textAlign: 'left'
           }}
           name={item.icon}
-          color={
-            item.icon === 'crown'
-              ? colors.yellow
-              : isFocused
-              ? colors.accent
-              : colors.pri
-          }
+          color={item.icon === 'crown' ? colors.yellow : isFocused ? colors.accent : colors.pri}
           size={SIZE.lg - 2}
         />
         {isFocused ? (

@@ -1,5 +1,5 @@
-import {Image} from 'react-native';
-import {decode, EntityLevel} from 'entities';
+import { Image } from 'react-native';
+import { decode, EntityLevel } from 'entities';
 export interface PreviewData {
   description?: string;
   image?: PreviewDataImage;
@@ -22,8 +22,7 @@ export const getActualImageUrl = (baseUrl: string, imageUrl?: string) => {
   let actualImageUrl = imageUrl?.trim();
   if (!actualImageUrl || actualImageUrl.startsWith('data')) return;
 
-  if (actualImageUrl.startsWith('//'))
-    actualImageUrl = `https:${actualImageUrl}`;
+  if (actualImageUrl.startsWith('//')) actualImageUrl = `https:${actualImageUrl}`;
 
   if (!actualImageUrl.startsWith('http')) {
     if (baseUrl.endsWith('/') && actualImageUrl.startsWith('/')) {
@@ -39,8 +38,8 @@ export const getActualImageUrl = (baseUrl: string, imageUrl?: string) => {
 export const getHtmlEntitiesDecodedText = (text?: string) => {
   const actualText = text?.trim();
   if (!actualText) return;
-  return decode(actualText,{
-    level:EntityLevel.HTML
+  return decode(actualText, {
+    level: EntityLevel.HTML
   });
 };
 
@@ -54,10 +53,7 @@ export const getContent = (left: string, right: string, type: string) => {
 };
 
 const getDiffUrl = actualImageUrl => {
-  if (
-    !actualImageUrl.startsWith('https://www.') ||
-    !actualImageUrl.startsWith('http://www.')
-  ) {
+  if (!actualImageUrl.startsWith('https://www.') || !actualImageUrl.startsWith('http://www.')) {
     if (actualImageUrl.startsWith('http://')) {
       actualImageUrl = actualImageUrl.replace('http://', 'http://www.');
     } else {
@@ -72,7 +68,7 @@ export const getImageSize = (url: string) => {
     Image.getSize(
       url,
       (width, height) => {
-        resolve({height, width});
+        resolve({ height, width });
       },
       // type-coverage:ignore-next-line
       error => {
@@ -83,7 +79,7 @@ export const getImageSize = (url: string) => {
           Image.getSize(
             urlWithwww,
             (width, height) => {
-              resolve({height, width});
+              resolve({ height, width });
             },
             // type-coverage:ignore-next-line
             error => reject(error)
@@ -178,19 +174,16 @@ export const getLinkPreview = async (text: string) => {
           !acc.description &&
           (getContent(curr[2], curr[3], 'og:description') ||
             getContent(curr[2], curr[3], 'description'));
-        const ogImage =
-          !acc.imageUrl && getContent(curr[2], curr[3], 'og:image');
+        const ogImage = !acc.imageUrl && getContent(curr[2], curr[3], 'og:image');
         const ogTitle = !acc.title && getContent(curr[2], curr[3], 'og:title');
 
         return {
-          description: description
-            ? getHtmlEntitiesDecodedText(description)
-            : acc.description,
+          description: description ? getHtmlEntitiesDecodedText(description) : acc.description,
           imageUrl: ogImage ? getActualImageUrl(url, ogImage) : acc.imageUrl,
           title: ogTitle ? getHtmlEntitiesDecodedText(ogTitle) : acc.title
         };
       },
-      {title: previewData.title}
+      { title: previewData.title }
     );
 
     previewData.description = metaPreviewData.description;
@@ -206,9 +199,7 @@ export const getLinkPreview = async (text: string) => {
 
       let images: PreviewDataImage[] = [];
 
-      for (const tag of tags
-        .filter(t => !t[1].startsWith('data'))
-        .slice(0, 5)) {
+      for (const tag of tags.filter(t => !t[1].startsWith('data')).slice(0, 5)) {
         const image = await getPreviewDataImage(getActualImageUrl(url, tag[1]));
 
         if (!image) continue;
@@ -216,9 +207,7 @@ export const getLinkPreview = async (text: string) => {
         images = [...images, image];
       }
 
-      previewData.image = images.sort(
-        (a, b) => b.height * b.width - a.height * a.width
-      )[0];
+      previewData.image = images.sort((a, b) => b.height * b.width - a.height * a.width)[0];
     }
 
     return previewData;
@@ -232,33 +221,28 @@ export const getPreviewDataImage = async (url?: string) => {
   if (!url) return;
 
   try {
-    const {height, width} = await getImageSize(url);
+    const { height, width } = await getImageSize(url);
     const aspectRatio = width / (height || 1);
 
     if (height > 100 && width > 100 && aspectRatio > 0.1 && aspectRatio < 10) {
-      const image: PreviewDataImage = {height, url, width};
+      const image: PreviewDataImage = { height, url, width };
       return image;
     }
   } catch {}
 };
 
 export const oneOf =
-  <T extends (...args: A) => any, U, A extends any[]>(
-    truthy: T | undefined,
-    falsy: U
-  ) =>
+  <T extends (...args: A) => any, U, A extends any[]>(truthy: T | undefined, falsy: U) =>
   (...args: Parameters<T>): ReturnType<T> | U => {
     return truthy ? truthy(...args) : falsy;
   };
 
-export const REGEX_EMAIL =
-  /([a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
+export const REGEX_EMAIL = /([a-zA-Z0-9+._-]+@[a-zA-Z0-9._-]+\.[a-zA-Z0-9_-]+)/g;
 export const REGEX_IMAGE_CONTENT_TYPE = /image\/*/g;
 // Consider empty line after img tag and take only the src field, space before to not match data-src for example
 export const REGEX_IMAGE_TAG = /<img[\n\r]*.*? src=["'](.*?)["']/g;
 export const REGEX_LINK =
   /((http|ftp|https):\/\/)?([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:/~+#-]*[\w@?^=%&/~+#-])?/i;
 // Some pages write content before the name/property, some use single quotes instead of double
-export const REGEX_META =
-  /<meta.*?(property|name)=["'](.*?)["'].*?content=["'](.*?)["'].*?>/g;
+export const REGEX_META = /<meta.*?(property|name)=["'](.*?)["'].*?content=["'](.*?)["'].*?>/g;
 export const REGEX_TITLE = /<title.*?>(.*?)<\/title>/g;

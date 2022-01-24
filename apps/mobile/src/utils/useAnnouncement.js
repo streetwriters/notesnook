@@ -1,9 +1,9 @@
-import {useCallback, useEffect, useState} from 'react';
-import {Platform} from 'react-native';
-import {SUBSCRIPTION_STATUS} from '.';
+import { useCallback, useEffect, useState } from 'react';
+import { Platform } from 'react-native';
+import { SUBSCRIPTION_STATUS } from '.';
 import PremiumService from '../services/PremiumService';
-import {db} from './database';
-import {MMKV} from './mmkv';
+import { db } from './database';
+import { MMKV } from './mmkv';
 
 var CACHED_ANNOUNCEMENT;
 export default function useAnnouncement() {
@@ -15,8 +15,7 @@ export default function useAnnouncement() {
         CACHED_ANNOUNCEMENT = CACHED_ANNOUNCEMENT || (await db.announcement());
         if (
           !CACHED_ANNOUNCEMENT ||
-          (await MMKV.getStringAsync('removedAnnouncement')) ===
-            CACHED_ANNOUNCEMENT.id ||
+          (await MMKV.getStringAsync('removedAnnouncement')) === CACHED_ANNOUNCEMENT.id ||
           !shouldShowAnnouncement(CACHED_ANNOUNCEMENT)
         ) {
           CACHED_ANNOUNCEMENT = null;
@@ -47,7 +46,7 @@ function shouldShowAnnouncement(announcement) {
 
   switch (announcement.userType) {
     case 'pro':
-      show = isUserPremium();
+      show = PremiumService.get() && subStatus !== SUBSCRIPTION_STATUS.TRIAL;
       break;
     case 'trial':
       show = subStatus === SUBSCRIPTION_STATUS.TRIAL;

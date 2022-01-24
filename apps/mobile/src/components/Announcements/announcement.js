@@ -1,11 +1,11 @@
 import React from 'react';
-import {FlatList, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {useMessageStore, useSelectionStore} from '../../provider/stores';
-import {Button} from '../Button';
-import {allowedOnPlatform, renderItem} from './functions';
+import { FlatList, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { useMessageStore, useSelectionStore } from '../../provider/stores';
+import { Button } from '../Button';
+import { allowedOnPlatform, renderItem } from './functions';
 
-export const Announcement = ({color}) => {
+export const Announcement = ({ color }) => {
   const [state] = useTracked();
   const colors = state.colors;
   const announcements = useMessageStore(state => state.announcements);
@@ -18,14 +18,16 @@ export const Announcement = ({color}) => {
       style={{
         backgroundColor: colors.bg,
         width: '100%'
-      }}>
+      }}
+    >
       <View
         style={{
           paddingVertical: 12,
           width: '100%',
           borderRadius: 10,
           overflow: 'hidden'
-        }}>
+        }}
+      >
         <Button
           type="errorShade"
           icon="close"
@@ -48,11 +50,9 @@ export const Announcement = ({color}) => {
               width: '100%',
               marginTop: 15
             }}
-            data={announcement?.body.filter(item =>
-              allowedOnPlatform(item.platforms)
-            )}
-            renderItem={({item, index}) =>
-              renderItem({item: item, index: index, color: colors[color],inline:true})
+            data={announcement?.body.filter(item => allowedOnPlatform(item.platforms))}
+            renderItem={({ item, index }) =>
+              renderItem({ item: item, index: index, color: colors[color], inline: true })
             }
           />
         </View>

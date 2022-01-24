@@ -1,8 +1,5 @@
 import React from 'react';
-import {
-  ActivityIndicator,
-  Platform, View
-} from 'react-native';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useTracked } from '../../provider';
@@ -18,7 +15,7 @@ import { TimeSince } from './TimeSince';
 
 export const UserSection = () => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const user = useUserStore(state => state.user);
   const syncing = useUserStore(state => state.syncing);
   const lastSynced = useUserStore(state => state.lastSynced);
@@ -32,13 +29,15 @@ export const UserSection = () => {
         paddingBottom: Platform.OS === 'ios' ? insets.bottom / 2 : null,
         borderTopWidth: 1,
         borderTopColor: colors.nav
-      }}>
+      }}
+    >
       <View
         style={{
           flexDirection: 'row',
           justifyContent: 'space-between',
           alignItems: 'center'
-        }}>
+        }}
+      >
         <PressableButton
           onPress={async () => {
             if (user) {
@@ -54,18 +53,21 @@ export const UserSection = () => {
             padding: 12,
             paddingHorizontal: 20,
             borderRadius: 0
-          }}>
+          }}
+        >
           <View
             style={{
               flexShrink: 1,
               flexGrow: 1
-            }}>
+            }}
+          >
             <Heading
               style={{
                 flexWrap: 'wrap'
               }}
               size={SIZE.xs}
-              color={colors.icon}>
+              color={colors.icon}
+            >
               {!user ? (
                 'You are not logged in'
               ) : !syncing ? (
@@ -73,7 +75,7 @@ export const UserSection = () => {
                   <>
                     Last synced{' '}
                     <TimeSince
-                      style={{fontSize: SIZE.xs, color: colors.icon}}
+                      style={{ fontSize: SIZE.xs, color: colors.icon }}
                       time={lastSynced}
                     />
                   </>
@@ -94,10 +96,9 @@ export const UserSection = () => {
               style={{
                 flexWrap: 'wrap'
               }}
-              color={colors.heading}>
-              {!user
-                ? 'Login to sync your notes.'
-                : 'Tap here to sync your notes.'}
+              color={colors.heading}
+            >
+              {!user ? 'Login to sync your notes.' : 'Tap here to sync your notes.'}
             </Paragraph>
           </View>
 

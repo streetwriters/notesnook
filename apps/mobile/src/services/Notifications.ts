@@ -1,22 +1,22 @@
-import {useNoteStore} from './../provider/stores';
+import { useNoteStore } from './../provider/stores';
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import PushNotification, {
   Importance,
   PushNotificationDeliveredObject
 } from 'react-native-push-notification';
-import {eSendEvent} from './EventManager';
-import {db} from '../utils/database';
-import {DDS} from './DeviceDetection';
-import {tabBarRef} from '../utils/Refs';
-import {eOnLoadNote} from '../utils/Events';
-import {editing} from '../utils';
-import {MMKV} from '../utils/mmkv';
+import { eSendEvent } from './EventManager';
+import { db } from '../utils/database';
+import { DDS } from './DeviceDetection';
+import { tabBarRef } from '../utils/Refs';
+import { eOnLoadNote } from '../utils/Events';
+import { editing } from '../utils';
+import { MMKV } from '../utils/mmkv';
 import SettingsService from './SettingsService';
 
 const NOTIFICATION_TAG = 'notesnook';
 const CHANNEL_ID = 'com.streetwriters.notesnook';
-let pinned:PushNotificationDeliveredObject[] = [];
+let pinned: PushNotificationDeliveredObject[] = [];
 
 function loadNote(id: string, jump: boolean) {
   if (!id || id === 'notesnook_note_input') return;
@@ -93,7 +93,7 @@ function init() {
           await db.notes.init();
           useNoteStore.getState().setNotes();
           //@ts-ignore/////
-         
+
           break;
       }
     },
@@ -116,33 +116,29 @@ function init() {
 }
 
 function remove(tag: string, id: string) {
-  PushNotification.clearLocalNotification(
-    tag || NOTIFICATION_TAG,
-    parseInt(id)
-  );
+  PushNotification.clearLocalNotification(tag || NOTIFICATION_TAG, parseInt(id));
   get().then(() => {
     eSendEvent('onUpdate', 'unpin');
   });
 }
 
-function pinQuickNote(launch:boolean) {
+function pinQuickNote(launch: boolean) {
   get().then(items => {
     let notif = items.filter(i => i.tag === 'notesnook_note_input');
     if (notif && launch) {
       return;
     }
-      console.log('showing');
-      present({
-        title: 'Quick note',
-        message: 'Tap on "Take note" to add a note.',
-        ongoing: true,
-        actions: ['ReplyInput', 'Hide'],
-        tag: 'notesnook_note_input',
-        reply_button_text: 'Take note',
-        reply_placeholder_text: 'Write something...',
-        id: 256266
-      });
-    
+    console.log('showing');
+    present({
+      title: 'Quick note',
+      message: 'Tap on "Take note" to add a note.',
+      ongoing: true,
+      actions: ['ReplyInput', 'Hide'],
+      tag: 'notesnook_note_input',
+      reply_button_text: 'Take note',
+      reply_placeholder_text: 'Write something...',
+      id: 256266
+    });
   });
 }
 

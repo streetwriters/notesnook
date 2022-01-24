@@ -1,4 +1,4 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import Storage from './storage';
 import EventSource from './even-source-ios';
 import AndroidEventSource from './event-source';

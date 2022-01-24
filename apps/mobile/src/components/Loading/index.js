@@ -1,8 +1,8 @@
 import React from 'react';
-import {ActivityIndicator, StyleSheet, View} from 'react-native';
-import {useTracked} from '../../provider';
-import {ph, pv, SIZE} from '../../utils/SizeUtils';
-import {Button} from '../Button';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+import { useTracked } from '../../provider';
+import { ph, pv, SIZE } from '../../utils/SizeUtils';
+import { Button } from '../Button';
 import Paragraph from '../Typography/Paragraph';
 
 export const Loading = ({
@@ -11,24 +11,22 @@ export const Loading = ({
   done = false,
   doneText = 'Action completed successfully!',
   onDone = () => {},
-  customStyle = {},
+  customStyle = {}
 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <View
       style={[
-        {height: height, backgroundColor: colors.bg},
+        { height: height, backgroundColor: colors.bg },
         styles.activityContainer,
-        customStyle,
-      ]}>
+        customStyle
+      ]}
+    >
       {done ? (
         <>
-          <Paragraph
-            color={colors.icon}
-            size={SIZE.xs}
-            style={styles.activityText}>
+          <Paragraph color={colors.icon} size={SIZE.xs} style={styles.activityText}>
             {doneText}
           </Paragraph>
 
@@ -40,9 +38,10 @@ export const Loading = ({
           <Paragraph
             size={SIZE.md}
             style={{
-              marginTop:10
+              marginTop: 10
             }}
-            color={colors.pri}>
+            color={colors.pri}
+          >
             {tagline}
           </Paragraph>
         </>
@@ -55,11 +54,11 @@ const styles = StyleSheet.create({
   activityText: {
     fontSize: SIZE.sm,
     textAlign: 'center',
-    marginBottom: 10,
+    marginBottom: 10
   },
   activityContainer: {
     alignItems: 'center',
-    justifyContent: 'center',
+    justifyContent: 'center'
   },
   button: {
     paddingVertical: pv,
@@ -71,11 +70,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 1,
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   buttonText: {
     //fontFamily: "sans-serif",
     color: 'white',
-    fontSize: SIZE.sm,
-  },
+    fontSize: SIZE.sm
+  }
 });

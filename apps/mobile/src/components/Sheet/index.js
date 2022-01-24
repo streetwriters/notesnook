@@ -1,13 +1,13 @@
 import React from 'react';
-import {Platform, View} from 'react-native';
+import { Platform, View } from 'react-native';
 import ActionSheet from 'react-native-actions-sheet';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import layoutmanager from '../../utils/layout-manager';
-import {PremiumToast} from '../Premium/premium-toast';
-import {Toast} from '../Toast';
-import {BouncingView} from '../Transitions/bouncing-view';
+import { PremiumToast } from '../Premium/premium-toast';
+import { Toast } from '../Toast';
+import { BouncingView } from '../Transitions/bouncing-view';
 
 const SheetWrapper = ({
   children,
@@ -20,7 +20,7 @@ const SheetWrapper = ({
   keyboardMode
 }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const deviceMode = useSettingStore(state => state.deviceMode);
   const sheetKeyboardHandler = useSettingStore(state => state.sheetKeyboardHandler);
   const largeTablet = deviceMode === 'tablet';
@@ -57,7 +57,7 @@ const SheetWrapper = ({
     }
   };
 
-  console.log('Sheet keyboard handler',sheetKeyboardHandler)
+  console.log('Sheet keyboard handler', sheetKeyboardHandler);
 
   return (
     <ActionSheet
@@ -74,27 +74,21 @@ const SheetWrapper = ({
       indicatorColor={colors.nav}
       onOpen={_onOpen}
       keyboardDismissMode="none"
-      overlayColor={pitchBlack? '#585858' : "#000000"}
+      overlayColor={pitchBlack ? '#585858' : '#000000'}
       keyboardShouldPersistTaps="always"
       ExtraOverlayComponent={
         <>
           <Toast context="local" />
-          <PremiumToast
-            context="sheet"
-            close={() => fwdRef?.current?.hide()}
-            offset={50}
-          />
+          <PremiumToast context="sheet" close={() => fwdRef?.current?.hide()} offset={50} />
         </>
       }
-      onClose={_onClose}>
+      onClose={_onClose}
+    >
       <BouncingView>
         {children}
         <View
           style={{
-            height:
-              Platform.OS === 'ios' && insets.bottom !== 0
-                ? insets.bottom + 5
-                : 20
+            height: Platform.OS === 'ios' && insets.bottom !== 0 ? insets.bottom + 5 : 20
           }}
         />
       </BouncingView>

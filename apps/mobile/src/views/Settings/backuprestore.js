@@ -1,34 +1,26 @@
-import React, {useEffect, useState} from 'react';
-import {Platform, TouchableOpacity, View} from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { Platform, TouchableOpacity, View } from 'react-native';
 import ToggleSwitch from 'toggle-switch-react-native';
 import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
-import {useTracked} from '../../provider';
-import {useSettingStore, useUserStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useSettingStore, useUserStore } from '../../provider/stores';
 import Backup from '../../services/Backup';
-import {
-  eSendEvent,
-  presentSheet,
-  ToastEvent
-} from '../../services/EventManager';
+import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
-import {
-  eCloseProgressDialog,
-  eOpenLoginDialog,
-  eOpenRestoreDialog
-} from '../../utils/Events';
-import {openLinkInBrowser} from '../../utils/functions';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
-import {CustomButton} from './button';
-import {verifyUser} from './functions';
+import { eCloseProgressDialog, eOpenLoginDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { openLinkInBrowser } from '../../utils/functions';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
+import { CustomButton } from './button';
+import { verifyUser } from './functions';
 import SectionHeader from './section-header';
 
-const SettingsBackupAndRestore = ({isSheet}) => {
+const SettingsBackupAndRestore = ({ isSheet }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const user = useUserStore(state => state.user);
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
@@ -81,10 +73,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
               icon: 'import',
               action: async () => {
                 try {
-                  await openLinkInBrowser(
-                    'https://importer.notesnook.com',
-                    colors
-                  );
+                  await openLinkInBrowser('https://importer.notesnook.com', colors);
                 } catch (e) {}
               },
               actionText: 'Go to Notesnook Importer',
@@ -177,11 +166,7 @@ const SettingsBackupAndRestore = ({isSheet}) => {
   return (
     <>
       {!isSheet && (
-        <SectionHeader
-          collapsed={collapsed}
-          setCollapsed={setCollapsed}
-          title="Backup & restore"
-        />
+        <SectionHeader collapsed={collapsed} setCollapsed={setCollapsed} title="Backup & restore" />
       )}
 
       {!collapsed && (
@@ -202,13 +187,15 @@ const SettingsBackupAndRestore = ({isSheet}) => {
               paddingHorizontal: 12,
               flexShrink: 1,
               paddingVertical: 10
-            }}>
+            }}
+          >
             <Paragraph
               size={SIZE.md}
               style={{
                 textAlignVertical: 'center',
                 maxWidth: '100%'
-              }}>
+              }}
+            >
               Automatic backups
             </Paragraph>
             <Paragraph color={colors.icon} size={SIZE.sm}>
@@ -222,7 +209,8 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                 overflow: 'hidden',
                 flexShrink: 1,
                 width: '100%'
-              }}>
+              }}
+            >
               {[
                 {
                   title: 'Never',
@@ -262,22 +250,19 @@ const SettingsBackupAndRestore = ({isSheet}) => {
                   }}
                   key={item.value}
                   style={{
-                    backgroundColor:
-                      settings.reminder === item.value
-                        ? colors.accent
-                        : colors.nav,
+                    backgroundColor: settings.reminder === item.value ? colors.accent : colors.nav,
                     justifyContent: 'center',
                     alignItems: 'center',
                     width: '25%',
                     height: 35,
                     borderRightWidth: index !== 3 ? 1 : 0,
                     borderRightColor: colors.border
-                  }}>
+                  }}
+                >
                   <Paragraph
-                    color={
-                      settings.reminder === item.value ? 'white' : colors.icon
-                    }
-                    size={SIZE.sm - 1}>
+                    color={settings.reminder === item.value ? 'white' : colors.icon}
+                    size={SIZE.sm - 1}
+                  >
                     {item.title}
                   </Paragraph>
                 </TouchableOpacity>

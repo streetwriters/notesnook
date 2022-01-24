@@ -1,15 +1,9 @@
-import {presentDialog} from '../../components/Dialog/functions';
-import {ToastEvent} from '../../services/EventManager';
-import {db} from '../../utils/database';
-import {sleep} from '../../utils/TimeUtils';
+import { presentDialog } from '../../components/Dialog/functions';
+import { ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/database';
+import { sleep } from '../../utils/TimeUtils';
 
-export async function verifyUser(
-  context,
-  onsuccess,
-  disableBackdropClosing,
-  onclose,
-  closeText
-) {
+export async function verifyUser(context, onsuccess, disableBackdropClosing, onclose, closeText) {
   presentDialog({
     context: context,
     title: "Verify it's you",

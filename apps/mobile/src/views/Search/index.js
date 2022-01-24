@@ -1,15 +1,15 @@
-import React, {useCallback, useEffect} from 'react';
-import {ContainerTopSection} from '../../components/Container/ContainerTopSection';
+import React, { useCallback, useEffect } from 'react';
+import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import {useTracked} from '../../provider';
-import {useSearchStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useSearchStore } from '../../provider/stores';
 import SearchService from '../../services/SearchService';
-import {inputRef} from '../../utils/Refs';
-import {sleep} from '../../utils/TimeUtils';
-import {SearchBar} from './search-bar';
+import { inputRef } from '../../utils/Refs';
+import { sleep } from '../../utils/TimeUtils';
+import { SearchBar } from './search-bar';
 
-export const Search = ({route, navigation}) => {
+export const Search = ({ route, navigation }) => {
   const [state, dispatch] = useTracked();
 
   const searchResults = useSearchStore(state => state.searchResults);
@@ -50,9 +50,7 @@ export const Search = ({route, navigation}) => {
           heading: 'Search',
           paragraph:
             searchStatus ||
-            `Type a keyword to search in ${
-              SearchService.getSearchInformation().title
-            }`,
+            `Type a keyword to search in ${SearchService.getSearchInformation().title}`,
           button: null,
           loading: 'Searching...'
         }}

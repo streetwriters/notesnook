@@ -17,9 +17,9 @@ import tiny from './tiny/tiny';
 import ColorItem from './tiny/toolbar/coloritem';
 import { editor_colors, rgbToHex } from './tiny/toolbar/constants';
 
-export const TableRowProperties = ({data}) => {
+export const TableRowProperties = ({ data }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [rowOptions, setRowOptions] = useState(data);
   console.log(data);
 
@@ -50,14 +50,16 @@ export const TableRowProperties = ({data}) => {
     <View
       style={{
         paddingHorizontal: 12
-      }}>
+      }}
+    >
       <Heading size={SIZE.md}>Row type</Heading>
 
       <View
         style={{
           flexDirection: 'row',
           marginVertical: 10
-        }}>
+        }}
+      >
         <Button
           type={rowOptions.rowType === 'header' ? 'shade' : 'grayBg'}
           icon={rowOptions.rowType === 'header' && 'check'}
@@ -105,7 +107,8 @@ export const TableRowProperties = ({data}) => {
         style={{
           flexDirection: 'row',
           marginTop: 10
-        }}>
+        }}
+      >
         {editor_colors.map(item => (
           <ColorItem
             value={item}
@@ -133,7 +136,8 @@ export const TableRowProperties = ({data}) => {
         style={{
           marginTop: 10
         }}
-        size={SIZE.md}>
+        size={SIZE.md}
+      >
         Column background color
       </Heading>
       <ScrollView
@@ -142,7 +146,8 @@ export const TableRowProperties = ({data}) => {
         style={{
           flexDirection: 'row',
           marginTop: 10
-        }}>
+        }}
+      >
         {editor_colors.map(item => (
           <ColorItem
             value={item}

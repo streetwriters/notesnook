@@ -4,7 +4,7 @@ import { db } from '../utils/database';
 let searchInformation = {
   placeholder: 'Search in all notes',
   data: [],
-  type: 'notes',
+  type: 'notes'
 };
 
 let keyword = null;
@@ -25,22 +25,22 @@ async function search() {
     searchstore.setSearchResults([]);
     return;
   }
-  searchstore.setSearchStatus(true,`Searching for "${term}" in ${searchInformation.title}`)
+  searchstore.setSearchStatus(true, `Searching for "${term}" in ${searchInformation.title}`);
 
   let results;
   if (!searchInformation.type) return;
 
-  results = await db.lookup[searchInformation.type](
-    searchInformation.data,
-    term,
-  );
+  results = await db.lookup[searchInformation.type](searchInformation.data, term);
 
   if (!results || results.length === 0) {
-    searchstore.setSearchStatus(false,`No search results found for "${term}" in ${searchInformation.title}`)
+    searchstore.setSearchStatus(
+      false,
+      `No search results found for "${term}" in ${searchInformation.title}`
+    );
     searchstore.setSearchResults(results);
     return;
   }
-  searchstore.setSearchStatus(false,null)
+  searchstore.setSearchStatus(false, null);
   searchstore.setSearchResults(results);
 }
 
@@ -52,5 +52,5 @@ export default {
   update,
   getSearchInformation,
   search,
-  setTerm,
+  setTerm
 };

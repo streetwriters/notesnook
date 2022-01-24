@@ -15,9 +15,9 @@ import { SIZE } from '../../utils/SizeUtils';
  *
  * @param {TextType | restTypes} props all props
  */
-const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
+const Heading = ({ color, size = SIZE.xl, style, ...restProps }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <Text
@@ -28,11 +28,12 @@ const Heading = ({color, size = SIZE.xl, style, ...restProps}) => {
         {
           fontSize: size || SIZE.xl,
           color: color || colors.heading,
-          fontFamily:Platform.OS === "android"  ? "OpenSans-SemiBold" : null,
-          fontWeight:Platform.OS === "ios" ? "600" : null
+          fontFamily: Platform.OS === 'android' ? 'OpenSans-SemiBold' : null,
+          fontWeight: Platform.OS === 'ios' ? '600' : null
         },
-        style,
-      ]}></Text>
+        style
+      ]}
+    ></Text>
   );
 };
 

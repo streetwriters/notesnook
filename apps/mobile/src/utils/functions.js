@@ -1,11 +1,11 @@
-import {Linking} from 'react-native';
-import {InAppBrowser} from 'react-native-inappbrowser-reborn';
-import {history} from '.';
-import {useMenuStore, useSelectionStore} from '../provider/stores';
-import {eSendEvent, ToastEvent} from '../services/EventManager';
+import { Linking } from 'react-native';
+import { InAppBrowser } from 'react-native-inappbrowser-reborn';
+import { history } from '.';
+import { useMenuStore, useSelectionStore } from '../provider/stores';
+import { eSendEvent, ToastEvent } from '../services/EventManager';
 import Navigation from '../services/Navigation';
-import {db} from './database';
-import {eClearEditor} from './Events';
+import { db } from './database';
+import { eClearEditor } from './Events';
 import layoutmanager from './layout-manager';
 
 export const deleteItems = async item => {
@@ -46,10 +46,7 @@ export const deleteItems = async item => {
     await db.notes.delete(...ids);
 
     //layoutmanager.withAnimation(150);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notes,
-      Navigation.routeNames.NotesPage
-    ]);
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notes, Navigation.routeNames.NotesPage]);
     eSendEvent(eClearEditor);
   }
   if (topics?.length > 0) {
@@ -59,10 +56,7 @@ export const deleteItems = async item => {
     }
 
     // layoutmanager.withAnimation(150);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notebook
-    ]);
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notebook]);
     useMenuStore.getState().setMenuPins();
     ToastEvent.show({
       heading: 'Topics deleted',
@@ -75,10 +69,7 @@ export const deleteItems = async item => {
     await db.notebooks.delete(...ids);
 
     //layoutmanager.withAnimation(150);
-    Navigation.setRoutesToUpdate([
-      Navigation.routeNames.Notebooks,
-      Navigation.routeNames.Notes
-    ]);
+    Navigation.setRoutesToUpdate([Navigation.routeNames.Notebooks, Navigation.routeNames.Notes]);
     useMenuStore.getState().setMenuPins();
   }
 

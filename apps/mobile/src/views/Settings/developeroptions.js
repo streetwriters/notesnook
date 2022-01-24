@@ -1,14 +1,14 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import ToggleSwitch from 'toggle-switch-react-native';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
 import SettingsService from '../../services/SettingsService';
 import { CustomButton } from './button';
 import SectionHeader from './section-header';
 
-const SettingsDeveloperOptions = ({isSheet}) => {
+const SettingsDeveloperOptions = ({ isSheet }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(isSheet ? false : true);
 

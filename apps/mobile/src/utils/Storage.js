@@ -1,9 +1,9 @@
-import {Platform} from 'react-native';
+import { Platform } from 'react-native';
 import 'react-native-get-random-values';
 import * as Keychain from 'react-native-keychain';
-import {generateSecureRandom} from 'react-native-securerandom';
+import { generateSecureRandom } from 'react-native-securerandom';
 import Sodium from 'react-native-sodium';
-import {MMKV} from './mmkv';
+import { MMKV } from './mmkv';
 
 let RNFetchBlob;
 async function read(key) {
@@ -19,10 +19,7 @@ async function read(key) {
 }
 
 async function write(key, data) {
-  return await MMKV.setItem(
-    key,
-    typeof data === 'string' ? data : JSON.stringify(data)
-  );
+  return await MMKV.setItem(key, typeof data === 'string' ? data : JSON.stringify(data));
 }
 
 async function readMulti(keys) {
@@ -54,8 +51,7 @@ async function clear() {
 
 async function encrypt(password, data) {
   if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === '' && !password.key)
-    return undefined;
+  if (password.password && password.password === '' && !password.key) return undefined;
 
   let message = {
     type: 'plain',
@@ -75,9 +71,8 @@ function getAlgorithm(base64Variant) {
 
 async function decrypt(password, data) {
   if (!password.password && !password.key) return undefined;
-  if (password.password && password.password === '' && !password.key)
-    return undefined;
-  let _data = {...data};
+  if (password.password && password.password === '' && !password.key) return undefined;
+  let _data = { ...data };
   _data.output = 'plain';
   return await Sodium.decrypt(password, _data);
 }
@@ -104,12 +99,7 @@ let CRYPT_CONFIG = Platform.select({
 async function deriveCryptoKey(name, data) {
   try {
     let credentials = await Sodium.deriveKey(data.password, data.salt);
-    await Keychain.setInternetCredentials(
-      'notesnook',
-      name,
-      credentials.key,
-      CRYPT_CONFIG
-    );
+    await Keychain.setInternetCredentials('notesnook', name, credentials.key, CRYPT_CONFIG);
     return credentials.key;
   } catch (e) {}
 }
@@ -117,10 +107,7 @@ async function deriveCryptoKey(name, data) {
 async function getCryptoKey(name) {
   try {
     if (await Keychain.hasInternetCredentials('notesnook')) {
-      let credentials = await Keychain.getInternetCredentials(
-        'notesnook',
-        CRYPT_CONFIG
-      );
+      let credentials = await Keychain.getInternetCredentials('notesnook', CRYPT_CONFIG);
       return credentials.password;
     } else {
       return null;

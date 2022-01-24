@@ -1,9 +1,9 @@
-import React, {Component, createRef} from 'react';
-import {Platform} from 'react-native';
-import {Keyboard} from 'react-native';
-import {FlatList, TextInput, View} from 'react-native';
-import {DDS} from '../../services/DeviceDetection';
-import {editing} from '../../utils';
+import React, { Component, createRef } from 'react';
+import { Platform } from 'react-native';
+import { Keyboard } from 'react-native';
+import { FlatList, TextInput, View } from 'react-native';
+import { DDS } from '../../services/DeviceDetection';
+import { editing } from '../../utils';
 
 export default class CustomTabs extends Component {
   constructor(props) {
@@ -22,7 +22,7 @@ export default class CustomTabs extends Component {
     this.lastOffset = this.props.offsets.a;
   }
 
-  renderItem = ({item, index}) => this.props.items[index];
+  renderItem = ({ item, index }) => this.props.items[index];
 
   onMoveShouldSetResponder = event => {
     if (this.responderAllowedScroll) return;
@@ -69,8 +69,7 @@ export default class CustomTabs extends Component {
         this.currentDrawerState = true;
         this.goToIndex(0);
       }
-      this.props.onDrawerStateChange &&
-        this.props.onDrawerStateChange(this.currentDrawerState);
+      this.props.onDrawerStateChange && this.props.onDrawerStateChange(this.currentDrawerState);
     }
   };
 
@@ -78,8 +77,7 @@ export default class CustomTabs extends Component {
     if (this.page === 0) {
       this.goToIndex(1);
       this.currentDrawerState = false;
-      this.props.onDrawerStateChange &&
-        this.props.onDrawerStateChange(this.currentDrawerState);
+      this.props.onDrawerStateChange && this.props.onDrawerStateChange(this.currentDrawerState);
     }
   };
 
@@ -151,11 +149,7 @@ export default class CustomTabs extends Component {
       this.scrollTimeout = null;
     }
     this.scrollTimeout = setTimeout(() => {
-      if (
-        this.scrollOffset !== this.props.offsets.a &&
-        this.page === 1 &&
-        !this.scrollEnabled
-      ) {
+      if (this.scrollOffset !== this.props.offsets.a && this.page === 1 && !this.scrollEnabled) {
         this.goToIndex(2, false);
       }
     }, 300);
@@ -174,7 +168,7 @@ export default class CustomTabs extends Component {
       this.goToIndex(2);
     }
     if (this.page !== page) {
-      this.props.onChangeTab({i: page, from: this.page});
+      this.props.onChangeTab({ i: page, from: this.page });
       this.page = page;
     }
   };
@@ -202,17 +196,14 @@ export default class CustomTabs extends Component {
     let drawerState = page === 0 && this.scrollOffset < 150;
     if (drawerState !== this.currentDrawerState) {
       this.currentDrawerState = drawerState;
-      this.props.onDrawerStateChange &&
-        this.props.onDrawerStateChange(this.currentDrawerState);
+      this.props.onDrawerStateChange && this.props.onDrawerStateChange(this.currentDrawerState);
     }
     this.props.toggleOverlay(
-      Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10)
-        ? true
-        : false
+      Math.floor(this.scrollOffset) < Math.floor(this.props.offsets.a - 10) ? true : false
     );
     if (this.page !== page) {
       this.scrollEndTimeout = setTimeout(() => {
-        this.props.onChangeTab({i: page, from: this.page});
+        this.props.onChangeTab({ i: page, from: this.page });
         this.page = page;
       }, 50);
     }
@@ -225,8 +216,7 @@ export default class CustomTabs extends Component {
       if (px > width * 0.75 || (DDS.isSmallTab && px > this.props.widths.a)) {
         this.goToIndex(1);
         this.currentDrawerState = false;
-        this.props.onDrawerStateChange &&
-          this.props.onDrawerStateChange(this.currentDrawerState);
+        this.props.onDrawerStateChange && this.props.onDrawerStateChange(this.currentDrawerState);
       }
     }
   };
@@ -239,10 +229,11 @@ export default class CustomTabs extends Component {
         onStartShouldSetResponderCapture={this.onMoveShouldSetResponder}
         style={{
           flex: 1
-        }}>
+        }}
+      >
         <TextInput
           ref={this.inputElement}
-          style={{height: 1, padding: 0, width: 1, position: 'absolute'}}
+          style={{ height: 1, padding: 0, width: 1, position: 'absolute' }}
           blurOnSubmit={false}
         />
         <FlatList
@@ -270,11 +261,7 @@ export default class CustomTabs extends Component {
           disableIntervalMomentum={true}
           decelerationRate="fast"
           snapToAlignment="start"
-          snapToOffsets={[
-            this.props.offsets.a,
-            this.props.offsets.b,
-            this.props.offsets.c
-          ]}
+          snapToOffsets={[this.props.offsets.a, this.props.offsets.b, this.props.offsets.c]}
           contentOffset={{
             x: editing.movedAway ? this.props.offsets.a : this.props.offsets.b
           }}

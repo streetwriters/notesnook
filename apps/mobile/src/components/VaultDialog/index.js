@@ -8,7 +8,8 @@ import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent, ToastEvent
+  eUnSubscribeEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { getElevation, toTXT } from '../../utils';
@@ -379,8 +380,7 @@ export class VaultDialog extends Component {
   async _lockNote() {
     if (!this.password || this.password.trim() === 0) {
       ToastEvent.show({
-        message: 'Incorrect password',
-        message: 'Please enter the correct password and try again',
+        heading: 'Incorrect password',
         type: 'error',
         context: 'local'
       });
@@ -474,8 +474,7 @@ export class VaultDialog extends Component {
           } catch (e) {
             ToastEvent.show({
               heading: 'Incorrect password',
-              message:
-                'Please enter the correct vault password to enable biometrics.',
+              message: 'Please enter the correct vault password to enable biometrics.',
               type: 'error',
               context: 'local'
             });
@@ -571,10 +570,7 @@ export class VaultDialog extends Component {
   }
 
   _takeErrorAction(e) {
-    if (
-      e.message === db.vault.ERRORS.wrongPassword ||
-      e.message === 'FAILURE'
-    ) {
+    if (e.message === db.vault.ERRORS.wrongPassword || e.message === 'FAILURE') {
       this.setState({
         wrongPassword: true,
         visible: true
@@ -631,7 +627,7 @@ export class VaultDialog extends Component {
   };
 
   render() {
-    const {colors} = this.props;
+    const { colors } = this.props;
     const {
       note,
       visible,
@@ -661,7 +657,8 @@ export class VaultDialog extends Component {
         }}
         statusBarTranslucent={false}
         onRequestClose={this.close}
-        visible={true}>
+        visible={true}
+      >
         <View
           style={{
             ...getElevation(5),
@@ -669,7 +666,8 @@ export class VaultDialog extends Component {
             borderRadius: 10,
             backgroundColor: colors.bg,
             paddingTop: 12
-          }}>
+          }}
+        >
           <DialogHeader
             title={this.state.title}
             paragraph={this.state.description}
@@ -681,11 +679,9 @@ export class VaultDialog extends Component {
           <View
             style={{
               paddingHorizontal: 12
-            }}>
-            {(novault ||
-              changePassword ||
-              this.state.clearVault ||
-              this.state.deleteVault) &&
+            }}
+          >
+            {(novault || changePassword || this.state.clearVault || this.state.deleteVault) &&
             !this.state.revokeFingerprintAccess ? (
               <>
                 <Input
@@ -705,9 +701,7 @@ export class VaultDialog extends Component {
                       : 10
                   }
                   onSubmit={() => {
-                    changePassword
-                      ? changePassInputRef.current?.focus()
-                      : this.onPress;
+                    changePassword ? changePassInputRef.current?.focus() : this.onPress;
                   }}
                   autoCompleteType="password"
                   returnKeyLabel={changePassword ? 'Next' : this.state.title}
@@ -721,9 +715,7 @@ export class VaultDialog extends Component {
                 !novault ||
                 changePassword ? null : (
                   <Button
-                    onPress={() =>
-                      this._onPressFingerprintAuth('Unlock note', '')
-                    }
+                    onPress={() => this._onPressFingerprintAuth('Unlock note', '')}
                     icon="fingerprint"
                     width="100%"
                     title={'Biometric unlock'}
@@ -741,9 +733,7 @@ export class VaultDialog extends Component {
                   })
                 }
                 icon={
-                  this.state.deleteAll
-                    ? 'check-circle-outline'
-                    : 'checkbox-blank-circle-outline'
+                  this.state.deleteAll ? 'check-circle-outline' : 'checkbox-blank-circle-outline'
                 }
                 style={{
                   marginTop: 10
@@ -825,12 +815,8 @@ export class VaultDialog extends Component {
               </View>
             ) : null}
 
-            {this.state.biometricUnlock &&
-            !this.state.isBiometryEnrolled &&
-            novault ? (
-              <Paragraph>
-                Unlock with password once to enable biometric access.
-              </Paragraph>
+            {this.state.biometricUnlock && !this.state.isBiometryEnrolled && novault ? (
+              <Paragraph>Unlock with password once to enable biometric access.</Paragraph>
             ) : null}
 
             {this.state.isBiometryAvailable &&
@@ -860,9 +846,7 @@ export class VaultDialog extends Component {
             onPressNegative={this.close}
             onPressPositive={this.onPress}
             loading={loading}
-            positiveType={
-              deleteVault || clearVault ? 'errorShade' : 'transparent'
-            }
+            positiveType={deleteVault || clearVault ? 'errorShade' : 'transparent'}
             positiveTitle={
               deleteVault
                 ? 'Delete'

@@ -1,30 +1,26 @@
-import React, {createRef, useEffect, useState} from 'react';
-import {ActivityIndicator, Platform, View} from 'react-native';
+import React, { createRef, useEffect, useState } from 'react';
+import { ActivityIndicator, Platform, View } from 'react-native';
 import DocumentPicker from 'react-native-document-picker';
-import {FlatList} from 'react-native-gesture-handler';
-import {useTracked} from '../../provider';
-import {initialize} from '../../provider/stores';
-import {
-  eSubscribeEvent,
-  eUnSubscribeEvent,
-  ToastEvent
-} from '../../services/EventManager';
-import {db} from '../../utils/database';
-import {eCloseRestoreDialog, eOpenRestoreDialog} from '../../utils/Events';
-import {MMKV} from '../../utils/mmkv';
-import {SIZE} from '../../utils/SizeUtils';
+import { FlatList } from 'react-native-gesture-handler';
+import { useTracked } from '../../provider';
+import { initialize } from '../../provider/stores';
+import { eSubscribeEvent, eUnSubscribeEvent, ToastEvent } from '../../services/EventManager';
+import { db } from '../../utils/database';
+import { eCloseRestoreDialog, eOpenRestoreDialog } from '../../utils/Events';
+import { MMKV } from '../../utils/mmkv';
+import { SIZE } from '../../utils/SizeUtils';
 import storage from '../../utils/storage';
-import {sleep, timeConverter} from '../../utils/TimeUtils';
+import { sleep, timeConverter } from '../../utils/TimeUtils';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 import * as ScopedStorage from 'react-native-scoped-storage';
-import {Dialog} from '../Dialog';
-import {verifyUser} from '../../views/Settings/functions';
-import {presentDialog} from '../Dialog/functions';
-import {Toast} from '../Toast';
+import { Dialog } from '../Dialog';
+import { verifyUser } from '../../views/Settings/functions';
+import { presentDialog } from '../Dialog/functions';
+import { Toast } from '../Toast';
 
 const actionSheetRef = createRef();
 let RNFetchBlob;
@@ -71,12 +67,9 @@ const RestoreDialog = () => {
       fwdRef={actionSheetRef}
       gestureEnabled={!restoring}
       closeOnTouchBackdrop={!restoring}
-      onClose={close}>
-      <RestoreDataComponent
-        close={close}
-        restoring={restoring}
-        setRestoring={setRestoring}
-      />
+      onClose={close}
+    >
+      <RestoreDataComponent close={close} restoring={restoring} setRestoring={setRestoring} />
       <Toast context="local" />
     </SheetWrapper>
   );
@@ -84,9 +77,9 @@ const RestoreDialog = () => {
 
 export default RestoreDialog;
 
-const RestoreDataComponent = ({close, setRestoring, restoring}) => {
+const RestoreDataComponent = ({ close, setRestoring, restoring }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [backupDirectoryAndroid, setBackupDirectoryAndroid] = useState(false);
@@ -187,8 +180,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         files = await RNFetchBlob.fs.lstat(path);
       }
       files = files.sort(function (a, b) {
-        timeA = a.lastModified;
-        timeB = b.lastModified;
+        let timeA = a.lastModified;
+        let timeB = b.lastModified;
         return timeB - timeA;
       });
       setFiles(files);
@@ -201,7 +194,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
     }
   };
 
-  const renderItem = ({item, index}) => (
+  const renderItem = ({ item, index }) => (
     <View
       style={{
         minHeight: 50,
@@ -212,12 +205,14 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
         flexDirection: 'row',
         borderBottomWidth: 0.5,
         borderBottomColor: colors.nav
-      }}>
+      }}
+    >
       <View
         style={{
           maxWidth: '75%'
-        }}>
-        <Paragraph size={SIZE.sm} style={{width: '100%', maxWidth: '100%'}}>
+        }}
+      >
+        <Paragraph size={SIZE.sm} style={{ width: '100%', maxWidth: '100%' }}>
           {timeConverter(item?.lastModified * 1)}
         </Paragraph>
         <Paragraph size={SIZE.xs}>
@@ -276,10 +271,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             .then(async r => {
               try {
                 let backup = await r.json();
-                console.log(
-                  'backup encrypted:',
-                  backup.data.iv && backup.data.salt
-                );
+                console.log('backup encrypted:', backup.data.iv && backup.data.salt);
                 if (backup.data.iv && backup.data.salt) {
                   withPassword(
                     async value => {
@@ -326,13 +318,12 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
             paddingRight: 8,
             alignItems: 'center',
             paddingTop: restoring ? 8 : 0
-          }}>
+          }}
+        >
           <DialogHeader
             title="Backups"
             paragraph={`All the backups are stored in ${
-              Platform.OS === 'ios'
-                ? 'File Manager/Notesnook/Backups'
-                : 'selected backups folder.'
+              Platform.OS === 'ios' ? 'File Manager/Notesnook/Backups' : 'selected backups folder.'
             }`}
             button={button}
           />
@@ -351,7 +342,8 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: 100
-                  }}>
+                  }}
+                >
                   <ActivityIndicator color={colors.accent} size={SIZE.lg} />
                 </View>
               ) : (
@@ -360,16 +352,15 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                     justifyContent: 'center',
                     alignItems: 'center',
                     height: 100
-                  }}>
+                  }}
+                >
                   {Platform.OS === 'android' && !backupDirectoryAndroid ? (
                     <>
                       <Button
                         title="Select backups folder"
                         icon="folder"
                         onPress={async () => {
-                          let folder = await ScopedStorage.openDocumentTree(
-                            true
-                          );
+                          let folder = await ScopedStorage.openDocumentTree(true);
                           let subfolder;
                           if (folder.name !== 'Notesnook backups') {
                             subfolder = await ScopedStorage.createDirectory(
@@ -380,10 +371,7 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                             subfolder = folder;
                           }
                           console.log(subfolder, folder);
-                          MMKV.setItem(
-                            'backupStorageDir',
-                            JSON.stringify(subfolder)
-                          );
+                          MMKV.setItem('backupStorageDir', JSON.stringify(subfolder));
                           setBackupDirectoryAndroid(subfolder);
                           setLoading(true);
                           checkBackups();
@@ -403,9 +391,9 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                         }}
                         size={SIZE.xs}
                         textBreakStrategy="balanced"
-                        color={colors.icon}>
-                        Select the folder that includes your backup files to
-                        list them here.
+                        color={colors.icon}
+                      >
+                        Select the folder that includes your backup files to list them here.
                       </Paragraph>
                     </>
                   ) : (
@@ -419,11 +407,10 @@ const RestoreDataComponent = ({close, setRestoring, restoring}) => {
                   justifyContent: 'center',
                   alignItems: 'center',
                   height: 200
-                }}>
+                }}
+              >
                 <ActivityIndicator color={colors.accent} />
-                <Paragraph color={colors.icon}>
-                  Restoring backup. Please wait.
-                </Paragraph>
+                <Paragraph color={colors.icon}>Restoring backup. Please wait.</Paragraph>
               </View>
             )
           }

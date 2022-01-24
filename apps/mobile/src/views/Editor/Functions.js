@@ -6,7 +6,8 @@ import { DDS } from '../../services/DeviceDetection';
 import {
   eSendEvent,
   eSubscribeEvent,
-  eUnSubscribeEvent, ToastEvent
+  eUnSubscribeEvent,
+  ToastEvent
 } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import PremiumService from '../../services/PremiumService';
@@ -31,15 +32,11 @@ import umami from '../../utils/umami';
 import { TableCellProperties } from './TableCellProperties';
 import { TableRowProperties } from './TableRowProperties';
 import tiny from './tiny/tiny';
-import {
-  IMAGE_TOOLTIP_CONFIG,
-  TABLE_TOOLTIP_CONFIG
-} from './tiny/toolbar/config';
+import { IMAGE_TOOLTIP_CONFIG, TABLE_TOOLTIP_CONFIG } from './tiny/toolbar/config';
 
 export let EditorWebView = createRef();
 export const editorTitleInput = createRef();
-export const sourceUri =
-  Platform.OS === 'android' ? 'file:///android_asset/' : 'Web.bundle/site/';
+export const sourceUri = Platform.OS === 'android' ? 'file:///android_asset/' : 'Web.bundle/site/';
 
 let lastEditTime = 0;
 let EDITOR_SETTINGS = null;
@@ -60,7 +57,6 @@ let appColors = COLOR_SCHEME;
 let closingSession = false;
 let webviewTimer = null;
 let requestedReload = false;
-let cTimeout = null;
 let disableSaving = false;
 let isSaving = false;
 let waitForContent = false;
@@ -84,7 +80,7 @@ export function setColors(colors) {
   if (colors) {
     appColors = colors;
   }
-  let theme = {...appColors, factor: normalize(1)};
+  let theme = { ...appColors, factor: normalize(1) };
 
   if (note && note.color && !DDS.isLargeTablet()) {
     theme.shade = hexToRGBA(COLORS_NOTE[note.color?.toLowerCase()], 0.15);
@@ -97,7 +93,7 @@ export function isNotedEdited() {
 }
 
 async function waitForEvent(event, caller, onend) {
-  return new Promise((resolve, reject) => {
+  return new Promise(resolve => {
     let resolved;
     let event_callback = () => {
       eUnSubscribeEvent(event, event_callback);
@@ -114,7 +110,7 @@ async function waitForEvent(event, caller, onend) {
   });
 }
 
-export async function clearTimer(clear) {
+export async function clearTimer() {
   if (waitForContent && noteEdited) {
     await waitForEvent('content_event', () => {
       console.log('requested content from edtior');
@@ -180,9 +176,7 @@ export function post(type, value = null) {
 export const _onShouldStartLoadWithRequest = async request => {
   if (request.url.includes('https')) {
     if (Platform.OS === 'ios' && !request.isTopFrame) return;
-    openLinkInBrowser(request.url, appColors)
-      .catch(e => {})
-      .then(r => {});
+    openLinkInBrowser(request.url, appColors).catch(console.log).then(console.log);
 
     return false;
   } else {
@@ -334,10 +328,7 @@ export const loadNote = async item => {
     editing.isFocused = false;
 
     await setNote(item);
-    if (
-      loading_queue &&
-      (loading_queue?.id !== item?.id || loading_queue?.type === 'new')
-    ) {
+    if (loading_queue && (loading_queue?.id !== item?.id || loading_queue?.type === 'new')) {
       clearNote();
       loading_note = false;
       loadNote(loading_queue);
@@ -456,7 +447,7 @@ function check_session_status() {
 export const _onMessage = async evt => {
   if (!evt || !evt.nativeEvent || !evt.nativeEvent.data) return;
   let message = evt.nativeEvent.data;
-
+  let user;
   try {
     message = JSON.parse(message);
   } catch (e) {
@@ -533,7 +524,7 @@ export const _onMessage = async evt => {
       eSendEvent('loadingNote');
       break;
     case 'premium':
-      let user = await db.user.getUser();
+      user = await db.user.getUser();
       if (user && !user.isEmailConfirmed) {
         await sleep(500);
         PremiumService.showVerifyEmailDialog();
@@ -547,7 +538,7 @@ export const _onMessage = async evt => {
       break;
     case 'status':
       if (sessionId !== message.sessionId) {
-        if (!sessionId) makeSessionId({id});
+        if (!sessionId) makeSessionId({ id });
         updateSessionStatus();
         return;
       }
@@ -637,7 +628,7 @@ export const _onMessage = async evt => {
     case 'newtag':
       if (!getNote()) {
         ToastEvent.show({
-          heading:"Create a note first"
+          heading: 'Create a note first'
         });
         return;
       }
@@ -663,12 +654,12 @@ function onNoteChange(wait = 300) {
   clearTimeout(timer);
   timer = null;
   noteEdited = false;
-  _sid = sessionId;
+  let _sid = sessionId;
   let params = [title, id, content.data, content.type, sessionId];
   timer = setTimeout(() => {
     //console.log('saving note', params[1], _sid, sessionId);
     if (!params[1]) {
-      console.log('update id to',id);
+      console.log('update id to', id);
       params[1] = id;
     }
     saveNote(...params, _sid !== sessionId);
@@ -752,10 +743,7 @@ async function addToCollection(id) {
       editing.actionAfterFirstSave = {
         type: null
       };
-      Navigation.setRoutesToUpdate([
-        Navigation.routeNames.Tags,
-        Navigation.routeNames.NotesPage
-      ]);
+      Navigation.setRoutesToUpdate([Navigation.routeNames.Tags, Navigation.routeNames.NotesPage]);
       break;
     }
     case 'color': {
@@ -773,15 +761,8 @@ async function addToCollection(id) {
   }
 }
 
-export async function saveNote(
-  title,
-  _id,
-  data,
-  type,
-  sessionId,
-  preventUpdate
-) {
-  console.log("saving note:", disableSaving, isSaving, _id,id);
+export async function saveNote(title, _id, data, type, sessionId, preventUpdate) {
+  console.log('saving note:', disableSaving, isSaving, _id, id);
   if (disableSaving || (isSaving && !id)) return;
   if (preventUpdate) {
     noteEdited = false;
@@ -876,10 +857,7 @@ export async function saveNote(
 
       lastEditTime = n + 10;
       let n = db.notes.note(_id)?.data?.dateEdited;
-      tiny.call(
-        EditorWebView,
-        tiny.updateDateEdited(n ? timeConverter(n) : '')
-      );
+      tiny.call(EditorWebView, tiny.updateDateEdited(n ? timeConverter(n) : ''));
       tiny.call(EditorWebView, tiny.updateSavingState(!n ? '' : 'Saved'));
     }
   } catch (e) {
@@ -985,7 +963,6 @@ const loadNoteInEditor = async (keepHistory = true) => {
     if (note?.id) {
       eSendEvent('updateTags');
       post('title', title);
-      intent = false;
 
       if (!content || !content.data || content?.data?.length === 0) {
         tiny.call(
@@ -1011,10 +988,7 @@ const loadNoteInEditor = async (keepHistory = true) => {
       }
 
       setColors();
-      tiny.call(
-        EditorWebView,
-        tiny.updateDateEdited(timeConverter(note.dateEdited))
-      );
+      tiny.call(EditorWebView, tiny.updateDateEdited(timeConverter(note.dateEdited)));
       tiny.call(EditorWebView, tiny.updateSavingState('Saved'));
     } else {
       await restoreEditorState();
@@ -1031,31 +1005,31 @@ const loadNoteInEditor = async (keepHistory = true) => {
 
 export async function updateNoteInEditor() {
   return;
-  let _note = db.notes.note(id).data;
-  if (_note.conflicted) {
-    presentResolveConflictDialog(_note);
-    return;
-  }
-  let data = await db.content.raw(_note.contentId);
-  if (lastEditTime > _note.dateEdited) return;
-  if (data.data === content.data) return;
-  if (content.data.indexOf(data.data) !== -1) return;
-  if (note.dateEdited === _note.dateEdited) return;
+  // let _note = db.notes.note(id).data;
+  // if (_note.conflicted) {
+  //   presentResolveConflictDialog(_note);
+  //   return;
+  // }
+  // let data = await db.content.raw(_note.contentId);
+  // if (lastEditTime > _note.dateEdited) return;
+  // if (data.data === content.data) return;
+  // if (content.data.indexOf(data.data) !== -1) return;
+  // if (note.dateEdited === _note.dateEdited) return;
 
-  title = note.title;
-  content.data = data.data;
-  note = _note;
-  lastEditTime = _note.dateEdited + 10;
-  tiny.call(EditorWebView, tiny.isLoading);
-  await setNote(_note);
-  tiny.call(EditorWebView, tiny.isLoading);
-  post('title', title);
-  post('inject', content.data);
-  setTimeout(() => {
-    tiny.call(EditorWebView, tiny.notLoading);
-  }, 50);
-  if (id) {
-    db.attachments.downloadImages(id);
-  }
-  tiny.call(EditorWebView, tiny.notLoading);
+  // title = note.title;
+  // content.data = data.data;
+  // note = _note;
+  // lastEditTime = _note.dateEdited + 10;
+  // tiny.call(EditorWebView, tiny.isLoading);
+  // await setNote(_note);
+  // tiny.call(EditorWebView, tiny.isLoading);
+  // post('title', title);
+  // post('inject', content.data);
+  // setTimeout(() => {
+  //   tiny.call(EditorWebView, tiny.notLoading);
+  // }, 50);
+  // if (id) {
+  //   db.attachments.downloadImages(id);
+  // }
+  // tiny.call(EditorWebView, tiny.notLoading);
 }

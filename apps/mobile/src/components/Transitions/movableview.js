@@ -1,6 +1,6 @@
-import React, {Component} from 'react';
-import {PanResponder} from 'react-native';
-import Animated, {Easing} from 'react-native-reanimated';
+import React, { Component } from 'react';
+import { PanResponder } from 'react-native';
+import Animated, { Easing } from 'react-native-reanimated';
 
 export default class MovableView extends Component {
   constructor(props) {
@@ -26,8 +26,10 @@ export default class MovableView extends Component {
         this.props.onDragStart();
       },
       onPanResponderMove: (event, state) => {
-        this.state.panX.setValue(state.dx);
-        this.state.panY.setValue(state.dy);
+        if (this.props.movable) {
+          this.state.panX.setValue(state.dx);
+          this.state.panY.setValue(state.dy);
+        }
       },
       onPanResponderRelease: () => {
         Animated.timing(this.state.panX, {
@@ -55,13 +57,13 @@ export default class MovableView extends Component {
     });
   }
 
-  componentWillMount() {
+  componentDidMount() {
     if (typeof this.props.onMove === 'function')
       this.state.pan.addListener(values => this.props.onMove(values));
     if (this.props.breath) {
       let value = 0;
       setInterval(() => {
-        value = value === 1 ? 1.02 : 1;
+        value = value === 1 ? 1.03 : 1;
         Animated.timing(this.state.scale, {
           toValue: value,
           duration: this.props.breathDuration | 1000,
@@ -72,7 +74,9 @@ export default class MovableView extends Component {
   }
 
   changeDisableStatus = () => {
-    this.state.disabled = !this.state.disabled;
+    this.setState({
+      disabled: !this.state.disabled
+    });
   };
 
   render() {
@@ -94,7 +98,8 @@ export default class MovableView extends Component {
               }
             ]
           }
-        ]}>
+        ]}
+      >
         {this.props.children}
       </Animated.View>
     );

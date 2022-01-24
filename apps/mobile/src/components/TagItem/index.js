@@ -1,24 +1,23 @@
-import React, {useEffect} from 'react';
-import {useWindowDimensions, View} from 'react-native';
-import {notesnook} from '../../../e2e/test.ids';
-import {PressableButton} from '../../components/PressableButton';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
+import React from 'react';
+import { useWindowDimensions, View } from 'react-native';
+import { notesnook } from '../../../e2e/test.ids';
+import { PressableButton } from '../../components/PressableButton';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {db} from '../../utils/database';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import { db } from '../../utils/database';
+import { refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
 import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
 const TagItem = React.memo(
-  ({item, index}) => {
+  ({ item, index }) => {
     const [state] = useTracked();
-    const {colors} = state;
-    const {fontScale} = useWindowDimensions();
+    const { colors } = state;
+    const { fontScale } = useWindowDimensions();
     const onPress = () => {
       let params = {
         ...item,
@@ -44,21 +43,24 @@ const TagItem = React.memo(
         customStyle={{
           paddingHorizontal: 12,
           flexDirection: 'row',
-          paddingVertical:12,
+          paddingVertical: 12,
           alignItems: 'center',
           width: '100%',
           justifyContent: 'space-between'
-        }}>
+        }}
+      >
         <View
           style={{
             maxWidth: '92%'
-          }}>
+          }}
+        >
           <Heading size={SIZE.md}>
             <Heading
               size={SIZE.md}
               style={{
                 color: colors.accent
-              }}>
+              }}
+            >
               #
             </Heading>
             {db.tags.alias(item.id)}
@@ -68,7 +70,8 @@ const TagItem = React.memo(
             size={SIZE.xs}
             style={{
               marginTop: 5
-            }}>
+            }}
+          >
             {item && item.noteIds.length && item.noteIds.length > 1
               ? item.noteIds.length + ' notes'
               : item.noteIds.length === 1
@@ -107,5 +110,7 @@ const TagItem = React.memo(
     return true;
   }
 );
+
+TagItem.displayName = 'TagItem';
 
 export default TagItem;

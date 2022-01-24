@@ -1,6 +1,6 @@
-import {Platform} from 'react-native';
-import {MMKV} from './mmkv';
-import {useSettingStore} from '../provider/stores';
+import { Platform } from 'react-native';
+import { MMKV } from './mmkv';
+import { useSettingStore } from '../provider/stores';
 
 const WEBSITE_ID = `3c6890ce-8410-49d5-8831-15fb2eb28a21`;
 const baseUrl = `https://analytics.streetwriters.co/api/collect`;
@@ -30,7 +30,7 @@ async function canUpdateAnalytics(route, conditions = []) {
     return false;
   }
   if (route !== '/welcome') {
-    for (cond of conditions) {
+    for (let cond of conditions) {
       if (!eventsList || !eventsList[cond]) {
         console.log('analytics: conditions not met for event', route, cond);
         return false;
@@ -61,12 +61,7 @@ async function saveAnalytics(route, value = true) {
  * @returns
  */
 
-async function pageView(
-  route,
-  prevRoute = '',
-  conditions = ['/welcome'],
-  once = true
-) {
+async function pageView(route, prevRoute = '', conditions = ['/welcome'], once = true) {
   if (!(await canUpdateAnalytics(route, conditions)) && once) return;
   let body = {
     payload: {

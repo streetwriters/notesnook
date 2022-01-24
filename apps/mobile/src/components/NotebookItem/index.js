@@ -1,30 +1,24 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {notesnook} from '../../../e2e/test.ids';
-import {useTracked} from '../../provider';
-import {useSettingStore} from '../../provider/stores';
-import {eSendEvent} from '../../services/EventManager';
+import { notesnook } from '../../../e2e/test.ids';
+import { useTracked } from '../../provider';
+import { useSettingStore } from '../../provider/stores';
+import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
-import {getTotalNotes, history} from '../../utils';
-import {refreshNotesPage} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {ActionIcon} from '../ActionIcon';
-import {Button} from '../Button';
-import {ActionSheetEvent} from '../DialogManager/recievers';
+import { getTotalNotes, history } from '../../utils';
+import { refreshNotesPage } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { ActionIcon } from '../ActionIcon';
+import { Button } from '../Button';
+import { ActionSheetEvent } from '../DialogManager/recievers';
 import { Properties } from '../Properties';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-export const NotebookItem = ({
-  item,
-  isTopic = false,
-  notebookID,
-  isTrash,
-  dateBy
-}) => {
+export const NotebookItem = ({ item, isTopic = false, notebookID, isTrash, dateBy }) => {
   const [state] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const compactMode = settings.notebooksListMode === 'compact';
   const topics = item.topics?.slice(0, 3) || [];
@@ -36,7 +30,7 @@ export const NotebookItem = ({
   const navigateToTopic = topic => {
     if (history.selectedItemsList.length > 0) return;
     let routeName = 'NotesPage';
-    let params = {...topic, menu: false, get: 'topics'};
+    let params = { ...topic, menu: false, get: 'topics' };
     let headerState = {
       heading: topic.title,
       id: topic.id,
@@ -52,13 +46,15 @@ export const NotebookItem = ({
         style={{
           flexGrow: 1,
           flexShrink: 1
-        }}>
+        }}
+      >
         <Heading
           size={SIZE.md}
           numberOfLines={1}
           style={{
             flexWrap: 'wrap'
-          }}>
+          }}
+        >
           {item.title}
         </Heading>
         {isTopic || !item.description || compactMode ? null : (
@@ -67,7 +63,8 @@ export const NotebookItem = ({
             numberOfLines={2}
             style={{
               flexWrap: 'wrap'
-            }}>
+            }}
+          >
             {item.description}
           </Paragraph>
         )}
@@ -78,7 +75,8 @@ export const NotebookItem = ({
               flexDirection: 'row',
               alignItems: 'center',
               flexWrap: 'wrap'
-            }}>
+            }}
+          >
             {topics.map(topic => (
               <Button
                 title={topic.title}
@@ -86,14 +84,12 @@ export const NotebookItem = ({
                 height={null}
                 textStyle={{
                   fontWeight: 'normal',
-                  fontFamily: null
+                  fontFamily: null,
+                  marginRight: 0
                 }}
                 type="grayBg"
                 fontSize={SIZE.xs}
                 icon="bookmark-outline"
-                textStyle={{
-                  marginRight: 0
-                }}
                 iconSize={SIZE.sm}
                 style={{
                   borderRadius: 5,
@@ -118,13 +114,15 @@ export const NotebookItem = ({
             alignItems: 'center',
             marginTop: 5,
             height: SIZE.md + 2
-          }}>
+          }}
+        >
           <Paragraph
             color={colors.accent}
             size={SIZE.xs}
             style={{
               marginRight: 6
-            }}>
+            }}
+          >
             {isTopic ? 'Topic' : 'Notebook'}
           </Paragraph>
 
@@ -136,9 +134,9 @@ export const NotebookItem = ({
                 style={{
                   textAlignVertical: 'center',
                   marginRight: 6
-                }}>
-                {'Deleted on ' +
-                  new Date(item.dateDeleted).toISOString().slice(0, 10)}
+                }}
+              >
+                {'Deleted on ' + new Date(item.dateDeleted).toISOString().slice(0, 10)}
               </Paragraph>
               <Paragraph
                 color={colors.accent}
@@ -146,7 +144,8 @@ export const NotebookItem = ({
                 style={{
                   textAlignVertical: 'center',
                   marginRight: 6
-                }}>
+                }}
+              >
                 {item.itemType[0].toUpperCase() + item.itemType.slice(1)}
               </Paragraph>
             </>
@@ -156,7 +155,8 @@ export const NotebookItem = ({
               size={SIZE.xs}
               style={{
                 marginRight: 6
-              }}>
+              }}
+            >
               {new Date(item[dateBy]).toDateString().substring(4)}
             </Paragraph>
           )}
@@ -165,7 +165,8 @@ export const NotebookItem = ({
             size={SIZE.xs}
             style={{
               marginRight: 6
-            }}>
+            }}
+          >
             {item && totalNotes > 1
               ? totalNotes + ' notes'
               : totalNotes === 1
@@ -175,7 +176,6 @@ export const NotebookItem = ({
 
           {item.pinned ? (
             <Icon
-              style={{marginRight: 6}}
               name="pin-outline"
               size={SIZE.sm}
               style={{

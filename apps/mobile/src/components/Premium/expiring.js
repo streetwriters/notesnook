@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { useTracked } from '../../provider';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../../services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
-import {
-  eOpenPremiumDialog,
-  eOpenResultDialog,
-  eOpenTrialEndingDialog
-} from '../../utils/Events';
+import { eOpenPremiumDialog, eOpenResultDialog, eOpenTrialEndingDialog } from '../../utils/Events';
 import { SIZE } from '../../utils/SizeUtils';
 import { sleep } from '../../utils/TimeUtils';
 import { Button } from '../Button';
@@ -25,17 +17,19 @@ import { Offer } from './offer';
 
 export const Expiring = () => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
   const [visible, setVisible] = useState(false);
   const [status, setStatus] = useState({
     title: 'Your trial is ending soon',
     offer: null,
     extend: true
   });
- const promo = status.offer ? {
-  promoCode:"com.streetwriters.notesnook.sub.yr.trialoffer",
-  text:"GET 30% OFF on yearly"
-}: null
+  const promo = status.offer
+    ? {
+        promoCode: 'com.streetwriters.notesnook.sub.yr.trialoffer',
+        text: 'GET 30% OFF on yearly'
+      }
+    : null;
 
   useEffect(() => {
     eSubscribeEvent(eOpenTrialEndingDialog, open);
@@ -54,24 +48,28 @@ export const Expiring = () => {
       <BaseDialog
         onRequestClose={() => {
           setVisible(false);
-        }}>
+        }}
+      >
         <DialogContainer>
           <View
             style={{
               width: '100%',
               alignItems: 'center'
-            }}>
+            }}
+          >
             <View
               style={{
                 paddingHorizontal: 12,
                 width: '100%'
-              }}>
+              }}
+            >
               <Heading
                 textBreakStrategy="balanced"
                 style={{
                   textAlign: 'center',
                   paddingTop: 18
-                }}>
+                }}
+              >
                 {status.title}
               </Heading>
               <Seperator />
@@ -79,7 +77,8 @@ export const Expiring = () => {
                 style={{
                   width: '100%',
                   alignItems: 'center'
-                }}>
+                }}
+              >
                 {status.offer ? (
                   <>
                     <Offer padding={20} off={status.offer} />
@@ -93,14 +92,14 @@ export const Expiring = () => {
                         paddingTop: 0,
                         paddingBottom: 20
                       }}
-                      size={SIZE.md + 2}>
-                      Upgrade now to continue using all the pro features after
-                      your trial ends
+                      size={SIZE.md + 2}
+                    >
+                      Upgrade now to continue using all the pro features after your trial ends
                     </Paragraph>
                   </>
                 )}
 
-               <CompactFeatures/>
+                <CompactFeatures />
 
                 <Paragraph
                   onPress={async () => {
@@ -113,7 +112,8 @@ export const Expiring = () => {
                     textDecorationLine: 'underline',
                     color: colors.icon,
                     marginTop: 10
-                  }}>
+                  }}
+                >
                   See what's included in Basic & Pro plans
                 </Paragraph>
 
@@ -127,14 +127,15 @@ export const Expiring = () => {
                 width: '100%',
                 borderBottomRightRadius: 10,
                 borderBottomLeftRadius: 10
-              }}>
+              }}
+            >
               <Button
                 type="transparent"
                 title="Subscribe now"
                 onPress={async () => {
                   setVisible(false);
                   await sleep(300);
-                  PremiumService.sheet(null,promo)
+                  PremiumService.sheet(null, promo);
                 }}
                 fontSize={SIZE.md + 2}
                 style={{

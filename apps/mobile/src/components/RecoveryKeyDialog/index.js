@@ -1,8 +1,8 @@
-import React, {createRef} from 'react';
-import {Platform, View} from 'react-native';
+import React, { createRef } from 'react';
+import { Platform, View } from 'react-native';
 import QRCode from 'react-native-qrcode-svg';
 import Share from 'react-native-share';
-import {LOGO_BASE64} from '../../assets/images/assets';
+import { LOGO_BASE64 } from '../../assets/images/assets';
 import Clipboard from '@react-native-clipboard/clipboard';
 import {
   eSendEvent,
@@ -10,22 +10,22 @@ import {
   eUnSubscribeEvent,
   ToastEvent
 } from '../../services/EventManager';
-import {db} from '../../utils/database';
-import {eOpenRecoveryKeyDialog, eOpenResultDialog} from '../../utils/Events';
-import {sanitizeFilename} from '../../utils/filename';
-import {SIZE} from '../../utils/SizeUtils';
+import { db } from '../../utils/database';
+import { eOpenRecoveryKeyDialog, eOpenResultDialog } from '../../utils/Events';
+import { sanitizeFilename } from '../../utils/filename';
+import { SIZE } from '../../utils/SizeUtils';
 import Storage from '../../utils/storage';
-import {sleep} from '../../utils/TimeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import SheetWrapper from '../Sheet';
-import {Button} from '../Button';
+import { Button } from '../Button';
 import DialogHeader from '../Dialog/dialog-header';
 import Seperator from '../Seperator';
 import Paragraph from '../Typography/Paragraph';
 import FileViewer from 'react-native-file-viewer';
 
 import * as ScopedStorage from 'react-native-scoped-storage';
-import {MMKV} from '../../utils/mmkv';
-import {clearMessage} from '../../services/Message';
+import { MMKV } from '../../utils/mmkv';
+import { clearMessage } from '../../services/Message';
 
 let RNFetchBlob;
 
@@ -98,24 +98,18 @@ class RecoveryKeyDialog extends React.Component {
         let path;
         RNFetchBlob = require('rn-fetch-blob').default;
         let fileName = 'nn_' + this.user.email + '_recovery_key_qrcode';
-        fileName = sanitizeFilename(fileName, {replacement: '_'});
+        fileName = sanitizeFilename(fileName, { replacement: '_' });
         fileName = fileName + '.png';
 
         if (Platform.OS === 'android') {
-          await ScopedStorage.createDocument(
-            fileName,
-            'image/png',
-            data,
-            'base64'
-          );
+          await ScopedStorage.createDocument(fileName, 'image/png', data, 'base64');
         } else {
           path = await Storage.checkAndCreateDir('/');
           await RNFetchBlob.fs.writeFile(path + fileName, data, 'base64');
         }
         ToastEvent.show({
           heading: 'Recovery key QR-Code saved',
-          message:
-            'QR-Code image has been saved to Gallery at ' + path + fileName,
+          message: 'QR-Code image has been saved to Gallery at ' + path + fileName,
           type: 'success',
           context: 'local'
         });
@@ -127,7 +121,7 @@ class RecoveryKeyDialog extends React.Component {
     try {
       let path;
       let fileName = 'nn_' + this.user?.email + '_recovery_key';
-      fileName = sanitizeFilename(fileName, {replacement: '_'});
+      fileName = sanitizeFilename(fileName, { replacement: '_' });
       fileName = fileName + '.txt';
 
       RNFetchBlob = require('rn-fetch-blob').default;
@@ -174,7 +168,7 @@ class RecoveryKeyDialog extends React.Component {
     try {
       if (Platform.OS === 'ios') {
         Share.open({
-          url: 'file:/' + result.filePath,
+          url: 'file:/' + path,
           failOnCancel: false
         }).catch(console.log);
       } else {
@@ -188,14 +182,15 @@ class RecoveryKeyDialog extends React.Component {
   };
 
   render() {
-    const {colors} = this.props;
+    const { colors } = this.props;
     if (!this.state.visible) return null;
     return (
       <SheetWrapper
         closeOnTouchBackdrop={false}
         gestureEnabled={false}
         onOpen={this.onOpen}
-        fwdRef={this.actionSheetRef}>
+        fwdRef={this.actionSheetRef}
+      >
         <View
           style={{
             width: '100%',
@@ -204,7 +199,8 @@ class RecoveryKeyDialog extends React.Component {
             paddingHorizontal: 12,
             borderRadius: 10,
             paddingTop: 10
-          }}>
+          }}
+        >
           <DialogHeader
             title="Save account recovery key"
             paragraph="If you forget your password, you can recover your
@@ -216,7 +212,8 @@ class RecoveryKeyDialog extends React.Component {
               borderRadius: 5,
               padding: 12,
               marginTop: 10
-            }}>
+            }}
+          >
             <Paragraph
               color={colors.pri}
               size={SIZE.sm}
@@ -228,7 +225,8 @@ class RecoveryKeyDialog extends React.Component {
                 paddingRight: 10,
                 textAlign: 'center',
                 textDecorationLine: 'underline'
-              }}>
+              }}
+            >
               {this.state.key}
             </Paragraph>
           </View>
@@ -244,13 +242,14 @@ class RecoveryKeyDialog extends React.Component {
               position: 'absolute',
               opacity: 0,
               zIndex: -1
-            }}>
+            }}
+          >
             {this.state.key ? (
               <QRCode
                 getRef={this.svg}
                 size={500}
                 value={this.state.key}
-                logo={{uri: LOGO_BASE64}}
+                logo={{ uri: LOGO_BASE64 }}
                 logoBorderRadius={10}
               />
             ) : null}
@@ -314,7 +313,8 @@ class RecoveryKeyDialog extends React.Component {
               maxWidth: '100%',
               marginBottom: 5,
               textAlign: 'center'
-            }}>
+            }}
+          >
             Tap twice to confirm you have saved the recovery key.
           </Paragraph>
           <Button

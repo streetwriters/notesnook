@@ -1,14 +1,14 @@
 import React, { Fragment } from 'react';
-import {View} from 'react-native';
-import {allowedPlatforms} from '../../provider/stores';
-import {ProFeatures} from '../ResultDialog/pro-features';
-import {Body} from './body';
-import {Cta} from './cta';
-import {Description} from './description';
-import {List} from './list';
-import {Photo} from './photo';
-import {SubHeading} from './subheading';
-import {Title} from './title';
+import { View } from 'react-native';
+import { allowedPlatforms } from '../../provider/stores';
+import { ProFeatures } from '../ResultDialog/pro-features';
+import { Body } from './body';
+import { Cta } from './cta';
+import { Description } from './description';
+import { List } from './list';
+import { Photo } from './photo';
+import { SubHeading } from './subheading';
+import { Title } from './title';
 
 export function allowedOnPlatform(platforms) {
   if (!platforms) return true;
@@ -37,7 +37,8 @@ const Features = () => {
         paddingHorizontal: 12,
         alignItems: 'center',
         width: '100%'
-      }}>
+      }}
+    >
       <ProFeatures />
     </View>
   );
@@ -47,7 +48,7 @@ const renderItems = {
   title: Title,
   description: Description,
   body: Body,
-  text:Body,
+  text: Body,
   image: Photo,
   list: List,
   subheading: SubHeading,
@@ -55,8 +56,16 @@ const renderItems = {
   callToActions: Cta
 };
 
-export const renderItem = ({item, index, color,inline}) => {
-  const Item = renderItems[item.type] || Fragment
+export const renderItem = ({ item, index, color, inline }) => {
+  const Item = renderItems[item.type] || Fragment;
 
-  return <Item key={item.text || item.src || item.type} {...item} index={index} color={color} inline={inline} />;
+  return (
+    <Item
+      key={item.text || item.src || item.type}
+      {...item}
+      index={index}
+      color={color}
+      inline={inline}
+    />
+  );
 };

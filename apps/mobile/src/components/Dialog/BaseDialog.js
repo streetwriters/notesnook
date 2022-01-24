@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, { useEffect } from 'react';
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -8,9 +8,9 @@ import {
   StyleSheet,
   TouchableOpacity
 } from 'react-native';
-import {useSettingStore} from '../../provider/stores';
+import { useSettingStore } from '../../provider/stores';
 import useIsFloatingKeyboard from '../../utils/use-is-floating-keyboard';
-import {BouncingView} from '../Transitions/bouncing-view';
+import { BouncingView } from '../Transitions/bouncing-view';
 
 const BaseDialog = ({
   visible,
@@ -60,18 +60,14 @@ const BaseDialog = ({
         if (!closeOnTouch) return null;
         useSettingStore.getState().setSheetKeyboardHandler(true);
         onRequestClose && onRequestClose();
-      }}>
+      }}
+    >
       <SafeAreaView
         style={{
-          backgroundColor: background
-            ? background
-            : transparent
-            ? 'transparent'
-            : 'rgba(0,0,0,0.3)'
-        }}>
-        <KeyboardAvoidingView
-          enabled={!floating && Platform.OS === 'ios'}
-          behavior="padding">
+          backgroundColor: background ? background : transparent ? 'transparent' : 'rgba(0,0,0,0.3)'
+        }}
+      >
+        <KeyboardAvoidingView enabled={!floating && Platform.OS === 'ios'} behavior="padding">
           <BouncingView
             duration={400}
             animated={animated}
@@ -79,13 +75,10 @@ const BaseDialog = ({
             style={[
               styles.backdrop,
               {
-                justifyContent: centered
-                  ? 'center'
-                  : bottom
-                  ? 'flex-end'
-                  : 'flex-start'
+                justifyContent: centered ? 'center' : bottom ? 'flex-end' : 'flex-start'
               }
-            ]}>
+            ]}
+          >
             <TouchableOpacity
               onPress={closeOnTouch ? onRequestClose : null}
               style={styles.overlayButton}

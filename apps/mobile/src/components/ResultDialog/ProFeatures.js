@@ -1,30 +1,24 @@
 import React from 'react';
-import {View} from 'react-native';
+import { View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {useTracked} from '../../provider';
-import {eSendEvent} from '../../services/EventManager';
-import {
-  eCloseProgressDialog,
-  eCloseResultDialog,
-  eOpenPremiumDialog
-} from '../../utils/Events';
-import {SIZE} from '../../utils/SizeUtils';
-import {sleep} from '../../utils/TimeUtils';
+import { useTracked } from '../../provider';
+import { eSendEvent } from '../../services/EventManager';
+import { eCloseProgressDialog, eCloseResultDialog, eOpenPremiumDialog } from '../../utils/Events';
+import { SIZE } from '../../utils/SizeUtils';
+import { sleep } from '../../utils/TimeUtils';
 import Paragraph from '../Typography/Paragraph';
-export const ProFeatures = ({count = 6}) => {
+export const ProFeatures = ({ count = 6 }) => {
   const [state, dispatch] = useTracked();
-  const {colors} = state;
+  const { colors } = state;
 
   return (
     <>
       {[
         {
-          content:
-            'Unlock unlimited notebooks, tags, colors. Organize like a pro'
+          content: 'Unlock unlimited notebooks, tags, colors. Organize like a pro'
         },
         {
-          content:
-            'Attach files upto 500MB, upload 4K images with unlimited storage'
+          content: 'Attach files upto 500MB, upload 4K images with unlimited storage'
         },
         {
           content: 'Instantly sync to unlimited devices'
@@ -33,8 +27,7 @@ export const ProFeatures = ({count = 6}) => {
           content: 'A private vault to keep everything imporant always locked'
         },
         {
-          content:
-            'Rich note editing experience with markdown, tables, checklists and more'
+          content: 'Rich note editing experience with markdown, tables, checklists and more'
         },
         {
           content: 'Export your notes in Pdf, markdown and html formats'
@@ -43,6 +36,7 @@ export const ProFeatures = ({count = 6}) => {
         .slice(0, count)
         .map(item => (
           <View
+            key={item.content}
             style={{
               flexDirection: 'row',
               width: '100%',
@@ -52,11 +46,10 @@ export const ProFeatures = ({count = 6}) => {
               alignItems: 'center',
               borderRadius: 5,
               justifyContent: 'flex-start'
-            }}>
+            }}
+          >
             <Icon size={SIZE.lg} color={colors.accent} name="check" />
-            <Paragraph style={{marginLeft: 5, flexShrink: 1}}>
-              {item.content}
-            </Paragraph>
+            <Paragraph style={{ marginLeft: 5, flexShrink: 1 }}>{item.content}</Paragraph>
           </View>
         ))}
       <Paragraph
@@ -70,7 +63,8 @@ export const ProFeatures = ({count = 6}) => {
         style={{
           textDecorationLine: 'underline',
           color: colors.icon
-        }}>
+        }}
+      >
         See all features included in Notesnook Pro
       </Paragraph>
     </>
