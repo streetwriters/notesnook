@@ -1,2 +1,3 @@
 1. 🥳 Support for Standard Notes is here! 🥳
 2. Fixed issue with Evernote provider where images got cut off.
+3. Fixes issue where some attachments were lost during Evernote .enex import.
