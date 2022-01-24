@@ -1,8 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
 import absolutify from 'absolutify';
-import { getLinkPreview } from '../src/utils/linkpreview';
-import React, {useEffect, useRef, useState} from 'react';
-import {ScrollView} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { ScrollView } from 'react-native';
 import {
   ActivityIndicator,
   Alert,
@@ -16,23 +15,20 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
-import Animated, {Easing, timing, useValue} from 'react-native-reanimated';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from '../src/services/EventManager';
-import {getElevation} from '../src/utils';
-import {db} from '../src/utils/database';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/EventManager';
+import { getElevation } from '../src/utils';
+import { db } from '../src/utils/database';
 import Storage from '../src/utils/storage';
-import {sleep} from '../src/utils/TimeUtils';
-import {Search} from './search';
-import {useShareStore} from './store';
+import { sleep } from '../src/utils/TimeUtils';
+import { Search } from './search';
+import { useShareStore } from './store';
 import isURL from 'validator/lib/isURL';
+import { getLinkPreview } from 'link-preview-js';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -68,7 +64,7 @@ function getBaseUrl(site) {
   return url;
 }
 function absolutifyImgs(html, site) {
-  let {parse} = require('node-html-parser');
+  let { parse } = require('node-html-parser');
   let parser = parse(html);
 
   let images = parser.querySelectorAll('img');
@@ -118,12 +114,12 @@ const modes = {
   }
 };
 
-const NotesnookShare = ({quicknote = false}) => {
+const NotesnookShare = ({ quicknote = false }) => {
   const colors = useShareStore(state => state.colors);
   const accent = useShareStore(state => state.accent);
 
   const appendNote = useShareStore(state => state.appendNote);
-  const [note, setNote] = useState({...defaultNote});
+  const [note, setNote] = useState({ ...defaultNote });
   const [loadingIntent, setLoadingIntent] = useState(true);
   const [loading, setLoading] = useState(false);
   const [floating, setFloating] = useState(false);
@@ -133,14 +129,11 @@ const NotesnookShare = ({quicknote = false}) => {
   });
   const [mode, setMode] = useState(1);
   const keyboardHeight = useRef(0);
-  const {width, height} = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const webviewRef = useRef();
   const opacity = useValue(0);
   const translate = useValue(1000);
-  const insets =
-    Platform.OS === 'android'
-      ? {top: StatusBar.currentHeight}
-      : useSafeAreaInsets();
+  const insets = Platform.OS === 'android' ? { top: StatusBar.currentHeight } : useSafeAreaInsets();
   const prevAnimation = useRef(null);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -174,14 +167,8 @@ const NotesnookShare = ({quicknote = false}) => {
       'keyboardWillChangeFrame',
       onKeyboardWillChangeFrame
     );
-    let keyboardDidShow = Keyboard.addListener(
-      'keyboardDidShow',
-      onKeyboardDidShow
-    );
-    let keyboardDidHide = Keyboard.addListener(
-      'keyboardDidHide',
-      onKeyboardDidHide
-    );
+    let keyboardDidShow = Keyboard.addListener('keyboardDidShow', onKeyboardDidShow);
+    let keyboardDidHide = Keyboard.addListener('keyboardDidHide', onKeyboardDidHide);
     return () => {
       keyboardWillChangeFrame?.remove();
       keyboardDidShow?.remove();
@@ -208,7 +195,7 @@ const NotesnookShare = ({quicknote = false}) => {
   const loadData = async () => {
     try {
       defaultNote.content.data = null;
-      setNote({...defaultNote});
+      setNote({ ...defaultNote });
       const data = await ShareExtension.data();
       if (!data || data.length === 0) {
         setRawData({
@@ -217,8 +204,8 @@ const NotesnookShare = ({quicknote = false}) => {
         setLoadingIntent(false);
         return;
       }
-      let note = {...defaultNote};
-      for (item of data) {
+      let note = { ...defaultNote };
+      for (let item of data) {
         if (item.type === 'text') {
           setRawData(item);
           if (isURL(item.value)) {
@@ -228,7 +215,7 @@ const NotesnookShare = ({quicknote = false}) => {
           }
         }
       }
-      setNote({...note});
+      setNote({ ...note });
     } catch (e) {}
     setLoadingIntent(false);
   };
@@ -248,7 +235,7 @@ const NotesnookShare = ({quicknote = false}) => {
   const close = async () => {
     animate(0, 1000);
     await sleep(300);
-    setNote({...defaultNote});
+    setNote({ ...defaultNote });
     setLoadingIntent(true);
     if (quicknote) {
       ShareExtension.openURL('ShareMedia://MainApp');
@@ -268,7 +255,7 @@ const NotesnookShare = ({quicknote = false}) => {
       setTheme();
     `);
     }, 300);
-    let theme = {...colors};
+    let theme = { ...colors };
     theme.factor = 1;
 
     postMessage(webviewRef, 'theme', JSON.stringify(theme));
@@ -283,7 +270,7 @@ const NotesnookShare = ({quicknote = false}) => {
   }
 
   const onPress = async () => {
-    content = await getContent();
+    let content = await getContent();
     if (!content || content === '') {
       return;
     }
@@ -309,7 +296,7 @@ const NotesnookShare = ({quicknote = false}) => {
         sessionId: Date.now()
       };
     } else {
-      _note = {...note};
+      _note = { ...note };
       _note.content.data = content;
       _note.sessionId = Date.now();
     }
@@ -368,7 +355,7 @@ const NotesnookShare = ({quicknote = false}) => {
         html = await absolutifyImgs(html, rawData.value);
         setNote(note => {
           note.content.data = html;
-          return {...note};
+          return { ...note };
         });
       } else {
         let html = isURL(rawData.value)
@@ -376,7 +363,7 @@ const NotesnookShare = ({quicknote = false}) => {
           : makeHtmlFromPlainText(rawData.value);
         setNote(note => {
           note.content.data = html;
-          return {...note};
+          return { ...note };
         });
       }
     } catch (e) {
@@ -391,7 +378,7 @@ const NotesnookShare = ({quicknote = false}) => {
       let content = await getContent();
       setNote(note => {
         note.content.data = content + '\n' + makeHtmlFromPlainText(text);
-        return {...note};
+        return { ...note };
       });
     }
   };
@@ -404,7 +391,8 @@ const NotesnookShare = ({quicknote = false}) => {
         justifyContent: quicknote ? 'flex-start' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1,
         alignSelf: 'center'
-      }}>
+      }}
+    >
       {quicknote && !showSearch ? (
         <View
           style={{
@@ -417,7 +405,8 @@ const NotesnookShare = ({quicknote = false}) => {
             flexDirection: 'row',
             alignItems: 'center',
             justifyContent: 'space-between'
-          }}>
+          }}
+        >
           <Button
             type="action"
             icon="close"
@@ -444,7 +433,8 @@ const NotesnookShare = ({quicknote = false}) => {
               color: colors.pri,
               fontSize: 17,
               fontFamily: 'OpenSans-Regular'
-            }}>
+            }}
+          >
             Quick note
           </Text>
 
@@ -477,7 +467,8 @@ const NotesnookShare = ({quicknote = false}) => {
             width: '100%',
             height: '100%',
             position: 'absolute'
-          }}>
+          }}
+        >
           <View
             style={{
               width: '100%',
@@ -513,17 +504,18 @@ const NotesnookShare = ({quicknote = false}) => {
           marginBottom: insets.top,
           transform: [
             {
-              translateY:
-                Platform.OS !== 'ios' ? translate : showSearch ? 1000 : 0
+              translateY: Platform.OS !== 'ios' ? translate : showSearch ? 1000 : 0
             }
           ]
         }}
-        behavior={Platform.OS === 'ios' ? 'padding' : null}>
+        behavior={Platform.OS === 'ios' ? 'padding' : null}
+      >
         <View
           style={{
             maxHeight: '100%',
             paddingHorizontal: 12
-          }}>
+          }}
+        >
           <ScrollView
             horizontal
             contentContainerStyle={{
@@ -535,7 +527,8 @@ const NotesnookShare = ({quicknote = false}) => {
               height: 45,
               borderRadius: 10,
               flexDirection: 'row'
-            }}>
+            }}
+          >
             <Button
               color={appendNote ? colors.nav : accent.color}
               onPress={() => {
@@ -562,9 +555,7 @@ const NotesnookShare = ({quicknote = false}) => {
               icon="text-short"
               iconSize={18}
               iconColor={appendNote ? colors.light : colors.icon}
-              title={`${
-                appendNote ? appendNote.title.slice(0, 25) : 'Append to note'
-              }`}
+              title={`${appendNote ? appendNote.title.slice(0, 25) : 'Append to note'}`}
               textColor={appendNote ? colors.light : colors.icon}
               type="rounded"
               style={{
@@ -577,7 +568,8 @@ const NotesnookShare = ({quicknote = false}) => {
           <View
             style={{
               width: '100%'
-            }}>
+            }}
+          >
             {!quicknote ? (
               <Button
                 color={accent.color}
@@ -586,7 +578,6 @@ const NotesnookShare = ({quicknote = false}) => {
                 icon="check"
                 iconSize={25}
                 type="action"
-                loading={loading}
                 iconColor={colors.light}
                 style={{
                   position: 'absolute',
@@ -606,14 +597,16 @@ const NotesnookShare = ({quicknote = false}) => {
                 ...getElevation(quicknote ? 1 : 5),
                 backgroundColor: colors.bg,
                 overflow: 'hidden'
-              }}>
+              }}
+            >
               <View
                 style={{
                   width: '100%',
                   height: height * 0.25,
                   paddingBottom: 15,
                   borderRadius: 10
-                }}>
+                }}
+              >
                 <WebView
                   onLoad={onLoad}
                   ref={webviewRef}
@@ -629,9 +622,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   bounces={false}
                   allowFileAccess={true}
                   scalesPageToFit={true}
-                  allowingReadAccessToURL={
-                    Platform.OS === 'android' ? true : null
-                  }
+                  allowingReadAccessToURL={Platform.OS === 'android' ? true : null}
                   onMessage={onMessage}
                   onShouldStartLoadWithRequest={onShouldStartLoadWithRequest}
                   allowFileAccessFromFileURLs={true}
@@ -641,7 +632,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   cacheEnabled={true}
                   source={
                     Platform.OS === 'ios'
-                      ? {uri: sourceUri}
+                      ? { uri: sourceUri }
                       : {
                           uri: 'file:///android_asset/plaineditor.html',
                           baseUrl: 'file:///android_asset/'
@@ -659,13 +650,15 @@ const NotesnookShare = ({quicknote = false}) => {
                     paddingHorizontal: 12,
                     marginBottom: 10,
                     flexWrap: 'wrap'
-                  }}>
+                  }}
+                >
                   This shared note will be appended to{' '}
                   <Text
                     style={{
                       color: accent.color,
                       fontFamily: 'OpenSans-SemiBold'
-                    }}>
+                    }}
+                  >
                     "{appendNote.title}"
                   </Text>{' '}
                   . Click on "Create new note" to add to a new note instead.
@@ -678,7 +671,8 @@ const NotesnookShare = ({quicknote = false}) => {
                   paddingHorizontal: 12,
                   paddingRight: 80,
                   alignItems: 'center'
-                }}>
+                }}
+              >
                 {rawData.value && isURL(rawData.value) ? (
                   <Button
                     color={mode == 2 ? colors.shade : colors.nav}
@@ -689,7 +683,7 @@ const NotesnookShare = ({quicknote = false}) => {
                     iconColor={mode == 2 ? accent.color : colors.icon}
                     textColor={mode == 2 ? accent.color : colors.icon}
                     type="rounded"
-                    style={{paddingHorizontal: 12}}
+                    style={{ paddingHorizontal: 12 }}
                   />
                 ) : null}
                 <Button
@@ -701,7 +695,7 @@ const NotesnookShare = ({quicknote = false}) => {
                   iconColor={mode == 1 ? accent.color : colors.icon}
                   textColor={mode == 1 ? accent.color : colors.icon}
                   type="rounded"
-                  style={{paddingHorizontal: 12}}
+                  style={{ paddingHorizontal: 12 }}
                 />
               </View>
             </View>
@@ -789,12 +783,11 @@ const Button = ({
         },
         types[type].style,
         style
-      ]}>
+      ]}
+    >
       {loading ? <ActivityIndicator color={iconColor} /> : null}
 
-      {icon && !loading ? (
-        <Icon name={icon} size={iconSize} color={iconColor || 'white'} />
-      ) : null}
+      {icon && !loading ? <Icon name={icon} size={iconSize} color={iconColor || 'white'} /> : null}
 
       {title ? (
         <Text
@@ -807,7 +800,8 @@ const Button = ({
             },
             textStyle,
             types[type].textStyle
-          ]}>
+          ]}
+        >
           {title}
         </Text>
       ) : null}

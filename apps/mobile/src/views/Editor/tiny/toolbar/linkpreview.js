@@ -1,3 +1,4 @@
+import { getLinkPreview } from 'link-preview-js';
 import React, { useEffect, useState } from 'react';
 import { Image, Linking, ScrollView, TouchableOpacity, View } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -12,7 +13,6 @@ import isEmail from 'validator/lib/isEmail';
 import isURL from 'validator/lib/isURL';
 import isMobilePhone from 'validator/lib/isMobilePhone';
 import { ToastEvent } from '../../../../services/EventManager';
-import { getLinkPreview } from '../../../../utils/linkpreview';
 
 let prevLink = {};
 const LinkPreview = ({ setMode, value, onSubmit }) => {
@@ -25,23 +25,24 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
     if (value && prevLink.value !== value) {
       getLinkPreview(value)
         .then(r => {
-          prevLink = {
-            value: value,
-            name: r.siteName,
-            title: r.title,
-            description: r.description,
-            image: r.image
-          };
-          setLink(prevLink);
+          if (r.contentType?.includes('text/html')) {
+            prevLink = {
+              value: value,
+              name: r.siteName,
+              title: r.title,
+              description: r.description,
+              image: r.images && r.images[0],
+              favicon: r.favicons && r.favicons[0]
+            };
+            setLink(prevLink);
+          }
         })
-        .catch(e => {
-          console.log(e);
-        });
+        .catch(console.log);
     }
   }, [value]);
 
-  const renderImage = image => {
-    return image ? (
+  const renderImage = (imageLink, faviconLink) => {
+    return imageLink ? (
       <Image
         style={{
           width: 35,
@@ -54,8 +55,27 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
           marginRight: 5
         }}
         resizeMode="contain"
-        source={{ uri: image }}
+        source={{ uri: imageLink }}
       />
+    ) : faviconLink ? (
+      <View
+        style={{
+          borderColor: colors.nav,
+          backgroundColor: colors.nav,
+          borderWidth: 1,
+          marginVertical: 5,
+          borderRadius: 5
+        }}
+      >
+        <Image
+          style={{
+            width: 35,
+            height: 35
+          }}
+          resizeMode="center"
+          source={{ uri: faviconLink }}
+        />
+      </View>
     ) : (
       <View
         style={{
@@ -64,7 +84,7 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
           marginVertical: 5,
           justifyContent: 'center',
           alignItems: 'center',
-          backgroundColor: colors.nav,
+          backgroundColor: colors.shade,
           borderRadius: 5
         }}
       >
@@ -91,8 +111,8 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
 
     if (isURL(value)) {
       openLinkInBrowser(value, colors)
-        .catch(e => {})
-        .then(async r => {
+        .catch(console.log)
+        .then(async () => {
           console.log('closed browser now');
           await reFocusEditor();
         });
@@ -148,7 +168,7 @@ const LinkPreview = ({ setMode, value, onSubmit }) => {
         alignItems: 'center'
       }}
     >
-      {renderImage(link.image)}
+      {renderImage(link.image, link.favicon)}
       {renderText(link.name, link.title, link.description)}
 
       <View
