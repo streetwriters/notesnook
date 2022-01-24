@@ -27,9 +27,10 @@ jobs:
         with:
           node-version: 16.x
       - run: |
+          cd app/importer
           npm i
-          npx turbo run build
-          mv ./apps/importer/build/ ./apps/importer/public_html/
+          npm run build
+          mv ./build/ ./public_html/
 
       - uses: blbecker/rsync-deploy@v1.0
         with:
