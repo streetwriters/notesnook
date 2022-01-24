@@ -1,13 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  AppState,
-  KeyboardAvoidingView,
-  LayoutAnimation,
-  Platform,
-  SafeAreaView,
-  TextInput,
-  View
-} from 'react-native';
+import { AppState, KeyboardAvoidingView, SafeAreaView, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/Premium/premium-toast';
@@ -38,9 +30,9 @@ export const EditorWrapper = ({ width }) => {
 
   useEffect(() => {
     if (loading) return;
-    AppState.addEventListener('change', onAppStateChanged);
+    let sub = AppState.addEventListener('change', onAppStateChanged);
     return () => {
-      AppState.removeEventListener('change', onAppStateChanged);
+      sub?.remove();
     };
   }, [loading]);
 
@@ -53,8 +45,6 @@ export const EditorWrapper = ({ width }) => {
         backgroundColor: state.colors.bg,
         borderLeftWidth: DDS.isTab ? 1 : 0,
         borderLeftColor: DDS.isTab ? colors.nav : 'transparent'
-        // paddingTop: Platform.OS === 'ios' ? insets.top : 0,
-        // paddingBottom: Platform.OS === 'ios' ? insets.bottom : 0
       }}
     >
       <SafeAreaView
@@ -69,7 +59,7 @@ export const EditorWrapper = ({ width }) => {
             width: '100%',
             height: '100%'
           }}
-          enabled={!floating && Platform.OS === 'ios'}
+          enabled={!floating}
         >
           <PremiumToast key="toast" context="editor" offset={50 + insets.top} />
           <TextInput

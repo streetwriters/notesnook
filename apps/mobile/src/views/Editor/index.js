@@ -90,10 +90,10 @@ const Editor = React.memo(
             testID={notesnook.editor.id}
             ref={EditorWebView}
             onLoad={onLoad}
-            onRenderProcessGone={event => {
+            onRenderProcessGone={() => {
               onResetRequested();
             }}
-            onError={event => {
+            onError={() => {
               onResetRequested();
             }}
             injectedJavaScript={`
