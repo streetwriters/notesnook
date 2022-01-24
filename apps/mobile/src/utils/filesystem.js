@@ -71,9 +71,10 @@ async function uploadFile(filename, data, cancelToken) {
       method: 'PUT',
       headers
     });
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve upload url`)
     const uploadUrl = await res.text();
-    console.log(uploadUrl);
-    console.log(uploadUrl);
+    if (!uploadUrl) throw new Error("Unable to resolve upload url");
+
     let request = RNFetchBlob.config({
       IOSBackgroundTask: true
     })
@@ -154,7 +155,10 @@ async function downloadFile(filename, data, cancelToken) {
       method: 'GET',
       headers
     });
+    if (!res.ok) throw new Error(`${res.status}: Unable to resolve download url`)
     const downloadUrl = await res.text();
+
+    if (!downloadUrl) throw new Error("Unable to resolve download url")
     let totalSize = 0;
     let request = RNFetchBlob.config({
       path: path,
