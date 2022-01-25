@@ -319,9 +319,9 @@ export const useAppEvents = () => {
   };
 
   const setCurrentUser = async login => {
+    let user;
     try {
-      let user = await db.user.getUser();
-
+      user = await db.user.getUser();
       let isUserEmailConfirmed = await MMKV.getStringAsync('isUserEmailConfirmed');
 
       if ((await MMKV.getItem('loginSessionHasExpired')) === 'expired') {
@@ -362,8 +362,7 @@ export const useAppEvents = () => {
         setLoginMessage();
       }
     } catch (e) {
-      let user = await db.user.getUser();
-
+      user = await db.user.getUser();
       if (user?.isEmailConfirmed) {
         let hasSavedRecoveryKey = await MMKV.getItem('userHasSavedRecoveryKey');
         if (!hasSavedRecoveryKey) {
@@ -380,7 +379,8 @@ export const useAppEvents = () => {
       }
     } finally {
       await PremiumService.setPremiumStatus();
-      if (PremiumService.get()) {
+      user = await db.user.getUser();
+      if (PremiumService.get() && user) {
         if (SettingsService.get().reminder === 'off') {
           await SettingsService.set('reminder', 'daily');
           sleep(2000).then(() => Backup.checkAndRun());
