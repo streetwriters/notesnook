@@ -4,16 +4,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppLoader from './src/components/AppLoader';
 import { RootView } from './src/navigation/RootView';
 import { useTracked } from './src/provider';
-import {
-  initialize, useSettingStore,
-  useUserStore
-} from './src/provider/stores';
+import { initialize, useSettingStore, useUserStore } from './src/provider/stores';
 import { DDS } from './src/services/DeviceDetection';
-import {
-  eSendEvent,
-  eSubscribeEvent,
-  eUnSubscribeEvent
-} from './src/services/EventManager';
+import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from './src/services/EventManager';
 import Notifications from './src/services/Notifications';
 import SettingsService from './src/services/SettingsService';
 import { Tracker } from './src/utils';
@@ -21,20 +14,19 @@ import { db } from './src/utils/database';
 import { eDispatchAction } from './src/utils/Events';
 import { MMKV } from './src/utils/mmkv';
 import { useAppEvents } from './src/utils/use-app-events';
-import RNBootSplash from "react-native-bootsplash";
 
 let databaseHasLoaded = false;
 
 const loadDatabase = async () => {
-  RNBootSplash.hide({fade:true})
+  let requireIntro = await MMKV.getItem('introCompleted');
+  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
   await db.init();
   Notifications.get();
   await checkFirstLaunch();
 };
 
 async function checkFirstLaunch() {
-  let requireIntro = await MMKV.getItem('introCompleted');
-  useSettingStore.getState().setIntroCompleted(requireIntro ? true : false);
+  let requireIntro = useSettingStore.getState().isIntroCompleted;
   if (!requireIntro) {
     await MMKV.setItem(
       'askForRating',
@@ -54,18 +46,10 @@ async function checkFirstLaunch() {
 function checkOrientation() {
   Orientation.getOrientation((e, r) => {
     DDS.checkSmallTab(r);
+    useSettingStore.getState().setDimensions({ width: DDS.width, height: DDS.height });
     useSettingStore
       .getState()
-      .setDimensions({width: DDS.width, height: DDS.height});
-    useSettingStore
-      .getState()
-      .setDeviceMode(
-        DDS.isLargeTablet()
-          ? 'tablet'
-          : DDS.isSmallTab
-          ? 'smallTablet'
-          : 'mobile'
-      );
+      .setDeviceMode(DDS.isLargeTablet() ? 'tablet' : DDS.isSmallTab ? 'smallTablet' : 'mobile');
   });
 }
 
@@ -87,10 +71,7 @@ const App = () => {
     (async () => {
       try {
         await SettingsService.init();
-        if (
-          SettingsService.get().appLockMode &&
-          SettingsService.get().appLockMode !== 'none'
-        ) {
+        if (SettingsService.get().appLockMode && SettingsService.get().appLockMode !== 'none') {
           setVerifyUser(true);
         }
         await loadDatabase();

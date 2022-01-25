@@ -5,13 +5,11 @@ import { Placeholder } from '../../components/ListPlaceholders';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
 import { useTagStore } from '../../provider/stores';
-import { eSendEvent } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
-import { eScrollEvent } from '../../utils/Events';
 
-export const Tags = ({ route, navigation }) => {
+export const Tags = ({ navigation }) => {
   const tags = useTagStore(state => state.tags);
   const setTags = useTagStore(state => state.setTags);
   let ranAfterInteractions = false;

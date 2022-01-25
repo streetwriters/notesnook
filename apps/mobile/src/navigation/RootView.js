@@ -339,7 +339,7 @@ const NativeStack = React.memo(
           backgroundColor: colors.bg
         }}
       >
-        <StatusBar animated="true" barStyle={colors.night ? 'light-content' : 'dark-content'} />
+        <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />
         {deviceMode ? (
           <CustomTabs
             ref={tabBarRef}

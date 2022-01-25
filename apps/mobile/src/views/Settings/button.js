@@ -5,14 +5,7 @@ import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
 import { SIZE } from '../../utils/SizeUtils';
 
-export const CustomButton = ({
-  title,
-  tagline,
-  customComponent,
-  onPress,
-  maxWidth = '100%',
-  color = null
-}) => {
+export const CustomButton = ({ title, tagline, customComponent, onPress, color = null }) => {
   const [state] = useTracked();
   const { colors } = state;
   return (

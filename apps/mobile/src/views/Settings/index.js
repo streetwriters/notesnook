@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Linking, Platform, ScrollView, View } from 'react-native';
+import { APP_VERSION } from '../../../version';
 import { Button as MButton } from '../../components/Button/index';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import { Issue } from '../../components/Github/issue';
@@ -7,11 +8,9 @@ import { Header as TopHeader } from '../../components/Header/index';
 import Seperator from '../../components/Seperator';
 import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
-import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
+import { eSendEvent, presentSheet } from '../../services/EventManager';
 import Navigation from '../../services/Navigation';
 import { InteractionManager, STORE_LINK } from '../../utils';
-import { APP_VERSION } from '../../../version';
-import { db } from '../../utils/database';
 import { eScrollEvent, eUpdateSearchState } from '../../utils/Events';
 import { openLinkInBrowser } from '../../utils/functions';
 import SettingsAppearanceSection from './appearance';
@@ -23,19 +22,16 @@ import AccoutLogoutSection from './logout';
 import SettingsPrivacyAndSecurity from './privacy';
 import SectionHeader from './section-header';
 import SettingsUserSection from './user-section';
-import { Update } from '../../components/Update';
-import { checkVersion } from 'react-native-check-version';
 
 const format = ver => {
   let parts = ver.toString().split('');
-
   return `v${parts[0]}.${parts[1]}.${parts[2]?.startsWith('0') ? parts[2]?.slice(1) : parts[2]}${
-    parts[3] === '0' ? '' : parts[3]
+    !parts[3] || parts[2] === '0' ? '' : parts[3]
   } `;
 };
 
 export const Settings = ({ navigation }) => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const { colors } = state;
   const [collapsed, setCollapsed] = useState(false);
 

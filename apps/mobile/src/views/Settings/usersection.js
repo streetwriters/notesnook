@@ -5,11 +5,10 @@ import * as RNIap from 'react-native-iap';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Button } from '../../components/Button';
 import Seperator from '../../components/Seperator';
-import { Card } from '../../components/SimpleList/card';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
-import { useMessageStore, useUserStore } from '../../provider/stores';
+import { useUserStore } from '../../provider/stores';
 import { eSendEvent, presentSheet, ToastEvent } from '../../services/EventManager';
 import PremiumService from '../../services/PremiumService';
 import Sync from '../../services/Sync';
@@ -42,7 +41,6 @@ const SettingsUserSection = () => {
   const { colors } = state;
 
   const user = useUserStore(state => state.user);
-  const messageBoardState = useMessageStore(state => state.message);
   const subscriptionDaysLeft = user && getTimeLeft(parseInt(user.subscription?.expiry));
   const isExpired = user && subscriptionDaysLeft.time < 0;
   const expiryDate = dayjs(user?.subscription?.expiry).format('MMMM D, YYYY');

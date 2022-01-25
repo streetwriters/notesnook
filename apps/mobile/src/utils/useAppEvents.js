@@ -423,11 +423,11 @@ export const useAppEvents = () => {
         if (refValues.current?.prevState === 'background' && !refValues.current?.showingDialog) {
           refValues.current.showingDialog = true;
           refValues.current.prevState = 'active';
-          eSendEvent('load_overlay', 'hide');
+          useUserStore.getState().setVerifyUser(true);
+
           let result = await BiometricService.validateUser('Unlock to access your notes');
           if (result) {
             refValues.current.showingDialog = false;
-            eSendEvent('load_overlay', 'show');
           } else {
             RNExitApp.exitApp();
             return;

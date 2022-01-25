@@ -51,13 +51,13 @@ export const useEditorTags = () => {
     load();
   }, [noteTags]);
 
-  const hideTagBar = `
-    toggleNode(".tag-bar-parent","hide"); 
-    clearNode(".tag-bar")`;
-  const showTagBar = `
-    toggleNode(".tag-bar-parent","show");
-    clearNode(".tag-bar")`;
-  const clearNode = `clearNode(".tag-bar")`;
+  // const hideTagBar = `
+  //   toggleNode(".tag-bar-parent","hide");
+  //   clearNode(".tag-bar")`;
+  // const showTagBar = `
+  //   toggleNode(".tag-bar-parent","show");
+  //   clearNode(".tag-bar")`;
+  // const clearNode = `clearNode(".tag-bar")`;
   const renderTags = tags => `(function() {
       clearNode(".tag-bar");
       toggleNode(".tag-bar-parent","show")

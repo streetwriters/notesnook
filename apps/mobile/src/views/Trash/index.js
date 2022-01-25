@@ -13,7 +13,7 @@ import SearchService from '../../services/SearchService';
 import { InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
 
-export const Trash = ({ route, navigation }) => {
+export const Trash = ({ navigation }) => {
   const trash = useTrashStore(state => state.trash);
   const setTrash = useTrashStore(state => state.setTrash);
   let pageIsLoaded = false;

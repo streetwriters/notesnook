@@ -80,12 +80,12 @@ const SettingsAppearanceSection = () => {
     }
   };
 
-  const reduceAnimations = async () => {
-    await SettingsService.set(
-      'reduceAnimations',
-      SettingsService.get().reduceAnimations ? false : true
-    );
-  };
+  // const reduceAnimations = async () => {
+  //   await SettingsService.set(
+  //     'reduceAnimations',
+  //     SettingsService.get().reduceAnimations ? false : true
+  //   );
+  // };
 
   return (
     <>
@@ -262,7 +262,7 @@ const SettingsAppearanceSection = () => {
                 offColor={colors.icon}
                 size="small"
                 animationSpeed={150}
-                onToggle={async isOn => {
+                onToggle={async () => {
                   if (!colors.night) {
                     await MMKV.setStringAsync('theme', JSON.stringify({ night: true }));
                     changeColorScheme(COLOR_SCHEME_DARK);
@@ -305,7 +305,7 @@ const SettingsAppearanceSection = () => {
                   </TouchableOpacity>
                 }
               >
-                {MenuItemsList.slice(0, MenuItemsList.length - 1).map((item, index) => (
+                {MenuItemsList.slice(0, MenuItemsList.length - 1).map(item => (
                   <MenuItem
                     key={item.name}
                     onPress={async () => {

@@ -2,16 +2,13 @@ import React, { useCallback, useEffect } from 'react';
 import { ContainerTopSection } from '../../components/Container/ContainerTopSection';
 import SelectionHeader from '../../components/SelectionHeader';
 import SimpleList from '../../components/SimpleList';
-import { useTracked } from '../../provider';
 import { useSearchStore } from '../../provider/stores';
 import SearchService from '../../services/SearchService';
 import { inputRef } from '../../utils/Refs';
 import { sleep } from '../../utils/TimeUtils';
 import { SearchBar } from './search-bar';
 
-export const Search = ({ route, navigation }) => {
-  const [state, dispatch] = useTracked();
-
+export const Search = ({ navigation }) => {
   const searchResults = useSearchStore(state => state.searchResults);
   const searching = useSearchStore(state => state.searching);
   const searchStatus = useSearchStore(state => state.searchStatus);

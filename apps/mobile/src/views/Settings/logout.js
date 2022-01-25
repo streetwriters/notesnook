@@ -1,15 +1,9 @@
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import { View } from 'react-native';
 import AnimatedProgress from 'react-native-reanimated-progress-bar';
 import BaseDialog from '../../components/Dialog/base-dialog';
-import DialogButtons from '../../components/Dialog/dialog-buttons';
-import DialogContainer from '../../components/Dialog/dialog-container';
-import DialogHeader from '../../components/Dialog/dialog-header';
 import { presentDialog } from '../../components/Dialog/functions';
-import Input from '../../components/Input';
 import { PressableButton } from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import { Toast } from '../../components/Toast';
 import Heading from '../../components/Typography/Heading';
 import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
@@ -22,11 +16,10 @@ import Storage from '../../utils/storage';
 import { sleep } from '../../utils/TimeUtils';
 
 const AccoutLogoutSection = () => {
-  const [state, dispatch] = useTracked();
+  const [state] = useTracked();
   const { colors } = state;
   const user = useUserStore(state => state.user);
   const [loading, setLoading] = useState(false);
-  const passwordValue = useRef();
 
   return !user ? null : (
     <>

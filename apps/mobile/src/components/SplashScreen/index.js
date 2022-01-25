@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, Image, View } from 'react-native';
 import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -11,7 +11,7 @@ import { sleep } from '../../utils/TimeUtils';
 import umami from '../../utils/umami';
 import { Button } from '../Button';
 import { SvgToPngView } from '../ListPlaceholders';
-import MovableView from '../Transitions/movableview';
+import { BouncingView } from '../Transitions/bouncing-view';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
@@ -22,10 +22,10 @@ const SVG_Z = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 245.487 113.
 const SplashScreen = () => {
   const [state] = useTracked();
   const { colors } = state;
-  const isIntroCompleted = false; //useSettingStore(state => state.isIntroCompleted);
+  const isIntroCompleted = useSettingStore(state => state.isIntroCompleted);
   const setIntroCompleted = useSettingStore(state => state.setIntroCompleted);
   const opacity = useValue(0);
-  const translateY = useValue(20);
+  const translateY = useValue(5);
   const translateY2 = useValue(0);
 
   useEffect(() => {
@@ -34,12 +34,12 @@ const SplashScreen = () => {
       setTimeout(() => {
         timing(opacity, {
           toValue: 1,
-          duration: 300,
+          duration: 600,
           easing: Easing.in(Easing.ease)
         }).start();
         timing(translateY, {
           toValue: 0,
-          duration: 500,
+          duration: 1000,
           easing: Easing.in(Easing.ease)
         }).start();
       }, 15);
@@ -80,12 +80,18 @@ const SplashScreen = () => {
             marginTop: 25
           }}
         >
-          <View
+          <Animated.View
             style={{
               width: '100%',
               height: '100%',
               justifyContent: 'center',
-              alignItems: 'center'
+              alignItems: 'center',
+              opacity: opacity,
+              transform: [
+                {
+                  translateY: translateY
+                }
+              ]
             }}
           >
             <Image
@@ -149,20 +155,21 @@ const SplashScreen = () => {
               />
             </View>
 
-            <View
+            <BouncingView
               style={{
                 position: 'absolute',
                 bottom: -100,
                 zIndex: -1
               }}
+              duration={3000}
             >
               <SvgToPngView
                 width={Dimensions.get('window').width}
                 height={Dimensions.get('window').width}
                 src={SVG_Z}
               />
-            </View>
-          </View>
+            </BouncingView>
+          </Animated.View>
         </SafeAreaView>
       </Animated.View>
     )
