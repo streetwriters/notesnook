@@ -84,7 +84,9 @@ const SplashScreen = () => {
           style={{
             width: '100%',
             height: '100%',
-            marginTop: 25
+            marginTop: 25,
+            maxWidth: 600,
+            alignSelf: 'center'
           }}
         >
           <Animated.View
@@ -118,7 +120,11 @@ const SplashScreen = () => {
                 marginBottom: 100
               }}
             >
-              <SvgToPngView width={height / 4} height={height / 4} src={SVG_D} />
+              <SvgToPngView
+                width={height / 4 > 200 ? 200 : height / 4}
+                height={height / 4 > 200 ? 200 : height / 4}
+                src={SVG_D}
+              />
 
               <View
                 style={{
@@ -148,11 +154,12 @@ const SplashScreen = () => {
                 style={{
                   flexDirection: 'row',
                   alignSelf: 'center',
-                  maxWidth: '90%',
+                  width: '90%',
                   marginBottom: 12,
                   paddingHorizontal: 12,
                   justifyContent: 'center',
-                  padding: 12
+                  padding: 12,
+                  maxWidth: 500
                 }}
                 onPress={async () => {
                   await SettingsService.set('telemetry', !isTelemetryEnabled);
