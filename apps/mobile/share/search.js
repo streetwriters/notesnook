@@ -1,5 +1,5 @@
-import React, {useEffect, useRef, useState} from 'react';
-import {StatusBar} from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
+import { StatusBar } from 'react-native';
 import {
   ActivityIndicator,
   FlatList,
@@ -10,26 +10,23 @@ import {
   useWindowDimensions,
   View
 } from 'react-native';
-import {useSafeAreaInsets} from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {getElevation} from '../src/utils';
-import {db} from '../src/utils/database';
-import {useShareStore} from './store';
+import { getElevation } from '../src/utils';
+import { db } from '../src/utils/database';
+import { useShareStore } from './store';
 
-export const Search = ({close, getKeyboardHeight, quicknote}) => {
+export const Search = ({ close, getKeyboardHeight, quicknote }) => {
   const colors = useShareStore(state => state.colors);
   const setAppendNote = useShareStore(state => state.setAppendNote);
   const [results, setResults] = useState([]);
   const [searching, setSearching] = useState(false);
   const searchKeyword = useRef(null);
-  const {width, height} = useWindowDimensions();
+  const { width, height } = useWindowDimensions();
   const notes = useRef(null);
   const timer = useRef(null);
   const inputRef = useRef();
-  const insets =
-    Platform.OS === 'android'
-      ? {top: StatusBar.currentHeight}
-      : useSafeAreaInsets();
+  const insets = Platform.OS === 'android' ? { top: StatusBar.currentHeight } : useSafeAreaInsets();
 
   const onSelectItem = async item => {
     if (item.locked) {
@@ -65,7 +62,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
     (async () => {
       await db.init();
       await db.notes.init();
-      notes.current = db.notes.all
+      notes.current = db.notes.all;
       setResults(notes.current);
     })();
     setTimeout(() => {
@@ -73,35 +70,39 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
     }, 300);
   }, []);
 
-  const renderItem = ({item, index}) => !item.locked ? (
-    <TouchableOpacity
-      activeOpacity={0.7}
-      onPress={() => onSelectItem(item)}
-      style={{
-        height: 50,
-        paddingHorizontal: 12
-      }}>
-      <Text
-        numberOfLines={1}
+  const renderItem = ({ item, index }) =>
+    !item.locked ? (
+      <TouchableOpacity
+        activeOpacity={0.7}
+        onPress={() => onSelectItem(item)}
         style={{
-          color: colors.pri,
-          fontFamily: 'OpenSans-SemiBold',
-          fontSize: 15
-        }}>
-        {item.title}
-      </Text>
+          height: 50,
+          paddingHorizontal: 12
+        }}
+      >
+        <Text
+          numberOfLines={1}
+          style={{
+            color: colors.pri,
+            fontFamily: 'OpenSans-SemiBold',
+            fontSize: 15
+          }}
+        >
+          {item.title}
+        </Text>
 
-      <Text
-        numberOfLines={1}
-        style={{
-          color: colors.icon,
-          fontSize: 12,
-          fontFamily: 'OpenSans-Regular'
-        }}>
-        {item.headline}
-      </Text>
-    </TouchableOpacity>
-  ) : null
+        <Text
+          numberOfLines={1}
+          style={{
+            color: colors.icon,
+            fontSize: 12,
+            fontFamily: 'OpenSans-Regular'
+          }}
+        >
+          {item.headline}
+        </Text>
+      </TouchableOpacity>
+    ) : null;
 
   let extra = quicknote
     ? {
@@ -123,7 +124,8 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
         zIndex: 999,
         ...getElevation(quicknote ? 1 : 5),
         ...extra
-      }}>
+      }}
+    >
       <View
         style={{
           flexShrink: 1,
@@ -133,7 +135,8 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
           paddingHorizontal: 12,
           marginBottom: 10,
           height: 50
-        }}>
+        }}
+      >
         <TextInput
           ref={inputRef}
           placeholder="Search for a note"
@@ -152,12 +155,7 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
         {searching ? (
           <ActivityIndicator size={25} color={colors.icon} />
         ) : (
-          <Icon
-            name="magnify"
-            color={colors.pri}
-            size={25}
-            onPress={onSearch}
-          />
+          <Icon name="magnify" color={colors.pri} size={25} onPress={onSearch} />
         )}
       </View>
 
@@ -177,12 +175,14 @@ export const Search = ({close, getKeyboardHeight, quicknote}) => {
               justifyContent: 'center',
               alignItems: 'center',
               height: 200
-            }}>
+            }}
+          >
             <Text
               style={{
                 fontFamily: 'OpenSans-Regular',
                 color: colors.icon
-              }}>
+              }}
+            >
               Search for a note to append to it.
             </Text>
           </View>
