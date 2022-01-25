@@ -388,7 +388,6 @@ const NotesnookShare = ({ quicknote = false }) => {
       style={{
         width: width > 500 ? 500 : width,
         height: height,
-        justifyContent: quicknote ? 'flex-start' : 'flex-end',
         opacity: Platform.OS !== 'ios' ? opacity : 1,
         alignSelf: 'center'
       }}
@@ -502,11 +501,7 @@ const NotesnookShare = ({ quicknote = false }) => {
           paddingVertical: 25,
           backgroundColor: 'transparent',
           marginBottom: insets.top,
-          transform: [
-            {
-              translateY: Platform.OS !== 'ios' ? translate : showSearch ? 1000 : 0
-            }
-          ]
+          display: showSearch ? 'none' : 'flex'
         }}
         behavior={Platform.OS === 'ios' ? 'padding' : null}
       >
@@ -524,7 +519,7 @@ const NotesnookShare = ({ quicknote = false }) => {
             }}
             style={{
               width: '100%',
-              height: 45,
+              height: 35,
               borderRadius: 10,
               flexDirection: 'row'
             }}
@@ -540,9 +535,13 @@ const NotesnookShare = ({ quicknote = false }) => {
               title="Create new note"
               textColor={!appendNote ? colors.light : colors.icon}
               type="rounded"
+              textStyle={{
+                fontSize: 13
+              }}
               style={{
                 paddingHorizontal: 12,
-                ...getElevation(1)
+                ...getElevation(1),
+                height: 35
               }}
             />
 
@@ -558,9 +557,13 @@ const NotesnookShare = ({ quicknote = false }) => {
               title={`${appendNote ? appendNote.title.slice(0, 25) : 'Append to note'}`}
               textColor={appendNote ? colors.light : colors.icon}
               type="rounded"
+              textStyle={{
+                fontSize: 13
+              }}
               style={{
                 paddingHorizontal: 12,
-                ...getElevation(1)
+                ...getElevation(1),
+                height: 35
               }}
             />
           </ScrollView>
@@ -576,15 +579,17 @@ const NotesnookShare = ({ quicknote = false }) => {
                 onPress={onPress}
                 loading={loading || loadingIntent}
                 icon="check"
-                iconSize={25}
-                type="action"
+                iconSize={22}
                 iconColor={colors.light}
                 style={{
                   position: 'absolute',
                   zIndex: 999,
                   ...getElevation(10),
                   right: 24,
-                  bottom: -35
+                  bottom: -25,
+                  paddingHorizontal: 24,
+                  height: 35,
+                  borderRadius: 100
                 }}
               />
             ) : null}
@@ -798,8 +803,8 @@ const Button = ({
               color: textColor,
               marginLeft: loading ? 10 : 0
             },
-            textStyle,
-            types[type].textStyle
+            types[type].textStyle,
+            textStyle
           ]}
         >
           {title}
