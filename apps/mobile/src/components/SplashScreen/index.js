@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Dimensions, Image, View, TouchableOpacity } from 'react-native';
+import { Dimensions, Image, View, TouchableOpacity, useWindowDimensions } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Animated, { Easing, timing, useValue } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -29,6 +29,7 @@ const SplashScreen = () => {
   const setIntroCompleted = useSettingStore(state => state.setIntroCompleted);
   const settings = useSettingStore(state => state.settings);
   const isTelemetryEnabled = settings.telemetry;
+  const { height } = useWindowDimensions();
 
   const opacity = useValue(0);
   const translateY = useValue(5);
@@ -117,7 +118,8 @@ const SplashScreen = () => {
                 marginBottom: 100
               }}
             >
-              <SvgToPngView width={200} height={200} src={SVG_D} />
+              <SvgToPngView width={height / 4} height={height / 4} src={SVG_D} />
+
               <View
                 style={{
                   marginTop: 40,
@@ -138,10 +140,11 @@ const SplashScreen = () => {
                 width: '100%',
                 zIndex: 20,
                 position: 'absolute',
-                bottom: 80
+                bottom: height / 10
               }}
             >
               <TouchableOpacity
+                activeOpacity={1}
                 style={{
                   flexDirection: 'row',
                   alignSelf: 'center',
@@ -178,10 +181,10 @@ const SplashScreen = () => {
                 height={45}
                 width={250}
                 onPress={async () => {
+                  AppLock.present(true);
                   await hide();
                   await MMKV.setItem('introCompleted', 'true');
                   umami.pageView('/home', '/welcome');
-                  AppLock.present(true);
                 }}
                 style={{
                   paddingHorizontal: 24,

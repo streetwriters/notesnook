@@ -75,7 +75,9 @@ const AppLock = welcome => {
 
             <View>
               <Heading>Protect your notes</Heading>
-              <Paragraph>Choose how you want to secure your notes locally.</Paragraph>
+              <Paragraph size={SIZE.md}>
+                Choose how you want to secure your notes locally.
+              </Paragraph>
             </View>
           </View>
           <Seperator />
@@ -122,32 +124,34 @@ const AppLock = welcome => {
               </PressableButton>
             ))}
 
-            <Button
-              fontSize={SIZE.md}
-              height={45}
-              width={250}
-              onPress={async () => {
-                LayoutAnimation.configureNext({
-                  ...LayoutAnimation.Presets.linear,
-                  delete: {
-                    duration: 50,
-                    property: 'opacity',
-                    type: 'linear'
-                  }
-                });
-                umami.pageView('/privacymode', '/welcome');
-                setStep(1);
-              }}
-              style={{
-                paddingHorizontal: 24,
-                alignSelf: 'center',
-                borderRadius: 100,
-                ...getElevation(5),
-                marginTop: 30
-              }}
-              type="accent"
-              title="Next"
-            />
+            {welcome && (
+              <Button
+                fontSize={SIZE.md}
+                height={45}
+                width={250}
+                onPress={async () => {
+                  LayoutAnimation.configureNext({
+                    ...LayoutAnimation.Presets.linear,
+                    delete: {
+                      duration: 50,
+                      property: 'opacity',
+                      type: 'linear'
+                    }
+                  });
+                  umami.pageView('/privacymode', '/welcome');
+                  setStep(1);
+                }}
+                style={{
+                  paddingHorizontal: 24,
+                  alignSelf: 'center',
+                  borderRadius: 100,
+                  ...getElevation(5),
+                  marginTop: 30
+                }}
+                type="accent"
+                title="Next"
+              />
+            )}
           </View>
         </>
       ) : (

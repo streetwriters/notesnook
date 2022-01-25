@@ -165,7 +165,7 @@ const SettingsPrivacyAndSecurity = () => {
           <CustomButton
             key="telemetry"
             title="Enable telemetry"
-            tagline="Usage data & crash reports will be sent to us for analytics (no 3rd party involved). All data is anonymous as mentioned in our privacy policy."
+            tagline="Help improve Notesnook by sending completely anonymized private analytics and bug reports."
             onPress={() => {
               SettingsService.set('telemetry', !settings.telemetry);
             }}
