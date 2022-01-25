@@ -7,10 +7,11 @@ import { name as appName } from './app.json';
 import Notifications from './src/services/Notifications';
 global.Buffer = require('buffer').Buffer;
 enableScreens(true);
-UIManager.setLayoutAnimationEnabledExperimental && UIManager.setLayoutAnimationEnabledExperimental(true);
+UIManager.setLayoutAnimationEnabledExperimental &&
+  UIManager.setLayoutAnimationEnabledExperimental(true);
 
 if (__DEV__) {
- LogBox.ignoreAllLogs();
+  LogBox.ignoreAllLogs();
 }
 
 let Provider;
