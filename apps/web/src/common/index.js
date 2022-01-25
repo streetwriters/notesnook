@@ -12,6 +12,7 @@ import { sanitizeFilename } from "../utils/filename";
 import { isTesting } from "../utils/platform";
 import { store as userstore } from "../stores/user-store";
 import FileSaver from "file-saver";
+import { showToast } from "../utils/toast";
 
 export const COLORS = [
   "Red",
@@ -107,6 +108,11 @@ export async function createBackup(save = true) {
       return await db.backup.export("web", encryptBackups);
     },
   });
+  if (!data) {
+    showToast("error", "Could not create a backup of your data.");
+    return;
+  }
+
   const filename = sanitizeFilename(
     `notesnook-backup-${new Date().toLocaleString("en")}`
   );
