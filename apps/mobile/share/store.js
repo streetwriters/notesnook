@@ -16,6 +16,11 @@ export const useShareStore = create((set, get) => ({
       set({ accent: accent });
     }
   },
+  setColors: () => {
+    set({
+      colors: Appearance.getColorScheme() === 'dark' ? COLOR_SCHEME_DARK : COLOR_SCHEME_LIGHT
+    });
+  },
   appendNote: null,
   setAppendNote: note => {
     MMKV.setItem('shareMenuAppendNote', JSON.stringify(note));

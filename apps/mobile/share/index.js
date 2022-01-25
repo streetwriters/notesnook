@@ -342,6 +342,7 @@ const NotesnookShare = ({ quicknote = false }) => {
   };
 
   useEffect(() => {
+    useShareStore.getState().setColors();
     onLoad();
   }, [note]);
 
