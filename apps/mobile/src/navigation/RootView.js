@@ -1,8 +1,9 @@
 import { activateKeepAwake, deactivateKeepAwake } from '@sayem314/react-native-keep-awake';
 import React, { useEffect, useRef } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { StatusBar } from 'react-native-bars';
 import Animated, { useValue } from 'react-native-reanimated';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { notesnook } from '../../e2e/test.ids';
 import CustomTabs from '../components/CustomTabs';
 import { DialogManager } from '../components/DialogManager';
@@ -91,6 +92,7 @@ const NativeStack = React.memo(
     const setDeviceModeState = useSettingStore(state => state.setDeviceMode);
     const dimensions = useSettingStore(state => state.dimensions);
     const setDimensions = useSettingStore(state => state.setDimensions);
+    const insets = useSafeAreaInsets();
     const animatedOpacity = useValue(0);
     const animatedTranslateY = useValue(-9999);
     const overlayRef = useRef();
@@ -336,7 +338,8 @@ const NativeStack = React.memo(
         style={{
           width: '100%',
           height: '100%',
-          backgroundColor: colors.bg
+          backgroundColor: colors.bg,
+          paddingBottom: Platform.OS === 'android' ? insets?.bottom : 0
         }}
       >
         <StatusBar animated={true} barStyle={colors.night ? 'light-content' : 'dark-content'} />

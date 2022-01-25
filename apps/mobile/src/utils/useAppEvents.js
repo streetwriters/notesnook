@@ -427,10 +427,8 @@ export const useAppEvents = () => {
 
           let result = await BiometricService.validateUser('Unlock to access your notes');
           if (result) {
+            useUserStore.getState().setVerifyUser(false);
             refValues.current.showingDialog = false;
-          } else {
-            RNExitApp.exitApp();
-            return;
           }
         }
       }

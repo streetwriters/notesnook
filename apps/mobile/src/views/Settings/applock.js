@@ -17,7 +17,7 @@ import { Button } from '../../components/Button';
 import { getElevation } from '../../utils';
 import umami from '../../utils/umami';
 
-const AppLock = welcome => {
+const AppLock = ({ welcome }) => {
   const [state] = useTracked();
   const { colors } = state;
   const settings = useSettingStore(state => state.settings);

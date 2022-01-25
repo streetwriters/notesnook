@@ -1,15 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Platform, View } from 'react-native';
+import { Platform } from 'react-native';
 import { enabled } from 'react-native-privacy-snapshot';
 import ToggleSwitch from 'toggle-switch-react-native';
-import BaseDialog from '../../components/Dialog/base-dialog';
-import DialogButtons from '../../components/Dialog/dialog-buttons';
-import DialogContainer from '../../components/Dialog/dialog-container';
-import DialogHeader from '../../components/Dialog/dialog-header';
-import { PressableButton } from '../../components/PressableButton';
-import Seperator from '../../components/Seperator';
-import Heading from '../../components/Typography/Heading';
-import Paragraph from '../../components/Typography/Paragraph';
 import { useTracked } from '../../provider';
 import { useSettingStore, useUserStore } from '../../provider/stores';
 import BiometricService from '../../services/BiometricService';
@@ -18,7 +10,7 @@ import PremiumService from '../../services/PremiumService';
 import SettingsService from '../../services/SettingsService';
 import { AndroidModule, InteractionManager } from '../../utils';
 import { db } from '../../utils/database';
-import { SIZE } from '../../utils/SizeUtils';
+import AppLock from './app-lock';
 import { CustomButton } from './button';
 import SectionHeader from './section-header';
 
@@ -27,7 +19,6 @@ const SettingsPrivacyAndSecurity = () => {
   const { colors } = state;
   const settings = useSettingStore(state => state.settings);
   const [collapsed, setCollapsed] = useState(true);
-  const [appLockVisible, setAppLockVisible] = useState(false);
   const user = useUserStore(state => state.user);
   const [vaultStatus, setVaultStatus] = React.useState({
     exists: false,
@@ -58,24 +49,6 @@ const SettingsPrivacyAndSecurity = () => {
     };
   }, [collapsed]);
 
-  const modes = [
-    {
-      title: 'None',
-      value: 'none',
-      desc: 'Disable app lock. Notes can be accessed by anyone who opens the app'
-    },
-    {
-      title: 'Secure Mode',
-      value: 'launch',
-      desc: 'Locks app on launch and keeps it unlocked when you switch to other apps.'
-    },
-    {
-      title: 'Strict Mode',
-      value: 'background',
-      desc: 'Locks app on launch and also when you switch from other apps or background.'
-    }
-  ];
-
   const toggleBiometricUnlocking = () => {
     openVault({
       item: {},
@@ -93,72 +66,6 @@ const SettingsPrivacyAndSecurity = () => {
 
   return (
     <>
-      {appLockVisible && (
-        <BaseDialog
-          onRequestClose={() => {
-            setAppLockVisible(false);
-          }}
-          visible={true}
-        >
-          <DialogContainer height={450}>
-            <DialogHeader
-              title="App lock mode"
-              paragraph="Select the level of security you want to enable."
-              padding={12}
-            />
-            <Seperator />
-            <View
-              style={{
-                paddingHorizontal: 12
-              }}
-            >
-              {modes.map(item => (
-                <PressableButton
-                  key={item.title}
-                  type={settings.appLockMode === item.value ? 'grayBg' : 'transparent'}
-                  onPress={() => {
-                    SettingsService.set('appLockMode', item.value);
-                  }}
-                  customStyle={{
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    paddingHorizontal: 6,
-                    paddingVertical: 6,
-                    marginTop: 3,
-                    marginBottom: 3
-                  }}
-                  style={{
-                    marginBottom: 10
-                  }}
-                >
-                  <Heading
-                    color={settings.appLockMode === item.value ? colors.accent : colors.pri}
-                    style={{ maxWidth: '95%' }}
-                    size={SIZE.md}
-                  >
-                    {item.title}
-                  </Heading>
-                  <Paragraph
-                    color={settings.appLockMode === item.value ? colors.accent : colors.icon}
-                    style={{ maxWidth: '95%' }}
-                    size={SIZE.sm}
-                  >
-                    {item.desc}
-                  </Paragraph>
-                </PressableButton>
-              ))}
-            </View>
-
-            <DialogButtons
-              negativeTitle="Done"
-              onPressNegative={() => {
-                setAppLockVisible(false);
-              }}
-            />
-          </DialogContainer>
-        </BaseDialog>
-      )}
-
       <SectionHeader collapsed={collapsed} setCollapsed={setCollapsed} title="Privacy & security" />
       {collapsed ? null : (
         <>
@@ -217,7 +124,7 @@ const SettingsPrivacyAndSecurity = () => {
               title="App lock"
               tagline="Require biometrics to access your notes."
               onPress={() => {
-                setAppLockVisible(true);
+                AppLock.present();
               }}
               maxWidth="90%"
             />

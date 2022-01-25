@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Appearance, NativeModules, Platform, SafeAreaView } from 'react-native';
+import { NavigationBar } from 'react-native-bars';
 import RNBootSplash from 'react-native-bootsplash';
 import { checkVersion } from 'react-native-check-version';
 import Animated from 'react-native-reanimated';
