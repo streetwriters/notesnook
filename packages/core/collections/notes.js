@@ -59,11 +59,11 @@ export default class Notes extends Collection {
       });
 
       note.headline = getNoteHeadline(note, content);
-      note.dateEdited = Date.now();
+      if (oldNote) note.dateEdited = Date.now();
     }
 
     const noteTitle = getNoteTitle(note, oldNote);
-    if (!oldNote || oldNote.title !== noteTitle) note.dateEdited = Date.now();
+    if (oldNote && oldNote.title !== noteTitle) note.dateEdited = Date.now();
 
     note = {
       id,
