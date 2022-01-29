@@ -1,5 +1,13 @@
 import React, { useEffect } from 'react';
-import { AppState, KeyboardAvoidingView, SafeAreaView, TextInput, View } from 'react-native';
+import {
+  AppState,
+  KeyboardAvoidingView,
+  Platform,
+  SafeAreaView,
+  TextInput,
+  useWindowDimensions,
+  View
+} from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Editor from '.';
 import { PremiumToast } from '../../components/Premium/premium-toast';
@@ -54,7 +62,7 @@ export const EditorWrapper = ({ width }) => {
         }}
       >
         <KeyboardAvoidingView
-          behavior="padding"
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
           style={{
             width: '100%',
             height: '100%'
