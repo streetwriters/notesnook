@@ -96,6 +96,7 @@ const NativeStack = React.memo(
     const animatedOpacity = useValue(0);
     const animatedTranslateY = useValue(-9999);
     const overlayRef = useRef();
+    const initialLayoutCalled = useRef(false);
 
     const showFullScreenEditor = () => {
       setFullscreen(true);
@@ -161,7 +162,7 @@ const NativeStack = React.memo(
         width: size.width,
         height: size.height
       });
-
+      console.log('height change', size.width, size.height);
       setWidthHeight(size);
       DDS.setSize(size);
 
@@ -291,7 +292,10 @@ const NativeStack = React.memo(
       <View
         key="1"
         onLayout={() => {
-          tabBarRef.current?.goToIndex(1, false);
+          if (!initialLayoutCalled.current) {
+            tabBarRef.current?.goToIndex(1, false);
+            initialLayoutCalled.current = true;
+          }
         }}
         style={{
           height: '100%',
