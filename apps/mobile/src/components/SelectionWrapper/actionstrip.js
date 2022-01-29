@@ -149,8 +149,7 @@ export const ActionStrip = ({ note, setActionStrip }) => {
             description: 'Unlock note to copy to clipboard.'
           });
         } else {
-          let delta = await db.notes.note(note.id).content();
-          let text = toTXT(delta);
+          let text = toTXT(note);
           text = `${note.title}\n \n ${text}`;
           Clipboard.setString(text);
           ToastEvent.show({
