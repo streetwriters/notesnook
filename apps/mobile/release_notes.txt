@@ -1,6 +1,5 @@
-- Improved onboarding for new users
-- Improved app launch for better UX
-- Fixed clicking on some links in editor cause a crash
-- Fixed many bugs and improved performance
+- Fix editor closes after opening note/new note on some devices
+- Fix Keyboard padding issues on some devices
+- Fix copy note from quick actions on note not working.
 
 Thank you for using Notesnook!
