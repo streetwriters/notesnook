@@ -71,7 +71,7 @@
             android:configChanges="keyboard|keyboardHidden|orientation|screenSize|uiMode"
             android:label="@string/title_activity_share"
             android:noHistory="true"
-            android:screenOrientation="portrait"
+            android:screenOrientation="unspecified"
             android:exported="true"
             android:theme="@style/AppThemeB">
             <intent-filter android:label="Make Note">
