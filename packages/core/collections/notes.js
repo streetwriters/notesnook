@@ -84,7 +84,7 @@ export default class Notes extends Collection {
       conflicted: !!note.conflicted,
 
       dateCreated: note.dateCreated,
-      dateEdited: note.dateEdited,
+      dateEdited: note.dateEdited || note.dateCreated || Date.now(),
       dateModified: note.dateModified,
     };
 
