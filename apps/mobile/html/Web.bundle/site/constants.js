@@ -619,6 +619,7 @@ th {
   let node = `
   body {
     color: ${pageTheme.colors.pri};
+    font-family:"Open Sans";
   }
 
   h1,
@@ -626,8 +627,16 @@ th {
   h3,
   h4,
   h5,
-  h6 {
-    color: ${pageTheme.colors.heading}
+  h6,
+  strong {
+    color: ${pageTheme.colors.heading};
+    font-weight:600 !important;
+  }
+
+  img {
+    max-width:100% !important;
+    height:auto !important;
+    border-radius:5px !important;
   }
 
 	#titleInput {
@@ -1004,6 +1013,10 @@ code:not(pre code),
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
   font-size: 10pt !important;
+}
+
+a {
+  color: ${pageTheme.colors.accent} !important;
 }
 
 `;
