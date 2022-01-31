@@ -225,8 +225,8 @@ function Editor({ noteId, nonce }) {
             action={{
               text: "Restore this version",
               onClick: async () => {
-                await editorstore.get().saveSession();
                 await disablePreviewMode(false);
+                await editorstore.get().saveSession();
               },
             }}
           />
