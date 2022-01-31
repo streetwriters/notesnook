@@ -23,53 +23,53 @@ let pageTheme = {
 };
 
 const markdownPatterns = [
-  {start: '*', end: '*', format: 'italic'},
-  {start: '**', end: '**', format: 'bold'},
-  {start: '`', end: '`', format: 'code'},
-  {start: '#', format: 'h1'},
-  {start: '##', format: 'h2'},
-  {start: '###', format: 'h3'},
-  {start: '####', format: 'h4'},
-  {start: '#####', format: 'h5'},
-  {start: '######', format: 'h6'},
-  {start: '* ', cmd: 'InsertUnorderedList'},
-  {start: '- [ ] ', cmd: 'insertCheckList'},
-  {start: '- [x] ', cmd: 'insertCheckList', value: 'checked'},
-  {start: '- ', cmd: 'InsertUnorderedList'},
-  {start: '> ', format: 'blockquote'},
+  { start: '*', end: '*', format: 'italic' },
+  { start: '**', end: '**', format: 'bold' },
+  { start: '`', end: '`', format: 'code' },
+  { start: '#', format: 'h1' },
+  { start: '##', format: 'h2' },
+  { start: '###', format: 'h3' },
+  { start: '####', format: 'h4' },
+  { start: '#####', format: 'h5' },
+  { start: '######', format: 'h6' },
+  { start: '* ', cmd: 'InsertUnorderedList' },
+  { start: '- [ ] ', cmd: 'insertCheckList' },
+  { start: '- [x] ', cmd: 'insertCheckList', value: 'checked' },
+  { start: '- ', cmd: 'InsertUnorderedList' },
+  { start: '> ', format: 'blockquote' },
   {
     start: '1. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'decimal'}
+    value: { 'list-style-type': 'decimal' }
   },
   {
     start: '1) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'decimal'}
+    value: { 'list-style-type': 'decimal' }
   },
   {
     start: 'a. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-alpha'}
+    value: { 'list-style-type': 'lower-alpha' }
   },
   {
     start: 'a) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-alpha'}
+    value: { 'list-style-type': 'lower-alpha' }
   },
   {
     start: 'i. ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-roman'}
+    value: { 'list-style-type': 'lower-roman' }
   },
   {
     start: 'i) ',
     cmd: 'InsertOrderedList',
-    value: {'list-style-type': 'lower-roman'}
+    value: { 'list-style-type': 'lower-roman' }
   },
-  {start: '---', replacement: '<hr/>'},
-  {start: '--', replacement: '—'},
-  {start: '(c)', replacement: '©'}
+  { start: '---', replacement: '<hr/>' },
+  { start: '--', replacement: '—' },
+  { start: '(c)', replacement: '©' }
 ];
 
 function dark() {
@@ -79,18 +79,10 @@ function dark() {
   }
   if (!globalThis.tinymce) return;
   if (!tinymce.activeEditor) return;
-  tinymce.activeEditor.dom.styleSheetLoader.unload(
-    'dist/skins/notesnook/content.min.css'
-  );
-  tinymce.activeEditor.dom.styleSheetLoader.load(
-    'dist/skins/notesnook-dark/content.min.css'
-  );
-  tinymce.activeEditor.ui.styleSheetLoader.unload(
-    'dist/skins/notesnook/skin.min.css'
-  );
-  tinymce.activeEditor.ui.styleSheetLoader.load(
-    'dist/skins/notesnook-dark/skin.min.css'
-  );
+  tinymce.activeEditor.dom.styleSheetLoader.unload('dist/skins/notesnook/content.min.css');
+  tinymce.activeEditor.dom.styleSheetLoader.load('dist/skins/notesnook-dark/content.min.css');
+  tinymce.activeEditor.ui.styleSheetLoader.unload('dist/skins/notesnook/skin.min.css');
+  tinymce.activeEditor.ui.styleSheetLoader.load('dist/skins/notesnook-dark/skin.min.css');
 }
 
 function light() {
@@ -100,18 +92,10 @@ function light() {
   }
   if (!globalThis.tinymce) return;
   if (!tinymce.activeEditor) return;
-  tinymce.activeEditor.dom.styleSheetLoader.unload(
-    'dist/skins/notesnook-dark/content.min.css'
-  );
-  tinymce.activeEditor.dom.styleSheetLoader.load(
-    'dist/skins/notesnook/content.min.css'
-  );
-  tinymce.activeEditor.ui.styleSheetLoader.unload(
-    'dist/skins/notesnook-dark/skin.min.css'
-  );
-  tinymce.activeEditor.ui.styleSheetLoader.load(
-    'dist/skins/notesnook/skin.min.css'
-  );
+  tinymce.activeEditor.dom.styleSheetLoader.unload('dist/skins/notesnook-dark/content.min.css');
+  tinymce.activeEditor.dom.styleSheetLoader.load('dist/skins/notesnook/content.min.css');
+  tinymce.activeEditor.ui.styleSheetLoader.unload('dist/skins/notesnook-dark/skin.min.css');
+  tinymce.activeEditor.ui.styleSheetLoader.load('dist/skins/notesnook/skin.min.css');
 }
 
 const codeblock_theme_light = `
@@ -1000,19 +984,23 @@ table[data-mce-selected]
   border-right: 1px solid ${pageTheme.colors.accent + 'B3'} !important;
 }
 
-
-
 table[data-mce-selected] td[data-mce-active],
 table[data-mce-selected] th[data-mce-active] {
   border: 2px solid ${pageTheme.colors.accent + 'B3'} !important;
   background-color: ${pageTheme.colors.shade};
 }
 
+ code[data-mce-selected="inline-boundary"]:not(pre code),
+.hljs[data-mce-selected="inline-boundary"] {
+  background-color: ${pageTheme.colors.nav} !important;
+}
+
+code:not(pre code),
 .hljs {
   background-color: ${pageTheme.colors.nav} !important;
   border: 1px solid ${pageTheme.colors.border} !important;
-  border-radius: 5px;
-  padding: 3px 5px 0px 5px;
+  border-radius: 5px !important;
+  padding: 3px 5px 0px 5px !important;
   font-family: ui-monospace, SFMono-Regular, SF Mono, Consolas, Liberation Mono,
     Menlo, monospace !important;
   font-size: 10pt !important;

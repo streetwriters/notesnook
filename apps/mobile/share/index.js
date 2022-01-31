@@ -1,7 +1,7 @@
 import Clipboard from '@react-native-clipboard/clipboard';
-import absolutify from 'absolutify';
+import { getLinkPreview } from 'link-preview-js';
+import { HTMLRootElement } from 'node-html-parser/dist/nodes/html';
 import React, { useEffect, useRef, useState } from 'react';
-import { ScrollView } from 'react-native';
 import {
   ActivityIndicator,
   Alert,
@@ -9,6 +9,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   SafeAreaView,
+  ScrollView,
   StatusBar,
   Text,
   TouchableOpacity,
@@ -20,6 +21,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import WebView from 'react-native-webview';
 import ShareExtension from 'rn-extensions-share';
+import isURL from 'validator/lib/isURL';
 import { eSendEvent, eSubscribeEvent, eUnSubscribeEvent } from '../src/services/EventManager';
 import { getElevation } from '../src/utils';
 import { db } from '../src/utils/database';
@@ -27,8 +29,6 @@ import Storage from '../src/utils/storage';
 import { sleep } from '../src/utils/TimeUtils';
 import { Search } from './search';
 import { useShareStore } from './store';
-import isURL from 'validator/lib/isURL';
-import { getLinkPreview } from 'link-preview-js';
 
 const AnimatedKAV = Animated.createAnimatedComponent(KeyboardAvoidingView);
 const AnimatedSAV = Animated.createAnimatedComponent(SafeAreaView);
@@ -36,11 +36,7 @@ async function sanitizeHtml(site) {
   try {
     let html = await fetch(site);
     html = await html.text();
-    let siteHtml = html.replace(
-      /(?:<(script|button|input|textarea|style|link|head)(?:\s[^>]*)?>)\s*((?:(?!<\1)[\s\S])*)\s*(?:<\/\1>)/g,
-      ''
-    );
-    return absolutify(siteHtml, site);
+    return sanitize(html, site);
   } catch (e) {
     return '';
   }
@@ -63,14 +59,65 @@ function getBaseUrl(site) {
   var url = site.split('/').slice(0, 3).join('/');
   return url;
 }
-function absolutifyImgs(html, site) {
-  let { parse } = require('node-html-parser');
-  let parser = parse(html);
 
-  let images = parser.querySelectorAll('img');
+/**
+ *
+ * @param {HTMLRootElement} document
+ */
+function wrapTablesWithDiv(document) {
+  const tables = document.getElementsByTagName('table');
+  for (let table of tables) {
+    table.setAttribute('contenteditable', 'true');
+    const div = document.createElement('div');
+    div.setAttribute('contenteditable', 'false');
+    div.innerHTML = table.outerHTML;
+    div.classList.add('table-container');
+    table.replaceWith(div);
+  }
+  return document;
+}
+
+let elementBlacklist = [
+  'script',
+  'button',
+  'input',
+  'textarea',
+  'style',
+  'form',
+  'link',
+  'head',
+  'nav',
+  'iframe',
+  'canvas',
+  'select',
+  'dialog',
+  'footer'
+];
+
+/**
+ *
+ * @param {HTMLRootElement} document
+ */
+function removeInvalidElements(document) {
+  let elements = document.querySelectorAll(elementBlacklist.join(','));
+  for (let element of elements) {
+    element.remove();
+  }
+  return document;
+}
+
+/**
+ *
+ * @param {HTMLRootElement} document
+ */
+function replaceSrcWithAbsoluteUrls(document, baseUrl) {
+  console.log('parsing:', document);
+
+  let images = document.querySelectorAll('img');
+  console.log(images.length);
   for (var i = 0; i < images.length; i++) {
     let img = images[i];
-    let url = getBaseUrl(site);
+    let url = getBaseUrl(baseUrl);
     let src = img.getAttribute('src');
     if (src.startsWith('/')) {
       if (src.startsWith('//')) {
@@ -80,10 +127,36 @@ function absolutifyImgs(html, site) {
       }
     }
     if (src.startsWith('data:')) {
-      src = '';
+      img.remove();
+    } else {
+      img.setAttribute('src', src);
     }
-    img.setAttribute('src', src);
   }
+  console.log('end');
+  return document;
+}
+
+/**
+ *
+ * @param {HTMLRootElement} document
+ */
+function fixCodeBlocks(document) {
+  let elements = document.querySelectorAll('code,pre');
+  console.log(elements.length);
+  for (let element of elements) {
+    element.classList.add('.hljs');
+  }
+  return document;
+}
+
+function sanitize(html, baseUrl) {
+  let { parse } = require('node-html-parser');
+  let parser = parse(html);
+  parser = wrapTablesWithDiv(parser);
+  parser = removeInvalidElements(parser);
+  parser = replaceSrcWithAbsoluteUrls(parser, baseUrl);
+  parser = fixCodeBlocks(parser);
+
   return parser.outerHTML;
 }
 
@@ -246,19 +319,25 @@ const NotesnookShare = ({ quicknote = false }) => {
 
   const onLoad = () => {
     postMessage(webviewRef, 'htmldiff', note.content?.data || '');
+    console.log('on load');
     setTimeout(() => {
-      webviewRef.current?.injectJavaScript(`document
-      .querySelector('.htmldiff_div')
-      .setAttribute('contenteditable', 'true');`);
-      webviewRef.current?.injectJavaScript(`
-      pageTheme.colors = ${theme};
-      setTheme();
-    `);
-    }, 300);
-    let theme = { ...colors };
-    theme.factor = 1;
+      let theme = { ...colors };
+      theme.factor = 1;
 
-    postMessage(webviewRef, 'theme', JSON.stringify(theme));
+      webviewRef.current?.injectJavaScript(`
+        document.querySelector('.htmldiff_div').setAttribute('contenteditable', 'true');`);
+
+      webviewRef.current?.injectJavaScript(`(function() {
+        try { 
+          pageTheme.colors = ${JSON.stringify(theme)};
+          setTheme();
+        } catch(e) {
+          console.log(e);
+        }
+      })();
+      
+      `);
+    }, 300);
   };
 
   function postMessage(webview, type, value = null) {
@@ -353,7 +432,6 @@ const NotesnookShare = ({ quicknote = false }) => {
     try {
       if (m === 2) {
         let html = await sanitizeHtml(rawData.value);
-        html = await absolutifyImgs(html, rawData.value);
         setNote(note => {
           note.content.data = html;
           return { ...note };
