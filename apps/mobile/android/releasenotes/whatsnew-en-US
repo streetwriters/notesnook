@@ -1,5 +1,5 @@
-- Fix editor closes after opening note/new note on some devices
-- Fix Keyboard padding issues on some devices
-- Fix copy note from quick actions on note not working.
+- Fixed app hangs and becomes unusable on some phones
+- Improved web clipper in widget to handle tables & codeblocks and remove invalid elements
+- Disable swipe to close gesture in editor as it interferes with editing or scrolling.
 
 Thank you for using Notesnook!

@@ -67,7 +67,13 @@ export const Properties = ({ close = () => {}, item, buttons = [], getRef }) => 
             </Heading>
 
             {item.headline || item.description ? (
-              <Paragraph numberOfLines={2} color={colors.icon}>
+              <Paragraph
+                style={{
+                  marginBottom: 5
+                }}
+                numberOfLines={2}
+                color={colors.icon}
+              >
                 {(item.type === 'notebook' || item.itemType === 'notebook') && item?.description
                   ? item.description
                   : null}
