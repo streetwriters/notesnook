@@ -27,14 +27,14 @@ export default class CustomTabs extends Component {
   onMoveShouldSetResponder = event => {
     if (this.responderAllowedScroll) return;
     this.lastOffset = this.scrollOffset;
-    let x = event.nativeEvent.pageX;
-    let y = event.nativeEvent.pageY;
+    // let x = event.nativeEvent.pageX;
+    // let y = event.nativeEvent.pageY;
     this.hideKeyboardIfVisible();
     let cOffset = this.scrollOffset.toFixed(0);
     let pOffset = this.props.offsets.b.toFixed(0);
-    let heightCheck = !editing.tooltip
-      ? this.props.dimensions.height - 70
-      : this.props.dimensions.height - 140;
+    // let heightCheck = !editing.tooltip
+    //   ? this.props.dimensions.height - 70
+    //   : this.props.dimensions.height - 140;
 
     if (DDS.isLargeTablet()) {
       this.setScrollEnabled(false);
@@ -43,19 +43,19 @@ export default class CustomTabs extends Component {
     }
 
     if (cOffset > pOffset - 50 || DDS.isSmallTab) {
-      if (
-        (!DDS.isSmallTab && x > 50) ||
-        y > heightCheck ||
-        (DDS.isSmallTab && x > this.props.widths.b)
-      ) {
-        this.responderAllowedScroll = false;
-        this.setScrollEnabled(false);
-        return;
-      } else {
-        this.responderAllowedScroll = true;
-        this.setScrollEnabled(true);
-        return;
-      }
+      // if (
+      //   (!DDS.isSmallTab && x > 50) ||
+      //   y > heightCheck ||
+      //   (DDS.isSmallTab && x > this.props.widths.b)
+      // ) {
+      this.responderAllowedScroll = false;
+      this.setScrollEnabled(false);
+      return;
+      // } else {
+      //   this.responderAllowedScroll = true;
+      //   this.setScrollEnabled(true);
+      //   return;
+      // }
     }
     this.responderAllowedScroll = true;
   };
