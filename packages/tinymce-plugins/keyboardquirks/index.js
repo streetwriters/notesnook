@@ -185,18 +185,14 @@ function androidGboardEnterKeyQuirk(editor) {
       e.preventDefault();
 
       const range = editor.selection.getRng();
+      if (!range.startContainer) return;
 
-      let sibling;
-      let parentElement = range.startContainer.parentElement;
+      let closestParagraph = range.startContainer.parentElement.closest("p");
+      if (!closestParagraph) return;
 
-      while (
-        parentElement.parentElement &&
-        !parentElement.parentElement.classList.contains("mce-content-body")
-      ) {
-        parentElement = parentElement.parentElement;
-      }
-      sibling = parentElement.nextElementSibling;
+      const sibling = closestParagraph.nextElementSibling;
       if (!sibling) return;
+
       editor.selection.setCursorLocation(sibling, 0);
     }
   });
