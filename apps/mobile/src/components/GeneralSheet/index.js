@@ -44,7 +44,6 @@ const GeneralSheet = ({ context = 'global' }) => {
     }
     setDialogData(data);
     setVisible(true);
-    console.log('calling open now');
     if (data.editor) {
       editor.current.refocus = false;
       if (editing.keyboardState) {

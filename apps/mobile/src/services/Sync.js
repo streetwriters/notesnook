@@ -43,7 +43,7 @@ const run = async (context = 'global', forced) => {
           heading: 'Sync failed',
           message: e.message,
           context: context,
-          actionText: 'Copy log',
+          actionText: 'Copy logs',
           func: () => {
             if (errorStack) {
               Clipboard.setString(errorStack);

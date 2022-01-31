@@ -1,4 +1,5 @@
 const { MMKV } = require('../utils/MMKV');
+import Clipboard from '@react-native-clipboard/clipboard';
 import { Platform } from 'react-native';
 import FileViewer from 'react-native-file-viewer';
 import * as ScopedStorage from 'react-native-scoped-storage';
@@ -79,8 +80,9 @@ async function run() {
   let error;
   try {
     backup = await db.backup.export('mobile', SettingsService.get().encryptedBackup);
+    if (!backup) throw new Error(`Backup returned empty.`);
   } catch (e) {
-    error = true;
+    error = e;
   }
 
   if (!error) {
@@ -155,7 +157,16 @@ async function run() {
         heading: 'Backup failed',
         message: e.message,
         type: 'error',
-        context: 'global'
+        context: 'global',
+        actionText: 'Copy logs',
+        func: () => {
+          Clipboard.setString(e.stack);
+          ToastEvent.show({
+            heading: 'Logs copied!',
+            type: 'success',
+            context: 'global'
+          });
+        }
       });
     }
   } else {
@@ -163,8 +174,18 @@ async function run() {
     eSendEvent(eCloseProgressDialog);
     ToastEvent.show({
       heading: 'Backup failed',
+      message: error?.message || '',
       type: 'error',
-      context: 'global'
+      context: 'global',
+      actionText: 'Copy logs',
+      func: () => {
+        Clipboard.setString(error.stack);
+        ToastEvent.show({
+          heading: 'Logs copied!',
+          type: 'success',
+          context: 'global'
+        });
+      }
     });
 
     return null;

@@ -105,12 +105,6 @@ const AppLoader = ({ onLoad }) => {
         }
 
         if (await checkAppUpdateAvailable()) return;
-
-        let settingsStore = useSettingStore.getState();
-        if (await Backup.checkBackupRequired(settingsStore.settings.reminder)) {
-          await Backup.checkAndRun();
-          return;
-        }
         if (await checkForRateAppRequest()) return;
         if (await checkNeedsBackup()) return;
         if (await PremiumService.getRemainingTrialDaysStatus()) return;
