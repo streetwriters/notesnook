@@ -57,7 +57,8 @@ export const Dialog = ({ context = 'global' }) => {
   };
 
   const show = data => {
-    if (data.context && data.context !== context) return;
+    if (!data.context) data.context = 'global';
+    if (data.context !== context) return;
     setDialogInfo(data);
     setVisible(true);
   };

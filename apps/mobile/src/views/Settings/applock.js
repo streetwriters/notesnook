@@ -17,11 +17,11 @@ import { Button } from '../../components/Button';
 import { getElevation } from '../../utils';
 import umami from '../../utils/umami';
 
-const AppLock = ({ welcome }) => {
+const AppLock = ({ welcome, s = 0 }) => {
   const [state] = useTracked();
   const { colors } = state;
   const settings = useSettingStore(state => state.settings);
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(s);
 
   const modes = [
     {
@@ -164,9 +164,8 @@ const AppLock = ({ welcome }) => {
 AppLock.present = async isWelcome => {
   let available = await BiometricService.isBiometryAvailable();
   let user = await db.user.getUser();
-  if (!available && !user) return;
   presentSheet({
-    component: <AppLock welcome={isWelcome} />
+    component: <AppLock welcome={isWelcome} s={!available && !user ? 1 : 0} />
   });
 };
 

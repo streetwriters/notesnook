@@ -15,7 +15,7 @@ import SheetWrapper from '../Sheet';
 import Heading from '../Typography/Heading';
 import Paragraph from '../Typography/Paragraph';
 
-const GeneralSheet = ({ context }) => {
+const GeneralSheet = ({ context = 'global' }) => {
   const [state] = useTracked();
   const { colors } = state;
   const [visible, setVisible] = useState(false);
@@ -35,9 +35,8 @@ const GeneralSheet = ({ context }) => {
   }, [visible]);
 
   const open = async data => {
-    if ((data.context && !context) || (data.context && data.context !== context)) {
-      return;
-    }
+    if (!data.context) data.context = 'global';
+    if (data.context !== context) return;
     if (visible || dialogData) {
       setDialogData(null);
       setVisible(false);
@@ -45,6 +44,7 @@ const GeneralSheet = ({ context }) => {
     }
     setDialogData(data);
     setVisible(true);
+    console.log('calling open now');
     if (data.editor) {
       editor.current.refocus = false;
       if (editing.keyboardState) {
