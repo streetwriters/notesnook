@@ -395,12 +395,12 @@ span.attachment em::before {
 }
 
 .mce-content-body code[data-mce-selected="inline-boundary"]:not(pre code),
-.hljs[data-mce-selected="inline-boundary"] {
+.hljs[data-mce-selected="inline-boundary"]:not(pre code) {
   background-color: ${pageTheme.colors.nav} !important;
 }
 
 .mce-content-body code:not(pre code),
-.hljs {
+.hljs:not(pre code) {
   background-color: ${pageTheme.colors.nav} !important;
   border: 1px solid ${pageTheme.colors.border} !important;
   border-radius: 5px !important;
@@ -594,6 +594,12 @@ th {
 .mce-content-body table[data-mce-selected] th[data-mce-active] {
   border: 2px solid ${pageTheme.colors.accent + 'B3'} !important;
   background-color: ${pageTheme.colors.shade};
+}
+
+pre code {
+  background-color: transparent !important;
+  font-size: 10pt !important;
+  padding: 0px 0px 0px 0px !important;
 }
 
 `;

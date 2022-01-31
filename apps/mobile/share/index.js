@@ -157,7 +157,11 @@ function sanitize(html, baseUrl) {
   parser = replaceSrcWithAbsoluteUrls(parser, baseUrl);
   parser = fixCodeBlocks(parser);
 
-  return parser.outerHTML;
+  let htmlString = parser.outerHTML;
+
+  htmlString = htmlString + `<hr>${makeHtmlFromUrl(baseUrl)}`;
+
+  return htmlString;
 }
 
 let defaultNote = {
