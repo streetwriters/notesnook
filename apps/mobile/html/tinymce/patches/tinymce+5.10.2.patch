@@ -112,3 +112,29 @@ index 4cdbfce..464b5fd 100644
          if (checkCharCode(charCodes, e)) {
            global$4.setEditorTimeout(editor, function () {
              handleInlineKey(editor, patternsState.get());     
+--- a/node_modules/tinymce/tinymce.js
++++ b/node_modules/tinymce/tinymce.js
+@@ -24894,6 +24894,9 @@
+     var inPreBlock = function (requiredState) {
+       return inBlock('pre', requiredState);
+     };
++    var inTableCell = function (requiredState) {
++      return inBlock('td', requiredState) || inBlock('th', requiredState);
++    };
+     var inSummaryBlock = function () {
+       return inBlock('summary', true);
+     };
+@@ -24925,6 +24928,13 @@
+       return evaluateUntil([
+         match([shouldBlockNewLine], newLineAction.none()),
+         match([inSummaryBlock()], newLineAction.br()),
++        match([
++          inTableCell(true),
++          hasShiftKey
++        ], newLineAction.br()),
++        match([
++          inTableCell(true)
++        ], newLineAction.br()),
+         match([
+           inPreBlock(true),
+           shouldPutBrInPre(false), 
