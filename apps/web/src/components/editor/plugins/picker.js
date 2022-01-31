@@ -37,7 +37,7 @@ async function insertAttachment(editor, type) {
     acceptedFileTypes: type || "*/*",
   });
 
-  attachFile(editor,selectedFile);
+  await attachFile(editor, selectedFile);
 }
 
 export async function attachFile(editor, selectedFile) {
@@ -47,6 +47,7 @@ export async function attachFile(editor, selectedFile) {
   }
   if (selectedFile.type.startsWith("image/")) {
     const image = await pickImage(selectedFile);
+    console.log(image);
     editor.execCommand("mceAttachImage", image);
   } else {
     const file = await pickFile(selectedFile);
@@ -68,54 +69,7 @@ async function pickFile(selectedFile) {
       throw new Error("File too big. You cannot add files over 500 MB.");
     if (!selectedFile) return;
 
-    const result = await showProgressDialog({
-      title: `Encrypting attachment`,
-      subtitle: "Please wait while we encrypt this attachment for upload.",
-      message: selectedFile.name,
-      total: formatBytes(selectedFile.size, 0),
-      setProgress: (set) => {
-        const event = AppEventManager.subscribe(
-          AppEvents.UPDATE_ATTACHMENT_PROGRESS,
-          ({ type, total, loaded }) => {
-            if (type !== "encrypt") return;
-
-            const percent = Math.round((loaded / total) * 100);
-            set({ loaded: formatBytes(loaded, 0), progress: percent });
-          }
-        );
-        return () => {
-          event.unsubscribe();
-        };
-      },
-      action: async () => {
-        const key = await getEncryptionKey();
-
-        const reader = selectedFile.stream().getReader();
-        const { hash, type: hashType } = await fs.hashStream(reader);
-        reader.releaseLock();
-
-        if (!db.attachments.exists(hash)) {
-          const output = await fs.writeEncryptedFile(selectedFile, key, hash);
-          await db.attachments.add({
-            ...output,
-            hash,
-            hashType,
-            filename: selectedFile.name,
-            type: selectedFile.type,
-            key,
-          });
-        }
-
-        return {
-          hash: hash,
-          filename: selectedFile.name,
-          type: selectedFile.type,
-          size: selectedFile.size,
-        };
-      },
-    });
-    if (result instanceof Error) throw result;
-    return result;
+    return await addAttachment(selectedFile);
   } catch (e) {
     showToast("error", `${e.message}`);
   }
@@ -131,33 +85,8 @@ async function pickImage(selectedImage) {
       throw new Error("Image too big. You cannot add images over 50 MB.");
     if (!selectedImage) return;
 
-    const key = await getEncryptionKey();
-
-    const { dataurl, blob } = await compressImage(selectedImage, "buffer");
-
-    const reader = blob.stream().getReader();
-    const { hash, type: hashType } = await fs.hashStream(reader);
-    reader.releaseLock();
-
-    if (!db.attachments.exists(hash)) {
-      const output = await fs.writeEncryptedFile(blob, key, hash);
-      await db.attachments.add({
-        ...output,
-        key,
-        hash,
-        hashType,
-        filename: selectedImage.name,
-        type: selectedImage.type,
-      });
-    }
-
-    return {
-      hash,
-      filename: selectedImage.name,
-      type: selectedImage.type,
-      size: selectedImage.size,
-      dataurl,
-    };
+    const { dataurl, file } = await compressImage(selectedImage, "buffer");
+    return await addAttachment(file, dataurl);
   } catch (e) {
     showToast("error", e.message);
   }
@@ -166,7 +95,7 @@ async function pickImage(selectedImage) {
 async function getEncryptionKey() {
   const key = await db.attachments.generateKey();
   if (!key) throw new Error("Could not generate a new encryption key.");
-  return key; // { password: "helloworld" };
+  return key;
 }
 
 /**
@@ -191,9 +120,9 @@ function showFilePicker({ acceptedFileTypes }) {
  *
  * @param {File} file
  * @param {"base64"|"buffer"} type
- * @returns {Promise<Blob>}
+ * @returns
  */
-function compressImage(file, type) {
+function compressImage(file) {
   return new Promise((resolve, reject) => {
     new Compressor(file, {
       quality: 0.8,
@@ -209,7 +138,10 @@ function compressImage(file, type) {
         const base64 = Buffer.from(buffer).toString("base64");
         resolve({
           dataurl: `data:${file.type};base64,${base64}`,
-          blob: result,
+          file: new File([result], file.name, {
+            lastModified: file.lastModified,
+            type: file.type,
+          }),
         });
       },
       error(err) {
@@ -217,4 +149,65 @@ function compressImage(file, type) {
       },
     });
   });
+}
+
+/**
+ *
+ * @param {File} file
+ * @param {string} dataurl
+ * @returns
+ */
+async function addAttachment(file, dataurl) {
+  const result = await showProgressDialog({
+    title: `Encrypting attachment`,
+    subtitle: "Please wait while we encrypt this attachment for upload.",
+    message: file.name,
+    total: formatBytes(file.size, 0),
+    setProgress: (set) => {
+      const event = AppEventManager.subscribe(
+        AppEvents.UPDATE_ATTACHMENT_PROGRESS,
+        ({ type, total, loaded }) => {
+          if (type !== "encrypt") return;
+
+          const percent = Math.round((loaded / total) * 100);
+          set({ loaded: formatBytes(loaded, 0), progress: percent });
+        }
+      );
+      return () => {
+        event.unsubscribe();
+      };
+    },
+    action: async () => {
+      const key = await getEncryptionKey();
+
+      const reader = file.stream().getReader();
+      const { hash, type: hashType } = await fs.hashStream(reader);
+      reader.releaseLock();
+
+      if (!db.attachments.exists(hash)) {
+        const output = await fs.writeEncryptedFile(file, key, hash);
+        if (!output) throw new Error("Could not encrypt file.");
+
+        await db.attachments.add({
+          ...output,
+          hash,
+          hashType,
+          filename: file.name,
+          type: file.type,
+          key,
+        });
+      }
+
+      return {
+        hash: hash,
+        filename: file.name,
+        type: file.type,
+        size: file.size,
+        dataurl,
+      };
+    },
+  });
+  console.log(file, dataurl, result);
+  if (result instanceof Error) throw result;
+  return result;
 }
