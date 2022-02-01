@@ -295,7 +295,7 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
                     eSendEvent(eOpenLoginDialog, 1);
                   }, 400);
                 }}
-                title={'Try free for 14 days'}
+                title={`Sign up for free`}
                 type="accent"
                 style={{
                   paddingHorizontal: 24,
@@ -361,27 +361,13 @@ export const PricingPlans = ({ promo, marginTop, heading = true, compact = false
           style={{
             alignSelf: 'center',
             textAlign: 'center',
-            marginTop: 10
+            marginTop: 10,
+            maxWidth: '80%'
           }}
         >
-          Upon signing up, your 14 day free trial of Notesnook Pro will be activated automatically.{' '}
+          Your 14 day free trial will activate when you sign up.{' '}
           <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
-            No credit card information is required.
-          </Paragraph>{' '}
-          Once the free trial period ends, your account will be downgraded to basic free account.{' '}
-          <Paragraph
-            size={SIZE.xs}
-            onPress={() => {
-              openLinkInBrowser('https://notesnook.com/#pricing', colors)
-                .catch(e => {})
-                .then(r => {
-                  console.log('closed');
-                });
-            }}
-            color={colors.accent}
-            style={{ fontWeight: 'bold', textDecorationLine: 'underline' }}
-          >
-            Visit our website to learn what is included in the basic free account.
+            No credit card is required.
           </Paragraph>
         </Paragraph>
       ) : null}

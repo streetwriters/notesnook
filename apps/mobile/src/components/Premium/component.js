@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { ScrollView, View } from 'react-native';
+import PremiumService from '../../services/PremiumService';
 import { LAUNCH_ROCKET } from '../../assets/images/assets';
 import { useTracked } from '../../provider';
 import { useUserStore } from '../../provider/stores';
@@ -115,6 +116,16 @@ export const Component = ({ close, promo, getRef }) => {
             Pro
           </Heading>
         </Heading>
+
+        <Paragraph
+          style={{
+            alignSelf: 'center',
+            marginBottom: 20
+          }}
+          size={SIZE.md}
+        >
+          ({PremiumService.getMontlySub().localizedPrice} / mo)
+        </Paragraph>
         <Paragraph
           key="description"
           size={SIZE.md}
@@ -132,7 +143,7 @@ export const Component = ({ close, promo, getRef }) => {
         <Button
           key="calltoaction"
           onPress={onPress}
-          title={promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'}
+          title={promo ? promo.text : user ? `See all plans` : `Sign up for free`}
           type="accent"
           style={{
             paddingHorizontal: 24,
@@ -140,7 +151,25 @@ export const Component = ({ close, promo, getRef }) => {
           }}
         />
 
-        <Seperator key="seperator" />
+        {!user ? (
+          <Paragraph
+            color={colors.icon}
+            size={SIZE.xs}
+            style={{
+              alignSelf: 'center',
+              textAlign: 'center',
+              marginTop: 10,
+              maxWidth: '80%'
+            }}
+          >
+            Your 14 day free trial will activate when you sign up.{' '}
+            <Paragraph size={SIZE.xs} style={{ fontWeight: 'bold' }}>
+              No credit card is required.
+            </Paragraph>
+          </Paragraph>
+        ) : null}
+
+        <Seperator key="seperator_1" />
 
         {features.map((item, index) => (
           <Group key={item.title} item={item} index={index} />
@@ -159,7 +188,7 @@ export const Component = ({ close, promo, getRef }) => {
       {floatingButton ? (
         <Button
           onPress={onPress}
-          title={promo ? promo.text : user ? `See all plans` : 'Try free for 14 days'}
+          title={promo ? promo.text : user ? `See all plans` : 'Sign up for free'}
           type="accent"
           style={{
             paddingHorizontal: 24,

@@ -550,10 +550,11 @@ const LoginDialog = () => {
             }}
           >
             <Icon size={20} style={{ marginRight: 10 }} name="information" color={colors.accent} />
-            <Paragraph style={{ maxWidth: '90%' }} color={colors.accent}>
-              When you sign up, your{' '}
-              <Text style={{ fontWeight: 'bold' }}>14 day free trial of Notesnook Pro</Text> will be
-              activated.
+            <Paragraph size={SIZE.xs + 1} style={{ maxWidth: '90%' }} color={colors.accent}>
+              Your 14 day free trial of Notesnook Pro will activate when you sign up.{' '}
+              <Paragraph size={SIZE.xs + 1} color={colors.accent} style={{ fontWeight: 'bold' }}>
+                No credit card is required.
+              </Paragraph>
             </Paragraph>
           </View>
         )}
